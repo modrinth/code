@@ -10,7 +10,7 @@ import {
 import { handleError } from '@/store/notifications.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import { install as packInstall } from '@/helpers/pack.js'
-import { mixpanel_track } from '@/helpers/mixpanel.js'
+import { trackEvent } from '@/helpers/analytics.js'
 import dayjs from 'dayjs'
 
 export const useInstall = defineStore('installStore', {
@@ -42,7 +42,7 @@ export const useInstall = defineStore('installStore', {
 })
 
 export const install = async (projectId, versionId, instancePath, source, callback = () => {}) => {
-  const project = await get_project(projectId).catch(handleError)
+  const project = await get_project(projectId, 'must_revalidate').catch(handleError)
 
   if (project.project_type === 'modpack') {
     const version = versionId ?? project.versions[project.versions.length - 1]
@@ -51,7 +51,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
     if (packs.length === 0 || !packs.find((pack) => pack.linked_data?.project_id === project.id)) {
       await packInstall(project.id, version, project.title, project.icon_url).catch(handleError)
 
-      mixpanel_track('PackInstall', {
+      trackEvent('PackInstall', {
         id: project.id,
         version_id: version,
         title: project.title,
@@ -68,7 +68,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
       const [instance, instanceProjects, versions] = await Promise.all([
         await get(instancePath).catch(handleError),
         await get_projects(instancePath).catch(handleError),
-        await get_version_many(project.versions),
+        await get_version_many(project.versions, 'must_revalidate'),
       ])
 
       const projectVersions = versions.sort(
@@ -107,7 +107,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
         await add_project_from_version(instance.path, version.id).catch(handleError)
         await installVersionDependencies(instance, version)
 
-        mixpanel_track('ProjectInstall', {
+        trackEvent('ProjectInstall', {
           loader: instance.loader,
           game_version: instance.game_version,
           id: project.id,
@@ -165,11 +165,11 @@ export const installVersionDependencies = async (profile, version) => {
       )
         continue
 
-      const depProject = await get_project(dep.project_id).catch(handleError)
+      const depProject = await get_project(dep.project_id, 'must_revalidate').catch(handleError)
 
-      const depVersions = (await get_version_many(depProject.versions).catch(handleError)).sort(
-        (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
-      )
+      const depVersions = (
+        await get_version_many(depProject.versions, 'must_revalidate').catch(handleError)
+      ).sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 
       const latest = depVersions.find(
         (v) => v.game_versions.includes(profile.game_version) && v.loaders.includes(profile.loader),

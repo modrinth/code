@@ -3,8 +3,6 @@
     windows_subsystem = "windows"
 )]
 
-use theseus::pack::install_from::{get_profile_from_pack, CreatePackLocation};
-use theseus::pack::install_mrpack::install_zipped_mrpack;
 use theseus::prelude::*;
 
 use theseus::profile::create::profile_create;
@@ -64,51 +62,33 @@ async fn main() -> theseus::Result<()> {
 
     println!("Creating/adding profile.");
 
-    // let name = "Example".to_string();
-    // let game_version = "1.21".to_string();
-    // let modloader = ModLoader::Fabric;
-    // let loader_version = "stable".to_string();
+    let name = "Example".to_string();
+    let game_version = "1.16.1".to_string();
+    let modloader = ModLoader::Forge;
+    let loader_version = "stable".to_string();
 
-    let pack = CreatePackLocation::FromVersionId {
-        project_id: "1KVo5zza".to_string(),
-        version_id: "lKloE8SA".to_string(),
-        title: "Fabulously Optimized".to_string(),
-        icon_url: Some("https://cdn.modrinth.com/data/1KVo5zza/d8152911f8fd5d7e9a8c499fe89045af81fe816e.png".to_string()),
-    };
-
-    let profile = get_profile_from_pack(pack.clone());
     let profile_path = profile_create(
-        profile.name,
-        profile.game_version,
-        profile.modloader,
-        profile.loader_version,
+        name,
+        game_version,
+        modloader,
+        Some(loader_version),
         None,
         None,
         None,
     )
     .await?;
-    install_zipped_mrpack(pack, profile_path.to_string()).await?;
-
-    let projects = profile::get_projects(&profile_path).await?;
-
-    for (path, file) in projects {
-        println!(
-            "{path} {} {:?} {:?}",
-            file.file_name, file.update_version_id, file.metadata
-        )
-    }
 
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process
     let process = profile::run(&profile_path).await?;
 
-    println!("Minecraft PID: {}", process.pid);
+    println!("Minecraft UUID: {}", process.uuid);
 
     println!("All running process UUID {:?}", process::get_all().await?);
 
     // hold the lock to the process until it ends
     println!("Waiting for process to end...");
-    process.wait_for().await?;
+    process::wait_for(process.uuid).await?;
 
     Ok(())
 }

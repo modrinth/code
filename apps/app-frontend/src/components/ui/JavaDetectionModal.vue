@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="detectJavaModal" header="Select java version" :noblur="!themeStore.advancedRendering">
+  <ModalWrapper ref="detectJavaModal" header="Select java version">
     <div class="auto-detect-modal">
       <div class="table">
         <div class="table-row table-head">
@@ -32,18 +32,16 @@
         </Button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 <script setup>
 import { PlusIcon, CheckIcon, XIcon } from '@modrinth/assets'
-import { Modal, Button } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { ref } from 'vue'
 import { find_filtered_jres } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { useTheming } from '@/store/theme.js'
-
-const themeStore = useTheming()
+import { trackEvent } from '@/helpers/analytics'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const chosenInstallOptions = ref([])
 const detectJavaModal = ref(null)
@@ -67,7 +65,7 @@ const emit = defineEmits(['submit'])
 function setJavaInstall(javaInstall) {
   emit('submit', javaInstall)
   detectJavaModal.value.hide()
-  mixpanel_track('JavaAutoDetect', {
+  trackEvent('JavaAutoDetect', {
     path: javaInstall.path,
     version: javaInstall.version,
   })

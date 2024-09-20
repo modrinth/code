@@ -16,6 +16,7 @@ pub mod settings;
 pub mod tags;
 pub mod utils;
 
+pub mod ads;
 pub mod cache;
 
 pub type Result<T> = std::result::Result<T, TheseusSerializableError>;
@@ -40,9 +41,9 @@ pub enum TheseusSerializableError {
     #[error("Tauri error: {0}")]
     Tauri(#[from] tauri::Error),
 
-    #[cfg(target_os = "macos")]
-    #[error("Callback error: {0}")]
-    Callback(String),
+    #[cfg(feature = "updater")]
+    #[error("Tauri updater error: {0}")]
+    TauriUpdater(#[from] tauri_plugin_updater::Error),
 }
 
 // Generic implementation of From<T> for ErrorTypeA
@@ -90,15 +91,15 @@ macro_rules! impl_serialize {
 }
 
 // Use the macro to implement Serialize for TheseusSerializableError
-#[cfg(target_os = "macos")]
+#[cfg(not(feature = "updater"))]
 impl_serialize! {
     IO,
     Tauri,
-    Callback
 }
 
-#[cfg(not(target_os = "macos"))]
+#[cfg(feature = "updater")]
 impl_serialize! {
     IO,
     Tauri,
+    TauriUpdater,
 }

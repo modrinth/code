@@ -7,10 +7,10 @@ import {
   LibraryIcon,
   PlusIcon,
   SettingsIcon,
-  FileIcon,
   XIcon,
+  DownloadIcon,
 } from '@modrinth/assets'
-import { Button, Notifications, Card } from '@modrinth/ui'
+import { Button, Notifications } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
@@ -22,32 +22,31 @@ import ErrorModal from '@/components/ui/ErrorModal.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
-import { MinimizeIcon, MaximizeIcon, ChatIcon } from '@/assets/icons'
-import { type } from '@tauri-apps/api/os'
-import { appWindow } from '@tauri-apps/api/window'
-import { isDev, getOS, showLauncherLogsFolder } from '@/helpers/utils.js'
-import {
-  mixpanel_track,
-  mixpanel_init,
-  mixpanel_opt_out_tracking,
-  mixpanel_is_loaded,
-} from '@/helpers/mixpanel'
-import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
+import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
+import { type } from '@tauri-apps/plugin-os'
+import { isDev, getOS, restartApp } from '@/helpers/utils.js'
+import { initAnalytics, debugAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
-import { window as TauriWindow } from '@tauri-apps/api'
-import { TauriEvent } from '@tauri-apps/api/event'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
+import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import { useInstall } from '@/store/install.js'
+import { invoke } from '@tauri-apps/api/core'
+import { open } from '@tauri-apps/plugin-shell'
+import { get_opening_command, initialize_state } from '@/helpers/state'
+import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { renderString } from '@modrinth/utils'
+import { useFetch } from '@/helpers/fetch.js'
+import { check } from '@tauri-apps/plugin-updater'
 
 const themeStore = useTheming()
+
 const urlModal = ref(null)
-const isLoading = ref(true)
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -60,86 +59,111 @@ window.addEventListener('online', () => {
 const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
 
-const onboardingVideo = ref()
-
-const failureText = ref(null)
 const os = ref('')
 
-defineExpose({
-  initialize: async () => {
-    isLoading.value = false
-    const {
-      native_decorations,
-      theme,
-      telemetry,
-      collapsed_navigation,
-      advanced_rendering,
-      onboarded,
-    } = await get()
-    // video should play if the user is not on linux, and has not onboarded
-    os.value = await getOS()
-    const dev = await isDev()
-    const version = await getVersion()
-    showOnboarding.value = !onboarded
+const stateInitialized = ref(false)
 
-    nativeDecorations.value = native_decorations
-    if (os.value !== 'MacOS') appWindow.setDecorations(native_decorations)
+const criticalErrorMessage = ref()
 
-    themeStore.setThemeState(theme)
-    themeStore.collapsedNavigation = collapsed_navigation
-    themeStore.advancedRendering = advanced_rendering
-
-    mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
-    if (telemetry) {
-      mixpanel_opt_out_tracking()
-    }
-    mixpanel_track('Launched', { version, dev, onboarded })
-
-    if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
-
-    if ((await type()) === 'Darwin') {
-      document.getElementsByTagName('html')[0].classList.add('mac')
-    } else {
-      document.getElementsByTagName('html')[0].classList.add('windows')
-    }
-
-    await warning_listener((e) =>
-      notificationsWrapper.value.addNotification({
-        title: 'Warning',
-        text: e.message,
-        type: 'warn',
-      }),
-    )
-
-    if (showOnboarding.value) {
-      onboardingVideo.value.play()
-    }
-  },
-  failure: async (e) => {
-    isLoading.value = false
-    failureText.value = e
-    os.value = await getOS()
-  },
+onMounted(async () => {
+  await useCheckDisableMouseover()
 })
 
-const handleClose = async () => {
-  await TauriWindow.getCurrent().close()
+async function setupApp() {
+  stateInitialized.value = true
+  const {
+    native_decorations,
+    theme,
+    telemetry,
+    collapsed_navigation,
+    advanced_rendering,
+    onboarded,
+    default_page,
+  } = await get()
+
+  if (default_page && default_page !== 'Home') {
+    await router.push({ name: default_page })
+  }
+
+  os.value = await getOS()
+  const dev = await isDev()
+  const version = await getVersion()
+  showOnboarding.value = !onboarded
+
+  nativeDecorations.value = native_decorations
+  if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
+
+  themeStore.setThemeState(theme)
+  themeStore.collapsedNavigation = collapsed_navigation
+  themeStore.advancedRendering = advanced_rendering
+
+  initAnalytics()
+  if (!telemetry) {
+    optOutAnalytics()
+  }
+  if (dev) debugAnalytics()
+  trackEvent('Launched', { version, dev, onboarded })
+
+  if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
+
+  const osType = await type()
+  if (osType === 'macos') {
+    document.getElementsByTagName('html')[0].classList.add('mac')
+  } else {
+    document.getElementsByTagName('html')[0].classList.add('windows')
+  }
+
+  await warning_listener((e) =>
+    notificationsWrapper.value.addNotification({
+      title: 'Warning',
+      text: e.message,
+      type: 'warn',
+    }),
+  )
+
+  useFetch(
+    `https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
+    'criticalAnnouncements',
+    true,
+  ).then((res) => {
+    if (res && res.header && res.body) {
+      criticalErrorMessage.value = res
+    }
+  })
+
+  get_opening_command().then(handleCommand)
+  checkUpdates()
 }
 
-TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-  await handleClose()
-})
+const stateFailed = ref(false)
+initialize_state()
+  .then(() => {
+    setupApp().catch((err) => {
+      stateFailed.value = true
+      console.error(err)
+      error.showError(err, null, false, 'state_init')
+    })
+  })
+  .catch((err) => {
+    stateFailed.value = true
+    console.error('Failed to initialize app', err)
+    error.showError(err, null, false, 'state_init')
+  })
+
+const handleClose = async () => {
+  await saveWindowState(StateFlags.ALL)
+  await getCurrentWindow().close()
+}
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {
-  if (mixpanel_is_loaded()) {
-    mixpanel_track('PageView', { path: to.path, fromPath: from.path, failed: failure })
-  }
+  trackEvent('PageView', { path: to.path, fromPath: from.path, failed: failure })
 })
 const route = useRoute()
 const isOnBrowse = computed(() => route.path.startsWith('/browse'))
 
 const loading = useLoading()
+loading.setEnabled(false)
 
 const notifications = useNotifications()
 const notificationsWrapper = ref()
@@ -153,6 +177,8 @@ const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
 
 onMounted(() => {
+  invoke('show_window')
+
   notifications.setNotifs(notificationsWrapper.value)
 
   error.setErrorModal(errorModal.value)
@@ -171,15 +197,10 @@ document.querySelector('body').addEventListener('click', function (e) {
         ['http://', 'https://', 'mailto:', 'tel:'].some((v) => target.href.startsWith(v)) &&
         !target.classList.contains('router-link-active') &&
         !target.href.startsWith('http://localhost') &&
-        !target.href.startsWith('https://tauri.localhost')
+        !target.href.startsWith('https://tauri.localhost') &&
+        !target.href.startsWith('http://tauri.localhost')
       ) {
-        window.__TAURI_INVOKE__('tauri', {
-          __tauriModule: 'Shell',
-          message: {
-            cmd: 'open',
-            path: target.href,
-          },
-        })
+        open(target.href)
       }
       e.preventDefault()
       break
@@ -204,12 +225,15 @@ document.querySelector('body').addEventListener('auxclick', function (e) {
 
 const accounts = ref(null)
 
-command_listener(async (e) => {
+command_listener(handleCommand)
+async function handleCommand(e) {
+  if (!e) return
+
   if (e.event === 'RunMRPack') {
     // RunMRPack should directly install a local mrpack given a path
     if (e.path.endsWith('.mrpack')) {
       await install_from_file(e.path).catch(handleError)
-      mixpanel_track('InstanceCreate', {
+      trackEvent('InstanceCreate', {
         source: 'CreationModalFileDrop',
       })
     }
@@ -217,53 +241,26 @@ command_listener(async (e) => {
     // Other commands are URL-based (deep linking)
     urlModal.value.show(e)
   }
-})
+}
+
+const updateAvailable = ref(false)
+async function checkUpdates() {
+  const update = await check()
+  console.log(update)
+  updateAvailable.value = !!update
+
+  setTimeout(
+    () => {
+      checkUpdates()
+    },
+    5 * 1000 * 60,
+  )
+}
 </script>
 
 <template>
-  <div v-if="failureText" class="failure dark-mode">
-    <div class="appbar-failure dark-mode">
-      <Button v-if="os != 'MacOS'" icon-only @click="TauriWindow.getCurrent().close()">
-        <XIcon />
-      </Button>
-    </div>
-    <div class="error-view dark-mode">
-      <Card class="error-text">
-        <div class="label">
-          <h3>
-            <span class="label__title size-card-header">Failed to initialize</span>
-          </h3>
-        </div>
-        <div class="error-div">
-          Modrinth App failed to load correctly. This may be because of a corrupted file, or because
-          the app is missing crucial files.
-        </div>
-        <div class="error-div">You may be able to fix it one of the following ways:</div>
-        <ul class="error-div">
-          <li>Ennsuring you are connected to the internet, then try restarting the app.</li>
-          <li>Redownloading the app.</li>
-        </ul>
-        <div class="error-div">
-          If it still does not work, you can seek support using the link below. You should provide
-          the following error, as well as any recent launcher logs in the folder below.
-        </div>
-        <div class="error-div">The following error was provided:</div>
-
-        <Card class="error-message">
-          {{ failureText.message }}
-        </Card>
-
-        <div class="button-row push-right">
-          <Button @click="showLauncherLogsFolder"><FileIcon />Open launcher logs</Button>
-
-          <a class="btn" href="https://support.modrinth.com"> <ChatIcon /> Get support </a>
-        </div>
-      </Card>
-    </div>
-  </div>
-  <SplashScreen v-else-if="isLoading" app-loading />
-  <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
-  <div v-else class="container">
+  <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
+  <div v-if="stateInitialized" class="app-container">
     <div class="nav-container">
       <div class="nav-section">
         <suspense>
@@ -292,6 +289,14 @@ command_listener(async (e) => {
         </div>
       </div>
       <div class="settings pages-list">
+        <button
+          v-if="updateAvailable"
+          v-tooltip="'Install update'"
+          class="btn btn-outline btn-primary icon-only collapsed-button"
+          @click="restartApp()"
+        >
+          <DownloadIcon />
+        </button>
         <Button
           v-tooltip="'Create profile'"
           class="sleek-primary collapsed-button"
@@ -307,6 +312,10 @@ command_listener(async (e) => {
       </div>
     </div>
     <div class="view">
+      <div v-if="criticalErrorMessage" class="critical-error-banner" data-tauri-drag-region>
+        <h1>{{ criticalErrorMessage.header }}</h1>
+        <div class="markdown-body" v-html="renderString(criticalErrorMessage.body ?? '')"></div>
+      </div>
       <div class="appbar-row">
         <div data-tauri-drag-region class="appbar">
           <section class="navigation-controls">
@@ -319,22 +328,17 @@ command_listener(async (e) => {
           </section>
         </div>
         <section v-if="!nativeDecorations" class="window-controls">
-          <Button class="titlebar-button" icon-only @click="() => appWindow.minimize()">
+          <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
             <MinimizeIcon />
           </Button>
-          <Button class="titlebar-button" icon-only @click="() => appWindow.toggleMaximize()">
+          <Button
+            class="titlebar-button"
+            icon-only
+            @click="() => getCurrentWindow().toggleMaximize()"
+          >
             <MaximizeIcon />
           </Button>
-          <Button
-            class="titlebar-button close"
-            icon-only
-            @click="
-              () => {
-                saveWindowState(StateFlags.ALL)
-                handleClose()
-              }
-            "
-          >
+          <Button class="titlebar-button close" icon-only @click="handleClose">
             <XIcon />
           </Button>
         </section>
@@ -411,7 +415,7 @@ command_listener(async (e) => {
   }
 }
 
-.container {
+.app-container {
   --appbar-height: 3.25rem;
   --sidebar-width: 4.5rem;
 
@@ -423,6 +427,16 @@ command_listener(async (e) => {
   .view {
     width: calc(100% - var(--sidebar-width));
     background-color: var(--color-raised-bg);
+
+    .critical-error-banner {
+      margin-top: -1.25rem;
+      padding: 1rem;
+      background-color: rgba(203, 34, 69, 0.1);
+      border-left: 2px solid var(--color-red);
+      border-bottom: 2px solid var(--color-red);
+      border-right: 2px solid var(--color-red);
+      border-radius: 1rem;
+    }
 
     .appbar {
       display: flex;
@@ -445,53 +459,6 @@ command_listener(async (e) => {
       overflow-x: hidden;
       background-color: var(--color-bg);
       border-top-left-radius: var(--radius-xl);
-    }
-  }
-}
-
-.failure {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background-color: var(--color-bg);
-
-  .appbar-failure {
-    display: flex; /* Change to flex to align items horizontally */
-    justify-content: flex-end; /* Align items to the right */
-    height: 3.25rem;
-    //no select
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  .error-view {
-    display: flex; /* Change to flex to align items horizontally */
-    justify-content: center;
-    width: 100%;
-    background-color: var(--color-bg);
-
-    color: var(--color-base);
-
-    .card {
-      background-color: var(--color-raised-bg);
-    }
-
-    .error-text {
-      display: flex;
-      max-width: 60%;
-      gap: 0.25rem;
-      flex-direction: column;
-
-      .error-div {
-        // spaced out
-        margin: 0.5rem;
-      }
-
-      .error-message {
-        margin: 0.5rem;
-        background-color: var(--color-button-bg);
-      }
     }
   }
 }
@@ -577,6 +544,36 @@ command_listener(async (e) => {
 
   .transparent {
     padding: var(--gap-sm) 0;
+  }
+}
+</style>
+<style>
+.mac {
+  .nav-container {
+    padding-top: calc(var(--gap-md) + 1.75rem);
+  }
+
+  .account-card,
+  .card-section {
+    top: calc(var(--gap-md) + 1.75rem);
+  }
+}
+
+.windows {
+  .fake-appbar {
+    height: 2.5rem !important;
+  }
+
+  .window-controls {
+    display: flex !important;
+  }
+
+  .info-card {
+    right: 8rem;
+  }
+
+  .profile-card {
+    right: 8rem;
   }
 }
 </style>

@@ -1,61 +1,78 @@
 <template>
-  <Modal ref="modal" header="Create an organization">
-    <div class="universal-modal modal-creation universal-labels">
-      <div class="markdown-body">
-        <p>
-          Organizations can be found under your profile page. You will be set as its owner, but you
-          can invite other members and transfer ownership at any time.
-        </p>
-      </div>
-      <label for="name">
-        <span class="label__title">Name<span class="required">*</span></span>
-      </label>
-      <input
-        id="name"
-        v-model="name"
-        type="text"
-        maxlength="64"
-        :placeholder="`Enter organization name...`"
-        autocomplete="off"
-        @input="updateSlug()"
-      />
-      <label for="slug">
-        <span class="label__title">URL<span class="required">*</span></span>
-      </label>
-      <div class="text-input-wrapper">
-        <div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
+  <NewModal ref="modal" header="Creating an organization">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
+        <label for="name">
+          <span class="text-lg font-semibold text-contrast">
+            Name
+            <span class="text-brand-red">*</span>
+          </span>
+        </label>
         <input
-          id="slug"
-          v-model="slug"
+          id="name"
+          v-model="name"
           type="text"
           maxlength="64"
+          :placeholder="`Enter organization name...`"
           autocomplete="off"
-          @input="manualSlug = true"
+          @input="updateSlug()"
         />
       </div>
-      <label for="additional-information">
-        <span class="label__title">Summary<span class="required">*</span></span>
-        <span class="label__description">This will appear on your organization's page.</span>
-      </label>
-      <div class="textarea-wrapper">
-        <textarea id="additional-information" v-model="description" maxlength="256" />
+      <div class="flex flex-col gap-2">
+        <label for="slug">
+          <span class="text-lg font-semibold text-contrast">
+            URL
+            <span class="text-brand-red">*</span>
+          </span>
+        </label>
+        <div class="text-input-wrapper">
+          <div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
+          <input
+            id="slug"
+            v-model="slug"
+            type="text"
+            maxlength="64"
+            autocomplete="off"
+            @input="manualSlug = true"
+          />
+        </div>
       </div>
-      <div class="push-right input-group">
-        <Button @click="modal.hide()">
-          <CrossIcon />
-          Cancel
-        </Button>
-        <Button color="primary" @click="createProject">
-          <CheckIcon />
-          Continue
-        </Button>
+      <div class="flex flex-col gap-2">
+        <label for="additional-information" class="flex flex-col gap-1">
+          <span class="text-lg font-semibold text-contrast">
+            Summary
+            <span class="text-brand-red">*</span>
+          </span>
+          <span>A sentence or two that describes your organization.</span>
+        </label>
+        <div class="textarea-wrapper">
+          <textarea id="additional-information" v-model="description" maxlength="256" />
+        </div>
+      </div>
+      <p class="m-0 max-w-[30rem]">
+        You will be the owner of this organization, but you can invite other members and transfer
+        ownership at any time.
+      </p>
+      <div class="flex gap-2">
+        <ButtonStyled color="brand">
+          <button @click="createOrganization">
+            <PlusIcon aria-hidden="true" />
+            Create organization
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="modal.hide()">
+            <XIcon aria-hidden="true" />
+            Cancel
+          </button>
+        </ButtonStyled>
       </div>
     </div>
-  </Modal>
+  </NewModal>
 </template>
 <script setup>
-import { XIcon as CrossIcon, CheckIcon } from "@modrinth/assets";
-import { Modal, Button } from "@modrinth/ui";
+import { XIcon, PlusIcon } from "@modrinth/assets";
+import { ButtonStyled, NewModal } from "@modrinth/ui";
 
 const router = useNativeRouter();
 
@@ -66,7 +83,7 @@ const manualSlug = ref(false);
 
 const modal = ref();
 
-async function createProject() {
+async function createOrganization() {
   startLoading();
   try {
     const value = {
@@ -95,10 +112,10 @@ async function createProject() {
   }
   stopLoading();
 }
-function show() {
+function show(event) {
   name.value = "";
   description.value = "";
-  modal.value.show();
+  modal.value.show(event);
 }
 
 function updateSlug() {

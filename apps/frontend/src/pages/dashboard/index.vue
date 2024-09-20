@@ -88,20 +88,6 @@
               ></span
             >
           </div>
-          <div class="grid-display__item">
-            <div class="label">Current balance</div>
-            <div class="value">
-              {{ $formatMoney(auth.user.payout_data.balance, true) }}
-            </div>
-            <NuxtLink
-              v-if="auth.user.payout_data.balance > 0"
-              class="goto-link"
-              to="/dashboard/revenue"
-            >
-              Withdraw earnings
-              <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
-            </NuxtLink>
-          </div>
         </div>
       </section>
     </div>

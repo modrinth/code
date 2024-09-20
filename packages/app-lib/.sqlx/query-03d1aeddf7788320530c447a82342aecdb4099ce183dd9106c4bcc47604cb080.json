@@ -6,12 +6,12 @@
       {
         "name": "max_concurrent_writes",
         "ordinal": 0,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "max_concurrent_downloads",
         "ordinal": 1,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "theme",
@@ -26,37 +26,37 @@
       {
         "name": "collapsed_navigation",
         "ordinal": 4,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "advanced_rendering",
         "ordinal": 5,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "native_decorations",
         "ordinal": 6,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "discord_rpc",
         "ordinal": 7,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "developer_mode",
         "ordinal": 8,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "telemetry",
         "ordinal": 9,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "onboarded",
         "ordinal": 10,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "extra_launch_args",
@@ -71,27 +71,27 @@
       {
         "name": "mc_memory_max",
         "ordinal": 13,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "mc_force_fullscreen",
         "ordinal": 14,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "mc_game_resolution_x",
         "ordinal": 15,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "mc_game_resolution_y",
         "ordinal": 16,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "hide_on_process_start",
         "ordinal": 17,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "hook_pre_launch",
@@ -121,7 +121,7 @@
       {
         "name": "migrated",
         "ordinal": 23,
-        "type_info": "Int64"
+        "type_info": "Integer"
       }
     ],
     "parameters": {

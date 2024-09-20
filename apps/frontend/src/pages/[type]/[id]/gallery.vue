@@ -8,7 +8,7 @@
       <div class="modal-gallery universal-labels">
         <div class="gallery-file-input">
           <div class="file-header">
-            <ImageIcon />
+            <ImageIcon aria-hidden="true" />
             <strong>{{ editFile ? editFile.name : "Current image" }}</strong>
             <FileInput
               v-if="editIndex === -1"
@@ -17,6 +17,7 @@
               :accept="acceptFileTypes"
               :max-size="524288000"
               should-always-reset
+              aria-label="Replace image"
               @change="
                 (x) => {
                   editFile = x[0];
@@ -24,7 +25,7 @@
                 }
               "
             >
-              <TransferIcon />
+              <TransferIcon aria-hidden="true" />
             </FileInput>
           </div>
           <img
@@ -95,7 +96,7 @@
         </button>
         <div class="button-group">
           <button class="iconified-button" @click="$refs.modal_edit_item.hide()">
-            <XIcon />
+            <XIcon aria-hidden="true" />
             Cancel
           </button>
           <button
@@ -104,7 +105,7 @@
             :disabled="shouldPreventActions"
             @click="createGalleryItem"
           >
-            <PlusIcon />
+            <PlusIcon aria-hidden="true" />
             Add gallery image
           </button>
           <button
@@ -113,7 +114,7 @@
             :disabled="shouldPreventActions"
             @click="editGalleryItem"
           >
-            <SaveIcon />
+            <SaveIcon aria-hidden="true" />
             Save changes
           </button>
         </div>
@@ -138,8 +139,8 @@
           class="image"
           :class="{ 'zoomed-in': zoomedIn }"
           :src="
-            expandedGalleryItem.url
-              ? expandedGalleryItem.url
+            expandedGalleryItem.raw_url
+              ? expandedGalleryItem.raw_url
               : 'https://cdn.modrinth.com/placeholder-banner.svg'
           "
           :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
@@ -164,8 +165,8 @@
                 class="open circle-button"
                 target="_blank"
                 :href="
-                  expandedGalleryItem.url
-                    ? expandedGalleryItem.url
+                  expandedGalleryItem.raw_url
+                    ? expandedGalleryItem.raw_url
                     : 'https://cdn.modrinth.com/placeholder-banner.svg'
                 "
               >
@@ -199,14 +200,15 @@
         :max-size="524288000"
         :accept="acceptFileTypes"
         prompt="Upload an image"
+        aria-label="Upload an image"
         class="iconified-button brand-button"
         :disabled="!isPermission(currentMember?.permissions, 1 << 2)"
         @change="handleFiles"
       >
-        <UploadIcon />
+        <UploadIcon aria-hidden="true" />
       </FileInput>
       <span class="indicator">
-        <InfoIcon /> Click to choose an image or drag one onto this page
+        <InfoIcon aria-hidden="true" /> Click to choose an image or drag one onto this page
       </span>
       <DropArea
         :accept="acceptFileTypes"
@@ -234,7 +236,7 @@
         </div>
         <div class="gallery-bottom">
           <div class="gallery-created">
-            <CalendarIcon />
+            <CalendarIcon aria-hidden="true" aria-label="Date created" />
             {{ $dayjs(item.created).format("MMMM D, YYYY") }}
           </div>
           <div v-if="currentMember" class="gallery-buttons input-group">
@@ -252,7 +254,7 @@
                 }
               "
             >
-              <EditIcon />
+              <EditIcon aria-hidden="true" />
               Edit
             </button>
             <button
@@ -264,7 +266,7 @@
                 }
               "
             >
-              <TrashIcon />
+              <TrashIcon aria-hidden="true" />
               Remove
             </button>
           </div>
@@ -793,5 +795,9 @@ export default defineNuxtComponent({
       background-color: #000000;
     }
   }
+}
+
+.brand-button {
+  color: var(--color-accent-contrast);
 }
 </style>

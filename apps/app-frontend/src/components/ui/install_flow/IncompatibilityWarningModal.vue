@@ -1,10 +1,5 @@
 <template>
-  <Modal
-    ref="incompatibleModal"
-    header="Incompatibility warning"
-    :noblur="!themeStore.advancedRendering"
-    :on-hide="onInstall"
-  >
+  <ModalWrapper ref="incompatibleModal" header="Incompatibility warning" :on-hide="onInstall">
     <div class="modal-body">
       <p>
         This {{ versions?.length > 0 ? 'project' : 'version' }} is not compatible with the instance
@@ -51,19 +46,18 @@
         </Button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <script setup>
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { XIcon, DownloadIcon } from '@modrinth/assets'
-import { Button, Modal, DropdownSelect } from '@modrinth/ui'
+import { Button, DropdownSelect } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 import { add_project_from_version as installMod } from '@/helpers/profile'
 import { ref } from 'vue'
-import { handleError, useTheming } from '@/store/state.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
-
-const themeStore = useTheming()
+import { handleError } from '@/store/state.js'
+import { trackEvent } from '@/helpers/analytics'
 
 const instance = ref(null)
 const project = ref(null)
@@ -72,7 +66,7 @@ const selectedVersion = ref(null)
 const incompatibleModal = ref(null)
 const installing = ref(false)
 
-let onInstall = ref(() => {})
+const onInstall = ref(() => {})
 
 defineExpose({
   show: (instanceVal, projectVal, projectVersions, callback) => {
@@ -87,7 +81,7 @@ defineExpose({
 
     incompatibleModal.value.show()
 
-    mixpanel_track('ProjectInstallStart', { source: 'ProjectIncompatibilityWarningModal' })
+    trackEvent('ProjectInstallStart', { source: 'ProjectIncompatibilityWarningModal' })
   },
 })
 
@@ -98,7 +92,7 @@ const install = async () => {
   onInstall.value(selectedVersion.value.id)
   incompatibleModal.value.hide()
 
-  mixpanel_track('ProjectInstall', {
+  trackEvent('ProjectInstall', {
     loader: instance.value.loader,
     game_version: instance.value.game_version,
     id: project.value,

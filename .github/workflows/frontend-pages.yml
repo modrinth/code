@@ -19,7 +19,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           commitHash: ${{ steps.push-changes.outputs.commit-hash }}
       - name: Purge cache
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/prod'
         run: |
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \

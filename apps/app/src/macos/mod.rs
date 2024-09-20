@@ -1,2 +1,2 @@
-pub mod delegate;
+pub mod deep_link;
 pub mod window_ext;

@@ -34,6 +34,16 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  noblur: {
+    type: Boolean,
+    default: false,
+  },
+  onHide: {
+    type: Function,
+    default() {
+      return () => {}
+    },
+  },
 })
 
 const shareModal = ref(null)
@@ -115,41 +125,54 @@ defineExpose({
 </script>
 
 <template>
-  <Modal ref="shareModal" :header="header">
+  <Modal ref="shareModal" :header="header" :noblur="noblur" :on-hide="onHide">
     <div class="share-body">
       <div v-if="link" class="qr-wrapper">
         <div ref="qrCode">
           <QrcodeVue :value="url" class="qr-code" margin="3" />
         </div>
-        <Button v-tooltip="'Copy QR code'" icon-only class="copy-button" @click="copyImage">
-          <ClipboardCopyIcon />
+        <Button
+          v-tooltip="'Copy QR code'"
+          icon-only
+          class="copy-button"
+          aria-label="Copy QR code"
+          @click="copyImage"
+        >
+          <ClipboardCopyIcon aria-hidden="true" />
         </Button>
       </div>
       <div v-else class="resizable-textarea-wrapper">
         <textarea v-model="content" />
-        <Button v-tooltip="'Copy Text'" icon-only class="copy-button transparent" @click="copyText">
-          <ClipboardCopyIcon />
+        <Button
+          v-tooltip="'Copy Text'"
+          icon-only
+          aria-label="Copy Text"
+          class="copy-button transparent"
+          @click="copyText"
+        >
+          <ClipboardCopyIcon aria-hidden="true" />
         </Button>
       </div>
       <div class="all-buttons">
         <div v-if="link" class="iconified-input">
           <LinkIcon />
           <input type="text" :value="url" readonly />
-          <Button v-tooltip="'Copy Text'" class="r-btn" @click="copyText">
-            <ClipboardCopyIcon />
+          <Button v-tooltip="'Copy Text'" aria-label="Copy Text" class="r-btn" @click="copyText">
+            <ClipboardCopyIcon aria-hidden="true" />
           </Button>
         </div>
         <div class="button-row">
-          <Button v-if="canShare" v-tooltip="'Share'" icon-only @click="share">
-            <ShareIcon />
+          <Button v-if="canShare" v-tooltip="'Share'" aria-label="Share" icon-only @click="share">
+            <ShareIcon aria-hidden="true" />
           </Button>
           <a
             v-tooltip="'Send as an email'"
             class="btn icon-only"
             :href="sendEmail"
             :target="targetParameter"
+            aria-label="Send as an email"
           >
-            <MailIcon />
+            <MailIcon aria-hidden="true" />
           </a>
           <a
             v-if="link"
@@ -157,32 +180,36 @@ defineExpose({
             class="btn icon-only"
             :target="targetParameter"
             :href="url"
+            aria-label="Open link in browser"
           >
-            <GlobeIcon />
+            <GlobeIcon aria-hidden="true" />
           </a>
           <a
             v-tooltip="'Toot about it'"
             class="btn mastodon icon-only"
             :target="targetParameter"
             :href="sendToot"
+            aria-label="Toot about it"
           >
-            <MastodonIcon />
+            <MastodonIcon aria-hidden="true" />
           </a>
           <a
             v-tooltip="'Tweet about it'"
             class="btn twitter icon-only"
             :target="targetParameter"
             :href="sendTweet"
+            aria-label="Tweet about it"
           >
-            <TwitterIcon />
+            <TwitterIcon aria-hidden="true" />
           </a>
           <a
             v-tooltip="'Share on Reddit'"
             class="btn reddit icon-only"
             :target="targetParameter"
             :href="postOnReddit"
+            aria-label="Share on Reddit"
           >
-            <RedditIcon />
+            <RedditIcon aria-hidden="true" />
           </a>
         </div>
       </div>

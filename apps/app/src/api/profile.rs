@@ -63,8 +63,9 @@ pub async fn profile_get_many(paths: Vec<String>) -> Result<Vec<Profile>> {
 #[tauri::command]
 pub async fn profile_get_projects(
     path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
 ) -> Result<DashMap<String, ProfileFile>> {
-    let res = profile::get_projects(path).await?;
+    let res = profile::get_projects(path, cache_behaviour).await?;
     Ok(res)
 }
 
@@ -111,7 +112,7 @@ pub async fn profile_check_installed(
 ) -> Result<bool> {
     let check_project_id = project_id;
 
-    if let Ok(projects) = profile::get_projects(path).await {
+    if let Ok(projects) = profile::get_projects(path, None).await {
         Ok(projects.into_iter().any(|(_, project)| {
             if let Some(metadata) = &project.metadata {
                 check_project_id == metadata.project_id
@@ -248,7 +249,7 @@ pub async fn profile_get_pack_export_candidates(
 // for the actual Child in the state.
 // invoke('plugin:profile|profile_run', path)
 #[tauri::command]
-pub async fn profile_run(path: &str) -> Result<Process> {
+pub async fn profile_run(path: &str) -> Result<ProcessMetadata> {
     let process = profile::run(path).await?;
 
     Ok(process)
@@ -262,7 +263,7 @@ pub async fn profile_run(path: &str) -> Result<Process> {
 pub async fn profile_run_credentials(
     path: &str,
     credentials: Credentials,
-) -> Result<Process> {
+) -> Result<ProcessMetadata> {
     let process = profile::run_credentials(path, &credentials).await?;
 
     Ok(process)

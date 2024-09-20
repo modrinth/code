@@ -1,18 +1,24 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, UpdatedIcon } from '@modrinth/assets'
-import { Card, Slider, DropdownSelect, Toggle, Modal, Button } from '@modrinth/ui'
+import { ref, watch, onMounted } from 'vue'
+import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
+import { Card, Slider, DropdownSelect, Toggle, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
-import { is_dir_writeable, change_config_dir, get, set } from '@/helpers/settings'
+import { get, set } from '@/helpers/settings'
 import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
-import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
-import { open } from '@tauri-apps/api/dialog'
+import { optOutAnalytics, optInAnalytics } from '@/helpers/analytics'
+import { open } from '@tauri-apps/plugin-dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
-import { get_user } from '@/helpers/cache.js'
+import { get_user, purge_cache_types } from '@/helpers/cache.js'
+import { hide_ads_window } from '@/helpers/ads.js'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+
+onMounted(() => {
+  hide_ads_window(true)
+})
 
 const pageOptions = ['Home', 'Library']
 
@@ -32,7 +38,6 @@ const accessSettings = async () => {
 const fetchSettings = await accessSettings().catch(handleError)
 
 const settings = ref(fetchSettings)
-// const settingsDir = ref(settings.value.loaded_config_dir)
 
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
 
@@ -46,9 +51,9 @@ watch(
     const setSettings = JSON.parse(JSON.stringify(newSettings))
 
     if (setSettings.telemetry) {
-      mixpanel_opt_out_tracking()
+      optInAnalytics()
     } else {
-      mixpanel_opt_in_tracking()
+      optOutAnalytics()
     }
 
     setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
@@ -92,7 +97,6 @@ async function updateJavaVersion(version) {
 
 async function fetchCredentials() {
   const creds = await getCreds().catch(handleError)
-  console.log(creds)
   if (creds && creds.user_id) {
     creds.user = await get_user(creds.user_id).catch(handleError)
   }
@@ -124,6 +128,25 @@ async function findLauncherDir() {
     settings.value.custom_dir = newDir
   }
 }
+
+async function purgeCache() {
+  await purge_cache_types([
+    'project',
+    'version',
+    'user',
+    'team',
+    'organization',
+    'loader_manifest',
+    'minecraft_manifest',
+    'categories',
+    'report_types',
+    'loaders',
+    'game_versions',
+    'donation_platforms',
+    'file_update',
+    'search_results',
+  ]).catch(handleError)
+}
 </script>
 
 <template>
@@ -136,26 +159,49 @@ async function findLauncherDir() {
       </div>
       <ModrinthLoginScreen ref="loginScreenModal" :callback="signInAfter" />
       <div class="adjacent-input">
-        <label for="theme">
+        <label for="sign-in">
           <span class="label__title">Manage account</span>
           <span v-if="credentials" class="label__description">
             You are currently logged in as {{ credentials.user.username }}.
           </span>
           <span v-else> Sign in to your Modrinth account. </span>
         </label>
-        <button v-if="credentials" class="btn" @click="logOut">
+        <button v-if="credentials" id="sign-in" class="btn" @click="logOut">
           <LogOutIcon />
           Sign out
         </button>
-        <button v-else class="btn" @click="$refs.loginScreenModal.show()">
+        <button v-else id="sign-in" class="btn" @click="$refs.loginScreenModal.show()">
           <LogInIcon />
           Sign in
         </button>
       </div>
-      <label for="theme">
+      <ConfirmModalWrapper
+        ref="purgeCacheConfirmModal"
+        title="Are you sure you want to purge the cache?"
+        description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
+        :has-to-type="false"
+        proceed-label="Purge cache"
+        @proceed="purgeCache"
+      />
+      <div class="adjacent-input">
+        <label for="purge-cache">
+          <span class="label__title">App cache</span>
+          <span class="label__description">
+            The Modrinth app stores a cache of data to speed up loading. This can be purged to force
+            the app to reload data. <br />
+            This may slow down the app temporarily.
+          </span>
+        </label>
+        <button id="purge-cache" class="btn" @click="$refs.purgeCacheConfirmModal.show()">
+          <TrashIcon />
+          Purge cache
+        </button>
+      </div>
+      <label for="appDir">
         <span class="label__title">App directory</span>
         <span class="label__description">
-          The directory where the launcher stores all of its files.
+          The directory where the launcher stores all of its files. Changes will be applied after
+          restarting the launcher.
         </span>
       </label>
       <div class="app-directory">
@@ -360,14 +406,14 @@ async function findLauncherDir() {
           <span class="label__title size-card-header">Java settings</span>
         </h3>
       </div>
-      <template v-for="version in [21, 17, 8]">
-        <label :for="'java-' + version">
-          <span class="label__title">Java {{ version }} location</span>
+      <template v-for="javaVersion in [21, 17, 8]" :key="`java-${javaVersion}`">
+        <label :for="'java-' + javaVersion">
+          <span class="label__title">Java {{ javaVersion }} location</span>
         </label>
         <JavaSelector
-          :id="'java-selector-' + version"
-          v-model="javaVersions[version]"
-          :version="version"
+          :id="'java-selector-' + javaVersion"
+          v-model="javaVersions[javaVersion]"
+          :version="javaVersion"
           @update:model-value="updateJavaVersion"
         />
       </template>

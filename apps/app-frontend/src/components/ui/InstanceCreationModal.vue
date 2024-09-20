@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="modal" header="Create instance" :noblur="!themeStore.advancedRendering">
+  <ModalWrapper ref="modal" header="Create instance">
     <div class="modal-header">
       <Chips v-model="creationType" :items="['custom', 'from file', 'import from launcher']" />
     </div>
@@ -193,10 +193,11 @@
         />
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <script setup>
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import {
   PlusIcon,
   UploadIcon,
@@ -207,17 +208,16 @@ import {
   FolderSearchIcon,
   UpdatedIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Chips, Modal, Checkbox } from '@modrinth/ui'
+import { Avatar, Button, Chips, Checkbox } from '@modrinth/ui'
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
-import { open } from '@tauri-apps/api/dialog'
-import { tauri } from '@tauri-apps/api'
+import { open } from '@tauri-apps/plugin-dialog'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { get_game_versions, get_loader_versions } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { useTheming } from '@/store/state.js'
+import { trackEvent } from '@/helpers/analytics'
 import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
 import {
@@ -226,8 +226,6 @@ import {
   import_instance,
 } from '@/helpers/import.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
-
-const themeStore = useTheming()
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -264,13 +262,13 @@ defineExpose({
       hide()
       if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
         await install_from_file(event.payload[0]).catch(handleError)
-        mixpanel_track('InstanceCreate', {
+        trackEvent('InstanceCreate', {
           source: 'CreationModalFileDrop',
         })
       }
     })
 
-    mixpanel_track('InstanceCreateStart', { source: 'CreationModal' })
+    trackEvent('InstanceCreateStart', { source: 'CreationModal' })
   },
 })
 
@@ -360,7 +358,7 @@ const create_instance = async () => {
     icon.value,
   ).catch(handleError)
 
-  mixpanel_track('InstanceCreate', {
+  trackEvent('InstanceCreate', {
     profile_name: profile_name.value,
     game_version: game_version.value,
     loader: loader.value,
@@ -371,7 +369,7 @@ const create_instance = async () => {
 }
 
 const upload_icon = async () => {
-  icon.value = await open({
+  const res = await open({
     multiple: false,
     filters: [
       {
@@ -381,8 +379,10 @@ const upload_icon = async () => {
     ],
   })
 
+  icon.value = res.path ?? res
+
   if (!icon.value) return
-  display_icon.value = tauri.convertFileSrc(icon.value)
+  display_icon.value = convertFileSrc(icon.value)
 }
 
 const reset_icon = () => {
@@ -417,9 +417,9 @@ const openFile = async () => {
   const newProject = await open({ multiple: false })
   if (!newProject) return
   hide()
-  await install_from_file(newProject).catch(handleError)
+  await install_from_file(newProject.path ?? newProject).catch(handleError)
 
-  mixpanel_track('InstanceCreate', {
+  trackEvent('InstanceCreate', {
     source: 'CreationModalFileOpen',
   })
 }
@@ -462,7 +462,7 @@ const promises = profileOptions.value.map(async (option) => {
       option.name,
       instances.map((name) => ({ name, selected: false })),
     )
-  } catch (error) {
+  } catch {
     // Allow failure silently
   }
 })

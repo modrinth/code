@@ -68,11 +68,13 @@ impl Settings {
             onboarded: res.onboarded == 1,
             extra_launch_args: res
                 .extra_launch_args
-                .and_then(|x| serde_json::from_str(&x).ok())
+                .as_ref()
+                .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
             custom_env_vars: res
                 .custom_env_vars
-                .and_then(|x| serde_json::from_str(&x).ok())
+                .as_ref()
+                .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
             memory: MemorySettings {
                 maximum: res.mc_memory_max as u32,

@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   font-family: var(--font-standard);
   color-scheme: dark;
@@ -69,35 +73,6 @@ input {
   }
 }
 
-.mac {
-  .nav-container {
-    padding-top: calc(var(--gap-md) + 1.75rem);
-  }
-
-  .account-card,
-  .card-section {
-    top: calc(var(--gap-md) + 1.75rem);
-  }
-}
-
-.windows {
-  .fake-appbar {
-    height: 2.5rem !important;
-  }
-
-  .window-controls {
-    display: flex !important;
-  }
-
-  .info-card {
-    right: 8rem;
-  }
-
-  .profile-card {
-    right: 8rem;
-  }
-}
-
 * {
   scrollbar-width: auto;
   scrollbar-color: var(--color-scrollbar) var(--color-bg);
@@ -135,3 +110,5 @@ img {
   -moz-user-select: none;
   -ms-user-select: none;
 }
+
+@import '@modrinth/assets/omorphia.scss';

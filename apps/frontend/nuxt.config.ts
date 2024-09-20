@@ -125,6 +125,7 @@ export default defineNuxtConfig({
         homePageProjects?: any[];
         homePageSearch?: any[];
         homePageNotifs?: any[];
+        products?: any[];
       } = {};
 
       try {
@@ -165,6 +166,7 @@ export default defineNuxtConfig({
         homePageProjects,
         homePageSearch,
         homePageNotifs,
+        products,
       ] = await Promise.all([
         $fetch(`${API_URL}tag/category`, headers),
         $fetch(`${API_URL}tag/loader`, headers),
@@ -174,6 +176,8 @@ export default defineNuxtConfig({
         $fetch(`${API_URL}projects_random?count=60`, headers),
         $fetch(`${API_URL}search?limit=3&query=leave&index=relevance`, headers),
         $fetch(`${API_URL}search?limit=3&query=&index=updated`, headers),
+        // TODO: dehardcode
+        $fetch(`${API_URL.replace("/v2/", "/_internal/")}billing/products`, headers),
       ]);
 
       state.categories = categories;
@@ -184,6 +188,7 @@ export default defineNuxtConfig({
       state.homePageProjects = homePageProjects;
       state.homePageSearch = homePageSearch;
       state.homePageNotifs = homePageNotifs;
+      state.products = products;
 
       await fs.writeFile("./src/generated/state.json", JSON.stringify(state));
 
@@ -236,7 +241,7 @@ export default defineNuxtConfig({
         const omorphiaLocales: string[] = [];
         const omorphiaLocaleSets = new Map<string, { files: { from: string }[] }>();
 
-        for await (const localeDir of globIterate("node_modules/omorphia/locales/*", {
+        for await (const localeDir of globIterate("node_modules/@modrinth/ui/src/locales/*", {
           posix: true,
         })) {
           const tag = basename(localeDir);
@@ -338,6 +343,11 @@ export default defineNuxtConfig({
         "unknown",
 
       turnstile: { siteKey: "0x4AAAAAAAW3guHM6Eunbgwu" },
+
+      stripePublishableKey:
+        process.env.STRIPE_PUBLISHABLE_KEY ||
+        globalThis.STRIPE_PUBLISHABLE_KEY ||
+        "pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b",
     },
   },
   typescript: {
@@ -417,6 +427,7 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: "2024-07-03",
+  telemetry: false,
 });
 
 function getApiUrl() {

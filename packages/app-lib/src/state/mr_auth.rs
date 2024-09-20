@@ -1,4 +1,5 @@
 use crate::config::MODRINTH_API_URL;
+use crate::state::{CacheBehaviour, CachedEntry};
 use crate::util::fetch::{fetch_advanced, FetchSemaphore};
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use dashmap::DashMap;
@@ -168,6 +169,23 @@ impl ModrinthCredentials {
             user_id,
         )
         .execute(exec)
+        .await?;
+
+        Ok(())
+    }
+
+    pub(crate) async fn refresh_all() -> crate::Result<()> {
+        let state = crate::State::get().await?;
+        let all = Self::get_all(&state.pool).await?;
+
+        let user_ids = all.into_iter().map(|x| x.0).collect::<Vec<_>>();
+
+        CachedEntry::get_user_many(
+            &user_ids.iter().map(|x| &**x).collect::<Vec<_>>(),
+            Some(CacheBehaviour::Bypass),
+            &state.pool,
+            &state.fetch_semaphore,
+        )
         .await?;
 
         Ok(())

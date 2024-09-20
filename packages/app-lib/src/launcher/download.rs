@@ -111,7 +111,7 @@ pub async fn download_version_info(
     }?;
 
     if let Some(loading_bar) = loading_bar {
-        emit_loading(loading_bar, 5.0, None).await?;
+        emit_loading(loading_bar, 5.0, None)?;
     }
 
     tracing::debug!("Loaded version info for Minecraft {version_id}");
@@ -154,7 +154,7 @@ pub async fn download_client(
         tracing::trace!("Fetched client version {version}");
     }
     if let Some(loading_bar) = loading_bar {
-        emit_loading(loading_bar, 9.0, None).await?;
+        emit_loading(loading_bar, 9.0, None)?;
     }
 
     tracing::debug!("Client loaded for version {version}!");
@@ -196,7 +196,7 @@ pub async fn download_assets_index(
     }?;
 
     if let Some(loading_bar) = loading_bar {
-        emit_loading(loading_bar, 5.0, None).await?;
+        emit_loading(loading_bar, 5.0, None)?;
     }
     tracing::debug!("Assets index successfully loaded!");
     Ok(res)

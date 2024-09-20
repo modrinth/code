@@ -1,12 +1,12 @@
 <script setup>
 import { XIcon, PlusIcon } from '@modrinth/assets'
-import { Button, Checkbox, Modal } from '@modrinth/ui'
+import { Button, Checkbox } from '@modrinth/ui'
 import { PackageIcon, VersionIcon } from '@/assets/icons'
 import { ref } from 'vue'
 import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
-import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/plugin-dialog'
 import { handleError } from '@/store/notifications.js'
-import { useTheming } from '@/store/theme'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const props = defineProps({
   instance: {
@@ -29,8 +29,6 @@ const versionInput = ref('1.0.0')
 const files = ref([])
 const folders = ref([])
 const showingFiles = ref(false)
-
-const themeStore = useTheming()
 
 const initFiles = async () => {
   const newFolders = new Map()
@@ -106,7 +104,7 @@ const exportPack = async () => {
 </script>
 
 <template>
-  <Modal ref="exportModal" header="Export modpack" :noblur="!themeStore.advancedRendering">
+  <ModalWrapper ref="exportModal" header="Export modpack">
     <div class="modal-body">
       <div class="labeled_input">
         <p>Modpack Name</p>
@@ -208,7 +206,7 @@ const exportPack = async () => {
         </Button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">
