@@ -3,13 +3,6 @@
     class="relative -mt-12 flex h-screen min-h-[400px] w-full flex-1 items-center justify-center"
   >
     <div
-      class="bg-loading-animation absolute inset-0 -mt-8"
-      style="
-        background: linear-gradient(0deg, rgba(22, 24, 28, 0.64), rgba(22, 24, 28, 0.64)),
-          linear-gradient(180deg, rgba(131, 66, 66, 0.275) 0%, rgba(202, 14, 14, 0.9) 97.29%);
-      "
-    ></div>
-    <div
       class="pyro-logo-animation relative flex flex-col items-center gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#270B11] p-8"
     >
       <svg
@@ -107,19 +100,5 @@ defineProps({
       1.001 87.2%,
       1 100%
     );
-}
-
-@keyframes fade-bg-in {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 0.6;
-  }
-}
-
-.bg-loading-animation {
-  animation: fade-bg-in 0.12s linear forwards;
 }
 </style>
