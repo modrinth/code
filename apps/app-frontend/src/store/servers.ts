@@ -3,11 +3,13 @@ import { defineStore } from 'pinia'
 import type { Project, Server, ServerBackup, WSAuth } from '@/types/servers'
 import { toRaw } from 'vue'
 import { useFetch } from '@/helpers/fetch'
+import type { SessionToken } from './credentials'
 
 interface ServerState {
   serverData: Record<string, Server>
   error: Error | null
 }
+
 
 export const useServerStore = defineStore('servers', {
   state: (): ServerState => ({
@@ -16,7 +18,7 @@ export const useServerStore = defineStore('servers', {
   }),
 
   actions: {
-    async fetchServerData(auth: string, serverId: string) {
+    async fetchServerData(auth: SessionToken, serverId: string) {
       try {
         const data = await usePyroFetch<Server>(`servers/${serverId}`, {
           session: auth,
@@ -44,7 +46,7 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async listServers(auth: string) {
+    async listServers(auth: SessionToken) {
       try {
         return await usePyroFetch<{ servers: Server[] }>('servers', {
           session: auth,
@@ -74,7 +76,7 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async fetchServerBackups(auth: string, serverId: string) {
+    async fetchServerBackups(auth: SessionToken, serverId: string) {
       try {
         const result = await usePyroFetch<ServerBackup[]>(`servers/${serverId}/backups`, {
           session: auth,
@@ -97,7 +99,7 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async requestWebsocket(auth: string, serverId: string): Promise<WSAuth> {
+    async requestWebsocket(auth: SessionToken, serverId: string): Promise<WSAuth> {
       try {
         return await usePyroFetch(`servers/${serverId}/ws`, {
           session: auth,
@@ -108,7 +110,7 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async sendPowerAction(auth: string, serverId: string, action: string) {
+    async sendPowerAction(auth: SessionToken, serverId: string, action: string) {
       try {
         await usePyroFetch(`servers/${serverId}/power`, {
           session: auth,

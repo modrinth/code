@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import WebSocket from '@tauri-apps/plugin-websocket'
 import { useServerStore } from './servers'
 import type { WSEvent, ServerState, Stats } from '@/types/servers'
+import type { SessionToken } from './credentials'
 
 interface ServerConnection {
   socket: WebSocket | null
@@ -182,7 +183,7 @@ export const useWebSocketStore = defineStore('webSocket', () => {
     }
   }
 
-  async function sendPowerAction(auth: string, serverId: string, action: 'restart' | 'start' | 'stop' | 'kill') {
+  async function sendPowerAction(auth: SessionToken, serverId: string, action: 'restart' | 'start' | 'stop' | 'kill') {
     const connection = getOrCreateConnection(serverId)
     const actionName = action.charAt(0).toUpperCase() + action.slice(1)
     console.log(`${actionName}ing server ${serverId}`)

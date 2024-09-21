@@ -22,6 +22,8 @@ export interface Credentials {
   user: User | null
 }
 
+export type SessionToken = Credentials['session']
+
 export const useCredentialsStore = defineStore('credentials', () => {
   const credentials = ref<Credentials | null>(null)
   const error = ref<Error | null>(null)
