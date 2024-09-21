@@ -108,9 +108,10 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async sendPowerAction(serverId: string, action: string) {
+    async sendPowerAction(auth: string, serverId: string, action: string) {
       try {
         await usePyroFetch(`servers/${serverId}/power`, {
+          session: auth,
           method: 'POST',
           body: { action },
         })

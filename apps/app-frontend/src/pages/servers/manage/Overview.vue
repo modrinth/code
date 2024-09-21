@@ -97,7 +97,7 @@ const animateMarginTop = () => {
 }
 
 const sendPowerAction = async (serverId: string, action: 'restart' | 'start' | 'stop' | 'kill') => {
-  await webSocketStore.sendPowerAction(serverId, action)
+  await webSocketStore.sendPowerAction(props.credentials.session, serverId, action)
 }
 
 onMounted(() => {

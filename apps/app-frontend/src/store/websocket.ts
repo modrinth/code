@@ -182,14 +182,14 @@ export const useWebSocketStore = defineStore('webSocket', () => {
     }
   }
 
-  async function sendPowerAction(serverId: string, action: 'restart' | 'start' | 'stop' | 'kill') {
+  async function sendPowerAction(auth: string, serverId: string, action: 'restart' | 'start' | 'stop' | 'kill') {
     const connection = getOrCreateConnection(serverId)
     const actionName = action.charAt(0).toUpperCase() + action.slice(1)
     console.log(`${actionName}ing server ${serverId}`)
 
     try {
       connection.isActioning = true
-      await serverStore.sendPowerAction(serverId, actionName)
+      await serverStore.sendPowerAction(auth, serverId, actionName)
     } catch (error) {
       console.error(`Error ${actionName}ing server:`, error)
       connection.errorTitle = `Failed to ${actionName.toLowerCase()} server`
