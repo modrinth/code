@@ -38,7 +38,7 @@
       </div>
 
       <div data-pyro-mount class="h-full w-full">
-        <RouterView :credentials="credentials" :server="serverData" />
+        <RouterView :credentials="credentialsStore.credentials" :server="serverData" />
       </div>
 
       <PoweredByPyro />
@@ -52,11 +52,9 @@
 import { RouterView, useRoute } from 'vue-router'
 import { useBreadcrumbs } from '../../../store/breadcrumbs'
 import { useServerStore } from '@/store/servers'
+import { useCredentialsStore } from '@/store/credentials'
 import { ref, onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { handleError } from '@/store/state'
-import { get as getCreds } from '@/helpers/mr_auth.js'
-import { get_user } from '@/helpers/cache.js'
 import PyroLoading from '@/components/ui/servers/PyroLoading.vue'
 import { Avatar } from '@modrinth/ui'
 import ServerGameLabel from '@/components/ui/servers/ServerGameLabel.vue'
@@ -67,24 +65,9 @@ import PyroError from '@/components/ui/servers/PyroError.vue'
 import { PyroFetchError } from '@/helpers/pyroFetch'
 import NavTabs from '@/components/ui/NavTabs.vue'
 
-export type Credentials = {
-  session: string
-  expires: Date
-  user_id: string
-  active: boolean
-  user: {
-    id: string
-    username: string
-    avatar_url: string
-    bio: string
-    created: Date
-    role: string
-    badges: number
-  }
-}
-
 const route = useRoute()
 const serverStore = useServerStore()
+const credentialsStore = useCredentialsStore() // Use the new store
 const breadcrumbs = useBreadcrumbs()
 
 const serverId = computed(() => route.params.id as string)
@@ -92,7 +75,6 @@ const loading = ref(true)
 const error = ref<Error | null>(null)
 const errorTitle = ref('Error')
 const errorMessage = ref('An unexpected error occurred.')
-const credentials = ref<Credentials | null>(null)
 
 const { serverData: storeServerData } = storeToRefs(serverStore)
 const serverData = computed(() => storeServerData.value[serverId.value] || null)
@@ -109,23 +91,8 @@ const navLinks = [
   { label: 'Options', href: `/servers/manage/${serverId.value}/options` },
 ]
 
-async function fetchCredentials() {
-  try {
-    const creds = await getCreds()
-    if (creds && creds.user_id) {
-      creds.user = await get_user(creds.user_id)
-    }
-    credentials.value = creds
-  } catch (err) {
-    handleError(err)
-    error.value = err as Error
-    errorTitle.value = 'Authentication Error'
-    errorMessage.value = 'Failed to fetch Modrinth session. Are you logged in?'
-  }
-}
-
 async function fetchServerDataOnMount() {
-  if (!credentials.value) {
+  if (!credentialsStore.credentials) {
     error.value = new Error('No credentials')
     errorTitle.value = 'Authentication Error'
     errorMessage.value = 'Could not retrieve Modrinth session. Try logging in again.'
@@ -133,7 +100,7 @@ async function fetchServerDataOnMount() {
     return
   }
 
-  const session = credentials.value.session || null
+  const session = credentialsStore.credentials.session || null
 
   if (!session) {
     error.value = new Error('No session')
@@ -176,9 +143,14 @@ async function fetchServerDataOnMount() {
 }
 
 onMounted(async () => {
-  await fetchCredentials()
-  if (!error.value) {
+  await credentialsStore.fetchCredentials()
+  if (!credentialsStore.error) {
     await fetchServerDataOnMount()
+  } else {
+    error.value = credentialsStore.error
+    errorTitle.value = 'Authentication Error'
+    errorMessage.value = 'Failed to fetch Modrinth session. Are you logged in?'
+    loading.value = false
   }
 })
 </script>

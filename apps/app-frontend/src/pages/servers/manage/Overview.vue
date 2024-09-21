@@ -55,7 +55,7 @@ import PanelServerActionButton from '@/components/ui/servers/PanelServerActionBu
 import PanelTerminal from '@/components/ui/servers/PanelTerminal.vue'
 import PanelOverviewLoading from '@/components/ui/servers/PanelOverviewLoading.vue'
 import PyroError from '@/components/ui/servers/PyroError.vue'
-import type { Credentials } from './Index.vue'
+import type { Credentials } from '@/store/credentials'
 
 const webSocketStore = useWebSocketStore()
 const route = useRoute()

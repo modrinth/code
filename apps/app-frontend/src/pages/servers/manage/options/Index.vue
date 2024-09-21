@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import type { Server } from '@/types/servers'
-import type { Credentials } from '../Index.vue'
+import type { Credentials } from '@/store/credentials'
 
 defineProps<{
   server: Server

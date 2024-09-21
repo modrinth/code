@@ -68,37 +68,19 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { handleError } from '@/store/state'
-import { get as getCreds } from '@/helpers/mr_auth.js'
-import { get_user } from '@/helpers/cache.js'
 import { useServerStore } from '@/store/servers'
+import { useCredentialsStore } from '@/store/credentials'
 import type { Server } from '@/types/servers'
 import PyroLoading from '@/components/ui/servers/PyroLoading.vue'
 import ServerListing from '@/components/ui/servers/ServerListing.vue'
 
-type Credentials = {
-  session: string
-  expires: Date
-  user_id: string
-  active: boolean
-  user: {
-    id: string
-    username: string
-    avatar_url: string
-    bio: string
-    created: Date
-    role: string
-    badges: number
-  }
-}
-
-const credentials = ref<Credentials | null>(null)
 const servers = ref<Server[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const searchQuery = ref('')
 
 const serverStore = useServerStore()
+const credentialsStore = useCredentialsStore()
 
 const filteredServers = computed(() => {
   if (!searchQuery.value) return servers.value
@@ -106,30 +88,17 @@ const filteredServers = computed(() => {
   return servers.value.filter((server) => server.name.toLowerCase().includes(query))
 })
 
-async function fetchCredentials() {
-  try {
-    const creds = await getCreds()
-    if (creds && creds.user_id) {
-      creds.user = await get_user(creds.user_id)
-    }
-    credentials.value = creds
-  } catch (err) {
-    handleError(err)
-    error.value = 'Failed to fetch Modrinth session. Are you logged in???'
-  }
-}
-
 async function fetchServers() {
-  if (!credentials.value) {
+  if (!credentialsStore.credentials) {
     error.value = 'Could not retrieve Modrinth session. Try logging in again.'
     loading.value = false
     return
   }
 
-  const session = credentials.value.session || null
+  const session = credentialsStore.credentials.session || null
 
   if (!session) {
-    error.value = 'No session found in credentials. Shit is FUCKED'
+    error.value = 'No session found in credentials.'
     loading.value = false
     return
   }
@@ -151,9 +120,12 @@ async function fetchServers() {
 }
 
 onMounted(async () => {
-  await fetchCredentials()
-  if (!error.value) {
+  await credentialsStore.fetchCredentials()
+  if (!credentialsStore.error) {
     await fetchServers()
+  } else {
+    error.value = 'Failed to fetch Modrinth session. Are you logged in?'
+    loading.value = false
   }
 })
 </script>
