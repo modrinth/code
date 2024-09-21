@@ -30,8 +30,9 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
 
   const fullUrl = `https://archon.pyro.host/modrinth/v${version}/${path.replace(/^\//, '')}`
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const headers: any = {
+  type HeadersRecord = Record<string, string>
+
+  const headers: HeadersRecord = {
     Accept: accept,
     Authorization: `Bearer ${authToken}`,
     'Access-Control-Allow-Headers': 'Authorization',

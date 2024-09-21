@@ -49,7 +49,9 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     ? `https://${override.url}/${path.replace(/^\//, "")}`
     : `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`;
 
-  const headers: any = {
+  type HeadersRecord = Record<string, string>;
+
+  const headers: HeadersRecord = {
     Accept: accept,
     Authorization: `Bearer ${override?.token ?? authToken}`,
     "Access-Control-Allow-Headers": "Authorization",
