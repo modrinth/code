@@ -66,6 +66,10 @@ export interface Project {
   gallery: GalleryItem[];
 }
 
+export interface Version extends Project {
+  project_id: string;
+}
+
 export interface ServerBackup {
   id: string;
   name: string;

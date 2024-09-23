@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { usePyroFetch } from '@/helpers/pyroFetch'
 import { defineStore } from 'pinia'
-import type { Project, Server, ServerBackup, WSAuth } from '@/types/servers'
+import type { Project, Server, ServerBackup, Version, WSAuth } from '@/types/servers'
 import type { SessionToken } from './credentials'
 import { ofetch } from 'ofetch'
 
@@ -24,11 +24,11 @@ export const useServerStore = defineStore('servers', {
         })
 
         if (data.modpack) {
-          const pid: Project = await this.fetchModpackVersion(data.modpack)
-          // @ts-expect-error Yeah I know eslint
-          const project = await this.fetchProject(pid.project_id)
+          const version: Version = await this.fetchModpackVersion(data.modpack)
 
-          data.modpack_id = pid.id
+          const project = await this.fetchProject(version.project_id as Project['id'])
+
+          data.modpack_id = version.id
           data.project = project as Project | null
         }
 
@@ -55,7 +55,7 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async fetchModpackVersion(modpackId: string): Promise<Project> {
+    async fetchModpackVersion(modpackId: string): Promise<Version> {
       try {
         const result = await ofetch(`https://staging-api.modrinth.com/v2/version/${modpackId}`, {
           method: 'GET',
@@ -64,7 +64,7 @@ export const useServerStore = defineStore('servers', {
             'User-Agent': 'Pyro/1.0 (https://pyro.host)',
           },
         })
-        return result as Project
+        return result as Version
       } catch (error) {
         console.error('Error fetching modpack version:', error)
         throw error
