@@ -329,7 +329,7 @@ const createBackup = async () => {
       group: "server",
       title: `Backup created`,
       text: "Your backup has been created successfully.",
-      type: "error",
+      type: "success",
     });
   } catch (error) {
     backupError.value = error as string;

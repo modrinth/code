@@ -1,9 +1,8 @@
 <template>
   <div
-    class="group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem] hover:bg-bg-raised cursor-pointer"
-    @click="navigateToFolder"
+    class="group flex w-full cursor-pointer items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem] last:rounded-b-xl last:border-none hover:bg-bg-raised"
   >
-    <div class="flex items-center gap-2">
+    <div class="flex w-full items-center gap-2" @click="navigateToFolder">
       <div
         class="flex h-8 w-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
       >
@@ -24,16 +23,20 @@
       :options="[
         {
           id: 'rename',
-          action: () => {},
+          action: () => $emit('rename', { name, type, path }),
         },
         {
-          id: 'restore',
-          action: () => {},
+          id: 'move',
+          action: () => $emit('move', { name, type, path }),
         },
-        { id: 'download', action: () => {} },
+        {
+          id: 'download',
+          action: () => $emit('download', { name, type, path }),
+          shown: type !== 'directory',
+        },
         {
           id: 'delete',
-          action: () => {},
+          action: () => $emit('delete', { name, type, path }),
           color: 'red',
         },
       ]"
@@ -42,7 +45,7 @@
     >
       <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
       <template #rename> <EditIcon /> Rename </template>
-      <template #restore> <ClipboardCopyIcon /> Restore </template>
+      <template #move> <ArrowBigUpDashIcon /> Move </template>
       <template #download> <DownloadIcon /> Download </template>
       <template #delete> <TrashIcon /> Delete </template>
     </OverflowMenu>
@@ -54,11 +57,11 @@ import { OverflowMenu } from "@modrinth/ui";
 import {
   MoreHorizontalIcon,
   EditIcon,
-  ClipboardCopyIcon,
   DownloadIcon,
   TrashIcon,
   FolderOpenIcon,
   FileIcon,
+  ArrowBigUpDashIcon,
 } from "@modrinth/assets";
 
 const router = useRouter();
@@ -66,7 +69,7 @@ const route = useRoute();
 
 const props = defineProps({
   name: {
-    type: String as PropType<string>,
+    type: String,
     required: true,
   },
   type: {
@@ -74,34 +77,39 @@ const props = defineProps({
     required: true,
   },
   size: {
-    type: Number as PropType<number>,
+    type: Number,
     required: false,
     default: 0,
   },
   count: {
-    type: Number as PropType<number>,
+    type: Number,
     required: false,
     default: 0,
   },
   created: {
-    type: Number as PropType<number>,
+    type: Number,
     required: false,
     default: 0,
   },
   modified: {
-    type: Number as PropType<number>,
+    type: Number,
     required: false,
     default: 0,
   },
+  path: {
+    type: String,
+    required: true,
+  },
 });
+
+const emit = defineEmits(["rename", "download", "delete", "move"]);
 
 const sizeInMB = computed(() => parseFloat((props.size / 1024 / 1024).toFixed(2)));
 
-const currentPath = ref(route.query.path || "/");
-
 const navigateToFolder = () => {
-  const newPath = `${route.query.path ?? ""}/${props.name}`;
-  // if file append /edit to end of path
-  router.push({ query: { path: newPath + (props.type === "file" ? "&edit=true" : "") } });
+  if (props.type === "directory") {
+    const newPath = `${route.query.path ?? ""}/${props.name}`;
+    router.push({ query: { path: newPath } });
+  }
 };
 </script>

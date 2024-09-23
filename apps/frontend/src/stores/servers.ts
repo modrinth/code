@@ -313,6 +313,7 @@ export const useServerStore = defineStore("servers", {
         throw error;
       }
     },
+
     async listDirContents(data: any, path: string, page: number, pageSize: number) {
       try {
         return (await usePyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
@@ -334,6 +335,44 @@ export const useServerStore = defineStore("servers", {
         console.error("Error listing dir contents:", error);
         throw error;
       }
+    },
+
+    createFileOrFolder(data: any, path: string, name: string, type: "file" | "directory") {
+      return usePyroFetch(`/create?path=${path}&type=${type}`, {
+        method: "POST",
+        override: data,
+      });
+    },
+
+    renameFileOrFolder(data: any, path: string, name: string) {
+      return usePyroFetch(`/rename?path=${path}&name=${name}`, {
+        method: "PUT",
+        override: data,
+      });
+    },
+
+    moveFileOrFolder(data: any, path: string, newPath: string) {
+      return usePyroFetch(`/move`, {
+        method: "PUT",
+        override: data,
+        body: {
+          source: path,
+          destination: newPath,
+        },
+      });
+    },
+
+    deleteFileOrFolder(data: any, path: string, recursive: boolean) {
+      return usePyroFetch(`/delete?path=${path}&recursive=${recursive}`, {
+        method: "DELETE",
+        override: data,
+      });
+    },
+
+    downloadFile(data: any, path: string) {
+      return usePyroFetch(`/download?path=${path}`, {
+        override: data,
+      });
     },
 
     clearError() {
