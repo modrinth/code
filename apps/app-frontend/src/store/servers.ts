@@ -2,9 +2,8 @@
 import { usePyroFetch } from '@/helpers/pyroFetch'
 import { defineStore } from 'pinia'
 import type { Project, Server, ServerBackup, WSAuth } from '@/types/servers'
-import { toRaw } from 'vue'
-import { useFetch } from '@/helpers/fetch'
 import type { SessionToken } from './credentials'
+import { ofetch } from 'ofetch'
 
 interface ServerState {
   serverData: Record<string, Server>
@@ -58,7 +57,13 @@ export const useServerStore = defineStore('servers', {
 
     async fetchModpackVersion(modpackId: string): Promise<Project> {
       try {
-        const result = await toRaw(useFetch(`version/${modpackId}`))
+        const result = await ofetch(`https://staging-api.modrinth.com/v2/version/${modpackId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Pyro/1.0 (https://pyro.host)',
+          },
+        })
         return result as Project
       } catch (error) {
         console.error('Error fetching modpack version:', error)
@@ -68,7 +73,14 @@ export const useServerStore = defineStore('servers', {
 
     async fetchProject(projectId: string) {
       try {
-        return await toRaw(useFetch(`project/${projectId}`))
+        const result = await ofetch(`https://staging-api.modrinth.com/v2/project/${projectId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Pyro/1.0 (https://pyro.host)',
+          },
+        })
+        return result as Project
       } catch (error) {
         console.error('Error fetching project:', error)
         throw error
