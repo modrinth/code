@@ -1,6 +1,5 @@
 <template>
-  <div>content</div>
-  {{ server }}
+  <pre>{{ server }}</pre>
   {{ credentials }}
 </template>
 

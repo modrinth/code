@@ -25,7 +25,6 @@ export const useServerStore = defineStore('servers', {
 
         if (data.modpack) {
           const version: Version = await this.fetchModpackVersion(data.modpack)
-
           const project = await this.fetchProject(version.project_id as Project['id'])
 
           data.modpack_id = version.id
