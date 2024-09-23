@@ -130,8 +130,8 @@
       >
         <div class="flex items-center gap-2 text-contrast">
           <span
-            @click="navigateToSegment(-1)"
             class="breadcrumb-link flex cursor-pointer items-center gap-2"
+            @click="navigateToSegment(-1)"
           >
             <BoxIcon class="h-6 w-6 text-brand" />
             <span class="opacity-50">/</span>
@@ -139,8 +139,8 @@
           <span
             v-for="(segment, index) in breadcrumbSegments"
             :key="index"
-            @click="navigateToSegment(index)"
             class="breadcrumb-link cursor-pointer"
+            @click="navigateToSegment(index)"
           >
             {{ segment || "" }}
             <span class="ms-1 opacity-50">/</span>
@@ -188,7 +188,7 @@
       </div>
       <UiServersPyroLoading v-else />
     </div>
-    <div class="mt-4 flex w-full flex-col items-center" v-if="data && data.total >= 1">
+    <div v-if="data && data.total >= 1" class="mt-4 flex w-full flex-col items-center">
       <Pagination
         :page="currentPage"
         :count="data.total"
@@ -317,7 +317,7 @@ const downloadFile = async (item: any) => {
       if (typeof downloadUrl === "string" || downloadUrl instanceof URL) {
         window.open(downloadUrl.toString(), "_blank");
       } else {
-        throw new Error("Invalid download URL");
+        throw new TypeError("Invalid download URL");
       }
     } catch (error) {
       console.error("Error downloading file:", error);
