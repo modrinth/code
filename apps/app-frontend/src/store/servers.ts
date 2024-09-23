@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { usePyroFetch } from '@/helpers/pyroFetch'
 import { defineStore } from 'pinia'
 import type { Project, Server, ServerBackup, WSAuth } from '@/types/servers'
@@ -9,7 +10,6 @@ interface ServerState {
   serverData: Record<string, Server>
   error: Error | null
 }
-
 
 export const useServerStore = defineStore('servers', {
   state: (): ServerState => ({
@@ -26,8 +26,7 @@ export const useServerStore = defineStore('servers', {
 
         if (data.modpack) {
           const pid: Project = await this.fetchModpackVersion(data.modpack)
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
+          // @ts-expect-error Yeah I know eslint
           const project = await this.fetchProject(pid.project_id)
 
           data.modpack_id = pid.id
@@ -40,7 +39,7 @@ export const useServerStore = defineStore('servers', {
         this.serverData[serverId] = data
         this.error = null
       } catch (error) {
-        console.error('(PYROFETCH) Error fetching server data:', error)
+        console.error('Error fetching server data:', error)
         this.error = error instanceof Error ? error : new Error('An unknown error occurred')
         throw this.error
       }
@@ -123,9 +122,10 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async updateServerName(serverId: string, newName: string) {
+    async updateServerName(auth: SessionToken, serverId: string, newName: string) {
       try {
         await usePyroFetch(`servers/${serverId}/name`, {
+          session: auth,
           method: 'POST',
           body: { name: newName },
         })
@@ -146,9 +146,10 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async createBackup(serverId: string, backupName: string) {
+    async createBackup(auth: SessionToken, serverId: string, backupName: string) {
       try {
         await usePyroFetch(`servers/${serverId}/backups`, {
+          session: auth,
           method: 'POST',
           body: { name: backupName },
         })
@@ -158,9 +159,10 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async renameBackup(serverId: string, backupId: string, newName: string) {
+    async renameBackup(auth: SessionToken, serverId: string, backupId: string, newName: string) {
       try {
         await usePyroFetch(`servers/${serverId}/backups/${backupId}/rename`, {
+          session: auth,
           method: 'POST',
           body: { name: newName },
         })
@@ -170,9 +172,10 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async deleteBackup(serverId: string, backupId: string) {
+    async deleteBackup(auth: SessionToken, serverId: string, backupId: string) {
       try {
         await usePyroFetch(`servers/${serverId}/backups/${backupId}`, {
+          session: auth,
           method: 'DELETE',
         })
       } catch (error) {
@@ -181,9 +184,10 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async restoreBackup(serverId: string, backupId: string) {
+    async restoreBackup(auth: SessionToken, serverId: string, backupId: string) {
       try {
         await usePyroFetch(`servers/${serverId}/backups/${backupId}/restore`, {
+          session: auth,
           method: 'POST',
         })
       } catch (error) {
@@ -192,46 +196,54 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async downloadBackup(serverId: string, backupId: string) {
+    async downloadBackup(auth: SessionToken, serverId: string, backupId: string) {
       try {
-        return await usePyroFetch(`servers/${serverId}/backups/${backupId}`)
+        return await usePyroFetch(`servers/${serverId}/backups/${backupId}`, {
+          session: auth,
+        })
       } catch (error) {
         console.error('Error downloading backup:', error)
         throw error
       }
     },
 
-    async initiateWorldDownload(serverId: string) {
+    async initiateWorldDownload(auth: SessionToken, serverId: string) {
       try {
-        await usePyroFetch(`servers/${serverId}/world`)
+        await usePyroFetch(`servers/${serverId}/world`, {
+          session: auth,
+        })
       } catch (error) {
         console.error('Error initiating world download:', error)
         throw error
       }
     },
 
-    async getWorldDownloadURL(serverId: string) {
+    async getWorldDownloadURL(auth: SessionToken, serverId: string) {
       try {
-        return await usePyroFetch(`servers/${serverId}/download`)
+        return await usePyroFetch(`servers/${serverId}/download`, {
+          session: auth,
+        })
       } catch (error) {
         console.error('Error getting world download URL:', error)
         throw error
       }
     },
 
-    async fetchConfigFile(serverId: string, fileName: string) {
+    async fetchConfigFile(auth: SessionToken, serverId: string, fileName: string) {
       try {
-        return await usePyroFetch(`servers/${serverId}/config/${fileName}`)
+        return await usePyroFetch(`servers/${serverId}/config/${fileName}`, {
+          session: auth,
+        })
       } catch (error) {
         console.error('Error fetching config file:', error)
         throw error
       }
     },
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async saveConfigFile(serverId: string, fileName: string, data: any) {
+    async saveConfigFile(auth: SessionToken, serverId: string, fileName: string, data: any) {
       try {
         await usePyroFetch(`servers/${serverId}/config/${fileName}`, {
+          session: auth,
           method: 'PUT',
           body: data,
         })
@@ -241,18 +253,21 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async checkSubdomainAvailability(subdomain: string) {
+    async checkSubdomainAvailability(auth: SessionToken, subdomain: string) {
       try {
-        return await usePyroFetch(`subdomains/${subdomain}/isavailable`)
+        return await usePyroFetch(`subdomains/${subdomain}/isavailable`, {
+          session: auth,
+        })
       } catch (error) {
         console.error('Error checking subdomain availability:', error)
         throw error
       }
     },
 
-    async changeSubdomain(serverId: string, subdomain: string) {
+    async changeSubdomain(auth: SessionToken, serverId: string, subdomain: string) {
       try {
         await usePyroFetch(`servers/${serverId}/subdomain`, {
+          session: auth,
           method: 'POST',
           body: { subdomain },
         })
@@ -262,9 +277,10 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async installMod(serverId: string, projectId: string, versionId: string) {
+    async installMod(auth: SessionToken, serverId: string, projectId: string, versionId: string) {
       try {
         await usePyroFetch(`servers/${serverId}/mods`, {
+          session: auth,
           method: 'POST',
           body: { rinth_ids: { project_id: projectId, version_id: versionId } },
         })
@@ -274,9 +290,10 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async removeMod(serverId: string, modId: string) {
+    async removeMod(auth: SessionToken, serverId: string, modId: string) {
       try {
         await usePyroFetch(`servers/${serverId}/mods/${modId}`, {
+          session: auth,
           method: 'DELETE',
         })
       } catch (error) {
@@ -285,9 +302,10 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async reinstallMod(serverId: string, modId: string, versionId: string) {
+    async reinstallMod(auth: SessionToken, serverId: string, modId: string, versionId: string) {
       try {
         await usePyroFetch(`servers/${serverId}/mods/${modId}`, {
+          session: auth,
           method: 'POST',
           body: { version_id: versionId },
         })
@@ -297,9 +315,15 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async reinstallServer(serverId: string, projectId: string, versionId: string) {
+    async reinstallServer(
+      auth: SessionToken,
+      serverId: string,
+      projectId: string,
+      versionId: string,
+    ) {
       try {
         await usePyroFetch(`servers/${serverId}/reinstall`, {
+          session: auth,
           method: 'POST',
           body: { project_id: projectId, version_id: versionId },
         })
@@ -307,6 +331,109 @@ export const useServerStore = defineStore('servers', {
         console.error('Error reinstalling server:', error)
         throw error
       }
+    },
+
+    async suspendServer(auth: SessionToken, serverId: string, status: boolean) {
+      try {
+        await usePyroFetch(`servers/${serverId}/suspend`, {
+          session: auth,
+          method: 'POST',
+          body: { suspended: status },
+        })
+      } catch (error) {
+        console.error('Error suspending server:', error)
+        throw error
+      }
+    },
+
+    async getFileApiInfo(auth: SessionToken, serverId: string) {
+      try {
+        return await usePyroFetch(`servers/${serverId}/fs`, {
+          session: auth,
+        })
+      } catch (error) {
+        console.error('Error getting file api info:', error)
+        throw error
+      }
+    },
+
+    async listDirContents(
+      auth: SessionToken,
+      data: any,
+      path: string,
+      page: number,
+      pageSize: number,
+    ) {
+      try {
+        return (await usePyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
+          session: auth,
+          override: data,
+        })) as {
+          current: number
+          items: {
+            count: number
+            created: number
+            modified: number
+            name: string
+            path: string
+            type: 'directory' | 'file'
+            size: number
+          }[]
+          total: number
+        }
+      } catch (error) {
+        console.error('Error listing dir contents:', error)
+        throw error
+      }
+    },
+
+    createFileOrFolder(
+      auth: SessionToken,
+      data: any,
+      path: string,
+      name: string,
+      type: 'file' | 'directory',
+    ) {
+      return usePyroFetch(`/create?path=${path}&type=${type}`, {
+        session: auth,
+        method: 'POST',
+        override: data,
+      })
+    },
+
+    renameFileOrFolder(auth: SessionToken, data: any, path: string, name: string) {
+      return usePyroFetch(`/rename?path=${path}&name=${name}`, {
+        session: auth,
+        method: 'PUT',
+        override: data,
+      })
+    },
+
+    moveFileOrFolder(auth: SessionToken, data: any, path: string, newPath: string) {
+      return usePyroFetch(`/move`, {
+        session: auth,
+        method: 'PUT',
+        override: data,
+        body: {
+          source: path,
+          destination: newPath,
+        },
+      })
+    },
+
+    deleteFileOrFolder(auth: SessionToken, data: any, path: string, recursive: boolean) {
+      return usePyroFetch(`/delete?path=${path}&recursive=${recursive}`, {
+        session: auth,
+        method: 'DELETE',
+        override: data,
+      })
+    },
+
+    downloadFile(auth: SessionToken, data: any, path: string) {
+      return usePyroFetch(`/download?path=${path}`, {
+        session: auth,
+        override: data,
+      })
     },
 
     clearError() {
