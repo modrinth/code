@@ -346,9 +346,11 @@ const showRenameModal = (item: any) => {
   renameItemModal.value?.show();
 };
 
-const showMoveModal = (item) => {
+const showMoveModal = (item: any) => {
   selectedItem.value = item;
-  destinationFolder.value = currentPath.value;
+  destinationFolder.value = Array.isArray(currentPath.value)
+    ? currentPath.value.join("")
+    : currentPath.value;
   moveItemModal.value?.show();
 };
 
