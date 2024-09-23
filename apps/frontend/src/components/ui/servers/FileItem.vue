@@ -102,7 +102,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["rename", "download", "delete", "move"]);
+defineEmits(["rename", "download", "delete", "move"]);
 
 const sizeInMB = computed(() => parseFloat((props.size / 1024 / 1024).toFixed(2)));
 
