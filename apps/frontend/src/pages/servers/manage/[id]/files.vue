@@ -239,9 +239,10 @@ const { data, status } = await useLazyAsyncData("filesData", async () => {
 });
 
 watch(
-  () => route.query.path,
-  async (newPath) => {
-    currentPath.value = newPath || "/";
+  () => route.query,
+  async (newQuery) => {
+    currentPath.value = newQuery.path || "/";
+    currentPage.value = newQuery.page || 1;
     await refreshNuxtData("filesData");
   },
 );
@@ -255,11 +256,11 @@ const breadcrumbSegments = computed(() => {
 
 const navigateToSegment = (index: number) => {
   const newPath = breadcrumbSegments.value.slice(0, index + 1).join("/");
-  router.push({ query: { path: newPath } });
+  router.push({ query: { path: newPath, page: 1 } });
 };
 
 const navigateToPage = (page: number) => {
-  currentPage.value = page;
+  router.push({ query: { page: page } });
   refreshNuxtData("filesData");
 };
 

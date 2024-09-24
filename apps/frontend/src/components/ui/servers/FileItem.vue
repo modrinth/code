@@ -109,7 +109,7 @@ const sizeInMB = computed(() => parseFloat((props.size / 1024 / 1024).toFixed(2)
 const navigateToFolder = () => {
   if (props.type === "directory") {
     const newPath = `${route.query.path ?? ""}/${props.name}`;
-    router.push({ query: { path: newPath } });
+    router.push({ query: { path: newPath, page: 1 } });
   }
 };
 </script>
