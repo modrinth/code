@@ -259,15 +259,15 @@ pub fn app_setup(
     }
 
     let stripe_client = stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
-    {
-        let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
-        let stripe_client_ref = stripe_client.clone();
-
-        actix_rt::spawn(async move {
-            routes::internal::billing::task(stripe_client_ref, pool_ref, redis_ref).await;
-        });
-    }
+    // {
+    //     let pool_ref = pool.clone();
+    //     let redis_ref = redis_pool.clone();
+    //     let stripe_client_ref = stripe_client.clone();
+    //
+    //     actix_rt::spawn(async move {
+    //         routes::internal::billing::task(stripe_client_ref, pool_ref, redis_ref).await;
+    //     });
+    // }
 
     let ip_salt = Pepper {
         pepper: models::ids::Base62Id(models::ids::random_base62(11)).to_string(),

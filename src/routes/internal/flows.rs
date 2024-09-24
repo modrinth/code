@@ -1628,7 +1628,28 @@ async fn validate_2fa_code(
         .generate_current()
         .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
+    const TOTP_NAMESPACE: &str = "used_totp";
+    let mut conn = redis.connect().await?;
+
+    // Check if TOTP has already been used
+    if conn
+        .get(TOTP_NAMESPACE, &format!("{}-{}", token, user_id.0))
+        .await?
+        .is_some()
+    {
+        return Err(AuthenticationError::InvalidCredentials);
+    }
+
     if input == token {
+        conn
+            .set(
+                TOTP_NAMESPACE,
+                &format!("{}-{}", token, user_id.0),
+                "",
+                Some(60),
+            )
+            .await?;
+
         Ok(true)
     } else if allow_backup {
         let backup_codes = crate::database::models::User::get_backup_codes(user_id, pool).await?;
