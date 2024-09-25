@@ -45,7 +45,7 @@
           <div class="flex flex-col gap-2">
             <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input
-              v-model="c_backupsName"
+              v-model="createBackupName"
               type="text"
               class="bg-bg-input w-full rounded-lg p-4"
               placeholder="e.g. Before 1.21"
@@ -80,7 +80,7 @@
           <div class="mt-2 flex flex-col gap-2">
             <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input
-              v-model="r_backupsName"
+              v-model="renameBackupName"
               type="text"
               class="bg-bg-input w-full rounded-lg p-4"
               placeholder="e.g. Before 1.21"
@@ -172,7 +172,7 @@
           </div>
           <div class="mb-4 mt-4 flex justify-end gap-4">
             <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
-            <Button color="danger" @click="deleteBackupModal?.hide()"> Delete backup </Button>
+            <Button color="danger" @click="deleteBackup(currentBackup)"> Delete backup </Button>
           </div>
         </div>
       </Modal>
@@ -215,7 +215,7 @@
                   {
                     id: 'rename',
                     action: () => {
-                      r_backupsName = backup.name;
+                      renameBackupName = backup.name;
                       currentBackup = backup.id;
                       renameBackupModal?.show();
                     },
@@ -276,14 +276,11 @@ import {
 } from "@modrinth/assets";
 import { ref, reactive } from "vue";
 
-import type { ServerBackup } from "~/types/servers.ts";
-
 const app = useNuxtApp();
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
-const auth = await useAuth();
-const emits = defineEmits(["onDownload"]);
+defineEmits(["onDownload"]);
 
 useHead({
   title: `Backups - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
@@ -303,8 +300,8 @@ const renameBackupModal = ref<typeof Modal>();
 const restoreBackupModal = ref<typeof Modal>();
 const deleteBackupModal = ref<typeof Modal>();
 
-const c_backupsName = ref("");
-const r_backupsName = ref("");
+const createBackupName = ref("");
+const renameBackupName = ref("");
 
 const currentBackup = ref("");
 
@@ -318,7 +315,7 @@ const showCreateModel = () => {
 
 const createBackup = async () => {
   backupsState.loading = true;
-  const backupName = c_backupsName.value;
+  const backupName = createBackupName.value;
   try {
     serverStore.createBackup(serverId, backupName);
 
@@ -339,7 +336,7 @@ const createBackup = async () => {
 };
 
 const renameBackup = async (backupId: string) => {
-  const backupName = r_backupsName.value;
+  const backupName = renameBackupName.value;
   console.log("renaming", backupName);
   try {
     await serverStore.renameBackup(serverId, backupId, backupName);
