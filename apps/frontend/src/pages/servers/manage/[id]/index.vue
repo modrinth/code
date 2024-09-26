@@ -29,9 +29,10 @@
       >
         <input
           v-model="commandInput"
+          @keyup.enter="sendCommand"
           type="text"
           placeholder="Send a command"
-          class="z-50 w-[96%] rounded-md p-2 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+          class="z-50 w-[96%] rounded-md p-2 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
         />
       </UiServersPanelTerminal>
     </div>
@@ -165,6 +166,13 @@ const connectWebSocket = async () => {
     console.error("WebSocket error:", error);
     isConnected.value = false;
   };
+};
+
+const sendCommand = async () => {
+  if (!socket) return;
+  console.log("Sending command", commandInput.value);
+  socket.send(JSON.stringify({ event: "command", cmd: commandInput.value }));
+  commandInput.value = "";
 };
 
 const handleWebSocketMessage = (data: WSEvent) => {

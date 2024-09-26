@@ -1,7 +1,7 @@
 <template>
   <div
     data-pyro-terminal-holy-shit
-    class="terminal-font console relative flex h-full w-full flex-col items-center gap-4 overflow-hidden rounded-xl pb-4 text-sm"
+    class="terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-xl pb-4 text-sm"
   >
     <div
       ref="scrollContainer"

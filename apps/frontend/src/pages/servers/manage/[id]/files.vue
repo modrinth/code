@@ -16,11 +16,6 @@
         </div>
         <div class="mt-2 flex flex-col gap-2">
           <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <UiServersFileEditor
-            v-model="newItemName"
-            :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
-            @update:model-value="newItemName = $event"
-          />
         </div>
         <div class="mb-4 mt-4 flex justify-end gap-4">
           <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
@@ -226,10 +221,13 @@
           @move="showMoveModal(item)"
           @edit="editFile(item)"
         />
-        <div v-if="!isLoading && items.length < totalItems" ref="sentinel"></div>
+        <div v-if="!isLoading" ref="sentinel"></div>
       </div>
 
-      <div v-else-if="!auth" class="flex h-full w-full items-center justify-center gap-6 p-20">
+      <div
+        v-else-if="!auth && !isLoading"
+        class="flex h-full w-full items-center justify-center gap-6 p-20"
+      >
         <FileIcon class="text-red-500 h-16 w-16" />
         <div class="flex flex-col gap-2">
           <h3 class="text-red-500 m-0 text-2xl font-bold">Unable to fetch file api info</h3>
@@ -272,15 +270,16 @@ import {
   FolderOpenIcon,
 } from "@modrinth/assets";
 import { Button, Modal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
-import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import { useInfiniteScroll } from "@vueuse/core";
 
 const route = useRoute();
 const router = useRouter();
 const serverId = route.params.id.toString();
 const serverStore = useServerStore();
 
-const maxResults = 20;
+const maxResults = 100;
 const currentPage = ref(1);
+const pages = ref(1);
 const currentPath = ref(route.query.path || "");
 
 useHead({
@@ -298,30 +297,22 @@ const fetchAuth = async () => {
   }
 };
 
-// Reactive list of items
+const scrollContainer = ref<HTMLElement | null>(null);
 const items = ref<any[]>([]);
-
-// Track total items if available
-const totalItems = ref(0);
-
-// Loading state
-const isLoading = ref(false);
-
-// Error state
+const isLoading = ref(true);
 const loadError = ref(false);
 
-// References to DOM elements
-const sentinel = ref<HTMLElement | null>(null);
-const scrollContainer = ref<HTMLElement | null>(null);
-
-// Intersection Observer
-let observer: IntersectionObserver | null = null;
+const { reset } = useInfiniteScroll(
+  scrollContainer,
+  () => {
+    if (currentPage.value <= pages.value) {
+      fetchData();
+    }
+  },
+  { distance: 200 },
+);
 
 const fetchData = async () => {
-  if (isLoading.value || (totalItems.value && items.value.length >= totalItems.value)) {
-    return;
-  }
-
   isLoading.value = true;
   loadError.value = false;
 
@@ -344,7 +335,7 @@ const fetchData = async () => {
     });
 
     items.value.push(...data.items);
-    totalItems.value = data.total;
+    pages.value = data.total;
 
     currentPage.value++;
   } catch (error) {
@@ -355,40 +346,10 @@ const fetchData = async () => {
   }
 };
 
-const setupObserver = () => {
-  if (observer) {
-    observer.disconnect();
-  }
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].isIntersecting) {
-        fetchData();
-      }
-    },
-    {
-      root: scrollContainer.value,
-      rootMargin: "0px",
-      threshold: 1.0,
-    },
-  );
-
-  if (sentinel.value) {
-    observer.observe(sentinel.value);
-  }
-};
-
 onMounted(async () => {
   await fetchAuth();
   if (auth.value) {
     await fetchData();
-    setupObserver();
-  }
-});
-
-onBeforeUnmount(() => {
-  if (observer) {
-    observer.disconnect();
   }
 });
 
@@ -399,11 +360,9 @@ watch(
     currentPath.value = newPath || "/";
     currentPage.value = 1;
     items.value = [];
-    totalItems.value = 0;
     loadError.value = false;
     if (auth.value) {
       await fetchData();
-      setupObserver();
     }
   },
 );
@@ -475,9 +434,7 @@ const createNewItem = async () => {
 
     currentPage.value = 1;
     items.value = [];
-    totalItems.value = 0;
     await fetchData();
-    setupObserver();
     createItemModal.value?.hide();
     console.log("Created new item and refreshed data.");
   } catch (error) {
@@ -495,9 +452,7 @@ const renameItem = async () => {
 
     currentPage.value = 1;
     items.value = [];
-    totalItems.value = 0;
     await fetchData();
-    setupObserver();
     renameItemModal.value?.hide();
     console.log("Renamed item and refreshed data.");
   } catch (error) {
@@ -517,9 +472,7 @@ const moveItem = async () => {
 
     currentPage.value = 1;
     items.value = [];
-    totalItems.value = 0;
     await fetchData();
-    setupObserver();
     moveItemModal.value?.hide();
     console.log("Moved item and refreshed data.");
   } catch (error) {
@@ -559,9 +512,7 @@ const deleteItem = async () => {
     );
     currentPage.value = 1;
     items.value = [];
-    totalItems.value = 0;
     await fetchData();
-    setupObserver();
     deleteItemModal.value?.hide();
     console.log("Deleted item and refreshed data.");
   } catch (error) {

@@ -40,6 +40,7 @@
     "@modrinth/utils": "workspace:*",
     "@pinia/nuxt": "^0.5.1",
     "@vintl/vintl": "^4.4.1",
+    "@vueuse/core": "^11.1.0",
     "ansi-to-html": "^0.7.2",
     "dayjs": "^1.11.7",
     "floating-vue": "2.0.0-beta.20",

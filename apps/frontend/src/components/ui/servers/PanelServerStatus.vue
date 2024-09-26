@@ -41,7 +41,7 @@ const getStatusClass = computed(() => {
     case "stopped":
       return { main: "", bg: "" };
     case "crashed":
-      return { main: "bg-bg-red", bg: "bg-bg-red" };
+      return { main: "bg-brand-red", bg: "bg-bg-red" };
     default:
       return { main: "", bg: "" };
   }
