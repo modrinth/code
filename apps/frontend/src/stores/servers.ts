@@ -369,10 +369,14 @@ export const useServerStore = defineStore("servers", {
       });
     },
 
-    downloadFile(data: any, path: string) {
-      return usePyroFetch(`/download?path=${path}`, {
+    async downloadFile(data: any, path: string) {
+      const fileData = await usePyroFetch(`/download?path=${path}`, {
         override: data,
       });
+
+      if (fileData instanceof Blob) {
+        return fileData.text();
+      }
     },
 
     clearError() {

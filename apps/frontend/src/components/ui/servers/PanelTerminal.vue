@@ -1,12 +1,12 @@
 <template>
   <div
     data-pyro-terminal-holy-shit
-    class="terminal-font console relative h-full w-full overflow-hidden rounded-xl text-sm"
+    class="terminal-font console relative flex h-full w-full flex-col items-center gap-4 overflow-hidden rounded-xl pb-4 text-sm"
   >
     <div
       ref="scrollContainer"
       data-pyro-terminal-root
-      class="h-full w-full overflow-x-auto overflow-y-auto py-6"
+      class="w-full overflow-x-auto overflow-y-auto py-6"
       @scroll="handleScroll"
     >
       <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
@@ -27,6 +27,7 @@
         </ul>
       </div>
     </div>
+    <slot />
     <button
       class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-300 hover:scale-110"
       @click="$emit('toggle-full-screen')"

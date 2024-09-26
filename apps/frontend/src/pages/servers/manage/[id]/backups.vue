@@ -115,13 +115,13 @@
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
               <div class="text-2xl font-extrabold text-contrast">
-                {{ data.backups.find((b) => b.id === currentBackup)?.name }}
+                {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
               </div>
               <div class="flex gap-2 font-semibold text-contrast">
                 <CalendarIcon />
                 {{
                   new Date(
-                    data.backups.find((b) => b.id === currentBackup)?.created_at || "",
+                    data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
                   ).toLocaleString()
                 }}
               </div>
@@ -158,13 +158,13 @@
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
               <div class="text-2xl font-extrabold text-contrast">
-                {{ data.backups.find((b) => b.id === currentBackup)?.name }}
+                {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
               </div>
               <div class="flex gap-2 font-semibold text-contrast">
                 <CalendarIcon />
                 {{
                   new Date(
-                    data.backups.find((b) => b.id === currentBackup)?.created_at || "",
+                    data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
                   ).toLocaleString()
                 }}
               </div>

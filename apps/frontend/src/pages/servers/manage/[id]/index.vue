@@ -8,7 +8,7 @@
       <UiServersServerStats v-if="!fullScreen" :data="stats" />
     </transition>
     <div
-      class="relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised p-8 transition-[height] duration-500 ease-in-out"
+      class="relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-8 transition-[height] duration-500 ease-in-out"
       :style="consoleStyle"
     >
       <div class="experimental-styles-within flex flex-row items-center justify-between">
@@ -22,12 +22,18 @@
           @action="sendPowerAction"
         />
       </div>
-
       <UiServersPanelTerminal
         :console-output="consoleOutput"
         :full-screen="fullScreen"
         @toggle-full-screen="toggleFullScreen"
-      />
+      >
+        <input
+          v-model="commandInput"
+          type="text"
+          placeholder="Send a command"
+          class="z-50 w-[96%] rounded-md p-2 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+        />
+      </UiServersPanelTerminal>
     </div>
   </div>
   <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWSAuthIncorrect" />
@@ -59,6 +65,7 @@ const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
 const serverPowerState = ref<ServerState>("stopped");
+const commandInput = ref("");
 
 const stats = ref<Stats>({
   current: {
@@ -221,6 +228,7 @@ onBeforeUnmount(() => socket?.close());
     opacity 0.5s ease,
     transform 0.5s ease;
 }
+
 .fade-slide-enter-from,
 .fade-slide-leave-to {
   opacity: 0;

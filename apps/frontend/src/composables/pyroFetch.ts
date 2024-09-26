@@ -3,7 +3,6 @@ import { $fetch, FetchError } from "ofetch";
 interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: Record<string, any>;
-  accept?: "application/json" | (string & {});
   version?: number;
   override?: {
     url: string;
@@ -31,7 +30,7 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     throw new PyroFetchError("Cannot pyrofetch without auth", 10000);
   }
 
-  const { method = "GET", body, accept = "application/json", version = 0, override } = options;
+  const { method = "GET", body, version = 0, override } = options;
 
   const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
     /\/$/,
@@ -52,7 +51,6 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
   type HeadersRecord = Record<string, string>;
 
   const headers: HeadersRecord = {
-    Accept: accept,
     Authorization: `Bearer ${override?.token ?? authToken}`,
     "Access-Control-Allow-Headers": "Authorization",
     "User-Agent": "Pyro/1.0 (https://pyro.host)",

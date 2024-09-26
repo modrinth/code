@@ -3,7 +3,7 @@
     <div
       v-for="(metric, index) in metrics"
       :key="index"
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-8"
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
@@ -26,7 +26,9 @@
       </ClientOnly>
     </div>
 
-    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
+    <div
+      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-8"
+    >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ formatBytes(data.current.storage_total_bytes / 10) }}
@@ -110,11 +112,14 @@ const updateMetrics = () => {
     const currentValue =
       index === 0
         ? props.data.current.cpu_percent
-        : (props.data.current.ram_usage_bytes / props.data.current.ram_total_bytes) * 100;
+        : Math.min(
+            (props.data.current.ram_usage_bytes / props.data.current.ram_total_bytes) * 100,
+            100,
+          );
     const pastValue =
       index === 0
         ? props.data.past.cpu_percent
-        : (props.data.past.ram_usage_bytes / props.data.past.ram_total_bytes) * 100;
+        : Math.min((props.data.past.ram_usage_bytes / props.data.past.ram_total_bytes) * 100, 100);
 
     const newValue = lerp(currentValue, pastValue);
 
