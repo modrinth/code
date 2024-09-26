@@ -1,8 +1,8 @@
 <template>
   <div class="relative h-full w-full">
     <div
-      class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto p-8"
       v-if="data && status == 'success'"
+      class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto p-8"
     >
       <h2 class="text-3xl font-bold">server.properties</h2>
       <div v-for="(property, index) in liveProperties" :key="index">
@@ -83,7 +83,7 @@
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
         v-if="hasUnsavedChanges"
-        :isUpdating="isUpdating"
+        :is-updating="isUpdating"
         :save="saveProperties"
         :reset="resetProperties"
       />

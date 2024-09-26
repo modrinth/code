@@ -131,8 +131,8 @@
     <!-- Main Content -->
     <div class="flex h-[631px] w-full flex-col rounded-xl border border-solid border-bg-raised">
       <div
-        class="flex h-12 items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
         v-if="!isEditing"
+        class="flex h-12 items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
       >
         <div class="flex items-center gap-2 text-contrast">
           <span
@@ -201,8 +201,8 @@
       </div>
       <div
         v-else-if="items.length > 0"
-        class="snap-y overflow-y-auto overflow-x-hidden"
         ref="scrollContainer"
+        class="snap-y overflow-y-auto overflow-x-hidden"
       >
         <UiServersFileItem
           v-for="item in items"
@@ -380,7 +380,7 @@ const navigateToSegment = (index: number) => {
 };
 
 const navigateToPage = (page: number) => {
-  router.push({ query: { page: page, path: currentPath.value } });
+  router.push({ query: { page, path: currentPath.value } });
 };
 
 const createItemModal = ref<typeof Modal>();

@@ -7,7 +7,7 @@
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
         v-if="hasUnsavedChanges"
-        :isUpdating="isUpdating"
+        :is-updating="isUpdating"
         :save="saveStartup"
         :reset="resetStartup"
       />

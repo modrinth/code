@@ -16,7 +16,6 @@
         />
       </div>
       // action bar
-      
     </div>
     <UiServersPyroLoading v-else />
   </div>

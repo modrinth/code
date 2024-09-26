@@ -29,10 +29,10 @@
       >
         <input
           v-model="commandInput"
-          @keyup.enter="sendCommand"
           type="text"
           placeholder="Send a command"
           class="z-50 w-[96%] rounded-md p-2 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+          @keyup.enter="sendCommand"
         />
       </UiServersPanelTerminal>
     </div>
