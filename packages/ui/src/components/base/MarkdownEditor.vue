@@ -329,6 +329,8 @@ let editorThemeCompartment: Compartment | null = null
 
 const emit = defineEmits(['update:modelValue'])
 
+const shiftKeyHeld = ref(false)
+
 onMounted(() => {
   const updateListener = EditorView.updateListener.of((update) => {
     if (update.docChanged) {
@@ -361,6 +363,16 @@ onMounted(() => {
   const disabledCompartment = EditorState.readOnly.of(props.disabled)
 
   const eventHandlers = EditorView.domEventHandlers({
+    keydown: (ev) => {
+      const { key, shiftKey } = ev
+      if (!key || !shiftKey) return
+      if (key === 'V' && shiftKey) shiftKeyHeld.value = true
+    },
+    keyup: (ev) => {
+      const { key, shiftKey } = ev
+      if (!key || !shiftKey) return
+      if (key === 'V' && shiftKey) shiftKeyHeld.value = false
+    },
     paste: (ev, view) => {
       const { clipboardData } = ev
       if (!clipboardData) return
@@ -387,7 +399,8 @@ onMounted(() => {
       // If the user's pasting a url, automatically convert it to a link with the selection as the text or the url itself if no selection content.
       const url = ev.clipboardData?.getData('text/plain')
 
-      if (url) {
+      // If the user is holding shift when pasting, don't change the link
+      if (url && !shiftKeyHeld.value) {
         try {
           cleanUrl(url)
         } catch (error: unknown) {
