@@ -571,20 +571,7 @@ pub async fn user_follows(
             ));
         }
 
-        use futures::TryStreamExt;
-
-        let project_ids = sqlx::query!(
-            "
-            SELECT mf.mod_id FROM mod_follows mf
-            WHERE mf.follower_id = $1
-            ",
-            id as crate::database::models::ids::UserId,
-        )
-        .fetch(&**pool)
-        .map_ok(|m| crate::database::models::ProjectId(m.mod_id))
-        .try_collect::<Vec<crate::database::models::ProjectId>>()
-        .await?;
-
+        let project_ids = User::get_follows(id, &**pool).await?;
         let projects: Vec<_> =
             crate::database::Project::get_many_ids(&project_ids, &**pool, &redis)
                 .await?

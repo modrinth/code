@@ -113,19 +113,25 @@ impl Thread {
                         true
                     }
                 })
-                .map(|x| ThreadMessage {
-                    id: x.id.into(),
-                    author_id: if x.hide_identity && !user.role.is_mod() {
-                        None
-                    } else {
-                        x.author_id.map(|x| x.into())
-                    },
-                    body: x.body,
-                    created: x.created,
-                    hide_identity: x.hide_identity,
-                })
+                .map(|x| ThreadMessage::from(x, user))
                 .collect(),
             members: users,
+        }
+    }
+}
+
+impl ThreadMessage {
+    pub fn from(data: crate::database::models::ThreadMessage, user: &User) -> Self {
+        Self {
+            id: data.id.into(),
+            author_id: if data.hide_identity && !user.role.is_mod() {
+                None
+            } else {
+                data.author_id.map(|x| x.into())
+            },
+            body: data.body,
+            created: data.created,
+            hide_identity: data.hide_identity,
         }
     }
 }

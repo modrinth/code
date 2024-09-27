@@ -88,6 +88,23 @@ pub struct UserSubscription {
     pub last_charge: Option<DateTime<Utc>>,
 }
 
+impl From<crate::database::models::user_subscription_item::UserSubscriptionItem>
+    for UserSubscription
+{
+    fn from(x: crate::database::models::user_subscription_item::UserSubscriptionItem) -> Self {
+        Self {
+            id: x.id.into(),
+            user_id: x.user_id.into(),
+            price_id: x.price_id.into(),
+            interval: x.interval,
+            status: x.status,
+            created: x.created,
+            expires: x.expires,
+            last_charge: x.last_charge,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub enum SubscriptionStatus {

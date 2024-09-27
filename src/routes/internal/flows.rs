@@ -1641,14 +1641,13 @@ async fn validate_2fa_code(
     }
 
     if input == token {
-        conn
-            .set(
-                TOTP_NAMESPACE,
-                &format!("{}-{}", token, user_id.0),
-                "",
-                Some(60),
-            )
-            .await?;
+        conn.set(
+            TOTP_NAMESPACE,
+            &format!("{}-{}", token, user_id.0),
+            "",
+            Some(60),
+        )
+        .await?;
 
         Ok(true)
     } else if allow_backup {

@@ -3,13 +3,12 @@ use crate::auth::AuthenticationError;
 use crate::database::models::user_item;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
-use crate::models::users::{Role, User, UserId, UserPayoutData};
+use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::session::get_session_metadata;
 use actix_web::http::header::{HeaderValue, AUTHORIZATION};
 use actix_web::HttpRequest;
 use chrono::Utc;
-use rust_decimal::Decimal;
 
 pub async fn get_user_from_headers<'a, E>(
     req: &HttpRequest,
@@ -26,51 +25,8 @@ where
         get_user_record_from_bearer_token(req, None, executor, redis, session_queue)
             .await?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-    let mut auth_providers = Vec::new();
-    if db_user.github_id.is_some() {
-        auth_providers.push(AuthProvider::GitHub)
-    }
-    if db_user.gitlab_id.is_some() {
-        auth_providers.push(AuthProvider::GitLab)
-    }
-    if db_user.discord_id.is_some() {
-        auth_providers.push(AuthProvider::Discord)
-    }
-    if db_user.google_id.is_some() {
-        auth_providers.push(AuthProvider::Google)
-    }
-    if db_user.microsoft_id.is_some() {
-        auth_providers.push(AuthProvider::Microsoft)
-    }
-    if db_user.steam_id.is_some() {
-        auth_providers.push(AuthProvider::Steam)
-    }
-    if db_user.paypal_id.is_some() {
-        auth_providers.push(AuthProvider::PayPal)
-    }
 
-    let user = User {
-        id: UserId::from(db_user.id),
-        username: db_user.username,
-        email: db_user.email,
-        email_verified: Some(db_user.email_verified),
-        avatar_url: db_user.avatar_url,
-        bio: db_user.bio,
-        created: db_user.created,
-        role: Role::from_string(&db_user.role),
-        badges: db_user.badges,
-        auth_providers: Some(auth_providers),
-        has_password: Some(db_user.password.is_some()),
-        has_totp: Some(db_user.totp_secret.is_some()),
-        github_id: None,
-        payout_data: Some(UserPayoutData {
-            paypal_address: db_user.paypal_email,
-            paypal_country: db_user.paypal_country,
-            venmo_handle: db_user.venmo_handle,
-            balance: Decimal::ZERO,
-        }),
-        stripe_customer_id: db_user.stripe_customer_id,
-    };
+    let user = User::from_full(db_user);
 
     if let Some(required_scopes) = required_scopes {
         for scope in required_scopes {

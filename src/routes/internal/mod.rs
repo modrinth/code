@@ -1,6 +1,7 @@
 pub(crate) mod admin;
 pub mod billing;
 pub mod flows;
+pub mod gdpr;
 pub mod moderation;
 pub mod pats;
 pub mod session;
@@ -19,6 +20,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(flows::config)
             .configure(pats::config)
             .configure(moderation::config)
-            .configure(billing::config),
+            .configure(billing::config)
+            .configure(gdpr::config),
     );
 }

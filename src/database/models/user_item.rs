@@ -1,5 +1,5 @@
 use super::ids::{ProjectId, UserId};
-use super::{CollectionId, ThreadId};
+use super::{CollectionId, ReportId, ThreadId};
 use crate::database::models;
 use crate::database::models::{DatabaseError, OrganizationId};
 use crate::database::redis::RedisPool;
@@ -321,6 +321,48 @@ impl User {
         .await?;
 
         Ok(projects)
+    }
+
+    pub async fn get_follows<'a, E>(user_id: UserId, exec: E) -> Result<Vec<ProjectId>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::stream::TryStreamExt;
+
+        let projects = sqlx::query!(
+            "
+            SELECT mf.mod_id FROM mod_follows mf
+            WHERE mf.follower_id = $1
+            ",
+            user_id as UserId,
+        )
+        .fetch(exec)
+        .map_ok(|m| ProjectId(m.mod_id))
+        .try_collect::<Vec<ProjectId>>()
+        .await?;
+
+        Ok(projects)
+    }
+
+    pub async fn get_reports<'a, E>(user_id: UserId, exec: E) -> Result<Vec<ReportId>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::stream::TryStreamExt;
+
+        let reports = sqlx::query!(
+            "
+            SELECT r.id FROM reports r
+            WHERE r.user_id = $1
+            ",
+            user_id as UserId,
+        )
+        .fetch(exec)
+        .map_ok(|m| ReportId(m.id))
+        .try_collect::<Vec<ReportId>>()
+        .await?;
+
+        Ok(reports)
     }
 
     pub async fn get_backup_codes<'a, E>(

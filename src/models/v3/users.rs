@@ -89,6 +89,57 @@ impl From<DBUser> for User {
     }
 }
 
+impl User {
+    pub fn from_full(db_user: DBUser) -> Self {
+        let mut auth_providers = Vec::new();
+
+        if db_user.github_id.is_some() {
+            auth_providers.push(AuthProvider::GitHub)
+        }
+        if db_user.gitlab_id.is_some() {
+            auth_providers.push(AuthProvider::GitLab)
+        }
+        if db_user.discord_id.is_some() {
+            auth_providers.push(AuthProvider::Discord)
+        }
+        if db_user.google_id.is_some() {
+            auth_providers.push(AuthProvider::Google)
+        }
+        if db_user.microsoft_id.is_some() {
+            auth_providers.push(AuthProvider::Microsoft)
+        }
+        if db_user.steam_id.is_some() {
+            auth_providers.push(AuthProvider::Steam)
+        }
+        if db_user.paypal_id.is_some() {
+            auth_providers.push(AuthProvider::PayPal)
+        }
+
+        Self {
+            id: UserId::from(db_user.id),
+            username: db_user.username,
+            email: db_user.email,
+            email_verified: Some(db_user.email_verified),
+            avatar_url: db_user.avatar_url,
+            bio: db_user.bio,
+            created: db_user.created,
+            role: Role::from_string(&db_user.role),
+            badges: db_user.badges,
+            auth_providers: Some(auth_providers),
+            has_password: Some(db_user.password.is_some()),
+            has_totp: Some(db_user.totp_secret.is_some()),
+            github_id: None,
+            payout_data: Some(UserPayoutData {
+                paypal_address: db_user.paypal_email,
+                paypal_country: db_user.paypal_country,
+                venmo_handle: db_user.venmo_handle,
+                balance: Decimal::ZERO,
+            }),
+            stripe_customer_id: db_user.stripe_customer_id,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {

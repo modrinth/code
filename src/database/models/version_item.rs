@@ -335,7 +335,8 @@ impl Version {
 
         sqlx::query!(
             "
-            DELETE FROM reports
+            UPDATE reports
+            SET version_id = NULL
             WHERE version_id = $1
             ",
             id as VersionId,

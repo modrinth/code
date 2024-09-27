@@ -95,16 +95,7 @@ pub async fn subscriptions(
         user_subscription_item::UserSubscriptionItem::get_all_user(user.id.into(), &**pool)
             .await?
             .into_iter()
-            .map(|x| UserSubscription {
-                id: x.id.into(),
-                user_id: x.user_id.into(),
-                price_id: x.price_id.into(),
-                interval: x.interval,
-                status: x.status,
-                created: x.created,
-                expires: x.expires,
-                last_charge: x.last_charge,
-            })
+            .map(UserSubscription::from)
             .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(subscriptions))
