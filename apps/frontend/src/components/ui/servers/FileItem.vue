@@ -42,7 +42,7 @@
             color: 'red',
           },
         ]"
-        direction="right"
+        direction="left"
       >
         <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
         <template #rename> <EditIcon /> Rename </template>

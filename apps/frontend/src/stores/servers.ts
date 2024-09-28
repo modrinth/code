@@ -340,20 +340,45 @@ export const useServerStore = defineStore("servers", {
     createFileOrFolder(data: any, path: string, name: string, type: "file" | "directory") {
       return usePyroFetch(`/create?path=${path}&type=${type}`, {
         method: "POST",
+        contentType: "",
+        override: data,
+      });
+    },
+
+    uploadFile(data: any, path: string, file: File) {
+      return usePyroFetch(`/create?path=${path}&type=file`, {
+        method: "POST",
+        contentType: "application/octet-stream",
+        body: file,
         override: data,
       });
     },
 
     renameFileOrFolder(data: any, path: string, name: string) {
-      return usePyroFetch(`/rename?path=${path}&name=${name}`, {
+      const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
+      return usePyroFetch(`/move`, {
+        method: "POST",
+        override: data,
+        body: {
+          source: path,
+          destination: pathName,
+        },
+      });
+    },
+
+    updateFile(data: any, path: string, content: string) {
+      const octetStream = new Blob([content], { type: "application/octet-stream" });
+      return usePyroFetch(`/update?path=${path}`, {
         method: "PUT",
+        contentType: "application/octet-stream",
+        body: octetStream,
         override: data,
       });
     },
 
     moveFileOrFolder(data: any, path: string, newPath: string) {
       return usePyroFetch(`/move`, {
-        method: "PUT",
+        method: "POST",
         override: data,
         body: {
           source: path,

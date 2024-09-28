@@ -16,6 +16,7 @@
         </div>
         <div class="mt-2 flex flex-col gap-2">
           <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+          <input type="text" class="w-full" v-model="newItemName" />
         </div>
         <div class="mb-4 mt-4 flex justify-end gap-4">
           <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
@@ -161,7 +162,7 @@
             :options="[
               { id: 'file', action: () => showCreateModal('file') },
               { id: 'directory', action: () => showCreateModal('directory') },
-              { id: 'upload', action: () => showUploadModal() },
+              { id: 'upload', action: () => uploadFile() },
             ]"
           >
             <PlusIcon aria-hidden="true" />
@@ -186,18 +187,29 @@
           </span>
         </div>
 
-        <ButtonStyled type="transparent">
-          <Button @click="cancelEditing">
-            <XIcon aria-hidden="true" />
-          </Button>
-        </ButtonStyled>
+        <div class="flex gap-2">
+          <ButtonStyled type="transparent">
+            <Button @click="saveFileContent">
+              <SaveIcon aria-hidden="true" />
+            </Button>
+          </ButtonStyled>
+          <ButtonStyled type="transparent">
+            <Button @click="cancelEditing">
+              <XIcon aria-hidden="true" />
+            </Button>
+          </ButtonStyled>
+        </div>
       </div>
 
       <div v-if="isEditing" class="flex-grow overflow-hidden">
-        <textarea
-          v-model="fileContent"
-          class="h-full w-full resize-none rounded-t-none bg-bg-raised p-4 font-mono text-sm"
-        ></textarea>
+        <component
+          :is="VAceEditor"
+          v-model:value="fileContent"
+          lang="json"
+          theme="one_dark"
+          :print-margin="false"
+          style="height: 100%"
+        />
       </div>
       <div
         v-else-if="items.length > 0"
@@ -268,9 +280,11 @@ import {
   XIcon,
   DropdownIcon,
   FolderOpenIcon,
+  SaveIcon,
 } from "@modrinth/assets";
 import { Button, Modal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
+const VAceEditor = ref("div");
 
 const route = useRoute();
 const router = useRouter();
@@ -347,6 +361,11 @@ const fetchData = async () => {
 };
 
 onMounted(async () => {
+  await import("ace-builds");
+  await import("ace-builds/src-noconflict/mode-json");
+  await import("ace-builds/src-noconflict/theme-one_dark");
+  VAceEditor.value = markRaw((await import("vue3-ace-editor")).VAceEditor);
+
   await fetchAuth();
   if (auth.value) {
     await fetchData();
@@ -401,9 +420,19 @@ const showCreateModal = (type: "file" | "directory") => {
   createItemModal.value?.show();
 };
 
-const showUploadModal = () => {
-  // Implement upload functionality or show another modal
-  console.warn("Upload functionality is not implemented yet.");
+const uploadFile = () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    console.log(file);
+    if (!file) return;
+    const filePath = currentPath.value + "/" + file.name;
+    await serverStore.uploadFile(auth.value, filePath, file);
+    await fetchData();
+  };
+  input.click();
+  input.remove();
 };
 
 const showRenameModal = (item: any) => {
@@ -538,6 +567,7 @@ const saveFileContent = async () => {
   if (!editingFile.value) return;
 
   try {
+    await serverStore.updateFile(auth.value, editingFile.value.path, fileContent.value);
     await refreshNuxtData("filesData");
     isEditing.value = false;
     editingFile.value = null;

@@ -15,20 +15,30 @@
           :show-created-date="false"
         />
       </div>
-      // action bar
+      <DropdownSelect v-model="version" :options="options" placeholder="Select version..." />
     </div>
     <UiServersPyroLoading v-else />
   </div>
 </template>
 
 <script setup lang="ts">
+import { DropdownSelect } from "@modrinth/ui";
+
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
-await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData(
-  "serverData",
-  async () => await serverStore.getServerData(serverId),
+const { data, status } = await useLazyAsyncData("serverData", async () => {
+  await serverStore.fetchServerData(serverId);
+  return serverStore.getServerData(serverId);
+});
+
+const { data: versions, refresh: refreshVersions } = await useLazyAsyncData(
+  "modpackVersions",
+  async () => await useBaseFetch(`project/${data.value?.project?.id}/version`),
 );
+
+const options = (versions.value as any[]).map((x) => x.version_number);
+
+const version = ref<any>(null);
 </script>

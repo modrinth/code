@@ -99,6 +99,21 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
+const auth = ref<any>(null);
+const fetchAuth = async () => {
+  try {
+    const apiInfo = await serverStore.getFileApiInfo(serverId);
+    auth.value = apiInfo;
+  } catch (error) {
+    console.error("Error fetching file api info:", error);
+    auth.value = null;
+  }
+};
+
+onMounted(async () => {
+  await fetchAuth();
+});
+
 const isUpdating = ref(false);
 
 const changedPropertiesState = ref({});
@@ -143,11 +158,30 @@ watch(
   { deep: true },
 );
 
+const constructServerProperties = (): string => {
+  const properties = liveProperties.value;
+
+  let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`;
+
+  for (const [key, value] of Object.entries(properties)) {
+    if (typeof value === "object") {
+      fileContent += `${key}=${JSON.stringify(value)}\n`;
+    } else if (typeof value === "boolean") {
+      fileContent += `${key}=${value ? "true" : "false"}\n`;
+    } else {
+      fileContent += `${key}=${value}\n`;
+    }
+  }
+
+  return fileContent;
+};
+
 const saveProperties = async () => {
   try {
     isUpdating.value = true;
-    await serverStore.saveConfigFile(serverId, "ServerProperties", changedPropertiesState.value);
+    await serverStore.updateFile(auth.value, "server.properties", constructServerProperties());
     await new Promise((resolve) => setTimeout(resolve, 500));
+    changedPropertiesState.value = {};
     await refreshNuxtData("data");
     // @ts-ignore
     app.$notify({

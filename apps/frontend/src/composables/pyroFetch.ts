@@ -2,6 +2,7 @@ import { $fetch, FetchError } from "ofetch";
 
 interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  contentType?: string;
   body?: Record<string, any>;
   version?: number;
   override?: {
@@ -30,7 +31,9 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     throw new PyroFetchError("Cannot pyrofetch without auth", 10000);
   }
 
-  const { method = "GET", body, version = 0, override } = options;
+  const { method = "GET", contentType = "application/json", body, version = 0, override } = options;
+
+  console.log(contentType);
 
   const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
     /\/$/,
@@ -55,14 +58,11 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     "Access-Control-Allow-Headers": "Authorization",
     "User-Agent": "Pyro/1.0 (https://pyro.host)",
     Vary: "Accept, Origin",
+    "Content-Type": contentType,
   };
 
   if (import.meta.client && typeof window !== "undefined") {
     headers.Origin = window.location.origin;
-  }
-
-  if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && body) {
-    headers["Content-Type"] = "application/json";
   }
 
   console.log("Pyro fetching", fullUrl);
@@ -70,7 +70,7 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     const response = await $fetch<T>(fullUrl, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined,
+      body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
       timeout: 10000,
       retry: method === "GET" ? 3 : 0,
     });
