@@ -57,7 +57,7 @@ export function createDisplayNames(
 
           try {
             return dict.of(lookup);
-          } catch (err) {
+          } catch {
             console.warn(
               `Failed to get display name for ${lookup} using dictionary for ${
                 this.resolvedOptions().locale
