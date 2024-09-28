@@ -1398,7 +1398,7 @@ try {
 
   versions = shallowRef(toRaw(versions));
   featuredVersions = shallowRef(toRaw(featuredVersions));
-} catch (error) {
+} catch {
   throw createError({
     fatal: true,
     statusCode: 404,
