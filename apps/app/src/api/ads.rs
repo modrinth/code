@@ -66,6 +66,7 @@ pub async fn init_ads_window<R: Runtime>(
     height: f32,
     override_shown: bool,
 ) -> crate::api::Result<()> {
+    use tauri::Listener;
     use tauri::WebviewUrl;
     const LINK_SCRIPT: &str = include_str!("ads-init.js");
 
