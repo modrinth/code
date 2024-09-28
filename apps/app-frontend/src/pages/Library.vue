@@ -10,6 +10,7 @@ import { Button } from '@modrinth/ui'
 import { PlusIcon } from '@modrinth/assets'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { NewInstanceImage } from '@/assets/icons'
+import { useSettings } from '@/composables/useSettings.js'
 import { hide_ads_window } from '@/helpers/ads.js'
 
 onMounted(() => {
@@ -37,10 +38,19 @@ const unlistenProfile = await profile_listener(async () => {
 onUnmounted(() => {
   unlistenProfile()
 })
+
+const settings = await useSettings()
 </script>
 
 <template>
-  <GridDisplay v-if="instances.length > 0" label="Instances" :instances="instances" />
+  <GridDisplay
+    v-if="instances.length > 0"
+    label="Instances"
+    :instances="instances"
+    v-model:group="settings.library_group"
+    v-model:filters="settings.library_filter"
+    v-model:sortBy="settings.library_sort"
+  />
   <div v-else class="no-instance">
     <div class="icon">
       <NewInstanceImage />
