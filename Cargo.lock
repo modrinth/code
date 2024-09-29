@@ -6980,8 +6980,7 @@ dependencies = [
 [[package]]
 name = "wry"
 version = "0.44.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "440600584cfbd8b0d28eace95c1f2c253db05dae43780b79380aa1e868f04c73"
+source = "git+https://github.com/modrinth/wry?rev=27fb16b#27fb16b3d80853f35316836f39bf8db982f5e82f"
 dependencies = [
  "base64 0.22.1",
  "block",
@@ -7268,8 +7267,3 @@ dependencies = [
  "quote",
  "syn 2.0.79",
 ]
-
-[[patch.unused]]
-name = "wry"
-version = "0.43.1"
-source = "git+https://github.com/modrinth/wry?rev=5840108#5840108b00930f038deaca8708804f091679a128"
