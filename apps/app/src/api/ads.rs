@@ -14,6 +14,8 @@ pub struct AdsState {
     pub malicious_origins: HashSet<String>,
 }
 
+const AD_LINK: &'static str = "https://modrinth.com/wrapper/app-ads-cookie";
+
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::<R>::new("ads")
         .setup(|app, _api| {
@@ -32,7 +34,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                     if let Some(webview) = app.webviews().get_mut("ads-window")
                     {
                         let _ = webview.navigate(
-                            "https://modrinth.com/wrapper/app-ads-cookie"
+                            AD_LINK
                                 .parse()
                                 .unwrap(),
                         );
@@ -88,7 +90,7 @@ pub async fn init_ads_window<R: Runtime>(
             tauri::webview::WebviewBuilder::new(
                 "ads-window",
                 WebviewUrl::External(
-                    "https://modrinth.com/wrapper/app-ads-cookie".parse().unwrap(),
+                   AD_LINK.parse().unwrap(),
                 ),
             )
             .initialization_script(LINK_SCRIPT)
@@ -102,12 +104,6 @@ pub async fn init_ads_window<R: Runtime>(
             },
             LogicalSize::new(width, height),
         );
-
-        if let Ok(window) = window {
-            window.listen_any("click", |event| {
-                println!("click: {:?}", event);
-            });
-        }
     }
 
     Ok(())
