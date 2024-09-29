@@ -19,4 +19,3 @@ opt-level = 3
 
 [patch.crates-io]
 wry = { git = "https://github.com/modrinth/wry", rev = "5840108" }
-tauri = { git = "https://github.com/modrinth/tauri", rev = "5e29428" }

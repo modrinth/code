@@ -41,9 +41,6 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --git https://github.com/modrinth/tauri.git --rev 5e2942876c2266594ed1db516c1d9975c873c36a
-
       - name: Setup rust cache
         uses: actions/cache@v4
         with:
@@ -65,7 +62,7 @@ jobs:
             !target/release/bundle/msi/*.msi
             !target/release/bundle/msi/*.msi.zip
             !target/release/bundle/msi/*.msi.zip.sig
-            
+
             !target/release/bundle/nsis/*.exe
             !target/release/bundle/nsis/*.nsis.zip
             !target/release/bundle/nsis/*.nsis.zip.sig
@@ -121,7 +118,6 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          V1_COMPATIBLE_BIN_NAME: true
 
       - name: build app
         run: pnpm --filter=@modrinth/app run tauri build --config "tauri-release.conf.json"
@@ -131,7 +127,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          V1_COMPATIBLE_BIN_NAME: true
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v4
@@ -154,7 +149,7 @@ jobs:
             target/release/bundle/msi/*.msi
             target/release/bundle/msi/*.msi.zip
             target/release/bundle/msi/*.msi.zip.sig
-            
+
             target/release/bundle/nsis/*.exe
             target/release/bundle/nsis/*.nsis.zip
             target/release/bundle/nsis/*.nsis.zip.sig
