@@ -226,7 +226,7 @@ async function changeLocale(value: string) {
   try {
     await vintl.changeLocale(value);
     $failedLocale.value = undefined;
-  } catch (err) {
+  } catch {
     $failedLocale.value = value;
   } finally {
     $changingTo.value = undefined;

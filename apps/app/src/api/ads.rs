@@ -2,10 +2,9 @@ use serde::Serialize;
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{
-    Emitter, Listener, LogicalPosition, LogicalSize, Manager, Runtime,
-};
-use tauri_plugin_shell::{open, ShellExt};
+use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, Runtime};
+use tauri_plugin_shell::ShellExt;
+use theseus::settings;
 use tokio::sync::RwLock;
 
 pub struct AdsState {
@@ -15,6 +14,8 @@ pub struct AdsState {
     pub last_click: Option<Instant>,
     pub malicious_origins: HashSet<String>,
 }
+
+const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::<R>::new("ads")
@@ -33,11 +34,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 loop {
                     if let Some(webview) = app.webviews().get_mut("ads-window")
                     {
-                        let _ = webview.navigate(
-                            "https://modrinth.com/wrapper/app-ads-cookie"
-                                .parse()
-                                .unwrap(),
-                        );
+                        let _ = webview.navigate(AD_LINK.parse().unwrap());
                     }
 
                     tokio::time::sleep(std::time::Duration::from_secs(60 * 5))
@@ -54,6 +51,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             show_ads_window,
             record_ads_click,
             open_link,
+            get_ads_personalization,
         ])
         .build()
 }
@@ -86,11 +84,11 @@ pub async fn init_ads_window<R: Runtime>(
             let _ = webview.set_size(LogicalSize::new(width, height));
         }
     } else if let Some(window) = app.get_window("main") {
-        let window = window.add_child(
+        let _ = window.add_child(
             tauri::webview::WebviewBuilder::new(
                 "ads-window",
                 WebviewUrl::External(
-                    "https://modrinth.com/wrapper/app-ads-cookie".parse().unwrap(),
+                   AD_LINK.parse().unwrap(),
                 ),
             )
             .initialization_script(LINK_SCRIPT)
@@ -104,12 +102,6 @@ pub async fn init_ads_window<R: Runtime>(
             },
             LogicalSize::new(width, height),
         );
-
-        if let Ok(window) = window {
-            window.listen_any("click", |event| {
-                println!("click: {:?}", event);
-            });
-        }
     }
 
     Ok(())
@@ -215,4 +207,10 @@ pub async fn open_link<R: Runtime>(
     state.malicious_origins.insert(origin);
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn get_ads_personalization() -> crate::api::Result<bool> {
+    let res = settings::get().await?;
+    Ok(res.personalized_ads)
 }
