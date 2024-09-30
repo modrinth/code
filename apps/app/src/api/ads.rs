@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
 use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, Runtime};
 use tauri_plugin_shell::ShellExt;
+use theseus::settings;
 use tokio::sync::RwLock;
 
 pub struct AdsState {
@@ -50,6 +51,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             show_ads_window,
             record_ads_click,
             open_link,
+            get_ads_personalization,
         ])
         .build()
 }
@@ -82,7 +84,7 @@ pub async fn init_ads_window<R: Runtime>(
             let _ = webview.set_size(LogicalSize::new(width, height));
         }
     } else if let Some(window) = app.get_window("main") {
-        let window = window.add_child(
+        let _ = window.add_child(
             tauri::webview::WebviewBuilder::new(
                 "ads-window",
                 WebviewUrl::External(
@@ -205,4 +207,10 @@ pub async fn open_link<R: Runtime>(
     state.malicious_origins.insert(origin);
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn get_ads_personalization() -> crate::api::Result<bool> {
+    let res = settings::get().await?;
+    Ok(res.personalized_ads)
 }

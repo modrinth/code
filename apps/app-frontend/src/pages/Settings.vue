@@ -365,6 +365,25 @@ async function purgeCache() {
       </div>
       <div class="adjacent-input">
         <label for="opt-out-analytics">
+          <span class="label__title">Personalized ads</span>
+          <span class="label__description">
+            Modrinth's ad provider, Aditude, shows ads based on your preferences. By disabling this
+            option, you opt out and ads will no longer be shown based on your interests.
+          </span>
+        </label>
+        <Toggle
+          id="opt-out-analytics"
+          :model-value="settings.personalized_ads"
+          :checked="settings.personalized_ads"
+          @update:model-value="
+            (e) => {
+              settings.personalized_ads = e
+            }
+          "
+        />
+      </div>
+      <div class="adjacent-input">
+        <label for="opt-out-analytics">
           <span class="label__title">Telemetry</span>
           <span class="label__description">
             Modrinth collects anonymized analytics and usage data to improve our user experience and

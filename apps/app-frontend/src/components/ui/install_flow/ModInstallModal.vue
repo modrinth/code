@@ -230,7 +230,7 @@ const createInstance = async () => {
             @click="installModal.hide()"
           >
             <Avatar
-              :src="profile.icon_path ? tauri.convertFileSrc(profile.icon_path) : null"
+              :src="profile.icon_path ? convertFileSrc(profile.icon_path) : null"
               class="profile-image"
             />
             {{ profile.name }}

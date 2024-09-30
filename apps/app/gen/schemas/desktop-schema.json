@@ -331,6 +331,11 @@
           "const": "ads:default"
         },
         {
+          "description": "Enables the get_ads_personalization command without any pre-configured scope.",
+          "type": "string",
+          "const": "ads:allow-get-ads-personalization"
+        },
+        {
           "description": "Enables the hide_ads_window command without any pre-configured scope.",
           "type": "string",
           "const": "ads:allow-hide-ads-window"
@@ -359,6 +364,11 @@
           "description": "Enables the show_ads_window command without any pre-configured scope.",
           "type": "string",
           "const": "ads:allow-show-ads-window"
+        },
+        {
+          "description": "Denies the get_ads_personalization command without any pre-configured scope.",
+          "type": "string",
+          "const": "ads:deny-get-ads-personalization"
         },
         {
           "description": "Denies the hide_ads_window command without any pre-configured scope.",
