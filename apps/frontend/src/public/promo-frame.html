@@ -44,19 +44,27 @@
   </head>
   <body>
     <div class="ads-container">
-      <a id="plus-link" href="https://modrinth.com/plus" target="_blank"></a>
+      <div id="plus-link"></div>
       <div id="modrinth-rail-1" />
     </div>
     <script>
-      window.tude = window.tude || { cmd: [] };
-      tude.cmd.push(function () {
-        tude.refreshAdsViaDivMappings([
-          {
-            divId: "modrinth-rail-1",
-            baseDivId: "pb-slot-square-2",
-          },
-        ]);
-      });
+      window.__TAURI_INTERNALS__.invoke("plugin:ads|get_ads_personalization", {})
+        .then((personalized) => {
+          window.tude = window.tude || { cmd: [] };
+
+          tude.cmd.push(function () {
+            tude.refreshAdsViaDivMappings([
+              {
+                divId: "modrinth-rail-1",
+                baseDivId: "pb-slot-square-2",
+              },
+            ]);
+
+            tude.setPrivacySettings({
+              personalizedAds: personalized ?? true,
+            })
+          });
+        });
 
       window.addEventListener(
         "message",
@@ -84,6 +92,15 @@
       });
 
       document.addEventListener("contextmenu", (event) => event.preventDefault());
+
+      const plusLink = document.getElementById("plus-link");
+      plusLink.addEventListener('click', function() {
+        window.__TAURI_INTERNALS__.invoke("plugin:ads|record_ads_click", {});
+        window.__TAURI_INTERNALS__.invoke("plugin:ads|open_link", {
+          path: 'https://modrinth.com/plus',
+          origin: 'https://modrinth.com',
+        });
+      });
     </script>
   </body>
 </html>
