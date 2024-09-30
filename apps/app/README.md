@@ -22,7 +22,6 @@ Before you begin, ensure you have the following installed on your machine:
 Follow these steps to set up your development environment:
 
 ```bash
-cargo install tauri-cli --git https://github.com/modrinth/tauri.git --rev 5e2942876c2266594ed1db516c1d9975c873c36a
 pnpm install
 pnpm app:dev
 ```

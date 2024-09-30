@@ -228,6 +228,7 @@ fn main() {
                         "show_ads_window",
                         "record_ads_click",
                         "open_link",
+                        "get_ads_personalization",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

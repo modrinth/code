@@ -145,7 +145,7 @@ if (route.query.flow) {
         await useAuth(auth.value.token);
       }
     }
-  } catch (err) {
+  } catch {
     success.value = false;
   }
 }
