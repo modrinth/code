@@ -37,14 +37,32 @@
         :full-screen="fullScreen"
         @toggle-full-screen="toggleFullScreen"
       >
-        <div class="w-full px-2.5 pt-2">
+        <div class="w-full px-2.5 pt-2 relative">
           <input
             v-model="commandInput"
             type="text"
             placeholder="Send a command"
             class="z-50 w-full rounded-md p-2 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
             @keyup.enter="sendCommand"
+            @input="handleInput"
+            @keydown.down.prevent="highlightNext"
+            @keydown.up.prevent="highlightPrev"
+            @keydown.enter.prevent="selectCommand"
           />
+          <!-- Autocomplete Dropdown -->
+          <ul
+            v-if="showSuggestions && filteredCommands.length"
+            class="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-md bg-white border border-gray-300 shadow-lg z-10"
+          >
+            <li
+              v-for="(command, index) in filteredCommands"
+              :key="command"
+              @click="selectSuggestion(command)"
+              :class="{'bg-blue-500 text-white': index === highlightedIndex, 'p-2 cursor-pointer': true}"
+            >
+              {{ command }}
+            </li>
+          </ul>
         </div>
       </UiServersPanelTerminal>
     </div>
@@ -63,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import type { ServerState, Stats, WSAuth, WSEvent } from "~/types/servers";
 
 const serverStore = useServerStore();
@@ -174,6 +192,116 @@ const connectWebSocket = async () => {
   };
 };
 
+const minecraftCommands = [
+  "/gamemode",
+  "/tp",
+  "/give",
+  "/ban",
+  "/kick",
+  "/whitelist",
+  "/setworldspawn",
+  "/time",
+  "/weather",
+  "/spawnpoint",
+  "/say",
+  "/op",
+  "/deop",
+  "/list",
+  "/clear",
+  "/msg",
+  "/home",
+  "/warp",
+  "/sethome",
+  "/back",
+  "/spawn",
+  "/enchant",
+  "/effect",
+  "/summon",
+  "/setblock",
+  "/fill",
+  "/clone",
+  "/scoreboard",
+  "/weather",
+  "/xp",
+  "/recipe",
+  "/tellraw",
+  "/title",
+  "/stopsound",
+  "/playsound",
+  "/locate",
+];
+
+const showSuggestions = ref(false);
+const highlightedIndex = ref(-1);
+
+const filteredCommands = computed(() => {
+  if (!commandInput.value.startsWith("/")) {
+    showSuggestions.value = false;
+    return [];
+  }
+  const input = commandInput.value.toLowerCase();
+  const suggestions = minecraftCommands.filter(cmd => cmd.startsWith(input));
+  showSuggestions.value = suggestions.length > 0;
+  if (!showSuggestions.value) {
+    highlightedIndex.value = -1;
+  }
+  return suggestions;
+});
+
+const handleInput = () => {
+  if (commandInput.value.startsWith("/")) {
+    showSuggestions.value = true;
+  } else {
+    showSuggestions.value = false;
+  }
+};
+
+const highlightNext = () => {
+  if (!showSuggestions.value) return;
+  if (highlightedIndex.value < filteredCommands.value.length - 1) {
+    highlightedIndex.value += 1;
+  }
+};
+
+const highlightPrev = () => {
+  if (!showSuggestions.value) return;
+  if (highlightedIndex.value > 0) {
+    highlightedIndex.value -= 1;
+  }
+};
+
+const selectCommand = () => {
+  if (highlightedIndex.value >= 0 && highlightedIndex.value < filteredCommands.value.length) {
+    commandInput.value = filteredCommands.value[highlightedIndex.value] + " ";
+    showSuggestions.value = false;
+    highlightedIndex.value = -1;
+  } else {
+    sendCommand();
+  }
+};
+
+const selectSuggestion = (command: string) => {
+  commandInput.value = command + " ";
+  showSuggestions.value = false;
+  highlightedIndex.value = -1;
+};
+
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement;
+  if (!target.closest('[data-pyro-server-manager-root]')) {
+    showSuggestions.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+  connectWebSocket();
+});
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
+  socket?.close();
+});
+
 const sendCommand = async () => {
   if (!socket) return;
   console.log("Sending command", commandInput.value);
@@ -230,7 +358,4 @@ const reauth = async () => {
   const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
   socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
 };
-
-onMounted(connectWebSocket);
-onBeforeUnmount(() => socket?.close());
 </script>
