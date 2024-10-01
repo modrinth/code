@@ -3,7 +3,7 @@
     class="save-banner z-50 h-fit w-full rounded-xl border-2 border-solid border-divider bg-bg-raised p-4 transition-all duration-300"
   >
     <div class="flex items-center justify-between gap-2">
-      <span class="font-bold text-contrast">Careful you have unsaved changes!</span>
+      <span class="font-bold text-contrast">Careful, you have unsaved changes!</span>
       <div class="flex gap-2">
         <Button transparent :loading="props.isUpdating" @click="props.reset"> Reset </Button>
         <Button color="primary" :loading="props.isUpdating" @click="props.save"> Save </Button>
