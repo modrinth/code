@@ -7,6 +7,14 @@
       <div class="flex gap-2">
         <Button transparent :loading="props.isUpdating" @click="props.reset"> Reset </Button>
         <Button color="primary" :loading="props.isUpdating" @click="props.save"> Save </Button>
+        <Button
+          v-if="restart"
+          color="primary"
+          :loading="props.isUpdating"
+          @click="props.saverestart"
+        >
+          Save & Restart
+        </Button>
       </div>
     </div>
   </div>
@@ -17,7 +25,9 @@ import { Button } from "@modrinth/ui";
 
 const props = defineProps<{
   isUpdating: boolean;
+  restart: boolean;
   save: () => void;
+  saverestart: () => void;
   reset: () => void;
 }>();
 </script>

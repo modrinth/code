@@ -24,10 +24,10 @@ useHead({
 });
 
 await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData(
-  "contentServerData",
-  async () => await serverStore.getServerData(serverId),
-);
+const { data, status } = await useLazyAsyncData("contentServerData", async () => {
+  await serverStore.fetchServerData(serverId);
+  return serverStore.getServerData(serverId);
+});
 
 const navLinks = [
   { icon: CogIcon, label: "Loader", href: `/servers/manage/${serverId}/content` },

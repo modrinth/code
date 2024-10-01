@@ -86,7 +86,9 @@
       <UiServersSaveBanner
         v-if="hasUnsavedChanges"
         :is-updating="isUpdating"
+        :restart="true"
         :save="saveProperties"
+        :saverestart="savePropertiesAndRestart"
         :reset="resetProperties"
       />
     </div>
@@ -203,7 +205,14 @@ const saveProperties = async () => {
     });
   } finally {
     isUpdating.value = false;
+    return;
   }
+};
+
+const savePropertiesAndRestart = async () => {
+  console.log("hai");
+  await saveProperties();
+  await serverStore.sendPowerAction(serverId, "Restart");
 };
 
 const resetProperties = () => {

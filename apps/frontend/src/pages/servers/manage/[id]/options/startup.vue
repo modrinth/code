@@ -21,10 +21,10 @@ const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
 await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData(
-  "data",
-  async () => await serverStore.getServerData(serverId),
-);
+const { data, status } = await useLazyAsyncData("data", async () => {
+  await serverStore.fetchServerData(serverId);
+  return serverStore.getServerData(serverId);
+});
 
 const isUpdating = ref(false);
 const hasUnsavedChanges = ref(false);

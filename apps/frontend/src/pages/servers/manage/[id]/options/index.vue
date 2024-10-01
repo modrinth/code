@@ -34,10 +34,10 @@ const serverId = route.params.id as string;
 
 const serverStore = useServerStore();
 
-const { data, status } = await useAsyncData(
-  "data",
-  async () => await serverStore.getServerData(serverId),
-);
+const { data, status } = await useAsyncData("data", async () => {
+  await serverStore.fetchServerData(serverId);
+  return serverStore.getServerData(serverId);
+});
 
 const serverName = ref(data.value?.name || "");
 

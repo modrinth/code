@@ -38,10 +38,10 @@ const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
 const isUpdating = ref(false);
-const { data, status } = await useAsyncData(
-  "data",
-  async () => await serverStore.getServerData(serverId),
-);
+const { data, status } = await useAsyncData("networkData", async () => {
+  await serverStore.fetchServerData(serverId);
+  return serverStore.getServerData(serverId);
+});
 
 const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 
@@ -65,7 +65,6 @@ const saveNetwork = async () => {
     }
     await serverStore.changeSubdomain(serverId, serverSubdomain.value);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await refreshNuxtData("data");
     // @ts-ignore
     app.$notify({
       group: "serverOptions",
@@ -83,6 +82,9 @@ const saveNetwork = async () => {
     });
   } finally {
     isUpdating.value = false;
+    resetNetwork();
+    await refreshNuxtData("networkData");
+    resetNetwork();
   }
 };
 

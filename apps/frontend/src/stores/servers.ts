@@ -26,6 +26,19 @@ export const useServerStore = defineStore("servers", {
         const backups = await this.fetchServerBackups(serverId);
         data.backups = backups;
 
+        const fileApi = await this.getFileApiInfo(serverId);
+        try {
+          const serverImage = await this.downloadFile(fileApi, "/server-icon.png");
+
+          if (serverImage) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              data.image = reader.result as string;
+            };
+            reader.readAsDataURL(serverImage);
+          }
+        } catch {}
+
         this.serverData[serverId] = data;
         this.error = null;
       } catch (error) {

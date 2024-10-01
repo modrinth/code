@@ -91,6 +91,7 @@ export interface Server {
   mods: Mod[];
   project: Project | null;
   suspension_reason: string | null;
+  image: string | null;
   upstream: {
     kind: "modpack";
     project_id: string;

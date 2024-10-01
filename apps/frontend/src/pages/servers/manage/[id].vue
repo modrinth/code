@@ -7,12 +7,16 @@
       class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
     >
       <div class="flex flex-row items-center gap-6 pt-4">
-        <UiAvatar
+        <img
           no-shadow
           size="lg"
           alt="Server Icon"
-          style="width: 128px; height: 128px; min-width: 128px; min-height: 128px"
-          :src="serverData?.project?.icon_url ?? undefined"
+          class="h-[9rem] w-[9rem] rounded-xl bg-bg-raised"
+          :src="
+            serverData?.image
+              ? 'data:image/png;base64, ' + serverData.image
+              : '~/assets/images/servers/minecraft_server_icon.png'
+          "
         />
         <div class="flex flex-col gap-4">
           <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">

@@ -27,10 +27,10 @@ const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
 await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData(
-  "infoServerData",
-  async () => await serverStore.getServerData(serverId),
-);
+const { data, status } = await useLazyAsyncData("infoServerData", async () => {
+  await serverStore.fetchServerData(serverId);
+  return serverStore.getServerData(serverId);
+});
 
 const properties = [
   { name: "Server ID", value: serverId },
