@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRaw } from "vue";
+import { computed } from "vue";
 import { ChevronRightIcon } from "@modrinth/assets";
 import type { StatusState } from "./ServerInstallStatusPill.vue";
 import type { Project, Server } from "~/types/servers";
@@ -65,9 +65,12 @@ const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 const showModLabel = computed(() => (props.mods?.length ?? 0) > 0);
 
-const { data: projectData } = await useLazyAsyncData(
+const { data: projectData } = await useLazyAsyncData<Project>(
   `server-project-${props.server_id}`,
-  async () => await useBaseFetch(`project/${props.upstream?.project_id}`),
+  async (): Promise<Project> => {
+    const result = await useBaseFetch(`project/${props.upstream?.project_id}`);
+    return result as Project;
+  },
 );
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
