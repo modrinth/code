@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { PlayIcon, UpdatedIcon, StopCircleIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, Button } from "@modrinth/ui";
 
 const props = defineProps<{
   isOnline: boolean;

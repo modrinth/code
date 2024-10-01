@@ -26,18 +26,30 @@ export const useServerStore = defineStore("servers", {
         const backups = await this.fetchServerBackups(serverId);
         data.backups = backups;
 
-        const fileApi = await this.getFileApiInfo(serverId);
+        const fileApi = (await this.getFileApiInfo(serverId)) as {
+          url: string;
+          token: string;
+        };
         try {
-          const serverImage = await this.downloadFile(fileApi, "/server-icon.png");
-
-          if (serverImage) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              data.image = reader.result as string;
+          const fileData = await usePyroFetch(`/download?path=/server-icon.png`, {
+            override: fileApi,
+          });
+          if (fileData instanceof Blob) {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+            img.src = URL.createObjectURL(fileData);
+            img.onload = () => {
+              canvas.width = 200;
+              canvas.height = 200;
+              ctx?.drawImage(img, 0, 0, 200, 200);
+              const dataURL = canvas.toDataURL("image/png");
+              data.image = dataURL;
             };
-            reader.readAsDataURL(serverImage);
           }
-        } catch {}
+        } catch (error) {
+          console.error("Error fetching server image:", error);
+        }
 
         this.serverData[serverId] = data;
         this.error = null;
@@ -300,11 +312,18 @@ export const useServerStore = defineStore("servers", {
       }
     },
 
-    async reinstallServer(serverId: string, projectId: string, versionId: string) {
+    async reinstallServer(
+      serverId: string,
+      loader: boolean,
+      projectId: string,
+      versionId?: string,
+    ) {
       try {
         await usePyroFetch(`servers/${serverId}/reinstall`, {
           method: "POST",
-          body: { project_id: projectId, version_id: versionId },
+          body: loader
+            ? { loader: projectId, version: projectId }
+            : { project_id: projectId, version_id: versionId },
         });
       } catch (error) {
         console.error("Error reinstalling server:", error);

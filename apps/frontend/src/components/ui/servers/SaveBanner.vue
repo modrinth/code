@@ -8,10 +8,10 @@
         <Button transparent :loading="props.isUpdating" @click="props.reset"> Reset </Button>
         <Button color="primary" :loading="props.isUpdating" @click="props.save"> Save </Button>
         <Button
-          v-if="restart"
+          v-if="props.restart"
           color="primary"
           :loading="props.isUpdating"
-          @click="props.saverestart"
+          @click="saveAndRestart"
         >
           Save & Restart
         </Button>
@@ -25,11 +25,19 @@ import { Button } from "@modrinth/ui";
 
 const props = defineProps<{
   isUpdating: boolean;
-  restart: boolean;
+  restart?: boolean;
   save: () => void;
-  saverestart: () => void;
   reset: () => void;
 }>();
+
+const route = useNativeRoute();
+const serverId = route.params.id as string;
+const serverStore = useServerStore();
+
+const saveAndRestart = async () => {
+  props.save();
+  await serverStore.sendPowerAction(serverId, "Restart");
+};
 </script>
 
 <style scoped>

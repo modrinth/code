@@ -24,7 +24,7 @@
         :filename="mod.filename"
         :version_number="mod.version_number"
         :disabled="mod.disabled"
-        :icon="mod.icon"
+        :icon="mod.icon_url"
         :project="mod.project_id"
         :version="mod.version_id"
         :icon_url="mod.icon_url"
@@ -38,6 +38,16 @@
 import { PlusIcon } from "@modrinth/assets";
 import { Button, Modal } from "@modrinth/ui";
 
+interface Mod {
+  name: string;
+  filename: string;
+  project_id: string;
+  version_id: string;
+  version_number: string;
+  icon_url: string;
+  disabled: boolean;
+}
+
 const serverStore = useServerStore();
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -50,7 +60,7 @@ const { data, status } = await useLazyAsyncData("modsData", async () => {
 });
 
 const { data: mods } = await useLazyAsyncData("modsData", async () => {
-  return await serverStore.getMods(serverId);
+  return (await serverStore.getMods(serverId)) as Mod[];
 });
 
 computed(() => {

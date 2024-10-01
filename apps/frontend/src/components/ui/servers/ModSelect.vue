@@ -71,9 +71,9 @@ const buildFacetString = (facets: string[]) => {
 };
 
 const { data: mods } = await useLazyAsyncData("modsResults", async () => {
-  return await useBaseFetch(
+  return (await useBaseFetch(
     `search?query=${queryFilter.value}&facets=${buildFacetString(facets.value)}&index=relevance&limit=20`,
-  );
+  )) as any;
 });
 
 const selectedVersion = ref("");

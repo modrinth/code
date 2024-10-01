@@ -34,12 +34,12 @@ const serverId = route.params.id as string;
 
 const serverStore = useServerStore();
 
-const { data, status } = await useAsyncData("data", async () => {
+const { data, status } = await useLazyAsyncData("data", async () => {
   await serverStore.fetchServerData(serverId);
   return serverStore.getServerData(serverId);
 });
 
-const serverName = ref(data.value?.name || "");
+const serverName = ref<string>(data.value?.name as string);
 
 const isUpdating = ref(false);
 const hasUnsavedChanges = computed(() => serverName.value !== data.value?.name);

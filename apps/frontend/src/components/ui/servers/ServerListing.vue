@@ -9,7 +9,22 @@
     :data-pyro-server-listing-id="server_id"
   >
     <!-- how do we want to get this now? -->
-    <UiAvatar :src="iconUrl" no-shadow size="md" alt="Server Icon" />
+    <img
+      v-if="image"
+      no-shadow
+      size="lg"
+      alt="Server Icon"
+      class="size-[96px] rounded-xl bg-bg-raised"
+      :src="image"
+    />
+    <img
+      v-else
+      no-shadow
+      size="lg"
+      alt="Server Icon"
+      class="size-[96px] rounded-xl bg-bg-raised"
+      src="~/assets/images/servers/minecraft_server_icon.png"
+    />
     <div class="ml-8 flex flex-col gap-2.5">
       <div class="flex flex-col gap-2 md:flex-row md:items-center">
         <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>
@@ -61,6 +76,8 @@ const status = computed(() => ({
   isInstalling: props.status === "Installing",
 }));
 
+const serverStore = useServerStore();
+
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 const showModLabel = computed(() => (props.mods?.length ?? 0) > 0);
@@ -72,6 +89,31 @@ const { data: projectData } = await useLazyAsyncData<Project>(
     return result as Project;
   },
 );
+
+const image = ref<string | undefined>();
+
+try {
+  const fileApi = (await serverStore.getFileApiInfo(props.server_id as string)) as {
+    url: string;
+    token: string;
+  };
+  const fileData = await usePyroFetch(`/download?path=/server-icon.png`, {
+    override: fileApi,
+  });
+  if (fileData instanceof Blob) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.src = URL.createObjectURL(fileData);
+    img.onload = () => {
+      canvas.width = 200;
+      canvas.height = 200;
+      ctx?.drawImage(img, 0, 0, 200, 200);
+      const dataURL = canvas.toDataURL("image/png");
+      image.value = dataURL;
+    };
+  }
+} catch {}
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 </script>

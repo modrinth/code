@@ -12,7 +12,14 @@
             class="border-0 border-b border-solid border-bg-raised"
           >
             <td class="py-3">{{ property.name }}</td>
-            <td class="px-4 py-3"><UiCopyCode :text="property.value" /></td>
+            <td class="px-4 py-3">
+              <UiCopyCode
+                :text="
+                  property.value as string
+                  // space to prevent highlighting from breaking
+                "
+              />
+            </td>
           </tr>
         </tbody>
       </table>

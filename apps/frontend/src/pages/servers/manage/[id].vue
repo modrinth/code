@@ -2,21 +2,26 @@
   <div class="contents">
     <UiServersPanelLoading v-if="isLoading" class="h-screen" />
     <div
-      v-else-if="serverData"
+      v-else-if="serverData && status === 'success'"
       data-pyro-server-manager-root
       class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
     >
       <div class="flex flex-row items-center gap-6 pt-4">
         <img
+          v-if="serverData?.image"
           no-shadow
           size="lg"
           alt="Server Icon"
           class="h-[9rem] w-[9rem] rounded-xl bg-bg-raised"
-          :src="
-            serverData?.image
-              ? 'data:image/png;base64, ' + serverData.image
-              : '~/assets/images/servers/minecraft_server_icon.png'
-          "
+          :src="serverData.image"
+        />
+        <img
+          v-else
+          no-shadow
+          size="lg"
+          alt="Server Icon"
+          class="h-[9rem] w-[9rem] rounded-xl bg-bg-raised"
+          src="~/assets/images/servers/minecraft_server_icon.png"
         />
         <div class="flex flex-col gap-4">
           <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
@@ -71,14 +76,15 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
-const { serverData: storeServerData } = storeToRefs(serverStore);
-
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
 const isLoading = ref(true);
 const error = ref<Error | null>(null);
 
-const serverData = computed(() => storeServerData.value[serverId] || null);
+const { data: serverData, status } = await useLazyAsyncData("serverData", async () => {
+  await serverStore.fetchServerData(serverId);
+  return await serverStore.getServerData(serverId);
+});
 
 const showGameLabel = computed(() => !!serverData.value?.game);
 const showLoaderLabel = computed(() => !!serverData.value?.loader);

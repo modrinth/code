@@ -38,7 +38,7 @@ const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
 const isUpdating = ref(false);
-const { data, status } = await useAsyncData("networkData", async () => {
+const { data, status } = await useLazyAsyncData("networkData", async () => {
   await serverStore.fetchServerData(serverId);
   return serverStore.getServerData(serverId);
 });

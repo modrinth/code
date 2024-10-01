@@ -284,7 +284,7 @@ import {
 } from "@modrinth/assets";
 import { Button, Modal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
-const VAceEditor = ref("div");
+const VAceEditor = ref();
 
 const route = useRoute();
 const router = useRouter();
