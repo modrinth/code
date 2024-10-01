@@ -13,7 +13,7 @@
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
             <input v-model="serverSubdomain" class="h-[50%] w-[63%]" @keyup.enter="saveNetwork" />
-            .{{ data.net.domain.split(".").slice(1).join(".") }}
+            .modrinth.gg
           </div>
         </div>
       </div>
@@ -43,11 +43,9 @@ const { data, status } = await useAsyncData(
   async () => await serverStore.getServerData(serverId),
 );
 
-const serverSubdomain = ref(data?.value?.net?.domain.split(".")[0] ?? "");
+const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 
-const hasUnsavedChanges = computed(
-  () => serverSubdomain.value !== data?.value?.net?.domain.split(".")[0],
-);
+const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
 
 const saveNetwork = async () => {
   try {
@@ -89,6 +87,6 @@ const saveNetwork = async () => {
 };
 
 const resetNetwork = () => {
-  serverSubdomain.value = data?.value?.net?.domain.split(".")[0] ?? "";
+  serverSubdomain.value = data?.value?.net?.domain ?? "";
 };
 </script>

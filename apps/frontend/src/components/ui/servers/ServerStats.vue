@@ -31,7 +31,7 @@
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-          {{ formatBytes(data.current.storage_total_bytes / 10) }}
+          {{ formatBytes(data.current.storage_usage_bytes) }}
         </h2>
         <ChevronRightIcon />
       </div>
