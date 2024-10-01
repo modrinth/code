@@ -31,7 +31,7 @@ export const useServerStore = defineStore("servers", {
           token: string;
         };
         try {
-          const fileData = await usePyroFetch(`/download?path=/server-icon.png`, {
+          const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
             override: fileApi,
           });
           if (fileData instanceof Blob) {
