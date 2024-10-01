@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-row items-center gap-2 rounded-xl bg-button-bg p-1">
+  <div class="flex flex-row items-center rounded-lg bg-button-bg p-1">
     <ButtonStyled type="transparent">
-      <Button :disabled="isActioning" @click="handleAction">
+      <Button class="!rounded-md" :disabled="isActioning" @click="handleAction">
         <div v-if="isActioning" class="grid place-content-center">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path
@@ -18,7 +18,7 @@
       </Button>
     </ButtonStyled>
     <ButtonStyled v-if="isOnline" type="transparent">
-      <Button v-if="isOnline" @click="stopServer">
+      <Button v-if="isOnline" class="!rounded-md" @click="stopServer">
         <div class="flex gap-1">
           <StopCircleIcon class="h-5 w-5" />
         </div>
@@ -45,6 +45,6 @@ const handleAction = () => {
 };
 
 const stopServer = async () => {
-  emit("action", "stop");
+  await emit("action", "stop");
 };
 </script>
