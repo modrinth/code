@@ -60,9 +60,9 @@ import { handleError } from '@/store/notifications'
 const props = defineProps<Partial<Server>>()
 
 const status = computed(() => ({
-  state: props.state as StatusState | undefined,
-  isFailed: props.state === 'Failed',
-  isInstalling: props.state === 'Installing',
+  state: props.status as StatusState | undefined,
+  isFailed: props.status === 'Failed',
+  isInstalling: props.status === 'Installing',
 }))
 
 const showGameLabel = computed(() => !!props.game)

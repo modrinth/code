@@ -1,10 +1,13 @@
 <template>
   <div class="h-full w-full">
-    <div v-if="data && status == 'success'" class="flex h-full w-full flex-col gap-6 p-8">
+    <div
+      v-if="data && status == 'success' && version"
+      class="flex h-full w-full flex-col gap-6 p-8"
+    >
       <div class="display-mode--list">
         <UiProjectCard
-          v-if="data && data.project"
-          :id="data.project.id"
+          v-if="data && data.upstream"
+          :id="data.upstream.project_id"
           :icon-url="data.project.icon_url"
           :name="data.project.title"
           :description="data.project.description"
@@ -35,8 +38,11 @@ const { data, status } = await useLazyAsyncData("serverData", async () => {
 
 const { data: versions, refresh: refreshVersions } = await useLazyAsyncData(
   "modpackVersions",
-  async () => await useBaseFetch(`project/${data.value?.project?.id}/version`),
+  async () => await useBaseFetch(`project/${data.value?.upstream?.project_id}/version`),
 );
+
+console.log(versions.value);
+console.log(data.value);
 
 const options = (versions.value as any[]).map((x) => x.version_number);
 

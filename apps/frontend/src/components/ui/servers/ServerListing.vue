@@ -56,9 +56,9 @@ import type { Project, Server } from "~/types/servers";
 const props = defineProps<Partial<Server>>();
 
 const status = computed(() => ({
-  state: props.state as StatusState | undefined,
-  isFailed: props.state === "Failed",
-  isInstalling: props.state === "Installing",
+  state: props.status as StatusState | undefined,
+  isFailed: props.status === "Failed",
+  isInstalling: props.status === "Installing",
 }));
 
 const showGameLabel = computed(() => !!props.game);
@@ -67,18 +67,7 @@ const showModLabel = computed(() => (props.mods?.length ?? 0) > 0);
 
 const { data: projectData } = await useLazyAsyncData(
   `server-project-${props.server_id}`,
-  async () => {
-    if (props.modpack) {
-      const versionData: any = await toRaw(useBaseFetch(`version/${props.modpack}`));
-      if (versionData && versionData.project_id) {
-        const projectData: Project = (await toRaw(
-          useBaseFetch(`project/${versionData.project_id}`),
-        )) as Project;
-        return projectData;
-      }
-    }
-    return null;
-  },
+  async () => await useBaseFetch(`project/${props.upstream?.project_id}`),
 );
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);

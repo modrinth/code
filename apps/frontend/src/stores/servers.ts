@@ -17,12 +17,9 @@ export const useServerStore = defineStore("servers", {
       try {
         const data = await usePyroFetch<Server>(`servers/${serverId}`);
 
-        if (data.modpack) {
-          const pid: Project = await this.fetchModpackVersion(data.modpack);
+        if (data.upstream.project_id) {
           // @ts-ignore
-          const project = await this.fetchProject(pid.project_id);
-
-          data.modpack_id = pid.id;
+          const project = await this.fetchProject(data.upstream.project_id);
           data.project = project as Project | null;
         }
 
@@ -242,6 +239,15 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error changing subdomain:", error);
+        throw error;
+      }
+    },
+
+    async getMods(serverId: string) {
+      try {
+        return await usePyroFetch(`servers/${serverId}/mods`);
+      } catch (error) {
+        console.error("Error getting mods:", error);
         throw error;
       }
     },

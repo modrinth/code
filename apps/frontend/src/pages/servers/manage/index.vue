@@ -84,12 +84,12 @@
           :key="server.server_id"
           :server_id="server.server_id"
           :name="server.name"
-          :state="server.state"
+          :status="server.status"
           :game="server.game"
           :loader="server.loader"
           :loader_version="server.loader_version"
           :mc_version="server.mc_version"
-          :modpack="server.modpack"
+          :upstream="server.upstream"
         />
       </ul>
       <div v-else class="flex h-full items-center justify-center">

@@ -1,54 +1,63 @@
 <template>
-  <div class="flex w-full flex-col">
-    <UiServersContentItem
-      v-for="mod in mods"
-      :key="mod.name"
-      :name="mod.name"
-      :icon="mod.icon"
-      :size="mod.size"
-    />
+  <Modal ref="addModModal" header="Add mod">
+    <div class="h-[500px]">
+      <UiServersModSelect />
+    </div>
+  </Modal>
+  <div class="flex h-full w-full flex-col">
+    <div
+      class="flex items-center justify-between gap-2 border-0 border-b border-solid border-bg-raised p-3"
+    >
+      <h2 class="m-0 text-2xl font-bold text-contrast">Mods</h2>
+      <Button icon-only transparent @click="addModModal.show()">
+        <PlusIcon class="h-10 w-10 text-contrast" />
+      </Button>
+    </div>
+    <div
+      class="flex h-full w-full flex-col overflow-y-scroll"
+      v-if="data && status == 'success' && mods"
+    >
+      <UiServersContentItem
+        v-for="mod in mods"
+        :key="mod.name"
+        :name="mod.name"
+        :filename="mod.filename"
+        :version_number="mod.version_number"
+        :disabled="mod.disabled"
+        :icon="mod.icon"
+        :project="mod.project_id"
+        :version="mod.version_id"
+        :icon_url="mod.icon_url"
+      />
+    </div>
+    <UiServersPyroLoading v-else />
   </div>
 </template>
 
 <script setup lang="ts">
-import { FileIcon } from "@modrinth/assets";
+import { PlusIcon } from "@modrinth/assets";
+import { Button, Modal } from "@modrinth/ui";
 
-const mods = [
-  {
-    name: "Fabric API",
-    icon: FileIcon,
-    version: "0.44.1",
-    size: 1.42,
-  },
-  {
-    name: "Modrinth API",
-    icon: FileIcon,
-    version: "0.1.0",
-    size: 0.69,
-  },
-  {
-    name: "Modrinth API",
-    icon: FileIcon,
-    version: "0.1.0",
-    size: 0.69,
-  },
-  {
-    name: "Modrinth API",
-    icon: FileIcon,
-    version: "0.1.0",
-    size: 0.69,
-  },
-  {
-    name: "Modrinth API",
-    icon: FileIcon,
-    version: "0.1.0",
-    size: 0.69,
-  },
-  {
-    name: "Modrinth API",
-    icon: FileIcon,
-    version: "0.1.0",
-    size: 0.69,
-  },
-];
+const serverStore = useServerStore();
+const route = useNativeRoute();
+const serverId = route.params.id as string;
+
+const addModModal = ref();
+
+const { data, status } = await useLazyAsyncData("modsData", async () => {
+  await serverStore.fetchServerData(serverId);
+  return serverStore.getServerData(serverId);
+});
+
+const { data: mods } = await useLazyAsyncData("modsData", async () => {
+  return await serverStore.getMods(serverId);
+});
+
+computed(() => {
+  mods.value?.sort((a: any, b: any) => {
+    if (a.name < b.name) return -1;
+    if (a.name > b.name) return 1;
+    return 0;
+  });
+});
 </script>

@@ -75,23 +75,27 @@ export interface ServerBackup {
 export interface Server {
   server_id: string;
   name: string;
-  state: string;
+  status: string;
   net: {
     ip: string;
     port: number;
     domain: string;
   };
-  modpack: string | null;
-  modpack_id: string | null;
-  project: Project | null;
-  backups: ServerBackup[];
   game: string;
   loader: string | null;
   loader_version: string | null;
   mc_version: string | null;
-  mods: Mod[];
   backup_quota: number;
   used_backup_quota: number;
+  backups: ServerBackup[];
+  mods: Mod[];
+  project: Project | null;
+  suspension_reason: string | null;
+  upstream: {
+    kind: "modpack";
+    project_id: string;
+    version_id: string;
+  };
 }
 
 export interface WSAuth {
