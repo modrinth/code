@@ -9,7 +9,7 @@
     :data-pyro-server-listing-id="server_id"
   >
     <!-- how do we want to get this now? -->
-    <UiAvatar :src="undefined" no-shadow size="md" alt="Server Icon" />
+    <UiAvatar :src="iconUrl" no-shadow size="md" alt="Server Icon" />
     <div class="ml-8 flex flex-col gap-2.5">
       <div class="flex flex-col gap-2 md:flex-row md:items-center">
         <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>

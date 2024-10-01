@@ -41,13 +41,6 @@
             <UiServersServerModLabel v-if="showModLabel" :mods="serverData.mods" />
           </div>
         </div>
-        <div class="ml-auto flex flex-row gap-2">
-          <UiServersPanelCopyIP
-            :ip="serverData.net.ip"
-            :port="serverData.net.port"
-            :subdomain="serverData.net.domain"
-          />
-        </div>
       </div>
 
       <div class="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">

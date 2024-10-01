@@ -2,19 +2,29 @@
   <div
     v-if="isConnected && !isWSAuthIncorrect"
     data-pyro-server-manager-root
-    class="flex flex-col gap-6"
+    class="relative flex flex-col gap-6"
   >
-    <transition name="fade-slide">
-      <UiServersServerStats v-if="!fullScreen" :data="stats" />
-    </transition>
     <div
-      class="relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-8 transition-[height] duration-500 ease-in-out"
+      :class="fullScreen ? '-translate-y-4 scale-95 opacity-0' : 'opacity-100'"
+      class="absolute left-0 right-0 top-0 w-full transition-all duration-[400ms]"
+    >
+      <UiServersServerStats :data="stats" />
+    </div>
+    <div
+      class="relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-8 transition-[height,_margin-top] duration-300 ease-in-out"
       :style="consoleStyle"
     >
       <div class="experimental-styles-within flex flex-row items-center justify-between">
         <div class="flex flex-row items-center gap-4">
           <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
           <UiServersPanelServerStatus :state="serverPowerState" />
+        </div>
+        <div class="ml-auto mr-2 flex flex-row gap-2">
+          <UiServersPanelCopyIP
+            :ip="serverStore.serverData[serverId]?.net.ip"
+            :port="serverStore.serverData[serverId]?.net.port"
+            :subdomain="serverStore.serverData[serverId]?.net.domain"
+          />
         </div>
         <UiServersPanelServerActionButton
           :is-online="serverPowerState === 'running'"
@@ -60,7 +70,6 @@ const serverStore = useServerStore();
 const app = useNuxtApp();
 
 const fullScreen = ref(false);
-const consoleStyle = ref({ height: "600px", marginTop: "0px" });
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const consoleOutput = ref<string[]>([]);
@@ -100,26 +109,21 @@ useHead({
 
 let socket: WebSocket | null = null;
 
+const consoleStyle = ref({
+  marginTop: "254px",
+  height: "600px",
+  transition: "height 0.3s ease-in-out, margin-top 0.3s ease-in-out",
+});
+
 const toggleFullScreen = () => {
   fullScreen.value = !fullScreen.value;
   if (fullScreen.value) {
-    consoleStyle.value.height = "90vh";
-    animateMarginTop();
+    consoleStyle.value.height = "85vh";
+    consoleStyle.value.marginTop = "0px";
   } else {
     consoleStyle.value.height = "600px";
-    consoleStyle.value.marginTop = "0px";
+    consoleStyle.value.marginTop = "254px";
   }
-};
-
-const animateMarginTop = () => {
-  setTimeout(() => {
-    let mt = 254;
-    const interval = setInterval(() => {
-      mt -= 10;
-      consoleStyle.value.marginTop = `${mt}px`;
-      if (mt <= 0 || !fullScreen.value) clearInterval(interval);
-    }, 10);
-  }, 500);
 };
 
 const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
@@ -230,24 +234,3 @@ const reauth = async () => {
 onMounted(connectWebSocket);
 onBeforeUnmount(() => socket?.close());
 </script>
-
-<style scoped>
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition:
-    opacity 0.5s ease,
-    transform 0.5s ease;
-}
-
-.fade-slide-enter-from,
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
-.console {
-  transition:
-    height 0.5s ease,
-    margin-top 0.5s ease;
-}
-</style>
