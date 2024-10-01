@@ -11,7 +11,7 @@
       <UiServersServerStats :data="stats" />
     </div>
     <div
-      class="relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-8 transition-[height,_margin-top] duration-300 ease-in-out"
+      class="relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-8 transition-[height,_margin-top] duration-300 ease-in-out"
       :style="consoleStyle"
     >
       <div class="experimental-styles-within flex flex-row items-center justify-between">
@@ -38,31 +38,24 @@
         @toggle-full-screen="toggleFullScreen"
       >
         <div class="w-full px-2.5 pt-2 relative">
-          <input
-            v-model="commandInput"
-            type="text"
-            placeholder="Send a command"
-            class="z-50 w-full rounded-md p-2 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
-            @keyup.enter="sendCommand"
-            @input="handleInput"
-            @keydown.down.prevent="highlightNext"
-            @keydown.up.prevent="highlightPrev"
-            @keydown.enter.prevent="selectCommand"
-          />
-          <!-- Autocomplete Dropdown -->
-          <ul
-            v-if="showSuggestions && filteredCommands.length"
-            class="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-md bg-white border border-gray-300 shadow-lg z-10"
-          >
-            <li
-              v-for="(command, index) in filteredCommands"
-              :key="command"
-              @click="selectSuggestion(command)"
-              :class="{'bg-blue-500 text-white': index === highlightedIndex, 'p-2 cursor-pointer': true}"
+          <div class="relative w-full">
+            <span
+              v-if="suggestion"
+              class="absolute left-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 flex items-center"
+              :style="suggestionStyle"
             >
-              {{ command }}
-            </li>
-          </ul>
+              {{ suggestion }}
+              <span class="ml-1 text-xs">Tab</span>
+            </span>
+            <input
+              v-model="commandInput"
+              type="text"
+              placeholder="Send a command"
+              class="z-10 w-full rounded-md p-2 pt-4 focus:outline-none border border-gray-300 bg-white"
+              @keydown.tab.prevent="acceptSuggestion"
+              @input="handleInput"
+            />
+          </div>
         </div>
       </UiServersPanelTerminal>
     </div>
@@ -81,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import type { ServerState, Stats, WSAuth, WSEvent } from "~/types/servers";
 
 const serverStore = useServerStore();
@@ -96,6 +89,12 @@ const ramData = ref<number[]>([]);
 const isActioning = ref(false);
 const serverPowerState = ref<ServerState>("stopped");
 const commandInput = ref("");
+const suggestion = ref("");
+
+const suggestionStyle = computed(() => ({
+  width: `${commandInput.value.length}ch`,
+  whiteSpace: "pre",
+}));
 
 const stats = ref<Stats>({
   current: {
@@ -146,7 +145,6 @@ const toggleFullScreen = () => {
 
 const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
-  // @ts-ignore
   app.$notify({
     group: "server",
     title: `${actionName}ing server`,
@@ -159,7 +157,6 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
     await serverStore.sendPowerAction(serverId, actionName);
   } catch (error) {
     console.error(`Error ${actionName}ing server:`, error);
-    // @ts-ignore
     app.$notify({
       group: "server",
       title: `Error ${actionName}ing server`,
@@ -209,11 +206,6 @@ const minecraftCommands = [
   "/list",
   "/clear",
   "/msg",
-  "/home",
-  "/warp",
-  "/sethome",
-  "/back",
-  "/spawn",
   "/enchant",
   "/effect",
   "/summon",
@@ -221,92 +213,57 @@ const minecraftCommands = [
   "/fill",
   "/clone",
   "/scoreboard",
-  "/weather",
   "/xp",
-  "/recipe",
-  "/tellraw",
   "/title",
   "/stopsound",
   "/playsound",
   "/locate",
 ];
 
-const showSuggestions = ref(false);
-const highlightedIndex = ref(-1);
+const filteredSuggestion = computed(() => {
+  if (commandInput.value.startsWith("/")) {
+    const input = commandInput.value.toLowerCase();
+    const matchingCommand = minecraftCommands.find((cmd) => cmd.startsWith(input));
+    if (matchingCommand && matchingCommand !== commandInput.value) {
+      return matchingCommand.slice(commandInput.value.length);
+    }
+    return "";
+  } else {
+    const input = "/" + commandInput.value.toLowerCase();
+    const matchingCommand = minecraftCommands.find((cmd) => cmd.startsWith(input));
+    if (matchingCommand) {
+      return matchingCommand.slice(1 + commandInput.value.length);
+    }
+    return "";
+  }
+});
 
-const filteredCommands = computed(() => {
-  if (!commandInput.value.startsWith("/")) {
-    showSuggestions.value = false;
-    return [];
-  }
-  const input = commandInput.value.toLowerCase();
-  const suggestions = minecraftCommands.filter(cmd => cmd.startsWith(input));
-  showSuggestions.value = suggestions.length > 0;
-  if (!showSuggestions.value) {
-    highlightedIndex.value = -1;
-  }
-  return suggestions;
+watch(filteredSuggestion, (newVal) => {
+  suggestion.value = newVal;
 });
 
 const handleInput = () => {
-  if (commandInput.value.startsWith("/")) {
-    showSuggestions.value = true;
-  } else {
-    showSuggestions.value = false;
+  if (commandInput.value.trim() === "") {
+    suggestion.value = "";
   }
 };
 
-const highlightNext = () => {
-  if (!showSuggestions.value) return;
-  if (highlightedIndex.value < filteredCommands.value.length - 1) {
-    highlightedIndex.value += 1;
+const acceptSuggestion = () => {
+  if (suggestion.value) {
+    if (commandInput.value.startsWith("/")) {
+      commandInput.value += suggestion.value;
+    } else {
+      commandInput.value = "/" + commandInput.value + suggestion.value;
+    }
+    suggestion.value = "";
   }
 };
-
-const highlightPrev = () => {
-  if (!showSuggestions.value) return;
-  if (highlightedIndex.value > 0) {
-    highlightedIndex.value -= 1;
-  }
-};
-
-const selectCommand = () => {
-  if (highlightedIndex.value >= 0 && highlightedIndex.value < filteredCommands.value.length) {
-    commandInput.value = filteredCommands.value[highlightedIndex.value] + " ";
-    showSuggestions.value = false;
-    highlightedIndex.value = -1;
-  } else {
-    sendCommand();
-  }
-};
-
-const selectSuggestion = (command: string) => {
-  commandInput.value = command + " ";
-  showSuggestions.value = false;
-  highlightedIndex.value = -1;
-};
-
-const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement;
-  if (!target.closest('[data-pyro-server-manager-root]')) {
-    showSuggestions.value = false;
-  }
-};
-
-onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
-  connectWebSocket();
-});
-onBeforeUnmount(() => {
-  document.removeEventListener("click", handleClickOutside);
-  socket?.close();
-});
 
 const sendCommand = async () => {
-  if (!socket) return;
-  console.log("Sending command", commandInput.value);
+  if (!socket || commandInput.value.trim() === "") return;
   await socket.send(JSON.stringify({ event: "command", cmd: commandInput.value }));
   commandInput.value = "";
+  suggestion.value = "";
 };
 
 const handleWebSocketMessage = (data: WSEvent) => {
@@ -358,4 +315,12 @@ const reauth = async () => {
   const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
   socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
 };
+
+onMounted(() => {
+  connectWebSocket();
+});
+
+onBeforeUnmount(() => {
+  socket?.close();
+});
 </script>
