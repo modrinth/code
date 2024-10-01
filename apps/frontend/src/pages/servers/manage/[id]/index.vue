@@ -27,13 +27,15 @@
         :full-screen="fullScreen"
         @toggle-full-screen="toggleFullScreen"
       >
-        <input
-          v-model="commandInput"
-          type="text"
-          placeholder="Send a command"
-          class="z-50 w-[96%] rounded-md p-2 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
-          @keyup.enter="sendCommand"
-        />
+        <div class="w-full px-2.5 pt-2">
+          <input
+            v-model="commandInput"
+            type="text"
+            placeholder="Send a command"
+            class="z-50 w-full rounded-md p-2 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+            @keyup.enter="sendCommand"
+          />
+        </div>
       </UiServersPanelTerminal>
     </div>
   </div>
@@ -171,7 +173,7 @@ const connectWebSocket = async () => {
 const sendCommand = async () => {
   if (!socket) return;
   console.log("Sending command", commandInput.value);
-  socket.send(JSON.stringify({ event: "command", cmd: commandInput.value }));
+  await socket.send(JSON.stringify({ event: "command", cmd: commandInput.value }));
   commandInput.value = "";
 };
 
