@@ -37,11 +37,11 @@
         :full-screen="fullScreen"
         @toggle-full-screen="toggleFullScreen"
       >
-        <div class="w-full px-2.5 pt-2 relative">
+        <div class="relative w-full px-2.5 pt-2">
           <div class="relative w-full">
             <span
               v-if="suggestion"
-              class="absolute left-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 flex items-center"
+              class="pointer-events-none absolute left-[1.2rem] top-[48%] flex -translate-y-1/2 transform items-center text-gray-400"
               :style="suggestionStyle"
             >
               {{ suggestion }}
@@ -51,7 +51,7 @@
               v-model="commandInput"
               type="text"
               placeholder="Send a command"
-              class="z-10 w-full rounded-md p-2 pt-4 focus:outline-none border border-gray-300 bg-white"
+              class="z-50 w-full rounded-md p-2 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
               @keydown.tab.prevent="acceptSuggestion"
               @input="handleInput"
             />
@@ -221,21 +221,24 @@ const minecraftCommands = [
 ];
 
 const filteredSuggestion = computed(() => {
+  const input = commandInput.value.toLowerCase();
+  const inputLength = commandInput.value.length;
+  let matchingCommand = "";
+
+  if (inputLength === 0) return "";
+
   if (commandInput.value.startsWith("/")) {
-    const input = commandInput.value.toLowerCase();
-    const matchingCommand = minecraftCommands.find((cmd) => cmd.startsWith(input));
-    if (matchingCommand && matchingCommand !== commandInput.value) {
-      return matchingCommand.slice(commandInput.value.length);
-    }
-    return "";
+    matchingCommand = minecraftCommands.find((cmd) => cmd.startsWith(input));
   } else {
-    const input = "/" + commandInput.value.toLowerCase();
-    const matchingCommand = minecraftCommands.find((cmd) => cmd.startsWith(input));
-    if (matchingCommand) {
-      return matchingCommand.slice(1 + commandInput.value.length);
-    }
-    return "";
+    matchingCommand = minecraftCommands.find((cmd) => cmd.startsWith("/" + input));
   }
+
+  if (matchingCommand && matchingCommand !== commandInput.value) {
+    const suggestion = matchingCommand.slice(inputLength + (input.startsWith("/") ? 0 : 1));
+    return " ".repeat(inputLength) + suggestion;
+  }
+
+  return "";
 });
 
 watch(filteredSuggestion, (newVal) => {
@@ -251,9 +254,9 @@ const handleInput = () => {
 const acceptSuggestion = () => {
   if (suggestion.value) {
     if (commandInput.value.startsWith("/")) {
-      commandInput.value += suggestion.value;
+      commandInput.value += suggestion.value.replaceAll(" ", "");
     } else {
-      commandInput.value = "/" + commandInput.value + suggestion.value;
+      commandInput.value = commandInput.value + suggestion.value.replaceAll(" ", "");
     }
     suggestion.value = "";
   }
