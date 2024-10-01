@@ -18,7 +18,7 @@ const props = defineProps<{
 }>();
 
 const copyText = () => {
-  const text = props.subdomain ? `${props.subdomain}` : `${props.ip}:${props.port}`;
+  const text = props.subdomain ? `${props.subdomain}.modrinth.gg` : `${props.ip}:${props.port}`;
   navigator.clipboard.writeText(text);
 
   // @ts-ignore
