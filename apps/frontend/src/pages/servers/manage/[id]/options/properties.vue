@@ -5,67 +5,69 @@
       class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto p-8"
     >
       <h2 class="text-3xl font-bold">server.properties</h2>
-      <div v-for="(property, index) in liveProperties" :key="index">
-        <div class="mb-4 flex justify-between">
-          <label :for="index.toString()" class="block text-lg font-semibold">
-            {{
-              index
-                .toString()
-                .split("-")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")
-            }}
-          </label>
-          <div v-if="overrides[index] && overrides[index].type === 'dropdown'">
-            <DropdownSelect
-              v-model="liveProperties[index]"
-              :name="property.id"
-              :options="overrides[index].options"
-              placeholder="Select..."
-            />
-          </div>
-          <div v-else-if="typeof property === 'boolean'">
-            <input
-              id="property.id"
-              v-model="liveProperties[index]"
-              class="switch stylized-toggle"
-              type="checkbox"
-            />
-          </div>
-          <div v-else-if="typeof property === 'number'" class="w-[320px]">
-            <input
-              :id="index.toString()"
-              v-model.number="liveProperties[index]"
-              type="number"
-              class="w-full rounded border p-2"
-            />
-          </div>
-          <div
-            v-else-if="
-              typeof property === 'object' ||
-              property.includes(',') ||
-              property.includes('{') ||
-              property.includes('}') ||
-              property.includes('[') ||
-              property.includes(']') ||
-              property.length > 30
-            "
-            class="w-[320px]"
-          >
-            <textarea
-              :id="index.toString()"
-              :value="JSON.stringify(property, null, 2)"
-              class="w-full rounded border p-2"
-            ></textarea>
-          </div>
-          <div v-else class="w-[320px]">
-            <input
-              :id="index.toString()"
-              :value="property"
-              type="text"
-              class="w-full rounded border p-2"
-            />
-          </div>
+      <div
+        v-for="(property, index) in liveProperties"
+        :key="index"
+        class="mb-2 flex items-center justify-between border-x-0 border-b-2 border-t-0 border-solid border-bg-raised pb-2"
+      >
+        <label :for="index.toString()" class="block">
+          {{
+            index
+              .toString()
+              .split("-")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")
+          }}
+        </label>
+        <div v-if="overrides[index] && overrides[index].type === 'dropdown'">
+          <DropdownSelect
+            v-model="liveProperties[index]"
+            :name="property.id"
+            :options="overrides[index].options"
+            placeholder="Select..."
+          />
+        </div>
+        <div v-else-if="typeof property === 'boolean'">
+          <input
+            id="property.id"
+            v-model="liveProperties[index]"
+            class="switch stylized-toggle"
+            type="checkbox"
+          />
+        </div>
+        <div v-else-if="typeof property === 'number'" class="w-[320px]">
+          <input
+            :id="index.toString()"
+            v-model.number="liveProperties[index]"
+            type="number"
+            class="w-full border p-2"
+          />
+        </div>
+        <div
+          v-else-if="
+            typeof property === 'object' ||
+            property.includes(',') ||
+            property.includes('{') ||
+            property.includes('}') ||
+            property.includes('[') ||
+            property.includes(']') ||
+            property.length > 30
+          "
+          class="w-[320px]"
+        >
+          <textarea
+            :id="index.toString()"
+            :value="JSON.stringify(property, null, 2)"
+            class="w-full rounded-xl border p-2"
+          ></textarea>
+        </div>
+        <div v-else class="w-[320px]">
+          <input
+            :id="index.toString()"
+            :value="property"
+            type="text"
+            class="w-full rounded-xl border p-2"
+          />
         </div>
       </div>
       <div class="mt-10"></div>
@@ -191,6 +193,7 @@ const saveProperties = async () => {
       text: "Your server settings were successfully changed.",
     });
   } catch (error) {
+    console.error("Error updating server settings:", error);
     // @ts-ignore
     app.$notify({
       group: "serverOptions",
