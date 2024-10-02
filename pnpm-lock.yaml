@@ -36,8 +36,8 @@ importers:
         version: link:../../packages/daedalus
     devDependencies:
       '@tauri-apps/cli':
-        specifier: 2.0.0-rc.16
-        version: 2.0.0-rc.16
+        specifier: ^2.0.3
+        version: 2.1.0
 
   apps/app-frontend:
     dependencies:
@@ -54,23 +54,23 @@ importers:
         specifier: ^8.27.0
         version: 8.27.0(vue@3.4.31(typescript@5.5.4))
       '@tauri-apps/api':
-        specifier: ^2.0.0-rc.3
-        version: 2.0.0-rc.3
+        specifier: ^2.0.3
+        version: 2.1.1
       '@tauri-apps/plugin-dialog':
-        specifier: ^2.0.0-rc.0
-        version: 2.0.0-rc.0
+        specifier: ^2.0.1
+        version: 2.0.1
       '@tauri-apps/plugin-os':
-        specifier: ^2.0.0-rc.0
-        version: 2.0.0-rc.0
+        specifier: ^2.0.0
+        version: 2.0.0
       '@tauri-apps/plugin-shell':
-        specifier: ^2.0.0-rc.0
-        version: 2.0.0-rc.0
+        specifier: ^2.0.1
+        version: 2.0.1
       '@tauri-apps/plugin-updater':
-        specifier: ^2.0.0-rc.0
-        version: 2.0.0-rc.1
+        specifier: ^2.0.0
+        version: 2.0.0
       '@tauri-apps/plugin-window-state':
-        specifier: ^2.0.0-rc.0
-        version: 2.0.0-rc.0
+        specifier: ^2.0.0
+        version: 2.0.0
       '@vintl/vintl':
         specifier: ^4.4.1
         version: 4.4.1(typescript@5.5.4)(vue@3.4.31(typescript@5.5.4))
@@ -79,7 +79,7 @@ importers:
         version: 1.11.11
       floating-vue:
         specifier: ^5.2.2
-        version: 5.2.2(@nuxt/kit@3.12.3(magicast@0.3.5)(rollup@4.21.2))(vue@3.4.31(typescript@5.5.4))
+        version: 5.2.2(@nuxt/kit@3.12.3(magicast@0.3.5))(vue@3.4.31(typescript@5.5.4))
       ofetch:
         specifier: ^1.3.4
         version: 1.3.4
@@ -2502,91 +2502,88 @@ packages:
     peerDependencies:
       eslint: '>=8.40.0'
 
-  '@tauri-apps/api@2.0.0-rc.3':
-    resolution: {integrity: sha512-k1erUfnoOFJwL5VNFZz0BQZ2agNstG7CNOjwpdWMl1vOaVuSn4DhJtXB0Deh9lZaaDlfrykKOyZs9c3XXpMi5Q==}
+  '@tauri-apps/api@2.1.1':
+    resolution: {integrity: sha512-fzUfFFKo4lknXGJq8qrCidkUcKcH2UHhfaaCNt4GzgzGaW2iS26uFOg4tS3H4P8D6ZEeUxtiD5z0nwFF0UN30A==}
 
-  '@tauri-apps/api@2.0.0-rc.4':
-    resolution: {integrity: sha512-UNiIhhKG08j4ooss2oEEVexffmWkgkYlC2M3GcX3VPtNsqFgVNL8Mcw/4Y7rO9M9S+ffAMnLOF5ypzyuyb8tyg==}
-
-  '@tauri-apps/cli-darwin-arm64@2.0.0-rc.16':
-    resolution: {integrity: sha512-lISZU4gG0c9PbY7h/j/gW7nJLxZEygNBrYEET6zN8R99Znf5rSO+CfjenaMcJUUj6yTAd8gzdakRpLqNSAWegA==}
+  '@tauri-apps/cli-darwin-arm64@2.1.0':
+    resolution: {integrity: sha512-ESc6J6CE8hl1yKH2vJ+ALF+thq4Be+DM1mvmTyUCQObvezNCNhzfS6abIUd3ou4x5RGH51ouiANeT3wekU6dCw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@tauri-apps/cli-darwin-x64@2.0.0-rc.16':
-    resolution: {integrity: sha512-D9uxPCxpyYcTSQulJGFX3POAKPOJd8WcWHFH8x6YVM1cIx6EWRXIE1sZnPUOjFr7qCg+bSdYdr8/BFHcZGcApQ==}
+  '@tauri-apps/cli-darwin-x64@2.1.0':
+    resolution: {integrity: sha512-TasHS442DFs8cSH2eUQzuDBXUST4ECjCd0yyP+zZzvAruiB0Bg+c8A+I/EnqCvBQ2G2yvWLYG8q/LI7c87A5UA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@tauri-apps/cli-linux-arm-gnueabihf@2.0.0-rc.16':
-    resolution: {integrity: sha512-WsVdKm4D1I1XV8I9yRnmOINZRwwWfh6xcLV3m19+B9g6TohK8RkRxWfxvs3TLQlWOLQ6lo8BzS9rzXB+KtjDpg==}
+  '@tauri-apps/cli-linux-arm-gnueabihf@2.1.0':
+    resolution: {integrity: sha512-aP7ZBGNL4ny07Cbb6kKpUOSrmhcIK2KhjviTzYlh+pPhAptxnC78xQGD3zKQkTi2WliJLPmBYbOHWWQa57lQ9w==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
 
-  '@tauri-apps/cli-linux-arm64-gnu@2.0.0-rc.16':
-    resolution: {integrity: sha512-2jpZDagNs6rrqposHJihHBayttgOl5aB2+bYiVEC6ye+haiFtmYmpdaPOaVIw+YVQs6lepf5PVrisCoU9DmYsg==}
+  '@tauri-apps/cli-linux-arm64-gnu@2.1.0':
+    resolution: {integrity: sha512-ZTdgD5gLeMCzndMT2f358EkoYkZ5T+Qy6zPzU+l5vv5M7dHVN9ZmblNAYYXmoOuw7y+BY4X/rZvHV9pcGrcanQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@tauri-apps/cli-linux-arm64-musl@2.0.0-rc.16':
-    resolution: {integrity: sha512-SNEDcB+sWOls/B0a+UpUHVa/oegvlXXKYWsTxuXtgWIr5VbWG7rXLZ3fZpLLP3SpRVGTGTnABcyqshFbWSqqKQ==}
+  '@tauri-apps/cli-linux-arm64-musl@2.1.0':
+    resolution: {integrity: sha512-NzwqjUCilhnhJzusz3d/0i0F1GFrwCQbkwR6yAHUxItESbsGYkZRJk0yMEWkg3PzFnyK4cWTlQJMEU52TjhEzA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@tauri-apps/cli-linux-x64-gnu@2.0.0-rc.16':
-    resolution: {integrity: sha512-Zsq29MM1ooeH1+chQBa7ffDFnzAZebBBFdsvs4e05tS1H8gn4oKE+PSMn9p/okzVXykEk9ri2/n7BG1XFeifMA==}
+  '@tauri-apps/cli-linux-x64-gnu@2.1.0':
+    resolution: {integrity: sha512-TyiIpMEtZxNOQmuFyfJwaaYbg3movSthpBJLIdPlKxSAB2BW0VWLY3/ZfIxm/G2YGHyREkjJvimzYE0i37PnMA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@tauri-apps/cli-linux-x64-musl@2.0.0-rc.16':
-    resolution: {integrity: sha512-g+pwSuis2YMxhJJ/pJYwp/Nps5CWvlv/5MV5UfDvClkCkeAyzIqVX+HbBLPcs5S0CePUQNeP0j4d4jBWUqZZQg==}
+  '@tauri-apps/cli-linux-x64-musl@2.1.0':
+    resolution: {integrity: sha512-/dQd0TlaxBdJACrR72DhynWftzHDaX32eBtS5WBrNJ+nnNb+znM3gON6nJ9tSE9jgDa6n1v2BkI/oIDtypfUXw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@tauri-apps/cli-win32-arm64-msvc@2.0.0-rc.16':
-    resolution: {integrity: sha512-PpPqdMTwJSDAK4KnNjvh77ShSkY+7pih1f6e50EtXar8bjC17e3XcEqFhDNne5mxEVTLYhibs6p1JLPad0ZjRA==}
+  '@tauri-apps/cli-win32-arm64-msvc@2.1.0':
+    resolution: {integrity: sha512-NdQJO7SmdYqOcE+JPU7bwg7+odfZMWO6g8xF9SXYCMdUzvM2Gv/AQfikNXz5yS7ralRhNFuW32i5dcHlxh4pDg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@tauri-apps/cli-win32-ia32-msvc@2.0.0-rc.16':
-    resolution: {integrity: sha512-io2yIcEcG7YLP+9n13NbilB93SjcB7jIl8GbURC4XZT4/4t9D1PWHpJr5hySVsGRLCz5e8NzwC5RlnenNzmpPQ==}
+  '@tauri-apps/cli-win32-ia32-msvc@2.1.0':
+    resolution: {integrity: sha512-f5h8gKT/cB8s1ticFRUpNmHqkmaLutT62oFDB7N//2YTXnxst7EpMIn1w+QimxTvTk2gcx6EcW6bEk/y2hZGzg==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
 
-  '@tauri-apps/cli-win32-x64-msvc@2.0.0-rc.16':
-    resolution: {integrity: sha512-Rfkmxe3k+cBVA/kVYt8O25QrQqWKJlH9AiH7Q3C6xBzzG9PCSRMBszCp+JhBF8jhVlwNmOBv6UG+lm85kspwGg==}
+  '@tauri-apps/cli-win32-x64-msvc@2.1.0':
+    resolution: {integrity: sha512-P/+LrdSSb5Xbho1LRP4haBjFHdyPdjWvGgeopL96OVtrFpYnfC+RctB45z2V2XxqFk3HweDDxk266btjttfjGw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
-  '@tauri-apps/cli@2.0.0-rc.16':
-    resolution: {integrity: sha512-wdjZg/M3dcxiqgWG6VRnABpX0dYxRww93t0d1MYoZxFDrnyoUz5kYwFQ0v4J9u0qenEgskjoypvon7V/Nj9qrg==}
+  '@tauri-apps/cli@2.1.0':
+    resolution: {integrity: sha512-K2VhcKqBhAeS5pNOVdnR/xQRU6jwpgmkSL2ejHXcl0m+kaTggT0WRDQnFtPq6NljA7aE03cvwsbCAoFG7vtkJw==}
     engines: {node: '>= 10'}
     hasBin: true
 
-  '@tauri-apps/plugin-dialog@2.0.0-rc.0':
-    resolution: {integrity: sha512-DPOXYe8SQ6Radk/67EOdaomlxL7oF99JO/ZUaPp1IBEs3Wro7lhlz63CfdKIBfKIZTLJLzP1R7/EiPL/GTA3Bg==}
+  '@tauri-apps/plugin-dialog@2.0.1':
+    resolution: {integrity: sha512-fnUrNr6EfvTqdls/ufusU7h6UbNFzLKvHk/zTuOiBq01R3dTODqwctZlzakdbfSp/7pNwTKvgKTAgl/NAP/Z0Q==}
 
-  '@tauri-apps/plugin-os@2.0.0-rc.0':
-    resolution: {integrity: sha512-OWAl8mooKnGykSD4iog8WRqcnOSx0gGmTJBlEExHdFeIuOHg0Ezvd+WiVLhT9LBg7go3ibNWRWpe/ZG7YEp4Vw==}
+  '@tauri-apps/plugin-os@2.0.0':
+    resolution: {integrity: sha512-M7hG/nNyQYTJxVG/UhTKhp9mpXriwWzrs9mqDreB8mIgqA3ek5nHLdwRZJWhkKjZrnDT4v9CpA9BhYeplTlAiA==}
 
-  '@tauri-apps/plugin-shell@2.0.0-rc.0':
-    resolution: {integrity: sha512-bhUcQcrqZoK8H1DFXapr5r1Z75oh6Kd5Tltz97XpZFLREEqp+KhN2Fvyh8r/fKAyenYsTYUIsDsyGdjdueuF9g==}
+  '@tauri-apps/plugin-shell@2.0.1':
+    resolution: {integrity: sha512-akU1b77sw3qHiynrK0s930y8zKmcdrSD60htjH+mFZqv5WaakZA/XxHR3/sF1nNv9Mgmt/Shls37HwnOr00aSw==}
 
-  '@tauri-apps/plugin-updater@2.0.0-rc.1':
-    resolution: {integrity: sha512-SwQhDad/jnGIUe4eFfVBZ+0wRZthPSLwrFAl/K0Fyuu7dD/uGHS/jbATxZzwFDGfcpWOGLOsS8+LqSmY5zufHw==}
+  '@tauri-apps/plugin-updater@2.0.0':
+    resolution: {integrity: sha512-N0cl71g7RPr7zK2Fe5aoIwzw14NcdLcz7XMGFWZVjprsqgDRWoxbnUkknyCQMZthjhGkppCd/wN2MIsUz+eAhQ==}
 
-  '@tauri-apps/plugin-window-state@2.0.0-rc.0':
-    resolution: {integrity: sha512-lR8reD+D1yIHT+53v56WltLS0+Y2zIkKqTuwrvz1yNbY5Hk4Z6foFV2Byo4kJAAvi5vbeGtvxYAjSiczZK5euw==}
+  '@tauri-apps/plugin-window-state@2.0.0':
+    resolution: {integrity: sha512-O82iRlrh1BLgBI8CTc+NMTPxQhQo8II5admKq9mLvH45Us5i4Zcr74At6eM46nOflFd7R8bZsVNGy+PxOEqUmQ==}
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -9621,6 +9618,34 @@ snapshots:
       - rollup
       - supports-color
 
+  '@nuxt/kit@3.12.3(magicast@0.3.5)':
+    dependencies:
+      '@nuxt/schema': 3.12.3
+      c12: 1.11.1(magicast@0.3.5)
+      consola: 3.2.3
+      defu: 6.1.4
+      destr: 2.0.3
+      globby: 14.0.2
+      hash-sum: 2.0.0
+      ignore: 5.3.1
+      jiti: 1.21.6
+      klona: 2.0.6
+      knitwork: 1.1.0
+      mlly: 1.7.1
+      pathe: 1.1.2
+      pkg-types: 1.1.3
+      scule: 1.3.0
+      semver: 7.6.2
+      ufo: 1.5.3
+      unctx: 2.3.1
+      unimport: 3.7.2
+      untyped: 1.4.2
+    transitivePeerDependencies:
+      - magicast
+      - rollup
+      - supports-color
+    optional: true
+
   '@nuxt/kit@3.12.3(magicast@0.3.5)(rollup@3.29.4)':
     dependencies:
       '@nuxt/schema': 3.12.3(rollup@3.29.4)
@@ -9649,30 +9674,21 @@ snapshots:
       - supports-color
     optional: true
 
-  '@nuxt/kit@3.12.3(magicast@0.3.5)(rollup@4.21.2)':
+  '@nuxt/schema@3.12.3':
     dependencies:
-      '@nuxt/schema': 3.12.3(rollup@4.21.2)
-      c12: 1.11.1(magicast@0.3.5)
+      compatx: 0.1.8
       consola: 3.2.3
       defu: 6.1.4
-      destr: 2.0.3
-      globby: 14.0.2
-      hash-sum: 2.0.0
-      ignore: 5.3.1
-      jiti: 1.21.6
-      klona: 2.0.6
-      knitwork: 1.1.0
-      mlly: 1.7.1
+      hookable: 5.5.3
       pathe: 1.1.2
       pkg-types: 1.1.3
       scule: 1.3.0
-      semver: 7.6.2
+      std-env: 3.7.0
       ufo: 1.5.3
-      unctx: 2.3.1
-      unimport: 3.7.2(rollup@4.21.2)
+      uncrypto: 0.1.3
+      unimport: 3.7.2
       untyped: 1.4.2
     transitivePeerDependencies:
-      - magicast
       - rollup
       - supports-color
     optional: true
@@ -9713,25 +9729,6 @@ snapshots:
     transitivePeerDependencies:
       - rollup
       - supports-color
-
-  '@nuxt/schema@3.12.3(rollup@4.21.2)':
-    dependencies:
-      compatx: 0.1.8
-      consola: 3.2.3
-      defu: 6.1.4
-      hookable: 5.5.3
-      pathe: 1.1.2
-      pkg-types: 1.1.3
-      scule: 1.3.0
-      std-env: 3.7.0
-      ufo: 1.5.3
-      uncrypto: 0.1.3
-      unimport: 3.7.2(rollup@4.21.2)
-      untyped: 1.4.2
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
-    optional: true
 
   '@nuxt/telemetry@2.5.4(magicast@0.3.4)(rollup@4.18.0)':
     dependencies:
@@ -10216,6 +10213,13 @@ snapshots:
       estree-walker: 2.0.2
       picomatch: 2.3.1
 
+  '@rollup/pluginutils@5.1.0':
+    dependencies:
+      '@types/estree': 1.0.5
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
+    optional: true
+
   '@rollup/pluginutils@5.1.0(rollup@3.29.4)':
     dependencies:
       '@types/estree': 1.0.5
@@ -10412,72 +10416,70 @@ snapshots:
       - supports-color
       - typescript
 
-  '@tauri-apps/api@2.0.0-rc.3': {}
+  '@tauri-apps/api@2.1.1': {}
 
-  '@tauri-apps/api@2.0.0-rc.4': {}
-
-  '@tauri-apps/cli-darwin-arm64@2.0.0-rc.16':
+  '@tauri-apps/cli-darwin-arm64@2.1.0':
     optional: true
 
-  '@tauri-apps/cli-darwin-x64@2.0.0-rc.16':
+  '@tauri-apps/cli-darwin-x64@2.1.0':
     optional: true
 
-  '@tauri-apps/cli-linux-arm-gnueabihf@2.0.0-rc.16':
+  '@tauri-apps/cli-linux-arm-gnueabihf@2.1.0':
     optional: true
 
-  '@tauri-apps/cli-linux-arm64-gnu@2.0.0-rc.16':
+  '@tauri-apps/cli-linux-arm64-gnu@2.1.0':
     optional: true
 
-  '@tauri-apps/cli-linux-arm64-musl@2.0.0-rc.16':
+  '@tauri-apps/cli-linux-arm64-musl@2.1.0':
     optional: true
 
-  '@tauri-apps/cli-linux-x64-gnu@2.0.0-rc.16':
+  '@tauri-apps/cli-linux-x64-gnu@2.1.0':
     optional: true
 
-  '@tauri-apps/cli-linux-x64-musl@2.0.0-rc.16':
+  '@tauri-apps/cli-linux-x64-musl@2.1.0':
     optional: true
 
-  '@tauri-apps/cli-win32-arm64-msvc@2.0.0-rc.16':
+  '@tauri-apps/cli-win32-arm64-msvc@2.1.0':
     optional: true
 
-  '@tauri-apps/cli-win32-ia32-msvc@2.0.0-rc.16':
+  '@tauri-apps/cli-win32-ia32-msvc@2.1.0':
     optional: true
 
-  '@tauri-apps/cli-win32-x64-msvc@2.0.0-rc.16':
+  '@tauri-apps/cli-win32-x64-msvc@2.1.0':
     optional: true
 
-  '@tauri-apps/cli@2.0.0-rc.16':
+  '@tauri-apps/cli@2.1.0':
     optionalDependencies:
-      '@tauri-apps/cli-darwin-arm64': 2.0.0-rc.16
-      '@tauri-apps/cli-darwin-x64': 2.0.0-rc.16
-      '@tauri-apps/cli-linux-arm-gnueabihf': 2.0.0-rc.16
-      '@tauri-apps/cli-linux-arm64-gnu': 2.0.0-rc.16
-      '@tauri-apps/cli-linux-arm64-musl': 2.0.0-rc.16
-      '@tauri-apps/cli-linux-x64-gnu': 2.0.0-rc.16
-      '@tauri-apps/cli-linux-x64-musl': 2.0.0-rc.16
-      '@tauri-apps/cli-win32-arm64-msvc': 2.0.0-rc.16
-      '@tauri-apps/cli-win32-ia32-msvc': 2.0.0-rc.16
-      '@tauri-apps/cli-win32-x64-msvc': 2.0.0-rc.16
+      '@tauri-apps/cli-darwin-arm64': 2.1.0
+      '@tauri-apps/cli-darwin-x64': 2.1.0
+      '@tauri-apps/cli-linux-arm-gnueabihf': 2.1.0
+      '@tauri-apps/cli-linux-arm64-gnu': 2.1.0
+      '@tauri-apps/cli-linux-arm64-musl': 2.1.0
+      '@tauri-apps/cli-linux-x64-gnu': 2.1.0
+      '@tauri-apps/cli-linux-x64-musl': 2.1.0
+      '@tauri-apps/cli-win32-arm64-msvc': 2.1.0
+      '@tauri-apps/cli-win32-ia32-msvc': 2.1.0
+      '@tauri-apps/cli-win32-x64-msvc': 2.1.0
 
-  '@tauri-apps/plugin-dialog@2.0.0-rc.0':
+  '@tauri-apps/plugin-dialog@2.0.1':
     dependencies:
-      '@tauri-apps/api': 2.0.0-rc.3
+      '@tauri-apps/api': 2.1.1
 
-  '@tauri-apps/plugin-os@2.0.0-rc.0':
+  '@tauri-apps/plugin-os@2.0.0':
     dependencies:
-      '@tauri-apps/api': 2.0.0-rc.3
+      '@tauri-apps/api': 2.1.1
 
-  '@tauri-apps/plugin-shell@2.0.0-rc.0':
+  '@tauri-apps/plugin-shell@2.0.1':
     dependencies:
-      '@tauri-apps/api': 2.0.0-rc.3
+      '@tauri-apps/api': 2.1.1
 
-  '@tauri-apps/plugin-updater@2.0.0-rc.1':
+  '@tauri-apps/plugin-updater@2.0.0':
     dependencies:
-      '@tauri-apps/api': 2.0.0-rc.4
+      '@tauri-apps/api': 2.1.1
 
-  '@tauri-apps/plugin-window-state@2.0.0-rc.0':
+  '@tauri-apps/plugin-window-state@2.0.0':
     dependencies:
-      '@tauri-apps/api': 2.0.0-rc.3
+      '@tauri-apps/api': 2.1.1
 
   '@trysound/sax@0.2.0': {}
 
@@ -13259,13 +13261,13 @@ snapshots:
     optionalDependencies:
       '@nuxt/kit': 3.12.3(magicast@0.3.5)(rollup@3.29.4)
 
-  floating-vue@5.2.2(@nuxt/kit@3.12.3(magicast@0.3.5)(rollup@4.21.2))(vue@3.4.31(typescript@5.5.4)):
+  floating-vue@5.2.2(@nuxt/kit@3.12.3(magicast@0.3.5))(vue@3.4.31(typescript@5.5.4)):
     dependencies:
       '@floating-ui/dom': 1.1.1
       vue: 3.4.31(typescript@5.5.4)
       vue-resize: 2.0.0-alpha.1(vue@3.4.31(typescript@5.5.4))
     optionalDependencies:
-      '@nuxt/kit': 3.12.3(magicast@0.3.5)(rollup@4.21.2)
+      '@nuxt/kit': 3.12.3(magicast@0.3.5)
 
   for-each@0.3.3:
     dependencies:
@@ -16772,6 +16774,25 @@ snapshots:
       trough: 2.2.0
       vfile: 6.0.3
 
+  unimport@3.7.2:
+    dependencies:
+      '@rollup/pluginutils': 5.1.0
+      acorn: 8.12.1
+      escape-string-regexp: 5.0.0
+      estree-walker: 3.0.3
+      fast-glob: 3.3.2
+      local-pkg: 0.5.0
+      magic-string: 0.30.10
+      mlly: 1.7.1
+      pathe: 1.1.2
+      pkg-types: 1.1.3
+      scule: 1.3.0
+      strip-literal: 2.1.0
+      unplugin: 1.11.0
+    transitivePeerDependencies:
+      - rollup
+    optional: true
+
   unimport@3.7.2(rollup@3.29.4):
     dependencies:
       '@rollup/pluginutils': 5.1.0(rollup@3.29.4)
@@ -16808,25 +16829,6 @@ snapshots:
       unplugin: 1.11.0
     transitivePeerDependencies:
       - rollup
-
-  unimport@3.7.2(rollup@4.21.2):
-    dependencies:
-      '@rollup/pluginutils': 5.1.0(rollup@4.21.2)
-      acorn: 8.12.1
-      escape-string-regexp: 5.0.0
-      estree-walker: 3.0.3
-      fast-glob: 3.3.2
-      local-pkg: 0.5.0
-      magic-string: 0.30.10
-      mlly: 1.7.1
-      pathe: 1.1.2
-      pkg-types: 1.1.3
-      scule: 1.3.0
-      strip-literal: 2.1.0
-      unplugin: 1.11.0
-    transitivePeerDependencies:
-      - rollup
-    optional: true
 
   unist-util-find-after@5.0.0:
     dependencies:
