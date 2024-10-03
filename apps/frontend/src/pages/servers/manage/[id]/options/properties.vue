@@ -102,21 +102,6 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
-const auth = ref<any>(null);
-const fetchAuth = async () => {
-  try {
-    const apiInfo = await serverStore.getFileApiInfo(serverId);
-    auth.value = apiInfo;
-  } catch (error) {
-    console.error("Error fetching file api info:", error);
-    auth.value = null;
-  }
-};
-
-onMounted(async () => {
-  await fetchAuth();
-});
-
 const isUpdating = ref(false);
 
 const changedPropertiesState = ref({});
@@ -182,7 +167,7 @@ const constructServerProperties = (): string => {
 const saveProperties = async () => {
   try {
     isUpdating.value = true;
-    await serverStore.updateFile(auth.value, "server.properties", constructServerProperties());
+    await serverStore.updateFile(serverId, "server.properties", constructServerProperties());
     await new Promise((resolve) => setTimeout(resolve, 500));
     changedPropertiesState.value = {};
     await refreshNuxtData("data");

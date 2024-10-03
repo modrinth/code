@@ -1,18 +1,31 @@
 import { defineStore } from "pinia";
 import type { Project, Server, ServerBackup } from "~/types/servers";
+const config = true;
 
 interface ServerState {
   serverData: Record<string, Server>;
+  fileAPIAuth: any;
   error: Error | null;
 }
 
 export const useServerStore = defineStore("servers", {
   state: (): ServerState => ({
     serverData: {},
+    fileAPIAuth: null,
     error: null,
   }),
 
   actions: {
+    async retryWithAuth(serverId: string, requestFn: () => Promise<any>) {
+      try {
+        console.log("retrying with auth");
+        return await requestFn();
+      } catch (err: any) {
+        await this.refreshFileApiInfo(serverId);
+        return await requestFn();
+      }
+    },
+
     async fetchServerData(serverId: string) {
       try {
         const data = await usePyroFetch<Server>(`servers/${serverId}`);
@@ -26,14 +39,15 @@ export const useServerStore = defineStore("servers", {
         const backups = await this.fetchServerBackups(serverId);
         data.backups = backups;
 
-        const fileApi = (await this.getFileApiInfo(serverId)) as {
-          url: string;
-          token: string;
-        };
+        await this.confirmFileApiInfo(serverId);
+
         try {
-          const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
-            override: fileApi,
+          const fileData = await this.retryWithAuth(serverId, async () => {
+            return await usePyroFetch(`/download?path=/server-icon-original.png`, {
+              override: this.fileAPIAuth,
+            });
           });
+
           if (fileData instanceof Blob) {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
@@ -65,26 +79,29 @@ export const useServerStore = defineStore("servers", {
         return await usePyroFetch<{ servers: Server[] }>("servers");
       } catch (error) {
         console.error("Error listing servers:", error);
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
         throw this.error;
       }
     },
 
     async fetchModpackVersion(modpackId: string): Promise<Project> {
       try {
-        const result = await toRaw(useBaseFetch(`version/${modpackId}`));
+        const result = await toRaw(useBaseFetch(`version/${modpackId}`, {}, false, config));
         return result as Project;
       } catch (error) {
         console.error("Error fetching modpack version:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
     async fetchProject(projectId: string) {
       try {
-        return await toRaw(useBaseFetch(`project/${projectId}`));
+        return await toRaw(useBaseFetch(`project/${projectId}`, {}, false, config));
       } catch (error) {
         console.error("Error fetching project:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -94,7 +111,8 @@ export const useServerStore = defineStore("servers", {
         return result.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
       } catch (error) {
         console.error("Error fetching server backups:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -114,7 +132,8 @@ export const useServerStore = defineStore("servers", {
         return await usePyroFetch(`servers/${serverId}/ws`);
       } catch (error) {
         console.error("Error requesting websocket:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -126,7 +145,8 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error changing power state:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -149,7 +169,8 @@ export const useServerStore = defineStore("servers", {
         }
       } catch (error) {
         console.error("Error updating server name:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -161,7 +182,8 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error creating backup:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -173,7 +195,8 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error renaming backup:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -184,7 +207,8 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error deleting backup:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -195,7 +219,8 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error restoring backup:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -204,7 +229,8 @@ export const useServerStore = defineStore("servers", {
         return await usePyroFetch(`servers/${serverId}/backups/${backupId}`);
       } catch (error) {
         console.error("Error downloading backup:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -213,7 +239,8 @@ export const useServerStore = defineStore("servers", {
         await usePyroFetch(`servers/${serverId}/world`);
       } catch (error) {
         console.error("Error initiating world download:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -222,7 +249,8 @@ export const useServerStore = defineStore("servers", {
         return await usePyroFetch(`servers/${serverId}/download`);
       } catch (error) {
         console.error("Error getting world download URL:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -231,7 +259,8 @@ export const useServerStore = defineStore("servers", {
         return await usePyroFetch(`servers/${serverId}/config/${fileName}`);
       } catch (error) {
         console.error("Error fetching config file:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -243,7 +272,8 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error saving config file:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -252,7 +282,8 @@ export const useServerStore = defineStore("servers", {
         return await usePyroFetch(`subdomains/${subdomain}/isavailable`);
       } catch (error) {
         console.error("Error checking subdomain availability:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -264,7 +295,8 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error changing subdomain:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -273,7 +305,8 @@ export const useServerStore = defineStore("servers", {
         return await usePyroFetch(`servers/${serverId}/mods`);
       } catch (error) {
         console.error("Error getting mods:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -285,30 +318,36 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error installing mod:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
     async removeMod(serverId: string, modId: string) {
       try {
-        await usePyroFetch(`servers/${serverId}/mods/${modId}`, {
-          method: "DELETE",
+        await usePyroFetch(`servers/${serverId}/deleteMod`, {
+          method: "POST",
+          body: {
+            path: modId,
+          },
         });
       } catch (error) {
         console.error("Error removing mod:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
     async reinstallMod(serverId: string, modId: string, versionId: string) {
       try {
         await usePyroFetch(`servers/${serverId}/mods/${modId}`, {
-          method: "POST",
+          method: "PUT",
           body: { version_id: versionId },
         });
       } catch (error) {
         console.error("Error reinstalling mod:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -327,7 +366,8 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error reinstalling server:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
@@ -339,107 +379,133 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error suspending server:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
-    async getFileApiInfo(serverId: string) {
+    // --- FILE API ---
+
+    async refreshFileApiInfo(serverId: string) {
+      console.log("refreshing tm");
       try {
-        return await usePyroFetch(`servers/${serverId}/fs`);
+        this.fileAPIAuth = await usePyroFetch(`servers/${serverId}/fs`);
       } catch (error) {
         console.error("Error getting file api info:", error);
-        throw error;
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
       }
     },
 
-    async listDirContents(data: any, path: string, page: number, pageSize: number) {
-      try {
-        return (await usePyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
-          override: data,
-        })) as {
-          current: number;
-          items: {
-            count: number;
-            created: number;
-            modified: number;
-            name: string;
-            path: string;
-            type: "directory" | "file";
-            size: number;
-          }[];
-          total: number;
-        };
-      } catch (error) {
-        console.error("Error listing dir contents:", error);
-        throw error;
+    async confirmFileApiInfo(serverId: string) {
+      console.log("confirming file api info...");
+      if (this.fileAPIAuth === null) {
+        console.log("Refreshing file api info...");
+        await this.refreshFileApiInfo(serverId);
+        return;
       }
     },
 
-    createFileOrFolder(data: any, path: string, name: string, type: "file" | "directory") {
-      return usePyroFetch(`/create?path=${path}&type=${type}`, {
-        method: "POST",
-        contentType: "",
-        override: data,
+    async listDirContents(serverId: string, path: string, page: number, pageSize: number) {
+      await this.confirmFileApiInfo(serverId);
+      return this.retryWithAuth(serverId, async () => {
+        return await usePyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
+          override: this.fileAPIAuth,
+        });
       });
     },
 
-    uploadFile(data: any, path: string, file: File) {
-      return usePyroFetch(`/create?path=${path}&type=file`, {
-        method: "POST",
-        contentType: "application/octet-stream",
-        body: file,
-        override: data,
+    async createFileOrFolder(
+      serverId: string,
+      path: string,
+      name: string,
+      type: "file" | "directory",
+    ) {
+      await this.confirmFileApiInfo(serverId);
+      return this.retryWithAuth(serverId, async () => {
+        return await usePyroFetch(`/create?path=${path}&type=${type}`, {
+          method: "POST",
+          contentType: "",
+          override: this.fileAPIAuth,
+        });
       });
     },
 
-    renameFileOrFolder(data: any, path: string, name: string) {
+    async uploadFile(serverId: string, path: string, file: File) {
+      await this.confirmFileApiInfo(serverId);
+      return this.retryWithAuth(serverId, async () => {
+        return await usePyroFetch(`/create?path=${path}&type=file`, {
+          method: "POST",
+          contentType: "application/octet-stream",
+          body: file,
+          override: this.fileAPIAuth,
+        });
+      });
+    },
+
+    async renameFileOrFolder(serverId: string, path: string, name: string) {
+      await this.confirmFileApiInfo(serverId);
       const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
-      return usePyroFetch(`/move`, {
-        method: "POST",
-        override: data,
-        body: {
-          source: path,
-          destination: pathName,
-        },
+      return this.retryWithAuth(serverId, async () => {
+        return await usePyroFetch(`/move`, {
+          method: "POST",
+          override: this.fileAPIAuth,
+          body: {
+            source: path,
+            destination: pathName,
+          },
+        });
       });
     },
 
-    updateFile(data: any, path: string, content: string) {
+    async updateFile(serverId: string, path: string, content: string) {
+      await this.confirmFileApiInfo(serverId);
       const octetStream = new Blob([content], { type: "application/octet-stream" });
-      return usePyroFetch(`/update?path=${path}`, {
-        method: "PUT",
-        contentType: "application/octet-stream",
-        body: octetStream,
-        override: data,
+      return this.retryWithAuth(serverId, async () => {
+        return await usePyroFetch(`/update?path=${path}`, {
+          method: "PUT",
+          contentType: "application/octet-stream",
+          body: octetStream,
+          override: this.fileAPIAuth,
+        });
       });
     },
 
-    moveFileOrFolder(data: any, path: string, newPath: string) {
-      return usePyroFetch(`/move`, {
-        method: "POST",
-        override: data,
-        body: {
-          source: path,
-          destination: newPath,
-        },
+    async moveFileOrFolder(serverId: string, path: string, newPath: string) {
+      await this.confirmFileApiInfo(serverId);
+      return this.retryWithAuth(serverId, async () => {
+        return await usePyroFetch(`/move`, {
+          method: "POST",
+          override: this.fileAPIAuth,
+          body: {
+            source: path,
+            destination: newPath,
+          },
+        });
       });
     },
 
-    deleteFileOrFolder(data: any, path: string, recursive: boolean) {
-      return usePyroFetch(`/delete?path=${path}&recursive=${recursive}`, {
-        method: "DELETE",
-        override: data,
+    async deleteFileOrFolder(serverId: string, path: string, recursive: boolean) {
+      await this.confirmFileApiInfo(serverId);
+      return this.retryWithAuth(serverId, async () => {
+        return await usePyroFetch(`/delete?path=${path}&recursive=${recursive}`, {
+          method: "DELETE",
+          override: this.fileAPIAuth,
+        });
       });
     },
 
-    async downloadFile(data: any, path: string) {
-      const fileData = await usePyroFetch(`/download?path=${path}`, {
-        override: data,
-      });
+    async downloadFile(serverId: string, path: string) {
+      await this.confirmFileApiInfo(serverId);
+      return this.retryWithAuth(serverId, async () => {
+        const fileData = await usePyroFetch(`/download?path=${path}`, {
+          override: this.fileAPIAuth,
+        });
 
-      if (fileData instanceof Blob) {
-        return fileData.text();
-      }
+        if (fileData instanceof Blob) {
+          return fileData.text();
+        }
+      });
     },
 
     clearError() {

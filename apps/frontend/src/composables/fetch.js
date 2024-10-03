@@ -1,6 +1,9 @@
-export const useBaseFetch = async (url, options = {}, skipAuth = false) => {
+export const useBaseFetch = async (url, options = {}, skipAuth = false, prodOverride = false) => {
   const config = useRuntimeConfig();
   let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
+  if (prodOverride) {
+    base = "https://api.modrinth.com/v2/";
+  }
 
   if (!options.headers) {
     options.headers = {};

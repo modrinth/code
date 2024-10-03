@@ -2,18 +2,11 @@
   <div>
     <!-- Create Item Modal -->
     <Modal ref="createItemModal" header="">
-      <div class="flex flex-col gap-4 p-6">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center gap-4">
-            <div class="text-2xl font-extrabold text-contrast">Create {{ newItemType }}</div>
-          </div>
-          <button
-            class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-            @click="createItemModal?.hide()"
-          >
-            <XIcon class="h-4 w-4" />
-          </button>
-        </div>
+      <UiServersPyroModal
+        @modal="createItemModal?.hide()"
+        :header="`Create ${newItemType}`"
+        :data="data"
+      >
         <div class="mt-2 flex flex-col gap-2">
           <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
           <input type="text" class="w-full" v-model="newItemName" />
@@ -22,25 +15,65 @@
           <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
           <Button color="primary" @click="createNewItem"> Create </Button>
         </div>
-      </div>
+      </UiServersPyroModal>
+    </Modal>
+
+    <!-- Rename Item Modal -->
+    <Modal ref="renameItemModal" header="">
+      <UiServersPyroModal
+        @modal="renameItemModal?.hide()"
+        :header="`Rename ${selectedItem?.type}`"
+        :data="data"
+      >
+        <div class="mt-2 flex flex-col gap-2">
+          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+          <input
+            v-model="newItemName"
+            type="text"
+            class="bg-bg-input w-full rounded-lg p-4"
+            :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
+          />
+        </div>
+        <div class="mb-4 mt-4 flex justify-end gap-4">
+          <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
+          <Button color="primary" @click="renameItem"> Rename </Button>
+        </div>
+      </UiServersPyroModal>
+    </Modal>
+
+    <!-- Move Item Modal -->
+    <Modal ref="moveItemModal" header="">
+      <UiServersPyroModal
+        @modal="moveItemModal?.hide()"
+        :header="`Move ${selectedItem?.name}`"
+        :data="data"
+      >
+        <div class="mt-2 flex flex-col gap-2">
+          <UiServersFileTree
+            :path="
+              currentPath as string
+              // :3
+            "
+            :type="selectedItem?.type"
+            :items="items"
+            @select="handleFileSelect"
+          />
+        </div>
+        <div class="mb-4 mt-4 flex justify-end gap-4">
+          <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
+          <Button color="primary" @click="moveItem"> Move </Button>
+        </div>
+      </UiServersPyroModal>
     </Modal>
 
     <!-- Delete Item Modal -->
     <Modal ref="deleteItemModal" header="">
-      <div
-        class="flex flex-col gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#270B11] p-6"
+      <UiServersPyroModal
+        @modal="deleteItemModal?.hide()"
+        :header="`Delete ${selectedItem?.type}`"
+        :data="data"
+        danger
       >
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center gap-4">
-            <div class="text-2xl font-extrabold text-contrast">Delete {{ selectedItem?.type }}</div>
-          </div>
-          <button
-            class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-            @click="deleteItemModal?.hide()"
-          >
-            <XIcon class="h-4 w-4" />
-          </button>
-        </div>
         <div class="flex flex-col gap-4">
           <div class="relative flex w-full items-center gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
             <div
@@ -66,67 +99,7 @@
           <Button transparent @click="deleteItemModal?.hide()"> Cancel </Button>
           <Button color="danger" @click="deleteItem"> Delete {{ selectedItem?.type }} </Button>
         </div>
-      </div>
-    </Modal>
-
-    <!-- Rename Item Modal -->
-    <Modal ref="renameItemModal" header="">
-      <div class="flex flex-col gap-4 p-6">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center gap-4">
-            <div class="text-2xl font-extrabold text-contrast">Rename {{ selectedItem?.type }}</div>
-          </div>
-          <button
-            class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-            @click="renameItemModal?.hide()"
-          >
-            <XIcon class="h-4 w-4" />
-          </button>
-        </div>
-        <div class="mt-2 flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <input
-            v-model="newItemName"
-            type="text"
-            class="bg-bg-input w-full rounded-lg p-4"
-            :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
-          />
-        </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
-          <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="renameItem"> Rename </Button>
-        </div>
-      </div>
-    </Modal>
-
-    <!-- Move Item Modal -->
-    <Modal ref="moveItemModal" header="">
-      <div class="flex flex-col gap-4 p-6">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center gap-4">
-            <div class="text-2xl font-extrabold text-contrast">Move {{ selectedItem?.name }}</div>
-          </div>
-          <button
-            class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-            @click="moveItemModal?.hide()"
-          >
-            <XIcon class="h-4 w-4" />
-          </button>
-        </div>
-        <div class="mt-2 flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Destination Folder</div>
-          <input
-            v-model="destinationFolder"
-            type="text"
-            class="bg-bg-input w-full rounded-lg p-4"
-            placeholder="e.g. /path/to/destination"
-          />
-        </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
-          <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="moveItem"> Move </Button>
-        </div>
-      </div>
+      </UiServersPyroModal>
     </Modal>
 
     <!-- Main Content -->
@@ -214,7 +187,7 @@
       <div
         v-else-if="items.length > 0"
         ref="scrollContainer"
-        class="snap-y overflow-y-auto overflow-x-hidden"
+        class="h-full w-full snap-y overflow-y-auto overflow-x-hidden"
       >
         <UiServersFileItem
           v-for="item in items"
@@ -226,20 +199,19 @@
           :path="item.path"
           :type="item.type"
           :size="item.size"
-          :auth="auth"
           @delete="showDeleteModal(item)"
           @rename="showRenameModal(item)"
           @download="downloadFile(item)"
           @move="showMoveModal(item)"
           @edit="editFile(item)"
         />
-        <div v-if="!isLoading" ref="sentinel"></div>
+        <div class="flex h-10 animate-pulse items-center justify-center gap-2" v-if="isLoading">
+          <PyroIcon class="h-4 w-4" /> Loading...
+        </div>
+        <div v-if="loadError">Error loading directories</div>
       </div>
 
-      <div
-        v-else-if="!auth && !isLoading"
-        class="flex h-full w-full items-center justify-center gap-6 p-20"
-      >
+      <div v-else-if="!isLoading" class="flex h-full w-full items-center justify-center gap-6 p-20">
         <FileIcon class="text-red-500 h-16 w-16" />
         <div class="flex flex-col gap-2">
           <h3 class="text-red-500 m-0 text-2xl font-bold">Unable to fetch file api info</h3>
@@ -281,6 +253,7 @@ import {
   DropdownIcon,
   FolderOpenIcon,
   SaveIcon,
+  PyroIcon,
 } from "@modrinth/assets";
 import { Button, Modal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
@@ -300,16 +273,10 @@ useHead({
   title: `Files - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
 });
 
-const auth = ref<any>(null);
-const fetchAuth = async () => {
-  try {
-    const apiInfo = await serverStore.getFileApiInfo(serverId);
-    auth.value = apiInfo;
-  } catch (error) {
-    console.error("Error fetching file api info:", error);
-    auth.value = null;
-  }
-};
+const { data, status } = await useLazyAsyncData("modsData", async () => {
+  await serverStore.fetchServerData(serverId);
+  return serverStore.getServerData(serverId);
+});
 
 const scrollContainer = ref<HTMLElement | null>(null);
 const items = ref<any[]>([]);
@@ -332,13 +299,13 @@ const fetchData = async () => {
 
   try {
     const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
-    const data = await serverStore.listDirContents(auth.value, path, currentPage.value, maxResults);
+    const data = await serverStore.listDirContents(serverId, path, currentPage.value, maxResults);
 
     if (!data || !data.items) {
       throw new Error("Invalid data structure received from server.");
     }
 
-    data.items.sort((a, b) => {
+    data.items.sort((a: any, b: any) => {
       if (a.type === "directory" && b.type !== "directory") return -1;
       if (a.type !== "directory" && b.type === "directory") return 1;
       if (a.count > b.count) return -1;
@@ -352,11 +319,10 @@ const fetchData = async () => {
     pages.value = data.total;
 
     currentPage.value++;
+    isLoading.value = false;
   } catch (error) {
     console.error("Error fetching data:", error);
     loadError.value = true;
-  } finally {
-    isLoading.value = false;
   }
 };
 
@@ -366,8 +332,7 @@ onMounted(async () => {
   await import("ace-builds/src-noconflict/theme-one_dark");
   VAceEditor.value = markRaw((await import("vue3-ace-editor")).VAceEditor);
 
-  await fetchAuth();
-  if (auth.value) {
+  if (serverId) {
     await fetchData();
   }
 });
@@ -380,7 +345,7 @@ watch(
     currentPage.value = 1;
     items.value = [];
     loadError.value = false;
-    if (auth.value) {
+    if (serverId) {
       await fetchData();
     }
   },
@@ -428,7 +393,7 @@ const uploadFile = () => {
     console.log(file);
     if (!file) return;
     const filePath = currentPath.value + "/" + file.name;
-    await serverStore.uploadFile(auth.value, filePath, file);
+    await serverStore.uploadFile(serverId, filePath, file);
     await fetchData();
   };
   input.click();
@@ -459,7 +424,7 @@ const createNewItem = async () => {
   try {
     const path =
       typeof currentPath.value === "string" ? currentPath.value : currentPath.value.join("/");
-    await serverStore.createFileOrFolder(auth.value, path, newItemName.value, newItemType.value);
+    await serverStore.createFileOrFolder(serverId, path, newItemName.value, newItemType.value);
 
     currentPage.value = 1;
     items.value = [];
@@ -474,7 +439,7 @@ const createNewItem = async () => {
 const renameItem = async () => {
   try {
     await serverStore.renameFileOrFolder(
-      auth.value,
+      serverId,
       `${currentPath.value}/${selectedItem.value.name}`,
       newItemName.value,
     );
@@ -494,7 +459,7 @@ const moveItem = async () => {
 
   try {
     await serverStore.moveFileOrFolder(
-      auth.value,
+      serverId,
       `${currentPath.value}/${selectedItem.value.name}`,
       `${destinationFolder.value}/${selectedItem.value.name}`,
     );
@@ -509,11 +474,15 @@ const moveItem = async () => {
   }
 };
 
+const handleFileSelect = (directory: any) => {
+  destinationFolder.value = directory.path;
+};
+
 const downloadFile = async (item: any) => {
   if (item.type === "file") {
     try {
       const path = `${currentPath.value}/${item.name}`.replace("//", "/");
-      const fileData = await serverStore.downloadFile(auth.value, path);
+      const fileData = await serverStore.downloadFile(serverId, path);
       if (fileData) {
         console.log(fileData);
 
@@ -535,7 +504,7 @@ const downloadFile = async (item: any) => {
 const deleteItem = async () => {
   try {
     await serverStore.deleteFileOrFolder(
-      auth.value,
+      serverId,
       `${currentPath.value}/${selectedItem.value.name}`,
       selectedItem.value.type === "directory",
     );
@@ -552,7 +521,7 @@ const deleteItem = async () => {
 const editFile = async (item: { name: string; type: string; path: string }) => {
   try {
     const path = `${currentPath.value}/${item.name}`.replace("//", "/");
-    const content = (await serverStore.downloadFile(auth.value, path)) as string;
+    const content = (await serverStore.downloadFile(serverId, path)) as string;
 
     fileContent.value = content;
     editingFile.value = item;
@@ -567,7 +536,7 @@ const saveFileContent = async () => {
   if (!editingFile.value) return;
 
   try {
-    await serverStore.updateFile(auth.value, editingFile.value.path, fileContent.value);
+    await serverStore.updateFile(serverId, editingFile.value.path, fileContent.value);
     await refreshNuxtData("filesData");
     isEditing.value = false;
     editingFile.value = null;

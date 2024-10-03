@@ -1,9 +1,9 @@
 <template>
-  <Modal ref="editModal" header="Edit project">
-    <div class="flex flex-col items-center justify-between gap-4 p-6">
-      <div class="w-[10rem] rounded-xl bg-bg p-8">Loader</div>
-      or
-      <div class="w-[10rem] rounded-xl bg-bg p-8">Modpack</div>
+  <Modal ref="editModal" header="">
+    <div class="h-[500px]">
+      <UiServersPyroModal @modal="editModal.hide()" header="Edit project" :data="data">
+        <UiServersProjectSelect type="modpack" @select="reinstallNew" />
+      </UiServersPyroModal>
     </div>
   </Modal>
 
@@ -11,7 +11,7 @@
     <div class="flex flex-col gap-4 p-6">
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-4">
-          <div class="text-2xl font-extrabold text-contrast">Select Version</div>
+          <div class="text-2xl font-extrabold text-contrast">Select version</div>
         </div>
         <button
           class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
@@ -166,6 +166,7 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 const tags = useTags();
+const config = useRuntimeConfig();
 
 const editModal = ref();
 const versionSelectModal = ref();
@@ -188,13 +189,23 @@ const updateData = async () => {
   await serverStore.fetchServerData(serverId);
   const d = await serverStore.getServerData(serverId);
   data.value = d;
-  const v = (await useBaseFetch(`project/${d?.upstream?.project_id}/version`)) as any;
+  const v = (await useBaseFetch(
+    `project/${d?.upstream?.project_id}/version`,
+    {},
+    false,
+    config.public.prodOverride?.toLocaleLowerCase() === "true",
+  )) as any;
   versions.value = v;
   version_ids.value = v.map((x: any) => {
     return { [x.version_number]: x.id };
   });
   options.value = v.map((x: any) => x.version_number);
-  currentVersion.value = await useBaseFetch(`version/${d?.upstream?.version_id}`);
+  currentVersion.value = await useBaseFetch(
+    `version/${d?.upstream?.version_id}`,
+    {},
+    false,
+    config.public.prodOverride?.toLocaleLowerCase() === "true",
+  );
   version.value = currentVersion.value.version_number;
 };
 updateData();
@@ -213,5 +224,24 @@ const selectLoader = async (loader: string) => {
 
 const reinstallLoader = async (loader: string) => {
   await serverStore.reinstallServer(serverId, true, loader, selectedMCVersion.value);
+};
+
+const reinstallNew = async (project_id: string, version_number: string) => {
+  editModal.value.hide();
+  const versions = (await useBaseFetch(
+    `project/${project_id}/version`,
+    {},
+    false,
+    config.public.prodOverride?.toLocaleLowerCase() === "true",
+  )) as any;
+  console.log(version_number);
+  const version_id = versions.find((x: any) => x.version_number === version_number)?.id;
+  console.log(version_id);
+
+  if (!version_id) {
+    throw new Error("Version not found");
+  }
+
+  await serverStore.reinstallServer(serverId, false, project_id, version_id);
 };
 </script>

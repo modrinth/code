@@ -68,6 +68,10 @@ import { ChevronRightIcon } from "@modrinth/assets";
 import type { StatusState } from "./ServerInstallStatusPill.vue";
 import type { Project, Server } from "~/types/servers";
 
+const config = useRuntimeConfig();
+const route = useRoute();
+const serverId = route.params.id as string;
+
 const props = defineProps<Partial<Server>>();
 
 const status = computed(() => ({
@@ -85,7 +89,12 @@ const showModLabel = computed(() => (props.mods?.length ?? 0) > 0);
 const { data: projectData } = await useLazyAsyncData<Project>(
   `server-project-${props.server_id}`,
   async (): Promise<Project> => {
-    const result = await useBaseFetch(`project/${props.upstream?.project_id}`);
+    const result = await useBaseFetch(
+      `project/${props.upstream?.project_id}`,
+      {},
+      false,
+      config.public.prodOverride?.toLocaleLowerCase() === "true",
+    );
     return result as Project;
   },
 );
@@ -93,13 +102,7 @@ const { data: projectData } = await useLazyAsyncData<Project>(
 const image = ref<string | undefined>();
 
 try {
-  const fileApi = (await serverStore.getFileApiInfo(props.server_id as string)) as {
-    url: string;
-    token: string;
-  };
-  const fileData = await usePyroFetch(`/download?path=/server-icon.png`, {
-    override: fileApi,
-  });
+  const fileData = await serverStore.downloadFile(serverId, "/server-icon.png");
   if (fileData instanceof Blob) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");

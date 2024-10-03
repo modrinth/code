@@ -1,15 +1,23 @@
 <template>
-  <div v-if="isConnected && !isWSAuthIncorrect" class="relative flex flex-col gap-6" data-pyro-server-manager-root>
-    <div :class="[
-      'duration-400 absolute left-0 right-0 top-0 w-full transition-all',
-      fullScreen ? '-translate-y-4 scale-95 opacity-0' : 'opacity-100',
-    ]">
+  <div
+    v-if="isConnected && !isWSAuthIncorrect"
+    class="relative flex flex-col gap-6"
+    data-pyro-server-manager-root
+  >
+    <div
+      :class="[
+        'duration-400 absolute left-0 right-0 top-0 w-full transition-all',
+        fullScreen ? '-translate-y-4 scale-95 opacity-0' : 'opacity-100',
+      ]"
+    >
       <UiServersServerStats :data="stats" />
     </div>
-    <div :class="[
-      'relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-8 transition-all duration-300 ease-in-out',
-      fullScreen ? 'mt-0 h-[85vh]' : 'mt-[254px] h-[600px]',
-    ]">
+    <div
+      :class="[
+        'relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-8 transition-all duration-300 ease-in-out',
+        fullScreen ? 'mt-0 h-[85vh]' : 'mt-[254px] h-[600px]',
+      ]"
+    >
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
           <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
@@ -18,96 +26,95 @@
         <div class="ml-auto mr-2 flex gap-2">
           <UiServersPanelCopyIP :ip="serverIP" :port="serverPort" :subdomain="serverDomain" />
         </div>
-        <UiServersPanelServerActionButton :is-online="isServerRunning" :is-actioning="isActioning"
-          @action="sendPowerAction" />
+        <UiServersPanelServerActionButton
+          :is-online="isServerRunning"
+          :is-actioning="isActioning"
+          @action="sendPowerAction"
+        />
       </div>
-      <UiServersPanelTerminal :console-output="consoleOutput" :full-screen="fullScreen"
-        @toggle-full-screen="toggleFullScreen">
+      <UiServersPanelTerminal
+        :console-output="consoleOutput"
+        :full-screen="fullScreen"
+        @toggle-full-screen="toggleFullScreen"
+      >
         <div class="relative w-full px-2.5 pt-2">
-          <ul v-if="suggestions.length" id="command-suggestions"
+          <ul
+            v-if="suggestions.length"
+            id="command-suggestions"
             class="z-20 mt-1 max-h-60 w-full list-none overflow-auto rounded-md border border-divider bg-bg-raised p-0 shadow-lg"
-            role="listbox">
-            <li v-for="(suggestion, index) in suggestions" :key="index" :id="'suggestion-' + index" role="option"
-              :aria-selected="index === selectedSuggestionIndex" :class="[
+            role="listbox"
+          >
+            <li
+              v-for="(suggestion, index) in suggestions"
+              :key="index"
+              :id="'suggestion-' + index"
+              role="option"
+              :aria-selected="index === selectedSuggestionIndex"
+              :class="[
                 'cursor-pointer px-4 py-2',
-                index === selectedSuggestionIndex ? 'bg-gray-200' : 'bg-white',
-              ]" @click="selectSuggestion(index)">
+                index === selectedSuggestionIndex ? 'bg-bg-raised' : 'bg-bg',
+              ]"
+              @click="selectSuggestion(index)"
+            >
               {{ suggestion }}
             </li>
           </ul>
           <div class="relative">
-            <span v-if="bestSuggestion"
-              class="pointer-events-none absolute left-4 top-1/2 z-20 -translate-y-1/2 transform select-none text-gray-400">
-              {{ bestSuggestion }}
+            <span
+              v-if="bestSuggestion"
+              class="pointer-events-none absolute left-[1.7rem] top-[52%] z-20 -translate-y-1/2 transform select-none text-gray-400"
+            >
+              {{ ".".repeat(commandInput.length - 1) }}{{ bestSuggestion }}
+              <button
+                class="text z-50 cursor-pointer border-none bg-transparent text-sm focus:outline-none"
+                @click="acceptSuggestion"
+                aria-label="Accept suggestion"
+              >
+                TAB
+              </button>
             </span>
 
-            <input v-model="commandInput" type="text" placeholder="Send a command"
-              class="z-50 w-full rounded-md border border-gray-300 bg-white p-2 pl-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              @keydown.tab.prevent="acceptSuggestion" @keydown.down.prevent="selectNextSuggestion"
-              @keydown.up.prevent="selectPrevSuggestion" @keydown.enter.prevent="sendCommand" aria-autocomplete="list"
-              aria-controls="command-suggestions" :aria-activedescendant="'suggestion-' + selectedSuggestionIndex" />
-
-            <button
-              class="text-blue-500 absolute left-4 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer border-none bg-transparent focus:outline-none"
-              @click="focusInput" aria-label="Focus input">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
-
-            <button
-              class="text-blue-500 absolute right-3 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer border-none bg-transparent focus:outline-none"
-              @click="acceptSuggestion" aria-label="Accept suggestion">
-              TAB
-            </button>
+            <input
+              v-model="commandInput"
+              type="text"
+              placeholder="Send a command"
+              class="z-50 w-full rounded-md p-2 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+              @keydown.tab.prevent="acceptSuggestion"
+              @keydown.down.prevent="selectNextSuggestion"
+              @keydown.up.prevent="selectPrevSuggestion"
+              @keydown.enter.prevent="sendCommand"
+              aria-autocomplete="list"
+              aria-controls="command-suggestions"
+              :aria-activedescendant="'suggestion-' + selectedSuggestionIndex"
+            />
           </div>
         </div>
       </UiServersPanelTerminal>
     </div>
   </div>
   <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWSAuthIncorrect" />
-  <UiServersPyroError v-else-if="isWSAuthIncorrect" title="WebSocket authentication failed"
-    message="Indicative of a server misconfiguration. Please report this to support." />
-  <UiServersPyroError v-else title="An error occurred"
-    message="Something went wrong while attempting to connect to your server. Your data is safe, and we're working to resolve the issue." />
+  <UiServersPyroError
+    v-else-if="isWSAuthIncorrect"
+    title="WebSocket authentication failed"
+    message="Indicative of a server misconfiguration. Please report this to support."
+  />
+  <UiServersPyroError
+    v-else
+    title="An error occurred"
+    message="Something went wrong while attempting to connect to your server. Your data is safe, and we're working to resolve the issue."
+  />
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  computed,
-  watch,
-  onMounted,
-  onBeforeUnmount,
-} from 'vue';
-import { useRoute, useHead } from 'vue-router';
-import type {
-  ServerState,
-  Stats,
-  WSAuth,
-  WSEvent,
-} from '~/types/servers';
-import UiServersServerStats from '~/components/UiServersServerStats.vue';
-import UiServersPanelServerStatus from '~/components/UiServersPanelServerStatus.vue';
-import UiServersPanelCopyIP from '~/components/UiServersPanelCopyIP.vue';
-import UiServersPanelServerActionButton from '~/components/UiServersPanelServerActionButton.vue';
-import UiServersPanelTerminal from '~/components/UiServersPanelTerminal.vue';
-import UiServersPanelOverviewLoading from '~/components/UiServersPanelOverviewLoading.vue';
-import UiServersPyroError from '~/components/UiServersPyroError.vue';
-import { useServerStore } from '~/stores/serverStore';
-import { useNuxtApp } from '#app';
+import type { ServerState, Stats, WSAuth, WSEvent } from "~/types/servers";
 
-// Symbols
-const DYNAMIC_ARG = Symbol('DYNAMIC_ARG');
+const toggleFullScreen = () => {
+  fullScreen.value = !fullScreen.value;
+};
 
-// Command Tree Type
-interface CommandNode {
-  [key: string]: CommandNode | string | null | symbol;
-}
+const DYNAMIC_ARG = Symbol("DYNAMIC_ARG");
 
-// Command Tree Definition
-const commandTree: CommandNode = {
+const commandTree: any = {
   advancement: {
     grant: {
       [DYNAMIC_ARG]: {
@@ -400,31 +407,26 @@ const consoleOutput = ref<string[]>([]);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
-const serverPowerState = ref<ServerState>('stopped');
-const commandInput = ref('');
+const serverPowerState = ref<ServerState>("stopped");
+const commandInput = ref("");
 const suggestions = ref<string[]>([]);
 const selectedSuggestionIndex = ref(0);
 
-// WebSocket Reference
 let socket: WebSocket | null = null;
 
-// Route and Server ID
 const route = useRoute();
 const serverId = route.params.id as string;
 
-// Computed Properties for Server Data
 const serverData = computed(() => serverStore.serverData[serverId]);
-const serverIP = computed(() => serverData.value?.net.ip ?? '');
-const serverPort = computed(() => serverData.value?.net.port ?? '');
-const serverDomain = computed(() => serverData.value?.net.domain ?? '');
-const isServerRunning = computed(() => serverPowerState.value === 'running');
+const serverIP = computed(() => serverData.value?.net.ip ?? "");
+const serverPort = computed(() => serverData.value?.net.port ?? "");
+const serverDomain = computed(() => serverData.value?.net.domain ?? "");
+const isServerRunning = computed(() => serverPowerState.value === "running");
 
-// Head Configuration
 useHead({
-  title: `Overview - ${serverData.value?.name ?? 'Server'} - Modrinth`,
+  title: `Overview - ${serverData.value?.name ?? "Server"} - Modrinth`,
 });
 
-// Stats Initialization
 const stats = ref<Stats>({
   current: {
     cpu_percent: 0,
@@ -446,35 +448,31 @@ const stats = ref<Stats>({
   },
 });
 
-// Computed for Best Suggestion
 const bestSuggestion = computed(() => {
-  if (!suggestions.value.length) return '';
+  if (!suggestions.value.length) return "";
   const inputTokens = commandInput.value.trim().split(/\s+/);
-  const lastInputToken = inputTokens[inputTokens.length - 1] || '';
+  const lastInputToken = inputTokens[inputTokens.length - 1] || "";
   const firstSuggestion = suggestions.value[0];
   const suggestionTokens = firstSuggestion.split(/\s+/);
-  const lastSuggestionToken = suggestionTokens[suggestionTokens.length - 1] || '';
+  const lastSuggestionToken = suggestionTokens[suggestionTokens.length - 1] || "";
   if (lastSuggestionToken.toLowerCase().startsWith(lastInputToken.toLowerCase())) {
     return lastSuggestionToken.slice(lastInputToken.length);
   }
-  return '';
+  return "";
 });
 
-// Improved Command Tree Navigation
 const getSuggestions = (input: string): string[] => {
   const trimmedInput = input.trim();
-  const inputWithoutSlash = trimmedInput.startsWith('/')
-    ? trimmedInput.slice(1)
-    : trimmedInput;
+  const inputWithoutSlash = trimmedInput.startsWith("/") ? trimmedInput.slice(1) : trimmedInput;
   const tokens = inputWithoutSlash.split(/\s+/);
-  let currentLevel: CommandNode | null = commandTree;
+  let currentLevel: any = commandTree;
 
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i].toLowerCase();
     if (currentLevel?.[token]) {
-      currentLevel = currentLevel[token] as CommandNode;
+      currentLevel = currentLevel[token] as any;
     } else if (currentLevel?.[DYNAMIC_ARG]) {
-      currentLevel = currentLevel[DYNAMIC_ARG] as CommandNode;
+      currentLevel = currentLevel[DYNAMIC_ARG] as any;
     } else {
       if (i === tokens.length - 1) {
         break;
@@ -485,26 +483,25 @@ const getSuggestions = (input: string): string[] => {
   }
 
   if (currentLevel) {
-    const lastToken = tokens[tokens.length - 1]?.toLowerCase() || '';
+    const lastToken = tokens[tokens.length - 1]?.toLowerCase() || "";
     let possibleKeys = Object.keys(currentLevel);
     if (currentLevel[DYNAMIC_ARG]) {
-      possibleKeys.push('<arg>');
+      possibleKeys.push("<arg>");
     }
     return possibleKeys
-      .filter((key) => key === '<arg>' || key.toLowerCase().startsWith(lastToken))
+      .filter((key) => key === "<arg>" || key.toLowerCase().startsWith(lastToken))
       .map((key) => {
-        if (key === '<arg>') {
-          return [...tokens.slice(0, -1), '<arg>'].join(' ');
+        if (key === "<arg>") {
+          return [...tokens.slice(0, -1), "<arg>"].join(" ");
         }
         const newTokens = [...tokens.slice(0, -1), key];
-        return newTokens.join(' ');
+        return newTokens.join(" ");
       });
   }
 
   return [];
 };
 
-// Improved watcher for commandInput
 watch(
   () => commandInput.value,
   (newVal) => {
@@ -515,35 +512,38 @@ watch(
     }
     suggestions.value = getSuggestions(newVal);
     selectedSuggestionIndex.value = 0;
-  }
+  },
 );
 
 // Suggestion Selection Methods
 const selectNextSuggestion = () => {
   if (suggestions.value.length === 0) return;
-  selectedSuggestionIndex.value =
-    (selectedSuggestionIndex.value + 1) % suggestions.value.length;
+  selectedSuggestionIndex.value = (selectedSuggestionIndex.value + 1) % suggestions.value.length;
 };
 
 const selectPrevSuggestion = () => {
   if (suggestions.value.length === 0) return;
   selectedSuggestionIndex.value =
-    (selectedSuggestionIndex.value - 1 + suggestions.value.length) %
-    suggestions.value.length;
+    (selectedSuggestionIndex.value - 1 + suggestions.value.length) % suggestions.value.length;
 };
 
 // Improved acceptSuggestion function
 const acceptSuggestion = () => {
-  if (!suggestions.value.length) return;
+  if (suggestions.value.length === 0) return;
   const selected = suggestions.value[selectedSuggestionIndex.value];
-  const currentTokens = commandInput.value.trim().split(/\s+/);
-  const suggestionTokens = selected.split(/\s+/);
+  const currentTokens = commandInput.value.trim().split(" ");
+  const suggestionTokens = selected.split(/\s+/).filter(Boolean);
+  console.log(currentTokens, suggestionTokens);
 
-  currentTokens.pop();
-  commandInput.value = [...currentTokens, ...suggestionTokens].join(' ') + ' ';
-
-  suggestions.value = getSuggestions(commandInput.value);
-  selectedSuggestionIndex.value = 0;
+  // check if last current token is in command tree if so just add to the end
+  if (currentTokens[currentTokens.length - 1].toLowerCase() === suggestionTokens[0].toLowerCase()) {
+  } else {
+    commandInput.value =
+      commandInput.value +
+      suggestionTokens[0].substring(currentTokens[currentTokens.length - 1].length);
+    suggestions.value = getSuggestions(commandInput.value);
+    selectedSuggestionIndex.value = 0;
+  }
 };
 
 const selectSuggestion = (index: number) => {
@@ -551,28 +551,26 @@ const selectSuggestion = (index: number) => {
   acceptSuggestion();
 };
 
-// Command Sending
 const sendCommand = async () => {
   const cmd = commandInput.value.trim();
   if (!socket || !cmd) return;
   try {
-    await socket.send(JSON.stringify({ event: 'command', cmd }));
-    commandInput.value = '';
+    await socket.send(JSON.stringify({ event: "command", cmd }));
+    commandInput.value = "";
     suggestions.value = [];
     selectedSuggestionIndex.value = 0;
   } catch (error) {
-    console.error('Error sending command:', error);
+    console.error("Error sending command:", error);
   }
 };
 
-// WebSocket Handling
 const connectWebSocket = async () => {
   try {
     const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
     socket = new WebSocket(`wss://${wsAuth.url}`);
 
     socket.onopen = () => {
-      socket?.send(JSON.stringify({ event: 'auth', jwt: wsAuth.token }));
+      socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
     };
 
     socket.onmessage = (event) => {
@@ -581,125 +579,117 @@ const connectWebSocket = async () => {
     };
 
     socket.onclose = () => {
-      consoleOutput.value.push('\nWS connection closed');
+      consoleOutput.value.push("\nWS connection closed");
       isConnected.value = false;
     };
 
     socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error("WebSocket error:", error);
       isConnected.value = false;
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
     isConnected.value = false;
   }
 };
 
-// WebSocket Message Handler
 const handleWebSocketMessage = (data: WSEvent) => {
   switch (data.event) {
-    case 'log':
+    case "log":
       consoleOutput.value.push(data.message);
       break;
-    case 'stats':
-      updateStats(data as Stats['current']);
+    case "stats":
+      updateStats(data as unknown as Stats["current"]);
       break;
-    case 'auth-expiring':
+    case "auth-expiring":
       reauthenticate();
       break;
-    case 'power-state':
+    case "power-state":
       updatePowerState(data.state);
       break;
-    case 'auth-incorrect':
+    case "auth-incorrect":
       isWSAuthIncorrect.value = true;
       break;
     default:
-      console.warn('Unhandled WebSocket event:', data);
+      console.warn("Unhandled WebSocket event:", data);
   }
 };
 
-// Update Server Power State
 const updatePowerState = (state: ServerState) => {
   serverPowerState.value = state;
 };
 
-// Update Stats Data
-const updateStats = (currentStats: Stats['current']) => {
+const updateStats = (currentStats: Stats["current"]) => {
   isConnected.value = true;
   stats.value = {
     current: currentStats,
     past: { ...stats.value.current },
     graph: {
-      cpu: updateGraphData(cpuData, currentStats.cpu_percent),
+      cpu: updateGraphData(cpuData.value, currentStats.cpu_percent),
       ram: updateGraphData(
-        ramData,
-        Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100)
+        ramData.value,
+        Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100),
       ),
     },
   };
 };
 
-// Update Graph Data Helper
 const updateGraphData = (dataArray: number[], newValue: number): number[] => {
   const updated = [...dataArray, newValue];
   if (updated.length > 10) updated.shift();
   return updated;
 };
 
-// Reauthenticate WebSocket
 const reauthenticate = async () => {
   try {
     const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
-    socket?.send(JSON.stringify({ event: 'auth', jwt: wsAuth.token }));
+    socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
   } catch (error) {
-    console.error('Reauthentication failed:', error);
+    console.error("Reauthentication failed:", error);
     isWSAuthIncorrect.value = true;
   }
 };
 
-// Power Action Handling
-const sendPowerAction = async (action: 'restart' | 'start' | 'stop' | 'kill') => {
+const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   try {
     isActioning.value = true;
     await serverStore.sendPowerAction(serverId, actionName);
-    notifySuccess(`${actionName}ing server`, `Your server is now ${actionName.toLowerCase()}ing. This may take a few moments.`);
+    notifySuccess(
+      `${actionName}ing server`,
+      `Your server is now ${actionName.toLowerCase()}ing. This may take a few moments.`,
+    );
   } catch (error) {
     console.error(`Error ${actionName}ing server:`, error);
-    notifyError(`Error ${actionName}ing server`, 'An error occurred while attempting to perform the action.');
+    notifyError(
+      `Error ${actionName}ing server`,
+      "An error occurred while attempting to perform the action.",
+    );
   } finally {
     isActioning.value = false;
   }
 };
 
-// Notification Helpers
 const notifySuccess = (title: string, text: string) => {
   // @ts-ignore
   app.$notify({
-    group: 'server',
+    group: "server",
     title,
     text,
-    type: 'success',
+    type: "success",
   });
 };
 
 const notifyError = (title: string, text: string) => {
   // @ts-ignore
   app.$notify({
-    group: 'server',
+    group: "server",
     title,
     text,
-    type: 'error',
+    type: "error",
   });
 };
 
-// Focus Input Field
-const focusInput = () => {
-  const inputElement = document.querySelector<HTMLInputElement>('input[placeholder="Send a command"]');
-  inputElement?.focus();
-};
-
-// Lifecycle Hooks
 onMounted(() => {
   connectWebSocket();
 });

@@ -20,25 +20,7 @@
         </div>
       </div>
       <Modal ref="createBackupModal" header="">
-        <div class="flex flex-col gap-4 p-6">
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-              <UiAvatar
-                v-if="data && data.project"
-                :src="data.project.icon_url"
-                no-shadow
-                size="sm"
-                alt="Server Icon"
-              />
-              <div class="text-2xl font-extrabold text-contrast">Create backup</div>
-            </div>
-            <button
-              class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-              @click="createBackupModal?.hide()"
-            >
-              <XIcon class="h-4 w-4" />
-            </button>
-          </div>
+        <UiServersPyroModal @modal="createBackupModal?.hide()" header="Create backup" :data="data">
           <div class="mb-3 mt-3">
             Your server will temporarily shutdown while the backup is being created.
           </div>
@@ -55,28 +37,10 @@
             <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
             <Button color="primary" @click="createBackup"> <PlusIcon /> Create backup </Button>
           </div>
-        </div>
+        </UiServersPyroModal>
       </Modal>
       <Modal ref="renameBackupModal" header="">
-        <div class="flex flex-col gap-4 p-6">
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-              <UiAvatar
-                v-if="data && data.project"
-                :src="data.project.icon_url"
-                no-shadow
-                size="sm"
-                alt="Server Icon"
-              />
-              <div class="text-2xl font-extrabold text-contrast">Rename backup</div>
-            </div>
-            <button
-              class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-              @click="renameBackupModal?.hide()"
-            >
-              <XIcon class="h-4 w-4" />
-            </button>
-          </div>
+        <UiServersPyroModal @modal="renameBackupModal?.hide()" header="Rename backup" :data="data">
           <div class="mt-2 flex flex-col gap-2">
             <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input
@@ -90,28 +54,14 @@
             <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
             <Button color="primary" @click="renameBackup(currentBackup)"> Rename backup </Button>
           </div>
-        </div>
+        </UiServersPyroModal>
       </Modal>
       <Modal ref="restoreBackupModal" header="">
-        <div class="flex flex-col gap-4 p-6">
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-              <UiAvatar
-                v-if="data && data.project"
-                :src="data.project.icon_url"
-                no-shadow
-                size="sm"
-                alt="Server Icon"
-              />
-              <div class="text-2xl font-extrabold text-contrast">Restore backup</div>
-            </div>
-            <button
-              class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-              @click="restoreBackupModal?.hide()"
-            >
-              <XIcon class="h-4 w-4" />
-            </button>
-          </div>
+        <UiServersPyroModal
+          @modal="restoreBackupModal?.hide()"
+          header="Restore backup"
+          :data="data"
+        >
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
               <div class="text-2xl font-extrabold text-contrast">
@@ -131,30 +81,15 @@
             <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
             <Button color="primary" @click="restoreBackup(currentBackup)"> Restore backup </Button>
           </div>
-        </div>
+        </UiServersPyroModal>
       </Modal>
       <Modal ref="deleteBackupModal" header="">
-        <div
-          class="flex flex-col gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#270B11] p-6"
+        <UiServersPyroModal
+          @modal="deleteBackupModal?.hide()"
+          header="Delete backup"
+          :data="data"
+          danger
         >
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-              <UiAvatar
-                v-if="data && data.project"
-                :src="data.project.icon_url"
-                no-shadow
-                size="sm"
-                alt="Server Icon"
-              />
-              <div class="text-2xl font-extrabold text-contrast">Delete backup</div>
-            </div>
-            <button
-              class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-              @click="deleteBackupModal?.hide()"
-            >
-              <XIcon class="h-4 w-4" />
-            </button>
-          </div>
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
               <div class="text-2xl font-extrabold text-contrast">
@@ -174,7 +109,7 @@
             <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
             <Button color="danger" @click="deleteBackup(currentBackup)"> Delete backup </Button>
           </div>
-        </div>
+        </UiServersPyroModal>
       </Modal>
 
       <div class="flex flex-col gap-6">

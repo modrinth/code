@@ -37,7 +37,8 @@
 import { PyroIcon } from "@modrinth/assets";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 
-const auth = await useAuth();
+const config = useRuntimeConfig();
+const auth = (await useAuth()) as any;
 const route = useNativeRoute();
 let loading = false;
 const packId = route.params.id;
@@ -53,15 +54,17 @@ interface IntServer {
   port: number;
 }
 
+const pack = (await toRaw(
+  useBaseFetch(`project/${Array.isArray(packId) ? packId[0] : packId}`, {}, false, true),
+)) as any;
+
 const loaders = ["Forge", "Fabric", "Liteloader", "Optifine", "Modloader", "Modpack"];
 
 const createServer = async () => {
   loading = true;
 
   // check if packid is in loader
-  const loader = loaders.includes(packId);
-
-  const pack: any = loader ? null : await toRaw(useBaseFetch(`project/${packId}`));
+  const loader = loaders.includes(Array.isArray(packId) ? packId[0] : packId);
 
   let path = "servers/create";
   const version = 0;
@@ -81,11 +84,9 @@ const createServer = async () => {
           project_id: packId,
           version_id: pack.versions.slice(-1)[0],
         },
-    user_id: auth.value.user.id,
+    user_id: auth.value?.user?.id ?? "",
   };
   const method = "POST";
-
-  const config = useRuntimeConfig();
 
   const timeout = 10000;
   const retryAmount = 3;

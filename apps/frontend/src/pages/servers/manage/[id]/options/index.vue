@@ -77,21 +77,6 @@ const { data, status } = await useLazyAsyncData("data", async () => {
   return serverStore.getServerData(serverId);
 });
 
-const auth = ref<any>(null);
-const fetchAuth = async () => {
-  try {
-    const apiInfo = await serverStore.getFileApiInfo(serverId);
-    auth.value = apiInfo;
-  } catch (error) {
-    console.error("Error fetching file api info:", error);
-    auth.value = null;
-  }
-};
-
-onMounted(async () => {
-  await fetchAuth();
-});
-
 const serverName = ref<string>(data.value?.name as string);
 
 const isUpdating = ref(false);
@@ -151,8 +136,8 @@ const uploadFile = async (e: Event) => {
     img.onerror = reject;
   });
   if (!file) return;
-  await serverStore.uploadFile(auth.value, "/server-icon.png", scaledFile);
-  await serverStore.uploadFile(auth.value, "/server-icon-original.png", file);
+  await serverStore.uploadFile(serverId, "/server-icon.png", scaledFile);
+  await serverStore.uploadFile(serverId, "/server-icon-original.png", file);
 
   refreshNuxtData("data");
 };
