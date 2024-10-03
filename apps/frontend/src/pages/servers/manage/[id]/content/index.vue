@@ -193,7 +193,7 @@ const updateData = async () => {
     `project/${d?.upstream?.project_id}/version`,
     {},
     false,
-    config.public.prodOverride?.toLocaleLowerCase() === "true",
+    PyroAuthOverride(),
   )) as any;
   versions.value = v;
   version_ids.value = v.map((x: any) => {
@@ -204,7 +204,7 @@ const updateData = async () => {
     `version/${d?.upstream?.version_id}`,
     {},
     false,
-    config.public.prodOverride?.toLocaleLowerCase() === "true",
+    PyroAuthOverride(),
   );
   version.value = currentVersion.value.version_number;
 };
@@ -232,7 +232,7 @@ const reinstallNew = async (project_id: string, version_number: string) => {
     `project/${project_id}/version`,
     {},
     false,
-    config.public.prodOverride?.toLocaleLowerCase() === "true",
+    PyroAuthOverride(),
   )) as any;
   console.log(version_number);
   const version_id = versions.find((x: any) => x.version_number === version_number)?.id;

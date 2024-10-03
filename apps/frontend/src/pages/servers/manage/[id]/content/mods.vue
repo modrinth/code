@@ -95,7 +95,7 @@ const fetchVersions = async (projectId: string) => {
       `project/${projectId}/version`,
       {},
       false,
-      config.public.prodOverride?.toLocaleLowerCase() === "true",
+      PyroAuthOverride(),
     )) as any[];
   }
   return versions.value[projectId];

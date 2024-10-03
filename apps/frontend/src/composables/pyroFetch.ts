@@ -22,6 +22,12 @@ export class PyroFetchError extends Error {
   }
 }
 
+export function PyroAuthOverride() {
+  const config = useRuntimeConfig();
+  const override = import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl;
+  return override.toLocaleLowerCase() === "true" ?? false;
+}
+
 export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promise<T> {
   const config = useRuntimeConfig();
   const auth = await useAuth();

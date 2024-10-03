@@ -93,7 +93,7 @@ const { data: projectData } = await useLazyAsyncData<Project>(
       `project/${props.upstream?.project_id}`,
       {},
       false,
-      config.public.prodOverride?.toLocaleLowerCase() === "true",
+      PyroAuthOverride(),
     );
     return result as Project;
   },

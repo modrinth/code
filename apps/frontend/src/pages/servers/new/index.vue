@@ -71,7 +71,7 @@ const createServer = async (loaderorprojectid: any, version_number?: string) => 
       `project/${loaderorprojectid.project_id}/version`,
       {},
       false,
-      config.public.prodOverride?.toLocaleLowerCase() === "true",
+      PyroAuthOverride(),
     )) as any[];
     const version_id = versions.find((x: any) => x.version_number === version_number)?.id;
     router.push(`/servers/new/${loaderorprojectid.project_id}?version=${version_id}`);
