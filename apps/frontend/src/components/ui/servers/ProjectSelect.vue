@@ -80,6 +80,7 @@ const props = defineProps<{
 const serverStore = useServerStore();
 const route = useNativeRoute();
 const config = useRuntimeConfig();
+const prodOverride = await PyroAuthOverride();
 const serverId = route.params.id as string;
 
 const queryFilter = ref("");
@@ -106,8 +107,12 @@ const modsStatus = ref("idle");
 
 const loadMods = async () => {
   modsStatus.value = "loading";
+
   const newMods = (await useBaseFetch(
     `search?query=${queryFilter.value}&facets=${buildFacetString(facets.value)}&index=relevance&limit=100&offset=${page.value * 100 - 100}`,
+    {},
+    false,
+    prodOverride,
   )) as any;
   pages.value = newMods.total_hits;
   mods.value.hits.push(...newMods.hits);
@@ -119,7 +124,7 @@ const versions = reactive<{ [key: string]: any[] }>({});
 const getVersions = async (project_id: string) => {
   if (!versions[project_id]) {
     versions[project_id] = (
-      (await useBaseFetch(`project/${project_id}/version`, {}, false, PyroAuthOverride())) as any
+      (await useBaseFetch(`project/${project_id}/version`, {}, false, prodOverride)) as any
     ).map((x: any) => x.version_number);
   }
   return versions[project_id];

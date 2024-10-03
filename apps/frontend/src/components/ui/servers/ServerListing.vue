@@ -69,6 +69,7 @@ import type { StatusState } from "./ServerInstallStatusPill.vue";
 import type { Project, Server } from "~/types/servers";
 
 const config = useRuntimeConfig();
+const prodOverride = await PyroAuthOverride();
 const route = useRoute();
 const serverId = route.params.id as string;
 
@@ -93,7 +94,7 @@ const { data: projectData } = await useLazyAsyncData<Project>(
       `project/${props.upstream?.project_id}`,
       {},
       false,
-      PyroAuthOverride(),
+      prodOverride,
     );
     return result as Project;
   },

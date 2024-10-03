@@ -67,6 +67,7 @@ interface Mod {
 const serverStore = useServerStore();
 const route = useNativeRoute();
 const config = useRuntimeConfig();
+const prodOverride = await PyroAuthOverride();
 const serverId = route.params.id as string;
 
 const modModal = ref();
@@ -95,7 +96,7 @@ const fetchVersions = async (projectId: string) => {
       `project/${projectId}/version`,
       {},
       false,
-      PyroAuthOverride(),
+      prodOverride,
     )) as any[];
   }
   return versions.value[projectId];
