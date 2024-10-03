@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="flex h-full w-full flex-col overflow-clip p-2 pb-4"
-    v-if="data && status === 'success'"
-  >
+  <div class="flex h-full w-full flex-col overflow-clip p-2 pb-4">
     <div class="iconified-input w-full">
       <label class="hidden" for="search">Search</label>
       <SearchIcon aria-hidden="true" />
@@ -51,7 +48,6 @@
       </div>
     </div>
   </div>
-  <UiServersPyroLoading class="[&&]:h-full" v-else />
 </template>
 
 <script setup lang="ts">
@@ -78,6 +74,7 @@ const emits = defineEmits(["select"]);
 
 const props = defineProps<{
   type: "mod" | "modpack" | "plugin" | "datapack";
+  server?: boolean;
 }>();
 
 const serverStore = useServerStore();
@@ -85,18 +82,20 @@ const route = useNativeRoute();
 const config = useRuntimeConfig();
 const serverId = route.params.id as string;
 
-const { data, status } = await useAsyncData("projectData", async () => {
-  await serverStore.fetchServerData(serverId);
-  return serverStore.getServerData(serverId);
-});
-
 const queryFilter = ref("");
 const facets = ref<any>([]);
-facets.value.push(`["categories:${data.value?.loader?.toLocaleLowerCase()}"]`);
-facets.value.push(`["versions:${data.value?.mc_version}"]`);
-if (data.value?.loader) {
-  facets.value.push(`["project_type:${props.type}"]`);
+
+if (!props.server === false) {
+  const { data, status } = await useAsyncData("projectData", async () => {
+    await serverStore.fetchServerData(serverId);
+    return serverStore.getServerData(serverId);
+  });
+
+  facets.value.push(`["categories:${data.value?.loader?.toLocaleLowerCase()}"]`);
+  facets.value.push(`["versions:${data.value?.mc_version}"]`);
 }
+
+facets.value.push(`["project_type:${props.type}"]`);
 
 const buildFacetString = (facets: string[]) => {
   return "[" + facets.map((facet) => `${facet}`).join(",") + "]";

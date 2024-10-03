@@ -1,8 +1,21 @@
 <template>
   <div class="flex h-screen items-center justify-center">
     <div v-if="!loading" class="flex flex-col items-center gap-4">
-      <div class="project-list display-mode--list">
-        <ProjectCard
+      <div
+        v-if="loader"
+        class="flex w-full items-center gap-1 rounded-xl bg-bg-raised p-2 pr-4 text-2xl font-bold text-contrast"
+      >
+        <UiServersLoaderIcon
+          :loader="
+            packId as string
+            // e
+          "
+          class="[&&]:size-10"
+        />
+        {{ packId }}
+      </div>
+      <div class="project-list display-mode--list" v-else>
+        <UiProjectCard
           v-if="pack"
           :id="packId"
           :key="pack.project_id"
@@ -21,27 +34,32 @@
           :color="pack.color"
         />
       </div>
-      <input
-        type="text"
-        class="rounded border p-2"
-        :value="serverName"
-        @input="updateServerName($event)"
-      />
-      <button type="submit" class="btn btn-primary" @click="() => createServer()">Create</button>
+      <div class="flex w-full items-center justify-between gap-2 rounded-xl bg-bg-raised p-2 pr-4">
+        <input
+          type="text"
+          class="rounded border p-2 [&&]:w-full"
+          :value="serverName"
+          @input="updateServerName($event)"
+        />
+        <Button icon-only @click="() => createServer()">
+          <ChevronRightIcon />
+        </Button>
+      </div>
     </div>
-    <PyroIcon v-else class="pyro-logo-animation size-10" />
+    <UiServersPyroLoading v-else />
   </div>
 </template>
 
 <script setup lang="ts">
-import { PyroIcon } from "@modrinth/assets";
-import ProjectCard from "~/components/ui/ProjectCard.vue";
+import { PyroIcon, ChevronRightIcon } from "@modrinth/assets";
+import { Button } from "@modrinth/ui";
 
 const config = useRuntimeConfig();
 const auth = (await useAuth()) as any;
 const route = useNativeRoute();
 let loading = false;
 const packId = route.params.id;
+const version_id = route.query.version;
 const serverName = ref("");
 
 const updateServerName = (event: Event) => {
@@ -54,17 +72,18 @@ interface IntServer {
   port: number;
 }
 
-const pack = (await toRaw(
-  useBaseFetch(`project/${Array.isArray(packId) ? packId[0] : packId}`, {}, false, true),
-)) as any;
+const loaders = ["Forge", "Fabric", "Neoforge", "Quilt", "Vanilla"];
 
-const loaders = ["Forge", "Fabric", "Liteloader", "Optifine", "Modloader", "Modpack"];
+const loader = loaders.includes(packId as string);
+
+const pack = loader
+  ? null
+  : ((await toRaw(
+      useBaseFetch(`project/${Array.isArray(packId) ? packId[0] : packId}`, {}, false, true),
+    )) as any);
 
 const createServer = async () => {
   loading = true;
-
-  // check if packid is in loader
-  const loader = loaders.includes(Array.isArray(packId) ? packId[0] : packId);
 
   let path = "servers/create";
   const version = 0;
@@ -82,7 +101,7 @@ const createServer = async () => {
         }
       : {
           project_id: packId,
-          version_id: pack.versions.slice(-1)[0],
+          version_id: version_id ? version_id : pack.versions.slice(-1)[0],
         },
     user_id: auth.value?.user?.id ?? "",
   };
