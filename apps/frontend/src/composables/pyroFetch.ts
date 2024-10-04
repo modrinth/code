@@ -23,11 +23,7 @@ export class PyroFetchError extends Error {
 }
 
 export async function PyroAuthOverride() {
-  const config = useRuntimeConfig();
-  const override = (
-    import.meta.server ? config.prodOverride : config.public.prodOverride
-  ) as string;
-  return override.toLocaleLowerCase() === "true" ?? false;
+  return true;
 }
 
 export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promise<T> {
