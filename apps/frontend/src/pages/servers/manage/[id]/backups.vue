@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="data && status === 'success'">
+    <div v-if="data">
       <div
         class="over-the-top-download-animation"
         :class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
@@ -21,38 +21,42 @@
       </div>
       <Modal ref="createBackupModal" header="">
         <UiServersPyroModal @modal="createBackupModal?.hide()" header="Create backup" :data="data">
-          <div class="mb-3 mt-3">
-            Your server will temporarily shutdown while the backup is being created.
-          </div>
-          <div class="flex flex-col gap-2">
-            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-            <input
-              v-model="createBackupName"
-              type="text"
-              class="bg-bg-input w-full rounded-lg p-4"
-              placeholder="e.g. Before 1.21"
-            />
-          </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
-            <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="createBackup"> <PlusIcon /> Create backup </Button>
+          <div class="p-2">
+            <div class="mb-3 mt-3">
+              Your server will temporarily shutdown while the backup is being created.
+            </div>
+            <div class="flex flex-col gap-2">
+              <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+              <input
+                v-model="createBackupName"
+                type="text"
+                class="bg-bg-input w-full rounded-lg p-4"
+                placeholder="e.g. Before 1.21"
+              />
+            </div>
+            <div class="mb-4 mt-4 flex justify-end gap-4">
+              <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
+              <Button color="primary" @click="createBackup"> <PlusIcon /> Create backup </Button>
+            </div>
           </div>
         </UiServersPyroModal>
       </Modal>
       <Modal ref="renameBackupModal" header="">
         <UiServersPyroModal @modal="renameBackupModal?.hide()" header="Rename backup" :data="data">
-          <div class="mt-2 flex flex-col gap-2">
-            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-            <input
-              v-model="renameBackupName"
-              type="text"
-              class="bg-bg-input w-full rounded-lg p-4"
-              placeholder="e.g. Before 1.21"
-            />
-          </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
-            <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="renameBackup(currentBackup)"> Rename backup </Button>
+          <div class="p-2">
+            <div class="mt-2 flex flex-col gap-2">
+              <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+              <input
+                v-model="renameBackupName"
+                type="text"
+                class="bg-bg-input w-full rounded-lg p-4"
+                placeholder="e.g. Before 1.21"
+              />
+            </div>
+            <div class="mb-4 mt-4 flex justify-end gap-4">
+              <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
+              <Button color="primary" @click="renameBackup(currentBackup)"> Rename backup </Button>
+            </div>
           </div>
         </UiServersPyroModal>
       </Modal>
@@ -62,24 +66,28 @@
           header="Restore backup"
           :data="data"
         >
-          <div class="flex flex-col gap-4">
-            <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
-              <div class="text-2xl font-extrabold text-contrast">
-                {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
-              </div>
-              <div class="flex gap-2 font-semibold text-contrast">
-                <CalendarIcon />
-                {{
-                  new Date(
-                    data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
-                  ).toLocaleString()
-                }}
+          <div class="p-2">
+            <div class="flex flex-col gap-4">
+              <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
+                <div class="text-2xl font-extrabold text-contrast">
+                  {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
+                </div>
+                <div class="flex gap-2 font-semibold text-contrast">
+                  <CalendarIcon />
+                  {{
+                    new Date(
+                      data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
+                    ).toLocaleString()
+                  }}
+                </div>
               </div>
             </div>
-          </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
-            <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="restoreBackup(currentBackup)"> Restore backup </Button>
+            <div class="mb-4 mt-4 flex justify-end gap-4">
+              <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
+              <Button color="primary" @click="restoreBackup(currentBackup)">
+                Restore backup
+              </Button>
+            </div>
           </div>
         </UiServersPyroModal>
       </Modal>
@@ -90,24 +98,26 @@
           :data="data"
           danger
         >
-          <div class="flex flex-col gap-4">
-            <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
-              <div class="text-2xl font-extrabold text-contrast">
-                {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
-              </div>
-              <div class="flex gap-2 font-semibold text-contrast">
-                <CalendarIcon />
-                {{
-                  new Date(
-                    data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
-                  ).toLocaleString()
-                }}
+          <div class="p-2">
+            <div class="flex flex-col gap-4">
+              <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
+                <div class="text-2xl font-extrabold text-contrast">
+                  {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
+                </div>
+                <div class="flex gap-2 font-semibold text-contrast">
+                  <CalendarIcon />
+                  {{
+                    new Date(
+                      data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
+                    ).toLocaleString()
+                  }}
+                </div>
               </div>
             </div>
-          </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
-            <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
-            <Button color="danger" @click="deleteBackup(currentBackup)"> Delete backup </Button>
+            <div class="mb-4 mt-4 flex justify-end gap-4">
+              <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
+              <Button color="danger" @click="deleteBackup(currentBackup)"> Delete backup </Button>
+            </div>
           </div>
         </UiServersPyroModal>
       </Modal>
@@ -187,12 +197,7 @@
         </div>
       </div>
     </div>
-    <UiServersPyroLoading v-else-if="status === 'pending'" />
-    <UiServersPyroError
-      v-else-if="status === 'error'"
-      title="Could not load backups"
-      message="Your backups could not be displayed due to a technical issue on our end. Please try again later."
-    />
+    <UiServersPyroLoading v-else />
   </div>
 </template>
 
@@ -223,10 +228,7 @@ useHead({
 
 const backupError = ref<string | null>(null);
 
-const { data, status } = await useLazyAsyncData("backupsData", async () => {
-  await serverStore.fetchServerData(serverId);
-  return serverStore.getServerData(serverId);
-});
+const data = computed(() => serverStore.serverData[serverId]);
 
 const overTheTopDownloadAnimation = ref();
 
@@ -254,7 +256,7 @@ const createBackup = async () => {
   try {
     serverStore.createBackup(serverId, backupName);
 
-    await refreshNuxtData("backupsData");
+    await serverStore.fetchServerData(serverId);
     createBackupModal.value?.hide();
     // @ts-ignore
     app.$notify({
@@ -276,7 +278,7 @@ const renameBackup = async (backupId: string) => {
   try {
     await serverStore.renameBackup(serverId, backupId, backupName);
 
-    await refreshNuxtData("backupsData");
+    await serverStore.fetchServerData(serverId);
     renameBackupModal.value?.hide();
   } catch (error) {
     backupError.value = error as string;
@@ -301,7 +303,7 @@ const deleteBackup = async (backupId: string) => {
   try {
     await serverStore.deleteBackup(serverId, backupId);
 
-    await refreshNuxtData("backupsData");
+    await serverStore.fetchServerData(serverId);
     await deleteBackupModal.value?.hide();
   } catch (error) {
     backupError.value = error as string;

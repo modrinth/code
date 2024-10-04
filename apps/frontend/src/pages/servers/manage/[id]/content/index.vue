@@ -41,28 +41,31 @@
   </Modal>
   <div class="flex h-full w-full flex-col">
     <div v-if="data && versions" class="flex w-full flex-col gap-6 p-8">
-      <div class="flex w-full justify-between gap-2 rounded-xl bg-bg-raised p-4">
+      <div
+        class="flex w-full justify-between gap-2 rounded-xl bg-bg-raised p-4"
+        v-if="data.upstream"
+      >
         <div class="flex gap-4">
-          <UiAvatar :src="data.project.icon_url" size="120px" />
+          <UiAvatar :src="data.project?.icon_url" size="120px" />
           <div class="flex flex-col justify-between">
             <div class="flex flex-col gap-2">
               <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
-                {{ data.project.title }}
+                {{ data.project?.title }}
                 <span class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand">
                   v{{ currentVersion?.version_number }}
                 </span>
               </h1>
               <span class="text-md font-semibold text-secondary">
                 {{
-                  data.project.description.length > 150
+                  data.project?.description && data.project.description.length > 150
                     ? data.project.description.substring(0, 150) + "..."
-                    : data.project.description
+                    : data.project?.description || ""
                 }}
               </span>
             </div>
             <div class="flex w-[16rem] items-center gap-2">
               <DropdownSelect
-                v-if="versions.length > 0"
+                v-if="versions && Array.isArray(versions) && versions.length > 0"
                 v-model="version"
                 :options="options"
                 placeholder="Change version"
@@ -80,6 +83,16 @@
           <EditIcon class="h-6 w-6 text-contrast" />
         </div>
       </div>
+      <div
+        v-else
+        class="flex w-full items-center justify-center rounded-xl bg-button-bg p-2 hover:bg-button-bgActive"
+      >
+        <div class="flex items-center gap-2">
+          <UiServersLoaderIcon v-if="data.loader" :loader="data.loader" class="[&&]:size-10" />
+          <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">{{ data.loader }}</h1>
+        </div>
+      </div>
+
       <div class="flex w-full items-center justify-between rounded-xl bg-bg-raised p-2 pr-4">
         <div class="flex items-center gap-2">
           <Button
@@ -176,33 +189,34 @@ const mcVersions = tags.value.gameVersions
   .filter((x) => x.version_type === "release")
   .map((x) => x.version);
 
-const data = ref();
-const versions = ref();
-const options = ref();
+const data = computed(() => serverStore.serverData[serverId]);
+
+const { data: versions } = await useLazyAsyncData(
+  `content-loader-versions`,
+  () =>
+    useBaseFetch(
+      `project/${data?.value.upstream?.project_id}/version`,
+      {},
+      false,
+      prodOverride,
+    ) as any,
+);
+
+const options = computed(() => (versions.value as any[]).map((x) => x.version_number));
+const version_ids = computed(() =>
+  (versions.value as any[]).map((x) => {
+    return { [x.version_number]: x.id };
+  }),
+);
 const version = ref();
 const currentVersion = ref();
-const version_ids = ref();
 
 const selectedLoader = ref("");
 const selectedMCVersion = ref("");
 
 const updateData = async () => {
-  await serverStore.fetchServerData(serverId);
-  const d = await serverStore.getServerData(serverId);
-  data.value = d;
-  const v = (await useBaseFetch(
-    `project/${d?.upstream?.project_id}/version`,
-    {},
-    false,
-    prodOverride,
-  )) as any;
-  versions.value = v;
-  version_ids.value = v.map((x: any) => {
-    return { [x.version_number]: x.id };
-  });
-  options.value = v.map((x: any) => x.version_number);
   currentVersion.value = await useBaseFetch(
-    `version/${d?.upstream?.version_id}`,
+    `version/${data?.value.upstream?.version_id}`,
     {},
     false,
     prodOverride,
@@ -212,8 +226,12 @@ const updateData = async () => {
 updateData();
 
 const reinstallCurrent = async () => {
-  const projectId = data.value.upstream.project_id;
-  const versionId = version_ids.value[0][version.value];
+  const projectId = data.value.upstream?.project_id;
+  if (!projectId) {
+    throw new Error("Project ID not found");
+  }
+  const resolvedVersionIds = await version_ids.value;
+  const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
   console.log(projectId, versionId);
   await serverStore.reinstallServer(serverId, false, projectId, versionId);
 };

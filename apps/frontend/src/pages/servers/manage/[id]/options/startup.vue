@@ -1,6 +1,6 @@
 <template>
   <div class="relative h-full w-full">
-    <div v-if="data && status == 'success'" class="flex h-full w-full flex-col gap-6 p-8">
+    <div v-if="data" class="flex h-full w-full flex-col gap-6 p-8">
       <h2 class="text-3xl font-bold">Startup</h2>
     </div>
     <UiServersPyroLoading v-else />
@@ -20,11 +20,7 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
-await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData("data", async () => {
-  await serverStore.fetchServerData(serverId);
-  return serverStore.getServerData(serverId);
-});
+const data = computed(() => serverStore.serverData[serverId]);
 
 const isUpdating = ref(false);
 const hasUnsavedChanges = ref(false);
@@ -40,7 +36,7 @@ const saveStartup = async () => {
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
     });
-    await refreshNuxtData("data");
+    await serverStore.fetchServerData(serverId);
   } catch (error) {
     // @ts-ignore
     app.$notify({

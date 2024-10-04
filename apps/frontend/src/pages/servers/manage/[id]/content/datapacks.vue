@@ -33,7 +33,7 @@ const serverId = route.params.id as string;
 
 const addModModal = ref();
 
-const { data, status } = await useLazyAsyncData("datapacksData", async () => {
+const { data, status } = await useLazyAsyncData("content-datapacks-data", async () => {
   await serverStore.fetchServerData(serverId);
   return serverStore.getServerData(serverId);
 });

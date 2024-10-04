@@ -1,13 +1,8 @@
 <template>
   <div>
-    <div v-if="data && status === 'success'">
+    <div v-if="data">
       <UiServersServerSidebar :route="route" :nav-links="navLinks" />
     </div>
-    <UiServersPyroError
-      v-else-if="status === 'error'"
-      title="Error Accessing Server"
-      message="Dont worry, your server is safe. We just can't connect to it right now."
-    />
     <UiServersPyroLoading v-else />
   </div>
 </template>
@@ -24,10 +19,7 @@ useHead({
 });
 
 await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData("contentServerData", async () => {
-  await serverStore.fetchServerData(serverId);
-  return serverStore.getServerData(serverId);
-});
+const data = computed(() => serverStore.serverData[serverId]);
 
 const navLinks = [
   { icon: CogIcon, label: "Loader", href: `/servers/manage/${serverId}/content` },

@@ -68,10 +68,9 @@ import { ChevronRightIcon } from "@modrinth/assets";
 import type { StatusState } from "./ServerInstallStatusPill.vue";
 import type { Project, Server } from "~/types/servers";
 
-const config = useRuntimeConfig();
+const serverStore = useServerStore();
 const prodOverride = await PyroAuthOverride();
 const route = useRoute();
-const serverId = route.params.id as string;
 
 const props = defineProps<Partial<Server>>();
 
@@ -80,8 +79,6 @@ const status = computed(() => ({
   isFailed: props.status === "Failed",
   isInstalling: props.status === "Installing",
 }));
-
-const serverStore = useServerStore();
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
@@ -103,7 +100,14 @@ const { data: projectData } = await useLazyAsyncData<Project>(
 const image = ref<string | undefined>();
 
 try {
-  const fileData = await serverStore.downloadFile(serverId, "/server-icon.png");
+  const serverId = props.server_id as string;
+  await serverStore.confirmFileApiInfo(serverId);
+  const fileData = await serverStore.retryWithAuth(serverId, async () => {
+    return await usePyroFetch(`/download?path=/server-icon-original.png`, {
+      override: serverStore.fileAPIAuth[serverId],
+    });
+  });
+
   if (fileData instanceof Blob) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -117,7 +121,9 @@ try {
       image.value = dataURL;
     };
   }
-} catch {}
+} catch (error) {
+  console.error("Error fetching server icon:", error);
+}
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 </script>

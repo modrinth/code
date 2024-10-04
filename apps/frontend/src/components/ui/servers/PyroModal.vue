@@ -30,7 +30,7 @@
     <div
       :class="'border-0 border-b border-solid border-button-bg' + (danger ? 'bg-[#FF496E]' : '')"
     ></div>
-    <div class="h-full overflow-scroll">
+    <div class="h-full w-full overflow-scroll">
       <slot />
     </div>
   </div>

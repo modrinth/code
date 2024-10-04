@@ -92,7 +92,7 @@ export interface Server {
   project: Project | null;
   suspension_reason: string | null;
   image: string | null;
-  upstream: {
+  upstream?: {
     kind: "modpack";
     project_id: string;
     version_id: string;

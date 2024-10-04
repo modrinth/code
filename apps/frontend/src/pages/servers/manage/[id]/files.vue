@@ -273,10 +273,7 @@ useHead({
   title: `Files - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
 });
 
-const { data, status } = await useLazyAsyncData("modsData", async () => {
-  await serverStore.fetchServerData(serverId);
-  return serverStore.getServerData(serverId);
-});
+const data = computed(() => serverStore.serverData[serverId]);
 
 const scrollContainer = ref<HTMLElement | null>(null);
 const items = ref<any[]>([]);
@@ -537,7 +534,7 @@ const saveFileContent = async () => {
 
   try {
     await serverStore.updateFile(serverId, editingFile.value.path, fileContent.value);
-    await refreshNuxtData("filesData");
+    await refreshNuxtData("files-data");
     isEditing.value = false;
     editingFile.value = null;
   } catch (error) {

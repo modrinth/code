@@ -64,16 +64,8 @@ const router = useRouter();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
-const error = ref<Error | null>(null);
+const error = computed(() => serverStore.error);
 
-watch(
-  () => serverStore.error,
-  (newVal) => {
-    if (newVal) {
-      error.value = newVal;
-    }
-  },
-);
 const returnToServers = () => {
   serverStore.clearError();
   router.push("/servers/manage");

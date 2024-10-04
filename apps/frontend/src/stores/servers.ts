@@ -4,14 +4,14 @@ const config = true;
 
 interface ServerState {
   serverData: Record<string, Server>;
-  fileAPIAuth: any;
+  fileAPIAuth: Record<string, any>;
   error: Error | null;
 }
 
 export const useServerStore = defineStore("servers", {
   state: (): ServerState => ({
     serverData: {},
-    fileAPIAuth: null,
+    fileAPIAuth: {},
     error: null,
   }),
 
@@ -26,11 +26,78 @@ export const useServerStore = defineStore("servers", {
       }
     },
 
+    async processImage(data: Server, serverId: string) {
+      const image = ref<string | null>(null);
+      try {
+        const fileData = await this.retryWithAuth(serverId, async () => {
+          return await usePyroFetch(`/download?path=/server-icon-original.png`, {
+            override: this.fileAPIAuth[serverId],
+          });
+        });
+
+        if (fileData instanceof Blob) {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const img = new Image();
+          img.src = URL.createObjectURL(fileData);
+          await new Promise<void>((resolve) => {
+            img.onload = () => {
+              canvas.width = 200;
+              canvas.height = 200;
+              ctx?.drawImage(img, 0, 0, 200, 200);
+              const dataURL = canvas.toDataURL("image/png");
+              data.image = dataURL;
+              image.value = dataURL;
+              resolve();
+            };
+          });
+        }
+      } catch (error) {}
+
+      if (image.value === null && data.project?.icon_url) {
+        try {
+          const response = await fetch(data.project.icon_url);
+          const file = await response.blob();
+          const originalfile = new File([file], "server-icon-original.png", {
+            type: "image/png",
+          });
+          const scaledFile = await new Promise<File>((resolve, reject) => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = () => {
+              canvas.width = 64;
+              canvas.height = 64;
+              ctx?.drawImage(img, 0, 0, 64, 64);
+              canvas.toBlob((blob) => {
+                if (blob) {
+                  const data = new File([blob], "server-icon.png", { type: "image/png" });
+                  resolve(data);
+                } else {
+                  reject(new Error("Canvas toBlob failed"));
+                }
+              }, "image/png");
+            };
+            img.onerror = reject;
+          });
+          if (scaledFile) {
+            await this.uploadFile(serverId, "/server-icon.png", scaledFile);
+            await this.uploadFile(serverId, "/server-icon-original.png", originalfile);
+          }
+        } catch (error) {
+          console.error("Error processing server image:", error);
+        }
+      }
+      return image.value;
+    },
+
     async fetchServerData(serverId: string) {
       try {
+        await this.confirmFileApiInfo(serverId);
         const data = await usePyroFetch<Server>(`servers/${serverId}`);
 
-        if (data.upstream.project_id) {
+        if (data.upstream?.project_id) {
           // @ts-ignore
           const project = await this.fetchProject(data.upstream.project_id);
           data.project = project as Project | null;
@@ -39,31 +106,7 @@ export const useServerStore = defineStore("servers", {
         const backups = await this.fetchServerBackups(serverId);
         data.backups = backups;
 
-        await this.confirmFileApiInfo(serverId);
-
-        try {
-          const fileData = await this.retryWithAuth(serverId, async () => {
-            return await usePyroFetch(`/download?path=/server-icon-original.png`, {
-              override: this.fileAPIAuth,
-            });
-          });
-
-          if (fileData instanceof Blob) {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const img = new Image();
-            img.src = URL.createObjectURL(fileData);
-            img.onload = () => {
-              canvas.width = 200;
-              canvas.height = 200;
-              ctx?.drawImage(img, 0, 0, 200, 200);
-              const dataURL = canvas.toDataURL("image/png");
-              data.image = dataURL;
-            };
-          }
-        } catch (error) {
-          console.error("Error fetching server image:", error);
-        }
+        data.image = await this.processImage(data, serverId);
 
         this.serverData[serverId] = data;
         this.error = null;
@@ -387,9 +430,8 @@ export const useServerStore = defineStore("servers", {
     // --- FILE API ---
 
     async refreshFileApiInfo(serverId: string) {
-      console.log("refreshing tm");
       try {
-        this.fileAPIAuth = await usePyroFetch(`servers/${serverId}/fs`);
+        this.fileAPIAuth[serverId] = await usePyroFetch(`servers/${serverId}/fs`);
       } catch (error) {
         console.error("Error getting file api info:", error);
         this.error = error instanceof Error ? error : new Error("An unknown error occurred");
@@ -398,9 +440,7 @@ export const useServerStore = defineStore("servers", {
     },
 
     async confirmFileApiInfo(serverId: string) {
-      console.log("confirming file api info...");
-      if (this.fileAPIAuth === null) {
-        console.log("Refreshing file api info...");
+      if (this.fileAPIAuth[serverId] === null) {
         await this.refreshFileApiInfo(serverId);
         return;
       }
@@ -410,7 +450,7 @@ export const useServerStore = defineStore("servers", {
       await this.confirmFileApiInfo(serverId);
       return this.retryWithAuth(serverId, async () => {
         return await usePyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
-          override: this.fileAPIAuth,
+          override: this.fileAPIAuth[serverId],
         });
       });
     },
@@ -426,7 +466,7 @@ export const useServerStore = defineStore("servers", {
         return await usePyroFetch(`/create?path=${path}&type=${type}`, {
           method: "POST",
           contentType: "",
-          override: this.fileAPIAuth,
+          override: this.fileAPIAuth[serverId],
         });
       });
     },
@@ -438,7 +478,7 @@ export const useServerStore = defineStore("servers", {
           method: "POST",
           contentType: "application/octet-stream",
           body: file,
-          override: this.fileAPIAuth,
+          override: this.fileAPIAuth[serverId],
         });
       });
     },
@@ -449,7 +489,7 @@ export const useServerStore = defineStore("servers", {
       return this.retryWithAuth(serverId, async () => {
         return await usePyroFetch(`/move`, {
           method: "POST",
-          override: this.fileAPIAuth,
+          override: this.fileAPIAuth[serverId],
           body: {
             source: path,
             destination: pathName,
@@ -466,7 +506,7 @@ export const useServerStore = defineStore("servers", {
           method: "PUT",
           contentType: "application/octet-stream",
           body: octetStream,
-          override: this.fileAPIAuth,
+          override: this.fileAPIAuth[serverId],
         });
       });
     },
@@ -476,7 +516,7 @@ export const useServerStore = defineStore("servers", {
       return this.retryWithAuth(serverId, async () => {
         return await usePyroFetch(`/move`, {
           method: "POST",
-          override: this.fileAPIAuth,
+          override: this.fileAPIAuth[serverId],
           body: {
             source: path,
             destination: newPath,
@@ -490,7 +530,7 @@ export const useServerStore = defineStore("servers", {
       return this.retryWithAuth(serverId, async () => {
         return await usePyroFetch(`/delete?path=${path}&recursive=${recursive}`, {
           method: "DELETE",
-          override: this.fileAPIAuth,
+          override: this.fileAPIAuth[serverId],
         });
       });
     },
@@ -499,7 +539,7 @@ export const useServerStore = defineStore("servers", {
       await this.confirmFileApiInfo(serverId);
       return this.retryWithAuth(serverId, async () => {
         const fileData = await usePyroFetch(`/download?path=${path}`, {
-          override: this.fileAPIAuth,
+          override: this.fileAPIAuth[serverId],
         });
 
         if (fileData instanceof Blob) {

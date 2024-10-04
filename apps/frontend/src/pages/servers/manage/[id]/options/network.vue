@@ -1,9 +1,6 @@
 <template>
-  <div class="relative h-full w-full">
-    <div
-      v-if="data && status == 'success'"
-      class="flex h-full w-full flex-col justify-between gap-6 p-8"
-    >
+  <div class="relative h-full w-full overflow-y-auto">
+    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 p-8">
       <h2 class="text-3xl font-bold">Network</h2>
       <div class="flex h-full flex-col gap-2">
         <div class="card flex flex-col gap-4">
@@ -38,10 +35,7 @@ const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
 const isUpdating = ref(false);
-const { data, status } = await useLazyAsyncData("networkData", async () => {
-  await serverStore.fetchServerData(serverId);
-  return serverStore.getServerData(serverId);
-});
+const data = computed(() => serverStore.serverData[serverId]);
 
 const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 
@@ -83,7 +77,7 @@ const saveNetwork = async () => {
   } finally {
     isUpdating.value = false;
     resetNetwork();
-    await refreshNuxtData("networkData");
+    await serverStore.fetchServerData(serverId);
     resetNetwork();
   }
 };

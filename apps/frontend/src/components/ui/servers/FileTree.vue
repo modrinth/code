@@ -105,7 +105,7 @@ const fetchChildren = async () => {
     );
     if (data && data.items) {
       children.value.push(
-        ...data.items.map((item) => ({
+        ...data.items.map((item: any) => ({
           ...item,
           isExpanded: false,
           children: [],
@@ -145,7 +145,7 @@ const toggleChild = async (child: any) => {
       try {
         const data = await serverStore.listDirContents(serverId, child.path, 1, maxResults);
         if (data && data.items) {
-          child.children = data.items.map((item) => ({
+          child.children = data.items.map((item: any) => ({
             ...item,
             isExpanded: false,
             children: [],

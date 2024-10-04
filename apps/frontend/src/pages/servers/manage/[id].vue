@@ -2,7 +2,7 @@
   <div class="contents">
     <UiServersPanelLoading v-if="isLoading" class="h-screen" />
     <div
-      v-else-if="serverData && status === 'success'"
+      v-else-if="serverData"
       data-pyro-server-manager-root
       class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
     >
@@ -68,8 +68,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { storeToRefs } from "pinia";
 import { LeftArrowIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
@@ -81,21 +79,26 @@ const errorMessage = ref("An unexpected error occurred.");
 const isLoading = ref(true);
 const error = ref<Error | null>(null);
 
-const { data: serverData, status } = await useLazyAsyncData("serverData", async () => {
-  await serverStore.fetchServerData(serverId);
-  return await serverStore.getServerData(serverId);
-});
+const serverData = computed(() => serverStore.serverData[serverId]);
 
 const showGameLabel = computed(() => !!serverData.value?.game);
 const showLoaderLabel = computed(() => !!serverData.value?.loader);
 const showModLabel = computed(() => (serverData.value?.mods?.length ?? 0) > 0);
 
 const navLinks = [
-  { label: "Overview", href: `/servers/manage/${serverId}` },
-  { label: "Content", href: `/servers/manage/${serverId}/content` },
-  { label: "Files", href: `/servers/manage/${serverId}/files` },
-  { label: "Backups", href: `/servers/manage/${serverId}/backups` },
-  { label: "Options", href: `/servers/manage/${serverId}/options` },
+  { label: "Overview", href: `/servers/manage/${serverId}`, subpages: [] },
+  {
+    label: "Content",
+    href: `/servers/manage/${serverId}/content`,
+    subpages: ["mods", "datapacks"],
+  },
+  { label: "Files", href: `/servers/manage/${serverId}/files`, subpages: [] },
+  { label: "Backups", href: `/servers/manage/${serverId}/backups`, subpages: [] },
+  {
+    label: "Options",
+    href: `/servers/manage/${serverId}/options`,
+    subpages: ["startup", "network", "properties", "info"],
+  },
 ];
 
 definePageMeta({

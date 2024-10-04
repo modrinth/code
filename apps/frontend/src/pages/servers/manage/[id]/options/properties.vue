@@ -1,7 +1,7 @@
 <template>
-  <div class="relative h-full w-full">
+  <div class="relative h-full w-full overflow-y-auto">
     <div
-      v-if="data && status == 'success'"
+      v-if="propsData"
       class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto p-8"
     >
       <h2 class="text-3xl font-bold">server.properties</h2>
@@ -10,7 +10,7 @@
         :key="index"
         class="mb-2 flex items-center justify-between border-x-0 border-b-2 border-t-0 border-solid border-bg-raised pb-2"
       >
-        <label :for="index.toString()" class="block">
+        <label :for="index.toString()" class="flex items-center">
           {{
             index
               .toString()
@@ -18,6 +18,9 @@
               .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" ")
           }}
+          <span v-if="overrides[index] && overrides[index].info" class="ml-2">
+            <EyeIcon v-tooltip="overrides[index].info" />
+          </span>
         </label>
         <div v-if="overrides[index] && overrides[index].type === 'dropdown'">
           <DropdownSelect
@@ -72,15 +75,6 @@
       </div>
       <div class="mt-10"></div>
     </div>
-    <div v-else-if="status === 'error'" class="mt-12 flex w-full items-center justify-center">
-      <div class="flex flex-col items-center gap-4">
-        <h2 class="text-3xl font-bold">Config not available</h2>
-        <div class="text-center text-lg">
-          We couldn't find a config, make sure you have started your server at least once. <br />
-          If this issue persists, please contact support.
-        </div>
-      </div>
-    </div>
     <UiServersPyroLoading v-else />
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
@@ -97,24 +91,41 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { DropdownSelect } from "@modrinth/ui";
+import { EyeIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
+const tags = useTags();
 
 const isUpdating = ref(false);
 
 const changedPropertiesState = ref({});
 
-const { data, status } = await useLazyAsyncData(
-  "data-properties",
+const data = computed(() => serverStore.serverData[serverId]);
+const { data: propsData, status } = await useAsyncData(
+  "ServerProperties",
   async () => await serverStore.fetchConfigFile(serverId, "ServerProperties"),
 );
 
-const overrides: { [key: string]: { type: string; options: string[] } } = {
+const getDifficultyOptions = () => {
+  const pre113Versions = tags.value.gameVersions
+    .filter((v) => {
+      const versionNumbers = v.version.split(".").map(Number);
+      return versionNumbers[0] === 1 && versionNumbers[1] < 13;
+    })
+    .map((v) => v.version);
+  if (data.value.mc_version && pre113Versions.includes(data.value.mc_version)) {
+    return ["0", "1", "2", "3"];
+  } else {
+    return ["peaceful", "easy", "normal", "hard"];
+  }
+};
+
+const overrides: { [key: string]: { type: string; options?: string[]; info?: string } } = {
   difficulty: {
     type: "dropdown",
-    options: ["peaceful", "easy", "normal", "hard"],
+    options: getDifficultyOptions(),
   },
   gamemode: {
     type: "dropdown",
@@ -122,7 +133,7 @@ const overrides: { [key: string]: { type: string; options: string[] } } = {
   },
 };
 
-const liveProperties = ref(JSON.parse(JSON.stringify(data.value)));
+const liveProperties = ref(JSON.parse(JSON.stringify(propsData.value)));
 
 const hasUnsavedChanges = computed(() => JSON.stringify(changedPropertiesState.value) !== "{}");
 
@@ -170,7 +181,7 @@ const saveProperties = async () => {
     await serverStore.updateFile(serverId, "server.properties", constructServerProperties());
     await new Promise((resolve) => setTimeout(resolve, 500));
     changedPropertiesState.value = {};
-    await refreshNuxtData("data");
+    await serverStore.fetchServerData(serverId);
     // @ts-ignore
     app.$notify({
       group: "serverOptions",
@@ -194,6 +205,6 @@ const saveProperties = async () => {
 };
 
 const resetProperties = () => {
-  liveProperties.value = JSON.parse(JSON.stringify(data.value));
+  liveProperties.value = JSON.parse(JSON.stringify(propsData.value));
 };
 </script>

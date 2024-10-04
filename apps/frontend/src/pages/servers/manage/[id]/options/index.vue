@@ -1,12 +1,17 @@
 <template>
-  <div class="relative h-full w-full">
-    <div
-      v-if="data && status == 'success'"
-      class="flex h-full w-full flex-col justify-between gap-6 p-8"
-    >
+  <div class="relative h-full w-full overflow-y-auto">
+    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 p-8">
       <h2 class="text-3xl font-bold">General</h2>
       <div class="flex h-full flex-col gap-2">
-        <div class="card flex justify-between gap-4">
+        <div class="card flex flex-col gap-4">
+          <label for="username-field" class="flex flex-col gap-2">
+            <span class="text-lg font-bold text-contrast">Server name</span>
+            <span> Change the name of your server as it appears on Modrinth </span>
+          </label>
+          <input v-model="serverName" class="w-full md:w-[50%]" @keyup.enter="saveGeneral" />
+        </div>
+
+        <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server icon</span>
             <span>
@@ -14,12 +19,13 @@
               server list
             </span>
           </label>
+
           <div
             @dragover.prevent="onDragOver"
             @dragleave.prevent="onDragLeave"
             @drop.prevent="onDrop"
             @click="triggerFileInput"
-            class="flex items-center gap-2 rounded-xl bg-bg p-4"
+            class="flex w-fit items-center gap-2 rounded-xl bg-button-bg p-2 hover:bg-button-bgActive"
           >
             <input
               v-if="data?.image"
@@ -32,24 +38,17 @@
               v-if="data?.image"
               no-shadow
               alt="Server Icon"
-              class="h-[6rem] w-[6rem]"
+              class="h-[6rem] w-[6rem] rounded-xl"
               :src="data.image"
             />
             <img
               v-else
               no-shadow
               alt="Server Icon"
-              class="h-[6rem] w-[6rem]"
+              class="h-[6rem] w-[6rem] rounded-xl"
               src="~/assets/images/servers/minecraft_server_icon.png"
             />
           </div>
-        </div>
-        <div class="card flex flex-col gap-4">
-          <label for="username-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Server name</span>
-            <span> Change the name of your server as it appears on Modrinth </span>
-          </label>
-          <input v-model="serverName" class="w-full md:w-[50%]" @keyup.enter="saveGeneral" />
         </div>
       </div>
     </div>
@@ -72,11 +71,7 @@ const serverId = route.params.id as string;
 
 const serverStore = useServerStore();
 
-const { data, status } = await useLazyAsyncData("data", async () => {
-  await serverStore.fetchServerData(serverId);
-  return serverStore.getServerData(serverId);
-});
-
+const data = computed(() => serverStore.serverData[serverId]);
 const serverName = ref<string>(data.value?.name as string);
 
 const isUpdating = ref(false);
@@ -87,7 +82,7 @@ const saveGeneral = async () => {
     isUpdating.value = true;
     await serverStore.updateServerName(serverId, serverName.value);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await refreshNuxtData("data");
+    await serverStore.fetchServerData(serverId);
     // @ts-ignore
     app.$notify({
       group: "serverOptions",
@@ -129,17 +124,26 @@ const uploadFile = async (e: Event) => {
       canvas.width = 64;
       canvas.height = 64;
       ctx?.drawImage(img, 0, 0, 64, 64);
-      const dataURL = canvas.toDataURL("image/png");
-      const data = dataURL.replace("data:image/png;base64,", "");
-      resolve(new File([data], "server-icon.png"));
+      // turn the downscaled image back to a png file
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const data = new File([blob], "server-icon.png", { type: "image/png" });
+          resolve(data);
+        } else {
+          reject(new Error("Canvas toBlob failed"));
+        }
+      }, "image/png");
     };
     img.onerror = reject;
   });
   if (!file) return;
+  if (data.value?.image) {
+    await serverStore.deleteFileOrFolder(serverId, "/server-icon.png", false);
+    await serverStore.deleteFileOrFolder(serverId, "/server-icon-original.png", false);
+  }
   await serverStore.uploadFile(serverId, "/server-icon.png", scaledFile);
   await serverStore.uploadFile(serverId, "/server-icon-original.png", file);
-
-  refreshNuxtData("data");
+  await serverStore.fetchServerData(serverId);
 };
 
 const onDragOver = (e: DragEvent) => {

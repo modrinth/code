@@ -15,14 +15,12 @@
             </Button>
           </div>
         </div>
-        <div v-else>
-          <UiServersProjectSelect type="mod" @select="handleModAction" />
-        </div>
+        <UiServersProjectSelect type="mod" @select="handleModAction" v-else />
       </UiServersPyroModal>
     </div>
   </Modal>
 
-  <div class="flex h-full w-full flex-col" v-if="data && status == 'success'">
+  <div class="flex h-full w-full flex-col" v-if="data">
     <div
       class="flex items-center justify-between gap-2 border-0 border-b border-solid border-bg-raised p-3"
     >
@@ -77,12 +75,9 @@ const selectedMod = ref<Mod | null>(null);
 const newModVersion = ref("");
 const versions = ref<Record<string, any[]>>({});
 
-const { data, status } = await useLazyAsyncData("data", async () => {
-  await serverStore.fetchServerData(serverId);
-  return serverStore.getServerData(serverId);
-});
+const data = computed(() => serverStore.serverData[serverId]);
 
-const { data: mods, status: modsStatus } = await useLazyAsyncData("mods", async () => {
+const { data: mods, status: modsStatus } = await useLazyAsyncData("content-mods-mods", async () => {
   return (await serverStore.getMods(serverId)) as Mod[];
 });
 
@@ -113,7 +108,7 @@ const toggleMod = async (mod: Mod) => {
     );
     new Promise((resolve) =>
       setTimeout(() => {
-        refreshNuxtData("mods");
+        refreshNuxtData("content-mods-mods");
       }, 1000),
     );
   } catch (error) {
@@ -126,7 +121,7 @@ const removeMod = async (mod: Mod) => {
     await serverStore.removeMod(serverId, mod.project_id);
     new Promise((resolve) =>
       setTimeout(() => {
-        refreshNuxtData("mods");
+        refreshNuxtData("content-mods-mods");
       }, 1000),
     );
   } catch (error) {
@@ -160,7 +155,7 @@ const handleModAction = async (mod: Mod, version_number?: string) => {
     } else {
       await serverStore.installMod(serverId, mod.project_id, version_id);
     }
-    await refreshNuxtData("mods");
+    await refreshNuxtData("content-mods-mods");
     modModal.value.hide();
   } catch (error) {
     console.error("Error handling mod action:", error);

@@ -6,9 +6,10 @@ interface PyroFetchOptions {
   body?: Record<string, any>;
   version?: number;
   override?: {
-    url: string;
+    url?: string;
     token: string;
   };
+  retry?: boolean;
 }
 
 export class PyroFetchError extends Error {
@@ -36,8 +37,6 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
   }
 
   const { method = "GET", contentType = "application/json", body, version = 0, override } = options;
-
-  console.log(contentType);
 
   const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
     /\/$/,
@@ -69,14 +68,13 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     headers.Origin = window.location.origin;
   }
 
-  console.log("Pyro fetching", fullUrl);
   try {
     const response = await $fetch<T>(fullUrl, {
       method,
       headers,
       body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
       timeout: 10000,
-      retry: method === "GET" ? 3 : 0,
+      retry: options.retry !== false ?? method === "GET" ? 3 : 0,
     });
     return response;
   } catch (error) {
