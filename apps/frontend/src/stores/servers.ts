@@ -42,9 +42,9 @@ export const useServerStore = defineStore("servers", {
           img.src = URL.createObjectURL(fileData);
           await new Promise<void>((resolve) => {
             img.onload = () => {
-              canvas.width = 200;
-              canvas.height = 200;
-              ctx?.drawImage(img, 0, 0, 200, 200);
+              canvas.width = 512;
+              canvas.height = 512;
+              ctx?.drawImage(img, 0, 0, 512, 512);
               const dataURL = canvas.toDataURL("image/png");
               data.image = dataURL;
               image.value = dataURL;

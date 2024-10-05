@@ -31,13 +31,19 @@
     <div
       class="flex gap-2 rounded-xl bg-bg-raised p-1 font-semibold text-contrast group-hover:bg-bg"
     >
-      <Button icon-only transparent v-if="data.project_id" @click="emit('edit', data)">
+      <Button
+        v-if="data.project_id"
+        v-tooltip="'Change the mod version'"
+        icon-only
+        transparent
+        @click="emit('edit', data)"
+      >
         <EditIcon />
       </Button>
-      <Button icon-only transparent @click="emit('toggle', data)">
+      <Button v-tooltip="'Enable/Disable mod'" icon-only transparent @click="emit('toggle', data)">
         <ArchiveIcon />
       </Button>
-      <Button icon-only transparent @click="emit('delete', data)">
+      <Button v-tooltip="'Delete mod'" icon-only transparent @click="emit('delete', data)">
         <TrashIcon />
       </Button>
     </div>

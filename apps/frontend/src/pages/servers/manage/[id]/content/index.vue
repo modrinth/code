@@ -48,8 +48,8 @@
         v-if="data.upstream"
         class="flex w-full justify-between gap-2 rounded-xl bg-bg-raised p-4"
       >
-        <div class="group flex gap-4">
-          <div class="relative">
+        <div class="flex gap-4">
+          <div v-tooltip="'Change the installed modpack'" class="group relative">
             <UiAvatar :src="data.project?.icon_url" size="120px" />
             <div
               class="absolute top-0 hidden size-[120px] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
@@ -62,7 +62,10 @@
             <div class="flex flex-col gap-2">
               <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
                 {{ data.project?.title }}
-                <span class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand">
+                <span
+                  v-tooltip="'Current installed Modpack version'"
+                  class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
+                >
                   v{{ currentVersion?.version_number }}
                 </span>
               </h1>
@@ -81,7 +84,11 @@
                 :options="options"
                 placeholder="Change version"
               />
-              <Button icon-only @click="reinstallCurrent">
+              <Button
+                v-tooltip="'Reinstall current pack with selected version'"
+                icon-only
+                @click="reinstallCurrent"
+              >
                 <ChevronRightIcon />
               </Button>
             </div>
@@ -103,6 +110,7 @@
       <div class="flex w-full items-center justify-between rounded-xl bg-bg-raised p-2 pr-4">
         <div class="flex items-center gap-2">
           <Button
+            v-tooltip="'Reinstall the server as vanilla with no mods'"
             icon-only
             :class="data.loader === 'Vanilla' ? '[&&]:bg-bg-green' : ''"
             @click="selectLoader('Vanilla')"
@@ -117,6 +125,7 @@
         </div>
         <div class="flex items-center gap-2">
           <Button
+            v-tooltip="'Reinstall the server with th fabric modloader'"
             icon-only
             :class="data.loader === 'Fabric' ? '[&&]:bg-bg-green' : ''"
             @click="selectLoader('Fabric')"
@@ -131,6 +140,7 @@
         </div>
         <div class="flex items-center gap-2">
           <Button
+            v-tooltip="'Reinstall the server with the quilt modloader'"
             icon-only
             :class="data.loader === 'Quilt' ? '[&&]:bg-bg-green' : ''"
             @click="selectLoader('Quilt')"
@@ -145,6 +155,7 @@
         </div>
         <div class="flex items-center gap-2">
           <Button
+            v-tooltip="'Reinstall the server with the forge modloader'"
             icon-only
             :class="data.loader === 'Forge' ? '[&&]:bg-bg-green' : ''"
             @click="selectLoader('Forge')"
@@ -159,6 +170,7 @@
         </div>
         <div class="flex items-center gap-2">
           <Button
+            v-tooltip="'Reinstall the server with the neoforge modloader'"
             icon-only
             :class="data.loader === 'Neoforge' ? '[&&]:bg-bg-green' : ''"
             @click="selectLoader('Neoforge')"

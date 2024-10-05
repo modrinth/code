@@ -21,6 +21,7 @@
           </label>
           <UiServersMOTDEditor>
             <div
+              v-tooltip="'Upload a custom Icon'"
               class="group relative flex w-fit items-center gap-2"
               @dragover.prevent="onDragOver"
               @dragleave.prevent="onDragLeave"
