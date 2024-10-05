@@ -6,11 +6,8 @@
         <!-- Subdomain section -->
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Subdomain</span>
-            <span>
-              Change the subdomain of your server. Your friends can use this subdomain to connect to
-              your server.
-            </span>
+            <span class="text-lg font-bold text-contrast">Custom URL</span>
+            <span> Your friends can connect to your server using this URL. </span>
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
             <input v-model="serverSubdomain" class="h-[50%] w-[63%]" @keyup.enter="saveNetwork" />
