@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Project, Server, ServerBackup, Allocation } from "~/types/servers";
+import type { Project, Server, ServerBackup } from "~/types/servers";
 const config = true;
 
 interface ServerState {
@@ -424,44 +424,6 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error suspending server:", error);
-        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
-        throw this.error;
-      }
-    },
-
-    // --- ALLOCATIONS / NETWORK API ---
-
-    async getAllocations(serverId: string): Promise<Allocation[]> {
-      try {
-        return await usePyroFetch<Allocation[]>(`servers/${serverId}/allocations`);
-      } catch (error) {
-        console.error("Error fetching allocations:", error);
-        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
-        throw this.error;
-      }
-    },
-
-    async createAllocation(serverId: string, name: string): Promise<Allocation> {
-      try {
-        return await usePyroFetch<Allocation>(`servers/${serverId}/allocations`, {
-          method: "POST",
-          body: { name },
-        });
-      } catch (error) {
-        console.error("Error creating allocation:", error);
-        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
-        throw this.error;
-      }
-    },
-
-    async updateAllocation(serverId: string, allocationId: string, name: string): Promise<void> {
-      try {
-        await usePyroFetch(`servers/${serverId}/allocations/${allocationId}`, {
-          method: "PUT",
-          body: { name },
-        });
-      } catch (error) {
-        console.error("Error updating allocation:", error);
         this.error = error instanceof Error ? error : new Error("An unknown error occurred");
         throw this.error;
       }
