@@ -20,11 +20,9 @@
     </div>
   </Modal>
 
-  <div v-if="data" class="flex h-full w-full flex-col">
-    <div
-      class="flex items-center justify-between gap-2 border-0 border-b border-solid border-bg-raised p-3"
-    >
-      <h2 class="m-0 text-2xl font-bold text-contrast">Mods</h2>
+  <div v-if="data" class="flex h-full w-full flex-col gap-2 px-8 py-4">
+    <div class="flex items-center justify-between gap-2 px-3">
+      <h2 class="m-0 text-3xl font-bold text-contrast">Mods</h2>
       <Button icon-only transparent @click="showAddModModal">
         <PlusIcon class="h-10 w-10 text-contrast" />
       </Button>

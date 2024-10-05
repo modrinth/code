@@ -48,8 +48,16 @@
         v-if="data.upstream"
         class="flex w-full justify-between gap-2 rounded-xl bg-bg-raised p-4"
       >
-        <div class="flex gap-4">
-          <UiAvatar :src="data.project?.icon_url" size="120px" />
+        <div class="group flex gap-4">
+          <div class="relative">
+            <UiAvatar :src="data.project?.icon_url" size="120px" />
+            <div
+              class="absolute top-0 hidden size-[120px] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
+              @click="editModal.show()"
+            >
+              <EditIcon class="h-8 w-8 text-contrast" />
+            </div>
+          </div>
           <div class="flex flex-col justify-between">
             <div class="flex flex-col gap-2">
               <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
@@ -78,12 +86,6 @@
               </Button>
             </div>
           </div>
-        </div>
-        <div
-          class="flex flex-col items-center justify-center rounded-xl bg-button-bg p-2 hover:bg-button-bgActive"
-          @click="editModal.show()"
-        >
-          <EditIcon class="h-6 w-6 text-contrast" />
         </div>
       </div>
       <div
