@@ -91,24 +91,6 @@ const saveGeneral = async () => {
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
     });
-    app.$notify({
-      group: "serverOptions",
-      type: "warn",
-      title: "Server settings updated",
-      text: "Your server settings were successfully changed.",
-    });
-    app.$notify({
-      group: "error",
-      type: "success",
-      title: "Server settings updated",
-      text: "Your server settings were successfully changed.",
-    });
-    app.$notify({
-      group: "serverOptions",
-      type: "info",
-      title: "Server settings updated",
-      text: "Your server settings were successfully changed.",
-    });
   } catch (error) {
     console.error(error);
     // @ts-ignore

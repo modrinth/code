@@ -27,6 +27,7 @@ function stopTimer(notif) {
 <style lang="scss" scoped>
 .vue-notification {
   background: var(--color-blue-bg) !important;
+  backdrop-filter: blur(6px);
   border-left: 5px solid var(--color-blue) !important;
   color: var(--color-contrast) !important;
 
