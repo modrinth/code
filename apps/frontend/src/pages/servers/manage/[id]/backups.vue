@@ -20,7 +20,7 @@
         </div>
       </div>
       <Modal ref="createBackupModal" header="">
-        <UiServersPyroModal @modal="createBackupModal?.hide()" header="Create backup" :data="data">
+        <UiServersPyroModal header="Create backup" :data="data" @modal="createBackupModal?.hide()">
           <div class="p-2">
             <div class="mb-3 mt-3">
               Your server will temporarily shutdown while the backup is being created.
@@ -42,7 +42,7 @@
         </UiServersPyroModal>
       </Modal>
       <Modal ref="renameBackupModal" header="">
-        <UiServersPyroModal @modal="renameBackupModal?.hide()" header="Rename backup" :data="data">
+        <UiServersPyroModal header="Rename backup" :data="data" @modal="renameBackupModal?.hide()">
           <div class="p-2">
             <div class="mt-2 flex flex-col gap-2">
               <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
@@ -62,9 +62,9 @@
       </Modal>
       <Modal ref="restoreBackupModal" header="">
         <UiServersPyroModal
-          @modal="restoreBackupModal?.hide()"
           header="Restore backup"
           :data="data"
+          @modal="restoreBackupModal?.hide()"
         >
           <div class="p-2">
             <div class="flex flex-col gap-4">
@@ -93,10 +93,10 @@
       </Modal>
       <Modal ref="deleteBackupModal" header="">
         <UiServersPyroModal
-          @modal="deleteBackupModal?.hide()"
           header="Delete backup"
           :data="data"
           danger
+          @modal="deleteBackupModal?.hide()"
         >
           <div class="p-2">
             <div class="flex flex-col gap-4">
@@ -212,7 +212,6 @@ import {
   ClipboardCopyIcon,
   DownloadIcon,
   TrashIcon,
-  XIcon,
 } from "@modrinth/assets";
 import { ref, reactive } from "vue";
 

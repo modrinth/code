@@ -7,7 +7,7 @@ interface PyroFetchOptions {
   version?: number;
   override?: {
     url?: string;
-    token: string;
+    token?: string;
   };
   retry?: boolean;
 }

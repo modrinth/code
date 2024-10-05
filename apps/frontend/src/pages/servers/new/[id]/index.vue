@@ -14,7 +14,7 @@
         />
         {{ packId }}
       </div>
-      <div class="project-list display-mode--list" v-else>
+      <div v-else class="project-list display-mode--list">
         <UiProjectCard
           v-if="pack"
           :id="packId"
@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { PyroIcon, ChevronRightIcon } from "@modrinth/assets";
+import { ChevronRightIcon } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
 
 const config = useRuntimeConfig();
@@ -59,7 +59,9 @@ const auth = (await useAuth()) as any;
 const route = useNativeRoute();
 let loading = false;
 const packId = route.params.id;
-const version_id = route.query.version;
+const versionId = route.query.version;
+const loaderVersion = route.query.loader_version;
+const gameVersion = route.query.game_version;
 const serverName = ref("");
 
 const updateServerName = (event: Event) => {
@@ -97,18 +99,19 @@ const createServer = async () => {
     source: loader
       ? {
           loader: packId,
-          version: "1.20.1-47.3.7",
+          loader_version: loaderVersion,
+          game_version: gameVersion,
         }
       : {
           project_id: packId,
-          version_id: version_id ? version_id : pack.versions.slice(-1)[0],
+          version_id: versionId || pack.versions.slice(-1)[0],
         },
     user_id: auth.value?.user?.id ?? "",
   };
   const method = "POST";
 
   const timeout = 10000;
-  const retryAmount = 3;
+  const retryAmount = 0;
 
   let base = import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl;
 
@@ -152,7 +155,7 @@ const createServer = async () => {
 
   const serverId = server.uuid;
 
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 5000));
 
   // redirect to the new server
   await navigateTo(`/servers/manage/${serverId}`);

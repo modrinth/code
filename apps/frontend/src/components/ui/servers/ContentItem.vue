@@ -54,11 +54,9 @@
 import { Button } from "@modrinth/ui";
 import { EditIcon, TrashIcon, ArchiveIcon } from "@modrinth/assets";
 
-const serverStore = useServerStore();
-
 const emit = defineEmits(["toggle", "delete", "edit"]);
 
-const props = defineProps<{
+defineProps<{
   data: {
     name?: string;
     filename: string;

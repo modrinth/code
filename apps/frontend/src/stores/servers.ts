@@ -8,6 +8,22 @@ interface ServerState {
   error: Error | null;
 }
 
+const constructServerProperties = (properties: any): string => {
+  let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`;
+
+  for (const [key, value] of Object.entries(properties)) {
+    if (typeof value === "object") {
+      fileContent += `${key}=${JSON.stringify(value)}\n`;
+    } else if (typeof value === "boolean") {
+      fileContent += `${key}=${value ? "true" : "false"}\n`;
+    } else {
+      fileContent += `${key}=${value}\n`;
+    }
+  }
+
+  return fileContent;
+};
+
 export const useServerStore = defineStore("servers", {
   state: (): ServerState => ({
     serverData: {},
@@ -107,6 +123,12 @@ export const useServerStore = defineStore("servers", {
 
         const backups = await this.fetchServerBackups(serverId);
         data.backups = backups;
+
+        const motd = await this.getMotd(serverId);
+        if (motd === "A Minecraft Server") {
+          await this.setMotd(serverId, `§b${data.project?.title} §f♦ §aModrinth Servers`);
+        }
+        data.motd = motd;
 
         data.image = await this.processImage(data, serverId);
 
@@ -602,6 +624,35 @@ export const useServerStore = defineStore("servers", {
           return fileData.text();
         }
       });
+    },
+
+    async getMotd(serverId: string) {
+      try {
+        const props = await this.downloadFile(serverId, "/server.properties");
+        if (props) {
+          const lines = props.split("\n");
+          for (const line of lines) {
+            if (line.startsWith("motd=")) {
+              return line.slice(5);
+            }
+          }
+        }
+      } catch {
+        return null;
+      }
+    },
+
+    async setMotd(serverId: string, motd: string) {
+      try {
+        const props = (await this.fetchConfigFile(serverId, "ServerProperties")) as any;
+        if (props) {
+          props.motd = motd;
+          const newProps = constructServerProperties(props);
+          await this.updateFile(serverId, "server.properties", newProps);
+        }
+      } catch (error) {
+        console.error("Error setting motd:", error);
+      }
     },
 
     clearError() {

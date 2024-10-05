@@ -1,7 +1,7 @@
 <template>
   <Modal ref="addModModal" header="">
     <div class="h-[500px]">
-      <UiServersPyroModal @modal="addModModal.hide()" header="Add Datapack" data="data">
+      <UiServersPyroModal header="Add Datapack" data="data" @modal="addModModal.hide()">
         <UiServersProjectSelect type="datapack" />
       </UiServersPyroModal>
     </div>
@@ -16,8 +16,8 @@
       </Button>
     </div>
     <div
-      class="flex h-full w-full flex-col overflow-y-scroll"
       v-if="data && status == 'success'"
+      class="flex h-full w-full flex-col overflow-y-scroll"
     ></div>
     <UiServersPyroLoading v-else />
   </div>

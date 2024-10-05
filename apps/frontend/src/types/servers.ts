@@ -103,6 +103,7 @@ export interface Server {
     project_id: string;
     version_id: string;
   };
+  motd: string;
 }
 
 export interface WSAuth {

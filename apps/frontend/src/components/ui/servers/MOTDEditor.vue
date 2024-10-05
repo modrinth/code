@@ -124,6 +124,10 @@ import {
 } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
 
+const route = useNativeRoute();
+const serverId = route.params.id;
+const serverStore = useServerStore();
+
 const formatCodes = [
   { code: "§f", color: "bg-white", description: "White" },
   { code: "§7", color: "bg-[#AAAAAA]", description: "Gray" },
@@ -328,7 +332,8 @@ const minecraftEmojis = [
   { char: "⚀", name: "DICE ONE" },
 ];
 
-const motd = ref("§bSimpily Optimized §f♦ §aModrith Servers");
+const motd = computed(() => serverStore.serverData[serverId]?.motd ?? "A Minecraft Server");
+
 const editor = ref(null);
 const showHexColorPicker = ref(false);
 const showEmojiPicker = ref(false);
