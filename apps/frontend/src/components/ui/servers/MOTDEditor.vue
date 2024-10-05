@@ -7,11 +7,11 @@
         <div
           ref="editor"
           contenteditable
+          class="flex min-h-[50px] items-center gap-1 whitespace-pre-wrap outline-none"
+          spellcheck="false"
           @input="handleInput"
           @keyup="updateCursorPosition"
           @click="updateCursorPosition"
-          class="flex min-h-[50px] items-center gap-1 whitespace-pre-wrap outline-none"
-          spellcheck="false"
         >
           <template v-for="(part, index) in parsedMotd" :key="index">
             <span v-if="part.type === 'text'" :style="part.style">{{ part.content }}</span>
@@ -32,35 +32,35 @@
         <div
           v-for="format in formatCodes"
           :key="format.code"
-          @click="insertFormatCode(format.code)"
-          :class="[`h-6 w-6 rounded-full p-0 hover:opacity-80`, format.color]"
           v-tooltip="`${format.description}`"
+          :class="[`h-6 w-6 rounded-full p-0 hover:opacity-80`, format.color]"
+          @click="insertFormatCode(format.code)"
         ></div>
       </div>
       <div class="flex gap-1">
         <Button
           v-for="style in styleButtons"
           :key="style.code"
-          @click="insertFormatCode(style.code)"
-          class="h-6 w-6 rounded bg-white p-0"
           v-tooltip="style.description"
+          class="h-6 w-6 rounded bg-white p-0"
           icon-only
+          @click="insertFormatCode(style.code)"
         >
           <component :is="style.icon" class="h-4 w-4" />
         </Button>
         <Button
-          @click="openHexColorPicker"
-          class="from-red-500 via-green-500 to-blue-500 h-6 w-6 rounded bg-gradient-to-r p-0"
           v-tooltip="'Custom Hex Color'"
+          class="from-red-500 via-green-500 to-blue-500 h-6 w-6 rounded bg-gradient-to-r p-0"
           icon-only
+          @click="openHexColorPicker"
         >
           <PaintBrushIcon class="h-4 w-4" />
         </Button>
         <Button
-          @click="openEmojiPicker"
-          class="flex h-6 w-6 items-center justify-center rounded bg-white p-0"
           v-tooltip="'Minecraft Emoji'"
+          class="flex h-6 w-6 items-center justify-center rounded bg-white p-0"
           icon-only
+          @click="openEmojiPicker"
         >
           ☺
         </Button>
@@ -75,12 +75,12 @@
     >
       <div class="rounded-lg bg-white p-4">
         <h3 class="mb-2 text-lg font-semibold">Choose a Hex Color</h3>
-        <input type="color" v-model="customHexColor" class="mb-2" />
+        <input v-model="customHexColor" type="color" class="mb-2" />
         <div>
-          <button @click="applyHexColor" class="bg-blue-500 mr-2 rounded px-4 py-2 text-white">
+          <button class="bg-blue-500 mr-2 rounded px-4 py-2 text-white" @click="applyHexColor">
             Apply
           </button>
-          <button @click="showHexColorPicker = false" class="rounded bg-gray-300 px-4 py-2">
+          <button class="rounded bg-gray-300 px-4 py-2" @click="showHexColorPicker = false">
             Cancel
           </button>
         </div>
@@ -98,14 +98,14 @@
           <button
             v-for="emoji in minecraftEmojis"
             :key="emoji.char"
-            @click="insertEmoji(emoji.char)"
             class="rounded p-2 text-2xl hover:bg-gray-200"
             :title="emoji.name"
+            @click="insertEmoji(emoji.char)"
           >
             {{ emoji.char }}
           </button>
         </div>
-        <button @click="showEmojiPicker = false" class="mt-4 rounded bg-gray-300 px-4 py-2">
+        <button class="mt-4 rounded bg-gray-300 px-4 py-2" @click="showEmojiPicker = false">
           Close
         </button>
       </div>
@@ -117,8 +117,6 @@
 import {
   BoldIcon,
   ClearIcon,
-  EyeIcon,
-  EyeOffIcon,
   ItalicIcon,
   PaintBrushIcon,
   StrikethroughIcon,
@@ -343,7 +341,7 @@ const parsedMotd = computed(() => {
   let currentStyle = {};
   const result = [];
 
-  parts.forEach((part, index) => {
+  parts.forEach((part) => {
     if (part.match(/^§[0-9a-f]$/)) {
       currentStyle.color = colorMap[part] || "";
       result.push({ type: "code", content: part, style: { ...currentStyle } });
@@ -402,7 +400,6 @@ const removeFormatCode = (index) => {
 const handleInput = (e) => {
   const selection = window.getSelection();
   const offset = selection.focusOffset;
-  const node = selection.focusNode;
 
   // Calculate the actual cursor position in the raw text
   let actualPosition = 0;
@@ -414,7 +411,7 @@ const handleInput = (e) => {
     if (node.nodeType === Node.TEXT_NODE) {
       actualPosition += node.length;
     } else {
-      for (let child of node.childNodes) {
+      for (const child of node.childNodes) {
         if (traverse(child)) {
           return true;
         }
@@ -439,29 +436,12 @@ const handleInput = (e) => {
   updateEditorContent();
 };
 
-const insertTextPreservingFormatting = (text, newText) => {
-  const parts = text.split(/(§[0-9a-flmnor]|§x[0-9A-Fa-f]{6}|§#[0-9A-Fa-f]{6}|§g\{[^}]+\})/);
-  let result = "";
-
-  console.log(text, newText);
-
-  for (let part of parts) {
-    if (part.startsWith("§")) {
-      result += part;
-    } else {
-      result += newText.slice(0, part.length);
-      newText = newText.slice(part.length);
-    }
-  }
-  return result + newText;
-};
-
 const formattedToRawPosition = (formattedPos) => {
   let rawPos = 0;
   let formattedCount = 0;
   const parts = motd.value.split(/(§[0-9a-flmnor]|§x[0-9A-Fa-f]{6}|§#[0-9A-Fa-f]{6}|§g\{[^}]+\})/);
 
-  for (let part of parts) {
+  for (const part of parts) {
     if (part.startsWith("§")) {
       rawPos += part.length;
     } else {
@@ -560,10 +540,6 @@ const openEmojiPicker = () => {
 const insertEmoji = (emoji) => {
   insertFormatCode(emoji);
   showEmojiPicker.value = false;
-};
-
-const toggleColorButtons = () => {
-  showColorButtons.value = !showColorButtons.value;
 };
 </script>
 

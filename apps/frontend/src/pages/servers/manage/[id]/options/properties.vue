@@ -25,7 +25,13 @@
         <div v-if="overrides[index] && overrides[index].type === 'dropdown'">
           <DropdownSelect
             v-model="liveProperties[index]"
-            :name="property.id"
+            :name="
+              index
+                .toString()
+                .split('-')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')
+            "
             :options="overrides[index].options"
             placeholder="Select..."
           />
@@ -101,6 +107,7 @@ const tags = useTags();
 const isUpdating = ref(false);
 
 const changedPropertiesState = ref({});
+const hasUnsavedChanges = computed(() => JSON.stringify(changedPropertiesState.value) !== "{}");
 
 const data = computed(() => serverStore.serverData[serverId]);
 const { data: propsData } = await useAsyncData(
@@ -134,10 +141,6 @@ const overrides: { [key: string]: { type: string; options?: string[]; info?: str
 };
 
 const liveProperties = ref(JSON.parse(JSON.stringify(propsData.value)));
-
-const hasUnsavedChanges = computed(
-  () => JSON.stringify(changedPropertiesState.value) !== "{}" || false,
-);
 
 watch(
   liveProperties,
@@ -205,7 +208,9 @@ const saveProperties = async () => {
   }
 };
 
-const resetProperties = () => {
+const resetProperties = async () => {
   liveProperties.value = JSON.parse(JSON.stringify(propsData.value));
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  changedPropertiesState.value = {};
 };
 </script>

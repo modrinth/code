@@ -1,7 +1,7 @@
 <template>
   <Modal ref="modModal" header="">
     <div class="h-[500px]">
-      <UiServersPyroModal @modal="modModal.hide()" :header="modalHeader" :data="data">
+      <UiServersPyroModal :header="modalHeader" :data="data" @modal="modModal.hide()">
         <div v-if="isEditMode">
           <div class="flex items-center gap-4">
             <DropdownSelect
@@ -15,12 +15,12 @@
             </Button>
           </div>
         </div>
-        <UiServersProjectSelect type="mod" @select="handleModAction" v-else />
+        <UiServersProjectSelect v-else type="mod" @select="handleModAction" />
       </UiServersPyroModal>
     </div>
   </Modal>
 
-  <div class="flex h-full w-full flex-col" v-if="data">
+  <div v-if="data" class="flex h-full w-full flex-col">
     <div
       class="flex items-center justify-between gap-2 border-0 border-b border-solid border-bg-raised p-3"
     >
@@ -30,8 +30,8 @@
       </Button>
     </div>
     <div
-      class="flex h-full w-full flex-col overflow-y-scroll"
       v-if="mods && modsStatus == 'success'"
+      class="flex h-full w-full flex-col overflow-y-scroll"
     >
       <UiServersContentItem
         v-for="mod in sortedMods"
@@ -64,7 +64,6 @@ interface Mod {
 
 const serverStore = useServerStore();
 const route = useNativeRoute();
-const config = useRuntimeConfig();
 const prodOverride = await PyroAuthOverride();
 const serverId = route.params.id as string;
 
@@ -82,7 +81,11 @@ const { data: mods, status: modsStatus } = await useLazyAsyncData("content-mods-
 });
 
 const sortedMods = computed(() => {
-  return mods.value?.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? "")) || [];
+  const modsValue = mods.value;
+  if (modsValue) {
+    return [...modsValue].sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? ""));
+  }
+  return [];
 });
 
 const fetchVersions = async (projectId: string) => {
@@ -106,11 +109,7 @@ const toggleMod = async (mod: Mod) => {
         ? mod.filename.replace(".disabled", "")
         : `${mod.filename}.disabled`,
     );
-    new Promise((resolve) =>
-      setTimeout(() => {
-        refreshNuxtData("content-mods-mods");
-      }, 1000),
-    );
+    refreshNuxtData("content-mods-mods");
   } catch (error) {
     console.error("Error disabling mod:", error);
   }
@@ -122,11 +121,7 @@ const removeMod = async (mod: Mod) => {
       throw new Error("Mod project_id is undefined");
     }
     await serverStore.removeMod(serverId, mod.project_id);
-    new Promise((resolve) =>
-      setTimeout(() => {
-        refreshNuxtData("content-mods-mods");
-      }, 1000),
-    );
+    refreshNuxtData("content-mods-mods");
   } catch (error) {
     console.error("Error removing mod:", error);
   }
@@ -150,19 +145,19 @@ const showEditModModal = async (mod: Mod) => {
   modModal.value.show();
 };
 
-const handleModAction = async (mod: Mod, version_number?: string) => {
+const handleModAction = async (mod: Mod, versionNumber?: string) => {
   try {
     if (!mod.project_id) {
       throw new Error("Mod project_id is undefined");
     }
     const versionList = await fetchVersions(mod.project_id);
-    const version_id = versionList.find((x: any) =>
-      x.version_number === version_number ? version_number : mod.version_number,
+    const versionId = versionList.find((x: any) =>
+      x.version_number === versionNumber ? versionNumber : mod.version_number,
     )?.id;
     if (isEditMode.value) {
-      await serverStore.reinstallMod(serverId, mod.project_id, version_id);
+      await serverStore.reinstallMod(serverId, mod.project_id, versionId);
     } else {
-      await serverStore.installMod(serverId, mod.project_id, version_id);
+      await serverStore.installMod(serverId, mod.project_id, versionId);
     }
     await refreshNuxtData("content-mods-mods");
     modModal.value.hide();

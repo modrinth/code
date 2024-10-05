@@ -184,7 +184,6 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 const tags = useTags();
-const config = useRuntimeConfig();
 const prodOverride = await PyroAuthOverride();
 
 const editModal = ref();
@@ -208,7 +207,7 @@ const { data: versions } = await useLazyAsyncData(
 );
 
 const options = computed(() => (versions.value as any[]).map((x) => x.version_number));
-const version_ids = computed(() =>
+const versionIds = computed(() =>
   (versions.value as any[]).map((x) => {
     return { [x.version_number]: x.id };
   }),
@@ -235,13 +234,13 @@ const reinstallCurrent = async () => {
   if (!projectId) {
     throw new Error("Project ID not found");
   }
-  const resolvedVersionIds = await version_ids.value;
+  const resolvedVersionIds = versionIds.value;
   const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
   console.log(projectId, versionId);
   await serverStore.reinstallServer(serverId, false, projectId, versionId);
 };
 
-const selectLoader = async (loader: string) => {
+const selectLoader = (loader: string) => {
   selectedLoader.value = loader;
   versionSelectModal.value.show();
 };
@@ -250,7 +249,7 @@ const reinstallLoader = async (loader: string) => {
   await serverStore.reinstallServer(serverId, true, loader, selectedMCVersion.value);
 };
 
-const reinstallNew = async (project: any, version_number: string) => {
+const reinstallNew = async (project: any, versionNumber: string) => {
   editModal.value.hide();
   const versions = (await useBaseFetch(
     `project/${project.project_id}/version`,
@@ -258,14 +257,12 @@ const reinstallNew = async (project: any, version_number: string) => {
     false,
     prodOverride,
   )) as any;
-  console.log(version_number);
-  const version_id = versions.find((x: any) => x.version_number === version_number)?.id;
-  console.log(version_id);
+  const versionId = versions.find((x: any) => x.version_number === versionNumber)?.id;
 
-  if (!version_id) {
+  if (!versionId) {
     throw new Error("Version not found");
   }
 
-  await serverStore.reinstallServer(serverId, false, project.project_id, version_id);
+  await serverStore.reinstallServer(serverId, false, project.project_id, versionId);
 };
 </script>
