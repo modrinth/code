@@ -68,6 +68,7 @@ import { useServerStore } from "~/stores/servers.ts";
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
+const app = useNuxtApp();
 
 const isUpdating = ref(false);
 const data = computed(() => serverStore.serverData[serverId]);

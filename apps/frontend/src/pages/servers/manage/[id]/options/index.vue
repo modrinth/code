@@ -13,7 +13,7 @@
 
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Server Display</span>
+            <span class="text-lg font-bold text-contrast">Server display</span>
             <span>
               Change your server's icon and MOTD. Changes will be visible on the server list and on
               Modrinth.
@@ -88,6 +88,24 @@ const saveGeneral = async () => {
     app.$notify({
       group: "serverOptions",
       type: "success",
+      title: "Server settings updated",
+      text: "Your server settings were successfully changed.",
+    });
+    app.$notify({
+      group: "serverOptions",
+      type: "warn",
+      title: "Server settings updated",
+      text: "Your server settings were successfully changed.",
+    });
+    app.$notify({
+      group: "error",
+      type: "success",
+      title: "Server settings updated",
+      text: "Your server settings were successfully changed.",
+    });
+    app.$notify({
+      group: "serverOptions",
+      type: "info",
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
     });

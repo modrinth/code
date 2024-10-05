@@ -54,12 +54,12 @@ const emit = defineEmits(["toggle", "delete", "edit"]);
 
 const props = defineProps<{
   data: {
-    name: string;
+    name?: string;
     filename: string;
-    project_id: string;
-    version_id: string;
-    version_number: string;
-    icon_url: string;
+    project_id?: string;
+    version_id?: string;
+    version_number?: string;
+    icon_url?: string;
     disabled: boolean;
   };
 }>();

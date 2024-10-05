@@ -2,18 +2,29 @@
   <div class="flex flex-col gap-4 rounded-xl bg-bg p-4">
     <div class="mcbg flex gap-4 p-4 text-white">
       <slot />
-      <div class="font-minecraft mb-2 flex flex-col gap-1 text-2xl">
-        Minecraft Server
+      <div class="font-minecraft mb-2 flex w-full flex-col gap-1 text-2xl">
+        <div class="flex items-center justify-between">Minecraft Server</div>
         <div
           ref="editor"
           contenteditable
           @input="handleInput"
           @keyup="updateCursorPosition"
           @click="updateCursorPosition"
-          class="min-h-[50px] whitespace-pre-wrap outline-none"
+          class="flex min-h-[50px] items-center gap-1 whitespace-pre-wrap outline-none"
           spellcheck="false"
-          v-html="formattedText"
-        ></div>
+        >
+          <template v-for="(part, index) in parsedMotd" :key="index">
+            <span v-if="part.type === 'text'" :style="part.style">{{ part.content }}</span>
+            <div v-else-if="part.type === 'code'" @click="removeFormatCode(index)">
+              <div
+                class="inline-flex cursor-pointer items-center justify-center rounded bg-button-bg px-1 py-0.5 text-sm hover:bg-button-bgActive"
+                :style="part.style"
+              >
+                {{ part.content }}
+              </div>
+            </div>
+          </template>
+        </div>
       </div>
     </div>
     <div class="mb-2 flex items-center justify-between">
@@ -106,13 +117,14 @@
 import {
   BoldIcon,
   ClearIcon,
+  EyeIcon,
+  EyeOffIcon,
   ItalicIcon,
   PaintBrushIcon,
   StrikethroughIcon,
   UnderlineIcon,
 } from "@modrinth/assets";
-import Button from "@modrinth/ui/src/components/base/Button.vue";
-import { ref, computed, onMounted } from "vue";
+import { Button } from "@modrinth/ui";
 
 const formatCodes = [
   { code: "§f", color: "bg-white", description: "White" },
@@ -321,16 +333,55 @@ const minecraftEmojis = [
 const motd = ref("§bSimpily Optimized §f♦ §aModrith Servers");
 const editor = ref(null);
 const showHexColorPicker = ref(false);
-const showGradientPicker = ref(false);
 const showEmojiPicker = ref(false);
 const customHexColor = ref("#000000");
-const gradientStart = ref("#000000");
-const gradientEnd = ref("#ffffff");
 const cursorPosition = ref(0);
-const lastFormattedLength = ref(0);
+const showColorButtons = ref(false);
 
-const formattedText = computed(() => {
-  return renderFormattedText(motd.value);
+const parsedMotd = computed(() => {
+  const parts = motd.value.split(/(§[0-9a-flmnor]|§x[0-9A-Fa-f]{6}|§#[0-9A-Fa-f]{6}|§g\{[^}]+\})/);
+  let currentStyle = {};
+  const result = [];
+
+  parts.forEach((part, index) => {
+    if (part.match(/^§[0-9a-f]$/)) {
+      currentStyle.color = colorMap[part] || "";
+      result.push({ type: "code", content: part, style: { ...currentStyle } });
+    } else if (part.match(/^§x[0-9A-Fa-f]{6}$/)) {
+      const hexColor = part.slice(2);
+      currentStyle.color = `#${hexColor}`;
+      result.push({ type: "code", content: part, style: { ...currentStyle } });
+    } else if (part.match(/^§#[0-9A-Fa-f]{6}$/)) {
+      const hexColor = part.slice(2);
+      currentStyle.color = hexColor;
+      result.push({ type: "code", content: part, style: { ...currentStyle } });
+    } else if (part.match(/^§g\{[^}]+\}$/)) {
+      const gradientColors = part.slice(3, -1).split(",");
+      currentStyle.background = `linear-gradient(to right, ${gradientColors.join(", ")})`;
+      currentStyle.webkitBackgroundClip = "text";
+      currentStyle.webkitTextFillColor = "transparent";
+      result.push({ type: "code", content: part, style: { ...currentStyle } });
+    } else if (part === "§l") {
+      currentStyle.fontWeight = "bold";
+      result.push({ type: "code", content: part, style: { ...currentStyle } });
+    } else if (part === "§m") {
+      currentStyle.textDecoration = "line-through";
+      result.push({ type: "code", content: part, style: { ...currentStyle } });
+    } else if (part === "§n") {
+      currentStyle.textDecoration = "underline";
+      result.push({ type: "code", content: part, style: { ...currentStyle } });
+    } else if (part === "§o") {
+      currentStyle.fontStyle = "italic";
+      result.push({ type: "code", content: part, style: { ...currentStyle } });
+    } else if (part === "§r") {
+      currentStyle = {};
+      result.push({ type: "code", content: part, style: { ...currentStyle } });
+    } else {
+      result.push({ type: "text", content: part, style: { ...currentStyle } });
+    }
+  });
+
+  return result;
 });
 
 const insertFormatCode = (code) => {
@@ -338,6 +389,13 @@ const insertFormatCode = (code) => {
     motd.value.slice(0, cursorPosition.value) + code + motd.value.slice(cursorPosition.value);
   motd.value = newMotd;
   cursorPosition.value += code.length;
+  updateEditorContent();
+};
+
+const removeFormatCode = (index) => {
+  const parts = [...parsedMotd.value];
+  parts.splice(index, 1);
+  motd.value = parts.map((part) => part.content).join("");
   updateEditorContent();
 };
 
@@ -370,9 +428,10 @@ const handleInput = (e) => {
   const rawPosition = formattedToRawPosition(actualPosition);
 
   // Update motd while preserving formatting codes
+  // strip out all color codes
   const newText = extractRawText(e.target.innerHTML);
-  console.log(newText);
-  motd.value = insertTextPreservingFormatting(motd.value, newText);
+  console.log(motd.value, newText);
+  motd.value = newText;
 
   // Update cursor position
   cursorPosition.value = rawPosition + (newText.length - extractRawText(motd.value).length);
@@ -383,6 +442,8 @@ const handleInput = (e) => {
 const insertTextPreservingFormatting = (text, newText) => {
   const parts = text.split(/(§[0-9a-flmnor]|§x[0-9A-Fa-f]{6}|§#[0-9A-Fa-f]{6}|§g\{[^}]+\})/);
   let result = "";
+
+  console.log(text, newText);
 
   for (let part of parts) {
     if (part.startsWith("§")) {
@@ -424,10 +485,23 @@ const extractRawText = (html) => {
 
 const updateEditorContent = () => {
   if (editor.value) {
-    const formattedContent = renderFormattedText(motd.value);
-    if (editor.value.innerHTML !== formattedContent) {
-      editor.value.innerHTML = formattedContent;
-    }
+    editor.value.innerHTML = "";
+    parsedMotd.value.forEach((part, index) => {
+      if (part.type === "text") {
+        const span = document.createElement("span");
+        span.textContent = part.content;
+        Object.assign(span.style, part.style);
+        editor.value.appendChild(span);
+      } else if (part.type === "code" && showColorButtons.value) {
+        const button = document.createElement("button");
+        button.textContent = part.content;
+        button.className =
+          "inline-flex items-center justify-center px-1 py-0.5 text-xs bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
+        Object.assign(button.style, part.style);
+        button.addEventListener("click", () => removeFormatCode(index));
+        editor.value.appendChild(button);
+      }
+    });
     nextTick(() => {
       setCaretPosition(editor.value, cursorPosition.value);
     });
@@ -470,41 +544,6 @@ const setCaretPosition = (element, position) => {
   }
 };
 
-const renderFormattedText = (text) => {
-  const parts = text.split(/(§[0-9a-flmnor]|§x[0-9A-Fa-f]{6}|§#[0-9A-Fa-f]{6}|§g\{[^}]+\})/);
-  let currentStyle = "";
-  let formattedText = "";
-
-  parts.forEach((part) => {
-    if (part.match(/^§[0-9a-f]$/)) {
-      currentStyle = `color: ${colorMap[part]};` || "";
-    } else if (part.match(/^§x[0-9A-Fa-f]{6}$/)) {
-      const hexColor = part.slice(2);
-      currentStyle = `color: #${hexColor};`;
-    } else if (part.match(/^§#[0-9A-Fa-f]{6}$/)) {
-      const hexColor = part.slice(2);
-      currentStyle = `color: ${hexColor};`;
-    } else if (part.match(/^§g\{[^}]+\}$/)) {
-      const gradientColors = part.slice(3, -1).split(",");
-      currentStyle = `background: linear-gradient(to right, ${gradientColors.join(", ")}); -webkit-background-clip: text; -webkit-text-fill-color: transparent;`;
-    } else if (part === "§l") {
-      currentStyle += " font-weight: bold;";
-    } else if (part === "§m") {
-      currentStyle += " text-decoration: line-through;";
-    } else if (part === "§n") {
-      currentStyle += " text-decoration: underline;";
-    } else if (part === "§o") {
-      currentStyle += " font-style: italic;";
-    } else if (part === "§r") {
-      currentStyle = "";
-    } else {
-      formattedText += `<span style="${currentStyle}">${part}</span>`;
-    }
-  });
-
-  return formattedText;
-};
-
 const openHexColorPicker = () => {
   showHexColorPicker.value = true;
 };
@@ -512,16 +551,6 @@ const openHexColorPicker = () => {
 const applyHexColor = () => {
   insertFormatCode(`§#${customHexColor.value.slice(1)}`);
   showHexColorPicker.value = false;
-};
-
-const openGradientPicker = () => {
-  showGradientPicker.value = true;
-};
-
-const applyGradient = () => {
-  const gradientCode = `§g{${gradientStart.value},${gradientEnd.value}}`;
-  insertFormatCode(gradientCode);
-  showGradientPicker.value = false;
 };
 
 const openEmojiPicker = () => {
@@ -533,11 +562,9 @@ const insertEmoji = (emoji) => {
   showEmojiPicker.value = false;
 };
 
-onMounted(() => {
-  if (editor.value) {
-    editor.value.innerHTML = renderFormattedText(motd.value);
-  }
-});
+const toggleColorButtons = () => {
+  showColorButtons.value = !showColorButtons.value;
+};
 </script>
 
 <style scoped>

@@ -53,12 +53,12 @@ import { Button, Modal, DropdownSelect } from "@modrinth/ui";
 import { ref, computed } from "vue";
 
 interface Mod {
-  name: string;
+  name?: string;
   filename: string;
-  project_id: string;
-  version_id: string;
-  version_number: string;
-  icon_url: string;
+  project_id?: string;
+  version_id?: string;
+  version_number?: string;
+  icon_url?: string;
   disabled: boolean;
 }
 
@@ -82,7 +82,7 @@ const { data: mods, status: modsStatus } = await useLazyAsyncData("content-mods-
 });
 
 const sortedMods = computed(() => {
-  return mods.value?.sort((a, b) => a.name.localeCompare(b.name)) || [];
+  return mods.value?.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? "")) || [];
 });
 
 const fetchVersions = async (projectId: string) => {
@@ -118,6 +118,9 @@ const toggleMod = async (mod: Mod) => {
 
 const removeMod = async (mod: Mod) => {
   try {
+    if (!mod.project_id) {
+      throw new Error("Mod project_id is undefined");
+    }
     await serverStore.removeMod(serverId, mod.project_id);
     new Promise((resolve) =>
       setTimeout(() => {
@@ -136,16 +139,22 @@ const showAddModModal = () => {
 };
 
 const showEditModModal = async (mod: Mod) => {
+  if (!mod.project_id) {
+    throw new Error("Mod project_id is undefined");
+  }
   isEditMode.value = true;
   modalHeader.value = "Edit mod";
   selectedMod.value = mod;
-  newModVersion.value = mod.version_number;
+  newModVersion.value = mod.version_number || "";
   await fetchVersions(mod.project_id);
   modModal.value.show();
 };
 
 const handleModAction = async (mod: Mod, version_number?: string) => {
   try {
+    if (!mod.project_id) {
+      throw new Error("Mod project_id is undefined");
+    }
     const versionList = await fetchVersions(mod.project_id);
     const version_id = versionList.find((x: any) =>
       x.version_number === version_number ? version_number : mod.version_number,
@@ -163,7 +172,7 @@ const handleModAction = async (mod: Mod, version_number?: string) => {
 };
 
 const versionOptions = computed(() => {
-  return selectedMod.value
+  return selectedMod.value && selectedMod.value.project_id
     ? versions.value[selectedMod.value.project_id]?.map((version: any) => version.version_number) ||
         []
     : [];
