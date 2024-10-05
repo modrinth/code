@@ -48,8 +48,11 @@
             </div>
 
             <!-- Additional allocations -->
-            <div v-for="allocation in allocations" :key="allocation.port"
-              class="flex flex-row items-center justify-between bg-bg px-4 py-4 border-t border-border">
+            <div
+              v-for="allocation in allocations"
+              :key="allocation.port"
+              class="border-border flex flex-row items-center justify-between border-t bg-bg px-4 py-4"
+            >
               <div class="flex flex-row items-center gap-4">
                 <span class="text-sm font-bold uppercase tracking-wide">{{ allocation.name }}</span>
                 <div class="font-[family-name:var(--mono-font)]">
@@ -69,8 +72,12 @@
     </div>
     <UiServersPyroLoading v-else />
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
-      <UiServersSaveBanner v-if="hasUnsavedChanges" :is-updating="isUpdating" :save="saveNetwork"
-        :reset="resetNetwork" />
+      <UiServersSaveBanner
+        v-if="hasUnsavedChanges"
+        :is-updating="isUpdating"
+        :save="saveNetwork"
+        :reset="resetNetwork"
+      />
     </div>
 
     <!-- New Allocation Modal -->
@@ -115,10 +122,7 @@ const allocations = ref(data?.value?.net?.allocations ?? []);
 const showNewAllocationModal = ref(false);
 const newAllocationName = ref("");
 
-const hasUnsavedChanges = computed(() =>
-  serverSubdomain.value !== data?.value?.net?.domain ||
-  JSON.stringify(allocations.value) !== JSON.stringify(data?.value?.net?.allocations)
-);
+const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
 
 const openNewAllocationModal = () => {
   showNewAllocationModal.value = true;
@@ -134,7 +138,7 @@ const addNewAllocation = async () => {
 
     allocations.value.push({
       name: newAllocationName.value,
-      port: newPort
+      port: newPort,
     });
 
     showNewAllocationModal.value = false;
@@ -145,7 +149,7 @@ const addNewAllocation = async () => {
 };
 
 const removeAllocation = (port: number) => {
-  allocations.value = allocations.value.filter(allocation => allocation.port !== port);
+  allocations.value = allocations.value.filter((allocation) => allocation.port !== port);
 };
 
 const saveNetwork = async () => {
