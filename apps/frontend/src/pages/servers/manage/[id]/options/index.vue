@@ -21,7 +21,7 @@
           </label>
           <UiServersMOTDEditor>
             <div
-              class="flex w-fit items-center gap-2"
+              class="group relative flex w-fit items-center gap-2"
               @dragover.prevent="onDragOver"
               @dragleave.prevent="onDragLeave"
               @drop.prevent="onDrop"
@@ -34,6 +34,11 @@
                 hidden
                 @change="uploadFile"
               />
+              <div
+                class="absolute top-0 hidden size-[6rem] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
+              >
+                <EditIcon class="h-8 w-8 text-contrast" />
+              </div>
               <img
                 v-if="data?.image"
                 no-shadow
@@ -66,6 +71,8 @@
 </template>
 
 <script setup lang="ts">
+import { EditIcon } from "@modrinth/assets";
+
 const app = useNuxtApp();
 const route = useRoute();
 const serverId = route.params.id as string;
