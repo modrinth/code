@@ -32,7 +32,7 @@
             On success, create server and redirect user to management page
           -->
           <ButtonStyled color="brand" size="large">
-            <nuxt-link class="w-fit" to="/mods"> Start your server </nuxt-link>
+            <nuxt-link class="w-fit" to="/servers/new"> Start your server </nuxt-link>
           </ButtonStyled>
           <UiServersPoweredByPyro class="!mt-0" />
         </div>

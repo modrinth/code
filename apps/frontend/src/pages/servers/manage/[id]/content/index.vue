@@ -245,10 +245,10 @@ const reinstallLoader = async (loader: string) => {
   await serverStore.reinstallServer(serverId, true, loader, selectedMCVersion.value);
 };
 
-const reinstallNew = async (project_id: string, version_number: string) => {
+const reinstallNew = async (project: any, version_number: string) => {
   editModal.value.hide();
   const versions = (await useBaseFetch(
-    `project/${project_id}/version`,
+    `project/${project.project_id}/version`,
     {},
     false,
     prodOverride,
@@ -261,6 +261,6 @@ const reinstallNew = async (project_id: string, version_number: string) => {
     throw new Error("Version not found");
   }
 
-  await serverStore.reinstallServer(serverId, false, project_id, version_id);
+  await serverStore.reinstallServer(serverId, false, project.project_id, version_id);
 };
 </script>
