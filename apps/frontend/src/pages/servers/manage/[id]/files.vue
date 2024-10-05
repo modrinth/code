@@ -103,7 +103,9 @@
     </Modal>
 
     <!-- Main Content -->
-    <div class="flex min-h-[800px] w-full flex-col rounded-xl border border-solid border-bg-raised">
+    <div
+      class="flex min-h-[800px] w-full flex-col overflow-hidden rounded-xl border border-solid border-bg-raised"
+    >
       <div
         v-if="!isEditing"
         class="flex h-12 select-none items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
