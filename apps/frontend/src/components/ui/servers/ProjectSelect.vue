@@ -15,9 +15,9 @@
     </div>
     <div class="flex h-[93%] w-full flex-col">
       <div
-        class="flex h-full w-full flex-col gap-2 overflow-y-scroll pt-2"
         v-if="mods && mods.hits.length > 0"
         ref="scrollContainer"
+        class="flex h-full w-full flex-col gap-2 overflow-y-scroll pt-2"
       >
         <div v-for="mod in mods.hits" :key="mod.title" class="rounded-lg p-2 hover:bg-divider-dark">
           <div class="flex cursor-pointer gap-2" @click="toggleMod(mod.project_id)">

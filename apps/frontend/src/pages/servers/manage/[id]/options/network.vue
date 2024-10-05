@@ -16,6 +16,35 @@
             .modrinth.gg
           </div>
         </div>
+        <div class="card flex flex-col gap-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <label for="username-field" class="flex flex-col gap-2">
+              <span class="text-lg font-bold text-contrast">Allocations</span>
+              <span>
+                Configure ports for internet-facing features like map viewers or voice chat mods.
+              </span>
+            </label>
+
+            <ButtonStyled type="standard" color="brand">
+              <button>
+                <PlusIcon />
+                <span>New Allocation</span>
+              </button>
+            </ButtonStyled>
+          </div>
+
+          <div class="flex w-full flex-col overflow-hidden rounded-xl">
+            <!-- allocation row -->
+            <div class="flex flex-row items-center justify-between bg-bg px-4 py-4">
+              <div class="flex flex-row items-center gap-4">
+                <span class="text-sm font-bold uppercase tracking-wide">Primary Allocation</span>
+                <div class="font-[family-name:var(--mono-font)]">
+                  <CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <UiServersPyroLoading v-else />
@@ -31,6 +60,9 @@
 </template>
 
 <script setup lang="ts">
+import { PlusIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
+import CopyCode from "~/components/ui/CopyCode.vue";
 import { useServerStore } from "~/stores/servers.ts";
 
 const route = useNativeRoute();
@@ -40,7 +72,9 @@ const serverStore = useServerStore();
 const isUpdating = ref(false);
 const data = computed(() => serverStore.serverData[serverId]);
 
+const serverIP = ref(data?.value?.net?.ip ?? "");
 const serverSubdomain = ref(data?.value?.net?.domain ?? "");
+const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
 
 const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
 

@@ -1,7 +1,7 @@
 <template>
   <Modal ref="editModal" header="">
     <div class="h-[500px]">
-      <UiServersPyroModal @modal="editModal.hide()" header="Edit project" :data="data">
+      <UiServersPyroModal header="Edit project" :data="data" @modal="editModal.hide()">
         <UiServersProjectSelect type="modpack" @select="reinstallNew" />
       </UiServersPyroModal>
     </div>
@@ -39,11 +39,14 @@
       </div>
     </div>
   </Modal>
+
   <div class="flex h-full w-full flex-col">
-    <div v-if="data && versions" class="flex w-full flex-col gap-6 p-8">
+    <div v-if="data && versions" class="flex w-full flex-col gap-6 px-8 py-4">
+      <h2 class="m-0 text-3xl font-bold">Modpack</h2>
+      <p class="m-0">This is the modpack that is currently installed on your server.</p>
       <div
-        class="flex w-full justify-between gap-2 rounded-xl bg-bg-raised p-4"
         v-if="data.upstream"
+        class="flex w-full justify-between gap-2 rounded-xl bg-bg-raised p-4"
       >
         <div class="flex gap-4">
           <UiAvatar :src="data.project?.icon_url" size="120px" />
@@ -93,6 +96,8 @@
         </div>
       </div>
 
+      <h2 class="m-0 text-3xl font-bold">Mod Loader</h2>
+      <p class="m-0">This is the modpack that is currently installed on your server.</p>
       <div class="flex w-full items-center justify-between rounded-xl bg-bg-raised p-2 pr-4">
         <div class="flex items-center gap-2">
           <Button

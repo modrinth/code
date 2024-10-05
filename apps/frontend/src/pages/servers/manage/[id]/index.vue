@@ -656,16 +656,10 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
   try {
     isActioning.value = true;
     await serverStore.sendPowerAction(serverId, actionName);
-    notifySuccess(
-      `${actionName}ing server`,
-      `Your server is now ${actionName.toLowerCase()}ing. This may take a few moments.`,
-    );
+    notifySuccess(`${actionName}ing server`, `This may take a few moments.`);
   } catch (error) {
     console.error(`Error ${actionName}ing server:`, error);
-    notifyError(
-      `Error ${actionName}ing server`,
-      "An error occurred while attempting to perform the action.",
-    );
+    notifyError(`Error ${actionName}ing server`, "An error occurred while performing this action.");
   } finally {
     isActioning.value = false;
   }

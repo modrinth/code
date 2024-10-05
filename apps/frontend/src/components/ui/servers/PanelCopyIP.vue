@@ -1,12 +1,15 @@
 <template>
-  <button aria-label="Copy server IP" class="btn btn-transparent text-sm" @click="copyText">
-    <CopyIcon />
-    Copy IP
-  </button>
+  <ButtonStyled type="standard">
+    <button aria-label="Copy server IP" @click="copyText">
+      <CopyIcon />
+      Copy IP
+    </button>
+  </ButtonStyled>
 </template>
 
 <script setup lang="ts">
 import { CopyIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
 import { useNuxtApp } from "#app";
 
 const app = useNuxtApp();

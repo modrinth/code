@@ -49,6 +49,8 @@
           <p>Server properties</p>
         </NuxtLink>
       </div>
+
+      <FolderOpenIcon class="absolute right-8 top-8 size-8" />
     </div>
   </div>
 </template>

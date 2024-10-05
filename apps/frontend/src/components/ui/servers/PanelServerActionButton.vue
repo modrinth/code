@@ -2,7 +2,7 @@
   <div class="flex flex-row items-center gap-2 rounded-lg">
     <!-- start -->
     <ButtonStyled type="standard" color="brand">
-      <button class="!rounded-md" :disabled="isActioning" @click="handleAction">
+      <button :disabled="isActioning" @click="handleAction">
         <div v-if="isActioning" class="grid place-content-center">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path
@@ -25,7 +25,7 @@
     </ButtonStyled>
 
     <ButtonStyled v-if="isOnline" type="standard" color="red">
-      <button v-if="isOnline" class="!rounded-md" @click="stopServer">
+      <button v-if="isOnline" @click="stopServer">
         <div class="flex gap-1">
           <StopCircleIcon class="h-5 w-5" />
           <span> Stop </span>
