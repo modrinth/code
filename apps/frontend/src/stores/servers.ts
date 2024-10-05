@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Project, Server, ServerBackup } from "~/types/servers";
+import type { Allocation, Project, Server, ServerBackup } from "~/types/servers";
 const config = true;
 
 interface ServerState {
@@ -340,6 +340,61 @@ export const useServerStore = defineStore("servers", {
         });
       } catch (error) {
         console.error("Error changing subdomain:", error);
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
+      }
+    },
+
+    async reserveNewAllocation(serverId: string): Promise<Allocation> {
+      try {
+        return await usePyroFetch<Allocation>(`servers/${serverId}/allocations`, {
+          method: "POST",
+        });
+      } catch (error) {
+        console.error("Error reserving new allocation:", error);
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
+      }
+    },
+
+    async updateAllocations(serverId: string, allocations: Allocation[]) {
+      try {
+        await usePyroFetch(`servers/${serverId}/allocations`, {
+          method: "PUT",
+          body: { allocations },
+        });
+
+        if (this.serverData[serverId]) {
+          this.serverData[serverId].net.allocations = allocations;
+        } else {
+          console.warn(
+            `Attempting to update allocations for non-existent server data. Server ID: ${serverId}`,
+          );
+        }
+      } catch (error) {
+        console.error("Error updating allocations:", error);
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
+      }
+    },
+
+    async deleteAllocation(serverId: string, allocationPort: number) {
+      try {
+        await usePyroFetch(`servers/${serverId}/allocations/${allocationPort}`, {
+          method: "DELETE",
+        });
+
+        if (this.serverData[serverId]) {
+          this.serverData[serverId].net.allocations = this.serverData[
+            serverId
+          ].net.allocations.filter((allocation) => allocation.port !== allocationPort);
+        } else {
+          console.warn(
+            `Attempting to delete allocation for non-existent server data. Server ID: ${serverId}`,
+          );
+        }
+      } catch (error) {
+        console.error("Error deleting allocation:", error);
         this.error = error instanceof Error ? error : new Error("An unknown error occurred");
         throw this.error;
       }

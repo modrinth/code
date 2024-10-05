@@ -3,6 +3,7 @@
     <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 px-8 py-4">
       <h2 class="m-0 text-3xl font-bold">Network</h2>
       <div class="flex h-full flex-col gap-2">
+        <!-- Subdomain section -->
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Subdomain</span>
@@ -16,6 +17,8 @@
             .modrinth.gg
           </div>
         </div>
+
+        <!-- Allocations section -->
         <div class="card flex flex-col gap-4">
           <div class="flex w-full flex-row items-center justify-between">
             <label for="username-field" class="flex flex-col gap-2">
@@ -25,7 +28,7 @@
               </span>
             </label>
 
-            <ButtonStyled type="standard" color="brand">
+            <ButtonStyled type="standard" color="brand" @click="openNewAllocationModal">
               <button>
                 <PlusIcon />
                 <span>New Allocation</span>
@@ -34,7 +37,7 @@
           </div>
 
           <div class="flex w-full flex-col overflow-hidden rounded-xl">
-            <!-- allocation row -->
+            <!-- Primary allocation -->
             <div class="flex flex-row items-center justify-between bg-bg px-4 py-4">
               <div class="flex flex-row items-center gap-4">
                 <span class="text-sm font-bold uppercase tracking-wide">Primary Allocation</span>
@@ -43,25 +46,56 @@
                 </div>
               </div>
             </div>
+
+            <!-- Additional allocations -->
+            <div v-for="allocation in allocations" :key="allocation.port"
+              class="flex flex-row items-center justify-between bg-bg px-4 py-4 border-t border-border">
+              <div class="flex flex-row items-center gap-4">
+                <span class="text-sm font-bold uppercase tracking-wide">{{ allocation.name }}</span>
+                <div class="font-[family-name:var(--mono-font)]">
+                  <CopyCode :text="`${serverIP}:${allocation.port}`" />
+                </div>
+              </div>
+              <ButtonStyled type="standard" @click="removeAllocation(allocation.port)">
+                <button>
+                  <TrashIcon />
+                  <span>Remove</span>
+                </button>
+              </ButtonStyled>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <UiServersPyroLoading v-else />
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
-      <UiServersSaveBanner
-        v-if="hasUnsavedChanges"
-        :is-updating="isUpdating"
-        :save="saveNetwork"
-        :reset="resetNetwork"
-      />
+      <UiServersSaveBanner v-if="hasUnsavedChanges" :is-updating="isUpdating" :save="saveNetwork"
+        :reset="resetNetwork" />
     </div>
+
+    <!-- New Allocation Modal -->
+    <Modal v-model:show="showNewAllocationModal">
+      <template #title>New Allocation</template>
+      <template #content>
+        <div class="flex flex-col gap-4">
+          <label for="allocation-name" class="flex flex-col gap-2">
+            <span class="text-lg font-bold text-contrast">Allocation Name</span>
+            <input id="allocation-name" v-model="newAllocationName" class="w-full" />
+          </label>
+        </div>
+      </template>
+      <template #footer>
+        <ButtonStyled type="standard" color="brand" @click="addNewAllocation">
+          <button>Add Allocation</button>
+        </ButtonStyled>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { PlusIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { PlusIcon, TrashIcon } from "@modrinth/assets";
+import { ButtonStyled, Modal } from "@modrinth/ui";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import { useServerStore } from "~/stores/servers.ts";
 
@@ -77,7 +111,42 @@ const serverIP = ref(data?.value?.net?.ip ?? "");
 const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
 
-const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
+const allocations = ref(data?.value?.net?.allocations ?? []);
+const showNewAllocationModal = ref(false);
+const newAllocationName = ref("");
+
+const hasUnsavedChanges = computed(() =>
+  serverSubdomain.value !== data?.value?.net?.domain ||
+  JSON.stringify(allocations.value) !== JSON.stringify(data?.value?.net?.allocations)
+);
+
+const openNewAllocationModal = () => {
+  showNewAllocationModal.value = true;
+  newAllocationName.value = "";
+};
+
+const addNewAllocation = async () => {
+  if (!newAllocationName.value) return;
+
+  try {
+    const response = await serverStore.reserveNewAllocation(serverId);
+    const newPort = response.port;
+
+    allocations.value.push({
+      name: newAllocationName.value,
+      port: newPort
+    });
+
+    showNewAllocationModal.value = false;
+    newAllocationName.value = "";
+  } catch (error) {
+    console.error("Failed to reserve new allocation:", error);
+  }
+};
+
+const removeAllocation = (port: number) => {
+  allocations.value = allocations.value.filter(allocation => allocation.port !== port);
+};
 
 const saveNetwork = async () => {
   try {
@@ -96,6 +165,7 @@ const saveNetwork = async () => {
       return;
     }
     await serverStore.changeSubdomain(serverId, serverSubdomain.value);
+    await serverStore.updateAllocations(serverId, allocations.value);
     await new Promise((resolve) => setTimeout(resolve, 500));
     // @ts-ignore
     app.$notify({
@@ -123,5 +193,6 @@ const saveNetwork = async () => {
 
 const resetNetwork = () => {
   serverSubdomain.value = data?.value?.net?.domain ?? "";
+  allocations.value = data?.value?.net?.allocations ?? [];
 };
 </script>

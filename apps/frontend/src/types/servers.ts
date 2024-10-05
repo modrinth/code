@@ -72,6 +72,11 @@ export interface ServerBackup {
   created_at: string;
 }
 
+export interface Allocation {
+  name: string;
+  port: number;
+}
+
 export interface Server {
   server_id: string;
   name: string;
@@ -80,6 +85,7 @@ export interface Server {
     ip: string;
     port: number;
     domain: string;
+    allocations: Allocation[];
   };
   game: string;
   loader: string | null;
