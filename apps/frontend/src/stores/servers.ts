@@ -20,7 +20,7 @@ export const useServerStore = defineStore("servers", {
       try {
         console.log("retrying with auth");
         return await requestFn();
-      } catch (err: any) {
+      } catch {
         await this.refreshFileApiInfo(serverId);
         return await requestFn();
       }
@@ -52,7 +52,9 @@ export const useServerStore = defineStore("servers", {
             };
           });
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error processing server image:", error);
+      }
 
       if (image.value === null && data.project?.icon_url) {
         try {
@@ -442,7 +444,6 @@ export const useServerStore = defineStore("servers", {
     async confirmFileApiInfo(serverId: string) {
       if (this.fileAPIAuth[serverId] === null) {
         await this.refreshFileApiInfo(serverId);
-        return;
       }
     },
 
@@ -458,7 +459,7 @@ export const useServerStore = defineStore("servers", {
     async createFileOrFolder(
       serverId: string,
       path: string,
-      name: string,
+      // name: string,
       type: "file" | "directory",
     ) {
       await this.confirmFileApiInfo(serverId);

@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isConnected && !isWSAuthIncorrect"
-    class="relative flex flex-col gap-6"
+    class="relative flex select-none flex-col gap-6"
     data-pyro-server-manager-root
   >
     <div
@@ -37,7 +37,7 @@
         :full-screen="fullScreen"
         @toggle-full-screen="toggleFullScreen"
       >
-        <div class="relative w-full px-2.5 pt-2">
+        <div class="relative w-full px-4 pt-4">
           <ul
             v-if="suggestions.length"
             id="command-suggestions"
@@ -46,8 +46,8 @@
           >
             <li
               v-for="(suggestion, index) in suggestions"
-              :key="index"
               :id="'suggestion-' + index"
+              :key="index"
               role="option"
               :aria-selected="index === selectedSuggestionIndex"
               :class="[
@@ -67,8 +67,8 @@
               {{ ".".repeat(commandInput.length - 1) }}{{ bestSuggestion }}
               <button
                 class="text z-50 cursor-pointer border-none bg-transparent text-sm focus:outline-none"
-                @click="acceptSuggestion"
                 aria-label="Accept suggestion"
+                @click="acceptSuggestion"
               >
                 TAB
               </button>
@@ -78,14 +78,14 @@
               v-model="commandInput"
               type="text"
               placeholder="Send a command"
-              class="z-50 w-full rounded-md p-2 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+              class="z-50 w-full rounded-md px-4 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+              aria-autocomplete="list"
+              aria-controls="command-suggestions"
+              :aria-activedescendant="'suggestion-' + selectedSuggestionIndex"
               @keydown.tab.prevent="acceptSuggestion"
               @keydown.down.prevent="selectNextSuggestion"
               @keydown.up.prevent="selectPrevSuggestion"
               @keydown.enter.prevent="sendCommand"
-              aria-autocomplete="list"
-              aria-controls="command-suggestions"
-              :aria-activedescendant="'suggestion-' + selectedSuggestionIndex"
             />
           </div>
         </div>
@@ -484,7 +484,7 @@ const getSuggestions = (input: string): string[] => {
 
   if (currentLevel) {
     const lastToken = tokens[tokens.length - 1]?.toLowerCase() || "";
-    let possibleKeys = Object.keys(currentLevel);
+    const possibleKeys = Object.keys(currentLevel);
     if (currentLevel[DYNAMIC_ARG]) {
       possibleKeys.push("<arg>");
     }
@@ -537,6 +537,7 @@ const acceptSuggestion = () => {
 
   // check if last current token is in command tree if so just add to the end
   if (currentTokens[currentTokens.length - 1].toLowerCase() === suggestionTokens[0].toLowerCase()) {
+    /* empty */
   } else {
     commandInput.value =
       commandInput.value +

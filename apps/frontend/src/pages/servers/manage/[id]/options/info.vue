@@ -1,23 +1,25 @@
 <template>
   <div class="h-full w-full overflow-y-auto">
-    <div v-if="data" class="flex h-full w-full flex-col gap-2 p-8">
+    <div v-if="data" class="flex h-full w-full flex-col gap-2 px-8 py-4">
       <h2 class="text-3xl font-bold">Info</h2>
-      <table
-        class="min-w-full border-collapse overflow-hidden rounded-lg border-2 border-gray-300 shadow-lg"
-      >
-        <tbody>
-          <tr
-            v-for="property in properties"
-            :key="property.name"
-            class="border-0 border-b border-solid border-bg-raised"
-          >
-            <td class="py-3">{{ property.name }}</td>
-            <td class="px-4 py-3">
-              <UiCopyCode :text="property.value" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="card">
+        <table
+          class="min-w-full border-collapse overflow-hidden rounded-lg border-2 border-gray-300"
+        >
+          <tbody>
+            <tr
+              v-for="property in properties"
+              :key="property.name"
+              class="border-0 border-b border-solid border-bg-raised"
+            >
+              <td class="py-3">{{ property.name }}</td>
+              <td class="px-4">
+                <UiCopyCode :text="property.value" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <UiServersPyroLoading v-else />
   </div>

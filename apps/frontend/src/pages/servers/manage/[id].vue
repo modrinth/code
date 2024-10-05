@@ -12,7 +12,7 @@
           no-shadow
           size="lg"
           alt="Server Icon"
-          class="h-[9rem] w-[9rem] rounded-xl bg-bg-raised"
+          class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised"
           :src="serverData.image"
         />
         <img
@@ -20,10 +20,10 @@
           no-shadow
           size="lg"
           alt="Server Icon"
-          class="h-[9rem] w-[9rem] rounded-xl bg-bg-raised"
+          class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised"
           src="~/assets/images/servers/minecraft_server_icon.png"
         />
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
           <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
               <LeftArrowIcon />
@@ -56,7 +56,7 @@
         <UiNavTabs :links="navLinks" />
       </div>
 
-      <div data-pyro-mount class="h-full w-full">
+      <div data-pyro-mount class="h-full w-full flex-1">
         <NuxtPage :route="route" />
       </div>
 

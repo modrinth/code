@@ -1,15 +1,15 @@
 <template>
-  <div>
+  <div class="flex h-full w-full flex-1">
     <!-- Create Item Modal -->
     <Modal ref="createItemModal" header="">
       <UiServersPyroModal
-        @modal="createItemModal?.hide()"
         :header="`Create ${newItemType}`"
         :data="data"
+        @modal="createItemModal?.hide()"
       >
         <div class="mt-2 flex flex-col gap-2">
           <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <input type="text" class="w-full" v-model="newItemName" />
+          <input v-model="newItemName" type="text" class="w-full" />
         </div>
         <div class="mb-4 mt-4 flex justify-end gap-4">
           <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
@@ -21,9 +21,9 @@
     <!-- Rename Item Modal -->
     <Modal ref="renameItemModal" header="">
       <UiServersPyroModal
-        @modal="renameItemModal?.hide()"
         :header="`Rename ${selectedItem?.type}`"
         :data="data"
+        @modal="renameItemModal?.hide()"
       >
         <div class="mt-2 flex flex-col gap-2">
           <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
@@ -44,9 +44,9 @@
     <!-- Move Item Modal -->
     <Modal ref="moveItemModal" header="">
       <UiServersPyroModal
-        @modal="moveItemModal?.hide()"
         :header="`Move ${selectedItem?.name}`"
         :data="data"
+        @modal="moveItemModal?.hide()"
       >
         <div class="mt-2 flex flex-col gap-2">
           <UiServersFileTree
@@ -69,10 +69,10 @@
     <!-- Delete Item Modal -->
     <Modal ref="deleteItemModal" header="">
       <UiServersPyroModal
-        @modal="deleteItemModal?.hide()"
         :header="`Delete ${selectedItem?.type}`"
         :data="data"
         danger
+        @modal="deleteItemModal?.hide()"
       >
         <div class="flex flex-col gap-4">
           <div class="relative flex w-full items-center gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
@@ -103,17 +103,17 @@
     </Modal>
 
     <!-- Main Content -->
-    <div class="flex h-[631px] w-full flex-col rounded-xl border border-solid border-bg-raised">
+    <div class="flex min-h-[800px] w-full flex-col rounded-xl border border-solid border-bg-raised">
       <div
         v-if="!isEditing"
-        class="flex h-12 items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
+        class="flex h-12 select-none items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
       >
         <div class="flex items-center gap-2 text-contrast">
           <span
             class="breadcrumb-link flex cursor-pointer items-center gap-2"
             @click="navigateToSegment(-1)"
           >
-            <BoxIcon class="h-6 w-6 text-brand" />
+            <BoxIcon class="h-5 w-5" />
             <span class="opacity-50">/</span>
           </span>
           <span
@@ -151,11 +151,12 @@
         class="flex h-12 items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
       >
         <div class="flex items-center gap-2 text-contrast">
-          <span
-            class="breadcrumb-link flex cursor-pointer items-center gap-2"
-            @click="navigateToSegment(-1)"
-          >
-            <BoxIcon class="h-6 w-6 text-brand" />
+          <ButtonStyled type="transparent">
+            <Button @click="cancelEditing">
+              <XIcon aria-hidden="true" />
+            </Button>
+          </ButtonStyled>
+          <span class="breadcrumb-link flex cursor-pointer items-center gap-2">
             <span class="text-lg font-bold">{{ editingFile?.name }}</span>
           </span>
         </div>
@@ -187,15 +188,10 @@
               </template>
             </OverflowMenu>
           </ButtonStyled>
-          <ButtonStyled type="transparent">
-            <Button @click="cancelEditing">
-              <XIcon aria-hidden="true" />
-            </Button>
-          </ButtonStyled>
         </div>
       </div>
 
-      <div v-if="isEditing" class="flex-grow overflow-hidden">
+      <div v-if="isEditing" class="h-full w-full flex-grow overflow-hidden">
         <component
           :is="VAceEditor"
           v-model:value="fileContent"
@@ -226,7 +222,7 @@
           @move="showMoveModal(item)"
           @edit="editFile(item)"
         />
-        <div class="flex h-10 animate-pulse items-center justify-center gap-2" v-if="isLoading">
+        <div v-if="isLoading" class="flex h-10 animate-pulse items-center justify-center gap-2">
           <PyroIcon class="h-4 w-4" /> Loading...
         </div>
         <div v-if="loadError">Error loading directories</div>
@@ -301,6 +297,7 @@ const items = ref<any[]>([]);
 const isLoading = ref(true);
 const loadError = ref(false);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { reset } = useInfiniteScroll(
   scrollContainer,
   () => {
@@ -442,7 +439,7 @@ const createNewItem = async () => {
   try {
     const path =
       typeof currentPath.value === "string" ? currentPath.value : currentPath.value.join("/");
-    await serverStore.createFileOrFolder(serverId, path, newItemName.value, newItemType.value);
+    await serverStore.createFileOrFolder(serverId, path, newItemType.value);
 
     currentPage.value = 1;
     items.value = [];

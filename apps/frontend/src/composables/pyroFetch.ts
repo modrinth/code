@@ -23,6 +23,7 @@ export class PyroFetchError extends Error {
   }
 }
 
+// eslint-disable-next-line require-await
 export async function PyroAuthOverride() {
   return true;
 }
@@ -74,7 +75,7 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
       headers,
       body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
       timeout: 10000,
-      retry: options.retry !== false ?? method === "GET" ? 3 : 0,
+      retry: options.retry !== false ? (method === "GET" ? 3 : 0) : 0,
     });
     return response;
   } catch (error) {
@@ -88,15 +89,16 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
         403: "Forbidden",
         404: "Not Found",
         500: "Internal Server Error",
+        502: "Bad Gateway",
       };
       const message =
         statusCode && statusCode in errorMessages
           ? errorMessages[statusCode]
           : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
-      throw new PyroFetchError(`[PYRO] ${message}`, statusCode, error);
+      throw new PyroFetchError(`[PYROFETCH][PYRO] ${message}`, statusCode, error);
     }
     throw new PyroFetchError(
-      "[PYRO] An unexpected error occurred during the fetch operation.",
+      "[PYROFETCH][PYRO] An unexpected error occurred during the fetch operation.",
       undefined,
       error as Error,
     );

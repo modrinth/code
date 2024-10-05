@@ -4,9 +4,9 @@
     class="experimental-styles-within pointer-events-none mx-auto flex min-h-screen w-full max-w-[1280px] select-none flex-col gap-6 px-3"
   >
     <div class="flex flex-row items-center gap-6 pt-4">
-      <div class="h-[128px] w-[128px] animate-pulse rounded-2xl bg-bg-raised"></div>
-      <div class="flex flex-col gap-4">
-        <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
+      <div class="h-[6rem] w-[6rem] animate-pulse rounded-2xl bg-bg-raised"></div>
+      <div class="flex flex-col gap-2">
+        <div class="-mb-1 flex shrink-0 flex-row items-center gap-1">
           <a href="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +28,7 @@
         <span class="h-[2.2rem] w-[200px] animate-pulse rounded-full bg-bg-raised"></span>
         <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
           <div class="flex flex-row items-center gap-2">
-            <img src="~/assets/images/games/minecraft.png" alt="Minecraft Logo" class="size-5" />
+            <GameIcon aria-hidden="true" class="size-5 text-secondary" />
             <span class="text-sm font-semibold">Minecraft</span>
             <span class="h-4 w-[40px] rounded-full bg-bg-raised"></span>
           </div>
@@ -78,3 +78,7 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { GameIcon } from "@modrinth/assets";
+</script>

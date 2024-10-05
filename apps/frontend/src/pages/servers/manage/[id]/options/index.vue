@@ -1,12 +1,12 @@
 <template>
   <div class="relative h-full w-full overflow-y-auto">
-    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 p-8">
-      <h2 class="text-3xl font-bold">General</h2>
+    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 px-8 py-4">
+      <h2 class="m-0 text-3xl font-bold">General</h2>
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Server name</span>
-            <span> Change the name of your server as it appears on Modrinth </span>
+            <span class="text-lg font-bold text-contrast">Server Name</span>
+            <span> Change the name of your server. This name is only visible on Modrinth. </span>
           </label>
           <input v-model="serverName" class="w-full md:w-[50%]" @keyup.enter="saveGeneral" />
         </div>
@@ -15,24 +15,24 @@
           <label for="username-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server Display</span>
             <span>
-              Upload a new server icon for your server will show up both on Modrinth and in the
-              server list and edit your MOTD with a preview of the minecraft server listing
+              Change your server's icon and MOTD. Changes will be visible on the server list and on
+              Modrinth.
             </span>
           </label>
           <UiServersMOTDEditor>
             <div
+              class="flex w-fit items-center gap-2"
               @dragover.prevent="onDragOver"
               @dragleave.prevent="onDragLeave"
               @drop.prevent="onDrop"
               @click="triggerFileInput"
-              class="flex w-fit items-center gap-2"
             >
               <input
                 v-if="data?.image"
                 type="file"
                 accept="image/png,image/jpeg,image/gif,image/webp"
-                @change="uploadFile"
                 hidden
+                @change="uploadFile"
               />
               <img
                 v-if="data?.image"

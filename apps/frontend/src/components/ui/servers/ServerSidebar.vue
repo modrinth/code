@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="relative h-[50vh] w-full grid-cols-1 rounded-xl border border-solid border-bg-raised md:flex"
-  >
+  <div class="relative w-full grid-cols-1 md:flex">
     <div class="absolute flex h-full flex-col md:relative">
       <div
         class="z-10 flex w-10 items-center gap-2 rounded-tl-xl text-lg font-bold text-contrast md:hidden"
@@ -16,7 +14,7 @@
       </div>
 
       <div
-        class="z-10 flex h-[95%] w-[16rem] flex-col gap-2 rounded-t-none rounded-bl-xl border-0 border-r border-solid border-bg-raised bg-table-alternateRow p-4 md:mt-0 md:h-full md:rounded-l-xl"
+        class="z-10 flex w-[16rem] select-none flex-col gap-2 rounded-xl border-0 border-r border-solid border-bg-raised bg-table-alternateRow p-4 md:mt-0 md:h-full md:rounded-l-xl"
         :class="{
           'hidden md:flex': !sidebarVisible,
         }"
@@ -24,8 +22,8 @@
         <div v-for="link in navLinks" :key="link.label">
           <nuxt-link
             :to="link.href"
-            class="flex items-center gap-2 rounded-xl p-2 hover:bg-brand-highlight hover:text-brand"
-            :class="{ 'bg-brand-highlight text-brand': route.path === link.href }"
+            class="flex items-center gap-2 rounded-xl p-2 hover:bg-button-bg"
+            :class="{ 'bg-button-bg text-contrast': route.path === link.href }"
           >
             <div class="flex items-center gap-2 font-bold">
               <component :is="link.icon" class="h-6 w-6" />

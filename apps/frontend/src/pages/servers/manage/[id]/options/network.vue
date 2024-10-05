@@ -1,12 +1,15 @@
 <template>
   <div class="relative h-full w-full overflow-y-auto">
-    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 p-8">
-      <h2 class="text-3xl font-bold">Network</h2>
+    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 px-8 py-4">
+      <h2 class="m-0 text-3xl font-bold">Network</h2>
       <div class="flex h-full flex-col gap-2">
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Subdomain</span>
-            <span> Change the subdomain to connect to your server </span>
+            <span>
+              Change the subdomain of your server. Your friends can use this subdomain to connect to
+              your server.
+            </span>
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
             <input v-model="serverSubdomain" class="h-[50%] w-[63%]" @keyup.enter="saveNetwork" />
@@ -67,6 +70,7 @@ const saveNetwork = async () => {
       text: "Your server settings were successfully changed.",
     });
   } catch (error) {
+    console.error(error);
     // @ts-ignore
     app.$notify({
       group: "serverOptions",

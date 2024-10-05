@@ -2,9 +2,9 @@
   <div class="relative h-full w-full overflow-y-auto">
     <div
       v-if="propsData"
-      class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto p-8"
+      class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto px-8 py-4"
     >
-      <h2 class="text-3xl font-bold">server.properties</h2>
+      <h2 class="m-0 text-3xl font-bold">server.properties</h2>
       <div
         v-for="(property, index) in liveProperties"
         :key="index"
@@ -103,7 +103,7 @@ const isUpdating = ref(false);
 const changedPropertiesState = ref({});
 
 const data = computed(() => serverStore.serverData[serverId]);
-const { data: propsData, status } = await useAsyncData(
+const { data: propsData } = await useAsyncData(
   "ServerProperties",
   async () => await serverStore.fetchConfigFile(serverId, "ServerProperties"),
 );
@@ -200,7 +200,6 @@ const saveProperties = async () => {
     });
   } finally {
     isUpdating.value = false;
-    return;
   }
 };
 

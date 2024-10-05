@@ -1,15 +1,14 @@
 <template>
-  <div data-pyro-server-stats class="flex flex-col items-center gap-6 md:flex-row">
+  <div data-pyro-server-stats class="flex select-none flex-col items-center gap-6 md:flex-row">
     <div
       v-for="(metric, index) in metrics"
       :key="index"
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-8"
+      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ metric.value }}
         </h2>
-        <ChevronRightIcon />
       </div>
       <h3>{{ metric.title }}</h3>
 
@@ -26,28 +25,25 @@
       </ClientOnly>
     </div>
 
-    <div
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-8"
-    >
+    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ formatBytes(data.current.storage_usage_bytes) }}
         </h2>
-        <ChevronRightIcon />
       </div>
       <h3>Storage usage</h3>
 
       <div class="flex flex-col gap-2 pt-3">
         <NuxtLink
           :to="`/servers/manage/${serverId}/files`"
-          class="flex h-5 flex-row items-center gap-2 text-sm"
+          class="flex h-5 flex-row items-center gap-2 text-sm transition hover:underline hover:brightness-150"
         >
           <FolderOpenIcon />
           <p>World</p>
         </NuxtLink>
         <NuxtLink
           :to="`/servers/manage/${serverId}/options/properties`"
-          class="flex h-5 flex-row items-center gap-2 text-sm"
+          class="flex h-5 flex-row items-center gap-2 text-sm transition hover:underline hover:brightness-150"
         >
           <FileTextIcon />
           <p>Server properties</p>
@@ -59,7 +55,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, markRaw } from "vue";
-import { FileTextIcon, FolderOpenIcon, ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
+import { FileTextIcon, FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 import type { Stats } from "~/types/servers";
 
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
