@@ -10,6 +10,7 @@
           </label>
           <input v-model="serverName" class="w-full md:w-[50%]" @keyup.enter="saveGeneral" />
         </div>
+        
 
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
