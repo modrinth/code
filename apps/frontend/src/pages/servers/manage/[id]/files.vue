@@ -204,7 +204,7 @@
       <div
         v-else-if="items.length > 0"
         ref="scrollContainer"
-        class="h-full w-full snap-y overflow-y-auto overflow-x-hidden"
+        class="h-full w-full snap-y overflow-x-hidden"
       >
         <UiServersFileItem
           v-for="item in items"

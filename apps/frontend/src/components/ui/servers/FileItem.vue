@@ -1,6 +1,9 @@
 <template>
   <div
-    class="group flex w-full cursor-pointer items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem] last:border-none hover:bg-bg-raised"
+    :class="[
+      'group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem] last:border-none hover:bg-bg-raised',
+      isNonEditableFile ? '' : 'cursor-pointer',
+    ]"
   >
     <div class="flex w-full items-center gap-2" @click="selectItem">
       <div
@@ -130,10 +133,43 @@ const navigateToFolder = () => {
   }
 };
 
+const nonEditableExtensions = [
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "bmp",
+  "tiff",
+  "jar",
+  "exe",
+  "zip",
+  "rar",
+  "7z",
+  "tar",
+  "gz",
+  "bz2",
+  "xz",
+  "pdf",
+  "doc",
+  "docx",
+  "xls",
+  "xlsx",
+  "ppt",
+  "pptx",
+];
+
+const isNonEditableFile = computed(() => {
+  if (props.type === "file") {
+    const fileExtension = props.name.split(".").pop()?.toLowerCase();
+    return nonEditableExtensions.includes(fileExtension || "");
+  }
+  return false;
+});
+
 const selectItem = () => {
   if (props.type === "directory") {
     navigateToFolder();
-  } else {
+  } else if (props.type === "file" && !isNonEditableFile.value) {
     emit("edit", { name: props.name, type: props.type, path: props.path });
   }
 };
