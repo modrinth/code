@@ -10,7 +10,6 @@
               Change the subdomain of your server. Your friends can use this subdomain to connect to
               your server.
             </span>
-
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
             <input v-model="serverSubdomain" class="h-[50%] w-[63%]" @keyup.enter="saveNetwork" />
