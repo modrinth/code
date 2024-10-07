@@ -63,14 +63,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { ChevronRightIcon } from "@modrinth/assets";
 import type { StatusState } from "./ServerInstallStatusPill.vue";
 import type { Project, Server } from "~/types/servers";
 
 const serverStore = useServerStore();
 const prodOverride = await PyroAuthOverride();
-const route = useRoute();
 
 const props = defineProps<Partial<Server>>();
 
@@ -99,30 +98,32 @@ const { data: projectData } = await useLazyAsyncData<Project>(
 
 const image = ref<string | undefined>();
 
-try {
-  const serverId = props.server_id as string;
-  await serverStore.confirmFileApiInfo(serverId);
-  const fileData = await serverStore.retryWithAuth(serverId, async () => {
-    return await usePyroFetch(`/download?path=/server-icon-original.png`, {
-      override: serverStore.fileAPIAuth[serverId],
+if (import.meta.client) {
+  try {
+    const serverId = props.server_id as string;
+    await serverStore.confirmFileApiInfo(serverId);
+    const fileData = await serverStore.retryWithAuth(serverId, async () => {
+      return await usePyroFetch(`/download?path=/server-icon-original.png`, {
+        override: serverStore.fileAPIAuth[serverId],
+      });
     });
-  });
 
-  if (fileData instanceof Blob) {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.src = URL.createObjectURL(fileData);
-    img.onload = () => {
-      canvas.width = 200;
-      canvas.height = 200;
-      ctx?.drawImage(img, 0, 0, 200, 200);
-      const dataURL = canvas.toDataURL("image/png");
-      image.value = dataURL;
-    };
+    if (fileData instanceof Blob) {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      img.src = URL.createObjectURL(fileData);
+      img.onload = () => {
+        canvas.width = 200;
+        canvas.height = 200;
+        ctx?.drawImage(img, 0, 0, 200, 200);
+        const dataURL = canvas.toDataURL("image/png");
+        image.value = dataURL;
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching server icon:", error);
   }
-} catch (error) {
-  console.error("Error fetching server icon:", error);
 }
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
