@@ -1,8 +1,8 @@
 <template>
   <div class="contents">
-    <UiServersPanelLoading v-if="isLoading" class="h-screen" />
+    <UiServersPanelLoading v-if="initialLoading" class="h-screen" />
     <div
-      v-else-if="serverData"
+      v-else-if="serverData && serverData.status !== 'installing'"
       data-pyro-server-manager-root
       class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
     >
@@ -68,10 +68,17 @@
     </div>
 
     <UiServersPyroError v-else-if="error" :title="errorTitle" :message="errorMessage" />
+    <div v-else class="flex h-screen flex-col items-center justify-center">
+      <p class="text-lg font-bold">Get ready! We're preparing your server for you.</p>
+      <div class="h-1.5 w-full max-w-lg overflow-hidden rounded-xl bg-brand-highlight">
+        <div class="progress left-right h-full w-full bg-brand"></div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { LeftArrowIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
@@ -80,10 +87,41 @@ const serverStore = useServerStore();
 
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
-const isLoading = ref(true);
-const error = ref<Error | null>(null);
+const initialLoading = ref(true);
 
-const serverData = computed(() => serverStore.serverData[serverId]);
+const {
+  data: serverData,
+  error,
+  refresh,
+} = useAsyncData(async () => {
+  try {
+    await serverStore.fetchServerData(serverId);
+    initialLoading.value = false;
+    return serverStore.serverData[serverId];
+  } catch (err) {
+    initialLoading.value = false;
+    if (err instanceof PyroFetchError) {
+      switch (err.statusCode) {
+        case 400:
+          errorTitle.value = "Oh no, a pop-up";
+          errorMessage.value = "Request was malformed.";
+          break;
+        case 401:
+        case 404:
+          errorTitle.value = "Server Not Found";
+          errorMessage.value = "The server you are looking for does not exist.";
+          break;
+        default:
+          errorTitle.value = "Error";
+          errorMessage.value = `An error occurred: ${err.message}`;
+      }
+    } else {
+      errorTitle.value = "Unexpected Error";
+      errorMessage.value = "An unexpected error occurred while fetching server data.";
+    }
+    throw err;
+  }
+});
 
 const showGameLabel = computed(() => !!serverData.value?.game);
 const showLoaderLabel = computed(() => !!serverData.value?.loader);
@@ -105,37 +143,65 @@ const navLinks = [
   },
 ];
 
+let intervalId: ReturnType<typeof setInterval> | null = null;
+
+const startPolling = () => {
+  intervalId = setInterval(async () => {
+    await refresh();
+  }, 10000);
+};
+
+const stopPolling = () => {
+  if (intervalId) {
+    clearInterval(intervalId);
+    intervalId = null;
+  }
+};
+
+onMounted(() => {
+  if (serverData.value?.status === "installing") {
+    startPolling();
+  }
+});
+
+onUnmounted(() => {
+  stopPolling();
+});
+
+watch(
+  () => serverData.value?.status,
+  (newStatus) => {
+    if (newStatus === "installing") {
+      startPolling();
+    } else {
+      stopPolling();
+    }
+  },
+);
+
 definePageMeta({
   middleware: "auth",
 });
-
-onMounted(async () => {
-  try {
-    isLoading.value = true;
-    await serverStore.fetchServerData(serverId);
-  } catch (err) {
-    error.value = err as Error;
-    if (err instanceof PyroFetchError) {
-      switch (err.statusCode) {
-        case 400:
-          errorTitle.value = "Oh no, a pop-up";
-          errorMessage.value = "Request was malformed.";
-          break;
-        case 401:
-        case 404:
-          errorTitle.value = "Server Not Found";
-          errorMessage.value = "The server you are looking for does not exist.";
-          break;
-        default:
-          errorTitle.value = "Error";
-          errorMessage.value = `An error occurred: ${err.message}`;
-      }
-    } else {
-      errorTitle.value = "Unexpected Error";
-      errorMessage.value = "An unexpected error occurred while fetching server data.";
-    }
-  } finally {
-    isLoading.value = false;
-  }
-});
 </script>
+
+<style scoped>
+.progress {
+  animation: progress 1s infinite linear;
+}
+
+.left-right {
+  transform-origin: 0% 50%;
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(0) scaleX(0);
+  }
+  40% {
+    transform: translateX(0) scaleX(0.4);
+  }
+  100% {
+    transform: translateX(100%) scaleX(0.5);
+  }
+}
+</style>
