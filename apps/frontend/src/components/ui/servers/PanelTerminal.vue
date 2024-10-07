@@ -11,7 +11,7 @@
     >
       <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
         <ul
-          class="m-0 list-none p-0"
+          class="m-0 select-text list-none p-0"
           data-pyro-terminal-virtual-list
           :style="{ transform: `translateY(${offsetY}px)` }"
         >
