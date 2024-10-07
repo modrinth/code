@@ -8,7 +8,6 @@
     data-pyro-server-listing
     :data-pyro-server-listing-id="server_id"
   >
-    <!-- how do we want to get this now? -->
     <img
       v-if="image"
       no-shadow
