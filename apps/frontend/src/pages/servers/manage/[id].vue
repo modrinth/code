@@ -24,7 +24,7 @@
           src="~/assets/images/servers/minecraft_server_icon.png"
         />
         <div class="flex flex-col gap-2">
-          <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
+          <div class="flex shrink-0 flex-row items-center gap-1">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
               <LeftArrowIcon />
               All servers
