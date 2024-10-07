@@ -3,7 +3,7 @@
     <div
       v-for="(metric, index) in metrics"
       :key="index"
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+      class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
@@ -17,7 +17,7 @@
         <VueApexCharts
           ref="chart"
           type="area"
-          height="150"
+          height="100"
           :options="chartOptions"
           :series="[{ name: 'Chart', data: metric.data }]"
           class="chart absolute bottom-0 left-0 right-0 w-full"
@@ -25,30 +25,13 @@
       </ClientOnly>
     </div>
 
-    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
+    <div class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ formatBytes(data.current.storage_usage_bytes) }}
         </h2>
       </div>
       <h3>Storage usage</h3>
-
-      <div class="flex flex-col gap-2 pt-3">
-        <NuxtLink
-          :to="`/servers/manage/${serverId}/files`"
-          class="flex h-5 flex-row items-center gap-2 text-sm transition hover:underline hover:brightness-150"
-        >
-          <FolderOpenIcon />
-          <p>World</p>
-        </NuxtLink>
-        <NuxtLink
-          :to="`/servers/manage/${serverId}/options/properties`"
-          class="flex h-5 flex-row items-center gap-2 text-sm transition hover:underline hover:brightness-150"
-        >
-          <FileTextIcon />
-          <p>Server properties</p>
-        </NuxtLink>
-      </div>
 
       <FolderOpenIcon class="absolute right-8 top-8 size-8" />
     </div>
@@ -57,13 +40,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, markRaw } from "vue";
-import { FileTextIcon, FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
+import { FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 import type { Stats } from "~/types/servers";
 
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
-
-const route = useNativeRoute();
-const serverId = route.params.id;
 
 const props = defineProps({
   data: {

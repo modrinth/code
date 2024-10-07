@@ -15,7 +15,7 @@
     <div
       :class="[
         'relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-8 transition-all duration-300 ease-in-out',
-        fullScreen ? 'mt-0 h-[85vh]' : 'mt-[254px] h-[600px]',
+        fullScreen ? 'mt-0 h-[85vh]' : 'mt-[180px] h-[600px]',
       ]"
     >
       <div class="flex items-center justify-between">

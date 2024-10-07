@@ -1,13 +1,28 @@
 <template>
   <div class="contents">
     <UiServersPanelLoading v-if="isLoading" class="h-screen" />
-    <div v-else-if="serverData" data-pyro-server-manager-root
-      class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3">
+    <div
+      v-else-if="serverData"
+      data-pyro-server-manager-root
+      class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
+    >
       <div class="flex flex-row items-center gap-6 pt-4">
-        <img v-if="serverData?.image" no-shadow size="lg" alt="Server Icon"
-          class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised" :src="serverData.image" />
-        <img v-else no-shadow size="lg" alt="Server Icon" class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised"
-          src="~/assets/images/servers/minecraft_server_icon.png" />
+        <img
+          v-if="serverData?.image"
+          no-shadow
+          size="lg"
+          alt="Server Icon"
+          class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised"
+          :src="serverData.image"
+        />
+        <img
+          v-else
+          no-shadow
+          size="lg"
+          alt="Server Icon"
+          class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised"
+          src="~/assets/images/servers/minecraft_server_icon.png"
+        />
         <div class="flex flex-col gap-2">
           <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
@@ -22,12 +37,21 @@
           </div>
 
           <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
-            <UiServersServerGameLabel v-if="showGameLabel" :game="serverData.game!"
-              :mc-version="serverData.mc_version ?? ''" />
-            <UiServersServerLoaderLabel v-if="showLoaderLabel" :loader="serverData.loader!"
-              :loader-version="serverData.loader_version ?? ''" />
+            <UiServersServerGameLabel
+              v-if="showGameLabel"
+              :game="serverData.game!"
+              :mc-version="serverData.mc_version ?? ''"
+            />
+            <UiServersServerLoaderLabel
+              v-if="showLoaderLabel"
+              :loader="serverData.loader!"
+              :loader-version="serverData.loader_version ?? ''"
+            />
             <UiServersServerModLabel v-if="showModLabel" :mods="serverData.mods" />
-            <ServerSubdomainLabel v-if="serverData.net.domain" :subdomain="serverData.net.domain" />
+            <UiServersServerSubdomainLabel
+              v-if="serverData.net.domain"
+              :subdomain="serverData.net.domain"
+            />
           </div>
         </div>
       </div>
