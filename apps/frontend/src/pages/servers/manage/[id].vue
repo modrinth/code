@@ -7,22 +7,7 @@
       class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
     >
       <div class="flex flex-row items-center gap-6 pt-4">
-        <img
-          v-if="serverData?.image"
-          no-shadow
-          size="lg"
-          alt="Server Icon"
-          class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised"
-          :src="serverData.image"
-        />
-        <img
-          v-else
-          no-shadow
-          size="lg"
-          alt="Server Icon"
-          class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised"
-          src="~/assets/images/servers/minecraft_server_icon.png"
-        />
+        <UiServersServerIcon :server-id="serverId" />
         <div class="flex flex-col gap-2">
           <div class="flex shrink-0 flex-row items-center gap-1">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
