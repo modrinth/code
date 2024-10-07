@@ -25,7 +25,10 @@
       </ClientOnly>
     </div>
 
-    <div class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
+    <NuxtLink
+      :to="`/servers/manage/${serverId}/files`"
+      class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+    >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ formatBytes(data.current.storage_usage_bytes) }}
@@ -34,7 +37,7 @@
       <h3>Storage usage</h3>
 
       <FolderOpenIcon class="absolute right-8 top-8 size-8" />
-    </div>
+    </NuxtLink>
   </div>
 </template>
 
@@ -42,6 +45,9 @@
 import { ref, onMounted, onUnmounted, markRaw } from "vue";
 import { FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 import type { Stats } from "~/types/servers";
+
+const route = useNativeRoute();
+const serverId = route.params.id;
 
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
 
