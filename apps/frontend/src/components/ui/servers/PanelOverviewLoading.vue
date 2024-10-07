@@ -1,55 +1,33 @@
 <template>
   <div aria-hidden="true" class="pointer-events-none h-full w-full select-none">
-    <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-8">
       <div class="flex flex-row items-center gap-6">
         <div
-          class="fade-in-up relative max-h-[230px] min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+          class="fade-in-up relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
         >
           <div class="flex flex-row items-center gap-2">
-            <div class="flex flex-row items-center gap-2">
-              <div class="h-9 w-[84px] rounded-full bg-[var(--color-text-secondary)]"></div>
-            </div>
-            <ChevronRightIcon />
+            <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0.00%</h2>
           </div>
           <h3>CPU usage</h3>
           <CPUIcon class="absolute right-8 top-8" />
         </div>
         <div
-          class="fade-in-up relative max-h-[230px] min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+          class="fade-in-up relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
         >
           <div class="flex flex-row items-center gap-2">
-            <div class="flex flex-row items-center gap-2">
-              <div class="h-9 w-[84px] rounded-full bg-[var(--color-text-secondary)]"></div>
-            </div>
-            <ChevronRightIcon />
+            <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0.00%</h2>
           </div>
           <h3>Memory usage</h3>
           <DBIcon class="absolute right-8 top-8" />
         </div>
         <div
-          class="fade-in-up relative max-h-[230px] min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+          class="fade-in-up relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
         >
           <div class="flex flex-row items-center gap-2">
-            <div class="flex flex-row items-center gap-2">
-              <div class="h-9 w-[84px] rounded-full bg-[var(--color-text-secondary)]"></div>
-            </div>
-            <ChevronRightIcon />
+            <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0 MB</h2>
           </div>
           <h3>Storage usage</h3>
-          <div class="flex flex-col gap-4 pt-4">
-            <div class="flex animate-pulse flex-row items-center gap-2">
-              <div class="h-4 w-4 rounded-full bg-[var(--color-text-secondary)]"></div>
-              <span class="h-4 w-[100px] rounded-full bg-[var(--color-text-secondary)]"></span>
-            </div>
-            <div class="flex animate-pulse flex-row items-center gap-2">
-              <div class="h-4 w-4 rounded-full bg-[var(--color-text-secondary)]"></div>
-              <span class="h-4 w-[100px] rounded-full bg-[var(--color-text-secondary)]"></span>
-            </div>
-            <div class="flex animate-pulse flex-row items-center gap-2">
-              <div class="h-4 w-4 rounded-full bg-[var(--color-text-secondary)]"></div>
-              <span class="h-4 w-[100px] rounded-full bg-[var(--color-text-secondary)]"></span>
-            </div>
-          </div>
+          <FolderOpenIcon class="absolute right-8 top-8 size-8" />
         </div>
       </div>
 
@@ -91,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
+import { CPUIcon, DBIcon, FolderOpenIcon } from "@modrinth/assets";
 </script>
 
 <style scoped>
@@ -107,7 +85,7 @@ import { ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 }
 
 .fade-in-up {
-  animation: fade-in-up 600ms
+  animation: fade-in-up 400ms
     linear(
       0,
       0.006,
