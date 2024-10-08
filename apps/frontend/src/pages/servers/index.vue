@@ -21,8 +21,8 @@
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
         >
-          Start your own Minecraft server directly in the Modrinth app. Play your favorite mods,
-          plugins, and datapacks — without the hassle of setup.
+          Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins,
+          and datapacks with friends — without the hassle of setup.
         </h2>
         <div class="relative flex w-fit flex-row gap-8">
           <!--
@@ -32,7 +32,7 @@
             On success, create server and redirect user to management page
           -->
           <ButtonStyled color="brand" size="large">
-            <nuxt-link class="w-fit" to="/servers/new"> Start your server </nuxt-link>
+            <nuxt-link class="w-fit" to="#plan"> Start your server </nuxt-link>
           </ButtonStyled>
           <UiServersPoweredByPyro class="!mt-0" />
         </div>
@@ -337,6 +337,7 @@
     </section>
 
     <section
+      id="plan"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
       <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
