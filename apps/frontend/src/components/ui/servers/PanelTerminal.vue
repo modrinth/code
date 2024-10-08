@@ -1,12 +1,16 @@
 <template>
   <div
-    data-pyro-terminal-holy-shit
-    class="terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-xl pb-4 text-sm"
+    :class="[
+      'terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-xl pb-4 text-sm',
+      { 'fixed inset-0 z-50 !rounded-none': isBrowserFullScreen },
+    ]"
+    tabindex="-1"
+    @keydown.tab.prevent="trapFocus"
   >
     <div
       ref="scrollContainer"
       data-pyro-terminal-root
-      class="w-full overflow-x-auto overflow-y-auto py-6"
+      class="w-full select-text overflow-x-auto overflow-y-auto py-6"
       @scroll="handleScroll"
     >
       <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
@@ -18,7 +22,7 @@
           <template v-for="(item, index) in visibleItems" :key="index">
             <li
               ref="itemRefs"
-              class="relative w-full list-none"
+              class="relative w-full select-text list-none"
               :data-pyro-terminal-recycle-tracker="index"
             >
               <UiServersLogParser :log="item" />
@@ -28,7 +32,7 @@
       </div>
     </div>
     <slot />
-    <button
+    <!-- <button
       class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-300 hover:scale-110"
       @click="$emit('toggle-full-screen')"
     >
@@ -49,9 +53,9 @@
         />
       </svg>
       <span class="sr-only">Toggle full screen</span>
-    </button>
+    </button> -->
     <button
-      class="absolute right-4 top-20 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-300 hover:scale-110"
+      class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-300 hover:scale-110"
       @click="toggleBrowserFullScreen"
     >
       <svg
@@ -91,7 +95,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
-import { ExpandIcon } from "@modrinth/assets";
+// import { ExpandIcon } from "@modrinth/assets";
 
 const props = defineProps<{
   consoleOutput: string[];
@@ -191,17 +195,13 @@ const scrollToBottom = () => {
 };
 
 const enterFullScreen = () => {
-  if (scrollContainer.value && scrollContainer.value.requestFullscreen) {
-    scrollContainer.value.requestFullscreen();
-    isBrowserFullScreen.value = true;
-  }
+  isBrowserFullScreen.value = true;
+  document.body.style.overflow = "hidden";
 };
 
 const exitFullScreen = () => {
-  if (document.fullscreenElement && document.exitFullscreen) {
-    document.exitFullscreen();
-    isBrowserFullScreen.value = false;
-  }
+  isBrowserFullScreen.value = false;
+  document.body.style.overflow = "";
 };
 
 const toggleBrowserFullScreen = () => {
@@ -212,21 +212,38 @@ const toggleBrowserFullScreen = () => {
   }
 };
 
-const handleFullScreenChange = () => {
-  isBrowserFullScreen.value = !!document.fullscreenElement;
+const trapFocus = (event: KeyboardEvent) => {
+  if (!isBrowserFullScreen.value) return;
+
+  const focusableElements = scrollContainer.value?.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+  ) as NodeListOf<HTMLElement>;
+
+  if (!focusableElements.length) return;
+
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+
+  if (event.shiftKey) {
+    if (document.activeElement === firstElement) {
+      lastElement.focus();
+      event.preventDefault();
+    }
+  } else if (document.activeElement === lastElement) {
+    firstElement.focus();
+    event.preventDefault();
+  }
 };
 
 onMounted(() => {
   updateClientHeight();
   updateItemHeights();
   window.addEventListener("resize", updateClientHeight);
-  document.addEventListener("fullscreenchange", handleFullScreenChange);
   // scrollToBottom();
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateClientHeight);
-  document.removeEventListener("fullscreenchange", handleFullScreenChange);
 });
 
 watch(
@@ -265,5 +282,15 @@ html.dark-mode .console {
 
 html.oled-mode .console {
   background: black;
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 50;
+  background: var(--color-bg);
 }
 </style>
