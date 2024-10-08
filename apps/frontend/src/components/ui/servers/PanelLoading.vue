@@ -6,8 +6,8 @@
     <div class="flex flex-row items-center gap-6 pt-4">
       <div class="h-[6rem] w-[6rem] animate-pulse rounded-2xl bg-bg-raised"></div>
       <div class="flex flex-col gap-2">
-        <div class="-mb-1 flex shrink-0 flex-row items-center gap-1">
-          <a href="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
+        <div class="flex shrink-0 flex-row items-center gap-1">
+          <div class="breadcrumb goto-link flex w-fit items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="14.414"
@@ -23,9 +23,9 @@
               ></path>
             </svg>
             All servers
-          </a>
+          </div>
         </div>
-        <span class="h-[2.2rem] w-[200px] animate-pulse rounded-full bg-bg-raised"></span>
+        <span class="h-[2.6rem] w-[200px] animate-pulse rounded-full bg-bg-raised"></span>
         <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
           <div class="flex flex-row items-center gap-2">
             <GameIcon aria-hidden="true" class="size-5 text-secondary" />
