@@ -43,6 +43,7 @@
         />
         Using {{ projectData?.title || "Unknown" }}
       </div>
+      <div v-else class="min-h-[20px]"></div>
 
       <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
         <UiServersServerGameLabel

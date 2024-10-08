@@ -20,12 +20,9 @@
           <XIcon class="h-4 w-4" />
         </button>
       </div>
-      <div class="mb-3 mt-3">
-        <p>
-          Choose the version of Minecraft you want to use for this server. You can change this
-          later.
-        </p>
-      </div>
+      <p>
+        Choose the version of Minecraft you want to use for this server. You can change this later.
+      </p>
       <div class="flex flex-col gap-2">
         <DropdownSelect
           v-model="selectedMCVersion"
@@ -33,7 +30,7 @@
           placeholder="Select version..."
         />
       </div>
-      <div class="mb-4 mt-4 flex justify-end gap-4">
+      <div class="mt-4 flex justify-end gap-4">
         <Button transparent @click="versionSelectModal?.hide()"> Cancel </Button>
         <Button color="primary" @click="reinstallLoader(selectedLoader)"> Reinstall </Button>
       </div>
@@ -44,8 +41,8 @@
     <div v-if="data && versions" class="flex w-full flex-col px-4">
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-3xl font-bold">Modpack</h2>
-          <p class="m-0">This is the modpack that is currently installed on your server.</p>
+          <h2 class="m-0 text-2xl font-bold">Modpack</h2>
+          <p class="m-0">The modpack that is currently installed on your server.</p>
         </div>
         <div
           v-if="data.upstream"
@@ -111,8 +108,11 @@
 
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-3xl font-bold">Mod Loader</h2>
-          <p class="m-0">This is the modpack that is currently installed on your server.</p>
+          <h2 class="m-0 text-2xl font-bold">Mod Loader</h2>
+          <p class="m-0">
+            The mod loader that provides the ability to load mods into your server. Changing this
+            will reinstall the server.
+          </p>
         </div>
         <div
           class="flex w-full items-center justify-between rounded-xl bg-table-alternateRow p-2 pr-4"

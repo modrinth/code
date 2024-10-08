@@ -5,12 +5,12 @@
       :key="index"
       class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
-      <div class="flex flex-row items-center gap-2">
+      <div class="relative z-10 flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ metric.value }}
         </h2>
       </div>
-      <h3>{{ metric.title }}</h3>
+      <h3 class="relative z-10">{{ metric.title }}</h3>
 
       <component :is="metric.icon" class="absolute right-8 top-8" />
       <ClientOnly>

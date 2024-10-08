@@ -121,7 +121,7 @@ interface ServerResponse {
   servers: Server[];
 }
 
-const { data: serverResponse, status } = await useLazyAsyncData<ServerResponse>(
+const { data: serverResponse, status } = await useAsyncData<ServerResponse>(
   "ServerList",
   async () => {
     try {
