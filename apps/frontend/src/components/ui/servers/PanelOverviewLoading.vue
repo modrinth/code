@@ -36,10 +36,7 @@
       >
         <div class="experimental-styles-within flex flex-row items-center justify-between">
           <div class="flex flex-row items-center gap-4">
-            <h2 class="m-0 text-3xl font-extrabold text-[var(--color-text-secondary)]">Console</h2>
-            <div class="flex items-center gap-2 rounded-full bg-button-border px-2 py-1 opacity-0">
-              <span class="text-sm font-semibold">Offline</span>
-            </div>
+            <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
           </div>
           <div class="btn btn-secondary color-accent-contrast opacity-0">
             <div class="contents">
