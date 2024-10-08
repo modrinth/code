@@ -17,6 +17,7 @@
         "HEROKU_APP_NAME",
         "STRIPE_PUBLISHABLE_KEY",
         "PYRO_BASE_URL",
+        "PROD_OVERRIDE",
         "PORT"
       ]
     },

@@ -276,7 +276,7 @@
     </div>
     <div
       v-if="isDragging"
-      class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white"
+      class="absolute inset-0 flex items-center justify-center rounded-xl bg-black bg-opacity-50 text-white"
     >
       <div class="text-center">
         <UploadIcon class="mx-auto h-16 w-16" />
