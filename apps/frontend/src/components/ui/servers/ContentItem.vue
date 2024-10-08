@@ -1,5 +1,6 @@
 <template>
-  <div
+  <NuxtLink
+    :to="`/project/${data.project_id}`"
     class="group flex w-full items-center justify-between rounded-xl border-0 border-b border-solid border-bg-raised p-2"
     :class="data.disabled ? 'bg-bg-raised text-secondary' : 'hover:bg-button-bg'"
   >
@@ -47,7 +48,7 @@
         <TrashIcon />
       </Button>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
