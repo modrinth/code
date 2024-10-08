@@ -9,7 +9,7 @@
     <div
       ref="scrollContainer"
       data-pyro-terminal-root
-      class="w-full select-text overflow-x-auto overflow-y-auto py-6"
+      class="no-scrollbar w-full select-text overflow-x-auto overflow-y-auto py-6"
       @scroll="handleScroll"
     >
       <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
@@ -242,6 +242,15 @@ html.dark-mode .console {
 
 html.oled-mode .console {
   background: black;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .fixed {
