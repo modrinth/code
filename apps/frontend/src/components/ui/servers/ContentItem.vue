@@ -1,36 +1,38 @@
 <template>
-  <NuxtLink
-    :to="`/project/${data.project_id}`"
-    class="group flex w-full items-center justify-between rounded-xl border-0 border-b border-solid border-bg-raised p-2"
-    :class="data.disabled ? 'bg-bg-raised text-secondary' : 'hover:bg-button-bg'"
-  >
-    <div class="flex items-center gap-2">
-      <UiAvatar
-        :src="data.icon_url"
-        no-shadow
-        size="sm"
-        alt="Server Icon"
-        :class="data.disabled ? 'grayscale' : ''"
-      />
-      <div class="flex flex-col">
-        <span
-          class="flex items-center gap-1 text-lg font-bold"
-          :class="data.disabled ? 'text-secondary' : 'text-contrast'"
-        >
-          {{ data.name === null ? "External Mod" : data.name }}
+  <div class="relative flex w-full items-center justify-between rounded-xl">
+    <NuxtLink
+      :to="`/project/${data.project_id}`"
+      class="group flex w-full items-center rounded-xl p-2"
+      :class="data.disabled ? 'bg-bg-raised text-secondary' : 'hover:bg-button-bg'"
+    >
+      <div class="flex items-center gap-2">
+        <UiAvatar
+          :src="data.icon_url"
+          no-shadow
+          size="sm"
+          alt="Server Icon"
+          :class="data.disabled ? 'grayscale' : ''"
+        />
+        <div class="flex flex-col">
           <span
-            v-if="data.disabled"
-            class="rounded-full bg-button-bg p-1 px-2 text-xs text-contrast"
-            >Disabled</span
+            class="flex items-center gap-1 text-lg font-bold"
+            :class="data.disabled ? 'text-secondary' : 'text-contrast'"
           >
-        </span>
-        <span class="text-xs text-secondary group-hover:text-primary">{{
-          data.version_number
-        }}</span>
+            {{ data.name === null ? "External Mod" : data.name }}
+            <span
+              v-if="data.disabled"
+              class="rounded-full bg-button-bg p-1 px-2 text-xs text-contrast"
+              >Disabled</span
+            >
+          </span>
+          <span class="text-xs text-secondary group-hover:text-primary">{{
+            data.version_number
+          }}</span>
+        </div>
       </div>
-    </div>
+    </NuxtLink>
     <div
-      class="flex gap-2 rounded-xl bg-bg p-1 font-semibold text-contrast group-hover:bg-bg-raised"
+      class="absolute right-2 flex gap-2 rounded-xl bg-bg p-1 font-semibold text-contrast group-hover:bg-bg-raised"
     >
       <Button
         v-if="data.project_id"
@@ -48,7 +50,7 @@
         <TrashIcon />
       </Button>
     </div>
-  </NuxtLink>
+  </div>
 </template>
 
 <script setup lang="ts">
