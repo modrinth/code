@@ -612,7 +612,7 @@ const visibility = ref(collection.value.status);
 const removeProjects = ref([]);
 
 async function unfollowProject(project) {
-  await userUnfollowProject(project);
+  await userFollowProject(project);
   projects.value = projects.value.filter((x) => x.id !== project.id);
 }
 
