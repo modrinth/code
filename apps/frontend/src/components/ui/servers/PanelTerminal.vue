@@ -95,7 +95,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
-// import { ExpandIcon } from "@modrinth/assets";
 
 const props = defineProps<{
   consoleOutput: string[];
@@ -235,15 +234,22 @@ const trapFocus = (event: KeyboardEvent) => {
   }
 };
 
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === "Escape" && isFullScreen.value) {
+    exitFullScreen();
+  }
+};
+
 onMounted(() => {
   updateClientHeight();
   updateItemHeights();
   window.addEventListener("resize", updateClientHeight);
-  // scrollToBottom();
+  window.addEventListener("keydown", handleKeydown);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateClientHeight);
+  window.removeEventListener("keydown", handleKeydown);
 });
 
 watch(
