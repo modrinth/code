@@ -1,11 +1,10 @@
 <template>
   <div
     :class="[
-      'terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-xl pb-4 text-sm',
-      { 'fixed inset-0 z-50 !rounded-none': isFullScreen },
+      'terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-xl pb-4 text-sm transition-transform duration-300',
+      { 'scale-fullscreen fixed inset-0 z-50 !rounded-none': isFullScreen },
     ]"
     tabindex="-1"
-    @keydown.tab.prevent="trapFocus"
   >
     <div
       ref="scrollContainer"
@@ -32,28 +31,6 @@
       </div>
     </div>
     <slot />
-    <!-- <button
-      class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-300 hover:scale-110"
-      @click="$emit('toggle-full-screen')"
-    >
-      <ExpandIcon v-if="!props.fullScreen" class="flex !size-6" />
-      <svg
-        v-else
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
-        />
-      </svg>
-      <span class="sr-only">Toggle full screen</span>
-    </button> -->
     <button
       class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-300 hover:scale-110"
       @click="toggleFullscreen"
@@ -211,29 +188,6 @@ const toggleFullscreen = () => {
   }
 };
 
-const trapFocus = (event: KeyboardEvent) => {
-  if (!isFullScreen.value) return;
-
-  const focusableElements = scrollContainer.value?.querySelectorAll(
-    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-  ) as NodeListOf<HTMLElement>;
-
-  if (!focusableElements.length) return;
-
-  const firstElement = focusableElements[0];
-  const lastElement = focusableElements[focusableElements.length - 1];
-
-  if (event.shiftKey) {
-    if (document.activeElement === firstElement) {
-      lastElement.focus();
-      event.preventDefault();
-    }
-  } else if (document.activeElement === lastElement) {
-    firstElement.focus();
-    event.preventDefault();
-  }
-};
-
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === "Escape" && isFullScreen.value) {
     exitFullScreen();
@@ -298,5 +252,20 @@ html.oled-mode .console {
   height: 100vh;
   z-index: 50;
   background: var(--color-bg);
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.scale-fullscreen {
+  animation: scaleUp 190ms forwards;
 }
 </style>
