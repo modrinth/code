@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem]"
+    class="group flex w-full items-center justify-between rounded-xl border-0 border-b border-solid border-bg-raised p-2"
     :class="data.disabled ? 'bg-bg-raised text-secondary' : 'hover:bg-button-bg'"
   >
     <div class="flex items-center gap-2">
@@ -29,7 +29,7 @@
       </div>
     </div>
     <div
-      class="flex gap-2 rounded-xl bg-bg-raised p-1 font-semibold text-contrast group-hover:bg-bg"
+      class="flex gap-2 rounded-xl bg-bg p-1 font-semibold text-contrast group-hover:bg-bg-raised"
     >
       <Button
         v-if="data.project_id"
