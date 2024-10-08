@@ -14,7 +14,7 @@
           <label for="username-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server Icon</span>
             <span>
-              Change your server's icon. Changes will be visible on the minecraft server list and on
+              Change your server's icon. Changes will be visible on the Minecraft server list and on
               Modrinth.
             </span>
           </label>
