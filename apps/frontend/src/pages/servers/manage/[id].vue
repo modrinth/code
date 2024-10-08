@@ -65,6 +65,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { LeftArrowIcon } from "@modrinth/assets";
+import type { Server } from "~/types/servers";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -73,18 +74,18 @@ const serverStore = useServerStore();
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
 const initialLoading = ref(true);
+const serverData = ref<Server | null>(null);
+const error = ref<Error | null>(null);
 
-const {
-  data: serverData,
-  error,
-  refresh,
-} = useAsyncData(async () => {
+const fetchServerData = async () => {
   try {
     await serverStore.fetchServerData(serverId);
+    serverData.value = serverStore.serverData[serverId];
     initialLoading.value = false;
-    return serverStore.serverData[serverId];
+    error.value = null;
   } catch (err) {
     initialLoading.value = false;
+    error.value = err as Error;
     if (err instanceof PyroFetchError) {
       switch (err.statusCode) {
         case 400:
@@ -104,9 +105,8 @@ const {
       errorTitle.value = "Unexpected Error";
       errorMessage.value = "An unexpected error occurred while fetching server data.";
     }
-    throw err;
   }
-});
+};
 
 const showGameLabel = computed(() => !!serverData.value?.game);
 const showLoaderLabel = computed(() => !!serverData.value?.loader);
@@ -132,7 +132,7 @@ let intervalId: ReturnType<typeof setInterval> | null = null;
 
 const startPolling = () => {
   intervalId = setInterval(async () => {
-    await refresh();
+    await fetchServerData();
   }, 10000);
 };
 
@@ -144,9 +144,7 @@ const stopPolling = () => {
 };
 
 onMounted(() => {
-  if (serverData.value?.status === "installing") {
-    startPolling();
-  }
+  fetchServerData();
 });
 
 onUnmounted(() => {
