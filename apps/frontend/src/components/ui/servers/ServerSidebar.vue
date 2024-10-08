@@ -14,7 +14,7 @@
       </div>
 
       <div
-        class="z-10 flex w-[16rem] select-none flex-col gap-2 rounded-xl border-0 border-r border-solid border-bg-raised bg-table-alternateRow p-4 md:mt-0 md:h-full md:rounded-l-xl"
+        class="z-10 flex w-[16rem] select-none flex-col gap-2 rounded-xl bg-bg-raised p-4 md:mt-0 md:h-full md:rounded-l-xl"
         :class="{
           'hidden md:flex': !sidebarVisible,
         }"

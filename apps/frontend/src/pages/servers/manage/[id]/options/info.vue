@@ -1,8 +1,8 @@
 <template>
   <div class="h-full w-full overflow-y-auto">
-    <div v-if="data" class="flex h-full w-full flex-col gap-2 px-8 py-4">
-      <h2 class="text-3xl font-bold">Info</h2>
+    <div v-if="data" class="flex h-full w-full flex-col gap-2 px-4">
       <div class="card">
+        <h2 class="text-3xl font-bold">Info</h2>
         <table
           class="min-w-full border-collapse overflow-hidden rounded-lg border-2 border-gray-300"
         >

@@ -5,128 +5,65 @@
       <div class="font-minecraft mb-2 flex w-full flex-col gap-1 text-2xl">
         <div class="flex items-center justify-between">Minecraft Server</div>
         <div
-          ref="editor"
-          contenteditable
-          class="flex min-h-[50px] items-center gap-1 whitespace-pre-wrap outline-none"
-          spellcheck="false"
-          @input="handleInput"
-          @keyup="updateCursorPosition"
-          @click="updateCursorPosition"
+          v-for="(line, lineIndex) in motd"
+          :key="lineIndex"
+          class="relative mb-2 rounded bg-gray-700 p-2"
         >
-          <template v-for="(part, index) in parsedMotd" :key="index">
-            <span v-if="part.type === 'text'" :style="part.style">{{ part.content }}</span>
-            <div v-else-if="part.type === 'code'" @click="removeFormatCode(index)">
-              <div
-                class="inline-flex cursor-pointer items-center justify-center rounded bg-button-bg px-1 py-0.5 text-sm hover:bg-button-bgActive"
-                :style="part.style"
-              >
-                {{ part.content }}
-              </div>
-            </div>
-          </template>
+          <div class="minecraft-font text-white" @mouseup="handleSelection(lineIndex)">
+            <span
+              v-for="(segment, segIndex) in line"
+              :key="segIndex"
+              :class="getSegmentStyle(segment)"
+              :contenteditable="true"
+              @input="handleInput($event, lineIndex, segIndex)"
+              @keydown.enter.prevent
+              @paste.prevent="handlePaste($event, lineIndex, segIndex)"
+              >{{ segment.text }}</span
+            >
+          </div>
         </div>
       </div>
     </div>
-    <div class="mb-2 flex items-center justify-between">
-      <div class="flex flex-wrap gap-1 rounded-lg bg-button-bg p-2">
-        <div
-          v-for="format in formatCodes"
-          :key="format.code"
-          v-tooltip="`${format.description}`"
-          :class="[`h-6 w-6 rounded-full p-0 hover:opacity-80`, format.color]"
-          @click="insertFormatCode(format.code)"
-        ></div>
-      </div>
-      <div class="flex gap-1">
-        <Button
-          v-for="style in styleButtons"
-          :key="style.code"
-          v-tooltip="style.description"
-          class="h-6 w-6 rounded bg-white p-0"
-          icon-only
-          @click="insertFormatCode(style.code)"
-        >
-          <component :is="style.icon" class="h-4 w-4" />
-        </Button>
-        <Button
-          v-tooltip="'Custom Hex Color'"
-          class="from-red-500 via-green-500 to-blue-500 h-6 w-6 rounded bg-gradient-to-r p-0"
-          icon-only
-          @click="openHexColorPicker"
-        >
-          <PaintBrushIcon class="h-4 w-4" />
-        </Button>
-        <Button
-          v-tooltip="'Minecraft Emoji'"
-          class="flex h-6 w-6 items-center justify-center rounded bg-white p-0"
-          icon-only
-          @click="openEmojiPicker"
-        >
-          ☺
-        </Button>
-      </div>
-    </div>
-    {{ motd }}
+    <div class="text-sm text-gray-400">{{ totalCharacters }}/90</div>
 
-    <!-- Hex Color Picker Modal -->
     <div
-      v-if="showHexColorPicker"
-      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+      v-if="showPopup"
+      class="fixed z-10 rounded border border-gray-600 bg-gray-800 p-2 shadow-lg"
+      :style="{ top: `${popupY}px`, left: `${popupX}px` }"
     >
-      <div class="rounded-lg bg-white p-4">
-        <h3 class="mb-2 text-lg font-semibold">Choose a Hex Color</h3>
-        <input v-model="customHexColor" type="color" class="mb-2" />
-        <div>
-          <button class="bg-blue-500 mr-2 rounded px-4 py-2 text-white" @click="applyHexColor">
-            Apply
-          </button>
-          <button class="rounded bg-gray-300 px-4 py-2" @click="showHexColorPicker = false">
-            Cancel
-          </button>
-        </div>
+      <div class="mb-2 flex space-x-1">
+        <button
+          v-for="color in formatCodes"
+          :key="color.description"
+          v-tooltip="color.description"
+          class="h-6 w-6 rounded-full p-2"
+          :class="color.color"
+          @click="applyStyle(color.code)"
+        ></button>
       </div>
-    </div>
-
-    <!-- Emoji Picker Modal -->
-    <div
-      v-if="showEmojiPicker"
-      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-    >
-      <div class="rounded-lg bg-white p-4">
-        <h3 class="mb-2 text-lg font-semibold">Choose a Minecraft Emoji</h3>
-        <div class="grid max-h-96 grid-cols-8 gap-2 overflow-y-auto">
-          <button
-            v-for="emoji in minecraftEmojis"
-            :key="emoji.char"
-            class="rounded p-2 text-2xl hover:bg-gray-200"
-            :title="emoji.name"
-            @click="insertEmoji(emoji.char)"
-          >
-            {{ emoji.char }}
-          </button>
-        </div>
-        <button class="mt-4 rounded bg-gray-300 px-4 py-2" @click="showEmojiPicker = false">
-          Close
+      <div class="mb-2 flex space-x-2">
+        <button
+          v-for="style in styles"
+          :key="style"
+          :class="{ 'bg-gray-600': currentSegment[style] }"
+          class="rounded px-2 py-1 text-sm text-white"
+          @click="applyStyle({ [style]: !currentSegment[style] })"
+        >
+          {{ style }}
         </button>
       </div>
+      <button class="w-full rounded bg-gray-700 px-2 py-1 text-sm text-white" @click="insertEmoji">
+        Insert Emoji
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import {
-  BoldIcon,
-  ClearIcon,
-  ItalicIcon,
-  PaintBrushIcon,
-  StrikethroughIcon,
-  UnderlineIcon,
-} from "@modrinth/assets";
-import { Button } from "@modrinth/ui";
-
-const route = useNativeRoute();
-const serverId = route.params.id;
-const serverStore = useServerStore();
+const motd = ref([
+  [{ text: "Welcome to our Minecraft server!", color: "white" }],
+  [{ text: "Enjoy your stay and have fun!", color: "yellow" }],
+]);
 
 const formatCodes = [
   { code: "§f", color: "bg-white", description: "White" },
@@ -147,405 +84,185 @@ const formatCodes = [
   { code: "§5", color: "bg-[#AA00AA]", description: "Dark Purple" },
 ];
 
-const styleButtons = [
-  { code: "§l", icon: BoldIcon, description: "Bold" },
-  { code: "§o", icon: ItalicIcon, description: "Italic" },
-  { code: "§n", icon: UnderlineIcon, description: "Underline" },
-  { code: "§m", icon: StrikethroughIcon, description: "Strikethrough" },
-  { code: "§r", icon: ClearIcon, description: "Reset" },
-];
+const styles = ["bold", "italic", "underline", "strikethrough"];
 
-const colorMap = {
-  "§0": "#000000",
-  "§1": "#0000AA",
-  "§2": "#00AA00",
-  "§3": "#00AAAA",
-  "§4": "#AA0000",
-  "§5": "#AA00AA",
-  "§6": "#FFAA00",
-  "§7": "#AAAAAA",
-  "§8": "#555555",
-  "§9": "#5555FF",
-  "§a": "#55FF55",
-  "§b": "#55FFFF",
-  "§c": "#FF5555",
-  "§d": "#FF55FF",
-  "§e": "#FFFF55",
-};
+const showPopup = ref(false);
+const popupX = ref(0);
+const popupY = ref(0);
+const currentLineIndex = ref(0);
+const currentSegmentIndex = ref(0);
+const selectionStart = ref(0);
+const selectionEnd = ref(0);
 
-const minecraftEmojis = [
-  { char: "☺", name: "SMILING FACE" },
-  { char: "☹", name: "FROWNING FACE" },
-  { char: "☠", name: "SKULL AND CROSSBONES" },
-  { char: "❣", name: "HEART EXCLAMATION" },
-  { char: "❤", name: "RED HEART" },
-  { char: "✌", name: "VICTORY HAND" },
-  { char: "☝", name: "INDEX POINTING UP" },
-  { char: "✍", name: "WRITING HAND" },
-  { char: "♨", name: "HOT SPRINGS" },
-  { char: "✈", name: "AIRPLANE" },
-  { char: "⌛", name: "HOURGLASS DONE" },
-  { char: "⌚", name: "WATCH" },
-  { char: "☀", name: "SUN" },
-  { char: "☁", name: "CLOUD" },
-  { char: "☂", name: "UMBRELLA" },
-  { char: "❄", name: "SNOWFLAKE" },
-  { char: "☃", name: "SNOWMAN" },
-  { char: "☄", name: "COMET" },
-  { char: "♠", name: "SPADE SUIT" },
-  { char: "♥", name: "HEART SUIT" },
-  { char: "♦", name: "DIAMOND SUIT" },
-  { char: "♣", name: "CLUB SUIT" },
-  { char: "♟", name: "CHESS PAWN" },
-  { char: "☎", name: "TELEPHONE" },
-  { char: "⌨", name: "KEYBOARD" },
-  { char: "✉", name: "ENVELOPE" },
-  { char: "✏", name: "PENCIL" },
-  { char: "✒", name: "BLACK PEN" },
-  { char: "✂", name: "SCISSORS" },
-  { char: "☢", name: "RADIOACTIVE" },
-  { char: "☣", name: "BIOHAZARD" },
-  { char: "⬆", name: "UP ARROW" },
-  { char: "⬇", name: "DOWN ARROW" },
-  { char: "➡", name: "RIGHT ARROW" },
-  { char: "⬅", name: "LEFT ARROW" },
-  { char: "↗", name: "UP-RIGHT ARROW" },
-  { char: "↘", name: "DOWN-RIGHT ARROW" },
-  { char: "↙", name: "DOWN-LEFT ARROW" },
-  { char: "↖", name: "UP-LEFT ARROW" },
-  { char: "↕", name: "UP-DOWN ARROW" },
-  { char: "↔", name: "LEFT-RIGHT ARROW" },
-  { char: "↩", name: "RIGHT ARROW CURVING LEFT" },
-  { char: "↪", name: "LEFT ARROW CURVING RIGHT" },
-  { char: "✡", name: "STAR OF DAVID" },
-  { char: "☸", name: "WHEEL OF DHARMA" },
-  { char: "☯", name: "YIN YANG" },
-  { char: "✝", name: "LATIN CROSS" },
-  { char: "☦", name: "ORTHODOX CROSS" },
-  { char: "☪", name: "STAR AND CRESCENT" },
-  { char: "☮", name: "PEACE SYMBOL" },
-  { char: "♈", name: "ARIES" },
-  { char: "♉", name: "TAURUS" },
-  { char: "♊", name: "GEMINI" },
-  { char: "♋", name: "CANCER" },
-  { char: "♌", name: "LEO" },
-  { char: "♍", name: "VIRGO" },
-  { char: "♎", name: "LIBRA" },
-  { char: "♏", name: "SCORPIO" },
-  { char: "♐", name: "SAGITTARIUS" },
-  { char: "♑", name: "CAPRICORN" },
-  { char: "♒", name: "AQUARIUS" },
-  { char: "♓", name: "PISCES" },
-  { char: "▶", name: "PLAY BUTTON" },
-  { char: "◀", name: "REVERSE BUTTON" },
-  { char: "♀", name: "FEMALE SIGN" },
-  { char: "♂", name: "MALE SIGN" },
-  { char: "✖", name: "MULTIPLY" },
-  { char: "‼", name: "DOUBLE EXCLAMATION MARK" },
-  { char: "〰", name: "WAVY DASH" },
-  { char: "☑", name: "CHECK BOX WITH CHECK" },
-  { char: "✔", name: "CHECK MARK" },
-  { char: "✳", name: "EIGHT-SPOKED ASTERISK" },
-  { char: "✴", name: "EIGHT-POINTED STAR" },
-  { char: "❇", name: "SPARKLE" },
-  { char: "©", name: "COPYRIGHT" },
-  { char: "®", name: "REGISTERED" },
-  { char: "™", name: "TRADE MARK" },
-  { char: "Ⓜ", name: "CIRCLED M" },
-  { char: "㊗", name: 'JAPANESE "CONGRATULATIONS" BUTTON' },
-  { char: "㊙", name: 'JAPANESE "SECRET" BUTTON' },
-  { char: "▪", name: "BLACK SMALL SQUARE" },
-  { char: "▫", name: "WHITE SMALL SQUARE" },
-  { char: "☷", name: "TRIGRAM FOR EARTH" },
-  { char: "☵", name: "TRIGRAM FOR WATER" },
-  { char: "☶", name: "TRIGRAM FOR MOUNTAIN" },
-  { char: "☋", name: "DESCENDING NODE" },
-  { char: "☌", name: "CONJUNCTION" },
-  { char: "♜", name: "BLACK CHESS ROOK" },
-  { char: "♕", name: "WHITE CHESS QUEEN" },
-  { char: "♡", name: "WHITE HEART SUIT" },
-  { char: "♬", name: "BEAMED SIXTEENTH NOTES" },
-  { char: "☚", name: "BLACK LEFT POINTING INDEX" },
-  { char: "♮", name: "MUSIC NATURAL SIGN" },
-  { char: "♝", name: "BLACK CHESS BISHOP" },
-  { char: "♯", name: "SHARP" },
-  { char: "☴", name: "TRIGRAM FOR WIND" },
-  { char: "♭", name: "FLAT" },
-  { char: "☓", name: "SALTIRE" },
-  { char: "☛", name: "BLACK RIGHT POINTING INDEX" },
-  { char: "☭", name: "HAMMER AND SICKLE" },
-  { char: "♢", name: "WHITE DIAMOND SUIT" },
-  { char: "✐", name: "UPPER RIGHT PENCIL" },
-  { char: "♖", name: "WHITE CHESS ROOK" },
-  { char: "☈", name: "THUNDERSTORM" },
-  { char: "☒", name: "BALLOT BOX WITH X" },
-  { char: "★", name: "BLACK STAR" },
-  { char: "♚", name: "BLACK CHESS KING" },
-  { char: "♛", name: "BLACK CHESS QUEEN" },
-  { char: "✎", name: "LOWER RIGHT PENCIL" },
-  { char: "♪", name: "EIGHTH NOTE" },
-  { char: "☰", name: "TRIGRAM FOR HEAVEN" },
-  { char: "☽", name: "FIRST QUARTER MOON" },
-  { char: "☡", name: "CAUTION SIGN" },
-  { char: "☼", name: "WHITE SUN WITH RAYS" },
-  { char: "♅", name: "URANUS" },
-  { char: "☐", name: "BALLOT BOX" },
-  { char: "☟", name: "WHITE DOWN POINTING INDEX" },
-  { char: "❦", name: "FLORAL HEART" },
-  { char: "☊", name: "ASCENDING NODE" },
-  { char: "☍", name: "OPPOSITION" },
-  { char: "☬", name: "ADI SHAKTI" },
-  { char: "♧", name: "WHITE CLUB SUIT" },
-  { char: "☫", name: "FARSI SYMBOL" },
-  { char: "☱", name: "TRIGRAM FOR LAKE" },
-  { char: "☾", name: "LAST QUARTER MOON" },
-  { char: "☤", name: "CADUCEUS" },
-  { char: "❧", name: "ROTATED FLORAL HEART BULLET" },
-  { char: "♄", name: "SATURN" },
-  { char: "♁", name: "EARTH" },
-  { char: "♔", name: "WHITE CHESS KING" },
-  { char: "❥", name: "ROTATED HEAVY BLACK HEART BULLET" },
-  { char: "☥", name: "ANKH" },
-  { char: "☻", name: "BLACK SMILING FACE" },
-  { char: "♤", name: "WHITE SPADE SUIT" },
-  { char: "♞", name: "BLACK CHESS KNIGHT" },
-  { char: "♆", name: "NEPTUNE" },
-  { char: "#", name: "HASH SIGN" },
-  { char: "♃", name: "JUPITER" },
-  { char: "♩", name: "QUARTER NOTE" },
-  { char: "☇", name: "LIGHTNING" },
-  { char: "☞", name: "WHITE RIGHT POINTING INDEX" },
-  { char: "♫", name: "BEAMED EIGHTH NOTES" },
-  { char: "☏", name: "WHITE TELEPHONE" },
-  { char: "♘", name: "WHITE CHESS KNIGHT" },
-  { char: "☧", name: "CHI RHO" },
-  { char: "☉", name: "SUN" },
-  { char: "♇", name: "PLUTO" },
-  { char: "☩", name: "CROSS OF JERUSALEM" },
-  { char: "♙", name: "WHITE CHESS PAWN" },
-  { char: "☜", name: "WHITE LEFT POINTING INDEX" },
-  { char: "☲", name: "TRIGRAM FOR FIRE" },
-  { char: "☨", name: "CROSS OF LORRAINE" },
-  { char: "♗", name: "WHITE CHESS BISHOP" },
-  { char: "☳", name: "TRIGRAM FOR THUNDER" },
-  { char: "⚔", name: "CROSSED SWORDS" },
-  { char: "⚀", name: "DICE ONE" },
-];
-
-const motd = computed(() => serverStore.serverData[serverId]?.motd ?? "A Minecraft Server");
-
-const editor = ref(null);
-const showHexColorPicker = ref(false);
-const showEmojiPicker = ref(false);
-const customHexColor = ref("#000000");
-const cursorPosition = ref(0);
-const showColorButtons = ref(false);
-
-const parsedMotd = computed(() => {
-  const parts = motd.value.split(/(§[0-9a-flmnor]|§x[0-9A-Fa-f]{6}|§#[0-9A-Fa-f]{6}|§g\{[^}]+\})/);
-  let currentStyle = {};
-  const result = [];
-
-  parts.forEach((part) => {
-    if (part.match(/^§[0-9a-f]$/)) {
-      currentStyle.color = colorMap[part] || "";
-      result.push({ type: "code", content: part, style: { ...currentStyle } });
-    } else if (part.match(/^§x[0-9A-Fa-f]{6}$/)) {
-      const hexColor = part.slice(2);
-      currentStyle.color = `#${hexColor}`;
-      result.push({ type: "code", content: part, style: { ...currentStyle } });
-    } else if (part.match(/^§#[0-9A-Fa-f]{6}$/)) {
-      const hexColor = part.slice(2);
-      currentStyle.color = hexColor;
-      result.push({ type: "code", content: part, style: { ...currentStyle } });
-    } else if (part.match(/^§g\{[^}]+\}$/)) {
-      const gradientColors = part.slice(3, -1).split(",");
-      currentStyle.background = `linear-gradient(to right, ${gradientColors.join(", ")})`;
-      currentStyle.webkitBackgroundClip = "text";
-      currentStyle.webkitTextFillColor = "transparent";
-      result.push({ type: "code", content: part, style: { ...currentStyle } });
-    } else if (part === "§l") {
-      currentStyle.fontWeight = "bold";
-      result.push({ type: "code", content: part, style: { ...currentStyle } });
-    } else if (part === "§m") {
-      currentStyle.textDecoration = "line-through";
-      result.push({ type: "code", content: part, style: { ...currentStyle } });
-    } else if (part === "§n") {
-      currentStyle.textDecoration = "underline";
-      result.push({ type: "code", content: part, style: { ...currentStyle } });
-    } else if (part === "§o") {
-      currentStyle.fontStyle = "italic";
-      result.push({ type: "code", content: part, style: { ...currentStyle } });
-    } else if (part === "§r") {
-      currentStyle = {};
-      result.push({ type: "code", content: part, style: { ...currentStyle } });
-    } else {
-      result.push({ type: "text", content: part, style: { ...currentStyle } });
-    }
-  });
-
-  return result;
+const totalCharacters = computed(() => {
+  return motd.value.reduce((sum, line) => {
+    return sum + line.reduce((lineSum, segment) => lineSum + segment.text.length, 0);
+  }, 0);
 });
 
-const insertFormatCode = (code) => {
-  const newMotd =
-    motd.value.slice(0, cursorPosition.value) + code + motd.value.slice(cursorPosition.value);
-  motd.value = newMotd;
-  cursorPosition.value += code.length;
-  updateEditorContent();
-};
+const minecraftFormat = computed(() => {
+  return motd.value
+    .map((line) => {
+      return line
+        .map((segment) => {
+          let format = "§";
+          if (segment.color) format += getColorCode(segment.color);
+          if (segment.bold) format += "l";
+          if (segment.italic) format += "o";
+          if (segment.underline) format += "n";
+          if (segment.strikethrough) format += "m";
+          return format + segment.text;
+        })
+        .join("");
+    })
+    .join("\n");
+});
 
-const removeFormatCode = (index) => {
-  const parts = [...parsedMotd.value];
-  parts.splice(index, 1);
-  motd.value = parts.map((part) => part.content).join("");
-  updateEditorContent();
-};
+const currentSegment = computed(() => {
+  return motd.value[currentLineIndex.value][currentSegmentIndex.value];
+});
 
-const handleInput = (e) => {
+function getColorCode(color) {
+  const colorCodes = Object.fromEntries(formatCodes.map((code) => [code.code, code.color]));
+  return colorCodes[color] || "f";
+}
+
+function getSegmentStyle(segment) {
+  const styleClasses = [];
+  if (segment.color)
+    styleClasses.push(`${formatCodes.find((code) => code.color === segment.color).code}`);
+  if (segment.bold) styleClasses.push("font-bold");
+  if (segment.italic) styleClasses.push("italic");
+  if (segment.underline) styleClasses.push("underline");
+  if (segment.strikethrough) styleClasses.push("line-through");
+
+  const styleClassesString = styleClasses.join(" ");
+  return styleClassesString;
+}
+
+function handleSelection(lineIndex) {
   const selection = window.getSelection();
-  const offset = selection.focusOffset;
+  if (selection.toString().length > 0) {
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    popupX.value = rect.left;
+    popupY.value = rect.bottom + window.scrollY;
+    showPopup.value = true;
+    currentLineIndex.value = lineIndex;
 
-  // Calculate the actual cursor position in the raw text
-  let actualPosition = 0;
-  const traverse = (node) => {
-    if (node === selection.focusNode) {
-      actualPosition += offset;
-      return true;
-    }
-    if (node.nodeType === Node.TEXT_NODE) {
-      actualPosition += node.length;
-    } else {
-      for (const child of node.childNodes) {
-        if (traverse(child)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-  traverse(editor.value);
-
-  // Convert formatted text position to raw text position
-  const rawPosition = formattedToRawPosition(actualPosition);
-
-  // Update motd while preserving formatting codes
-  // strip out all color codes
-  const newText = extractRawText(e.target.innerHTML);
-  console.log(motd.value, newText);
-  motd.value = newText;
-
-  // Update cursor position
-  cursorPosition.value = rawPosition + (newText.length - extractRawText(motd.value).length);
-
-  updateEditorContent();
-};
-
-const formattedToRawPosition = (formattedPos) => {
-  let rawPos = 0;
-  let formattedCount = 0;
-  const parts = motd.value.split(/(§[0-9a-flmnor]|§x[0-9A-Fa-f]{6}|§#[0-9A-Fa-f]{6}|§g\{[^}]+\})/);
-
-  for (const part of parts) {
-    if (part.startsWith("§")) {
-      rawPos += part.length;
-    } else {
-      if (formattedCount + part.length >= formattedPos) {
-        rawPos += formattedPos - formattedCount;
+    // Find the segment where the selection starts
+    let charCount = 0;
+    for (let i = 0; i < motd.value[lineIndex].length; i++) {
+      const segmentLength = motd.value[lineIndex][i].text.length;
+      if (charCount + segmentLength >= selection.anchorOffset) {
+        currentSegmentIndex.value = i;
+        selectionStart.value = selection.anchorOffset - charCount;
+        selectionEnd.value = selection.focusOffset - charCount;
         break;
       }
-      rawPos += part.length;
-      formattedCount += part.length;
+      charCount += segmentLength;
     }
+  } else {
+    showPopup.value = false;
+  }
+}
+
+function applyStyle(style) {
+  const segment = motd.value[currentLineIndex.value][currentSegmentIndex.value];
+  const newSegment = { ...segment, ...style };
+  const selectedText = segment.text.slice(selectionStart.value, selectionEnd.value);
+
+  if (selectedText.length === segment.text.length) {
+    // If the entire segment is selected, just update it
+    motd.value[currentLineIndex.value][currentSegmentIndex.value] = newSegment;
+  } else {
+    // Split the segment and apply the style only to the selected part
+    const beforeText = segment.text.slice(0, selectionStart.value);
+    const afterText = segment.text.slice(selectionEnd.value);
+
+    motd.value[currentLineIndex.value].splice(
+      currentSegmentIndex.value,
+      1,
+      { ...segment, text: beforeText },
+      { ...newSegment, text: selectedText },
+      { ...segment, text: afterText },
+    );
   }
 
-  return rawPos;
-};
+  showPopup.value = false;
+}
 
-const extractRawText = (html) => {
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = html;
-  return tempDiv.textContent || tempDiv.innerText || "";
-};
+function insertEmoji() {
+  // In a real implementation, you would open an emoji picker here
+  // For this example, we'll just insert a simple smiley face
+  const segment = motd.value[currentLineIndex.value][currentSegmentIndex.value];
+  const newText =
+    segment.text.slice(0, selectionStart.value) + "☺" + segment.text.slice(selectionEnd.value);
+  if (totalCharacters.value + 1 <= 90) {
+    motd.value[currentLineIndex.value][currentSegmentIndex.value].text = newText;
+  }
+  showPopup.value = false;
+}
 
-const updateEditorContent = () => {
-  if (editor.value) {
-    editor.value.innerHTML = "";
-    parsedMotd.value.forEach((part, index) => {
-      if (part.type === "text") {
-        const span = document.createElement("span");
-        span.textContent = part.content;
-        Object.assign(span.style, part.style);
-        editor.value.appendChild(span);
-      } else if (part.type === "code" && showColorButtons.value) {
-        const button = document.createElement("button");
-        button.textContent = part.content;
-        button.className =
-          "inline-flex items-center justify-center px-1 py-0.5 text-xs bg-gray-700 rounded cursor-pointer hover:bg-gray-600";
-        Object.assign(button.style, part.style);
-        button.addEventListener("click", () => removeFormatCode(index));
-        editor.value.appendChild(button);
-      }
+function handleInput(event, lineIndex, segmentIndex) {
+  const selection = window.getSelection();
+  const cursorPosition = selection.focusOffset;
+
+  const newText = event.target.textContent;
+  const oldText = motd.value[lineIndex][segmentIndex].text;
+  const diff = newText.length - oldText.length;
+
+  if (totalCharacters.value + diff <= 90) {
+    motd.value[lineIndex][segmentIndex].text = newText;
+
+    // Use Vue.nextTick to ensure the DOM has updated before setting the cursor position
+    Vue.nextTick(() => {
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.setStart(event.target.childNodes[0], cursorPosition);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
     });
-    nextTick(() => {
-      setCaretPosition(editor.value, cursorPosition.value);
+  } else {
+    // If the new text would exceed the limit, revert the change
+    event.target.textContent = oldText;
+
+    // Set cursor to the end of the text
+    Vue.nextTick(() => {
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(event.target);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
     });
   }
-};
+}
 
-const setCaretPosition = (element, position) => {
-  const range = document.createRange();
-  const sel = window.getSelection();
-  let currentLength = 0;
-  let targetNode = null;
-  let targetOffset = 0;
+function handlePaste(event, lineIndex, segmentIndex) {
+  const pastedText = (event.clipboardData || window.clipboardData).getData("text");
+  const selection = window.getSelection();
+  const cursorPosition = selection.focusOffset;
 
-  const traverse = (node) => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const nodeLength = node.length;
-      if (currentLength + nodeLength >= position) {
-        targetNode = node;
-        targetOffset = position - currentLength;
-        return true;
-      }
-      currentLength += nodeLength;
-    } else {
-      for (let i = 0; i < node.childNodes.length; i++) {
-        if (traverse(node.childNodes[i])) {
-          return true;
-        }
-      }
-    }
-    return false;
-  };
+  const segment = motd.value[lineIndex][segmentIndex];
+  const newText =
+    segment.text.slice(0, cursorPosition) + pastedText + segment.text.slice(cursorPosition);
+  const diff = newText.length - segment.text.length;
 
-  traverse(element);
+  if (totalCharacters.value + diff <= 90) {
+    motd.value[lineIndex][segmentIndex].text = newText;
 
-  if (targetNode) {
-    range.setStart(targetNode, targetOffset);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    Vue.nextTick(() => {
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.setStart(event.target.childNodes[0], cursorPosition + pastedText.length);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    });
   }
-};
-
-const openHexColorPicker = () => {
-  showHexColorPicker.value = true;
-};
-
-const applyHexColor = () => {
-  insertFormatCode(`§#${customHexColor.value.slice(1)}`);
-  showHexColorPicker.value = false;
-};
-
-const openEmojiPicker = () => {
-  showEmojiPicker.value = true;
-};
-
-const insertEmoji = (emoji) => {
-  insertFormatCode(emoji);
-  showEmojiPicker.value = false;
-};
+}
 </script>
 
 <style scoped>

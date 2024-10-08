@@ -1,5 +1,11 @@
 <template>
-  <div class="flex h-full w-full flex-1">
+  <div
+    class="relative z-10 flex min-h-[800px] w-full flex-col overflow-visible rounded-xl border border-solid border-bg-raised"
+    @dragenter.prevent="handleDragEnter"
+    @dragover.prevent="handleDragOver"
+    @dragleave.prevent="handleDragLeave"
+    @drop.prevent="handleDrop"
+  >
     <!-- Create Item Modal -->
     <Modal ref="createItemModal" header="">
       <UiServersPyroModal
@@ -7,13 +13,15 @@
         :data="data"
         @modal="createItemModal?.hide()"
       >
-        <div class="mt-2 flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <input v-model="newItemName" type="text" class="w-full" />
-        </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
-          <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="createNewItem"> Create </Button>
+        <div class="px-4">
+          <div class="mt-2 flex flex-col gap-2">
+            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+            <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
+          </div>
+          <div class="mb-4 mt-4 flex justify-end gap-4">
+            <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
+            <Button color="primary" @click="createNewItem"> Create </Button>
+          </div>
         </div>
       </UiServersPyroModal>
     </Modal>
@@ -25,18 +33,20 @@
         :data="data"
         @modal="renameItemModal?.hide()"
       >
-        <div class="mt-2 flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <input
-            v-model="newItemName"
-            type="text"
-            class="bg-bg-input w-full rounded-lg p-4"
-            :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
-          />
-        </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
-          <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="renameItem"> Rename </Button>
+        <div class="px-4">
+          <div class="mt-2 flex flex-col gap-2">
+            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+            <input
+              v-model="newItemName"
+              type="text"
+              class="bg-bg-input w-full rounded-lg p-4"
+              :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
+            />
+          </div>
+          <div class="mb-4 mt-4 flex justify-end gap-4">
+            <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
+            <Button color="primary" @click="renameItem"> Rename </Button>
+          </div>
         </div>
       </UiServersPyroModal>
     </Modal>
@@ -48,20 +58,19 @@
         :data="data"
         @modal="moveItemModal?.hide()"
       >
-        <div class="mt-2 flex flex-col gap-2">
-          <UiServersFileTree
-            :path="
-              currentPath as string
-              // :3
-            "
-            :type="selectedItem?.type"
-            :items="items"
-            @select="handleFileSelect"
-          />
-        </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
-          <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="moveItem"> Move </Button>
+        <div class="px-4">
+          <div class="mt-2 flex flex-col gap-2">
+            <input
+              v-model="destinationFolder"
+              type="text"
+              class="bg-bg-input w-full rounded-lg p-4"
+              placeholder="e.g. mods/modname"
+            />
+          </div>
+          <div class="mb-4 mt-4 flex justify-end gap-4">
+            <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
+            <Button color="primary" @click="moveItem"> Move </Button>
+          </div>
         </div>
       </UiServersPyroModal>
     </Modal>
@@ -104,7 +113,7 @@
 
     <!-- Main Content -->
     <div
-      class="flex min-h-[800px] w-full flex-col overflow-hidden rounded-xl border border-solid border-bg-raised"
+      class="flex min-h-[800px] w-full flex-col overflow-visible rounded-xl border border-solid border-bg-raised"
     >
       <div
         v-if="!isEditing"
@@ -137,7 +146,7 @@
             :options="[
               { id: 'file', action: () => showCreateModal('file') },
               { id: 'directory', action: () => showCreateModal('directory') },
-              { id: 'upload', action: () => uploadFile() },
+              { id: 'upload', action: () => initiateFileUpload() },
             ]"
           >
             <PlusIcon aria-hidden="true" />
@@ -193,7 +202,7 @@
         </div>
       </div>
 
-      <div v-if="isEditing" class="h-full w-full flex-grow overflow-hidden">
+      <div v-if="isEditing" class="h-full w-full flex-grow overflow-visible">
         <component
           :is="VAceEditor"
           v-model:value="fileContent"
@@ -206,7 +215,7 @@
       <div
         v-else-if="items.length > 0"
         ref="scrollContainer"
-        class="h-full w-full snap-y overflow-x-hidden"
+        class="h-full w-full snap-y overflow-visible"
       >
         <UiServersFileItem
           v-for="item in items"
@@ -224,10 +233,16 @@
           @move="showMoveModal(item)"
           @edit="editFile(item)"
         />
-        <div v-if="isLoading" class="flex h-10 animate-pulse items-center justify-center gap-2">
+        <div v-if="loadError" class="flex h-10 items-center justify-center gap-2">
+          <ClearIcon class="h-4 w-4" />
+          Error loading more directories {{ loadError }}
+        </div>
+        <div
+          v-else-if="isLoading"
+          class="flex h-10 animate-pulse items-center justify-center gap-2"
+        >
           <PyroIcon class="h-4 w-4" /> Loading...
         </div>
-        <div v-if="loadError">Error loading directories</div>
       </div>
 
       <div v-else-if="!isLoading" class="flex h-full w-full items-center justify-center gap-6 p-20">
@@ -259,6 +274,15 @@
         <UiServersPyroLoading />
       </div>
     </div>
+    <div
+      v-if="isDragging"
+      class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white"
+    >
+      <div class="text-center">
+        <UploadIcon class="mx-auto h-16 w-16" />
+        <p class="mt-2 text-xl">Drop files here to upload</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -273,11 +297,13 @@ import {
   FolderOpenIcon,
   SaveIcon,
   PyroIcon,
+  ClearIcon,
 } from "@modrinth/assets";
 import { Button, Modal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
 const VAceEditor = ref();
 
+const app = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
 const serverId = route.params.id.toString();
@@ -402,16 +428,65 @@ const showCreateModal = (type: "file" | "directory") => {
   createItemModal.value?.show();
 };
 
-const uploadFile = () => {
+const isDragging = ref(false);
+const dragCounter = ref(0);
+
+const handleDragEnter = (event: DragEvent) => {
+  event.preventDefault();
+  dragCounter.value++;
+  isDragging.value = true;
+};
+
+const handleDragOver = (event: DragEvent) => {
+  event.preventDefault();
+};
+
+const handleDragLeave = (event: DragEvent) => {
+  event.preventDefault();
+  dragCounter.value--;
+  if (dragCounter.value === 0) {
+    isDragging.value = false;
+  }
+};
+
+const handleDrop = async (event: DragEvent) => {
+  event.preventDefault();
+  isDragging.value = false;
+  dragCounter.value = 0;
+  const files = event.dataTransfer?.files;
+  if (files) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      await uploadFile(file);
+    }
+  }
+};
+
+const uploadFile = async (file: File) => {
+  try {
+    const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
+    await serverStore.uploadFile(serverId, filePath, file);
+    await fetchData();
+    // @ts-ignore
+    app.$notify({
+      group: "files",
+      title: "File uploaded",
+      text: "Your file has been uploaded.",
+      type: "success",
+    });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+  }
+};
+
+const initiateFileUpload = () => {
   const input = document.createElement("input");
   input.type = "file";
   input.onchange = async () => {
     const file = input.files?.[0];
-    console.log(file);
-    if (!file) return;
-    const filePath = currentPath.value + "/" + file.name;
-    await serverStore.uploadFile(serverId, filePath, file);
-    await fetchData();
+    if (file) {
+      await uploadFile(file);
+    }
   };
   input.click();
   input.remove();
@@ -439,15 +514,21 @@ const showDeleteModal = (item: any) => {
 
 const createNewItem = async () => {
   try {
-    const path =
-      typeof currentPath.value === "string" ? currentPath.value : currentPath.value.join("/");
+    const path = `${currentPath.value}/${newItemName.value}`.replace("//", "/");
     await serverStore.createFileOrFolder(serverId, path, newItemType.value);
 
     currentPage.value = 1;
+    newItemName.value = "";
     items.value = [];
     await fetchData();
     createItemModal.value?.hide();
-    console.log("Created new item and refreshed data.");
+    // @ts-ignore
+    app.$notify({
+      group: "files",
+      title: "File created",
+      text: "Your file has been created.",
+      type: "success",
+    });
   } catch (error) {
     console.error("Error creating item:", error);
   }
@@ -465,7 +546,13 @@ const renameItem = async () => {
     items.value = [];
     await fetchData();
     renameItemModal.value?.hide();
-    console.log("Renamed item and refreshed data.");
+    // @ts-ignore
+    app.$notify({
+      group: "files",
+      title: "File renamed",
+      text: "Your file has been renamed.",
+      type: "success",
+    });
   } catch (error) {
     console.error("Error renaming item:", error);
   }
@@ -477,22 +564,24 @@ const moveItem = async () => {
   try {
     await serverStore.moveFileOrFolder(
       serverId,
-      `${currentPath.value}/${selectedItem.value.name}`,
-      `${destinationFolder.value}/${selectedItem.value.name}`,
+      `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/"),
+      `${destinationFolder.value}/${selectedItem.value.name}`.replace("//", "/"),
     );
 
     currentPage.value = 1;
     items.value = [];
     await fetchData();
     moveItemModal.value?.hide();
-    console.log("Moved item and refreshed data.");
+    // @ts-ignore
+    app.$notify({
+      group: "files",
+      title: "File moved",
+      text: "Your file has been moved.",
+      type: "success",
+    });
   } catch (error) {
     console.error("Error moving item:", error);
   }
-};
-
-const handleFileSelect = (directory: any) => {
-  destinationFolder.value = directory.path;
 };
 
 const downloadFile = async (item: any) => {
@@ -529,7 +618,13 @@ const deleteItem = async () => {
     items.value = [];
     await fetchData();
     deleteItemModal.value?.hide();
-    console.log("Deleted item and refreshed data.");
+    // @ts-ignore
+    app.$notify({
+      group: "files",
+      title: "File deleted",
+      text: "Your file has been deleted.",
+      type: "success",
+    });
   } catch (error) {
     console.error("Error deleting item:", error);
   }
@@ -543,7 +638,6 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
     fileContent.value = content;
     editingFile.value = item;
     isEditing.value = true;
-    console.log(item);
   } catch (error) {
     console.error("Error fetching file content:", error);
   }
@@ -557,6 +651,13 @@ const saveFileContent = async () => {
     await refreshNuxtData("files-data");
     isEditing.value = false;
     editingFile.value = null;
+    // @ts-ignore
+    app.$notify({
+      group: "files",
+      title: "File saved",
+      text: "Your file has been saved.",
+      type: "success",
+    });
   } catch (error) {
     console.error("Error saving file content:", error);
   }

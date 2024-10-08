@@ -1,7 +1,6 @@
 <template>
   <div class="relative h-full w-full overflow-y-auto">
-    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 px-8 py-4">
-      <h2 class="m-0 text-3xl font-bold">General</h2>
+    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 px-4">
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
@@ -13,49 +12,47 @@
 
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Server display</span>
+            <span class="text-lg font-bold text-contrast">Server Icon</span>
             <span>
-              Change your server's icon and MOTD. Changes will be visible on the server list and on
+              Change your server's icon. Changes will be visible on the minecraft server list and on
               Modrinth.
             </span>
           </label>
-          <UiServersMOTDEditor>
+          <div
+            v-tooltip="'Upload a custom Icon'"
+            class="group relative flex w-fit items-center gap-2 rounded-xl bg-table-alternateRow"
+            @dragover.prevent="onDragOver"
+            @dragleave.prevent="onDragLeave"
+            @drop.prevent="onDrop"
+            @click="triggerFileInput"
+          >
+            <input
+              v-if="data?.image"
+              type="file"
+              accept="image/png,image/jpeg,image/gif,image/webp"
+              hidden
+              @change="uploadFile"
+            />
             <div
-              v-tooltip="'Upload a custom Icon'"
-              class="group relative flex w-fit items-center gap-2"
-              @dragover.prevent="onDragOver"
-              @dragleave.prevent="onDragLeave"
-              @drop.prevent="onDrop"
-              @click="triggerFileInput"
+              class="absolute top-0 hidden size-[6rem] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
             >
-              <input
-                v-if="data?.image"
-                type="file"
-                accept="image/png,image/jpeg,image/gif,image/webp"
-                hidden
-                @change="uploadFile"
-              />
-              <div
-                class="absolute top-0 hidden size-[6rem] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
-              >
-                <EditIcon class="h-8 w-8 text-contrast" />
-              </div>
-              <img
-                v-if="data?.image"
-                no-shadow
-                alt="Server Icon"
-                class="h-[6rem] w-[6rem]"
-                :src="data.image"
-              />
-              <img
-                v-else
-                no-shadow
-                alt="Server Icon"
-                class="h-[6rem] w-[6rem]"
-                src="~/assets/images/servers/minecraft_server_icon.png"
-              />
+              <EditIcon class="h-8 w-8 text-contrast" />
             </div>
-          </UiServersMOTDEditor>
+            <img
+              v-if="data?.image"
+              no-shadow
+              alt="Server Icon"
+              class="h-[6rem] w-[6rem] rounded-xl"
+              :src="data.image"
+            />
+            <img
+              v-else
+              no-shadow
+              alt="Server Icon"
+              class="h-[6rem] w-[6rem] rounded-xl"
+              src="~/assets/images/servers/minecraft_server_icon.png"
+            />
+          </div>
         </div>
       </div>
     </div>

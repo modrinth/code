@@ -1,7 +1,6 @@
 <template>
   <div class="relative h-full w-full overflow-y-auto">
-    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 px-8 py-4">
-      <h2 class="m-0 text-3xl font-bold">Network</h2>
+    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4 px-4">
       <div class="flex h-full flex-col gap-2">
         <!-- Subdomain section -->
         <div class="card flex flex-col gap-4">

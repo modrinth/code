@@ -28,7 +28,8 @@
       </button>
     </div>
     <div
-      :class="'border-0 border-b border-solid border-button-bg' + (danger ? 'bg-[#FF496E]' : '')"
+      class="border-0 border-b border-solid"
+      :class="danger ? 'border-[#612d38]' : 'border-button-bg'"
     ></div>
     <div class="h-full w-full overflow-scroll">
       <slot />

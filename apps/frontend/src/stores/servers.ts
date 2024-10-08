@@ -543,7 +543,7 @@ export const useServerStore = defineStore("servers", {
       return this.retryWithAuth(serverId, async () => {
         return await usePyroFetch(`/create?path=${path}&type=${type}`, {
           method: "POST",
-          contentType: "",
+          contentType: "application/octet-stream",
           override: this.fileAPIAuth[serverId],
         });
       });

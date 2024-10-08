@@ -1,7 +1,6 @@
 <template>
   <div class="relative h-full w-full">
-    <div v-if="data" class="flex h-full w-full flex-col gap-6 px-8 py-4">
-      <h2 class="m-0 text-3xl font-bold">Startup</h2>
+    <div v-if="data" class="flex h-full w-full flex-col gap-4 px-4">
       <div class="rounded-xl border-solid border-rose-500 bg-rose-500/20 p-4">
         These settings are meant for advanced users. Changing these settings may break your server.
       </div>
@@ -15,8 +14,8 @@
           <textarea class="min-h-[200px] w-full font-[family-name:var(--mono-font)]" />
         </div>
 
-        <div class="gap-2">
-          <div class="card flex flex-col gap-4">
+        <div class="card flex justify-between gap-2">
+          <div class="flex flex-col gap-4">
             <label for="username-field" class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Java Version</span>
               <span> The version of Java that your server will run on. </span>
@@ -27,11 +26,7 @@
               placeholder="Java Version"
             />
           </div>
-        </div>
-
-        <!-- runtime -->
-        <div class="gap-2">
-          <div class="card flex flex-col gap-4">
+          <div class="flex flex-col gap-4">
             <label for="username-field" class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Runtime</span>
               <span> The runtime that your server will run on. </span>
