@@ -2,7 +2,7 @@
   <div
     :class="[
       'terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-xl pb-4 text-sm',
-      { 'fixed inset-0 z-50 !rounded-none': isBrowserFullScreen },
+      { 'fixed inset-0 z-50 !rounded-none': isFullScreen },
     ]"
     tabindex="-1"
     @keydown.tab.prevent="trapFocus"
@@ -56,10 +56,10 @@
     </button> -->
     <button
       class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-300 hover:scale-110"
-      @click="toggleBrowserFullScreen"
+      @click="toggleFullscreen"
     >
       <svg
-        v-if="!isBrowserFullScreen"
+        v-if="!isFullScreen"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -114,7 +114,7 @@ const bufferSize = 5;
 
 const scrollTop = ref(0);
 const clientHeight = ref(0);
-const isBrowserFullScreen = ref(false);
+const isFullScreen = ref(false);
 
 const totalHeight = computed(
   () =>
@@ -195,17 +195,17 @@ const scrollToBottom = () => {
 };
 
 const enterFullScreen = () => {
-  isBrowserFullScreen.value = true;
+  isFullScreen.value = true;
   document.body.style.overflow = "hidden";
 };
 
 const exitFullScreen = () => {
-  isBrowserFullScreen.value = false;
+  isFullScreen.value = false;
   document.body.style.overflow = "";
 };
 
-const toggleBrowserFullScreen = () => {
-  if (isBrowserFullScreen.value) {
+const toggleFullscreen = () => {
+  if (isFullScreen.value) {
     exitFullScreen();
   } else {
     enterFullScreen();
@@ -213,7 +213,7 @@ const toggleBrowserFullScreen = () => {
 };
 
 const trapFocus = (event: KeyboardEvent) => {
-  if (!isBrowserFullScreen.value) return;
+  if (!isFullScreen.value) return;
 
   const focusableElements = scrollContainer.value?.querySelectorAll(
     'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
