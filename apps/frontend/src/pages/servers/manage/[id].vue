@@ -109,7 +109,6 @@ const fetchServerData = async () => {
 
 const showGameLabel = computed(() => !!serverData.value?.game);
 const showLoaderLabel = computed(() => !!serverData.value?.loader);
-const showModLabel = computed(() => (serverData.value?.mods?.length ?? 0) > 0);
 
 const navLinks = [
   { label: "Overview", href: `/servers/manage/${serverId}`, subpages: [] },
