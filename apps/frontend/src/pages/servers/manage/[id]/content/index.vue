@@ -25,7 +25,7 @@
       <h2 class="m-0 text-2xl font-bold text-contrast">Mods</h2>
       <ButtonStyled color="brand">
         <button v-tooltip="'Add a mod'" @click="showAddModModal">
-          <PlusIcon class="size-6" />
+          <PlusIcon />
           Add mod
         </button>
       </ButtonStyled>
