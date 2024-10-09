@@ -344,10 +344,7 @@ async function checkUpdates() {
         </section>
       </div>
       <div class="router-view">
-        <ModrinthLoadingIndicator
-          offset-height="var(--appbar-height)"
-          offset-width="var(--sidebar-width)"
-        />
+        <ModrinthLoadingIndicator />
         <RouterView v-slot="{ Component }">
           <template v-if="Component">
             <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
@@ -459,6 +456,8 @@ async function checkUpdates() {
       overflow-x: hidden;
       background-color: var(--color-bg);
       border-top-left-radius: var(--radius-xl);
+
+      position: relative;
     }
   }
 }
