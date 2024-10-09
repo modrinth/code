@@ -1,6 +1,6 @@
 <template>
   <div aria-hidden="true" class="pointer-events-none h-full w-full select-none">
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-6">
       <div class="flex flex-row items-center gap-6">
         <div
           class="fade-in-up relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"

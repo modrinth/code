@@ -4,19 +4,9 @@
     class="relative flex select-none flex-col gap-6"
     data-pyro-server-manager-root
   >
+    <UiServersServerStats :data="stats" />
     <div
-      :class="[
-        'duration-400 absolute left-0 right-0 top-0 w-full transition-all',
-        fullScreen ? '-translate-y-4 scale-95 opacity-0' : 'opacity-100',
-      ]"
-    >
-      <UiServersServerStats :data="stats" />
-    </div>
-    <div
-      :class="[
-        'relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-8 transition-all duration-300 ease-in-out',
-        fullScreen ? 'mt-0 h-[85vh]' : 'mt-[180px] h-[600px]',
-      ]"
+      class="relative flex h-[600px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-8 transition-all duration-300 ease-in-out"
     >
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
@@ -32,11 +22,7 @@
           @action="sendPowerAction"
         />
       </div>
-      <UiServersPanelTerminal
-        :console-output="consoleOutput"
-        :full-screen="fullScreen"
-        @toggle-full-screen="toggleFullScreen"
-      >
+      <UiServersPanelTerminal :console-output="consoleOutput" :full-screen="fullScreen">
         <div class="relative w-full px-4 pt-4">
           <ul
             v-if="suggestions.length"
@@ -107,10 +93,6 @@
 
 <script setup lang="ts">
 import type { ServerState, Stats, WSAuth, WSEvent } from "~/types/servers";
-
-const toggleFullScreen = () => {
-  fullScreen.value = !fullScreen.value;
-};
 
 const DYNAMIC_ARG = Symbol("DYNAMIC_ARG");
 
@@ -397,7 +379,6 @@ const commandTree: any = {
   xp: null,
 };
 
-// Reactive References
 const serverStore = useServerStore();
 const app = useNuxtApp();
 const fullScreen = ref(false);
