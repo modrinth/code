@@ -1,15 +1,22 @@
 <template>
-  <Modal ref="newAllocationModal" header="New Allocation">
-    <div class="flex flex-col gap-4">
-      <label for="allocation-name" class="flex flex-col gap-2">
-        <span class="text-lg font-bold text-contrast">Allocation Name</span>
-        <input id="allocation-name" v-model="newAllocationName" class="w-full" />
-      </label>
-    </div>
-    <div class="button-row">
-      <Button @click="newAllocationModal.hide()"> Cancel </Button>
-      <Button color="primary" @click="addNewAllocation"> Create </Button>
-    </div>
+  <Modal ref="newAllocationModal" header="">
+    <UiServersPyroModal header="New allocation" :data="data" @modal="newAllocationModal?.hide()">
+      <div class="p-2">
+        <div class="flex flex-col gap-2">
+          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+          <input
+            v-model="newAllocationName"
+            type="text"
+            class="bg-bg-input w-full rounded-lg p-4"
+            placeholder="e.g. Secondary allocation"
+          />
+        </div>
+        <div class="mb-4 mt-4 flex justify-end gap-4">
+          <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
+          <Button color="primary" @click="addNewAllocation"> <PlusIcon /> Create allocation </Button>
+        </div>
+      </div>
+    </UiServersPyroModal>
   </Modal>
   <div class="relative h-full w-full overflow-y-auto">
     <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4 px-4">
@@ -92,7 +99,7 @@
 
 <script setup lang="ts">
 import { PlusIcon, TrashIcon } from "@modrinth/assets";
-import { ButtonStyled, Modal } from "@modrinth/ui";
+import { ButtonStyled, Modal, Button } from "@modrinth/ui";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import { useServerStore } from "~/stores/servers.ts";
 
