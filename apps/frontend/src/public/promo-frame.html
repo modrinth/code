@@ -73,17 +73,26 @@
           });
 
           const hash = getCookie("modrinth-app-token");
-          console.log(hash)
+          console.log(hash);
           tude.setIdProfile({
             e: hash,
           });
         });
       }
 
-      window.__TAURI_INTERNALS__
-        .invoke("plugin:ads|get_ads_personalization", {})
-        .then(initAds)
-        .catch(() => initAds(true));
+      try {
+        if (window.__TAURI_INTERNALS__) {
+          window.__TAURI_INTERNALS__
+            .invoke("plugin:ads|get_ads_personalization", {})
+            .then(initAds)
+            .catch(() => initAds(true));
+        } else {
+          initAds(true);
+        }
+      } catch (err) {
+        initAds(true);
+        console.error(err);
+      }
 
       window.addEventListener(
         "message",
