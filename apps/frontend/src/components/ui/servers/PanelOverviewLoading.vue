@@ -8,7 +8,7 @@
           <div class="flex flex-row items-center gap-2">
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0.00%</h2>
           </div>
-          <h3>CPU usage</h3>
+          <h3 class="relative z-10 text-base font-normal text-secondary">CPU usage</h3>
           <CPUIcon class="absolute right-8 top-8" />
         </div>
         <div
@@ -17,7 +17,7 @@
           <div class="flex flex-row items-center gap-2">
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0.00%</h2>
           </div>
-          <h3>Memory usage</h3>
+          <h3 class="relative z-10 text-base font-normal text-secondary">Memory usage</h3>
           <DBIcon class="absolute right-8 top-8" />
         </div>
         <div
@@ -26,7 +26,7 @@
           <div class="flex flex-row items-center gap-2">
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0 MB</h2>
           </div>
-          <h3>Storage usage</h3>
+          <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
           <FolderOpenIcon class="absolute right-8 top-8 size-8" />
         </div>
       </div>

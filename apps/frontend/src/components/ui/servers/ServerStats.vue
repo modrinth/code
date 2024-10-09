@@ -10,7 +10,7 @@
           {{ metric.value }}
         </h2>
       </div>
-      <h3 class="relative z-10">{{ metric.title }}</h3>
+      <h3 class="relative z-10 text-base font-normal text-secondary">{{ metric.title }}</h3>
 
       <component :is="metric.icon" class="absolute right-8 top-8" />
       <ClientOnly>
@@ -34,7 +34,7 @@
           {{ formatBytes(data.current.storage_usage_bytes) }}
         </h2>
       </div>
-      <h3>Storage usage</h3>
+      <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
 
       <FolderOpenIcon class="absolute right-8 top-8 size-8" />
     </NuxtLink>
