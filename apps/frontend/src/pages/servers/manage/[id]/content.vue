@@ -14,12 +14,16 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
-useHead({
-  title: `Content - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
-});
+const { data } = await useLazyAsyncData("serverData", async () => {
+  await serverStore.fetchServerData(serverId);
+  const serverData = serverStore.serverData[serverId];
 
-await serverStore.fetchServerData(serverId);
-const data = computed(() => serverStore.serverData[serverId]);
+  useHead({
+    title: `Content - ${serverData?.name ?? "Server"} - Modrinth`,
+  });
+
+  return serverData;
+});
 
 const navLinks = [
   { icon: BoxIcon, label: "Mods", href: `/servers/manage/${serverId}/content` },
