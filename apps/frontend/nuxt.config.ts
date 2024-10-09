@@ -452,22 +452,24 @@ function getFeatureFlagOverrides() {
 
 function getDomain() {
   if (process.env.NODE_ENV === "production") {
-    if (process.env.SITE_URL) {
-      return process.env.SITE_URL;
-    }
-    // @ts-ignore
-    else if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
-      // @ts-ignore
-      return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL;
-    } else if (process.env.HEROKU_APP_NAME) {
-      return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
-    } else if (process.env.VERCEL_URL) {
-      return `https://${process.env.VERCEL_URL}`;
-    } else if (getApiUrl() === STAGING_API_URL) {
-      return "https://staging.modrinth.com";
-    } else {
-      return "https://modrinth.com";
-    }
+    // if (process.env.SITE_URL) {
+    //   return process.env.SITE_URL;
+    // }
+    // // @ts-ignore
+    // else if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
+    //   // @ts-ignore
+    //   return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL;
+    // } else if (process.env.HEROKU_APP_NAME) {
+    //   return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+    // } else if (process.env.VERCEL_URL) {
+    //   return `https://${process.env.VERCEL_URL}`;
+    // } else if (getApiUrl() === STAGING_API_URL) {
+    //   return "https://staging.modrinth.com";
+    // } else {
+    //   return "https://modrinth.com";
+    // }
+    // TODO: remove on merge
+    return "https://redacted.modrinth.com";
   } else {
     const port = process.env.PORT || 3000;
     return `http://localhost:${port}`;
