@@ -8,13 +8,7 @@
   >
     <div class="flex items-center justify-between gap-4">
       <div class="flex w-full items-center gap-4">
-        <UiAvatar
-          v-if="data && data.project"
-          :src="data.project.icon_url"
-          no-shadow
-          size="xs"
-          alt="Server Icon"
-        />
+        <UiServersServerIcon :server-id="serverId" class="w-12 h-12 rounded-lg"/>
         <div class="text-2xl font-extrabold text-contrast">{{ props.header }}</div>
       </div>
       <button
@@ -39,6 +33,9 @@
 
 <script setup lang="ts">
 import { XIcon } from "@modrinth/assets";
+
+const route = useNativeRoute();
+const serverId = route.params.id as string;
 
 defineEmits(["modal"]);
 

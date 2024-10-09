@@ -5,7 +5,7 @@
       no-shadow
       size="lg"
       alt="Server Icon"
-      class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised"
+      :class="computedClass"
       :src="serverImage"
     />
     <img
@@ -13,18 +13,20 @@
       no-shadow
       size="lg"
       alt="Server Icon"
-      class="h-[6rem] w-[6rem] rounded-xl bg-bg-raised"
+      :class="computedClass"
       src="~/assets/images/servers/minecraft_server_icon.png"
     />
   </client-only>
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-  serverId: {
-    type: String,
-    required: true,
-  },
+const props = defineProps<{
+  serverId: string,
+  class?: string,
+}>();
+
+const computedClass = computed(() => {
+  return props.class || "h-[6rem] w-[6rem] rounded-xl bg-bg-raised";
 });
 
 const serverStore = useServerStore();
