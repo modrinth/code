@@ -3,9 +3,13 @@
     <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
     <div class="flex flex-row items-center gap-2">
       <UiServersLoaderIcon :loader="loader" class="[&&]:size-5" />
-      <span class="text-sm font-semibold capitalize">
+      <NuxtLink
+        :to="serverId ? `/servers/manage/${serverId}/options/loader` : ''"
+        class="text-sm font-semibold"
+        :class="serverId ? 'hover:underline' : ''"
+      >
         {{ loader }} <span v-if="loaderVersion">{{ loaderVersion }}</span>
-      </span>
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -15,4 +19,7 @@ defineProps<{
   loader: string;
   loaderVersion: string;
 }>();
+
+const route = useNativeRoute();
+const serverId = route.params.id as string;
 </script>

@@ -202,14 +202,14 @@
         </div>
       </div>
 
-      <div v-if="isEditing" class="h-full w-full flex-grow overflow-visible">
+      <div v-if="isEditing" class="h-full w-full flex-grow">
         <component
           :is="VAceEditor"
           v-model:value="fileContent"
           lang="json"
           theme="one_dark"
           :print-margin="false"
-          style="height: 100%"
+          style="height: 750px"
         />
       </div>
       <div

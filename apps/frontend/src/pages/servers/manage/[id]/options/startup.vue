@@ -21,8 +21,9 @@
               <span> The version of Java that your server will run on. </span>
             </label>
             <DropdownSelect
+              v-model="jdkVersion"
               name="version"
-              :options="['Java 8', 'Java 11', 'Java 16', 'Java 17', 'Java 21', 'Java 22']"
+              :options="['Java 21', 'Java 17', 'Java 11', 'Java 8']"
               placeholder="Java Version"
             />
           </div>
@@ -32,8 +33,9 @@
               <span> The runtime that your server will run on. </span>
             </label>
             <DropdownSelect
+              v-model="jdkBuild"
               name="runtime"
-              :options="['OpenJDK', 'Corretto', 'OpenJ9', 'Adoptium', 'GraalVM']"
+              :options="['Corretto', 'Adoptium', 'GraalVM']"
               placeholder="Runtime"
             />
           </div>
@@ -60,12 +62,22 @@ const serverStore = useServerStore();
 
 const data = computed(() => serverStore.serverData[serverId]);
 
+const invocation = ref();
+const jdkVersion = ref();
+const jdkBuild = ref();
+
 const isUpdating = ref(false);
 const hasUnsavedChanges = ref(false);
 
 const saveStartup = async () => {
   try {
     isUpdating.value = true;
+    await serverStore.updateStartupSettings(
+      serverId,
+      invocation.value,
+      jdkVersion.value,
+      jdkBuild.value,
+    );
     await new Promise((resolve) => setTimeout(resolve, 500));
     // @ts-ignore
     app.$notify({

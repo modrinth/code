@@ -1,9 +1,13 @@
 <template>
   <div v-if="game" class="flex flex-row items-center gap-2">
     <GameIcon aria-hidden="true" class="size-5 text-secondary" />
-    <span class="text-sm font-semibold">
+    <NuxtLink
+      :to="serverId ? `/servers/manage/${serverId}/options/loader` : ''"
+      class="text-sm font-semibold"
+      :class="serverId ? 'hover:underline' : ''"
+    >
       {{ game[0].toUpperCase() + game.slice(1) }} {{ mcVersion }}
-    </span>
+    </NuxtLink>
   </div>
 </template>
 
@@ -14,4 +18,7 @@ defineProps<{
   game: string;
   mcVersion: string;
 }>();
+
+const route = useNativeRoute();
+const serverId = route.params.id as string;
 </script>

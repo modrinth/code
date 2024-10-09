@@ -35,11 +35,11 @@
 </template>
 
 <script setup lang="ts">
-import { XIcon } from "@modrinth/assets";
+import { XIcon } from '@modrinth/assets'
 
-export type StatusState = "Installing" | "Failed";
+export type StatusState = 'Installing' | 'Failed'
 
 defineProps<{
-  state: StatusState;
-}>();
+  state: StatusState
+}>()
 </script>

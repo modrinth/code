@@ -1,40 +1,19 @@
 <template>
-  <Modal ref="addModModal" header="">
-    <div class="h-[500px]">
-      <UiServersPyroModal header="Add Datapack" data="data" @modal="addModModal.hide()">
-        <UiServersProjectSelect type="datapack" />
-      </UiServersPyroModal>
+  <div class="flex h-full w-full flex-col px-4">
+    <div class="card flex items-center justify-between gap-2 px-3">
+      <h2 class="m-0 text-2xl font-bold text-contrast">Datapacks</h2>
+      <ButtonStyled color="brand">
+        <button v-tooltip="'Add a mod'">
+          <PlusIcon />
+          Add Datapack
+        </button>
+      </ButtonStyled>
     </div>
-  </Modal>
-  <div class="flex h-full w-full flex-col">
-    <div
-      class="flex items-center justify-between gap-2 border-0 border-b border-solid border-bg-raised p-3"
-    >
-      <h2 class="m-0 text-2xl font-bold text-contrast">DataPacks</h2>
-      <Button icon-only transparent @click="addModModal.show()">
-        <PlusIcon class="h-10 w-10 text-contrast" />
-      </Button>
-    </div>
-    <div
-      v-if="data && status == 'success'"
-      class="flex h-full w-full flex-col overflow-y-scroll"
-    ></div>
-    <UiServersPyroLoading v-else />
+    soon tm
   </div>
 </template>
 
 <script setup lang="ts">
 import { PlusIcon } from "@modrinth/assets";
-import { Button, Modal } from "@modrinth/ui";
-
-const serverStore = useServerStore();
-const route = useNativeRoute();
-const serverId = route.params.id as string;
-
-const addModModal = ref();
-
-const { data, status } = await useLazyAsyncData("content-datapacks-data", async () => {
-  await serverStore.fetchServerData(serverId);
-  return serverStore.getServerData(serverId);
-});
+import { ButtonStyled } from "@modrinth/ui";
 </script>

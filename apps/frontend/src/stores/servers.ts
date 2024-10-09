@@ -367,9 +367,39 @@ export const useServerStore = defineStore("servers", {
       }
     },
 
-    async reserveNewAllocation(serverId: string): Promise<Allocation> {
+    async getStartupSettings(serverId: string) {
       try {
-        return await usePyroFetch<Allocation>(`servers/${serverId}/allocations`, {
+        await usePyroFetch(`servers/${serverId}/startup`, {
+          method: "GET",
+        });
+      } catch (error) {
+        console.error("Error updating startup settings:", error);
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
+      }
+    },
+
+    async updateStartupSettings(
+      serverId: string,
+      invocation: string,
+      jdkVersion: "lts8" | "lts11" | "lts17" | "lts21",
+      jdkBuild: "corretto" | "temurin" | "graal",
+    ) {
+      try {
+        await usePyroFetch(`servers/${serverId}/startup`, {
+          method: "POST",
+          body: { invocation, jdk_version: jdkVersion, jdk_build: jdkBuild },
+        });
+      } catch (error) {
+        console.error("Error updating startup settings:", error);
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
+      }
+    },
+
+    async reserveAllocation(serverId: string, name: string): Promise<Allocation> {
+      try {
+        return await usePyroFetch<Allocation>(`servers/${serverId}/allocations?name=${name}`, {
           method: "POST",
         });
       } catch (error) {
@@ -379,20 +409,11 @@ export const useServerStore = defineStore("servers", {
       }
     },
 
-    async updateAllocations(serverId: string, allocations: Allocation[]) {
+    async updateAllocation(serverId: string, port: number, name: string) {
       try {
-        await usePyroFetch(`servers/${serverId}/allocations`, {
+        await usePyroFetch(`servers/${serverId}/allocations/${port}?name=${name}`, {
           method: "PUT",
-          body: { allocations },
         });
-
-        if (this.serverData[serverId]) {
-          this.serverData[serverId].net.allocations = allocations;
-        } else {
-          console.warn(
-            `Attempting to update allocations for non-existent server data. Server ID: ${serverId}`,
-          );
-        }
       } catch (error) {
         console.error("Error updating allocations:", error);
         this.error = error instanceof Error ? error : new Error("An unknown error occurred");
@@ -400,21 +421,11 @@ export const useServerStore = defineStore("servers", {
       }
     },
 
-    async deleteAllocation(serverId: string, allocationPort: number) {
+    async deleteAllocation(serverId: string, port: number) {
       try {
-        await usePyroFetch(`servers/${serverId}/allocations/${allocationPort}`, {
+        await usePyroFetch(`servers/${serverId}/allocations/${port}`, {
           method: "DELETE",
         });
-
-        if (this.serverData[serverId]) {
-          this.serverData[serverId].net.allocations = this.serverData[
-            serverId
-          ].net.allocations.filter((allocation) => allocation.port !== allocationPort);
-        } else {
-          console.warn(
-            `Attempting to delete allocation for non-existent server data. Server ID: ${serverId}`,
-          );
-        }
       } catch (error) {
         console.error("Error deleting allocation:", error);
         this.error = error instanceof Error ? error : new Error("An unknown error occurred");

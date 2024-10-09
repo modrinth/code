@@ -32,7 +32,6 @@
               :loader="serverData.loader!"
               :loader-version="serverData.loader_version ?? ''"
             />
-            <UiServersServerModLabel v-if="showModLabel" :mods="serverData.mods" />
             <UiServersServerSubdomainLabel
               v-if="serverData.net.domain"
               :subdomain="serverData.net.domain"

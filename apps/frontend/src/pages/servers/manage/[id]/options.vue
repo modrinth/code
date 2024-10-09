@@ -3,7 +3,14 @@
 </template>
 
 <script setup lang="ts">
-import { CogIcon, FileIcon, ListIcon, TextQuoteIcon, VersionIcon } from "@modrinth/assets";
+import {
+  CogIcon,
+  FileIcon,
+  ListIcon,
+  LoaderIcon,
+  TextQuoteIcon,
+  VersionIcon,
+} from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id.toString();
@@ -15,7 +22,7 @@ useHead({
 
 const navLinks = [
   { icon: CogIcon, label: "General", href: `/servers/manage/${serverId}/options` },
-  { icon: CogIcon, label: "Loader", href: `/servers/manage/${serverId}/options/loader` },
+  { icon: LoaderIcon, label: "Loader", href: `/servers/manage/${serverId}/options/loader` },
   { icon: TextQuoteIcon, label: "Startup", href: `/servers/manage/${serverId}/options/startup` },
   { icon: VersionIcon, label: "Network", href: `/servers/manage/${serverId}/options/network` },
   { icon: ListIcon, label: "Properties", href: `/servers/manage/${serverId}/options/properties` },

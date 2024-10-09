@@ -6,5 +6,5 @@
 </template>
 
 <script setup lang="ts">
-import { PyroIcon } from "@modrinth/assets";
+import { PyroIcon } from '@modrinth/assets'
 </script>

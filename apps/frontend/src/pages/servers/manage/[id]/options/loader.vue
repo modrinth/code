@@ -115,80 +115,135 @@
           </p>
         </div>
         <div class="flex w-full flex-col gap-4 rounded-xl bg-table-alternateRow p-2 pr-4">
-          <div class="flex items-center gap-2">
-            <Button
-              v-tooltip="'Reinstall the server as vanilla with no mods'"
-              icon-only
-              :class="data.loader === 'Vanilla' ? '[&&]:bg-bg-green' : ''"
-              @click="selectLoader('Vanilla')"
-            >
-              <UiServersLoaderIcon
-                loader="Vanilla"
-                class="[&&]:size-10"
-                :class="data.loader === 'Vanilla' ? 'text-brand' : ''"
-              />
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div
+                class="rounded-xl bg-button-bg p-2"
+                :class="data.loader === 'Vanilla' ? '[&&]:bg-bg-green' : ''"
+              >
+                <UiServersLoaderIcon
+                  loader="Vanilla"
+                  class="[&&]:size-10"
+                  :class="data.loader === 'Vanilla' ? 'text-brand' : ''"
+                />
+              </div>
+              <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Vanilla</h1>
+              <span
+                v-if="data.loader === 'Vanilla'"
+                class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
+              >
+                Current
+              </span>
+            </div>
+
+            <Button @click="selectLoader('Vanilla')">
+              {{ data.loader === "Vanilla" ? "Reinstall" : "Install" }}
+              <ChevronRightIcon />
             </Button>
-            <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Vanilla</h1>
           </div>
-          <div class="flex items-center gap-2">
-            <Button
-              v-tooltip="'Reinstall the server with th fabric modloader'"
-              icon-only
-              :class="data.loader === 'Fabric' ? '[&&]:bg-bg-green' : ''"
-              @click="selectLoader('Fabric')"
-            >
-              <UiServersLoaderIcon
-                loader="Fabric"
-                class="[&&]:size-10"
-                :class="data.loader === 'Fabric' ? 'text-brand' : ''"
-              />
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div
+                class="rounded-xl bg-button-bg p-2"
+                :class="data.loader === 'Fabric' ? '[&&]:bg-bg-green' : ''"
+              >
+                <UiServersLoaderIcon
+                  loader="Fabric"
+                  class="[&&]:size-10"
+                  :class="data.loader === 'Fabric' ? 'text-brand' : ''"
+                />
+              </div>
+              <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Fabric</h1>
+              <span
+                v-if="data.loader === 'Fabric'"
+                class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
+              >
+                Current
+              </span>
+            </div>
+
+            <Button @click="selectLoader('Fabric')">
+              {{ data.loader === "Fabric" ? "Reinstall" : "Install" }}
+              <ChevronRightIcon />
             </Button>
-            <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Fabric</h1>
           </div>
-          <div class="flex items-center gap-2">
-            <Button
-              v-tooltip="'Reinstall the server with the quilt modloader'"
-              icon-only
-              :class="data.loader === 'Quilt' ? '[&&]:bg-bg-green' : ''"
-              @click="selectLoader('Quilt')"
-            >
-              <UiServersLoaderIcon
-                loader="Quilt"
-                class="[&&]:size-10"
-                :class="data.loader === 'Quilt' ? 'text-brand' : ''"
-              />
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div
+                class="rounded-xl bg-button-bg p-2"
+                :class="data.loader === 'Quilt' ? '[&&]:bg-bg-green' : ''"
+              >
+                <UiServersLoaderIcon
+                  loader="Quilt"
+                  class="[&&]:size-10"
+                  :class="data.loader === 'Quilt' ? 'text-brand' : ''"
+                />
+              </div>
+              <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Quilt</h1>
+              <span
+                v-if="data.loader === 'Quilt'"
+                class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
+              >
+                Current
+              </span>
+            </div>
+
+            <Button @click="selectLoader('Quilt')">
+              {{ data.loader === "Quilt" ? "Reinstall" : "Install" }}
+              <ChevronRightIcon />
             </Button>
-            <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Quilt</h1>
           </div>
-          <div class="flex items-center gap-2">
-            <Button
-              v-tooltip="'Reinstall the server with the forge modloader'"
-              icon-only
-              :class="data.loader === 'Forge' ? '[&&]:bg-bg-green' : ''"
-              @click="selectLoader('Forge')"
-            >
-              <UiServersLoaderIcon
-                loader="Forge"
-                class="[&&]:size-10"
-                :class="data.loader === 'Forge' ? 'text-brand' : ''"
-              />
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div
+                class="rounded-xl bg-button-bg p-2"
+                :class="data.loader === 'Forge' ? '[&&]:bg-bg-green' : ''"
+              >
+                <UiServersLoaderIcon
+                  loader="Forge"
+                  class="[&&]:size-10"
+                  :class="data.loader === 'Forge' ? 'text-brand' : ''"
+                />
+              </div>
+              <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Forge</h1>
+              <span
+                v-if="data.loader === 'Forge'"
+                class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
+              >
+                Current
+              </span>
+            </div>
+
+            <Button @click="selectLoader('Forge')">
+              {{ data.loader === "Forge" ? "Reinstall" : "Install" }}
+              <ChevronRightIcon />
             </Button>
-            <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Forge</h1>
           </div>
-          <div class="flex items-center gap-2">
-            <Button
-              v-tooltip="'Reinstall the server with the neoforge modloader'"
-              icon-only
-              :class="data.loader === 'Neoforge' ? '[&&]:bg-bg-green' : ''"
-              @click="selectLoader('Neoforge')"
-            >
-              <UiServersLoaderIcon
-                loader="Neoforge"
-                class="[&&]:size-10"
-                :class="data.loader === 'Neoforge' ? 'text-brand' : ''"
-              />
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div
+                class="rounded-xl bg-button-bg p-2"
+                :class="data.loader === 'Neoforge' ? '[&&]:bg-bg-green' : ''"
+              >
+                <UiServersLoaderIcon
+                  loader="Neoforge"
+                  class="[&&]:size-10"
+                  :class="data.loader === 'Neoforge' ? 'text-brand' : ''"
+                />
+              </div>
+              <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Neoforge</h1>
+              <span
+                v-if="data.loader === 'Neoforge'"
+                class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
+              >
+                Current
+              </span>
+            </div>
+
+            <Button @click="selectLoader('Neoforge')">
+              {{ data.loader === "Neoforge" ? "Reinstall" : "Install" }}
+              <ChevronRightIcon />
             </Button>
-            <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Neoforge</h1>
           </div>
         </div>
       </div>

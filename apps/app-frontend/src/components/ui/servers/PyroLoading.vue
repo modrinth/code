@@ -11,16 +11,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { PyroIcon } from "@modrinth/assets";
+import { ref, onMounted } from 'vue'
+import { PyroIcon } from '@modrinth/assets'
 
-const showLoading = ref(false);
+const showLoading = ref(false)
 
 onMounted(() => {
   setTimeout(() => {
-    showLoading.value = true;
-  }, 5000);
-});
+    showLoading.value = true
+  }, 5000)
+})
 </script>
 
 <style>

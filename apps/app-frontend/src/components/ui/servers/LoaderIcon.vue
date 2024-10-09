@@ -169,12 +169,12 @@
 </template>
 
 <script setup lang="ts">
-import { LoaderIcon } from "@modrinth/assets";
+import { LoaderIcon } from '@modrinth/assets'
 
 defineProps({
   loader: {
     type: String,
-    default: "",
+    default: '',
   },
-});
+})
 </script>

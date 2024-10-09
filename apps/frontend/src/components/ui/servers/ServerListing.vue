@@ -56,14 +56,16 @@
           :loader="loader!"
           :loader-version="loader_version ?? ''"
         />
-        <UiServersServerModLabel v-if="showModLabel" :mods="mods || []" />
+        <UiServersServerSubdomainLabel
+          v-if="showSubdomainLabel"
+          :subdomain="props.net?.domain ?? ''"
+        />
       </div>
     </div>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
 import { ChevronRightIcon } from "@modrinth/assets";
 import type { StatusState } from "./ServerInstallStatusPill.vue";
 import type { Project, Server } from "~/types/servers";
@@ -81,7 +83,7 @@ const status = computed(() => ({
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
-const showModLabel = computed(() => (props.mods?.length ?? 0) > 0);
+const showSubdomainLabel = computed(() => !!props.net?.domain);
 
 const { data: projectData } = await useLazyAsyncData<Project>(
   `server-project-${props.server_id}`,

@@ -51,7 +51,6 @@
 <script setup lang="ts">
 import { PlusIcon, ChevronRightIcon } from "@modrinth/assets";
 import { ButtonStyled, Modal, DropdownSelect } from "@modrinth/ui";
-import { ref, computed } from "vue";
 
 interface Mod {
   name?: string;

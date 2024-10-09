@@ -18,6 +18,7 @@
         "STRIPE_PUBLISHABLE_KEY",
         "PYRO_BASE_URL",
         "PROD_OVERRIDE",
+        "PYRO_MASTER_KEY",
         "PORT"
       ]
     },

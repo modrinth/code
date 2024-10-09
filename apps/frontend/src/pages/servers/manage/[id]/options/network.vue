@@ -1,4 +1,16 @@
 <template>
+  <Modal ref="newAllocationModal" header="New Allocation">
+    <div class="flex flex-col gap-4">
+      <label for="allocation-name" class="flex flex-col gap-2">
+        <span class="text-lg font-bold text-contrast">Allocation Name</span>
+        <input id="allocation-name" v-model="newAllocationName" class="w-full" />
+      </label>
+    </div>
+    <div class="button-row">
+      <Button @click="newAllocationModal.hide()"> Cancel </Button>
+      <Button color="primary" @click="addNewAllocation"> Create </Button>
+    </div>
+  </Modal>
   <div class="relative h-full w-full overflow-y-auto">
     <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4 px-4">
       <div class="flex h-full flex-col">
@@ -75,24 +87,6 @@
         :reset="resetNetwork"
       />
     </div>
-
-    <!-- New Allocation Modal -->
-    <Modal v-model:show="showNewAllocationModal">
-      <template #title>New Allocation</template>
-      <template #content>
-        <div class="flex flex-col gap-4">
-          <label for="allocation-name" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Allocation Name</span>
-            <input id="allocation-name" v-model="newAllocationName" class="w-full" />
-          </label>
-        </div>
-      </template>
-      <template #footer>
-        <ButtonStyled type="standard" color="brand" @click="addNewAllocation">
-          <button>Add Allocation</button>
-        </ButtonStyled>
-      </template>
-    </Modal>
   </div>
 </template>
 
@@ -115,21 +109,20 @@ const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
 
 const allocations = ref(data?.value?.net?.allocations ?? []);
-const showNewAllocationModal = ref(false);
+const newAllocationModal = ref();
 const newAllocationName = ref("");
 
 const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
 
 const openNewAllocationModal = () => {
-  showNewAllocationModal.value = true;
-  newAllocationName.value = "";
+  newAllocationModal.value.show();
 };
 
 const addNewAllocation = async () => {
   if (!newAllocationName.value) return;
 
   try {
-    const response = await serverStore.reserveNewAllocation(serverId);
+    const response = await serverStore.reserveAllocation(serverId, newAllocationName.value);
     const newPort = response.port;
 
     allocations.value.push({
@@ -137,7 +130,7 @@ const addNewAllocation = async () => {
       port: newPort,
     });
 
-    showNewAllocationModal.value = false;
+    newAllocationModal.value.hide();
     newAllocationName.value = "";
   } catch (error) {
     console.error("Failed to reserve new allocation:", error);
@@ -164,8 +157,16 @@ const saveNetwork = async () => {
       });
       return;
     }
-    await serverStore.changeSubdomain(serverId, serverSubdomain.value);
-    await serverStore.updateAllocations(serverId, allocations.value);
+    if (serverSubdomain.value !== data?.value?.net?.domain) {
+      await serverStore.changeSubdomain(serverId, serverSubdomain.value);
+    }
+    if (serverPrimaryPort.value !== data?.value?.net?.port) {
+      await serverStore.updateAllocation(
+        serverId,
+        serverPrimaryPort.value,
+        newAllocationName.value,
+      );
+    }
     await new Promise((resolve) => setTimeout(resolve, 500));
     // @ts-ignore
     app.$notify({

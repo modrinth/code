@@ -324,10 +324,12 @@ export default defineNuxtConfig({
     rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
     pyroBaseUrl: process.env.PYRO_BASE_URL,
     prodOverride: process.env.PROD_OVERRIDE,
+    masterKey: process.env.PYRO_MASTER_KEY,
     public: {
       apiBaseUrl: getApiUrl(),
       pyroBaseUrl: process.env.PYRO_BASE_URL,
       prodOverride: process.env.PROD_OVERRIDE,
+      masterKey: process.env.PYRO_MASTER_KEY,
       siteUrl: getDomain(),
       production: isProduction(),
       featureFlagOverrides: getFeatureFlagOverrides(),

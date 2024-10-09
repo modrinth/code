@@ -183,7 +183,11 @@ export const useWebSocketStore = defineStore('webSocket', () => {
     }
   }
 
-  async function sendPowerAction(auth: SessionToken, serverId: string, action: 'restart' | 'start' | 'stop' | 'kill') {
+  async function sendPowerAction(
+    auth: SessionToken,
+    serverId: string,
+    action: 'restart' | 'start' | 'stop' | 'kill',
+  ) {
     const connection = getOrCreateConnection(serverId)
     const actionName = action.charAt(0).toUpperCase() + action.slice(1)
     console.log(`${actionName}ing server ${serverId}`)
