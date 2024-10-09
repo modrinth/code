@@ -61,6 +61,7 @@
             </span>
 
             <input
+              v-if="isServerRunning"
               v-model="commandInput"
               type="text"
               placeholder="Send a command"
@@ -72,6 +73,13 @@
               @keydown.down.prevent="selectNextSuggestion"
               @keydown.up.prevent="selectPrevSuggestion"
               @keydown.enter.prevent="sendCommand"
+            />
+            <input
+              v-else
+              disabled
+              type="text"
+              placeholder="Send a command"
+              class="z-50 w-full rounded-md px-4 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
             />
           </div>
         </div>
