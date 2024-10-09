@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="contents">
     <div v-if="data">
       <UiServersServerSidebar :route="route" :nav-links="navLinks" />
     </div>
