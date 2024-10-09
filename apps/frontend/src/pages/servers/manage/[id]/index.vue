@@ -640,15 +640,31 @@ const reauthenticate = async () => {
   }
 };
 
+const toAdverb = (word: string) => {
+  if (word.endsWith("p")) {
+    return word + "ping";
+  }
+  if (word.endsWith("e")) {
+    return word.slice(0, -1) + "ing";
+  }
+  if (word.endsWith("ie")) {
+    return word.slice(0, -2) + "ying";
+  }
+  return word + "ing";
+};
+
 const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   try {
     isActioning.value = true;
     await serverStore.sendPowerAction(serverId, actionName);
-    notifySuccess(`${actionName}ing server`, `This may take a few moments.`);
+    notifySuccess(`${toAdverb(actionName)} server`, `This may take a few moments.`);
   } catch (error) {
-    console.error(`Error ${actionName}ing server:`, error);
-    notifyError(`Error ${actionName}ing server`, "An error occurred while performing this action.");
+    console.error(`Error ${toAdverb(actionName)} server:`, error);
+    notifyError(
+      `Error ${toAdverb(actionName)} server`,
+      "An error occurred while performing this action.",
+    );
   } finally {
     isActioning.value = false;
   }
