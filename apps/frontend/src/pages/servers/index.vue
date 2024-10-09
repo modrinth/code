@@ -250,10 +250,10 @@
                 <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                 <path d="M2 12h20" />
               </svg>
-              <h2 class="m-0 text-lg font-bold">Custom subdomain</h2>
+              <h2 class="m-0 text-lg font-bold">Custom URL</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
                 Share your server with a custom
-                <span class="text-contrast">modrinth.gg</span> subdomain.
+                <span class="text-contrast">modrinth.gg</span> URL.
               </h3>
               <div
                 aria-hidden="true"
@@ -282,7 +282,7 @@
               </svg>
               <h2 class="m-0 text-lg font-bold">Backups included</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
-                Backup your server up to 15 times and keep your data stored forever.
+                Back up your server up to 15 times and keep your data stored forever.
               </h3>
             </div>
           </div>
@@ -300,6 +300,7 @@
               class="absolute -bottom-16 -right-[15%] max-w-2xl rounded-2xl bg-brand p-4"
             />
             <div
+              aria-hidden="true"
               class="absolute bottom-8 right-8 rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)]"
             >
               8.49 GB used
@@ -330,7 +331,7 @@
           </svg>
           <h2 class="m-0 text-lg font-bold">Help when you need it</h2>
           <h3 class="m-0 text-base font-normal text-secondary">
-            Reach out to the Modrinth team for help with your server.
+            Reach out to the Modrinth team for help with your server at any time.
           </h3>
         </div>
       </div>
@@ -348,14 +349,11 @@
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          Plans start at ___. Cancel anytime.
+          It's time to play on a platform tailored for modded Minecraft. Plans start at $12.
         </h2>
 
-        <div class="relative flex w-full flex-col items-center gap-8">
-          <ButtonStyled color="brand" size="large">
-            <nuxt-link class="w-fit" to="/mods"> Start your server </nuxt-link>
-          </ButtonStyled>
-          <UiServersPoweredByPyro class="!mt-0" />
+        <div class="flex w-full flex-row">
+          <div class=""></div>
         </div>
       </div>
     </section>
@@ -368,7 +366,7 @@ import { ButtonStyled } from "@modrinth/ui";
 
 const title = "Modrinth Servers";
 const description =
-  "Start your own Minecraft server directly in the Modrinth app. Play your favorite mods, plugins, and datapacks — without the hassle of setup.";
+  "Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins, and datapacks — without the hassle of setup.";
 
 useSeoMeta({
   title,
