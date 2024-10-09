@@ -78,10 +78,6 @@ const props = defineProps<{
   fullScreen: boolean;
 }>();
 
-defineEmits<{
-  (e: "toggle-full-screen"): void;
-}>();
-
 const scrollContainer = ref<HTMLElement | null>(null);
 const itemRefs = ref<HTMLElement[]>([]);
 const itemHeights = ref<number[]>([]);
@@ -90,7 +86,7 @@ const bufferSize = 5;
 
 const scrollTop = ref(0);
 const clientHeight = ref(0);
-const isFullScreen = ref(false);
+const isFullScreen = ref(props.fullScreen);
 
 const totalHeight = computed(
   () =>
@@ -173,11 +169,19 @@ const scrollToBottom = () => {
 const enterFullScreen = () => {
   isFullScreen.value = true;
   document.body.style.overflow = "hidden";
+  nextTick(() => {
+    updateClientHeight();
+    updateItemHeights();
+  });
 };
 
 const exitFullScreen = () => {
   isFullScreen.value = false;
   document.body.style.overflow = "";
+  nextTick(() => {
+    updateClientHeight();
+    updateItemHeights();
+  });
 };
 
 const toggleFullscreen = () => {
@@ -223,8 +227,25 @@ watch(
 );
 
 watch([visibleStartIndex, visibleEndIndex], updateItemHeights);
-</script>
 
+watch(
+  () => props.fullScreen,
+  (newValue) => {
+    isFullScreen.value = newValue;
+    nextTick(() => {
+      updateClientHeight();
+      updateItemHeights();
+    });
+  },
+);
+
+watch(isFullScreen, () => {
+  nextTick(() => {
+    updateClientHeight();
+    updateItemHeights();
+  });
+});
+</script>
 <style scoped>
 .terminal-font {
   font-family: var(--mono-font);
