@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { BoxIcon, CogIcon } from "@modrinth/assets";
+import { BookIcon, BoxIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -22,8 +22,7 @@ await serverStore.fetchServerData(serverId);
 const data = computed(() => serverStore.serverData[serverId]);
 
 const navLinks = [
-  { icon: CogIcon, label: "Loader", href: `/servers/manage/${serverId}/content` },
-  { icon: BoxIcon, label: "Mods", href: `/servers/manage/${serverId}/content/mods` },
-  // { icon: BookIcon, label: "Datapacks", href: `/servers/manage/${serverId}/content/datapacks` },
+  { icon: BoxIcon, label: "Mods", href: `/servers/manage/${serverId}/content` },
+  { icon: BookIcon, label: "Datapacks", href: `/servers/manage/${serverId}/content/datapacks` },
 ];
 </script>

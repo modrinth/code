@@ -349,11 +349,19 @@
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          It's time to play on a platform tailored for modded Minecraft. Plans start at $12.
+          Tailor-made for modded Minecraft. Breathtakingly fast. Plans start at
+          <!-- hook stripe -->
+          <span>$12</span>
         </h2>
 
         <div class="flex w-full flex-row">
-          <div class=""></div>
+          <div class="flex flex-col gap-6 rounded-2xl bg-bg p-8 text-left">
+            <div role="heading" aria-level="2" class="text-lg font-bold">4 GB</div>
+            <div class="flex flex-row items-end">
+              <div class="text-5xl font-bold text-contrast">$12</div>
+              <div class="text-secondary">/month</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
