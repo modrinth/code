@@ -39,6 +39,7 @@
           type="text"
           class="rounded border p-2 [&&]:w-full"
           :value="serverName"
+          placeholder="Server name"
           @input="updateServerName($event)"
         />
         <Button icon-only @click="() => createServer()">
