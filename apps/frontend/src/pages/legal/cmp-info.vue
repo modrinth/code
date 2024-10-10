@@ -81,7 +81,7 @@
     <h3 id="pending">What does "pending" revenue mean in my dashboard?</h3>
     <p>
       Modrinth receives ad revenue from our ad providers on a NET 60 day basis. Due to this, not all
-      revenue is not immediately available to withdraw. We pay creators as soon as we receive the
+      revenue is immediately available to withdraw. We pay creators as soon as we receive the
       money from our ad providers, which is 60 days after the last day of each month. This table
       outlines some example dates of how NET 60 payments are made:
     </p>
