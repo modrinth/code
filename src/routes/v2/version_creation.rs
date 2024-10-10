@@ -106,14 +106,11 @@ pub async fn version_create(
 
                 // Get all possible side-types for loaders given- we will use these to check if we need to convert/apply singleplayer, etc.
                 let loaders = match v3::tags::loader_list(client.clone(), redis.clone()).await {
-                    Ok(loader_response) => match v2_reroute::extract_ok_json::<
-                        Vec<v3::tags::LoaderData>,
-                    >(loader_response)
-                    .await
-                    {
-                        Ok(loaders) => loaders,
-                        Err(_) => vec![],
-                    },
+                    Ok(loader_response) => {
+                        (v2_reroute::extract_ok_json::<Vec<v3::tags::LoaderData>>(loader_response)
+                            .await)
+                            .unwrap_or_default()
+                    }
                     Err(_) => vec![],
                 };
 

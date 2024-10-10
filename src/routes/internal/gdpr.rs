@@ -21,7 +21,7 @@ pub async fn export(
         &req,
         &**pool,
         &redis,
-        &*session_queue,
+        &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
     )
     .await?
@@ -34,19 +34,19 @@ pub async fn export(
         crate::database::models::Collection::get_many(&collection_ids, &**pool, &redis)
             .await?
             .into_iter()
-            .map(|x| crate::models::collections::Collection::from(x))
+            .map(crate::models::collections::Collection::from)
             .collect::<Vec<_>>();
 
     let follows = crate::database::models::User::get_follows(user_id, &**pool)
         .await?
         .into_iter()
-        .map(|x| crate::models::ids::ProjectId::from(x))
+        .map(crate::models::ids::ProjectId::from)
         .collect::<Vec<_>>();
 
     let projects = crate::database::models::User::get_projects(user_id, &**pool, &redis)
         .await?
         .into_iter()
-        .map(|x| crate::models::ids::ProjectId::from(x))
+        .map(crate::models::ids::ProjectId::from)
         .collect::<Vec<_>>();
 
     let org_ids = crate::database::models::User::get_organizations(user_id, &**pool).await?;
@@ -64,7 +64,7 @@ pub async fn export(
     )
     .await?
     .into_iter()
-    .map(|x| crate::models::notifications::Notification::from(x))
+    .map(crate::models::notifications::Notification::from)
     .collect::<Vec<_>>();
 
     let oauth_clients =
@@ -73,7 +73,7 @@ pub async fn export(
         )
         .await?
         .into_iter()
-        .map(|x| crate::models::oauth_clients::OAuthClient::from(x))
+        .map(crate::models::oauth_clients::OAuthClient::from)
         .collect::<Vec<_>>();
 
     let oauth_authorizations = crate::database::models::oauth_client_authorization_item::OAuthClientAuthorization::get_all_for_user(
@@ -81,7 +81,7 @@ pub async fn export(
     )
         .await?
         .into_iter()
-        .map(|x| crate::models::oauth_clients::OAuthClientAuthorization::from(x))
+        .map(crate::models::oauth_clients::OAuthClientAuthorization::from)
         .collect::<Vec<_>>();
 
     let pat_ids = crate::database::models::pat_item::PersonalAccessToken::get_user_pats(
@@ -102,7 +102,7 @@ pub async fn export(
     let payouts = crate::database::models::payout_item::Payout::get_many(&payout_ids, &**pool)
         .await?
         .into_iter()
-        .map(|x| crate::models::payouts::Payout::from(x))
+        .map(crate::models::payouts::Payout::from)
         .collect::<Vec<_>>();
 
     let report_ids =
@@ -110,7 +110,7 @@ pub async fn export(
     let reports = crate::database::models::report_item::Report::get_many(&report_ids, &**pool)
         .await?
         .into_iter()
-        .map(|x| crate::models::reports::Report::from(x))
+        .map(crate::models::reports::Report::from)
         .collect::<Vec<_>>();
 
     let message_ids = sqlx::query!(
@@ -146,7 +146,7 @@ pub async fn export(
         crate::database::models::image_item::Image::get_many(&uploaded_images_ids, &**pool, &redis)
             .await?
             .into_iter()
-            .map(|x| crate::models::images::Image::from(x))
+            .map(crate::models::images::Image::from)
             .collect::<Vec<_>>();
 
     let subscriptions =
@@ -155,7 +155,7 @@ pub async fn export(
         )
         .await?
         .into_iter()
-        .map(|x| crate::models::billing::UserSubscription::from(x))
+        .map(crate::models::billing::UserSubscription::from)
         .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(serde_json::json!({

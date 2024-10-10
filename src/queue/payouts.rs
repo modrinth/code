@@ -74,7 +74,7 @@ impl PayoutsQueue {
         }
 
         let credential: PaypalCredential = client
-            .post(&format!("{}oauth2/token", dotenvy::var("PAYPAL_API_URL")?))
+            .post(format!("{}oauth2/token", dotenvy::var("PAYPAL_API_URL")?))
             .header("Accept", "application/json")
             .header("Accept-Language", "en_US")
             .header("Authorization", formatted_key)

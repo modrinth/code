@@ -13,8 +13,7 @@ pub use super::teams::TeamId;
 pub use super::threads::ThreadId;
 pub use super::threads::ThreadMessageId;
 pub use super::users::UserId;
-pub use crate::models::billing::UserSubscriptionId;
-pub use crate::models::v3::billing::{ProductId, ProductPriceId};
+pub use crate::models::billing::{ChargeId, ProductId, ProductPriceId, UserSubscriptionId};
 use thiserror::Error;
 
 /// Generates a random 64 bit integer that is exactly `n` characters
@@ -137,6 +136,7 @@ base62_id_impl!(PayoutId, PayoutId);
 base62_id_impl!(ProductId, ProductId);
 base62_id_impl!(ProductPriceId, ProductPriceId);
 base62_id_impl!(UserSubscriptionId, UserSubscriptionId);
+base62_id_impl!(ChargeId, ChargeId);
 
 pub mod base62_impl {
     use serde::de::{self, Deserializer, Visitor};

@@ -510,7 +510,7 @@ impl AuthProvider {
                 map.insert("grant_type", "authorization_code");
 
                 let token: AccessToken = reqwest::Client::new()
-                    .post(&format!("{api_url}oauth2/token"))
+                    .post(format!("{api_url}oauth2/token"))
                     .header(reqwest::header::ACCEPT, "application/json")
                     .header(
                         AUTHORIZATION,
@@ -766,7 +766,7 @@ impl AuthProvider {
                 let api_url = dotenvy::var("PAYPAL_API_URL")?;
 
                 let paypal_user: PayPalUser = reqwest::Client::new()
-                    .get(&format!(
+                    .get(format!(
                         "{api_url}identity/openidconnect/userinfo?schema=openid"
                     ))
                     .header(reqwest::header::USER_AGENT, "Modrinth")
@@ -1393,7 +1393,7 @@ pub async fn sign_up_beehiiv(email: &str) -> Result<(), AuthenticationError> {
 
     let client = reqwest::Client::new();
     client
-        .post(&format!(
+        .post(format!(
             "https://api.beehiiv.com/v2/publications/{id}/subscriptions"
         ))
         .header(AUTHORIZATION, format!("Bearer {}", api_key))

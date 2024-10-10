@@ -15,7 +15,7 @@ pub async fn delete_file_version(
     file_name: &str,
 ) -> Result<DeleteFileData, FileHostingError> {
     let response = reqwest::Client::new()
-        .post(&format!(
+        .post(format!(
             "{}/b2api/v2/b2_delete_file_version",
             authorization_data.api_url
         ))

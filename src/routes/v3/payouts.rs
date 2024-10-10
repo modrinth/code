@@ -352,7 +352,7 @@ pub async fn create_payout(
     .fetch_optional(&mut *transaction)
     .await?;
 
-    let balance = get_user_balance(user.id.into(), &**pool).await?;
+    let balance = get_user_balance(user.id, &pool).await?;
     if balance.available < body.amount || body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You do not have enough funds to make this payout!".to_string(),
@@ -734,7 +734,7 @@ pub async fn get_balance(
     .await?
     .1;
 
-    let balance = get_user_balance(user.id.into(), &**pool).await?;
+    let balance = get_user_balance(user.id.into(), &pool).await?;
 
     Ok(HttpResponse::Ok().json(balance))
 }

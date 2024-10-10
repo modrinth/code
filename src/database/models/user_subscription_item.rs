@@ -1,7 +1,8 @@
 use crate::database::models::{DatabaseError, ProductPriceId, UserId, UserSubscriptionId};
-use crate::models::billing::{PriceDuration, SubscriptionStatus};
+use crate::models::billing::{PriceDuration, SubscriptionMetadata, SubscriptionStatus};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
+use std::convert::{TryFrom, TryInto};
 
 pub struct UserSubscriptionItem {
     pub id: UserSubscriptionId,
@@ -9,9 +10,8 @@ pub struct UserSubscriptionItem {
     pub price_id: ProductPriceId,
     pub interval: PriceDuration,
     pub created: DateTime<Utc>,
-    pub expires: DateTime<Utc>,
-    pub last_charge: Option<DateTime<Utc>>,
     pub status: SubscriptionStatus,
+    pub metadata: Option<SubscriptionMetadata>,
 }
 
 struct UserSubscriptionResult {
@@ -20,9 +20,8 @@ struct UserSubscriptionResult {
     price_id: i64,
     interval: String,
     pub created: DateTime<Utc>,
-    pub expires: DateTime<Utc>,
-    pub last_charge: Option<DateTime<Utc>>,
     pub status: String,
+    pub metadata: serde_json::Value,
 }
 
 macro_rules! select_user_subscriptions_with_predicate {
@@ -31,8 +30,8 @@ macro_rules! select_user_subscriptions_with_predicate {
             UserSubscriptionResult,
             r#"
             SELECT
-                id, user_id, price_id, interval, created, expires, last_charge, status
-            FROM users_subscriptions
+                us.id, us.user_id, us.price_id, us.interval, us.created, us.status, us.metadata
+            FROM users_subscriptions us
             "#
                 + $predicate,
             $param
@@ -40,18 +39,19 @@ macro_rules! select_user_subscriptions_with_predicate {
     };
 }
 
-impl From<UserSubscriptionResult> for UserSubscriptionItem {
-    fn from(r: UserSubscriptionResult) -> Self {
-        UserSubscriptionItem {
+impl TryFrom<UserSubscriptionResult> for UserSubscriptionItem {
+    type Error = serde_json::Error;
+
+    fn try_from(r: UserSubscriptionResult) -> Result<Self, Self::Error> {
+        Ok(UserSubscriptionItem {
             id: UserSubscriptionId(r.id),
             user_id: UserId(r.user_id),
             price_id: ProductPriceId(r.price_id),
             interval: PriceDuration::from_string(&r.interval),
             created: r.created,
-            expires: r.expires,
-            last_charge: r.last_charge,
             status: SubscriptionStatus::from_string(&r.status),
-        }
+            metadata: serde_json::from_value(r.metadata)?,
+        })
     }
 }
 
@@ -70,11 +70,14 @@ impl UserSubscriptionItem {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
         let results =
-            select_user_subscriptions_with_predicate!("WHERE id = ANY($1::bigint[])", ids_ref)
+            select_user_subscriptions_with_predicate!("WHERE us.id = ANY($1::bigint[])", ids_ref)
                 .fetch_all(exec)
                 .await?;
 
-        Ok(results.into_iter().map(|r| r.into()).collect())
+        Ok(results
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
     pub async fn get_all_user(
@@ -82,22 +85,38 @@ impl UserSubscriptionItem {
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
         let user_id = user_id.0;
-        let results = select_user_subscriptions_with_predicate!("WHERE user_id = $1", user_id)
+        let results = select_user_subscriptions_with_predicate!("WHERE us.user_id = $1", user_id)
             .fetch_all(exec)
             .await?;
 
-        Ok(results.into_iter().map(|r| r.into()).collect())
+        Ok(results
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
-    pub async fn get_all_expired(
+    pub async fn get_all_unprovision(
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
         let now = Utc::now();
-        let results = select_user_subscriptions_with_predicate!("WHERE expires < $1", now)
-            .fetch_all(exec)
-            .await?;
+        let results = select_user_subscriptions_with_predicate!(
+            "
+             INNER JOIN charges c
+                ON c.subscription_id = us.id
+                    AND (
+                        (c.status = 'cancelled' AND c.due < $1) OR
+                        (c.status = 'failed' AND c.last_attempt < $1 - INTERVAL '2 days')
+                    )
+             ",
+            now
+        )
+        .fetch_all(exec)
+        .await?;
 
-        Ok(results.into_iter().map(|r| r.into()).collect())
+        Ok(results
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
     pub async fn upsert(
@@ -107,44 +126,25 @@ impl UserSubscriptionItem {
         sqlx::query!(
             "
             INSERT INTO users_subscriptions (
-                id, user_id, price_id, interval, created, expires, last_charge, status
+                id, user_id, price_id, interval, created, status, metadata
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8
+                $1, $2, $3, $4, $5, $6, $7
             )
             ON CONFLICT (id)
             DO UPDATE
                 SET interval = EXCLUDED.interval,
-                    expires = EXCLUDED.expires,
-                    last_charge = EXCLUDED.last_charge,
                     status = EXCLUDED.status,
-                    price_id = EXCLUDED.price_id
+                    price_id = EXCLUDED.price_id,
+                    metadata = EXCLUDED.metadata
             ",
             self.id.0,
             self.user_id.0,
             self.price_id.0,
             self.interval.as_str(),
             self.created,
-            self.expires,
-            self.last_charge,
             self.status.as_str(),
-        )
-        .execute(&mut **transaction)
-        .await?;
-
-        Ok(())
-    }
-
-    pub async fn remove(
-        id: UserSubscriptionId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
-        sqlx::query!(
-            "
-            DELETE FROM users_subscriptions
-            WHERE id = $1
-            ",
-            id.0 as i64
+            serde_json::to_value(&self.metadata)?,
         )
         .execute(&mut **transaction)
         .await?;

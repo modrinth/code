@@ -256,6 +256,14 @@ generate_ids!(
     UserSubscriptionId
 );
 
+generate_ids!(
+    pub generate_charge_id,
+    ChargeId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM charges WHERE id=$1)",
+    ChargeId
+);
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Hash, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
@@ -385,6 +393,10 @@ pub struct ProductPriceId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[sqlx(transparent)]
 pub struct UserSubscriptionId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[sqlx(transparent)]
+pub struct ChargeId(pub i64);
 
 use crate::models::ids;
 
@@ -569,5 +581,16 @@ impl From<ids::UserSubscriptionId> for UserSubscriptionId {
 impl From<UserSubscriptionId> for ids::UserSubscriptionId {
     fn from(id: UserSubscriptionId) -> Self {
         ids::UserSubscriptionId(id.0 as u64)
+    }
+}
+
+impl From<ids::ChargeId> for ChargeId {
+    fn from(id: ids::ChargeId) -> Self {
+        ChargeId(id.0 as i64)
+    }
+}
+impl From<ChargeId> for ids::ChargeId {
+    fn from(id: ChargeId) -> Self {
+        ids::ChargeId(id.0 as u64)
     }
 }
