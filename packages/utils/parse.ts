@@ -1,4 +1,12 @@
+import {
+  InfoIcon,
+  LightBulbIcon,
+  MessageSquareWarningIcon,
+  OctogonAlertIcon,
+  TriangleAlertIcon,
+} from '@modrinth/assets'
 import MarkdownIt from 'markdown-it'
+import MarkdownItGitHubAlerts from 'markdown-it-github-alerts'
 import { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } from 'xss'
 
 export const configuredXss = new FilterXSS({
@@ -24,6 +32,19 @@ export const configuredXss = new FilterXSS({
     source: ['media', 'sizes', 'src', 'srcset', 'type'],
     p: [...(whiteList.p || []), 'align'],
     div: [...(whiteList.p || []), 'align'],
+    svg: [
+      'aria-hidden',
+      'width',
+      'height',
+      'viewBox',
+      'fill',
+      'stroke',
+      'stroke-width',
+      'stroke-linecap',
+      'stroke-linejoin',
+    ],
+    path: ['d'],
+    circle: ['cx', 'cy', 'r'],
   },
   css: {
     whiteList: {
@@ -74,6 +95,28 @@ export const configuredXss = new FilterXSS({
         }
       }
       return `${name}="${escapeAttrValue(allowedClasses.join(' '))}"`
+    }
+
+    // For markdown callouts
+    if (name === 'class' && ['div', 'p'].includes(tag)) {
+      const classWhitelist = [
+        'markdown-alert',
+        'markdown-alert-note',
+        'markdown-alert-tip',
+        'markdown-alert-warning',
+        'markdown-alert-important',
+        'markdown-alert-caution',
+        'markdown-alert-title',
+      ]
+
+      const allowed: string[] = []
+      for (const className of value.split(/\s/g)) {
+        if (classWhitelist.includes(className)) {
+          allowed.push(className)
+        }
+      }
+
+      return `${name}="${escapeAttrValue(allowed.join(' '))}"`
     }
   },
   safeAttrValue(tag, name, value, cssFilter) {
@@ -131,6 +174,16 @@ export const md = (options = {}) => {
     linkify: true,
     breaks: false,
     ...options,
+  })
+
+  md.use(MarkdownItGitHubAlerts, {
+    icons: {
+      note: InfoIcon,
+      tip: LightBulbIcon,
+      important: MessageSquareWarningIcon,
+      warning: TriangleAlertIcon,
+      caution: OctogonAlertIcon,
+    },
   })
 
   const defaultLinkOpenRenderer =
