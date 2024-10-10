@@ -346,41 +346,66 @@
         <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
           Start your server on Modrinth
         </h1>
+        <h2
+          class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+        >
+          Choose the plan that's right for your server.
+        </h2>
 
-        <ul class="m-0 flex w-full flex-row gap-8 p-0">
+        <ul class="m-0 flex w-full flex-col gap-8 p-0 md:flex-row">
           <li class="m-0 flex w-full list-none flex-col gap-6 rounded-2xl bg-bg p-8 text-left">
-            <div role="heading" aria-level="2" class="text-lg">Small Server</div>
+            <div role="heading" aria-level="2" class="-mb-4 text-sm">Small</div>
             <div class="flex flex-row items-end">
-              <div class="text-5xl font-bold text-contrast">$xx</div>
+              <div class="text-5xl font-bold text-contrast">$12</div>
               <div class="text-secondary">/month</div>
             </div>
+            <div>4 GB RAM</div>
             <div class="h-[1px] w-full bg-bg-raised"></div>
-            <ul class="m-0 flex flex-col gap-4 p-0">
-              <li class="m-0 flex flex-row items-center gap-2">
-                <CheckCircleIcon class="size-6 text-brand" />
-                <p class="m-0">4 GB RAM</p>
-              </li>
-              <li class="m-0 flex flex-row items-center gap-2">
-                <CheckCircleIcon class="size-6 text-brand" />
-                <p class="m-0">Play with smaller modpacks</p>
-              </li>
-              <li class="m-0 flex flex-row items-center gap-2">
-                <CheckCircleIcon class="size-6 text-brand" />
-                <p class="m-0">Unlimited super-fast storage</p>
-              </li>
-              <li class="m-0 flex flex-row items-center gap-2">
-                <CheckCircleIcon class="size-6 text-brand" />
-                <p class="m-0">Unlimited players</p>
-              </li>
-              <li class="m-0 flex flex-row items-center gap-2">
-                <CheckCircleIcon class="size-6 text-brand" />
-                <p class="m-0">Custom modrinth.gg URL</p>
-              </li>
-              <li class="m-0 flex flex-row items-center gap-2">
-                <CheckCircleIcon class="size-6 text-brand" />
-                <p class="m-0">Support included</p>
-              </li>
-            </ul>
+            <p class="m-0">
+              Perfect for small modpacks and friend groups looking to play together.
+            </p>
+            <ButtonStyled color="standard" size="large">
+              <!-- stripe hook -->
+              <nuxt-link to="#plan"> Select plan </nuxt-link>
+            </ButtonStyled>
+          </li>
+          <li
+            class="relative m-0 flex w-full list-none flex-col gap-6 rounded-2xl bg-highlight p-8 text-left"
+          >
+            <!-- <div
+              class="absolute -right-4 -top-4 flex items-center gap-2 rounded-full bg-brand p-2 text-sm font-bold text-[var(--color-accent-contrast)]"
+            >
+              <CheckCircleIcon class="h-6 w-6 text-[var(--color-accent-contrast)]" />
+              <span> Recommended </span>
+            </div> -->
+            <div role="heading" aria-level="2" class="-mb-4 text-sm text-contrast">Medium</div>
+            <div class="flex flex-row items-end">
+              <div class="text-5xl font-bold text-contrast">$18</div>
+              <div class="text-secondary">/month</div>
+            </div>
+            <div>6 GB RAM</div>
+            <div class="h-[1px] w-full bg-brand opacity-50"></div>
+            <p class="m-0 text-contrast">
+              The best value for most players. Add more mods and friends to your server with ease.
+            </p>
+            <ButtonStyled color="brand" size="large">
+              <!-- stripe hook -->
+              <nuxt-link to="#plan"> Start your server </nuxt-link>
+            </ButtonStyled>
+          </li>
+          <li class="m-0 flex w-full list-none flex-col gap-6 rounded-2xl bg-bg p-8 text-left">
+            <div role="heading" aria-level="2" class="-mb-4 text-sm">Large</div>
+            <div class="flex flex-row items-end">
+              <div class="text-5xl font-bold text-contrast">$24</div>
+              <div class="text-secondary">/month</div>
+            </div>
+            <div>8 GB RAM</div>
+            <div class="h-[1px] w-full bg-bg-raised"></div>
+            <p class="m-0">For the biggest modpacks. Play with hundreds of mods at once.</p>
+            <ButtonStyled color="standard" size="large">
+              <!-- stripe hook -->
+              <nuxt-link to="#plan"> Select plan </nuxt-link>
+            </ButtonStyled>
           </li>
         </ul>
       </div>
