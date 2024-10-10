@@ -137,25 +137,28 @@
             <span class="ms-1 opacity-50">/</span>
           </span>
         </div>
-        <ButtonStyled type="transparent">
-          <OverflowMenu
-            class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-            position="bottom"
-            direction="left"
-            aria-label="Create new..."
-            :options="[
-              { id: 'file', action: () => showCreateModal('file') },
-              { id: 'directory', action: () => showCreateModal('directory') },
-              { id: 'upload', action: () => initiateFileUpload() },
-            ]"
-          >
-            <PlusIcon aria-hidden="true" />
-            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-            <template #file> <BoxIcon aria-hidden="true" /> File </template>
-            <template #directory> <FolderOpenIcon aria-hidden="true" /> Directory </template>
-            <template #upload> <UploadIcon aria-hidden="true" /> Upload </template>
-          </OverflowMenu>
-        </ButtonStyled>
+        <div class="flex gap-2">
+          <ButtonStyled type="transparent">
+            <OverflowMenu
+              class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+              position="bottom"
+              direction="left"
+              aria-label="Create new..."
+              :options="[
+                { id: 'file', action: () => showCreateModal('file') },
+                { id: 'directory', action: () => showCreateModal('directory') },
+                { id: 'upload', action: () => initiateFileUpload() },
+              ]"
+            >
+              <PlusIcon aria-hidden="true" />
+              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+              <template #file> <BoxIcon aria-hidden="true" /> File </template>
+              <template #directory> <FolderOpenIcon aria-hidden="true" /> Directory </template>
+              <template #upload> <UploadIcon aria-hidden="true" /> Upload </template>
+            </OverflowMenu>
+          </ButtonStyled>
+          <Button> Launch SFTP </Button>
+        </div>
       </div>
       <div
         v-else

@@ -82,7 +82,7 @@
                 Primary Allocation
               </span>
 
-              <CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
+              <UiCopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
             </div>
           </div>
 
@@ -140,7 +140,6 @@
 <script setup lang="ts">
 import { PlusIcon, TrashIcon, EditIcon, VersionIcon, SaveIcon } from "@modrinth/assets";
 import { ButtonStyled, Modal, Button } from "@modrinth/ui";
-import CopyCode from "~/components/ui/CopyCode.vue";
 import { useServerStore } from "~/stores/servers.ts";
 
 const route = useNativeRoute();
