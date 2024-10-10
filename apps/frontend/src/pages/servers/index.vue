@@ -416,7 +416,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import { ButtonStyled } from "@modrinth/ui";
-import { CheckCircleIcon } from "@modrinth/assets";
 
 const title = "Modrinth Servers";
 const description =
