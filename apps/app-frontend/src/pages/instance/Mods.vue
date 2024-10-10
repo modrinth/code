@@ -880,6 +880,8 @@ async function refreshProjects() {
 }
 
 const unlisten = await listen('tauri://file-drop', async (event) => {
+  if (isPackLocked.value) return
+
   for (const file of event.payload) {
     if (file.endsWith('.mrpack')) continue
     await add_project_from_path(props.instance.path, file).catch(handleError)
