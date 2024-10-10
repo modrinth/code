@@ -378,7 +378,6 @@ import {
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { trackEvent } from '@/helpers/analytics'
-import { listen } from '@tauri-apps/api/event'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
@@ -393,6 +392,7 @@ import {
 import { profile_listener } from '@/helpers/events.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
 
 const props = defineProps({
   instance: {
@@ -879,8 +879,10 @@ async function refreshProjects() {
   refreshingProjects.value = false
 }
 
-const unlisten = await listen('tauri://file-drop', async (event) => {
-  for (const file of event.payload) {
+const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
+  if (event.payload.type !== 'drop') return
+
+  for (const file of event.payload.paths) {
     if (file.endsWith('.mrpack')) continue
     await add_project_from_path(props.instance.path, file).catch(handleError)
   }

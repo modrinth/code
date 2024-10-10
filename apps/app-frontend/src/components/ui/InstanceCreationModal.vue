@@ -218,7 +218,6 @@ import { get_game_versions, get_loader_versions } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
 import { trackEvent } from '@/helpers/analytics'
-import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
 import {
   get_default_launcher_path,
@@ -226,6 +225,7 @@ import {
   import_instance,
 } from '@/helpers/import.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -255,13 +255,15 @@ defineExpose({
     isShowing.value = true
     modal.value.show()
 
-    unlistener.value = await listen('tauri://file-drop', async (event) => {
+    unlistener.value = await getCurrentWebview().onDragDropEvent(async (event) => {
       // Only if modal is showing
       if (!isShowing.value) return
+      if (event.payload.type !== 'drop') return
       if (creationType.value !== 'from file') return
       hide()
-      if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
-        await install_from_file(event.payload[0]).catch(handleError)
+      const { paths } = event.payload
+      if (paths && paths.length > 0 && paths[0].endsWith('.mrpack')) {
+        await install_from_file(paths[0]).catch(handleError)
         trackEvent('InstanceCreate', {
           source: 'CreationModalFileDrop',
         })
