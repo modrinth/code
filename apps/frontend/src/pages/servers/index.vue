@@ -13,7 +13,7 @@
         <div
           class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
         >
-          Experimental Release
+          Experimental
         </div>
         <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
           Play together on Modrinth Servers
@@ -150,7 +150,7 @@
         </div>
         <div class="relative">
           <img
-            src="~/assets/images/games/servers-hero-square-fixed-forreal.png"
+            src="~/assets/images/games/servers-hero-square-fixed-forreal-updated.png"
             alt=""
             class="w-full rounded-2xl"
           />
@@ -197,7 +197,7 @@
               <polygon points="13 19 22 12 13 5 13 19" />
               <polygon points="2 19 11 12 2 5 2 19" />
             </svg>
-            <h2 class="m-0 text-lg font-bold">Experience the fastest servers in the world</h2>
+            <h2 class="m-0 text-lg font-bold">Play on the fastest servers in the world</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
               Modrinth Servers are hosted on the fastest, most reliable infrastructure using
               custom-built software built by Pyro.
@@ -346,23 +346,43 @@
         <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
           Start your server on Modrinth
         </h1>
-        <h2
-          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
-        >
-          Tailor-made for modded Minecraft. Breathtakingly fast. Plans start at
-          <!-- hook stripe -->
-          <span>$12</span>
-        </h2>
 
-        <div class="flex w-full flex-row">
-          <div class="flex flex-col gap-6 rounded-2xl bg-bg p-8 text-left">
-            <div role="heading" aria-level="2" class="text-lg font-bold">4 GB</div>
+        <ul class="m-0 flex w-full flex-row gap-8 p-0">
+          <li class="m-0 flex w-full list-none flex-col gap-6 rounded-2xl bg-bg p-8 text-left">
+            <div role="heading" aria-level="2" class="text-lg">Small Server</div>
             <div class="flex flex-row items-end">
-              <div class="text-5xl font-bold text-contrast">$12</div>
+              <div class="text-5xl font-bold text-contrast">$xx</div>
               <div class="text-secondary">/month</div>
             </div>
-          </div>
-        </div>
+            <div class="h-[1px] w-full bg-bg-raised"></div>
+            <ul class="m-0 flex flex-col gap-4 p-0">
+              <li class="m-0 flex flex-row items-center gap-2">
+                <CheckCircleIcon class="size-6 text-brand" />
+                <p class="m-0">4 GB RAM</p>
+              </li>
+              <li class="m-0 flex flex-row items-center gap-2">
+                <CheckCircleIcon class="size-6 text-brand" />
+                <p class="m-0">Play with smaller modpacks</p>
+              </li>
+              <li class="m-0 flex flex-row items-center gap-2">
+                <CheckCircleIcon class="size-6 text-brand" />
+                <p class="m-0">Unlimited super-fast storage</p>
+              </li>
+              <li class="m-0 flex flex-row items-center gap-2">
+                <CheckCircleIcon class="size-6 text-brand" />
+                <p class="m-0">Unlimited players</p>
+              </li>
+              <li class="m-0 flex flex-row items-center gap-2">
+                <CheckCircleIcon class="size-6 text-brand" />
+                <p class="m-0">Custom modrinth.gg URL</p>
+              </li>
+              <li class="m-0 flex flex-row items-center gap-2">
+                <CheckCircleIcon class="size-6 text-brand" />
+                <p class="m-0">Support included</p>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </section>
   </div>
@@ -371,6 +391,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import { ButtonStyled } from "@modrinth/ui";
+import { CheckCircleIcon } from "@modrinth/assets";
 
 const title = "Modrinth Servers";
 const description =
