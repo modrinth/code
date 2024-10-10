@@ -45,9 +45,18 @@
   <body>
     <div class="ads-container">
       <div id="plus-link"></div>
-      <div id="modrinth-rail-1" />
+      <div id="modrinth-rail-1"></div>
     </div>
     <script>
+      function getCookie(name) {
+        function escape(s) {
+          return s.replace(/([.*+?\^$(){}|\[\]\/\\])/g, "\\$1");
+        }
+
+        const match = document.cookie.match(RegExp("(?:^|;\\s*)" + escape(name) + "=([^;]*)"));
+        return match ? match[1] : null;
+      }
+
       function initAds(personalized) {
         window.tude = window.tude || { cmd: [] };
 
@@ -62,13 +71,28 @@
           tude.setPrivacySettings({
             personalizedAds: personalized ?? true,
           });
+
+          const hash = getCookie("modrinth-app-token");
+          console.log(hash);
+          tude.setIdProfile({
+            e: hash,
+          });
         });
       }
 
-      window.__TAURI_INTERNALS__
-        .invoke("plugin:ads|get_ads_personalization", {})
-        .then(initAds)
-        .catch(() => initAds(true));
+      try {
+        if (window.__TAURI_INTERNALS__) {
+          window.__TAURI_INTERNALS__
+            .invoke("plugin:ads|get_ads_personalization", {})
+            .then(initAds)
+            .catch(() => initAds(true));
+        } else {
+          initAds(true);
+        }
+      } catch (err) {
+        initAds(true);
+        console.error(err);
+      }
 
       window.addEventListener(
         "message",
