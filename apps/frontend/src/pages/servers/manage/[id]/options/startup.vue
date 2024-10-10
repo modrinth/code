@@ -11,7 +11,10 @@
             <span class="text-lg font-bold text-contrast">Startup Command</span>
             <span> This is the command that starts your server. </span>
           </label>
-          <textarea class="min-h-[200px] w-full font-[family-name:var(--mono-font)]" />
+          <textarea
+            v-model="invocation"
+            class="min-h-[200px] w-full font-[family-name:var(--mono-font)]"
+          />
         </div>
 
         <div class="card flex justify-between gap-2">
@@ -35,7 +38,7 @@
             <DropdownSelect
               v-model="jdkBuild"
               name="runtime"
-              :options="['Corretto', 'Adoptium', 'GraalVM']"
+              :options="['Corretto', 'Temurin', 'GraalVM']"
               placeholder="Runtime"
             />
           </div>
@@ -56,27 +59,65 @@
 
 <script setup lang="ts">
 import { DropdownSelect } from "@modrinth/ui";
+
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
+const app = useNuxtApp();
 
 const data = computed(() => serverStore.serverData[serverId]);
 
-const invocation = ref();
-const jdkVersion = ref();
-const jdkBuild = ref();
+const { data: startupSettings } = await useAsyncData(
+  "ServerStartupSettings",
+  async () =>
+    (await serverStore.getStartupSettings(serverId)) as {
+      invocation: string;
+      jdk_version: "lts8" | "lts11" | "lts17" | "lts21";
+      jdk_build: "corretto" | "temurin" | "graal";
+    },
+);
 
+const jdkVersionMap = [
+  { value: "lts8", label: "Java 8" },
+  { value: "lts11", label: "Java 11" },
+  { value: "lts17", label: "Java 17" },
+  { value: "lts21", label: "Java 21" },
+];
+
+const jdkBuildMap = [
+  { value: "corretto", label: "Corretto" },
+  { value: "temurin", label: "Temurin" },
+  { value: "graal", label: "GraalVM" },
+];
+
+const invocation = ref(startupSettings.value?.invocation);
+const jdkVersion = ref(
+  jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "",
+);
+const jdkBuild = ref(
+  jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build)?.label || "",
+);
 const isUpdating = ref(false);
-const hasUnsavedChanges = ref(false);
+const hasUnsavedChanges = computed(
+  () =>
+    invocation.value !== startupSettings.value?.invocation ||
+    jdkVersion.value !==
+      (jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "") ||
+    jdkBuild.value !==
+      jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build || "")?.label,
+);
 
 const saveStartup = async () => {
   try {
     isUpdating.value = true;
+    const invocationValue = invocation.value ?? "";
+    const jdkVersionKey = jdkVersionMap.find((v) => v.label === jdkVersion.value)?.value;
+    const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value;
     await serverStore.updateStartupSettings(
       serverId,
-      invocation.value,
-      jdkVersion.value,
-      jdkBuild.value,
+      invocationValue,
+      jdkVersionKey as any,
+      jdkBuildKey as any,
     );
     await new Promise((resolve) => setTimeout(resolve, 500));
     // @ts-ignore
@@ -87,6 +128,7 @@ const saveStartup = async () => {
       text: "Your server settings were successfully changed.",
     });
     await serverStore.fetchServerData(serverId);
+    refreshNuxtData("ServerStartupSettings");
   } catch (error) {
     console.error(error);
     // @ts-ignore
@@ -101,5 +143,11 @@ const saveStartup = async () => {
   }
 };
 
-const resetStartup = () => {};
+const resetStartup = () => {
+  invocation.value = startupSettings.value?.invocation;
+  jdkVersion.value =
+    jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "";
+  jdkBuild.value =
+    jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build)?.label || "";
+};
 </script>

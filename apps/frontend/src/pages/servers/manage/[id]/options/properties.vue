@@ -5,79 +5,84 @@
       class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto px-4"
     >
       <div class="card flex flex-col gap-4">
-        <h2 class="m-0 text-3xl font-bold">Server Properties</h2>
-        <div
-          v-for="(property, index) in liveProperties"
-          :key="index"
-          class="mb-2 flex items-center justify-between border-x-0 border-b-2 border-t-0 border-solid border-bg-raised pb-2"
-        >
-          <label :for="index.toString()" class="flex items-center">
-            {{
-              index
-                .toString()
-                .split("-")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")
-            }}
-            <span v-if="overrides[index] && overrides[index].info" class="ml-2">
-              <EyeIcon v-tooltip="overrides[index].info" />
-            </span>
-          </label>
-          <div v-if="overrides[index] && overrides[index].type === 'dropdown'">
-            <DropdownSelect
-              v-model="liveProperties[index]"
-              :name="
+        <label for="username-field" class="flex flex-col gap-2">
+          <span class="text-lg font-bold text-contrast">Server Properties</span>
+          <span> Edit the minecraft server properties file. </span>
+        </label>
+        <div class="flex flex-col gap-4 rounded-xl bg-table-alternateRow p-4">
+          <div
+            v-for="(property, index) in liveProperties"
+            :key="index"
+            class="mb-2 flex items-center justify-between pb-2"
+          >
+            <label :for="index.toString()" class="flex items-center">
+              {{
                 index
                   .toString()
-                  .split('-')
+                  .split("-")
                   .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(' ')
+                  .join(" ")
+              }}
+              <span v-if="overrides[index] && overrides[index].info" class="ml-2">
+                <EyeIcon v-tooltip="overrides[index].info" />
+              </span>
+            </label>
+            <div v-if="overrides[index] && overrides[index].type === 'dropdown'">
+              <DropdownSelect
+                v-model="liveProperties[index]"
+                :name="
+                  index
+                    .toString()
+                    .split('-')
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ')
+                "
+                :options="overrides[index].options"
+                placeholder="Select..."
+              />
+            </div>
+            <div v-else-if="typeof property === 'boolean'">
+              <input
+                id="property.id"
+                v-model="liveProperties[index]"
+                class="switch stylized-toggle"
+                type="checkbox"
+              />
+            </div>
+            <div v-else-if="typeof property === 'number'" class="w-[320px]">
+              <input
+                :id="index.toString()"
+                v-model.number="liveProperties[index]"
+                type="number"
+                class="w-full border p-2"
+              />
+            </div>
+            <div
+              v-else-if="
+                typeof property === 'object' ||
+                property.includes(',') ||
+                property.includes('{') ||
+                property.includes('}') ||
+                property.includes('[') ||
+                property.includes(']') ||
+                property.length > 30
               "
-              :options="overrides[index].options"
-              placeholder="Select..."
-            />
-          </div>
-          <div v-else-if="typeof property === 'boolean'">
-            <input
-              id="property.id"
-              v-model="liveProperties[index]"
-              class="switch stylized-toggle"
-              type="checkbox"
-            />
-          </div>
-          <div v-else-if="typeof property === 'number'" class="w-[320px]">
-            <input
-              :id="index.toString()"
-              v-model.number="liveProperties[index]"
-              type="number"
-              class="w-full border p-2"
-            />
-          </div>
-          <div
-            v-else-if="
-              typeof property === 'object' ||
-              property.includes(',') ||
-              property.includes('{') ||
-              property.includes('}') ||
-              property.includes('[') ||
-              property.includes(']') ||
-              property.length > 30
-            "
-            class="w-[320px]"
-          >
-            <textarea
-              :id="index.toString()"
-              :value="JSON.stringify(property, null, 2)"
-              class="w-full rounded-xl border p-2"
-            ></textarea>
-          </div>
-          <div v-else class="w-[320px]">
-            <input
-              :id="index.toString()"
-              :value="property"
-              type="text"
-              class="w-full rounded-xl border p-2"
-            />
+              class="w-[320px]"
+            >
+              <textarea
+                :id="index.toString()"
+                :value="JSON.stringify(property, null, 2)"
+                class="w-full rounded-xl border p-2"
+              ></textarea>
+            </div>
+            <div v-else class="w-[320px]">
+              <input
+                :id="index.toString()"
+                :value="property"
+                type="text"
+                class="w-full rounded-xl border p-2"
+              />
+            </div>
           </div>
         </div>
       </div>

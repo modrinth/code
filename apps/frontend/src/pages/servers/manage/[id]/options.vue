@@ -4,10 +4,10 @@
 
 <script setup lang="ts">
 import {
-  CogIcon,
-  FileIcon,
+  InfoIcon,
   ListIcon,
   LoaderIcon,
+  SettingsIcon,
   TextQuoteIcon,
   VersionIcon,
 } from "@modrinth/assets";
@@ -21,11 +21,11 @@ useHead({
 });
 
 const navLinks = [
-  { icon: CogIcon, label: "General", href: `/servers/manage/${serverId}/options` },
+  { icon: SettingsIcon, label: "General", href: `/servers/manage/${serverId}/options` },
   { icon: LoaderIcon, label: "Loader", href: `/servers/manage/${serverId}/options/loader` },
   { icon: TextQuoteIcon, label: "Startup", href: `/servers/manage/${serverId}/options/startup` },
   { icon: VersionIcon, label: "Network", href: `/servers/manage/${serverId}/options/network` },
   { icon: ListIcon, label: "Properties", href: `/servers/manage/${serverId}/options/properties` },
-  { icon: FileIcon, label: "Info", href: `/servers/manage/${serverId}/options/info` },
+  { icon: InfoIcon, label: "Info", href: `/servers/manage/${serverId}/options/info` },
 ];
 </script>

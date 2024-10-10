@@ -369,7 +369,7 @@ export const useServerStore = defineStore("servers", {
 
     async getStartupSettings(serverId: string) {
       try {
-        await usePyroFetch(`servers/${serverId}/startup`, {
+        return await usePyroFetch(`servers/${serverId}/startup`, {
           method: "GET",
         });
       } catch (error) {
@@ -388,10 +388,26 @@ export const useServerStore = defineStore("servers", {
       try {
         await usePyroFetch(`servers/${serverId}/startup`, {
           method: "POST",
-          body: { invocation, jdk_version: jdkVersion, jdk_build: jdkBuild },
+          body: {
+            invocation: invocation || null,
+            jdk_version: jdkVersion || null,
+            jdk_build: jdkBuild || null,
+          },
         });
       } catch (error) {
         console.error("Error updating startup settings:", error);
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+        throw this.error;
+      }
+    },
+
+    async getAllocations(serverId: string) {
+      try {
+        return await usePyroFetch(`servers/${serverId}/allocations`, {
+          method: "GET",
+        });
+      } catch (error) {
+        console.error("Error getting allocations:", error);
         this.error = error instanceof Error ? error : new Error("An unknown error occurred");
         throw this.error;
       }
