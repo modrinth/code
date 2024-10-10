@@ -17,33 +17,24 @@
             <span class="font-bold text-primary">
               <template v-if="charge.product.metadata.type === 'midas'"> Modrinth Plus </template>
               <template v-else> Unknown product </template>
-              <template v-if="charge.metadata.modrinth_subscription_interval">
-                {{ charge.metadata.modrinth_subscription_interval }}
+              <template v-if="charge.subscription_interval">
+                {{ charge.subscription_interval }}
               </template>
             </span>
             ⋅
-            <span>{{ formatPrice(charge.amount, charge.currency) }}</span>
+            <span>{{ formatPrice(charge.amount, charge.currency_code) }}</span>
           </div>
           <div class="flex items-center gap-1">
             <Badge :color="charge.status === 'succeeded' ? 'green' : 'red'" :type="charge.status" />
             ⋅
-            {{ $dayjs.unix(charge.created).format("YYYY-MM-DD") }}
+            {{ $dayjs(charge.due).format("YYYY-MM-DD") }}
           </div>
         </div>
-        <a
-          v-if="charge.receipt_url"
-          class="iconified-button raised-button"
-          :href="charge.receipt_url"
-        >
-          <ReceiptTextIcon />
-          View receipt
-        </a>
       </div>
     </section>
   </div>
 </template>
 <script setup>
-import { ReceiptTextIcon } from "@modrinth/assets";
 import { Breadcrumbs, Badge } from "@modrinth/ui";
 import { products } from "~/generated/state.json";
 
@@ -58,15 +49,17 @@ const { data: charges } = await useAsyncData(
   () => useBaseFetch("billing/payments", { internal: true }),
   {
     transform: (charges) => {
-      return charges.map((charge) => {
-        const product = products.find((product) =>
-          product.prices.some((price) => price.id === charge.metadata.modrinth_price_id),
-        );
+      return charges
+        .filter((charge) => charge.status !== "open" && charge.status !== "cancelled")
+        .map((charge) => {
+          const product = products.find((product) =>
+            product.prices.some((price) => price.id === charge.price_id),
+          );
 
-        charge.product = product;
+          charge.product = product;
 
-        return charge;
-      });
+          return charge;
+        });
     },
   },
 );
