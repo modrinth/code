@@ -8,7 +8,7 @@
   >
     <div class="flex items-center justify-between gap-4">
       <div class="flex w-full items-center gap-4">
-        <UiServersServerIcon :server-id="serverId" class="w-12 h-12 rounded-lg"/>
+        <UiServersServerIcon :server-id="serverId" class="h-12 w-12 rounded-lg" />
         <div class="text-2xl font-extrabold text-contrast">{{ props.header }}</div>
       </div>
       <button

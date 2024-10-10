@@ -21,8 +21,8 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  serverId: string,
-  class?: string,
+  serverId: string;
+  class?: string;
 }>();
 
 const computedClass = computed(() => {
