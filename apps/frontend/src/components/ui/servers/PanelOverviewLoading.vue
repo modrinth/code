@@ -58,7 +58,7 @@
           </div>
         </div>
         <div
-          class="console relative h-full min-h-[488px] w-full overflow-hidden rounded-xl bg-black text-sm"
+          class="console relative h-full min-h-[488px] w-full overflow-hidden rounded-xl bg-bg text-sm"
         ></div>
       </div>
     </div>
