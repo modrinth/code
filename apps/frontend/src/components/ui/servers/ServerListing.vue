@@ -1,65 +1,72 @@
 <template>
-  <NuxtLink
-    :to="`/servers/manage/${server_id}`"
-    :aria-disabled="status.isInstalling || status.isFailed"
-    :tabindex="status.isInstalling || status.isFailed ? -1 : 0"
-    :class="status.isInstalling || status.isFailed ? 'pointer-events-none cursor-not-allowed' : ''"
-    class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4"
-    data-pyro-server-listing
-    :data-pyro-server-listing-id="server_id"
-  >
-    <img
-      v-if="image"
-      no-shadow
-      size="lg"
-      alt="Server Icon"
-      class="size-[96px] rounded-xl bg-bg-raised"
-      :src="image"
-    />
-    <img
-      v-else
-      no-shadow
-      size="lg"
-      alt="Server Icon"
-      class="size-[96px] rounded-xl bg-bg-raised"
-      src="~/assets/images/servers/minecraft_server_icon.png"
-    />
-    <div class="ml-8 flex flex-col gap-2.5">
-      <div class="flex flex-col gap-2 md:flex-row md:items-center">
-        <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>
-        <UiServersServerInstallStatusPill v-if="status.state" :state="status.state" />
-        <ChevronRightIcon v-if="!status.isInstalling && !status.isFailed" />
-      </div>
+  <NuxtLink custom>
+    <div
+      class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100 active:scale-95"
+      :aria-disabled="status.isInstalling || status.isFailed"
+      :tabindex="status.isInstalling || status.isFailed ? -1 : 0"
+      :class="
+        status.isInstalling || status.isFailed
+          ? 'pointer-events-none cursor-not-allowed'
+          : 'cursor-pointer'
+      "
+      data-pyro-server-listing
+      :data-pyro-server-listing-id="server_id"
+      @click="$router.push(`/servers/manage/${server_id}`)"
+      @keydown="(e) => e.key === 'Enter' && $router.push(`/servers/manage/${server_id}`)"
+    >
+      <img
+        v-if="image"
+        no-shadow
+        size="lg"
+        alt="Server Icon"
+        class="size-[96px] rounded-xl bg-bg-raised"
+        :src="image"
+      />
+      <img
+        v-else
+        no-shadow
+        size="lg"
+        alt="Server Icon"
+        class="size-[96px] rounded-xl bg-bg-raised"
+        src="~/assets/images/servers/minecraft_server_icon.png"
+      />
+      <div class="ml-8 flex flex-col gap-2.5">
+        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+          <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>
+          <UiServersServerInstallStatusPill v-if="status.state" :state="status.state" />
+          <ChevronRightIcon v-if="!status.isInstalling && !status.isFailed" />
+        </div>
 
-      <div
-        v-if="projectData?.title"
-        class="m-0 flex flex-row items-center gap-1 text-sm font-medium text-[var(--color-text-secondary)]"
-      >
-        <UiAvatar
-          :src="iconUrl"
-          no-shadow
-          style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
-          alt="Server Icon"
-        />
-        Using {{ projectData?.title || "Unknown" }}
-      </div>
-      <div v-else class="min-h-[20px]"></div>
+        <div
+          v-if="projectData?.title"
+          class="m-0 flex flex-row items-center gap-1 text-sm font-medium text-[var(--color-text-secondary)]"
+        >
+          <UiAvatar
+            :src="iconUrl"
+            no-shadow
+            style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
+            alt="Server Icon"
+          />
+          Using {{ projectData?.title || "Unknown" }}
+        </div>
+        <div v-else class="min-h-[20px]"></div>
 
-      <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
-        <UiServersServerGameLabel
-          v-if="showGameLabel"
-          :game="game!"
-          :mc-version="mc_version ?? ''"
-        />
-        <UiServersServerLoaderLabel
-          v-if="showLoaderLabel"
-          :loader="loader!"
-          :loader-version="loader_version ?? ''"
-        />
-        <UiServersServerSubdomainLabel
-          v-if="showSubdomainLabel"
-          :subdomain="props.net?.domain ?? ''"
-        />
+        <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
+          <UiServersServerGameLabel
+            v-if="showGameLabel"
+            :game="game!"
+            :mc-version="mc_version ?? ''"
+          />
+          <UiServersServerLoaderLabel
+            v-if="showLoaderLabel"
+            :loader="loader!"
+            :loader-version="loader_version ?? ''"
+          />
+          <UiServersServerSubdomainLabel
+            v-if="showSubdomainLabel"
+            :subdomain="props.net?.domain ?? ''"
+          />
+        </div>
       </div>
     </div>
   </NuxtLink>
