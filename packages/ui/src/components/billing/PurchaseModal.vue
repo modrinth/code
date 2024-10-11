@@ -408,7 +408,7 @@ const loadingPaymentMethodModal = ref(0)
 const selectedPlan = ref('yearly')
 const currency = computed(() => getCurrency(props.country))
 
-const price = ref(props.product.prices.find((x) => x.currency_code === currency.value))
+const price = ref(props.product?.prices?.find((x) => x.currency_code === currency.value) ?? null)
 
 const clientSecret = ref()
 const paymentIntentId = ref()
