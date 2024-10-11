@@ -530,7 +530,6 @@ const acceptSuggestion = () => {
   const selected = suggestions.value[selectedSuggestionIndex.value];
   const currentTokens = commandInput.value.trim().split(" ");
   const suggestionTokens = selected.split(/\s+/).filter(Boolean);
-  console.log(currentTokens, suggestionTokens);
 
   // check if last current token is in command tree if so just add to the end
   if (currentTokens[currentTokens.length - 1].toLowerCase() === suggestionTokens[0].toLowerCase()) {
