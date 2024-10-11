@@ -22,6 +22,7 @@
           <ul
             v-if="suggestions.length"
             id="command-suggestions"
+            ref="suggestionsList"
             class="z-20 mt-1 max-h-60 w-full list-none overflow-auto rounded-md border border-divider bg-bg-raised p-0 shadow-lg"
             role="listbox"
           >
@@ -40,12 +41,13 @@
               {{ suggestion }}
             </li>
           </ul>
-          <div class="relative">
+          <div class="relative flex items-center">
             <span
               v-if="bestSuggestion"
-              class="pointer-events-none absolute left-[1.7rem] top-[52%] z-20 -translate-y-1/2 transform select-none text-gray-400"
+              class="pointer-events-none absolute left-[1.6rem] z-50 transform select-none text-gray-500"
             >
-              {{ ".".repeat(commandInput.length - 1) }}{{ bestSuggestion }}
+              <span class="whitespace-pre">{{ " ".repeat(commandInput.length - 1) }}</span>
+              <span> {{ bestSuggestion }} </span>
               <button
                 class="text z-50 cursor-pointer border-none bg-transparent text-sm focus:outline-none"
                 aria-label="Accept suggestion"
@@ -60,9 +62,10 @@
               v-model="commandInput"
               type="text"
               placeholder="Send a command"
-              class="z-50 w-full rounded-md px-4 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+              class="z-20 w-full rounded-md px-4 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
               aria-autocomplete="list"
               aria-controls="command-suggestions"
+              spellcheck="false"
               :aria-activedescendant="'suggestion-' + selectedSuggestionIndex"
               @keydown.tab.prevent="acceptSuggestion"
               @keydown.down.prevent="selectNextSuggestion"
@@ -108,7 +111,6 @@ const attrs = defineProps<{
 }>();
 
 const socket = ref(attrs.socket);
-
 const DYNAMIC_ARG = Symbol("DYNAMIC_ARG");
 
 const commandTree: any = {
@@ -408,6 +410,8 @@ const serverIP = computed(() => serverData.value?.net.ip ?? "");
 const serverPort = computed(() => serverData.value?.net.port ?? "");
 const serverDomain = computed(() => serverData.value?.net.domain ?? "");
 
+const suggestionsList = ref<HTMLUListElement | null>(null);
+
 useHead({
   title: `Overview - ${serverData.value?.name ?? "Server"} - Modrinth`,
 });
@@ -454,6 +458,7 @@ const getSuggestions = (input: string): string[] => {
     }
     return possibleKeys
       .filter((key) => key === "<arg>" || key.toLowerCase().startsWith(lastToken))
+      .filter((k) => k !== lastToken.trim())
       .map((key) => {
         if (key === "<arg>") {
           return [...tokens.slice(0, -1), "<arg>"].join(" ");
@@ -478,6 +483,18 @@ const sendCommand = () => {
     console.error("Error sending command:", error);
   }
 };
+
+watch(
+  () => selectedSuggestionIndex.value,
+  (newVal) => {
+    if (suggestionsList.value) {
+      const selectedSuggestion = suggestionsList.value.querySelector(`#suggestion-${newVal}`);
+      if (selectedSuggestion) {
+        selectedSuggestion.scrollIntoView({ block: "nearest" });
+      }
+    }
+  },
+);
 
 watch(
   () => commandInput.value,
@@ -516,9 +533,13 @@ const acceptSuggestion = () => {
   if (currentTokens[currentTokens.length - 1].toLowerCase() === suggestionTokens[0].toLowerCase()) {
     /* empty */
   } else {
+    const offset = currentTokens.length - 1 === 0 ? 1 : 0;
     commandInput.value =
       commandInput.value +
-      suggestionTokens[0].substring(currentTokens[currentTokens.length - 1].length);
+      suggestionTokens[suggestionTokens.length - 1].substring(
+        currentTokens[currentTokens.length - 1].length - offset,
+      ) +
+      " ";
     suggestions.value = getSuggestions(commandInput.value);
     selectedSuggestionIndex.value = 0;
   }
