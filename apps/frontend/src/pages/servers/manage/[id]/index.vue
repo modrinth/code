@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="isConnected && !isWSAuthIncorrect"
+    v-if="isConnected && !isWsAuthIncorrect"
     class="relative flex select-none flex-col gap-6"
     data-pyro-server-manager-root
   >
@@ -16,11 +16,6 @@
         <div class="ml-auto mr-2 flex gap-2">
           <UiServersPanelCopyIP :ip="serverIP" :port="serverPort" :subdomain="serverDomain" />
         </div>
-        <UiServersPanelServerActionButton
-          :is-online="isServerRunning"
-          :is-actioning="isActioning"
-          @action="sendPowerAction"
-        />
       </div>
       <UiServersPanelTerminal :console-output="consoleOutput" :full-screen="fullScreen">
         <div class="relative w-full px-4 pt-4">
@@ -86,9 +81,9 @@
       </UiServersPanelTerminal>
     </div>
   </div>
-  <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWSAuthIncorrect" />
+  <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
   <UiServersPyroError
-    v-else-if="isWSAuthIncorrect"
+    v-else-if="isWsAuthIncorrect"
     title="WebSocket authentication failed"
     message="Indicative of a server misconfiguration. Please report this to support."
   />
@@ -100,7 +95,19 @@
 </template>
 
 <script setup lang="ts">
-import type { ServerState, Stats, WSAuth, WSEvent } from "~/types/servers";
+import type { ServerState, Stats } from "~/types/servers";
+
+const attrs = defineProps<{
+  socket: WebSocket | null;
+  isConnected: boolean;
+  isWsAuthIncorrect: boolean;
+  stats: Stats;
+  consoleOutput: string[];
+  serverPowerState: ServerState;
+  isServerRunning: boolean;
+}>();
+
+const socket = ref(attrs.socket);
 
 const DYNAMIC_ARG = Symbol("DYNAMIC_ARG");
 
@@ -388,20 +395,10 @@ const commandTree: any = {
 };
 
 const serverStore = useServerStore();
-const app = useNuxtApp();
 const fullScreen = ref(false);
-const isConnected = ref(false);
-const isWSAuthIncorrect = ref(false);
-const consoleOutput = ref<string[]>([]);
-const cpuData = ref<number[]>([]);
-const ramData = ref<number[]>([]);
-const isActioning = ref(false);
-const serverPowerState = ref<ServerState>("stopped");
 const commandInput = ref("");
 const suggestions = ref<string[]>([]);
 const selectedSuggestionIndex = ref(0);
-
-let socket: WebSocket | null = null;
 
 const route = useRoute();
 const serverId = route.params.id as string;
@@ -410,31 +407,9 @@ const serverData = computed(() => serverStore.serverData[serverId]);
 const serverIP = computed(() => serverData.value?.net.ip ?? "");
 const serverPort = computed(() => serverData.value?.net.port ?? "");
 const serverDomain = computed(() => serverData.value?.net.domain ?? "");
-const isServerRunning = computed(() => serverPowerState.value === "running");
 
 useHead({
   title: `Overview - ${serverData.value?.name ?? "Server"} - Modrinth`,
-});
-
-const stats = ref<Stats>({
-  current: {
-    cpu_percent: 0,
-    ram_usage_bytes: 0,
-    ram_total_bytes: 1,
-    storage_usage_bytes: 0,
-    storage_total_bytes: 0,
-  },
-  past: {
-    cpu_percent: 0,
-    ram_usage_bytes: 0,
-    ram_total_bytes: 1,
-    storage_usage_bytes: 0,
-    storage_total_bytes: 0,
-  },
-  graph: {
-    cpu: [],
-    ram: [],
-  },
 });
 
 const bestSuggestion = computed(() => {
@@ -491,6 +466,19 @@ const getSuggestions = (input: string): string[] => {
   return [];
 };
 
+const sendCommand = () => {
+  const cmd = commandInput.value.trim();
+  if (!socket || !cmd) return;
+  try {
+    socket.value?.send(JSON.stringify({ event: "command", cmd }));
+    commandInput.value = "";
+    suggestions.value = [];
+    selectedSuggestionIndex.value = 0;
+  } catch (error) {
+    console.error("Error sending command:", error);
+  }
+};
+
 watch(
   () => commandInput.value,
   (newVal) => {
@@ -540,161 +528,4 @@ const selectSuggestion = (index: number) => {
   selectedSuggestionIndex.value = index;
   acceptSuggestion();
 };
-
-const sendCommand = async () => {
-  const cmd = commandInput.value.trim();
-  if (!socket || !cmd) return;
-  try {
-    await socket.send(JSON.stringify({ event: "command", cmd }));
-    commandInput.value = "";
-    suggestions.value = [];
-    selectedSuggestionIndex.value = 0;
-  } catch (error) {
-    console.error("Error sending command:", error);
-  }
-};
-
-const connectWebSocket = async () => {
-  try {
-    const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
-    socket = new WebSocket(`wss://${wsAuth.url}`);
-
-    socket.onopen = () => {
-      socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
-    };
-
-    socket.onmessage = (event) => {
-      const data: WSEvent = JSON.parse(event.data);
-      handleWebSocketMessage(data);
-    };
-
-    socket.onclose = () => {
-      consoleOutput.value.push("\nWS connection closed");
-      isConnected.value = false;
-    };
-
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      isConnected.value = false;
-    };
-  } catch (error) {
-    console.error("Failed to connect WebSocket:", error);
-    isConnected.value = false;
-  }
-};
-
-const handleWebSocketMessage = (data: WSEvent) => {
-  switch (data.event) {
-    case "log":
-      consoleOutput.value.push(data.message);
-      break;
-    case "stats":
-      updateStats(data as unknown as Stats["current"]);
-      break;
-    case "auth-expiring":
-      reauthenticate();
-      break;
-    case "power-state":
-      updatePowerState(data.state);
-      break;
-    case "auth-incorrect":
-      isWSAuthIncorrect.value = true;
-      break;
-    default:
-      console.warn("Unhandled WebSocket event:", data);
-  }
-};
-
-const updatePowerState = (state: ServerState) => {
-  serverPowerState.value = state;
-};
-
-const updateStats = (currentStats: Stats["current"]) => {
-  isConnected.value = true;
-  stats.value = {
-    current: currentStats,
-    past: { ...stats.value.current },
-    graph: {
-      cpu: updateGraphData(cpuData.value, currentStats.cpu_percent),
-      ram: updateGraphData(
-        ramData.value,
-        Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100),
-      ),
-    },
-  };
-};
-
-const updateGraphData = (dataArray: number[], newValue: number): number[] => {
-  const updated = [...dataArray, newValue];
-  if (updated.length > 10) updated.shift();
-  return updated;
-};
-
-const reauthenticate = async () => {
-  try {
-    const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
-    socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
-  } catch (error) {
-    console.error("Reauthentication failed:", error);
-    isWSAuthIncorrect.value = true;
-  }
-};
-
-const toAdverb = (word: string) => {
-  if (word.endsWith("p")) {
-    return word + "ping";
-  }
-  if (word.endsWith("e")) {
-    return word.slice(0, -1) + "ing";
-  }
-  if (word.endsWith("ie")) {
-    return word.slice(0, -2) + "ying";
-  }
-  return word + "ing";
-};
-
-const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
-  const actionName = action.charAt(0).toUpperCase() + action.slice(1);
-  try {
-    isActioning.value = true;
-    await serverStore.sendPowerAction(serverId, actionName);
-    notifySuccess(`${toAdverb(actionName)} server`, `This may take a few moments.`);
-  } catch (error) {
-    console.error(`Error ${toAdverb(actionName)} server:`, error);
-    notifyError(
-      `Error ${toAdverb(actionName)} server`,
-      "An error occurred while performing this action.",
-    );
-  } finally {
-    isActioning.value = false;
-  }
-};
-
-const notifySuccess = (title: string, text: string) => {
-  // @ts-ignore
-  app.$notify({
-    group: "server",
-    title,
-    text,
-    type: "success",
-  });
-};
-
-const notifyError = (title: string, text: string) => {
-  // @ts-ignore
-  app.$notify({
-    group: "server",
-    title,
-    text,
-    type: "error",
-  });
-};
-
-onMounted(() => {
-  connectWebSocket();
-});
-
-onBeforeUnmount(() => {
-  socket?.close();
-});
 </script>
