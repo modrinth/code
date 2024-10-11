@@ -126,6 +126,11 @@ const stats = ref<Stats>({
 
 const fetchServerData = async () => {
   try {
+    if (serverStore.serverData[serverId]) {
+      serverData.value = serverStore.serverData[serverId];
+      console.log(serverData.value);
+      initialLoading.value = false;
+    }
     await serverStore.fetchServerData(serverId);
     serverData.value = serverStore.serverData[serverId];
     initialLoading.value = false;

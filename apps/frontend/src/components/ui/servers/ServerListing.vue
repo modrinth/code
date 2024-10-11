@@ -121,6 +121,7 @@ if (import.meta.client) {
         ctx?.drawImage(img, 0, 0, 200, 200);
         const dataURL = canvas.toDataURL("image/png");
         image.value = dataURL;
+        serverStore.serverData[serverId].image = dataURL;
       };
     }
   } catch (error) {

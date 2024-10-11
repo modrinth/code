@@ -143,7 +143,15 @@ export const useServerStore = defineStore("servers", {
 
     async listServers() {
       try {
-        return await usePyroFetch<{ servers: Server[] }>("servers");
+        const response = await usePyroFetch<{ servers: Server[] }>("servers");
+        response.servers.forEach((server) => {
+          const oldImage = this.serverData[server.server_id].image;
+          this.serverData[server.server_id] = server;
+          if (oldImage) {
+            this.serverData[server.server_id].image = oldImage;
+          }
+        });
+        return response;
       } catch (error) {
         console.error("Error listing servers:", error);
         this.error = error instanceof Error ? error : new Error("An unknown error occurred");
