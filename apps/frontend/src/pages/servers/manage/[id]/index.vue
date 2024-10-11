@@ -44,13 +44,14 @@
           <div class="relative flex items-center">
             <span
               v-if="bestSuggestion"
-              class="pointer-events-none absolute left-[1.6rem] z-50 transform select-none text-gray-500"
+              class="pointer-events-none absolute left-[26px] z-50 transform select-none text-gray-400"
             >
               <span class="whitespace-pre">{{ " ".repeat(commandInput.length - 1) }}</span>
               <span> {{ bestSuggestion }} </span>
               <button
-                class="text z-50 cursor-pointer border-none bg-transparent text-sm focus:outline-none"
+                class="text pointer-events-auto z-50 ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-none"
                 aria-label="Accept suggestion"
+                style="transform: translateY(-1px)"
                 @click="acceptSuggestion"
               >
                 TAB
