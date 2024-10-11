@@ -27,7 +27,7 @@
 
     <NuxtLink
       :to="`/servers/manage/${serverId}/files`"
-      class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+      class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
