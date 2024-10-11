@@ -484,7 +484,7 @@ const getProductDescription = (product) => {
 const selectProduct = async (product) => {
   selectedProduct.value = product;
   showModal.value = true;
-  modalKey.value++; // Increment the key to force re-render
+  modalKey.value++;
   await nextTick();
   if (purchaseModal.value && purchaseModal.value.show) {
     purchaseModal.value.show();
@@ -509,7 +509,6 @@ watch(selectedProduct, async (newProduct) => {
     showModal.value = false;
     await nextTick();
     showModal.value = true;
-    // rerender
     modalKey.value++;
     await nextTick();
     if (purchaseModal.value && purchaseModal.value.show) {
@@ -594,9 +593,6 @@ watch(selectedProduct, async (newProduct) => {
     }
   }
 });
-
-// Log pyroProducts for debugging
-console.log("Pyro Products:", pyroProducts);
 </script>
 
 <style scoped>
