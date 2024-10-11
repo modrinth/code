@@ -211,7 +211,7 @@ const connectWebSocket = async () => {
 const handleWebSocketMessage = (data: WSEvent) => {
   switch (data.event) {
     case "log":
-      consoleOutput.value.push(data.message);
+      consoleOutput.value.push(...data.message.split("\n").filter((l) => l.trim()));
       break;
     case "stats":
       updateStats(data as unknown as Stats["current"]);
