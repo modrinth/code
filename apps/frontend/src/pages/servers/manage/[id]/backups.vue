@@ -33,7 +33,7 @@
               placeholder="e.g. Before 1.21"
             />
           </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
+          <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
             <Button color="primary" @click="createBackup"> <PlusIcon /> Create backup </Button>
           </div>
@@ -50,7 +50,7 @@
               placeholder="e.g. Before 1.21"
             />
           </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
+          <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
             <Button color="primary" @click="renameBackup(currentBackup)"> Rename backup </Button>
           </div>
@@ -77,7 +77,7 @@
               </div>
             </div>
           </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
+          <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
             <Button color="primary" @click="restoreBackup(currentBackup)">
               Restore backup
@@ -107,7 +107,7 @@
               </div>
             </div>
           </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
+          <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
             <Button color="danger" @click="deleteBackup(currentBackup)"> Delete backup </Button>
           </div>

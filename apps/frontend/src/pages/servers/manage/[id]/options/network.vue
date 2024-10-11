@@ -10,7 +10,7 @@
           placeholder="e.g. Secondary allocation"
         />
       </div>
-      <div class="mb-4 mt-4 flex justify-end gap-4">
+      <div class="mb-1 mt-4 flex justify-end gap-4">
         <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
         <Button color="primary" @click="addNewAllocation">
           <PlusIcon /> Create allocation
@@ -30,7 +30,7 @@
           placeholder="e.g. Secondary allocation"
         />
       </div>
-      <div class="mb-4 mt-4 flex justify-end gap-4">
+      <div class="mb-1 mt-4 flex justify-end gap-4">
         <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
         <Button color="primary" @click="editAllocation"> <SaveIcon /> Update Allocation </Button>
       </div>

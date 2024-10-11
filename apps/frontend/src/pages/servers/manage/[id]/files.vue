@@ -17,7 +17,7 @@
           <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
           <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
         </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
+        <div class="mb-1 mt-4 flex justify-end gap-4">
           <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
           <Button color="primary" @click="createNewItem"> Create </Button>
         </div>
@@ -40,7 +40,7 @@
             :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
           />
         </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
+        <div class="mb-1 mt-4 flex justify-end gap-4">
           <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
           <Button color="primary" @click="renameItem"> Rename </Button>
         </div>
@@ -62,7 +62,7 @@
             placeholder="e.g. mods/modname"
           />
         </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
+        <div class="mb-1 mt-4 flex justify-end gap-4">
           <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
           <Button color="primary" @click="moveItem"> Move </Button>
         </div>
@@ -98,7 +98,7 @@
             </div>
           </div>
         </div>
-        <div class="mb-2 mt-4 flex justify-end gap-4">
+        <div class="mb-1 mt-4 flex justify-end gap-4">
           <Button transparent @click="deleteItemModal?.hide()"> Cancel </Button>
           <Button color="danger" @click="deleteItem"> Delete {{ selectedItem?.type }} </Button>
         </div>
