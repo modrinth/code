@@ -77,7 +77,7 @@
                   }}
                 </span>
               </div>
-              <div class="flex w-[16rem] items-center gap-2">
+              <div class="flex w-full max-w-[18rem] items-center gap-2">
                 <DropdownSelect
                   v-if="versions && Array.isArray(versions) && versions.length > 0"
                   v-model="version"
@@ -89,7 +89,7 @@
                   icon-only
                   @click="reinstallCurrent"
                 >
-                  <ChevronRightIcon />
+                  <div class="mx-4">Reinstall</div>
                 </Button>
               </div>
             </div>
