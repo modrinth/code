@@ -259,7 +259,7 @@ import { ChevronRightIcon, EditIcon, XIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const serverStore = useServerStore();
+const server = await usePyroServer(serverId, ["general"]);
 const tags = useTags();
 const prodOverride = await PyroAuthOverride();
 
@@ -270,13 +270,13 @@ const mcVersions = tags.value.gameVersions
   .filter((x) => x.version_type === "release")
   .map((x) => x.version);
 
-const data = computed(() => serverStore.serverData[serverId]);
+const data = computed(() => server.general);
 
 const { data: versions } = await useLazyAsyncData(
   `content-loader-versions`,
   () =>
     useBaseFetch(
-      `project/${data?.value.upstream?.project_id}/version`,
+      `project/${data?.value?.upstream?.project_id}/version`,
       {},
       false,
       prodOverride,
@@ -297,7 +297,7 @@ const selectedMCVersion = ref("");
 
 const updateData = async () => {
   currentVersion.value = await useBaseFetch(
-    `version/${data?.value.upstream?.version_id}`,
+    `version/${data?.value?.upstream?.version_id}`,
     {},
     false,
     prodOverride,
@@ -307,14 +307,14 @@ const updateData = async () => {
 updateData();
 
 const reinstallCurrent = async () => {
-  const projectId = data.value.upstream?.project_id;
+  const projectId = data.value?.upstream?.project_id;
   if (!projectId) {
     throw new Error("Project ID not found");
   }
   const resolvedVersionIds = versionIds.value;
   const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
   console.log(projectId, versionId);
-  await serverStore.reinstallServer(serverId, false, projectId, versionId);
+  await server.general?.reinstall(serverId, false, projectId, versionId);
 };
 
 const selectLoader = (loader: string) => {
@@ -323,7 +323,7 @@ const selectLoader = (loader: string) => {
 };
 
 const reinstallLoader = async (loader: string) => {
-  await serverStore.reinstallServer(serverId, true, loader, selectedMCVersion.value);
+  await server.general?.reinstall(serverId, true, loader, selectedMCVersion.value);
 };
 
 const reinstallNew = async (project: any, versionNumber: string) => {
@@ -340,6 +340,6 @@ const reinstallNew = async (project: any, versionNumber: string) => {
     throw new Error("Version not found");
   }
 
-  await serverStore.reinstallServer(serverId, false, project.project_id, versionId);
+  await server.general?.reinstall(serverId, false, project.project_id, versionId);
 };
 </script>

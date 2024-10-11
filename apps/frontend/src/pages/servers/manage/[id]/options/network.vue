@@ -81,7 +81,7 @@
           </div>
 
           <div
-            v-if="allocations[0]"
+            v-if="allocations?.[0]"
             class="flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-table-alternateRow p-4"
           >
             <div
@@ -133,26 +133,26 @@
 </template>
 
 <script setup lang="ts">
+// currently broken, will fix
+
 import { PlusIcon, TrashIcon, EditIcon, VersionIcon, SaveIcon } from "@modrinth/assets";
 import { ButtonStyled, Modal, Button } from "@modrinth/ui";
-import { useServerStore } from "~/stores/servers.ts";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const serverStore = useServerStore();
+const server = await usePyroServer(serverId, ["general", "network"]);
 const app = useNuxtApp();
 
 const isUpdating = ref(false);
-const data = computed(() => serverStore.serverData[serverId]);
+const data = computed(() => server.general);
 
 const serverIP = ref(data?.value?.net?.ip ?? "");
 const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
 
-const { data: allocations } = await useAsyncData(
-  "ServerAllocations",
-  async () => (await serverStore.getAllocations(serverId)) as any,
-);
+const network = computed(() => server.network);
+const allocations = ref(network.value?.allocations);
+
 const newAllocationModal = ref();
 const editAllocationModal = ref();
 const newAllocationName = ref("");
@@ -164,9 +164,9 @@ const addNewAllocation = async () => {
   if (!newAllocationName.value) return;
 
   try {
-    await serverStore.reserveAllocation(serverId, newAllocationName.value);
+    await server.network?.reserveAllocation(serverId, newAllocationName.value);
 
-    refreshNuxtData("ServerAllocations");
+    await server.refresh();
 
     newAllocationModal.value.hide();
     newAllocationName.value = "";
@@ -184,9 +184,13 @@ const editAllocation = async () => {
   if (!newAllocationName.value) return;
 
   try {
-    await serverStore.updateAllocation(serverId, newAllocationPort.value, newAllocationName.value);
+    await server.network?.updateAllocation(
+      serverId,
+      newAllocationPort.value,
+      newAllocationName.value,
+    );
 
-    refreshNuxtData("ServerAllocations");
+    await server.refresh();
 
     editAllocationModal.value.hide();
     newAllocationName.value = "";
@@ -196,17 +200,15 @@ const editAllocation = async () => {
 };
 
 const removeAllocation = async (port: number) => {
-  await serverStore.deleteAllocation(serverId, port);
-  refreshNuxtData("ServerAllocations");
+  await server.network?.deleteAllocation(serverId, port);
+  await server.refresh();
 };
 
 const saveNetwork = async () => {
   try {
     isUpdating.value = true;
-    const available = (await serverStore.checkSubdomainAvailability(serverSubdomain.value)) as {
-      available: boolean;
-    };
-    if (!available.available) {
+    const available = await server.network?.checkSubdomainAvailability(serverSubdomain.value);
+    if (!available) {
       // @ts-ignore
       app.$notify({
         group: "serverOptions",
@@ -217,16 +219,17 @@ const saveNetwork = async () => {
       return;
     }
     if (serverSubdomain.value !== data?.value?.net?.domain) {
-      await serverStore.changeSubdomain(serverId, serverSubdomain.value);
+      await server.network?.changeSubdomain(serverId, serverSubdomain.value);
     }
     if (serverPrimaryPort.value !== data?.value?.net?.port) {
-      await serverStore.updateAllocation(
+      await server.network?.updateAllocation(
         serverId,
         serverPrimaryPort.value,
         newAllocationName.value,
       );
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
+    await server.refresh();
     // @ts-ignore
     app.$notify({
       group: "serverOptions",
@@ -245,14 +248,11 @@ const saveNetwork = async () => {
     });
   } finally {
     isUpdating.value = false;
-    resetNetwork();
-    await serverStore.fetchServerData(serverId);
-    resetNetwork();
   }
 };
 
 const resetNetwork = () => {
   serverSubdomain.value = data?.value?.net?.domain ?? "";
-  allocations.value = data?.value?.net?.allocations ?? [];
+  allocations.value = network.value?.allocations ?? [];
 };
 </script>

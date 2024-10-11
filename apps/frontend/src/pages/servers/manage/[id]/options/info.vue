@@ -48,9 +48,9 @@
 import { Button } from "@modrinth/ui";
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const serverStore = useServerStore();
+const server = await usePyroServer(serverId, ["general"]);
 
-const data = computed(() => serverStore.serverData[serverId]);
+const data = computed(() => server.general);
 
 const properties = [
   { name: "Server ID", value: serverId ?? "Unknown" },
