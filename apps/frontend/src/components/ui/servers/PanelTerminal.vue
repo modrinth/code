@@ -88,11 +88,20 @@ const scrollTop = ref(0);
 const clientHeight = ref(0);
 const isFullScreen = ref(props.fullScreen);
 
+let initial = false;
+
 const totalHeight = computed(
   () =>
     itemHeights.value.reduce((sum, height) => sum + height, 0) ||
     props.consoleOutput.length * averageItemHeight.value,
 );
+
+watch(totalHeight, () => {
+  if (initial) {
+    scrollToBottom();
+  }
+  initial = true;
+});
 
 const getItemOffset = (index: number) => {
   return itemHeights.value.slice(0, index).reduce((sum, height) => sum + height, 0);
