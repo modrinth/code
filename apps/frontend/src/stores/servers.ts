@@ -145,7 +145,7 @@ export const useServerStore = defineStore("servers", {
       try {
         const response = await usePyroFetch<{ servers: Server[] }>("servers");
         response.servers.forEach((server) => {
-          const oldImage = this.serverData[server.server_id].image;
+          const oldImage = this.serverData[server.server_id]?.image;
           this.serverData[server.server_id] = server;
           if (oldImage) {
             this.serverData[server.server_id].image = oldImage;
