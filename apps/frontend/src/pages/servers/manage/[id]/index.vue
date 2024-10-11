@@ -419,7 +419,10 @@ useHead({
 const bestSuggestion = computed(() => {
   if (!suggestions.value.length) return "";
   const inputTokens = commandInput.value.trim().split(/\s+/);
-  const lastInputToken = inputTokens[inputTokens.length - 1] || "";
+  let lastInputToken = inputTokens[inputTokens.length - 1] || "";
+  if (inputTokens.length - 1 === 0 && lastInputToken.startsWith("/")) {
+    lastInputToken = lastInputToken.slice(1);
+  }
   const firstSuggestion = suggestions.value[0];
   const suggestionTokens = firstSuggestion.split(/\s+/);
   const lastSuggestionToken = suggestionTokens[suggestionTokens.length - 1] || "";
@@ -523,7 +526,7 @@ const selectPrevSuggestion = () => {
 
 // Improved acceptSuggestion function
 const acceptSuggestion = () => {
-  if (suggestions.value.length === 0) return;
+  if (suggestions.value.filter((s) => s !== "<arg>").length === 0) return;
   const selected = suggestions.value[selectedSuggestionIndex.value];
   const currentTokens = commandInput.value.trim().split(" ");
   const suggestionTokens = selected.split(/\s+/).filter(Boolean);
