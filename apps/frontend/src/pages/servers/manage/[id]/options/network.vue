@@ -1,42 +1,38 @@
 <template>
   <Modal ref="newAllocationModal" header="">
     <UiServersPyroModal header="New allocation" :data="data" @modal="newAllocationModal?.hide()">
-      <div class="p-2">
-        <div class="flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <input
-            v-model="newAllocationName"
-            type="text"
-            class="bg-bg-input w-full rounded-lg p-4"
-            placeholder="e.g. Secondary allocation"
-          />
-        </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
-          <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="addNewAllocation">
-            <PlusIcon /> Create allocation
-          </Button>
-        </div>
+      <div class="flex flex-col gap-2">
+        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <input
+          v-model="newAllocationName"
+          type="text"
+          class="bg-bg-input w-full rounded-lg p-4"
+          placeholder="e.g. Secondary allocation"
+        />
+      </div>
+      <div class="mb-4 mt-4 flex justify-end gap-4">
+        <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
+        <Button color="primary" @click="addNewAllocation">
+          <PlusIcon /> Create allocation
+        </Button>
       </div>
     </UiServersPyroModal>
   </Modal>
 
   <Modal ref="editAllocationModal" header="">
     <UiServersPyroModal header="Edit allocation" :data="data" @modal="editAllocationModal?.hide()">
-      <div class="p-2">
-        <div class="flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <input
-            v-model="newAllocationName"
-            type="text"
-            class="bg-bg-input w-full rounded-lg p-4"
-            placeholder="e.g. Secondary allocation"
-          />
-        </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
-          <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="editAllocation"> <SaveIcon /> Update Allocation </Button>
-        </div>
+      <div class="flex flex-col gap-2">
+        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <input
+          v-model="newAllocationName"
+          type="text"
+          class="bg-bg-input w-full rounded-lg p-4"
+          placeholder="e.g. Secondary allocation"
+        />
+      </div>
+      <div class="mb-4 mt-4 flex justify-end gap-4">
+        <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
+        <Button color="primary" @click="editAllocation"> <SaveIcon /> Update Allocation </Button>
       </div>
     </UiServersPyroModal>
   </Modal>

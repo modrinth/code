@@ -21,42 +21,38 @@
       </div>
       <Modal ref="createBackupModal" header="">
         <UiServersPyroModal header="Create backup" :data="data" @modal="createBackupModal?.hide()">
-          <div class="p-2">
-            <div class="mb-3 mt-3">
-              Your server will temporarily shutdown while the backup is being created.
-            </div>
-            <div class="flex flex-col gap-2">
-              <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-              <input
-                v-model="createBackupName"
-                type="text"
-                class="bg-bg-input w-full rounded-lg p-4"
-                placeholder="e.g. Before 1.21"
-              />
-            </div>
-            <div class="mb-4 mt-4 flex justify-end gap-4">
-              <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
-              <Button color="primary" @click="createBackup"> <PlusIcon /> Create backup </Button>
-            </div>
+          <div class="mb-3 mt-3">
+            Your server will temporarily shutdown while the backup is being created.
+          </div>
+          <div class="flex flex-col gap-2">
+            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+            <input
+              v-model="createBackupName"
+              type="text"
+              class="bg-bg-input w-full rounded-lg p-4"
+              placeholder="e.g. Before 1.21"
+            />
+          </div>
+          <div class="mb-4 mt-4 flex justify-end gap-4">
+            <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
+            <Button color="primary" @click="createBackup"> <PlusIcon /> Create backup </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
       <Modal ref="renameBackupModal" header="">
         <UiServersPyroModal header="Rename backup" :data="data" @modal="renameBackupModal?.hide()">
-          <div class="p-2">
-            <div class="mt-2 flex flex-col gap-2">
-              <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-              <input
-                v-model="renameBackupName"
-                type="text"
-                class="bg-bg-input w-full rounded-lg p-4"
-                placeholder="e.g. Before 1.21"
-              />
-            </div>
-            <div class="mb-4 mt-4 flex justify-end gap-4">
-              <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
-              <Button color="primary" @click="renameBackup(currentBackup)"> Rename backup </Button>
-            </div>
+          <div class="mt-2 flex flex-col gap-2">
+            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+            <input
+              v-model="renameBackupName"
+              type="text"
+              class="bg-bg-input w-full rounded-lg p-4"
+              placeholder="e.g. Before 1.21"
+            />
+          </div>
+          <div class="mb-4 mt-4 flex justify-end gap-4">
+            <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
+            <Button color="primary" @click="renameBackup(currentBackup)"> Rename backup </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
@@ -66,28 +62,26 @@
           :data="data"
           @modal="restoreBackupModal?.hide()"
         >
-          <div class="p-2">
-            <div class="flex flex-col gap-4">
-              <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
-                <div class="text-2xl font-extrabold text-contrast">
-                  {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
-                </div>
-                <div class="flex gap-2 font-semibold text-contrast">
-                  <CalendarIcon />
-                  {{
-                    new Date(
-                      data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
-                    ).toLocaleString()
-                  }}
-                </div>
+          <div class="flex flex-col gap-4">
+            <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
+              <div class="text-2xl font-extrabold text-contrast">
+                {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
+              </div>
+              <div class="flex gap-2 font-semibold text-contrast">
+                <CalendarIcon />
+                {{
+                  new Date(
+                    data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
+                  ).toLocaleString()
+                }}
               </div>
             </div>
-            <div class="mb-4 mt-4 flex justify-end gap-4">
-              <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
-              <Button color="primary" @click="restoreBackup(currentBackup)">
-                Restore backup
-              </Button>
-            </div>
+          </div>
+          <div class="mb-4 mt-4 flex justify-end gap-4">
+            <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
+            <Button color="primary" @click="restoreBackup(currentBackup)">
+              Restore backup
+            </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
@@ -98,26 +92,24 @@
           danger
           @modal="deleteBackupModal?.hide()"
         >
-          <div class="p-2">
-            <div class="flex flex-col gap-4">
-              <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
-                <div class="text-2xl font-extrabold text-contrast">
-                  {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
-                </div>
-                <div class="flex gap-2 font-semibold text-contrast">
-                  <CalendarIcon />
-                  {{
-                    new Date(
-                      data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
-                    ).toLocaleString()
-                  }}
-                </div>
+          <div class="flex flex-col gap-4">
+            <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
+              <div class="text-2xl font-extrabold text-contrast">
+                {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
+              </div>
+              <div class="flex gap-2 font-semibold text-contrast">
+                <CalendarIcon />
+                {{
+                  new Date(
+                    data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
+                  ).toLocaleString()
+                }}
               </div>
             </div>
-            <div class="mb-4 mt-4 flex justify-end gap-4">
-              <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
-              <Button color="danger" @click="deleteBackup(currentBackup)"> Delete backup </Button>
-            </div>
+          </div>
+          <div class="mb-4 mt-4 flex justify-end gap-4">
+            <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
+            <Button color="danger" @click="deleteBackup(currentBackup)"> Delete backup </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
