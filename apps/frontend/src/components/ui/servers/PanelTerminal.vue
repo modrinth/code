@@ -32,6 +32,7 @@
     </div>
     <slot />
     <button
+      :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
       class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-300 hover:scale-110"
       @click="toggleFullscreen"
     >
