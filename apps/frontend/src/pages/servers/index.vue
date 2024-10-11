@@ -1,5 +1,23 @@
 <template>
   <div data-pyro class="servers-hero relative -mt-48 h-full min-h-screen py-48 md:-mt-20 md:py-32">
+    <PurchaseModal
+      v-if="showModal && selectedProduct && customer"
+      :key="selectedProduct.id"
+      ref="purchaseModal"
+      :product="selectedProduct"
+      :country="country"
+      :publishable-key="config.public.stripePublishableKey"
+      :send-billing-request="
+        async (body) =>
+          await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
+      "
+      :fetch-payment-data="fetchPaymentData"
+      :on-error="handleError"
+      :customer="customer"
+      :payment-methods="paymentMethods"
+      :return-url="`${config.public.siteUrl}/settings/billing`"
+      @hidden="handleModalHidden"
+    />
     <img
       src="~/assets/images/games/maze.png"
       alt=""
@@ -353,58 +371,46 @@
         </h2>
 
         <ul class="m-0 flex w-full flex-col gap-8 p-0 md:flex-row">
-          <li class="m-0 flex w-full list-none flex-col gap-6 rounded-2xl bg-bg p-8 text-left">
-            <div role="heading" aria-level="2" class="-mb-4 text-sm">Small</div>
-            <div class="flex flex-row items-end">
-              <div class="text-5xl font-bold text-contrast">$12</div>
-              <div class="text-secondary">/month</div>
-            </div>
-            <div>4 GB RAM</div>
-            <div class="h-[1px] w-full bg-bg-raised"></div>
-            <p class="m-0">
-              Perfect for small modpacks and friend groups looking to play together.
-            </p>
-            <ButtonStyled color="standard" size="large">
-              <!-- stripe hook -->
-              <nuxt-link to="#plan"> Select plan </nuxt-link>
-            </ButtonStyled>
-          </li>
           <li
-            class="relative m-0 flex w-full list-none flex-col gap-6 rounded-2xl bg-highlight p-8 text-left"
+            v-for="product in pyroProducts"
+            :key="product.id"
+            :class="[
+              'm-0 flex w-full list-none flex-col gap-6 rounded-2xl p-8 text-left',
+              product.metadata.ram === 6 ? 'bg-highlight' : 'bg-bg',
+            ]"
           >
-            <!-- <div
-              class="absolute -right-4 -top-4 flex items-center gap-2 rounded-full bg-brand p-2 text-sm font-bold text-[var(--color-accent-contrast)]"
+            <div
+              role="heading"
+              aria-level="2"
+              class="-mb-4 text-sm"
+              :class="{ 'text-contrast': product.metadata.ram === 6 }"
             >
-              <CheckCircleIcon class="h-6 w-6 text-[var(--color-accent-contrast)]" />
-              <span> Recommended </span>
-            </div> -->
-            <div role="heading" aria-level="2" class="-mb-4 text-sm text-contrast">Medium</div>
+              {{ getProductSize(product) }}
+            </div>
             <div class="flex flex-row items-end">
-              <div class="text-5xl font-bold text-contrast">$18</div>
+              <div class="text-5xl font-bold text-contrast">
+                {{
+                  formatPrice(
+                    vintl.locale,
+                    getProductPrice(product).prices.intervals.monthly,
+                    getProductPrice(product).currency_code,
+                  )
+                }}
+              </div>
               <div class="text-secondary">/month</div>
             </div>
-            <div>6 GB RAM</div>
-            <div class="h-[1px] w-full bg-brand opacity-50"></div>
-            <p class="m-0 text-contrast">
-              The best value for most players. Add more mods and friends to your server with ease.
+            <div>{{ product.metadata.ram }} GB RAM</div>
+            <div
+              class="h-[1px] w-full"
+              :class="product.metadata.ram === 6 ? 'bg-brand opacity-50' : 'bg-bg-raised'"
+            ></div>
+            <p class="m-0" :class="{ 'text-contrast': product.metadata.ram === 6 }">
+              {{ getProductDescription(product) }}
             </p>
-            <ButtonStyled color="brand" size="large">
-              <!-- stripe hook -->
-              <nuxt-link to="#plan"> Start your server </nuxt-link>
-            </ButtonStyled>
-          </li>
-          <li class="m-0 flex w-full list-none flex-col gap-6 rounded-2xl bg-bg p-8 text-left">
-            <div role="heading" aria-level="2" class="-mb-4 text-sm">Large</div>
-            <div class="flex flex-row items-end">
-              <div class="text-5xl font-bold text-contrast">$24</div>
-              <div class="text-secondary">/month</div>
-            </div>
-            <div>8 GB RAM</div>
-            <div class="h-[1px] w-full bg-bg-raised"></div>
-            <p class="m-0">For the biggest modpacks. Play with hundreds of mods at once.</p>
-            <ButtonStyled color="standard" size="large">
-              <!-- stripe hook -->
-              <nuxt-link to="#plan"> Select plan </nuxt-link>
+            <ButtonStyled :color="product.metadata.ram === 6 ? 'brand' : 'standard'" size="large">
+              <button @click="selectProduct(product)">
+                {{ product.metadata.ram === 6 ? "Start your server" : "Select plan" }}
+              </button>
             </ButtonStyled>
           </li>
         </ul>
@@ -413,9 +419,11 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { ButtonStyled } from "@modrinth/ui";
+<script setup>
+import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
+import { formatPrice, getCurrency } from "@modrinth/utils";
+import { products } from "~/generated/state.json";
 
 const title = "Modrinth Servers";
 const description =
@@ -427,6 +435,107 @@ useSeoMeta({
   ogTitle: title,
   ogDescription: description,
 });
+
+useHead({
+  script: [
+    {
+      src: "https://js.stripe.com/v3/",
+      defer: true,
+      async: true,
+    },
+  ],
+});
+
+const vintl = useVIntl();
+const data = useNuxtApp();
+const config = useRuntimeConfig();
+const purchaseModal = ref(null);
+const country = useUserCountry();
+const customer = ref(null);
+const paymentMethods = ref([]);
+const selectedProduct = ref(null);
+const showModal = ref(false);
+const modalKey = ref(0);
+
+const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
+
+const getProductSize = (product) => {
+  const ramSize = parseInt(product.metadata.ram);
+  if (ramSize === 4) return "Small";
+  if (ramSize === 6) return "Medium";
+  if (ramSize === 8) return "Large";
+  return "Custom";
+};
+
+const getProductPrice = (product) => {
+  return product.prices.find((p) => p.currency_code === getCurrency(country.value));
+};
+
+const getProductDescription = (product) => {
+  const ramSize = parseInt(product.metadata.ram);
+  if (ramSize === 4)
+    return "Perfect for small modpacks and friend groups looking to play together.";
+  if (ramSize === 6)
+    return "The best value for most players. Add more mods and friends to your server with ease.";
+  if (ramSize === 8) return "For the biggest modpacks. Play with hundreds of mods at once.";
+  return "Custom server configuration.";
+};
+
+const selectProduct = async (product) => {
+  selectedProduct.value = product;
+  showModal.value = true;
+  modalKey.value++; // Increment the key to force re-render
+  await nextTick();
+  if (purchaseModal.value && purchaseModal.value.show) {
+    purchaseModal.value.show();
+  }
+};
+
+const handleError = (err) => {
+  data.$notify({
+    group: "main",
+    title: "An error occurred",
+    type: "error",
+    text: err.message ?? (err.data ? err.data.description : err),
+  });
+};
+
+const handleModalHidden = () => {
+  showModal.value = false;
+};
+
+watch(selectedProduct, async (newProduct) => {
+  if (newProduct) {
+    showModal.value = false;
+    await nextTick();
+    showModal.value = true;
+    // rerender
+    modalKey.value++;
+    await nextTick();
+    if (purchaseModal.value && purchaseModal.value.show) {
+      purchaseModal.value.show();
+    }
+  }
+});
+
+async function fetchPaymentData() {
+  try {
+    const [customerData, paymentMethodsData] = await Promise.all([
+      useBaseFetch("billing/customer", { internal: true }),
+      useBaseFetch("billing/payment_methods", { internal: true }),
+    ]);
+    customer.value = customerData;
+    paymentMethods.value = paymentMethodsData;
+  } catch (error) {
+    console.error("Error fetching payment data:", error);
+    data.$notify({
+      group: "main",
+      title: "Error fetching payment data",
+      type: "error",
+      text: error.message || "An unexpected error occurred",
+    });
+  }
+}
 
 const words = ["friends", "medieval-masters", "create-server", "mega-smp", "spookypack"];
 const currentWordIndex = ref(0);
@@ -458,20 +567,36 @@ const startTyping = () => {
 
 onMounted(() => {
   document.body.style.background = "var(--color-accent-contrast)";
-  const layoutDiv = document.querySelector(".layout") as HTMLElement;
+  const layoutDiv = document.querySelector(".layout");
   if (layoutDiv) {
     layoutDiv.style.background = "var(--color-accent-contrast)";
   }
   startTyping();
+  fetchPaymentData();
 });
 
 onUnmounted(() => {
   document.body.style.background = "";
-  const layoutDiv = document.querySelector(".layout") as HTMLElement;
+  const layoutDiv = document.querySelector(".layout");
   if (layoutDiv) {
     layoutDiv.style.background = "";
   }
 });
+
+watch(selectedProduct, async (newProduct) => {
+  if (newProduct) {
+    showModal.value = false;
+    await nextTick();
+    showModal.value = true;
+    await nextTick();
+    if (purchaseModal.value && purchaseModal.value.show) {
+      purchaseModal.value.show();
+    }
+  }
+});
+
+// Log pyroProducts for debugging
+console.log("Pyro Products:", pyroProducts);
 </script>
 
 <style scoped>
