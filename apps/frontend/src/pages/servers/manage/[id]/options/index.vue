@@ -75,10 +75,12 @@ const app = useNuxtApp();
 const route = useRoute();
 const serverId = route.params.id as string;
 
+const server = await usePyroServer(serverId, ["general"]);
+
 const serverStore = useServerStore();
 
-const data = computed(() => serverStore.serverData[serverId]);
-const serverName = ref<string>(data.value?.name as string);
+const data = computed(() => server.general);
+const serverName = ref(data.value?.name);
 
 const isUpdating = ref(false);
 const hasUnsavedChanges = computed(() => serverName.value !== data.value?.name);
@@ -86,9 +88,9 @@ const hasUnsavedChanges = computed(() => serverName.value !== data.value?.name);
 const saveGeneral = async () => {
   try {
     isUpdating.value = true;
-    await serverStore.updateServerName(serverId, serverName.value);
+    await data.value?.updateName(serverId, serverName.value ?? "");
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await serverStore.fetchServerData(serverId);
+    await server.refresh();
     // @ts-ignore
     app.$notify({
       group: "serverOptions",

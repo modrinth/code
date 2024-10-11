@@ -65,13 +65,13 @@
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
               <div class="text-2xl font-extrabold text-contrast">
-                {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
+                {{ backups?.find((b: any) => b.id === currentBackup)?.name }}
               </div>
               <div class="flex gap-2 font-semibold text-contrast">
                 <CalendarIcon />
                 {{
                   new Date(
-                    data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
+                    backups?.find((b: any) => b.id === currentBackup)?.created_at || "",
                   ).toLocaleString()
                 }}
               </div>
@@ -93,13 +93,13 @@
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
               <div class="text-2xl font-extrabold text-contrast">
-                {{ data.backups.find((b: any) => b.id === currentBackup)?.name }}
+                {{ backups?.find((b: any) => b.id === currentBackup)?.name }}
               </div>
               <div class="flex gap-2 font-semibold text-contrast">
                 <CalendarIcon />
                 {{
                   new Date(
-                    data.backups.find((b: any) => b.id === currentBackup)?.created_at || "",
+                    backups?.find((b: any) => b.id === currentBackup)?.created_at || "",
                   ).toLocaleString()
                 }}
               </div>
@@ -128,7 +128,7 @@
         </div>
 
         <div
-          v-for="(backup, index) in data.backups"
+          v-for="(backup, index) in backups"
           :key="backup.id"
           class="relative w-full rounded-2xl bg-bg-raised p-8"
         >
@@ -205,19 +205,20 @@ import {
 } from "@modrinth/assets";
 import { ref, reactive } from "vue";
 
+defineEmits(["onDownload"]);
+
 const app = useNuxtApp();
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const serverStore = useServerStore();
-defineEmits(["onDownload"]);
+const server = await usePyroServer(serverId, ["general", "backups"]);
+const data = computed(() => server.general);
+const backups = computed(() => server.backups?.data);
 
 useHead({
-  title: `Backups - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
+  title: `Backups - ${data.value?.name ?? "Server"} - Modrinth`,
 });
 
 const backupError = ref<string | null>(null);
-
-const data = computed(() => serverStore.serverData[serverId]);
 
 const overTheTopDownloadAnimation = ref();
 
@@ -243,9 +244,9 @@ const createBackup = async () => {
   backupsState.loading = true;
   const backupName = createBackupName.value;
   try {
-    serverStore.createBackup(serverId, backupName);
+    await server.backups?.create(serverId, backupName);
 
-    await serverStore.fetchServerData(serverId);
+    await server.refresh();
     createBackupModal.value?.hide();
     // @ts-ignore
     app.$notify({
@@ -265,9 +266,9 @@ const renameBackup = async (backupId: string) => {
   const backupName = renameBackupName.value;
   console.log("renaming", backupName);
   try {
-    await serverStore.renameBackup(serverId, backupId, backupName);
+    await server.backups?.rename(serverId, backupId, backupName);
 
-    await serverStore.fetchServerData(serverId);
+    await server.refresh();
     renameBackupModal.value?.hide();
   } catch (error) {
     backupError.value = error as string;
@@ -278,7 +279,7 @@ const renameBackup = async (backupId: string) => {
 
 const restoreBackup = async (backupId: string) => {
   try {
-    await serverStore.restoreBackup(serverId, backupId);
+    await server.backups?.restore(serverId, backupId);
 
     await restoreBackupModal.value?.hide();
   } catch (error) {
@@ -290,9 +291,9 @@ const restoreBackup = async (backupId: string) => {
 
 const deleteBackup = async (backupId: string) => {
   try {
-    await serverStore.deleteBackup(serverId, backupId);
+    await server.backups?.delete(serverId, backupId);
 
-    await serverStore.fetchServerData(serverId);
+    await server.refresh();
     await deleteBackupModal.value?.hide();
   } catch (error) {
     backupError.value = error as string;
@@ -309,7 +310,7 @@ function triggerDownloadAnimation() {
 const initiateDownload = async (backupId: string) => {
   triggerDownloadAnimation();
 
-  const downloadurl: any = await serverStore.downloadBackup(serverId, backupId);
+  const downloadurl: any = await server.backups?.download(serverId, backupId);
   const a = document.createElement("a");
   a.href = downloadurl.download_url;
   a.click();
