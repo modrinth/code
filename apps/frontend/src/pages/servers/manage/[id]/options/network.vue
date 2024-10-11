@@ -87,6 +87,7 @@
           </div>
 
           <div
+            v-if="allocations[0]"
             class="flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-table-alternateRow p-4"
           >
             <div
