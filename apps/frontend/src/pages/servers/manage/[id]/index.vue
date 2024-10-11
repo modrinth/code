@@ -536,7 +536,8 @@ const acceptSuggestion = () => {
   if (currentTokens[currentTokens.length - 1].toLowerCase() === suggestionTokens[0].toLowerCase()) {
     /* empty */
   } else {
-    const offset = currentTokens.length - 1 === 0 ? 1 : 0;
+    const offset =
+      currentTokens.length - 1 === 0 && currentTokens[0].trim().startsWith("/") ? 1 : 0;
     commandInput.value =
       commandInput.value +
       suggestionTokens[suggestionTokens.length - 1].substring(
