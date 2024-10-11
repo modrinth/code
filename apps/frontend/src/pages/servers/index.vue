@@ -1,5 +1,23 @@
 <template>
   <div data-pyro class="servers-hero relative -mt-48 h-full min-h-screen py-48 md:-mt-20 md:py-32">
+    <PurchaseModal
+      v-if="showModal && selectedProduct && customer"
+      :key="selectedProduct.id"
+      ref="purchaseModal"
+      :product="selectedProduct"
+      :country="country"
+      :publishable-key="config.public.stripePublishableKey"
+      :send-billing-request="
+        async (body) =>
+          await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
+      "
+      :fetch-payment-data="fetchPaymentData"
+      :on-error="handleError"
+      :customer="customer"
+      :payment-methods="paymentMethods"
+      :return-url="`${config.public.siteUrl}/settings/billing`"
+      @hidden="handleModalHidden"
+    />
     <img
       src="~/assets/images/games/maze.png"
       alt=""
@@ -13,7 +31,7 @@
         <div
           class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
         >
-          Experimental Release
+          Experimental
         </div>
         <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
           Play together on Modrinth Servers
@@ -150,7 +168,7 @@
         </div>
         <div class="relative">
           <img
-            src="~/assets/images/games/servers-hero-square-fixed-forreal.png"
+            src="~/assets/images/games/servers-hero-square-fixed-forreal-updated.png"
             alt=""
             class="w-full rounded-2xl"
           />
@@ -197,7 +215,7 @@
               <polygon points="13 19 22 12 13 5 13 19" />
               <polygon points="2 19 11 12 2 5 2 19" />
             </svg>
-            <h2 class="m-0 text-lg font-bold">Experience the fastest servers in the world</h2>
+            <h2 class="m-0 text-lg font-bold">Play on the fastest servers in the world</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
               Modrinth Servers are hosted on the fastest, most reliable infrastructure using
               custom-built software built by Pyro.
@@ -347,30 +365,65 @@
           Start your server on Modrinth
         </h1>
         <h2
-          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+          class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          Tailor-made for modded Minecraft. Breathtakingly fast. Plans start at
-          <!-- hook stripe -->
-          <span>$12</span>
+          Choose the plan that's right for your server.
         </h2>
 
-        <div class="flex w-full flex-row">
-          <div class="flex flex-col gap-6 rounded-2xl bg-bg p-8 text-left">
-            <div role="heading" aria-level="2" class="text-lg font-bold">4 GB</div>
+        <ul class="m-0 flex w-full flex-col gap-8 p-0 md:flex-row">
+          <li
+            v-for="product in pyroProducts"
+            :key="product.id"
+            :class="[
+              'm-0 flex w-full list-none flex-col gap-6 rounded-2xl p-8 text-left',
+              product.metadata.ram === 6 ? 'bg-highlight' : 'bg-bg',
+            ]"
+          >
+            <div
+              role="heading"
+              aria-level="2"
+              class="-mb-4 text-sm"
+              :class="{ 'text-contrast': product.metadata.ram === 6 }"
+            >
+              {{ getProductSize(product) }}
+            </div>
             <div class="flex flex-row items-end">
-              <div class="text-5xl font-bold text-contrast">$12</div>
+              <div class="text-5xl font-bold text-contrast">
+                {{
+                  formatPrice(
+                    vintl.locale,
+                    getProductPrice(product).prices.intervals.monthly,
+                    getProductPrice(product).currency_code,
+                  )
+                }}
+              </div>
               <div class="text-secondary">/month</div>
             </div>
-          </div>
-        </div>
+            <div>{{ product.metadata.ram }} GB RAM</div>
+            <div
+              class="h-[1px] w-full"
+              :class="product.metadata.ram === 6 ? 'bg-brand opacity-50' : 'bg-bg-raised'"
+            ></div>
+            <p class="m-0" :class="{ 'text-contrast': product.metadata.ram === 6 }">
+              {{ getProductDescription(product) }}
+            </p>
+            <ButtonStyled :color="product.metadata.ram === 6 ? 'brand' : 'standard'" size="large">
+              <button @click="selectProduct(product)">
+                {{ product.metadata.ram === 6 ? "Start your server" : "Select plan" }}
+              </button>
+            </ButtonStyled>
+          </li>
+        </ul>
       </div>
     </section>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { ButtonStyled } from "@modrinth/ui";
+<script setup>
+import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
+import { formatPrice, getCurrency } from "@modrinth/utils";
+import { products } from "~/generated/state.json";
 
 const title = "Modrinth Servers";
 const description =
@@ -382,6 +435,106 @@ useSeoMeta({
   ogTitle: title,
   ogDescription: description,
 });
+
+useHead({
+  script: [
+    {
+      src: "https://js.stripe.com/v3/",
+      defer: true,
+      async: true,
+    },
+  ],
+});
+
+const vintl = useVIntl();
+const data = useNuxtApp();
+const config = useRuntimeConfig();
+const purchaseModal = ref(null);
+const country = useUserCountry();
+const customer = ref(null);
+const paymentMethods = ref([]);
+const selectedProduct = ref(null);
+const showModal = ref(false);
+const modalKey = ref(0);
+
+const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
+
+const getProductSize = (product) => {
+  const ramSize = parseInt(product.metadata.ram);
+  if (ramSize === 4) return "Small";
+  if (ramSize === 6) return "Medium";
+  if (ramSize === 8) return "Large";
+  return "Custom";
+};
+
+const getProductPrice = (product) => {
+  return product.prices.find((p) => p.currency_code === getCurrency(country.value));
+};
+
+const getProductDescription = (product) => {
+  const ramSize = parseInt(product.metadata.ram);
+  if (ramSize === 4)
+    return "Perfect for small modpacks and friend groups looking to play together.";
+  if (ramSize === 6)
+    return "The best value for most players. Add more mods and friends to your server with ease.";
+  if (ramSize === 8) return "For the biggest modpacks. Play with hundreds of mods at once.";
+  return "Custom server configuration.";
+};
+
+const selectProduct = async (product) => {
+  selectedProduct.value = product;
+  showModal.value = true;
+  modalKey.value++;
+  await nextTick();
+  if (purchaseModal.value && purchaseModal.value.show) {
+    purchaseModal.value.show();
+  }
+};
+
+const handleError = (err) => {
+  data.$notify({
+    group: "main",
+    title: "An error occurred",
+    type: "error",
+    text: err.message ?? (err.data ? err.data.description : err),
+  });
+};
+
+const handleModalHidden = () => {
+  showModal.value = false;
+};
+
+watch(selectedProduct, async (newProduct) => {
+  if (newProduct) {
+    showModal.value = false;
+    await nextTick();
+    showModal.value = true;
+    modalKey.value++;
+    await nextTick();
+    if (purchaseModal.value && purchaseModal.value.show) {
+      purchaseModal.value.show();
+    }
+  }
+});
+
+async function fetchPaymentData() {
+  try {
+    const [customerData, paymentMethodsData] = await Promise.all([
+      useBaseFetch("billing/customer", { internal: true }),
+      useBaseFetch("billing/payment_methods", { internal: true }),
+    ]);
+    customer.value = customerData;
+    paymentMethods.value = paymentMethodsData;
+  } catch (error) {
+    console.error("Error fetching payment data:", error);
+    data.$notify({
+      group: "main",
+      title: "Error fetching payment data",
+      type: "error",
+      text: error.message || "An unexpected error occurred",
+    });
+  }
+}
 
 const words = ["friends", "medieval-masters", "create-server", "mega-smp", "spookypack"];
 const currentWordIndex = ref(0);
@@ -413,18 +566,31 @@ const startTyping = () => {
 
 onMounted(() => {
   document.body.style.background = "var(--color-accent-contrast)";
-  const layoutDiv = document.querySelector(".layout") as HTMLElement;
+  const layoutDiv = document.querySelector(".layout");
   if (layoutDiv) {
     layoutDiv.style.background = "var(--color-accent-contrast)";
   }
   startTyping();
+  fetchPaymentData();
 });
 
 onUnmounted(() => {
   document.body.style.background = "";
-  const layoutDiv = document.querySelector(".layout") as HTMLElement;
+  const layoutDiv = document.querySelector(".layout");
   if (layoutDiv) {
     layoutDiv.style.background = "";
+  }
+});
+
+watch(selectedProduct, async (newProduct) => {
+  if (newProduct) {
+    showModal.value = false;
+    await nextTick();
+    showModal.value = true;
+    await nextTick();
+    if (purchaseModal.value && purchaseModal.value.show) {
+      purchaseModal.value.show();
+    }
   }
 });
 </script>

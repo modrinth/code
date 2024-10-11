@@ -408,7 +408,7 @@ const loadingPaymentMethodModal = ref(0)
 const selectedPlan = ref('yearly')
 const currency = computed(() => getCurrency(props.country))
 
-const price = ref(props.product.prices.find((x) => x.currency_code === currency.value))
+const price = ref(props.product?.prices?.find((x) => x.currency_code === currency.value) ?? null)
 
 const clientSecret = ref()
 const paymentIntentId = ref()
@@ -540,8 +540,11 @@ async function refreshPayment(confirmationId, paymentMethodId) {
         }
 
     const result = await props.sendBillingRequest({
-      product_id: props.product.id,
-      interval: selectedPlan.value,
+      charge: {
+        type: 'new',
+        product_id: props.product.id,
+        interval: selectedPlan.value,
+      },
       existing_payment_intent: paymentIntentId.value,
       ...base,
     })

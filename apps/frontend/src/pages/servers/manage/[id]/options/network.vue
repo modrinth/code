@@ -1,25 +1,40 @@
 <template>
   <Modal ref="newAllocationModal" header="">
     <UiServersPyroModal header="New allocation" :data="data" @modal="newAllocationModal?.hide()">
-      <div class="p-2">
-        <div class="flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <input
-            v-model="newAllocationName"
-            type="text"
-            class="bg-bg-input w-full rounded-lg p-4"
-            placeholder="e.g. Secondary allocation"
-          />
-        </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
-          <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="addNewAllocation">
-            <PlusIcon /> Create allocation
-          </Button>
-        </div>
+      <div class="flex flex-col gap-2">
+        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <input
+          v-model="newAllocationName"
+          type="text"
+          class="bg-bg-input w-full rounded-lg p-4"
+          placeholder="e.g. Secondary allocation"
+        />
+      </div>
+      <div class="mb-1 mt-4 flex justify-end gap-4">
+        <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
+        <Button color="primary" @click="addNewAllocation"> <PlusIcon /> Create allocation </Button>
       </div>
     </UiServersPyroModal>
   </Modal>
+
+  <Modal ref="editAllocationModal" header="">
+    <UiServersPyroModal header="Edit allocation" :data="data" @modal="editAllocationModal?.hide()">
+      <div class="flex flex-col gap-2">
+        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <input
+          v-model="newAllocationName"
+          type="text"
+          class="bg-bg-input w-full rounded-lg p-4"
+          placeholder="e.g. Secondary allocation"
+        />
+      </div>
+      <div class="mb-1 mt-4 flex justify-end gap-4">
+        <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
+        <Button color="primary" @click="editAllocation"> <SaveIcon /> Update Allocation </Button>
+      </div>
+    </UiServersPyroModal>
+  </Modal>
+
   <div class="relative h-full w-full overflow-y-auto">
     <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4 px-4">
       <div class="flex h-full flex-col">
@@ -41,11 +56,12 @@
             <label for="username-field" class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Allocations</span>
               <span>
-                Configure ports for internet-facing features like map viewers or voice chat mods.
+                Configure additional ports for internet-facing features like map viewers or voice
+                chat mods.
               </span>
             </label>
 
-            <ButtonStyled type="standard" color="brand" @click="openNewAllocationModal">
+            <ButtonStyled type="standard" color="brand" @click="newAllocationModal.show()">
               <button>
                 <PlusIcon />
                 <span>New Allocation</span>
@@ -53,35 +69,52 @@
             </ButtonStyled>
           </div>
 
-          <div class="flex w-full flex-col overflow-hidden rounded-xl">
+          <div class="flex w-full flex-col overflow-hidden rounded-xl bg-table-alternateRow p-4">
             <!-- Primary allocation -->
-            <div class="flex flex-row items-center justify-between bg-bg px-4 py-4">
-              <div class="flex flex-row items-center gap-4">
-                <span class="text-sm font-bold uppercase tracking-wide">Primary Allocation</span>
-                <div class="font-[family-name:var(--mono-font)]">
-                  <CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
-                </div>
-              </div>
-            </div>
+            <div class="flex flex-row items-center justify-between">
+              <span class="text-md font-bold capitalize tracking-wide text-contrast">
+                Primary Allocation
+              </span>
 
-            <!-- Additional allocations -->
+              <UiCopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
+            </div>
+          </div>
+
+          <div
+            v-if="allocations[0]"
+            class="flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-table-alternateRow p-4"
+          >
             <div
               v-for="allocation in allocations"
               :key="allocation.port"
-              class="border-border flex flex-row items-center justify-between border-t bg-bg px-4 py-4"
+              class="border-border flex flex-row items-center justify-between"
             >
               <div class="flex flex-row items-center gap-4">
-                <span class="text-sm font-bold uppercase tracking-wide">{{ allocation.name }}</span>
-                <div class="font-[family-name:var(--mono-font)]">
-                  <CopyCode :text="`${serverIP}:${allocation.port}`" />
+                <VersionIcon class="h-7 w-7 rotate-90" />
+                <div class="flex w-[20rem] flex-row items-center justify-between">
+                  <div class="flex flex-col gap-1">
+                    <span class="text-md font-bold capitalize tracking-wide text-contrast">
+                      {{ allocation.name }}
+                    </span>
+                    <span class="text-xs uppercase text-secondary">name</span>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <span class="text-md w-10 font-bold capitalize tracking-wide text-contrast">
+                      {{ allocation.port }}
+                    </span>
+                    <span class="text-xs uppercase text-secondary">port</span>
+                  </div>
                 </div>
               </div>
-              <ButtonStyled type="standard" @click="removeAllocation(allocation.port)">
-                <button>
+
+              <div class="flex flex-row items-center gap-2">
+                <Button icon-only @click="showEditAllocation(allocation.port)">
+                  <EditIcon />
+                </Button>
+                <Button icon-only color="danger" @click="removeAllocation(allocation.port)">
                   <TrashIcon />
-                  <span>Remove</span>
-                </button>
-              </ButtonStyled>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -100,9 +133,8 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, TrashIcon } from "@modrinth/assets";
+import { PlusIcon, TrashIcon, EditIcon, VersionIcon, SaveIcon } from "@modrinth/assets";
 import { ButtonStyled, Modal, Button } from "@modrinth/ui";
-import CopyCode from "~/components/ui/CopyCode.vue";
 import { useServerStore } from "~/stores/servers.ts";
 
 const route = useNativeRoute();
@@ -117,27 +149,24 @@ const serverIP = ref(data?.value?.net?.ip ?? "");
 const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
 
-const allocations = ref(data?.value?.net?.allocations ?? []);
+const { data: allocations } = await useAsyncData(
+  "ServerAllocations",
+  async () => (await serverStore.getAllocations(serverId)) as any,
+);
 const newAllocationModal = ref();
+const editAllocationModal = ref();
 const newAllocationName = ref("");
+const newAllocationPort = ref(0);
 
 const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
-
-const openNewAllocationModal = () => {
-  newAllocationModal.value.show();
-};
 
 const addNewAllocation = async () => {
   if (!newAllocationName.value) return;
 
   try {
-    const response = await serverStore.reserveAllocation(serverId, newAllocationName.value);
-    const newPort = response.port;
+    await serverStore.reserveAllocation(serverId, newAllocationName.value);
 
-    allocations.value.push({
-      name: newAllocationName.value,
-      port: newPort,
-    });
+    refreshNuxtData("ServerAllocations");
 
     newAllocationModal.value.hide();
     newAllocationName.value = "";
@@ -146,8 +175,29 @@ const addNewAllocation = async () => {
   }
 };
 
-const removeAllocation = (port: number) => {
-  allocations.value = allocations.value.filter((allocation) => allocation.port !== port);
+const showEditAllocation = (port: number) => {
+  newAllocationPort.value = port;
+  editAllocationModal.value.show();
+};
+
+const editAllocation = async () => {
+  if (!newAllocationName.value) return;
+
+  try {
+    await serverStore.updateAllocation(serverId, newAllocationPort.value, newAllocationName.value);
+
+    refreshNuxtData("ServerAllocations");
+
+    editAllocationModal.value.hide();
+    newAllocationName.value = "";
+  } catch (error) {
+    console.error("Failed to reserve new allocation:", error);
+  }
+};
+
+const removeAllocation = async (port: number) => {
+  await serverStore.deleteAllocation(serverId, port);
+  refreshNuxtData("ServerAllocations");
 };
 
 const saveNetwork = async () => {

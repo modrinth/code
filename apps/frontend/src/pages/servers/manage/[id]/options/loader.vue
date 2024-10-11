@@ -114,7 +114,7 @@
             will reinstall the server.
           </p>
         </div>
-        <div class="flex w-full flex-col gap-4 rounded-xl bg-table-alternateRow p-2 pr-4">
+        <div class="flex w-full flex-col gap-4 rounded-xl bg-table-alternateRow p-4 pr-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <div

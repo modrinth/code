@@ -13,15 +13,13 @@
         :data="data"
         @modal="createItemModal?.hide()"
       >
-        <div class="px-4">
-          <div class="mt-2 flex flex-col gap-2">
-            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-            <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
-          </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
-            <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="createNewItem"> Create </Button>
-          </div>
+        <div class="mt-2 flex flex-col gap-2">
+          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+          <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
+        </div>
+        <div class="mb-1 mt-4 flex justify-end gap-4">
+          <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
+          <Button color="primary" @click="createNewItem"> Create </Button>
         </div>
       </UiServersPyroModal>
     </Modal>
@@ -33,20 +31,18 @@
         :data="data"
         @modal="renameItemModal?.hide()"
       >
-        <div class="px-4">
-          <div class="mt-2 flex flex-col gap-2">
-            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-            <input
-              v-model="newItemName"
-              type="text"
-              class="bg-bg-input w-full rounded-lg p-4"
-              :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
-            />
-          </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
-            <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="renameItem"> Rename </Button>
-          </div>
+        <div class="mt-2 flex flex-col gap-2">
+          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+          <input
+            v-model="newItemName"
+            type="text"
+            class="bg-bg-input w-full rounded-lg p-4"
+            :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
+          />
+        </div>
+        <div class="mb-1 mt-4 flex justify-end gap-4">
+          <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
+          <Button color="primary" @click="renameItem"> Rename </Button>
         </div>
       </UiServersPyroModal>
     </Modal>
@@ -58,19 +54,17 @@
         :data="data"
         @modal="moveItemModal?.hide()"
       >
-        <div class="px-4">
-          <div class="mt-2 flex flex-col gap-2">
-            <input
-              v-model="destinationFolder"
-              type="text"
-              class="bg-bg-input w-full rounded-lg p-4"
-              placeholder="e.g. mods/modname"
-            />
-          </div>
-          <div class="mb-4 mt-4 flex justify-end gap-4">
-            <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="moveItem"> Move </Button>
-          </div>
+        <div class="mt-2 flex flex-col gap-2">
+          <input
+            v-model="destinationFolder"
+            type="text"
+            class="bg-bg-input w-full rounded-lg p-4"
+            placeholder="e.g. mods/modname"
+          />
+        </div>
+        <div class="mb-1 mt-4 flex justify-end gap-4">
+          <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
+          <Button color="primary" @click="moveItem"> Move </Button>
         </div>
       </UiServersPyroModal>
     </Modal>
@@ -104,7 +98,7 @@
             </div>
           </div>
         </div>
-        <div class="mb-4 mt-4 flex justify-end gap-4">
+        <div class="mb-1 mt-4 flex justify-end gap-4">
           <Button transparent @click="deleteItemModal?.hide()"> Cancel </Button>
           <Button color="danger" @click="deleteItem"> Delete {{ selectedItem?.type }} </Button>
         </div>
@@ -137,25 +131,28 @@
             <span class="ms-1 opacity-50">/</span>
           </span>
         </div>
-        <ButtonStyled type="transparent">
-          <OverflowMenu
-            class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-            position="bottom"
-            direction="left"
-            aria-label="Create new..."
-            :options="[
-              { id: 'file', action: () => showCreateModal('file') },
-              { id: 'directory', action: () => showCreateModal('directory') },
-              { id: 'upload', action: () => initiateFileUpload() },
-            ]"
-          >
-            <PlusIcon aria-hidden="true" />
-            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-            <template #file> <BoxIcon aria-hidden="true" /> File </template>
-            <template #directory> <FolderOpenIcon aria-hidden="true" /> Directory </template>
-            <template #upload> <UploadIcon aria-hidden="true" /> Upload </template>
-          </OverflowMenu>
-        </ButtonStyled>
+        <div class="flex gap-2">
+          <ButtonStyled type="transparent">
+            <OverflowMenu
+              class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+              position="bottom"
+              direction="left"
+              aria-label="Create new..."
+              :options="[
+                { id: 'file', action: () => showCreateModal('file') },
+                { id: 'directory', action: () => showCreateModal('directory') },
+                { id: 'upload', action: () => initiateFileUpload() },
+              ]"
+            >
+              <PlusIcon aria-hidden="true" />
+              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+              <template #file> <BoxIcon aria-hidden="true" /> File </template>
+              <template #directory> <FolderOpenIcon aria-hidden="true" /> Directory </template>
+              <template #upload> <UploadIcon aria-hidden="true" /> Upload </template>
+            </OverflowMenu>
+          </ButtonStyled>
+          <Button> Launch SFTP </Button>
+        </div>
       </div>
       <div
         v-else

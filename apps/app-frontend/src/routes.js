@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import * as Pages from '@/pages'
 import * as Project from '@/pages/project'
 import * as Instance from '@/pages/instance'
-import * as Server from '@/pages/servers'
 
 /**
  * Configures application routing. Add page to pages/index and then add to route table here.
@@ -41,85 +40,6 @@ export default new createRouter({
       meta: {
         breadcrumb: [{ name: 'Settings' }],
       },
-    },
-    {
-      path: '/servers',
-      name: 'servers',
-      component: Server.Index,
-      meta: {
-        breadcrumb: [{ name: 'Servers' }],
-      },
-    },
-    {
-      path: '/servers/manage/:id',
-      name: 'servers.manage',
-      component: Server.ManageIndex,
-      props: true,
-      meta: {
-        useContext: true,
-        breadcrumb: [{ name: 'Servers', link: '/servers' }, { name: '?Server' }],
-      },
-      children: [
-        {
-          path: '',
-          name: 'servers.manage.overview',
-          component: Server.ManageOverview,
-        },
-        {
-          path: 'content',
-          name: 'servers.manage.content',
-          component: Server.ManageContent,
-          meta: {
-            breadcrumb: [
-              { name: 'Servers', link: '/servers' },
-              { name: '?Server', link: '/servers/manage/{id}' },
-              { name: 'Content' },
-            ],
-          },
-        },
-        {
-          path: 'files',
-          name: 'servers.manage.files',
-          component: Server.ManageFiles,
-          meta: {
-            breadcrumb: [
-              { name: 'Servers', link: '/servers' },
-              { name: '?Server', link: '/servers/manage/{id}' },
-              { name: 'Files' },
-            ],
-          },
-        },
-        {
-          path: 'backups',
-          name: 'servers.manage.backups',
-          component: Server.ManageBackups,
-          meta: {
-            breadcrumb: [
-              { name: 'Servers', link: '/servers' },
-              { name: '?Server', link: '/servers/manage/{id}' },
-              { name: 'Backups' },
-            ],
-          },
-        },
-        {
-          path: 'options',
-          name: 'servers.manage.options',
-          component: Server.ManageOptionsIndex,
-          meta: {
-            breadcrumb: [
-              { name: 'Servers', link: '/servers' },
-              { name: '?Server', link: '/servers/manage/{id}' },
-              { name: 'Options' },
-            ],
-          },
-          children: [
-            {
-              path: '',
-              name: 'servers.manage.options.general',
-            },
-          ],
-        },
-      ],
     },
     {
       path: '/project/:id',

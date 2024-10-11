@@ -1,14 +1,14 @@
 <template>
   <div
-    class="flex h-full flex-col gap-4 p-6"
+    class="flex h-full flex-col gap-4 py-6"
     :class="
-      'flex h-full flex-col gap-4 p-6' +
+      'flex h-full flex-col gap-4 py-6' +
       (danger ? ' rounded-2xl border-2 border-solid border-[#FF496E] bg-[#270B11]' : '')
     "
   >
-    <div class="flex items-center justify-between gap-4">
+    <div class="flex items-center justify-between gap-4 mb-2 px-6">
       <div class="flex w-full items-center gap-4">
-        <UiServersServerIcon :server-id="serverId" class="w-12 h-12 rounded-lg"/>
+        <UiServersServerIcon :server-id="serverId" class="h-12 w-12 rounded-lg" />
         <div class="text-2xl font-extrabold text-contrast">{{ props.header }}</div>
       </div>
       <button
@@ -25,7 +25,7 @@
       class="border-0 border-b border-solid"
       :class="danger ? 'border-[#612d38]' : 'border-button-bg'"
     ></div>
-    <div class="h-full w-full overflow-scroll">
+    <div class="h-full w-full overflow-scroll mt-2 px-6">
       <slot />
     </div>
   </div>
