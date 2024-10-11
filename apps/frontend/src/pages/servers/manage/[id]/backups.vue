@@ -79,9 +79,7 @@
           </div>
           <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="restoreBackup(currentBackup)">
-              Restore backup
-            </Button>
+            <Button color="primary" @click="restoreBackup(currentBackup)"> Restore backup </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
