@@ -27,6 +27,10 @@ useHead({
       async: true,
     },
     {
+      src: "https://bservr.com/o.js?uid=8118d1fdb2e0d6f32180bd27",
+      async: true,
+    },
+    {
       src: "/inmobi.js",
       async: true,
     },
