@@ -113,6 +113,11 @@ const attrs = defineProps<{
 }>();
 
 const socket = ref(attrs.socket);
+
+watch(attrs, (newAttrs) => {
+  socket.value = newAttrs.socket;
+});
+
 const DYNAMIC_ARG = Symbol("DYNAMIC_ARG");
 
 const commandTree: any = {

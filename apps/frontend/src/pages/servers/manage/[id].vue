@@ -80,12 +80,11 @@ import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { LeftArrowIcon } from "@modrinth/assets";
 import type { ServerState, Stats, WSEvent } from "~/types/servers";
 
-let socket: WebSocket | null = null;
+const socket = ref<WebSocket | null>(null);
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const server = await usePyroServer(serverId, ["general", "ws"]);
-console.log(server);
 
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
@@ -144,23 +143,23 @@ const navLinks = [
 const connectWebSocket = () => {
   try {
     const wsAuth = computed(() => server.ws);
-    socket = new WebSocket(`wss://${wsAuth.value?.url}`);
+    socket.value = new WebSocket(`wss://${wsAuth.value?.url}`);
 
-    socket.onopen = () => {
-      socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+    socket.value.onopen = () => {
+      socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
     };
 
-    socket.onmessage = (event) => {
+    socket.value.onmessage = (event) => {
       const data: WSEvent = JSON.parse(event.data);
       handleWebSocketMessage(data);
     };
 
-    socket.onclose = () => {
+    socket.value.onclose = () => {
       consoleOutput.value.push("\nWS connection closed");
       isConnected.value = false;
     };
 
-    socket.onerror = (error) => {
+    socket.value.onerror = (error) => {
       console.error("WebSocket error:", error);
       isConnected.value = false;
     };
@@ -220,7 +219,7 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
 const reauthenticate = () => {
   try {
     const wsAuth = computed(() => server.ws);
-    socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+    socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
   } catch (error) {
     console.error("Reauthentication failed:", error);
     isWSAuthIncorrect.value = true;
@@ -298,7 +297,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopPolling();
-  socket?.close();
+  socket.value?.close();
 });
 
 watch(
