@@ -8,7 +8,7 @@
   >
     <div class="mb-2 flex items-center justify-between gap-4 px-6">
       <div class="flex w-full items-center gap-4">
-        <UiServersServerIcon :server-id="serverId" class="h-12 w-12 rounded-lg" />
+        <UiServersServerIcon v-if="data" :image="data.image" class="h-12 w-12 rounded-lg" />
         <div class="text-2xl font-extrabold text-contrast">{{ props.header }}</div>
       </div>
       <button
@@ -33,9 +33,6 @@
 
 <script setup lang="ts">
 import { XIcon } from "@modrinth/assets";
-
-const route = useNativeRoute();
-const serverId = route.params.id as string;
 
 defineEmits(["modal"]);
 

@@ -62,20 +62,12 @@ import { DropdownSelect } from "@modrinth/ui";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const serverStore = useServerStore();
+const server = await usePyroServer(serverId, ["general", "startup"]);
 const app = useNuxtApp();
 
-const data = computed(() => serverStore.serverData[serverId]);
+const data = computed(() => server.general);
 
-const { data: startupSettings } = await useAsyncData(
-  "ServerStartupSettings",
-  async () =>
-    (await serverStore.getStartupSettings(serverId)) as {
-      invocation: string;
-      jdk_version: "lts8" | "lts11" | "lts17" | "lts21";
-      jdk_build: "corretto" | "temurin" | "graal";
-    },
-);
+const startupSettings = computed(() => server.startup);
 
 const jdkVersionMap = [
   { value: "lts8", label: "Java 8" },
@@ -102,7 +94,7 @@ const hasUnsavedChanges = computed(
   () =>
     invocation.value !== startupSettings.value?.invocation ||
     jdkVersion.value !==
-      (jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "") ||
+      (jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "") ||
     jdkBuild.value !==
       jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build || "")?.label,
 );
@@ -113,12 +105,7 @@ const saveStartup = async () => {
     const invocationValue = invocation.value ?? "";
     const jdkVersionKey = jdkVersionMap.find((v) => v.label === jdkVersion.value)?.value;
     const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value;
-    await serverStore.updateStartupSettings(
-      serverId,
-      invocationValue,
-      jdkVersionKey as any,
-      jdkBuildKey as any,
-    );
+    await server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any);
     await new Promise((resolve) => setTimeout(resolve, 500));
     // @ts-ignore
     app.$notify({
@@ -127,7 +114,7 @@ const saveStartup = async () => {
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
     });
-    await serverStore.fetchServerData(serverId);
+    await server.refresh();
     refreshNuxtData("ServerStartupSettings");
   } catch (error) {
     console.error(error);

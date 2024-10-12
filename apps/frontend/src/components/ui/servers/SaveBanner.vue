@@ -32,11 +32,11 @@ const props = defineProps<{
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const serverStore = useServerStore();
+const server = await usePyroServer(serverId, ["general"]);
 
 const saveAndRestart = async () => {
   props.save();
-  await serverStore.sendPowerAction(serverId, "Restart");
+  await server.general?.power("Restart");
 };
 </script>
 

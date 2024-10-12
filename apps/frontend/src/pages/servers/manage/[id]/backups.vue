@@ -244,7 +244,7 @@ const createBackup = async () => {
   backupsState.loading = true;
   const backupName = createBackupName.value;
   try {
-    await server.backups?.create(serverId, backupName);
+    await server.backups?.create(backupName);
 
     await server.refresh();
     createBackupModal.value?.hide();
@@ -266,7 +266,7 @@ const renameBackup = async (backupId: string) => {
   const backupName = renameBackupName.value;
   console.log("renaming", backupName);
   try {
-    await server.backups?.rename(serverId, backupId, backupName);
+    await server.backups?.rename(backupId, backupName);
 
     await server.refresh();
     renameBackupModal.value?.hide();
@@ -279,7 +279,7 @@ const renameBackup = async (backupId: string) => {
 
 const restoreBackup = async (backupId: string) => {
   try {
-    await server.backups?.restore(serverId, backupId);
+    await server.backups?.restore(backupId);
 
     await restoreBackupModal.value?.hide();
   } catch (error) {
@@ -291,7 +291,7 @@ const restoreBackup = async (backupId: string) => {
 
 const deleteBackup = async (backupId: string) => {
   try {
-    await server.backups?.delete(serverId, backupId);
+    await server.backups?.delete(backupId);
 
     await server.refresh();
     await deleteBackupModal.value?.hide();
@@ -310,7 +310,7 @@ function triggerDownloadAnimation() {
 const initiateDownload = async (backupId: string) => {
   triggerDownloadAnimation();
 
-  const downloadurl: any = await server.backups?.download(serverId, backupId);
+  const downloadurl: any = await server.backups?.download(backupId);
   const a = document.createElement("a");
   a.href = downloadurl.download_url;
   a.click();

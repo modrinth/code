@@ -75,9 +75,7 @@ const app = useNuxtApp();
 const route = useRoute();
 const serverId = route.params.id as string;
 
-const server = await usePyroServer(serverId, ["general"]);
-
-const serverStore = useServerStore();
+const server = await usePyroServer(serverId, ["general", "fs"]);
 
 const data = computed(() => server.general);
 const serverName = ref(data.value?.name);
@@ -88,7 +86,7 @@ const hasUnsavedChanges = computed(() => serverName.value !== data.value?.name);
 const saveGeneral = async () => {
   try {
     isUpdating.value = true;
-    await data.value?.updateName(serverId, serverName.value ?? "");
+    await data.value?.updateName(serverName.value ?? "");
     await new Promise((resolve) => setTimeout(resolve, 500));
     await server.refresh();
     // @ts-ignore
@@ -146,12 +144,12 @@ const uploadFile = async (e: Event) => {
   });
   if (!file) return;
   if (data.value?.image) {
-    await serverStore.deleteFileOrFolder(serverId, "/server-icon.png", false);
-    await serverStore.deleteFileOrFolder(serverId, "/server-icon-original.png", false);
+    await server.fs?.deleteFileOrFolder("/server-icon.png", false);
+    await server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
   }
-  await serverStore.uploadFile(serverId, "/server-icon.png", scaledFile);
-  await serverStore.uploadFile(serverId, "/server-icon-original.png", file);
-  await serverStore.fetchServerData(serverId);
+  await server.fs?.uploadFile("/server-icon.png", scaledFile);
+  await server.fs?.uploadFile("/server-icon-original.png", file);
+  await server.refresh();
 };
 
 const onDragOver = (e: DragEvent) => {

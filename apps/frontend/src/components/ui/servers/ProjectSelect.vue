@@ -51,7 +51,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from "vue";
 import { ChevronRightIcon, SearchIcon } from "@modrinth/assets";
 import { Button, DropdownSelect } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
@@ -60,16 +59,15 @@ const emits = defineEmits(["select"]);
 
 const props = defineProps<{
   type: "mod" | "modpack" | "plugin" | "datapack";
-  server?: boolean;
+  isserver?: boolean;
 }>();
 
-const serverStore = useServerStore();
 const route = useNativeRoute();
-const config = useRuntimeConfig();
 const prodOverride = await PyroAuthOverride();
 const serverId = route.params.id as string;
+const server = serverId ? await usePyroServer(serverId, ["general"]) : null;
 
-const data = computed(() => serverStore.serverData[serverId]);
+const data = computed(() => (serverId ? server?.general : null));
 
 const scrollContainer = ref<HTMLElement | null>(null);
 const pages = ref(1);
@@ -78,7 +76,7 @@ const page = ref(0);
 const queryFilter = ref("");
 const facets = ref<any>([]);
 
-if (props.server === false && props.type !== "modpack") {
+if (props.isserver === false && props.type !== "modpack") {
   facets.value.push(`["categories:${data.value?.loader?.toLocaleLowerCase()}"]`);
   facets.value.push(`["versions:${data.value?.mc_version}"]`);
 }
@@ -108,25 +106,25 @@ const loadMods = async () => {
 
 const versions = reactive<{ [key: string]: any[] }>({});
 
-const getVersions = async (project_id: string) => {
-  if (!versions[project_id]) {
+const getVersions = async (projectId: string) => {
+  if (!versions[projectId]) {
     const allVersions = (await useBaseFetch(
-      `project/${project_id}/version`,
+      `project/${projectId}/version`,
       {},
       false,
       prodOverride,
     )) as any;
 
-    if (props.server === false && props.type !== "modpack") {
-      versions[project_id] = allVersions
+    if (props.isserver === false && props.type !== "modpack") {
+      versions[projectId] = allVersions
         .filter((x: any) => x.loaders.includes(data.value?.loader?.toLocaleLowerCase()))
         .filter((x: any) => x.game_versions.includes(data.value?.mc_version))
         .map((x: any) => x.version_number);
     } else {
-      versions[project_id] = allVersions.map((x: any) => x.version_number);
+      versions[projectId] = allVersions.map((x: any) => x.version_number);
     }
   }
-  return versions[project_id];
+  return versions[projectId];
 };
 
 const selectedVersion = ref("");

@@ -2,7 +2,7 @@
   <Modal ref="editModal" header="">
     <div class="h-[500px]">
       <UiServersPyroModal header="Edit project" @modal="editModal.hide()">
-        <UiServersProjectSelect type="modpack" :server="false" @select="createServer" />
+        <UiServersProjectSelect type="modpack" :isserver="false" @select="createServer" />
       </UiServersPyroModal>
     </div>
   </Modal>

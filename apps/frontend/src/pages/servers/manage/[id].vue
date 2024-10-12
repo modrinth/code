@@ -1,13 +1,12 @@
 <template>
   <div class="contents">
-    <UiServersPanelLoading v-if="initialLoading" class="h-screen" />
     <div
-      v-else-if="serverData && serverData.status !== 'installing'"
+      v-if="serverData && serverData.status !== 'installing'"
       data-pyro-server-manager-root
       class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
     >
       <div class="flex flex-row items-center gap-6 pt-4">
-        <UiServersServerIcon :server-id="serverId" />
+        <UiServersServerIcon :image="serverData.image" />
         <div class="flex w-full flex-col gap-2">
           <div class="flex shrink-0 flex-row items-center gap-1">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
@@ -79,19 +78,18 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { LeftArrowIcon } from "@modrinth/assets";
-import type { Server, ServerState, Stats, WSAuth, WSEvent } from "~/types/servers";
-import type { NuxtPage } from "#build/components";
+import type { ServerState, Stats, WSEvent } from "~/types/servers";
 
 let socket: WebSocket | null = null;
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const serverStore = useServerStore();
+const server = await usePyroServer(serverId, ["general", "ws"]);
+console.log(server);
 
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
-const initialLoading = ref(true);
-const serverData = ref<Server | null>(null);
+const serverData = computed(() => server.general);
 const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
@@ -124,42 +122,6 @@ const stats = ref<Stats>({
   },
 });
 
-const fetchServerData = async () => {
-  try {
-    if (serverStore.serverData[serverId]) {
-      serverData.value = serverStore.serverData[serverId];
-      console.log(serverData.value);
-      initialLoading.value = false;
-    }
-    await serverStore.fetchServerData(serverId);
-    serverData.value = serverStore.serverData[serverId];
-    initialLoading.value = false;
-    error.value = null;
-  } catch (err) {
-    initialLoading.value = false;
-    error.value = err as Error;
-    if (err instanceof PyroFetchError) {
-      switch (err.statusCode) {
-        case 400:
-          errorTitle.value = "Oh no, a pop-up";
-          errorMessage.value = "Request was malformed.";
-          break;
-        case 401:
-        case 404:
-          errorTitle.value = "Server Not Found";
-          errorMessage.value = "The server you are looking for does not exist.";
-          break;
-        default:
-          errorTitle.value = "Error";
-          errorMessage.value = `An error occurred: ${err.message}`;
-      }
-    } else {
-      errorTitle.value = "Unexpected Error";
-      errorMessage.value = "An unexpected error occurred while fetching server data.";
-    }
-  }
-};
-
 const showGameLabel = computed(() => !!serverData.value?.game);
 const showLoaderLabel = computed(() => !!serverData.value?.loader);
 
@@ -179,13 +141,13 @@ const navLinks = [
   },
 ];
 
-const connectWebSocket = async () => {
+const connectWebSocket = () => {
   try {
-    const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
-    socket = new WebSocket(`wss://${wsAuth.url}`);
+    const wsAuth = computed(() => server.ws);
+    socket = new WebSocket(`wss://${wsAuth.value?.url}`);
 
     socket.onopen = () => {
-      socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
+      socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
     };
 
     socket.onmessage = (event) => {
@@ -255,10 +217,10 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
   return updated;
 };
 
-const reauthenticate = async () => {
+const reauthenticate = () => {
   try {
-    const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
-    socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
+    const wsAuth = computed(() => server.ws);
+    socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
   } catch (error) {
     console.error("Reauthentication failed:", error);
     isWSAuthIncorrect.value = true;
@@ -282,7 +244,7 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   try {
     isActioning.value = true;
-    await serverStore.sendPowerAction(serverId, actionName);
+    await server.general?.power(actionName);
     notifySuccess(`${toAdverb(actionName)} server`, `This may take a few moments.`);
   } catch (error) {
     console.error(`Error ${toAdverb(actionName)} server:`, error);
@@ -319,7 +281,7 @@ let intervalId: ReturnType<typeof setInterval> | null = null;
 
 const startPolling = () => {
   intervalId = setInterval(async () => {
-    await fetchServerData();
+    await server.refresh();
   }, 10000);
 };
 
@@ -332,7 +294,6 @@ const stopPolling = () => {
 
 onMounted(() => {
   connectWebSocket();
-  fetchServerData();
 });
 
 onUnmounted(() => {

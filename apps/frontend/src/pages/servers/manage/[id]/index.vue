@@ -397,7 +397,6 @@ const commandTree: any = {
   xp: null,
 };
 
-const serverStore = useServerStore();
 const fullScreen = ref(false);
 const commandInput = ref("");
 const suggestions = ref<string[]>([]);
@@ -405,10 +404,11 @@ const selectedSuggestionIndex = ref(0);
 
 const route = useRoute();
 const serverId = route.params.id as string;
+const server = await usePyroServer(serverId, ["general", "ws"]);
 
-const serverData = computed(() => serverStore.serverData[serverId]);
+const serverData = computed(() => server.general);
 const serverIP = computed(() => serverData.value?.net.ip ?? "");
-const serverPort = computed(() => serverData.value?.net.port ?? "");
+const serverPort = computed(() => serverData.value?.net.port ?? 0);
 const serverDomain = computed(() => serverData.value?.net.domain ?? "");
 
 const suggestionsList = ref<HTMLUListElement | null>(null);

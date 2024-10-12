@@ -107,7 +107,7 @@ import { EyeIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const serverStore = useServerStore();
+const server = await usePyroServer(serverId, ["general", "fs"]);
 const tags = useTags();
 
 const isUpdating = ref(false);
@@ -115,10 +115,10 @@ const isUpdating = ref(false);
 const changedPropertiesState = ref({});
 const hasUnsavedChanges = computed(() => JSON.stringify(changedPropertiesState.value) !== "{}");
 
-const data = computed(() => serverStore.serverData[serverId]);
+const data = computed(() => server.general);
 const { data: propsData } = await useAsyncData(
   "ServerProperties",
-  async () => await serverStore.fetchConfigFile(serverId, "ServerProperties"),
+  async () => await server.general?.fetchConfigFile("ServerProperties"),
 );
 
 const getDifficultyOptions = () => {
@@ -128,7 +128,7 @@ const getDifficultyOptions = () => {
       return versionNumbers[0] === 1 && versionNumbers[1] < 13;
     })
     .map((v) => v.version);
-  if (data.value.mc_version && pre113Versions.includes(data.value.mc_version)) {
+  if (data.value?.mc_version && pre113Versions.includes(data.value.mc_version)) {
     return ["0", "1", "2", "3"];
   } else {
     return ["peaceful", "easy", "normal", "hard"];
@@ -189,10 +189,10 @@ const constructServerProperties = (): string => {
 const saveProperties = async () => {
   try {
     isUpdating.value = true;
-    await serverStore.updateFile(serverId, "server.properties", constructServerProperties());
+    await server.fs?.updateFile("server.properties", constructServerProperties());
     await new Promise((resolve) => setTimeout(resolve, 500));
     changedPropertiesState.value = {};
-    await serverStore.fetchServerData(serverId);
+    await server.refresh();
     // @ts-ignore
     app.$notify({
       group: "serverOptions",

@@ -115,8 +115,6 @@ useHead({
   title: "Servers - Modrinth",
 });
 
-const serverStore = useServerStore();
-
 interface ServerResponse {
   servers: Server[];
 }
@@ -125,7 +123,7 @@ const { data: serverResponse, status } = await useAsyncData<ServerResponse>(
   "ServerList",
   async () => {
     try {
-      const response = await serverStore.listServers();
+      const response = await usePyroFetch<{ servers: Server[] }>("servers");
       return response;
     } catch {
       throw new PyroFetchError("Unable to load servers");

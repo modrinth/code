@@ -14,10 +14,10 @@ import {
 
 const route = useNativeRoute();
 const serverId = route.params.id.toString();
-const serverStore = useServerStore();
+const server = await usePyroServer(serverId, ["general"]);
 
 useHead({
-  title: `Options - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
+  title: `Options - ${server.general?.name ?? "Server"} - Modrinth`,
 });
 
 const navLinks = [

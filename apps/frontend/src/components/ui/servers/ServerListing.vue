@@ -77,7 +77,6 @@ import { ChevronRightIcon } from "@modrinth/assets";
 import type { StatusState } from "./ServerInstallStatusPill.vue";
 import type { Project, Server } from "~/types/servers";
 
-const serverStore = useServerStore();
 const prodOverride = await PyroAuthOverride();
 
 const props = defineProps<Partial<Server>>();
@@ -107,33 +106,30 @@ const { data: projectData } = await useLazyAsyncData<Project>(
 
 const image = ref<string | undefined>();
 
-if (import.meta.client) {
-  try {
-    const serverId = props.server_id as string;
-    await serverStore.confirmFileApiInfo(serverId);
-    const fileData = await serverStore.retryWithAuth(serverId, async () => {
-      return await usePyroFetch(`/download?path=/server-icon-original.png`, {
-        override: serverStore.fileAPIAuth[serverId],
-      });
-    });
+const auth = (await await usePyroFetch(`servers/${props.server_id}/fs`)) as any;
+try {
+  const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
+    override: auth,
+  });
 
-    if (fileData instanceof Blob) {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
-      img.src = URL.createObjectURL(fileData);
+  if (fileData instanceof Blob) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.src = URL.createObjectURL(fileData);
+    await new Promise<void>((resolve) => {
       img.onload = () => {
-        canvas.width = 200;
-        canvas.height = 200;
-        ctx?.drawImage(img, 0, 0, 200, 200);
+        canvas.width = 512;
+        canvas.height = 512;
+        ctx?.drawImage(img, 0, 0, 512, 512);
         const dataURL = canvas.toDataURL("image/png");
         image.value = dataURL;
-        serverStore.serverData[serverId].image = dataURL;
+        resolve();
       };
-    }
-  } catch (error) {
-    console.error("Error fetching server icon:", error);
+    });
   }
+} catch (error) {
+  console.error("Error processing server image:", error);
 }
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);

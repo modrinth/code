@@ -83,6 +83,7 @@
                   v-model="version"
                   :options="options"
                   placeholder="Change version"
+                  name="version"
                 />
                 <Button
                   v-tooltip="'Reinstall current pack with selected version'"

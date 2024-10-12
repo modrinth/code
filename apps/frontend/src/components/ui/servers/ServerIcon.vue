@@ -1,13 +1,6 @@
 <template>
   <client-only>
-    <img
-      v-if="serverImage"
-      no-shadow
-      size="lg"
-      alt="Server Icon"
-      :class="computedClass"
-      :src="serverImage"
-    />
+    <img v-if="image" no-shadow size="lg" alt="Server Icon" :class="computedClass" :src="image" />
     <img
       v-else
       no-shadow
@@ -21,18 +14,11 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  serverId: string;
+  image: string | undefined;
   class?: string;
 }>();
 
 const computedClass = computed(() => {
   return props.class || "h-[6rem] w-[6rem] rounded-xl bg-bg-raised";
-});
-
-const serverStore = useServerStore();
-const serverImage = computed(() => {
-  const serverData = serverStore.serverData[props.serverId];
-  const image = serverData?.image;
-  return typeof image === "string" ? image : "";
 });
 </script>

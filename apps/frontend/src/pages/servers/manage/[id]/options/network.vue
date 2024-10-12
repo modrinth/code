@@ -164,7 +164,7 @@ const addNewAllocation = async () => {
   if (!newAllocationName.value) return;
 
   try {
-    await server.network?.reserveAllocation(serverId, newAllocationName.value);
+    await server.network?.reserveAllocation(newAllocationName.value);
 
     await server.refresh();
 
@@ -184,11 +184,7 @@ const editAllocation = async () => {
   if (!newAllocationName.value) return;
 
   try {
-    await server.network?.updateAllocation(
-      serverId,
-      newAllocationPort.value,
-      newAllocationName.value,
-    );
+    await server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value);
 
     await server.refresh();
 
@@ -200,7 +196,7 @@ const editAllocation = async () => {
 };
 
 const removeAllocation = async (port: number) => {
-  await server.network?.deleteAllocation(serverId, port);
+  await server.network?.deleteAllocation(port);
   await server.refresh();
 };
 
@@ -219,14 +215,10 @@ const saveNetwork = async () => {
       return;
     }
     if (serverSubdomain.value !== data?.value?.net?.domain) {
-      await server.network?.changeSubdomain(serverId, serverSubdomain.value);
+      await server.network?.changeSubdomain(serverSubdomain.value);
     }
     if (serverPrimaryPort.value !== data?.value?.net?.port) {
-      await server.network?.updateAllocation(
-        serverId,
-        serverPrimaryPort.value,
-        newAllocationName.value,
-      );
+      await server.network?.updateAllocation(serverPrimaryPort.value, newAllocationName.value);
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
     await server.refresh();
