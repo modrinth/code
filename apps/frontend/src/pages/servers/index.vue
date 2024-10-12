@@ -376,14 +376,14 @@
             :key="product.id"
             :class="[
               'm-0 flex w-full list-none flex-col gap-6 rounded-2xl p-8 text-left',
-              product.metadata.ram === 6 ? 'bg-highlight' : 'bg-bg',
+              product.metadata.ram === 6144 ? 'bg-highlight' : 'bg-bg',
             ]"
           >
             <div
               role="heading"
               aria-level="2"
               class="-mb-4 text-sm"
-              :class="{ 'text-contrast': product.metadata.ram === 6 }"
+              :class="{ 'text-contrast': product.metadata.ram === 6144 }"
             >
               {{ getProductSize(product) }}
             </div>
@@ -399,17 +399,20 @@
               </div>
               <div class="text-secondary">/month</div>
             </div>
-            <div>{{ product.metadata.ram }} GB RAM</div>
+            <div>{{ product.metadata.ram / 1024 }} GB RAM</div>
             <div
               class="h-[1px] w-full"
-              :class="product.metadata.ram === 6 ? 'bg-brand opacity-50' : 'bg-bg-raised'"
+              :class="product.metadata.ram === 6144 ? 'bg-brand opacity-50' : 'bg-bg-raised'"
             ></div>
             <p class="m-0" :class="{ 'text-contrast': product.metadata.ram === 6 }">
               {{ getProductDescription(product) }}
             </p>
-            <ButtonStyled :color="product.metadata.ram === 6 ? 'brand' : 'standard'" size="large">
+            <ButtonStyled
+              :color="product.metadata.ram === 6144 ? 'brand' : 'standard'"
+              size="large"
+            >
               <button @click="selectProduct(product)">
-                {{ product.metadata.ram === 6 ? "Start your server" : "Select plan" }}
+                {{ product.metadata.ram === 6144 ? "Start your server" : "Select plan" }}
               </button>
             </ButtonStyled>
           </li>
@@ -458,12 +461,13 @@ const showModal = ref(false);
 const modalKey = ref(0);
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
+pyroProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
 
 const getProductSize = (product) => {
   const ramSize = parseInt(product.metadata.ram);
-  if (ramSize === 4) return "Small";
-  if (ramSize === 6) return "Medium";
-  if (ramSize === 8) return "Large";
+  if (ramSize === 4096) return "Small";
+  if (ramSize === 6144) return "Medium";
+  if (ramSize === 8192) return "Large";
   return "Custom";
 };
 
@@ -473,11 +477,11 @@ const getProductPrice = (product) => {
 
 const getProductDescription = (product) => {
   const ramSize = parseInt(product.metadata.ram);
-  if (ramSize === 4)
+  if (ramSize === 4096)
     return "Perfect for small modpacks and friend groups looking to play together.";
-  if (ramSize === 6)
+  if (ramSize === 6144)
     return "The best value for most players. Add more mods and friends to your server with ease.";
-  if (ramSize === 8) return "For the biggest modpacks. Play with hundreds of mods at once.";
+  if (ramSize === 8192) return "For the biggest modpacks. Play with hundreds of mods at once.";
   return "Custom server configuration.";
 };
 
