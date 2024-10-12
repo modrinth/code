@@ -37,6 +37,7 @@
                 index === selectedSuggestionIndex ? 'bg-bg-raised' : 'bg-bg',
               ]"
               @click="selectSuggestion(index)"
+              @mousemove="() => (selectedSuggestionIndex = index)"
             >
               {{ suggestion }}
             </li>
@@ -424,8 +425,8 @@ const bestSuggestion = computed(() => {
   if (inputTokens.length - 1 === 0 && lastInputToken.startsWith("/")) {
     lastInputToken = lastInputToken.slice(1);
   }
-  const firstSuggestion = suggestions.value[0];
-  const suggestionTokens = firstSuggestion.split(/\s+/);
+  const selectedSuggestion = suggestions.value[selectedSuggestionIndex.value];
+  const suggestionTokens = selectedSuggestion.split(/\s+/);
   const lastSuggestionToken = suggestionTokens[suggestionTokens.length - 1] || "";
   if (lastSuggestionToken.toLowerCase().startsWith(lastInputToken.toLowerCase())) {
     return lastSuggestionToken.slice(lastInputToken.length);
