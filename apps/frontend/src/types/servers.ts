@@ -183,8 +183,11 @@ export interface WSInstallationResultErrEvent {
   result: "err";
   reason: string;
 }
-
 export type WSInstallationResultEvent = WSInstallationResultOkEvent | WSInstallationResultErrEvent;
+
+export interface WSAuthOkEvent {
+  event: "auth-ok";
+}
 
 export type WSEvent =
   | WSLogEvent
@@ -192,7 +195,8 @@ export type WSEvent =
   | WSPowerStateEvent
   | WSAuthExpiringEvent
   | WSAuthIncorrectEvent
-  | WSInstallationResultEvent;
+  | WSInstallationResultEvent
+  | WSAuthOkEvent;
 
 export interface Servers {
   servers: Server[];

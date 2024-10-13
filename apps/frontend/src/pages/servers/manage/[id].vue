@@ -198,6 +198,8 @@ const handleWebSocketMessage = (data: WSEvent) => {
     case "installation-result":
       handleInstallationResult(data);
       break;
+    case "auth-ok":
+      break;
     default:
       console.warn("Unhandled WebSocket event:", data);
   }
@@ -211,8 +213,8 @@ const handleInstallationResult = (data: WSInstallationResultEvent) => {
       break;
     case "err":
       errorTitle.value = "Installation error";
-      errorMessage.value = data.reason;
-      error.value = new Error(data.reason);
+      errorMessage.value = data.reason ?? "Unknown error";
+      error.value = new Error(data.reason ?? "Unknown error");
       break;
   }
 };
