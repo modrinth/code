@@ -101,8 +101,9 @@
 
 <script setup lang="ts">
 import type { ServerState, Stats } from "~/types/servers";
+import type { Server } from "~/composables/pyroServers";
 
-const attrs = defineProps<{
+const props = defineProps<{
   socket: WebSocket | null;
   isConnected: boolean;
   isWsAuthIncorrect: boolean;
@@ -110,11 +111,12 @@ const attrs = defineProps<{
   consoleOutput: string[];
   serverPowerState: ServerState;
   isServerRunning: boolean;
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
-const socket = ref(attrs.socket);
+const socket = ref(props.socket);
 
-watch(attrs, (newAttrs) => {
+watch(props, (newAttrs) => {
   socket.value = newAttrs.socket;
 });
 
@@ -408,11 +410,7 @@ const commandInput = ref("");
 const suggestions = ref<string[]>([]);
 const selectedSuggestionIndex = ref(0);
 
-const route = useRoute();
-const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general", "ws"]);
-
-const serverData = computed(() => server.general);
+const serverData = computed(() => props.server.general);
 const serverIP = computed(() => serverData.value?.net.ip ?? "");
 const serverPort = computed(() => serverData.value?.net.port ?? 0);
 const serverDomain = computed(() => serverData.value?.net.domain ?? "");

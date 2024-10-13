@@ -298,14 +298,19 @@ import {
 } from "@modrinth/assets";
 import { Button, Modal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
+import type { Server } from "~/composables/pyroServers";
+
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
+
 const VAceEditor = ref();
 
 const app = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
 const serverId = route.params.id.toString();
-const server = await usePyroServer(serverId, ["general", "fs"]);
-const data = computed(() => server.general);
+const data = computed(() => props.server.general);
 
 const maxResults = 100;
 const currentPage = ref(1);
@@ -338,7 +343,7 @@ const fetchData = async () => {
 
   try {
     const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
-    const data = await server.fs?.listDirContents(path, currentPage.value, maxResults);
+    const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
 
     if (!data || !data.items) {
       throw new Error("Invalid data structure received from server.");
@@ -461,7 +466,7 @@ const handleDrop = async (event: DragEvent) => {
 const uploadFile = async (file: File) => {
   try {
     const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
-    await server.fs?.uploadFile(filePath, file);
+    await props.server.fs?.uploadFile(filePath, file);
     await fetchData();
     // @ts-ignore
     app.$notify({
@@ -511,7 +516,7 @@ const showDeleteModal = (item: any) => {
 const createNewItem = async () => {
   try {
     const path = `${currentPath.value}/${newItemName.value}`.replace("//", "/");
-    await server.fs?.createFileOrFolder(path, newItemType.value);
+    await props.server.fs?.createFileOrFolder(path, newItemType.value);
 
     currentPage.value = 1;
     newItemName.value = "";
@@ -532,7 +537,7 @@ const createNewItem = async () => {
 
 const renameItem = async () => {
   try {
-    await server.fs?.renameFileOrFolder(
+    await props.server.fs?.renameFileOrFolder(
       `${currentPath.value}/${selectedItem.value.name}`,
       newItemName.value,
     );
@@ -557,7 +562,7 @@ const moveItem = async () => {
   if (!selectedItem.value || !destinationFolder.value) return;
 
   try {
-    await server.fs?.moveFileOrFolder(
+    await props.server.fs?.moveFileOrFolder(
       `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/"),
       `${destinationFolder.value}/${selectedItem.value.name}`.replace("//", "/"),
     );
@@ -582,7 +587,7 @@ const downloadFile = async (item: any) => {
   if (item.type === "file") {
     try {
       const path = `${currentPath.value}/${item.name}`.replace("//", "/");
-      const fileData = await server.fs?.downloadFile(path);
+      const fileData = await props.server.fs?.downloadFile(path);
       if (fileData) {
         console.log(fileData);
 
@@ -603,7 +608,7 @@ const downloadFile = async (item: any) => {
 
 const deleteItem = async () => {
   try {
-    await server.fs?.deleteFileOrFolder(
+    await props.server.fs?.deleteFileOrFolder(
       `${currentPath.value}/${selectedItem.value.name}`,
       selectedItem.value.type === "directory",
     );
@@ -626,7 +631,7 @@ const deleteItem = async () => {
 const editFile = async (item: { name: string; type: string; path: string }) => {
   try {
     const path = `${currentPath.value}/${item.name}`.replace("//", "/");
-    const content = (await server.fs?.downloadFile(path)) as string;
+    const content = (await props.server.fs?.downloadFile(path)) as string;
 
     fileContent.value = content;
     editingFile.value = item;
@@ -640,7 +645,7 @@ const saveFileContent = async () => {
   if (!editingFile.value) return;
 
   try {
-    await server.fs?.updateFile(editingFile.value.path, fileContent.value);
+    await props.server.fs?.updateFile(editingFile.value.path, fileContent.value);
     await refreshNuxtData("files-data");
     isEditing.value = false;
     editingFile.value = null;
@@ -658,7 +663,7 @@ const saveFileContent = async () => {
 
 const saveFileContentRestart = async () => {
   await saveFileContent();
-  await server.general?.power("Restart");
+  await props.server.general?.power("Restart");
 };
 
 const cancelEditing = () => {

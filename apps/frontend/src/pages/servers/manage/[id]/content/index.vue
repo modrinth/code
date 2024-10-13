@@ -47,6 +47,11 @@
 <script setup lang="ts">
 import { PlusIcon, ChevronRightIcon } from "@modrinth/assets";
 import { ButtonStyled, Modal, DropdownSelect, Button } from "@modrinth/ui";
+import type { Server } from "~/composables/pyroServers";
+
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
 
 interface Mod {
   name?: string;
@@ -58,10 +63,7 @@ interface Mod {
   disabled: boolean;
 }
 
-const route = useNativeRoute();
 const prodOverride = await PyroAuthOverride();
-const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general", "mods", "fs"]);
 
 const modModal = ref();
 const isEditMode = ref(false);
@@ -70,8 +72,8 @@ const selectedMod = ref<Mod | null>(null);
 const newModVersion = ref("");
 const versions = ref<Record<string, any[]>>({});
 
-const data = computed(() => server.general);
-const mods = computed(() => server.mods?.data);
+const data = computed(() => props.server.general);
+const mods = computed(() => props.server.mods?.data);
 
 const fetchVersions = async (projectId: string) => {
   if (!versions.value[projectId]) {
@@ -87,13 +89,13 @@ const fetchVersions = async (projectId: string) => {
 
 const toggleMod = async (mod: Mod) => {
   try {
-    await server.fs?.renameFileOrFolder(
+    await props.server.fs?.renameFileOrFolder(
       `/mods/${mod.filename}`,
       mod.filename.includes("disabled")
         ? mod.filename.replace(".disabled", "")
         : `${mod.filename}.disabled`,
     );
-    await server.refresh();
+    await props.server.refresh();
   } catch (error) {
     console.error("Error disabling mod:", error);
   }
@@ -104,8 +106,8 @@ const removeMod = async (mod: Mod) => {
     if (!mod.project_id) {
       throw new Error("Mod project_id is undefined");
     }
-    await server.mods?.remove(mod.project_id);
-    await server.refresh();
+    await props.server.mods?.remove(mod.project_id);
+    await props.server.refresh();
   } catch (error) {
     console.error("Error removing mod:", error);
   }
@@ -139,11 +141,11 @@ const handleModAction = async (mod: Mod, versionNumber?: string) => {
       x.version_number === versionNumber ? versionNumber : mod.version_number,
     )?.id;
     if (isEditMode.value) {
-      await server.mods?.reinstall(mod.project_id, versionId);
+      await props.server.mods?.reinstall(mod.project_id, versionId);
     } else {
-      await server.mods?.install(mod.project_id, versionId);
+      await props.server.mods?.install(mod.project_id, versionId);
     }
-    await server.refresh();
+    await props.server.refresh();
     modModal.value.hide();
   } catch (error) {
     console.error("Error handling mod action:", error);

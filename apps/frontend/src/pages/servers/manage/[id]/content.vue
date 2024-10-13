@@ -1,20 +1,20 @@
 <template>
-  <div class="contents">
-    <div v-if="data">
-      <UiServersServerSidebar :route="route" :nav-links="navLinks" />
-    </div>
-    <UiServersPyroLoading v-else />
-  </div>
+  <UiServersServerSidebar :route="route" :nav-links="navLinks" :server="props.server" />
 </template>
 
 <script setup lang="ts">
 import { BookIcon, BoxIcon } from "@modrinth/assets";
 
+import type { Server } from "~/composables/pyroServers";
+
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general", "mods"]);
 
-const data = computed(() => server.general);
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
+
+const data = computed(() => props.server.general);
 
 useHead({
   title: `Content - ${data.value?.name ?? "Server"} - Modrinth`,

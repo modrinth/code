@@ -1,5 +1,5 @@
 <template>
-  <UiServersServerSidebar :route="route" :nav-links="navLinks" />
+  <UiServersServerSidebar :route="route" :nav-links="navLinks" :server="props.server" />
 </template>
 
 <script setup lang="ts">
@@ -11,13 +11,17 @@ import {
   TextQuoteIcon,
   VersionIcon,
 } from "@modrinth/assets";
+import type { Server } from "~/composables/pyroServers";
 
-const route = useNativeRoute();
-const serverId = route.params.id.toString();
-const server = await usePyroServer(serverId, ["general"]);
+const route = useRoute();
+const serverId = route.params.id as string;
+
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
 
 useHead({
-  title: `Options - ${server.general?.name ?? "Server"} - Modrinth`,
+  title: `Options - ${props.general?.name ?? "Server"} - Modrinth`,
 });
 
 const navLinks = [

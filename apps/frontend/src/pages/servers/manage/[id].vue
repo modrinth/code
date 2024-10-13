@@ -59,6 +59,7 @@
           :server-power-state="serverPowerState"
           :console-output="consoleOutput"
           :socket="socket"
+          :server="server"
         />
       </div>
 
@@ -84,7 +85,15 @@ const socket = ref<WebSocket | null>(null);
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general", "ws"]);
+const server = await usePyroServer(serverId, [
+  "general",
+  "mods",
+  "backups",
+  "network",
+  "startup",
+  "ws",
+  "fs",
+]);
 
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");

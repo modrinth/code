@@ -46,11 +46,15 @@
 
 <script setup lang="ts">
 import { Button } from "@modrinth/ui";
+import type { Server } from "~/composables/pyroServers";
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general"]);
 
-const data = computed(() => server.general);
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
+
+const data = computed(() => props.server.general);
 
 const properties = [
   { name: "Server ID", value: serverId ?? "Unknown" },
