@@ -104,10 +104,12 @@
 import { ref, watch } from "vue";
 import { DropdownSelect } from "@modrinth/ui";
 import { EyeIcon } from "@modrinth/assets";
+import type { Server } from "~/composables/pyroServers";
 
-const route = useNativeRoute();
-const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general", "fs"]);
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
+
 const tags = useTags();
 
 const isUpdating = ref(false);
@@ -115,10 +117,10 @@ const isUpdating = ref(false);
 const changedPropertiesState = ref({});
 const hasUnsavedChanges = computed(() => JSON.stringify(changedPropertiesState.value) !== "{}");
 
-const data = computed(() => server.general);
+const data = computed(() => props.server.general);
 const { data: propsData } = await useAsyncData(
   "ServerProperties",
-  async () => await server.general?.fetchConfigFile("ServerProperties"),
+  async () => await props.server.general?.fetchConfigFile("ServerProperties"),
 );
 
 const getDifficultyOptions = () => {
@@ -189,10 +191,10 @@ const constructServerProperties = (): string => {
 const saveProperties = async () => {
   try {
     isUpdating.value = true;
-    await server.fs?.updateFile("server.properties", constructServerProperties());
+    await props.server.fs?.updateFile("server.properties", constructServerProperties());
     await new Promise((resolve) => setTimeout(resolve, 500));
     changedPropertiesState.value = {};
-    await server.refresh();
+    await props.server.refresh();
     // @ts-ignore
     app.$notify({
       group: "serverOptions",

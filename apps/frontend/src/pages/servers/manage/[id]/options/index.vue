@@ -71,13 +71,15 @@
 <script setup lang="ts">
 import { EditIcon } from "@modrinth/assets";
 
+import type { Server } from "~/composables/pyroServers";
+
 const app = useNuxtApp();
-const route = useRoute();
-const serverId = route.params.id as string;
 
-const server = await usePyroServer(serverId, ["general", "fs"]);
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
 
-const data = computed(() => server.general);
+const data = computed(() => props.server.general);
 const serverName = ref(data.value?.name);
 
 const isUpdating = ref(false);
@@ -88,7 +90,7 @@ const saveGeneral = async () => {
     isUpdating.value = true;
     await data.value?.updateName(serverName.value ?? "");
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await server.refresh();
+    await props.server.refresh();
     // @ts-ignore
     app.$notify({
       group: "serverOptions",
@@ -144,12 +146,12 @@ const uploadFile = async (e: Event) => {
   });
   if (!file) return;
   if (data.value?.image) {
-    await server.fs?.deleteFileOrFolder("/server-icon.png", false);
-    await server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+    await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
+    await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
   }
-  await server.fs?.uploadFile("/server-icon.png", scaledFile);
-  await server.fs?.uploadFile("/server-icon-original.png", file);
-  await server.refresh();
+  await props.server.fs?.uploadFile("/server-icon.png", scaledFile);
+  await props.server.fs?.uploadFile("/server-icon-original.png", file);
+  await props.server.refresh();
 };
 
 const onDragOver = (e: DragEvent) => {

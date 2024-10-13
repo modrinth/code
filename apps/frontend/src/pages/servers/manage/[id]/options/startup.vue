@@ -59,15 +59,17 @@
 
 <script setup lang="ts">
 import { DropdownSelect } from "@modrinth/ui";
+import type { Server } from "~/composables/pyroServers";
 
-const route = useNativeRoute();
-const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general", "startup"]);
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
+
 const app = useNuxtApp();
 
-const data = computed(() => server.general);
+const data = computed(() => props.server.general);
 
-const startupSettings = computed(() => server.startup);
+const startupSettings = computed(() => props.server.startup);
 
 const jdkVersionMap = [
   { value: "lts8", label: "Java 8" },
@@ -105,7 +107,7 @@ const saveStartup = async () => {
     const invocationValue = invocation.value ?? "";
     const jdkVersionKey = jdkVersionMap.find((v) => v.label === jdkVersion.value)?.value;
     const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value;
-    await server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any);
+    await props.server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any);
     await new Promise((resolve) => setTimeout(resolve, 500));
     // @ts-ignore
     app.$notify({
@@ -114,8 +116,7 @@ const saveStartup = async () => {
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
     });
-    await server.refresh();
-    refreshNuxtData("ServerStartupSettings");
+    await props.server.refresh();
   } catch (error) {
     console.error(error);
     // @ts-ignore

@@ -22,21 +22,19 @@
 
 <script setup lang="ts">
 import { Button } from "@modrinth/ui";
+import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
   isUpdating: boolean;
   restart?: boolean;
   save: () => void;
   reset: () => void;
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
-
-const route = useNativeRoute();
-const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general"]);
 
 const saveAndRestart = async () => {
   props.save();
-  await server.general?.power("Restart");
+  await props.server.general?.power("Restart");
 };
 </script>
 

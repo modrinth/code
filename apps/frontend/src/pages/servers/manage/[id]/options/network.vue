@@ -137,20 +137,21 @@
 
 import { PlusIcon, TrashIcon, EditIcon, VersionIcon, SaveIcon } from "@modrinth/assets";
 import { ButtonStyled, Modal, Button } from "@modrinth/ui";
+import type { Server } from "~/composables/pyroServers";
 
-const route = useNativeRoute();
-const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general", "network"]);
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
 const app = useNuxtApp();
 
 const isUpdating = ref(false);
-const data = computed(() => server.general);
+const data = computed(() => props.server.general);
 
 const serverIP = ref(data?.value?.net?.ip ?? "");
 const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
 
-const network = computed(() => server.network);
+const network = computed(() => props.server.network);
 const allocations = ref(network.value?.allocations);
 
 const newAllocationModal = ref();
@@ -164,9 +165,9 @@ const addNewAllocation = async () => {
   if (!newAllocationName.value) return;
 
   try {
-    await server.network?.reserveAllocation(newAllocationName.value);
+    await props.server.network?.reserveAllocation(newAllocationName.value);
 
-    await server.refresh();
+    await props.server.refresh();
 
     newAllocationModal.value.hide();
     newAllocationName.value = "";
@@ -184,9 +185,9 @@ const editAllocation = async () => {
   if (!newAllocationName.value) return;
 
   try {
-    await server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value);
+    await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value);
 
-    await server.refresh();
+    await props.server.refresh();
 
     editAllocationModal.value.hide();
     newAllocationName.value = "";
@@ -196,14 +197,14 @@ const editAllocation = async () => {
 };
 
 const removeAllocation = async (port: number) => {
-  await server.network?.deleteAllocation(port);
-  await server.refresh();
+  await props.server.network?.deleteAllocation(port);
+  await props.server.refresh();
 };
 
 const saveNetwork = async () => {
   try {
     isUpdating.value = true;
-    const available = await server.network?.checkSubdomainAvailability(serverSubdomain.value);
+    const available = await props.server.network?.checkSubdomainAvailability(serverSubdomain.value);
     if (!available) {
       // @ts-ignore
       app.$notify({
@@ -215,13 +216,16 @@ const saveNetwork = async () => {
       return;
     }
     if (serverSubdomain.value !== data?.value?.net?.domain) {
-      await server.network?.changeSubdomain(serverSubdomain.value);
+      await props.server.network?.changeSubdomain(serverSubdomain.value);
     }
     if (serverPrimaryPort.value !== data?.value?.net?.port) {
-      await server.network?.updateAllocation(serverPrimaryPort.value, newAllocationName.value);
+      await props.server.network?.updateAllocation(
+        serverPrimaryPort.value,
+        newAllocationName.value,
+      );
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await server.refresh();
+    await props.server.refresh();
     // @ts-ignore
     app.$notify({
       group: "serverOptions",

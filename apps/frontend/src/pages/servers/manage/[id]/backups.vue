@@ -204,15 +204,18 @@ import {
   TrashIcon,
 } from "@modrinth/assets";
 import { ref, reactive } from "vue";
+import type { Server } from "~/composables/pyroServers";
+
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
 
 defineEmits(["onDownload"]);
 
 const app = useNuxtApp();
-const route = useNativeRoute();
-const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general", "backups"]);
-const data = computed(() => server.general);
-const backups = computed(() => server.backups?.data);
+
+const data = computed(() => props.server.general);
+const backups = computed(() => props.server.backups?.data);
 
 useHead({
   title: `Backups - ${data.value?.name ?? "Server"} - Modrinth`,
@@ -244,9 +247,9 @@ const createBackup = async () => {
   backupsState.loading = true;
   const backupName = createBackupName.value;
   try {
-    await server.backups?.create(backupName);
+    await props.server.backups?.create(backupName);
 
-    await server.refresh();
+    await props.server.refresh();
     createBackupModal.value?.hide();
     // @ts-ignore
     app.$notify({
@@ -266,9 +269,9 @@ const renameBackup = async (backupId: string) => {
   const backupName = renameBackupName.value;
   console.log("renaming", backupName);
   try {
-    await server.backups?.rename(backupId, backupName);
+    await props.server.backups?.rename(backupId, backupName);
 
-    await server.refresh();
+    await props.server.refresh();
     renameBackupModal.value?.hide();
   } catch (error) {
     backupError.value = error as string;
@@ -279,7 +282,7 @@ const renameBackup = async (backupId: string) => {
 
 const restoreBackup = async (backupId: string) => {
   try {
-    await server.backups?.restore(backupId);
+    await props.server.backups?.restore(backupId);
 
     await restoreBackupModal.value?.hide();
   } catch (error) {
@@ -291,9 +294,9 @@ const restoreBackup = async (backupId: string) => {
 
 const deleteBackup = async (backupId: string) => {
   try {
-    await server.backups?.delete(backupId);
+    await props.server.backups?.delete(backupId);
 
-    await server.refresh();
+    await props.server.refresh();
     await deleteBackupModal.value?.hide();
   } catch (error) {
     backupError.value = error as string;

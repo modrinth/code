@@ -257,10 +257,11 @@
 <script setup lang="ts">
 import { DropdownSelect, Button, Modal } from "@modrinth/ui";
 import { ChevronRightIcon, EditIcon, XIcon } from "@modrinth/assets";
+import type { Server } from "~/composables/pyroServers";
 
-const route = useNativeRoute();
-const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, ["general"]);
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
 const tags = useTags();
 const prodOverride = await PyroAuthOverride();
 
@@ -271,7 +272,7 @@ const mcVersions = tags.value.gameVersions
   .filter((x) => x.version_type === "release")
   .map((x) => x.version);
 
-const data = computed(() => server.general);
+const data = computed(() => props.server.general);
 
 const { data: versions } = await useLazyAsyncData(
   `content-loader-versions`,
@@ -315,7 +316,7 @@ const reinstallCurrent = async () => {
   const resolvedVersionIds = versionIds.value;
   const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
   console.log(projectId, versionId);
-  await server.general?.reinstall(serverId, false, projectId, versionId);
+  await props.server.general?.reinstall(false, projectId, versionId);
 };
 
 const selectLoader = (loader: string) => {
@@ -324,7 +325,7 @@ const selectLoader = (loader: string) => {
 };
 
 const reinstallLoader = async (loader: string) => {
-  await server.general?.reinstall(serverId, true, loader, selectedMCVersion.value);
+  await props.server.general?.reinstall(true, loader, selectedMCVersion.value);
 };
 
 const reinstallNew = async (project: any, versionNumber: string) => {
@@ -341,6 +342,6 @@ const reinstallNew = async (project: any, versionNumber: string) => {
     throw new Error("Version not found");
   }
 
-  await server.general?.reinstall(serverId, false, project.project_id, versionId);
+  await props.server.general?.reinstall(false, project.project_id, versionId);
 };
 </script>
