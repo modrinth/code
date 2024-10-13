@@ -406,7 +406,8 @@ const selectLoader = (loader: string) => {
 const reinstallLoader = async (loader: string) => {
   await props.server.general?.reinstall(
     serverId,
-    true,
+    // if the loader is vanilla, we don't need to reinstall the loader
+    loader !== "Vanilla" && typeof loader === "string",
     loader,
     selectedMCVersion.value,
     selectedLoaderVersion.value,
