@@ -258,12 +258,22 @@ const fetchProject = async (projectId: string): Promise<Project> => {
   }
 };
 
-const reinstallServer = async (loader: boolean, projectId: string, versionId?: string) => {
+const reinstallServer = async (
+  serverId: string,
+  loader: boolean,
+  projectId: string,
+  versionId?: string,
+) => {
+  console.log(
+    loader
+      ? { loader: projectId, version: projectId }
+      : { project_id: projectId, version_id: versionId },
+  );
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/reinstall`, {
+    await usePyroFetch(`servers/${serverId}/reinstall`, {
       method: "POST",
       body: loader
-        ? { loader: projectId, version: projectId }
+        ? { loader: projectId, loader_version: versionId, game_version: versionId }
         : { project_id: projectId, version_id: versionId },
     });
   } catch (error) {
@@ -989,30 +999,40 @@ export type Server<T extends avaliableModules> = {
    * Refreshes the included modules of the server
    * @param refreshModules - The modules to refresh.
    */
-  refresh: (refreshModules?: avaliableModules) => void;
+  refresh: (refreshModules?: avaliableModules) => Promise<void>;
   serverId: string;
 };
 
 export const usePyroServer = async (serverId: string, includedModules: avaliableModules) => {
   const server: Server<typeof includedModules> = reactive({
     refresh: async (refreshModules?: avaliableModules) => {
+      const promises: Promise<void>[] = [];
       if (refreshModules) {
         for (const module of refreshModules) {
-          const mods = modules[module];
-          if (mods.get) {
-            const data = await mods.get(serverId);
-            server[module] = { ...server[module], ...data };
-          }
+          promises.push(
+            (async () => {
+              const mods = modules[module];
+              if (mods.get) {
+                const data = await mods.get(serverId);
+                server[module] = { ...server[module], ...data };
+              }
+            })(),
+          );
         }
       } else {
         for (const module of includedModules) {
-          const mods = modules[module];
-          if (mods.get) {
-            const data = await mods.get(serverId);
-            server[module] = { ...server[module], ...data };
-          }
+          promises.push(
+            (async () => {
+              const mods = modules[module];
+              if (mods.get) {
+                const data = await mods.get(serverId);
+                server[module] = { ...server[module], ...data };
+              }
+            })(),
+          );
         }
       }
+      await Promise.all(promises);
     },
     serverId,
   });
