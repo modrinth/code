@@ -27,7 +27,13 @@
         <DropdownSelect
           v-model="selectedMCVersion"
           :options="mcVersions"
-          placeholder="Select version..."
+          placeholder="Select Minecraft version..."
+        />
+        <DropdownSelect
+          v-if="selectedMCVersion && selectedLoader.toLowerCase() !== 'vanilla'"
+          v-model="selectedLoaderVersion"
+          :options="selectedLoaderVersions"
+          placeholder="Select loader version..."
         />
       </div>
       <div class="mt-4 flex justify-end gap-4">
@@ -273,7 +279,40 @@ const emit = defineEmits<{
 }>();
 
 const tags = useTags();
+const config = useRuntimeConfig();
 const prodOverride = await PyroAuthOverride();
+
+const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
+
+const loaderVersions = (await Promise.all(
+  versionStrings.map(async (loader) => {
+    const runFetch = async () => {
+      try {
+        const res = await fetch(
+          `${config.public.siteUrl}/loader-versions?loader=${loader}`,
+          {},
+        ).then((r) => r.json());
+        return { [loader]: res.gameVersions };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {
+        return await runFetch();
+      }
+    };
+    return await runFetch();
+  }),
+).then((res) => res.reduce((acc, val) => ({ ...acc, ...val }), {}))) as Record<
+  string,
+  {
+    // eslint-disable-next-line no-template-curly-in-string
+    id: "${modrinth.gameVersion}" | (string & {});
+    stable: boolean;
+    loaders: {
+      id: string;
+      url: string;
+      stable: boolean;
+    }[];
+  }[]
+>;
 
 const editModal = ref();
 const versionSelectModal = ref();
@@ -281,6 +320,30 @@ const versionSelectModal = ref();
 const mcVersions = tags.value.gameVersions
   .filter((x) => x.version_type === "release")
   .map((x) => x.version);
+
+const selectedLoaderVersions = computed(() => {
+  /*
+      loaderVersions[
+      selectedLoader.value.toLowerCase() === "neoforge" ? "neo" : selectedLoader.toLowerCase()
+    ]
+      .find((x) => x.id === selectedMCVersion)
+      ?.loaders.map((x) => x.id) || []
+      */
+  let loader = selectedLoader.value.toLowerCase();
+  if (loader === "neoforge") {
+    loader = "neo";
+  }
+  const backwardsCompatibleVersion = loaderVersions[loader].find(
+    // eslint-disable-next-line no-template-curly-in-string
+    (x) => x.id === "${modrinth.gameVersion}",
+  );
+  if (backwardsCompatibleVersion) {
+    return backwardsCompatibleVersion.loaders.map((x) => x.id);
+  }
+  return loaderVersions[loader]
+    .find((x) => x.id === selectedMCVersion.value)
+    ?.loaders.map((x) => x.id);
+});
 
 const data = computed(() => props.server.general);
 const { data: versions } = data?.value?.upstream
@@ -307,6 +370,7 @@ const currentVersion = ref();
 
 const selectedLoader = ref("");
 const selectedMCVersion = ref("");
+const selectedLoaderVersion = ref("");
 
 const updateData = async () => {
   if (!data.value?.upstream?.version_id) {
@@ -340,14 +404,20 @@ const selectLoader = (loader: string) => {
 };
 
 const reinstallLoader = async (loader: string) => {
-  await props.server.general?.reinstall(serverId, true, loader, selectedMCVersion.value);
+  await props.server.general?.reinstall(
+    serverId,
+    true,
+    loader,
+    selectedMCVersion.value,
+    selectedLoaderVersion.value,
+  );
   emit("reinstall");
+  await nextTick();
+  window.scrollTo(0, 0);
   if (data.value) {
     data.value.loader = loader;
+    data.value.loader_version = selectedLoaderVersion.value;
   }
-  await nextTick();
-  // scroll to top
-  window.scrollTo(0, 0);
 };
 
 const reinstallNew = async (project: any, versionNumber: string) => {

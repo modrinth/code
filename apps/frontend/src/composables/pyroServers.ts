@@ -264,37 +264,14 @@ const reinstallServer = async (
   loader: boolean,
   projectId: string,
   versionId?: string,
+  loaderVersionId?: string,
 ) => {
   // launcher-meta.modrinth.com/{forge,neo,minecraft,quilt,fabric}/v0/manifest.json
   try {
     if (loader) {
-      const loaderVersions = (await fetch(`/loader-versions?loader=${projectId}`).then((res) =>
-        res.json(),
-      )) as {
-        gameVersions: {
-          id: string;
-          stable: boolean;
-          loaders: {
-            id: string;
-            url: string;
-            stable: boolean;
-          }[];
-        }[];
-      };
-
-      let version = loaderVersions.gameVersions.find((v) => v.id === versionId);
-      if (version?.loaders.length === 0) {
-        version = loaderVersions.gameVersions.find((v) => v.loaders.length > 0);
-      }
-      console.log("version", version);
-      let loader = version?.loaders.find((l) => l.stable)?.id;
-      if (!loader) {
-        loader = version?.loaders[0].id;
-      }
-
       await usePyroFetch(`servers/${serverId}/reinstall`, {
         method: "POST",
-        body: { loader: projectId, loader_version: loader, game_version: versionId },
+        body: { loader: projectId, loader_version: loaderVersionId, game_version: versionId },
       });
     } else {
       await usePyroFetch(`servers/${serverId}/reinstall`, {
@@ -766,6 +743,7 @@ type GeneralFunctions = {
     loader: boolean,
     projectId: string,
     versionId?: string,
+    loaderVersionId?: string,
   ) => Promise<void>;
 
   /**
