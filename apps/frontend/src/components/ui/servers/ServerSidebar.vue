@@ -38,7 +38,7 @@
       class="h-full w-full"
       :class="{ 'rounded-xl bg-black opacity-30 bg-blend-overlay': sidebarVisible && $mq == 'sm' }"
     >
-      <NuxtPage :route="props.route" :server="props.server" />
+      <NuxtPage :route="props.route" :server="props.server" @reinstall="onReinstall" />
     </div>
   </div>
 </template>
@@ -49,11 +49,17 @@ import { Button } from "@modrinth/ui";
 import { HamburgerIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
+const emit = defineEmits(["reinstall"]);
+
 const props = defineProps<{
   navLinks: { label: string; href: string; icon: Component }[];
   route: RouteLocationNormalized;
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
+
+const onReinstall = () => {
+  emit("reinstall");
+};
 
 const sidebarVisible = ref(false);
 const toggleSidebar = () => {

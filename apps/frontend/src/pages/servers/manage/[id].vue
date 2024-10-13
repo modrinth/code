@@ -60,6 +60,7 @@
           :console-output="consoleOutput"
           :socket="socket"
           :server="server"
+          @reinstall="onReinstall"
         />
       </div>
 
@@ -217,6 +218,12 @@ const handleInstallationResult = (data: WSInstallationResultEvent) => {
       error.value = new Error(data.reason ?? "Unknown error");
       break;
   }
+};
+
+const onReinstall = () => {
+  console.log("QAHHHHHHHHHHHHHHH");
+  if (!serverData.value) return;
+  serverData.value.status = "installing";
 };
 
 const updateStats = (currentStats: Stats["current"]) => {

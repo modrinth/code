@@ -101,8 +101,10 @@
           class="flex w-full items-center justify-center rounded-xl bg-button-bg p-2 hover:bg-button-bgActive"
         >
           <div class="flex items-center gap-2">
-            <UiServersLoaderIcon v-if="data.loader" :loader="data.loader" class="[&&]:size-10" />
-            <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">{{ data.loader }}</h1>
+            <UiServersLoaderIcon :loader="data.loader || 'Vanilla'" class="[&&]:size-10" />
+            <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
+              {{ data.loader || "Vanilla" }}
+            </h1>
           </div>
         </div>
       </div>
@@ -265,6 +267,11 @@ const serverId = route.params.id as string;
 const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
+
+const emit = defineEmits<{
+  reinstall: [];
+}>();
+
 const tags = useTags();
 const prodOverride = await PyroAuthOverride();
 
@@ -334,6 +341,13 @@ const selectLoader = (loader: string) => {
 
 const reinstallLoader = async (loader: string) => {
   await props.server.general?.reinstall(serverId, true, loader, selectedMCVersion.value);
+  emit("reinstall");
+  if (data.value) {
+    data.value.loader = loader;
+  }
+  await nextTick();
+  // scroll to top
+  window.scrollTo(0, 0);
 };
 
 const reinstallNew = async (project: any, versionNumber: string) => {
