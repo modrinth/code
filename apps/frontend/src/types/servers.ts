@@ -106,31 +106,6 @@ export interface Server {
   motd: string;
 }
 
-export interface WSAuth {
-  url: string;
-  token: string;
-}
-
-export type ServerState = "running" | "stopped" | "crashed";
-export type WebsocketEventType =
-  | "log"
-  | "auth"
-  | "stats"
-  | "power-state"
-  | "auth-expiring"
-  | "auth-incorrect"
-  | (string & {});
-
-export interface WSEvent {
-  event: WebsocketEventType;
-  message: string;
-  state: ServerState;
-}
-
-export interface Servers {
-  servers: Server[];
-}
-
 export interface Stats {
   current: {
     cpu_percent: number;
@@ -150,4 +125,75 @@ export interface Stats {
     cpu: number[];
     ram: number[];
   };
+}
+
+export interface WSAuth {
+  url: string;
+  token: string;
+}
+
+export type ServerState = "running" | "stopped" | "crashed";
+// export type WebsocketEventType =
+//   | "log"
+//   | "auth"
+//   | "stats"
+//   | "power-state"
+//   | "auth-expiring"
+//   | "auth-incorrect"
+//   | "installation-result"
+//   | (string & {});
+
+// export interface WSEvent {
+//   event: WebsocketEventType;
+//   message: string;
+//   state: ServerState;
+// }
+
+export interface WSLogEvent {
+  event: "log";
+  message: string;
+}
+
+type CurrentStats = Stats["current"];
+
+export interface WSStatsEvent extends CurrentStats {
+  event: "stats";
+}
+
+export interface WSAuthExpiringEvent {
+  event: "auth-expiring";
+}
+
+export interface WSPowerStateEvent {
+  event: "power-state";
+  state: ServerState;
+}
+
+export interface WSAuthIncorrectEvent {
+  event: "auth-incorrect";
+}
+
+export interface WSInstallationResultOkEvent {
+  event: "installation-result";
+  result: "ok";
+}
+
+export interface WSInstallationResultErrEvent {
+  event: "installation-result";
+  result: "err";
+  reason: string;
+}
+
+export type WSInstallationResultEvent = WSInstallationResultOkEvent | WSInstallationResultErrEvent;
+
+export type WSEvent =
+  | WSLogEvent
+  | WSStatsEvent
+  | WSPowerStateEvent
+  | WSAuthExpiringEvent
+  | WSAuthIncorrectEvent
+  | WSInstallationResultEvent;
+
+export interface Servers {
+  servers: Server[];
 }

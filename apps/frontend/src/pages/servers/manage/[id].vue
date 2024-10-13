@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { LeftArrowIcon } from "@modrinth/assets";
-import type { ServerState, Stats, WSEvent } from "~/types/servers";
+import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 
 const socket = ref<WebSocket | null>(null);
 
@@ -175,7 +175,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
       consoleOutput.value.push(...data.message.split("\n").filter((l) => l.trim()));
       break;
     case "stats":
-      updateStats(data as unknown as Stats["current"]);
+      updateStats(data);
       break;
     case "auth-expiring":
       reauthenticate();
@@ -186,8 +186,25 @@ const handleWebSocketMessage = (data: WSEvent) => {
     case "auth-incorrect":
       isWSAuthIncorrect.value = true;
       break;
+    case "installation-result":
+      handleInstallationResult(data);
+      break;
     default:
       console.warn("Unhandled WebSocket event:", data);
+  }
+};
+
+const handleInstallationResult = (data: WSInstallationResultEvent) => {
+  switch (data.result) {
+    case "ok":
+      if (!serverData.value) break;
+      serverData.value.status = "available";
+      break;
+    case "err":
+      errorTitle.value = "Installation error";
+      errorMessage.value = data.reason;
+      error.value = new Error(data.reason);
+      break;
   }
 };
 
