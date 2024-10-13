@@ -3,14 +3,30 @@
     <template #title>
       <span class="text-contrast text-xl font-extrabold">
         <template v-if="product.metadata.type === 'midas'">Subscribe to Modrinth Plus!</template>
+        <template v-else-if="product.metadata.type === 'pyro'"
+          >Subscribe to Modrinth Servers!</template
+        >
         <template v-else>Purchase product</template>
       </span>
     </template>
     <div class="flex items-center gap-1 pb-4">
+      <template v-if="product.metadata.type === 'pyro' && !projectId">
+        <span
+          :class="{
+            'text-secondary': purchaseModalStep !== 0,
+            'font-bold': purchaseModalStep === 0,
+          }"
+        >
+          Configure server
+        </span>
+        <ChevronRightIcon class="h-5 w-5 text-secondary" />
+      </template>
       <span
         :class="{
-          'text-secondary': purchaseModalStep !== 0,
-          'font-bold': purchaseModalStep === 0,
+          'text-secondary':
+            purchaseModalStep !== (product.metadata.type === 'pyro' && !projectId ? 1 : 0),
+          'font-bold':
+            purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 1 : 0),
         }"
       >
         Select plan
@@ -18,8 +34,10 @@
       <ChevronRightIcon class="h-5 w-5 text-secondary" />
       <span
         :class="{
-          'text-secondary': purchaseModalStep !== 1,
-          'font-bold': purchaseModalStep === 1,
+          'text-secondary':
+            purchaseModalStep !== (product.metadata.type === 'pyro' && !projectId ? 2 : 1),
+          'font-bold':
+            purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 2 : 1),
         }"
       >
         Payment
@@ -27,14 +45,35 @@
       <ChevronRightIcon class="h-5 w-5 text-secondary" />
       <span
         :class="{
-          'text-secondary': purchaseModalStep !== 2,
-          'font-bold': purchaseModalStep === 2,
+          'text-secondary':
+            purchaseModalStep !== (product.metadata.type === 'pyro' && !projectId ? 3 : 2),
+          'font-bold':
+            purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 3 : 2),
         }"
       >
         Review
       </span>
     </div>
-    <div v-if="purchaseModalStep === 0" class="md:w-[600px]">
+    <div
+      v-if="product.metadata.type === 'pyro' && !projectId && purchaseModalStep === 0"
+      class="md:w-[600px]"
+    >
+      <div>
+        <p class="my-2 text-lg font-bold">Configure your server</p>
+        <div class="flex flex-col gap-4">
+          <input v-model="serverName" placeholder="Server name" class="input" />
+          <select v-model="serverLoader" class="select">
+            <option value="Vanilla">Vanilla</option>
+            <option value="Fabric">Fabric</option>
+            <option value="Forge">Forge</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div
+      v-if="purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 1 : 0)"
+      class="md:w-[600px]"
+    >
       <div>
         <p class="my-2 text-lg font-bold">Choose billing interval</p>
         <div class="flex flex-col gap-4">
@@ -81,7 +120,7 @@
         </div>
       </div>
     </div>
-    <template v-if="purchaseModalStep === 1">
+    <template v-if="purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 2 : 1)">
       <div
         v-show="loadingPaymentMethodModal !== 2"
         class="flex min-h-[16rem] items-center justify-center md:w-[600px]"
@@ -93,12 +132,34 @@
         <div id="payment-element" class="mt-4"></div>
       </div>
     </template>
-    <div v-if="purchaseModalStep === 2" class="md:w-[650px]">
+    <div
+      v-if="purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 3 : 2)"
+      class="md:w-[650px]"
+    >
+      <div v-if="product.metadata.type === 'pyro'" class="r-4 rounded-xl bg-bg p-4 mb-4">
+        <p class="my-2 text-lg font-bold text-primary">Server details</p>
+        <div class="flex items-center gap-4">
+          <img
+            v-if="projectImage"
+            :src="projectImage"
+            alt="Project image"
+            class="w-16 h-16 rounded"
+          />
+          <div>
+            <p v-if="projectName" class="font-bold">{{ projectName }}</p>
+            <p>Server name: {{ serverName }}</p>
+            <p v-if="!projectId">Loader: {{ serverLoader }}</p>
+          </div>
+        </div>
+      </div>
       <div>
         <div class="r-4 rounded-xl bg-bg p-4">
           <p class="my-2 text-lg font-bold text-primary">Purchase details</p>
           <div class="mb-2 flex justify-between">
-            <span class="text-secondary">Modrinth+ {{ selectedPlan }}</span>
+            <span class="text-secondary"
+              >{{ product.metadata.type === 'midas' ? 'Modrinth+' : 'Modrinth Servers' }}
+              {{ selectedPlan }}</span
+            >
             <span class="text-secondary">
               {{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }} /
               {{ selectedPlan }}
@@ -131,7 +192,7 @@
           class="max-w-[20rem]"
           @select="selectPaymentMethod"
         >
-          <!-- TODO: Move this to component to remove duplicated code -->
+          <!-- eslint-disable-next-line vue/no-template-shadow -->
           <template #singleLabel="props">
             <div class="flex items-center gap-2">
               <CardIcon v-if="props.option.type === 'card'" class="h-8 w-8" />
@@ -163,6 +224,7 @@
               </span>
             </div>
           </template>
+          <!-- eslint-disable-next-line vue/no-template-shadow -->
           <template #option="props">
             <div class="flex items-center gap-2">
               <template v-if="props.option.id === 'new'">
@@ -216,17 +278,42 @@
           <XIcon />
           Cancel
         </button>
+        <button
+          class="btn btn-primary"
+          :disabled="
+            paymentLoading || (product.metadata.type === 'pyro' && !projectId && !serverName)
+          "
+          @click="nextStep"
+        >
+          <RightArrowIcon />
+          {{ product.metadata.type === 'pyro' && !projectId ? 'Next' : 'Select' }}
+        </button>
+      </template>
+      <template
+        v-else-if="purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 1 : 0)"
+      >
+        <button
+          class="btn"
+          @click="
+            purchaseModalStep =
+              product.metadata.type === 'pyro' && !projectId ? 0 : purchaseModalStep
+          "
+        >
+          Back
+        </button>
         <button class="btn btn-primary" :disabled="paymentLoading" @click="beginPurchaseFlow(true)">
           <RightArrowIcon />
           Select
         </button>
       </template>
-      <template v-else-if="purchaseModalStep === 1">
+      <template
+        v-else-if="purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 2 : 1)"
+      >
         <button
           class="btn"
           @click="
             () => {
-              purchaseModalStep = 0
+              purchaseModalStep = product.metadata.type === 'pyro' && !projectId ? 1 : 0
               loadingPaymentMethodModal = 0
               paymentLoading = false
             }
@@ -239,7 +326,9 @@
           Continue
         </button>
       </template>
-      <template v-else-if="purchaseModalStep === 2">
+      <template
+        v-else-if="purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 3 : 2)"
+      >
         <button class="btn" @click="$refs.purchaseModal.hide()">
           <XIcon />
           Cancel
@@ -251,6 +340,7 @@
     </div>
   </NewModal>
 </template>
+
 <script setup>
 import { ref, computed, nextTick } from 'vue'
 import NewModal from '../modal/NewModal.vue'
@@ -310,6 +400,26 @@ const props = defineProps({
   onError: {
     type: Function,
     required: true,
+  },
+  projectName: {
+    type: String,
+    default: null,
+  },
+  projectImage: {
+    type: String,
+    default: null,
+  },
+  projectId: {
+    type: String,
+    default: null,
+  },
+  versionId: {
+    type: String,
+    default: null,
+  },
+  serverName: {
+    type: String,
+    default: null,
   },
 })
 
@@ -372,42 +482,12 @@ let stripe = null
 let elements = null
 
 const purchaseModal = ref()
-
-const primaryPaymentMethodId = computed(() => {
-  if (
-    props.customer &&
-    props.customer.invoice_settings &&
-    props.customer.invoice_settings.default_payment_method
-  ) {
-    return props.customer.invoice_settings.default_payment_method
-  } else if (props.paymentMethods && props.paymentMethods[0] && props.paymentMethods[0].id) {
-    return props.paymentMethods[0].id
-  } else {
-    return null
-  }
-})
-
-defineExpose({
-  show: () => {
-    // eslint-disable-next-line no-undef
-    stripe = Stripe(props.publishableKey)
-
-    selectedPlan.value = 'yearly'
-
-    purchaseModalStep.value = 0
-    loadingPaymentMethodModal.value = 0
-    paymentLoading.value = false
-
-    purchaseModal.value.show()
-  },
-})
-
 const purchaseModalStep = ref(0)
 const loadingPaymentMethodModal = ref(0)
+const paymentLoading = ref(false)
 
 const selectedPlan = ref('yearly')
 const currency = computed(() => getCurrency(props.country))
-
 const price = ref(props.product?.prices?.find((x) => x.currency_code === currency.value) ?? null)
 
 const clientSecret = ref()
@@ -415,6 +495,9 @@ const paymentIntentId = ref()
 const confirmationToken = ref()
 const tax = ref()
 const total = ref()
+
+const serverName = ref(props.serverName || '')
+const serverLoader = ref('Vanilla')
 
 const selectedPaymentMethod = ref()
 const inputtedPaymentMethod = ref()
@@ -433,7 +516,44 @@ const selectablePaymentMethods = computed(() => {
   return values
 })
 
-const paymentLoading = ref(false)
+const primaryPaymentMethodId = computed(() => {
+  if (
+    props.customer &&
+    props.customer.invoice_settings &&
+    props.customer.invoice_settings.default_payment_method
+  ) {
+    return props.customer.invoice_settings.default_payment_method
+  } else if (props.paymentMethods && props.paymentMethods[0] && props.paymentMethods[0].id) {
+    return props.paymentMethods[0].id
+  } else {
+    return null
+  }
+})
+
+const metadata = computed(() => {
+  if (props.product.metadata.type === 'pyro') {
+    return {
+      type: 'pyro',
+      server_name: serverName.value,
+      source:
+        props.projectId && props.versionId
+          ? {
+              project_id: props.projectId,
+              version_id: props.versionId,
+            }
+          : { loader: serverLoader.value },
+    }
+  }
+  return {}
+})
+
+function nextStep() {
+  if (props.product.metadata.type === 'pyro' && !props.projectId && purchaseModalStep.value === 0) {
+    purchaseModalStep.value = 1
+  } else {
+    beginPurchaseFlow(true)
+  }
+}
 
 async function beginPurchaseFlow(skip = false) {
   if (!props.customer) {
@@ -446,11 +566,11 @@ async function beginPurchaseFlow(skip = false) {
     paymentLoading.value = true
     await refreshPayment(null, primaryPaymentMethodId.value)
     paymentLoading.value = false
-    purchaseModalStep.value = 2
+    purchaseModalStep.value = props.product.metadata.type === 'pyro' && !props.projectId ? 3 : 2
   } else {
     try {
       loadingPaymentMethodModal.value = 0
-      purchaseModalStep.value = 1
+      purchaseModalStep.value = props.product.metadata.type === 'pyro' && !props.projectId ? 2 : 1
 
       await nextTick()
 
@@ -486,7 +606,6 @@ async function createConfirmationToken() {
 
   if (error) {
     props.onError(error)
-
     return
   }
 
@@ -509,7 +628,7 @@ async function validatePayment() {
 
   loadingPaymentMethodModal.value = 0
   confirmationToken.value = await createConfirmationToken()
-  purchaseModalStep.value = 2
+  purchaseModalStep.value = props.product.metadata.type === 'pyro' && !props.projectId ? 3 : 2
   paymentLoading.value = false
 }
 
@@ -546,6 +665,7 @@ async function refreshPayment(confirmationId, paymentMethodId) {
         interval: selectedPlan.value,
       },
       existing_payment_intent: paymentIntentId.value,
+      metadata: metadata.value,
       ...base,
     })
 
@@ -585,5 +705,22 @@ async function submitPayment() {
   }
   paymentLoading.value = false
 }
+
+defineExpose({
+  show: () => {
+    // eslint-disable-next-line no-undef
+    stripe = Stripe(props.publishableKey)
+
+    selectedPlan.value = 'yearly'
+    serverName.value = props.serverName || ''
+    serverLoader.value = 'Vanilla'
+
+    purchaseModalStep.value = 0
+    loadingPaymentMethodModal.value = 0
+    paymentLoading.value = false
+
+    purchaseModal.value.show()
+  },
+})
 </script>
 <style scoped lang="scss"></style>
