@@ -269,6 +269,9 @@ const reinstallServer = async (
   // launcher-meta.modrinth.com/{forge,neo,minecraft,quilt,fabric}/v0/manifest.json
   try {
     if (loader) {
+      if (projectId.toLowerCase() === "neoforge") {
+        projectId = "NeoForge";
+      }
       await usePyroFetch(`servers/${serverId}/reinstall`, {
         method: "POST",
         body: { loader: projectId, loader_version: loaderVersionId, game_version: versionId },
