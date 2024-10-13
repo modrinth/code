@@ -37,8 +37,23 @@
         />
       </div>
       <div class="mt-4 flex justify-end gap-4">
-        <Button transparent @click="versionSelectModal?.hide()"> Cancel </Button>
-        <Button color="primary" @click="reinstallLoader(selectedLoader)"> Reinstall </Button>
+        <Button
+          transparent
+          @click="
+            versionSelectModal?.hide();
+            selectedMCVersion = '';
+            selectedLoaderVersion = '';
+          "
+        >
+          Cancel
+        </Button>
+        <Button
+          color="primary"
+          :disabled="!selectedMCVersion || !selectedLoaderVersion"
+          @click="reinstallLoader(selectedLoader)"
+        >
+          Reinstall
+        </Button>
       </div>
     </div>
   </Modal>
