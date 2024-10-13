@@ -226,6 +226,7 @@
           <template #saved> <BookmarkIcon aria-hidden="true" /> Saved projects </template>
           <template #settings> <SettingsIcon aria-hidden="true" /> Settings </template>
           <template #projects> <BoxIcon aria-hidden="true" /> Projects </template>
+          <template #servers> <ServerIcon aria-hidden="true" /> Servers </template>
           <template #organizations>
             <OrganizationIcon aria-hidden="true" /> Organizations
           </template>
@@ -537,14 +538,14 @@ import {
 } from "@modrinth/assets";
 import { Button, ButtonStyled, OverflowMenu, Avatar } from "@modrinth/ui";
 
+import CrossIcon from "assets/images/utils/x.svg";
+import NotificationIcon from "assets/images/sidebar/notifications.svg";
+import ModerationIcon from "assets/images/sidebar/admin.svg";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import { commonMessages } from "~/utils/common-messages.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
-import CrossIcon from "assets/images/utils/x.svg";
-import NotificationIcon from "assets/images/sidebar/notifications.svg";
-import ModerationIcon from "assets/images/sidebar/admin.svg";
 
 const { formatMessage } = useVIntl();
 
@@ -785,6 +786,10 @@ const userMenuOptions = computed(() => {
     ...options,
     {
       divider: true,
+    },
+    {
+      id: "servers",
+      link: "/servers/manage",
     },
     {
       id: "projects",
