@@ -1,5 +1,6 @@
 <template>
   <div data-pyro class="servers-hero relative -mt-48 h-full min-h-screen py-48 md:-mt-20 md:py-32">
+    <!-- TODO: redirect to server url (/servers/manage/:id) -->
     <PurchaseModal
       v-if="showModal && selectedProduct && customer"
       :key="selectedProduct.id"
@@ -15,7 +16,7 @@
       :on-error="handleError"
       :customer="customer"
       :payment-methods="paymentMethods"
-      :return-url="`${config.public.siteUrl}/settings/billing`"
+      :return-url="`${config.public.siteUrl}/servers/manage`"
       @hidden="handleModalHidden"
     />
     <img
