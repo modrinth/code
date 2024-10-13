@@ -128,17 +128,17 @@
             <div class="flex items-center gap-2">
               <div
                 class="rounded-xl bg-button-bg p-2"
-                :class="data.loader === 'Vanilla' ? '[&&]:bg-bg-green' : ''"
+                :class="data.loader === 'Vanilla' || !data.loader ? '[&&]:bg-bg-green' : ''"
               >
                 <UiServersLoaderIcon
                   loader="Vanilla"
                   class="[&&]:size-10"
-                  :class="data.loader === 'Vanilla' ? 'text-brand' : ''"
+                  :class="data.loader === 'Vanilla' || !data.loader ? 'text-brand' : ''"
                 />
               </div>
               <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Vanilla</h1>
               <span
-                v-if="data.loader === 'Vanilla'"
+                v-if="data.loader === 'Vanilla' || !data.loader"
                 class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
               >
                 Current
@@ -146,7 +146,7 @@
             </div>
 
             <Button @click="selectLoader('Vanilla')">
-              {{ data.loader === "Vanilla" ? "Reinstall" : "Install" }}
+              {{ data.loader === "Vanilla" || !data.loader ? "Reinstall" : "Install" }}
               <ChevronRightIcon />
             </Button>
           </div>
