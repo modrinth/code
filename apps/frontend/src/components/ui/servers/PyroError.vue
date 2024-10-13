@@ -19,7 +19,7 @@
       />
     </div>
     <div
-      class="pyro-logo-animation relative flex flex-col items-center gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#270B11] p-8"
+      class="pyro-logo-animation relative flex flex-col items-center gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#fff5f6] p-8 dark:bg-[#270B11]"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -36,7 +36,7 @@
         />
       </svg>
       <h1
-        class="m-0 inline-flex items-center gap-2 text-4xl font-bold text-[var(--color-contrast)]"
+        class="m-0 inline-flex items-center gap-2 text-4xl font-bold dark:text-[var(--color-contrast)]"
       >
         {{ title }}
       </h1>

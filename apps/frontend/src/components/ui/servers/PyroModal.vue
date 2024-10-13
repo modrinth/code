@@ -3,7 +3,9 @@
     class="flex h-full flex-col gap-4 py-6"
     :class="
       'flex h-full flex-col gap-4 py-6' +
-      (danger ? ' rounded-2xl border-2 border-solid border-[#FF496E] bg-[#270B11]' : '')
+      (danger
+        ? ' rounded-2xl border-2 border-solid border-[#cb2245] bg-[#fff5f6] dark:border-[#FF496E] dark:bg-[#270B11]'
+        : '')
     "
   >
     <div class="mb-2 flex items-center justify-between gap-4 px-6">
@@ -23,9 +25,9 @@
     </div>
     <div
       class="border-0 border-b border-solid"
-      :class="danger ? 'border-[#612d38]' : 'border-button-bg'"
+      :class="danger ? 'border-[#cb2245] dark:border-[#612d38]' : 'border-button-bg'"
     ></div>
-    <div class="mt-2 h-full w-full overflow-scroll px-6">
+    <div class="mt-2 h-full w-full overflow-auto px-6">
       <slot />
     </div>
   </div>
