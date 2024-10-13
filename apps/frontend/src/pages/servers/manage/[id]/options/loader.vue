@@ -259,6 +259,9 @@ import { DropdownSelect, Button, Modal } from "@modrinth/ui";
 import { ChevronRightIcon, EditIcon, XIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
+const route = useNativeRoute();
+const serverId = route.params.id as string;
+
 const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
@@ -273,21 +276,22 @@ const mcVersions = tags.value.gameVersions
   .map((x) => x.version);
 
 const data = computed(() => props.server.general);
+const { data: versions } = data?.value?.upstream
+  ? await useLazyAsyncData(
+      `content-loader-versions`,
+      () =>
+        useBaseFetch(
+          `project/${data?.value?.upstream?.project_id}/version`,
+          {},
+          false,
+          prodOverride,
+        ) as any,
+    )
+  : { data: { value: [] } };
 
-const { data: versions } = await useLazyAsyncData(
-  `content-loader-versions`,
-  () =>
-    useBaseFetch(
-      `project/${data?.value?.upstream?.project_id}/version`,
-      {},
-      false,
-      prodOverride,
-    ) as any,
-);
-
-const options = computed(() => (versions.value as any[]).map((x) => x.version_number));
+const options = computed(() => (versions?.value as any[]).map((x) => x.version_number));
 const versionIds = computed(() =>
-  (versions.value as any[]).map((x) => {
+  (versions?.value as any[]).map((x) => {
     return { [x.version_number]: x.id };
   }),
 );
@@ -298,6 +302,9 @@ const selectedLoader = ref("");
 const selectedMCVersion = ref("");
 
 const updateData = async () => {
+  if (!data.value?.upstream?.version_id) {
+    return;
+  }
   currentVersion.value = await useBaseFetch(
     `version/${data?.value?.upstream?.version_id}`,
     {},
@@ -315,8 +322,9 @@ const reinstallCurrent = async () => {
   }
   const resolvedVersionIds = versionIds.value;
   const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
+  // get the [id] url param
   console.log(projectId, versionId);
-  await props.server.general?.reinstall(false, projectId, versionId);
+  await props.server.general?.reinstall(serverId, false, projectId, versionId);
 };
 
 const selectLoader = (loader: string) => {
@@ -325,7 +333,7 @@ const selectLoader = (loader: string) => {
 };
 
 const reinstallLoader = async (loader: string) => {
-  await props.server.general?.reinstall(true, loader, selectedMCVersion.value);
+  await props.server.general?.reinstall(serverId, true, loader, selectedMCVersion.value);
 };
 
 const reinstallNew = async (project: any, versionNumber: string) => {
@@ -342,6 +350,6 @@ const reinstallNew = async (project: any, versionNumber: string) => {
     throw new Error("Version not found");
   }
 
-  await props.server.general?.reinstall(false, project.project_id, versionId);
+  await props.server.general?.reinstall(serverId, false, project.project_id, versionId);
 };
 </script>
