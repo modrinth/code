@@ -12,10 +12,10 @@
 
 <script setup lang="ts">
 defineProps<{
-  to: any,
+  to: any
 }>()
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 </script>
