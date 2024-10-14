@@ -3,22 +3,6 @@
     class="relative -mt-12 flex h-screen min-h-[400px] w-full flex-1 items-center justify-center"
   >
     <div
-      class="bg-loading-animation absolute inset-0 -mt-8"
-      style="
-        background: linear-gradient(0deg, rgba(22, 24, 28, 0.64), rgba(22, 24, 28, 0.64)),
-          linear-gradient(180deg, rgba(131, 66, 66, 0.275) 0%, rgba(202, 14, 14, 0.9) 97.29%);
-      "
-    ></div>
-    <div
-      class="bg-loading-animation pointer-events-none absolute inset-0 mx-auto flex h-full w-full max-w-7xl select-none items-center justify-center"
-    >
-      <img
-        src="~/assets/images/games/bg-mock.png"
-        alt="Background"
-        class="absolute inset-0 mt-12 h-full w-full object-fill"
-      />
-    </div>
-    <div
       class="pyro-logo-animation relative flex flex-col items-center gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#fff5f6] p-8 dark:bg-[#270B11]"
     >
       <svg
@@ -70,7 +54,7 @@ defineProps({
 });
 </script>
 
-<style>
+<style scoped>
 .page-enter-active,
 .page-leave-active {
   transition: all 0.1s;
