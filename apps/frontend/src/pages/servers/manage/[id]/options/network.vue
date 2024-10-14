@@ -124,6 +124,7 @@
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
         v-if="hasUnsavedChanges"
+        :server="props.server"
         :is-updating="isUpdating"
         :save="saveNetwork"
         :reset="resetNetwork"
@@ -206,8 +207,7 @@ const saveNetwork = async () => {
     isUpdating.value = true;
     const available = await props.server.network?.checkSubdomainAvailability(serverSubdomain.value);
     if (!available) {
-      // @ts-ignore
-      app.$notify({
+      addNotification({
         group: "serverOptions",
         type: "error",
         title: "Subdomain not available",
@@ -226,8 +226,7 @@ const saveNetwork = async () => {
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
     await props.server.refresh();
-    // @ts-ignore
-    app.$notify({
+    addNotification({
       group: "serverOptions",
       type: "success",
       title: "Server settings updated",
@@ -235,8 +234,7 @@ const saveNetwork = async () => {
     });
   } catch (error) {
     console.error(error);
-    // @ts-ignore
-    app.$notify({
+    addNotification({
       group: "serverOptions",
       type: "error",
       title: "Failed to update server settings",

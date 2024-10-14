@@ -470,8 +470,8 @@ const uploadFile = async (file: File) => {
     const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
     await props.server.fs?.uploadFile(filePath, file);
     await fetchData();
-    // @ts-ignore
-    app.$notify({
+
+    addNotification({
       group: "files",
       title: "File uploaded",
       text: "Your file has been uploaded.",
@@ -525,8 +525,8 @@ const createNewItem = async () => {
     items.value = [];
     await fetchData();
     createItemModal.value?.hide();
-    // @ts-ignore
-    app.$notify({
+
+    addNotification({
       group: "files",
       title: "File created",
       text: "Your file has been created.",
@@ -548,8 +548,8 @@ const renameItem = async () => {
     items.value = [];
     await fetchData();
     renameItemModal.value?.hide();
-    // @ts-ignore
-    app.$notify({
+
+    addNotification({
       group: "files",
       title: "File renamed",
       text: "Your file has been renamed.",
@@ -573,8 +573,8 @@ const moveItem = async () => {
     items.value = [];
     await fetchData();
     moveItemModal.value?.hide();
-    // @ts-ignore
-    app.$notify({
+
+    addNotification({
       group: "files",
       title: "File moved",
       text: "Your file has been moved.",
@@ -618,8 +618,8 @@ const deleteItem = async () => {
     items.value = [];
     await fetchData();
     deleteItemModal.value?.hide();
-    // @ts-ignore
-    app.$notify({
+
+    addNotification({
       group: "files",
       title: "File deleted",
       text: "Your file has been deleted.",
@@ -651,8 +651,8 @@ const saveFileContent = async () => {
     await refreshNuxtData("files-data");
     isEditing.value = false;
     editingFile.value = null;
-    // @ts-ignore
-    app.$notify({
+
+    addNotification({
       group: "files",
       title: "File saved",
       text: "Your file has been saved.",
@@ -665,7 +665,7 @@ const saveFileContent = async () => {
 
 const saveFileContentRestart = async () => {
   await saveFileContent();
-  await props.server.general?.power("Restart");
+  await props.server.general?.power("restart");
 };
 
 const cancelEditing = () => {

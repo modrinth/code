@@ -91,8 +91,7 @@ const saveGeneral = async () => {
     await data.value?.updateName(serverName.value ?? "");
     await new Promise((resolve) => setTimeout(resolve, 500));
     await props.server.refresh();
-    // @ts-ignore
-    app.$notify({
+    addNotification({
       group: "serverOptions",
       type: "success",
       title: "Server settings updated",
@@ -100,8 +99,7 @@ const saveGeneral = async () => {
     });
   } catch (error) {
     console.error(error);
-    // @ts-ignore
-    app.$notify({
+    addNotification({
       group: "serverOptions",
       type: "error",
       title: "Failed to update server settings",

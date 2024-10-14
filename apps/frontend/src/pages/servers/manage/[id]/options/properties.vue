@@ -195,8 +195,7 @@ const saveProperties = async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     changedPropertiesState.value = {};
     await props.server.refresh();
-    // @ts-ignore
-    app.$notify({
+    addNotification({
       group: "serverOptions",
       type: "success",
       title: "Server settings updated",
@@ -204,8 +203,7 @@ const saveProperties = async () => {
     });
   } catch (error) {
     console.error("Error updating server settings:", error);
-    // @ts-ignore
-    app.$notify({
+    addNotification({
       group: "serverOptions",
       type: "error",
       title: "Failed to update server settings",

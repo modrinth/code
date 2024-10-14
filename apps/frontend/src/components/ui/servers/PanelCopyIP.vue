@@ -24,8 +24,7 @@ const copyText = () => {
   const text = props.subdomain ? `${props.subdomain}.modrinth.gg` : `${props.ip}:${props.port}`;
   navigator.clipboard.writeText(text);
 
-  // @ts-ignore
-  app.$notify({
+  addNotification({
     group: "server",
     title: `Copied IP`,
     text: `Your server's IP has been copied to your clipboard`,

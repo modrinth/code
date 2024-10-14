@@ -110,8 +110,7 @@ const saveStartup = async () => {
     const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value;
     await props.server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    // @ts-ignore
-    app.$notify({
+    addNotification({
       group: "serverOptions",
       type: "success",
       title: "Server settings updated",
@@ -120,8 +119,7 @@ const saveStartup = async () => {
     await props.server.refresh();
   } catch (error) {
     console.error(error);
-    // @ts-ignore
-    app.$notify({
+    addNotification({
       group: "serverOptions",
       type: "error",
       title: "Failed to update server arguments",

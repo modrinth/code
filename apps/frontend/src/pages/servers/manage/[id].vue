@@ -292,8 +292,7 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
 };
 
 const notifySuccess = (title: string, text: string) => {
-  // @ts-ignore
-  app.$notify({
+  addNotification({
     group: "server",
     title,
     text,
@@ -302,8 +301,7 @@ const notifySuccess = (title: string, text: string) => {
 };
 
 const notifyError = (title: string, text: string) => {
-  // @ts-ignore
-  app.$notify({
+  addNotification({
     group: "server",
     title,
     text,
