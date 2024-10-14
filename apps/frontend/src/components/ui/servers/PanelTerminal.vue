@@ -294,6 +294,11 @@ const handleKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
   updateClientHeight();
   updateItemHeights();
+  nextTick(() => {
+    updateItemHeights();
+    setTimeout(scrollToBottom, 200);
+    console.log("s2b");
+  });
   window.addEventListener("resize", updateClientHeight);
   window.addEventListener("keydown", handleKeydown);
 });
@@ -316,7 +321,7 @@ watch(
       scrollToBottom();
     });
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
 
 watch([visibleStartIndex, visibleEndIndex], updateItemHeights);
