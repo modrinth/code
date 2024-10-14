@@ -7,25 +7,14 @@
     tabindex="-1"
   >
     <div
-      class="pointer-events-none absolute bottom-0 left-0 z-[9999] h-1/3 w-full overflow-hidden rounded-xl"
-      :style="{
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-      }"
+      class="progressive-gradient pointer-events-none absolute -bottom-3 left-0 z-[9999] h-2/5 w-full overflow-hidden rounded-xl"
+      :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 4))}%`"
     >
       <div
         v-for="i in progressiveBlurIterations"
         :key="i"
-        class="relative left-0 w-full"
-        :style="{
-          height: `${100 - (i - 1) * (100 / progressiveBlurIterations)}%`,
-          backdropFilter: `blur(${lerp(0, 1, bottomThreshold)}px)`,
-          // opacity should start at 0.5 and end at 1
-          opacity: `${0.5 + (i - 1) * (0.5 / progressiveBlurIterations)}`,
-          gridRowStart: 1,
-          gridColumnStart: 1,
-          alignSelf: 'end',
-        }"
+        class="absolute left-0 top-0 h-full w-full"
+        :style="getBlurStyle(i)"
       />
     </div>
     <div
@@ -136,13 +125,13 @@ const averageItemHeight = ref(36);
 const bottomThreshold = ref(1);
 const bufferSize = 5;
 
-const progressiveBlurIterations = ref(16);
+const progressiveBlurIterations = ref(8);
 
 const scrollTop = ref(0);
 const clientHeight = ref(0);
 const isFullScreen = ref(props.fullScreen);
 
-let initial = false;
+const initial = ref(false);
 
 const totalHeight = computed(
   () =>
@@ -151,14 +140,44 @@ const totalHeight = computed(
 );
 
 watch(totalHeight, () => {
-  if (initial) {
+  if (!initial.value) {
     scrollToBottom();
   }
-  initial = true;
+  initial.value = true;
 });
 
 const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
 
+const getBlurStyle = (i: number) => {
+  const properBlurIteration = i + 1; // Adjusting iteration for reverse order
+  const blur = lerp(0, 2 ** (properBlurIteration - 3), bottomThreshold.value);
+  const singular = 100 / progressiveBlurIterations.value;
+  let mask = "linear-gradient(";
+
+  switch (i) {
+    case 0:
+      mask += `rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) ${singular}%`;
+      break;
+    case 1:
+      mask += `rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) ${singular}%, rgb(0, 0, 0) ${singular * 2}%`;
+      break;
+    case 2:
+      mask += `rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) ${singular}%, rgba(0, 0, 0, 0) ${singular * 2}%, rgb(0, 0, 0) ${singular * 3}%`;
+      break;
+    default:
+      mask += `rgba(0, 0, 0, 0) ${singular * (i - 3)}%, rgb(0, 0, 0) ${singular * (i + 1 - 3)}%, rgb(0, 0, 0) ${singular * (i + 2 - 3)}%, rgba(0, 0, 0, 0) ${singular * (i + 3 - 3)}%`;
+      break;
+  }
+
+  mask += `)`;
+
+  return {
+    backdropFilter: `blur(${blur}px)`,
+    mask,
+    position: "absolute" as any,
+    zIndex: progressiveBlurIterations.value - i, // Adjusting z-index for reverse order
+  };
+};
 const getItemOffset = (index: number) => {
   return itemHeights.value.slice(0, index).reduce((sum, height) => sum + height, 0);
 };
@@ -370,5 +389,21 @@ html.oled-mode .console {
 
 .scale-fullscreen {
   animation: scaleUp 190ms forwards;
+}
+
+.progressive-gradient {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-bg), transparent var(--transparency)) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+html.dark-mode .progressive-gradient {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, black, transparent var(--transparency)) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
 }
 </style>
