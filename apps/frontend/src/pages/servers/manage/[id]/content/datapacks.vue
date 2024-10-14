@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full w-full flex-col px-4">
+  <div class="flex h-full w-full flex-col">
     <div class="card flex items-center justify-between gap-2 px-3">
       <h2 class="m-0 text-2xl font-bold text-contrast">Datapacks</h2>
       <ButtonStyled color="brand">

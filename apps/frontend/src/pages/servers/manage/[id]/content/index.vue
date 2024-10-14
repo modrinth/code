@@ -20,7 +20,7 @@
     </div>
   </Modal>
 
-  <div v-if="data && mods" class="flex h-full w-full flex-col px-4">
+  <div v-if="data && mods" class="flex h-full w-full flex-col">
     <div class="card flex items-center justify-between gap-2 px-3">
       <h2 class="m-0 text-2xl font-bold text-contrast">Mods</h2>
       <ButtonStyled color="brand">
