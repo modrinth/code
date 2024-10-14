@@ -20,7 +20,7 @@
           height="100"
           :options="chartOptions"
           :series="[{ name: 'Chart', data: metric.data }]"
-          class="chart absolute bottom-0 left-0 right-0 w-full"
+          class="chart chart-animation absolute bottom-0 left-0 right-0 w-full"
         />
       </ClientOnly>
     </div>
@@ -181,3 +181,20 @@ onUnmounted(() => {
   }
 });
 </script>
+
+<style scoped>
+@keyframes chart-enter-animation {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.chart-animation {
+  opacity: 0;
+  animation: chart-enter-animation 0.5s ease-out forwards;
+  animation-delay: 1s;
+}
+</style>
