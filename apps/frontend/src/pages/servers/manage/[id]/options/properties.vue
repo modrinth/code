@@ -4,7 +4,7 @@
       <div class="card flex flex-col gap-4">
         <label for="username-field" class="flex flex-col gap-2">
           <span class="text-lg font-bold text-contrast">Server Properties</span>
-          <span> Edit the minecraft server properties file. </span>
+          <span> Edit the Minecraft server properties file. </span>
         </label>
         <div class="flex flex-col gap-4 rounded-xl bg-table-alternateRow p-4">
           <div
