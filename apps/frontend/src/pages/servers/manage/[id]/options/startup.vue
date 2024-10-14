@@ -17,7 +17,7 @@
           />
         </div>
 
-        <div class="card flex justify-between gap-2">
+        <div class="card flex flex-col gap-8">
           <div class="flex flex-col gap-4">
             <label for="username-field" class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Java Version</span>
@@ -33,7 +33,7 @@
           <div class="flex flex-col gap-4">
             <label for="username-field" class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Runtime</span>
-              <span> The runtime that your server will run on. </span>
+              <span> The Java runtime your server will use. </span>
             </label>
             <DropdownSelect
               v-model="jdkBuild"
