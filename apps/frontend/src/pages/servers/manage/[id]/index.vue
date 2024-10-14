@@ -517,7 +517,6 @@ watch(
   },
 );
 
-// Suggestion Selection Methods
 const selectNextSuggestion = () => {
   if (suggestions.value.length === 0) return;
   selectedSuggestionIndex.value = (selectedSuggestionIndex.value + 1) % suggestions.value.length;
@@ -529,7 +528,6 @@ const selectPrevSuggestion = () => {
     (selectedSuggestionIndex.value - 1 + suggestions.value.length) % suggestions.value.length;
 };
 
-// Improved acceptSuggestion function
 const acceptSuggestion = () => {
   if (suggestions.value.filter((s) => s !== "<arg>").length === 0) return;
   const selected = suggestions.value[selectedSuggestionIndex.value];
