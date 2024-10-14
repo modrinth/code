@@ -30,6 +30,8 @@
       <div class="max-w-md text-center leading-relaxed text-secondary">
         If this issue persists, contact Modrinth support.
       </div>
+      <!-- reload page this is nuxt -->
+      <Button @click="reloadNuxtApp()"> Reload </Button>
       <Button @click="$router.push('/servers/manage')">
         <LeftArrowIcon />
         Back to Servers
