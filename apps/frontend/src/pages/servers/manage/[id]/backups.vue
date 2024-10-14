@@ -313,7 +313,7 @@ function triggerDownloadAnimation() {
 const initiateDownload = async (backupId: string) => {
   triggerDownloadAnimation();
 
-  const downloadurl: any = await server.backups?.download(backupId);
+  const downloadurl: any = await props.server.backups?.download(backupId);
   const a = document.createElement("a");
   a.href = downloadurl.download_url;
   a.click();
