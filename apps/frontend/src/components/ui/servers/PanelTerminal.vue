@@ -7,8 +7,8 @@
     tabindex="-1"
   >
     <div
-      class="progressive-gradient pointer-events-none absolute -bottom-3 left-0 z-[9999] h-2/5 w-full overflow-hidden rounded-xl"
-      :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 16))}%`"
+      class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[9999] h-2/5 w-full overflow-hidden rounded-xl"
+      :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 8))}%`"
     >
       <div
         v-for="i in progressiveBlurIterations"
@@ -221,7 +221,7 @@ const handleScroll = () => {
     clientHeight.value = scrollContainer.value.clientHeight;
   }
 
-  const maxBottom = 1024;
+  const maxBottom = 256;
   // when we're at the very bottom of the scroll container, bottomThreshold should be 0
   // when we're maxBottom pixels from the bottom of the scroll container, bottomThreshold should be 1
   bottomThreshold.value = Math.min(
