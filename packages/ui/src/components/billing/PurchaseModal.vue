@@ -67,7 +67,12 @@
             <option value="Fabric">Fabric</option>
             <option value="Forge">Forge</option>
           </select>
-          <div class="text-xs text-secondary">These settings can always be changed later.</div>
+          <div class="flex items-center gap-2">
+            <InfoIcon />
+            <span class="text-sm text-secondary">
+              You can change these settings later in your server settings.
+            </span>
+          </div>
         </div>
       </div>
     </div>
