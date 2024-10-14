@@ -541,7 +541,11 @@ const metadata = computed(() => {
               project_id: props.projectId,
               version_id: props.versionId,
             }
-          : { loader: serverLoader.value },
+          : { 
+              loader: serverLoader.value,
+              loader_version: "",
+              game_version: "latest",
+          },
     }
   }
   return {}
