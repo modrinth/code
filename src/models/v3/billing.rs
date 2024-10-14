@@ -21,7 +21,12 @@ pub struct Product {
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ProductMetadata {
     Midas,
-    Pyro { ram: u32 },
+    Pyro {
+        cpu: u32,
+        ram: u32,
+        swap: u32,
+        storage: u32,
+    },
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
@@ -70,12 +75,15 @@ impl PriceDuration {
             _ => PriceDuration::Monthly,
         }
     }
-
     pub fn as_str(&self) -> &'static str {
         match self {
             PriceDuration::Monthly => "monthly",
             PriceDuration::Yearly => "yearly",
         }
+    }
+
+    pub fn iterator() -> impl Iterator<Item = PriceDuration> {
+        vec![PriceDuration::Monthly, PriceDuration::Yearly].into_iter()
     }
 }
 

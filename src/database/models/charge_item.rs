@@ -162,6 +162,22 @@ impl ChargeItem {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
+    pub async fn get_unprovision(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+        let now = Utc::now();
+
+        let res =
+            select_charges_with_predicate!("WHERE (status = 'cancelled' AND due < $1) OR (status = 'failed' AND last_attempt < $1 - INTERVAL '2 days')", now)
+            .fetch_all(exec)
+            .await?;
+
+        Ok(res
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
+
     pub async fn remove(
         id: ChargeId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,

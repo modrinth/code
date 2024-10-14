@@ -95,30 +95,6 @@ impl UserSubscriptionItem {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
-    pub async fn get_all_unprovision(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
-        let now = Utc::now();
-        let results = select_user_subscriptions_with_predicate!(
-            "
-             INNER JOIN charges c
-                ON c.subscription_id = us.id
-                    AND (
-                        (c.status = 'cancelled' AND c.due < $1) OR
-                        (c.status = 'failed' AND c.last_attempt < $1 - INTERVAL '2 days')
-                    )
-             ",
-            now
-        )
-        .fetch_all(exec)
-        .await?;
-
-        Ok(results
-            .into_iter()
-            .map(|r| r.try_into())
-            .collect::<Result<Vec<_>, serde_json::Error>>()?)
-    }
-
     pub async fn upsert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
