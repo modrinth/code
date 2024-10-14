@@ -66,8 +66,6 @@ const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
-const app = useNuxtApp();
-
 const data = computed(() => props.server.general);
 
 const startupSettings = computed(() => props.server.startup);

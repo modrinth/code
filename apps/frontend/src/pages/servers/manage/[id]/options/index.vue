@@ -60,6 +60,7 @@
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
         v-if="hasUnsavedChanges"
+        :server="props.server"
         :is-updating="isUpdating"
         :save="saveGeneral"
         :reset="resetGeneral"
@@ -72,8 +73,6 @@
 import { EditIcon } from "@modrinth/assets";
 
 import type { Server } from "~/composables/pyroServers";
-
-const app = useNuxtApp();
 
 const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;

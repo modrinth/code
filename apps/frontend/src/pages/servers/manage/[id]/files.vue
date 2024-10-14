@@ -308,7 +308,6 @@ const props = defineProps<{
 
 const VAceEditor = ref();
 
-const app = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
 const serverId = route.params.id.toString();

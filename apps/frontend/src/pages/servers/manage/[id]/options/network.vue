@@ -143,7 +143,6 @@ import type { Server } from "~/composables/pyroServers";
 const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
-const app = useNuxtApp();
 
 const isUpdating = ref(false);
 const data = computed(() => props.server.general);
