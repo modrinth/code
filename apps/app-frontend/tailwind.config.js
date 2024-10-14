@@ -5,7 +5,7 @@ export default {
     './src/layouts/**/*.vue',
     './src/pages/**/*.vue',
     './src/plugins/**/*.{js,ts}',
-    './src/app.vue',
+    './src/App.vue',
     './src/error.vue',
     // monorepo - TODO: migrate this to its own package
     '../../packages/**/*.{js,vue,ts}',

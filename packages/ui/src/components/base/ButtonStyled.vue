@@ -170,7 +170,7 @@ const colorVariables = computed(() => {
   > *:first-child
   > *:first-child
   > :is(button, a, .button-like):first-child {
-  @apply flex flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight];
+  @apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight];
   transition:
     scale 0.125s ease-in-out,
     background-color 0.25s ease-in-out,

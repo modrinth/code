@@ -1,5 +1,40 @@
 <template>
-  <Card v-if="projects.length > 0" class="mod-card">
+  <div v-if="isPackLocked" class="border-2 border-solid rounded-2xl border-bg-raised p-4 flex flex-col mb-4 gap-2">
+    <div class="flex items-center text-lg font-semibold text-contrast">
+      <LockIcon class="mr-2" />
+      Content locked
+    </div>
+    <p class="m-0">This instance is linked to the modpack <router-link :to="{ path: `/project/${instance.linked_data.project_id}/`, query: { i: props.instance.path } }">{{ instance.name }}</router-link>. Adding or removing content may break the modpack or cause unexpected behavior.</p>
+    <p class="m-0 text-sm text-secondary">You can unlock content in this instance's settings if you know what you're doing.</p>
+  </div>
+  <div class="flex items-center gap-2 mb-4">
+    <div class="iconified-input flex-grow">
+      <SearchIcon />
+      <input
+        v-model="searchFilter"
+        type="text"
+        :placeholder="`Search content...`"
+        class="text-input"
+        autocomplete="off"
+      />
+      <Button class="r-btn" @click="() => (searchFilter = '')">
+        <XIcon />
+      </Button>
+    </div>
+    <ButtonStyled v-if="!isPackLocked" type="transparent" color="green" @click="updateAll">
+      <button>
+        <DownloadIcon /> Update all
+      </button>
+    </ButtonStyled>
+    <AddContentButton v-if="!isPackLocked" :instance="instance" />
+  </div>
+  <div class="flex flex-wrap gap-1 items-center pb-4">
+    <FilterIcon class="unlocked-size text-secondary h-5 w-5 mr-1" />
+    <button v-for="filter in ['Mods', 'Resource Packs', 'Shaders', 'Updates available'].filter((x) => isPackLocked ? x !== 'Updates available' : true)" :key="filter" class="px-2 py-1 rounded-full bg-bg-raised text-secondary font-semibold leading-none border-none">
+      {{ filter }}
+    </button>
+  </div>
+  <Card v-if="false && projects.length > 0" class="mod-card">
     <div class="dropdown-input">
       <DropdownSelect
         v-model="selectedProjectType"
@@ -52,223 +87,272 @@
     </Button>
     <AddContentButton v-if="!isPackLocked" :instance="instance" />
   </Card>
-  <Pagination
-    v-if="projects.length > 0"
-    :page="currentPage"
-    :count="Math.ceil(search.length / 20)"
-    class="pagination-before"
-    :link-function="(page) => `?page=${page}`"
-    @switch-page="switchPage"
-  />
-  <Card v-if="projects.length > 0" class="list-card">
-    <div class="table">
-      <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
-        <div class="table-cell table-text">
-          <Checkbox v-model="selectAll" class="select-checkbox" />
-        </div>
-        <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
-          <Button class="transparent" @click="sortProjects('Name')">
-            Name
-            <DropdownIcon v-if="sortColumn === 'Name'" :class="{ down: ascending }" />
-          </Button>
-        </div>
-        <div v-if="selected.length === 0" class="table-cell table-text version">
-          <Button class="transparent" @click="sortProjects('Version')">
-            Version
-            <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
-          </Button>
-        </div>
-        <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
-          <Button class="transparent" @click="sortProjects('Enabled')">
-            Actions
-            <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
-          </Button>
-        </div>
-        <div v-else class="options table-cell name-cell">
-          <div>
-            <Button
-              class="transparent share"
-              @click="() => (showingOptions = !showingOptions)"
-              @mouseover="selectedOption = 'Share'"
-            >
-              <MenuIcon :class="{ open: showingOptions }" />
-            </Button>
-          </div>
+  <ContentListPanel
+      v-if="projects.length > 0"
+      :items="search.map((x) => ({
+        disabled: x.disabled,
+        filename: x.file_name,
+        icon: x.icon,
+        title: x.name,
+        creator: {
+          name: x.author,
+          type: 'user',
+          id: x.author ,
+          link: 'https://modrinth.com/user/' + x.author,
+          linkProps: { target: '_blank' }
+        },
+        project: {
+          id: x.id,
+          link: { path: `/project/${x.id}/`, query: { i: props.instance.path } },
+          linkProps: {}
+        },
+        version: x.version,
+        versionId: x.version,
+        data: x,
+      }))"
+  >
+    <template #actions="{ item }">
+      <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
+        <button @click="removeMod(item)">
+          <TrashIcon />
+        </button>
+      </ButtonStyled>
+      <ButtonStyled type="transparent" circular>
+        <OverflowMenu
+          :options="[
+            {
+              id: 'copy-link',
+              shown: item.project,
+              action: () => toggleDisableMod(item.data),
+            },
+            {
+              id: 'toggle',
+              shown: !isPackLocked,
+              action: () => toggleDisableMod(item.data),
+            },
+          ]"
+        >
+          <MoreVerticalIcon />
+          <template #copy-link>
+            <ClipboardCopyIcon /> Copy link
+          </template>
+          <template v-if="item.disabled" #toggle>
+            <CheckCircleIcon /> Enable
+          </template>
+          <template v-else #toggle>
+            <SlashIcon /> Disable
+          </template>
+        </OverflowMenu>
+      </ButtonStyled>
+    </template>
+  </ContentListPanel>
+  <div v-if="false && projects.length > 0" class="table bg-bg-raised">
+    <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
+      <div class="table-cell table-text">
+        <Checkbox v-model="selectAll" class="select-checkbox" />
+      </div>
+      <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
+        <Button class="transparent" @click="sortProjects('Name')">
+          Name
+          <DropdownIcon v-if="sortColumn === 'Name'" :class="{ down: ascending }" />
+        </Button>
+      </div>
+      <div v-if="selected.length === 0" class="table-cell table-text version">
+        <Button class="transparent" @click="sortProjects('Version')">
+          Version
+          <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
+        </Button>
+      </div>
+      <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
+        <Button class="transparent" @click="sortProjects('Enabled')">
+          Actions
+          <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
+        </Button>
+      </div>
+      <div v-else class="options table-cell name-cell">
+        <div>
           <Button
             class="transparent share"
-            @click="shareNames()"
+            @click="() => (showingOptions = !showingOptions)"
             @mouseover="selectedOption = 'Share'"
           >
-            <ShareIcon />
-            Share
+            <MenuIcon :class="{ open: showingOptions }" />
           </Button>
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to remove mods' : ''">
-            <Button
-              :disabled="isPackLocked"
-              class="transparent trash"
-              @click="deleteWarning.show()"
-              @mouseover="selectedOption = 'Delete'"
-            >
-              <TrashIcon />
-              Delete
-            </Button>
-          </div>
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to update mods' : ''">
-            <Button
-              :disabled="isPackLocked || offline"
-              class="transparent update"
-              @click="updateSelected()"
-              @mouseover="selectedOption = 'Update'"
-            >
-              <UpdatedIcon />
-              Update
-            </Button>
-          </div>
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to toggle mods' : ''">
-            <Button
-              :disabled="isPackLocked"
-              class="transparent"
-              @click="toggleSelected()"
-              @mouseover="selectedOption = 'Toggle'"
-            >
-              <ToggleIcon />
-              Toggle
-            </Button>
-          </div>
         </div>
-      </div>
-      <div v-if="showingOptions && selected.length > 0" class="more-box">
-        <section v-if="selectedOption === 'Share'" class="options">
-          <Button class="transparent" @click="shareNames()">
-            <TextInputIcon />
-            Share names
-          </Button>
-          <Button class="transparent" @click="shareUrls()">
-            <GlobeIcon />
-            Share URLs
-          </Button>
-          <Button class="transparent" @click="shareFileNames()">
-            <FileIcon />
-            Share file names
-          </Button>
-          <Button class="transparent" @click="shareMarkdown()">
-            <CodeIcon />
-            Share as markdown
-          </Button>
-        </section>
-        <section v-if="selectedOption === 'Delete'" class="options">
-          <Button class="transparent" @click="deleteWarning.show()">
-            <TrashIcon />
-            Delete selected
-          </Button>
-          <Button class="transparent" @click="deleteDisabledWarning.show()">
-            <ToggleIcon />
-            Delete disabled
-          </Button>
-        </section>
-        <section v-if="selectedOption === 'Update'" class="options">
-          <Button class="transparent" :disabled="offline" @click="updateAll()">
-            <UpdatedIcon />
-            Update all
-          </Button>
-          <Button class="transparent" @click="selectUpdatable()">
-            <CheckIcon />
-            Select updatable
-          </Button>
-        </section>
-        <section v-if="selectedOption === 'Toggle'" class="options">
-          <Button class="transparent" @click="enableAll()">
-            <CheckIcon />
-            Toggle on
-          </Button>
-          <Button class="transparent" @click="disableAll()">
-            <XIcon />
-            Toggle off
-          </Button>
-          <Button class="transparent" @click="hideShowAll()">
-            <EyeIcon v-if="hideNonSelected" />
-            <EyeOffIcon v-else />
-            {{ hideNonSelected ? 'Show' : 'Hide' }} untoggled
-          </Button>
-        </section>
-      </div>
-      <div
-        v-for="mod in search.slice((currentPage - 1) * 20, currentPage * 20)"
-        :key="mod.file_name"
-        class="table-row"
-        @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
-      >
-        <div class="table-cell table-text checkbox">
-          <Checkbox
-            :model-value="selectionMap.get(mod.path)"
-            class="select-checkbox"
-            @update:model-value="(newValue) => selectionMap.set(mod.path, newValue)"
-          />
-        </div>
-        <div class="table-cell table-text name-cell">
-          <router-link
-            v-if="mod.slug"
-            :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
-            :disabled="offline"
-            class="mod-content"
-          >
-            <Avatar :src="mod.icon" />
-            <div class="mod-text">
-              <div class="title">{{ mod.name }}</div>
-              <span v-if="mod.author" class="no-wrap">by {{ mod.author }}</span>
-            </div>
-          </router-link>
-          <div v-else class="mod-content">
-            <Avatar :src="mod.icon" />
-            <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
-          </div>
-        </div>
-        <div class="table-cell table-text version">
-          <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
-        </div>
-        <div class="table-cell table-text manage">
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to remove mods.' : 'Remove project'">
-            <Button :disabled="isPackLocked" icon-only @click="removeMod(mod)">
-              <TrashIcon />
-            </Button>
-          </div>
-          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator" />
-          <div
-            v-else
-            v-tooltip="isPackLocked ? 'Unlock this instance to update mods.' : 'Update project'"
-          >
-            <Button
-              :disabled="!mod.outdated || offline || isPackLocked"
-              icon-only
-              @click="updateProject(mod)"
-            >
-              <UpdatedIcon v-if="mod.outdated" />
-              <CheckIcon v-else />
-            </Button>
-          </div>
-          <div v-tooltip="isPackLocked ? 'Unlock this instance to toggle mods.' : ''">
-            <input
-              id="switch-1"
-              :disabled="isPackLocked"
-              autocomplete="off"
-              type="checkbox"
-              class="switch stylized-toggle"
-              :checked="!mod.disabled"
-              @change="toggleDisableMod(mod)"
-            />
-          </div>
+        <Button
+          class="transparent share"
+          @click="shareNames()"
+          @mouseover="selectedOption = 'Share'"
+        >
+          <ShareIcon />
+          Share
+        </Button>
+        <div v-tooltip="isPackLocked ? 'Unlock this instance to remove mods' : ''">
           <Button
-            v-tooltip="`Show ${mod.file_name}`"
-            icon-only
-            @click="highlightModInProfile(instance.path, mod.path)"
+            :disabled="isPackLocked"
+            class="transparent trash"
+            @click="deleteWarning.show()"
+            @mouseover="selectedOption = 'Delete'"
           >
-            <FolderOpenIcon />
+            <TrashIcon />
+            Delete
+          </Button>
+        </div>
+        <div v-tooltip="isPackLocked ? 'Unlock this instance to update mods' : ''">
+          <Button
+            :disabled="isPackLocked || offline"
+            class="transparent update"
+            @click="updateSelected()"
+            @mouseover="selectedOption = 'Update'"
+          >
+            <UpdatedIcon />
+            Update
+          </Button>
+        </div>
+        <div v-tooltip="isPackLocked ? 'Unlock this instance to toggle mods' : ''">
+          <Button
+            :disabled="isPackLocked"
+            class="transparent"
+            @click="toggleSelected()"
+            @mouseover="selectedOption = 'Toggle'"
+          >
+            <ToggleIcon />
+            Toggle
           </Button>
         </div>
       </div>
     </div>
-  </Card>
-  <div v-else class="empty-prompt">
+    <div v-if="showingOptions && selected.length > 0" class="more-box">
+      <section v-if="selectedOption === 'Share'" class="options">
+        <Button class="transparent" @click="shareNames()">
+          <TextInputIcon />
+          Share names
+        </Button>
+        <Button class="transparent" @click="shareUrls()">
+          <GlobeIcon />
+          Share URLs
+        </Button>
+        <Button class="transparent" @click="shareFileNames()">
+          <FileIcon />
+          Share file names
+        </Button>
+        <Button class="transparent" @click="shareMarkdown()">
+          <CodeIcon />
+          Share as markdown
+        </Button>
+      </section>
+      <section v-if="selectedOption === 'Delete'" class="options">
+        <Button class="transparent" @click="deleteWarning.show()">
+          <TrashIcon />
+          Delete selected
+        </Button>
+        <Button class="transparent" @click="deleteDisabledWarning.show()">
+          <ToggleIcon />
+          Delete disabled
+        </Button>
+      </section>
+      <section v-if="selectedOption === 'Update'" class="options">
+        <Button class="transparent" :disabled="offline" @click="updateAll()">
+          <UpdatedIcon />
+          Update all
+        </Button>
+        <Button class="transparent" @click="selectUpdatable()">
+          <CheckIcon />
+          Select updatable
+        </Button>
+      </section>
+      <section v-if="selectedOption === 'Toggle'" class="options">
+        <Button class="transparent" @click="enableAll()">
+          <CheckIcon />
+          Toggle on
+        </Button>
+        <Button class="transparent" @click="disableAll()">
+          <XIcon />
+          Toggle off
+        </Button>
+        <Button class="transparent" @click="hideShowAll()">
+          <EyeIcon v-if="hideNonSelected" />
+          <EyeOffIcon v-else />
+          {{ hideNonSelected ? 'Show' : 'Hide' }} untoggled
+        </Button>
+      </section>
+    </div>
+    <div
+      v-for="mod in search"
+      :key="mod.file_name"
+      class="table-row"
+      @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
+    >
+      <div class="table-cell table-text checkbox">
+        <Checkbox
+          :model-value="selectionMap.get(mod.path)"
+          class="select-checkbox"
+          @update:model-value="(newValue) => selectionMap.set(mod.path, newValue)"
+        />
+      </div>
+      <div class="table-cell table-text name-cell">
+        <router-link
+          v-if="mod.slug"
+          :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
+          :disabled="offline"
+          class="mod-content"
+        >
+          <Avatar :src="mod.icon" />
+          <div class="mod-text">
+            <div class="title">{{ mod.name }}</div>
+            <span v-if="mod.author" class="no-wrap">by {{ mod.author }}</span>
+          </div>
+        </router-link>
+        <div v-else class="mod-content">
+          <Avatar :src="mod.icon" />
+          <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
+        </div>
+      </div>
+      <div class="table-cell table-text version">
+        <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
+      </div>
+      <div class="table-cell table-text manage">
+        <div v-tooltip="isPackLocked ? 'Unlock this instance to remove mods.' : 'Remove project'">
+          <Button :disabled="isPackLocked" icon-only @click="removeMod(mod)">
+            <TrashIcon />
+          </Button>
+        </div>
+        <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator" />
+        <div
+          v-else
+          v-tooltip="isPackLocked ? 'Unlock this instance to update mods.' : 'Update project'"
+        >
+          <Button
+            :disabled="!mod.outdated || offline || isPackLocked"
+            icon-only
+            @click="updateProject(mod)"
+          >
+            <UpdatedIcon v-if="mod.outdated" />
+            <CheckIcon v-else />
+          </Button>
+        </div>
+        <div v-tooltip="isPackLocked ? 'Unlock this instance to toggle mods.' : ''">
+          <input
+            id="switch-1"
+            :disabled="isPackLocked"
+            autocomplete="off"
+            type="checkbox"
+            class="switch stylized-toggle"
+            :checked="!mod.disabled"
+            @change="toggleDisableMod(mod)"
+          />
+        </div>
+        <Button
+          v-tooltip="`Show ${mod.file_name}`"
+          icon-only
+          @click="highlightModInProfile(instance.path, mod.path)"
+        >
+          <FolderOpenIcon />
+        </Button>
+      </div>
+    </div>
+  </div>
+  <div v-else-if="false" class="empty-prompt">
     <div class="empty-icon">
       <AddProjectImage />
     </div>
@@ -276,14 +360,6 @@
     <p class="empty-subtitle">Add a project to get started</p>
     <AddContentButton :instance="instance" />
   </div>
-  <Pagination
-    v-if="projects.length > 0"
-    :page="currentPage"
-    :count="Math.ceil(search.length / 20)"
-    class="pagination-after"
-    :link-function="(page) => `?page=${page}`"
-    @switch-page="switchPage"
-  />
   <ModalWrapper ref="deleteWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
@@ -342,6 +418,9 @@
 </template>
 <script setup>
 import {
+  LockIcon,
+  ClipboardCopyIcon,
+  CompassIcon,
   TrashIcon,
   CheckIcon,
   SearchIcon,
@@ -356,15 +435,18 @@ import {
   EyeOffIcon,
   CodeIcon,
   DownloadIcon,
+  FilterIcon,
+  MoreVerticalIcon,
+  CheckCircleIcon,
+  SlashIcon,
 } from '@modrinth/assets'
 import {
-  Pagination,
   DropdownSelect,
   Checkbox,
   AnimatedLogo,
   Avatar,
   Button,
-  Card,
+  Card, ButtonStyled, ContentListPanel, OverflowMenu
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -379,7 +461,7 @@ import {
 import { handleError } from '@/store/notifications.js'
 import { trackEvent } from '@/helpers/analytics'
 import { listen } from '@tauri-apps/api/event'
-import { highlightModInProfile } from '@/helpers/utils.js'
+import { highlightModInProfile, showProfileInFolder } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
@@ -555,9 +637,6 @@ const selectedOption = ref('Share')
 const shareModal = ref(null)
 const ascending = ref(true)
 const sortColumn = ref('Name')
-const currentPage = ref(1)
-
-watch([searchFilter, selectedProjectType], () => (currentPage.value = 1))
 
 const selected = computed(() =>
   Array.from(selectionMap.value)
@@ -867,10 +946,6 @@ watch(selectAll, () => {
     }
   }
 })
-
-const switchPage = (page) => {
-  currentPage.value = page
-}
 
 const refreshingProjects = ref(false)
 async function refreshProjects() {
@@ -1196,5 +1271,12 @@ onUnmounted(() => {
 
 .pagination-after {
   margin-bottom: 5rem;
+}
+
+.iconified-input {
+  input {
+    min-height: 2.25rem;
+    background-color: var(--color-raised-bg);
+  }
 }
 </style>

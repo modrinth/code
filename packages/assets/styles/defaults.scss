@@ -169,7 +169,7 @@ input[type='number'] {
   }
 }
 
-svg {
+svg:not(.unlocked-size) {
   height: 1em;
   width: 1em;
 }

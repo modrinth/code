@@ -2,19 +2,20 @@
   <div
     v-if="mode !== 'isolated'"
     ref="button"
-    v-tooltip.right="'Minecraft accounts'"
-    class="button-base avatar-button"
+    class="experimental-styles-within button-base mt-2 px-3 py-2 bg-button-bg rounded-xl flex items-center gap-2"
     :class="{ expanded: mode === 'expanded' }"
     @click="toggleMenu"
   >
     <Avatar
-      :size="mode === 'expanded' ? 'xs' : 'sm'"
+      size="36px"
       :src="
         selectedAccount
           ? `https://mc-heads.net/avatar/${selectedAccount.id}/128`
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
+    <span class="w-full">{{ selectedAccount ? selectedAccount.username : 'Select account' }}</span>
+    <DropdownIcon class="unlocked-size w-5 h-5" />
   </div>
   <transition name="fade">
     <Card
@@ -59,7 +60,7 @@
 </template>
 
 <script setup>
-import { PlusIcon, TrashIcon, LogInIcon } from '@modrinth/assets'
+import { DropdownIcon, PlusIcon, TrashIcon, LogInIcon } from '@modrinth/assets'
 import { Avatar, Button, Card } from '@modrinth/ui'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import {
@@ -96,6 +97,8 @@ defineExpose({
   refreshValues,
 })
 await refreshValues()
+
+const menuOpened = ref(false);
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => defaultUser.value !== account.id),
@@ -209,11 +212,11 @@ onUnmounted(() => {
 }
 
 .account-card {
-  position: absolute;
+  position: fixed;
   display: flex;
   flex-direction: column;
-  top: 0.5rem;
-  left: 5.5rem;
+  margin-top: 0.5rem;
+  right: 2rem;
   z-index: 11;
   gap: 0.5rem;
   padding: 1rem;
@@ -288,12 +291,14 @@ onUnmounted(() => {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.25s ease, translate 0.25s ease, scale 0.25s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  translate: 0 -2rem;
+  scale: 0.9;
 }
 
 .avatar-button {
@@ -301,9 +306,10 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   color: var(--color-base);
-  background-color: var(--color-raised-bg);
+  background-color: var(--color-button-bg);
   border-radius: var(--radius-md);
   width: 100%;
+  padding: 0.5rem 0.75rem;
   text-align: left;
 
   &.expanded {

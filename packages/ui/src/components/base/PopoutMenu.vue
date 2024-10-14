@@ -10,6 +10,7 @@
       <slot></slot>
     </button>
     <div
+      ref="dropdownMenu"
       class="popup-menu"
       :class="`position-${computedPosition}-${computedDirection} ${dropdownVisible ? 'visible' : ''}`"
       :inert="!tabInto && !dropdownVisible"
@@ -49,6 +50,7 @@ const emit = defineEmits(['open', 'close'])
 const dropdownVisible = ref(false)
 const dropdown = ref(null)
 const dropdownButton = ref(null)
+const dropdownMenu = ref(null)
 const computedPosition = ref('bottom')
 const computedDirection = ref('left')
 
@@ -64,9 +66,14 @@ function updateDirection() {
     computedDirection.value = props.direction
   }
   if (props.position === 'auto') {
-    if (dropdownButton.value) {
-      const y = dropdownButton.value.getBoundingClientRect().top
-      computedPosition.value = y < window.innerHeight / 2 ? 'bottom' : 'top'
+    if (dropdownMenu.value) {
+      computedPosition.value = 'bottom' // set to bottom before calulating to see if it fits below
+      const bottom = dropdownMenu.value.getBoundingClientRect().bottom
+
+      if (bottom > window.innerHeight) {
+        // if it doesn't fit below, set to top
+        computedPosition.value = 'top'
+      }
     } else {
       computedPosition.value = 'bottom'
     }

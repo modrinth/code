@@ -2,6 +2,8 @@
 import { computed, ref, onMounted } from 'vue'
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
 import {
+  ArrowBigUpDashIcon,
+  LogInIcon,
   HomeIcon,
   SearchIcon,
   LibraryIcon,
@@ -9,9 +11,14 @@ import {
   SettingsIcon,
   XIcon,
   DownloadIcon,
+  CompassIcon,
+  MinimizeIcon,
+  MaximizeIcon,
+  RestoreIcon
 } from '@modrinth/assets'
-import { Button, Notifications } from '@modrinth/ui'
+import { Avatar, Button, Notifications } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
+import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -22,7 +29,6 @@ import ErrorModal from '@/components/ui/ErrorModal.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
-import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/plugin-os'
 import { isDev, getOS, restartApp } from '@/helpers/utils.js'
 import { initAnalytics, debugAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
@@ -43,8 +49,37 @@ import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { renderString } from '@modrinth/utils'
 import { useFetch } from '@/helpers/fetch.js'
 import { check } from '@tauri-apps/plugin-updater'
+import NavButton from '@/components/ui/NavButton.vue'
+import { get as getCreds } from '@/helpers/mr_auth.js'
+import { get_user } from '@/helpers/cache.js'
+import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
+import dayjs from 'dayjs'
 
 const themeStore = useTheming()
+
+const news = ref([
+  {
+    title: "Modrinth App 0.9.0",
+    summary: "An all-new UI, Modrinth Servers, and support for collections.",
+    thumbnail: "https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/publication/thumbnail/a49f8e1b-3835-4ea1-a85b-118c6425ebc3/landscape_1667087426098458.png",
+    date: "2024-10-11T00:00:00Z",
+    link: "https://blog.modrinth.com/p/creator-revenue-update",
+  },
+  {
+    title: "Becoming Sustainable",
+    summary: "Announcing 5x creator revenue and updates to the monetization program.",
+    thumbnail: "https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/asset/file/c99b9885-8248-4d7a-b19a-3ae2c902fdd5/revenue.png",
+    date: "2024-09-13T00:00:00Z",
+    link: "https://blog.modrinth.com/p/creator-revenue-update",
+  },
+  {
+    title: "Modrinth+ and New Ads",
+    summary: "Introducing a new advertising system, a subscription to remove ads, and a redesign of the website!\n",
+    thumbnail: "https://media.beehiiv.com/cdn-cgi/image/fit=scale-down,format=auto,onerror=redirect,quality=80/uploads/asset/file/38ce85e4-5d93-43eb-b61b-b6296f6b9e66/things.png?t=1724260059",
+    date: "2024-08-21T00:00:00Z",
+    link: "https://blog.modrinth.com/p/introducing-modrinth-refreshed-site-look-new-advertising-system",
+  }
+]);
 
 const urlModal = ref(null)
 
@@ -64,6 +99,8 @@ const os = ref('')
 const stateInitialized = ref(false)
 
 const criticalErrorMessage = ref()
+
+const isMaximized = ref(false)
 
 onMounted(async () => {
   await useCheckDisableMouseover()
@@ -96,6 +133,12 @@ async function setupApp() {
   themeStore.setThemeState(theme)
   themeStore.collapsedNavigation = collapsed_navigation
   themeStore.advancedRendering = advanced_rendering
+
+  isMaximized.value = await getCurrentWindow().isMaximized()
+
+  await getCurrentWindow().onResized(async () => {
+    isMaximized.value = await getCurrentWindow().isMaximized()
+  })
 
   initAnalytics()
   if (!telemetry) {
@@ -176,6 +219,21 @@ const modInstallModal = ref()
 const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
 
+const settingsTest = ref()
+
+const credentials = ref()
+
+async function fetchCredentials() {
+  const creds = await getCreds().catch(handleError)
+  if (creds && creds.user_id) {
+    creds.user = await get_user(creds.user_id).catch(handleError)
+  }
+  credentials.value = creds
+}
+
+const MIDAS_BITFLAG = 1 << 0
+const hasPlus = computed(() => credentials.value && credentials.value.user && (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG)
+
 onMounted(() => {
   invoke('show_window')
 
@@ -186,6 +244,8 @@ onMounted(() => {
   install.setIncompatibilityWarningModal(incompatibilityWarningModal)
   install.setInstallConfirmModal(installConfirmModal)
   install.setModInstallModal(modInstallModal)
+
+  fetchCredentials();
 })
 
 document.querySelector('body').addEventListener('click', function (e) {
@@ -260,8 +320,123 @@ async function checkUpdates() {
 
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
-  <div v-if="stateInitialized" class="app-container">
-    <div class="nav-container">
+  <AppSettingsModal ref="settingsTest" />
+  <div v-if="stateInitialized" class="app-grid-layout relative">
+    <div class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10">
+      <NavButton to="/">
+        <HomeIcon />
+        <template #label>Home</template>
+      </NavButton>
+      <NavButton
+        to="/browse/modpack"
+      >
+        <CompassIcon />
+        <template #label>Discover content</template>
+      </NavButton>
+      <NavButton to="/library">
+        <LibraryIcon />
+        <template #label>Library</template>
+      </NavButton>
+      <div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
+      <NavButton to="/settings">
+        <PlusIcon />
+        <template #label>Create new instance</template>
+      </NavButton>
+      <div class="flex flex-grow"></div>
+      <NavButton to="/settings" @click="settingsTest.show()">
+        <SettingsIcon />
+        <template #label>Settings</template>
+      </NavButton>
+      <NavButton v-if="credentials" to="/settings">
+        <Avatar :src="credentials.user.avatar_url" :alt="credentials.user.username" size="32px" circle />
+        <template #label>User options</template>
+      </NavButton>
+      <NavButton v-else to="/settings">
+        <LogInIcon />
+        <template #label>Sign in</template>
+      </NavButton>
+    </div>
+    <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[3.75rem] flex">
+      <div data-tauri-drag-region class="flex p-4">
+        <ModrinthAppLogo class="unlocked-size h-full w-auto text-contrast pointer-events-none" />
+        <Breadcrumbs />
+      </div>
+      <section class="flex ml-auto">
+        <div class="flex mr-3">
+          <Suspense>
+            <RunningAppBar />
+          </Suspense>
+        </div>
+        <section v-if="!nativeDecorations" class="window-controls">
+          <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
+            <MinimizeIcon />
+          </Button>
+          <Button
+            class="titlebar-button"
+            icon-only
+            @click="() => getCurrentWindow().toggleMaximize()"
+          >
+            <RestoreIcon v-if="isMaximized" />
+            <MaximizeIcon v-else />
+          </Button>
+          <Button class="titlebar-button close" icon-only @click="handleClose">
+            <XIcon />
+          </Button>
+        </section>
+      </section>
+    </div>
+  </div>
+  <div v-if="stateInitialized" class="app-contents experimental-styles-within">
+    <div class="app-viewport flex-grow">
+      <ModrinthLoadingIndicator
+        offset-height="var(--appbar-height)"
+        offset-width="var(--sidebar-width)"
+      />
+      <RouterView v-slot="{ Component }">
+        <template v-if="Component">
+          <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
+            <component :is="Component"></component>
+          </Suspense>
+        </template>
+      </RouterView>
+    </div>
+    <div class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto" :class="{ 'has-plus': hasPlus }">
+      <div class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative" :class="{ 'pb-4': !hasPlus }">
+        <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+          <h3 class="text-base m-0">Playing as</h3>
+          <suspense>
+            <AccountsCard ref="accounts" mode="small" />
+          </suspense>
+        </div>
+        <div v-if="false" class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+          <h3 class="text-base m-0">Friends</h3>
+          <p class="m-0">you have no friends :c</p>
+          <p class="m-0">what's up with that?</p>
+        </div>
+        <div class="pt-4 flex flex-col">
+          <h3 class="px-4 text-base m-0">News</h3>
+          <template v-for="(item, index) in news" :key="`news-${index}`">
+            <a :class="`flex flex-col outline-offset-[-4px] hover:bg-[--brand-gradient-border] focus:bg-[--brand-gradient-border] px-4 transition-colors ${index === 0 ? 'pt-2 pb-4' : 'py-4'}`" :href="item.link" target="_blank" rel="external">
+              <img :src="item.thumbnail" alt="News thumbnail" aria-hidden="true" class="w-full aspect-[3/1] object-cover rounded-2xl"/>
+              <h4 class="mt-2 mb-0 text-sm leading-none text-contrast font-semibold">{{item.title}}</h4>
+              <p class="my-1 text-sm text-secondary leading-tight">{{item.summary}}</p>
+              <p class="text-right text-sm text-secondary opacity-60 leading-tight m-0"> {{ dayjs(item.date).fromNow() }}</p>
+            </a>
+            <hr v-if="index !== news.length - 1" class="h-px my-[-2px] mx-4 border-0 m-0 bg-[--brand-gradient-border]"/>
+          </template>
+        </div>
+      </div>
+      <template v-if="!hasPlus">
+        <a href="https://modrinth.plus?app" class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"><ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+</a>
+        <div class="w-[300px] h-[250px] bg-white text-black p-4 shrink-0">
+          Ad!
+        </div>
+      </template>
+    </div>
+  </div>
+  <!-- TODO: remove old UI -->
+  <div class="app-container">
+    <div v-if="false" class="nav-container">
       <div class="nav-section">
         <suspense>
           <AccountsCard ref="accounts" mode="small" />
@@ -316,46 +491,6 @@ async function checkUpdates() {
         <h1>{{ criticalErrorMessage.header }}</h1>
         <div class="markdown-body" v-html="renderString(criticalErrorMessage.body ?? '')"></div>
       </div>
-      <div class="appbar-row">
-        <div data-tauri-drag-region class="appbar">
-          <section class="navigation-controls">
-            <Breadcrumbs data-tauri-drag-region />
-          </section>
-          <section class="mod-stats">
-            <Suspense>
-              <RunningAppBar />
-            </Suspense>
-          </section>
-        </div>
-        <section v-if="!nativeDecorations" class="window-controls">
-          <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
-            <MinimizeIcon />
-          </Button>
-          <Button
-            class="titlebar-button"
-            icon-only
-            @click="() => getCurrentWindow().toggleMaximize()"
-          >
-            <MaximizeIcon />
-          </Button>
-          <Button class="titlebar-button close" icon-only @click="handleClose">
-            <XIcon />
-          </Button>
-        </section>
-      </div>
-      <div class="router-view">
-        <ModrinthLoadingIndicator
-          offset-height="var(--appbar-height)"
-          offset-width="var(--sidebar-width)"
-        />
-        <RouterView v-slot="{ Component }">
-          <template v-if="Component">
-            <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
-              <component :is="Component"></component>
-            </Suspense>
-          </template>
-        </RouterView>
-      </div>
     </div>
   </div>
   <URLConfirmModal ref="urlModal" />
@@ -394,23 +529,56 @@ async function checkUpdates() {
     justify-content: center;
     cursor: pointer;
     transition: all ease-in-out 0.1s;
-    background-color: var(--color-raised-bg);
+    background-color: transparent;
     color: var(--color-base);
-    border-radius: 0;
-    height: 3.25rem;
+    height: 100%;
+    width: 3rem;
+    position: relative;
+    box-shadow: none;
+
+    &:last-child {
+      padding-right: 0.75rem;
+      width: 3.75rem;
+    }
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    &::before {
+      content: '';
+      border-radius: 999999px;
+      width: 3rem;
+      height: 3rem;
+      aspect-ratio: 1 / 1;
+      margin-block: auto;
+      position: absolute;
+      background-color: transparent;
+      scale: 0.9;
+      transition: all ease-in-out 0.2s;
+      z-index: -1;
+    }
 
     &.close {
       &:hover,
       &:active {
-        background-color: var(--color-red);
         color: var(--color-accent-contrast);
+
+        &::before {
+          background-color: var(--color-red);
+        }
       }
     }
 
     &:hover,
     &:active {
-      background-color: var(--color-button-bg);
       color: var(--color-contrast);
+
+      &::before {
+        background-color: var(--color-button-bg);
+        scale: 1;
+      }
     }
   }
 }
@@ -546,16 +714,111 @@ async function checkUpdates() {
     padding: var(--gap-sm) 0;
   }
 }
+
+.app-grid-layout {
+  display: grid;
+  grid-template: 'status status' 'nav dummy';
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  position: relative;
+  //z-index: 0;
+  background-color: var(--color-raised-bg);
+  height: 100vh;
+}
+
+.app-grid-navbar {
+  grid-area: nav;
+}
+
+.app-grid-statusbar {
+  grid-area: status;
+}
+
+.app-contents {
+  position: absolute;
+  z-index: 1;
+  left: 5rem;
+  top: 3.75rem;
+  right: 0;
+  bottom: 0;
+  height: calc(100vh - 3.75rem);
+  background-color: var(--color-bg);
+  border-top-left-radius: var(--radius-xl);
+
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  //grid-template-columns: 1fr 0px;
+  transition: grid-template-columns 0.4s ease-in-out;
+}
+
+.app-sidebar {
+  overflow: visible;
+  width: 300px;
+  position: relative;
+  height: calc(100vh - 3.75rem);
+}
+
+.app-sidebar::after {
+  content: '';
+  position: absolute;
+  bottom: 250px;
+  left: 0;
+  right: 0;
+  height: 5rem;
+  background: var(--brand-gradient-fade-out-color);
+  pointer-events: none;
+}
+
+.app-sidebar.has-plus::after {
+  display: none;
+}
+
+.app-sidebar::before {
+  content: '';
+  box-shadow: -15px 0 15px -15px rgba(0, 0, 0, 0.2) inset;
+  top: 0;
+  bottom: 0;
+  left: -2rem;
+  width: 2rem;
+  position: absolute;
+  pointer-events: none;
+}
+
+.app-viewport {
+  flex-grow: 1;
+  height: 100%;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+//::-webkit-scrollbar-track {
+//  background-color: transparent; /* Make it transparent if needed */
+//  margin-block: 5px;
+//  margin-right: 5px;
+//}
+
+.app-contents::before {
+  z-index: 1;
+  content: '';
+  position: fixed;
+  left: 5rem;
+  top: 3.75rem;
+  right: -5rem;
+  bottom: -5rem;
+  border-radius: var(--radius-xl);
+  //box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.2) inset;
+  box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.2) inset, inset 1px 1px 1px rgba(255, 255, 255, 0.23);
+  pointer-events: none;
+}
+
+.app-sidebar {
+  background: var(--brand-gradient-bg);
+}
 </style>
 <style>
 .mac {
-  .nav-container {
-    padding-top: calc(var(--gap-md) + 1.75rem);
-  }
-
-  .account-card,
-  .card-section {
-    top: calc(var(--gap-md) + 1.75rem);
+  .app-grid-statusbar {
+    padding-left: 5rem;
   }
 }
 
