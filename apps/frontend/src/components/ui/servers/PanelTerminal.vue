@@ -28,7 +28,12 @@
         }"
       />
     </div>
-    <div class="pointer-events-none absolute left-0 top-0 z-[9999999] h-full w-full">
+    <div
+      class="pointer-events-none absolute left-0 top-0 z-[9999999] h-full w-full"
+      :style="{
+        visibility: isFullScreen ? 'hidden' : 'visible',
+      }"
+    >
       <div
         class="absolute -bottom-2 -right-2 h-7 w-7"
         :style="{
