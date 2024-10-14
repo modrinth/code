@@ -47,7 +47,9 @@
               v-if="bestSuggestion"
               class="pointer-events-none absolute left-[26px] z-50 transform select-none text-gray-400"
             >
-              <span class="whitespace-pre">{{ " ".repeat(commandInput.length - 1) }}</span>
+              <span class="ml-[23.5px] whitespace-pre">{{
+                " ".repeat(commandInput.length - 1)
+              }}</span>
               <span> {{ bestSuggestion }} </span>
               <button
                 class="text pointer-events-auto z-50 ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-none dark:bg-highlight"
@@ -58,13 +60,17 @@
                 TAB
               </button>
             </span>
-
+            <div
+              class="pointer-events-none absolute left-0 top-0 z-30 flex h-full w-full items-center"
+            >
+              <TerminalSquareIcon class="ml-3 h-5 w-5" />
+            </div>
             <input
               v-if="isServerRunning"
               v-model="commandInput"
               type="text"
               placeholder="Send a command"
-              class="z-20 w-full rounded-md px-4 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+              class="z-20 w-full rounded-md !pl-10 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
               aria-autocomplete="list"
               aria-controls="command-suggestions"
               spellcheck="false"
@@ -79,7 +85,7 @@
               disabled
               type="text"
               placeholder="Send a command"
-              class="z-50 w-full rounded-md px-4 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+              class="z-50 w-full rounded-md !pl-10 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
             />
           </div>
         </div>
@@ -100,6 +106,7 @@
 </template>
 
 <script setup lang="ts">
+import { TerminalSquareIcon } from "@modrinth/assets";
 import type { ServerState, Stats } from "~/types/servers";
 import type { Server } from "~/composables/pyroServers";
 
