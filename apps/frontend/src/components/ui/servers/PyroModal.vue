@@ -36,11 +36,25 @@
 <script setup lang="ts">
 import { XIcon } from "@modrinth/assets";
 
-defineEmits(["modal"]);
+const emit = defineEmits(["modal"]);
 
 const props = defineProps<{
   header?: string;
   data?: any;
   danger?: boolean;
 }>();
+
+const onEscKeyRelease = (event: KeyboardEvent) => {
+  if (event.key === "Escape") {
+    emit("modal");
+  }
+};
+
+onMounted(() => {
+  document.body.addEventListener("keyup", onEscKeyRelease);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("keyup", onEscKeyRelease);
+});
 </script>
