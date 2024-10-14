@@ -487,7 +487,7 @@ const loadingPaymentMethodModal = ref(0)
 const paymentLoading = ref(false)
 
 const selectedPlan = ref('yearly')
-const currency = ref('USD') // temp fix until servers support other currencies computed(() => getCurrency(props.country))
+const currency = computed(() => getCurrency(props.country))
 const price = ref(props.product?.prices?.find((x) => x.currency_code === currency.value) ?? null)
 
 const clientSecret = ref()

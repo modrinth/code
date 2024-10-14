@@ -473,7 +473,12 @@ const getProductSize = (product) => {
 };
 
 const getProductPrice = (product) => {
-  return product.prices.find((p) => p.currency_code === getCurrency(country.value));
+  // fallback to us
+  return (
+    product.prices.find((p) => p.currency_code === getCurrency(country.value)) ??
+    product.prices.find((p) => p.currency_code === "USD") ??
+    product.prices[0]
+  );
 };
 
 const getProductDescription = (product) => {
