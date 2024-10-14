@@ -210,6 +210,7 @@
           :print-margin="false"
           style="height: 750px"
           class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
+          @init="onInit"
         />
       </div>
       <div
@@ -339,6 +340,14 @@ const { reset } = useInfiniteScroll(
   { distance: 200 },
 );
 
+const onInit = (editor: any) => {
+  editor.commands.addCommand({
+    name: "saveFile",
+    bindKey: { win: "Ctrl-S", mac: "Command-S" },
+    exec: () => saveFileContent(false),
+  });
+};
+
 const fetchData = async () => {
   isLoading.value = true;
   loadError.value = false;
@@ -377,7 +386,6 @@ onMounted(async () => {
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/theme-one_dark");
   VAceEditor.value = markRaw((await import("vue3-ace-editor")).VAceEditor);
-
   if (serverId) {
     await fetchData();
   }
@@ -643,15 +651,16 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
   }
 };
 
-const saveFileContent = async () => {
-  console.log("hii");
+const saveFileContent = async (exit: boolean = true) => {
   if (!editingFile.value) return;
 
   try {
     await props.server.fs?.updateFile(editingFile.value.path, fileContent.value);
-    await refreshNuxtData("files-data");
-    isEditing.value = false;
-    editingFile.value = null;
+    if (exit) {
+      await refreshNuxtData("files-data");
+      isEditing.value = false;
+      editingFile.value = null;
+    }
 
     addNotification({
       group: "files",
