@@ -209,6 +209,7 @@
           theme="one_dark"
           :print-margin="false"
           style="height: 750px"
+          class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
         />
       </div>
       <div
