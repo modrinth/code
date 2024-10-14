@@ -179,8 +179,8 @@
               direction="left"
               aria-label="Save file"
               :options="[
-                { id: 'save', action: () => saveFileContent },
-                { id: 'save&restart', action: () => saveFileContentRestart },
+                { id: 'save', action: saveFileContent },
+                { id: 'save&restart', action: saveFileContentRestart },
               ]"
             >
               <SaveIcon aria-hidden="true" />
@@ -644,6 +644,7 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
 };
 
 const saveFileContent = async () => {
+  console.log("hii");
   if (!editingFile.value) return;
 
   try {
