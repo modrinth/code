@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loader" class="flex flex-row items-center gap-4">
+  <div v-if="loader" v-tooltip="'Change server loader'" class="flex flex-row items-center gap-4">
     <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
     <div class="flex flex-row items-center gap-2">
       <UiServersLoaderIcon :loader="loader" class="[&&]:size-5" />

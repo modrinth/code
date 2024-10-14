@@ -1,5 +1,5 @@
 <template>
-  <div v-if="game" class="flex flex-row items-center gap-2">
+  <div v-if="game" v-tooltip="'Change server version'" class="flex flex-row items-center gap-2">
     <GameIcon aria-hidden="true" class="size-5 text-secondary" />
     <NuxtLink
       :to="serverId ? `/servers/manage/${serverId}/options/loader` : ''"

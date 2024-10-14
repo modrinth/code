@@ -1,5 +1,5 @@
 <template>
-  <div v-if="subdomain" class="flex flex-row items-center gap-4">
+  <div v-if="subdomain" v-tooltip="'Change custom URL'" class="flex flex-row items-center gap-4">
     <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
     <div class="flex flex-row items-center gap-2">
       <LinkIcon />
