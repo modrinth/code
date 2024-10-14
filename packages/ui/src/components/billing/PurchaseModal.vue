@@ -67,6 +67,7 @@
             <option value="Fabric">Fabric</option>
             <option value="Forge">Forge</option>
           </select>
+          <div class="text-xs text-secondary">These settings can always be changed later.</div>
         </div>
       </div>
     </div>
