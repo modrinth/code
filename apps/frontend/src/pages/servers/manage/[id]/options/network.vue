@@ -45,7 +45,12 @@
             <span> Your friends can connect to your server using this URL. </span>
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
-            <input v-model="serverSubdomain" class="h-[50%] w-[63%]" @keyup.enter="saveNetwork" />
+            <input
+              v-model="serverSubdomain"
+              class="h-[50%] w-[63%]"
+              maxlength="52"
+              @keyup.enter="saveNetwork"
+            />
             .modrinth.gg
           </div>
         </div>
