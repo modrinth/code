@@ -1,4 +1,5 @@
 // am i winning? :smilew:
+// youre winning! love you - evan
 
 // very wip, but it works i know stuff is missing and broken, dont worry, i'll fix it
 const internalServerRefrence = ref<any>(null);
