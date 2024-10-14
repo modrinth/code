@@ -1,6 +1,6 @@
 <template>
   <div
-    class="parsed-log w-full overflow-hidden whitespace-nowrap text-wrap px-6 py-1"
+    class="parsed-log w-full overflow-hidden whitespace-nowrap text-wrap px-6 py-1 selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black"
     v-html="parsedLog"
   ></div>
 </template>
