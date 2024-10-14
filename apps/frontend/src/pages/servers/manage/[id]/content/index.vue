@@ -31,14 +31,17 @@
       </ButtonStyled>
     </div>
     <div class="card flex h-full w-full flex-col overflow-y-scroll">
-      <UiServersContentItem
-        v-for="mod in mods"
-        :key="mod.name"
-        :data="mod"
-        @toggle="toggleMod"
-        @delete="removeMod"
-        @edit="showEditModModal"
-      />
+      <div v-if="hasMods(mods)">
+        <UiServersContentItem
+          v-for="mod in mods"
+          :key="mod.name"
+          :data="mod"
+          @toggle="toggleMod"
+          @delete="removeMod"
+          @edit="showEditModModal"
+        />
+      </div>
+      <div v-else>You haven't added any mods yet, time to add some!</div>
     </div>
   </div>
   <UiServersPyroLoading v-else />
@@ -74,6 +77,14 @@ const versions = ref<Record<string, any[]>>({});
 
 const data = computed(() => props.server.general);
 const mods = computed(() => props.server.mods?.data);
+
+const hasMods = (mods: Mod[]) => {
+  if (mods.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 const fetchVersions = async (projectId: string) => {
   if (!versions.value[projectId]) {
