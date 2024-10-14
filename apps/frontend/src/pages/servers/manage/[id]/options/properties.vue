@@ -1,9 +1,6 @@
 <template>
   <div class="relative h-full w-full overflow-y-auto">
-    <div
-      v-if="propsData"
-      class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto px-4"
-    >
+    <div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto">
       <div class="card flex flex-col gap-4">
         <label for="username-field" class="flex flex-col gap-2">
           <span class="text-lg font-bold text-contrast">Server Properties</span>

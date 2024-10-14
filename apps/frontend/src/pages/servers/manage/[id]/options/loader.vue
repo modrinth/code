@@ -59,7 +59,7 @@
   </Modal>
 
   <div class="flex h-full w-full flex-col">
-    <div v-if="data && versions" class="flex w-full flex-col px-4">
+    <div v-if="data && versions" class="flex w-full flex-col">
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
           <h2 class="m-0 text-2xl font-bold">Modpack</h2>

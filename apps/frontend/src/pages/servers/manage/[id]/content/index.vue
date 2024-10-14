@@ -20,7 +20,7 @@
     </div>
   </Modal>
 
-  <div v-if="data && mods" class="flex h-full w-full flex-col px-4">
+  <div v-if="data && mods" class="flex h-full w-full flex-col">
     <div class="card flex items-center justify-between gap-2 px-3">
       <h2 class="m-0 text-2xl font-bold text-contrast">Mods</h2>
       <ButtonStyled color="brand">
@@ -31,14 +31,17 @@
       </ButtonStyled>
     </div>
     <div class="card flex h-full w-full flex-col overflow-y-scroll">
-      <UiServersContentItem
-        v-for="mod in mods"
-        :key="mod.name"
-        :data="mod"
-        @toggle="toggleMod"
-        @delete="removeMod"
-        @edit="showEditModModal"
-      />
+      <div v-if="hasMods(mods)">
+        <UiServersContentItem
+          v-for="mod in mods"
+          :key="mod.name"
+          :data="mod"
+          @toggle="toggleMod"
+          @delete="removeMod"
+          @edit="showEditModModal"
+        />
+      </div>
+      <div v-else>You haven't added any mods yet, time to add some!</div>
     </div>
   </div>
   <UiServersPyroLoading v-else />
@@ -74,6 +77,14 @@ const versions = ref<Record<string, any[]>>({});
 
 const data = computed(() => props.server.general);
 const mods = computed(() => props.server.mods?.data);
+
+const hasMods = (mods: Mod[]) => {
+  if (mods.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 const fetchVersions = async (projectId: string) => {
   if (!versions.value[projectId]) {

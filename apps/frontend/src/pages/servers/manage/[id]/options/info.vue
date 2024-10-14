@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full gap-2 overflow-y-auto px-4">
+  <div class="h-full w-full gap-2 overflow-y-auto">
     <div class="card">
       <div class="flex flex-col gap-2">
         <div class="flex justify-between">

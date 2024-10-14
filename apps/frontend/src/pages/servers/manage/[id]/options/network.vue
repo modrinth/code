@@ -36,7 +36,7 @@
   </Modal>
 
   <div class="relative h-full w-full overflow-y-auto">
-    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4 px-4">
+    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4">
       <div class="flex h-full flex-col">
         <!-- Subdomain section -->
         <div class="card flex flex-col gap-4">

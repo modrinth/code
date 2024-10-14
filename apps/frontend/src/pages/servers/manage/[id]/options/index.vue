@@ -1,6 +1,6 @@
 <template>
   <div class="relative h-full w-full overflow-y-auto">
-    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6 px-4">
+    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6">
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
