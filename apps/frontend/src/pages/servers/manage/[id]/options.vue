@@ -21,7 +21,7 @@ const props = defineProps<{
 }>();
 
 useHead({
-  title: `Options - ${props.general?.name ?? "Server"} - Modrinth`,
+  title: `Options - ${props.server.general?.name ?? "Server"} - Modrinth`,
 });
 
 const navLinks = [
