@@ -488,7 +488,11 @@ const paymentLoading = ref(false)
 
 const selectedPlan = ref('yearly')
 const currency = computed(() => getCurrency(props.country))
-const price = ref(props.product?.prices?.find((x) => x.currency_code === currency.value) ?? null)
+const price = ref(
+  props.product?.prices?.find((x) => x.currency_code === currency.value) ??
+    props.product?.prices?.find((x) => x.currency_code === 'USD') ??
+    null,
+)
 
 const clientSecret = ref()
 const paymentIntentId = ref()
