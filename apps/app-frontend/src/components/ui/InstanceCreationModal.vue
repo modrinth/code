@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="modal" header="Create instance" :noblur="!themeStore.advancedRendering">
+  <ModalWrapper ref="modal" header="Create instance">
     <div class="modal-header">
       <Chips v-model="creationType" :items="['custom', 'from file', 'import from launcher']" />
     </div>
@@ -193,10 +193,11 @@
         />
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <script setup>
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import {
   PlusIcon,
   UploadIcon,
@@ -207,7 +208,7 @@ import {
   FolderSearchIcon,
   UpdatedIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Chips, Modal, Checkbox } from '@modrinth/ui'
+import { Avatar, Button, Chips, Checkbox } from '@modrinth/ui'
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
@@ -217,8 +218,6 @@ import { get_game_versions, get_loader_versions } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
 import { trackEvent } from '@/helpers/analytics'
-import { useTheming } from '@/store/state.js'
-import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
 import {
   get_default_launcher_path,
@@ -226,8 +225,7 @@ import {
   import_instance,
 } from '@/helpers/import.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
-
-const themeStore = useTheming()
+import { getCurrentWebview } from '@tauri-apps/api/webview'
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -257,13 +255,15 @@ defineExpose({
     isShowing.value = true
     modal.value.show()
 
-    unlistener.value = await listen('tauri://file-drop', async (event) => {
+    unlistener.value = await getCurrentWebview().onDragDropEvent(async (event) => {
       // Only if modal is showing
       if (!isShowing.value) return
+      if (event.payload.type !== 'drop') return
       if (creationType.value !== 'from file') return
       hide()
-      if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
-        await install_from_file(event.payload[0]).catch(handleError)
+      const { paths } = event.payload
+      if (paths && paths.length > 0 && paths[0].endsWith('.mrpack')) {
+        await install_from_file(paths[0]).catch(handleError)
         trackEvent('InstanceCreate', {
           source: 'CreationModalFileDrop',
         })
@@ -371,7 +371,7 @@ const create_instance = async () => {
 }
 
 const upload_icon = async () => {
-  icon.value = await open({
+  const res = await open({
     multiple: false,
     filters: [
       {
@@ -380,6 +380,8 @@ const upload_icon = async () => {
       },
     ],
   })
+
+  icon.value = res.path ?? res
 
   if (!icon.value) return
   display_icon.value = convertFileSrc(icon.value)
@@ -417,7 +419,7 @@ const openFile = async () => {
   const newProject = await open({ multiple: false })
   if (!newProject) return
   hide()
-  await install_from_file(newProject).catch(handleError)
+  await install_from_file(newProject.path ?? newProject).catch(handleError)
 
   trackEvent('InstanceCreate', {
     source: 'CreationModalFileOpen',
@@ -462,7 +464,7 @@ const promises = profileOptions.value.map(async (option) => {
       option.name,
       instances.map((name) => ({ name, selected: false })),
     )
-  } catch (error) {
+  } catch {
     // Allow failure silently
   }
 })

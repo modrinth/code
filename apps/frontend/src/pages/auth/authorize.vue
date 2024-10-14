@@ -195,7 +195,7 @@ const onAuthorize = async () => {
     }
 
     throw new Error(formatMessage(messages.noRedirectUrlError));
-  } catch (error) {
+  } catch {
     data.$notify({
       group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
@@ -222,7 +222,7 @@ const onReject = async () => {
     }
 
     throw new Error(formatMessage(messages.noRedirectUrlError));
-  } catch (error) {
+  } catch {
     data.$notify({
       group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),

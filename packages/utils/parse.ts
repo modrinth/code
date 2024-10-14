@@ -120,7 +120,11 @@ export const configuredXss = new FilterXSS({
     }
   },
   safeAttrValue(tag, name, value, cssFilter) {
-    if (tag === 'img' && name === 'src' && !value.startsWith('data:')) {
+    if (
+      (tag === 'img' || tag === 'video' || tag === 'audio' || tag === 'source') &&
+      (name === 'src' || name === 'srcset') &&
+      !value.startsWith('data:')
+    ) {
       try {
         const url = new URL(value)
 
@@ -155,7 +159,7 @@ export const configuredXss = new FilterXSS({
           )
         }
         return safeAttrValue(tag, name, url.toString(), cssFilter)
-      } catch (err) {
+      } catch {
         /* empty */
       }
     }
@@ -202,7 +206,7 @@ export const md = (options = {}) => {
         if (allowedHostnames.includes(url.hostname)) {
           return defaultLinkOpenRenderer(tokens, idx, options, env, self)
         }
-      } catch (err) {
+      } catch {
         /* empty */
       }
     }

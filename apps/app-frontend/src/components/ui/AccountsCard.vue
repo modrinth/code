@@ -5,7 +5,7 @@
     v-tooltip.right="'Minecraft accounts'"
     class="button-base avatar-button"
     :class="{ expanded: mode === 'expanded' }"
-    @click="showCard = !showCard"
+    @click="toggleMenu"
   >
     <Avatar
       :size="mode === 'expanded' ? 'xs' : 'sm'"
@@ -73,6 +73,7 @@ import { handleError } from '@/store/state.js'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
+import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
 
 defineProps({
   mode: {
@@ -133,9 +134,9 @@ const logout = async (id) => {
   trackEvent('AccountLogOut')
 }
 
-let showCard = ref(false)
-let card = ref(null)
-let button = ref(null)
+const showCard = ref(false)
+const card = ref(null)
+const button = ref(null)
 const handleClickOutside = (event) => {
   const elements = document.elementsFromPoint(event.clientX, event.clientY)
   if (
@@ -144,7 +145,20 @@ const handleClickOutside = (event) => {
     !elements.includes(card.value.$el) &&
     !button.value.contains(event.target)
   ) {
+    toggleMenu(false)
+  }
+}
+
+function toggleMenu(override = true) {
+  if (showCard.value || !override) {
+    if (showCard.value) {
+      show_ads_window()
+    }
+
     showCard.value = false
+  } else {
+    hide_ads_window()
+    showCard.value = true
   }
 }
 

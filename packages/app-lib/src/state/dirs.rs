@@ -330,8 +330,7 @@ impl DirectoryInfo {
                         &loader_bar_id,
                         10.0 / (MOVE_DIRS.len() as f64),
                         None,
-                    )
-                    .await?;
+                    )?;
                 }
 
                 let paths_len = paths.len();
@@ -380,8 +379,7 @@ impl DirectoryInfo {
                                     &loader_bar_id,
                                     90.0 / paths_len as f64,
                                     None,
-                                )
-                                .await;
+                                );
 
                                 success_idxs.insert(idx);
 
@@ -433,8 +431,7 @@ impl DirectoryInfo {
                                 &loader_bar_id,
                                 ((x.size as f64) / (total_size as f64)) * 60.0,
                                 None,
-                            )
-                            .await;
+                            );
 
                             Ok::<(), crate::Error>(())
                         }
@@ -453,8 +450,7 @@ impl DirectoryInfo {
                                     &loader_bar_id,
                                     30.0 / paths_len as f64,
                                     None,
-                                )
-                                .await?;
+                                )?;
 
                                 Ok::<(), crate::Error>(())
                             };

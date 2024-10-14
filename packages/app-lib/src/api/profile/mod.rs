@@ -40,14 +40,9 @@ pub mod update;
 #[tracing::instrument]
 pub async fn remove(path: &str) -> crate::Result<()> {
     let state = State::get().await?;
-
-    let mut transaction = state.pool.begin().await?;
-
-    Profile::remove(path, &mut transaction).await?;
+    Profile::remove(path, &state.pool).await?;
 
     emit_profile(path, ProfilePayloadType::Removed).await?;
-
-    transaction.commit().await?;
 
     Ok(())
 }
@@ -510,7 +505,7 @@ pub async fn export_mrpack(
     // Iterate over every file in the folder
     // Every file that is NOT in the config file is added to the zip, in overrides
     for path in path_list {
-        emit_loading(&loading_bar, 1.0, None).await?;
+        emit_loading(&loading_bar, 1.0, None)?;
 
         let relative_path = pack_get_relative_path(&profile_base_path, &path)?;
 

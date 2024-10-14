@@ -833,7 +833,6 @@ a,
 // MARKDOWN
 
 .markdown-body {
-  overflow-y: auto;
   h1:first-child {
     margin-top: 0;
   }
@@ -887,7 +886,7 @@ a,
 
   a {
     cursor: pointer;
-    color: var(--color-link);
+    color: var(--color-blue);
 
     &:focus-visible,
     &:hover {

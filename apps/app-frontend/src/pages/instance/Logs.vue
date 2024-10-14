@@ -76,7 +76,7 @@
         </div>
       </RecycleScroller>
     </div>
-    <ShareModal
+    <ShareModalWrapper
       ref="shareModal"
       header="Share Log"
       share-title="Instance Log"
@@ -89,7 +89,7 @@
 
 <script setup>
 import { CheckIcon, ClipboardCopyIcon, ShareIcon, TrashIcon } from '@modrinth/assets'
-import { Button, Card, ShareModal, Checkbox, DropdownSelect } from '@modrinth/ui'
+import { Button, Card, Checkbox, DropdownSelect } from '@modrinth/ui'
 import {
   delete_logs_by_filename,
   get_logs,
@@ -107,6 +107,7 @@ import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
 import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 
 dayjs.extend(isToday)
 dayjs.extend(isYesterday)
@@ -295,7 +296,7 @@ if (logs.value.length > 1 && !props.playing) {
 
 const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
-    let deleteIndex = selectedLogIndex.value
+    const deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
     await delete_logs_by_filename(
       props.instance.path,

@@ -336,8 +336,7 @@ pub async fn install_minecraft(
                     server => "";
             }
 
-            emit_loading(&loading_bar, 0.0, Some("Running forge processors"))
-                .await?;
+            emit_loading(&loading_bar, 0.0, Some("Running forge processors"))?;
             let total_length = processors.len();
 
             // Forge processors (90-100)
@@ -402,8 +401,7 @@ pub async fn install_minecraft(
                         "Running forge processor {}/{}",
                         index, total_length
                     )),
-                )
-                .await?;
+                )?;
             }
         }
     }
@@ -414,7 +412,7 @@ pub async fn install_minecraft(
         async { Ok(()) }
     })
     .await?;
-    emit_loading(&loading_bar, 1.0, Some("Finished installing")).await?;
+    emit_loading(&loading_bar, 1.0, Some("Finished installing"))?;
 
     Ok(())
 }

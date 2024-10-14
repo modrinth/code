@@ -16,3 +16,6 @@ strip = true # Remove debug symbols
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3
+
+[patch.crates-io]
+wry = { git = "https://github.com/modrinth/wry", rev = "27fb16b" }
