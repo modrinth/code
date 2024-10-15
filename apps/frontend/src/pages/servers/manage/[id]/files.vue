@@ -262,11 +262,10 @@
       <div v-else-if="!isLoading" class="flex h-full w-full items-center justify-center gap-6 p-20">
         <FileIcon class="text-red-500 h-16 w-16" />
         <div class="flex flex-col gap-2">
-          <h3 class="text-red-500 m-0 text-2xl font-bold">Unable to fetch file api info</h3>
+          <h3 class="text-red-500 m-0 text-2xl font-bold">Unable to list files</h3>
           <p class="m-0 text-sm text-secondary">
-            Don't worry, your server is safe. We just can't get to your files right now.
-            <br />
-            Wait a few seconds and try again. If your issue persists, contact support.
+            Unfortunately, we were unable to list the files in this folder. If this issue persists,
+            contact support.
           </p>
         </div>
         <Button size="sm" @click="navigateToPage(1)">
@@ -274,6 +273,7 @@
           Go to homepage
         </Button>
       </div>
+
       <div v-else-if="loadError" class="flex h-full w-full items-center justify-center gap-6 p-20">
         <FileIcon class="text-red-500 h-16 w-16" />
         <div class="flex flex-col gap-2">
