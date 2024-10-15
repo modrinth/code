@@ -9,7 +9,7 @@
       class="pyro-logo-animation relative flex w-[35rem] flex-col items-center gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#fff5f6] p-8 dark:bg-[#270B11]"
       tabindex="-1"
     >
-      <PanelErrorIcon class="size-8" aria-hidden="true" />
+      <UiServersPanelErrorIcon class="size-8" />
       <h1
         id="error-title"
         class="m-0 inline-flex items-center gap-2 text-4xl font-bold dark:text-[var(--color-contrast)]"
@@ -46,7 +46,6 @@
 <script setup lang="ts">
 import { LeftArrowIcon, UpdatedIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import PanelErrorIcon from "./PanelErrorIcon.vue";
 
 defineProps({
   title: {
