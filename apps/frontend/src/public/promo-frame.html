@@ -71,12 +71,6 @@
           tude.setPrivacySettings({
             personalizedAds: personalized ?? true,
           });
-
-          const hash = getCookie("modrinth-app-token");
-          console.log(hash);
-          tude.setIdProfile({
-            e: hash,
-          });
         });
       }
 
