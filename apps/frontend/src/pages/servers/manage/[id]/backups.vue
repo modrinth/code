@@ -35,10 +35,14 @@
           </div>
           <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="createBackup"> <PlusIcon /> Create backup </Button>
+            <Button color="primary" :disabled="isCreatingBackup" @click="createBackup">
+              <PlusIcon v-if="!isCreatingBackup" />
+              Create backup
+            </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
+
       <Modal ref="renameBackupModal" header="">
         <UiServersPyroModal header="Rename backup" :data="data" @modal="renameBackupModal?.hide()">
           <div class="mt-2 flex flex-col gap-2">
@@ -52,10 +56,13 @@
           </div>
           <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="renameBackup(currentBackup)"> Rename backup </Button>
+            <Button color="primary" :disabled="isRenamingBackup" @click="renameBackup">
+              Rename backup
+            </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
+
       <Modal ref="restoreBackupModal" header="">
         <UiServersPyroModal
           header="Restore backup"
@@ -65,7 +72,7 @@
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
               <div class="text-2xl font-extrabold text-contrast">
-                {{ backups?.find((b: any) => b.id === currentBackup)?.name }}
+                {{ backups?.find((b) => b.id === currentBackup)?.name }}
               </div>
               <div class="flex gap-2 font-semibold text-contrast">
                 <CalendarIcon />
@@ -79,10 +86,13 @@
           </div>
           <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="restoreBackup(currentBackup)"> Restore backup </Button>
+            <Button color="primary" :loading="isRestoringBackup" @click="restoreBackup">
+              Restore backup
+            </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
+
       <Modal ref="deleteBackupModal" header="">
         <UiServersPyroModal
           header="Delete backup"
@@ -93,7 +103,7 @@
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
               <div class="text-2xl font-extrabold text-contrast">
-                {{ backups?.find((b: any) => b.id === currentBackup)?.name }}
+                {{ backups?.find((b) => b.id === currentBackup)?.name }}
               </div>
               <div class="flex gap-2 font-semibold text-contrast">
                 <CalendarIcon />
@@ -107,7 +117,9 @@
           </div>
           <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
-            <Button color="danger" @click="deleteBackup(currentBackup)"> Delete backup </Button>
+            <Button color="danger" :loading="isDeletingBackup" @click="deleteBackup">
+              Delete backup
+            </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
@@ -203,7 +215,7 @@ import {
   DownloadIcon,
   TrashIcon,
 } from "@modrinth/assets";
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
@@ -211,8 +223,6 @@ const props = defineProps<{
 }>();
 
 defineEmits(["onDownload"]);
-
-const app = useNuxtApp();
 
 const data = computed(() => props.server.general);
 const backups = computed(() => props.server.backups?.data);
@@ -235,74 +245,152 @@ const renameBackupName = ref("");
 
 const currentBackup = ref("");
 
-const backupsState = reactive({
-  loading: false,
-});
+const isCreatingBackup = ref(false);
+const isRenamingBackup = ref(false);
+const isRestoringBackup = ref(false);
+const isDeletingBackup = ref(false);
 
 const showCreateModel = () => {
   createBackupModal.value?.show();
 };
 
 const createBackup = async () => {
-  backupsState.loading = true;
-  const backupName = createBackupName.value;
-  try {
-    await props.server.backups?.create(backupName);
+  if (!createBackupName.value.trim()) {
+    addNotification({
+      group: "server",
+      title: "Error",
+      text: "Backup name cannot be empty",
+      type: "error",
+    });
+    return;
+  }
 
+  isCreatingBackup.value = true;
+  try {
+    await props.server.backups?.create(createBackupName.value);
     await props.server.refresh();
     createBackupModal.value?.hide();
-    // @ts-ignore
-    app.$notify({
+    addNotification({
       group: "server",
-      title: `Backup created`,
+      title: "Backup created",
       text: "Your backup has been created successfully.",
       type: "success",
     });
   } catch (error) {
-    backupError.value = error as string;
+    backupError.value = error instanceof Error ? error.message : String(error);
+    addNotification({
+      group: "server",
+      title: "Error creating backup",
+      text: backupError.value,
+      type: "error",
+    });
   } finally {
-    backupsState.loading = false;
+    isCreatingBackup.value = false;
   }
 };
 
-const renameBackup = async (backupId: string) => {
-  const backupName = renameBackupName.value;
-  console.log("renaming", backupName);
-  try {
-    await props.server.backups?.rename(backupId, backupName);
+const renameBackup = async () => {
+  if (!renameBackupName.value.trim() || !currentBackup.value) {
+    addNotification({
+      group: "server",
+      title: "Error",
+      text: "Backup name cannot be empty",
+      type: "error",
+    });
+    return;
+  }
 
+  isRenamingBackup.value = true;
+  try {
+    await props.server.backups?.rename(currentBackup.value, renameBackupName.value);
     await props.server.refresh();
     renameBackupModal.value?.hide();
+    addNotification({
+      group: "server",
+      title: "Backup renamed",
+      text: "Your backup has been renamed successfully.",
+      type: "success",
+    });
   } catch (error) {
-    backupError.value = error as string;
+    backupError.value = error instanceof Error ? error.message : String(error);
+    addNotification({
+      group: "server",
+      title: "Error renaming backup",
+      text: backupError.value,
+      type: "error",
+    });
+  } finally {
+    isRenamingBackup.value = false;
   }
-
-  await renameBackupModal.value?.hide();
 };
 
-const restoreBackup = async (backupId: string) => {
-  try {
-    await props.server.backups?.restore(backupId);
-
-    await restoreBackupModal.value?.hide();
-  } catch (error) {
-    backupError.value = error as string;
+const restoreBackup = async () => {
+  if (!currentBackup.value) {
+    addNotification({
+      group: "server",
+      title: "Error",
+      text: "No backup selected",
+      type: "error",
+    });
+    return;
   }
 
-  await restoreBackupModal.value?.hide();
+  isRestoringBackup.value = true;
+  try {
+    await props.server.backups?.restore(currentBackup.value);
+    restoreBackupModal.value?.hide();
+    addNotification({
+      group: "server",
+      title: "Backup restored",
+      text: "Your backup has been restored successfully.",
+      type: "success",
+    });
+  } catch (error) {
+    backupError.value = error instanceof Error ? error.message : String(error);
+    addNotification({
+      group: "server",
+      title: "Error restoring backup",
+      text: backupError.value,
+      type: "error",
+    });
+  } finally {
+    isRestoringBackup.value = false;
+  }
 };
 
-const deleteBackup = async (backupId: string) => {
-  try {
-    await props.server.backups?.delete(backupId);
+const deleteBackup = async () => {
+  if (!currentBackup.value) {
+    addNotification({
+      group: "server",
+      title: "Error",
+      text: "No backup selected",
+      type: "error",
+    });
+    return;
+  }
 
+  isDeletingBackup.value = true;
+  try {
+    await props.server.backups?.delete(currentBackup.value);
     await props.server.refresh();
-    await deleteBackupModal.value?.hide();
+    deleteBackupModal.value?.hide();
+    addNotification({
+      group: "server",
+      title: "Backup deleted",
+      text: "Your backup has been deleted successfully.",
+      type: "success",
+    });
   } catch (error) {
-    backupError.value = error as string;
+    backupError.value = error instanceof Error ? error.message : String(error);
+    addNotification({
+      group: "server",
+      title: "Error deleting backup",
+      text: backupError.value,
+      type: "error",
+    });
+  } finally {
+    isDeletingBackup.value = false;
   }
-
-  await deleteBackupModal.value?.hide();
 };
 
 function triggerDownloadAnimation() {
