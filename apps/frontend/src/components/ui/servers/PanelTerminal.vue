@@ -122,7 +122,7 @@ const scrollContainer = ref<HTMLElement | null>(null);
 const itemRefs = ref<HTMLElement[]>([]);
 const itemHeights = ref<number[]>([]);
 const averageItemHeight = ref(36);
-const bottomThreshold = ref(1);
+const bottomThreshold = ref(0);
 const bufferSize = 5;
 
 const progressiveBlurIterations = ref(8);

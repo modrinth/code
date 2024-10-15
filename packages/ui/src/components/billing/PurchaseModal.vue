@@ -62,13 +62,27 @@
         <p class="my-2 text-lg font-bold">Configure your server</p>
         <div class="flex flex-col gap-4">
           <input v-model="serverName" placeholder="Server name" class="input" />
-          <DropdownSelect
+          <!-- <DropdownSelect
             v-model="serverLoader"
             v-tooltip="'Select the mod loader for your server'"
             name="server-loader"
             :options="['Vanilla', 'Fabric', 'Forge']"
             placeholder="Select mod loader..."
-          />
+          /> -->
+          <div class="flex justify-between h-32 gap-4">
+            <button
+              v-for="loader in ['Vanilla', 'Fabric', 'Forge']"
+              :key="loader"
+              class="!w-full !h-full btn flex !flex-col !items-center !justify-between !py-5"
+              :style="{
+                filter: serverLoader === loader ? 'brightness(1.5)' : '',
+              }"
+              @click="serverLoader = loader"
+            >
+              <UiServersLoaderIcon :loader="loader" class="!h-12 !w-12" />
+              <p class="text-lg font-bold m-0">{{ loader }}</p>
+            </button>
+          </div>
           <div class="flex items-center gap-2">
             <InfoIcon />
             <span class="text-sm text-secondary">
@@ -369,7 +383,6 @@ import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import { getCurrency, calculateSavings, formatPrice, createStripeElements } from '@modrinth/utils'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import { Multiselect } from 'vue-multiselect'
-import DropdownSelect from '../base/DropdownSelect.vue'
 
 const { locale, formatMessage } = useVIntl()
 
