@@ -223,6 +223,11 @@
                   formatMessage(pyroMessages.pyroServerName, { name: subscription.server.name })
                 }}</span>
               </div>
+              <ButtonStyled>
+                <NuxtLink :to="'/servers/manage/' + subscription.server.server_id">
+                  View Server
+                </NuxtLink>
+              </ButtonStyled>
             </div>
           </div>
         </div>
@@ -488,7 +493,14 @@
   </section>
 </template>
 <script setup>
-import { ConfirmModal, NewModal, OverflowMenu, AnimatedLogo, PurchaseModal } from "@modrinth/ui";
+import {
+  ConfirmModal,
+  NewModal,
+  OverflowMenu,
+  AnimatedLogo,
+  PurchaseModal,
+  ButtonStyled,
+} from "@modrinth/ui";
 import {
   PlusIcon,
   XIcon,
