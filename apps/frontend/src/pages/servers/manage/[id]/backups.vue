@@ -147,18 +147,18 @@
         <li
           v-for="(backup, index) in backups"
           :key="backup.id"
-          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-8"
+          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised px-8 py-4"
         >
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between">
               <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
-                  <div class="text-2xl font-extrabold text-contrast">{{ backup.name }}</div>
+                  <div class="text-xl font-bold text-contrast">{{ backup.name }}</div>
                   <div v-if="index == 0" class="flex gap-2 font-bold text-brand">
                     <CheckIcon class="h-5 w-5" /> Latest
                   </div>
                 </div>
-                <div class="flex gap-2 font-semibold text-contrast">
+                <div class="flex items-center gap-2 text-sm font-semibold text-contrast">
                   <CalendarIcon /> {{ new Date(backup.created_at).toLocaleString() }}
                 </div>
               </div>
