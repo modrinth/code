@@ -31,18 +31,27 @@
         If this issue persists, contact Modrinth support.
       </div>
       <!-- reload page this is nuxt -->
-      <Button @click="reloadNuxtApp()"> Reload </Button>
-      <Button @click="$router.push('/servers/manage')">
-        <LeftArrowIcon />
-        Back to Servers
-      </Button>
+      <div class="flex flex-row gap-4">
+        <ButtonStyled type="standard">
+          <button @click="$router.push('/servers/manage')">
+            <LeftArrowIcon class="h-6 w-6" />
+            Back to servers
+          </button>
+        </ButtonStyled>
+        <ButtonStyled type="standard" color="brand">
+          <button @click="reloadNuxtApp()">
+            <UpdatedIcon class="h-6 w-6" />
+            Reload
+          </button>
+        </ButtonStyled>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Button } from "@modrinth/ui";
-import { LeftArrowIcon } from "@modrinth/assets";
+import { LeftArrowIcon, UpdatedIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
 
 defineProps({
   title: {
