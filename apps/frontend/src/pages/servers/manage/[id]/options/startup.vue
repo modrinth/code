@@ -2,7 +2,7 @@
   <div class="relative h-full w-full">
     <div v-if="data" class="flex h-full w-full flex-col gap-4">
       <div class="rounded-xl border-solid border-rose-500 bg-rose-500/20 p-4">
-        These settings are meant for advanced users. Changing these settings may break your server.
+        These settings are for advanced users. Changing them can break your server.
       </div>
 
       <div class="gap-2">
