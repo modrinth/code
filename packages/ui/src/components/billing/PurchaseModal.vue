@@ -69,11 +69,11 @@
             :options="['Vanilla', 'Fabric', 'Forge']"
             placeholder="Select mod loader..."
           /> -->
-          <div class="flex justify-between h-32 gap-4">
+          <div class="flex justify-between h-24 gap-4">
             <button
-              v-for="loader in ['Vanilla', 'Fabric', 'Forge']"
+              v-for="loader in ['Vanilla', 'Fabric', 'Forge', 'Quilt', 'Neoforge']"
               :key="loader"
-              class="!w-full !h-full btn flex !flex-col !items-center !justify-between !py-5"
+              class="!w-full !h-full btn flex !flex-col !items-center !justify-between !pt-4 !pb-3"
               :style="{
                 filter: serverLoader === loader ? 'brightness(1.5)' : '',
               }"
