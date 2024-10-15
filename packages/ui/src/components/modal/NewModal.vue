@@ -19,7 +19,7 @@
       @click="() => (closable ? hide() : {})"
     />
     <div class="modal-container experimental-styles-within" :class="{ shown: visible }">
-      <div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
+      <div class="modal-body flex flex-col bg-bg-raised rounded-2xl !overflow-visible">
         <div
           class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-button-bg max-w-full"
         >
@@ -36,8 +36,8 @@
             </button>
           </ButtonStyled>
         </div>
-        <div class="overflow-y-auto p-6">
-          <slot> You just lost the game.</slot>
+        <div class="p-6 overflow-visible">
+          <slot>You just lost the game.</slot>
         </div>
       </div>
     </div>
