@@ -124,7 +124,7 @@
         </UiServersPyroModal>
       </Modal>
 
-      <div class="flex flex-col gap-6">
+      <ul class="m-0 flex list-none flex-col gap-6 p-0">
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
@@ -144,10 +144,10 @@
           </div>
         </div>
 
-        <div
+        <li
           v-for="(backup, index) in backups"
           :key="backup.id"
-          class="relative w-full rounded-2xl bg-bg-raised p-8"
+          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-8"
         >
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between">
@@ -201,8 +201,8 @@
               </OverflowMenu>
             </div>
           </div>
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
     <UiServersPyroLoading v-else />
   </div>
