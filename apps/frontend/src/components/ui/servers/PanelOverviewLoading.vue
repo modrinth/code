@@ -34,27 +34,9 @@
       <div
         class="fade-in-up relative flex h-full w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised p-8"
       >
-        <div class="experimental-styles-within flex flex-row items-center justify-between">
+        <div class="experimental-styles-within flex flex-row items-center">
           <div class="flex flex-row items-center gap-4">
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
-          </div>
-          <div class="btn btn-secondary color-accent-contrast opacity-0">
-            <div class="contents">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="m5 3 14 9-14 9z"></path>
-              </svg>
-              Start
-            </div>
           </div>
         </div>
         <div
