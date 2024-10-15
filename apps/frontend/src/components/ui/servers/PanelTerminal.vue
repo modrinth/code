@@ -71,18 +71,32 @@
       <slot />
     </div>
     <button
+      data-pyro-fullscreen
       :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
       class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-200 hover:scale-110 active:scale-95"
       @click="toggleFullscreen"
     >
       <UiServersPanelTerminalFullscreen v-if="isFullScreen" />
       <UiServersPanelTerminalMinimize v-else />
-      <span class="sr-only">Toggle browser full screen</span>
     </button>
+
+    <Transition name="scroll-to-bottom">
+      <button
+        v-if="bottomThreshold > 0"
+        data-pyro-scrolltobottom
+        label="Scroll to bottom"
+        class="scroll-to-bottom-btn absolute bottom-20 right-4 z-[999999] grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-200 hover:scale-110 active:scale-95"
+        @click="scrollToBottom"
+      >
+        <RightArrowIcon class="rotate-90" />
+        <span class="sr-only">Scroll to bottom</span>
+      </button>
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
+import { RightArrowIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 
 const props = defineProps<{
@@ -383,5 +397,18 @@ html.dark-mode .progressive-gradient {
     color-mix(in srgb, black, transparent var(--transparency)) 0%,
     rgba(0, 0, 0, 0) 100%
   );
+}
+
+.scroll-to-bottom-enter-active,
+.scroll-to-bottom-leave-active {
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+.scroll-to-bottom-enter-from,
+.scroll-to-bottom-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
 }
 </style>
