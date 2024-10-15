@@ -86,6 +86,8 @@ interface General {
   motd?: string;
   image?: string;
   project?: Project;
+  sftp_username: string;
+  sftp_password: string;
 }
 
 interface Allocation {
