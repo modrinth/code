@@ -168,8 +168,8 @@
         :proceed-label="formatMessage(cancelModalMessages.action)"
         @proceed="cancelSubscription(subscription.id, true)"
       />
-      <div class="flex flex-wrap justify-between gap-4">
-        <div class="flex flex-col gap-4">
+      <div class="flex flex-wrap justify-between gap-4 xl:flex-nowrap xl:justify-normal xl:gap-16">
+        <div class="flex flex-col gap-4 xl:flex-grow">
           <span v-if="getPyroCharge(subscription).status === 'open'">
             {{ formatMessage(pyroMessages.pyroActiveSubscription) }}
           </span>
@@ -191,7 +191,9 @@
             </div>
           </div>
         </div>
-        <div class="flex w-full flex-wrap justify-between gap-4 xl:w-auto xl:flex-col">
+        <div
+          class="flex w-full flex-wrap justify-between gap-4 xl:w-auto xl:flex-shrink-0 xl:flex-col"
+        >
           <div class="flex flex-col gap-1 xl:ml-auto xl:text-right">
             <span class="text-2xl font-bold text-dark">
               {{
@@ -249,7 +251,7 @@
                   id: 'cancel',
                   action: () => {
                     cancelSubscriptionId = subscription.id;
-                    $refs.modal_cancel_pyro.show();
+                    $refs.modal_cancel_pyro[0].show();
                   },
                 },
               ]"
@@ -262,8 +264,8 @@
           </div>
           <button
             v-else-if="getPyroCharge(subscription).status !== 'cancelled'"
-            class="iconified-button raised-button !ml-auto"
-            @click="() => $refs.modal_cancel_pyro.show()"
+            class="iconified-button raised-button !ml-auto active:scale-95"
+            @click="$refs.modal_cancel_pyro[0].show"
           >
             <XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
           </button>
@@ -272,7 +274,7 @@
             class="btn btn-purple btn-large ml-auto"
             @click="cancelSubscription(subscription.id, false)"
           >
-            <RightArrowIcon /> {{ formatMessage(messages.pyroResubscribe) }}
+            <RightArrowIcon /> {{ formatMessage(pyroMessages.pyroResubscribe) }}
           </button>
         </div>
       </div>
