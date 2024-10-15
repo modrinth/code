@@ -17,11 +17,13 @@
         </div>
         <div class="flex gap-2">
           <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
-            <span class="font-bold text-contrast">geezyippeedrat</span>
+            <span class="font-bold text-contrast"> {{ data?.sftp_username }} </span>
             <span class="text-xs uppercase text-secondary">username</span>
           </div>
           <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
-            <span class="font-bold text-contrast">/nEL8>]23&kM</span>
+            <span class="font-bold text-contrast">
+              {{ data?.sftp_password }}
+            </span>
             <span class="text-xs uppercase text-secondary">password</span>
           </div>
         </div>
