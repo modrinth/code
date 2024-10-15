@@ -157,7 +157,7 @@
     <div class="mb-6 flex items-center">
       <h2 class="m-0 flex-grow">{{ formatMessage(pyroMessages.pyroSubscriptionTitle) }}</h2>
       <button
-        class="btn"
+        class="btn !hidden sm:!block"
         :disabled="loadingAddMethod"
         @click="
           // go to http://localhost:3000/servers#plan
