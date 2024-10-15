@@ -17,6 +17,7 @@
       :customer="customer"
       :payment-methods="paymentMethods"
       :return-url="`${config.public.siteUrl}/servers/manage`"
+      :server-name="`${auth?.user?.username}'s server`"
       @hidden="handleModalHidden"
     />
     <img
