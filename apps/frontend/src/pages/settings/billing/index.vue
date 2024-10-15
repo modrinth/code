@@ -182,7 +182,7 @@
         @proceed="cancelSubscription(subscription.id, true)"
       />
       <div class="flex flex-wrap justify-between gap-4 xl:flex-nowrap xl:justify-normal xl:gap-16">
-        <div class="flex flex-col gap-4 xl:flex-grow">
+        <div class="flex flex-col gap-5 xl:flex-grow">
           <span v-if="getPyroCharge(subscription).status === 'open'">
             {{ formatMessage(pyroMessages.pyroActiveSubscription) }}
           </span>
@@ -195,12 +195,29 @@
           <span v-else-if="getPyroCharge(subscription).status === 'failed'" class="text-red">
             {{ formatMessage(pyroMessages.pyroFailedPayment) }}
           </span>
-          <div class="flex flex-col gap-2">
-            <span class="font-bold">{{ formatMessage(pyroMessages.pyroServerDetails) }}</span>
-            <div class="flex items-center gap-2">
-              <span>{{
-                formatMessage(pyroMessages.pyroServerId, { id: subscription.metadata.id })
-              }}</span>
+          <div class="flex items-center gap-5">
+            <img
+              v-if="subscription.server.icon"
+              class="aspect-square h-24 rounded-lg"
+              :src="subscription.server.icon"
+            />
+            <img
+              v-else
+              class="aspect-square h-24 rounded-lg"
+              src="~/assets/images/servers/minecraft_server_icon.png"
+            />
+            <div class="flex h-fit flex-col gap-2">
+              <span class="font-bold">{{ formatMessage(pyroMessages.pyroServerDetails) }}</span>
+              <div class="flex items-center gap-2">
+                <span>{{
+                  formatMessage(pyroMessages.pyroServerId, { id: subscription.metadata.id })
+                }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span>{{
+                  formatMessage(pyroMessages.pyroServerName, { name: subscription.server.name })
+                }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -611,6 +628,10 @@ const pyroMessages = defineMessages({
     id: "settings.billing.pyro_subscription.server_id",
     defaultMessage: "Server ID: {id}",
   },
+  pyroServerName: {
+    id: "settings.billing.pyro_subscription.server_id",
+    defaultMessage: "Server name: {name}",
+  },
   pyroSubscriptionSince: {
     id: "settings.billing.pyro_subscription.since",
     defaultMessage: "Since {date}",
@@ -680,6 +701,7 @@ const [
   { data: charges, refresh: refreshCharges },
   { data: customer, refresh: refreshCustomer },
   { data: subscriptions, refresh: refreshSubscriptions },
+  { data: servers, refresh: refreshServers },
 ] = await Promise.all([
   useAsyncData("billing/payment_methods", () =>
     useBaseFetch("billing/payment_methods", { internal: true }),
@@ -689,6 +711,26 @@ const [
   useAsyncData("billing/subscriptions", () =>
     useBaseFetch("billing/subscriptions", { internal: true }),
   ),
+  useAsyncData("ServerList", async () => {
+    try {
+      const response = await usePyroFetch("servers");
+      // for each server, fetch the icon
+      for (const server of response.servers) {
+        const auth = await usePyroFetch(`servers/${server.server_id}/fs`);
+        try {
+          const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
+            override: auth,
+          });
+          server.icon = URL.createObjectURL(new Blob([fileData]));
+        } catch {
+          server.icon = "";
+        }
+      }
+      return response;
+    } catch {
+      throw new PyroFetchError("Unable to load servers");
+    }
+  }),
 ]);
 
 async function refresh() {
@@ -697,14 +739,21 @@ async function refresh() {
     refreshCharges(),
     refreshCustomer(),
     refreshSubscriptions(),
+    refreshServers(),
   ]);
 }
 
-const pyroSubscriptions = computed(() =>
-  subscriptions.value.filter(
-    (x) => x.status === "provisioned" && x.metadata && x.metadata.type === "pyro",
-  ),
-);
+const pyroSubscriptions = computed(() => {
+  return subscriptions.value
+    .filter((x) => x.status === "provisioned" && x.metadata && x.metadata.type === "pyro")
+    .map((x) => {
+      const server = servers.value.servers.find((y) => y.server_id === x.metadata.id);
+      return {
+        ...x,
+        server,
+      };
+    });
+});
 
 function getPyroCharge(subscription) {
   return charges.value.find(

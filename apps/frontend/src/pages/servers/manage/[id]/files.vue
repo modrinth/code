@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative z-10 flex min-h-[800px] w-full flex-col overflow-visible rounded-xl border border-solid border-bg-raised"
+    class="relative flex min-h-[800px] w-full flex-col overflow-visible rounded-xl border border-solid border-bg-raised"
     @dragenter.prevent="handleDragEnter"
     @dragover.prevent="handleDragOver"
     @dragleave.prevent="handleDragLeave"
@@ -348,6 +348,8 @@ const onInit = (editor: any) => {
     bindKey: { win: "Ctrl-S", mac: "Command-S" },
     exec: () => saveFileContent(false),
   });
+  // set font size
+  editor.setFontSize(20);
 };
 
 const fetchData = async () => {
