@@ -4,8 +4,8 @@
     <div
       v-if="serverData && serverData.status !== 'installing'"
       data-pyro-server-manager-root
-      class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
-      :class="error ? 'blur-md' : ''"
+      class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
+      :class="error ? 'pointer-events-none select-none blur-md' : ''"
     >
       <div class="flex flex-row items-center gap-6 pt-4">
         <UiServersServerIcon :image="serverData.image" />
