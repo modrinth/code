@@ -248,6 +248,17 @@
         </div>
       </div>
 
+      <div
+        v-else-if="!isLoading && items.length === 0"
+        class="flex h-full w-full items-center justify-center p-20"
+      >
+        <div class="flex flex-col items-center gap-4 text-center">
+          <FolderOpenIcon class="h-16 w-16 text-secondary" />
+          <h3 class="text-2xl font-bold text-contrast">This folder is empty</h3>
+          <p class="m-0 text-sm text-secondary">There are no files or folders in this folder.</p>
+        </div>
+      </div>
+
       <div v-else-if="!isLoading" class="flex h-full w-full items-center justify-center gap-6 p-20">
         <FileIcon class="text-red-500 h-16 w-16" />
         <div class="flex flex-col gap-2">
