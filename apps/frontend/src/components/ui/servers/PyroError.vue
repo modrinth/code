@@ -1,9 +1,9 @@
 <template>
   <div
-    class="relative -mt-12 flex h-screen min-h-[400px] w-full flex-1 items-center justify-center"
+    class="absolute z-50 -mt-12 flex h-full min-h-[400px] w-full flex-1 items-center justify-center"
   >
     <div
-      class="pyro-logo-animation relative flex flex-col items-center gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#fff5f6] p-8 dark:bg-[#270B11]"
+      class="pyro-logo-animation relative flex w-[35rem] flex-col items-center gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#fff5f6] p-8 dark:bg-[#270B11]"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

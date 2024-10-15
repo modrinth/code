@@ -1,7 +1,5 @@
-// am i winning? :smilew:
-// youre winning! love you - evan
+// usePyroServer is a composable that interfaces with the REDACTED API to get data and control the users server
 
-// very wip, but it works i know stuff is missing and broken, dont worry, i'll fix it
 const internalServerRefrence = ref<any>(null);
 const config = true;
 
@@ -232,6 +230,9 @@ const sendPowerAction = async (action: string) => {
       method: "POST",
       body: { action },
     });
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await internalServerRefrence.value.refresh();
   } catch (error) {
     console.error("Error changing power state:", error);
     throw error;
@@ -457,6 +458,7 @@ const downloadBackup = async (backupId: string) => {
 };
 
 // ------------------ NETWORK ------------------ //
+
 const reserveAllocation = async (name: string): Promise<Allocation> => {
   try {
     return await usePyroFetch<Allocation>(
@@ -541,15 +543,11 @@ const updateStartupSettings = async (
 
 // ------------------ FS ------------------ //
 
-const refreshFileApiInfo = () => {
-  internalServerRefrence.value.refresh(["fs"]);
-};
-
 const retryWithAuth = async (requestFn: () => Promise<any>) => {
   try {
     return await requestFn();
   } catch {
-    await refreshFileApiInfo();
+    await internalServerRefrence.value.refresh(["fs"]);
     return await requestFn();
   }
 };

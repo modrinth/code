@@ -20,8 +20,16 @@ useHead({
   title: `Content - ${data.value?.name ?? "Server"} - Modrinth`,
 });
 
-const navLinks = [
-  { icon: BoxIcon, label: "Mods", href: `/servers/manage/${serverId}/content` },
-  { icon: BookIcon, label: "Datapacks", href: `/servers/manage/${serverId}/content/datapacks` },
-];
+const navLinks = computed(() => {
+  if (data.value?.loader === "Vanilla") {
+    return [
+      { icon: BookIcon, label: "Datapacks", href: `/servers/manage/${serverId}/content/datapacks` },
+    ];
+  } else {
+    return [
+      { icon: BoxIcon, label: "Mods", href: `/servers/manage/${serverId}/content` },
+      { icon: BookIcon, label: "Datapacks", href: `/servers/manage/${serverId}/content/datapacks` },
+    ];
+  }
+});
 </script>

@@ -1,9 +1,11 @@
 <template>
   <div class="contents">
+    <UiServersPyroError v-if="error" :title="errorTitle" :message="errorMessage" />
     <div
       v-if="serverData && serverData.status !== 'installing'"
       data-pyro-server-manager-root
       class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
+      :class="error ? 'blur-md' : ''"
     >
       <div class="flex flex-row items-center gap-6 pt-4">
         <UiServersServerIcon :image="serverData.image" />
@@ -67,7 +69,6 @@
       <UiServersPoweredByPyro />
     </div>
 
-    <UiServersPyroError v-else-if="error" :title="errorTitle" :message="errorMessage" />
     <div v-else class="flex h-screen flex-col items-center justify-center">
       <p class="text-lg font-bold">Get ready! We're preparing your server for you.</p>
       <div class="h-1.5 w-full max-w-lg overflow-hidden rounded-xl bg-brand-highlight">
@@ -212,6 +213,8 @@ const handleInstallationResult = (data: WSInstallationResultEvent) => {
       serverData.value.status = "available";
       break;
     case "err":
+      console.log("failed to install");
+      console.log(data);
       errorTitle.value = "Installation error";
       errorMessage.value = data.reason ?? "Unknown error";
       error.value = new Error(data.reason ?? "Unknown error");

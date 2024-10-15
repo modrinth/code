@@ -1,12 +1,14 @@
 <template>
   <div class="h-full w-full gap-2 overflow-y-auto">
     <div class="card">
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-4">
         <div class="flex justify-between">
-          <h2 class="text-xl font-bold">SFTP</h2>
+          <label class="flex flex-col gap-2">
+            <span class="text-lg font-bold text-contrast">SFTP</span>
+            <span> SFTP is a way to access your server's files from outside of Modrinth. </span>
+          </label>
           <Button> Launch SFTP </Button>
         </div>
-        <p class="m-0">SFTP is a way to access your server's files from outside of Modrinth.</p>
         <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
           <span class="font-bold text-contrast">
             sftp://geezyippeedrat@us-lax2.kyros.pyro.host:2022/

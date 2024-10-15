@@ -1,6 +1,6 @@
 <template>
   <div class="static w-full grid-cols-1 md:relative md:flex">
-    <div class="static h-full flex-col pb-4 md:absolute md:relative md:flex md:pb-0 md:pr-4">
+    <div class="static h-full flex-col pb-4 md:flex md:pb-0 md:pr-4">
       <div class="z-10 flex select-none flex-col gap-2 rounded-xl bg-bg-raised p-4 md:w-[16rem]">
         <div v-for="link in navLinks" :key="link.label">
           <nuxt-link
@@ -17,10 +17,7 @@
       </div>
     </div>
 
-    <div
-      class="h-full w-full"
-      :class="{ 'rounded-xl bg-black opacity-30 bg-blend-overlay': sidebarVisible && $mq == 'sm' }"
-    >
+    <div class="h-full w-full">
       <NuxtPage :route="props.route" :server="props.server" @reinstall="onReinstall" />
     </div>
   </div>

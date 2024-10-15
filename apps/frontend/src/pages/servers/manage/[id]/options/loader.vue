@@ -1,7 +1,7 @@
 <template>
   <Modal ref="editModal" header="">
     <div class="h-[500px]">
-      <UiServersPyroModal header="Edit project" :data="data" @modal="editModal.hide()">
+      <UiServersPyroModal header="Install Modpack" :data="data" @modal="editModal.hide()">
         <UiServersProjectSelect type="modpack" @select="reinstallNew" />
       </UiServersPyroModal>
     </div>
@@ -117,17 +117,7 @@
             </div>
           </div>
         </div>
-        <div
-          v-else
-          class="flex w-full items-center justify-center rounded-xl bg-button-bg p-2 hover:bg-button-bgActive"
-        >
-          <div class="flex items-center gap-2">
-            <UiServersLoaderIcon :loader="data.loader || 'Vanilla'" class="[&&]:size-10" />
-            <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
-              {{ data.loader || "Vanilla" }}
-            </h1>
-          </div>
-        </div>
+        <Button v-else @click="editModal.show()"> Install modpack </Button>
       </div>
 
       <div class="card flex flex-col gap-4">

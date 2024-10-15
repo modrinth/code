@@ -1,37 +1,41 @@
 <template>
   <Modal ref="modModal" header="">
-    <div class="h-[500px]">
-      <UiServersPyroModal :header="modalHeader" :data="data" @modal="modModal.hide()">
-        <div v-if="isEditMode">
-          <div class="flex items-center gap-4">
-            <DropdownSelect
-              v-model="newModVersion"
-              name="Project"
-              :options="versionOptions"
-              placeholder="Select project..."
-            />
-            <Button icon-only @click="handleModAction(selectedMod!)">
-              <ChevronRightIcon />
-            </Button>
-          </div>
+    <UiServersPyroModal :header="modalHeader" :data="data" @modal="modModal.hide()">
+      <div v-if="isEditMode">
+        <div class="flex items-center gap-4">
+          <DropdownSelect
+            v-model="newModVersion"
+            name="Project"
+            :options="versionOptions"
+            placeholder="Select project..."
+          />
+          <Button icon-only @click="handleModAction(selectedMod!)">
+            <ChevronRightIcon />
+          </Button>
         </div>
-        <UiServersProjectSelect v-else type="mod" @select="handleModAction" />
-      </UiServersPyroModal>
-    </div>
+      </div>
+      <UiServersProjectSelect v-else type="mod" @select="handleModAction" />
+    </UiServersPyroModal>
   </Modal>
 
   <div v-if="data && mods" class="flex h-full w-full flex-col">
-    <div class="card flex items-center justify-between gap-2 px-3">
-      <h2 class="m-0 text-2xl font-bold text-contrast">Mods</h2>
-      <ButtonStyled color="brand">
-        <button v-tooltip="'Add a mod'" @click="showAddModModal">
-          <PlusIcon />
-          Add mod
-        </button>
-      </ButtonStyled>
+    <div class="card flex flex-col gap-4 [&&]:py-3">
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-extrabold text-contrast">Mods</h1>
+        <div class="flex gap-2">
+          <Button color="green" outline @click="showAddModModal">
+            <PlusIcon />
+            Add mod
+          </Button>
+          <Button>
+            <DownloadIcon />
+            Update mods
+          </Button>
+        </div>
+      </div>
     </div>
-    <div class="card flex h-full w-full flex-col overflow-y-scroll">
-      <div v-if="hasMods(mods)">
+    <div class="flex h-full w-full flex-col overflow-y-scroll">
+      <div v-if="hasMods(mods)" class="flex flex-col gap-2">
         <UiServersContentItem
           v-for="mod in mods"
           :key="mod.name"
@@ -48,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, ChevronRightIcon } from "@modrinth/assets";
-import { ButtonStyled, Modal, DropdownSelect, Button } from "@modrinth/ui";
+import { PlusIcon, ChevronRightIcon, DownloadIcon } from "@modrinth/assets";
+import { Modal, DropdownSelect, Button } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
@@ -67,6 +71,9 @@ interface Mod {
 }
 
 const prodOverride = await PyroAuthOverride();
+const router = useRouter();
+const route = useNativeRoute();
+const serverId = route.params.id as string;
 
 const modModal = ref();
 const isEditMode = ref(false);
@@ -77,6 +84,10 @@ const versions = ref<Record<string, any[]>>({});
 
 const data = computed(() => props.server.general);
 const mods = computed(() => props.server.mods?.data);
+
+if (data.value?.loader === "Vanilla") {
+  router.push(`/servers/manage/${serverId}/content/datapacks`);
+}
 
 const hasMods = (mods: Mod[]) => {
   if (mods.length > 0) {

@@ -180,12 +180,14 @@
               aria-label="Save file"
               :options="[
                 { id: 'save', action: saveFileContent },
+                { id: 'save-as', action: saveFileContentAs },
                 { id: 'save&restart', action: saveFileContentRestart },
               ]"
             >
               <SaveIcon aria-hidden="true" />
               <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
               <template #save> <SaveIcon aria-hidden="true" /> Save </template>
+              <template #save-as> <SaveIcon aria-hidden="true" /> Save as... </template>
               <template #save&restart>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -432,6 +434,7 @@ const destinationFolder = ref("");
 const isEditing = ref(false);
 const fileContent = ref("");
 const editingFile = ref<any>(null);
+const closeEditor = ref(false);
 
 const showCreateModal = (type: "file" | "directory") => {
   newItemType.value = type;
@@ -557,6 +560,14 @@ const renameItem = async () => {
     await fetchData();
     renameItemModal.value?.hide();
 
+    if (closeEditor.value) {
+      await props.server.refresh();
+      isEditing.value = false;
+      editingFile.value = null;
+      closeEditor.value = false;
+      await fetchData();
+    }
+
     addNotification({
       group: "files",
       title: "File renamed",
@@ -657,7 +668,7 @@ const saveFileContent = async (exit: boolean = true) => {
   try {
     await props.server.fs?.updateFile(editingFile.value.path, fileContent.value);
     if (exit) {
-      await refreshNuxtData("files-data");
+      await props.server.refresh();
       isEditing.value = false;
       editingFile.value = null;
     }
@@ -676,6 +687,12 @@ const saveFileContent = async (exit: boolean = true) => {
 const saveFileContentRestart = async () => {
   await saveFileContent();
   await props.server.general?.power("restart");
+};
+
+const saveFileContentAs = async () => {
+  await saveFileContent(false);
+  closeEditor.value = true;
+  showRenameModal(editingFile.value);
 };
 
 const cancelEditing = () => {

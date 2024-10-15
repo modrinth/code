@@ -10,6 +10,7 @@ import {
   SettingsIcon,
   TextQuoteIcon,
   VersionIcon,
+  CardIcon,
 } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
@@ -30,6 +31,11 @@ const navLinks = [
   { icon: TextQuoteIcon, label: "Startup", href: `/servers/manage/${serverId}/options/startup` },
   { icon: VersionIcon, label: "Network", href: `/servers/manage/${serverId}/options/network` },
   { icon: ListIcon, label: "Properties", href: `/servers/manage/${serverId}/options/properties` },
+  {
+    icon: CardIcon,
+    label: "Billing",
+    href: `/servers/manage/${serverId}/options/billing`,
+  },
   { icon: InfoIcon, label: "Info", href: `/servers/manage/${serverId}/options/info` },
 ];
 </script>

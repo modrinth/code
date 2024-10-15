@@ -84,6 +84,15 @@
         </div>
       </div>
     </div>
+    <div
+      v-else-if="props.server.mods?.data.length === 0"
+      class="card flex h-full w-full items-center justify-center"
+    >
+      <p class="text-contrast">
+        The server properties file has not been generated yet. Start up your server to generate it.
+      </p>
+    </div>
+
     <UiServersPyroLoading v-else />
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
