@@ -179,7 +179,7 @@
         :title="formatMessage(cancelModalMessages.title)"
         :description="formatMessage(cancelModalMessages.description)"
         :proceed-label="formatMessage(cancelModalMessages.action)"
-        @proceed="cancelSubscription(subscription.id, true)"
+        @proceed="cancelSubscription(cancelSubscriptionId, true)"
       />
       <div class="flex flex-wrap justify-between gap-4 xl:flex-nowrap xl:justify-normal xl:gap-16">
         <div class="flex flex-col gap-5 xl:flex-grow">
@@ -196,8 +196,13 @@
             {{ formatMessage(pyroMessages.pyroFailedPayment) }}
           </span>
           <div class="flex items-center gap-5">
+            <div
+              v-if="subscription.server.icon === 'ICON-LOADING'"
+              class="throbbing aspect-square h-24 rounded-lg"
+              :src="subscription.server.icon"
+            />
             <img
-              v-if="subscription.server.icon"
+              v-else-if="subscription.server.icon"
               class="aspect-square h-24 rounded-lg"
               :src="subscription.server.icon"
             />
@@ -295,7 +300,12 @@
           <button
             v-else-if="getPyroCharge(subscription).status !== 'cancelled'"
             class="iconified-button raised-button !ml-auto active:scale-95"
-            @click="$refs.modal_cancel_pyro[0].show"
+            @click="
+              () => {
+                cancelSubscriptionId = subscription.id;
+                $refs.modal_cancel_pyro[0].show();
+              }
+            "
           >
             <XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
           </button>
@@ -696,6 +706,26 @@ function loadStripe() {
   } catch {}
 }
 
+const updateIcons = async (data) => {
+  await Promise.all(
+    data.map(async (server) => {
+      if (import.meta.browser) {
+        try {
+          const auth = await usePyroFetch(`servers/${server.server_id}/fs`);
+          const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
+            override: auth,
+          });
+          server.icon = URL.createObjectURL(new Blob([fileData]));
+        } catch {
+          server.icon = null;
+        }
+        return;
+      }
+      server.icon = "ICON-LOADING";
+    }),
+  );
+};
+
 const [
   { data: paymentMethods, refresh: refreshPaymentMethods },
   { data: charges, refresh: refreshCharges },
@@ -714,24 +744,19 @@ const [
   useAsyncData("ServerList", async () => {
     try {
       const response = await usePyroFetch("servers");
-      // for each server, fetch the icon
-      for (const server of response.servers) {
-        const auth = await usePyroFetch(`servers/${server.server_id}/fs`);
-        try {
-          const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
-            override: auth,
-          });
-          server.icon = URL.createObjectURL(new Blob([fileData]));
-        } catch {
-          server.icon = "";
-        }
-      }
+      await updateIcons(response.servers);
       return response;
     } catch {
       throw new PyroFetchError("Unable to load servers");
     }
   }),
 ]);
+
+onMounted(() => {
+  // re-hydrate the icons and force subscription refresh
+  updateIcons(servers.value.servers);
+  subscriptions.value = [...subscriptions.value];
+});
 
 async function refresh() {
   await Promise.all([
@@ -943,6 +968,7 @@ async function removePaymentMethod(index) {
 const cancelSubscriptionId = ref();
 async function cancelSubscription(id, cancelled) {
   startLoading();
+  console.log(id);
   try {
     await useBaseFetch(`billing/subscription/${id}`, {
       internal: true,
@@ -963,3 +989,10 @@ async function cancelSubscription(id, cancelled) {
   stopLoading();
 }
 </script>
+
+<style>
+.throbbing {
+  animation: pulse 1.5s infinite;
+  background: var(--color-raised-bg);
+}
+</style>
