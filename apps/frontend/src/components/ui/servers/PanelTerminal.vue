@@ -409,6 +409,6 @@ html.dark-mode .progressive-gradient {
 .scroll-to-bottom-enter-from,
 .scroll-to-bottom-leave-to {
   opacity: 0;
-  transform: translateY(12px);
+  transform: scale(0.4) translateY(2rem);
 }
 </style>
