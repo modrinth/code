@@ -210,7 +210,7 @@
           lang="json"
           theme="one_dark"
           :print-margin="false"
-          style="height: 750px"
+          style="height: 750px; font-size: 1rem"
           class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
           @init="onInit"
         />
@@ -359,8 +359,6 @@ const onInit = (editor: any) => {
     bindKey: { win: "Ctrl-S", mac: "Command-S" },
     exec: () => saveFileContent(false),
   });
-  // set font size
-  editor.setFontSize(20);
 };
 
 const fetchData = async () => {
