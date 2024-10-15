@@ -25,7 +25,6 @@ useHead({
     {
       // Clean.io
       src: "https://cadmus.script.ac/d14pdm1b7fi5kh/script.js",
-      async: true,
     },
     {
       // Aditude
