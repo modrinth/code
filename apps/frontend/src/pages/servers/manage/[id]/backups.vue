@@ -135,7 +135,12 @@
                 {{ data.backup_quota - data.used_backup_quota }} Slots avaliable
               </div>
             </div>
-            <Button color="primary" @click="showCreateModel()"> <PlusIcon /> Create backup </Button>
+            <ButtonStyled type="standard" color="brand">
+              <button @click="showCreateModel">
+                <PlusIcon class="h-5 w-5" />
+                Create backup
+              </button>
+            </ButtonStyled>
           </div>
         </div>
 
@@ -204,7 +209,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, OverflowMenu, Modal } from "@modrinth/ui";
+import { Button, OverflowMenu, Modal, ButtonStyled } from "@modrinth/ui";
 import {
   PlusIcon,
   CheckIcon,
