@@ -1,6 +1,12 @@
 <template>
   <div class="relative h-full w-full overflow-y-auto">
-    <div v-if="subscription" class="flex h-full w-full flex-col justify-between gap-6">
+    <div
+      v-if="status === 'pending'"
+      class="flex h-full w-full items-center justify-center gap-6 p-20"
+    >
+      <AnimatedLogo />
+    </div>
+    <div v-else-if="subscription" class="flex h-full w-full flex-col justify-between gap-6">
       <div class="card flex h-full w-full flex-col gap-4 rounded-xl p-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
@@ -87,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from "@modrinth/ui";
+import { AnimatedLogo, Button } from "@modrinth/ui";
 import { CheckCircleIcon, ModrinthIcon } from "@modrinth/assets";
 // @ts-ignore
 import { formatPrice, getCurrency } from "@modrinth/utils";
@@ -100,7 +106,7 @@ const vintl = useVIntl();
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 
-const { data: subscription } = useAsyncData("billing/subscriptions", async () => {
+const { data: subscription, status } = useAsyncData("billing/subscriptions", async () => {
   const data = (await useBaseFetch("billing/subscriptions", { internal: true })) as any;
   return data.filter((s: any) => s.metadata.type === "pyro" && s.metadata.id === serverId);
 });
