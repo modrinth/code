@@ -635,3 +635,6 @@ xad.com, 963, RESELLER, 81cbf0a75a5e0e9a
 openx.com, 543878511, RESELLER, 6a698e2ec38604c6
 smaato.com, 1100047589, RESELLER, 07bcf65f187117b4
 inmobi.com, ba5fd3fb82c5412989b23c3eec71baf7, RESELLER, 83e75a7ae333ca9d
+
+#Criteo
+themediagrid.com, 4R7XKQ, DIRECT, 35d5010d7789b49d
