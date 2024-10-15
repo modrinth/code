@@ -450,6 +450,7 @@ useHead({
   ],
 });
 
+const auth = await useAuth();
 const vintl = useVIntl();
 const data = useNuxtApp();
 const config = useRuntimeConfig();
@@ -492,6 +493,10 @@ const getProductDescription = (product) => {
 };
 
 const selectProduct = async (product) => {
+  if (!auth.value.user) {
+    data.$router.push("/auth/sign-in");
+    return;
+  }
   selectedProduct.value = product;
   showModal.value = true;
   modalKey.value++;
@@ -528,6 +533,7 @@ watch(selectedProduct, async (newProduct) => {
 });
 
 async function fetchPaymentData() {
+  if (!auth.value.user) return;
   try {
     const [customerData, paymentMethodsData] = await Promise.all([
       useBaseFetch("billing/customer", { internal: true }),

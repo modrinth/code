@@ -434,12 +434,14 @@ const reinstallNew = async (project: any, versionNumber: string) => {
     false,
     prodOverride,
   )) as any;
-  const versionId = versions.find((x: any) => x.version_number === versionNumber)?.id;
+  const version = versions.find((x: any) => x.version_number === versionNumber);
 
-  if (!versionId) {
+  if (!version?.id) {
     throw new Error("Version not found");
   }
-
-  await props.server.general?.reinstall(serverId, false, project.project_id, versionId);
+  await props.server.general?.reinstall(serverId, false, project.project_id, version.id);
+  emit("reinstall");
+  await nextTick();
+  window.scrollTo(0, 0);
 };
 </script>

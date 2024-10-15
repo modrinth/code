@@ -281,7 +281,7 @@ const reinstallServer = async (
     } else {
       await usePyroFetch(`servers/${serverId}/reinstall`, {
         method: "POST",
-        body: { loader: "Vanilla", loader_version: versionId, game_version: versionId },
+        body: { project_id: projectId, version_id: versionId },
       });
     }
   } catch (error) {
