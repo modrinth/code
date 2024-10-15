@@ -20,12 +20,19 @@
             <h1 class="m-0 flex-grow text-4xl font-bold text-[var(--color-contrast)]">
               {{ serverData.name }}
             </h1>
-            <UiServersPanelServerActionButton
-              class="flex-shrink-0"
-              :is-online="isServerRunning"
-              :is-actioning="isActioning"
-              @action="sendPowerAction"
-            />
+            <!-- only show power action button when websocket is fully connected -->
+            <div
+              v-if="isConnected"
+              data-pyro-server-action-buttons
+              class="server-action-buttons-anim"
+            >
+              <UiServersPanelServerActionButton
+                class="flex-shrink-0"
+                :is-online="isServerRunning"
+                :is-actioning="isActioning"
+                @action="sendPowerAction"
+              />
+            </div>
           </div>
 
           <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
@@ -370,5 +377,20 @@ definePageMeta({
   100% {
     transform: translateX(100%) scaleX(0.5);
   }
+}
+
+@keyframes server-action-buttons-anim {
+  0% {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.server-action-buttons-anim {
+  animation: server-action-buttons-anim 0.2s ease-out;
 }
 </style>
