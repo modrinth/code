@@ -154,7 +154,20 @@
     </div>
   </section>
   <section v-if="pyroSubscriptions.length > 0" class="universal-card">
-    <h2>{{ formatMessage(pyroMessages.pyroSubscriptionTitle) }}</h2>
+    <div class="mb-6 flex items-center">
+      <h2 class="m-0 flex-grow">{{ formatMessage(pyroMessages.pyroSubscriptionTitle) }}</h2>
+      <button
+        class="btn"
+        :disabled="loadingAddMethod"
+        @click="
+          // go to http://localhost:3000/servers#plan
+          $router.push({ name: 'servers', hash: '#plan' })
+        "
+      >
+        <PlusIcon />
+        {{ formatMessage(pyroMessages.pyroNewSubscription) }}
+      </button>
+    </div>
     <p>{{ formatMessage(pyroMessages.pyroSubscriptionDescription) }}</p>
     <div
       v-for="subscription in pyroSubscriptions"
@@ -617,6 +630,10 @@ const pyroMessages = defineMessages({
   pyroResubscribe: {
     id: "settings.billing.pyro_subscription.resubscribe",
     defaultMessage: "Resubscribe",
+  },
+  pyroNewSubscription: {
+    id: "settings.billing.pyro_subscription.new",
+    defaultMessage: "Add a new server subscription",
   },
 });
 
