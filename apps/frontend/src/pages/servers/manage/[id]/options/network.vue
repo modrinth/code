@@ -48,7 +48,7 @@
             <input
               v-model="serverSubdomain"
               class="h-[50%] w-[63%]"
-              maxlength="52"
+              maxlength="32"
               @keyup.enter="saveNetwork"
             />
             .modrinth.gg
