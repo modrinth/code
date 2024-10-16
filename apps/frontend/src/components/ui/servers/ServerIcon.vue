@@ -1,9 +1,8 @@
 <template>
   <client-only>
-    <img v-if="image" no-shadow alt="Server Icon" :class="computedClass" :src="image" />
+    <img v-if="image" alt="Server Icon" :class="computedClass" :src="image" />
     <img
       v-else
-      no-shadow
       alt="Server Icon"
       :class="computedClass"
       src="~/assets/images/servers/minecraft_server_icon.png"
