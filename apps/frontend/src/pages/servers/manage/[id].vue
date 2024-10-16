@@ -9,27 +9,26 @@
     <div
       v-if="serverData && serverData.status !== 'installing'"
       data-pyro-server-manager-root
-      class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
+      class="mx-auto box-border flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
       :class="error ? 'pointer-events-none select-none blur-md' : ''"
     >
-      <div class="flex flex-row items-center gap-6 pt-4">
+      <div class="flex w-full min-w-0 flex-row items-center gap-6 pt-4">
         <UiServersServerIcon :image="serverData.image" />
-        <div class="flex w-full flex-col gap-2">
+        <div class="flex w-full flex-1 flex-col gap-2">
           <div class="flex shrink-0 flex-row items-center gap-1">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
               <LeftArrowIcon />
               All servers
             </NuxtLink>
           </div>
-          <div class="flex flex-row items-center gap-4">
-            <h1 class="m-0 flex-grow text-4xl font-bold text-[var(--color-contrast)]">
+          <div class="flex w-full flex-row items-center gap-4">
+            <h1 class="m-0 w-full truncate text-4xl font-bold text-[var(--color-contrast)]">
               {{ serverData.name }}
             </h1>
-            <!-- only show power action button when websocket is fully connected -->
             <div
               v-if="isConnected"
               data-pyro-server-action-buttons
-              class="server-action-buttons-anim"
+              class="server-action-buttons-anim flex w-fit flex-1"
             >
               <UiServersPanelServerActionButton
                 class="flex-shrink-0"
