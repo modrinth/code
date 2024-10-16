@@ -697,7 +697,7 @@ const saveFileContent = async (exit: boolean = true) => {
 
 const saveFileContentRestart = async () => {
   await saveFileContent();
-  await props.server.general?.power("restart");
+  await props.server.general?.power("Restart");
 };
 
 const saveFileContentAs = async () => {
