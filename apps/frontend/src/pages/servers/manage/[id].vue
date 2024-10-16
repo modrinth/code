@@ -317,8 +317,9 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
   return updated;
 };
 
-const reauthenticate = () => {
+const reauthenticate = async () => {
   try {
+    await server.refresh();
     const wsAuth = computed(() => server.ws);
     socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
   } catch (error) {
