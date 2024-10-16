@@ -31,7 +31,7 @@
           </label>
           <div
             v-tooltip="'Upload a custom Icon'"
-            class="group relative flex w-fit items-center gap-2 rounded-xl bg-table-alternateRow"
+            class="group relative flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-table-alternateRow"
             @dragover.prevent="onDragOver"
             @dragleave.prevent="onDragLeave"
             @drop.prevent="onDrop"
