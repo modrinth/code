@@ -5,15 +5,17 @@
     <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
       <span class="font-bold text-contrast">Careful, you have unsaved changes!</span>
       <div class="flex gap-2">
-        <Button transparent :loading="props.isUpdating" @click="props.reset"> Reset </Button>
-        <Button color="primary" :loading="props.isUpdating" @click="props.save"> Save </Button>
+        <Button transparent :disabled="props.isUpdating" @click="props.reset"> Reset </Button>
+        <Button color="primary" :disabled="props.isUpdating" @click="props.save">
+          {{ props.isUpdating ? "Saving..." : "Save" }}
+        </Button>
         <Button
           v-if="props.restart"
           color="primary"
-          :loading="props.isUpdating"
+          :disabled="props.isUpdating"
           @click="saveAndRestart"
         >
-          Save & Restart
+          {{ props.isUpdating ? "Saving..." : "Save & Restart" }}
         </Button>
       </div>
     </div>
