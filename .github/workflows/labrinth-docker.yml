@@ -2,17 +2,17 @@ name: docker-build
 
 on:
   push:
-    branches:
-      - '**'
-    tags:
-      - 'v*'
+    branches: [ "main" ]
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
   pull_request:
+    types: [ opened, synchronize ]
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
+  merge_group:
+    types: [ checks_requested ]
 
 jobs:
   docker:
