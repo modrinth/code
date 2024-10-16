@@ -13,7 +13,7 @@
       </div>
       <div class="mb-1 mt-4 flex justify-end gap-4">
         <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
-        <Button color="primary" @click="addNewAllocation" :disabled="!newAllocationName">
+        <Button color="primary" :disabled="!newAllocationName" @click="addNewAllocation">
           <PlusIcon /> Create allocation
         </Button>
       </div>
@@ -65,8 +65,10 @@
         <div class="card flex flex-col gap-4">
           <div class="flex w-full flex-row items-center justify-between">
             <label for="username-field" class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-contrast">DNS records</span>
-              <span> Use your personal domain to connect to your server. </span>
+              <span class="text-lg font-bold text-contrast">Generated DNS records</span>
+              <span>
+                Setup your personal domain to connect to your server via custom DNS records.
+              </span>
             </label>
 
             <Button @click="exportDnsRecords"> Export DNS records </Button>
@@ -361,7 +363,7 @@ const dnsRecords = computed(() => {
     {
       type: "SRV",
       name: `_minecraft._tcp.${userDomain.value}`,
-      content: `0 0 ${data.value?.net?.port} ${userDomain.value}`,
+      content: `0 10 ${data.value?.net?.port} ${data.value?.net?.ip}`,
     },
   ];
 });
