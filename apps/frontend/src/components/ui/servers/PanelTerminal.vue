@@ -26,14 +26,12 @@
       <div
         class="absolute -bottom-2 -right-2 h-7 w-7"
         :style="{
-          // background should be solid red bottom right corner of a circle
           background: `radial-gradient(circle at 0% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
         }"
       ></div>
       <div
         class="absolute -bottom-2 -left-2 h-7 w-7"
         :style="{
-          // background should be solid red bottom right corner of a circle
           background: `radial-gradient(circle at 100% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
         }"
       ></div>
@@ -118,6 +116,8 @@ const clientHeight = ref(0);
 const isFullScreen = ref(props.fullScreen);
 
 const initial = ref(false);
+const userHasScrolled = ref(false);
+const isScrolledToBottom = ref(true);
 
 const totalHeight = computed(
   () =>
@@ -126,7 +126,6 @@ const totalHeight = computed(
 );
 
 watch(totalHeight, () => {
-  console.log(initial.value);
   if (!initial.value) {
     scrollToBottom();
   }
@@ -136,7 +135,7 @@ watch(totalHeight, () => {
 const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
 
 const getBlurStyle = (i: number) => {
-  const properBlurIteration = i + 1; // Adjusting iteration for reverse order
+  const properBlurIteration = i + 1;
   const blur = lerp(0, 2 ** (properBlurIteration - 3), bottomThreshold.value);
   const singular = 100 / progressiveBlurIterations.value;
   let mask = "linear-gradient(";
@@ -162,9 +161,10 @@ const getBlurStyle = (i: number) => {
     backdropFilter: `blur(${blur}px)`,
     mask,
     position: "absolute" as any,
-    zIndex: progressiveBlurIterations.value - i, // Adjusting z-index for reverse order
+    zIndex: progressiveBlurIterations.value - i,
   };
 };
+
 const getItemOffset = (index: number) => {
   return itemHeights.value.slice(0, index).reduce((sum, height) => sum + height, 0);
 };
@@ -205,11 +205,16 @@ const handleScroll = () => {
   if (scrollContainer.value) {
     scrollTop.value = scrollContainer.value.scrollTop;
     clientHeight.value = scrollContainer.value.clientHeight;
+
+    const scrollHeight = scrollContainer.value.scrollHeight;
+    isScrolledToBottom.value = scrollTop.value + clientHeight.value >= scrollHeight - 32; // threshold
+
+    if (!isScrolledToBottom.value) {
+      userHasScrolled.value = true;
+    }
   }
 
   const maxBottom = 256;
-  // when we're at the very bottom of the scroll container, bottomThreshold should be 0
-  // when we're maxBottom pixels from the bottom of the scroll container, bottomThreshold should be 1
   bottomThreshold.value = Math.min(
     1,
     ((scrollContainer.value?.scrollHeight || 1) - scrollTop.value - clientHeight.value) / maxBottom,
@@ -242,6 +247,8 @@ const updateClientHeight = () => {
 const scrollToBottom = () => {
   if (scrollContainer.value) {
     scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight + 99999999;
+    userHasScrolled.value = false;
+    isScrolledToBottom.value = true;
   }
 };
 
@@ -303,7 +310,9 @@ watch(
 
     nextTick(() => {
       updateItemHeights();
-      scrollToBottom();
+      if (!userHasScrolled.value || isScrolledToBottom.value) {
+        scrollToBottom();
+      }
     });
   },
   { deep: true, immediate: true },
@@ -329,6 +338,7 @@ watch(isFullScreen, () => {
   });
 });
 </script>
+
 <style scoped>
 .terminal-font {
   font-family: var(--mono-font);

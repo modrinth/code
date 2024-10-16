@@ -282,13 +282,22 @@ const createBackup = async () => {
       type: "success",
     });
   } catch (error) {
-    backupError.value = error instanceof Error ? error.message : String(error);
-    addNotification({
-      group: "server",
-      title: "Error creating backup",
-      text: backupError.value,
-      type: "error",
-    });
+    if (error instanceof PyroFetchError && error.statusCode === 429) {
+      addNotification({
+        group: "server",
+        title: "Error creating backup",
+        text: "Please wait a few moments before creating another backup.",
+        type: "error",
+      });
+    } else {
+      backupError.value = error instanceof Error ? error.message : String(error);
+      addNotification({
+        group: "server",
+        title: "Error creating backup",
+        text: backupError.value,
+        type: "error",
+      });
+    }
   } finally {
     isCreatingBackup.value = false;
   }

@@ -18,6 +18,9 @@
             <span v-if="!serverName" class="text-sm text-rose-400">
               Server name must be at least 1 character long.
             </span>
+            <span v-if="!isValidServerName" class="text-sm text-rose-400">
+              Server name can contain any character.
+            </span>
           </div>
         </div>
 
@@ -31,7 +34,7 @@
           </label>
           <div
             v-tooltip="'Upload a custom Icon'"
-            class="group relative flex w-fit items-center gap-2 rounded-xl bg-table-alternateRow"
+            class="group relative flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-table-alternateRow"
             @dragover.prevent="onDragOver"
             @dragleave.prevent="onDragLeave"
             @drop.prevent="onDrop"
@@ -70,7 +73,7 @@
     <UiServersPyroLoading v-else />
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
-        v-if="hasUnsavedChanges"
+        :is-visible="!!hasUnsavedChanges && !!isValidServerName"
         :server="props.server"
         :is-updating="isUpdating"
         :save="saveGeneral"
@@ -95,7 +98,17 @@ const serverName = ref(data.value?.name);
 const isUpdating = ref(false);
 const hasUnsavedChanges = computed(() => serverName.value && serverName.value !== data.value?.name);
 
+const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0);
+
+watch(serverName, (oldValue) => {
+  if (!isValidServerName.value) {
+    serverName.value = oldValue;
+  }
+});
+
 const saveGeneral = async () => {
+  if (!isValidServerName.value) return;
+
   try {
     isUpdating.value = true;
     await data.value?.updateName(serverName.value ?? "");

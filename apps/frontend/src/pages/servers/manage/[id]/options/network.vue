@@ -41,7 +41,7 @@
         <!-- Subdomain section -->
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Custom URL</span>
+            <span class="text-lg font-bold text-contrast">Custom Subdomain</span>
             <span> Your friends can connect to your server using this URL. </span>
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
@@ -52,6 +52,77 @@
               @keyup.enter="saveNetwork"
             />
             .modrinth.gg
+          </div>
+          <span v-if="!isValidSubdomain" class="text-sm text-rose-400">
+            Subdomain must be at least 3 characters long and can only contain alphanumeric
+            characters, dashes, and underscores.
+          </span>
+        </div>
+
+        <div class="card flex flex-col gap-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <label for="username-field" class="flex flex-col gap-2">
+              <span class="text-lg font-bold text-contrast">DNS records</span>
+              <span> Use your personal domain to connect to your server. </span>
+            </label>
+
+            <Button @click="exportDnsRecords"> Export DNS records </Button>
+          </div>
+
+          <input
+            v-model="userDomain"
+            class="w-full md:w-[50%]"
+            maxlength="64"
+            minlength="1"
+            type="text"
+            placeholder="domain.com"
+          />
+
+          <div class="rounded-xl bg-table-alternateRow p-4">
+            <table
+              class="min-w-full border-collapse overflow-hidden rounded-lg border-2 border-gray-300"
+            >
+              <tbody>
+                <tr v-for="record in dnsRecords" :key="record.content">
+                  <td class="py-3">
+                    <div class="ml-2 flex flex-col gap-1" @click="copyText(record.type)">
+                      <span
+                        class="text-md font-bold tracking-wide text-contrast hover:cursor-pointer"
+                      >
+                        {{ record.type }}
+                      </span>
+                      <span class="text-xs uppercase text-secondary">type</span>
+                    </div>
+                  </td>
+                  <td class="py-3">
+                    <div class="flex flex-col gap-1" @click="copyText(record.name)">
+                      <span
+                        class="text-md font-bold tracking-wide text-contrast hover:cursor-pointer"
+                      >
+                        {{ record.name }}
+                      </span>
+                      <span class="text-xs uppercase text-secondary">name</span>
+                    </div>
+                  </td>
+                  <td class="px-4">
+                    <div class="flex flex-col gap-1" @click="copyText(record.content)">
+                      <span
+                        class="text-md w-fit font-bold tracking-wide text-contrast hover:cursor-pointer"
+                      >
+                        {{ record.content }}
+                      </span>
+                      <span class="text-xs uppercase text-secondary">content</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="flex items-center gap-2">
+            <InfoIcon />
+            <span class="text-sm text-secondary">
+              You must own your own domain to use this feature.
+            </span>
           </div>
         </div>
 
@@ -128,7 +199,7 @@
     <UiServersPyroLoading v-else />
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
-        v-if="hasUnsavedChanges"
+        :is-visible="!!hasUnsavedChanges && !!isValidSubdomain"
         :server="props.server"
         :is-updating="isUpdating"
         :save="saveNetwork"
@@ -139,7 +210,7 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, TrashIcon, EditIcon, VersionIcon, SaveIcon } from "@modrinth/assets";
+import { PlusIcon, TrashIcon, EditIcon, VersionIcon, SaveIcon, InfoIcon } from "@modrinth/assets";
 import { ButtonStyled, Modal, Button } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
@@ -153,6 +224,7 @@ const data = computed(() => props.server.general);
 const serverIP = ref(data?.value?.net?.ip ?? "");
 const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
+const userDomain = ref("play.yourdomain.com");
 
 const network = computed(() => props.server.network);
 const allocations = computed(() => network.value?.allocations);
@@ -163,6 +235,8 @@ const newAllocationName = ref("");
 const newAllocationPort = ref(0);
 
 const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
+
+const isValidSubdomain = computed(() => /^[a-zA-Z0-9-_]{3,}$/.test(serverSubdomain.value));
 
 const addNewAllocation = async () => {
   if (!newAllocationName.value) return;
@@ -226,6 +300,8 @@ const removeAllocation = async (port: number) => {
 };
 
 const saveNetwork = async () => {
+  if (!isValidSubdomain.value) return;
+
   try {
     isUpdating.value = true;
     const available = await props.server.network?.checkSubdomainAvailability(serverSubdomain.value);
@@ -270,5 +346,56 @@ const saveNetwork = async () => {
 
 const resetNetwork = () => {
   serverSubdomain.value = data?.value?.net?.domain ?? "";
+};
+
+const dnsRecords = computed(() => {
+  return [
+    {
+      type: "A",
+      name: `${userDomain.value}`,
+      content: data.value?.net?.ip ?? "",
+    },
+    {
+      type: "SRV",
+      name: `_minecraft._tcp.${userDomain.value}`,
+      content: `0 0 ${data.value?.net?.port} ${userDomain.value}`,
+    },
+  ];
+});
+
+const exportDnsRecords = () => {
+  const records = dnsRecords.value.reduce(
+    (acc, record) => {
+      const type = record.type;
+      if (!acc[type]) {
+        acc[type] = [];
+      }
+      acc[type].push(record);
+      return acc;
+    },
+    {} as Record<string, any[]>,
+  );
+
+  const text = Object.entries(records)
+    .map(([type, records]) => {
+      return `; ${type} Record\n${records.map((record) => `${record.name}.	1	IN	${record.type} ${record.content}`).join("\n")}\n`;
+    })
+    .join("\n");
+  const blob = new Blob([text], { type: "text/plain" });
+  const a = document.createElement("a");
+  a.href = window.URL.createObjectURL(blob);
+  a.download = `${userDomain.value}.txt`;
+  a.click();
+  a.remove();
+};
+
+const copyText = (text: string) => {
+  navigator.clipboard.writeText(text);
+  addNotification({
+    group: "serverOptions",
+    type: "success",
+    title: "Text copied",
+    text: `${text} has been copied to your clipboard`,
+  });
 };
 </script>

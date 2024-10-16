@@ -91,18 +91,24 @@ const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 const showSubdomainLabel = computed(() => !!props.net?.domain);
 
-const { data: projectData } = await useLazyAsyncData<Project>(
-  `server-project-${props.server_id}`,
-  async (): Promise<Project> => {
-    const result = await useBaseFetch(
-      `project/${props.upstream?.project_id}`,
-      {},
-      false,
-      prodOverride,
-    );
-    return result as Project;
-  },
-);
+let projectData;
+if (props.upstream) {
+  const { data } = await useLazyAsyncData<Project>(
+    `server-project-${props.server_id}`,
+    async (): Promise<Project> => {
+      const result = await useBaseFetch(
+        `project/${props.upstream?.project_id}`,
+        {},
+        false,
+        prodOverride,
+      );
+      return result as Project;
+    },
+  );
+  projectData = data;
+} else {
+  projectData = ref(undefined);
+}
 
 const image = ref<string | undefined>();
 
