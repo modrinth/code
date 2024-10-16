@@ -4,18 +4,10 @@
     class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-3"
   >
     <div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
-      <h1 class="text-4xl font-bold text-[--color-contrast]">Servers</h1>
-      <div class="flex w-full flex-row items-center justify-end gap-4">
-        <button
-          v-if="status === 'error'"
-          type="button"
-          alt="Reload servers"
-          class="flex items-center gap-2 bg-transparent text-sm font-bold"
-          @click="() => refreshNuxtData('ServerList')"
-        >
-          <UpdatedIcon />
-          Retry
-        </button>
+      <h1 v-if="serverList.length > 0" class="text-4xl font-bold text-[--color-contrast]">
+        Servers
+      </h1>
+      <div v-if="serverList.length > 0" class="flex w-full flex-row items-center justify-end gap-4">
         <div class="relative mb-4 w-full text-sm md:mb-0 md:w-72">
           <label class="sr-only" for="search">Search</label>
           <SearchIcon
@@ -72,9 +64,19 @@
 
     <div
       v-else-if="serverList.length === 0"
-      class="flex h-full min-h-[128px] items-center justify-center"
+      class="flex h-full flex-col items-center justify-center gap-8"
     >
-      <p class="text-contrast">You don't have any servers yet.</p>
+      <img
+        src="~/assets/images/games/excitement.png"
+        alt=""
+        class="hidden max-w-[360px] lg:block"
+        style="mask-image: radial-gradient(97% 77% at 50% 25%, #d9d9d9 0, hsla(0, 0%, 45%, 0) 100%)"
+      />
+      <h1 class="m-0 text-contrast">You don't have any servers yet!</h1>
+      <p class="m-0">Modrinth Servers is a new way to play modded Minecraft with your friends.</p>
+      <ButtonStyled size="large" type="standard" color="brand">
+        <NuxtLink to="/servers#plan">Create a Server</NuxtLink>
+      </ButtonStyled>
     </div>
 
     <template v-else>
@@ -104,7 +106,8 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import Fuse from "fuse.js";
-import { SearchIcon, UpdatedIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
+import { SearchIcon } from "@modrinth/assets";
 import type { Server } from "~/types/servers";
 
 definePageMeta({
