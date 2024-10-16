@@ -2,8 +2,11 @@
   <Modal ref="newAllocationModal" header="">
     <UiServersPyroModal header="New allocation" :data="data" @modal="newAllocationModal?.hide()">
       <div class="flex flex-col gap-2">
-        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <label for="new-allocation-name" class="font-semibold text-contrast">
+          Name<span class="text-red-500">*</span>
+        </label>
         <input
+          id="new-allocation-name"
           v-model="newAllocationName"
           type="text"
           class="bg-bg-input w-full rounded-lg p-4"
@@ -23,8 +26,11 @@
   <Modal ref="editAllocationModal" header="">
     <UiServersPyroModal header="Edit allocation" :data="data" @modal="editAllocationModal?.hide()">
       <div class="flex flex-col gap-2">
-        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <label for="edit-allocation-name" class="font-semibold text-contrast">
+          Name<span class="text-red-500">*</span>
+        </label>
         <input
+          id="edit-allocation-name"
           v-model="newAllocationName"
           type="text"
           class="bg-bg-input w-full rounded-lg p-4"
@@ -43,12 +49,13 @@
       <div class="flex h-full flex-col">
         <!-- Subdomain section -->
         <div class="card flex flex-col gap-4">
-          <label for="username-field" class="flex flex-col gap-2">
+          <label for="server-subdomain" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Custom Subdomain</span>
             <span> Your friends can connect to your server using this URL. </span>
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
             <input
+              id="server-subdomain"
               v-model="serverSubdomain"
               class="h-[50%] w-[63%]"
               maxlength="32"
@@ -64,7 +71,7 @@
 
         <div class="card flex flex-col gap-4">
           <div class="flex w-full flex-row items-center justify-between">
-            <label for="username-field" class="flex flex-col gap-2">
+            <label for="user-domain" class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Generated DNS records</span>
               <span>
                 Setup your personal domain to connect to your server via custom DNS records.
@@ -75,6 +82,7 @@
           </div>
 
           <input
+            id="user-domain"
             v-model="userDomain"
             class="w-full md:w-[50%]"
             maxlength="64"
@@ -134,13 +142,13 @@
         <!-- Allocations section -->
         <div class="card flex flex-col gap-4">
           <div class="flex w-full flex-row items-center justify-between">
-            <label for="username-field" class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Allocations</span>
               <span>
                 Configure additional ports for internet-facing features like map viewers or voice
                 chat mods.
               </span>
-            </label>
+            </div>
 
             <ButtonStyled type="standard" color="brand" @click="newAllocationModal.show()">
               <button>
