@@ -272,7 +272,6 @@ const reinstallServer = async (
   versionId?: string,
   loaderVersionId?: string,
 ) => {
-  // launcher-meta.modrinth.com/{forge,neo,minecraft,quilt,fabric}/v0/manifest.json
   try {
     if (loader) {
       if (projectId.toLowerCase() === "neoforge") {

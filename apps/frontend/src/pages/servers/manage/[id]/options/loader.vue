@@ -49,7 +49,11 @@
         </Button>
         <Button
           color="primary"
-          :disabled="!selectedMCVersion || !selectedLoaderVersion"
+          :disabled="
+            selectedLoader.toLowerCase() === 'vanilla'
+              ? !selectedMCVersion
+              : !selectedMCVersion || !selectedLoaderVersion
+          "
           @click="reinstallLoader(selectedLoader)"
         >
           Reinstall
@@ -237,17 +241,17 @@
             <div class="flex items-center gap-2">
               <div
                 class="rounded-xl bg-button-bg p-2"
-                :class="data.loader === 'NeoForge' ? '[&&]:bg-bg-green' : ''"
+                :class="data.loader?.toLowerCase() === 'neoforge' ? '[&&]:bg-bg-green' : ''"
               >
                 <UiServersLoaderIcon
                   loader="NeoForge"
                   class="[&&]:size-10"
-                  :class="data.loader === 'NeoForge' ? 'text-brand' : ''"
+                  :class="data.loader?.toLowerCase() === 'neoforge' ? 'text-brand' : ''"
                 />
               </div>
               <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">NeoForge</h1>
               <span
-                v-if="data.loader === 'NeoForge'"
+                v-if="data.loader?.toLowerCase() === 'neoforge'"
                 class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
               >
                 Current
@@ -255,7 +259,7 @@
             </div>
 
             <Button @click="selectLoader('NeoForge')">
-              {{ data.loader === "NeoForge" ? "Reinstall" : "Install" }}
+              {{ data.loader?.toLowerCase() === "neoforge" ? "Reinstall" : "Install" }}
               <ChevronRightIcon />
             </Button>
           </div>
@@ -280,7 +284,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  reinstall: [];
+  reinstall: [any?];
 }>();
 
 const tags = useTags();
@@ -351,6 +355,16 @@ const selectedLoaderVersions = computed(() => {
 });
 
 const data = computed(() => props.server.general);
+watch(
+  () => data.value?.loader,
+  () => {
+    console.log("Loader:", data.value?.loader);
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+);
 const { data: versions } = data?.value?.upstream
   ? await useLazyAsyncData(
       `content-loader-versions`,
@@ -398,8 +412,6 @@ const reinstallCurrent = async () => {
   }
   const resolvedVersionIds = versionIds.value;
   const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
-  // get the [id] url param
-  console.log(projectId, versionId);
   await props.server.general?.reinstall(serverId, false, projectId, versionId);
 };
 
@@ -411,19 +423,18 @@ const selectLoader = (loader: string) => {
 const reinstallLoader = async (loader: string) => {
   await props.server.general?.reinstall(
     serverId,
-    // if the loader is vanilla, we don't need to reinstall the loader
-    loader !== "Vanilla" && typeof loader === "string",
+    true,
     loader,
     selectedMCVersion.value,
-    selectedLoaderVersion.value,
+    loader === "Vanilla" ? "" : selectedLoaderVersion.value,
   );
-  emit("reinstall");
+  emit("reinstall", {
+    loader,
+    lVersion: selectedLoaderVersion.value,
+    mVersion: selectedMCVersion.value,
+  });
   await nextTick();
   window.scrollTo(0, 0);
-  if (data.value) {
-    data.value.loader = loader;
-    data.value.loader_version = selectedLoaderVersion.value;
-  }
 };
 
 const reinstallNew = async (project: any, versionNumber: string) => {

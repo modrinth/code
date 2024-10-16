@@ -232,8 +232,6 @@ const handleWebSocketMessage = (data: WSEvent) => {
         }
       });
 
-      console.log(players.value);
-
       if (isInitialListCommand.value) {
         log = log.filter((line) => {
           if (line.includes("There are") && line.includes("players online")) {
@@ -270,11 +268,20 @@ const handleWebSocketMessage = (data: WSEvent) => {
   }
 };
 
+const newLoader = ref<string | null>(null);
+const newLoaderVersion = ref<string | null>(null);
+const newMCVersion = ref<string | null>(null);
+
 const handleInstallationResult = (data: WSInstallationResultEvent) => {
   switch (data.result) {
     case "ok":
       if (!serverData.value) break;
       serverData.value.status = "available";
+      if (server.general) {
+        if (newLoader.value) server.general.loader = newLoader.value;
+        if (newLoaderVersion.value) server.general.loader_version = newLoaderVersion.value;
+        if (newMCVersion.value) server.general.mc_version = newMCVersion.value;
+      }
       break;
     case "err":
       console.log("failed to install");
@@ -286,10 +293,33 @@ const handleInstallationResult = (data: WSInstallationResultEvent) => {
   }
 };
 
-const onReinstall = () => {
-  console.log("QAHHHHHHHHHHHHHHH");
+const onReinstall = (potentialArgs: any) => {
   if (!serverData.value) return;
   serverData.value.status = "installing";
+  // serverData.value.loader = potentialArgs.loader;
+  // serverData.value.loader_version = potentialArgs.lVersion;
+  // serverData.value.mc_version = potentialArgs.mVersion;
+  // if (potentialArgs?.loader) {
+  //   console.log("setting loader to", potentialArgs.loader);
+  //   serverData.value.loader = potentialArgs.loader;
+  // }
+  // if (potentialArgs?.lVersion) {
+  //   serverData.value.loader_version = potentialArgs.lVersion;
+  // }
+  // if (potentialArgs?.mVersion) {
+  //   serverData.value.mc_version = potentialArgs.mVersion;
+  // }
+  if (potentialArgs?.loader) {
+    newLoader.value = potentialArgs.loader;
+  }
+  if (potentialArgs?.lVersion) {
+    newLoaderVersion.value = potentialArgs.lVersion;
+  }
+  if (potentialArgs?.mVersion) {
+    newMCVersion.value = potentialArgs.mVersion;
+  }
+
+  console.log(serverData.value);
 };
 
 const updateStats = (currentStats: Stats["current"]) => {

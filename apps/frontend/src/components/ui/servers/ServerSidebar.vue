@@ -35,7 +35,7 @@ const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
-const onReinstall = () => {
-  emit("reinstall");
+const onReinstall = (...args: any[]) => {
+  emit("reinstall", ...args);
 };
 </script>
