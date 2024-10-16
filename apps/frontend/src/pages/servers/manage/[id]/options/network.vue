@@ -53,6 +53,10 @@
             />
             .modrinth.gg
           </div>
+          <span v-if="!isValidSubdomain" class="text-sm text-rose-400">
+            Subdomain must be at least 3 characters long and can only contain alphanumeric
+            characters, dashes, and underscores.
+          </span>
         </div>
 
         <!-- Allocations section -->
@@ -128,7 +132,7 @@
     <UiServersPyroLoading v-else />
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
-        v-if="hasUnsavedChanges"
+        v-if="hasUnsavedChanges && isValidSubdomain"
         :server="props.server"
         :is-updating="isUpdating"
         :save="saveNetwork"
@@ -163,6 +167,8 @@ const newAllocationName = ref("");
 const newAllocationPort = ref(0);
 
 const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
+
+const isValidSubdomain = computed(() => /^[a-zA-Z0-9-_]{3,}$/.test(serverSubdomain.value));
 
 const addNewAllocation = async () => {
   if (!newAllocationName.value) return;
@@ -226,6 +232,8 @@ const removeAllocation = async (port: number) => {
 };
 
 const saveNetwork = async () => {
+  if (!isValidSubdomain.value) return;
+
   try {
     isUpdating.value = true;
     const available = await props.server.network?.checkSubdomainAvailability(serverSubdomain.value);
