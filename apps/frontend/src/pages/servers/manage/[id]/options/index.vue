@@ -5,15 +5,15 @@
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server Name</span>
-            <span> Change the name of your server. This name is only visible on Modrinth. </span>
+            <span> Change the name of your server. This name is only visible on Modrinth.</span>
           </label>
           <div class="flex flex-col gap-2">
             <input
               v-model="serverName"
               class="w-full md:w-[50%]"
-              @keyup.enter="!serverName && saveGeneral"
               maxlength="64"
               minlength="1"
+              @keyup.enter="!serverName && saveGeneral"
             />
             <span v-if="!serverName" class="text-sm text-rose-400">
               Server name must be at least 1 character long.
