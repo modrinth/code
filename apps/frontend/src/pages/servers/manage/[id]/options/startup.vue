@@ -13,7 +13,7 @@
           </label>
           <textarea
             v-model="invocation"
-            class="min-h-[200px] w-full font-[family-name:var(--mono-font)]"
+            class="min-h-[270px] w-full font-[family-name:var(--mono-font)]"
           />
         </div>
 
@@ -21,12 +21,15 @@
           <div class="flex flex-col gap-4">
             <label for="username-field" class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Java Version</span>
-              <span> The version of Java that your server will run on. </span>
+              <span>
+                The version of Java that your server will run on. Your server is running Minecraft
+                {{ data.mc_version }}
+              </span>
             </label>
             <DropdownSelect
               v-model="jdkVersion"
               name="version"
-              :options="['Java 21', 'Java 17', 'Java 11', 'Java 8']"
+              :options="compatibleJavaVersions"
               placeholder="Java Version"
             />
           </div>
@@ -91,6 +94,24 @@ const jdkBuild = ref(
   jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build)?.label || "",
 );
 const isUpdating = ref(false);
+
+const compatibleJavaVersions = computed(() => {
+  const mcVersion = data.value?.mc_version ?? "";
+  if (!mcVersion) return jdkVersionMap.map((v) => v.label);
+
+  const [major, minor] = mcVersion.split(".").map(Number);
+
+  if (major >= 1) {
+    if (minor >= 20) return ["Java 21"];
+    if (minor >= 18) return ["Java 17", "Java 21"];
+    if (minor >= 17) return ["Java 16", "Java 17", "Java 21"];
+    if (minor >= 12) return ["Java 8", "Java 11", "Java 17", "Java 21"];
+    if (minor >= 6) return ["Java 8", "Java 11"];
+  }
+
+  return ["Java 8"];
+});
+
 const hasUnsavedChanges = computed(
   () =>
     invocation.value !== startupSettings.value?.invocation ||
