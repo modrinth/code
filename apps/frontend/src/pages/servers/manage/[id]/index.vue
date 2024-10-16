@@ -23,7 +23,7 @@
             v-if="suggestions.length"
             id="command-suggestions"
             ref="suggestionsList"
-            class="z-20 mt-1 max-h-60 w-full list-none overflow-auto rounded-md border border-divider bg-bg-raised p-0 shadow-lg"
+            class="mt-1 max-h-60 w-full list-none overflow-auto rounded-md border border-divider bg-bg-raised p-0 shadow-lg"
             role="listbox"
           >
             <li
@@ -45,14 +45,14 @@
           <div class="relative flex items-center">
             <span
               v-if="bestSuggestion"
-              class="pointer-events-none absolute left-[26px] z-50 transform select-none text-gray-400"
+              class="pointer-events-none absolute left-[26px] transform select-none text-gray-400"
             >
               <span class="ml-[23.5px] whitespace-pre">{{
                 " ".repeat(commandInput.length - 1)
               }}</span>
               <span> {{ bestSuggestion }} </span>
               <button
-                class="text pointer-events-auto z-50 ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-none dark:bg-highlight"
+                class="text pointer-events-auto ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-none dark:bg-highlight"
                 aria-label="Accept suggestion"
                 style="transform: translateY(-1px)"
                 @click="acceptSuggestion"
@@ -60,9 +60,7 @@
                 TAB
               </button>
             </span>
-            <div
-              class="pointer-events-none absolute left-0 top-0 z-30 flex h-full w-full items-center"
-            >
+            <div class="pointer-events-none absolute left-0 top-0 flex h-full w-full items-center">
               <TerminalSquareIcon class="ml-3 h-5 w-5" />
             </div>
             <input
@@ -70,7 +68,7 @@
               v-model="commandInput"
               type="text"
               placeholder="Send a command"
-              class="z-20 w-full rounded-md !pl-10 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+              class="w-full rounded-md !pl-10 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
               aria-autocomplete="list"
               aria-controls="command-suggestions"
               spellcheck="false"
@@ -85,11 +83,14 @@
               disabled
               type="text"
               placeholder="Send a command"
-              class="z-50 w-full rounded-md !pl-10 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+              class="w-full rounded-md !pl-10 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
             />
           </div>
         </div>
       </UiServersPanelTerminal>
+    </div>
+    <div v-if="playerList && playerList.length > 0" class="card">
+      <UiServersPanelPlayerList :players="playerList" @send-command="sendConsoleCommand" />
     </div>
   </div>
   <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
@@ -107,6 +108,7 @@
 
 <script setup lang="ts">
 import { TerminalSquareIcon } from "@modrinth/assets";
+import { asyncComputed } from "@vueuse/core";
 import type { ServerState, Stats } from "~/types/servers";
 import type { Server } from "~/composables/pyroServers";
 
@@ -119,7 +121,27 @@ const props = defineProps<{
   serverPowerState: ServerState;
   isServerRunning: boolean;
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  players: string[];
 }>();
+
+const playerList = asyncComputed(async () => {
+  const results = await Promise.all(
+    props.players.map(async (name) => {
+      const ply = await $fetch<any>(`https://api.ashcon.app/mojang/v2/user/${name}`, {
+        method: "GET",
+        retry: false,
+      });
+      return {
+        name,
+        id: ply.uuid,
+        avatar: `https://crafatar.com/avatars/${ply.uuid}`,
+        name_history: ply.username_history,
+        created_at: ply.created_at,
+      };
+    }),
+  );
+  return results;
+});
 
 const socket = ref(props.socket);
 
@@ -490,10 +512,18 @@ const sendCommand = () => {
   const cmd = commandInput.value.trim();
   if (!socket || !cmd) return;
   try {
-    socket.value?.send(JSON.stringify({ event: "command", cmd }));
+    sendConsoleCommand(cmd);
     commandInput.value = "";
     suggestions.value = [];
     selectedSuggestionIndex.value = 0;
+  } catch (error) {
+    console.error("Error sending command:", error);
+  }
+};
+
+const sendConsoleCommand = (cmd: string) => {
+  try {
+    socket.value?.send(JSON.stringify({ event: "command", cmd }));
   } catch (error) {
     console.error("Error sending command:", error);
   }

@@ -74,6 +74,7 @@
           :console-output="consoleOutput"
           :socket="socket"
           :server="server"
+          :players="players"
           @reinstall="onReinstall"
         />
       </div>
@@ -121,6 +122,9 @@ const ramData = ref<number[]>([]);
 const isActioning = ref(false);
 const isServerRunning = computed(() => serverPowerState.value === "running");
 const serverPowerState = ref<ServerState>("stopped");
+const players = ref<string[]>([]);
+const isInitialListCommand = ref(true);
+const firstOk = ref(true);
 
 const stats = ref<Stats>({
   current: {
@@ -194,7 +198,53 @@ const connectWebSocket = () => {
 const handleWebSocketMessage = (data: WSEvent) => {
   switch (data.event) {
     case "log":
-      consoleOutput.value.push(...data.message.split("\n").filter((l) => l.trim()));
+      // eslint-disable-next-line no-case-declarations
+      let log = data.message.split("\n").filter((l) => l.trim());
+
+      // eslint-disable-next-line no-case-declarations
+      const joinRegex = /(.+) joined the game/;
+      // eslint-disable-next-line no-case-declarations
+      const leaveRegex = /(.+) left the game/;
+      // eslint-disable-next-line no-case-declarations
+      const playerListRegex = /There are \d+ of a max of \d+ players online: (.+)/;
+
+      log.forEach((line) => {
+        const joinMatch = line.match(joinRegex);
+        const leaveMatch = line.match(leaveRegex);
+        const playerListMatch = line.match(playerListRegex);
+
+        if (joinMatch && joinMatch[1]) {
+          const player = joinMatch[1].split(" ")[3];
+          console.log("Adding player", player);
+          if (!players.value.includes(player)) {
+            players.value.push(player);
+          }
+        }
+
+        if (leaveMatch && leaveMatch[1]) {
+          const player = leaveMatch[1].split(" ")[3];
+          console.log("Removing player", player);
+          players.value = players.value.filter((p) => p !== player);
+        }
+
+        if (playerListMatch && playerListMatch[1]) {
+          players.value = playerListMatch[1].split(", ");
+        }
+      });
+
+      console.log(players.value);
+
+      if (isInitialListCommand.value) {
+        log = log.filter((line) => {
+          if (line.includes("There are") && line.includes("players online")) {
+            isInitialListCommand.value = false;
+            return false;
+          }
+          return true;
+        });
+      }
+
+      consoleOutput.value.push(...log);
       break;
     case "stats":
       updateStats(data);
@@ -210,6 +260,10 @@ const handleWebSocketMessage = (data: WSEvent) => {
       handleInstallationResult(data);
       break;
     case "auth-ok":
+      if (firstOk.value) {
+        socket.value?.send(JSON.stringify({ event: "command", cmd: "list" }));
+        firstOk.value = false;
+      }
       break;
     default:
       console.warn("Unhandled WebSocket event:", data);
