@@ -4,19 +4,35 @@
       <div class="card flex flex-col gap-4">
         <label for="username-field" class="flex flex-col gap-2">
           <span class="text-lg font-bold text-contrast">Server Properties</span>
-          <span> Edit the Minecraft server properties file. </span>
+          <span> Edit the Minecraft server properties file.</span>
         </label>
         <div class="flex flex-col gap-4 rounded-xl bg-table-alternateRow p-4">
+          <div class="relative w-full text-sm">
+            <label class="sr-only" for="search">Search</label>
+            <SearchIcon
+              class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+              aria-hidden="true"
+            />
+            <input
+              id="search"
+              v-model="searchInput"
+              class="w-full border-[1px] border-solid border-[var(--color-button-border)] pl-9"
+              type="search"
+              name="search"
+              autocomplete="off"
+              placeholder="Search server properties..."
+            />
+          </div>
           <div
-            v-for="(property, index) in liveProperties"
+            v-for="(property, index) in filteredProperties"
             :key="index"
-            class="mb-2 flex items-center justify-between pb-2"
+            class="mb-2 mt-2 flex items-center justify-between pb-2"
           >
             <label :for="index.toString()" class="flex items-center">
               {{
                 index
                   .toString()
-                  .split("-")
+                  .split(/[-.]/)
                   .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                   .join(" ")
               }}
@@ -110,7 +126,8 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { DropdownSelect } from "@modrinth/ui";
-import { EyeIcon } from "@modrinth/assets";
+import { EyeIcon, SearchIcon } from "@modrinth/assets";
+import Fuse from "fuse.js";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
@@ -123,6 +140,8 @@ const isUpdating = ref(false);
 
 const changedPropertiesState = ref({});
 const hasUnsavedChanges = computed(() => JSON.stringify(changedPropertiesState.value) !== "{}");
+
+const searchInput = ref("");
 
 const data = computed(() => props.server.general);
 const { data: propsData } = await useAsyncData(
@@ -156,6 +175,30 @@ const overrides: { [key: string]: { type: string; options?: string[]; info?: str
 };
 
 const liveProperties = ref(JSON.parse(JSON.stringify(propsData.value)));
+
+const fuse = computed(() => {
+  if (!liveProperties.value) return null;
+
+  const propertiesToFuse = Object.entries(liveProperties.value).map(([key, value]) => ({
+    key,
+    value: String(value),
+  }));
+
+  return new Fuse(propertiesToFuse, {
+    keys: ["key", "value"],
+    threshold: 0.2,
+  });
+});
+
+const filteredProperties = computed(() => {
+  if (!searchInput.value?.trim()) {
+    return liveProperties.value;
+  }
+
+  const results = fuse.value?.search(searchInput.value) ?? [];
+
+  return Object.fromEntries(results.map(({ item }) => [item.key, liveProperties.value[item.key]]));
+});
 
 watch(
   liveProperties,
