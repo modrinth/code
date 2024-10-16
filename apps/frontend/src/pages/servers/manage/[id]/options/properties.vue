@@ -1,20 +1,20 @@
 <template>
-  <div class="relative h-full w-full overflow-y-auto">
+  <div class="relative h-full w-full select-none overflow-y-auto">
     <div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto">
       <div class="card flex flex-col gap-4">
-        <label for="username-field" class="flex flex-col gap-2">
-          <span class="text-lg font-bold text-contrast">Server Properties</span>
-          <span> Edit the Minecraft server properties file.</span>
-        </label>
+        <div class="flex flex-col gap-2">
+          <h2 class="m-0 text-lg font-bold text-contrast">Server Properties</h2>
+          <p class="m-0">Edit the Minecraft server properties file.</p>
+        </div>
         <div class="flex flex-col gap-4 rounded-xl bg-table-alternateRow p-4">
           <div class="relative w-full text-sm">
-            <label class="sr-only" for="search">Search</label>
+            <label for="search-server-properties" class="sr-only">Search server properties</label>
             <SearchIcon
               class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
               aria-hidden="true"
             />
             <input
-              id="search"
+              id="search-server-properties"
               v-model="searchInput"
               class="w-full pl-9"
               type="search"
@@ -26,74 +26,60 @@
           <div
             v-for="(property, index) in filteredProperties"
             :key="index"
-            class="mb-2 mt-2 flex items-center justify-between pb-2"
+            class="flex items-center justify-between py-2"
           >
-            <label :for="index.toString()" class="flex items-center">
-              {{
-                index
-                  .toString()
-                  .split(/[-.]/)
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")
-              }}
+            <div class="flex items-center">
+              <span :id="`property-label-${index}`">{{ formatPropertyName(index) }}</span>
               <span v-if="overrides[index] && overrides[index].info" class="ml-2">
                 <EyeIcon v-tooltip="overrides[index].info" />
               </span>
-            </label>
-            <div v-if="overrides[index] && overrides[index].type === 'dropdown'">
+            </div>
+            <div
+              v-if="overrides[index] && overrides[index].type === 'dropdown'"
+              class="flex w-[320px] justify-end"
+            >
               <DropdownSelect
+                :id="`server-property-${index}`"
                 v-model="liveProperties[index]"
-                :name="
-                  index
-                    .toString()
-                    .split('-')
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ')
-                "
+                :name="formatPropertyName(index)"
                 :options="overrides[index].options"
+                :aria-labelledby="`property-label-${index}`"
                 placeholder="Select..."
               />
             </div>
-            <div v-else-if="typeof property === 'boolean'">
+            <div v-else-if="typeof property === 'boolean'" class="flex w-[320px] justify-end">
               <input
-                id="property.id"
+                :id="`server-property-${index}`"
                 v-model="liveProperties[index]"
                 class="switch stylized-toggle"
                 type="checkbox"
+                :aria-labelledby="`property-label-${index}`"
               />
             </div>
             <div v-else-if="typeof property === 'number'" class="w-[320px]">
               <input
-                :id="index.toString()"
+                :id="`server-property-${index}`"
                 v-model.number="liveProperties[index]"
                 type="number"
                 class="w-full border p-2"
+                :aria-labelledby="`property-label-${index}`"
               />
             </div>
-            <div
-              v-else-if="
-                typeof property === 'object' ||
-                property.includes(',') ||
-                property.includes('{') ||
-                property.includes('}') ||
-                property.includes('[') ||
-                property.includes(']') ||
-                property.length > 30
-              "
-              class="w-[320px]"
-            >
+            <div v-else-if="isComplexProperty(property)" class="w-[320px]">
               <textarea
-                :id="index.toString()"
-                :value="JSON.stringify(property, null, 2)"
+                :id="`server-property-${index}`"
+                v-model="liveProperties[index]"
                 class="w-full resize-y rounded-xl border p-2"
+                :aria-labelledby="`property-label-${index}`"
               ></textarea>
             </div>
-            <div v-else class="w-[320px]">
+            <div v-else class="flex w-[320px] justify-end">
               <input
-                :id="index.toString()"
-                :value="property"
+                :id="`server-property-${index}`"
+                v-model="liveProperties[index]"
                 type="text"
                 class="w-full rounded-xl border p-2"
+                :aria-labelledby="`property-label-${index}`"
               />
             </div>
           </div>
@@ -112,7 +98,7 @@
     <UiServersPyroLoading v-else />
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
-        :is-visible="!!hasUnsavedChanges"
+        :is-visible="hasUnsavedChanges"
         :server="props.server"
         :is-updating="isUpdating"
         restart
@@ -124,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { DropdownSelect } from "@modrinth/ui";
 import { EyeIcon, SearchIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
@@ -138,9 +124,6 @@ const tags = useTags();
 
 const isUpdating = ref(false);
 
-const changedPropertiesState = ref({});
-const hasUnsavedChanges = computed(() => JSON.stringify(changedPropertiesState.value) !== "{}");
-
 const searchInput = ref("");
 
 const data = computed(() => props.server.general);
@@ -148,6 +131,27 @@ const { data: propsData } = await useAsyncData(
   "ServerProperties",
   async () => await props.server.general?.fetchConfigFile("ServerProperties"),
 );
+
+const liveProperties = ref<Record<string, any>>({});
+const originalProperties = ref<Record<string, any>>({});
+
+watch(
+  propsData,
+  (newPropsData) => {
+    if (newPropsData) {
+      liveProperties.value = JSON.parse(JSON.stringify(newPropsData));
+      originalProperties.value = JSON.parse(JSON.stringify(newPropsData));
+    }
+  },
+  { immediate: true },
+);
+
+const hasUnsavedChanges = computed(() => {
+  return Object.keys(liveProperties.value).some(
+    (key) =>
+      JSON.stringify(liveProperties.value[key]) !== JSON.stringify(originalProperties.value[key]),
+  );
+});
 
 const getDifficultyOptions = () => {
   const pre113Versions = tags.value.gameVersions
@@ -174,8 +178,6 @@ const overrides: { [key: string]: { type: string; options?: string[]; info?: str
   },
 };
 
-const liveProperties = ref(JSON.parse(JSON.stringify(propsData.value)));
-
 const fuse = computed(() => {
   if (!liveProperties.value) return null;
 
@@ -200,26 +202,6 @@ const filteredProperties = computed(() => {
   return Object.fromEntries(results.map(({ item }) => [item.key, liveProperties.value[item.key]]));
 });
 
-watch(
-  liveProperties,
-  (newProperties) => {
-    changedPropertiesState.value = {};
-    const changed = [];
-    for (const key in newProperties) {
-      // @ts-ignore https://typescript.tv/errors/#ts7053
-      if (newProperties[key] !== data.value[key]) {
-        changed.push(key);
-      }
-    }
-    // @ts-ignore
-    for (const key of changed) {
-      // @ts-ignore
-      changedPropertiesState.value[key] = newProperties[key];
-    }
-  },
-  { deep: true },
-);
-
 const constructServerProperties = (): string => {
   const properties = liveProperties.value;
 
@@ -243,7 +225,7 @@ const saveProperties = async () => {
     isUpdating.value = true;
     await props.server.fs?.updateFile("server.properties", constructServerProperties());
     await new Promise((resolve) => setTimeout(resolve, 500));
-    changedPropertiesState.value = {};
+    originalProperties.value = JSON.parse(JSON.stringify(liveProperties.value));
     await props.server.refresh();
     addNotification({
       group: "serverOptions",
@@ -265,8 +247,27 @@ const saveProperties = async () => {
 };
 
 const resetProperties = async () => {
-  liveProperties.value = JSON.parse(JSON.stringify(propsData.value));
+  liveProperties.value = JSON.parse(JSON.stringify(originalProperties.value));
   await new Promise((resolve) => setTimeout(resolve, 200));
-  changedPropertiesState.value = {};
+};
+
+const formatPropertyName = (propertyName: string): string => {
+  return propertyName
+    .split(/[-.]/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+const isComplexProperty = (property: any): boolean => {
+  return (
+    typeof property === "object" ||
+    (typeof property === "string" &&
+      (property.includes(",") ||
+        property.includes("{") ||
+        property.includes("}") ||
+        property.includes("[") ||
+        property.includes("]") ||
+        property.length > 30))
+  );
 };
 </script>
