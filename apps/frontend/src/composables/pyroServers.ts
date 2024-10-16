@@ -658,7 +658,6 @@ const modules: any = {
       }
       data.image = (await processImage(data.project?.icon_url)) ?? undefined;
       const motd = await getMotd();
-      console.log(motd);
       if (motd === "A Minecraft Server") {
         await setMotd(`§b${data.project?.title} §f♦ §aModrinth Servers`);
       }
