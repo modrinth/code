@@ -411,6 +411,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.22.1
         version: 6.28.4
+      '@modrinth/assets':
+        specifier: workspace:*
+        version: link:../assets
       '@types/markdown-it':
         specifier: ^14.1.1
         version: 14.1.1
@@ -423,6 +426,9 @@ importers:
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
+      markdown-it-github-alerts:
+        specifier: ^0.3.0
+        version: 0.3.0(markdown-it@14.1.0)
       xss:
         specifier: ^1.0.14
         version: 1.0.15
@@ -4430,6 +4436,11 @@ packages:
   make-dir@3.1.0:
     resolution: {integrity: sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==}
     engines: {node: '>=8'}
+
+  markdown-it-github-alerts@0.3.0:
+    resolution: {integrity: sha512-qyIuDyfdrVGHhY+E/44yMyNA3ZnayaT/KKT2VgkIz1nmrgiuPkdgPUh4YBZwgJ9VKEGJvGd82Ndrc4oGftrJWg==}
+    peerDependencies:
+      markdown-it: ^14.0.0
 
   markdown-it@13.0.2:
     resolution: {integrity: sha512-FtwnEuuK+2yVU7goGn/MJ0WBZMM9ZPgU9spqlFs7/A/pDIUNSOQZhUgOqYCficIuR2QaFnrt8LHqBWsbTAoI5w==}
@@ -11148,6 +11159,10 @@ snapshots:
   make-dir@3.1.0:
     dependencies:
       semver: 6.3.1
+
+  markdown-it-github-alerts@0.3.0(markdown-it@14.1.0):
+    dependencies:
+      markdown-it: 14.1.0
 
   markdown-it@13.0.2:
     dependencies:
