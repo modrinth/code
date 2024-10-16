@@ -73,7 +73,7 @@
     <UiServersPyroLoading v-else />
     <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
       <UiServersSaveBanner
-        v-if="hasUnsavedChanges && isValidServerName"
+        :is-visible="!!hasUnsavedChanges && !!isValidServerName"
         :server="props.server"
         :is-updating="isUpdating"
         :save="saveGeneral"
