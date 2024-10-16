@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                                INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)\n                                VALUES ($1, $2, $3)\n                                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int4",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6366891bb34a14278f1ae857b8d6f68dff44badae9ae5c5aceba3c32e8d00356"
+}

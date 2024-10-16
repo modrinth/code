@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE collections\n                SET name = $1\n                WHERE (id = $2)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4b089a5d9408febe64af1cf5f78cc11c33f6702637c03c1ed9d24df8a847f91a"
+}

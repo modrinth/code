@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, metadata, unitary\n            FROM products\n            WHERE 1 = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 2,
+        "name": "unitary",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "ba2e3eab0daba9698686cbf324351f5d0ddc7be1d1b650a86a43712786fd4a4d"
+}

@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT DISTINCT mod_id, v.id as id, date_published\n                    FROM mods m\n                    INNER JOIN versions v ON m.id = v.mod_id AND v.status = ANY($3)\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "date_published",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7f5cccc8927d3675f91c2b2f5c260466d989b5cd4a73926abacc3989b9e887ab"
+}

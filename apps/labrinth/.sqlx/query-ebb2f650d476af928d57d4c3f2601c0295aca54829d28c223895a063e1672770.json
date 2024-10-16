@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                clients.id as \"id!\",\n                clients.name as \"name!\",\n                clients.icon_url as \"icon_url?\",\n                clients.raw_icon_url as \"raw_icon_url?\",\n                clients.max_scopes as \"max_scopes!\",\n                clients.secret_hash as \"secret_hash!\",\n                clients.created as \"created!\",\n                clients.created_by as \"created_by!\",\n                clients.url as \"url?\",\n                clients.description as \"description?\",\n                uris.uri_ids as \"uri_ids?\",\n                uris.uri_vals as \"uri_vals?\"\n            FROM oauth_clients clients\n            LEFT JOIN (\n                SELECT client_id, array_agg(id) as uri_ids, array_agg(uri) as uri_vals\n                FROM oauth_client_redirect_uris\n                GROUP BY client_id\n            ) uris ON clients.id = uris.client_id\n            WHERE created_by = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "icon_url?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "raw_icon_url?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "max_scopes!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "secret_hash!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "created!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_by!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "url?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "description?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "uri_ids?",
+        "type_info": "Int8Array"
+      },
+      {
+        "ordinal": 11,
+        "name": "uri_vals?",
+        "type_info": "TextArray"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      null,
+      null
+    ]
+  },
+  "hash": "ebb2f650d476af928d57d4c3f2601c0295aca54829d28c223895a063e1672770"
+}

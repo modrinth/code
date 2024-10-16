@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.raw_icon_url, o.color\n            FROM organizations o\n            LEFT JOIN mods m ON m.organization_id = o.id\n            WHERE m.id = $1\n            GROUP BY o.id;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "team_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "icon_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "raw_icon_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "color",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "31de3bbe7e8768bf32ae60d1cd32a26032e5cdb0e7f64eb4ac791855d7256cc8"
+}

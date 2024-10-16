@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE users\n                    SET steam_id = $2\n                    WHERE (id = $1)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f9bc19beaa70db45b058e80ba86599d393fad4c7d4af98426a8a9d9ca9b24035"
+}

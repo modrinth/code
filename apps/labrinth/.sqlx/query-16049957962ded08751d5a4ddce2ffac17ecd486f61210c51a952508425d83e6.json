@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE versions\n                    SET changelog = $1\n                    WHERE (id = $2)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "16049957962ded08751d5a4ddce2ffac17ecd486f61210c51a952508425d83e6"
+}

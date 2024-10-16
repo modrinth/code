@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM notifications\n            WHERE id = ANY($1)\n            RETURNING user_id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ee375e658423156a758cc372400961f627fa5a620a3f61e37ec09fee1d7bb4e3"
+}

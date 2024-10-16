@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    DELETE FROM user_backup_codes\n                    WHERE user_id = $1 AND code = $2\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "de1bf7e33a99a10154cefdbe3b8322e4c6a19448b6ee3c6087b1b8163bc52cb1"
+}

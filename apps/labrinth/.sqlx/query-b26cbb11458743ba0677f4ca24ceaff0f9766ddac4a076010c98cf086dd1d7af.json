@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                        SELECT EXISTS(SELECT 1 FROM organizations WHERE id=$1)\n                        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "b26cbb11458743ba0677f4ca24ceaff0f9766ddac4a076010c98cf086dd1d7af"
+}

@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT tm.id, tm.author_id, tm.thread_id, tm.body, tm.created, tm.hide_identity\n            FROM threads_messages tm\n            WHERE tm.id = ANY($1)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "author_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "thread_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "body",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "hide_identity",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "caa4f261950f027cd34e2099e5489c02de214299004ea182f5eae93396e1d313"
+}

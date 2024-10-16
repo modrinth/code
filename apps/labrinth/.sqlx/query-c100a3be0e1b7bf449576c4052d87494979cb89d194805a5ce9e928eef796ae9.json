@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE mods\n                    SET license_url = $1\n                    WHERE (id = $2)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c100a3be0e1b7bf449576c4052d87494979cb89d194805a5ce9e928eef796ae9"
+}

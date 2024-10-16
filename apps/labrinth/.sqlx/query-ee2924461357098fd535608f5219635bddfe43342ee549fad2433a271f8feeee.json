@@ -1,0 +1,44 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, slug, name, icon_url, banner_url FROM games\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "icon_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "banner_url",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "ee2924461357098fd535608f5219635bddfe43342ee549fad2433a271f8feeee"
+}

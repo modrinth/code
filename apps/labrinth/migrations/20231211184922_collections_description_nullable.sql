@@ -1,0 +1,1 @@
+ALTER TABLE collections ALTER COLUMN description DROP NOT NULL;

@@ -1,0 +1,38 @@
+version: '3'
+services:
+  postgres_db:
+    image: postgres:alpine
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: labrinth
+      POSTGRES_PASSWORD: labrinth
+      POSTGRES_HOST_AUTH_METHOD: trust
+  meilisearch:
+    image: getmeili/meilisearch:v1.5.0
+    restart: on-failure
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch-data:/data.ms
+    environment:
+      MEILI_MASTER_KEY: modrinth
+      MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 107374182400
+  redis:
+    image: redis:alpine
+    restart: on-failure
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    ports:
+      - "8123:8123"
+volumes:
+  meilisearch-data:
+  db-data:
+  redis-data:

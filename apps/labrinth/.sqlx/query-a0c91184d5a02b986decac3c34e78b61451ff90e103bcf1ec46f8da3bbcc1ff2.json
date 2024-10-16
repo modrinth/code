@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                DELETE FROM notifications_actions\n                 WHERE notification_id = ANY($1)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a0c91184d5a02b986decac3c34e78b61451ff90e103bcf1ec46f8da3bbcc1ff2"
+}

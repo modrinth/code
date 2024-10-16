@@ -1,0 +1,36 @@
+name: Rust building
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  SQLX_OFFLINE: true
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get build cache
+        id: cache-build
+        uses: actions/cache@v2
+        with:
+          path: target/**
+          key: ${{ runner.os }}-build-cache
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+        env:
+          SQLX_OFFLINE: true
+      - uses: actions-rs/cargo@v1
+        name: Build program
+        with:
+          command: build
+        env:
+          SQLX_OFFLINE: true
