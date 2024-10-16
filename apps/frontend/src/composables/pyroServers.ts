@@ -655,6 +655,11 @@ const modules: any = {
         data.project = await fetchProject(data.upstream.project_id);
       }
       data.image = (await processImage(data.project?.icon_url)) ?? undefined;
+      const motd = await getMotd();
+      if (motd === "A Minecraft Server") {
+        await setMotd(`§b${data.project?.title} §f♦ §aModrinth Servers`);
+      }
+      data.motd = motd;
       return data;
     },
     updateName,
