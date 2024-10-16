@@ -10,9 +10,6 @@
 <script setup lang="ts">
 import { CopyIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import { useNuxtApp } from "#app";
-
-const app = useNuxtApp();
 
 const props = defineProps<{
   ip: string;
