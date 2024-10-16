@@ -240,12 +240,12 @@
                 :class="data.loader === 'NeoForge' ? '[&&]:bg-bg-green' : ''"
               >
                 <UiServersLoaderIcon
-                  loader="Neoforge"
+                  loader="NeoForge"
                   class="[&&]:size-10"
                   :class="data.loader === 'NeoForge' ? 'text-brand' : ''"
                 />
               </div>
-              <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Neoforge</h1>
+              <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">NeoForge</h1>
               <span
                 v-if="data.loader === 'NeoForge'"
                 class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"

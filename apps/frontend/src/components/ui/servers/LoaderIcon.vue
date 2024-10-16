@@ -77,7 +77,7 @@
     ></path>
   </svg>
   <svg
-    v-else-if="loader === 'Neoforge'"
+    v-else-if="loader === 'NeoForge'"
     enable-background="new 0 0 24 24"
     version="1.1"
     viewBox="0 0 24 24"
