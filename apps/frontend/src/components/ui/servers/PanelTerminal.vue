@@ -283,7 +283,6 @@ onMounted(() => {
   nextTick(() => {
     updateItemHeights();
     setTimeout(scrollToBottom, 200);
-    console.log("s2b");
   });
   window.addEventListener("resize", updateClientHeight);
   window.addEventListener("keydown", handleKeydown);

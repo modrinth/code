@@ -88,6 +88,8 @@ interface General {
   project?: Project;
   sftp_username: string;
   sftp_password: string;
+  sftp_host: string;
+  datacenter?: string;
 }
 
 interface Allocation {
@@ -317,7 +319,7 @@ const fetchConfigFile = async (fileName: string) => {
 
 const getMotd = async () => {
   try {
-    const props = (await fetchConfigFile("ServerProperties")) as any;
+    const props = await downloadFile("/server.properties");
     if (props) {
       const lines = props.split("\n");
       for (const line of lines) {
@@ -656,6 +658,7 @@ const modules: any = {
       }
       data.image = (await processImage(data.project?.icon_url)) ?? undefined;
       const motd = await getMotd();
+      console.log(motd);
       if (motd === "A Minecraft Server") {
         await setMotd(`§b${data.project?.title} §f♦ §aModrinth Servers`);
       }

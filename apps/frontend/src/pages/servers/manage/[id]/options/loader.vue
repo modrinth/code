@@ -237,25 +237,25 @@
             <div class="flex items-center gap-2">
               <div
                 class="rounded-xl bg-button-bg p-2"
-                :class="data.loader === 'Neoforge' ? '[&&]:bg-bg-green' : ''"
+                :class="data.loader === 'NeoForge' ? '[&&]:bg-bg-green' : ''"
               >
                 <UiServersLoaderIcon
                   loader="Neoforge"
                   class="[&&]:size-10"
-                  :class="data.loader === 'Neoforge' ? 'text-brand' : ''"
+                  :class="data.loader === 'NeoForge' ? 'text-brand' : ''"
                 />
               </div>
               <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Neoforge</h1>
               <span
-                v-if="data.loader === 'Neoforge'"
+                v-if="data.loader === 'NeoForge'"
                 class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
               >
                 Current
               </span>
             </div>
 
-            <Button @click="selectLoader('Neoforge')">
-              {{ data.loader === "Neoforge" ? "Reinstall" : "Install" }}
+            <Button @click="selectLoader('NeoForge')">
+              {{ data.loader === "NeoForge" ? "Reinstall" : "Install" }}
               <ChevronRightIcon />
             </Button>
           </div>

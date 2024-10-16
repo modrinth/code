@@ -195,13 +195,11 @@ const handleWebSocketMessage = (data: WSEvent) => {
       updateStats(data);
       break;
     case "auth-expiring":
+    case "auth-incorrect":
       reauthenticate();
       break;
     case "power-state":
       updatePowerState(data.state);
-      break;
-    case "auth-incorrect":
-      isWSAuthIncorrect.value = true;
       break;
     case "installation-result":
       handleInstallationResult(data);

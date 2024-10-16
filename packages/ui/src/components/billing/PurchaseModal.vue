@@ -71,7 +71,7 @@
           /> -->
           <div class="flex justify-between h-24 gap-4">
             <button
-              v-for="loader in ['Vanilla', 'Fabric', 'Forge', 'Quilt', 'Neoforge']"
+              v-for="loader in ['Vanilla', 'Fabric', 'Forge', 'Quilt', 'NeoForge']"
               :key="loader"
               class="!w-full !h-full btn flex !flex-col !items-center !justify-between !pt-4 !pb-3"
               :style="{

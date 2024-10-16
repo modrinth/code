@@ -1,6 +1,14 @@
 <template>
   <div class="flex flex-row items-center gap-2 rounded-lg">
     <ButtonStyled v-if="showStopButton" type="standard" color="red">
+      <button :disabled="!canTakeAction" @click="killServer">
+        <div class="flex gap-1">
+          <SlashIcon class="h-5 w-5" />
+          <span>{{ killButtonText }}</span>
+        </div>
+      </button>
+    </ButtonStyled>
+    <ButtonStyled v-if="showStopButton" type="standard" color="red">
       <button :disabled="!canTakeAction" @click="stopServer">
         <div class="flex gap-1">
           <StopCircleIcon class="h-5 w-5" />
@@ -35,7 +43,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-import { PlayIcon, UpdatedIcon, StopCircleIcon } from "@modrinth/assets";
+import { PlayIcon, UpdatedIcon, StopCircleIcon, SlashIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps<{
@@ -44,7 +52,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "action", action: "start" | "restart" | "stop"): void;
+  (e: "action", action: "start" | "restart" | "stop" | "kill"): void;
 }>();
 
 const ServerState = {
@@ -97,6 +105,10 @@ const stopButtonText = computed(() => {
   return currentState.value === ServerState.Stopping ? "Stopping..." : "Stop";
 });
 
+const killButtonText = computed(() => {
+  return currentState.value === ServerState.Stopping ? "Stopping..." : "Kill";
+});
+
 const updateState = (newState: ServerStateType) => {
   currentState.value = newState;
 };
@@ -118,6 +130,13 @@ const stopServer = () => {
 
   updateState(ServerState.Stopping);
   emit("action", "stop");
+};
+
+const killServer = () => {
+  if (!canTakeAction.value) return;
+
+  updateState(ServerState.Stopping);
+  emit("action", "kill");
 };
 
 watch(

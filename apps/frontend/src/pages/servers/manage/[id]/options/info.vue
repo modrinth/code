@@ -1,11 +1,5 @@
 <template>
   <div class="h-full w-full gap-2 overflow-y-auto">
-    <div
-      class="mb-4 flex h-full w-full items-center gap-2 rounded-xl border border-solid border-blue bg-bg-blue p-4 text-contrast"
-    >
-      <UnknownIcon class="h-8 w-8 text-blue" />
-      SFTP is currently unavailable. This feature is under construction and will be available soon.
-    </div>
     <div class="card">
       <div class="flex flex-col gap-4">
         <div class="flex justify-between">
@@ -13,11 +7,11 @@
             <span class="text-lg font-bold text-contrast">SFTP</span>
             <span> SFTP is a way to access your server's files from outside of Modrinth. </span>
           </label>
-          <Button> Launch SFTP </Button>
+          <Button @click="openSftp"> Launch SFTP </Button>
         </div>
         <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
           <span class="font-bold text-contrast">
-            sftp://geezyippeedrat@us-lax2.kyros.pyro.host:2022/
+            {{ data?.sftp_host }}
           </span>
           <span class="text-xs uppercase text-secondary">server address</span>
         </div>
@@ -27,9 +21,22 @@
             <span class="text-xs uppercase text-secondary">username</span>
           </div>
           <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
-            <span class="font-bold text-contrast">
-              {{ data?.sftp_password }}
-            </span>
+            <div class="flex items-center justify-between">
+              <span
+                class="font-bold text-contrast hover:cursor-pointer"
+                :class="{ blur: !showPassword }"
+                @click="togglePassword"
+              >
+                {{ data?.sftp_password }}
+              </span>
+
+              <EyeIcon
+                v-if="showPassword"
+                class="h-5 w-5 hover:cursor-pointer"
+                @click="togglePassword"
+              />
+              <EyeOffIcon v-else class="h-5 w-5 hover:cursor-pointer" @click="togglePassword" />
+            </div>
             <span class="text-xs uppercase text-secondary">password</span>
           </div>
         </div>
@@ -57,8 +64,9 @@
 
 <script setup lang="ts">
 import { Button } from "@modrinth/ui";
-import { UnknownIcon } from "@modrinth/assets";
+import { EyeIcon, EyeOffIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
+
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 
@@ -67,6 +75,15 @@ const props = defineProps<{
 }>();
 
 const data = computed(() => props.server.general);
+const showPassword = ref(false);
+
+const openSftp = () => {
+  window.open(`sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`);
+};
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value;
+};
 
 const properties = [
   { name: "Server ID", value: serverId ?? "Unknown" },
