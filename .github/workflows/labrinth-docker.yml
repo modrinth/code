@@ -6,7 +6,13 @@ on:
       - '**'
     tags:
       - 'v*'
+    paths:
+      - .github/workflows/labrinth-docker.yml
+      - 'apps/labrinth/**'
   pull_request:
+    paths:
+      - .github/workflows/labrinth-docker.yml
+      - 'apps/labrinth/**'
 
 jobs:
   docker:
@@ -32,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./Dockerfile
+          file: .apps/labrinth/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}

@@ -66,5 +66,8 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Start Docker Compose
+        run: docker compose up -d
+
       - name: Test
         run: pnpm test

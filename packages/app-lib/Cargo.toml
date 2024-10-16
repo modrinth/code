@@ -60,7 +60,7 @@ rand = "0.8"
 byteorder = "1.5.0"
 base64 = "0.22.0"
 
-sqlx = { version = "0.8.0", features = [ "runtime-tokio", "sqlite", "macros" ] }
+sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52.0"
