@@ -16,7 +16,7 @@
             <input
               id="search"
               v-model="searchInput"
-              class="w-full border-[1px] border-solid border-[var(--color-button-border)] pl-9"
+              class="w-full pl-9"
               type="search"
               name="search"
               autocomplete="off"
@@ -248,16 +248,16 @@ const saveProperties = async () => {
     addNotification({
       group: "serverOptions",
       type: "success",
-      title: "Server settings updated",
-      text: "Your server settings were successfully changed.",
+      title: "Server properties updated",
+      text: "Your server properties were successfully changed.",
     });
   } catch (error) {
-    console.error("Error updating server settings:", error);
+    console.error("Error updating server properties:", error);
     addNotification({
       group: "serverOptions",
       type: "error",
-      title: "Failed to update server settings",
-      text: "An error occurred while attempting to update your server settings.",
+      title: "Failed to update server properties",
+      text: "An error occurred while attempting to update your server properties.",
     });
   } finally {
     isUpdating.value = false;
