@@ -19,20 +19,21 @@
   </Modal>
 
   <div v-if="data && mods" class="flex h-full w-full flex-col">
-    <div class="card flex flex-col gap-4 [&&]:py-3">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-extrabold text-contrast">Mods</h1>
-        <div class="flex gap-2">
-          <Button color="green" outline @click="showAddModModal">
-            <PlusIcon />
-            Add mod
-          </Button>
-          <Button>
-            <DownloadIcon />
-            Update mods
-          </Button>
-        </div>
+    <div class="flex items-center justify-between">
+      <h1 class="my-4 text-2xl font-extrabold text-contrast">Mods</h1>
+      <div class="flex gap-2">
+        <Button color="green" outline @click="showAddModModal">
+          <PlusIcon />
+          Add mod
+        </Button>
       </div>
+    </div>
+    <div
+      class="mb-4 flex h-full w-full items-center gap-2 rounded-xl border border-solid border-blue bg-bg-blue p-4 text-contrast"
+    >
+      <UnknownIcon class="h-8 w-8 text-blue" />
+      This page is under construction some features may not be available yet, or are subject to
+      change.
     </div>
     <div class="flex h-full w-full flex-col overflow-y-scroll">
       <div v-if="hasMods(mods)" class="flex flex-col gap-2">
@@ -45,14 +46,14 @@
           @edit="showEditModModal"
         />
       </div>
-      <div v-else class="card">You haven't added any mods yet, time to add some!</div>
+      <div v-else>You haven't added any mods yet, time to add some!</div>
     </div>
   </div>
   <UiServersPyroLoading v-else />
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, ChevronRightIcon, DownloadIcon } from "@modrinth/assets";
+import { PlusIcon, ChevronRightIcon, UnknownIcon } from "@modrinth/assets";
 import { Modal, DropdownSelect, Button } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 

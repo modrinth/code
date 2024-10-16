@@ -3,7 +3,6 @@
     class="relative flex w-full items-center justify-between rounded-xl bg-bg-raised"
     :class="data.disabled ? 'bg-table-alternateRow text-secondary' : ''"
   >
-    <Checkbox v-model="selected" class="ml-2" :disabled="data.disabled" />
     <NuxtLink
       :to="`/project/${data.project_id}`"
       class="group flex w-full items-center rounded-xl p-2"

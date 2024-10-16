@@ -309,7 +309,7 @@
           <div
             class="relative flex flex-col gap-4 overflow-hidden rounded-2xl bg-highlight p-6 text-left backdrop-blur-xl md:p-12"
           >
-            <h2 class="m-0 text-lg font-bold">Unlimited storage</h2>
+            <h2 class="m-0 text-lg font-bold">Easy to use file manager</h2>
             <h3 class="m-0 text-base font-normal">
               Store as many mods, plugins, and worlds as you need.
             </h3>
@@ -553,7 +553,7 @@ async function fetchPaymentData() {
   }
 }
 
-const words = ["friends", "medieval-masters", "create-server", "mega-smp", "spookypack"];
+const words = ["my-smp", "medieval-masters", "create-server", "mega-smp", "spookypack"];
 const currentWordIndex = ref(0);
 const currentText = ref("");
 const isDeleting = ref(false);

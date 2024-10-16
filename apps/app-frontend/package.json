@@ -20,10 +20,8 @@
     "@tauri-apps/plugin-os": "^2.0.0-rc.0",
     "@tauri-apps/plugin-shell": "^2.0.0-rc.0",
     "@tauri-apps/plugin-updater": "^2.0.0-rc.0",
-    "@tauri-apps/plugin-websocket": "2.0.0-rc.1",
     "@tauri-apps/plugin-window-state": "^2.0.0-rc.0",
     "@vintl/vintl": "^4.4.1",
-    "ansi-to-html": "^0.7.2",
     "dayjs": "^1.11.10",
     "floating-vue": "^5.2.2",
     "ofetch": "^1.3.4",
@@ -33,8 +31,7 @@
     "vue": "^3.4.21",
     "vue-multiselect": "3.0.0",
     "vue-router": "4.3.0",
-    "vue-virtual-scroller": "v2.0.0-beta.8",
-    "vue3-apexcharts": "^1.6.0"
+    "vue-virtual-scroller": "v2.0.0-beta.8"
   },
   "devDependencies": {
     "@eslint/compat": "^1.1.1",
