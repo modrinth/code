@@ -19,7 +19,7 @@
               Server name must be at least 1 character long.
             </span>
             <span v-if="!isValidServerName" class="text-sm text-rose-400">
-              Server name can only contain alphanumeric characters.
+              Server name can contain any character.
             </span>
           </div>
         </div>
@@ -98,7 +98,7 @@ const serverName = ref(data.value?.name);
 const isUpdating = ref(false);
 const hasUnsavedChanges = computed(() => serverName.value && serverName.value !== data.value?.name);
 
-const isValidServerName = computed(() => /^[a-zA-Z0-9]*$/.test(serverName.value ?? ""));
+const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0);
 
 watch(serverName, (oldValue) => {
   if (!isValidServerName.value) {
