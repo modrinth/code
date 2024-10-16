@@ -7,12 +7,15 @@
           v-model="newAllocationName"
           type="text"
           class="bg-bg-input w-full rounded-lg p-4"
+          maxlength="32"
           placeholder="e.g. Secondary allocation"
         />
       </div>
       <div class="mb-1 mt-4 flex justify-end gap-4">
         <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
-        <Button color="primary" @click="addNewAllocation"> <PlusIcon /> Create allocation </Button>
+        <Button color="primary" @click="addNewAllocation" :disabled="!newAllocationName">
+          <PlusIcon /> Create allocation
+        </Button>
       </div>
     </UiServersPyroModal>
   </Modal>
