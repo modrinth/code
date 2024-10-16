@@ -1,5 +1,11 @@
 <template>
   <div class="h-full w-full gap-2 overflow-y-auto">
+    <div
+      class="mb-4 flex h-full w-full items-center gap-2 rounded-xl border border-solid border-blue bg-bg-blue p-4 text-contrast"
+    >
+      <UnknownIcon class="h-8 w-8 text-blue" />
+      SFTP is currently unavailable. This feature is under construction and will be available soon.
+    </div>
     <div class="card">
       <div class="flex flex-col gap-4">
         <div class="flex justify-between">
@@ -51,6 +57,7 @@
 
 <script setup lang="ts">
 import { Button } from "@modrinth/ui";
+import { UnknownIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 const route = useNativeRoute();
 const serverId = route.params.id as string;

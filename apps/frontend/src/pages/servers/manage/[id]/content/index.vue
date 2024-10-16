@@ -45,7 +45,7 @@
           @edit="showEditModModal"
         />
       </div>
-      <div v-else>You haven't added any mods yet, time to add some!</div>
+      <div v-else class="card">You haven't added any mods yet, time to add some!</div>
     </div>
   </div>
   <UiServersPyroLoading v-else />
