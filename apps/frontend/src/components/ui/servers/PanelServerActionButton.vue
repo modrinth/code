@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-row items-center gap-2 rounded-lg">
     <ButtonStyled v-if="showStopButton" type="standard" color="red">
-      <button :disabled="!canTakeAction" @click="killServer">
+      <button :disabled="!canTakeAction || isStartingDelay" @click="killServer">
         <div class="flex gap-1">
           <SlashIcon class="h-5 w-5" />
           <span>{{ killButtonText }}</span>
@@ -9,7 +9,7 @@
       </button>
     </ButtonStyled>
     <ButtonStyled v-if="showStopButton" type="standard" color="red">
-      <button :disabled="!canTakeAction" @click="stopServer">
+      <button :disabled="!canTakeAction || isStartingDelay" @click="stopServer">
         <div class="flex gap-1">
           <StopCircleIcon class="h-5 w-5" />
           <span>{{ stopButtonText }}</span>
@@ -18,7 +18,7 @@
     </ButtonStyled>
 
     <ButtonStyled type="standard" color="brand">
-      <button :disabled="!canTakeAction" @click="handleAction">
+      <button :disabled="!canTakeAction || isStartingDelay" @click="handleAction">
         <div v-if="isStartingOrRestarting" class="grid place-content-center">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path
@@ -106,8 +106,10 @@ const stopButtonText = computed(() => {
 });
 
 const killButtonText = computed(() => {
-  return currentState.value === ServerState.Stopping ? "Stopping..." : "Kill";
+  return "Kill";
 });
+
+const isStartingDelay = ref(false);
 
 const updateState = (newState: ServerStateType) => {
   currentState.value = newState;
@@ -122,6 +124,10 @@ const handleAction = () => {
   } else {
     updateState(ServerState.Starting);
     emit("action", "start");
+    isStartingDelay.value = true;
+    setTimeout(() => {
+      isStartingDelay.value = false;
+    }, 5000);
   }
 };
 
@@ -135,7 +141,6 @@ const stopServer = () => {
 const killServer = () => {
   if (!canTakeAction.value) return;
 
-  updateState(ServerState.Stopping);
   emit("action", "kill");
 };
 
