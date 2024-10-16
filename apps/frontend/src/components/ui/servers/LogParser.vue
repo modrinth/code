@@ -47,7 +47,14 @@ const parsedLog = computed(() => {
 });
 
 const sanitizedLog = computed(() => {
-  return DOMPurify.sanitize(parsedLog.value);
+  return DOMPurify.sanitize(parsedLog.value, {
+    ALLOWED_TAGS: ["span"],
+    ALLOWED_ATTR: ["style"],
+    ALLOWED_CSS_STYLES: {
+      color: true,
+      "background-color": true,
+    },
+  });
 });
 </script>
 
