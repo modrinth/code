@@ -1,6 +1,11 @@
 <template>
   <div class="contents">
-    <UiServersPyroError v-if="error" :title="errorTitle" :message="errorMessage" />
+    <UiServersPyroError
+      v-if="error"
+      :title="errorTitle"
+      :message="errorMessage"
+      :server-id="serverData?.server_id"
+    />
     <div
       v-if="serverData && serverData.status !== 'installing'"
       data-pyro-server-manager-root

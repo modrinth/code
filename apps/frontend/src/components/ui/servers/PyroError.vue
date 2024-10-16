@@ -22,7 +22,11 @@
       >
         {{ message }}
       </h2>
-      <p class="m-0 max-w-md text-center leading-relaxed text-secondary">
+      <p v-if="serverId" class="m-0 max-w-md text-center leading-relaxed text-secondary">
+        If this issue persists, contact Modrinth support and provide the following server ID:
+        <UiCopyCode :text="serverId" />
+      </p>
+      <p v-else class="m-0 max-w-md text-center leading-relaxed text-secondary">
         If this issue persists, contact Modrinth support.
       </p>
       <div class="flex flex-row gap-4">
@@ -55,6 +59,11 @@ defineProps({
   message: {
     type: String,
     required: true,
+  },
+  serverId: {
+    type: String,
+    default: "",
+    required: false,
   },
 });
 </script>
