@@ -11,7 +11,7 @@
             <input
               v-model="serverName"
               class="w-full md:w-[50%]"
-              maxlength="64"
+              maxlength="48"
               minlength="1"
               @keyup.enter="!serverName && saveGeneral"
             />
