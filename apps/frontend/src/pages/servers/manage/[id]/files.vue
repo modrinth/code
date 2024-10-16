@@ -641,7 +641,7 @@ const downloadFile = async (item: any) => {
 const deleteItem = async () => {
   try {
     await props.server.fs?.deleteFileOrFolder(
-      `${currentPath.value}/${selectedItem.value.name}`,
+      `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/"),
       selectedItem.value.type === "directory",
     );
     currentPage.value = 1;
