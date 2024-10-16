@@ -16,11 +16,15 @@
           <span class="text-xs uppercase text-secondary">server address</span>
         </div>
         <div class="flex gap-2">
-          <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
+          <div
+            class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
+          >
             <span class="font-bold text-contrast"> {{ data?.sftp_username }} </span>
             <span class="text-xs uppercase text-secondary">username</span>
           </div>
-          <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
+          <div
+            class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
+          >
             <div class="flex items-center justify-between">
               <span
                 class="font-bold text-contrast hover:cursor-pointer"
@@ -30,12 +34,19 @@
                 {{ data?.sftp_password }}
               </span>
 
-              <EyeIcon
-                v-if="showPassword"
-                class="h-5 w-5 hover:cursor-pointer"
-                @click="togglePassword"
-              />
-              <EyeOffIcon v-else class="h-5 w-5 hover:cursor-pointer" @click="togglePassword" />
+              <div class="flex flex-row items-center gap-1">
+                <ButtonStyled type="transparent">
+                  <button v-tooltip="'Copy SFTP password'" @click="copyPassword">
+                    <CopyIcon class="h-5 w-5 hover:cursor-pointer" />
+                  </button>
+                </ButtonStyled>
+                <ButtonStyled type="transparent">
+                  <button v-tooltip="'Show/hide SFTP password'" @click="togglePassword">
+                    <EyeIcon v-if="showPassword" class="h-5 w-5 hover:cursor-pointer" />
+                    <EyeOffIcon v-else class="h-5 w-5 hover:cursor-pointer" />
+                  </button>
+                </ButtonStyled>
+              </div>
             </div>
             <span class="text-xs uppercase text-secondary">password</span>
           </div>
@@ -63,8 +74,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from "@modrinth/ui";
-import { EyeIcon, EyeOffIcon } from "@modrinth/assets";
+import { Button, ButtonStyled } from "@modrinth/ui";
+import { CopyIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();
@@ -83,6 +94,14 @@ const openSftp = () => {
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
+};
+
+const copyPassword = () => {
+  navigator.clipboard.writeText(data.value?.sftp_password ?? "");
+  addNotification({
+    type: "success",
+    title: "Password copied!",
+  });
 };
 
 const properties = [
