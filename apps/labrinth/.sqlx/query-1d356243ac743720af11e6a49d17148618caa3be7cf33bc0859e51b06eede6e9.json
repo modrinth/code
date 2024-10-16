@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT o.id FROM organizations o\n            INNER JOIN team_members tm ON tm.team_id = o.team_id AND tm.accepted = TRUE\n            WHERE tm.user_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "1d356243ac743720af11e6a49d17148618caa3be7cf33bc0859e51b06eede6e9"
+}

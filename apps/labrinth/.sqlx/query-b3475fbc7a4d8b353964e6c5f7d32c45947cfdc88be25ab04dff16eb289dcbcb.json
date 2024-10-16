@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE reports\n            SET version_id = NULL\n            WHERE version_id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b3475fbc7a4d8b353964e6c5f7d32c45947cfdc88be25ab04dff16eb289dcbcb"
+}

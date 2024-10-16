@@ -3,7 +3,8 @@ resolver = '2'
 members = [
   './packages/app-lib',
 	'./apps/app-playground',
-  './apps/app'
+  './apps/app',
+  './apps/labrinth'
 ]
 
 # Optimize for speed and reduce size on release builds

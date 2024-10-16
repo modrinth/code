@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT DISTINCT id, enum_id, value, ordering, created, metadata\n                    FROM loader_field_enum_values lfev\n                    WHERE id = ANY($1)\n                    ORDER BY enum_id, ordering, created ASC\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "enum_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "value",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "ordering",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "d9c4d536ce0bea290f445c3bccb56b4743f2f3a9ce4b170fb439e0e135ca9d51"
+}

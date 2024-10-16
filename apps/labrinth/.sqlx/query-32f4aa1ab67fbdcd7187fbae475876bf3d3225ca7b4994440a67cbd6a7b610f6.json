@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n                    v.changelog changelog, v.date_published date_published, v.downloads downloads,\n                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering\n                    FROM versions v\n                    WHERE v.id = ANY($1);\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "author_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "version_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "version_number",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "changelog",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "date_published",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "downloads",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "version_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "featured",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "requested_status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "ordering",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "32f4aa1ab67fbdcd7187fbae475876bf3d3225ca7b4994440a67cbd6a7b610f6"
+}

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM hashes\n            WHERE EXISTS(\n                SELECT 1 FROM files WHERE\n                    (files.version_id = $1) AND\n                    (hashes.file_id = files.id)\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b903ac4e686ef85ba28d698c668da07860e7f276b261d8f2cebb74e73b094970"
+}

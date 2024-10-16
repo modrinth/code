@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                                        SELECT mel.id, mel.flame_project_id, mel.status status\n                                        FROM moderation_external_licenses mel\n                                        WHERE mel.flame_project_id = ANY($1)\n                                        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "flame_project_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "status",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4Array"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "3151ef71738a1f0d097aa14967d7b9eb1f24d4de1f81b80c4bd186427edc1399"
+}
