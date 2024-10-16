@@ -13,7 +13,7 @@
           </label>
           <textarea
             v-model="invocation"
-            class="min-h-[270px] resize-y w-full font-[family-name:var(--mono-font)]"
+            class="min-h-[270px] w-full resize-y font-[family-name:var(--mono-font)]"
           />
         </div>
 

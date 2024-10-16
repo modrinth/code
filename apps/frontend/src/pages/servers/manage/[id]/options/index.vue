@@ -8,8 +8,14 @@
             <span> Change the name of your server. This name is only visible on Modrinth. </span>
           </label>
           <div class="flex flex-col gap-2">
-            <input v-model="serverName" class="w-full md:w-[50%]" @keyup.enter="!serverName && saveGeneral" maxlength="64" minlength="1" />
-            <span v-if="!serverName" class="text-rose-400 text-sm">
+            <input
+              v-model="serverName"
+              class="w-full md:w-[50%]"
+              @keyup.enter="!serverName && saveGeneral"
+              maxlength="64"
+              minlength="1"
+            />
+            <span v-if="!serverName" class="text-sm text-rose-400">
               Server name must be at least 1 character long.
             </span>
           </div>
