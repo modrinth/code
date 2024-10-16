@@ -57,6 +57,9 @@ onMounted(() => {
       {
         divId: "modrinth-rail-1",
         baseDivId: "pb-slot-square-2",
+        targeting: {
+          location: "web",
+        },
       },
     ]);
   });
