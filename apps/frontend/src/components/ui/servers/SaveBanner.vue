@@ -1,29 +1,34 @@
 <template>
   <div
+    data-pyro-save-banner
     class="save-banner fixed bottom-8 left-4 right-4 z-50 mx-auto h-fit w-full max-w-4xl rounded-2xl border-2 border-solid border-divider bg-bg-raised p-4 transition-all duration-300"
   >
     <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
       <span class="font-bold text-contrast">Careful, you have unsaved changes!</span>
       <div class="flex gap-2">
-        <Button transparent :disabled="props.isUpdating" @click="props.reset"> Reset </Button>
-        <Button color="primary" :disabled="props.isUpdating" @click="props.save">
-          {{ props.isUpdating ? "Saving..." : "Save" }}
-        </Button>
-        <Button
+        <ButtonStyled type="transparent" color="standard" transparent :disabled="props.isUpdating">
+          <button @click="props.reset">Reset</button>
+        </ButtonStyled>
+        <ButtonStyled type="standard" color="brand" :disabled="props.isUpdating">
+          <button @click="props.save">{{ props.isUpdating ? "Saving..." : "Save" }}</button>
+        </ButtonStyled>
+        <ButtonStyled
           v-if="props.restart"
-          color="primary"
+          type="standard"
+          color="brand"
           :disabled="props.isUpdating"
-          @click="saveAndRestart"
         >
-          {{ props.isUpdating ? "Saving..." : "Save & Restart" }}
-        </Button>
+          <button @click="saveAndRestart">
+            {{ props.isUpdating ? "Saving..." : "Save & Restart" }}
+          </button>
+        </ButtonStyled>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Button } from "@modrinth/ui";
+import { ButtonStyled } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
