@@ -7,7 +7,12 @@
             <span class="text-lg font-bold text-contrast">Server Name</span>
             <span> Change the name of your server. This name is only visible on Modrinth. </span>
           </label>
-          <input v-model="serverName" class="w-full md:w-[50%]" @keyup.enter="saveGeneral" />
+          <div class="flex flex-col gap-2">
+            <input v-model="serverName" class="w-full md:w-[50%]" @keyup.enter="!serverName && saveGeneral" maxlength="64" minlength="1" />
+            <span v-if="!serverName" class="text-rose-400 text-sm">
+              Server name must be at least 1 character long.
+            </span>
+          </div>
         </div>
 
         <div class="card flex flex-col gap-4">
@@ -82,7 +87,7 @@ const data = computed(() => props.server.general);
 const serverName = ref(data.value?.name);
 
 const isUpdating = ref(false);
-const hasUnsavedChanges = computed(() => serverName.value !== data.value?.name);
+const hasUnsavedChanges = computed(() => serverName.value && serverName.value !== data.value?.name);
 
 const saveGeneral = async () => {
   try {
