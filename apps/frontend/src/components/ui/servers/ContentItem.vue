@@ -49,12 +49,10 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Checkbox } from "@modrinth/ui";
+import { Button } from "@modrinth/ui";
 import { EditIcon, TrashIcon } from "@modrinth/assets";
 
 const emit = defineEmits(["toggle", "delete", "edit"]);
-
-const selected = ref(false);
 
 defineProps<{
   data: {

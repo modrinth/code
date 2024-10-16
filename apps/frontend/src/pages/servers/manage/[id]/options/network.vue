@@ -139,8 +139,6 @@
 </template>
 
 <script setup lang="ts">
-// currently broken, will fix
-
 import { PlusIcon, TrashIcon, EditIcon, VersionIcon, SaveIcon } from "@modrinth/assets";
 import { ButtonStyled, Modal, Button } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
@@ -157,7 +155,7 @@ const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
 
 const network = computed(() => props.server.network);
-const allocations = ref(network.value?.allocations);
+const allocations = computed(() => network.value?.allocations);
 
 const newAllocationModal = ref();
 const editAllocationModal = ref();
@@ -172,10 +170,17 @@ const addNewAllocation = async () => {
   try {
     await props.server.network?.reserveAllocation(newAllocationName.value);
 
-    await props.server.refresh();
-
     newAllocationModal.value.hide();
     newAllocationName.value = "";
+
+    await props.server.refresh();
+
+    addNotification({
+      group: "serverOptions",
+      type: "success",
+      title: "Allocation reserved",
+      text: "Your allocation has been reserved.",
+    });
   } catch (error) {
     console.error("Failed to reserve new allocation:", error);
   }
@@ -192,10 +197,17 @@ const editAllocation = async () => {
   try {
     await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value);
 
-    await props.server.refresh();
-
     editAllocationModal.value.hide();
     newAllocationName.value = "";
+
+    await props.server.refresh();
+
+    addNotification({
+      group: "serverOptions",
+      type: "success",
+      title: "Allocation updated",
+      text: "Your allocation has been updated.",
+    });
   } catch (error) {
     console.error("Failed to reserve new allocation:", error);
   }
@@ -203,7 +215,14 @@ const editAllocation = async () => {
 
 const removeAllocation = async (port: number) => {
   await props.server.network?.deleteAllocation(port);
+
   await props.server.refresh();
+  addNotification({
+    group: "serverOptions",
+    type: "success",
+    title: "Allocation removed",
+    text: "Your allocation has been removed.",
+  });
 };
 
 const saveNetwork = async () => {
@@ -251,6 +270,5 @@ const saveNetwork = async () => {
 
 const resetNetwork = () => {
   serverSubdomain.value = data?.value?.net?.domain ?? "";
-  allocations.value = network.value?.allocations ?? [];
 };
 </script>

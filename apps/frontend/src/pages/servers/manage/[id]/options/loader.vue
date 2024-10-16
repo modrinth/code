@@ -87,7 +87,7 @@
                     v-tooltip="'Current installed Modpack version'"
                     class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
                   >
-                    v{{ currentVersion?.version_number }}
+                    {{ currentVersion?.version_number }}
                   </span>
                 </h1>
                 <span class="text-md font-semibold text-secondary">

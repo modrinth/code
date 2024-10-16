@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full w-full flex-col overflow-clip p-2 pb-4">
+  <div class="flex h-[400px] w-full flex-col overflow-clip p-2 pb-4">
     <div class="iconified-input w-full">
       <label class="hidden" for="search">Search</label>
       <SearchIcon aria-hidden="true" />
@@ -150,6 +150,9 @@ const loadMore = async () => {
 const { reset } = useInfiniteScroll(scrollContainer, async () => {
   if (page.value <= pages.value) {
     await loadMore();
+    console.log("loading more");
+    console.log(page.value);
+    console.log(pages.value);
   }
 });
 
