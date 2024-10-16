@@ -6,19 +6,16 @@
     <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
       <span class="font-bold text-contrast">Careful, you have unsaved changes!</span>
       <div class="flex gap-2">
-        <ButtonStyled type="transparent" color="standard" transparent :disabled="props.isUpdating">
-          <button @click="props.reset">Reset</button>
+        <ButtonStyled type="transparent" color="standard" transparent>
+          <button :disabled="props.isUpdating" @click="props.reset">Reset</button>
         </ButtonStyled>
-        <ButtonStyled type="standard" color="brand" :disabled="props.isUpdating">
-          <button @click="props.save">{{ props.isUpdating ? "Saving..." : "Save" }}</button>
+        <ButtonStyled type="standard" color="brand">
+          <button :disabled="props.isUpdating" @click="props.save">
+            {{ props.isUpdating ? "Saving..." : "Save" }}
+          </button>
         </ButtonStyled>
-        <ButtonStyled
-          v-if="props.restart"
-          type="standard"
-          color="brand"
-          :disabled="props.isUpdating"
-        >
-          <button @click="saveAndRestart">
+        <ButtonStyled v-if="props.restart" type="standard" color="brand">
+          <button :disabled="props.isUpdating" @click="saveAndRestart">
             {{ props.isUpdating ? "Saving..." : "Save & Restart" }}
           </button>
         </ButtonStyled>
