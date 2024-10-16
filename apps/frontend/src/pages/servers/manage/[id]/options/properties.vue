@@ -69,7 +69,7 @@
               <textarea
                 :id="index.toString()"
                 :value="JSON.stringify(property, null, 2)"
-                class="w-full rounded-xl border p-2"
+                class="w-full rounded-xl border p-2 resize-y"
               ></textarea>
             </div>
             <div v-else class="w-[320px]">
