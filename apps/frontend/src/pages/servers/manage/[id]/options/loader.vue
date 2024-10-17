@@ -20,9 +20,7 @@
           <XIcon class="h-4 w-4" />
         </button>
       </div>
-      <p>
-        Choose the version of Minecraft you want to use for this server. You can change this later.
-      </p>
+      <p>Choose the version of Minecraft you want to use for this server.</p>
       <div class="flex flex-col gap-2">
         <DropdownSelect
           v-model="selectedMCVersion"
