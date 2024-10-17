@@ -72,9 +72,9 @@ interface Mod {
 }
 
 const prodOverride = await PyroAuthOverride();
-const router = useRouter();
-const route = useNativeRoute();
-const serverId = route.params.id as string;
+// const router = useRouter();
+// const route = useNativeRoute();
+// const serverId = route.params.id as string;
 
 const modModal = ref();
 const isEditMode = ref(false);
@@ -86,9 +86,9 @@ const versions = ref<Record<string, any[]>>({});
 const data = computed(() => props.server.general);
 const mods = computed(() => props.server.mods?.data);
 
-if (data.value?.loader === "Vanilla") {
-  router.push(`/servers/manage/${serverId}/content/datapacks`);
-}
+// if (data.value?.loader === "Vanilla") {
+//   router.push(`/servers/manage/${serverId}/content/datapacks`);
+// }
 
 const hasMods = (mods: Mod[]) => {
   if (mods.length > 0) {
