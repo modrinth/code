@@ -365,7 +365,7 @@ const dnsRecords = computed(() => {
   return [
     {
       type: "A",
-      name: `${userDomain.value}`,
+      name: `${userDomain.value.split(".")[0]}`,
       content: data.value?.net?.ip ?? "",
     },
     {
