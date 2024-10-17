@@ -29,7 +29,6 @@
               <span
                 class="font-bold text-contrast hover:cursor-pointer"
                 :class="{ blur: !showPassword }"
-                @click="togglePassword"
               >
                 {{ data?.sftp_password }}
               </span>
@@ -41,7 +40,10 @@
                   </button>
                 </ButtonStyled>
                 <ButtonStyled type="transparent">
-                  <button v-tooltip="'Show/hide SFTP password'" @click="togglePassword">
+                  <button
+                    v-tooltip="showPassword ? 'Hide password' : 'Show password'"
+                    @click="togglePassword"
+                  >
                     <EyeIcon v-if="showPassword" class="h-5 w-5 hover:cursor-pointer" />
                     <EyeOffIcon v-else class="h-5 w-5 hover:cursor-pointer" />
                   </button>
