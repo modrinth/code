@@ -85,11 +85,11 @@
       <UiServersPoweredByPyro />
     </div>
 
-    <div v-else class="flex h-screen flex-col items-center justify-center">
-      <p class="text-lg font-bold">Get ready! We're preparing your server for you.</p>
-      <div class="h-1.5 w-full max-w-lg overflow-hidden rounded-xl bg-brand-highlight">
-        <div class="progress left-right h-full w-full bg-brand"></div>
-      </div>
+    <div class="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center gap-4">
+      <BrandLogoAnimated />
+      <h1 class="m-0 font-bold">Get ready! Your server is being prepared</h1>
+      <p class="m-0 text-secondary">This will take a few moments.</p>
+      <UiCopyCode :text="`Server ID: ${serverId}`" />
     </div>
   </div>
 </template>
@@ -166,6 +166,26 @@ const navLinks = [
     subpages: ["startup", "network", "properties", "info"],
   },
 ];
+
+const progress = ref(0);
+let progressInterval: ReturnType<typeof setInterval> | null = null;
+
+const startProgress = () => {
+  progressInterval = setInterval(() => {
+    if (progress.value < 95) {
+      progress.value += Math.random() * 5; // Increment progress randomly to simulate realistic progress
+    } else {
+      clearInterval(progressInterval!);
+    }
+  }, 1000);
+};
+
+const completeProgress = () => {
+  progress.value = 100;
+  setTimeout(() => {
+    progress.value = 0;
+  }, 500); // Transition out after 0.5 seconds
+};
 
 const connectWebSocket = () => {
   try {
@@ -262,6 +282,7 @@ const handleInstallationResult = (data: WSInstallationResultEvent) => {
         if (newLoaderVersion.value) server.general.loader_version = newLoaderVersion.value;
         if (newMCVersion.value) server.general.mc_version = newMCVersion.value;
       }
+      completeProgress();
       break;
     case "err":
       console.log("failed to install");
@@ -403,11 +424,15 @@ const stopPolling = () => {
 
 onMounted(() => {
   connectWebSocket();
+  startProgress();
 });
 
 onUnmounted(() => {
   stopPolling();
   socket.value?.close();
+  if (progressInterval) {
+    clearInterval(progressInterval);
+  }
 });
 
 watch(
@@ -427,6 +452,20 @@ definePageMeta({
 </script>
 
 <style scoped>
+.progress-bar-container {
+  width: 100%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #76c7c0;
+  transition: width 0.5s ease;
+}
+
 .progress {
   animation: progress 1s infinite linear;
 }
