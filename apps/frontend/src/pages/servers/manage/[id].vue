@@ -85,7 +85,7 @@
       <UiServersPoweredByPyro />
     </div>
 
-    <div class="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center gap-4">
+    <div v-else class="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center gap-4">
       <BrandLogoAnimated />
       <h1 class="m-0 font-bold">Get ready! Your server is being prepared</h1>
       <p class="m-0 text-secondary">This will take a few moments.</p>
