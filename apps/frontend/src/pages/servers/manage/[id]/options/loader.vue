@@ -26,12 +26,14 @@
       <div class="flex flex-col gap-2">
         <DropdownSelect
           v-model="selectedMCVersion"
+          name="mcVersion"
           :options="mcVersions"
           placeholder="Select Minecraft version..."
         />
         <DropdownSelect
           v-if="selectedMCVersion && selectedLoader.toLowerCase() !== 'vanilla'"
           v-model="selectedLoaderVersion"
+          name="loaderVersion"
           :options="selectedLoaderVersions"
           placeholder="Select loader version..."
         />
