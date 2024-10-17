@@ -85,11 +85,11 @@
       <UiServersPoweredByPyro />
     </div>
 
-    <div v-else class="flex h-screen flex-col items-center justify-center">
-      <p class="text-lg font-bold">Get ready! We're preparing your server for you.</p>
-      <div class="h-1.5 w-full max-w-lg overflow-hidden rounded-xl bg-brand-highlight">
-        <div class="progress left-right h-full w-full bg-brand"></div>
-      </div>
+    <div v-else class="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center gap-4">
+      <BrandLogoAnimated />
+      <h1 class="m-0 font-bold">Get ready! Your server is being prepared</h1>
+      <p class="m-0 text-secondary">This will take a few moments.</p>
+      <UiCopyCode :text="`Server ID: ${serverId}`" />
     </div>
   </div>
 </template>
@@ -407,7 +407,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopPolling();
-  socket.value?.close();
 });
 
 watch(
@@ -427,26 +426,6 @@ definePageMeta({
 </script>
 
 <style scoped>
-.progress {
-  animation: progress 1s infinite linear;
-}
-
-.left-right {
-  transform-origin: 0% 50%;
-}
-
-@keyframes progress {
-  0% {
-    transform: translateX(0) scaleX(0);
-  }
-  40% {
-    transform: translateX(0) scaleX(0.4);
-  }
-  100% {
-    transform: translateX(100%) scaleX(0.5);
-  }
-}
-
 @keyframes server-action-buttons-anim {
   0% {
     opacity: 0;

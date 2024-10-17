@@ -26,12 +26,10 @@
             class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
           >
             <div class="flex items-center justify-between">
-              <span
-                class="font-bold text-contrast hover:cursor-pointer"
-                :class="{ blur: !showPassword }"
-                @click="togglePassword"
-              >
-                {{ data?.sftp_password }}
+              <span class="font-bold text-contrast">
+                {{
+                  showPassword ? data?.sftp_password : "*".repeat(data?.sftp_password?.length ?? 0)
+                }}
               </span>
 
               <div class="flex flex-row items-center gap-1">
@@ -41,7 +39,10 @@
                   </button>
                 </ButtonStyled>
                 <ButtonStyled type="transparent">
-                  <button v-tooltip="'Show/hide SFTP password'" @click="togglePassword">
+                  <button
+                    v-tooltip="showPassword ? 'Hide password' : 'Show password'"
+                    @click="togglePassword"
+                  >
                     <EyeIcon v-if="showPassword" class="h-5 w-5 hover:cursor-pointer" />
                     <EyeOffIcon v-else class="h-5 w-5 hover:cursor-pointer" />
                   </button>
