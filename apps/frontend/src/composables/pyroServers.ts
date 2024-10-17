@@ -1,4 +1,5 @@
 // usePyroServer is a composable that interfaces with the REDACTED API to get data and control the users server
+import { usePyroFetch } from "@/composables/pyroFetch.ts";
 
 const internalServerRefrence = ref<any>(null);
 const config = true;
