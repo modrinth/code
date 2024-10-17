@@ -371,7 +371,7 @@ const dnsRecords = computed(() => {
     {
       type: "SRV",
       name: `_minecraft._tcp.${userDomain.value}`,
-      content: `0 10 ${data.value?.net?.port} ${data.value?.net?.ip}`,
+      content: `0 10 ${data.value?.net?.port} ${userDomain.value}`,
     },
   ];
 });
