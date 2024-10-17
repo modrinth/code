@@ -35,12 +35,12 @@
           <div v-if="expandedMods[mod.project_id]" class="mt-2 flex items-center gap-2">
             <DropdownSelect
               id="version-select"
-              v-model="selectedVersion"
+              v-model="selectedVersions[mod.project_id]"
               name="version-select"
               :options="expandedMods[mod.project_id].versions"
               placeholder="Select version..."
             />
-            <Button icon-only @click="emits('select', mod, selectedVersion)">
+            <Button icon-only @click="emits('select', mod, selectedVersions[mod.project_id])">
               <ChevronRightIcon />
             </Button>
           </div>
@@ -127,7 +127,7 @@ const getVersions = async (projectId: string) => {
   return versions[projectId];
 };
 
-const selectedVersion = ref("");
+const selectedVersions = reactive<{ [key: string]: string }>({});
 
 const expandedMods = reactive<{ [key: string]: { expanded: boolean; versions: any[] } }>({});
 
@@ -138,8 +138,11 @@ const toggleMod = async (modId: string) => {
   expandedMods[modId].expanded = !expandedMods[modId].expanded;
   if (expandedMods[modId].expanded && expandedMods[modId].versions.length === 0) {
     expandedMods[modId].versions = await getVersions(modId);
+    // Select the first version by default
+    if (expandedMods[modId].versions.length > 0) {
+      selectedVersions[modId] = expandedMods[modId].versions[0];
+    }
   }
-  selectedVersion.value = "";
 };
 
 const loadMore = async () => {
@@ -159,8 +162,8 @@ const { reset } = useInfiniteScroll(scrollContainer, async () => {
 const resetList = () => {
   mods.value.hits = [];
   Object.keys(expandedMods).forEach((key) => delete expandedMods[key]);
+  Object.keys(selectedVersions).forEach((key) => delete selectedVersions[key]);
   page.value = 0;
-  selectedVersion.value = "";
   loadMods();
   reset();
 };
