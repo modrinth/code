@@ -1,4 +1,96 @@
 // usePyroServer is a composable that interfaces with the REDACTED API to get data and control the users server
+import { $fetch, FetchError } from "ofetch";
+
+interface PyroFetchOptions {
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  contentType?: string;
+  body?: Record<string, any>;
+  version?: number;
+  override?: {
+    url?: string;
+    token?: string;
+  };
+  retry?: boolean;
+}
+
+async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promise<T> {
+  const config = useRuntimeConfig();
+  const auth = await useAuth();
+  const authToken = auth.value?.token;
+
+  if (!authToken) {
+    throw new PyroFetchError("Cannot pyrofetch without auth", 10000);
+  }
+
+  const { method = "GET", contentType = "application/json", body, version = 0, override } = options;
+
+  const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
+    /\/$/,
+    "",
+  );
+
+  if (!base) {
+    throw new PyroFetchError(
+      "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
+      10001,
+    );
+  }
+
+  const fullUrl = override?.url
+    ? `https://${override.url}/${path.replace(/^\//, "")}`
+    : `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`;
+
+  type HeadersRecord = Record<string, string>;
+
+  const headers: HeadersRecord = {
+    Authorization: `Bearer ${override?.token ?? authToken}`,
+    "Access-Control-Allow-Headers": "Authorization",
+    "User-Agent": "Pyro/1.0 (https://pyro.host)",
+    Vary: "Accept, Origin",
+    "Content-Type": contentType,
+  };
+
+  if (import.meta.client && typeof window !== "undefined") {
+    headers.Origin = window.location.origin;
+  }
+
+  try {
+    const response = await $fetch<T>(fullUrl, {
+      method,
+      headers,
+      body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
+      timeout: 10000,
+      retry: options.retry !== false ? (method === "GET" ? 3 : 0) : 0,
+    });
+    return response;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    if (error instanceof FetchError) {
+      const statusCode = error.response?.status;
+      const statusText = error.response?.statusText || "Unknown error";
+      const errorMessages: { [key: number]: string } = {
+        400: "Bad Request",
+        401: "Unauthorized",
+        403: "Forbidden",
+        404: "Not Found",
+        405: "Method Not Allowed",
+        429: "Too Many Requests",
+        500: "Internal Server Error",
+        502: "Bad Gateway",
+      };
+      const message =
+        statusCode && statusCode in errorMessages
+          ? errorMessages[statusCode]
+          : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
+      throw new PyroFetchError(`[PYROFETCH][PYRO] ${message}`, statusCode, error);
+    }
+    throw new PyroFetchError(
+      "[PYROFETCH][PYRO] An unexpected error occurred during the fetch operation.",
+      undefined,
+      error as Error,
+    );
+  }
+}
 
 const internalServerRefrence = ref<any>(null);
 const config = true;
@@ -147,11 +239,9 @@ const constructServerProperties = (properties: any): string => {
 
 const processImage = async (iconUrl: string | undefined) => {
   const image = ref<string | null>(null);
-  const auth = await await usePyroFetch<FSAuth>(
-    `servers/${internalServerRefrence.value.serverId}/fs`,
-  );
+  const auth = await await PyroFetch<FSAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
   try {
-    const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
+    const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
       override: auth,
     });
 
@@ -205,14 +295,14 @@ const processImage = async (iconUrl: string | undefined) => {
         img.onerror = reject;
       });
       if (scaledFile) {
-        await usePyroFetch(`/create?path=/server-icon.png&type=file`, {
+        await PyroFetch(`/create?path=/server-icon.png&type=file`, {
           method: "POST",
           contentType: "application/octet-stream",
           body: scaledFile,
           override: auth,
         });
 
-        await usePyroFetch(`/create?path=/server-icon-original.png&type=file`, {
+        await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
           method: "POST",
           contentType: "application/octet-stream",
           body: originalfile,
@@ -230,7 +320,7 @@ const processImage = async (iconUrl: string | undefined) => {
 
 const sendPowerAction = async (action: string) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/power`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/power`, {
       method: "POST",
       body: { action },
     });
@@ -245,7 +335,7 @@ const sendPowerAction = async (action: string) => {
 
 const updateName = async (newName: string) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/name`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/name`, {
       method: "POST",
       body: { name: newName },
     });
@@ -277,12 +367,12 @@ const reinstallServer = async (
       if (projectId.toLowerCase() === "neoforge") {
         projectId = "NeoForge";
       }
-      await usePyroFetch(`servers/${serverId}/reinstall`, {
+      await PyroFetch(`servers/${serverId}/reinstall`, {
         method: "POST",
         body: { loader: projectId, loader_version: loaderVersionId, game_version: versionId },
       });
     } else {
-      await usePyroFetch(`servers/${serverId}/reinstall`, {
+      await PyroFetch(`servers/${serverId}/reinstall`, {
         method: "POST",
         body: { project_id: projectId, version_id: versionId },
       });
@@ -295,7 +385,7 @@ const reinstallServer = async (
 
 const suspendServer = async (status: boolean) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/suspend`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/suspend`, {
       method: "POST",
       body: { suspended: status },
     });
@@ -307,9 +397,7 @@ const suspendServer = async (status: boolean) => {
 
 const fetchConfigFile = async (fileName: string) => {
   try {
-    return await usePyroFetch(
-      `servers/${internalServerRefrence.value.serverId}/config/${fileName}`,
-    );
+    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/config/${fileName}`);
   } catch (error) {
     console.error("Error fetching config file:", error);
     throw error;
@@ -339,11 +427,11 @@ const setMotd = async (motd: string) => {
       props.motd = motd;
       const newProps = constructServerProperties(props);
       const octetStream = new Blob([newProps], { type: "application/octet-stream" });
-      const auth = await await usePyroFetch<FSAuth>(
+      const auth = await await PyroFetch<FSAuth>(
         `servers/${internalServerRefrence.value.serverId}/fs`,
       );
 
-      return await usePyroFetch(`/update?path=/server.properties`, {
+      return await PyroFetch(`/update?path=/server.properties`, {
         method: "PUT",
         contentType: "application/octet-stream",
         body: octetStream,
@@ -359,7 +447,7 @@ const setMotd = async (motd: string) => {
 
 const installMod = async (projectId: string, versionId: string) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/mods`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods`, {
       method: "POST",
       body: { rinth_ids: { project_id: projectId, version_id: versionId } },
     });
@@ -371,7 +459,7 @@ const installMod = async (projectId: string, versionId: string) => {
 
 const removeMod = async (modId: string) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/deleteMod`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/deleteMod`, {
       method: "POST",
       body: {
         path: modId,
@@ -385,7 +473,7 @@ const removeMod = async (modId: string) => {
 
 const reinstallMod = async (modId: string, versionId: string) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/mods/${modId}`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods/${modId}`, {
       method: "PUT",
       body: { version_id: versionId },
     });
@@ -399,7 +487,7 @@ const reinstallMod = async (modId: string, versionId: string) => {
 
 const createBackup = async (backupName: string) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
       method: "POST",
       body: { name: backupName },
     });
@@ -411,13 +499,10 @@ const createBackup = async (backupName: string) => {
 
 const renameBackup = async (backupId: string, newName: string) => {
   try {
-    await usePyroFetch(
-      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/rename`,
-      {
-        method: "POST",
-        body: { name: newName },
-      },
-    );
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}/rename`, {
+      method: "POST",
+      body: { name: newName },
+    });
   } catch (error) {
     console.error("Error renaming backup:", error);
     throw error;
@@ -426,7 +511,7 @@ const renameBackup = async (backupId: string, newName: string) => {
 
 const deleteBackup = async (backupId: string) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}`, {
       method: "DELETE",
     });
   } catch (error) {
@@ -437,7 +522,7 @@ const deleteBackup = async (backupId: string) => {
 
 const restoreBackup = async (backupId: string) => {
   try {
-    await usePyroFetch(
+    await PyroFetch(
       `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/restore`,
       {
         method: "POST",
@@ -451,9 +536,7 @@ const restoreBackup = async (backupId: string) => {
 
 const downloadBackup = async (backupId: string) => {
   try {
-    return await usePyroFetch(
-      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}`,
-    );
+    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}`);
   } catch (error) {
     console.error("Error downloading backup:", error);
     throw error;
@@ -464,7 +547,7 @@ const downloadBackup = async (backupId: string) => {
 
 const reserveAllocation = async (name: string): Promise<Allocation> => {
   try {
-    return await usePyroFetch<Allocation>(
+    return await PyroFetch<Allocation>(
       `servers/${internalServerRefrence.value.serverId}/allocations?name=${name}`,
       {
         method: "POST",
@@ -478,7 +561,7 @@ const reserveAllocation = async (name: string): Promise<Allocation> => {
 
 const updateAllocation = async (port: number, name: string) => {
   try {
-    await usePyroFetch(
+    await PyroFetch(
       `servers/${internalServerRefrence.value.serverId}/allocations/${port}?name=${name}`,
       {
         method: "PUT",
@@ -492,7 +575,7 @@ const updateAllocation = async (port: number, name: string) => {
 
 const deleteAllocation = async (port: number) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/allocations/${port}`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/allocations/${port}`, {
       method: "DELETE",
     });
   } catch (error) {
@@ -503,7 +586,7 @@ const deleteAllocation = async (port: number) => {
 
 const checkSubdomainAvailability = async (subdomain: string): Promise<{ available: boolean }> => {
   try {
-    return (await usePyroFetch(`subdomains/${subdomain}/isavailable`)) as { available: boolean };
+    return (await PyroFetch(`subdomains/${subdomain}/isavailable`)) as { available: boolean };
   } catch (error) {
     console.error("Error checking subdomain availability:", error);
     throw error;
@@ -512,7 +595,7 @@ const checkSubdomainAvailability = async (subdomain: string): Promise<{ availabl
 
 const changeSubdomain = async (subdomain: string) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/subdomain`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/subdomain`, {
       method: "POST",
       body: { subdomain },
     });
@@ -530,7 +613,7 @@ const updateStartupSettings = async (
   jdkBuild: "corretto" | "temurin" | "graal",
 ) => {
   try {
-    await usePyroFetch(`servers/${internalServerRefrence.value.serverId}/startup`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/startup`, {
       method: "POST",
       body: {
         invocation: invocation || null,
@@ -557,7 +640,7 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
 
 const listDirContents = (path: string, page: number, pageSize: number) => {
   return retryWithAuth(async () => {
-    return await usePyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
+    return await PyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
       override: internalServerRefrence.value.fs.auth,
     });
   });
@@ -569,7 +652,7 @@ const createFileOrFolder = (
   type: "file" | "directory",
 ) => {
   return retryWithAuth(async () => {
-    return await usePyroFetch(`/create?path=${path}&type=${type}`, {
+    return await PyroFetch(`/create?path=${path}&type=${type}`, {
       method: "POST",
       contentType: "application/octet-stream",
       override: internalServerRefrence.value.fs.auth,
@@ -579,7 +662,7 @@ const createFileOrFolder = (
 
 const uploadFile = (path: string, file: File) => {
   return retryWithAuth(async () => {
-    return await usePyroFetch(`/create?path=${path}&type=file`, {
+    return await PyroFetch(`/create?path=${path}&type=file`, {
       method: "POST",
       contentType: "application/octet-stream",
       body: file,
@@ -591,7 +674,7 @@ const uploadFile = (path: string, file: File) => {
 const renameFileOrFolder = (path: string, name: string) => {
   const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
   return retryWithAuth(async () => {
-    return await usePyroFetch(`/move`, {
+    return await PyroFetch(`/move`, {
       method: "POST",
       override: internalServerRefrence.value.fs.auth,
       body: {
@@ -605,7 +688,7 @@ const renameFileOrFolder = (path: string, name: string) => {
 const updateFile = (path: string, content: string) => {
   const octetStream = new Blob([content], { type: "application/octet-stream" });
   return retryWithAuth(async () => {
-    return await usePyroFetch(`/update?path=${path}`, {
+    return await PyroFetch(`/update?path=${path}`, {
       method: "PUT",
       contentType: "application/octet-stream",
       body: octetStream,
@@ -616,7 +699,7 @@ const updateFile = (path: string, content: string) => {
 
 const moveFileOrFolder = (path: string, newPath: string) => {
   return retryWithAuth(async () => {
-    return await usePyroFetch(`/move`, {
+    return await PyroFetch(`/move`, {
       method: "POST",
       override: internalServerRefrence.value.fs.auth,
       body: {
@@ -629,7 +712,7 @@ const moveFileOrFolder = (path: string, newPath: string) => {
 
 const deleteFileOrFolder = (path: string, recursive: boolean) => {
   return retryWithAuth(async () => {
-    return await usePyroFetch(`/delete?path=${path}&recursive=${recursive}`, {
+    return await PyroFetch(`/delete?path=${path}&recursive=${recursive}`, {
       method: "DELETE",
       override: internalServerRefrence.value.fs.auth,
     });
@@ -638,7 +721,7 @@ const deleteFileOrFolder = (path: string, recursive: boolean) => {
 
 const downloadFile = (path: string) => {
   return retryWithAuth(async () => {
-    const fileData = await usePyroFetch(`/download?path=${path}`, {
+    const fileData = await PyroFetch(`/download?path=${path}`, {
       override: internalServerRefrence.value.fs.auth,
     });
 
@@ -651,7 +734,7 @@ const downloadFile = (path: string) => {
 const modules: any = {
   general: {
     get: async (serverId: string) => {
-      const data = await usePyroFetch<General>(`servers/${serverId}`);
+      const data = await PyroFetch<General>(`servers/${serverId}`);
       if (data.upstream?.project_id) {
         data.project = await fetchProject(data.upstream.project_id);
       }
@@ -675,7 +758,7 @@ const modules: any = {
   },
   mods: {
     get: async (serverId: string) => {
-      const mods = await usePyroFetch<Mod[]>(`servers/${serverId}/mods`);
+      const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`);
       return { data: mods.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? "")) };
     },
     install: installMod,
@@ -684,7 +767,7 @@ const modules: any = {
   },
   backups: {
     get: async (serverId: string) => {
-      return { data: await usePyroFetch<Backup[]>(`servers/${serverId}/backups`) };
+      return { data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`) };
     },
     create: createBackup,
     rename: renameBackup,
@@ -694,7 +777,7 @@ const modules: any = {
   },
   network: {
     get: async (serverId: string) => {
-      return { allocations: await usePyroFetch<Allocation[]>(`servers/${serverId}/allocations`) };
+      return { allocations: await PyroFetch<Allocation[]>(`servers/${serverId}/allocations`) };
     },
     reserveAllocation,
     updateAllocation,
@@ -703,15 +786,15 @@ const modules: any = {
     changeSubdomain,
   },
   startup: {
-    get: async (serverId: string) => await usePyroFetch<Startup>(`servers/${serverId}/startup`),
+    get: async (serverId: string) => await PyroFetch<Startup>(`servers/${serverId}/startup`),
     update: updateStartupSettings,
   },
   ws: {
-    get: async (serverId: string) => await usePyroFetch<WSAuth>(`servers/${serverId}/ws`),
+    get: async (serverId: string) => await PyroFetch<WSAuth>(`servers/${serverId}/ws`),
   },
   fs: {
     get: async (serverId: string) => {
-      return { auth: await usePyroFetch<FSAuth>(`servers/${serverId}/fs`) };
+      return { auth: await PyroFetch<FSAuth>(`servers/${serverId}/fs`) };
     },
     listDirContents,
     createFileOrFolder,

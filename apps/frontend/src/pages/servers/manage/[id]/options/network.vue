@@ -2,17 +2,23 @@
   <Modal ref="newAllocationModal" header="">
     <UiServersPyroModal header="New allocation" :data="data" @modal="newAllocationModal?.hide()">
       <div class="flex flex-col gap-2">
-        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <label for="new-allocation-name" class="font-semibold text-contrast">
+          Name<span class="text-red-500">*</span>
+        </label>
         <input
+          id="new-allocation-name"
           v-model="newAllocationName"
           type="text"
           class="bg-bg-input w-full rounded-lg p-4"
+          maxlength="32"
           placeholder="e.g. Secondary allocation"
         />
       </div>
       <div class="mb-1 mt-4 flex justify-end gap-4">
         <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
-        <Button color="primary" @click="addNewAllocation"> <PlusIcon /> Create allocation </Button>
+        <Button color="primary" :disabled="!newAllocationName" @click="addNewAllocation">
+          <PlusIcon /> Create allocation
+        </Button>
       </div>
     </UiServersPyroModal>
   </Modal>
@@ -20,17 +26,23 @@
   <Modal ref="editAllocationModal" header="">
     <UiServersPyroModal header="Edit allocation" :data="data" @modal="editAllocationModal?.hide()">
       <div class="flex flex-col gap-2">
-        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <label for="edit-allocation-name" class="font-semibold text-contrast">
+          Name<span class="text-red-500">*</span>
+        </label>
         <input
+          id="edit-allocation-name"
           v-model="newAllocationName"
           type="text"
           class="bg-bg-input w-full rounded-lg p-4"
+          maxlength="32"
           placeholder="e.g. Secondary allocation"
         />
       </div>
       <div class="mb-1 mt-4 flex justify-end gap-4">
         <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
-        <Button color="primary" @click="editAllocation"> <SaveIcon /> Update Allocation </Button>
+        <Button color="primary" :disabled="!newAllocationName" @click="editAllocation">
+          <SaveIcon /> Update Allocation
+        </Button>
       </div>
     </UiServersPyroModal>
   </Modal>
@@ -40,12 +52,13 @@
       <div class="flex h-full flex-col">
         <!-- Subdomain section -->
         <div class="card flex flex-col gap-4">
-          <label for="username-field" class="flex flex-col gap-2">
+          <label for="server-subdomain" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Custom Subdomain</span>
             <span> Your friends can connect to your server using this URL. </span>
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
             <input
+              id="server-subdomain"
               v-model="serverSubdomain"
               class="h-[50%] w-[63%]"
               maxlength="32"
@@ -61,15 +74,18 @@
 
         <div class="card flex flex-col gap-4">
           <div class="flex w-full flex-row items-center justify-between">
-            <label for="username-field" class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-contrast">DNS records</span>
-              <span> Use your personal domain to connect to your server. </span>
+            <label for="user-domain" class="flex flex-col gap-2">
+              <span class="text-lg font-bold text-contrast">Generated DNS records</span>
+              <span>
+                Setup your personal domain to connect to your server via custom DNS records.
+              </span>
             </label>
 
             <Button @click="exportDnsRecords"> Export DNS records </Button>
           </div>
 
           <input
+            id="user-domain"
             v-model="userDomain"
             class="w-full md:w-[50%]"
             maxlength="64"
@@ -129,13 +145,13 @@
         <!-- Allocations section -->
         <div class="card flex flex-col gap-4">
           <div class="flex w-full flex-row items-center justify-between">
-            <label for="username-field" class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Allocations</span>
               <span>
                 Configure additional ports for internet-facing features like map viewers or voice
                 chat mods.
               </span>
-            </label>
+            </div>
 
             <ButtonStyled type="standard" color="brand" @click="newAllocationModal.show()">
               <button>
@@ -352,13 +368,13 @@ const dnsRecords = computed(() => {
   return [
     {
       type: "A",
-      name: `${userDomain.value}`,
+      name: `${userDomain.value.split(".")[0]}`,
       content: data.value?.net?.ip ?? "",
     },
     {
       type: "SRV",
       name: `_minecraft._tcp.${userDomain.value}`,
-      content: `0 0 ${data.value?.net?.port} ${userDomain.value}`,
+      content: `0 10 ${data.value?.net?.port} ${userDomain.value}`,
     },
   ];
 });
@@ -378,7 +394,7 @@ const exportDnsRecords = () => {
 
   const text = Object.entries(records)
     .map(([type, records]) => {
-      return `; ${type} Record\n${records.map((record) => `${record.name}.	1	IN	${record.type} ${record.content}`).join("\n")}\n`;
+      return `; ${type} Records\n${records.map((record) => `${record.name}.	1	IN	${record.type} ${record.content}`).join("\n")}\n`;
     })
     .join("\n");
   const blob = new Blob([text], { type: "text/plain" });

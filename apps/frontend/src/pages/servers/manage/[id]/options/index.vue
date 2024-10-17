@@ -3,12 +3,13 @@
     <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6">
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
-          <label for="username-field" class="flex flex-col gap-2">
+          <label for="server-name-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server Name</span>
             <span> Change the name of your server. This name is only visible on Modrinth.</span>
           </label>
           <div class="flex flex-col gap-2">
             <input
+              id="server-name-field"
               v-model="serverName"
               class="w-full md:w-[50%]"
               maxlength="48"
@@ -25,7 +26,7 @@
         </div>
 
         <div class="card flex flex-col gap-4">
-          <label for="username-field" class="flex flex-col gap-2">
+          <label for="server-icon-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server Icon</span>
             <span>
               Change your server's icon. Changes will be visible on the Minecraft server list and on
@@ -42,6 +43,7 @@
           >
             <input
               v-if="data?.image"
+              id="server-icon-field"
               type="file"
               accept="image/png,image/jpeg,image/gif,image/webp"
               hidden
@@ -191,6 +193,7 @@ const onDrop = (e: DragEvent) => {
 const triggerFileInput = () => {
   const input = document.createElement("input");
   input.type = "file";
+  input.id = "server-icon-field";
   input.accept = "image/png,image/jpeg,image/gif,image/webp";
   input.onchange = uploadFile;
   input.click();
