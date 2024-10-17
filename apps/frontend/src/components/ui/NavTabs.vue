@@ -38,7 +38,7 @@ interface Tab {
   label: string;
   href: string;
   shown?: boolean;
-  icon?: string;
+  icon?: unknown;
   subpages?: string[];
 }
 

@@ -54,7 +54,7 @@
       </div>
     </div>
     <header
-      class="experimental-styles-within desktop-only relative z-[5] mx-auto my-4 grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-3 sm:grid-cols-[auto_1fr_auto]"
+      class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-3 py-4 sm:grid-cols-[auto_1fr_auto]"
     >
       <div>
         <NuxtLink to="/" aria-label="Modrinth home page">
@@ -226,6 +226,7 @@
           <template #saved> <BookmarkIcon aria-hidden="true" /> Saved projects </template>
           <template #settings> <SettingsIcon aria-hidden="true" /> Settings </template>
           <template #projects> <BoxIcon aria-hidden="true" /> Projects </template>
+          <template #servers> <ServerIcon aria-hidden="true" /> Servers </template>
           <template #organizations>
             <OrganizationIcon aria-hidden="true" /> Organizations
           </template>
@@ -537,14 +538,14 @@ import {
 } from "@modrinth/assets";
 import { Button, ButtonStyled, OverflowMenu, Avatar } from "@modrinth/ui";
 
+import CrossIcon from "assets/images/utils/x.svg";
+import NotificationIcon from "assets/images/sidebar/notifications.svg";
+import ModerationIcon from "assets/images/sidebar/admin.svg";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import { commonMessages } from "~/utils/common-messages.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
-import CrossIcon from "assets/images/utils/x.svg";
-import NotificationIcon from "assets/images/sidebar/notifications.svg";
-import ModerationIcon from "assets/images/sidebar/admin.svg";
 
 const { formatMessage } = useVIntl();
 
@@ -787,6 +788,10 @@ const userMenuOptions = computed(() => {
       divider: true,
     },
     {
+      id: "servers",
+      link: "/servers/manage",
+    },
+    {
       id: "projects",
       link: "/dashboard/projects",
     },
@@ -894,19 +899,23 @@ function runAnalytics() {
   const config = useRuntimeConfig();
   const replacedUrl = config.public.apiBaseUrl.replace("v2/", "");
 
-  setTimeout(() => {
-    $fetch(`${replacedUrl}analytics/view`, {
-      method: "POST",
-      body: {
-        url: window.location.href,
-      },
-      headers: {
-        Authorization: auth.value.token,
-      },
-    })
-      .then(() => {})
-      .catch(() => {});
-  });
+  try {
+    setTimeout(() => {
+      $fetch(`${replacedUrl}analytics/view`, {
+        method: "POST",
+        body: {
+          url: window.location.href,
+        },
+        headers: {
+          Authorization: auth.value.token,
+        },
+      })
+        .then(() => {})
+        .catch(() => {});
+    });
+  } catch (e) {
+    console.error(`Sending analytics failed (CORS error? If so, ignore)`, e);
+  }
 }
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
