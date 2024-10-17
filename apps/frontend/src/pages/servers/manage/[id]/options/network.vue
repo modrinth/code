@@ -391,7 +391,7 @@ const exportDnsRecords = () => {
 
   const text = Object.entries(records)
     .map(([type, records]) => {
-      return `; ${type} Record\n${records.map((record) => `${record.name}.	1	IN	${record.type} ${record.content}`).join("\n")}\n`;
+      return `; ${type} Records\n${records.map((record) => `${record.name}.	1	IN	${record.type} ${record.content}`).join("\n")}\n`;
     })
     .join("\n");
   const blob = new Blob([text], { type: "text/plain" });
