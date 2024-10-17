@@ -1,16 +1,9 @@
 <template>
   <div class="contents">
-    <UiServersPyroError
-      v-if="error"
-      :title="errorTitle"
-      :message="errorMessage"
-      :server-id="serverData?.server_id"
-    />
     <div
       v-if="serverData && serverData.status !== 'installing'"
       data-pyro-server-manager-root
       class="mx-auto box-border flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
-      :class="error ? 'pointer-events-none select-none blur-md' : ''"
     >
       <div class="flex w-full min-w-0 flex-row items-center gap-6 pt-4">
         <UiServersServerIcon :image="serverData.image" />
@@ -34,6 +27,7 @@
                 class="flex-shrink-0"
                 :is-online="isServerRunning"
                 :is-actioning="isActioning"
+                :disabled="error"
                 @action="sendPowerAction"
               />
             </div>
@@ -63,6 +57,16 @@
       </div>
 
       <div data-pyro-mount class="h-full w-full flex-1">
+        <div
+          v-if="error"
+          class="mb-4 flex h-full w-full items-center gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+        >
+          <IssuesIcon class="h-8 w-8 text-red" />
+          <div class="flex flex-col gap-2">
+            {{ errorTitle }}
+            {{ errorMessage }}
+          </div>
+        </div>
         <NuxtPage
           :route="route"
           :is-connected="isConnected"
@@ -92,7 +96,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-import { LeftArrowIcon } from "@modrinth/assets";
+import { IssuesIcon, LeftArrowIcon } from "@modrinth/assets";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 
 const socket = ref<WebSocket | null>(null);

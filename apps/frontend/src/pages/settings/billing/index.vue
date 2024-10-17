@@ -519,6 +519,7 @@ import {
 } from "@modrinth/assets";
 import { calculateSavings, formatPrice, createStripeElements, getCurrency } from "@modrinth/utils";
 import { ref } from "vue";
+import { asyncComputed } from "@vueuse/core";
 import { products } from "~/generated/state.json";
 
 definePageMeta({
@@ -743,7 +744,6 @@ const [
   { data: charges, refresh: refreshCharges },
   { data: customer, refresh: refreshCustomer },
   { data: subscriptions, refresh: refreshSubscriptions },
-  { data: servers, refresh: refreshServers },
 ] = await Promise.all([
   useAsyncData("billing/payment_methods", () =>
     useBaseFetch("billing/payment_methods", { internal: true }),
@@ -753,15 +753,6 @@ const [
   useAsyncData("billing/subscriptions", () =>
     useBaseFetch("billing/subscriptions", { internal: true }),
   ),
-  useAsyncData("ServerList", async () => {
-    try {
-      const response = await usePyroFetch("servers");
-      await updateIcons(response.servers);
-      return response;
-    } catch {
-      throw new PyroFetchError("Unable to load servers");
-    }
-  }),
 ]);
 
 onMounted(() => {
@@ -780,11 +771,11 @@ async function refresh() {
   ]);
 }
 
-const pyroSubscriptions = computed(() => {
+const pyroSubscriptions = asyncComputed(() => {
   return subscriptions.value
     .filter((x) => x.status === "provisioned" && x.metadata && x.metadata.type === "pyro")
-    .map((x) => {
-      const server = servers.value.servers.find((y) => y.server_id === x.metadata.id);
+    .map(async (x) => {
+      const server = await usePyroServer(x.metadata.id, ["general"]);
       return {
         ...x,
         server,
