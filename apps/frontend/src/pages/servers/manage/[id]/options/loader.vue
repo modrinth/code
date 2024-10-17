@@ -409,6 +409,29 @@ const updateData = async () => {
 };
 updateData();
 
+const selectLoader = (loader: string) => {
+  selectedLoader.value = loader;
+  versionSelectModal.value.show();
+};
+
+const handleReinstallError = (error: any) => {
+  if (error instanceof PyroFetchError && error.statusCode === 429) {
+    addNotification({
+      group: "server",
+      title: "Cannot reinstall server",
+      text: "You are being rate limited. Please try again later.",
+      type: "error",
+    });
+  } else {
+    addNotification({
+      group: "server",
+      title: "Reinstall Failed",
+      text: "An unexpected error occurred while reinstalling. Please try again later.",
+      type: "error",
+    });
+  }
+};
+
 const reinstallCurrent = async () => {
   const projectId = data.value?.upstream?.project_id;
   if (!projectId) {
@@ -416,47 +439,54 @@ const reinstallCurrent = async () => {
   }
   const resolvedVersionIds = versionIds.value;
   const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
-  await props.server.general?.reinstall(serverId, false, projectId, versionId);
-};
-
-const selectLoader = (loader: string) => {
-  selectedLoader.value = loader;
-  versionSelectModal.value.show();
+  try {
+    await props.server.general?.reinstall(serverId, false, projectId, versionId);
+  } catch (error) {
+    handleReinstallError(error);
+  }
 };
 
 const reinstallLoader = async (loader: string) => {
-  await props.server.general?.reinstall(
-    serverId,
-    true,
-    loader,
-    selectedMCVersion.value,
-    loader === "Vanilla" ? "" : selectedLoaderVersion.value,
-  );
-  emit("reinstall", {
-    loader,
-    lVersion: selectedLoaderVersion.value,
-    mVersion: selectedMCVersion.value,
-  });
-  await nextTick();
-  window.scrollTo(0, 0);
+  try {
+    await props.server.general?.reinstall(
+      serverId,
+      true,
+      loader,
+      selectedMCVersion.value,
+      loader === "Vanilla" ? "" : selectedLoaderVersion.value,
+    );
+    emit("reinstall", {
+      loader,
+      lVersion: selectedLoaderVersion.value,
+      mVersion: selectedMCVersion.value,
+    });
+    await nextTick();
+    window.scrollTo(0, 0);
+  } catch (error) {
+    handleReinstallError(error);
+  }
 };
 
 const reinstallNew = async (project: any, versionNumber: string) => {
   editModal.value.hide();
-  const versions = (await useBaseFetch(
-    `project/${project.project_id}/version`,
-    {},
-    false,
-    prodOverride,
-  )) as any;
-  const version = versions.find((x: any) => x.version_number === versionNumber);
+  try {
+    const versions = (await useBaseFetch(
+      `project/${project.project_id}/version`,
+      {},
+      false,
+      prodOverride,
+    )) as any;
+    const version = versions.find((x: any) => x.version_number === versionNumber);
 
-  if (!version?.id) {
-    throw new Error("Version not found");
+    if (!version?.id) {
+      throw new Error("Version not found");
+    }
+    await props.server.general?.reinstall(serverId, false, project.project_id, version.id);
+    emit("reinstall");
+    await nextTick();
+    window.scrollTo(0, 0);
+  } catch (error) {
+    handleReinstallError(error);
   }
-  await props.server.general?.reinstall(serverId, false, project.project_id, version.id);
-  emit("reinstall");
-  await nextTick();
-  window.scrollTo(0, 0);
 };
 </script>
