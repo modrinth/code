@@ -167,26 +167,6 @@ const navLinks = [
   },
 ];
 
-const progress = ref(0);
-let progressInterval: ReturnType<typeof setInterval> | null = null;
-
-const startProgress = () => {
-  progressInterval = setInterval(() => {
-    if (progress.value < 95) {
-      progress.value += Math.random() * 5; // Increment progress randomly to simulate realistic progress
-    } else {
-      clearInterval(progressInterval!);
-    }
-  }, 1000);
-};
-
-const completeProgress = () => {
-  progress.value = 100;
-  setTimeout(() => {
-    progress.value = 0;
-  }, 500); // Transition out after 0.5 seconds
-};
-
 const connectWebSocket = () => {
   try {
     const wsAuth = computed(() => server.ws);
@@ -282,7 +262,6 @@ const handleInstallationResult = (data: WSInstallationResultEvent) => {
         if (newLoaderVersion.value) server.general.loader_version = newLoaderVersion.value;
         if (newMCVersion.value) server.general.mc_version = newMCVersion.value;
       }
-      completeProgress();
       break;
     case "err":
       console.log("failed to install");
@@ -424,15 +403,10 @@ const stopPolling = () => {
 
 onMounted(() => {
   connectWebSocket();
-  startProgress();
 });
 
 onUnmounted(() => {
   stopPolling();
-  socket.value?.close();
-  if (progressInterval) {
-    clearInterval(progressInterval);
-  }
 });
 
 watch(
@@ -452,40 +426,6 @@ definePageMeta({
 </script>
 
 <style scoped>
-.progress-bar-container {
-  width: 100%;
-  height: 10px;
-  background-color: #e0e0e0;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background-color: #76c7c0;
-  transition: width 0.5s ease;
-}
-
-.progress {
-  animation: progress 1s infinite linear;
-}
-
-.left-right {
-  transform-origin: 0% 50%;
-}
-
-@keyframes progress {
-  0% {
-    transform: translateX(0) scaleX(0);
-  }
-  40% {
-    transform: translateX(0) scaleX(0.4);
-  }
-  100% {
-    transform: translateX(100%) scaleX(0.5);
-  }
-}
-
 @keyframes server-action-buttons-anim {
   0% {
     opacity: 0;
