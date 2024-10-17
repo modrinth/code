@@ -4,6 +4,7 @@
       'group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem] last:border-none hover:bg-bg-raised',
       isNonEditableFile ? '' : 'cursor-pointer',
     ]"
+    @contextmenu="openContextMenu"
   >
     <div class="flex w-full items-center gap-2" @click="selectItem">
       <div
@@ -109,7 +110,14 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["rename", "download", "delete", "move", "edit"]);
+const emit = defineEmits(["rename", "download", "delete", "move", "edit", "contextmenu"]);
+
+const openContextMenu = (event: MouseEvent) => {
+  event.preventDefault();
+  // emit("contextmenu", event.clientX, event.clientY);
+  // accounting for scroll top:
+  emit("contextmenu", event.clientX, event.clientY + window.scrollY);
+};
 
 const formattedSize = computed(() => {
   const bytes = props.size;

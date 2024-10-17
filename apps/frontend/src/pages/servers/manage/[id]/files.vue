@@ -235,6 +235,7 @@
           @download="downloadFile(item)"
           @move="showMoveModal(item)"
           @edit="editFile(item)"
+          @contextmenu="(x, y) => showContextMenu(item, x, y)"
         />
         <div v-if="loadError" class="flex h-10 items-center justify-center gap-2">
           <ClearIcon class="h-4 w-4" />
@@ -298,6 +299,64 @@
       </div>
     </div>
   </div>
+
+  <div
+    class="absolute left-0 top-0"
+    :style="{
+      transform: `translateY(${isAtBottom ? '-100%' : '0'})`,
+      top: `${contextMenuInfo.y}px`,
+      left: `${contextMenuInfo.x}px`,
+    }"
+  >
+    <Transition>
+      <div
+        v-if="contextMenuInfo.item"
+        id="item-context-menu"
+        ref="ctxRef"
+        :style="{
+          border: '1px solid var(--color-button-bg)',
+          borderRadius: 'var(--radius-md)',
+          backgroundColor: 'var(--color-raised-bg)',
+          padding: 'var(--gap-sm)',
+          boxShadow: 'var(--shadow-floating)',
+          gap: 'var(--gap-xs)',
+          width: 'max-content',
+          // '--translate-y': isAtBottom ? '-100%' : '0',
+        }"
+        class="flex h-fit w-fit select-none flex-col"
+      >
+        <button
+          class="btn btn-transparent flex !w-full items-center"
+          @click="showRenameModal(contextMenuInfo.item)"
+        >
+          <EditIcon class="h-5 w-5" />
+          Rename
+        </button>
+        <button
+          class="btn btn-transparent flex !w-full items-center"
+          @click="showMoveModal(contextMenuInfo.item)"
+        >
+          <ArrowBigUpDashIcon class="h-5 w-5" />
+          Move
+        </button>
+        <button
+          v-if="contextMenuInfo.item.type !== 'directory'"
+          class="btn btn-transparent flex !w-full items-center"
+          @click="downloadFile(contextMenuInfo.item)"
+        >
+          <DownloadIcon class="h-5 w-5" />
+          Download
+        </button>
+        <button
+          class="btn btn-transparent btn-red flex !w-full items-center"
+          @click="showDeleteModal(contextMenuInfo.item)"
+        >
+          <TrashIcon class="h-5 w-5" />
+          Delete
+        </button>
+      </div>
+    </Transition>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -312,6 +371,10 @@ import {
   SaveIcon,
   PyroIcon,
   ClearIcon,
+  EditIcon,
+  ArrowBigUpDashIcon,
+  DownloadIcon,
+  TrashIcon,
 } from "@modrinth/assets";
 import { Button, Modal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
@@ -332,6 +395,9 @@ const maxResults = 100;
 const currentPage = ref(1);
 const pages = ref(1);
 const currentPath = ref(route.query.path || "");
+const ctxRef = ref<HTMLElement | null>(null);
+
+const isAtBottom = ref(false);
 
 useHead({
   title: `Files - ${data.value?.name ?? "Server"} - Modrinth`,
@@ -341,6 +407,15 @@ const scrollContainer = ref<HTMLElement | null>(null);
 const items = ref<any[]>([]);
 const isLoading = ref(true);
 const loadError = ref(false);
+const contextMenuInfo = ref<{
+  item: any;
+  x: number;
+  y: number;
+}>({
+  item: null,
+  x: 0,
+  y: 0,
+});
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { reset } = useInfiniteScroll(
@@ -360,6 +435,37 @@ const onInit = (editor: any) => {
     exec: () => saveFileContent(false),
   });
 };
+
+watch(contextMenuInfo, () => console.log(contextMenuInfo.value), {
+  deep: true,
+  immediate: true,
+});
+
+const showContextMenu = async (item: any, x: number, y: number) => {
+  contextMenuInfo.value = { item, x, y };
+  selectedItem.value = item;
+  await nextTick();
+  if (!ctxRef.value) return false;
+  const screenHeight = window.innerHeight;
+  const ctxRect = ctxRef.value.getBoundingClientRect();
+  isAtBottom.value = isAtBottom.value
+    ? ctxRect.bottom + ctxRect.height > screenHeight
+    : ctxRect.bottom > screenHeight;
+  console.log(ctxRect.bottom, screenHeight, isAtBottom.value);
+};
+
+const onAnywhereClicked = (e: MouseEvent) => {
+  // if the clicked element does not have a parent with the id of item-context-menu, hide the context menu
+  if (!(e.target as HTMLElement).closest("#item-context-menu")) contextMenuInfo.value.item = null;
+};
+
+onMounted(() => {
+  document.addEventListener("click", onAnywhereClicked);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", onAnywhereClicked);
+});
 
 const fetchData = async () => {
   isLoading.value = true;
@@ -522,6 +628,7 @@ const showRenameModal = (item: any) => {
   newItemName.value = item.name;
   newItemType.value = item.type;
   renameItemModal.value?.show();
+  contextMenuInfo.value.item = null;
 };
 
 const showMoveModal = (item: any) => {
@@ -530,11 +637,13 @@ const showMoveModal = (item: any) => {
     ? currentPath.value.join("/")
     : currentPath.value;
   moveItemModal.value?.show();
+  contextMenuInfo.value.item = null;
 };
 
 const showDeleteModal = (item: any) => {
   selectedItem.value = item;
   deleteItemModal.value?.show();
+  contextMenuInfo.value.item = null;
 };
 
 const createNewItem = async () => {
@@ -635,6 +744,7 @@ const downloadFile = async (item: any) => {
     } catch (error) {
       console.error("Error downloading file:", error);
     }
+    contextMenuInfo.value.item = null;
   }
 };
 
@@ -716,3 +826,24 @@ const openSftp = () => {
   window.open(`sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`);
 };
 </script>
+
+<style>
+#item-context-menu {
+  transition:
+    transform 0.1s ease,
+    opacity 0.1s ease;
+  transform-origin: top left;
+}
+
+#item-context-menu.v-enter-active,
+#item-context-menu.v-leave-active {
+  transform: scale(1);
+  opacity: 1;
+}
+
+#item-context-menu.v-enter-from,
+#item-context-menu.v-leave-to {
+  transform: scale(0.5);
+  opacity: 0;
+}
+</style>
