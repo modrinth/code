@@ -288,26 +288,30 @@ const emit = defineEmits<{
 }>();
 
 const tags = useTags();
-const config = useRuntimeConfig();
 const prodOverride = await PyroAuthOverride();
 
 const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
 
 const loaderVersions = (await Promise.all(
   versionStrings.map(async (loader) => {
-    const runFetch = async () => {
+    const runFetch = async (iterations: number) => {
+      if (iterations > 5) {
+        throw new Error("Failed to fetch loader versions");
+      }
       try {
-        const res = await fetch(
-          `${config.public.siteUrl}/loader-versions?loader=${loader}`,
-          {},
-        ).then((r) => r.json());
+        // get our info
+        const res = await fetch(`/loader-versions?loader=${loader}`).then((r) => r.json());
         return { [loader]: res.gameVersions };
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_) {
-        return await runFetch();
+        return await runFetch(iterations + 1);
       }
     };
-    return await runFetch();
+    try {
+      return await runFetch(0);
+    } catch (e) {
+      console.error(e);
+    }
   }),
 ).then((res) => res.reduce((acc, val) => ({ ...acc, ...val }), {}))) as Record<
   string,

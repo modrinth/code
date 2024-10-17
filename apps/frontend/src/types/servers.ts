@@ -189,6 +189,11 @@ export interface WSAuthOkEvent {
   event: "auth-ok";
 }
 
+export interface WSUptimeEvent {
+  event: "uptime";
+  uptime: number; // seconds
+}
+
 export type WSEvent =
   | WSLogEvent
   | WSStatsEvent
@@ -196,7 +201,8 @@ export type WSEvent =
   | WSAuthExpiringEvent
   | WSAuthIncorrectEvent
   | WSInstallationResultEvent
-  | WSAuthOkEvent;
+  | WSAuthOkEvent
+  | WSUptimeEvent;
 
 export interface Servers {
   servers: Server[];
