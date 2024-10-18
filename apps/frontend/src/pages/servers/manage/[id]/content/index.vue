@@ -32,7 +32,7 @@
       class="mb-4 flex h-full w-full items-center gap-2 rounded-xl border border-solid border-blue bg-bg-blue p-4 text-contrast"
     >
       <UnknownIcon class="h-8 w-8 text-blue" />
-      This page is under construction some features may not be available yet, or are subject to
+      This page is under construction - some features may not be available yet, or are subject to
       change.
     </div>
     <div class="flex h-full w-full flex-col overflow-y-scroll">
