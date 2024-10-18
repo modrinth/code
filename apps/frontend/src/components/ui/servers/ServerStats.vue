@@ -10,7 +10,18 @@
           {{ metric.value }}
         </h2>
       </div>
-      <h3 class="relative z-10 text-base font-normal text-secondary">{{ metric.title }}</h3>
+      <h3 class="relative z-10 flex items-center gap-2 text-base font-normal text-secondary">
+        {{ metric.title }}
+        <WarningIcon
+          v-tooltip="getPotentialWarning(metric)"
+          :style="{
+            color: 'var(--color-orange)',
+            width: '1.25rem',
+            height: '1.25rem',
+            display: getPotentialWarning(metric) ? 'block' : 'none',
+          }"
+        />
+      </h3>
 
       <component :is="metric.icon" class="absolute right-8 top-8" />
       <ClientOnly>
@@ -18,7 +29,7 @@
           ref="chart"
           type="area"
           height="100"
-          :options="chartOptions"
+          :options="generateOptions(metric)"
           :series="[{ name: 'Chart', data: metric.data }]"
           class="chart chart-animation absolute bottom-0 left-0 right-0 w-full"
         />
@@ -45,6 +56,7 @@
 import { ref, onMounted, onUnmounted, markRaw } from "vue";
 import { FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 import type { Stats } from "~/types/servers";
+import WarningIcon from "~/assets/images/utils/issues.svg?component";
 
 const route = useNativeRoute();
 const serverId = route.params.id;
@@ -115,58 +127,102 @@ const updateMetrics = () => {
   });
 };
 
-const chartOptions = ref({
-  chart: {
-    id: "stats",
-    fontFamily:
-      "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
-    foreColor: "var(--color-base)",
-    toolbar: { show: false },
-    zoom: { enabled: false },
-    sparkline: { enabled: true },
-    animations: {
-      enabled: true,
-      easing: "linear",
-      dynamicAnimation: { speed: 1000 },
+// aww, you gotta give em that rinth tuah, mod on that thang
+const getPotentialWarning = (metric: (typeof metrics.value)[0]) => {
+  // make all words in the string lowercase, unless the word is in all caps
+  const split = metric.title.split(" ");
+  const title = split
+    .map((word) => {
+      if (word === word.toUpperCase()) {
+        return word;
+      }
+      return word.toLowerCase();
+    })
+    .join(" ");
+  const data = metric.data.at(-1) || 0;
+  switch (true) {
+    case data >= 90:
+      return `Your server's ${title} is very high.`;
+    default:
+      return "";
+  }
+};
+
+const generateOptions = (metric: (typeof metrics.value)[0]) => {
+  let color = "var(--color-brand)";
+  const data = metric.data.at(-1) || 0;
+  switch (true) {
+    case data >= 90:
+      color = "var(--color-red)";
+      break;
+    case data >= 80:
+      color = "var(--color-orange)";
+      break;
+  }
+  return {
+    chart: {
+      id: "stats",
+      fontFamily:
+        "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
+      foreColor: "var(--color-base)",
+      toolbar: { show: false },
+      zoom: { enabled: false },
+      sparkline: { enabled: true },
+      animations: {
+        enabled: true,
+        easing: "linear",
+        dynamicAnimation: { speed: 1000 },
+      },
     },
-  },
-  stroke: { curve: "smooth" },
-  fill: {
-    colors: ["var(--color-brand)"],
-    type: "gradient",
-    opacity: 1,
-    gradient: {
-      shade: "light",
-      type: "vertical",
-      shadeIntensity: 0,
-      gradientToColors: ["var(--color-brand)"],
-      inverseColors: true,
-      opacityFrom: 0.5,
-      opacityTo: 0,
-      stops: [0, 100],
-      colorStops: [],
+    stroke: { curve: "smooth" },
+    fill: {
+      colors: [color],
+      type: "gradient",
+      opacity: 1,
+      gradient: {
+        shade: "light",
+        type: "vertical",
+        shadeIntensity: 0,
+        gradientToColors: [color],
+        inverseColors: true,
+        opacityFrom: 0.5,
+        opacityTo: 0,
+        stops: [0, 100],
+        colorStops: [],
+      },
     },
-  },
-  grid: { show: false },
-  legend: { show: false },
-  colors: ["var(--color-brand)"],
-  dataLabels: { enabled: false },
-  xaxis: {
-    type: "numeric",
-    lines: { show: false },
-    axisBorder: { show: false },
-    labels: { show: false },
-  },
-  yaxis: {
-    min: 0,
-    max: 100,
-    tickAmount: 5,
-    labels: { show: false },
-    axisBorder: { show: false },
-    axisTicks: { show: false },
-  },
-  tooltip: { enabled: false },
-});
+    grid: { show: false },
+    legend: { show: false },
+    colors: [color],
+    dataLabels: { enabled: false },
+    xaxis: {
+      type: "numeric",
+      lines: { show: false },
+      axisBorder: { show: false },
+      labels: { show: false },
+    },
+    yaxis: {
+      min: 0,
+      max: 100,
+      tickAmount: 5,
+      labels: { show: false },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+    },
+    tooltip: { enabled: false },
+  };
+};
+
+// watch(
+//   metrics,
+//   () => {
+//     console.log(metrics.value[0].data.at(-1));
+//   },
+//   {
+//     deep: true,
+//     immediate: true,
+//   },
+// );
 
 let interval: number;
 
