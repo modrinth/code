@@ -5,7 +5,12 @@
       :key="index"
       class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
-      <div class="relative z-10 flex flex-row items-center gap-2">
+      <div
+        class="relative z-10 -ml-2 flex w-fit flex-row items-center gap-2 rounded-xl px-2 py-0.5"
+        :style="{
+          backdropFilter: 'blur(32px)',
+        }"
+      >
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ metric.value }}
         </h2>
