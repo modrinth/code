@@ -11,6 +11,7 @@ import {
   TextQuoteIcon,
   VersionIcon,
   CardIcon,
+  UserIcon,
 } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
@@ -35,6 +36,11 @@ const navLinks = [
     icon: CardIcon,
     label: "Billing",
     href: `/servers/manage/${serverId}/options/billing`,
+  },
+  {
+    icon: UserIcon,
+    label: "Preferences",
+    href: `/servers/manage/${serverId}/options/preferences`,
   },
   { icon: InfoIcon, label: "Info", href: `/servers/manage/${serverId}/options/info` },
 ];

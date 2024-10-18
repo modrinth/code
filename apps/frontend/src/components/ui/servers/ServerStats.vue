@@ -3,13 +3,13 @@
     <div
       v-for="(metric, index) in metrics"
       :key="index"
-      v-tooltip="memoryTooltip(index)"
       class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
       <div class="relative z-10 flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ metric.value }}
         </h2>
+        <h3 class="relative z-10 text-sm font-normal text-secondary">/ {{ metric.max }}</h3>
       </div>
       <h3 class="relative z-10 text-base font-normal text-secondary">{{ metric.title }}</h3>
 
@@ -27,7 +27,6 @@
     </div>
 
     <NuxtLink
-      v-tooltip="storageTooltip"
       :to="`/servers/manage/${serverId}/files`"
       class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
     >
@@ -35,6 +34,9 @@
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ formatBytes(data.current.storage_usage_bytes) }}
         </h2>
+        <h3 class="relative z-10 text-sm font-normal text-secondary">
+          / {{ formatBytes(data.current.storage_total_bytes) }}
+        </h3>
       </div>
       <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
 
@@ -44,12 +46,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, markRaw, computed } from "vue";
 import { FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
+import { useStorage } from "@vueuse/core";
 import type { Stats } from "~/types/servers";
 
 const route = useNativeRoute();
 const serverId = route.params.id;
+
+const userPrefrences = useStorage(`pyro-server-${serverId}-preferences`, {
+  ramAsNumber: false,
+});
 
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
 
@@ -82,12 +88,16 @@ const metrics = ref([
   {
     title: "CPU usage",
     value: "0%",
+    max: "100%",
     icon: markRaw(CPUIcon),
     data: [] as number[],
   },
   {
     title: "Memory usage",
     value: "0%",
+    max: userPrefrences.value.ramAsNumber
+      ? formatBytes(props.data.current.ram_total_bytes)
+      : "100%",
     icon: markRaw(DBIcon),
     data: [] as number[],
   },
@@ -95,25 +105,35 @@ const metrics = ref([
 
 const updateMetrics = () => {
   metrics.value = metrics.value.map((metric, index) => {
-    const currentValue =
-      index === 0
-        ? props.data.current.cpu_percent
-        : Math.min(
-            (props.data.current.ram_usage_bytes / props.data.current.ram_total_bytes) * 100,
-            100,
-          );
-    const pastValue =
-      index === 0
-        ? props.data.past.cpu_percent
-        : Math.min((props.data.past.ram_usage_bytes / props.data.past.ram_total_bytes) * 100, 100);
+    if (userPrefrences.value.ramAsNumber && index === 1) {
+      return {
+        ...metric,
+        value: formatBytes(props.data.current.ram_usage_bytes),
+        data: [...metric.data.slice(-10), props.data.current.ram_usage_bytes],
+      };
+    } else {
+      const currentValue =
+        index === 0
+          ? props.data.current.cpu_percent
+          : Math.min(
+              (props.data.current.ram_usage_bytes / props.data.current.ram_total_bytes) * 100,
+              100,
+            );
+      const pastValue =
+        index === 0
+          ? props.data.past.cpu_percent
+          : Math.min(
+              (props.data.past.ram_usage_bytes / props.data.past.ram_total_bytes) * 100,
+              100,
+            );
 
-    const newValue = lerp(currentValue, pastValue);
-
-    return {
-      ...metric,
-      value: `${newValue.toFixed(2)}%`,
-      data: [...metric.data.slice(-10), newValue],
-    };
+      const newValue = lerp(currentValue, pastValue);
+      return {
+        ...metric,
+        value: `${newValue.toFixed(2)}%`,
+        data: [...metric.data.slice(-10), newValue],
+      };
+    }
   });
 };
 
@@ -169,21 +189,6 @@ const chartOptions = ref({
     axisTicks: { show: false },
   },
   tooltip: { enabled: false },
-});
-
-const memoryTooltip = (index: number) => {
-  if (index === 1) {
-    const used = formatBytes(props.data.current.ram_usage_bytes);
-    const total = formatBytes(props.data.current.ram_total_bytes);
-    return `${used} / ${total}`;
-  }
-  return "";
-};
-
-const storageTooltip = computed(() => {
-  const used = formatBytes(props.data.current.storage_usage_bytes);
-  const total = formatBytes(props.data.current.storage_total_bytes);
-  return `${used} / ${total}`;
 });
 
 let interval: number;

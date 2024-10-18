@@ -446,11 +446,18 @@ const stopPolling = () => {
 
 onMounted(() => {
   connectWebSocket();
-  DOMPurify.addHook("afterSanitizeAttributes", (node) => {
-    if (node.tagName === "A" && node.getAttribute("target")) {
-      node.setAttribute("rel", "noopener noreferrer");
-    }
-  });
+  DOMPurify.addHook(
+    "afterSanitizeAttributes",
+    (node: {
+      tagName: string;
+      getAttribute: (arg0: string) => any;
+      setAttribute: (arg0: string, arg1: string) => void;
+    }) => {
+      if (node.tagName === "A" && node.getAttribute("target")) {
+        node.setAttribute("rel", "noopener noreferrer");
+      }
+    },
+  );
 });
 
 onUnmounted(() => {
