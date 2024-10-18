@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-row items-center gap-2 rounded-lg">
     <ButtonStyled v-if="showStopButton" type="standard" color="red">
-      <button :disabled="!canTakeAction || isStartingDelay || disabled" @click="killServer">
+      <button @click="killServer">
         <div class="flex gap-1">
           <SlashIcon class="h-5 w-5" />
           <span>{{ killButtonText }}</span>
