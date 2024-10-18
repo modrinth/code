@@ -65,7 +65,7 @@
 
       <div data-pyro-mount class="h-full w-full flex-1">
         <div
-          v-if="!isConnected && !isReconnecting"
+          v-if="!isConnected && !isReconnecting && !isLoading"
           data-pyro-server-ws-error
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-xl bg-bg-red p-4 text-contrast"
         >
@@ -116,6 +116,7 @@ import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/t
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
+const isLoading = ref(true); // initial loading state
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
 const route = useNativeRoute();
@@ -193,6 +194,7 @@ const connectWebSocket = () => {
       socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
       isConnected.value = true;
       isReconnecting.value = false;
+      isLoading.value = false;
       if (reconnectInterval.value) {
         clearInterval(reconnectInterval.value);
         reconnectInterval.value = null;
