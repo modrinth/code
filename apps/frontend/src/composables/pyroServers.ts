@@ -191,6 +191,7 @@ interface Allocation {
 
 interface Startup {
   invocation: string;
+  original_invocation: string;
   jdk_version: "lts8" | "lts11" | "lts17" | "lts21";
   jdk_build: "corretto" | "temurin" | "graal";
 }
