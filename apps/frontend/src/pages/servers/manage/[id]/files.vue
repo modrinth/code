@@ -1,369 +1,377 @@
 <template>
-  <div
-    class="relative flex min-h-[800px] w-full flex-col overflow-hidden rounded-xl border border-solid border-bg-raised"
-    @dragenter.prevent="handleDragEnter"
-    @dragover.prevent="handleDragOver"
-    @dragleave.prevent="handleDragLeave"
-    @drop.prevent="handleDrop"
-  >
-    <!-- Create Item Modal -->
-    <Modal ref="createItemModal" header="">
-      <UiServersPyroModal
-        :header="`Create ${newItemType}`"
-        :data="data"
-        @modal="createItemModal?.hide()"
-      >
-        <div class="mt-2 flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
-        </div>
-        <div class="mb-1 mt-4 flex justify-end gap-4">
-          <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="createNewItem"> Create </Button>
-        </div>
-      </UiServersPyroModal>
-    </Modal>
+  <div data-pyro-file-manager-root class="contents">
+    <div
+      class="relative flex min-h-[800px] w-full flex-col overflow-hidden rounded-xl border border-solid border-bg-raised"
+      @dragenter.prevent="handleDragEnter"
+      @dragover.prevent="handleDragOver"
+      @dragleave.prevent="handleDragLeave"
+      @drop.prevent="handleDrop"
+    >
+      <!-- Create Item Modal -->
+      <Modal ref="createItemModal" header="">
+        <UiServersPyroModal
+          :header="`Create ${newItemType}`"
+          :data="data"
+          @modal="createItemModal?.hide()"
+        >
+          <div class="mt-2 flex flex-col gap-2">
+            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+            <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
+          </div>
+          <div class="mb-1 mt-4 flex justify-end gap-4">
+            <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
+            <Button color="primary" @click="createNewItem"> Create </Button>
+          </div>
+        </UiServersPyroModal>
+      </Modal>
 
-    <!-- Rename Item Modal -->
-    <Modal ref="renameItemModal" header="">
-      <UiServersPyroModal
-        :header="`Rename ${selectedItem?.type}`"
-        :data="data"
-        @modal="renameItemModal?.hide()"
-      >
-        <div class="mt-2 flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-          <input
-            v-model="newItemName"
-            type="text"
-            class="bg-bg-input w-full rounded-lg p-4"
-            :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
-          />
-        </div>
-        <div class="mb-1 mt-4 flex justify-end gap-4">
-          <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="renameItem"> Rename </Button>
-        </div>
-      </UiServersPyroModal>
-    </Modal>
+      <!-- Rename Item Modal -->
+      <Modal ref="renameItemModal" header="">
+        <UiServersPyroModal
+          :header="`Rename ${selectedItem?.type}`"
+          :data="data"
+          @modal="renameItemModal?.hide()"
+        >
+          <div class="mt-2 flex flex-col gap-2">
+            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+            <input
+              v-model="newItemName"
+              type="text"
+              class="bg-bg-input w-full rounded-lg p-4"
+              :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
+            />
+          </div>
+          <div class="mb-1 mt-4 flex justify-end gap-4">
+            <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
+            <Button color="primary" @click="renameItem"> Rename </Button>
+          </div>
+        </UiServersPyroModal>
+      </Modal>
 
-    <!-- Move Item Modal -->
-    <Modal ref="moveItemModal" header="">
-      <UiServersPyroModal
-        :header="`Move ${selectedItem?.name}`"
-        :data="data"
-        @modal="moveItemModal?.hide()"
-      >
-        <div class="mt-2 flex flex-col gap-2">
-          <input
-            v-model="destinationFolder"
-            type="text"
-            class="bg-bg-input w-full rounded-lg p-4"
-            placeholder="e.g. mods/modname"
-          />
-        </div>
-        <div class="mb-1 mt-4 flex justify-end gap-4">
-          <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
-          <Button color="primary" @click="moveItem"> Move </Button>
-        </div>
-      </UiServersPyroModal>
-    </Modal>
+      <!-- Move Item Modal -->
+      <Modal ref="moveItemModal" header="">
+        <UiServersPyroModal
+          :header="`Move ${selectedItem?.name}`"
+          :data="data"
+          @modal="moveItemModal?.hide()"
+        >
+          <div class="mt-2 flex flex-col gap-2">
+            <input
+              v-model="destinationFolder"
+              type="text"
+              class="bg-bg-input w-full rounded-lg p-4"
+              placeholder="e.g. mods/modname"
+            />
+          </div>
+          <div class="mb-1 mt-4 flex justify-end gap-4">
+            <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
+            <Button color="primary" @click="moveItem"> Move </Button>
+          </div>
+        </UiServersPyroModal>
+      </Modal>
 
-    <!-- Delete Item Modal -->
-    <Modal ref="deleteItemModal" header="">
-      <UiServersPyroModal
-        :header="`Delete ${selectedItem?.type}`"
-        :data="data"
-        danger
-        @modal="deleteItemModal?.hide()"
-      >
-        <div class="flex flex-col gap-4">
-          <div
-            class="relative flex w-full items-center gap-2 rounded-2xl border border-solid border-[#cb224436] bg-[#f57b7b0e] p-6 shadow-md dark:border-0 dark:bg-[#0e0e0ea4]"
-          >
+      <!-- Delete Item Modal -->
+      <Modal ref="deleteItemModal" header="">
+        <UiServersPyroModal
+          :header="`Delete ${selectedItem?.type}`"
+          :data="data"
+          danger
+          @modal="deleteItemModal?.hide()"
+        >
+          <div class="flex flex-col gap-4">
             <div
-              class="flex h-9 w-9 items-center justify-center rounded-full bg-[#3f1818a4] p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+              class="relative flex w-full items-center gap-2 rounded-2xl border border-solid border-[#cb224436] bg-[#f57b7b0e] p-6 shadow-md dark:border-0 dark:bg-[#0e0e0ea4]"
             >
-              <FolderOpenIcon v-if="selectedItem?.type === 'directory'" class="h-5 w-5" />
-              <FileIcon v-else-if="selectedItem?.type === 'file'" class="h-5 w-5" />
-            </div>
-            <div class="flex flex-col">
-              <span class="font-bold group-hover:text-contrast">{{ selectedItem?.name }}</span>
-              <span
-                v-if="selectedItem?.type === 'directory'"
-                class="text-xs text-secondary group-hover:text-primary"
-                >{{ selectedItem?.count }} items</span
+              <div
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-[#3f1818a4] p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
               >
-              <span v-else class="text-xs text-secondary group-hover:text-primary"
-                >{{ (selectedItem?.size / 1024 / 1024).toFixed(2) }} MB</span
-              >
+                <FolderOpenIcon v-if="selectedItem?.type === 'directory'" class="h-5 w-5" />
+                <FileIcon v-else-if="selectedItem?.type === 'file'" class="h-5 w-5" />
+              </div>
+              <div class="flex flex-col">
+                <span class="font-bold group-hover:text-contrast">{{ selectedItem?.name }}</span>
+                <span
+                  v-if="selectedItem?.type === 'directory'"
+                  class="text-xs text-secondary group-hover:text-primary"
+                  >{{ selectedItem?.count }} items</span
+                >
+                <span v-else class="text-xs text-secondary group-hover:text-primary"
+                  >{{ (selectedItem?.size / 1024 / 1024).toFixed(2) }} MB</span
+                >
+              </div>
             </div>
           </div>
-        </div>
-        <div class="mb-1 mt-4 flex justify-end gap-4">
-          <Button transparent @click="deleteItemModal?.hide()"> Cancel </Button>
-          <Button color="danger" @click="deleteItem"> Delete {{ selectedItem?.type }} </Button>
-        </div>
-      </UiServersPyroModal>
-    </Modal>
+          <div class="mb-1 mt-4 flex justify-end gap-4">
+            <Button transparent @click="deleteItemModal?.hide()"> Cancel </Button>
+            <Button color="danger" @click="deleteItem"> Delete {{ selectedItem?.type }} </Button>
+          </div>
+        </UiServersPyroModal>
+      </Modal>
 
-    <!-- Main Content -->
-    <div
-      class="flex min-h-[800px] w-full flex-col overflow-visible rounded-xl border border-solid border-bg-raised"
-    >
+      <!-- Main Content -->
       <div
-        v-if="!isEditing"
-        class="flex h-12 select-none items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
+        class="flex min-h-[800px] w-full flex-col overflow-visible rounded-xl border border-solid border-bg-raised"
       >
-        <div class="flex items-center gap-2 text-contrast">
-          <span
-            class="breadcrumb-link flex cursor-pointer items-center gap-2"
-            @click="navigateToSegment(-1)"
-          >
-            <BoxIcon class="h-5 w-5" />
-            <span class="opacity-50">/</span>
-          </span>
-          <span
-            v-for="(segment, index) in breadcrumbSegments"
-            :key="index"
-            class="breadcrumb-link cursor-pointer"
-            @click="navigateToSegment(index)"
-          >
-            {{ segment || "" }}
-            <span class="ms-1 opacity-50">/</span>
-          </span>
-        </div>
-        <div class="flex gap-2">
-          <ButtonStyled type="transparent">
-            <OverflowMenu
-              class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-              position="bottom"
-              direction="left"
-              aria-label="Create new..."
-              :options="[
-                { id: 'file', action: () => showCreateModal('file') },
-                { id: 'directory', action: () => showCreateModal('directory') },
-                { id: 'upload', action: () => initiateFileUpload() },
-              ]"
+        <div
+          v-if="!isEditing"
+          class="flex h-12 select-none items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
+        >
+          <div class="flex items-center gap-2 text-contrast">
+            <span
+              class="breadcrumb-link flex cursor-pointer items-center gap-2"
+              @click="navigateToSegment(-1)"
             >
-              <PlusIcon aria-hidden="true" />
-              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-              <template #file> <BoxIcon aria-hidden="true" /> File </template>
-              <template #directory> <FolderOpenIcon aria-hidden="true" /> Directory </template>
-              <template #upload> <UploadIcon aria-hidden="true" /> Upload </template>
-            </OverflowMenu>
-          </ButtonStyled>
-        </div>
-      </div>
-      <div
-        v-else
-        class="flex h-12 items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
-      >
-        <div class="flex items-center gap-2 text-contrast">
-          <ButtonStyled type="transparent">
-            <Button @click="cancelEditing">
-              <XIcon aria-hidden="true" />
-            </Button>
-          </ButtonStyled>
-          <span class="breadcrumb-link flex cursor-pointer items-center gap-2">
-            <span class="text-lg font-bold">{{ editingFile?.name }}</span>
-          </span>
-        </div>
-
-        <div class="flex gap-2">
-          <Button
-            v-if="editingFile.path.startsWith('logs') && editingFile.path.endsWith('.log')"
-            v-tooltip="'Share your mc log'"
-            icon-only
-            transparent
-            @click="requestShareLink"
-          >
-            <ShareIcon />
-          </Button>
-          <ButtonStyled type="transparent">
-            <OverflowMenu
-              class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-              position="bottom"
-              direction="left"
-              aria-label="Save file"
-              :options="[
-                { id: 'save', action: saveFileContent },
-                { id: 'save-as', action: saveFileContentAs },
-                { id: 'save&restart', action: saveFileContentRestart },
-              ]"
+              <BoxIcon class="h-5 w-5" />
+              <span class="opacity-50">/</span>
+            </span>
+            <span
+              v-for="(segment, index) in breadcrumbSegments"
+              :key="index"
+              class="breadcrumb-link cursor-pointer"
+              @click="navigateToSegment(index)"
             >
-              <SaveIcon aria-hidden="true" />
-              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-              <template #save> <SaveIcon aria-hidden="true" /> Save </template>
-              <template #save-as> <SaveIcon aria-hidden="true" /> Save as... </template>
-              <template #save&restart>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fill-rule="evenodd"
-                    d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                Save & Restart
-              </template>
-            </OverflowMenu>
-          </ButtonStyled>
-        </div>
-      </div>
-
-      <div v-if="isEditing" class="h-full w-full flex-grow">
-        <component
-          :is="VAceEditor"
-          v-model:value="fileContent"
-          lang="json"
-          theme="one_dark"
-          :print-margin="false"
-          style="height: 750px; font-size: 1rem"
-          class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
-          @init="onInit"
-        />
-      </div>
-      <div
-        v-else-if="items.length > 0"
-        ref="scrollContainer"
-        class="h-full w-full snap-y overflow-visible"
-      >
-        <UiServersFileItem
-          v-for="item in items"
-          :key="item.name"
-          :count="item.count"
-          :created="item.created"
-          :modified="item.modified"
-          :name="item.name"
-          :path="item.path"
-          :type="item.type"
-          :size="item.size"
-          @delete="showDeleteModal(item)"
-          @rename="showRenameModal(item)"
-          @download="downloadFile(item)"
-          @move="showMoveModal(item)"
-          @edit="editFile(item)"
-          @contextmenu="(x, y) => showContextMenu(item, x, y)"
-        />
-        <div v-if="loadError" class="flex h-10 items-center justify-center gap-2">
-          <ClearIcon class="h-4 w-4" />
-          Error loading more directories {{ loadError }}
+              {{ segment || "" }}
+              <span class="ms-1 opacity-50">/</span>
+            </span>
+          </div>
+          <div class="flex gap-2">
+            <ButtonStyled type="transparent">
+              <OverflowMenu
+                class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+                position="bottom"
+                direction="left"
+                aria-label="Create new..."
+                :options="[
+                  { id: 'file', action: () => showCreateModal('file') },
+                  { id: 'directory', action: () => showCreateModal('directory') },
+                  { id: 'upload', action: () => initiateFileUpload() },
+                ]"
+              >
+                <PlusIcon aria-hidden="true" />
+                <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+                <template #file> <BoxIcon aria-hidden="true" /> File </template>
+                <template #directory> <FolderOpenIcon aria-hidden="true" /> Directory </template>
+                <template #upload> <UploadIcon aria-hidden="true" /> Upload </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </div>
         </div>
         <div
-          v-else-if="isLoading"
-          class="flex h-10 animate-pulse items-center justify-center gap-2"
+          v-else
+          class="flex h-12 items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
         >
-          <PyroIcon class="h-4 w-4" /> Loading...
+          <div class="flex items-center gap-2 text-contrast">
+            <ButtonStyled type="transparent">
+              <Button @click="cancelEditing">
+                <XIcon aria-hidden="true" />
+              </Button>
+            </ButtonStyled>
+            <span class="breadcrumb-link flex cursor-pointer items-center gap-2">
+              <span class="text-lg font-bold">{{ editingFile?.name }}</span>
+            </span>
+          </div>
+
+          <div class="flex gap-2">
+            <Button
+              v-if="editingFile.path.startsWith('logs') && editingFile.path.endsWith('.log')"
+              v-tooltip="'Share your mc log'"
+              icon-only
+              transparent
+              @click="requestShareLink"
+            >
+              <ShareIcon />
+            </Button>
+            <ButtonStyled type="transparent">
+              <OverflowMenu
+                class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+                position="bottom"
+                direction="left"
+                aria-label="Save file"
+                :options="[
+                  { id: 'save', action: saveFileContent },
+                  { id: 'save-as', action: saveFileContentAs },
+                  { id: 'save&restart', action: saveFileContentRestart },
+                ]"
+              >
+                <SaveIcon aria-hidden="true" />
+                <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+                <template #save> <SaveIcon aria-hidden="true" /> Save </template>
+                <template #save-as> <SaveIcon aria-hidden="true" /> Save as... </template>
+                <template #save&restart>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fill-rule="evenodd"
+                      d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  Save & Restart
+                </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </div>
+        </div>
+
+        <div v-if="isEditing" class="h-full w-full flex-grow">
+          <component
+            :is="VAceEditor"
+            v-model:value="fileContent"
+            lang="json"
+            theme="one_dark"
+            :print-margin="false"
+            style="height: 750px; font-size: 1rem"
+            class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
+            @init="onInit"
+          />
+        </div>
+        <div
+          v-else-if="items.length > 0"
+          ref="scrollContainer"
+          class="h-full w-full snap-y overflow-visible"
+        >
+          <UiServersFileItem
+            v-for="item in items"
+            :key="item.name"
+            :count="item.count"
+            :created="item.created"
+            :modified="item.modified"
+            :name="item.name"
+            :path="item.path"
+            :type="item.type"
+            :size="item.size"
+            @delete="showDeleteModal(item)"
+            @rename="showRenameModal(item)"
+            @download="downloadFile(item)"
+            @move="showMoveModal(item)"
+            @edit="editFile(item)"
+            @contextmenu="(x, y) => showContextMenu(item, x, y)"
+          />
+          <div v-if="loadError" class="flex h-10 items-center justify-center gap-2">
+            <ClearIcon class="h-4 w-4" />
+            Error loading more directories {{ loadError }}
+          </div>
+          <div
+            v-else-if="isLoading"
+            class="flex h-10 animate-pulse items-center justify-center gap-2"
+          >
+            <PyroIcon class="h-4 w-4" /> Loading...
+          </div>
+        </div>
+
+        <div
+          v-else-if="!isLoading && items.length === 0"
+          class="flex h-full w-full items-center justify-center p-20"
+        >
+          <div class="flex flex-col items-center gap-4 text-center">
+            <FolderOpenIcon class="h-16 w-16 text-secondary" />
+            <h3 class="text-2xl font-bold text-contrast">This folder is empty</h3>
+            <p class="m-0 text-sm text-secondary">There are no files or folders in this folder.</p>
+          </div>
+        </div>
+
+        <div
+          v-else-if="!isLoading"
+          class="flex h-full w-full items-center justify-center gap-6 p-20"
+        >
+          <FileIcon class="text-red-500 h-16 w-16" />
+          <div class="flex flex-col gap-2">
+            <h3 class="text-red-500 m-0 text-2xl font-bold">Unable to list files</h3>
+            <p class="m-0 text-sm text-secondary">
+              Unfortunately, we were unable to list the files in this folder. If this issue
+              persists, contact support.
+            </p>
+          </div>
+          <Button size="sm" @click="navigateToPage(1)">
+            <XIcon class="h-5 w-5" />
+            Go to homepage
+          </Button>
+        </div>
+
+        <div
+          v-else-if="loadError"
+          class="flex h-full w-full items-center justify-center gap-6 p-20"
+        >
+          <FileIcon class="text-red-500 h-16 w-16" />
+          <div class="flex flex-col gap-2">
+            <h3 class="text-red-500 m-0 text-2xl font-bold">Unable to fetch files</h3>
+            <p class="m-0 text-sm text-secondary">
+              This path is no longer valid or we couldn't find it. If this issue persists, contact
+              support.
+            </p>
+          </div>
+        </div>
+        <div v-else class="flex h-full w-full items-center justify-center p-20">
+          <UiServersPyroLoading />
         </div>
       </div>
-
       <div
-        v-else-if="!isLoading && items.length === 0"
-        class="flex h-full w-full items-center justify-center p-20"
+        v-if="isDragging"
+        class="absolute inset-0 flex items-center justify-center rounded-xl bg-black bg-opacity-50 text-white"
       >
-        <div class="flex flex-col items-center gap-4 text-center">
-          <FolderOpenIcon class="h-16 w-16 text-secondary" />
-          <h3 class="text-2xl font-bold text-contrast">This folder is empty</h3>
-          <p class="m-0 text-sm text-secondary">There are no files or folders in this folder.</p>
+        <div class="text-center">
+          <UploadIcon class="mx-auto h-16 w-16" />
+          <p class="mt-2 text-xl">Drop files here to upload</p>
         </div>
-      </div>
-
-      <div v-else-if="!isLoading" class="flex h-full w-full items-center justify-center gap-6 p-20">
-        <FileIcon class="text-red-500 h-16 w-16" />
-        <div class="flex flex-col gap-2">
-          <h3 class="text-red-500 m-0 text-2xl font-bold">Unable to list files</h3>
-          <p class="m-0 text-sm text-secondary">
-            Unfortunately, we were unable to list the files in this folder. If this issue persists,
-            contact support.
-          </p>
-        </div>
-        <Button size="sm" @click="navigateToPage(1)">
-          <XIcon class="h-5 w-5" />
-          Go to homepage
-        </Button>
-      </div>
-
-      <div v-else-if="loadError" class="flex h-full w-full items-center justify-center gap-6 p-20">
-        <FileIcon class="text-red-500 h-16 w-16" />
-        <div class="flex flex-col gap-2">
-          <h3 class="text-red-500 m-0 text-2xl font-bold">Unable to fetch files</h3>
-          <p class="m-0 text-sm text-secondary">
-            This path is no longer valid or we couldn't find it. If this issue persists, contact
-            support.
-          </p>
-        </div>
-      </div>
-      <div v-else class="flex h-full w-full items-center justify-center p-20">
-        <UiServersPyroLoading />
       </div>
     </div>
+
     <div
-      v-if="isDragging"
-      class="absolute inset-0 flex items-center justify-center rounded-xl bg-black bg-opacity-50 text-white"
+      class="absolute left-0 top-0"
+      :style="{
+        transform: `translateY(${isAtBottom ? '-100%' : '0'})`,
+        top: `${contextMenuInfo.y}px`,
+        left: `${contextMenuInfo.x}px`,
+      }"
     >
-      <div class="text-center">
-        <UploadIcon class="mx-auto h-16 w-16" />
-        <p class="mt-2 text-xl">Drop files here to upload</p>
-      </div>
+      <Transition>
+        <div
+          v-if="contextMenuInfo.item"
+          id="item-context-menu"
+          ref="ctxRef"
+          :style="{
+            border: '1px solid var(--color-button-bg)',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'var(--color-raised-bg)',
+            padding: 'var(--gap-sm)',
+            boxShadow: 'var(--shadow-floating)',
+            gap: 'var(--gap-xs)',
+            width: 'max-content',
+            // '--translate-y': isAtBottom ? '-100%' : '0',
+          }"
+          class="flex h-fit w-fit select-none flex-col"
+        >
+          <button
+            class="btn btn-transparent flex !w-full items-center"
+            @click="showRenameModal(contextMenuInfo.item)"
+          >
+            <EditIcon class="h-5 w-5" />
+            Rename
+          </button>
+          <button
+            class="btn btn-transparent flex !w-full items-center"
+            @click="showMoveModal(contextMenuInfo.item)"
+          >
+            <ArrowBigUpDashIcon class="h-5 w-5" />
+            Move
+          </button>
+          <button
+            v-if="contextMenuInfo.item.type !== 'directory'"
+            class="btn btn-transparent flex !w-full items-center"
+            @click="downloadFile(contextMenuInfo.item)"
+          >
+            <DownloadIcon class="h-5 w-5" />
+            Download
+          </button>
+          <button
+            class="btn btn-transparent btn-red flex !w-full items-center"
+            @click="showDeleteModal(contextMenuInfo.item)"
+          >
+            <TrashIcon class="h-5 w-5" />
+            Delete
+          </button>
+        </div>
+      </Transition>
     </div>
-  </div>
-
-  <div
-    class="absolute left-0 top-0"
-    :style="{
-      transform: `translateY(${isAtBottom ? '-100%' : '0'})`,
-      top: `${contextMenuInfo.y}px`,
-      left: `${contextMenuInfo.x}px`,
-    }"
-  >
-    <Transition>
-      <div
-        v-if="contextMenuInfo.item"
-        id="item-context-menu"
-        ref="ctxRef"
-        :style="{
-          border: '1px solid var(--color-button-bg)',
-          borderRadius: 'var(--radius-md)',
-          backgroundColor: 'var(--color-raised-bg)',
-          padding: 'var(--gap-sm)',
-          boxShadow: 'var(--shadow-floating)',
-          gap: 'var(--gap-xs)',
-          width: 'max-content',
-          // '--translate-y': isAtBottom ? '-100%' : '0',
-        }"
-        class="flex h-fit w-fit select-none flex-col"
-      >
-        <button
-          class="btn btn-transparent flex !w-full items-center"
-          @click="showRenameModal(contextMenuInfo.item)"
-        >
-          <EditIcon class="h-5 w-5" />
-          Rename
-        </button>
-        <button
-          class="btn btn-transparent flex !w-full items-center"
-          @click="showMoveModal(contextMenuInfo.item)"
-        >
-          <ArrowBigUpDashIcon class="h-5 w-5" />
-          Move
-        </button>
-        <button
-          v-if="contextMenuInfo.item.type !== 'directory'"
-          class="btn btn-transparent flex !w-full items-center"
-          @click="downloadFile(contextMenuInfo.item)"
-        >
-          <DownloadIcon class="h-5 w-5" />
-          Download
-        </button>
-        <button
-          class="btn btn-transparent btn-red flex !w-full items-center"
-          @click="showDeleteModal(contextMenuInfo.item)"
-        >
-          <TrashIcon class="h-5 w-5" />
-          Delete
-        </button>
-      </div>
-    </Transition>
   </div>
 </template>
 
