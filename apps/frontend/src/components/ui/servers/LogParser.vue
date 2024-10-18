@@ -37,23 +37,34 @@ const convert = new Convert({
   fg: "#FFF",
   bg: "#000",
   newline: false,
-  escapeXML: false,
+  escapeXML: true,
   stream: false,
   colors,
 });
 
-const parsedLog = computed(() => {
-  return convert.toHtml(props.log);
-});
+const urlRegex = /https?:\/\/[^\s]+/g;
+const usernameRegex = /&lt;([^&]+)&gt;/g;
 
 const sanitizedLog = computed(() => {
-  return DOMPurify.sanitize(parsedLog.value, {
-    ALLOWED_TAGS: ["span"],
-    ALLOWED_ATTR: ["style"],
-    ALLOWED_CSS_STYLES: {
-      color: true,
-      "background-color": true,
-    },
+  let html = convert.toHtml(props.log);
+
+  html = html.replace(
+    urlRegex,
+    (url) =>
+      `<a style="color:var(--color-link);text-decoration:underline;" href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`,
+  );
+
+  html = html.replace(
+    usernameRegex,
+    (_, username) => `<span class="minecraft-username">&lt;${username}&gt;</span>`,
+  );
+
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ["span", "a"],
+    ALLOWED_ATTR: ["style", "href", "target", "rel", "class"],
+    ADD_ATTR: ["target"],
+    RETURN_TRUSTED_TYPE: true,
+    USE_PROFILES: { html: true },
   });
 });
 </script>
@@ -69,5 +80,9 @@ html.dark-mode .parsed-log:hover {
 
 html.oled-mode .parsed-log:hover {
   background-color: #333;
+}
+
+.minecraft-username {
+  font-weight: bold;
 }
 </style>

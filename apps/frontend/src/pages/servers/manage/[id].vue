@@ -1,6 +1,13 @@
 <template>
   <div class="contents">
     <div
+      v-if="error"
+      class="mb-4 flex h-full w-full items-center gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+    >
+      <IssuesIcon class="h-8 w-8 text-red" />
+      <div class="flex flex-col gap-2">{{ errorTitle }} - {{ errorMessage }}</div>
+    </div>
+    <div
       v-if="serverData && serverData.status !== 'installing'"
       data-pyro-server-manager-root
       class="mx-auto box-border flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
@@ -27,7 +34,7 @@
                 class="flex-shrink-0"
                 :is-online="isServerRunning"
                 :is-actioning="isActioning"
-                :disabled="error"
+                :disabled="isActioning || !!error"
                 @action="sendPowerAction"
               />
             </div>
@@ -58,15 +65,23 @@
 
       <div data-pyro-mount class="h-full w-full flex-1">
         <div
-          v-if="error"
-          class="mb-4 flex h-full w-full items-center gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+          v-if="!isConnected && !isReconnecting && !isLoading"
+          data-pyro-server-ws-error
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-xl bg-bg-red p-4 text-contrast"
         >
-          <IssuesIcon class="h-8 w-8 text-red" />
-          <div class="flex flex-col gap-2">
-            {{ errorTitle }}
-            {{ errorMessage }}
-          </div>
+          <IssuesIcon class="size-5 text-red" />
+          Something went wrong...
         </div>
+
+        <div
+          v-if="isReconnecting"
+          data-pyro-server-ws-reconnecting
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-xl bg-bg-orange p-4 text-contrast"
+        >
+          <UiServersPanelSpinner />
+          Hang on, we're reconnecting to your server.
+        </div>
+
         <NuxtPage
           :route="route"
           :is-connected="isConnected"
@@ -97,9 +112,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { IssuesIcon, LeftArrowIcon } from "@modrinth/assets";
+import DOMPurify from "dompurify";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 
 const socket = ref<WebSocket | null>(null);
+const isReconnecting = ref(false);
+const isLoading = ref(true); // initial loading state
+const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -174,6 +193,13 @@ const connectWebSocket = () => {
 
     socket.value.onopen = () => {
       socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+      isConnected.value = true;
+      isReconnecting.value = false;
+      isLoading.value = false;
+      if (reconnectInterval.value) {
+        clearInterval(reconnectInterval.value);
+        reconnectInterval.value = null;
+      }
     };
 
     socket.value.onmessage = (event) => {
@@ -184,15 +210,28 @@ const connectWebSocket = () => {
     socket.value.onclose = () => {
       consoleOutput.value.push("\nWS connection closed");
       isConnected.value = false;
+      scheduleReconnect();
     };
 
     socket.value.onerror = (error) => {
       console.error("WebSocket error:", error);
       isConnected.value = false;
+      scheduleReconnect();
     };
   } catch (error) {
     console.error("Failed to connect WebSocket:", error);
     isConnected.value = false;
+    scheduleReconnect();
+  }
+};
+
+const scheduleReconnect = () => {
+  if (!reconnectInterval.value) {
+    isReconnecting.value = true;
+    reconnectInterval.value = setInterval(() => {
+      console.log("Attempting to reconnect...");
+      connectWebSocket();
+    }, 5000);
   }
 };
 
@@ -240,6 +279,10 @@ const handleWebSocketMessage = (data: WSEvent) => {
       break;
     case "installation-result":
       handleInstallationResult(data);
+      break;
+    case "new-mod":
+      server.refresh(["mods"]);
+      console.log("New mod:", data);
       break;
     case "auth-ok":
       break;
@@ -403,10 +446,29 @@ const stopPolling = () => {
 
 onMounted(() => {
   connectWebSocket();
+  DOMPurify.addHook(
+    "afterSanitizeAttributes",
+    (node: {
+      tagName: string;
+      getAttribute: (arg0: string) => any;
+      setAttribute: (arg0: string, arg1: string) => void;
+    }) => {
+      if (node.tagName === "A" && node.getAttribute("target")) {
+        node.setAttribute("rel", "noopener noreferrer");
+      }
+    },
+  );
 });
 
 onUnmounted(() => {
   stopPolling();
+  if (reconnectInterval.value) {
+    clearInterval(reconnectInterval.value);
+  }
+  if (socket.value) {
+    socket.value.close();
+  }
+  DOMPurify.removeHook("afterSanitizeAttributes");
 });
 
 watch(

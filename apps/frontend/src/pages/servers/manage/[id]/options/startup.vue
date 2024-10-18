@@ -7,10 +7,13 @@
 
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
-          <label for="startup-command-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Startup Command</span>
-            <span> This is the command that starts your server. </span>
-          </label>
+          <div class="flex justify-between">
+            <label for="startup-command-field" class="flex flex-col gap-2">
+              <span class="text-lg font-bold text-contrast">Startup Command</span>
+              <span> The command that runs when your server is started. </span>
+            </label>
+            <Button @click="resetToDefault"> Original Command </Button>
+          </div>
           <textarea
             id="startup-command-field"
             v-model="invocation"
@@ -65,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownSelect } from "@modrinth/ui";
+import { DropdownSelect, Button } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
@@ -158,5 +161,9 @@ const resetStartup = () => {
     jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "";
   jdkBuild.value =
     jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build)?.label || "";
+};
+
+const resetToDefault = () => {
+  invocation.value = startupSettings.value?.original_invocation;
 };
 </script>

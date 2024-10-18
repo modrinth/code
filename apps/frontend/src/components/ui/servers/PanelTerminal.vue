@@ -7,7 +7,7 @@
     tabindex="-1"
   >
     <div
-      class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[9999] h-2/5 w-full overflow-hidden rounded-xl"
+      class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[9999] h-[10rem] w-full overflow-hidden rounded-xl"
       :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 8))}%`"
     >
       <div

@@ -194,6 +194,10 @@ export interface WSUptimeEvent {
   uptime: number; // seconds
 }
 
+export interface WSNewModEvent {
+  event: "new-mod";
+}
+
 export type WSEvent =
   | WSLogEvent
   | WSStatsEvent
@@ -202,7 +206,8 @@ export type WSEvent =
   | WSAuthIncorrectEvent
   | WSInstallationResultEvent
   | WSAuthOkEvent
-  | WSUptimeEvent;
+  | WSUptimeEvent
+  | WSNewModEvent;
 
 export interface Servers {
   servers: Server[];

@@ -2,13 +2,13 @@
   <div
     v-if="subdomain"
     v-tooltip="'Copy subdomain'"
-    class="flex flex-row items-center gap-4 hover:cursor-pointer"
+    class="flex min-w-0 flex-row items-center gap-4 hover:cursor-pointer"
   >
     <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
     <div class="flex flex-row items-center gap-2">
-      <LinkIcon />
+      <LinkIcon class="flex size-5 shrink-0" />
       <div
-        class="text-sm font-semibold"
+        class="truncate text-sm font-semibold"
         :class="serverId ? 'hover:underline' : ''"
         @click="copySubdomain"
       >

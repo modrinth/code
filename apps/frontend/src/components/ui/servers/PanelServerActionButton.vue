@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-row items-center gap-2 rounded-lg">
-    <ButtonStyled v-if="showStopButton" type="standard" color="red">
-      <button :disabled="!canTakeAction || isStartingDelay || disabled" @click="killServer">
+    <ButtonStyled v-if="showKillButton" type="standard" color="red">
+      <button @click="killServer">
         <div class="flex gap-1">
           <SlashIcon class="h-5 w-5" />
           <span>{{ killButtonText }}</span>
@@ -9,16 +9,15 @@
       </button>
     </ButtonStyled>
     <ButtonStyled v-if="showStopButton" type="standard" color="red">
-      <button :disabled="!canTakeAction || isStartingDelay || disabled" @click="stopServer">
+      <button :disabled="!canTakeAction || disabled" @click="stopServer">
         <div class="flex gap-1">
           <StopCircleIcon class="h-5 w-5" />
           <span>{{ stopButtonText }}</span>
         </div>
       </button>
     </ButtonStyled>
-
     <ButtonStyled type="standard" color="brand">
-      <button :disabled="!canTakeAction || isStartingDelay || disabled" @click="handleAction">
+      <button :disabled="!canTakeAction || disabled" @click="handleAction">
         <div v-if="isStartingOrRestarting" class="grid place-content-center">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path
@@ -28,11 +27,9 @@
             />
           </svg>
         </div>
-
         <div v-else class="contents">
           <component :is="showRestartIcon ? UpdatedIcon : PlayIcon" />
         </div>
-
         <span>
           {{ actionButtonText }}
         </span>
@@ -49,7 +46,7 @@ import { ButtonStyled } from "@modrinth/ui";
 const props = defineProps<{
   isOnline: boolean;
   isActioning: boolean;
-  disabled: any;
+  disabled: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -70,16 +67,19 @@ const currentState = ref<ServerStateType>(
   props.isOnline ? ServerState.Running : ServerState.Stopped,
 );
 
-const showStopButton = computed(
-  () => currentState.value === ServerState.Running || currentState.value === ServerState.Stopping,
-);
+const isStartingDelay = ref(false);
+
+const showKillButton = computed(() => currentState.value === ServerState.Running);
+const showStopButton = computed(() => currentState.value === ServerState.Running);
 const showRestartIcon = computed(() => currentState.value === ServerState.Running);
 const canTakeAction = computed(
   () =>
+    !props.isActioning &&
+    !isStartingDelay.value &&
     currentState.value !== ServerState.Starting &&
-    currentState.value !== ServerState.Stopping &&
-    currentState.value !== ServerState.Restarting,
+    currentState.value !== ServerState.Stopping,
 );
+
 const isStartingOrRestarting = computed(
   () =>
     currentState.value === ServerState.Starting || currentState.value === ServerState.Restarting,
@@ -87,43 +87,30 @@ const isStartingOrRestarting = computed(
 
 const actionButtonText = computed(() => {
   switch (currentState.value) {
-    case ServerState.Stopped:
-      return "Start";
     case ServerState.Starting:
       return "Starting...";
-    case ServerState.Running:
-      return "Restart";
     case ServerState.Restarting:
       return "Restarting...";
-    case ServerState.Stopping:
+    case ServerState.Running:
       return "Restart";
     default:
-      return "Unknown";
+      return "Start";
   }
 });
 
-const stopButtonText = computed(() => {
-  return currentState.value === ServerState.Stopping ? "Stopping..." : "Stop";
-});
+const stopButtonText = computed(() =>
+  currentState.value === ServerState.Stopping ? "Stopping..." : "Stop",
+);
 
-const killButtonText = computed(() => {
-  return "Kill";
-});
-
-const isStartingDelay = ref(false);
-
-const updateState = (newState: ServerStateType) => {
-  currentState.value = newState;
-};
+const killButtonText = computed(() => "Kill");
 
 const handleAction = () => {
   if (!canTakeAction.value) return;
-
   if (currentState.value === ServerState.Running) {
-    updateState(ServerState.Restarting);
+    currentState.value = ServerState.Restarting;
     emit("action", "restart");
   } else {
-    updateState(ServerState.Starting);
+    currentState.value = ServerState.Starting;
     emit("action", "start");
     isStartingDelay.value = true;
     setTimeout(() => {
@@ -134,14 +121,11 @@ const handleAction = () => {
 
 const stopServer = () => {
   if (!canTakeAction.value) return;
-
-  updateState(ServerState.Stopping);
+  currentState.value = ServerState.Stopping;
   emit("action", "stop");
 };
 
 const killServer = () => {
-  if (!canTakeAction.value) return;
-
   emit("action", "kill");
 };
 
@@ -149,28 +133,21 @@ watch(
   () => props.isOnline,
   (newValue) => {
     if (newValue) {
-      updateState(ServerState.Running);
-    } else {
-      updateState(ServerState.Stopped);
+      currentState.value = ServerState.Running;
+    } else if (
+      currentState.value !== ServerState.Starting &&
+      currentState.value !== ServerState.Restarting
+    ) {
+      currentState.value = ServerState.Stopped;
     }
   },
 );
 
-// debounce to prevent flickering
 watch(
   () => props.isActioning,
   (newValue) => {
     if (!newValue) {
-      setTimeout(() => {
-        if (
-          currentState.value === ServerState.Starting ||
-          currentState.value === ServerState.Restarting
-        ) {
-          updateState(ServerState.Running);
-        } else if (currentState.value === ServerState.Stopping) {
-          updateState(ServerState.Stopped);
-        }
-      }, 500);
+      currentState.value = props.isOnline ? ServerState.Running : ServerState.Stopped;
     }
   },
 );

@@ -121,7 +121,13 @@
             </div>
           </div>
         </div>
-        <Button v-else @click="editModal.show()"> Install modpack </Button>
+        <div v-else class="flex items-center gap-2">
+          <Button @click="editModal.show()">
+            <DownloadIcon class="size-4" /> Install modpack
+          </Button>
+          or
+          <Button> <UploadIcon class="size-4" /> Upload mrpack </Button>
+        </div>
       </div>
 
       <div class="card flex flex-col gap-4">
@@ -273,7 +279,7 @@
 
 <script setup lang="ts">
 import { DropdownSelect, Button, Modal } from "@modrinth/ui";
-import { ChevronRightIcon, EditIcon, XIcon } from "@modrinth/assets";
+import { ChevronRightIcon, DownloadIcon, EditIcon, XIcon, UploadIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();

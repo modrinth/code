@@ -23,38 +23,43 @@
         </span>
       </div>
     </div>
-    <ButtonStyled type="transparent">
-      <OverflowMenu
-        class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-        :options="[
-          {
-            id: 'rename',
-            action: () => $emit('rename', { name, type, path }),
-          },
-          {
-            id: 'move',
-            action: () => $emit('move', { name, type, path }),
-          },
-          {
-            id: 'download',
-            action: () => $emit('download', { name, type, path }),
-            shown: type !== 'directory',
-          },
-          {
-            id: 'delete',
-            action: () => $emit('delete', { name, type, path }),
-            color: 'red',
-          },
-        ]"
-        direction="left"
-      >
-        <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-        <template #rename> <EditIcon /> Rename </template>
-        <template #move> <ArrowBigUpDashIcon /> Move </template>
-        <template #download> <DownloadIcon /> Download </template>
-        <template #delete> <TrashIcon /> Delete </template>
-      </OverflowMenu>
-    </ButtonStyled>
+    <div class="flex w-fit items-center gap-4">
+      <span class="w-full text-nowrap text-sm text-secondary">
+        {{ new Date(modified * 1000).toLocaleString() }}
+      </span>
+      <ButtonStyled type="transparent">
+        <OverflowMenu
+          class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+          :options="[
+            {
+              id: 'rename',
+              action: () => $emit('rename', { name, type, path }),
+            },
+            {
+              id: 'move',
+              action: () => $emit('move', { name, type, path }),
+            },
+            {
+              id: 'download',
+              action: () => $emit('download', { name, type, path }),
+              shown: type !== 'directory',
+            },
+            {
+              id: 'delete',
+              action: () => $emit('delete', { name, type, path }),
+              color: 'red',
+            },
+          ]"
+          direction="left"
+        >
+          <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+          <template #rename> <EditIcon /> Rename </template>
+          <template #move> <ArrowBigUpDashIcon /> Move </template>
+          <template #download> <DownloadIcon /> Download </template>
+          <template #delete> <TrashIcon /> Delete </template>
+        </OverflowMenu>
+      </ButtonStyled>
+    </div>
   </div>
 </template>
 
