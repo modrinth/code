@@ -123,12 +123,14 @@ const metrics = ref([
 ]);
 
 const updateMetrics = () => {
+  console.log(props.data.current.ram_usage_bytes);
   metrics.value = metrics.value.map((metric, index) => {
     if (userPrefrences.value.ramAsNumber && index === 1) {
       return {
         ...metric,
         value: formatBytes(props.data.current.ram_usage_bytes),
         data: [...metric.data.slice(-10), props.data.current.ram_usage_bytes],
+        max: formatBytes(props.data.current.ram_total_bytes),
       };
     } else {
       const currentValue =
