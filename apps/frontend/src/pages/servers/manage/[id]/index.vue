@@ -4,6 +4,29 @@
     class="relative flex select-none flex-col gap-6"
     data-pyro-server-manager-root
   >
+    <div
+      v-if="inspectingError"
+      class="flex h-full w-full items-center gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+    >
+      <div class="flex w-full justify-between">
+        <li
+          v-for="problem in inspectingError.analysis.problems"
+          :key="problem.message"
+          class="list-none"
+        >
+          <div class="flex items-center gap-2">
+            <IssuesIcon class="h-8 w-8 text-red" />
+            <h4 class="text-red-500 m-0 text-lg font-semibold">{{ problem.message }}</h4>
+          </div>
+          <ul class="m-0 ml-6">
+            <li v-for="solution in problem.solutions" :key="solution.message">
+              <span class="text-green-600 m-0 text-sm">{{ solution.message }}</span>
+            </li>
+          </ul>
+        </li>
+        <Button icon-only color="red" @click="clearError"><XIcon /></Button>
+      </div>
+    </div>
     <UiServersServerStats :data="stats" />
     <div
       class="relative flex h-[600px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-8 transition-all duration-300 ease-in-out"
@@ -107,7 +130,8 @@
 </template>
 
 <script setup lang="ts">
-import { TerminalSquareIcon } from "@modrinth/assets";
+import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
+import { Button } from "@modrinth/ui";
 import { asyncComputed } from "@vueuse/core";
 import type { ServerState, Stats } from "~/types/servers";
 import type { Server } from "~/composables/pyroServers";
@@ -123,6 +147,89 @@ const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
   players: string[];
 }>();
+
+interface ErrorData {
+  id: string;
+  name: string;
+  type: string;
+  version: string;
+  title: string;
+  analysis: {
+    problems: Array<{
+      message: string;
+      counter: number;
+      entry: {
+        level: number;
+        time: string | null;
+        prefix: string;
+        lines: Array<{ number: number; content: string }>;
+      };
+      solutions: Array<{ message: string }>;
+    }>;
+    information: Array<{
+      message: string;
+      counter: number;
+      label: string;
+      value: string;
+      entry: {
+        level: number;
+        time: string | null;
+        prefix: string;
+        lines: Array<{ number: number; content: string }>;
+      };
+    }>;
+  };
+}
+
+const inspectingError = ref<ErrorData | null>(null);
+const mcError = ref<any>(null);
+
+const inspectError = async () => {
+  const log = await props.server.fs?.downloadFile("logs/latest.log");
+  const response = (await $fetch("https://api.mclo.gs/1/log", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      content: log,
+    }),
+  })) as any;
+
+  mcError.value = response;
+
+  const analysis = (await $fetch(`https://api.mclo.gs/1/insights/${response.id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      content: log,
+    }),
+  })) as ErrorData;
+
+  inspectingError.value = analysis;
+};
+
+const clearError = () => {
+  inspectingError.value = null;
+  mcError.value = null;
+};
+
+watch(
+  () => props.serverPowerState,
+  (newVal) => {
+    if (newVal === "crashed") {
+      inspectError();
+    } else {
+      clearError();
+    }
+  },
+);
+
+if (props.serverPowerState === "crashed") {
+  inspectError();
+}
 
 const playerList = asyncComputed(async () => {
   const results = await Promise.all(

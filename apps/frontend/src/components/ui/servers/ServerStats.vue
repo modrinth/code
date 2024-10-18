@@ -72,6 +72,8 @@ const serverId = route.params.id;
 
 const userPrefrences = useStorage(`pyro-server-${serverId}-preferences`, {
   ramAsNumber: false,
+  autoRestart: false,
+  backupWhileRunning: false,
 });
 
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));

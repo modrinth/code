@@ -169,6 +169,9 @@ const nonEditableExtensions = [
   "xlsx",
   "ppt",
   "pptx",
+  "dat",
+  "lock",
+  "mca",
 ];
 
 const isNonEditableFile = computed(() => {
