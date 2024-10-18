@@ -67,6 +67,8 @@ jobs:
 
       - name: Lint
         run: pnpm lint
+        env:
+          SQLX_OFFLINE: true
 
       - name: Start docker compose
         run: docker-compose up -d
