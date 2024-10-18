@@ -74,7 +74,7 @@
         </div>
 
         <div
-          v-if="!isReconnecting"
+          v-if="isReconnecting"
           data-pyro-server-ws-reconnecting
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-xl bg-bg-orange p-4 text-contrast"
         >
