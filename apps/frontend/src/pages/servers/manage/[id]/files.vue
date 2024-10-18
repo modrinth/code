@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex min-h-[800px] w-full flex-col overflow-visible rounded-xl border border-solid border-bg-raised"
+    class="relative flex min-h-[800px] w-full flex-col overflow-hidden rounded-xl border border-solid border-bg-raised"
     @dragenter.prevent="handleDragEnter"
     @dragover.prevent="handleDragOver"
     @dragleave.prevent="handleDragLeave"
