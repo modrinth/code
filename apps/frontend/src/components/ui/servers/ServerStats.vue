@@ -29,7 +29,7 @@
         />
       </h3>
 
-      <component :is="metric.icon" class="absolute right-8 top-8" />
+      <component :is="metric.icon" class="absolute right-8 top-8 z-10" />
       <ClientOnly>
         <VueApexCharts
           ref="chart"
