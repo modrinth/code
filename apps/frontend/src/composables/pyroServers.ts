@@ -64,7 +64,7 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
     });
     return response;
   } catch (error) {
-    console.error("Fetch error:", error);
+    console.error("[PYROSERVERS]:", error);
     if (error instanceof FetchError) {
       const statusCode = error.response?.status;
       const statusText = error.response?.statusText || "Unknown error";
@@ -82,10 +82,10 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
         statusCode && statusCode in errorMessages
           ? errorMessages[statusCode]
           : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
-      throw new PyroFetchError(`[PYROFETCH][PYRO] ${message}`, statusCode, error);
+      throw new PyroFetchError(`[PYROSERVERS][PYRO] ${message}`, statusCode, error);
     }
     throw new PyroFetchError(
-      "[PYROFETCH][PYRO] An unexpected error occurred during the fetch operation.",
+      "[PYROSERVERS][PYRO] An unexpected error occurred during the fetch operation.",
       undefined,
       error as Error,
     );
@@ -263,7 +263,11 @@ const processImage = async (iconUrl: string | undefined) => {
       });
     }
   } catch (error) {
-    console.error("Error processing server image:", error);
+    if (error instanceof PyroFetchError && error.statusCode === 404) {
+      console.log("[PYROSERVERS] No server icon found");
+    } else {
+      console.error(error);
+    }
   }
 
   if (image.value === null && iconUrl) {

@@ -136,7 +136,11 @@ onMounted(async () => {
       });
     }
   } catch (error) {
-    console.error("Error processing server image:", error);
+    if (error instanceof PyroFetchError && error.statusCode === 404) {
+      image.value = undefined;
+    } else {
+      console.error(error);
+    }
   }
 });
 
