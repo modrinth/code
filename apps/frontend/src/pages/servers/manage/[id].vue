@@ -280,6 +280,10 @@ const handleWebSocketMessage = (data: WSEvent) => {
     case "installation-result":
       handleInstallationResult(data);
       break;
+    case "new-mod":
+      server.refresh(["mods"]);
+      console.log("New mod:", data);
+      break;
     case "auth-ok":
       break;
     default:

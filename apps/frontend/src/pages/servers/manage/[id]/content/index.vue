@@ -37,14 +37,62 @@
     </div>
     <div class="flex h-full w-full flex-col overflow-y-scroll">
       <div v-if="hasMods(mods)" class="flex flex-col gap-2">
-        <UiServersContentItem
+        <div
           v-for="mod in mods"
           :key="mod.name"
-          :data="mod"
-          @toggle="toggleMod"
-          @delete="removeMod"
-          @edit="showEditModModal"
-        />
+          class="relative flex w-full items-center justify-between rounded-xl bg-bg-raised"
+          :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
+        >
+          <NuxtLink
+            :to="
+              mod.project_id
+                ? `/project/${mod.project_id}/version/${mod.version_id}`
+                : `files?path=mods`
+            "
+            class="group flex w-full items-center rounded-xl p-2"
+          >
+            <div class="flex items-center gap-2">
+              <UiAvatar
+                :src="mod.icon_url"
+                no-shadow
+                size="sm"
+                alt="Server Icon"
+                :class="mod.disabled ? 'grayscale' : ''"
+              />
+              <div class="flex flex-col">
+                <span class="flex items-center gap-2 text-lg font-bold">
+                  {{ mod.name === null ? "External Mod" : mod.name }}
+                  <span
+                    v-if="mod.disabled"
+                    class="rounded-full bg-button-bg p-1 px-2 text-xs text-contrast"
+                  >
+                    Disabled
+                  </span>
+                </span>
+                <span class="text-xs text-secondary">
+                  {{
+                    mod.name === null ? mod.filename.replace(".disabled", "") : mod.version_number
+                  }}
+                </span>
+              </div>
+            </div>
+          </NuxtLink>
+          <div class="absolute right-2 flex gap-2 rounded-xl p-1 font-semibold text-contrast">
+            <Button v-if="mod.project_id" icon-only transparent @click="showEditModModal(mod)">
+              <EditIcon />
+            </Button>
+            <Button icon-only transparent @click="removeMod(mod)">
+              <TrashIcon />
+            </Button>
+            <input
+              id="property.id"
+              :checked="!mod.disabled"
+              class="switch stylized-toggle"
+              type="checkbox"
+              @change="toggleMod(mod)"
+            />
+          </div>
+        </div>
       </div>
       <div v-else>You haven't added any mods yet, time to add some!</div>
     </div>
@@ -53,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, ChevronRightIcon, UnknownIcon } from "@modrinth/assets";
+import { PlusIcon, ChevronRightIcon, UnknownIcon, EditIcon, TrashIcon } from "@modrinth/assets";
 import { Modal, DropdownSelect, Button } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
@@ -114,11 +162,10 @@ const toggleMod = async (mod: Mod) => {
   try {
     await props.server.fs?.renameFileOrFolder(
       `/mods/${mod.filename}`,
-      mod.filename.includes("disabled")
-        ? mod.filename.replace(".disabled", "")
-        : `${mod.filename}.disabled`,
+      mod.disabled ? mod.filename.replace(".disabled", "") : `${mod.filename}.disabled`,
     );
-    await props.server.refresh();
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await props.server.refresh(["mods"]);
   } catch (error) {
     console.error("Error disabling mod:", error);
   }
