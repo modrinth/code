@@ -2,13 +2,21 @@
   <div class="contents">
     <div
       v-if="error"
-      class="mb-4 flex h-full w-full items-center gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+      class="mx-auto mb-4 flex h-full w-full max-w-[1280px] items-center justify-between gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
     >
-      <IssuesIcon class="h-8 w-8 text-red" />
-      <div class="flex flex-col gap-2">{{ errorTitle }} - {{ errorMessage }}</div>
+      <div class="flex flex-row items-center gap-2">
+        <IssuesIcon class="h-8 w-8 text-red" />
+        <div class="flex gap-2">{{ errorTitle }} - {{ errorMessage }}</div>
+      </div>
+
+      <div v-if="errorTitle === 'Installation error'">
+        <ButtonStyled color="red" type="standard">
+          <NuxtLink :to="`/servers/manage/${serverId}/options/loader`">Reinstall Server</NuxtLink>
+        </ButtonStyled>
+      </div>
     </div>
     <div
-      v-if="serverData && serverData.status !== 'installing'"
+      v-if="serverData"
       data-pyro-server-manager-root
       class="mx-auto box-border flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
     >
@@ -26,7 +34,7 @@
               {{ serverData.name }}
             </h1>
             <div
-              v-if="isConnected"
+              v-if="isConnected && serverData.status !== 'installing'"
               data-pyro-server-action-buttons
               class="server-action-buttons-anim flex w-fit flex-1"
             >
@@ -38,6 +46,15 @@
                 @action="sendPowerAction"
               />
             </div>
+            <ButtonStyled
+              v-else-if="serverData.status === 'installing'"
+              type="standard"
+              color="brand"
+            >
+              <button disabled class="flex-shrink-0">
+                <UiServersPanelSpinner class="size-5" /> Installing...
+              </button>
+            </ButtonStyled>
           </div>
 
           <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
@@ -82,6 +99,15 @@
           Hang on, we're reconnecting to your server.
         </div>
 
+        <div
+          v-if="serverData.status === 'installing'"
+          data-pyro-server-installing
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-xl bg-bg-orange p-4 text-contrast"
+        >
+          <UiServersPanelSpinner />
+          We're preparing your server, this may take a few minutes.
+        </div>
+
         <NuxtPage
           :route="route"
           :is-connected="isConnected"
@@ -99,13 +125,6 @@
 
       <UiServersPoweredByPyro />
     </div>
-
-    <div v-else class="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center gap-4">
-      <BrandLogoAnimated />
-      <h1 class="m-0 font-bold">Get ready! Your server is being prepared</h1>
-      <p class="m-0 text-secondary">This will take a few moments.</p>
-      <UiCopyCode :text="`Server ID: ${serverId}`" />
-    </div>
   </div>
 </template>
 
@@ -113,6 +132,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { IssuesIcon, LeftArrowIcon } from "@modrinth/assets";
 import DOMPurify from "dompurify";
+import { ButtonStyled } from "@modrinth/ui";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 
 const socket = ref<WebSocket | null>(null);
@@ -342,6 +362,8 @@ const onReinstall = (potentialArgs: any) => {
     newMCVersion.value = potentialArgs.mVersion;
   }
 
+  server.refresh();
+
   console.log(serverData.value);
 };
 
@@ -399,7 +421,6 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
   try {
     isActioning.value = true;
     await server.general?.power(actionName);
-    notifySuccess(`${toAdverb(actionName)} server`, `This may take a few moments.`);
   } catch (error) {
     console.error(`Error ${toAdverb(actionName)} server:`, error);
     notifyError(
@@ -409,15 +430,6 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
   } finally {
     isActioning.value = false;
   }
-};
-
-const notifySuccess = (title: string, text: string) => {
-  addNotification({
-    group: "server",
-    title,
-    text,
-    type: "success",
-  });
 };
 
 const notifyError = (title: string, text: string) => {
