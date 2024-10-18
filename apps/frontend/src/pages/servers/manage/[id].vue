@@ -34,7 +34,7 @@
                 class="flex-shrink-0"
                 :is-online="isServerRunning"
                 :is-actioning="isActioning"
-                :disabled="error"
+                :disabled="isActioning || !!error"
                 @action="sendPowerAction"
               />
             </div>
