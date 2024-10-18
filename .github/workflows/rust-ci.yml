@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    types: [opened, synchronize]
+  merge_group:
+    types: [ checks_requested ]
+
+env:
+  CARGO_TERM_COLOR: always
+  SQLX_OFFLINE: true
+
+jobs:
+  build:
+    name: Build and Lint (Rust)
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Get build cache
+        id: cache-build
+        uses: actions/cache@v2
+        with:
+          path: target/**
+          key: ${{ runner.os }}-rust-cache
+
+      - name: Build
+        run: cargo build
+
+      - name: Lint
+        run: cargo clippy --all-targets --all-features -- -D warnings

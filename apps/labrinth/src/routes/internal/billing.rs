@@ -290,7 +290,7 @@ pub async fn edit_subscription(
             intent.setup_future_usage = Some(PaymentIntentSetupFutureUsage::OffSession);
 
             if let Some(payment_method) = &edit_subscription.payment_method {
-                let payment_method_id = if let Ok(id) = PaymentMethodId::from_str(&payment_method) {
+                let payment_method_id = if let Ok(id) = PaymentMethodId::from_str(payment_method) {
                     id
                 } else {
                     return Err(ApiError::InvalidInput(

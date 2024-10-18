@@ -3,10 +3,7 @@
   "scripts": {
     "build": "tauri build",
     "tauri": "tauri",
-    "dev": "tauri dev",
-    "test": "cargo test",
-    "lint": "cargo fmt --check && cargo clippy -- -D warnings",
-    "fix": "cargo fmt && cargo clippy --fix"
+    "dev": "tauri dev"
   },
   "devDependencies": {
     "@tauri-apps/cli": "2.0.0-rc.16"

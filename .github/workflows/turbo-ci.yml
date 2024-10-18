@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build, Test, and Lint
+    name: Build, Test, and Lint (Turbo)
     runs-on: ubuntu-22.04
 
     steps:
@@ -65,9 +65,6 @@ jobs:
 
       - name: Lint
         run: pnpm lint
-
-      - name: Start Docker Compose
-        run: docker compose up -d
 
       - name: Test
         run: pnpm test
