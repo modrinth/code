@@ -1,11 +1,15 @@
 <template>
-  <div v-if="loader" v-tooltip="'Change server loader'" class="flex flex-row items-center gap-4">
+  <div
+    v-if="loader"
+    v-tooltip="'Change server loader'"
+    class="flex min-w-0 flex-row items-center gap-4"
+  >
     <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
     <div class="flex flex-row items-center gap-2">
-      <UiServersLoaderIcon :loader="loader" class="[&&]:size-5" />
+      <UiServersLoaderIcon :loader="loader" class="flex shrink-0 [&&]:size-5" />
       <NuxtLink
         :to="serverId ? `/servers/manage/${serverId}/options/loader` : ''"
-        class="text-sm font-semibold"
+        class="min-w-0 truncate text-sm font-semibold"
         :class="serverId ? 'hover:underline' : ''"
       >
         {{ loader }} <span v-if="loaderVersion">{{ loaderVersion }}</span>
