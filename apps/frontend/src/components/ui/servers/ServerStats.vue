@@ -29,12 +29,12 @@
         />
       </h3>
 
-      <component :is="metric.icon" class="absolute right-8 top-8" />
+      <component :is="metric.icon" class="absolute right-8 top-8 z-10" />
       <ClientOnly>
         <VueApexCharts
           ref="chart"
           type="area"
-          height="100"
+          height="142"
           :options="generateOptions(metric)"
           :series="[{ name: 'Chart', data: metric.data }]"
           class="chart chart-animation absolute bottom-0 left-0 right-0 w-full"

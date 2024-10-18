@@ -12,7 +12,7 @@
               <span class="text-lg font-bold text-contrast">Startup Command</span>
               <span> The command that runs when your server is started. </span>
             </label>
-            <Button @click="resetToDefault"> Original Command </Button>
+            <Button @click="resetToDefault"> Restore Default Command </Button>
           </div>
           <textarea
             id="startup-command-field"
