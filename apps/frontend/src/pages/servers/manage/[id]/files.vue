@@ -153,7 +153,6 @@
               <template #upload> <UploadIcon aria-hidden="true" /> Upload </template>
             </OverflowMenu>
           </ButtonStyled>
-          <Button @click="openSftp"> Launch SFTP </Button>
         </div>
       </div>
       <div
@@ -820,10 +819,6 @@ const cancelEditing = () => {
   isEditing.value = false;
   editingFile.value = null;
   fileContent.value = "";
-};
-
-const openSftp = () => {
-  window.open(`sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`);
 };
 </script>
 
