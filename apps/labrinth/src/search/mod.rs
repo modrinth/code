@@ -68,8 +68,10 @@ impl SearchConfig {
     // Panics if the environment variables are not set,
     // but these are already checked for on startup.
     pub fn new(meta_namespace: Option<String>) -> Self {
-        let address = dotenvy::var("MEILISEARCH_ADDR").expect("MEILISEARCH_ADDR not set");
-        let key = dotenvy::var("MEILISEARCH_KEY").expect("MEILISEARCH_KEY not set");
+        let address =
+            dotenvy::var("MEILISEARCH_ADDR").expect("MEILISEARCH_ADDR not set");
+        let key =
+            dotenvy::var("MEILISEARCH_KEY").expect("MEILISEARCH_KEY not set");
 
         Self {
             address,
@@ -172,7 +174,8 @@ pub fn get_sort_index(
     index: &str,
 ) -> Result<(String, [&'static str; 1]), SearchError> {
     let projects_name = config.get_index_name("projects", false);
-    let projects_filtered_name = config.get_index_name("projects_filtered", false);
+    let projects_filtered_name =
+        config.get_index_name("projects_filtered", false);
     Ok(match index {
         "relevance" => (projects_name, ["downloads:desc"]),
         "downloads" => (projects_filtered_name, ["downloads:desc"]),
@@ -224,12 +227,13 @@ pub async fn search_for_project(
                 None
             };
 
-            let filters: Cow<_> = match (info.filters.as_deref(), info.version.as_deref()) {
-                (Some(f), Some(v)) => format!("({f}) AND ({v})").into(),
-                (Some(f), None) => f.into(),
-                (None, Some(v)) => v.into(),
-                (None, None) => "".into(),
-            };
+            let filters: Cow<_> =
+                match (info.filters.as_deref(), info.version.as_deref()) {
+                    (Some(f), Some(v)) => format!("({f}) AND ({v})").into(),
+                    (Some(f), None) => f.into(),
+                    (None, Some(v)) => v.into(),
+                    (None, None) => "".into(),
+                };
 
             if let Some(facets) = facets {
                 // Search can now *optionally* have a third inner array: So Vec(AND)<Vec(OR)<Vec(AND)< _ >>>
@@ -242,10 +246,13 @@ pub async fn search_for_project(
                             .into_iter()
                             .map(|facet| {
                                 if facet.is_array() {
-                                    serde_json::from_value::<Vec<String>>(facet).unwrap_or_default()
+                                    serde_json::from_value::<Vec<String>>(facet)
+                                        .unwrap_or_default()
                                 } else {
-                                    vec![serde_json::from_value::<String>(facet)
-                                        .unwrap_or_default()]
+                                    vec![serde_json::from_value::<String>(
+                                        facet,
+                                    )
+                                    .unwrap_or_default()]
                                 }
                             })
                             .collect_vec()
@@ -256,12 +263,16 @@ pub async fn search_for_project(
                 for (index, facet_outer_list) in facets.iter().enumerate() {
                     filter_string.push('(');
 
-                    for (facet_outer_index, facet_inner_list) in facet_outer_list.iter().enumerate()
+                    for (facet_outer_index, facet_inner_list) in
+                        facet_outer_list.iter().enumerate()
                     {
                         filter_string.push('(');
-                        for (facet_inner_index, facet) in facet_inner_list.iter().enumerate() {
+                        for (facet_inner_index, facet) in
+                            facet_inner_list.iter().enumerate()
+                        {
                             filter_string.push_str(&facet.replace(':', " = "));
-                            if facet_inner_index != (facet_inner_list.len() - 1) {
+                            if facet_inner_index != (facet_inner_list.len() - 1)
+                            {
                                 filter_string.push_str(" AND ")
                             }
                         }

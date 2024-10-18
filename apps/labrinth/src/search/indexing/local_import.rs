@@ -7,10 +7,12 @@ use std::collections::HashMap;
 
 use super::IndexingError;
 use crate::database::models::loader_fields::{
-    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField, VersionField,
+    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
+    VersionField,
 };
 use crate::database::models::{
-    LoaderFieldEnumId, LoaderFieldEnumValueId, LoaderFieldId, ProjectId, VersionId,
+    LoaderFieldEnumId, LoaderFieldEnumValueId, LoaderFieldId, ProjectId,
+    VersionId,
 };
 use crate::models::projects::from_duplicate_version_fields;
 use crate::models::v2::projects::LegacyProject;
@@ -18,7 +20,9 @@ use crate::routes::v2_reroute;
 use crate::search::UploadSearchProject;
 use sqlx::postgres::PgPool;
 
-pub async fn index_local(pool: &PgPool) -> Result<Vec<UploadSearchProject>, IndexingError> {
+pub async fn index_local(
+    pool: &PgPool,
+) -> Result<Vec<UploadSearchProject>, IndexingError> {
     info!("Indexing local projects!");
 
     // todo: loaders, project type, game versions
@@ -190,24 +194,25 @@ pub async fn index_local(pool: &PgPool) -> Result<Vec<UploadSearchProject>, Inde
 
     info!("Getting all loader field enum values!");
 
-    let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
-        "
+    let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> =
+        sqlx::query!(
+            "
         SELECT DISTINCT id, enum_id, value, ordering, created, metadata
         FROM loader_field_enum_values lfev
         ORDER BY enum_id, ordering, created DESC
         "
-    )
-    .fetch(pool)
-    .map_ok(|m| QueryLoaderFieldEnumValue {
-        id: LoaderFieldEnumValueId(m.id),
-        enum_id: LoaderFieldEnumId(m.enum_id),
-        value: m.value,
-        ordering: m.ordering,
-        created: m.created,
-        metadata: m.metadata,
-    })
-    .try_collect()
-    .await?;
+        )
+        .fetch(pool)
+        .map_ok(|m| QueryLoaderFieldEnumValue {
+            id: LoaderFieldEnumValueId(m.id),
+            enum_id: LoaderFieldEnumId(m.enum_id),
+            value: m.value,
+            ordering: m.ordering,
+            created: m.created,
+            metadata: m.metadata,
+        })
+        .try_collect()
+        .await?;
 
     info!("Indexing loaders, project types!");
     let mut uploads = Vec::new();
@@ -218,17 +223,20 @@ pub async fn index_local(pool: &PgPool) -> Result<Vec<UploadSearchProject>, Inde
         count += 1;
         info!("projects index prog: {count}/{total_len}");
 
-        let owner = if let Some((_, org_owner)) = mods_org_owners.remove(&project.id) {
-            org_owner
-        } else if let Some((_, team_owner)) = mods_team_owners.remove(&project.id) {
-            team_owner
-        } else {
-            println!(
-                "org owner not found for project {} id: {}!",
-                project.name, project.id.0
-            );
-            continue;
-        };
+        let owner =
+            if let Some((_, org_owner)) = mods_org_owners.remove(&project.id) {
+                org_owner
+            } else if let Some((_, team_owner)) =
+                mods_team_owners.remove(&project.id)
+            {
+                team_owner
+            } else {
+                println!(
+                    "org owner not found for project {} id: {}!",
+                    project.name, project.id.0
+                );
+                continue;
+            };
 
         let license = match project.license.split(' ').next() {
             Some(license) => license.to_string(),
@@ -291,7 +299,8 @@ pub async fn index_local(pool: &PgPool) -> Result<Vec<UploadSearchProject>, Inde
                 &loader_field_enum_values,
                 true,
             );
-            let project_loader_fields = from_duplicate_version_fields(aggregated_version_fields);
+            let project_loader_fields =
+                from_duplicate_version_fields(aggregated_version_fields);
 
             // aggregated project loaders
             let project_loaders = versions
@@ -308,9 +317,12 @@ pub async fn index_local(pool: &PgPool) -> Result<Vec<UploadSearchProject>, Inde
                 );
                 let unvectorized_loader_fields = version_fields
                     .iter()
-                    .map(|vf| (vf.field_name.clone(), vf.value.serialize_internal()))
+                    .map(|vf| {
+                        (vf.field_name.clone(), vf.value.serialize_internal())
+                    })
                     .collect();
-                let mut loader_fields = from_duplicate_version_fields(version_fields);
+                let mut loader_fields =
+                    from_duplicate_version_fields(version_fields);
                 let project_types = version.project_types;
 
                 let mut version_loaders = version.loaders;
@@ -347,22 +359,28 @@ pub async fn index_local(pool: &PgPool) -> Result<Vec<UploadSearchProject>, Inde
                 // client_side and server_side fields from the loader fields into
                 // separate loader fields.
                 // 'client_side' and 'server_side' remain supported by meilisearch even though they are no longer v3 fields.
-                let (_, v2_og_project_type) = LegacyProject::get_project_type(&project_types);
-                let (client_side, server_side) = v2_reroute::convert_side_types_v2(
-                    &unvectorized_loader_fields,
-                    Some(&v2_og_project_type),
-                );
+                let (_, v2_og_project_type) =
+                    LegacyProject::get_project_type(&project_types);
+                let (client_side, server_side) =
+                    v2_reroute::convert_side_types_v2(
+                        &unvectorized_loader_fields,
+                        Some(&v2_og_project_type),
+                    );
 
                 if let Ok(client_side) = serde_json::to_value(client_side) {
-                    loader_fields.insert("client_side".to_string(), vec![client_side]);
+                    loader_fields
+                        .insert("client_side".to_string(), vec![client_side]);
                 }
                 if let Ok(server_side) = serde_json::to_value(server_side) {
-                    loader_fields.insert("server_side".to_string(), vec![server_side]);
+                    loader_fields
+                        .insert("server_side".to_string(), vec![server_side]);
                 }
 
                 let usp = UploadSearchProject {
-                    version_id: crate::models::ids::VersionId::from(version.id).to_string(),
-                    project_id: crate::models::ids::ProjectId::from(project.id).to_string(),
+                    version_id: crate::models::ids::VersionId::from(version.id)
+                        .to_string(),
+                    project_id: crate::models::ids::ProjectId::from(project.id)
+                        .to_string(),
                     name: project.name.clone(),
                     summary: project.summary.clone(),
                     categories: categories.clone(),
@@ -470,34 +488,36 @@ async fn index_versions(
     .await?;
 
     // Get version fields
-    let version_fields: DashMap<VersionId, Vec<QueryVersionField>> = sqlx::query!(
-        "
+    let version_fields: DashMap<VersionId, Vec<QueryVersionField>> =
+        sqlx::query!(
+            "
         SELECT version_id, field_id, int_value, enum_value, string_value
         FROM version_fields
         WHERE version_id = ANY($1)
         ",
-        &all_version_ids,
-    )
-    .fetch(pool)
-    .try_fold(
-        DashMap::new(),
-        |acc: DashMap<VersionId, Vec<QueryVersionField>>, m| {
-            let qvf = QueryVersionField {
-                version_id: VersionId(m.version_id),
-                field_id: LoaderFieldId(m.field_id),
-                int_value: m.int_value,
-                enum_value: m.enum_value.map(LoaderFieldEnumValueId),
-                string_value: m.string_value,
-            };
+            &all_version_ids,
+        )
+        .fetch(pool)
+        .try_fold(
+            DashMap::new(),
+            |acc: DashMap<VersionId, Vec<QueryVersionField>>, m| {
+                let qvf = QueryVersionField {
+                    version_id: VersionId(m.version_id),
+                    field_id: LoaderFieldId(m.field_id),
+                    int_value: m.int_value,
+                    enum_value: m.enum_value.map(LoaderFieldEnumValueId),
+                    string_value: m.string_value,
+                };
 
-            acc.entry(VersionId(m.version_id)).or_default().push(qvf);
-            async move { Ok(acc) }
-        },
-    )
-    .await?;
+                acc.entry(VersionId(m.version_id)).or_default().push(qvf);
+                async move { Ok(acc) }
+            },
+        )
+        .await?;
 
     // Convert to partial versions
-    let mut res_versions: HashMap<ProjectId, Vec<PartialVersion>> = HashMap::new();
+    let mut res_versions: HashMap<ProjectId, Vec<PartialVersion>> =
+        HashMap::new();
     for (project_id, version_ids) in versions.iter() {
         for version_id in version_ids {
             // Extract version-specific data fetched

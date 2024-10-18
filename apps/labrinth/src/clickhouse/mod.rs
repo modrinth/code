@@ -6,7 +6,8 @@ mod fetch;
 pub use fetch::*;
 
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
-    init_client_with_database(&dotenvy::var("CLICKHOUSE_DATABASE").unwrap()).await
+    init_client_with_database(&dotenvy::var("CLICKHOUSE_DATABASE").unwrap())
+        .await
 }
 
 pub async fn init_client_with_database(
@@ -16,9 +17,12 @@ pub async fn init_client_with_database(
         let mut http_connector = HttpConnector::new();
         http_connector.enforce_http(false); // allow https URLs
 
-        let tls_connector = native_tls::TlsConnector::builder().build().unwrap().into();
-        let https_connector = HttpsConnector::from((http_connector, tls_connector));
-        let hyper_client = hyper::client::Client::builder().build(https_connector);
+        let tls_connector =
+            native_tls::TlsConnector::builder().build().unwrap().into();
+        let https_connector =
+            HttpsConnector::from((http_connector, tls_connector));
+        let hyper_client =
+            hyper::client::Client::builder().build(https_connector);
 
         clickhouse::Client::with_http_client(hyper_client)
             .with_url(dotenvy::var("CLICKHOUSE_URL").unwrap())

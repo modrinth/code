@@ -14,7 +14,9 @@ pub struct V3Stats {
     pub files: Option<i64>,
 }
 
-pub async fn get_stats(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
+pub async fn get_stats(
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
     let projects = sqlx::query!(
         "
         SELECT COUNT(id)

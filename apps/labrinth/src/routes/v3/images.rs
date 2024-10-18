@@ -4,7 +4,9 @@ use super::threads::is_authorized_thread;
 use crate::auth::checks::{is_team_member_project, is_team_member_version};
 use crate::auth::get_user_from_headers;
 use crate::database;
-use crate::database::models::{project_item, report_item, thread_item, version_item};
+use crate::database::models::{
+    project_item, report_item, thread_item, version_item,
+};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::{ThreadMessageId, VersionId};
@@ -50,18 +52,31 @@ pub async fn images_add(
 
     let scopes = vec![context.relevant_scope()];
 
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue, Some(&scopes))
-        .await?
-        .1;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&scopes),
+    )
+    .await?
+    .1;
 
     // Attempt to associated a supplied id with the context
     // If the context cannot be found, or the user is not authorized to upload images for the context, return an error
     match &mut context {
         ImageContext::Project { project_id } => {
             if let Some(id) = data.project_id {
-                let project = project_item::Project::get(&id, &**pool, &redis).await?;
+                let project =
+                    project_item::Project::get(&id, &**pool, &redis).await?;
                 if let Some(project) = project {
-                    if is_team_member_project(&project.inner, &Some(user.clone()), &pool).await? {
+                    if is_team_member_project(
+                        &project.inner,
+                        &Some(user.clone()),
+                        &pool,
+                    )
+                    .await?
+                    {
                         *project_id = Some(project.inner.id.into());
                     } else {
                         return Err(ApiError::CustomAuthentication(
@@ -77,10 +92,17 @@ pub async fn images_add(
         }
         ImageContext::Version { version_id } => {
             if let Some(id) = data.version_id {
-                let version = version_item::Version::get(id.into(), &**pool, &redis).await?;
+                let version =
+                    version_item::Version::get(id.into(), &**pool, &redis)
+                        .await?;
                 if let Some(version) = version {
-                    if is_team_member_version(&version.inner, &Some(user.clone()), &pool, &redis)
-                        .await?
+                    if is_team_member_version(
+                        &version.inner,
+                        &Some(user.clone()),
+                        &pool,
+                        &redis,
+                    )
+                    .await?
                     {
                         *version_id = Some(version.inner.id.into());
                     } else {
@@ -97,11 +119,15 @@ pub async fn images_add(
         }
         ImageContext::ThreadMessage { thread_message_id } => {
             if let Some(id) = data.thread_message_id {
-                let thread_message = thread_item::ThreadMessage::get(id.into(), &**pool)
-                    .await?
-                    .ok_or_else(|| {
-                        ApiError::InvalidInput("The thread message could not found.".to_string())
-                    })?;
+                let thread_message =
+                    thread_item::ThreadMessage::get(id.into(), &**pool)
+                        .await?
+                        .ok_or_else(|| {
+                            ApiError::InvalidInput(
+                                "The thread message could not found."
+                                    .to_string(),
+                            )
+                        })?;
                 let thread = thread_item::Thread::get(thread_message.thread_id, &**pool)
                     .await?
                     .ok_or_else(|| {
@@ -125,7 +151,9 @@ pub async fn images_add(
                 let report = report_item::Report::get(id.into(), &**pool)
                     .await?
                     .ok_or_else(|| {
-                        ApiError::InvalidInput("The report could not be found.".to_string())
+                        ApiError::InvalidInput(
+                            "The report could not be found.".to_string(),
+                        )
                     })?;
                 let thread = thread_item::Thread::get(report.thread_id, &**pool)
                     .await?
@@ -151,8 +179,12 @@ pub async fn images_add(
     }
 
     // Upload the image to the file host
-    let bytes =
-        read_from_payload(&mut payload, 1_048_576, "Icons must be smaller than 1MiB").await?;
+    let bytes = read_from_payload(
+        &mut payload,
+        1_048_576,
+        "Icons must be smaller than 1MiB",
+    )
+    .await?;
 
     let content_length = bytes.len();
     let upload_result = upload_image_optimized(

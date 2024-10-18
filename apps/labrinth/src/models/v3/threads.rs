@@ -93,7 +93,11 @@ impl ThreadType {
 }
 
 impl Thread {
-    pub fn from(data: crate::database::models::Thread, users: Vec<User>, user: &User) -> Self {
+    pub fn from(
+        data: crate::database::models::Thread,
+        users: Vec<User>,
+        user: &User,
+    ) -> Self {
         let thread_type = data.type_;
 
         Thread {
@@ -107,7 +111,8 @@ impl Thread {
                 .filter(|x| {
                     if let MessageBody::Text { private, .. } = x.body {
                         !private || user.role.is_mod()
-                    } else if let MessageBody::Deleted { private, .. } = x.body {
+                    } else if let MessageBody::Deleted { private, .. } = x.body
+                    {
                         !private || user.role.is_mod()
                     } else {
                         true
@@ -121,7 +126,10 @@ impl Thread {
 }
 
 impl ThreadMessage {
-    pub fn from(data: crate::database::models::ThreadMessage, user: &User) -> Self {
+    pub fn from(
+        data: crate::database::models::ThreadMessage,
+        user: &User,
+    ) -> Self {
         Self {
             id: data.id.into(),
             author_id: if data.hide_identity && !user.role.is_mod() {

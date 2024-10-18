@@ -1,4 +1,6 @@
-use crate::validate::{filter_out_packs, SupportedGameVersions, ValidationError, ValidationResult};
+use crate::validate::{
+    filter_out_packs, SupportedGameVersions, ValidationError, ValidationResult,
+};
 use chrono::DateTime;
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -16,7 +18,9 @@ impl super::Validator for ForgeValidator {
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Time since release of 1.13, the first forge version which uses the new TOML system
-        SupportedGameVersions::PastDate(DateTime::from_timestamp(1540122067, 0).unwrap())
+        SupportedGameVersions::PastDate(
+            DateTime::from_timestamp(1540122067, 0).unwrap(),
+        )
     }
 
     fn validate(

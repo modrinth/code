@@ -220,7 +220,12 @@ impl VersionBuilder {
             file.insert(version_id, transaction).await?;
         }
 
-        DependencyBuilder::insert_many(dependencies, self.version_id, transaction).await?;
+        DependencyBuilder::insert_many(
+            dependencies,
+            self.version_id,
+            transaction,
+        )
+        .await?;
 
         let loader_versions = loaders
             .iter()
@@ -898,13 +903,20 @@ impl Version {
 
         redis
             .delete_many(
-                iter::once((VERSIONS_NAMESPACE, Some(version.inner.id.0.to_string()))).chain(
-                    version.files.iter().flat_map(|file| {
+                iter::once((
+                    VERSIONS_NAMESPACE,
+                    Some(version.inner.id.0.to_string()),
+                ))
+                .chain(version.files.iter().flat_map(
+                    |file| {
                         file.hashes.iter().map(|(algo, hash)| {
-                            (VERSION_FILES_NAMESPACE, Some(format!("{}_{}", algo, hash)))
+                            (
+                                VERSION_FILES_NAMESPACE,
+                                Some(format!("{}_{}", algo, hash)),
+                            )
                         })
-                    }),
-                ),
+                    },
+                )),
             )
             .await?;
         Ok(())
@@ -1016,7 +1028,11 @@ mod tests {
         Utc::now().checked_sub_months(Months::new(months)).unwrap()
     }
 
-    fn get_version(id: i64, ordering: Option<i32>, date_published: DateTime<Utc>) -> Version {
+    fn get_version(
+        id: i64,
+        ordering: Option<i32>,
+        date_published: DateTime<Utc>,
+    ) -> Version {
         Version {
             id: VersionId(id),
             ordering,

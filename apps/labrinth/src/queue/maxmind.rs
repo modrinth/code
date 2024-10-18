@@ -46,11 +46,13 @@ impl MaxMindIndexer {
         if let Ok(entries) = archive.entries() {
             for mut file in entries.flatten() {
                 if let Ok(path) = file.header().path() {
-                    if path.extension().and_then(|x| x.to_str()) == Some("mmdb") {
+                    if path.extension().and_then(|x| x.to_str()) == Some("mmdb")
+                    {
                         let mut buf = Vec::new();
                         file.read_to_end(&mut buf).unwrap();
 
-                        let reader = maxminddb::Reader::from_source(buf).unwrap();
+                        let reader =
+                            maxminddb::Reader::from_source(buf).unwrap();
 
                         return Ok(Some(reader));
                     }
@@ -71,10 +73,9 @@ impl MaxMindIndexer {
         let maxmind = self.reader.read().await;
 
         if let Some(ref maxmind) = *maxmind {
-            maxmind
-                .lookup::<Country>(ip.into())
-                .ok()
-                .and_then(|x| x.country.and_then(|x| x.iso_code.map(|x| x.to_string())))
+            maxmind.lookup::<Country>(ip.into()).ok().and_then(|x| {
+                x.country.and_then(|x| x.iso_code.map(|x| x.to_string()))
+            })
         } else {
             None
         }

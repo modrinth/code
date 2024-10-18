@@ -37,7 +37,8 @@ async fn can_create_edit_get_oauth_client() {
             )
             .await;
         assert_status!(&resp, StatusCode::OK);
-        let creation_result: OAuthClientCreationResult = test::read_body_json(resp).await;
+        let creation_result: OAuthClientCreationResult =
+            test::read_body_json(resp).await;
         let client_id = get_json_val_str(creation_result.client.id);
 
         let url = Some("https://modrinth.com".to_string());
@@ -95,7 +96,8 @@ async fn create_oauth_client_with_restricted_scopes_fails() {
 #[actix_rt::test]
 async fn get_oauth_client_for_client_creator_succeeds() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let DummyOAuthClientAlpha { client_id, .. } = env.dummy.oauth_client_alpha.clone();
+        let DummyOAuthClientAlpha { client_id, .. } =
+            env.dummy.oauth_client_alpha.clone();
 
         let resp = env
             .api
@@ -176,7 +178,8 @@ async fn can_list_user_oauth_authorizations() {
             )
             .await;
 
-        let authorizations = env.api.get_user_oauth_authorizations(USER_USER_PAT).await;
+        let authorizations =
+            env.api.get_user_oauth_authorizations(USER_USER_PAT).await;
         assert_eq!(1, authorizations.len());
         assert_eq!(USER_USER_ID_PARSED, authorizations[0].user_id.0 as i64);
     })

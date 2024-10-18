@@ -128,7 +128,9 @@ pub fn from_duplicate_version_fields(
     let mut fields: HashMap<String, Vec<serde_json::Value>> = HashMap::new();
     for vf in version_fields {
         // We use a string directly, so we can remove duplicates
-        let serialized = if let Some(inner_array) = vf.value.serialize_internal().as_array() {
+        let serialized = if let Some(inner_array) =
+            vf.value.serialize_internal().as_array()
+        {
             inner_array.clone()
         } else {
             vec![vf.value.serialize_internal()]
@@ -151,7 +153,8 @@ pub fn from_duplicate_version_fields(
 
 impl From<QueryProject> for Project {
     fn from(data: QueryProject) -> Self {
-        let fields = from_duplicate_version_fields(data.aggregate_version_fields);
+        let fields =
+            from_duplicate_version_fields(data.aggregate_version_fields);
         let m = data.inner;
         Self {
             id: m.id.into(),
@@ -655,7 +658,9 @@ pub struct Version {
     pub fields: HashMap<String, serde_json::Value>,
 }
 
-pub fn skip_nulls<'de, D>(deserializer: D) -> Result<HashMap<String, serde_json::Value>, D::Error>
+pub fn skip_nulls<'de, D>(
+    deserializer: D,
+) -> Result<HashMap<String, serde_json::Value>, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
@@ -708,7 +713,9 @@ impl From<QueryVersion> for Version {
                     version_id: d.version_id.map(|i| VersionId(i.0 as u64)),
                     project_id: d.project_id.map(|i| ProjectId(i.0 as u64)),
                     file_name: d.file_name,
-                    dependency_type: DependencyType::from_string(d.dependency_type.as_str()),
+                    dependency_type: DependencyType::from_string(
+                        d.dependency_type.as_str(),
+                    ),
                 })
                 .collect(),
             loaders: data.loaders.into_iter().map(Loader).collect(),

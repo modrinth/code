@@ -60,11 +60,12 @@ pub async fn get_projects(
     .try_collect::<Vec<database::models::ProjectId>>()
     .await?;
 
-    let projects: Vec<_> = database::Project::get_many_ids(&project_ids, &**pool, &redis)
-        .await?
-        .into_iter()
-        .map(crate::models::projects::Project::from)
-        .collect();
+    let projects: Vec<_> =
+        database::Project::get_many_ids(&project_ids, &**pool, &redis)
+            .await?
+            .into_iter()
+            .map(crate::models::projects::Project::from)
+            .collect();
 
     Ok(HttpResponse::Ok().json(projects))
 }
@@ -86,7 +87,8 @@ pub async fn get_project_meta(
     .await?;
 
     let project_id = info.into_inner().0;
-    let project = database::models::Project::get(&project_id, &**pool, &redis).await?;
+    let project =
+        database::models::Project::get(&project_id, &**pool, &redis).await?;
 
     if let Some(project) = project {
         let rows = sqlx::query!(
@@ -122,7 +124,8 @@ pub async fn get_project_meta(
 
                 check_hashes.extend(merged.flame_files.keys().cloned());
                 check_hashes.extend(merged.unknown_files.keys().cloned());
-                check_flames.extend(merged.flame_files.values().map(|x| x.id as i32));
+                check_flames
+                    .extend(merged.flame_files.values().map(|x| x.id as i32));
             }
         }
 

@@ -1,6 +1,8 @@
 use super::project_creation::{CreateError, UploadedFile};
 use crate::auth::get_user_from_headers;
-use crate::database::models::loader_fields::{LoaderField, LoaderFieldEnumValue, VersionField};
+use crate::database::models::loader_fields::{
+    LoaderField, LoaderFieldEnumValue, VersionField,
+};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
@@ -14,8 +16,8 @@ use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
 use crate::models::projects::{skip_nulls, DependencyType, ProjectStatus};
 use crate::models::projects::{
-    Dependency, FileType, Loader, ProjectId, Version, VersionFile, VersionId, VersionStatus,
-    VersionType,
+    Dependency, FileType, Loader, ProjectId, Version, VersionFile, VersionId,
+    VersionStatus, VersionType,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
@@ -122,8 +124,11 @@ pub async fn version_create(
     .await;
 
     if result.is_err() {
-        let undo_result =
-            super::project_creation::undo_uploads(&***file_host, &uploaded_files).await;
+        let undo_result = super::project_creation::undo_uploads(
+            &***file_host,
+            &uploaded_files,
+        )
+        .await;
         let rollback_result = transaction.rollback().await;
 
         undo_result?;
@@ -374,10 +379,12 @@ async fn version_create_inner(
         return Err(error);
     }
 
-    let version_data = initial_version_data
-        .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
-    let builder = version_builder
-        .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
+    let version_data = initial_version_data.ok_or_else(|| {
+        CreateError::InvalidInput("`data` field is required".to_string())
+    })?;
+    let builder = version_builder.ok_or_else(|| {
+        CreateError::InvalidInput("`data` field is required".to_string())
+    })?;
 
     if builder.files.is_empty() {
         return Err(CreateError::InvalidInput(
@@ -470,7 +477,8 @@ async fn version_create_inner(
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
-            image_item::Image::get(image_id.into(), &mut **transaction, redis).await?
+            image_item::Image::get(image_id.into(), &mut **transaction, redis)
+                .await?
         {
             let image: Image = db_image.into();
             if !matches!(image.context, ImageContext::Report { .. })
@@ -549,8 +557,11 @@ pub async fn upload_file_to_version(
     .await;
 
     if result.is_err() {
-        let undo_result =
-            super::project_creation::undo_uploads(&***file_host, &uploaded_files).await;
+        let undo_result = super::project_creation::undo_uploads(
+            &***file_host,
+            &uploaded_files,
+        )
+        .await;
         let rollback_result = transaction.rollback().await;
 
         undo_result?;
@@ -602,7 +613,8 @@ async fn upload_file_to_version_inner(
         }
     };
 
-    let all_loaders = models::loader_fields::Loader::list(&mut **transaction, &redis).await?;
+    let all_loaders =
+        models::loader_fields::Loader::list(&mut **transaction, &redis).await?;
     let selected_loaders = version
         .loaders
         .iter()
@@ -615,9 +627,13 @@ async fn upload_file_to_version_inner(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
-    if models::Project::get_id(version.inner.project_id, &mut **transaction, &redis)
-        .await?
-        .is_none()
+    if models::Project::get_id(
+        version.inner.project_id,
+        &mut **transaction,
+        &redis,
+    )
+    .await?
+    .is_none()
     {
         return Err(CreateError::InvalidInput(
             "An invalid project id was supplied".to_string(),
@@ -633,13 +649,15 @@ async fn upload_file_to_version_inner(
         )
         .await?;
 
-        let organization = Organization::get_associated_organization_project_id(
-            version.inner.project_id,
-            &**client,
-        )
-        .await?;
+        let organization =
+            Organization::get_associated_organization_project_id(
+                version.inner.project_id,
+                &**client,
+            )
+            .await?;
 
-        let organization_team_member = if let Some(organization) = &organization {
+        let organization_team_member = if let Some(organization) = &organization
+        {
             models::TeamMember::get_from_user_id(
                 organization.team_id,
                 user.id.into(),
@@ -659,7 +677,8 @@ async fn upload_file_to_version_inner(
 
         if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
             return Err(CreateError::CustomAuthenticationError(
-                "You don't have permission to upload files to this version!".to_string(),
+                "You don't have permission to upload files to this version!"
+                    .to_string(),
             ));
         }
     }
@@ -676,7 +695,9 @@ async fn upload_file_to_version_inner(
         let result = async {
             let content_disposition = field.content_disposition().clone();
             let name = content_disposition.get_name().ok_or_else(|| {
-                CreateError::MissingValueError("Missing content name".to_string())
+                CreateError::MissingValueError(
+                    "Missing content name".to_string(),
+                )
             })?;
 
             if name == "data" {
@@ -691,7 +712,9 @@ async fn upload_file_to_version_inner(
             }
 
             let file_data = initial_file_data.as_ref().ok_or_else(|| {
-                CreateError::InvalidInput(String::from("`data` field must come before file fields"))
+                CreateError::InvalidInput(String::from(
+                    "`data` field must come before file fields",
+                ))
             })?;
 
             let loaders = selected_loaders
@@ -788,7 +811,8 @@ pub async fn upload_file(
 
     if other_file_names.contains(&format!("{}.{}", file_name, file_extension)) {
         return Err(CreateError::InvalidInput(
-            "Duplicate files are not allowed to be uploaded to Modrinth!".to_string(),
+            "Duplicate files are not allowed to be uploaded to Modrinth!"
+                .to_string(),
         ));
     }
 
@@ -799,7 +823,9 @@ pub async fn upload_file(
     }
 
     let content_type = crate::util::ext::project_file_type(file_extension)
-        .ok_or_else(|| CreateError::InvalidFileType(file_extension.to_string()))?;
+        .ok_or_else(|| {
+            CreateError::InvalidFileType(file_extension.to_string())
+        })?;
 
     let data = read_from_field(
         field, 500 * (1 << 20),
@@ -825,7 +851,8 @@ pub async fn upload_file(
 
     if exists {
         return Err(CreateError::InvalidInput(
-            "Duplicate files are not allowed to be uploaded to Modrinth!".to_string(),
+            "Duplicate files are not allowed to be uploaded to Modrinth!"
+                .to_string(),
         ));
     }
 
@@ -867,7 +894,11 @@ pub async fn upload_file(
 
             for file in &format.files {
                 if let Some(dep) = res.iter().find(|x| {
-                    Some(&*x.hash) == file.hashes.get(&PackFileHash::Sha1).map(|x| x.as_bytes())
+                    Some(&*x.hash)
+                        == file
+                            .hashes
+                            .get(&PackFileHash::Sha1)
+                            .map(|x| x.as_bytes())
                 }) {
                     dependencies.push(DependencyBuilder {
                         project_id: Some(models::ProjectId(dep.project_id)),
@@ -917,7 +948,8 @@ pub async fn upload_file(
         version_id,
         urlencoding::encode(file_name)
     );
-    let file_path = format!("data/{}/versions/{}/{}", project_id, version_id, &file_name);
+    let file_path =
+        format!("data/{}/versions/{}/{}", project_id, version_id, &file_name);
 
     let upload_data = file_host
         .upload_file(content_type, &file_path, data)
@@ -937,7 +969,8 @@ pub async fn upload_file(
             .any(|y| y.hash == sha1_bytes || y.hash == sha512_bytes)
     }) {
         return Err(CreateError::InvalidInput(
-            "Duplicate files are not allowed to be uploaded to Modrinth!".to_string(),
+            "Duplicate files are not allowed to be uploaded to Modrinth!"
+                .to_string(),
         ));
     }
 
@@ -975,9 +1008,9 @@ pub async fn upload_file(
 pub fn get_name_ext(
     content_disposition: &actix_web::http::header::ContentDisposition,
 ) -> Result<(&str, &str), CreateError> {
-    let file_name = content_disposition
-        .get_filename()
-        .ok_or_else(|| CreateError::MissingValueError("Missing content file name".to_string()))?;
+    let file_name = content_disposition.get_filename().ok_or_else(|| {
+        CreateError::MissingValueError("Missing content file name".to_string())
+    })?;
     let file_extension = if let Some(last_period) = file_name.rfind('.') {
         file_name.get((last_period + 1)..).unwrap_or("")
     } else {
@@ -994,7 +1027,10 @@ pub fn try_create_version_fields(
     version_id: VersionId,
     submitted_fields: &HashMap<String, serde_json::Value>,
     loader_fields: &[LoaderField],
-    loader_field_enum_values: &mut HashMap<models::LoaderFieldId, Vec<LoaderFieldEnumValue>>,
+    loader_field_enum_values: &mut HashMap<
+        models::LoaderFieldId,
+        Vec<LoaderFieldEnumValue>,
+    >,
 ) -> Result<Vec<VersionField>, CreateError> {
     let mut version_fields = vec![];
     let mut remaining_mandatory_loader_fields = loader_fields

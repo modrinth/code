@@ -4,7 +4,8 @@ use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::ImageId;
 use crate::models::projects::{
-    Dependency, FileType, Loader, ProjectId, Version, VersionId, VersionStatus, VersionType,
+    Dependency, FileType, Loader, ProjectId, Version, VersionId, VersionStatus,
+    VersionType,
 };
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::moderation::AutomatedModerationQueue;
@@ -93,7 +94,8 @@ pub async fn version_create(
     let payload = v2_reroute::alter_actix_multipart(
         payload,
         req.headers().clone(),
-        |legacy_create: InitialVersionData, content_dispositions: Vec<ContentDisposition>| {
+        |legacy_create: InitialVersionData,
+         content_dispositions: Vec<ContentDisposition>| {
             let client = client.clone();
             let redis = redis.clone();
             async move {
@@ -105,19 +107,27 @@ pub async fn version_create(
                 );
 
                 // Get all possible side-types for loaders given- we will use these to check if we need to convert/apply singleplayer, etc.
-                let loaders = match v3::tags::loader_list(client.clone(), redis.clone()).await {
-                    Ok(loader_response) => {
-                        (v2_reroute::extract_ok_json::<Vec<v3::tags::LoaderData>>(loader_response)
+                let loaders =
+                    match v3::tags::loader_list(client.clone(), redis.clone())
+                        .await
+                    {
+                        Ok(loader_response) => {
+                            (v2_reroute::extract_ok_json::<
+                                Vec<v3::tags::LoaderData>,
+                            >(loader_response)
                             .await)
-                            .unwrap_or_default()
-                    }
-                    Err(_) => vec![],
-                };
+                                .unwrap_or_default()
+                        }
+                        Err(_) => vec![],
+                    };
 
                 let loader_fields_aggregate = loaders
                     .into_iter()
                     .filter_map(|loader| {
-                        if legacy_create.loaders.contains(&Loader(loader.name.clone())) {
+                        if legacy_create
+                            .loaders
+                            .contains(&Loader(loader.name.clone()))
+                        {
                             Some(loader.supported_fields)
                         } else {
                             None
@@ -150,15 +160,29 @@ pub async fn version_create(
                             .map(|f| (f.to_string(), json!(false))),
                     );
                     if let Some(example_version_fields) =
-                        get_example_version_fields(legacy_create.project_id, client, &redis).await?
+                        get_example_version_fields(
+                            legacy_create.project_id,
+                            client,
+                            &redis,
+                        )
+                        .await?
                     {
-                        fields.extend(example_version_fields.into_iter().filter_map(|f| {
-                            if side_type_loader_field_names.contains(&f.field_name.as_str()) {
-                                Some((f.field_name, f.value.serialize_internal()))
-                            } else {
-                                None
-                            }
-                        }));
+                        fields.extend(
+                            example_version_fields.into_iter().filter_map(
+                                |f| {
+                                    if side_type_loader_field_names
+                                        .contains(&f.field_name.as_str())
+                                    {
+                                        Some((
+                                            f.field_name,
+                                            f.value.serialize_internal(),
+                                        ))
+                                    } else {
+                                        None
+                                    }
+                                },
+                            ),
+                        );
                     }
                 }
                 // Handle project type via file extension prediction
@@ -180,9 +204,14 @@ pub async fn version_create(
                 // Similarly, check actual content disposition for mrpacks, in case file_parts is wrong
                 for content_disposition in content_dispositions {
                     // Uses version_create functions to get the file name and extension
-                    let (_, file_extension) = version_creation::get_name_ext(&content_disposition)?;
+                    let (_, file_extension) =
+                        version_creation::get_name_ext(&content_disposition)?;
                     crate::util::ext::project_file_type(file_extension)
-                        .ok_or_else(|| CreateError::InvalidFileType(file_extension.to_string()))?;
+                        .ok_or_else(|| {
+                            CreateError::InvalidFileType(
+                                file_extension.to_string(),
+                            )
+                        })?;
 
                     if file_extension == "mrpack" {
                         project_type = Some("modpack");
@@ -193,7 +222,10 @@ pub async fn version_create(
                 // Modpacks now use the "mrpack" loader, and loaders are converted to loader fields.
                 // Setting of 'project_type' directly is removed, it's loader-based now.
                 if project_type == Some("modpack") {
-                    fields.insert("mrpack_loaders".to_string(), json!(legacy_create.loaders));
+                    fields.insert(
+                        "mrpack_loaders".to_string(),
+                        json!(legacy_create.loaders),
+                    );
                 }
 
                 let loaders = if project_type == Some("modpack") {
@@ -257,18 +289,20 @@ async fn get_example_version_fields(
         None => return Ok(None),
     };
 
-    let vid = match project_item::Project::get_id(project_id.into(), &**pool, redis)
-        .await?
-        .and_then(|p| p.versions.first().cloned())
-    {
-        Some(vid) => vid,
-        None => return Ok(None),
-    };
+    let vid =
+        match project_item::Project::get_id(project_id.into(), &**pool, redis)
+            .await?
+            .and_then(|p| p.versions.first().cloned())
+        {
+            Some(vid) => vid,
+            None => return Ok(None),
+        };
 
-    let example_version = match version_item::Version::get(vid, &**pool, redis).await? {
-        Some(version) => version,
-        None => return Ok(None),
-    };
+    let example_version =
+        match version_item::Version::get(vid, &**pool, redis).await? {
+            Some(version) => version,
+            None => return Ok(None),
+        };
     Ok(Some(example_version.version_fields))
 }
 

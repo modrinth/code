@@ -13,7 +13,9 @@ use crate::common::api_common::{ApiProject, ApiVersion};
 use crate::common::api_v3::request_data::get_public_project_creation_data;
 use crate::common::database::*;
 
-use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta, TestFile};
+use crate::common::dummy_data::{
+    DummyProjectAlpha, DummyProjectBeta, TestFile,
+};
 
 // importing common module.
 mod common;
@@ -353,7 +355,10 @@ async fn creating_loader_fields() {
         .await;
 
         let project = api
-            .get_project_deserialized(&alpha_project_id.to_string(), USER_USER_PAT)
+            .get_project_deserialized(
+                &alpha_project_id.to_string(),
+                USER_USER_PAT,
+            )
             .await;
         assert_eq!(
             project.fields.get("game_versions").unwrap(),
@@ -413,57 +418,60 @@ async fn get_loader_fields_variants() {
 async fn get_available_loader_fields() {
     // Get available loader fields for a given loader
     // (ie: which fields are relevant for 'fabric', etc)
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
-        let loaders = api.get_loaders_deserialized().await;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let loaders = api.get_loaders_deserialized().await;
 
-        let fabric_loader_fields = loaders
-            .iter()
-            .find(|x| x.name == "fabric")
-            .unwrap()
-            .supported_fields
-            .clone()
-            .into_iter()
-            .collect::<HashSet<_>>();
-        assert_eq!(
-            fabric_loader_fields,
-            [
-                "game_versions",
-                "singleplayer",
-                "client_and_server",
-                "client_only",
-                "server_only",
-                "test_fabric_optional" // exists for testing
-            ]
-            .iter()
-            .map(|s| s.to_string())
-            .collect()
-        );
+            let fabric_loader_fields = loaders
+                .iter()
+                .find(|x| x.name == "fabric")
+                .unwrap()
+                .supported_fields
+                .clone()
+                .into_iter()
+                .collect::<HashSet<_>>();
+            assert_eq!(
+                fabric_loader_fields,
+                [
+                    "game_versions",
+                    "singleplayer",
+                    "client_and_server",
+                    "client_only",
+                    "server_only",
+                    "test_fabric_optional" // exists for testing
+                ]
+                .iter()
+                .map(|s| s.to_string())
+                .collect()
+            );
 
-        let mrpack_loader_fields = loaders
-            .iter()
-            .find(|x| x.name == "mrpack")
-            .unwrap()
-            .supported_fields
-            .clone()
-            .into_iter()
-            .collect::<HashSet<_>>();
-        assert_eq!(
-            mrpack_loader_fields,
-            [
-                "game_versions",
-                "singleplayer",
-                "client_and_server",
-                "client_only",
-                "server_only",
-                // mrpack has all the general fields as well as this
-                "mrpack_loaders"
-            ]
-            .iter()
-            .map(|s| s.to_string())
-            .collect()
-        );
-    })
+            let mrpack_loader_fields = loaders
+                .iter()
+                .find(|x| x.name == "mrpack")
+                .unwrap()
+                .supported_fields
+                .clone()
+                .into_iter()
+                .collect::<HashSet<_>>();
+            assert_eq!(
+                mrpack_loader_fields,
+                [
+                    "game_versions",
+                    "singleplayer",
+                    "client_and_server",
+                    "client_only",
+                    "server_only",
+                    // mrpack has all the general fields as well as this
+                    "mrpack_loaders"
+                ]
+                .iter()
+                .map(|s| s.to_string())
+                .collect()
+            );
+        },
+    )
     .await;
 }
 
@@ -471,90 +479,100 @@ async fn get_available_loader_fields() {
 async fn test_multi_get_redis_cache() {
     // Ensures a multi-project get including both modpacks and mods ddoes not
     // incorrectly cache loader fields
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
 
-        // Create 5 modpacks
-        let mut modpacks = Vec::new();
-        for i in 0..5 {
-            let slug = format!("test-modpack-{}", i);
+            // Create 5 modpacks
+            let mut modpacks = Vec::new();
+            for i in 0..5 {
+                let slug = format!("test-modpack-{}", i);
 
-            let creation_data = get_public_project_creation_data(
-                &slug,
-                Some(TestFile::build_random_mrpack()),
-                None,
-            );
-            let resp = api.create_project(creation_data, USER_USER_PAT).await;
-            assert_status!(&resp, StatusCode::OK);
-            modpacks.push(slug);
-        }
-
-        // Create 5 mods
-        let mut mods = Vec::new();
-        for i in 0..5 {
-            let slug = format!("test-mod-{}", i);
-
-            let creation_data =
-                get_public_project_creation_data(&slug, Some(TestFile::build_random_jar()), None);
-            let resp = api.create_project(creation_data, USER_USER_PAT).await;
-            assert_status!(&resp, StatusCode::OK);
-            mods.push(slug);
-        }
-
-        // Get all 10 projects
-        let project_slugs = modpacks
-            .iter()
-            .map(|x| x.as_str())
-            .chain(mods.iter().map(|x| x.as_str()))
-            .collect_vec();
-        let resp = api.get_projects(&project_slugs, USER_USER_PAT).await;
-        assert_status!(&resp, StatusCode::OK);
-        let projects: Vec<v3::projects::Project> = test::read_body_json(resp).await;
-        assert_eq!(projects.len(), 10);
-
-        // Ensure all 5 modpacks have 'mrpack_loaders', and all 5 mods do not
-        for project in projects.iter() {
-            if modpacks.contains(project.slug.as_ref().unwrap()) {
-                assert!(project.fields.contains_key("mrpack_loaders"));
-            } else if mods.contains(project.slug.as_ref().unwrap()) {
-                assert!(!project.fields.contains_key("mrpack_loaders"));
-            } else {
-                panic!("Unexpected project slug: {:?}", project.slug);
+                let creation_data = get_public_project_creation_data(
+                    &slug,
+                    Some(TestFile::build_random_mrpack()),
+                    None,
+                );
+                let resp =
+                    api.create_project(creation_data, USER_USER_PAT).await;
+                assert_status!(&resp, StatusCode::OK);
+                modpacks.push(slug);
             }
-        }
 
-        // Get a version from each project
-        let version_ids_modpacks = projects
-            .iter()
-            .filter(|x| modpacks.contains(x.slug.as_ref().unwrap()))
-            .map(|x| x.versions[0])
-            .collect_vec();
-        let version_ids_mods = projects
-            .iter()
-            .filter(|x| mods.contains(x.slug.as_ref().unwrap()))
-            .map(|x| x.versions[0])
-            .collect_vec();
-        let version_ids = version_ids_modpacks
-            .iter()
-            .chain(version_ids_mods.iter())
-            .map(|x| x.to_string())
-            .collect_vec();
-        let resp = api.get_versions(version_ids, USER_USER_PAT).await;
-        assert_status!(&resp, StatusCode::OK);
-        let versions: Vec<v3::projects::Version> = test::read_body_json(resp).await;
-        assert_eq!(versions.len(), 10);
+            // Create 5 mods
+            let mut mods = Vec::new();
+            for i in 0..5 {
+                let slug = format!("test-mod-{}", i);
 
-        // Ensure all 5 versions from modpacks have 'mrpack_loaders', and all 5 versions from mods do not
-        for version in versions.iter() {
-            if version_ids_modpacks.contains(&version.id) {
-                assert!(version.fields.contains_key("mrpack_loaders"));
-            } else if version_ids_mods.contains(&version.id) {
-                assert!(!version.fields.contains_key("mrpack_loaders"));
-            } else {
-                panic!("Unexpected version id: {:?}", version.id);
+                let creation_data = get_public_project_creation_data(
+                    &slug,
+                    Some(TestFile::build_random_jar()),
+                    None,
+                );
+                let resp =
+                    api.create_project(creation_data, USER_USER_PAT).await;
+                assert_status!(&resp, StatusCode::OK);
+                mods.push(slug);
             }
-        }
-    })
+
+            // Get all 10 projects
+            let project_slugs = modpacks
+                .iter()
+                .map(|x| x.as_str())
+                .chain(mods.iter().map(|x| x.as_str()))
+                .collect_vec();
+            let resp = api.get_projects(&project_slugs, USER_USER_PAT).await;
+            assert_status!(&resp, StatusCode::OK);
+            let projects: Vec<v3::projects::Project> =
+                test::read_body_json(resp).await;
+            assert_eq!(projects.len(), 10);
+
+            // Ensure all 5 modpacks have 'mrpack_loaders', and all 5 mods do not
+            for project in projects.iter() {
+                if modpacks.contains(project.slug.as_ref().unwrap()) {
+                    assert!(project.fields.contains_key("mrpack_loaders"));
+                } else if mods.contains(project.slug.as_ref().unwrap()) {
+                    assert!(!project.fields.contains_key("mrpack_loaders"));
+                } else {
+                    panic!("Unexpected project slug: {:?}", project.slug);
+                }
+            }
+
+            // Get a version from each project
+            let version_ids_modpacks = projects
+                .iter()
+                .filter(|x| modpacks.contains(x.slug.as_ref().unwrap()))
+                .map(|x| x.versions[0])
+                .collect_vec();
+            let version_ids_mods = projects
+                .iter()
+                .filter(|x| mods.contains(x.slug.as_ref().unwrap()))
+                .map(|x| x.versions[0])
+                .collect_vec();
+            let version_ids = version_ids_modpacks
+                .iter()
+                .chain(version_ids_mods.iter())
+                .map(|x| x.to_string())
+                .collect_vec();
+            let resp = api.get_versions(version_ids, USER_USER_PAT).await;
+            assert_status!(&resp, StatusCode::OK);
+            let versions: Vec<v3::projects::Version> =
+                test::read_body_json(resp).await;
+            assert_eq!(versions.len(), 10);
+
+            // Ensure all 5 versions from modpacks have 'mrpack_loaders', and all 5 versions from mods do not
+            for version in versions.iter() {
+                if version_ids_modpacks.contains(&version.id) {
+                    assert!(version.fields.contains_key("mrpack_loaders"));
+                } else if version_ids_mods.contains(&version.id) {
+                    assert!(!version.fields.contains_key("mrpack_loaders"));
+                } else {
+                    panic!("Unexpected version id: {:?}", version.id);
+                }
+            }
+        },
+    )
     .await;
 }
 

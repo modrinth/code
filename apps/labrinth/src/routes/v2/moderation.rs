@@ -43,7 +43,8 @@ pub async fn get_projects(
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
-            let legacy_projects = LegacyProject::from_many(project, &**pool, &redis).await?;
+            let legacy_projects =
+                LegacyProject::from_many(project, &**pool, &redis).await?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),

@@ -19,7 +19,9 @@ pub struct V2Stats {
 }
 
 #[get("statistics")]
-pub async fn get_stats(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
+pub async fn get_stats(
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
     let response = v3::statistics::get_stats(pool)
         .await
         .or_else(v2_reroute::flatten_404_error)?;

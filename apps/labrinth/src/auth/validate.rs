@@ -21,10 +21,15 @@ where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     // Fetch DB user record and minos user from headers
-    let (scopes, db_user) =
-        get_user_record_from_bearer_token(req, None, executor, redis, session_queue)
-            .await?
-            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+    let (scopes, db_user) = get_user_record_from_bearer_token(
+        req,
+        None,
+        executor,
+        redis,
+        session_queue,
+    )
+    .await?
+    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
     let user = User::from_full(db_user);
 
@@ -58,31 +63,37 @@ where
     let possible_user = match token.split_once('_') {
         Some(("mrp", _)) => {
             let pat =
-                crate::database::models::pat_item::PersonalAccessToken::get(token, executor, redis)
-                    .await?
-                    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+                crate::database::models::pat_item::PersonalAccessToken::get(
+                    token, executor, redis,
+                )
+                .await?
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
             if pat.expires < Utc::now() {
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
-            let user = user_item::User::get_id(pat.user_id, executor, redis).await?;
+            let user =
+                user_item::User::get_id(pat.user_id, executor, redis).await?;
 
             session_queue.add_pat(pat.id).await;
 
             user.map(|x| (pat.scopes, x))
         }
         Some(("mra", _)) => {
-            let session =
-                crate::database::models::session_item::Session::get(token, executor, redis)
-                    .await?
-                    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+            let session = crate::database::models::session_item::Session::get(
+                token, executor, redis,
+            )
+            .await?
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
             if session.expires < Utc::now() {
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
-            let user = user_item::User::get_id(session.user_id, executor, redis).await?;
+            let user =
+                user_item::User::get_id(session.user_id, executor, redis)
+                    .await?;
 
             let rate_limit_ignore = dotenvy::var("RATE_LIMIT_IGNORE_KEY")?;
             if !req
@@ -111,7 +122,9 @@ where
                 return Err(AuthenticationError::InvalidCredentials);
             }
 
-            let user = user_item::User::get_id(access_token.user_id, executor, redis).await?;
+            let user =
+                user_item::User::get_id(access_token.user_id, executor, redis)
+                    .await?;
 
             session_queue.add_oauth_access_token(access_token.id).await;
 
@@ -119,7 +132,8 @@ where
         }
         Some(("github", _)) | Some(("gho", _)) | Some(("ghp", _)) => {
             let user = AuthProvider::GitHub.get_user(token).await?;
-            let id = AuthProvider::GitHub.get_user_id(&user.id, executor).await?;
+            let id =
+                AuthProvider::GitHub.get_user_id(&user.id, executor).await?;
 
             let user = user_item::User::get_id(
                 id.ok_or_else(|| AuthenticationError::InvalidCredentials)?,
@@ -135,7 +149,9 @@ where
     Ok(possible_user)
 }
 
-pub fn extract_authorization_header(req: &HttpRequest) -> Result<&str, AuthenticationError> {
+pub fn extract_authorization_header(
+    req: &HttpRequest,
+) -> Result<&str, AuthenticationError> {
     let headers = req.headers();
     let token_val: Option<&HeaderValue> = headers.get(AUTHORIZATION);
     token_val
@@ -154,9 +170,15 @@ pub async fn check_is_moderator_from_headers<'a, 'b, E>(
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
-    let user = get_user_from_headers(req, executor, redis, session_queue, required_scopes)
-        .await?
-        .1;
+    let user = get_user_from_headers(
+        req,
+        executor,
+        redis,
+        session_queue,
+        required_scopes,
+    )
+    .await?
+    .1;
 
     if user.role.is_mod() {
         Ok(user)

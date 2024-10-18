@@ -16,7 +16,9 @@ pub async fn read_from_payload(
             return Err(ApiError::InvalidInput(String::from(err_msg)));
         } else {
             bytes.extend_from_slice(&item.map_err(|_| {
-                ApiError::InvalidInput("Unable to parse bytes in payload sent!".to_string())
+                ApiError::InvalidInput(
+                    "Unable to parse bytes in payload sent!".to_string(),
+                )
             })?);
         }
     }

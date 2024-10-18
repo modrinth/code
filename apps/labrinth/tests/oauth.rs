@@ -3,7 +3,9 @@ use actix_web::test;
 use common::{
     api_v3::oauth::get_redirect_location_query_params,
     api_v3::{
-        oauth::{get_auth_code_from_redirect_params, get_authorize_accept_flow_id},
+        oauth::{
+            get_auth_code_from_redirect_params, get_authorize_accept_flow_id,
+        },
         ApiV3,
     },
     database::FRIEND_USER_ID,
@@ -81,7 +83,8 @@ async fn oauth_flow_happy_path() {
 #[actix_rt::test]
 async fn oauth_authorize_for_already_authorized_scopes_returns_auth_code() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let DummyOAuthClientAlpha { client_id, .. } = env.dummy.oauth_client_alpha;
+        let DummyOAuthClientAlpha { client_id, .. } =
+            env.dummy.oauth_client_alpha;
 
         let resp = env
             .api
@@ -131,7 +134,12 @@ async fn get_oauth_token_with_already_used_auth_code_fails() {
 
         let resp = env
             .api
-            .oauth_token(auth_code.clone(), None, client_id.clone(), &client_secret)
+            .oauth_token(
+                auth_code.clone(),
+                None,
+                client_id.clone(),
+                &client_secret,
+            )
             .await;
         assert_status!(&resp, StatusCode::OK);
 
@@ -211,7 +219,13 @@ async fn oauth_authorize_with_broader_scopes_requires_user_accept() {
         let client_id = env.dummy.oauth_client_alpha.client_id;
         let resp = env
             .api
-            .oauth_authorize(&client_id, Some("USER_READ"), None, None, USER_USER_PAT)
+            .oauth_authorize(
+                &client_id,
+                Some("USER_READ"),
+                None,
+                None,
+                USER_USER_PAT,
+            )
             .await;
         let flow_id = get_authorize_accept_flow_id(resp).await;
         env.api.oauth_accept(&flow_id, USER_USER_PAT).await;
@@ -289,8 +303,12 @@ async fn revoke_authorization_after_issuing_token_revokes_token() {
                 USER_USER_PAT,
             )
             .await;
-        env.assert_read_notifications_status(USER_USER_ID, Some(&access_token), StatusCode::OK)
-            .await;
+        env.assert_read_notifications_status(
+            USER_USER_ID,
+            Some(&access_token),
+            StatusCode::OK,
+        )
+        .await;
 
         let resp = env
             .api

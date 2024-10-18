@@ -1,4 +1,7 @@
-use super::{DatabaseError, OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId, UserId};
+use super::{
+    DatabaseError, OAuthAccessTokenId, OAuthClientAuthorizationId,
+    OAuthClientId, UserId,
+};
 use crate::models::pats::Scopes;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};

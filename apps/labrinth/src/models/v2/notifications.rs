@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::{
     ids::{
-        NotificationId, OrganizationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
-        UserId, VersionId,
+        NotificationId, OrganizationId, ProjectId, ReportId, TeamId, ThreadId,
+        ThreadMessageId, UserId, VersionId,
     },
     notifications::{Notification, NotificationAction, NotificationBody},
     projects::ProjectStatus,
@@ -78,11 +78,21 @@ pub enum LegacyNotificationBody {
 impl LegacyNotification {
     pub fn from(notification: Notification) -> Self {
         let type_ = match &notification.body {
-            NotificationBody::ProjectUpdate { .. } => Some("project_update".to_string()),
-            NotificationBody::TeamInvite { .. } => Some("team_invite".to_string()),
-            NotificationBody::OrganizationInvite { .. } => Some("organization_invite".to_string()),
-            NotificationBody::StatusChange { .. } => Some("status_change".to_string()),
-            NotificationBody::ModeratorMessage { .. } => Some("moderator_message".to_string()),
+            NotificationBody::ProjectUpdate { .. } => {
+                Some("project_update".to_string())
+            }
+            NotificationBody::TeamInvite { .. } => {
+                Some("team_invite".to_string())
+            }
+            NotificationBody::OrganizationInvite { .. } => {
+                Some("organization_invite".to_string())
+            }
+            NotificationBody::StatusChange { .. } => {
+                Some("status_change".to_string())
+            }
+            NotificationBody::ModeratorMessage { .. } => {
+                Some("moderator_message".to_string())
+            }
             NotificationBody::LegacyMarkdown {
                 notification_type, ..
             } => notification_type.clone(),

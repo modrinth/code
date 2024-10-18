@@ -135,7 +135,11 @@ impl User {
         User::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
+    pub async fn get_many<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
         users_strings: &[T],
         exec: E,
         redis: &RedisPool,
@@ -213,7 +217,10 @@ impl User {
         Ok(val)
     }
 
-    pub async fn get_email<'a, E>(email: &str, exec: E) -> Result<Option<UserId>, sqlx::Error>
+    pub async fn get_email<'a, E>(
+        email: &str,
+        exec: E,
+    ) -> Result<Option<UserId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -268,7 +275,12 @@ impl User {
         .await?;
 
         redis
-            .set_serialized_to_json(USERS_PROJECTS_NAMESPACE, user_id.0, &db_projects, None)
+            .set_serialized_to_json(
+                USERS_PROJECTS_NAMESPACE,
+                user_id.0,
+                &db_projects,
+                None,
+            )
             .await?;
 
         Ok(db_projects)
@@ -323,7 +335,10 @@ impl User {
         Ok(projects)
     }
 
-    pub async fn get_follows<'a, E>(user_id: UserId, exec: E) -> Result<Vec<ProjectId>, sqlx::Error>
+    pub async fn get_follows<'a, E>(
+        user_id: UserId,
+        exec: E,
+    ) -> Result<Vec<ProjectId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -344,7 +359,10 @@ impl User {
         Ok(projects)
     }
 
-    pub async fn get_reports<'a, E>(user_id: UserId, exec: E) -> Result<Vec<ReportId>, sqlx::Error>
+    pub async fn get_reports<'a, E>(
+        user_id: UserId,
+        exec: E,
+    ) -> Result<Vec<ReportId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -417,9 +435,9 @@ impl User {
 
         redis
             .delete_many(
-                user_ids
-                    .iter()
-                    .map(|id| (USERS_PROJECTS_NAMESPACE, Some(id.0.to_string()))),
+                user_ids.iter().map(|id| {
+                    (USERS_PROJECTS_NAMESPACE, Some(id.0.to_string()))
+                }),
             )
             .await?;
 
@@ -434,9 +452,11 @@ impl User {
         let user = Self::get_id(id, &mut **transaction, redis).await?;
 
         if let Some(delete_user) = user {
-            User::clear_caches(&[(id, Some(delete_user.username))], redis).await?;
+            User::clear_caches(&[(id, Some(delete_user.username))], redis)
+                .await?;
 
-            let deleted_user: UserId = crate::models::users::DELETED_USER.into();
+            let deleted_user: UserId =
+                crate::models::users::DELETED_USER.into();
 
             sqlx::query!(
                 "
@@ -509,7 +529,8 @@ impl User {
             .await?;
 
             for collection_id in user_collections {
-                models::Collection::remove(collection_id, transaction, redis).await?;
+                models::Collection::remove(collection_id, transaction, redis)
+                    .await?;
             }
 
             let report_threads = sqlx::query!(

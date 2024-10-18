@@ -13,6 +13,6 @@ pub async fn redis_execute<T>(
 where
     T: redis::FromRedisValue,
 {
-    let res = cmd.query_async::<_, T>(redis).await?;
+    let res = cmd.query_async::<T>(redis).await?;
     Ok(res)
 }

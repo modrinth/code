@@ -56,7 +56,11 @@ impl ApiV3 {
         test::read_body_json(resp).await
     }
 
-    pub async fn get_oauth_client(&self, client_id: String, pat: Option<&str>) -> ServiceResponse {
+    pub async fn get_oauth_client(
+        &self,
+        client_id: String,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/_internal/oauth/app/{}", client_id))
             .append_pat(pat)
@@ -83,7 +87,11 @@ impl ApiV3 {
         self.call(req).await
     }
 
-    pub async fn delete_oauth_client(&self, client_id: &str, pat: Option<&str>) -> ServiceResponse {
+    pub async fn delete_oauth_client(
+        &self,
+        client_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = TestRequest::delete()
             .uri(&format!("/_internal/oauth/app/{}", client_id))
             .append_pat(pat)

@@ -39,11 +39,16 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
                 Cors::default()
                     .allowed_origin_fn(|origin, _req_head| {
                         let allowed_origins =
-                            parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS").unwrap_or_default();
+                            parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS")
+                                .unwrap_or_default();
 
                         allowed_origins.contains(&"*".to_string())
-                            || allowed_origins
-                                .contains(&origin.to_str().unwrap_or_default().to_string())
+                            || allowed_origins.contains(
+                                &origin
+                                    .to_str()
+                                    .unwrap_or_default()
+                                    .to_string(),
+                            )
                     })
                     .allowed_methods(vec!["GET", "POST"])
                     .allowed_headers(vec![

@@ -53,16 +53,25 @@ pub async fn count_download(
         .find(|x| x.0.to_lowercase() == "authorization")
         .map(|x| &**x.1);
 
-    let user = get_user_record_from_bearer_token(&req, token, &**pool, &redis, &session_queue)
-        .await
-        .ok()
-        .flatten();
+    let user = get_user_record_from_bearer_token(
+        &req,
+        token,
+        &**pool,
+        &redis,
+        &session_queue,
+    )
+    .await
+    .ok()
+    .flatten();
 
-    let project_id: crate::database::models::ids::ProjectId = download_body.project_id.into();
+    let project_id: crate::database::models::ids::ProjectId =
+        download_body.project_id.into();
 
-    let id_option = crate::models::ids::base62_impl::parse_base62(&download_body.version_name)
-        .ok()
-        .map(|x| x as i64);
+    let id_option = crate::models::ids::base62_impl::parse_base62(
+        &download_body.version_name,
+    )
+    .ok()
+    .map(|x| x as i64);
 
     let (version_id, project_id) = if let Some(version) = sqlx::query!(
         "
@@ -95,8 +104,9 @@ pub async fn count_download(
         ));
     };
 
-    let url = url::Url::parse(&download_body.url)
-        .map_err(|_| ApiError::InvalidInput("invalid download URL specified!".to_string()))?;
+    let url = url::Url::parse(&download_body.url).map_err(|_| {
+        ApiError::InvalidInput("invalid download URL specified!".to_string())
+    })?;
 
     let ip = crate::routes::analytics::convert_to_ip_v6(&download_body.ip)
         .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
@@ -127,7 +137,10 @@ pub async fn count_download(
             .headers
             .clone()
             .into_iter()
-            .filter(|x| !crate::routes::analytics::FILTERED_HEADERS.contains(&&*x.0.to_lowercase()))
+            .filter(|x| {
+                !crate::routes::analytics::FILTERED_HEADERS
+                    .contains(&&*x.0.to_lowercase())
+            })
             .collect(),
     });
 

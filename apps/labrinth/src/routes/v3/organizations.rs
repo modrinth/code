@@ -4,7 +4,9 @@ use std::sync::Arc;
 use super::ApiError;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::team_item::TeamMember;
-use crate::database::models::{generate_organization_id, team_item, Organization};
+use crate::database::models::{
+    generate_organization_id, team_item, Organization,
+};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::base62_impl::parse_base62;
@@ -83,10 +85,16 @@ pub async fn organization_projects_get(
     .try_collect::<Vec<database::models::ProjectId>>()
     .await?;
 
-    let projects_data =
-        crate::database::models::Project::get_many_ids(&project_ids, &**pool, &redis).await?;
+    let projects_data = crate::database::models::Project::get_many_ids(
+        &project_ids,
+        &**pool,
+        &redis,
+    )
+    .await?;
 
-    let projects = filter_visible_projects(projects_data, &current_user, &pool, true).await?;
+    let projects =
+        filter_visible_projects(projects_data, &current_user, &pool, true)
+            .await?;
     Ok(HttpResponse::Ok().json(projects))
 }
 
@@ -121,9 +129,9 @@ pub async fn organization_create(
     .await?
     .1;
 
-    new_organization
-        .validate()
-        .map_err(|err| CreateError::ValidationError(validation_errors_to_string(err, None)))?;
+    new_organization.validate().map_err(|err| {
+        CreateError::ValidationError(validation_errors_to_string(err, None))
+    })?;
 
     let mut transaction = pool.begin().await?;
 
@@ -135,7 +143,12 @@ pub async fn organization_create(
         organization_strings.push(name_organization_id.to_string());
     }
     organization_strings.push(new_organization.slug.clone());
-    let results = Organization::get_many(&organization_strings, &mut *transaction, &redis).await?;
+    let results = Organization::get_many(
+        &organization_strings,
+        &mut *transaction,
+        &redis,
+    )
+    .await?;
     if !results.is_empty() {
         return Err(CreateError::SlugCollision);
     }
@@ -188,7 +201,8 @@ pub async fn organization_create(
         ));
     };
 
-    let organization = models::organizations::Organization::from(organization, members_data);
+    let organization =
+        models::organizations::Organization::from(organization, members_data);
 
     Ok(HttpResponse::Ok().json(organization))
 }
@@ -215,7 +229,9 @@ pub async fn organization_get(
 
     let organization_data = Organization::get(&id, &**pool, &redis).await?;
     if let Some(data) = organization_data {
-        let members_data = TeamMember::get_from_team_full(data.team_id, &**pool, &redis).await?;
+        let members_data =
+            TeamMember::get_from_team_full(data.team_id, &**pool, &redis)
+                .await?;
 
         let users = crate::database::models::User::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
@@ -237,17 +253,24 @@ pub async fn organization_get(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| y == x.user_id)
+                        .map(|y: crate::database::models::UserId| {
+                            y == x.user_id
+                        })
                         .unwrap_or(false)
             })
             .flat_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
-                    crate::models::teams::TeamMember::from(data, user.clone(), !logged_in)
+                    crate::models::teams::TeamMember::from(
+                        data,
+                        user.clone(),
+                        !logged_in,
+                    )
                 })
             })
             .collect();
 
-        let organization = models::organizations::Organization::from(data, team_members);
+        let organization =
+            models::organizations::Organization::from(data, team_members);
         return Ok(HttpResponse::Ok().json(organization));
     }
     Err(ApiError::NotFound)
@@ -266,13 +289,15 @@ pub async fn organizations_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
-    let organizations_data = Organization::get_many(&ids, &**pool, &redis).await?;
+    let organizations_data =
+        Organization::get_many(&ids, &**pool, &redis).await?;
     let team_ids = organizations_data
         .iter()
         .map(|x| x.team_id)
         .collect::<Vec<_>>();
 
-    let teams_data = TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
+    let teams_data =
+        TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
     let users = crate::database::models::User::get_many_ids(
         &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
         &**pool,
@@ -316,17 +341,24 @@ pub async fn organizations_get(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| y == x.user_id)
+                        .map(|y: crate::database::models::UserId| {
+                            y == x.user_id
+                        })
                         .unwrap_or(false)
             })
             .flat_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
-                    crate::models::teams::TeamMember::from(data, user.clone(), !logged_in)
+                    crate::models::teams::TeamMember::from(
+                        data,
+                        user.clone(),
+                        !logged_in,
+                    )
                 })
             })
             .collect();
 
-        let organization = models::organizations::Organization::from(data, team_members);
+        let organization =
+            models::organizations::Organization::from(data, team_members);
         organizations.push(organization);
     }
 
@@ -364,12 +396,13 @@ pub async fn organizations_edit(
     .await?
     .1;
 
-    new_organization
-        .validate()
-        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
+    new_organization.validate().map_err(|err| {
+        ApiError::Validation(validation_errors_to_string(err, None))
+    })?;
 
     let string = info.into_inner().0;
-    let result = database::models::Organization::get(&string, &**pool, &redis).await?;
+    let result =
+        database::models::Organization::get(&string, &**pool, &redis).await?;
     if let Some(organization_item) = result {
         let id = organization_item.id;
 
@@ -380,8 +413,10 @@ pub async fn organizations_edit(
         )
         .await?;
 
-        let permissions =
-            OrganizationPermissions::get_permissions_by_role(&user.role, &team_member);
+        let permissions = OrganizationPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+        );
 
         if let Some(perms) = permissions {
             let mut transaction = pool.begin().await?;
@@ -433,8 +468,10 @@ pub async fn organizations_edit(
                     ));
                 }
 
-                let name_organization_id_option: Option<u64> = parse_base62(slug).ok();
-                if let Some(name_organization_id) = name_organization_id_option {
+                let name_organization_id_option: Option<u64> =
+                    parse_base62(slug).ok();
+                if let Some(name_organization_id) = name_organization_id_option
+                {
                     let results = sqlx::query!(
                         "
                         SELECT EXISTS(SELECT 1 FROM organizations WHERE id=$1)
@@ -446,7 +483,8 @@ pub async fn organizations_edit(
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::InvalidInput(
-                            "slug collides with other organization's id!".to_string(),
+                            "slug collides with other organization's id!"
+                                .to_string(),
                         ));
                     }
                 }
@@ -465,7 +503,8 @@ pub async fn organizations_edit(
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::InvalidInput(
-                            "slug collides with other organization's id!".to_string(),
+                            "slug collides with other organization's id!"
+                                .to_string(),
                         ));
                     }
                 }
@@ -494,7 +533,8 @@ pub async fn organizations_edit(
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this organization!".to_string(),
+                "You do not have permission to edit this organization!"
+                    .to_string(),
             ))
         }
     } else {
@@ -520,32 +560,41 @@ pub async fn organization_delete(
     .1;
     let string = info.into_inner().0;
 
-    let organization = database::models::Organization::get(&string, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified organization does not exist!".to_string())
-        })?;
+    let organization =
+        database::models::Organization::get(&string, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "The specified organization does not exist!".to_string(),
+                )
+            })?;
 
     if !user.role.is_admin() {
-        let team_member = database::models::TeamMember::get_from_user_id_organization(
-            organization.id,
-            user.id.into(),
-            false,
-            &**pool,
-        )
-        .await
-        .map_err(ApiError::Database)?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified organization does not exist!".to_string())
-        })?;
+        let team_member =
+            database::models::TeamMember::get_from_user_id_organization(
+                organization.id,
+                user.id.into(),
+                false,
+                &**pool,
+            )
+            .await
+            .map_err(ApiError::Database)?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "The specified organization does not exist!".to_string(),
+                )
+            })?;
 
-        let permissions =
-            OrganizationPermissions::get_permissions_by_role(&user.role, &Some(team_member))
-                .unwrap_or_default();
+        let permissions = OrganizationPermissions::get_permissions_by_role(
+            &user.role,
+            &Some(team_member),
+        )
+        .unwrap_or_default();
 
         if !permissions.contains(OrganizationPermissions::DELETE_ORGANIZATION) {
             return Err(ApiError::CustomAuthentication(
-                "You don't have permission to delete this organization!".to_string(),
+                "You don't have permission to delete this organization!"
+                    .to_string(),
             ));
         }
     }
@@ -582,8 +631,10 @@ pub async fn organization_delete(
     .await?;
 
     for organization_project_team in organization_project_teams.iter() {
-        let new_id =
-            crate::database::models::ids::generate_team_member_id(&mut transaction).await?;
+        let new_id = crate::database::models::ids::generate_team_member_id(
+            &mut transaction,
+        )
+        .await?;
         let member = TeamMember {
             id: new_id,
             team_id: *organization_project_team,
@@ -599,13 +650,21 @@ pub async fn organization_delete(
         member.insert(&mut transaction).await?;
     }
     // Safely remove the organization
-    let result =
-        database::models::Organization::remove(organization.id, &mut transaction, &redis).await?;
+    let result = database::models::Organization::remove(
+        organization.id,
+        &mut transaction,
+        &redis,
+    )
+    .await?;
 
     transaction.commit().await?;
 
-    database::models::Organization::clear_cache(organization.id, Some(organization.slug), &redis)
-        .await?;
+    database::models::Organization::clear_cache(
+        organization.id,
+        Some(organization.slug),
+        &redis,
+    )
+    .await?;
 
     for team_id in organization_project_teams {
         database::models::TeamMember::clear_cache(team_id, &redis).await?;
@@ -641,41 +700,59 @@ pub async fn organization_projects_add(
     .await?
     .1;
 
-    let organization = database::models::Organization::get(&info, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified organization does not exist!".to_string())
-        })?;
+    let organization =
+        database::models::Organization::get(&info, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "The specified organization does not exist!".to_string(),
+                )
+            })?;
 
-    let project_item = database::models::Project::get(&project_info.project_id, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified project does not exist!".to_string())
-        })?;
-    if project_item.inner.organization_id.is_some() {
-        return Err(ApiError::InvalidInput(
-            "The specified project is already owned by an organization!".to_string(),
-        ));
-    }
-
-    let project_team_member = database::models::TeamMember::get_from_user_id_project(
-        project_item.inner.id,
-        current_user.id.into(),
-        false,
+    let project_item = database::models::Project::get(
+        &project_info.project_id,
         &**pool,
-    )
-    .await?
-    .ok_or_else(|| ApiError::InvalidInput("You are not a member of this project!".to_string()))?;
-    let organization_team_member = database::models::TeamMember::get_from_user_id_organization(
-        organization.id,
-        current_user.id.into(),
-        false,
-        &**pool,
+        &redis,
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInput("You are not a member of this organization!".to_string())
+        ApiError::InvalidInput(
+            "The specified project does not exist!".to_string(),
+        )
     })?;
+    if project_item.inner.organization_id.is_some() {
+        return Err(ApiError::InvalidInput(
+            "The specified project is already owned by an organization!"
+                .to_string(),
+        ));
+    }
+
+    let project_team_member =
+        database::models::TeamMember::get_from_user_id_project(
+            project_item.inner.id,
+            current_user.id.into(),
+            false,
+            &**pool,
+        )
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "You are not a member of this project!".to_string(),
+            )
+        })?;
+    let organization_team_member =
+        database::models::TeamMember::get_from_user_id_organization(
+            organization.id,
+            current_user.id.into(),
+            false,
+            &**pool,
+        )
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "You are not a member of this organization!".to_string(),
+            )
+        })?;
 
     // Require ownership of a project to add it to an organization
     if !current_user.role.is_admin() && !project_team_member.is_owner {
@@ -734,8 +811,16 @@ pub async fn organization_projects_add(
 
         transaction.commit().await?;
 
-        database::models::User::clear_project_cache(&[current_user.id.into()], &redis).await?;
-        database::models::TeamMember::clear_cache(project_item.inner.team_id, &redis).await?;
+        database::models::User::clear_project_cache(
+            &[current_user.id.into()],
+            &redis,
+        )
+        .await?;
+        database::models::TeamMember::clear_cache(
+            project_item.inner.team_id,
+            &redis,
+        )
+        .await?;
         database::models::Project::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
@@ -745,7 +830,8 @@ pub async fn organization_projects_add(
         .await?;
     } else {
         return Err(ApiError::CustomAuthentication(
-            "You do not have permission to add projects to this organization!".to_string(),
+            "You do not have permission to add projects to this organization!"
+                .to_string(),
         ));
     }
     Ok(HttpResponse::Ok().finish())
@@ -777,17 +863,23 @@ pub async fn organization_projects_remove(
     .await?
     .1;
 
-    let organization = database::models::Organization::get(&organization_id, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified organization does not exist!".to_string())
-        })?;
+    let organization =
+        database::models::Organization::get(&organization_id, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "The specified organization does not exist!".to_string(),
+                )
+            })?;
 
-    let project_item = database::models::Project::get(&project_id, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified project does not exist!".to_string())
-        })?;
+    let project_item =
+        database::models::Project::get(&project_id, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "The specified project does not exist!".to_string(),
+                )
+            })?;
 
     if !project_item
         .inner
@@ -795,20 +887,24 @@ pub async fn organization_projects_remove(
         .eq(&Some(organization.id))
     {
         return Err(ApiError::InvalidInput(
-            "The specified project is not owned by this organization!".to_string(),
+            "The specified project is not owned by this organization!"
+                .to_string(),
         ));
     }
 
-    let organization_team_member = database::models::TeamMember::get_from_user_id_organization(
-        organization.id,
-        current_user.id.into(),
-        false,
-        &**pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput("You are not a member of this organization!".to_string())
-    })?;
+    let organization_team_member =
+        database::models::TeamMember::get_from_user_id_organization(
+            organization.id,
+            current_user.id.into(),
+            false,
+            &**pool,
+        )
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "You are not a member of this organization!".to_string(),
+            )
+        })?;
 
     let permissions = OrganizationPermissions::get_permissions_by_role(
         &current_user.role,
@@ -826,7 +922,8 @@ pub async fn organization_projects_remove(
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
-                "The specified user is not a member of this organization!".to_string(),
+                "The specified user is not a member of this organization!"
+                    .to_string(),
             )
         })?;
 
@@ -847,7 +944,10 @@ pub async fn organization_projects_remove(
             Some(new_owner) => new_owner,
             None => {
                 let new_id =
-                    crate::database::models::ids::generate_team_member_id(&mut transaction).await?;
+                    crate::database::models::ids::generate_team_member_id(
+                        &mut transaction,
+                    )
+                    .await?;
                 let member = TeamMember {
                     id: new_id,
                     team_id: project_item.inner.team_id,
@@ -895,8 +995,16 @@ pub async fn organization_projects_remove(
         .await?;
 
         transaction.commit().await?;
-        database::models::User::clear_project_cache(&[current_user.id.into()], &redis).await?;
-        database::models::TeamMember::clear_cache(project_item.inner.team_id, &redis).await?;
+        database::models::User::clear_project_cache(
+            &[current_user.id.into()],
+            &redis,
+        )
+        .await?;
+        database::models::TeamMember::clear_cache(
+            project_item.inner.team_id,
+            &redis,
+        )
+        .await?;
         database::models::Project::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
@@ -906,7 +1014,8 @@ pub async fn organization_projects_remove(
         .await?;
     } else {
         return Err(ApiError::CustomAuthentication(
-            "You do not have permission to add projects to this organization!".to_string(),
+            "You do not have permission to add projects to this organization!"
+                .to_string(),
         ));
     }
     Ok(HttpResponse::Ok().finish())
@@ -939,11 +1048,14 @@ pub async fn organization_icon_edit(
     .1;
     let string = info.into_inner().0;
 
-    let organization_item = database::models::Organization::get(&string, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified organization does not exist!".to_string())
-        })?;
+    let organization_item =
+        database::models::Organization::get(&string, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "The specified organization does not exist!".to_string(),
+                )
+            })?;
 
     if !user.role.is_mod() {
         let team_member = database::models::TeamMember::get_from_user_id(
@@ -954,13 +1066,16 @@ pub async fn organization_icon_edit(
         .await
         .map_err(ApiError::Database)?;
 
-        let permissions =
-            OrganizationPermissions::get_permissions_by_role(&user.role, &team_member)
-                .unwrap_or_default();
+        let permissions = OrganizationPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+        )
+        .unwrap_or_default();
 
         if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
             return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this organization's icon.".to_string(),
+                "You don't have permission to edit this organization's icon."
+                    .to_string(),
             ));
         }
     }
@@ -972,8 +1087,12 @@ pub async fn organization_icon_edit(
     )
     .await?;
 
-    let bytes =
-        read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
+    let bytes = read_from_payload(
+        &mut payload,
+        262144,
+        "Icons must be smaller than 256KiB",
+    )
+    .await?;
 
     let organization_id: OrganizationId = organization_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(
@@ -1032,11 +1151,14 @@ pub async fn delete_organization_icon(
     .1;
     let string = info.into_inner().0;
 
-    let organization_item = database::models::Organization::get(&string, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified organization does not exist!".to_string())
-        })?;
+    let organization_item =
+        database::models::Organization::get(&string, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "The specified organization does not exist!".to_string(),
+                )
+            })?;
 
     if !user.role.is_mod() {
         let team_member = database::models::TeamMember::get_from_user_id(
@@ -1047,13 +1169,16 @@ pub async fn delete_organization_icon(
         .await
         .map_err(ApiError::Database)?;
 
-        let permissions =
-            OrganizationPermissions::get_permissions_by_role(&user.role, &team_member)
-                .unwrap_or_default();
+        let permissions = OrganizationPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+        )
+        .unwrap_or_default();
 
         if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
             return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this organization's icon.".to_string(),
+                "You don't have permission to edit this organization's icon."
+                    .to_string(),
             ));
         }
     }

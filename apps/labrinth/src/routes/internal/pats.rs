@@ -44,15 +44,17 @@ pub async fn get_pats(
     .await?
     .1;
 
-    let pat_ids = database::models::pat_item::PersonalAccessToken::get_user_pats(
-        user.id.into(),
-        &**pool,
-        &redis,
+    let pat_ids =
+        database::models::pat_item::PersonalAccessToken::get_user_pats(
+            user.id.into(),
+            &**pool,
+            &redis,
+        )
+        .await?;
+    let pats = database::models::pat_item::PersonalAccessToken::get_many_ids(
+        &pat_ids, &**pool, &redis,
     )
     .await?;
-    let pats =
-        database::models::pat_item::PersonalAccessToken::get_many_ids(&pat_ids, &**pool, &redis)
-            .await?;
 
     Ok(HttpResponse::Ok().json(
         pats.into_iter()
@@ -77,9 +79,9 @@ pub async fn create_pat(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    info.0
-        .validate()
-        .map_err(|err| ApiError::InvalidInput(validation_errors_to_string(err, None)))?;
+    info.0.validate().map_err(|err| {
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
 
     if info.scopes.is_restricted() {
         return Err(ApiError::InvalidInput(
@@ -174,7 +176,10 @@ pub async fn edit_pat(
     .1;
 
     let id = id.into_inner().0;
-    let pat = database::models::pat_item::PersonalAccessToken::get(&id, &**pool, &redis).await?;
+    let pat = database::models::pat_item::PersonalAccessToken::get(
+        &id, &**pool, &redis,
+    )
+    .await?;
 
     if let Some(pat) = pat {
         if pat.user_id == user.id.into() {
@@ -262,13 +267,19 @@ pub async fn delete_pat(
     .await?
     .1;
     let id = id.into_inner().0;
-    let pat = database::models::pat_item::PersonalAccessToken::get(&id, &**pool, &redis).await?;
+    let pat = database::models::pat_item::PersonalAccessToken::get(
+        &id, &**pool, &redis,
+    )
+    .await?;
 
     if let Some(pat) = pat {
         if pat.user_id == user.id.into() {
             let mut transaction = pool.begin().await?;
-            database::models::pat_item::PersonalAccessToken::remove(pat.id, &mut transaction)
-                .await?;
+            database::models::pat_item::PersonalAccessToken::remove(
+                pat.id,
+                &mut transaction,
+            )
+            .await?;
             transaction.commit().await?;
             database::models::pat_item::PersonalAccessToken::clear_cache(
                 vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],

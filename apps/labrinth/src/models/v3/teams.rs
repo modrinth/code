@@ -118,7 +118,8 @@ impl OrganizationPermissions {
         }
         if role.is_mod() {
             return Some(
-                OrganizationPermissions::EDIT_DETAILS | OrganizationPermissions::ADD_PROJECT,
+                OrganizationPermissions::EDIT_DETAILS
+                    | OrganizationPermissions::ADD_PROJECT,
             );
         }
         None

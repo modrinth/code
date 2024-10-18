@@ -32,7 +32,8 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         Arc::new(file_hosting::MockHost::new());
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
-    let maxmind_reader = Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
+    let maxmind_reader =
+        Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
 
     labrinth::app_setup(
         pool.clone(),

@@ -4,10 +4,14 @@ use common::api_v3::ApiV3;
 use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
 
-use common::environment::{with_test_environment, with_test_environment_all, TestEnvironment};
+use common::environment::{
+    with_test_environment, with_test_environment_all, TestEnvironment,
+};
 use common::permissions::{PermissionsTest, PermissionsTestContext};
 use futures::StreamExt;
-use labrinth::database::models::project_item::{PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE};
+use labrinth::database::models::project_item::{
+    PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
+};
 use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::projects::ProjectId;
 use labrinth::models::teams::ProjectPermissions;
@@ -18,7 +22,8 @@ use crate::common::api_common::models::{CommonItemType, CommonProject};
 use crate::common::api_common::request_data::ProjectCreationRequestData;
 use crate::common::api_common::{ApiProject, ApiTeams, ApiVersion};
 use crate::common::dummy_data::{
-    DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta, TestFile,
+    DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta,
+    TestFile,
 };
 mod common;
 
@@ -68,7 +73,8 @@ async fn test_get_project() {
             .await
             .unwrap()
             .unwrap();
-        let cached_project: serde_json::Value = serde_json::from_str(&cached_project).unwrap();
+        let cached_project: serde_json::Value =
+            serde_json::from_str(&cached_project).unwrap();
         assert_eq!(
             cached_project["val"]["inner"]["slug"],
             json!(alpha_project_slug)
@@ -96,394 +102,426 @@ async fn test_get_project() {
 #[actix_rt::test]
 async fn test_add_remove_project() {
     // Test setup and dummy data
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
 
-        // Generate test project data.
-        let mut json_data = api
-            .get_public_project_creation_data_json("demo", Some(&TestFile::BasicMod))
-            .await;
+            // Generate test project data.
+            let mut json_data = api
+                .get_public_project_creation_data_json(
+                    "demo",
+                    Some(&TestFile::BasicMod),
+                )
+                .await;
 
-        // Basic json
-        let json_segment = MultipartSegment {
-            name: "data".to_string(),
-            filename: None,
-            content_type: Some("application/json".to_string()),
-            data: MultipartSegmentData::Text(serde_json::to_string(&json_data).unwrap()),
-        };
+            // Basic json
+            let json_segment = MultipartSegment {
+                name: "data".to_string(),
+                filename: None,
+                content_type: Some("application/json".to_string()),
+                data: MultipartSegmentData::Text(
+                    serde_json::to_string(&json_data).unwrap(),
+                ),
+            };
 
-        // Basic json, with a different file
-        json_data["initial_versions"][0]["file_parts"][0] = json!("basic-mod-different.jar");
-        let json_diff_file_segment = MultipartSegment {
-            data: MultipartSegmentData::Text(serde_json::to_string(&json_data).unwrap()),
-            ..json_segment.clone()
-        };
+            // Basic json, with a different file
+            json_data["initial_versions"][0]["file_parts"][0] =
+                json!("basic-mod-different.jar");
+            let json_diff_file_segment = MultipartSegment {
+                data: MultipartSegmentData::Text(
+                    serde_json::to_string(&json_data).unwrap(),
+                ),
+                ..json_segment.clone()
+            };
 
-        // Basic json, with a different file, and a different slug
-        json_data["slug"] = json!("new_demo");
-        json_data["initial_versions"][0]["file_parts"][0] = json!("basic-mod-different.jar");
-        let json_diff_slug_file_segment = MultipartSegment {
-            data: MultipartSegmentData::Text(serde_json::to_string(&json_data).unwrap()),
-            ..json_segment.clone()
-        };
+            // Basic json, with a different file, and a different slug
+            json_data["slug"] = json!("new_demo");
+            json_data["initial_versions"][0]["file_parts"][0] =
+                json!("basic-mod-different.jar");
+            let json_diff_slug_file_segment = MultipartSegment {
+                data: MultipartSegmentData::Text(
+                    serde_json::to_string(&json_data).unwrap(),
+                ),
+                ..json_segment.clone()
+            };
 
-        let basic_mod_file = TestFile::BasicMod;
-        let basic_mod_different_file = TestFile::BasicModDifferent;
+            let basic_mod_file = TestFile::BasicMod;
+            let basic_mod_different_file = TestFile::BasicModDifferent;
 
-        // Basic file
-        let file_segment = MultipartSegment {
-            // 'Basic'
-            name: basic_mod_file.filename(),
-            filename: Some(basic_mod_file.filename()),
-            content_type: basic_mod_file.content_type(),
-            data: MultipartSegmentData::Binary(basic_mod_file.bytes()),
-        };
+            // Basic file
+            let file_segment = MultipartSegment {
+                // 'Basic'
+                name: basic_mod_file.filename(),
+                filename: Some(basic_mod_file.filename()),
+                content_type: basic_mod_file.content_type(),
+                data: MultipartSegmentData::Binary(basic_mod_file.bytes()),
+            };
 
-        // Differently named file, with the SAME content (for hash testing)
-        let file_diff_name_segment = MultipartSegment {
-            // 'Different'
-            name: basic_mod_different_file.filename(),
-            filename: Some(basic_mod_different_file.filename()),
-            content_type: basic_mod_different_file.content_type(),
-            // 'Basic'
-            data: MultipartSegmentData::Binary(basic_mod_file.bytes()),
-        };
+            // Differently named file, with the SAME content (for hash testing)
+            let file_diff_name_segment = MultipartSegment {
+                // 'Different'
+                name: basic_mod_different_file.filename(),
+                filename: Some(basic_mod_different_file.filename()),
+                content_type: basic_mod_different_file.content_type(),
+                // 'Basic'
+                data: MultipartSegmentData::Binary(basic_mod_file.bytes()),
+            };
 
-        // Differently named file, with different content
-        let file_diff_name_content_segment = MultipartSegment {
-            // 'Different'
-            name: basic_mod_different_file.filename(),
-            filename: Some(basic_mod_different_file.filename()),
-            content_type: basic_mod_different_file.content_type(),
-            data: MultipartSegmentData::Binary(basic_mod_different_file.bytes()),
-        };
+            // Differently named file, with different content
+            let file_diff_name_content_segment = MultipartSegment {
+                // 'Different'
+                name: basic_mod_different_file.filename(),
+                filename: Some(basic_mod_different_file.filename()),
+                content_type: basic_mod_different_file.content_type(),
+                data: MultipartSegmentData::Binary(
+                    basic_mod_different_file.bytes(),
+                ),
+            };
 
-        // Add a project- simple, should work.
-        let resp = api
-            .create_project(
-                ProjectCreationRequestData {
-                    slug: "demo".to_string(),
-                    segment_data: vec![json_segment.clone(), file_segment.clone()],
-                    jar: None, // File not needed at this point
-                },
-                USER_USER_PAT,
-            )
-            .await;
+            // Add a project- simple, should work.
+            let resp = api
+                .create_project(
+                    ProjectCreationRequestData {
+                        slug: "demo".to_string(),
+                        segment_data: vec![
+                            json_segment.clone(),
+                            file_segment.clone(),
+                        ],
+                        jar: None, // File not needed at this point
+                    },
+                    USER_USER_PAT,
+                )
+                .await;
 
-        assert_status!(&resp, StatusCode::OK);
+            assert_status!(&resp, StatusCode::OK);
 
-        // Get the project we just made, and confirm that it's correct
-        let project = api
-            .get_project_deserialized_common("demo", USER_USER_PAT)
-            .await;
-        assert!(project.versions.len() == 1);
-        let uploaded_version_id = project.versions[0];
+            // Get the project we just made, and confirm that it's correct
+            let project = api
+                .get_project_deserialized_common("demo", USER_USER_PAT)
+                .await;
+            assert!(project.versions.len() == 1);
+            let uploaded_version_id = project.versions[0];
 
-        // Checks files to ensure they were uploaded and correctly identify the file
-        let hash = sha1::Sha1::from(basic_mod_file.bytes())
-            .digest()
-            .to_string();
-        let version = api
-            .get_version_from_hash_deserialized_common(&hash, "sha1", USER_USER_PAT)
-            .await;
-        assert_eq!(version.id, uploaded_version_id);
+            // Checks files to ensure they were uploaded and correctly identify the file
+            let hash = sha1::Sha1::from(basic_mod_file.bytes())
+                .digest()
+                .to_string();
+            let version = api
+                .get_version_from_hash_deserialized_common(
+                    &hash,
+                    "sha1",
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_eq!(version.id, uploaded_version_id);
 
-        // Reusing with a different slug and the same file should fail
-        // Even if that file is named differently
-        let resp = api
-            .create_project(
-                ProjectCreationRequestData {
-                    slug: "demo".to_string(),
-                    segment_data: vec![
-                        json_diff_slug_file_segment.clone(),
-                        file_diff_name_segment.clone(),
-                    ],
-                    jar: None, // File not needed at this point
-                },
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::BAD_REQUEST);
+            // Reusing with a different slug and the same file should fail
+            // Even if that file is named differently
+            let resp = api
+                .create_project(
+                    ProjectCreationRequestData {
+                        slug: "demo".to_string(),
+                        segment_data: vec![
+                            json_diff_slug_file_segment.clone(),
+                            file_diff_name_segment.clone(),
+                        ],
+                        jar: None, // File not needed at this point
+                    },
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::BAD_REQUEST);
 
-        // Reusing with the same slug and a different file should fail
-        let resp = api
-            .create_project(
-                ProjectCreationRequestData {
-                    slug: "demo".to_string(),
-                    segment_data: vec![
-                        json_diff_file_segment.clone(),
-                        file_diff_name_content_segment.clone(),
-                    ],
-                    jar: None, // File not needed at this point
-                },
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::BAD_REQUEST);
+            // Reusing with the same slug and a different file should fail
+            let resp = api
+                .create_project(
+                    ProjectCreationRequestData {
+                        slug: "demo".to_string(),
+                        segment_data: vec![
+                            json_diff_file_segment.clone(),
+                            file_diff_name_content_segment.clone(),
+                        ],
+                        jar: None, // File not needed at this point
+                    },
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::BAD_REQUEST);
 
-        // Different slug, different file should succeed
-        let resp = api
-            .create_project(
-                ProjectCreationRequestData {
-                    slug: "demo".to_string(),
-                    segment_data: vec![
-                        json_diff_slug_file_segment.clone(),
-                        file_diff_name_content_segment.clone(),
-                    ],
-                    jar: None, // File not needed at this point
-                },
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::OK);
+            // Different slug, different file should succeed
+            let resp = api
+                .create_project(
+                    ProjectCreationRequestData {
+                        slug: "demo".to_string(),
+                        segment_data: vec![
+                            json_diff_slug_file_segment.clone(),
+                            file_diff_name_content_segment.clone(),
+                        ],
+                        jar: None, // File not needed at this point
+                    },
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::OK);
 
-        // Get
-        let project = api
-            .get_project_deserialized_common("demo", USER_USER_PAT)
-            .await;
-        let id = project.id.to_string();
+            // Get
+            let project = api
+                .get_project_deserialized_common("demo", USER_USER_PAT)
+                .await;
+            let id = project.id.to_string();
 
-        // Remove the project
-        let resp = test_env.api.remove_project("demo", USER_USER_PAT).await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // Remove the project
+            let resp = test_env.api.remove_project("demo", USER_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        // Confirm that the project is gone from the cache
-        let mut redis_pool = test_env.db.redis_pool.connect().await.unwrap();
-        assert_eq!(
-            redis_pool
-                .get(PROJECTS_SLUGS_NAMESPACE, "demo")
-                .await
-                .unwrap()
-                .and_then(|x| x.parse::<i64>().ok()),
-            None
-        );
-        assert_eq!(
-            redis_pool
-                .get(PROJECTS_SLUGS_NAMESPACE, &id)
-                .await
-                .unwrap()
-                .and_then(|x| x.parse::<i64>().ok()),
-            None
-        );
+            // Confirm that the project is gone from the cache
+            let mut redis_pool =
+                test_env.db.redis_pool.connect().await.unwrap();
+            assert_eq!(
+                redis_pool
+                    .get(PROJECTS_SLUGS_NAMESPACE, "demo")
+                    .await
+                    .unwrap()
+                    .and_then(|x| x.parse::<i64>().ok()),
+                None
+            );
+            assert_eq!(
+                redis_pool
+                    .get(PROJECTS_SLUGS_NAMESPACE, &id)
+                    .await
+                    .unwrap()
+                    .and_then(|x| x.parse::<i64>().ok()),
+                None
+            );
 
-        // Old slug no longer works
-        let resp = api.get_project("demo", USER_USER_PAT).await;
-        assert_status!(&resp, StatusCode::NOT_FOUND);
-    })
+            // Old slug no longer works
+            let resp = api.get_project("demo", USER_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NOT_FOUND);
+        },
+    )
     .await;
 }
 
 #[actix_rt::test]
 pub async fn test_patch_project() {
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
 
-        let alpha_project_slug = &test_env.dummy.project_alpha.project_slug;
-        let beta_project_slug = &test_env.dummy.project_beta.project_slug;
+            let alpha_project_slug = &test_env.dummy.project_alpha.project_slug;
+            let beta_project_slug = &test_env.dummy.project_beta.project_slug;
 
-        // First, we do some patch requests that should fail.
-        // Failure because the user is not authorized.
-        let resp = api
-            .edit_project(
-                alpha_project_slug,
-                json!({
-                    "name": "Test_Add_Project project - test 1",
-                }),
-                ENEMY_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::UNAUTHORIZED);
-
-        // Failure because we are setting URL fields to invalid urls.
-        for url_type in ["issues", "source", "wiki", "discord"] {
+            // First, we do some patch requests that should fail.
+            // Failure because the user is not authorized.
             let resp = api
                 .edit_project(
                     alpha_project_slug,
                     json!({
-                        "link_urls": {
-                            url_type: "not a url",
-                        },
+                        "name": "Test_Add_Project project - test 1",
                     }),
-                    USER_USER_PAT,
+                    ENEMY_USER_PAT,
                 )
                 .await;
-            assert_status!(&resp, StatusCode::BAD_REQUEST);
-        }
+            assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
-        // Failure because these are illegal requested statuses for a normal user.
-        for req in ["unknown", "processing", "withheld", "scheduled"] {
+            // Failure because we are setting URL fields to invalid urls.
+            for url_type in ["issues", "source", "wiki", "discord"] {
+                let resp = api
+                    .edit_project(
+                        alpha_project_slug,
+                        json!({
+                            "link_urls": {
+                                url_type: "not a url",
+                            },
+                        }),
+                        USER_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&resp, StatusCode::BAD_REQUEST);
+            }
+
+            // Failure because these are illegal requested statuses for a normal user.
+            for req in ["unknown", "processing", "withheld", "scheduled"] {
+                let resp = api
+                    .edit_project(
+                        alpha_project_slug,
+                        json!({
+                            "requested_status": req,
+                        }),
+                        USER_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&resp, StatusCode::BAD_REQUEST);
+            }
+
+            // Failure because these should not be able to be set by a non-mod
+            for key in ["moderation_message", "moderation_message_body"] {
+                let resp = api
+                    .edit_project(
+                        alpha_project_slug,
+                        json!({
+                            key: "test",
+                        }),
+                        USER_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&resp, StatusCode::UNAUTHORIZED);
+
+                // (should work for a mod, though)
+                let resp = api
+                    .edit_project(
+                        alpha_project_slug,
+                        json!({
+                            key: "test",
+                        }),
+                        MOD_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&resp, StatusCode::NO_CONTENT);
+            }
+
+            // Failed patch to alpha slug:
+            // - slug collision with beta
+            // - too short slug
+            // - too long slug
+            // - not url safe slug
+            // - not url safe slug
+            for slug in [
+                beta_project_slug,
+                "a",
+                &"a".repeat(100),
+                "not url safe%&^!#$##!@#$%^&*()",
+            ] {
+                let resp = api
+                    .edit_project(
+                        alpha_project_slug,
+                        json!({
+                            "slug": slug, // the other dummy project has this slug
+                        }),
+                        USER_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&resp, StatusCode::BAD_REQUEST);
+            }
+
+            // Not allowed to directly set status, as 'beta_project_slug' (the other project) is "processing" and cannot have its status changed like this.
             let resp = api
                 .edit_project(
-                    alpha_project_slug,
+                    beta_project_slug,
                     json!({
-                        "requested_status": req,
-                    }),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_status!(&resp, StatusCode::BAD_REQUEST);
-        }
-
-        // Failure because these should not be able to be set by a non-mod
-        for key in ["moderation_message", "moderation_message_body"] {
-            let resp = api
-                .edit_project(
-                    alpha_project_slug,
-                    json!({
-                        key: "test",
+                        "status": "private"
                     }),
                     USER_USER_PAT,
                 )
                 .await;
             assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
-            // (should work for a mod, though)
+            // Sucessful request to patch many fields.
             let resp = api
                 .edit_project(
                     alpha_project_slug,
                     json!({
-                        key: "test",
-                    }),
-                    MOD_USER_PAT,
-                )
-                .await;
-            assert_status!(&resp, StatusCode::NO_CONTENT);
-        }
-
-        // Failed patch to alpha slug:
-        // - slug collision with beta
-        // - too short slug
-        // - too long slug
-        // - not url safe slug
-        // - not url safe slug
-        for slug in [
-            beta_project_slug,
-            "a",
-            &"a".repeat(100),
-            "not url safe%&^!#$##!@#$%^&*()",
-        ] {
-            let resp = api
-                .edit_project(
-                    alpha_project_slug,
-                    json!({
-                        "slug": slug, // the other dummy project has this slug
+                        "slug": "newslug",
+                        "categories": [DUMMY_CATEGORIES[0]],
+                        "license_id": "MIT",
+                        "link_urls":
+                            {
+                                "patreon": "https://patreon.com",
+                                "issues": "https://github.com",
+                                "discord": "https://discord.gg",
+                                "wiki": "https://wiki.com"
+                            }
                     }),
                     USER_USER_PAT,
                 )
                 .await;
-            assert_status!(&resp, StatusCode::BAD_REQUEST);
-        }
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        // Not allowed to directly set status, as 'beta_project_slug' (the other project) is "processing" and cannot have its status changed like this.
-        let resp = api
-            .edit_project(
-                beta_project_slug,
-                json!({
-                    "status": "private"
-                }),
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::UNAUTHORIZED);
+            // Old slug no longer works
+            let resp = api.get_project(alpha_project_slug, USER_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NOT_FOUND);
 
-        // Sucessful request to patch many fields.
-        let resp = api
-            .edit_project(
-                alpha_project_slug,
-                json!({
-                    "slug": "newslug",
-                    "categories": [DUMMY_CATEGORIES[0]],
-                    "license_id": "MIT",
-                    "link_urls":
-                        {
-                            "patreon": "https://patreon.com",
-                            "issues": "https://github.com",
-                            "discord": "https://discord.gg",
-                            "wiki": "https://wiki.com"
-                        }
-                }),
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // New slug does work
+            let project =
+                api.get_project_deserialized("newslug", USER_USER_PAT).await;
 
-        // Old slug no longer works
-        let resp = api.get_project(alpha_project_slug, USER_USER_PAT).await;
-        assert_status!(&resp, StatusCode::NOT_FOUND);
+            assert_eq!(project.slug.unwrap(), "newslug");
+            assert_eq!(project.categories, vec![DUMMY_CATEGORIES[0]]);
+            assert_eq!(project.license.id, "MIT");
 
-        // New slug does work
-        let project = api.get_project_deserialized("newslug", USER_USER_PAT).await;
+            let link_urls = project.link_urls;
+            assert_eq!(link_urls.len(), 4);
+            assert_eq!(link_urls["patreon"].platform, "patreon");
+            assert_eq!(link_urls["patreon"].url, "https://patreon.com");
+            assert!(link_urls["patreon"].donation);
+            assert_eq!(link_urls["issues"].platform, "issues");
+            assert_eq!(link_urls["issues"].url, "https://github.com");
+            assert!(!link_urls["issues"].donation);
+            assert_eq!(link_urls["discord"].platform, "discord");
+            assert_eq!(link_urls["discord"].url, "https://discord.gg");
+            assert!(!link_urls["discord"].donation);
+            assert_eq!(link_urls["wiki"].platform, "wiki");
+            assert_eq!(link_urls["wiki"].url, "https://wiki.com");
+            assert!(!link_urls["wiki"].donation);
 
-        assert_eq!(project.slug.unwrap(), "newslug");
-        assert_eq!(project.categories, vec![DUMMY_CATEGORIES[0]]);
-        assert_eq!(project.license.id, "MIT");
-
-        let link_urls = project.link_urls;
-        assert_eq!(link_urls.len(), 4);
-        assert_eq!(link_urls["patreon"].platform, "patreon");
-        assert_eq!(link_urls["patreon"].url, "https://patreon.com");
-        assert!(link_urls["patreon"].donation);
-        assert_eq!(link_urls["issues"].platform, "issues");
-        assert_eq!(link_urls["issues"].url, "https://github.com");
-        assert!(!link_urls["issues"].donation);
-        assert_eq!(link_urls["discord"].platform, "discord");
-        assert_eq!(link_urls["discord"].url, "https://discord.gg");
-        assert!(!link_urls["discord"].donation);
-        assert_eq!(link_urls["wiki"].platform, "wiki");
-        assert_eq!(link_urls["wiki"].url, "https://wiki.com");
-        assert!(!link_urls["wiki"].donation);
-
-        // Unset the set link_urls
-        let resp = api
-            .edit_project(
-                "newslug",
-                json!({
-                    "link_urls":
-                        {
-                            "issues": null,
-                        }
-                }),
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
-        let project = api.get_project_deserialized("newslug", USER_USER_PAT).await;
-        assert_eq!(project.link_urls.len(), 3);
-        assert!(!project.link_urls.contains_key("issues"));
-    })
+            // Unset the set link_urls
+            let resp = api
+                .edit_project(
+                    "newslug",
+                    json!({
+                        "link_urls":
+                            {
+                                "issues": null,
+                            }
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
+            let project =
+                api.get_project_deserialized("newslug", USER_USER_PAT).await;
+            assert_eq!(project.link_urls.len(), 3);
+            assert!(!project.link_urls.contains_key("issues"));
+        },
+    )
     .await;
 }
 
 #[actix_rt::test]
 pub async fn test_patch_v3() {
     // Hits V3-specific patchable fields
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
 
-        let alpha_project_slug = &test_env.dummy.project_alpha.project_slug;
+            let alpha_project_slug = &test_env.dummy.project_alpha.project_slug;
 
-        // Sucessful request to patch many fields.
-        let resp = api
-            .edit_project(
-                alpha_project_slug,
-                json!({
-                    "name": "New successful title",
-                    "summary": "New successful summary",
-                    "description": "New successful description",
-                }),
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // Sucessful request to patch many fields.
+            let resp = api
+                .edit_project(
+                    alpha_project_slug,
+                    json!({
+                        "name": "New successful title",
+                        "summary": "New successful summary",
+                        "description": "New successful description",
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        let project = api
-            .get_project_deserialized(alpha_project_slug, USER_USER_PAT)
-            .await;
+            let project = api
+                .get_project_deserialized(alpha_project_slug, USER_USER_PAT)
+                .await;
 
-        assert_eq!(project.name, "New successful title");
-        assert_eq!(project.summary, "New successful summary");
-        assert_eq!(project.description, "New successful description");
-    })
+            assert_eq!(project.name, "New successful title");
+            assert_eq!(project.summary, "New successful summary");
+            assert_eq!(project.description, "New successful description");
+        },
+    )
     .await;
 }
 
@@ -530,52 +568,62 @@ pub async fn test_bulk_edit_categories() {
 
 #[actix_rt::test]
 pub async fn test_bulk_edit_links() {
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
-        let alpha_project_id: &str = &test_env.dummy.project_alpha.project_id;
-        let beta_project_id: &str = &test_env.dummy.project_beta.project_id;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let alpha_project_id: &str =
+                &test_env.dummy.project_alpha.project_id;
+            let beta_project_id: &str = &test_env.dummy.project_beta.project_id;
 
-        // Sets links for issue, source, wiki, and patreon for all projects
-        // The first loop, sets issue, the second, clears it for all projects.
-        for issues in [Some("https://www.issues.com"), None] {
-            let resp = api
-                .edit_project_bulk(
-                    &[alpha_project_id, beta_project_id],
-                    json!({
-                        "link_urls": {
-                            "issues": issues,
-                            "wiki": "https://wiki.com",
-                            "patreon": "https://patreon.com",
-                        },
-                    }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&resp, StatusCode::NO_CONTENT);
+            // Sets links for issue, source, wiki, and patreon for all projects
+            // The first loop, sets issue, the second, clears it for all projects.
+            for issues in [Some("https://www.issues.com"), None] {
+                let resp = api
+                    .edit_project_bulk(
+                        &[alpha_project_id, beta_project_id],
+                        json!({
+                            "link_urls": {
+                                "issues": issues,
+                                "wiki": "https://wiki.com",
+                                "patreon": "https://patreon.com",
+                            },
+                        }),
+                        ADMIN_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&resp, StatusCode::NO_CONTENT);
 
-            let alpha_body = api
-                .get_project_deserialized(alpha_project_id, ADMIN_USER_PAT)
-                .await;
-            if let Some(issues) = issues {
-                assert_eq!(alpha_body.link_urls.len(), 3);
-                assert_eq!(alpha_body.link_urls["issues"].url, issues);
-            } else {
-                assert_eq!(alpha_body.link_urls.len(), 2);
-                assert!(!alpha_body.link_urls.contains_key("issues"));
+                let alpha_body = api
+                    .get_project_deserialized(alpha_project_id, ADMIN_USER_PAT)
+                    .await;
+                if let Some(issues) = issues {
+                    assert_eq!(alpha_body.link_urls.len(), 3);
+                    assert_eq!(alpha_body.link_urls["issues"].url, issues);
+                } else {
+                    assert_eq!(alpha_body.link_urls.len(), 2);
+                    assert!(!alpha_body.link_urls.contains_key("issues"));
+                }
+                assert_eq!(
+                    alpha_body.link_urls["wiki"].url,
+                    "https://wiki.com"
+                );
+                assert_eq!(
+                    alpha_body.link_urls["patreon"].url,
+                    "https://patreon.com"
+                );
+
+                let beta_body = api
+                    .get_project_deserialized(beta_project_id, ADMIN_USER_PAT)
+                    .await;
+                assert_eq!(beta_body.categories, alpha_body.categories);
+                assert_eq!(
+                    beta_body.additional_categories,
+                    alpha_body.additional_categories,
+                );
             }
-            assert_eq!(alpha_body.link_urls["wiki"].url, "https://wiki.com");
-            assert_eq!(alpha_body.link_urls["patreon"].url, "https://patreon.com");
-
-            let beta_body = api
-                .get_project_deserialized(beta_project_id, ADMIN_USER_PAT)
-                .await;
-            assert_eq!(beta_body.categories, alpha_body.categories);
-            assert_eq!(
-                beta_body.additional_categories,
-                alpha_body.additional_categories,
-            );
-        }
-    })
+        },
+    )
     .await;
 }
 
@@ -780,8 +828,12 @@ async fn permissions_edit_details() {
         // Icon delete
         // Uses alpha project to delete added icon
         let req_gen = |ctx: PermissionsTestContext| async move {
-            api.edit_project_icon(&ctx.project_id.unwrap(), None, ctx.test_pat.as_deref())
-                .await
+            api.edit_project_icon(
+                &ctx.project_id.unwrap(),
+                None,
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -857,98 +909,104 @@ async fn permissions_edit_details() {
 
 #[actix_rt::test]
 async fn permissions_upload_version() {
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let alpha_project_id = &test_env.dummy.project_alpha.project_id;
-        let alpha_version_id = &test_env.dummy.project_alpha.version_id;
-        let alpha_team_id = &test_env.dummy.project_alpha.team_id;
-        let alpha_file_hash = &test_env.dummy.project_alpha.file_hash;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let alpha_project_id = &test_env.dummy.project_alpha.project_id;
+            let alpha_version_id = &test_env.dummy.project_alpha.version_id;
+            let alpha_team_id = &test_env.dummy.project_alpha.team_id;
+            let alpha_file_hash = &test_env.dummy.project_alpha.file_hash;
 
-        let api = &test_env.api;
+            let api = &test_env.api;
 
-        let upload_version = ProjectPermissions::UPLOAD_VERSION;
-        // Upload version with basic-mod.jar
-        let req_gen = |ctx: PermissionsTestContext| async move {
-            let project_id = ctx.project_id.unwrap();
-            let project_id = ProjectId(parse_base62(&project_id).unwrap());
-            api.add_public_version(
-                project_id,
-                "1.0.0",
-                TestFile::BasicMod,
-                None,
-                None,
-                ctx.test_pat.as_deref(),
-            )
-            .await
-        };
-        PermissionsTest::new(&test_env)
-            .simple_project_permissions_test(upload_version, req_gen)
-            .await
-            .unwrap();
-
-        // Upload file to existing version
-        // Uses alpha project, as it has an existing version
-        let req_gen = |ctx: PermissionsTestContext| async move {
-            api.upload_file_to_version(
-                alpha_version_id,
-                &TestFile::BasicModDifferent,
-                ctx.test_pat.as_deref(),
-            )
-            .await
-        };
-        PermissionsTest::new(&test_env)
-            .with_existing_project(alpha_project_id, alpha_team_id)
-            .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
-            .simple_project_permissions_test(upload_version, req_gen)
-            .await
-            .unwrap();
-
-        // Patch version
-        // Uses alpha project, as it has an existing version
-        let req_gen = |ctx: PermissionsTestContext| async move {
-            api.edit_version(
-                alpha_version_id,
-                json!({
-                    "name": "Basic Mod",
-                }),
-                ctx.test_pat.as_deref(),
-            )
-            .await
-        };
-        PermissionsTest::new(&test_env)
-            .with_existing_project(alpha_project_id, alpha_team_id)
-            .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
-            .simple_project_permissions_test(upload_version, req_gen)
-            .await
-            .unwrap();
-
-        // Delete version file
-        // Uses alpha project, as it has an existing version
-        let delete_version = ProjectPermissions::DELETE_VERSION;
-        let req_gen = |ctx: PermissionsTestContext| async move {
-            api.remove_version_file(alpha_file_hash, ctx.test_pat.as_deref())
+            let upload_version = ProjectPermissions::UPLOAD_VERSION;
+            // Upload version with basic-mod.jar
+            let req_gen = |ctx: PermissionsTestContext| async move {
+                let project_id = ctx.project_id.unwrap();
+                let project_id = ProjectId(parse_base62(&project_id).unwrap());
+                api.add_public_version(
+                    project_id,
+                    "1.0.0",
+                    TestFile::BasicMod,
+                    None,
+                    None,
+                    ctx.test_pat.as_deref(),
+                )
                 .await
-        };
-
-        PermissionsTest::new(&test_env)
-            .with_existing_project(alpha_project_id, alpha_team_id)
-            .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
-            .simple_project_permissions_test(delete_version, req_gen)
-            .await
-            .unwrap();
-
-        // Delete version
-        // Uses alpha project, as it has an existing version
-        let req_gen = |ctx: PermissionsTestContext| async move {
-            api.remove_version(alpha_version_id, ctx.test_pat.as_deref())
+            };
+            PermissionsTest::new(&test_env)
+                .simple_project_permissions_test(upload_version, req_gen)
                 .await
-        };
-        PermissionsTest::new(&test_env)
-            .with_existing_project(alpha_project_id, alpha_team_id)
-            .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
-            .simple_project_permissions_test(delete_version, req_gen)
-            .await
-            .unwrap();
-    })
+                .unwrap();
+
+            // Upload file to existing version
+            // Uses alpha project, as it has an existing version
+            let req_gen = |ctx: PermissionsTestContext| async move {
+                api.upload_file_to_version(
+                    alpha_version_id,
+                    &TestFile::BasicModDifferent,
+                    ctx.test_pat.as_deref(),
+                )
+                .await
+            };
+            PermissionsTest::new(&test_env)
+                .with_existing_project(alpha_project_id, alpha_team_id)
+                .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
+                .simple_project_permissions_test(upload_version, req_gen)
+                .await
+                .unwrap();
+
+            // Patch version
+            // Uses alpha project, as it has an existing version
+            let req_gen = |ctx: PermissionsTestContext| async move {
+                api.edit_version(
+                    alpha_version_id,
+                    json!({
+                        "name": "Basic Mod",
+                    }),
+                    ctx.test_pat.as_deref(),
+                )
+                .await
+            };
+            PermissionsTest::new(&test_env)
+                .with_existing_project(alpha_project_id, alpha_team_id)
+                .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
+                .simple_project_permissions_test(upload_version, req_gen)
+                .await
+                .unwrap();
+
+            // Delete version file
+            // Uses alpha project, as it has an existing version
+            let delete_version = ProjectPermissions::DELETE_VERSION;
+            let req_gen = |ctx: PermissionsTestContext| async move {
+                api.remove_version_file(
+                    alpha_file_hash,
+                    ctx.test_pat.as_deref(),
+                )
+                .await
+            };
+
+            PermissionsTest::new(&test_env)
+                .with_existing_project(alpha_project_id, alpha_team_id)
+                .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
+                .simple_project_permissions_test(delete_version, req_gen)
+                .await
+                .unwrap();
+
+            // Delete version
+            // Uses alpha project, as it has an existing version
+            let req_gen = |ctx: PermissionsTestContext| async move {
+                api.remove_version(alpha_version_id, ctx.test_pat.as_deref())
+                    .await
+            };
+            PermissionsTest::new(&test_env)
+                .with_existing_project(alpha_project_id, alpha_team_id)
+                .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
+                .simple_project_permissions_test(delete_version, req_gen)
+                .await
+                .unwrap();
+        },
+    )
     .await;
 }
 
@@ -1003,8 +1061,12 @@ async fn permissions_manage_invites() {
         // remove member
         // requires manage_invites if they have not yet accepted the invite
         let req_gen = |ctx: PermissionsTestContext| async move {
-            api.remove_from_team(&ctx.team_id.unwrap(), MOD_USER_ID, ctx.test_pat.as_deref())
-                .await
+            api.remove_from_team(
+                &ctx.team_id.unwrap(),
+                MOD_USER_ID,
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -1032,8 +1094,12 @@ async fn permissions_manage_invites() {
         // remove existing member (requires remove_member)
         let remove_member = ProjectPermissions::REMOVE_MEMBER;
         let req_gen = |ctx: PermissionsTestContext| async move {
-            api.remove_from_team(&ctx.team_id.unwrap(), MOD_USER_ID, ctx.test_pat.as_deref())
-                .await
+            api.remove_from_team(
+                &ctx.team_id.unwrap(),
+                MOD_USER_ID,
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
 
         PermissionsTest::new(&test_env)
@@ -1054,8 +1120,11 @@ async fn permissions_delete_project() {
         let api = &test_env.api;
         // Delete project
         let req_gen = |ctx: PermissionsTestContext| async move {
-            api.remove_project(&ctx.project_id.unwrap(), ctx.test_pat.as_deref())
-                .await
+            api.remove_project(
+                &ctx.project_id.unwrap(),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .simple_project_permissions_test(delete_project, req_gen)
@@ -1206,7 +1275,8 @@ async fn projects_various_visibility() {
 
             // Tests get_project, a route that uses is_visible_project
             for (project_id, pat, expected_status) in visible_pat_pairs {
-                let resp = env.api.get_project(&project_id.to_string(), pat).await;
+                let resp =
+                    env.api.get_project(&project_id.to_string(), pat).await;
                 assert_status!(&resp, expected_status);
             }
 
@@ -1227,12 +1297,20 @@ async fn projects_various_visibility() {
             // Add projects to org zeta
             let resp = env
                 .api
-                .organization_add_project(zeta_organization_id, alpha_project_id, USER_USER_PAT)
+                .organization_add_project(
+                    zeta_organization_id,
+                    alpha_project_id,
+                    USER_USER_PAT,
+                )
                 .await;
             assert_status!(&resp, StatusCode::OK);
             let resp = env
                 .api
-                .organization_add_project(zeta_organization_id, beta_project_id, USER_USER_PAT)
+                .organization_add_project(
+                    zeta_organization_id,
+                    beta_project_id,
+                    USER_USER_PAT,
+                )
                 .await;
             assert_status!(&resp, StatusCode::OK);
 
@@ -1251,7 +1329,8 @@ async fn projects_various_visibility() {
             ];
 
             for (project_id, pat, expected_status) in visible_pat_pairs {
-                let resp = env.api.get_project(&project_id.to_string(), pat).await;
+                let resp =
+                    env.api.get_project(&project_id.to_string(), pat).await;
                 assert_status!(&resp, expected_status);
             }
 
@@ -1266,7 +1345,8 @@ async fn projects_various_visibility() {
                     .api
                     .get_projects(&[&alpha_project_id, &beta_project_id], pat)
                     .await;
-                let projects: Vec<CommonProject> = test::read_body_json(projects).await;
+                let projects: Vec<CommonProject> =
+                    test::read_body_json(projects).await;
                 assert_eq!(projects.len(), expected_count);
             }
         },

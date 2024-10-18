@@ -264,25 +264,35 @@ generate_ids!(
     ChargeId
 );
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Hash, Serialize, Deserialize)]
+#[derive(
+    Copy, Clone, Debug, PartialEq, Eq, Type, Hash, Serialize, Deserialize,
+)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Eq, Hash, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Copy, Clone, Debug, Type, Eq, Hash, PartialEq, Serialize, Deserialize,
+)]
 #[sqlx(transparent)]
 pub struct TeamId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct TeamMemberId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(
+    Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize,
+)]
 #[sqlx(transparent)]
 pub struct OrganizationId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(
+    Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize,
+)]
 #[sqlx(transparent)]
 pub struct ProjectId(pub i64);
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct ProjectTypeId(pub i32);
 
@@ -292,16 +302,30 @@ pub struct StatusId(pub i32);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct GameId(pub i32);
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct LinkPlatformId(pub i32);
 
 #[derive(
-    Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord,
+    Copy,
+    Clone,
+    Debug,
+    Type,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    PartialOrd,
+    Ord,
 )]
 #[sqlx(transparent)]
 pub struct VersionId(pub i64);
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct LoaderId(pub i32);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
@@ -319,11 +343,15 @@ pub struct ReportId(pub i64);
 #[sqlx(transparent)]
 pub struct ReportTypeId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, Hash, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(
+    Copy, Clone, Debug, Type, Hash, Eq, PartialEq, Deserialize, Serialize,
+)]
 #[sqlx(transparent)]
 pub struct FileId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Deserialize, Serialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Deserialize, Serialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct PatId(pub i64);
 
@@ -337,64 +365,102 @@ pub struct NotificationActionId(pub i32);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq)]
 #[sqlx(transparent)]
 pub struct ThreadId(pub i64);
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct ThreadMessageId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct SessionId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct ImageId(pub i64);
 
 #[derive(
-    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash, PartialOrd, Ord,
+    Copy,
+    Clone,
+    Debug,
+    Type,
+    Serialize,
+    Deserialize,
+    Eq,
+    PartialEq,
+    Hash,
+    PartialOrd,
+    Ord,
 )]
 #[sqlx(transparent)]
 pub struct LoaderFieldId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct LoaderFieldEnumId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct LoaderFieldEnumValueId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct OAuthClientId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct OAuthClientAuthorizationId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct OAuthRedirectUriId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct OAuthAccessTokenId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct PayoutId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct ProductId(pub i64);
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct ProductPriceId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct UserSubscriptionId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash,
+)]
 #[sqlx(transparent)]
 pub struct ChargeId(pub i64);
 

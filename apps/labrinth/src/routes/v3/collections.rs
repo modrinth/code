@@ -1,6 +1,8 @@
 use crate::auth::checks::is_visible_collection;
 use crate::auth::{filter_visible_collections, get_user_from_headers};
-use crate::database::models::{collection_item, generate_collection_id, project_item};
+use crate::database::models::{
+    collection_item, generate_collection_id, project_item,
+};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::collections::{Collection, CollectionStatus};
@@ -74,13 +76,14 @@ pub async fn collection_create(
     .await?
     .1;
 
-    collection_create_data
-        .validate()
-        .map_err(|err| CreateError::InvalidInput(validation_errors_to_string(err, None)))?;
+    collection_create_data.validate().map_err(|err| {
+        CreateError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
 
     let mut transaction = client.begin().await?;
 
-    let collection_id: CollectionId = generate_collection_id(&mut transaction).await?.into();
+    let collection_id: CollectionId =
+        generate_collection_id(&mut transaction).await?.into();
 
     let initial_project_ids = project_item::Project::get_many(
         &collection_create_data.projects,
@@ -140,10 +143,13 @@ pub async fn collections_get(
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
     let ids = ids
         .into_iter()
-        .map(|x| parse_base62(x).map(|x| database::models::CollectionId(x as i64)))
+        .map(|x| {
+            parse_base62(x).map(|x| database::models::CollectionId(x as i64))
+        })
         .collect::<Result<Vec<_>, _>>()?;
 
-    let collections_data = database::models::Collection::get_many(&ids, &**pool, &redis).await?;
+    let collections_data =
+        database::models::Collection::get_many(&ids, &**pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -156,7 +162,8 @@ pub async fn collections_get(
     .map(|x| x.1)
     .ok();
 
-    let collections = filter_visible_collections(collections_data, &user_option).await?;
+    let collections =
+        filter_visible_collections(collections_data, &user_option).await?;
 
     Ok(HttpResponse::Ok().json(collections))
 }
@@ -171,7 +178,8 @@ pub async fn collection_get(
     let string = info.into_inner().0;
 
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
-    let collection_data = database::models::Collection::get(id, &**pool, &redis).await?;
+    let collection_data =
+        database::models::Collection::get(id, &**pool, &redis).await?;
     let user_option = get_user_from_headers(
         &req,
         &**pool,
@@ -228,9 +236,9 @@ pub async fn collection_edit(
     .await?
     .1;
 
-    new_collection
-        .validate()
-        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
+    new_collection.validate().map_err(|err| {
+        ApiError::Validation(validation_errors_to_string(err, None))
+    })?;
 
     let string = info.into_inner().0;
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
@@ -275,7 +283,8 @@ pub async fn collection_edit(
 
         if let Some(status) = &new_collection.status {
             if !(user.role.is_mod()
-                || collection_item.status.is_approved() && status.can_be_requested())
+                || collection_item.status.is_approved()
+                    && status.can_be_requested())
             {
                 return Err(ApiError::CustomAuthentication(
                     "You don't have permission to set this status!".to_string(),
@@ -313,13 +322,14 @@ pub async fn collection_edit(
                 .collect_vec();
             let mut validated_project_ids = Vec::new();
             for project_id in new_project_ids {
-                let project = database::models::Project::get(project_id, &**pool, &redis)
-                    .await?
-                    .ok_or_else(|| {
-                        ApiError::InvalidInput(format!(
+                let project =
+                    database::models::Project::get(project_id, &**pool, &redis)
+                        .await?
+                        .ok_or_else(|| {
+                            ApiError::InvalidInput(format!(
                             "The specified project {project_id} does not exist!"
                         ))
-                    })?;
+                        })?;
                 validated_project_ids.push(project.inner.id.0);
             }
             // Insert- don't throw an error if it already exists
@@ -348,7 +358,8 @@ pub async fn collection_edit(
         }
 
         transaction.commit().await?;
-        database::models::Collection::clear_cache(collection_item.id, &redis).await?;
+        database::models::Collection::clear_cache(collection_item.id, &redis)
+            .await?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -384,11 +395,14 @@ pub async fn collection_icon_edit(
 
     let string = info.into_inner().0;
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
-    let collection_item = database::models::Collection::get(id, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified collection does not exist!".to_string())
-        })?;
+    let collection_item =
+        database::models::Collection::get(id, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "The specified collection does not exist!".to_string(),
+                )
+            })?;
 
     if !can_modify_collection(&collection_item, &user) {
         return Ok(HttpResponse::Unauthorized().body(""));
@@ -401,8 +415,12 @@ pub async fn collection_icon_edit(
     )
     .await?;
 
-    let bytes =
-        read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
+    let bytes = read_from_payload(
+        &mut payload,
+        262144,
+        "Icons must be smaller than 256KiB",
+    )
+    .await?;
 
     let collection_id: CollectionId = collection_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(
@@ -432,7 +450,8 @@ pub async fn collection_icon_edit(
     .await?;
 
     transaction.commit().await?;
-    database::models::Collection::clear_cache(collection_item.id, &redis).await?;
+    database::models::Collection::clear_cache(collection_item.id, &redis)
+        .await?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -457,11 +476,14 @@ pub async fn delete_collection_icon(
 
     let string = info.into_inner().0;
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
-    let collection_item = database::models::Collection::get(id, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The specified collection does not exist!".to_string())
-        })?;
+    let collection_item =
+        database::models::Collection::get(id, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "The specified collection does not exist!".to_string(),
+                )
+            })?;
     if !can_modify_collection(&collection_item, &user) {
         return Ok(HttpResponse::Unauthorized().body(""));
     }
@@ -486,7 +508,8 @@ pub async fn delete_collection_icon(
     .await?;
 
     transaction.commit().await?;
-    database::models::Collection::clear_cache(collection_item.id, &redis).await?;
+    database::models::Collection::clear_cache(collection_item.id, &redis)
+        .await?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -513,15 +536,21 @@ pub async fn collection_delete(
     let collection = database::models::Collection::get(id, &**pool, &redis)
         .await?
         .ok_or_else(|| {
-            ApiError::InvalidInput("The specified collection does not exist!".to_string())
+            ApiError::InvalidInput(
+                "The specified collection does not exist!".to_string(),
+            )
         })?;
     if !can_modify_collection(&collection, &user) {
         return Ok(HttpResponse::Unauthorized().body(""));
     }
     let mut transaction = pool.begin().await?;
 
-    let result =
-        database::models::Collection::remove(collection.id, &mut transaction, &redis).await?;
+    let result = database::models::Collection::remove(
+        collection.id,
+        &mut transaction,
+        &redis,
+    )
+    .await?;
 
     transaction.commit().await?;
     database::models::Collection::clear_cache(collection.id, &redis).await?;

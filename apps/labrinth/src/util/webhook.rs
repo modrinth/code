@@ -47,9 +47,12 @@ async fn get_webhook_metadata(
     redis: &RedisPool,
     emoji: bool,
 ) -> Result<Option<WebhookMetadata>, ApiError> {
-    let project =
-        crate::database::models::project_item::Project::get_id(project_id.into(), pool, redis)
-            .await?;
+    let project = crate::database::models::project_item::Project::get_id(
+        project_id.into(),
+        pool,
+        redis,
+    )
+    .await?;
 
     if let Some(mut project) = project {
         let mut owner = None;
@@ -82,9 +85,12 @@ async fn get_webhook_metadata(
             .await?;
 
             if let Some(member) = team.into_iter().find(|x| x.is_owner) {
-                let user =
-                    crate::database::models::user_item::User::get_id(member.user_id, pool, redis)
-                        .await?;
+                let user = crate::database::models::user_item::User::get_id(
+                    member.user_id,
+                    pool,
+                    redis,
+                )
+                .await?;
 
                 if let Some(user) = user {
                     owner = Some(WebhookAuthor {
@@ -100,13 +106,16 @@ async fn get_webhook_metadata(
             }
         };
 
-        let all_game_versions = MinecraftGameVersion::list(None, None, pool, redis).await?;
+        let all_game_versions =
+            MinecraftGameVersion::list(None, None, pool, redis).await?;
 
         let versions = project
             .aggregate_version_fields
             .clone()
             .into_iter()
-            .find_map(|vf| MinecraftGameVersion::try_from_version_field(&vf).ok())
+            .find_map(|vf| {
+                MinecraftGameVersion::try_from_version_field(&vf).ok()
+            })
             .unwrap_or_default();
 
         let formatted_game_versions = get_gv_range(versions, all_game_versions);
@@ -196,7 +205,10 @@ async fn get_webhook_metadata(
                             _ => 1049805243866681424,
                         };
 
-                        format!("<:{loader}:{emoji_id}> {}{x}", x.remove(0).to_uppercase())
+                        format!(
+                            "<:{loader}:{emoji_id}> {}{x}",
+                            x.remove(0).to_uppercase()
+                        )
                     } else {
                         format!("{}{x}", x.remove(0).to_uppercase())
                     }
@@ -323,7 +335,11 @@ pub async fn send_slack_webhook(
             }))
             .send()
             .await
-            .map_err(|_| ApiError::Discord("Error while sending projects webhook".to_string()))?;
+            .map_err(|_| {
+                ApiError::Discord(
+                    "Error while sending projects webhook".to_string(),
+                )
+            })?;
     }
 
     Ok(())
@@ -436,7 +452,9 @@ pub async fn send_discord_webhook(
                 .map(|x| DiscordEmbedImage { url: Some(x) }),
             footer: Some(DiscordEmbedFooter {
                 text: format!("{} on Modrinth", project.display_project_type),
-                icon_url: Some("https://cdn-raw.modrinth.com/modrinth-new.png".to_string()),
+                icon_url: Some(
+                    "https://cdn-raw.modrinth.com/modrinth-new.png".to_string(),
+                ),
             }),
         };
 
@@ -445,14 +463,21 @@ pub async fn send_discord_webhook(
         client
             .post(&webhook_url)
             .json(&DiscordWebhook {
-                avatar_url: Some("https://cdn.modrinth.com/Modrinth_Dark_Logo.png".to_string()),
+                avatar_url: Some(
+                    "https://cdn.modrinth.com/Modrinth_Dark_Logo.png"
+                        .to_string(),
+                ),
                 username: Some("Modrinth Release".to_string()),
                 embeds: vec![embed],
                 content: message,
             })
             .send()
             .await
-            .map_err(|_| ApiError::Discord("Error while sending projects webhook".to_string()))?;
+            .map_err(|_| {
+                ApiError::Discord(
+                    "Error while sending projects webhook".to_string(),
+                )
+            })?;
     }
 
     Ok(())
@@ -496,15 +521,21 @@ fn get_gv_range(
         } else {
             let interval_base = &intervals[current_interval];
 
-            if ((index as i32) - (interval_base[interval_base.len() - 1][1] as i32) == 1
-                || (release_index as i32) - (interval_base[interval_base.len() - 1][2] as i32) == 1)
+            if ((index as i32)
+                - (interval_base[interval_base.len() - 1][1] as i32)
+                == 1
+                || (release_index as i32)
+                    - (interval_base[interval_base.len() - 1][2] as i32)
+                    == 1)
                 && (all_game_versions[interval_base[0][1]].type_ == "release"
                     || all_game_versions[index].type_ != "release")
             {
                 if intervals[current_interval].get(1).is_some() {
-                    intervals[current_interval][1] = vec![i, index, release_index];
+                    intervals[current_interval][1] =
+                        vec![i, index, release_index];
                 } else {
-                    intervals[current_interval].insert(1, vec![i, index, release_index]);
+                    intervals[current_interval]
+                        .insert(1, vec![i, index, release_index]);
                 }
             } else {
                 current_interval += 1;
@@ -516,7 +547,10 @@ fn get_gv_range(
     let mut new_intervals = Vec::new();
 
     for interval in intervals {
-        if interval.len() == 2 && interval[0][2] != MAX_VALUE && interval[1][2] == MAX_VALUE {
+        if interval.len() == 2
+            && interval[0][2] != MAX_VALUE
+            && interval[1][2] == MAX_VALUE
+        {
             let mut last_snapshot: Option<usize> = None;
 
             for j in ((interval[0][1] + 1)..=interval[1][1]).rev() {
@@ -526,12 +560,16 @@ fn get_gv_range(
                         vec![
                             game_versions
                                 .iter()
-                                .position(|x| x.version == all_game_versions[j].version)
+                                .position(|x| {
+                                    x.version == all_game_versions[j].version
+                                })
                                 .unwrap_or(MAX_VALUE),
                             j,
                             all_releases
                                 .iter()
-                                .position(|x| x.version == all_game_versions[j].version)
+                                .position(|x| {
+                                    x.version == all_game_versions[j].version
+                                })
                                 .unwrap_or(MAX_VALUE),
                         ],
                     ]);
@@ -543,7 +581,10 @@ fn get_gv_range(
                                     game_versions
                                         .iter()
                                         .position(|x| {
-                                            x.version == all_game_versions[last_snapshot].version
+                                            x.version
+                                                == all_game_versions
+                                                    [last_snapshot]
+                                                    .version
                                         })
                                         .unwrap_or(MAX_VALUE),
                                     last_snapshot,
@@ -572,7 +613,8 @@ fn get_gv_range(
         if interval.len() == 2 {
             output.push(format!(
                 "{}—{}",
-                &game_versions[interval[0][0]].version, &game_versions[interval[1][0]].version
+                &game_versions[interval[0][0]].version,
+                &game_versions[interval[1][0]].version
             ))
         } else {
             output.push(game_versions[interval[0][0]].version.clone())

@@ -13,7 +13,9 @@ pub use super::teams::TeamId;
 pub use super::threads::ThreadId;
 pub use super::threads::ThreadMessageId;
 pub use super::users::UserId;
-pub use crate::models::billing::{ChargeId, ProductId, ProductPriceId, UserSubscriptionId};
+pub use crate::models::billing::{
+    ChargeId, ProductId, ProductPriceId, UserSubscriptionId,
+};
 use thiserror::Error;
 
 /// Generates a random 64 bit integer that is exactly `n` characters
@@ -41,7 +43,11 @@ pub fn random_base62_rng<R: rand::RngCore>(rng: &mut R, n: usize) -> u64 {
     random_base62_rng_range(rng, n, n)
 }
 
-pub fn random_base62_rng_range<R: rand::RngCore>(rng: &mut R, n_min: usize, n_max: usize) -> u64 {
+pub fn random_base62_rng_range<R: rand::RngCore>(
+    rng: &mut R,
+    n_min: usize,
+    n_max: usize,
+) -> u64 {
     use rand::Rng;
     assert!(n_min > 0 && n_max <= 11 && n_min <= n_max);
     // gen_range is [low, high): max value is `MULTIPLES[n] - 1`,
@@ -155,7 +161,10 @@ pub mod base62_impl {
             impl<'de> Visitor<'de> for Base62Visitor {
                 type Value = Base62Id;
 
-                fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                fn expecting(
+                    &self,
+                    formatter: &mut std::fmt::Formatter,
+                ) -> std::fmt::Result {
                     formatter.write_str("a base62 string id")
                 }
 
@@ -211,7 +220,9 @@ pub mod base62_impl {
             }
 
             // We don't want this panicking or wrapping on integer overflow
-            if let Some(n) = num.checked_mul(62).and_then(|n| n.checked_add(next_digit)) {
+            if let Some(n) =
+                num.checked_mul(62).and_then(|n| n.checked_add(next_digit))
+            {
                 num = n;
             } else {
                 return Err(DecodingError::Overflow);

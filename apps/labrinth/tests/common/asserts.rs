@@ -38,7 +38,10 @@ pub fn assert_version_ids(versions: &[Version], expected_ids: Vec<String>) {
     assert_eq!(version_ids, expected_ids);
 }
 
-pub fn assert_common_version_ids(versions: &[CommonVersion], expected_ids: Vec<String>) {
+pub fn assert_common_version_ids(
+    versions: &[CommonVersion],
+    expected_ids: Vec<String>,
+) {
     let version_ids = versions
         .iter()
         .map(|v| get_json_val_str(v.id))

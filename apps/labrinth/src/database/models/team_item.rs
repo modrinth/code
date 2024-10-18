@@ -149,10 +149,12 @@ impl Team {
             // Only one of project_id or organization_id will be set
             let mut team_association_id = None;
             if let Some(pid) = t.pid {
-                team_association_id = Some(TeamAssociationId::Project(ProjectId(pid)));
+                team_association_id =
+                    Some(TeamAssociationId::Project(ProjectId(pid)));
             }
             if let Some(oid) = t.oid {
-                team_association_id = Some(TeamAssociationId::Organization(OrganizationId(oid)));
+                team_association_id =
+                    Some(TeamAssociationId::Organization(OrganizationId(oid)));
             }
             return Ok(team_association_id);
         }
@@ -257,7 +259,10 @@ impl TeamMember {
         Ok(val.into_iter().flatten().collect())
     }
 
-    pub async fn clear_cache(id: TeamId, redis: &RedisPool) -> Result<(), super::DatabaseError> {
+    pub async fn clear_cache(
+        id: TeamId,
+        redis: &RedisPool,
+    ) -> Result<(), super::DatabaseError> {
         let mut redis = redis.connect().await?;
         redis.delete(TEAMS_NAMESPACE, id.0).await?;
         Ok(())
@@ -354,11 +359,14 @@ impl TeamMember {
                 user_id,
                 role: m.role,
                 is_owner: m.is_owner,
-                permissions: ProjectPermissions::from_bits(m.permissions as u64)
-                    .unwrap_or_default(),
-                organization_permissions: m
-                    .organization_permissions
-                    .map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
+                permissions: ProjectPermissions::from_bits(
+                    m.permissions as u64,
+                )
+                .unwrap_or_default(),
+                organization_permissions: m.organization_permissions.map(|p| {
+                    OrganizationPermissions::from_bits(p as u64)
+                        .unwrap_or_default()
+                }),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
                 ordering: m.ordering,
@@ -574,11 +582,14 @@ impl TeamMember {
                 user_id,
                 role: m.role,
                 is_owner: m.is_owner,
-                permissions: ProjectPermissions::from_bits(m.permissions as u64)
-                    .unwrap_or_default(),
-                organization_permissions: m
-                    .organization_permissions
-                    .map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
+                permissions: ProjectPermissions::from_bits(
+                    m.permissions as u64,
+                )
+                .unwrap_or_default(),
+                organization_permissions: m.organization_permissions.map(|p| {
+                    OrganizationPermissions::from_bits(p as u64)
+                        .unwrap_or_default()
+                }),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
                 ordering: m.ordering,
@@ -623,11 +634,14 @@ impl TeamMember {
                 user_id,
                 role: m.role,
                 is_owner: m.is_owner,
-                permissions: ProjectPermissions::from_bits(m.permissions as u64)
-                    .unwrap_or_default(),
-                organization_permissions: m
-                    .organization_permissions
-                    .map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
+                permissions: ProjectPermissions::from_bits(
+                    m.permissions as u64,
+                )
+                .unwrap_or_default(),
+                organization_permissions: m.organization_permissions.map(|p| {
+                    OrganizationPermissions::from_bits(p as u64)
+                        .unwrap_or_default()
+                }),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
                 ordering: m.ordering,
@@ -666,11 +680,14 @@ impl TeamMember {
                 user_id,
                 role: m.role,
                 is_owner: m.is_owner,
-                permissions: ProjectPermissions::from_bits(m.permissions as u64)
-                    .unwrap_or_default(),
-                organization_permissions: m
-                    .organization_permissions
-                    .map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
+                permissions: ProjectPermissions::from_bits(
+                    m.permissions as u64,
+                )
+                .unwrap_or_default(),
+                organization_permissions: m.organization_permissions.map(|p| {
+                    OrganizationPermissions::from_bits(p as u64)
+                        .unwrap_or_default()
+                }),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
                 ordering: m.ordering,
@@ -695,10 +712,15 @@ impl TeamMember {
             Self::get_from_user_id(project.team_id, user_id, executor).await?;
 
         let organization =
-            Organization::get_associated_organization_project_id(project.id, executor).await?;
+            Organization::get_associated_organization_project_id(
+                project.id, executor,
+            )
+            .await?;
 
-        let organization_team_member = if let Some(organization) = &organization {
-            Self::get_from_user_id(organization.team_id, user_id, executor).await?
+        let organization_team_member = if let Some(organization) = &organization
+        {
+            Self::get_from_user_id(organization.team_id, user_id, executor)
+                .await?
         } else {
             None
         };

@@ -65,9 +65,15 @@ pub async fn notification_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::notifications::notification_get(req, info, pool, redis, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::notifications::notification_get(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
     match v2_reroute::extract_ok_json::<Notification>(response).await {
         Ok(notification) => {
             let notification = LegacyNotification::from(notification);
@@ -100,9 +106,15 @@ pub async fn notification_delete(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::notifications::notification_delete(req, info, pool, redis, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
+    v3::notifications::notification_delete(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[patch("notifications")]

@@ -68,12 +68,20 @@ impl Flow {
             .collect::<String>();
 
         redis
-            .set_serialized_to_json(FLOWS_NAMESPACE, &flow, &self, Some(expires.num_seconds()))
+            .set_serialized_to_json(
+                FLOWS_NAMESPACE,
+                &flow,
+                &self,
+                Some(expires.num_seconds()),
+            )
             .await?;
         Ok(flow)
     }
 
-    pub async fn get(id: &str, redis: &RedisPool) -> Result<Option<Flow>, DatabaseError> {
+    pub async fn get(
+        id: &str,
+        redis: &RedisPool,
+    ) -> Result<Option<Flow>, DatabaseError> {
         let mut redis = redis.connect().await?;
 
         redis.get_deserialized_from_json(FLOWS_NAMESPACE, id).await
@@ -95,7 +103,10 @@ impl Flow {
         Ok(flow)
     }
 
-    pub async fn remove(id: &str, redis: &RedisPool) -> Result<Option<()>, DatabaseError> {
+    pub async fn remove(
+        id: &str,
+        redis: &RedisPool,
+    ) -> Result<Option<()>, DatabaseError> {
         let mut redis = redis.connect().await?;
 
         redis.delete(FLOWS_NAMESPACE, id).await?;

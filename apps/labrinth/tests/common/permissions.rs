@@ -97,7 +97,8 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         failure_organization_permissions: Option<OrganizationPermissions>,
     ) -> Self {
         self.failure_project_permissions = failure_project_permissions;
-        self.failure_organization_permissions = failure_organization_permissions;
+        self.failure_organization_permissions =
+            failure_organization_permissions;
         self
     }
 
@@ -136,19 +137,28 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         mut self,
         allowed_failure_codes: impl IntoIterator<Item = u16>,
     ) -> Self {
-        self.allowed_failure_codes = allowed_failure_codes.into_iter().collect();
+        self.allowed_failure_codes =
+            allowed_failure_codes.into_iter().collect();
         self
     }
 
     // If an existing project or organization is intended to be used
     // We will not create a new project, and will use the given project ID
     // (But will still add the user to the project's team)
-    pub fn with_existing_project(mut self, project_id: &str, team_id: &str) -> Self {
+    pub fn with_existing_project(
+        mut self,
+        project_id: &str,
+        team_id: &str,
+    ) -> Self {
         self.project_id = Some(project_id.to_string());
         self.project_team_id = Some(team_id.to_string());
         self
     }
-    pub fn with_existing_organization(mut self, organization_id: &str, team_id: &str) -> Self {
+    pub fn with_existing_organization(
+        mut self,
+        organization_id: &str,
+        team_id: &str,
+    ) -> Self {
         self.organization_id = Some(organization_id.to_string());
         self.organization_team_id = Some(team_id.to_string());
         self
@@ -176,14 +186,15 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             organization_team_id: None,
         };
 
-        let (project_id, team_id) = if self.project_id.is_some() && self.project_team_id.is_some() {
-            (
-                self.project_id.clone().unwrap(),
-                self.project_team_id.clone().unwrap(),
-            )
-        } else {
-            create_dummy_project(&test_env.setup_api).await
-        };
+        let (project_id, team_id) =
+            if self.project_id.is_some() && self.project_team_id.is_some() {
+                (
+                    self.project_id.clone().unwrap(),
+                    self.project_team_id.clone().unwrap(),
+                )
+            } else {
+                create_dummy_project(&test_env.setup_api).await
+            };
 
         add_user_to_team(
             self.user_id,
@@ -299,7 +310,8 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // If the remove_user flag is set, remove the user from the project
         // Relevant for existing projects/users
         if self.remove_user {
-            remove_user_from_team(self.user_id, &team_id, &test_env.setup_api).await;
+            remove_user_from_team(self.user_id, &team_id, &test_env.setup_api)
+                .await;
         }
         Ok(())
     }
@@ -326,15 +338,16 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             organization_team_id: None,
         };
 
-        let (organization_id, team_id) =
-            if self.organization_id.is_some() && self.organization_team_id.is_some() {
-                (
-                    self.organization_id.clone().unwrap(),
-                    self.organization_team_id.clone().unwrap(),
-                )
-            } else {
-                create_dummy_org(&test_env.setup_api).await
-            };
+        let (organization_id, team_id) = if self.organization_id.is_some()
+            && self.organization_team_id.is_some()
+        {
+            (
+                self.organization_id.clone().unwrap(),
+                self.organization_team_id.clone().unwrap(),
+            )
+        } else {
+            create_dummy_org(&test_env.setup_api).await
+        };
 
         add_user_to_team(
             self.user_id,
@@ -395,7 +408,8 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // If the remove_user flag is set, remove the user from the organization
         // Relevant for existing projects/users
         if self.remove_user {
-            remove_user_from_team(self.user_id, &team_id, &test_env.setup_api).await;
+            remove_user_from_team(self.user_id, &team_id, &test_env.setup_api)
+                .await;
         }
         Ok(())
     }
@@ -426,7 +440,8 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // This should always fail, regardless of permissions
         // (As we are testing permissions-based failures)
         let test_1 = async {
-            let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
+            let (project_id, team_id) =
+                create_dummy_project(&test_env.setup_api).await;
 
             let resp = req_gen(PermissionsTestContext {
                 test_pat: None,
@@ -466,7 +481,8 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // TEST 2: Failure
         // Random user, unaffiliated with the project, with no permissions
         let test_2 = async {
-            let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
+            let (project_id, team_id) =
+                create_dummy_project(&test_env.setup_api).await;
 
             let resp = req_gen(PermissionsTestContext {
                 test_pat: self.user_pat.map(|s| s.to_string()),
@@ -506,7 +522,8 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // TEST 3: Failure
         // User affiliated with the project, with failure permissions
         let test_3 = async {
-            let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
+            let (project_id, team_id) =
+                create_dummy_project(&test_env.setup_api).await;
             add_user_to_team(
                 self.user_id,
                 self.user_pat,
@@ -555,7 +572,8 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // TEST 4: Success
         // User affiliated with the project, with the given permissions
         let test_4 = async {
-            let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
+            let (project_id, team_id) =
+                create_dummy_project(&test_env.setup_api).await;
             add_user_to_team(
                 self.user_id,
                 self.user_pat,
@@ -601,10 +619,16 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // Project has an organization
         // User affiliated with the project's org, with default failure permissions
         let test_5 = async {
-            let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
+            let (project_id, team_id) =
+                create_dummy_project(&test_env.setup_api).await;
             let (organization_id, organization_team_id) =
                 create_dummy_org(&test_env.setup_api).await;
-            add_project_to_org(&test_env.setup_api, &project_id, &organization_id).await;
+            add_project_to_org(
+                &test_env.setup_api,
+                &project_id,
+                &organization_id,
+            )
+            .await;
             add_user_to_team(
                 self.user_id,
                 self.user_pat,
@@ -654,10 +678,16 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // Project has an organization
         // User affiliated with the project's org, with the default success
         let test_6 = async {
-            let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
+            let (project_id, team_id) =
+                create_dummy_project(&test_env.setup_api).await;
             let (organization_id, organization_team_id) =
                 create_dummy_org(&test_env.setup_api).await;
-            add_project_to_org(&test_env.setup_api, &project_id, &organization_id).await;
+            add_project_to_org(
+                &test_env.setup_api,
+                &project_id,
+                &organization_id,
+            )
+            .await;
             add_user_to_team(
                 self.user_id,
                 self.user_pat,
@@ -704,10 +734,16 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // User affiliated with the project's org (even can have successful permissions!)
         // User overwritten on the project team with failure permissions
         let test_7 = async {
-            let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
+            let (project_id, team_id) =
+                create_dummy_project(&test_env.setup_api).await;
             let (organization_id, organization_team_id) =
                 create_dummy_org(&test_env.setup_api).await;
-            add_project_to_org(&test_env.setup_api, &project_id, &organization_id).await;
+            add_project_to_org(
+                &test_env.setup_api,
+                &project_id,
+                &organization_id,
+            )
+            .await;
             add_user_to_team(
                 self.user_id,
                 self.user_pat,
@@ -767,10 +803,16 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         // User affiliated with the project's org with default failure permissions
         // User overwritten to the project with the success permissions
         let test_8 = async {
-            let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
+            let (project_id, team_id) =
+                create_dummy_project(&test_env.setup_api).await;
             let (organization_id, organization_team_id) =
                 create_dummy_org(&test_env.setup_api).await;
-            add_project_to_org(&test_env.setup_api, &project_id, &organization_id).await;
+            add_project_to_org(
+                &test_env.setup_api,
+                &project_id,
+                &organization_id,
+            )
+            .await;
             add_user_to_team(
                 self.user_id,
                 self.user_pat,
@@ -822,8 +864,10 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             Ok(())
         };
 
-        tokio::try_join!(test_1, test_2, test_3, test_4, test_5, test_6, test_7, test_8)
-            .map_err(|e| e)?;
+        tokio::try_join!(
+            test_1, test_2, test_3, test_4, test_5, test_6, test_7, test_8
+        )
+        .map_err(|e| e)?;
 
         Ok(())
     }
@@ -1012,7 +1056,12 @@ async fn create_dummy_org(setup_api: &ApiV3) -> (String, String) {
     let slug = generate_random_name("test_org");
 
     let resp = setup_api
-        .create_organization("Example org", &slug, "Example description.", ADMIN_USER_PAT)
+        .create_organization(
+            "Example org",
+            &slug,
+            "Example description.",
+            ADMIN_USER_PAT,
+        )
         .await;
     assert!(resp.status().is_success());
 
@@ -1025,7 +1074,11 @@ async fn create_dummy_org(setup_api: &ApiV3) -> (String, String) {
     (organizaion_id, team_id)
 }
 
-async fn add_project_to_org(setup_api: &ApiV3, project_id: &str, organization_id: &str) {
+async fn add_project_to_org(
+    setup_api: &ApiV3,
+    project_id: &str,
+    organization_id: &str,
+) {
     let resp = setup_api
         .organization_add_project(organization_id, project_id, ADMIN_USER_PAT)
         .await;
@@ -1081,7 +1134,11 @@ async fn modify_user_team_permissions(
     assert!(resp.status().is_success());
 }
 
-async fn remove_user_from_team(user_id: &str, team_id: &str, setup_api: &ApiV3) {
+async fn remove_user_from_team(
+    user_id: &str,
+    team_id: &str,
+    setup_api: &ApiV3,
+) {
     // Send invitation to user
     let resp = setup_api
         .remove_from_team(team_id, user_id, ADMIN_USER_PAT)
@@ -1102,7 +1159,9 @@ async fn get_project_permissions(
     let organization_id = project.organization.map(|id| id.to_string());
 
     let organization = match organization_id {
-        Some(id) => Some(setup_api.get_organization_deserialized(&id, user_pat).await),
+        Some(id) => {
+            Some(setup_api.get_organization_deserialized(&id, user_pat).await)
+        }
         None => None,
     };
 
@@ -1117,7 +1176,10 @@ async fn get_project_permissions(
     let organization_members = match organization {
         Some(org) => Some(
             setup_api
-                .get_team_members_deserialized(&org.team_id.to_string(), user_pat)
+                .get_team_members_deserialized(
+                    &org.team_id.to_string(),
+                    user_pat,
+                )
                 .await,
         ),
         None => None,

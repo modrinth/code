@@ -92,14 +92,16 @@ impl LegacyResultSearchProject {
             .cloned()
             .unwrap_or("project".to_string()); // Default to 'project' if none are found
 
-        let project_type = if og_project_type == "datapack" || og_project_type == "plugin" {
-            // These are not supported in V2, so we'll just use 'mod' instead
-            "mod".to_string()
-        } else {
-            og_project_type.clone()
-        };
+        let project_type =
+            if og_project_type == "datapack" || og_project_type == "plugin" {
+                // These are not supported in V2, so we'll just use 'mod' instead
+                "mod".to_string()
+            } else {
+                og_project_type.clone()
+            };
 
-        let project_loader_fields = result_search_project.project_loader_fields.clone();
+        let project_loader_fields =
+            result_search_project.project_loader_fields.clone();
         let get_one_bool_loader_field = |key: &str| {
             project_loader_fields
                 .get(key)
@@ -110,17 +112,20 @@ impl LegacyResultSearchProject {
         };
 
         let singleplayer = get_one_bool_loader_field("singleplayer");
-        let client_only = get_one_bool_loader_field("client_only").unwrap_or(false);
-        let server_only = get_one_bool_loader_field("server_only").unwrap_or(false);
+        let client_only =
+            get_one_bool_loader_field("client_only").unwrap_or(false);
+        let server_only =
+            get_one_bool_loader_field("server_only").unwrap_or(false);
         let client_and_server = get_one_bool_loader_field("client_and_server");
 
-        let (client_side, server_side) = v2_reroute::convert_side_types_v2_bools(
-            singleplayer,
-            client_only,
-            server_only,
-            client_and_server,
-            Some(&*og_project_type),
-        );
+        let (client_side, server_side) =
+            v2_reroute::convert_side_types_v2_bools(
+                singleplayer,
+                client_only,
+                server_only,
+                client_and_server,
+                Some(&*og_project_type),
+            );
         let client_side = client_side.to_string();
         let server_side = server_side.to_string();
 

@@ -91,10 +91,12 @@ impl OAuthClient {
     ) -> Result<Vec<OAuthClient>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
-        let results =
-            select_clients_with_predicate!("WHERE clients.id = ANY($1::bigint[])", ids_ref)
-                .fetch_all(exec)
-                .await?;
+        let results = select_clients_with_predicate!(
+            "WHERE clients.id = ANY($1::bigint[])",
+            ids_ref
+        )
+        .fetch_all(exec)
+        .await?;
 
         Ok(results.into_iter().map(|r| r.into()).collect_vec())
     }
@@ -104,9 +106,12 @@ impl OAuthClient {
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<OAuthClient>, DatabaseError> {
         let user_id_param = user_id.0;
-        let clients = select_clients_with_predicate!("WHERE created_by = $1", user_id_param)
-            .fetch_all(exec)
-            .await?;
+        let clients = select_clients_with_predicate!(
+            "WHERE created_by = $1",
+            user_id_param
+        )
+        .fetch_all(exec)
+        .await?;
 
         Ok(clients.into_iter().map(|r| r.into()).collect())
     }
@@ -153,7 +158,8 @@ impl OAuthClient {
         .execute(&mut **transaction)
         .await?;
 
-        Self::insert_redirect_uris(&self.redirect_uris, &mut **transaction).await?;
+        Self::insert_redirect_uris(&self.redirect_uris, &mut **transaction)
+            .await?;
 
         Ok(())
     }
@@ -231,7 +237,9 @@ impl OAuthClient {
 
 impl From<ClientQueryResult> for OAuthClient {
     fn from(r: ClientQueryResult) -> Self {
-        let redirects = if let (Some(ids), Some(uris)) = (r.uri_ids.as_ref(), r.uri_vals.as_ref()) {
+        let redirects = if let (Some(ids), Some(uris)) =
+            (r.uri_ids.as_ref(), r.uri_vals.as_ref())
+        {
             ids.iter()
                 .zip(uris.iter())
                 .map(|(id, uri)| OAuthRedirectUri {

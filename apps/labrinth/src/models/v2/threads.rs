@@ -1,4 +1,6 @@
-use crate::models::ids::{ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId};
+use crate::models::ids::{
+    ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId,
+};
 use crate::models::projects::ProjectStatus;
 use crate::models::users::{User, UserId};
 use chrono::{DateTime, Utc};
@@ -57,8 +59,12 @@ pub enum LegacyThreadType {
 impl From<crate::models::v3::threads::ThreadType> for LegacyThreadType {
     fn from(t: crate::models::v3::threads::ThreadType) -> Self {
         match t {
-            crate::models::v3::threads::ThreadType::Report => LegacyThreadType::Report,
-            crate::models::v3::threads::ThreadType::Project => LegacyThreadType::Project,
+            crate::models::v3::threads::ThreadType::Report => {
+                LegacyThreadType::Report
+            }
+            crate::models::v3::threads::ThreadType::Project => {
+                LegacyThreadType::Project
+            }
             crate::models::v3::threads::ThreadType::DirectMessage => {
                 LegacyThreadType::DirectMessage
             }

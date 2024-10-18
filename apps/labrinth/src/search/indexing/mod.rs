@@ -44,7 +44,9 @@ pub async fn remove_documents(
 
     for index in indexes {
         index
-            .delete_documents(&ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>())
+            .delete_documents(
+                &ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>(),
+            )
             .await?;
     }
 
@@ -70,11 +72,13 @@ pub async fn index_projects(
     let indices = get_indexes_for_indexing(config, true).await?;
 
     let all_loader_fields =
-        crate::database::models::loader_fields::LoaderField::get_fields_all(&pool, &redis)
-            .await?
-            .into_iter()
-            .map(|x| x.field)
-            .collect::<Vec<_>>();
+        crate::database::models::loader_fields::LoaderField::get_fields_all(
+            &pool, &redis,
+        )
+        .await?
+        .into_iter()
+        .map(|x| x.field)
+        .collect::<Vec<_>>();
 
     let uploads = index_local(&pool).await?;
     add_projects(&indices, uploads, all_loader_fields.clone(), config).await?;
@@ -92,7 +96,10 @@ pub async fn index_projects(
     Ok(())
 }
 
-pub async fn swap_index(config: &SearchConfig, index_name: &str) -> Result<(), IndexingError> {
+pub async fn swap_index(
+    config: &SearchConfig,
+    index_name: &str,
+) -> Result<(), IndexingError> {
     let client = config.make_client();
     let index_name_next = config.get_index_name(index_name, true);
     let index_name = config.get_index_name(index_name, false);
@@ -114,7 +121,8 @@ pub async fn get_indexes_for_indexing(
 ) -> Result<Vec<Index>, meilisearch_sdk::errors::Error> {
     let client = config.make_client();
     let project_name = config.get_index_name("projects", next);
-    let project_filtered_name = config.get_index_name("projects_filtered", next);
+    let project_filtered_name =
+        config.get_index_name("projects_filtered", next);
     let projects_index = create_or_update_index(
         &client,
         &project_name,
@@ -214,7 +222,11 @@ async fn add_to_index(
         index
             .add_or_replace(chunk, Some("version_id"))
             .await?
-            .wait_for_completion(client, None, Some(std::time::Duration::from_secs(3600)))
+            .wait_for_completion(
+                client,
+                None,
+                Some(std::time::Duration::from_secs(3600)),
+            )
             .await?;
         info!("Added chunk of {} projects to index", chunk.len());
     }
@@ -275,7 +287,8 @@ pub async fn add_projects(
 ) -> Result<(), IndexingError> {
     let client = config.make_client();
     for index in indices {
-        update_and_add_to_index(&client, index, &projects, &additional_fields).await?;
+        update_and_add_to_index(&client, index, &projects, &additional_fields)
+            .await?;
     }
 
     Ok(())
@@ -342,7 +355,8 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "project_loader_fields",
 ];
 
-const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] = &["name", "summary", "author", "slug"];
+const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] =
+    &["name", "summary", "author", "slug"];
 
 const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "categories",

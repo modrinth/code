@@ -43,7 +43,8 @@ impl ApiProject for ApiV3 {
         modify_json: Option<json_patch::Patch>,
         pat: Option<&str>,
     ) -> (CommonProject, Vec<CommonVersion>) {
-        let creation_data = get_public_project_creation_data(slug, version_jar, modify_json);
+        let creation_data =
+            get_public_project_creation_data(slug, version_jar, modify_json);
 
         // Add a project.
         let slug = creation_data.slug.clone();
@@ -98,7 +99,11 @@ impl ApiProject for ApiV3 {
         self.call(req).await
     }
 
-    async fn remove_project(&self, project_slug_or_id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn remove_project(
+        &self,
+        project_slug_or_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v3/project/{project_slug_or_id}"))
             .append_pat(pat)
@@ -107,7 +112,11 @@ impl ApiProject for ApiV3 {
         self.call(req).await
     }
 
-    async fn get_project(&self, id_or_slug: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn get_project(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v3/project/{id_or_slug}"))
             .append_pat(pat)
@@ -129,7 +138,11 @@ impl ApiProject for ApiV3 {
         serde_json::from_value(value).unwrap()
     }
 
-    async fn get_projects(&self, ids_or_slugs: &[&str], pat: Option<&str>) -> ServiceResponse {
+    async fn get_projects(
+        &self,
+        ids_or_slugs: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let ids_or_slugs = serde_json::to_string(ids_or_slugs).unwrap();
         let req = test::TestRequest::get()
             .uri(&format!(
@@ -279,7 +292,11 @@ impl ApiProject for ApiV3 {
         self.call(req).await
     }
 
-    async fn get_reports(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse {
+    async fn get_reports(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let ids_str = serde_json::to_string(ids).unwrap();
         let req = test::TestRequest::get()
             .uri(&format!(
@@ -316,7 +333,11 @@ impl ApiProject for ApiV3 {
         self.call(req).await
     }
 
-    async fn delete_report(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn delete_report(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v3/report/{id}"))
             .append_pat(pat)
@@ -414,7 +435,11 @@ impl ApiProject for ApiV3 {
         self.call(req).await
     }
 
-    async fn get_threads(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse {
+    async fn get_threads(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let ids_str = serde_json::to_string(ids).unwrap();
         let req = test::TestRequest::get()
             .uri(&format!(
@@ -457,7 +482,11 @@ impl ApiProject for ApiV3 {
         self.call(req).await
     }
 
-    async fn read_thread(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn read_thread(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::post()
             .uri(&format!("/v3/thread/{id}/read"))
             .append_pat(pat)
@@ -466,7 +495,11 @@ impl ApiProject for ApiV3 {
         self.call(req).await
     }
 
-    async fn delete_thread_message(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn delete_thread_message(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v3/message/{id}"))
             .append_pat(pat)
@@ -477,7 +510,11 @@ impl ApiProject for ApiV3 {
 }
 
 impl ApiV3 {
-    pub async fn get_project_deserialized(&self, id_or_slug: &str, pat: Option<&str>) -> Project {
+    pub async fn get_project_deserialized(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> Project {
         let resp = self.get_project(id_or_slug, pat).await;
         assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
@@ -543,11 +580,13 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let pv_string = if ids_are_version_ids {
-            let version_string: String = serde_json::to_string(&id_or_slugs).unwrap();
+            let version_string: String =
+                serde_json::to_string(&id_or_slugs).unwrap();
             let version_string = urlencoding::encode(&version_string);
             format!("version_ids={}", version_string)
         } else {
-            let projects_string: String = serde_json::to_string(&id_or_slugs).unwrap();
+            let projects_string: String =
+                serde_json::to_string(&id_or_slugs).unwrap();
             let projects_string = urlencoding::encode(&projects_string);
             format!("project_ids={}", projects_string)
         };
@@ -566,7 +605,10 @@ impl ApiV3 {
             extra_args.push_str(&format!("&end_date={end_date}"));
         }
         if let Some(resolution_minutes) = resolution_minutes {
-            extra_args.push_str(&format!("&resolution_minutes={}", resolution_minutes));
+            extra_args.push_str(&format!(
+                "&resolution_minutes={}",
+                resolution_minutes
+            ));
         }
 
         let req = test::TestRequest::get()

@@ -89,7 +89,8 @@ impl ApiProject for ApiV2 {
         modify_json: Option<json_patch::Patch>,
         pat: Option<&str>,
     ) -> (CommonProject, Vec<CommonVersion>) {
-        let creation_data = get_public_project_creation_data(slug, version_jar, modify_json);
+        let creation_data =
+            get_public_project_creation_data(slug, version_jar, modify_json);
 
         // Add a project.
         let slug = creation_data.slug.clone();
@@ -143,7 +144,11 @@ impl ApiProject for ApiV2 {
         self.call(req).await
     }
 
-    async fn remove_project(&self, project_slug_or_id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn remove_project(
+        &self,
+        project_slug_or_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v2/project/{project_slug_or_id}"))
             .append_pat(pat)
@@ -152,7 +157,11 @@ impl ApiProject for ApiV2 {
         self.call(req).await
     }
 
-    async fn get_project(&self, id_or_slug: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn get_project(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v2/project/{id_or_slug}"))
             .append_pat(pat)
@@ -174,7 +183,11 @@ impl ApiProject for ApiV2 {
         serde_json::from_value(value).unwrap()
     }
 
-    async fn get_projects(&self, ids_or_slugs: &[&str], pat: Option<&str>) -> ServiceResponse {
+    async fn get_projects(
+        &self,
+        ids_or_slugs: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let ids_or_slugs = serde_json::to_string(ids_or_slugs).unwrap();
         let req = test::TestRequest::get()
             .uri(&format!(
@@ -324,7 +337,11 @@ impl ApiProject for ApiV2 {
         self.call(req).await
     }
 
-    async fn get_reports(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse {
+    async fn get_reports(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let ids_str = serde_json::to_string(ids).unwrap();
         let req = test::TestRequest::get()
             .uri(&format!(
@@ -346,7 +363,11 @@ impl ApiProject for ApiV2 {
         self.call(req).await
     }
 
-    async fn delete_report(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn delete_report(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v2/report/{id}"))
             .append_pat(pat)
@@ -379,7 +400,11 @@ impl ApiProject for ApiV2 {
         self.call(req).await
     }
 
-    async fn get_threads(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse {
+    async fn get_threads(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let ids_str = serde_json::to_string(ids).unwrap();
         let req = test::TestRequest::get()
             .uri(&format!(
@@ -422,7 +447,11 @@ impl ApiProject for ApiV2 {
         self.call(req).await
     }
 
-    async fn read_thread(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn read_thread(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::post()
             .uri(&format!("/v2/thread/{id}/read"))
             .append_pat(pat)
@@ -431,7 +460,11 @@ impl ApiProject for ApiV2 {
         self.call(req).await
     }
 
-    async fn delete_thread_message(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn delete_thread_message(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v2/message/{id}"))
             .append_pat(pat)

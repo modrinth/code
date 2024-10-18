@@ -87,7 +87,8 @@ impl TempUser {
             }
         }
 
-        let user_id = crate::database::models::generate_user_id(transaction).await?;
+        let user_id =
+            crate::database::models::generate_user_id(transaction).await?;
 
         let mut username_increment: i32 = 0;
         let mut username = None;
@@ -103,7 +104,12 @@ impl TempUser {
                 }
             );
 
-            let new_id = crate::database::models::User::get(&test_username, client, redis).await?;
+            let new_id = crate::database::models::User::get(
+                &test_username,
+                client,
+                redis,
+            )
+            .await?;
 
             if new_id.is_none() {
                 username = Some(test_username);
@@ -112,71 +118,74 @@ impl TempUser {
             }
         }
 
-        let (avatar_url, raw_avatar_url) = if let Some(avatar_url) = self.avatar_url {
-            let res = reqwest::get(&avatar_url).await?;
-            let headers = res.headers().clone();
+        let (avatar_url, raw_avatar_url) =
+            if let Some(avatar_url) = self.avatar_url {
+                let res = reqwest::get(&avatar_url).await?;
+                let headers = res.headers().clone();
 
-            let img_data = if let Some(content_type) = headers
-                .get(reqwest::header::CONTENT_TYPE)
-                .and_then(|ct| ct.to_str().ok())
-            {
-                get_image_ext(content_type)
-            } else {
-                avatar_url.rsplit('.').next()
-            };
+                let img_data = if let Some(content_type) = headers
+                    .get(reqwest::header::CONTENT_TYPE)
+                    .and_then(|ct| ct.to_str().ok())
+                {
+                    get_image_ext(content_type)
+                } else {
+                    avatar_url.rsplit('.').next()
+                };
 
-            if let Some(ext) = img_data {
-                let bytes = res.bytes().await?;
+                if let Some(ext) = img_data {
+                    let bytes = res.bytes().await?;
 
-                let upload_result = upload_image_optimized(
-                    &format!("user/{}", crate::models::users::UserId::from(user_id)),
-                    bytes,
-                    ext,
-                    Some(96),
-                    Some(1.0),
-                    &**file_host,
-                )
-                .await;
+                    let upload_result = upload_image_optimized(
+                        &format!(
+                            "user/{}",
+                            crate::models::users::UserId::from(user_id)
+                        ),
+                        bytes,
+                        ext,
+                        Some(96),
+                        Some(1.0),
+                        &**file_host,
+                    )
+                    .await;
 
-                if let Ok(upload_result) = upload_result {
-                    (Some(upload_result.url), Some(upload_result.raw_url))
+                    if let Ok(upload_result) = upload_result {
+                        (Some(upload_result.url), Some(upload_result.raw_url))
+                    } else {
+                        (None, None)
+                    }
                 } else {
                     (None, None)
                 }
             } else {
                 (None, None)
-            }
-        } else {
-            (None, None)
-        };
+            };
 
         if let Some(username) = username {
             crate::database::models::User {
                 id: user_id,
                 github_id: if provider == AuthProvider::GitHub {
                     Some(
-                        self.id
-                            .clone()
-                            .parse()
-                            .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                        self.id.clone().parse().map_err(|_| {
+                            AuthenticationError::InvalidCredentials
+                        })?,
                     )
                 } else {
                     None
                 },
                 discord_id: if provider == AuthProvider::Discord {
                     Some(
-                        self.id
-                            .parse()
-                            .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                        self.id.parse().map_err(|_| {
+                            AuthenticationError::InvalidCredentials
+                        })?,
                     )
                 } else {
                     None
                 },
                 gitlab_id: if provider == AuthProvider::GitLab {
                     Some(
-                        self.id
-                            .parse()
-                            .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                        self.id.parse().map_err(|_| {
+                            AuthenticationError::InvalidCredentials
+                        })?,
                     )
                 } else {
                     None
@@ -188,9 +197,9 @@ impl TempUser {
                 },
                 steam_id: if provider == AuthProvider::Steam {
                     Some(
-                        self.id
-                            .parse()
-                            .map_err(|_| AuthenticationError::InvalidCredentials)?,
+                        self.id.parse().map_err(|_| {
+                            AuthenticationError::InvalidCredentials
+                        })?,
                     )
                 } else {
                     None
@@ -236,7 +245,10 @@ impl TempUser {
 }
 
 impl AuthProvider {
-    pub fn get_redirect_url(&self, state: String) -> Result<String, AuthenticationError> {
+    pub fn get_redirect_url(
+        &self,
+        state: String,
+    ) -> Result<String, AuthenticationError> {
         let self_addr = dotenvy::var("SELF_ADDR")?;
         let raw_redirect_uri = format!("{}/v2/auth/callback", self_addr);
         let redirect_uri = urlencoding::encode(&raw_redirect_uri);
@@ -316,7 +328,8 @@ impl AuthProvider {
         &self,
         query: HashMap<String, String>,
     ) -> Result<String, AuthenticationError> {
-        let redirect_uri = format!("{}/v2/auth/callback", dotenvy::var("SELF_ADDR")?);
+        let redirect_uri =
+            format!("{}/v2/auth/callback", dotenvy::var("SELF_ADDR")?);
 
         #[derive(Deserialize)]
         struct AccessToken {
@@ -454,22 +467,26 @@ impl AuthProvider {
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
                 form.insert(
                     "openid.assoc_handle".to_string(),
-                    &**query
-                        .get("openid.assoc_handle")
-                        .ok_or_else(|| AuthenticationError::InvalidCredentials)?,
+                    &**query.get("openid.assoc_handle").ok_or_else(|| {
+                        AuthenticationError::InvalidCredentials
+                    })?,
                 );
                 form.insert("openid.signed".to_string(), &**signed);
                 form.insert(
                     "openid.sig".to_string(),
-                    &**query
-                        .get("openid.sig")
-                        .ok_or_else(|| AuthenticationError::InvalidCredentials)?,
+                    &**query.get("openid.sig").ok_or_else(|| {
+                        AuthenticationError::InvalidCredentials
+                    })?,
                 );
-                form.insert("openid.ns".to_string(), "http://specs.openid.net/auth/2.0");
+                form.insert(
+                    "openid.ns".to_string(),
+                    "http://specs.openid.net/auth/2.0",
+                );
                 form.insert("openid.mode".to_string(), "check_authentication");
 
                 for val in signed.split(',') {
-                    if let Some(arr_val) = query.get(&format!("openid.{}", val)) {
+                    if let Some(arr_val) = query.get(&format!("openid.{}", val))
+                    {
                         form.insert(format!("openid.{}", val), &**arr_val);
                     }
                 }
@@ -484,9 +501,10 @@ impl AuthProvider {
                     .await?;
 
                 if res.contains("is_valid:true") {
-                    let identity = query
-                        .get("openid.identity")
-                        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+                    let identity =
+                        query.get("openid.identity").ok_or_else(|| {
+                            AuthenticationError::InvalidCredentials
+                        })?;
 
                     identity
                         .rsplit('/')
@@ -533,7 +551,10 @@ impl AuthProvider {
         Ok(res)
     }
 
-    pub async fn get_user(&self, token: &str) -> Result<TempUser, AuthenticationError> {
+    pub async fn get_user(
+        &self,
+        token: &str,
+    ) -> Result<TempUser, AuthenticationError> {
         let res = match self {
             AuthProvider::GitHub => {
                 let response = reqwest::Client::new()
@@ -549,7 +570,9 @@ impl AuthProvider {
                         .get("x-oauth-client-id")
                         .and_then(|x| x.to_str().ok());
 
-                    if client_id != Some(&*dotenvy::var("GITHUB_CLIENT_ID").unwrap()) {
+                    if client_id
+                        != Some(&*dotenvy::var("GITHUB_CLIENT_ID").unwrap())
+                    {
                         return Err(AuthenticationError::InvalidClientId);
                     }
                 }
@@ -599,9 +622,12 @@ impl AuthProvider {
                     id: discord_user.id,
                     username: discord_user.username,
                     email: discord_user.email,
-                    avatar_url: discord_user
-                        .avatar
-                        .map(|x| format!("https://cdn.discordapp.com/avatars/{}/{}.webp", id, x)),
+                    avatar_url: discord_user.avatar.map(|x| {
+                        format!(
+                            "https://cdn.discordapp.com/avatars/{}/{}.webp",
+                            id, x
+                        )
+                    }),
                     bio: None,
                     country: None,
                 }
@@ -727,7 +753,8 @@ impl AuthProvider {
                     .text()
                     .await?;
 
-                let mut response: SteamResponse = serde_json::from_str(&response)?;
+                let mut response: SteamResponse =
+                    serde_json::from_str(&response)?;
 
                 if let Some(player) = response.response.players.pop() {
                     let username = player
@@ -827,9 +854,12 @@ impl AuthProvider {
                 value.map(|x| crate::database::models::UserId(x.id))
             }
             AuthProvider::Microsoft => {
-                let value = sqlx::query!("SELECT id FROM users WHERE microsoft_id = $1", id)
-                    .fetch_optional(executor)
-                    .await?;
+                let value = sqlx::query!(
+                    "SELECT id FROM users WHERE microsoft_id = $1",
+                    id
+                )
+                .fetch_optional(executor)
+                .await?;
 
                 value.map(|x| crate::database::models::UserId(x.id))
             }
@@ -845,9 +875,12 @@ impl AuthProvider {
                 value.map(|x| crate::database::models::UserId(x.id))
             }
             AuthProvider::Google => {
-                let value = sqlx::query!("SELECT id FROM users WHERE google_id = $1", id)
-                    .fetch_optional(executor)
-                    .await?;
+                let value = sqlx::query!(
+                    "SELECT id FROM users WHERE google_id = $1",
+                    id
+                )
+                .fetch_optional(executor)
+                .await?;
 
                 value.map(|x| crate::database::models::UserId(x.id))
             }
@@ -863,9 +896,12 @@ impl AuthProvider {
                 value.map(|x| crate::database::models::UserId(x.id))
             }
             AuthProvider::PayPal => {
-                let value = sqlx::query!("SELECT id FROM users WHERE paypal_id = $1", id)
-                    .fetch_optional(executor)
-                    .await?;
+                let value = sqlx::query!(
+                    "SELECT id FROM users WHERE paypal_id = $1",
+                    id
+                )
+                .fetch_optional(executor)
+                .await?;
 
                 value.map(|x| crate::database::models::UserId(x.id))
             }
@@ -1024,11 +1060,15 @@ pub async fn init(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, AuthenticationError> {
-    let url = url::Url::parse(&info.url).map_err(|_| AuthenticationError::Url)?;
+    let url =
+        url::Url::parse(&info.url).map_err(|_| AuthenticationError::Url)?;
 
-    let allowed_callback_urls = parse_strings_from_var("ALLOWED_CALLBACK_URLS").unwrap_or_default();
+    let allowed_callback_urls =
+        parse_strings_from_var("ALLOWED_CALLBACK_URLS").unwrap_or_default();
     let domain = url.host_str().ok_or(AuthenticationError::Url)?;
-    if !allowed_callback_urls.iter().any(|x| domain.ends_with(x)) && domain != "modrinth.com" {
+    if !allowed_callback_urls.iter().any(|x| domain.ends_with(x))
+        && domain != "modrinth.com"
+    {
         return Err(AuthenticationError::Url);
     }
 
@@ -1381,7 +1421,11 @@ pub async fn delete_auth_provider(
     }
 
     transaction.commit().await?;
-    crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
+    crate::database::models::User::clear_caches(
+        &[(user.id.into(), None)],
+        &redis,
+    )
+    .await?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -1431,24 +1475,28 @@ pub async fn create_account_with_password(
     redis: Data<RedisPool>,
     new_account: web::Json<NewAccount>,
 ) -> Result<HttpResponse, ApiError> {
-    new_account
-        .0
-        .validate()
-        .map_err(|err| ApiError::InvalidInput(validation_errors_to_string(err, None)))?;
+    new_account.0.validate().map_err(|err| {
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
 
     if !check_turnstile_captcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
-    if crate::database::models::User::get(&new_account.username, &**pool, &redis)
-        .await?
-        .is_some()
+    if crate::database::models::User::get(
+        &new_account.username,
+        &**pool,
+        &redis,
+    )
+    .await?
+    .is_some()
     {
         return Err(ApiError::InvalidInput("Username is taken!".to_string()));
     }
 
     let mut transaction = pool.begin().await?;
-    let user_id = crate::database::models::generate_user_id(&mut transaction).await?;
+    let user_id =
+        crate::database::models::generate_user_id(&mut transaction).await?;
 
     let new_account = new_account.0;
 
@@ -1459,10 +1507,13 @@ pub async fn create_account_with_password(
 
     if score.score() < 3 {
         return Err(ApiError::InvalidInput(
-            if let Some(feedback) = score.feedback().clone().and_then(|x| x.warning()) {
+            if let Some(feedback) =
+                score.feedback().clone().and_then(|x| x.warning())
+            {
                 format!("Password too weak: {}", feedback)
             } else {
-                "Specified password is too weak! Please improve its strength.".to_string()
+                "Specified password is too weak! Please improve its strength."
+                    .to_string()
             },
         ));
     }
@@ -1554,13 +1605,15 @@ pub async fn login_password(
     }
 
     let user = if let Some(user) =
-        crate::database::models::User::get(&login.username, &**pool, &redis).await?
+        crate::database::models::User::get(&login.username, &**pool, &redis)
+            .await?
     {
         user
     } else {
-        let user = crate::database::models::User::get_email(&login.username, &**pool)
-            .await?
-            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+        let user =
+            crate::database::models::User::get_email(&login.username, &**pool)
+                .await?
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
         crate::database::models::User::get_id(user, &**pool, &redis)
             .await?
@@ -1591,7 +1644,8 @@ pub async fn login_password(
         })))
     } else {
         let mut transaction = pool.begin().await?;
-        let session = issue_session(req, user.id, &mut transaction, &redis).await?;
+        let session =
+            issue_session(req, user.id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
@@ -1651,7 +1705,9 @@ async fn validate_2fa_code(
 
         Ok(true)
     } else if allow_backup {
-        let backup_codes = crate::database::models::User::get_backup_codes(user_id, pool).await?;
+        let backup_codes =
+            crate::database::models::User::get_backup_codes(user_id, pool)
+                .await?;
 
         if !backup_codes.contains(&input) {
             Ok(false)
@@ -1669,7 +1725,11 @@ async fn validate_2fa_code(
             .execute(&mut **transaction)
             .await?;
 
-            crate::database::models::User::clear_caches(&[(user_id, None)], redis).await?;
+            crate::database::models::User::clear_caches(
+                &[(user_id, None)],
+                redis,
+            )
+            .await?;
 
             Ok(true)
         }
@@ -1690,9 +1750,10 @@ pub async fn login_2fa(
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
     if let Flow::Login2FA { user_id } = flow {
-        let user = crate::database::models::User::get_id(user_id, &**pool, &redis)
-            .await?
-            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+        let user =
+            crate::database::models::User::get_id(user_id, &**pool, &redis)
+                .await?
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
         let mut transaction = pool.begin().await?;
         if !validate_2fa_code(
@@ -1713,7 +1774,8 @@ pub async fn login_2fa(
         }
         Flow::remove(&login.flow, &redis).await?;
 
-        let session = issue_session(req, user_id, &mut transaction, &redis).await?;
+        let session =
+            issue_session(req, user_id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
@@ -1870,7 +1932,11 @@ pub async fn finish_2fa_flow(
         }
 
         transaction.commit().await?;
-        crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
+        crate::database::models::User::clear_caches(
+            &[(user.id.into(), None)],
+            &redis,
+        )
+        .await?;
 
         Ok(HttpResponse::Ok().json(serde_json::json!({
             "backup_codes": codes,
@@ -1895,10 +1961,15 @@ pub async fn remove_2fa(
     login: web::Json<Remove2FA>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (scopes, user) =
-        get_user_record_from_bearer_token(&req, None, &**pool, &redis, &session_queue)
-            .await?
-            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+    let (scopes, user) = get_user_record_from_bearer_token(
+        &req,
+        None,
+        &**pool,
+        &redis,
+        &session_queue,
+    )
+    .await?
+    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
     if !scopes.contains(Scopes::USER_AUTH_WRITE) {
         return Err(ApiError::Authentication(
@@ -1911,7 +1982,9 @@ pub async fn remove_2fa(
     if !validate_2fa_code(
         login.code.clone(),
         user.totp_secret.ok_or_else(|| {
-            ApiError::InvalidInput("User does not have 2FA enabled on the account!".to_string())
+            ApiError::InvalidInput(
+                "User does not have 2FA enabled on the account!".to_string(),
+            )
         })?,
         true,
         user.id,
@@ -1958,7 +2031,8 @@ pub async fn remove_2fa(
     }
 
     transaction.commit().await?;
-    crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
+    crate::database::models::User::clear_caches(&[(user.id, None)], &redis)
+        .await?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -1980,12 +2054,20 @@ pub async fn reset_password_begin(
         return Err(ApiError::Turnstile);
     }
 
-    let user = if let Some(user_id) =
-        crate::database::models::User::get_email(&reset_password.username, &**pool).await?
+    let user = if let Some(user_id) = crate::database::models::User::get_email(
+        &reset_password.username,
+        &**pool,
+    )
+    .await?
     {
         crate::database::models::User::get_id(user_id, &**pool, &redis).await?
     } else {
-        crate::database::models::User::get(&reset_password.username, &**pool, &redis).await?
+        crate::database::models::User::get(
+            &reset_password.username,
+            &**pool,
+            &redis,
+        )
+        .await?
     };
 
     if let Some(user) = user {
@@ -2026,9 +2108,10 @@ pub async fn change_password(
         let flow = Flow::get(flow, &redis).await?;
 
         if let Some(Flow::ForgotPassword { user_id }) = flow {
-            let user = crate::database::models::User::get_id(user_id, &**pool, &redis)
-                .await?
-                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+            let user =
+                crate::database::models::User::get_id(user_id, &**pool, &redis)
+                    .await?
+                    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
             Some(user)
         } else {
@@ -2041,10 +2124,15 @@ pub async fn change_password(
     let user = if let Some(user) = user {
         user
     } else {
-        let (scopes, user) =
-            get_user_record_from_bearer_token(&req, None, &**pool, &redis, &session_queue)
-                .await?
-                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+        let (scopes, user) = get_user_record_from_bearer_token(
+            &req,
+            None,
+            &**pool,
+            &redis,
+            &session_queue,
+        )
+        .await?
+        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
         if !scopes.contains(Scopes::USER_AUTH_WRITE) {
             return Err(ApiError::Authentication(
@@ -2060,7 +2148,10 @@ pub async fn change_password(
             })?;
 
             let hasher = Argon2::default();
-            hasher.verify_password(old_password.as_bytes(), &PasswordHash::new(pass)?)?;
+            hasher.verify_password(
+                old_password.as_bytes(),
+                &PasswordHash::new(pass)?,
+            )?;
         }
 
         user
@@ -2068,7 +2159,9 @@ pub async fn change_password(
 
     let mut transaction = pool.begin().await?;
 
-    let update_password = if let Some(new_password) = &change_password.new_password {
+    let update_password = if let Some(new_password) =
+        &change_password.new_password
+    {
         let score = zxcvbn::zxcvbn(
             new_password,
             &[&user.username, &user.email.clone().unwrap_or_default()],
@@ -2076,7 +2169,9 @@ pub async fn change_password(
 
         if score.score() < 3 {
             return Err(ApiError::InvalidInput(
-                if let Some(feedback) = score.feedback().clone().and_then(|x| x.warning()) {
+                if let Some(feedback) =
+                    score.feedback().clone().and_then(|x| x.warning())
+                {
                     format!("Password too weak: {}", feedback)
                 } else {
                     "Specified password is too weak! Please improve its strength.".to_string()
@@ -2140,7 +2235,8 @@ pub async fn change_password(
     }
 
     transaction.commit().await?;
-    crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
+    crate::database::models::User::clear_caches(&[(user.id, None)], &redis)
+        .await?;
 
     Ok(HttpResponse::Ok().finish())
 }
@@ -2160,10 +2256,9 @@ pub async fn set_email(
     session_queue: Data<AuthQueue>,
     stripe_client: Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    email
-        .0
-        .validate()
-        .map_err(|err| ApiError::InvalidInput(validation_errors_to_string(err, None)))?;
+    email.0.validate().map_err(|err| {
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
 
     let user = get_user_from_headers(
         &req,
@@ -2229,7 +2324,11 @@ pub async fn set_email(
     )?;
 
     transaction.commit().await?;
-    crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
+    crate::database::models::User::clear_caches(
+        &[(user.id.into(), None)],
+        &redis,
+    )
+    .await?;
 
     Ok(HttpResponse::Ok().finish())
 }
@@ -2265,7 +2364,11 @@ pub async fn resend_verify_email(
         .insert(Duration::hours(24), &redis)
         .await?;
 
-        send_email_verify(email, flow, "We need to verify your email address.")?;
+        send_email_verify(
+            email,
+            flow,
+            "We need to verify your email address.",
+        )?;
 
         Ok(HttpResponse::NoContent().finish())
     } else {
@@ -2293,9 +2396,10 @@ pub async fn verify_email(
         confirm_email,
     }) = flow
     {
-        let user = crate::database::models::User::get_id(user_id, &**pool, &redis)
-            .await?
-            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+        let user =
+            crate::database::models::User::get_id(user_id, &**pool, &redis)
+                .await?
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
         if user.email != Some(confirm_email) {
             return Err(ApiError::InvalidInput(
@@ -2319,12 +2423,14 @@ pub async fn verify_email(
 
         Flow::remove(&email.flow, &redis).await?;
         transaction.commit().await?;
-        crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
+        crate::database::models::User::clear_caches(&[(user.id, None)], &redis)
+            .await?;
 
         Ok(HttpResponse::NoContent().finish())
     } else {
         Err(ApiError::InvalidInput(
-            "Flow does not exist. Try re-requesting the verification link.".to_string(),
+            "Flow does not exist. Try re-requesting the verification link."
+                .to_string(),
         ))
     }
 }

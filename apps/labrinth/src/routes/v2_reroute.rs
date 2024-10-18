@@ -3,14 +3,20 @@ use std::collections::HashMap;
 use super::v3::project_creation::CreateError;
 use super::ApiError;
 use crate::models::v2::projects::LegacySideType;
-use crate::util::actix::{generate_multipart, MultipartSegment, MultipartSegmentData};
+use crate::util::actix::{
+    generate_multipart, MultipartSegment, MultipartSegmentData,
+};
 use actix_multipart::Multipart;
-use actix_web::http::header::{ContentDisposition, HeaderMap, TryIntoHeaderPair};
+use actix_web::http::header::{
+    ContentDisposition, HeaderMap, TryIntoHeaderPair,
+};
 use actix_web::HttpResponse;
 use futures::{stream, Future, StreamExt};
 use serde_json::{json, Value};
 
-pub async fn extract_ok_json<T>(response: HttpResponse) -> Result<T, HttpResponse>
+pub async fn extract_ok_json<T>(
+    response: HttpResponse,
+) -> Result<T, HttpResponse>
 where
     T: serde::de::DeserializeOwned,
 {
@@ -27,7 +33,8 @@ where
         let bytes = actix_web::body::to_bytes(body)
             .await
             .map_err(|_| failure_http_response())?;
-        let json_value: T = serde_json::from_slice(&bytes).map_err(|_| failure_http_response())?;
+        let json_value: T = serde_json::from_slice(&bytes)
+            .map_err(|_| failure_http_response())?;
         Ok(json_value)
     } else {
         Err(response)
@@ -119,9 +126,10 @@ where
         let json_value = json.ok_or(CreateError::InvalidInput(
             "No json segment found in multipart.".to_string(),
         ))?;
-        let mut json_segment = json_segment.ok_or(CreateError::InvalidInput(
-            "No json segment found in multipart.".to_string(),
-        ))?;
+        let mut json_segment =
+            json_segment.ok_or(CreateError::InvalidInput(
+                "No json segment found in multipart.".to_string(),
+            ))?;
 
         // Call closure, with the json value and names of the other segments
         let json_value: U = closure(json_value, content_dispositions).await?;
@@ -144,11 +152,15 @@ where
             headers.insert(key, value);
         }
         Err(err) => {
-            CreateError::InvalidInput(format!("Error inserting test header: {:?}.", err));
+            CreateError::InvalidInput(format!(
+                "Error inserting test header: {:?}.",
+                err
+            ));
         }
     };
 
-    let new_multipart = Multipart::new(&headers, stream::once(async { Ok(payload) }));
+    let new_multipart =
+        Multipart::new(&headers, stream::once(async { Ok(payload) }));
 
     Ok(new_multipart)
 }
@@ -165,10 +177,10 @@ pub fn convert_side_types_v3(
         || server_side == Required
         || server_side == Optional;
     let client_and_server = singleplayer;
-    let client_only =
-        (client_side == Required || client_side == Optional) && server_side != Required;
-    let server_only =
-        (server_side == Required || server_side == Optional) && client_side != Required;
+    let client_only = (client_side == Required || client_side == Optional)
+        && server_side != Required;
+    let server_only = (server_side == Required || server_side == Optional)
+        && client_side != Required;
 
     let mut fields = HashMap::new();
     fields.insert("singleplayer".to_string(), json!(singleplayer));
@@ -181,7 +193,9 @@ pub fn convert_side_types_v3(
 // Converts plugin loaders from v2 to v3, for search facets
 // Within every 1st and 2nd level (the ones allowed in v2), we convert every instance of:
 // "project_type:mod" to "project_type:plugin" OR "project_type:mod"
-pub fn convert_plugin_loader_facets_v3(facets: Vec<Vec<String>>) -> Vec<Vec<String>> {
+pub fn convert_plugin_loader_facets_v3(
+    facets: Vec<Vec<String>>,
+) -> Vec<Vec<String>> {
     facets
         .into_iter()
         .map(|inner_facets| {
@@ -246,7 +260,8 @@ pub fn convert_side_types_v2_bools(
         Some("shader") => (Required, Unsupported),
         Some("resourcepack") => (Required, Unsupported),
         _ => {
-            let singleplayer = singleplayer.or(client_and_server).unwrap_or(false);
+            let singleplayer =
+                singleplayer.or(client_and_server).unwrap_or(false);
 
             match (singleplayer, client_only, server_only) {
                 // Only singleplayer
@@ -282,7 +297,9 @@ pub fn capitalize_first(input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::v2::projects::LegacySideType::{Optional, Required, Unsupported};
+    use crate::models::v2::projects::LegacySideType::{
+        Optional, Required, Unsupported,
+    };
 
     #[test]
     fn convert_types() {
@@ -300,8 +317,10 @@ mod tests {
                 if lossy_pairs.contains(&(client_side, server_side)) {
                     continue;
                 }
-                let side_types = convert_side_types_v3(client_side, server_side);
-                let (client_side2, server_side2) = convert_side_types_v2(&side_types, None);
+                let side_types =
+                    convert_side_types_v3(client_side, server_side);
+                let (client_side2, server_side2) =
+                    convert_side_types_v2(&side_types, None);
                 assert_eq!(client_side, client_side2);
                 assert_eq!(server_side, server_side2);
             }

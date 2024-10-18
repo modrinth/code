@@ -1,5 +1,6 @@
 use crate::models::payouts::{
-    PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodFee, PayoutMethodType,
+    PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodFee,
+    PayoutMethodType,
 };
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
@@ -81,12 +82,17 @@ impl PayoutsQueue {
             .form(&form)
             .send()
             .await
-            .map_err(|_| ApiError::Payments("Error while authenticating with PayPal".to_string()))?
+            .map_err(|_| {
+                ApiError::Payments(
+                    "Error while authenticating with PayPal".to_string(),
+                )
+            })?
             .json()
             .await
             .map_err(|_| {
                 ApiError::Payments(
-                    "Error while authenticating with PayPal (deser error)".to_string(),
+                    "Error while authenticating with PayPal (deser error)"
+                        .to_string(),
                 )
             })?;
 
@@ -114,7 +120,9 @@ impl PayoutsQueue {
             if credentials.expires < Utc::now() {
                 drop(read);
                 self.refresh_token().await.map_err(|_| {
-                    ApiError::Payments("Error while authenticating with PayPal".to_string())
+                    ApiError::Payments(
+                        "Error while authenticating with PayPal".to_string(),
+                    )
                 })?
             } else {
                 credentials.clone()
@@ -122,7 +130,9 @@ impl PayoutsQueue {
         } else {
             drop(read);
             self.refresh_token().await.map_err(|_| {
-                ApiError::Payments("Error while authenticating with PayPal".to_string())
+                ApiError::Payments(
+                    "Error while authenticating with PayPal".to_string(),
+                )
             })?
         };
 
@@ -138,7 +148,10 @@ impl PayoutsQueue {
             )
             .header(
                 "Authorization",
-                format!("{} {}", credentials.token_type, credentials.access_token),
+                format!(
+                    "{} {}",
+                    credentials.token_type, credentials.access_token
+                ),
             );
 
         if let Some(body) = body {
@@ -149,15 +162,16 @@ impl PayoutsQueue {
                 .body(body);
         }
 
-        let resp = request
-            .send()
-            .await
-            .map_err(|_| ApiError::Payments("could not communicate with PayPal".to_string()))?;
+        let resp = request.send().await.map_err(|_| {
+            ApiError::Payments("could not communicate with PayPal".to_string())
+        })?;
 
         let status = resp.status();
 
         let value = resp.json::<Value>().await.map_err(|_| {
-            ApiError::Payments("could not retrieve PayPal response body".to_string())
+            ApiError::Payments(
+                "could not retrieve PayPal response body".to_string(),
+            )
         })?;
 
         if !status.is_success() {
@@ -173,14 +187,18 @@ impl PayoutsQueue {
                 pub error_description: String,
             }
 
-            if let Ok(error) = serde_json::from_value::<PayPalError>(value.clone()) {
+            if let Ok(error) =
+                serde_json::from_value::<PayPalError>(value.clone())
+            {
                 return Err(ApiError::Payments(format!(
                     "error name: {}, message: {}",
                     error.name, error.message
                 )));
             }
 
-            if let Ok(error) = serde_json::from_value::<PayPalIdentityError>(value) {
+            if let Ok(error) =
+                serde_json::from_value::<PayPalIdentityError>(value)
+            {
                 return Err(ApiError::Payments(format!(
                     "error name: {}, message: {}",
                     error.error, error.error_description
@@ -216,15 +234,18 @@ impl PayoutsQueue {
             request = request.json(&body);
         }
 
-        let resp = request
-            .send()
-            .await
-            .map_err(|_| ApiError::Payments("could not communicate with Tremendous".to_string()))?;
+        let resp = request.send().await.map_err(|_| {
+            ApiError::Payments(
+                "could not communicate with Tremendous".to_string(),
+            )
+        })?;
 
         let status = resp.status();
 
         let value = resp.json::<Value>().await.map_err(|_| {
-            ApiError::Payments("could not retrieve Tremendous response body".to_string())
+            ApiError::Payments(
+                "could not retrieve Tremendous response body".to_string(),
+            )
         })?;
 
         if !status.is_success() {
@@ -235,12 +256,15 @@ impl PayoutsQueue {
                         message: String,
                     }
 
-                    let err =
-                        serde_json::from_value::<TremendousError>(array.clone()).map_err(|_| {
-                            ApiError::Payments(
-                                "could not retrieve Tremendous error json body".to_string(),
-                            )
-                        })?;
+                    let err = serde_json::from_value::<TremendousError>(
+                        array.clone(),
+                    )
+                    .map_err(|_| {
+                        ApiError::Payments(
+                            "could not retrieve Tremendous error json body"
+                                .to_string(),
+                        )
+                    })?;
 
                     return Err(ApiError::Payments(err.message));
                 }
@@ -254,8 +278,12 @@ impl PayoutsQueue {
         Ok(serde_json::from_value(value)?)
     }
 
-    pub async fn get_payout_methods(&self) -> Result<Vec<PayoutMethod>, ApiError> {
-        async fn refresh_payout_methods(queue: &PayoutsQueue) -> Result<PayoutMethods, ApiError> {
+    pub async fn get_payout_methods(
+        &self,
+    ) -> Result<Vec<PayoutMethod>, ApiError> {
+        async fn refresh_payout_methods(
+            queue: &PayoutsQueue,
+        ) -> Result<PayoutMethods, ApiError> {
             let mut options = queue.payout_options.write().await;
 
             let mut methods = Vec::new();
@@ -304,7 +332,11 @@ impl PayoutsQueue {
             }
 
             let response = queue
-                .make_tremendous_request::<(), TremendousResponse>(Method::GET, "products", None)
+                .make_tremendous_request::<(), TremendousResponse>(
+                    Method::GET,
+                    "products",
+                    None,
+                )
                 .await?;
 
             for product in response.products {
@@ -361,7 +393,11 @@ impl PayoutsQueue {
                     id: product.id,
                     type_: PayoutMethodType::Tremendous,
                     name: product.name.clone(),
-                    supported_countries: product.countries.into_iter().map(|x| x.abbr).collect(),
+                    supported_countries: product
+                        .countries
+                        .into_iter()
+                        .map(|x| x.abbr)
+                        .collect(),
                     image_url: product
                         .images
                         .into_iter()
@@ -412,7 +448,8 @@ impl PayoutsQueue {
                 methods.push(method);
             }
 
-            const UPRANK_IDS: &[&str] = &["ET0ZVETV5ILN", "Q24BD9EZ332JT", "UIL1ZYJU5MKN"];
+            const UPRANK_IDS: &[&str] =
+                &["ET0ZVETV5ILN", "Q24BD9EZ332JT", "UIL1ZYJU5MKN"];
             const DOWNRANK_IDS: &[&str] = &["EIPF8Q00EMM1", "OU2MWXYWPNWQ"];
 
             methods.sort_by(|a, b| {
@@ -558,7 +595,10 @@ pub async fn make_aditude_request(
     Ok(json)
 }
 
-pub async fn process_payout(pool: &PgPool, client: &clickhouse::Client) -> Result<(), ApiError> {
+pub async fn process_payout(
+    pool: &PgPool,
+    client: &clickhouse::Client,
+) -> Result<(), ApiError> {
     let start: DateTime<Utc> = DateTime::from_naive_utc_and_offset(
         (Utc::now() - Duration::days(1))
             .date_naive()
@@ -750,8 +790,12 @@ pub async fn process_payout(pool: &PgPool, client: &clickhouse::Client) -> Resul
         );
     }
 
-    let aditude_res =
-        make_aditude_request(&["METRIC_IMPRESSIONS", "METRIC_REVENUE"], "Yesterday", "1d").await?;
+    let aditude_res = make_aditude_request(
+        &["METRIC_IMPRESSIONS", "METRIC_REVENUE"],
+        "Yesterday",
+        "1d",
+    )
+    .await?;
 
     let aditude_amount: Decimal = aditude_res
         .iter()
@@ -777,8 +821,9 @@ pub async fn process_payout(pool: &PgPool, client: &clickhouse::Client) -> Resul
     // Clean.io fee (ad antimalware). Per 1000 impressions.
     let clean_io_fee = Decimal::from(8) / Decimal::from(1000);
 
-    let net_revenue =
-        aditude_amount - (clean_io_fee * Decimal::from(aditude_impressions) / Decimal::from(1000));
+    let net_revenue = aditude_amount
+        - (clean_io_fee * Decimal::from(aditude_impressions)
+            / Decimal::from(1000));
 
     let payout = net_revenue * (Decimal::from(1) - modrinth_cut);
 
@@ -811,11 +856,13 @@ pub async fn process_payout(pool: &PgPool, client: &clickhouse::Client) -> Resul
             let project_multiplier: Decimal =
                 Decimal::from(**value) / Decimal::from(multipliers.sum);
 
-            let sum_splits: Decimal = project.team_members.iter().map(|x| x.1).sum();
+            let sum_splits: Decimal =
+                project.team_members.iter().map(|x| x.1).sum();
 
             if sum_splits > Decimal::ZERO {
                 for (user_id, split) in project.team_members {
-                    let payout: Decimal = payout * project_multiplier * (split / sum_splits);
+                    let payout: Decimal =
+                        payout * project_multiplier * (split / sum_splits);
 
                     if payout > Decimal::ZERO {
                         insert_user_ids.push(user_id);

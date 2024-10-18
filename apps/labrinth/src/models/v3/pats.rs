@@ -131,7 +131,9 @@ impl Scopes {
         self.intersects(Self::restricted())
     }
 
-    pub fn parse_from_oauth_scopes(scopes: &str) -> Result<Scopes, bitflags::parser::ParseError> {
+    pub fn parse_from_oauth_scopes(
+        scopes: &str,
+    ) -> Result<Scopes, bitflags::parser::ParseError> {
         let scopes = scopes.replace(['+', ' '], "|").replace("%20", "|");
         bitflags::parser::from_str(&scopes)
     }
@@ -187,7 +189,9 @@ mod test {
     #[test]
     fn test_parse_from_oauth_scopes_well_formed() {
         let raw = "USER_READ_EMAIL SESSION_READ ORGANIZATION_CREATE";
-        let expected = Scopes::USER_READ_EMAIL | Scopes::SESSION_READ | Scopes::ORGANIZATION_CREATE;
+        let expected = Scopes::USER_READ_EMAIL
+            | Scopes::SESSION_READ
+            | Scopes::ORGANIZATION_CREATE;
 
         let parsed = Scopes::parse_from_oauth_scopes(raw).unwrap();
 
@@ -224,7 +228,8 @@ mod test {
 
     #[test]
     fn test_parse_from_oauth_scopes_url_encoded() {
-        let raw = urlencoding::encode("PAT_WRITE COLLECTION_DELETE").to_string();
+        let raw =
+            urlencoding::encode("PAT_WRITE COLLECTION_DELETE").to_string();
         let expected = Scopes::PAT_WRITE | Scopes::COLLECTION_DELETE;
 
         let parsed = Scopes::parse_from_oauth_scopes(&raw).unwrap();

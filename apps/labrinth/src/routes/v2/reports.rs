@@ -25,9 +25,10 @@ pub async fn report_create(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::reports::report_create(req, pool, body, redis, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)?;
+    let response =
+        v3::reports::report_create(req, pool, body, redis, session_queue)
+            .await
+            .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Report>(response).await {
@@ -78,7 +79,8 @@ pub async fn reports(
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Report>>(response).await {
         Ok(reports) => {
-            let reports: Vec<_> = reports.into_iter().map(LegacyReport::from).collect();
+            let reports: Vec<_> =
+                reports.into_iter().map(LegacyReport::from).collect();
             Ok(HttpResponse::Ok().json(reports))
         }
         Err(response) => Ok(response),
@@ -111,7 +113,8 @@ pub async fn reports_get(
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Report>>(response).await {
         Ok(report_list) => {
-            let report_list: Vec<_> = report_list.into_iter().map(LegacyReport::from).collect();
+            let report_list: Vec<_> =
+                report_list.into_iter().map(LegacyReport::from).collect();
             Ok(HttpResponse::Ok().json(report_list))
         }
         Err(response) => Ok(response),
@@ -126,9 +129,10 @@ pub async fn report_get(
     info: web::Path<(crate::models::reports::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::reports::report_get(req, pool, redis, info, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)?;
+    let response =
+        v3::reports::report_get(req, pool, redis, info, session_queue)
+            .await
+            .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Report>(response).await {

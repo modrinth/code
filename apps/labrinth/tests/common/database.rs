@@ -55,13 +55,15 @@ impl TemporaryDatabase {
         let temp_database_name = generate_random_name("labrinth_tests_db_");
         println!("Creating temporary database: {}", &temp_database_name);
 
-        let database_url = dotenvy::var("DATABASE_URL").expect("No database URL");
+        let database_url =
+            dotenvy::var("DATABASE_URL").expect("No database URL");
 
         // Create the temporary (and template datbase, if needed)
         Self::create_temporary(&database_url, &temp_database_name).await;
 
         // Pool to the temporary database
-        let mut temporary_url = Url::parse(&database_url).expect("Invalid database URL");
+        let mut temporary_url =
+            Url::parse(&database_url).expect("Invalid database URL");
 
         temporary_url.set_path(&format!("/{}", &temp_database_name));
         let temp_db_url = temporary_url.to_string();
@@ -86,7 +88,8 @@ impl TemporaryDatabase {
         let redis_pool = RedisPool::new(Some(temp_database_name.clone()));
 
         // Create new meilisearch config
-        let search_config = search::SearchConfig::new(Some(temp_database_name.clone()));
+        let search_config =
+            search::SearchConfig::new(Some(temp_database_name.clone()));
         Self {
             pool,
             database_name: temp_database_name,
@@ -110,10 +113,11 @@ impl TemporaryDatabase {
 
         loop {
             // Try to acquire an advisory lock
-            let lock_acquired: bool = sqlx::query_scalar("SELECT pg_try_advisory_lock(1)")
-                .fetch_one(&main_pool)
-                .await
-                .unwrap();
+            let lock_acquired: bool =
+                sqlx::query_scalar("SELECT pg_try_advisory_lock(1)")
+                    .fetch_one(&main_pool)
+                    .await
+                    .unwrap();
 
             if lock_acquired {
                 // Create the db template if it doesn't exist
@@ -129,8 +133,10 @@ impl TemporaryDatabase {
                 }
 
                 // Switch to template
-                let url = dotenvy::var("DATABASE_URL").expect("No database URL");
-                let mut template_url = Url::parse(&url).expect("Invalid database URL");
+                let url =
+                    dotenvy::var("DATABASE_URL").expect("No database URL");
+                let mut template_url =
+                    Url::parse(&url).expect("Invalid database URL");
                 template_url.set_path(&format!("/{}", TEMPLATE_DATABASE_NAME));
 
                 let pool = PgPool::connect(template_url.as_str())
@@ -138,19 +144,22 @@ impl TemporaryDatabase {
                     .expect("Connection to database failed");
 
                 // Check if dummy data exists- a fake 'dummy_data' table is created if it does
-                let mut dummy_data_exists: bool =
-                    sqlx::query_scalar("SELECT to_regclass('dummy_data') IS NOT NULL")
-                        .fetch_one(&pool)
-                        .await
-                        .unwrap();
+                let mut dummy_data_exists: bool = sqlx::query_scalar(
+                    "SELECT to_regclass('dummy_data') IS NOT NULL",
+                )
+                .fetch_one(&pool)
+                .await
+                .unwrap();
                 if dummy_data_exists {
                     // Check if the dummy data needs to be updated
-                    let dummy_data_update =
-                        sqlx::query_scalar::<_, i64>("SELECT update_id FROM dummy_data")
-                            .fetch_optional(&pool)
-                            .await
-                            .unwrap();
-                    let needs_update = !dummy_data_update.is_some_and(|d| d == DUMMY_DATA_UPDATE);
+                    let dummy_data_update = sqlx::query_scalar::<_, i64>(
+                        "SELECT update_id FROM dummy_data",
+                    )
+                    .fetch_optional(&pool)
+                    .await
+                    .unwrap();
+                    let needs_update = !dummy_data_update
+                        .is_some_and(|d| d == DUMMY_DATA_UPDATE);
                     if needs_update {
                         println!("Dummy data updated, so template DB tables will be dropped and re-created");
                         // Drop all tables in the database so they can be re-created and later filled with updated dummy data
@@ -179,7 +188,8 @@ impl TemporaryDatabase {
                         redis_pool: RedisPool::new(Some(name.clone())),
                         search_config: search::SearchConfig::new(Some(name)),
                     };
-                    let setup_api = TestEnvironment::<ApiV3>::build_setup_api(&db).await;
+                    let setup_api =
+                        TestEnvironment::<ApiV3>::build_setup_api(&db).await;
                     dummy_data::add_dummy_data(&setup_api, db.clone()).await;
                     db.pool.close().await;
                 }
@@ -215,7 +225,8 @@ impl TemporaryDatabase {
     // If a temporary db is created, it must be cleaned up with cleanup.
     // This means that dbs will only 'remain' if a test fails (for examination of the db), and will be cleaned up otherwise.
     pub async fn cleanup(mut self) {
-        let database_url = dotenvy::var("DATABASE_URL").expect("No database URL");
+        let database_url =
+            dotenvy::var("DATABASE_URL").expect("No database URL");
         self.pool.close().await;
 
         self.pool = PgPool::connect(&database_url)
@@ -234,7 +245,8 @@ impl TemporaryDatabase {
             .unwrap();
 
         // Execute the deletion query asynchronously
-        let drop_db_query = format!("DROP DATABASE IF EXISTS {}", &self.database_name);
+        let drop_db_query =
+            format!("DROP DATABASE IF EXISTS {}", &self.database_name);
         sqlx::query(&drop_db_query)
             .execute(&self.pool)
             .await

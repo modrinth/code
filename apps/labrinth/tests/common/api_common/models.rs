@@ -6,8 +6,9 @@ use labrinth::{
         notifications::NotificationId,
         organizations::OrganizationId,
         projects::{
-            Dependency, GalleryItem, License, ModeratorMessage, MonetizationStatus, ProjectId,
-            ProjectStatus, VersionFile, VersionId, VersionStatus, VersionType,
+            Dependency, GalleryItem, License, ModeratorMessage,
+            MonetizationStatus, ProjectId, ProjectStatus, VersionFile,
+            VersionId, VersionStatus, VersionType,
         },
         reports::ReportId,
         teams::{ProjectPermissions, TeamId},

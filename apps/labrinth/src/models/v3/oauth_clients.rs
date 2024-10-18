@@ -93,7 +93,11 @@ impl From<DBOAuthClient> for OAuthClient {
             name: value.name,
             icon_url: value.icon_url,
             max_scopes: value.max_scopes,
-            redirect_uris: value.redirect_uris.into_iter().map(|r| r.into()).collect(),
+            redirect_uris: value
+                .redirect_uris
+                .into_iter()
+                .map(|r| r.into())
+                .collect(),
             created_by: value.created_by.into(),
             created: value.created,
             url: value.url,

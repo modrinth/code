@@ -12,7 +12,9 @@ use serde_json::json;
 use crate::database::redis::RedisPool;
 
 use super::{
-    loader_fields::{LoaderFieldEnum, LoaderFieldEnumValue, VersionField, VersionFieldValue},
+    loader_fields::{
+        LoaderFieldEnum, LoaderFieldEnumValue, VersionField, VersionFieldValue,
+    },
     DatabaseError, LoaderFieldEnumValueId,
 };
 
@@ -44,13 +46,17 @@ impl MinecraftGameVersion {
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
         let mut exec = exec.acquire().await?;
-        let game_version_enum = LoaderFieldEnum::get(Self::FIELD_NAME, &mut *exec, redis)
-            .await?
-            .ok_or_else(|| {
-                DatabaseError::SchemaError("Could not find game version enum.".to_string())
-            })?;
+        let game_version_enum =
+            LoaderFieldEnum::get(Self::FIELD_NAME, &mut *exec, redis)
+                .await?
+                .ok_or_else(|| {
+                    DatabaseError::SchemaError(
+                        "Could not find game version enum.".to_string(),
+                    )
+                })?;
         let game_version_enum_values =
-            LoaderFieldEnumValue::list(game_version_enum.id, &mut *exec, redis).await?;
+            LoaderFieldEnumValue::list(game_version_enum.id, &mut *exec, redis)
+                .await?;
 
         let game_versions = game_version_enum_values
             .into_iter()
@@ -105,7 +111,9 @@ impl MinecraftGameVersion {
         Ok(game_versions)
     }
 
-    pub fn from_enum_value(loader_field_enum_value: LoaderFieldEnumValue) -> MinecraftGameVersion {
+    pub fn from_enum_value(
+        loader_field_enum_value: LoaderFieldEnumValue,
+    ) -> MinecraftGameVersion {
         MinecraftGameVersion {
             id: loader_field_enum_value.id,
             version: loader_field_enum_value.value,
@@ -157,7 +165,10 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
         })
     }
 
-    pub fn created(self, created: &'a DateTime<Utc>) -> MinecraftGameVersionBuilder<'a> {
+    pub fn created(
+        self,
+        created: &'a DateTime<Utc>,
+    ) -> MinecraftGameVersionBuilder<'a> {
         Self {
             date: Some(created),
             ..self
@@ -172,11 +183,12 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
     where
         E: sqlx::Executor<'b, Database = sqlx::Postgres> + Copy,
     {
-        let game_versions_enum = LoaderFieldEnum::get("game_versions", exec, redis)
-            .await?
-            .ok_or(DatabaseError::SchemaError(
-                "Missing loaders field: 'game_versions'".to_string(),
-            ))?;
+        let game_versions_enum =
+            LoaderFieldEnum::get("game_versions", exec, redis)
+                .await?
+                .ok_or(DatabaseError::SchemaError(
+                    "Missing loaders field: 'game_versions'".to_string(),
+                ))?;
 
         // Get enum id for game versions
         let metadata = json!({

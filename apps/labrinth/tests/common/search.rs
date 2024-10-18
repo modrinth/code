@@ -16,11 +16,14 @@ use crate::{
 
 use super::{api_v3::ApiV3, environment::TestEnvironment};
 
-pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<HashMap<u64, u64>> {
+pub async fn setup_search_projects(
+    test_env: &TestEnvironment<ApiV3>,
+) -> Arc<HashMap<u64, u64>> {
     // Test setup and dummy data
     let api = &test_env.api;
     let test_name = test_env.db.database_name.clone();
-    let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
+    let zeta_organization_id =
+        &test_env.dummy.organization_zeta.organization_id;
 
     // Add dummy projects of various categories for searchability
     let mut project_creation_futures = vec![];
@@ -39,7 +42,8 @@ pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<Has
             };
             async move {
                 // Add a project- simple, should work.
-                let req = api.add_public_project(&slug, Some(jar), modify_json, pat);
+                let req =
+                    api.add_public_project(&slug, Some(jar), modify_json, pat);
                 let (project, _) = req.await;
 
                 // Approve, so that the project is searchable

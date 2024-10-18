@@ -4,7 +4,9 @@ use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::ids::ImageId;
 use crate::models::projects::{Loader, Project, ProjectStatus};
-use crate::models::v2::projects::{DonationLink, LegacyProject, LegacySideType};
+use crate::models::v2::projects::{
+    DonationLink, LegacyProject, LegacySideType,
+};
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
@@ -158,13 +160,22 @@ pub async fn project_create(
                 .into_iter()
                 .map(|v| {
                     let mut fields = HashMap::new();
-                    fields.extend(v2_reroute::convert_side_types_v3(client_side, server_side));
-                    fields.insert("game_versions".to_string(), json!(v.game_versions));
+                    fields.extend(v2_reroute::convert_side_types_v3(
+                        client_side,
+                        server_side,
+                    ));
+                    fields.insert(
+                        "game_versions".to_string(),
+                        json!(v.game_versions),
+                    );
 
                     // Modpacks now use the "mrpack" loader, and loaders are converted to loader fields.
                     // Setting of 'project_type' directly is removed, it's loader-based now.
                     if project_type == "modpack" {
-                        fields.insert("mrpack_loaders".to_string(), json!(v.loaders));
+                        fields.insert(
+                            "mrpack_loaders".to_string(),
+                            json!(v.loaders),
+                        );
                     }
 
                     let loaders = if project_type == "modpack" {
@@ -248,7 +259,10 @@ pub async fn project_create(
     match v2_reroute::extract_ok_json::<Project>(response).await {
         Ok(project) => {
             let version_item = match project.versions.first() {
-                Some(vid) => version_item::Version::get((*vid).into(), &**client, &redis).await?,
+                Some(vid) => {
+                    version_item::Version::get((*vid).into(), &**client, &redis)
+                        .await?
+                }
                 None => None,
             };
             let project = LegacyProject::from(project, version_item);

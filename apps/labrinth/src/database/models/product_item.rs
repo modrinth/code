@@ -1,4 +1,6 @@
-use crate::database::models::{product_item, DatabaseError, ProductId, ProductPriceId};
+use crate::database::models::{
+    product_item, DatabaseError, ProductId, ProductPriceId,
+};
 use crate::database::redis::RedisPool;
 use crate::models::billing::{Price, ProductMetadata};
 use dashmap::DashMap;
@@ -61,9 +63,12 @@ impl ProductItem {
     ) -> Result<Vec<ProductItem>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
-        let results = select_products_with_predicate!("WHERE id = ANY($1::bigint[])", ids_ref)
-            .fetch_all(exec)
-            .await?;
+        let results = select_products_with_predicate!(
+            "WHERE id = ANY($1::bigint[])",
+            ids_ref
+        )
+        .fetch_all(exec)
+        .await?;
 
         Ok(results
             .into_iter()
@@ -95,7 +100,10 @@ pub struct QueryProduct {
 }
 
 impl QueryProduct {
-    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<QueryProduct>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<QueryProduct>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -201,9 +209,12 @@ impl ProductPriceItem {
     ) -> Result<Vec<ProductPriceItem>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
-        let results = select_prices_with_predicate!("WHERE id = ANY($1::bigint[])", ids_ref)
-            .fetch_all(exec)
-            .await?;
+        let results = select_prices_with_predicate!(
+            "WHERE id = ANY($1::bigint[])",
+            ids_ref
+        )
+        .fetch_all(exec)
+        .await?;
 
         Ok(results
             .into_iter()
@@ -228,20 +239,25 @@ impl ProductPriceItem {
         let ids_ref: &[i64] = &ids;
 
         use futures_util::TryStreamExt;
-        let prices = select_prices_with_predicate!("WHERE product_id = ANY($1::bigint[])", ids_ref)
-            .fetch(exec)
-            .try_fold(
-                DashMap::new(),
-                |acc: DashMap<ProductId, Vec<ProductPriceItem>>, x| {
-                    if let Ok(item) = <ProductPriceResult as TryInto<ProductPriceItem>>::try_into(x)
-                    {
-                        acc.entry(item.product_id).or_default().push(item);
-                    }
+        let prices = select_prices_with_predicate!(
+            "WHERE product_id = ANY($1::bigint[])",
+            ids_ref
+        )
+        .fetch(exec)
+        .try_fold(
+            DashMap::new(),
+            |acc: DashMap<ProductId, Vec<ProductPriceItem>>, x| {
+                if let Ok(item) = <ProductPriceResult as TryInto<
+                    ProductPriceItem,
+                >>::try_into(x)
+                {
+                    acc.entry(item.product_id).or_default().push(item);
+                }
 
-                    async move { Ok(acc) }
-                },
-            )
-            .await?;
+                async move { Ok(acc) }
+            },
+        )
+        .await?;
 
         Ok(prices)
     }

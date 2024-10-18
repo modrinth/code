@@ -82,7 +82,11 @@ pub struct Session {
 }
 
 impl Session {
-    pub async fn get<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
+    pub async fn get<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
         id: T,
         exec: E,
         redis: &RedisPool,
@@ -103,9 +107,13 @@ impl Session {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Session::get_many(&[crate::models::ids::SessionId::from(id)], executor, redis)
-            .await
-            .map(|x| x.into_iter().next())
+        Session::get_many(
+            &[crate::models::ids::SessionId::from(id)],
+            executor,
+            redis,
+        )
+        .await
+        .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many_ids<'a, E>(
@@ -123,7 +131,11 @@ impl Session {
         Session::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
+    pub async fn get_many<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
         session_strings: &[T],
         exec: E,
         redis: &RedisPool,
@@ -226,14 +238,23 @@ impl Session {
         .await?;
 
         redis
-            .set_serialized_to_json(SESSIONS_USERS_NAMESPACE, user_id.0, &db_sessions, None)
+            .set_serialized_to_json(
+                SESSIONS_USERS_NAMESPACE,
+                user_id.0,
+                &db_sessions,
+                None,
+            )
             .await?;
 
         Ok(db_sessions)
     }
 
     pub async fn clear_cache(
-        clear_sessions: Vec<(Option<SessionId>, Option<String>, Option<UserId>)>,
+        clear_sessions: Vec<(
+            Option<SessionId>,
+            Option<String>,
+            Option<UserId>,
+        )>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
@@ -243,17 +264,18 @@ impl Session {
         }
 
         redis
-            .delete_many(
-                clear_sessions
-                    .into_iter()
-                    .flat_map(|(id, session, user_id)| {
-                        [
-                            (SESSIONS_NAMESPACE, id.map(|i| i.0.to_string())),
-                            (SESSIONS_IDS_NAMESPACE, session),
-                            (SESSIONS_USERS_NAMESPACE, user_id.map(|i| i.0.to_string())),
-                        ]
-                    }),
-            )
+            .delete_many(clear_sessions.into_iter().flat_map(
+                |(id, session, user_id)| {
+                    [
+                        (SESSIONS_NAMESPACE, id.map(|i| i.0.to_string())),
+                        (SESSIONS_IDS_NAMESPACE, session),
+                        (
+                            SESSIONS_USERS_NAMESPACE,
+                            user_id.map(|i| i.0.to_string()),
+                        ),
+                    ]
+                },
+            ))
             .await?;
         Ok(())
     }

@@ -1,5 +1,6 @@
 use super::loader_fields::{
-    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField, VersionField,
+    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
+    VersionField,
 };
 use super::{ids::*, User};
 use crate::database::models;
@@ -72,15 +73,15 @@ impl GalleryItem {
         project_id: ProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
-        let (project_ids, image_urls, raw_image_urls, featureds, names, descriptions, orderings): (
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-        ) = items
+        let (
+            project_ids,
+            image_urls,
+            raw_image_urls,
+            featureds,
+            names,
+            descriptions,
+            orderings,
+        ): (Vec<_>, Vec<_>, Vec<_>, Vec<_>, Vec<_>, Vec<_>, Vec<_>) = items
             .into_iter()
             .map(|gi| {
                 (
@@ -128,7 +129,11 @@ impl ModCategory {
         items: Vec<Self>,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
-        let (project_ids, category_ids, is_additionals): (Vec<_>, Vec<_>, Vec<_>) = items
+        let (project_ids, category_ids, is_additionals): (
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+        ) = items
             .into_iter()
             .map(|mc| (mc.project_id.0, mc.category_id.0, mc.is_additional))
             .multiunzip();
@@ -223,9 +228,19 @@ impl ProjectBuilder {
             version.insert(&mut *transaction).await?;
         }
 
-        LinkUrl::insert_many_projects(link_urls, self.project_id, &mut *transaction).await?;
+        LinkUrl::insert_many_projects(
+            link_urls,
+            self.project_id,
+            &mut *transaction,
+        )
+        .await?;
 
-        GalleryItem::insert_many(gallery_items, self.project_id, &mut *transaction).await?;
+        GalleryItem::insert_many(
+            gallery_items,
+            self.project_id,
+            &mut *transaction,
+        )
+        .await?;
 
         let project_id = self.project_id;
         let mod_categories = categories
@@ -323,7 +338,8 @@ impl Project {
         let project = Self::get_id(id, &mut **transaction, redis).await?;
 
         if let Some(project) = project {
-            Project::clear_cache(id, project.inner.slug, Some(true), redis).await?;
+            Project::clear_cache(id, project.inner.slug, Some(true), redis)
+                .await?;
 
             sqlx::query!(
                 "
@@ -389,7 +405,8 @@ impl Project {
             .await?;
 
             for version in project.versions {
-                super::Version::remove_full(version, redis, transaction).await?;
+                super::Version::remove_full(version, redis, transaction)
+                    .await?;
             }
 
             sqlx::query!(
@@ -422,7 +439,8 @@ impl Project {
             .execute(&mut **transaction)
             .await?;
 
-            models::TeamMember::clear_cache(project.inner.team_id, redis).await?;
+            models::TeamMember::clear_cache(project.inner.team_id, redis)
+                .await?;
 
             let affected_user_ids = sqlx::query!(
                 "
@@ -476,9 +494,13 @@ impl Project {
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
-        Project::get_many(&[crate::models::ids::ProjectId::from(id)], executor, redis)
-            .await
-            .map(|x| x.into_iter().next())
+        Project::get_many(
+            &[crate::models::ids::ProjectId::from(id)],
+            executor,
+            redis,
+        )
+        .await
+        .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many_ids<'a, E>(
@@ -496,7 +518,11 @@ impl Project {
         Project::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
+    pub async fn get_many<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
         project_strings: &[T],
         exec: E,
         redis: &RedisPool,
@@ -837,11 +863,15 @@ impl Project {
         id: ProjectId,
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<(Option<VersionId>, Option<ProjectId>, Option<ProjectId>)>, DatabaseError>
+    ) -> Result<
+        Vec<(Option<VersionId>, Option<ProjectId>, Option<ProjectId>)>,
+        DatabaseError,
+    >
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        type Dependencies = Vec<(Option<VersionId>, Option<ProjectId>, Option<ProjectId>)>;
+        type Dependencies =
+            Vec<(Option<VersionId>, Option<ProjectId>, Option<ProjectId>)>;
 
         let mut redis = redis.connect().await?;
 
@@ -881,7 +911,12 @@ impl Project {
         .await?;
 
         redis
-            .set_serialized_to_json(PROJECTS_DEPENDENCIES_NAMESPACE, id.0, &dependencies, None)
+            .set_serialized_to_json(
+                PROJECTS_DEPENDENCIES_NAMESPACE,
+                id.0,
+                &dependencies,
+                None,
+            )
             .await?;
         Ok(dependencies)
     }

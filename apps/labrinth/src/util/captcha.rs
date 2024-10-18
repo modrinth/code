@@ -4,7 +4,10 @@ use actix_web::HttpRequest;
 use serde::Deserialize;
 use serde_json::json;
 
-pub async fn check_turnstile_captcha(req: &HttpRequest, challenge: &str) -> Result<bool, ApiError> {
+pub async fn check_turnstile_captcha(
+    req: &HttpRequest,
+    challenge: &str,
+) -> Result<bool, ApiError> {
     let conn_info = req.connection_info().clone();
     let ip_addr = if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
         if let Some(header) = req.headers().get("CF-Connecting-IP") {

@@ -56,7 +56,10 @@ impl Report {
         Ok(())
     }
 
-    pub async fn get<'a, E>(id: ReportId, exec: E) -> Result<Option<QueryReport>, sqlx::Error>
+    pub async fn get<'a, E>(
+        id: ReportId,
+        exec: E,
+    ) -> Result<Option<QueryReport>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -74,7 +77,8 @@ impl Report {
     {
         use futures::stream::TryStreamExt;
 
-        let report_ids_parsed: Vec<i64> = report_ids.iter().map(|x| x.0).collect();
+        let report_ids_parsed: Vec<i64> =
+            report_ids.iter().map(|x| x.0).collect();
         let reports = sqlx::query!(
             "
             SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created, t.id thread_id, r.closed
@@ -133,8 +137,11 @@ impl Report {
         .await?;
 
         if let Some(thread_id) = thread_id {
-            crate::database::models::Thread::remove_full(ThreadId(thread_id.id), transaction)
-                .await?;
+            crate::database::models::Thread::remove_full(
+                ThreadId(thread_id.id),
+                transaction,
+            )
+            .await?;
         }
 
         sqlx::query!(

@@ -128,10 +128,14 @@ impl ModerationMessage {
     pub fn header(&self) -> &'static str {
         match self {
             ModerationMessage::NoPrimaryFile => "No primary files",
-            ModerationMessage::PackFilesNotAllowed { .. } => "Copyrighted Content",
+            ModerationMessage::PackFilesNotAllowed { .. } => {
+                "Copyrighted Content"
+            }
             ModerationMessage::MissingGalleryImage => "Missing Gallery Images",
             ModerationMessage::MissingLicense => "Missing License",
-            ModerationMessage::MissingCustomLicenseUrl { .. } => "Missing License URL",
+            ModerationMessage::MissingCustomLicenseUrl { .. } => {
+                "Missing License URL"
+            }
             ModerationMessage::NoSideTypes => "Missing Environment Information",
         }
     }
@@ -806,7 +810,9 @@ impl ApprovalType {
     pub fn from_string(string: &str) -> Option<Self> {
         match string {
             "yes" => Some(ApprovalType::Yes),
-            "with-attribution-and-source" => Some(ApprovalType::WithAttributionAndSource),
+            "with-attribution-and-source" => {
+                Some(ApprovalType::WithAttributionAndSource)
+            }
             "with-attribution" => Some(ApprovalType::WithAttribution),
             "no" => Some(ApprovalType::No),
             "permanent-no" => Some(ApprovalType::PermanentNo),
@@ -818,7 +824,9 @@ impl ApprovalType {
     pub(crate) fn as_str(&self) -> &'static str {
         match self {
             ApprovalType::Yes => "yes",
-            ApprovalType::WithAttributionAndSource => "with-attribution-and-source",
+            ApprovalType::WithAttributionAndSource => {
+                "with-attribution-and-source"
+            }
             ApprovalType::WithAttribution => "with-attribution",
             ApprovalType::No => "no",
             ApprovalType::PermanentNo => "permanent-no",

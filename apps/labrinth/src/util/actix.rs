@@ -20,11 +20,17 @@ pub enum MultipartSegmentData {
 }
 
 pub trait AppendsMultipart {
-    fn set_multipart(self, data: impl IntoIterator<Item = MultipartSegment>) -> Self;
+    fn set_multipart(
+        self,
+        data: impl IntoIterator<Item = MultipartSegment>,
+    ) -> Self;
 }
 
 impl AppendsMultipart for TestRequest {
-    fn set_multipart(self, data: impl IntoIterator<Item = MultipartSegment>) -> Self {
+    fn set_multipart(
+        self,
+        data: impl IntoIterator<Item = MultipartSegment>,
+    ) -> Self {
         let (boundary, payload) = generate_multipart(data);
         self.append_header((
             "Content-Type",
@@ -34,7 +40,9 @@ impl AppendsMultipart for TestRequest {
     }
 }
 
-pub fn generate_multipart(data: impl IntoIterator<Item = MultipartSegment>) -> (String, Bytes) {
+pub fn generate_multipart(
+    data: impl IntoIterator<Item = MultipartSegment>,
+) -> (String, Bytes) {
     let mut boundary: String = String::from("----WebKitFormBoundary");
     boundary.push_str(&rand::random::<u64>().to_string());
     boundary.push_str(&rand::random::<u64>().to_string());
@@ -54,7 +62,8 @@ pub fn generate_multipart(data: impl IntoIterator<Item = MultipartSegment>) -> (
 
         if let Some(filename) = &segment.filename {
             payload.extend_from_slice(
-                format!("; filename=\"{filename}\"", filename = filename).as_bytes(),
+                format!("; filename=\"{filename}\"", filename = filename)
+                    .as_bytes(),
             );
         }
         if let Some(content_type) = &segment.content_type {
@@ -78,7 +87,9 @@ pub fn generate_multipart(data: impl IntoIterator<Item = MultipartSegment>) -> (
         }
         payload.extend_from_slice(b"\r\n");
     }
-    payload.extend_from_slice(format!("--{boundary}--\r\n", boundary = boundary).as_bytes());
+    payload.extend_from_slice(
+        format!("--{boundary}--\r\n", boundary = boundary).as_bytes(),
+    );
 
     (boundary, Bytes::from(payload))
 }

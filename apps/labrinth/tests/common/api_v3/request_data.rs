@@ -2,7 +2,9 @@
 use serde_json::json;
 
 use crate::common::{
-    api_common::request_data::{ProjectCreationRequestData, VersionCreationRequestData},
+    api_common::request_data::{
+        ProjectCreationRequestData, VersionCreationRequestData,
+    },
     dummy_data::TestFile,
 };
 use labrinth::{
@@ -15,11 +17,13 @@ pub fn get_public_project_creation_data(
     version_jar: Option<TestFile>,
     modify_json: Option<json_patch::Patch>,
 ) -> ProjectCreationRequestData {
-    let mut json_data = get_public_project_creation_data_json(slug, version_jar.as_ref());
+    let mut json_data =
+        get_public_project_creation_data_json(slug, version_jar.as_ref());
     if let Some(modify_json) = modify_json {
         json_patch::patch(&mut json_data, &modify_json).unwrap();
     }
-    let multipart_data = get_public_creation_data_multipart(&json_data, version_jar.as_ref());
+    let multipart_data =
+        get_public_creation_data_multipart(&json_data, version_jar.as_ref());
     ProjectCreationRequestData {
         slug: slug.to_string(),
         jar: version_jar,
@@ -36,14 +40,18 @@ pub fn get_public_version_creation_data(
     // and modifies it before it is serialized and sent
     modify_json: Option<json_patch::Patch>,
 ) -> VersionCreationRequestData {
-    let mut json_data =
-        get_public_version_creation_data_json(version_number, ordering, &version_jar);
+    let mut json_data = get_public_version_creation_data_json(
+        version_number,
+        ordering,
+        &version_jar,
+    );
     json_data["project_id"] = json!(project_id);
     if let Some(modify_json) = modify_json {
         json_patch::patch(&mut json_data, &modify_json).unwrap();
     }
 
-    let multipart_data = get_public_creation_data_multipart(&json_data, Some(&version_jar));
+    let multipart_data =
+        get_public_creation_data_multipart(&json_data, Some(&version_jar));
     VersionCreationRequestData {
         version: version_number.to_string(),
         jar: Some(version_jar),
@@ -116,7 +124,9 @@ pub fn get_public_creation_data_multipart(
         name: "data".to_string(),
         filename: None,
         content_type: Some("application/json".to_string()),
-        data: MultipartSegmentData::Text(serde_json::to_string(json_data).unwrap()),
+        data: MultipartSegmentData::Text(
+            serde_json::to_string(json_data).unwrap(),
+        ),
     };
 
     if let Some(jar) = version_jar {

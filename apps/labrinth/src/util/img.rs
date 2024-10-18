@@ -6,7 +6,10 @@ use crate::models::images::ImageContext;
 use crate::routes::ApiError;
 use color_thief::ColorFormat;
 use image::imageops::FilterType;
-use image::{DynamicImage, EncodableLayout, GenericImageView, ImageError, ImageOutputFormat};
+use image::{
+    DynamicImage, EncodableLayout, GenericImageView, ImageError,
+    ImageOutputFormat,
+};
 use std::io::Cursor;
 use webp::Encoder;
 
@@ -14,10 +17,15 @@ pub fn get_color_from_img(data: &[u8]) -> Result<Option<u32>, ImageError> {
     let image = image::load_from_memory(data)?
         .resize(256, 256, FilterType::Nearest)
         .crop_imm(128, 128, 64, 64);
-    let color = color_thief::get_palette(image.to_rgb8().as_bytes(), ColorFormat::Rgb, 10, 2)
-        .ok()
-        .and_then(|x| x.first().copied())
-        .map(|x| (x.r as u32) << 16 | (x.g as u32) << 8 | (x.b as u32));
+    let color = color_thief::get_palette(
+        image.to_rgb8().as_bytes(),
+        ColorFormat::Rgb,
+        10,
+        2,
+    )
+    .ok()
+    .and_then(|x| x.first().copied())
+    .map(|x| (x.r as u32) << 16 | (x.g as u32) << 8 | (x.b as u32));
 
     Ok(color)
 }
@@ -40,16 +48,23 @@ pub async fn upload_image_optimized(
     min_aspect_ratio: Option<f32>,
     file_host: &dyn FileHost,
 ) -> Result<UploadImageResult, ApiError> {
-    let content_type =
-        crate::util::ext::get_image_content_type(file_extension).ok_or_else(|| {
-            ApiError::InvalidInput(format!("Invalid format for image: {}", file_extension))
+    let content_type = crate::util::ext::get_image_content_type(file_extension)
+        .ok_or_else(|| {
+            ApiError::InvalidInput(format!(
+                "Invalid format for image: {}",
+                file_extension
+            ))
         })?;
 
     let cdn_url = dotenvy::var("CDN_URL")?;
 
     let hash = sha1::Sha1::from(&bytes).hexdigest();
-    let (processed_image, processed_image_ext) =
-        process_image(bytes.clone(), content_type, target_width, min_aspect_ratio)?;
+    let (processed_image, processed_image_ext) = process_image(
+        bytes.clone(),
+        content_type,
+        target_width,
+        min_aspect_ratio,
+    )?;
     let color = get_color_from_img(&bytes)?;
 
     // Only upload the processed image if it's smaller than the original
@@ -118,7 +133,8 @@ fn process_image(
 
     if let Some(target_width) = target_width {
         if img.width() > target_width {
-            let new_height = (target_width as f32 / aspect_ratio).round() as u32;
+            let new_height =
+                (target_width as f32 / aspect_ratio).round() as u32;
             img = img.resize(target_width, new_height, FilterType::Lanczos3);
         }
     }
@@ -126,7 +142,8 @@ fn process_image(
     if let Some(min_aspect_ratio) = min_aspect_ratio {
         // Crop if necessary
         if aspect_ratio < min_aspect_ratio {
-            let crop_height = (img.width() as f32 / min_aspect_ratio).round() as u32;
+            let crop_height =
+                (img.width() as f32 / min_aspect_ratio).round() as u32;
             let y_offset = (img.height() - crop_height) / 2;
             img = img.crop_imm(0, y_offset, img.width(), crop_height);
         }
@@ -181,7 +198,9 @@ pub async fn delete_unused_images(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
-    let uploaded_images = database::models::Image::get_many_contexted(context, transaction).await?;
+    let uploaded_images =
+        database::models::Image::get_many_contexted(context, transaction)
+            .await?;
 
     for image in uploaded_images {
         let mut should_delete = true;

@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
 use super::ApiError;
-use crate::database::models::categories::{Category, LinkPlatform, ProjectType, ReportType};
+use crate::database::models::categories::{
+    Category, LinkPlatform, ProjectType, ReportType,
+};
 use crate::database::models::loader_fields::{
     Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
 };
@@ -147,7 +149,8 @@ pub async fn loader_fields_list(
         })?;
 
     let loader_field_enum_id = match loader_field.field_type {
-        LoaderFieldType::Enum(enum_id) | LoaderFieldType::ArrayEnum(enum_id) => enum_id,
+        LoaderFieldType::Enum(enum_id)
+        | LoaderFieldType::ArrayEnum(enum_id) => enum_id,
         _ => {
             return Err(ApiError::InvalidInput(format!(
                 "'{}' is not an enumerable field, but an '{}' field.",
@@ -158,9 +161,16 @@ pub async fn loader_fields_list(
     };
 
     let results: Vec<_> = if let Some(filters) = query.filters {
-        LoaderFieldEnumValue::list_filter(loader_field_enum_id, filters, &**pool, &redis).await?
+        LoaderFieldEnumValue::list_filter(
+            loader_field_enum_id,
+            filters,
+            &**pool,
+            &redis,
+        )
+        .await?
     } else {
-        LoaderFieldEnumValue::list(loader_field_enum_id, &**pool, &redis).await?
+        LoaderFieldEnumValue::list(loader_field_enum_id, &**pool, &redis)
+            .await?
     };
 
     Ok(HttpResponse::Ok().json(results))
@@ -192,7 +202,9 @@ pub struct LicenseText {
     pub body: String,
 }
 
-pub async fn license_text(params: web::Path<(String,)>) -> Result<HttpResponse, ApiError> {
+pub async fn license_text(
+    params: web::Path<(String,)>,
+) -> Result<HttpResponse, ApiError> {
     let license_id = params.into_inner().0;
 
     if license_id == *crate::models::projects::DEFAULT_LICENSE_ID {
@@ -224,14 +236,15 @@ pub async fn link_platform_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let results: Vec<LinkPlatformQueryData> = LinkPlatform::list(&**pool, &redis)
-        .await?
-        .into_iter()
-        .map(|x| LinkPlatformQueryData {
-            name: x.name,
-            donation: x.donation,
-        })
-        .collect();
+    let results: Vec<LinkPlatformQueryData> =
+        LinkPlatform::list(&**pool, &redis)
+            .await?
+            .into_iter()
+            .map(|x| LinkPlatformQueryData {
+                name: x.name,
+                donation: x.donation,
+            })
+            .collect();
     Ok(HttpResponse::Ok().json(results))
 }
 

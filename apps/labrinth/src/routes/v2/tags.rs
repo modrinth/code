@@ -43,7 +43,9 @@ pub async fn category_list(
     let response = v3::tags::category_list(pool, redis).await?;
 
     // Convert to V2 format
-    match v2_reroute::extract_ok_json::<Vec<v3::tags::CategoryData>>(response).await {
+    match v2_reroute::extract_ok_json::<Vec<v3::tags::CategoryData>>(response)
+        .await
+    {
         Ok(categories) => {
             let categories = categories
                 .into_iter()
@@ -75,7 +77,9 @@ pub async fn loader_list(
     let response = v3::tags::loader_list(pool, redis).await?;
 
     // Convert to V2 format
-    match v2_reroute::extract_ok_json::<Vec<v3::tags::LoaderData>>(response).await {
+    match v2_reroute::extract_ok_json::<Vec<v3::tags::LoaderData>>(response)
+        .await
+    {
         Ok(loaders) => {
             let loaders = loaders
                 .into_iter()
@@ -86,12 +90,15 @@ pub async fn loader_list(
                     // a project type before any versions are set.
                     supported_project_types.push("project".to_string());
 
-                    if ["forge", "fabric", "quilt", "neoforge"].contains(&&*l.name) {
+                    if ["forge", "fabric", "quilt", "neoforge"]
+                        .contains(&&*l.name)
+                    {
                         supported_project_types.push("modpack".to_string());
                     }
 
                     if supported_project_types.contains(&"datapack".to_string())
-                        || supported_project_types.contains(&"plugin".to_string())
+                        || supported_project_types
+                            .contains(&"plugin".to_string())
                     {
                         supported_project_types.push("mod".to_string());
                     }
@@ -149,7 +156,9 @@ pub async fn game_version_list(
 
     // Convert to V2 format
     Ok(
-        match v2_reroute::extract_ok_json::<Vec<LoaderFieldEnumValue>>(response).await {
+        match v2_reroute::extract_ok_json::<Vec<LoaderFieldEnumValue>>(response)
+            .await
+        {
             Ok(fields) => {
                 let fields = fields
                     .into_iter()
@@ -187,7 +196,8 @@ pub async fn license_list() -> HttpResponse {
     let response = v3::tags::license_list().await;
 
     // Convert to V2 format
-    match v2_reroute::extract_ok_json::<Vec<v3::tags::License>>(response).await {
+    match v2_reroute::extract_ok_json::<Vec<v3::tags::License>>(response).await
+    {
         Ok(licenses) => {
             let licenses = licenses
                 .into_iter()
@@ -209,14 +219,18 @@ pub struct LicenseText {
 }
 
 #[get("license/{id}")]
-pub async fn license_text(params: web::Path<(String,)>) -> Result<HttpResponse, ApiError> {
+pub async fn license_text(
+    params: web::Path<(String,)>,
+) -> Result<HttpResponse, ApiError> {
     let license = v3::tags::license_text(params)
         .await
         .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2 format
     Ok(
-        match v2_reroute::extract_ok_json::<v3::tags::LicenseText>(license).await {
+        match v2_reroute::extract_ok_json::<v3::tags::LicenseText>(license)
+            .await
+        {
             Ok(license) => HttpResponse::Ok().json(LicenseText {
                 title: license.title,
                 body: license.body,
@@ -244,7 +258,11 @@ pub async fn donation_platform_list(
 
     // Convert to V2 format
     Ok(
-        match v2_reroute::extract_ok_json::<Vec<LinkPlatformQueryData>>(response).await {
+        match v2_reroute::extract_ok_json::<Vec<LinkPlatformQueryData>>(
+            response,
+        )
+        .await
+        {
             Ok(platforms) => {
                 let platforms = platforms
                     .into_iter()

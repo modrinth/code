@@ -7,7 +7,9 @@ use crate::database::redis::RedisPool;
 use crate::database::Project;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
-use crate::models::teams::{OrganizationPermissions, ProjectPermissions, TeamId};
+use crate::models::teams::{
+    OrganizationPermissions, ProjectPermissions, TeamId,
+};
 use crate::models::users::UserId;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -46,7 +48,8 @@ pub async fn team_members_get_project(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
-    let project_data = crate::database::models::Project::get(&string, &**pool, &redis).await?;
+    let project_data =
+        crate::database::models::Project::get(&string, &**pool, &redis).await?;
 
     if let Some(project) = project_data {
         let current_user = get_user_from_headers(
@@ -60,11 +63,17 @@ pub async fn team_members_get_project(
         .map(|x| x.1)
         .ok();
 
-        if !is_visible_project(&project.inner, &current_user, &pool, false).await? {
+        if !is_visible_project(&project.inner, &current_user, &pool, false)
+            .await?
+        {
             return Err(ApiError::NotFound);
         }
-        let members_data =
-            TeamMember::get_from_team_full(project.inner.team_id, &**pool, &redis).await?;
+        let members_data = TeamMember::get_from_team_full(
+            project.inner.team_id,
+            &**pool,
+            &redis,
+        )
+        .await?;
         let users = User::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
@@ -75,7 +84,12 @@ pub async fn team_members_get_project(
         let user_id = current_user.as_ref().map(|x| x.id.into());
         let logged_in = if let Some(user_id) = user_id {
             let (team_member, organization_team_member) =
-                TeamMember::get_for_project_permissions(&project.inner, user_id, &**pool).await?;
+                TeamMember::get_for_project_permissions(
+                    &project.inner,
+                    user_id,
+                    &**pool,
+                )
+                .await?;
 
             team_member.is_some() || organization_team_member.is_some()
         } else {
@@ -88,12 +102,18 @@ pub async fn team_members_get_project(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| y == x.user_id)
+                        .map(|y: crate::database::models::UserId| {
+                            y == x.user_id
+                        })
                         .unwrap_or(false)
             })
             .flat_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
-                    crate::models::teams::TeamMember::from(data, user.clone(), !logged_in)
+                    crate::models::teams::TeamMember::from(
+                        data,
+                        user.clone(),
+                        !logged_in,
+                    )
                 })
             })
             .collect();
@@ -113,7 +133,8 @@ pub async fn team_members_get_organization(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
     let organization_data =
-        crate::database::models::Organization::get(&string, &**pool, &redis).await?;
+        crate::database::models::Organization::get(&string, &**pool, &redis)
+            .await?;
 
     if let Some(organization) = organization_data {
         let current_user = get_user_from_headers(
@@ -127,8 +148,12 @@ pub async fn team_members_get_organization(
         .map(|x| x.1)
         .ok();
 
-        let members_data =
-            TeamMember::get_from_team_full(organization.team_id, &**pool, &redis).await?;
+        let members_data = TeamMember::get_from_team_full(
+            organization.team_id,
+            &**pool,
+            &redis,
+        )
+        .await?;
         let users = crate::database::models::User::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
@@ -152,12 +177,18 @@ pub async fn team_members_get_organization(
                 logged_in
                     || x.accepted
                     || user_id
-                        .map(|y: crate::database::models::UserId| y == x.user_id)
+                        .map(|y: crate::database::models::UserId| {
+                            y == x.user_id
+                        })
                         .unwrap_or(false)
             })
             .flat_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
-                    crate::models::teams::TeamMember::from(data, user.clone(), !logged_in)
+                    crate::models::teams::TeamMember::from(
+                        data,
+                        user.clone(),
+                        !logged_in,
+                    )
                 })
             })
             .collect();
@@ -177,7 +208,8 @@ pub async fn team_members_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    let members_data = TeamMember::get_from_team_full(id.into(), &**pool, &redis).await?;
+    let members_data =
+        TeamMember::get_from_team_full(id.into(), &**pool, &redis).await?;
     let users = crate::database::models::User::get_many_ids(
         &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
         &**pool,
@@ -215,10 +247,13 @@ pub async fn team_members_get(
                     .unwrap_or(false)
         })
         .flat_map(|data| {
-            users
-                .iter()
-                .find(|x| x.id == data.user_id)
-                .map(|user| crate::models::teams::TeamMember::from(data, user.clone(), !logged_in))
+            users.iter().find(|x| x.id == data.user_id).map(|user| {
+                crate::models::teams::TeamMember::from(
+                    data,
+                    user.clone(),
+                    !logged_in,
+                )
+            })
         })
         .collect();
 
@@ -244,7 +279,8 @@ pub async fn teams_get(
         .map(|x| x.into())
         .collect::<Vec<crate::database::models::ids::TeamId>>();
 
-    let teams_data = TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
+    let teams_data =
+        TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
     let users = crate::database::models::User::get_many_ids(
         &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
         &**pool,
@@ -284,7 +320,11 @@ pub async fn teams_get(
             .filter(|x| logged_in || x.accepted)
             .flat_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
-                    crate::models::teams::TeamMember::from(data, user.clone(), !logged_in)
+                    crate::models::teams::TeamMember::from(
+                        data,
+                        user.clone(),
+                        !logged_in,
+                    )
                 })
             });
 
@@ -312,8 +352,12 @@ pub async fn join_team(
     .await?
     .1;
 
-    let member =
-        TeamMember::get_from_user_id_pending(team_id, current_user.id.into(), &**pool).await?;
+    let member = TeamMember::get_from_user_id_pending(
+        team_id,
+        current_user.id.into(),
+        &**pool,
+    )
+    .await?;
 
     if let Some(member) = member {
         if member.accepted {
@@ -398,19 +442,33 @@ pub async fn add_team_member(
     .1;
     let team_association = Team::get_association(team_id, &**pool)
         .await?
-        .ok_or_else(|| ApiError::InvalidInput("The team specified does not exist".to_string()))?;
-    let member = TeamMember::get_from_user_id(team_id, current_user.id.into(), &**pool).await?;
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The team specified does not exist".to_string(),
+            )
+        })?;
+    let member =
+        TeamMember::get_from_user_id(team_id, current_user.id.into(), &**pool)
+            .await?;
     match team_association {
         // If team is associated with a project, check if they have permissions to invite users to that project
         TeamAssociationId::Project(pid) => {
             let organization =
-                Organization::get_associated_organization_project_id(pid, &**pool).await?;
-            let organization_team_member = if let Some(organization) = &organization {
-                TeamMember::get_from_user_id(organization.team_id, current_user.id.into(), &**pool)
+                Organization::get_associated_organization_project_id(
+                    pid, &**pool,
+                )
+                .await?;
+            let organization_team_member =
+                if let Some(organization) = &organization {
+                    TeamMember::get_from_user_id(
+                        organization.team_id,
+                        current_user.id.into(),
+                        &**pool,
+                    )
                     .await?
-            } else {
-                None
-            };
+                } else {
+                    None
+                };
             let permissions = ProjectPermissions::get_permissions_by_role(
                 &current_user.role,
                 &member,
@@ -420,12 +478,14 @@ pub async fn add_team_member(
 
             if !permissions.contains(ProjectPermissions::MANAGE_INVITES) {
                 return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to invite users to this team".to_string(),
+                    "You don't have permission to invite users to this team"
+                        .to_string(),
                 ));
             }
             if !permissions.contains(new_member.permissions) {
                 return Err(ApiError::InvalidInput(
-                    "The new member has permissions that you don't have".to_string(),
+                    "The new member has permissions that you don't have"
+                        .to_string(),
                 ));
             }
 
@@ -439,23 +499,28 @@ pub async fn add_team_member(
         // If team is associated with an organization, check if they have permissions to invite users to that organization
         TeamAssociationId::Organization(_) => {
             let organization_permissions =
-                OrganizationPermissions::get_permissions_by_role(&current_user.role, &member)
-                    .unwrap_or_default();
-            if !organization_permissions.contains(OrganizationPermissions::MANAGE_INVITES) {
+                OrganizationPermissions::get_permissions_by_role(
+                    &current_user.role,
+                    &member,
+                )
+                .unwrap_or_default();
+            if !organization_permissions
+                .contains(OrganizationPermissions::MANAGE_INVITES)
+            {
                 return Err(ApiError::CustomAuthentication(
                     "You don't have permission to invite users to this organization".to_string(),
                 ));
             }
-            if !organization_permissions
-                .contains(new_member.organization_permissions.unwrap_or_default())
-            {
+            if !organization_permissions.contains(
+                new_member.organization_permissions.unwrap_or_default(),
+            ) {
                 return Err(ApiError::InvalidInput(
                     "The new member has organization permissions that you don't have".to_string(),
                 ));
             }
-            if !organization_permissions
-                .contains(OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS)
-                && !new_member.permissions.is_empty()
+            if !organization_permissions.contains(
+                OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS,
+            ) && !new_member.permissions.is_empty()
             {
                 return Err(ApiError::CustomAuthentication(
                     "You do not have permission to give this user default project permissions. Ensure 'permissions' is set if it is not, and empty (0)."
@@ -465,14 +530,20 @@ pub async fn add_team_member(
         }
     }
 
-    if new_member.payouts_split < Decimal::ZERO || new_member.payouts_split > Decimal::from(5000) {
+    if new_member.payouts_split < Decimal::ZERO
+        || new_member.payouts_split > Decimal::from(5000)
+    {
         return Err(ApiError::InvalidInput(
             "Payouts split must be between 0 and 5000!".to_string(),
         ));
     }
 
-    let request =
-        TeamMember::get_from_user_id_pending(team_id, new_member.user_id.into(), &**pool).await?;
+    let request = TeamMember::get_from_user_id_pending(
+        team_id,
+        new_member.user_id.into(),
+        &**pool,
+    )
+    .await?;
 
     if let Some(req) = request {
         if req.accepted {
@@ -481,25 +552,38 @@ pub async fn add_team_member(
             ));
         } else {
             return Err(ApiError::InvalidInput(
-                "There is already a pending member request for this user".to_string(),
+                "There is already a pending member request for this user"
+                    .to_string(),
             ));
         }
     }
-    let new_user =
-        crate::database::models::User::get_id(new_member.user_id.into(), &**pool, &redis)
-            .await?
-            .ok_or_else(|| ApiError::InvalidInput("An invalid User ID specified".to_string()))?;
+    let new_user = crate::database::models::User::get_id(
+        new_member.user_id.into(),
+        &**pool,
+        &redis,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput("An invalid User ID specified".to_string())
+    })?;
 
     let mut force_accepted = false;
     if let TeamAssociationId::Project(pid) = team_association {
         // We cannot add the owner to a project team in their own org
         let organization =
-            Organization::get_associated_organization_project_id(pid, &**pool).await?;
-        let new_user_organization_team_member = if let Some(organization) = &organization {
-            TeamMember::get_from_user_id(organization.team_id, new_user.id, &**pool).await?
-        } else {
-            None
-        };
+            Organization::get_associated_organization_project_id(pid, &**pool)
+                .await?;
+        let new_user_organization_team_member =
+            if let Some(organization) = &organization {
+                TeamMember::get_from_user_id(
+                    organization.team_id,
+                    new_user.id,
+                    &**pool,
+                )
+                .await?
+            } else {
+                None
+            };
         if new_user_organization_team_member
             .as_ref()
             .map(|tm| tm.is_owner)
@@ -521,7 +605,9 @@ pub async fn add_team_member(
         }
     }
 
-    let new_id = crate::database::models::ids::generate_team_member_id(&mut transaction).await?;
+    let new_id =
+        crate::database::models::ids::generate_team_member_id(&mut transaction)
+            .await?;
     TeamMember {
         id: new_id,
         team_id,
@@ -605,22 +691,30 @@ pub async fn edit_team_member(
     .await?
     .1;
 
-    let team_association = Team::get_association(id, &**pool)
-        .await?
-        .ok_or_else(|| ApiError::InvalidInput("The team specified does not exist".to_string()))?;
-    let member = TeamMember::get_from_user_id(id, current_user.id.into(), &**pool).await?;
-    let edit_member_db = TeamMember::get_from_user_id_pending(id, user_id, &**pool)
-        .await?
-        .ok_or_else(|| {
-            ApiError::CustomAuthentication(
-                "You don't have permission to edit members of this team".to_string(),
+    let team_association =
+        Team::get_association(id, &**pool).await?.ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The team specified does not exist".to_string(),
             )
         })?;
+    let member =
+        TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
+            .await?;
+    let edit_member_db =
+        TeamMember::get_from_user_id_pending(id, user_id, &**pool)
+            .await?
+            .ok_or_else(|| {
+                ApiError::CustomAuthentication(
+                    "You don't have permission to edit members of this team"
+                        .to_string(),
+                )
+            })?;
 
     let mut transaction = pool.begin().await?;
 
     if edit_member_db.is_owner
-        && (edit_member.permissions.is_some() || edit_member.organization_permissions.is_some())
+        && (edit_member.permissions.is_some()
+            || edit_member.organization_permissions.is_some())
     {
         return Err(ApiError::InvalidInput(
             "The owner's permission's in a team cannot be edited".to_string(),
@@ -630,13 +724,21 @@ pub async fn edit_team_member(
     match team_association {
         TeamAssociationId::Project(project_id) => {
             let organization =
-                Organization::get_associated_organization_project_id(project_id, &**pool).await?;
-            let organization_team_member = if let Some(organization) = &organization {
-                TeamMember::get_from_user_id(organization.team_id, current_user.id.into(), &**pool)
+                Organization::get_associated_organization_project_id(
+                    project_id, &**pool,
+                )
+                .await?;
+            let organization_team_member =
+                if let Some(organization) = &organization {
+                    TeamMember::get_from_user_id(
+                        organization.team_id,
+                        current_user.id.into(),
+                        &**pool,
+                    )
                     .await?
-            } else {
-                None
-            };
+                } else {
+                    None
+                };
 
             if organization_team_member
                 .as_ref()
@@ -661,7 +763,8 @@ pub async fn edit_team_member(
             .unwrap_or_default();
             if !permissions.contains(ProjectPermissions::EDIT_MEMBER) {
                 return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit members of this team".to_string(),
+                    "You don't have permission to edit members of this team"
+                        .to_string(),
                 ));
             }
 
@@ -682,16 +785,23 @@ pub async fn edit_team_member(
         }
         TeamAssociationId::Organization(_) => {
             let organization_permissions =
-                OrganizationPermissions::get_permissions_by_role(&current_user.role, &member)
-                    .unwrap_or_default();
+                OrganizationPermissions::get_permissions_by_role(
+                    &current_user.role,
+                    &member,
+                )
+                .unwrap_or_default();
 
-            if !organization_permissions.contains(OrganizationPermissions::EDIT_MEMBER) {
+            if !organization_permissions
+                .contains(OrganizationPermissions::EDIT_MEMBER)
+            {
                 return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit members of this team".to_string(),
+                    "You don't have permission to edit members of this team"
+                        .to_string(),
                 ));
             }
 
-            if let Some(new_permissions) = edit_member.organization_permissions {
+            if let Some(new_permissions) = edit_member.organization_permissions
+            {
                 if !organization_permissions.contains(new_permissions) {
                     return Err(ApiError::InvalidInput(
                         "The new organization permissions have permissions that you don't have"
@@ -701,8 +811,9 @@ pub async fn edit_team_member(
             }
 
             if edit_member.permissions.is_some()
-                && !organization_permissions
-                    .contains(OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS)
+                && !organization_permissions.contains(
+                    OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS,
+                )
             {
                 return Err(ApiError::CustomAuthentication(
                     "You do not have permission to give this user default project permissions."
@@ -713,7 +824,8 @@ pub async fn edit_team_member(
     }
 
     if let Some(payouts_split) = edit_member.payouts_split {
-        if payouts_split < Decimal::ZERO || payouts_split > Decimal::from(5000) {
+        if payouts_split < Decimal::ZERO || payouts_split > Decimal::from(5000)
+        {
             return Err(ApiError::InvalidInput(
                 "Payouts split must be between 0 and 5000!".to_string(),
             ));
@@ -782,26 +894,38 @@ pub async fn transfer_ownership(
     }
 
     if !current_user.role.is_admin() {
-        let member = TeamMember::get_from_user_id(id.into(), current_user.id.into(), &**pool)
-            .await?
-            .ok_or_else(|| {
-                ApiError::CustomAuthentication(
-                    "You don't have permission to edit members of this team".to_string(),
-                )
-            })?;
+        let member = TeamMember::get_from_user_id(
+            id.into(),
+            current_user.id.into(),
+            &**pool,
+        )
+        .await?
+        .ok_or_else(|| {
+            ApiError::CustomAuthentication(
+                "You don't have permission to edit members of this team"
+                    .to_string(),
+            )
+        })?;
 
         if !member.is_owner {
             return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit the ownership of this team".to_string(),
+                "You don't have permission to edit the ownership of this team"
+                    .to_string(),
             ));
         }
     }
 
-    let new_member = TeamMember::get_from_user_id(id.into(), new_owner.user_id.into(), &**pool)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput("The new owner specified does not exist".to_string())
-        })?;
+    let new_member = TeamMember::get_from_user_id(
+        id.into(),
+        new_owner.user_id.into(),
+        &**pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "The new owner specified does not exist".to_string(),
+        )
+    })?;
 
     if !new_member.accepted {
         return Err(ApiError::InvalidInput(
@@ -848,7 +972,8 @@ pub async fn transfer_ownership(
     .await?;
 
     let project_teams_edited =
-        if let Some(TeamAssociationId::Organization(oid)) = team_association_id {
+        if let Some(TeamAssociationId::Organization(oid)) = team_association_id
+        {
             // The owner of ALL projects that this organization owns, if applicable, should be removed as members of the project,
             // if they are members of those projects.
             // (As they are the org owners for them, and they should not have more specific permissions)
@@ -872,7 +997,12 @@ pub async fn transfer_ownership(
 
             // If the owner of the organization is a member of the project, remove them
             for team_id in team_ids.iter() {
-                TeamMember::delete(*team_id, new_owner.user_id.into(), &mut transaction).await?;
+                TeamMember::delete(
+                    *team_id,
+                    new_owner.user_id.into(),
+                    &mut transaction,
+                )
+                .await?;
             }
 
             team_ids
@@ -910,12 +1040,18 @@ pub async fn remove_team_member(
     .await?
     .1;
 
-    let team_association = Team::get_association(id, &**pool)
-        .await?
-        .ok_or_else(|| ApiError::InvalidInput("The team specified does not exist".to_string()))?;
-    let member = TeamMember::get_from_user_id(id, current_user.id.into(), &**pool).await?;
+    let team_association =
+        Team::get_association(id, &**pool).await?.ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The team specified does not exist".to_string(),
+            )
+        })?;
+    let member =
+        TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
+            .await?;
 
-    let delete_member = TeamMember::get_from_user_id_pending(id, user_id, &**pool).await?;
+    let delete_member =
+        TeamMember::get_from_user_id_pending(id, user_id, &**pool).await?;
 
     if let Some(delete_member) = delete_member {
         if delete_member.is_owner {
@@ -931,17 +1067,21 @@ pub async fn remove_team_member(
         match team_association {
             TeamAssociationId::Project(pid) => {
                 let organization =
-                    Organization::get_associated_organization_project_id(pid, &**pool).await?;
-                let organization_team_member = if let Some(organization) = &organization {
-                    TeamMember::get_from_user_id(
-                        organization.team_id,
-                        current_user.id.into(),
-                        &**pool,
+                    Organization::get_associated_organization_project_id(
+                        pid, &**pool,
                     )
-                    .await?
-                } else {
-                    None
-                };
+                    .await?;
+                let organization_team_member =
+                    if let Some(organization) = &organization {
+                        TeamMember::get_from_user_id(
+                            organization.team_id,
+                            current_user.id.into(),
+                            &**pool,
+                        )
+                        .await?
+                    } else {
+                        None
+                    };
                 let permissions = ProjectPermissions::get_permissions_by_role(
                     &current_user.role,
                     &member,
@@ -952,18 +1092,22 @@ pub async fn remove_team_member(
                 if delete_member.accepted {
                     // Members other than the owner can either leave the team, or be
                     // removed by a member with the REMOVE_MEMBER permission.
-                    if Some(delete_member.user_id) == member.as_ref().map(|m| m.user_id)
-                        || permissions.contains(ProjectPermissions::REMOVE_MEMBER)
+                    if Some(delete_member.user_id)
+                        == member.as_ref().map(|m| m.user_id)
+                        || permissions
+                            .contains(ProjectPermissions::REMOVE_MEMBER)
                     // true as if the permission exists, but the member does not, they are part of an org
                     {
-                        TeamMember::delete(id, user_id, &mut transaction).await?;
+                        TeamMember::delete(id, user_id, &mut transaction)
+                            .await?;
                     } else {
                         return Err(ApiError::CustomAuthentication(
                             "You do not have permission to remove a member from this team"
                                 .to_string(),
                         ));
                     }
-                } else if Some(delete_member.user_id) == member.as_ref().map(|m| m.user_id)
+                } else if Some(delete_member.user_id)
+                    == member.as_ref().map(|m| m.user_id)
                     || permissions.contains(ProjectPermissions::MANAGE_INVITES)
                 // true as if the permission exists, but the member does not, they are part of an org
                 {
@@ -973,30 +1117,38 @@ pub async fn remove_team_member(
                     TeamMember::delete(id, user_id, &mut transaction).await?;
                 } else {
                     return Err(ApiError::CustomAuthentication(
-                        "You do not have permission to cancel a team invite".to_string(),
+                        "You do not have permission to cancel a team invite"
+                            .to_string(),
                     ));
                 }
             }
             TeamAssociationId::Organization(_) => {
                 let organization_permissions =
-                    OrganizationPermissions::get_permissions_by_role(&current_user.role, &member)
-                        .unwrap_or_default();
+                    OrganizationPermissions::get_permissions_by_role(
+                        &current_user.role,
+                        &member,
+                    )
+                    .unwrap_or_default();
                 // Organization teams requires a TeamMember, so we can 'unwrap'
                 if delete_member.accepted {
                     // Members other than the owner can either leave the team, or be
                     // removed by a member with the REMOVE_MEMBER permission.
                     if Some(delete_member.user_id) == member.map(|m| m.user_id)
-                        || organization_permissions.contains(OrganizationPermissions::REMOVE_MEMBER)
+                        || organization_permissions
+                            .contains(OrganizationPermissions::REMOVE_MEMBER)
                     {
-                        TeamMember::delete(id, user_id, &mut transaction).await?;
+                        TeamMember::delete(id, user_id, &mut transaction)
+                            .await?;
                     } else {
                         return Err(ApiError::CustomAuthentication(
                             "You do not have permission to remove a member from this organization"
                                 .to_string(),
                         ));
                     }
-                } else if Some(delete_member.user_id) == member.map(|m| m.user_id)
-                    || organization_permissions.contains(OrganizationPermissions::MANAGE_INVITES)
+                } else if Some(delete_member.user_id)
+                    == member.map(|m| m.user_id)
+                    || organization_permissions
+                        .contains(OrganizationPermissions::MANAGE_INVITES)
                 {
                     // This is a pending invite rather than a member, so the
                     // user being invited or team members with the MANAGE_INVITES

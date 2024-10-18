@@ -5,8 +5,9 @@ pub mod templates;
 pub mod validate;
 pub use crate::auth::email::send_email;
 pub use checks::{
-    filter_enlisted_projects_ids, filter_enlisted_version_ids, filter_visible_collections,
-    filter_visible_project_ids, filter_visible_projects,
+    filter_enlisted_projects_ids, filter_enlisted_version_ids,
+    filter_visible_collections, filter_visible_project_ids,
+    filter_visible_projects,
 };
 use serde::{Deserialize, Serialize};
 // pub use pat::{generate_pat, PersonalAccessToken};
@@ -55,16 +56,22 @@ impl actix_web::ResponseError for AuthenticationError {
         match self {
             AuthenticationError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::Sqlx(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            AuthenticationError::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            AuthenticationError::Database(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             AuthenticationError::SerDe(..) => StatusCode::BAD_REQUEST,
-            AuthenticationError::Reqwest(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            AuthenticationError::Reqwest(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             AuthenticationError::InvalidCredentials => StatusCode::UNAUTHORIZED,
             AuthenticationError::Decoding(..) => StatusCode::BAD_REQUEST,
             AuthenticationError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::InvalidAuthMethod => StatusCode::UNAUTHORIZED,
             AuthenticationError::InvalidClientId => StatusCode::UNAUTHORIZED,
             AuthenticationError::Url => StatusCode::BAD_REQUEST,
-            AuthenticationError::FileHosting(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            AuthenticationError::FileHosting(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             AuthenticationError::DuplicateUser => StatusCode::BAD_REQUEST,
             AuthenticationError::SocketError => StatusCode::BAD_REQUEST,
         }
@@ -99,7 +106,9 @@ impl AuthenticationError {
     }
 }
 
-#[derive(Serialize, Deserialize, Default, Eq, PartialEq, Clone, Copy, Debug)]
+#[derive(
+    Serialize, Deserialize, Default, Eq, PartialEq, Clone, Copy, Debug,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum AuthProvider {
     #[default]

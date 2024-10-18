@@ -11,7 +11,11 @@ use super::database::TemporaryDatabase;
 // Creates a PAT with the given scopes, and returns the access token
 // Interfacing with the db directly, rather than using a ourte,
 //  allows us to test with scopes that are not allowed to be created by PATs
-pub async fn create_test_pat(scopes: Scopes, user_id: i64, db: &TemporaryDatabase) -> String {
+pub async fn create_test_pat(
+    scopes: Scopes,
+    user_id: i64,
+    db: &TemporaryDatabase,
+) -> String {
     let mut transaction = db.pool.begin().await.unwrap();
     let id = generate_pat_id(&mut transaction).await.unwrap();
     let pat = database::models::pat_item::PersonalAccessToken {

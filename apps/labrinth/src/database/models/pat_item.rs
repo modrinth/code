@@ -55,7 +55,11 @@ impl PersonalAccessToken {
         Ok(())
     }
 
-    pub async fn get<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
+    pub async fn get<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
         id: T,
         exec: E,
         redis: &RedisPool,
@@ -83,7 +87,11 @@ impl PersonalAccessToken {
         PersonalAccessToken::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
+    pub async fn get_many<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
         pat_strings: &[T],
         exec: E,
         redis: &RedisPool,
@@ -151,7 +159,10 @@ impl PersonalAccessToken {
         let mut redis = redis.connect().await?;
 
         let res = redis
-            .get_deserialized_from_json::<Vec<i64>>(PATS_USERS_NAMESPACE, &user_id.0.to_string())
+            .get_deserialized_from_json::<Vec<i64>>(
+                PATS_USERS_NAMESPACE,
+                &user_id.0.to_string(),
+            )
             .await?;
 
         if let Some(res) = res {
@@ -194,13 +205,18 @@ impl PersonalAccessToken {
         }
 
         redis
-            .delete_many(clear_pats.into_iter().flat_map(|(id, token, user_id)| {
-                [
-                    (PATS_NAMESPACE, id.map(|i| i.0.to_string())),
-                    (PATS_TOKENS_NAMESPACE, token),
-                    (PATS_USERS_NAMESPACE, user_id.map(|i| i.0.to_string())),
-                ]
-            }))
+            .delete_many(clear_pats.into_iter().flat_map(
+                |(id, token, user_id)| {
+                    [
+                        (PATS_NAMESPACE, id.map(|i| i.0.to_string())),
+                        (PATS_TOKENS_NAMESPACE, token),
+                        (
+                            PATS_USERS_NAMESPACE,
+                            user_id.map(|i| i.0.to_string()),
+                        ),
+                    ]
+                },
+            ))
             .await?;
 
         Ok(())

@@ -110,7 +110,14 @@ pub async fn message_delete(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
-    v3::threads::message_delete(req, info, pool, redis, session_queue, file_host)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
+    v3::threads::message_delete(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+        file_host,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
 }

@@ -38,10 +38,16 @@ pub async fn get_version_from_hash(
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response =
-        v3::version_file::get_version_from_hash(req, info, pool, redis, hash_query, session_queue)
-            .await
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::version_file::get_version_from_hash(
+        req,
+        info,
+        pool,
+        redis,
+        hash_query,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
@@ -64,9 +70,16 @@ pub async fn download_version(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns TemporaryRedirect, so no need to convert to V2
-    v3::version_file::download_version(req, info, pool, redis, hash_query, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
+    v3::version_file::download_version(
+        req,
+        info,
+        pool,
+        redis,
+        hash_query,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 // under /api/v1/version_file/{hash}
@@ -80,9 +93,16 @@ pub async fn delete_file(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert to V2
-    v3::version_file::delete_file(req, info, pool, redis, hash_query, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
+    v3::version_file::delete_file(
+        req,
+        info,
+        pool,
+        redis,
+        hash_query,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -171,7 +191,9 @@ pub async fn get_versions_from_hashes(
     .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2
-    match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response).await {
+    match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)
+        .await
+    {
         Ok(versions) => {
             let v2_versions = versions
                 .into_iter()
@@ -210,7 +232,9 @@ pub async fn get_projects_from_hashes(
     .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2
-    match v2_reroute::extract_ok_json::<HashMap<String, Project>>(response).await {
+    match v2_reroute::extract_ok_json::<HashMap<String, Project>>(response)
+        .await
+    {
         Ok(projects_hashes) => {
             let hash_to_project_id = projects_hashes
                 .iter()
@@ -219,14 +243,19 @@ pub async fn get_projects_from_hashes(
                     (hash.clone(), project_id)
                 })
                 .collect::<HashMap<_, _>>();
-            let legacy_projects =
-                LegacyProject::from_many(projects_hashes.into_values().collect(), &**pool, &redis)
-                    .await?;
+            let legacy_projects = LegacyProject::from_many(
+                projects_hashes.into_values().collect(),
+                &**pool,
+                &redis,
+            )
+            .await?;
             let legacy_projects_hashes = hash_to_project_id
                 .into_iter()
                 .filter_map(|(hash, project_id)| {
-                    let legacy_project =
-                        legacy_projects.iter().find(|x| x.id == project_id)?.clone();
+                    let legacy_project = legacy_projects
+                        .iter()
+                        .find(|x| x.id == project_id)?
+                        .clone();
                     Some((hash, legacy_project))
                 })
                 .collect::<HashMap<_, _>>();
@@ -261,12 +290,15 @@ pub async fn update_files(
         hashes: update_data.hashes,
     };
 
-    let response = v3::version_file::update_files(pool, redis, web::Json(update_data))
-        .await
-        .or_else(v2_reroute::flatten_404_error)?;
+    let response =
+        v3::version_file::update_files(pool, redis, web::Json(update_data))
+            .await
+            .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response).await {
+    match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)
+        .await
+    {
         Ok(returned_versions) => {
             let v3_versions = returned_versions
                 .into_iter()
@@ -316,7 +348,8 @@ pub async fn update_individual_files(
                     game_versions.push(serde_json::json!(gv.clone()));
                 }
                 if !game_versions.is_empty() {
-                    loader_fields.insert("game_versions".to_string(), game_versions);
+                    loader_fields
+                        .insert("game_versions".to_string(), game_versions);
                 }
                 v3::version_file::FileUpdateData {
                     hash: x.hash.clone(),
@@ -339,7 +372,9 @@ pub async fn update_individual_files(
     .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response).await {
+    match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)
+        .await
+    {
         Ok(returned_versions) => {
             let v3_versions = returned_versions
                 .into_iter()

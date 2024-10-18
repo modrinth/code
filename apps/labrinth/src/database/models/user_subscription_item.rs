@@ -1,5 +1,9 @@
-use crate::database::models::{DatabaseError, ProductPriceId, UserId, UserSubscriptionId};
-use crate::models::billing::{PriceDuration, SubscriptionMetadata, SubscriptionStatus};
+use crate::database::models::{
+    DatabaseError, ProductPriceId, UserId, UserSubscriptionId,
+};
+use crate::models::billing::{
+    PriceDuration, SubscriptionMetadata, SubscriptionStatus,
+};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use std::convert::{TryFrom, TryInto};
@@ -69,10 +73,12 @@ impl UserSubscriptionItem {
     ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
         let ids = ids.iter().map(|id| id.0).collect_vec();
         let ids_ref: &[i64] = &ids;
-        let results =
-            select_user_subscriptions_with_predicate!("WHERE us.id = ANY($1::bigint[])", ids_ref)
-                .fetch_all(exec)
-                .await?;
+        let results = select_user_subscriptions_with_predicate!(
+            "WHERE us.id = ANY($1::bigint[])",
+            ids_ref
+        )
+        .fetch_all(exec)
+        .await?;
 
         Ok(results
             .into_iter()
@@ -85,9 +91,12 @@ impl UserSubscriptionItem {
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
         let user_id = user_id.0;
-        let results = select_user_subscriptions_with_predicate!("WHERE us.user_id = $1", user_id)
-            .fetch_all(exec)
-            .await?;
+        let results = select_user_subscriptions_with_predicate!(
+            "WHERE us.user_id = $1",
+            user_id
+        )
+        .fetch_all(exec)
+        .await?;
 
         Ok(results
             .into_iter()

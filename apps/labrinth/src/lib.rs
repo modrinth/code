@@ -6,7 +6,8 @@ use actix_web::web;
 use database::redis::RedisPool;
 use log::{info, warn};
 use queue::{
-    analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue, socket::ActiveSockets,
+    analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
+    socket::ActiveSockets,
 };
 use sqlx::Postgres;
 use tokio::sync::RwLock;
@@ -74,7 +75,8 @@ pub fn app_setup(
         dotenvy::var("BIND_ADDR").unwrap()
     );
 
-    let automated_moderation_queue = web::Data::new(AutomatedModerationQueue::default());
+    let automated_moderation_queue =
+        web::Data::new(AutomatedModerationQueue::default());
 
     {
         let automated_moderation_queue_ref = automated_moderation_queue.clone();
@@ -110,8 +112,9 @@ pub fn app_setup(
 
     // The interval in seconds at which the local database is indexed
     // for searching.  Defaults to 1 hour if unset.
-    let local_index_interval =
-        std::time::Duration::from_secs(parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600));
+    let local_index_interval = std::time::Duration::from_secs(
+        parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600),
+    );
 
     let pool_ref = pool.clone();
     let search_config_ref = search_config.clone();
@@ -122,7 +125,12 @@ pub fn app_setup(
         let search_config_ref = search_config_ref.clone();
         async move {
             info!("Indexing local database");
-            let result = index_projects(pool_ref, redis_pool_ref.clone(), &search_config_ref).await;
+            let result = index_projects(
+                pool_ref,
+                redis_pool_ref.clone(),
+                &search_config_ref,
+            )
+            .await;
             if let Err(e) = result {
                 warn!("Local project indexing failed: {:?}", e);
             }
@@ -172,7 +180,11 @@ pub fn app_setup(
         }
     });
 
-    scheduler::schedule_versions(&mut scheduler, pool.clone(), redis_pool.clone());
+    scheduler::schedule_versions(
+        &mut scheduler,
+        pool.clone(),
+        redis_pool.clone(),
+    );
 
     let session_queue = web::Data::new(AuthQueue::new());
 
@@ -258,14 +270,20 @@ pub fn app_setup(
         });
     }
 
-    let stripe_client = stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
+    let stripe_client =
+        stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
     {
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
         let stripe_client_ref = stripe_client.clone();
 
         actix_rt::spawn(async move {
-            routes::internal::billing::task(stripe_client_ref, pool_ref, redis_ref).await;
+            routes::internal::billing::task(
+                stripe_client_ref,
+                pool_ref,
+                redis_ref,
+            )
+            .await;
         });
     }
 
@@ -274,12 +292,14 @@ pub fn app_setup(
         let redis_ref = redis_pool.clone();
 
         actix_rt::spawn(async move {
-            routes::internal::billing::subscription_task(pool_ref, redis_ref).await;
+            routes::internal::billing::subscription_task(pool_ref, redis_ref)
+                .await;
         });
     }
 
     let ip_salt = Pepper {
-        pepper: models::ids::Base62Id(models::ids::random_base62(11)).to_string(),
+        pepper: models::ids::Base62Id(models::ids::random_base62(11))
+            .to_string(),
     };
 
     let payouts_queue = web::Data::new(PayoutsQueue::new());
@@ -304,23 +324,22 @@ pub fn app_setup(
     }
 }
 
-pub fn app_config(cfg: &mut web::ServiceConfig, labrinth_config: LabrinthConfig) {
-    cfg.app_data(
-        web::FormConfig::default()
-            .error_handler(|err, _req| routes::ApiError::Validation(err.to_string()).into()),
-    )
-    .app_data(
-        web::PathConfig::default()
-            .error_handler(|err, _req| routes::ApiError::Validation(err.to_string()).into()),
-    )
-    .app_data(
-        web::QueryConfig::default()
-            .error_handler(|err, _req| routes::ApiError::Validation(err.to_string()).into()),
-    )
-    .app_data(
-        web::JsonConfig::default()
-            .error_handler(|err, _req| routes::ApiError::Validation(err.to_string()).into()),
-    )
+pub fn app_config(
+    cfg: &mut web::ServiceConfig,
+    labrinth_config: LabrinthConfig,
+) {
+    cfg.app_data(web::FormConfig::default().error_handler(|err, _req| {
+        routes::ApiError::Validation(err.to_string()).into()
+    }))
+    .app_data(web::PathConfig::default().error_handler(|err, _req| {
+        routes::ApiError::Validation(err.to_string()).into()
+    }))
+    .app_data(web::QueryConfig::default().error_handler(|err, _req| {
+        routes::ApiError::Validation(err.to_string()).into()
+    }))
+    .app_data(web::JsonConfig::default().error_handler(|err, _req| {
+        routes::ApiError::Validation(err.to_string()).into()
+    }))
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))

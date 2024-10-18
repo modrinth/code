@@ -3,7 +3,9 @@ use super::ids::OrganizationId;
 use super::users::UserId;
 use crate::database::models::notification_item::Notification as DBNotification;
 use crate::database::models::notification_item::NotificationAction as DBNotificationAction;
-use crate::models::ids::{ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId, VersionId};
+use crate::models::ids::{
+    ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId, VersionId,
+};
 use crate::models::projects::ProjectStatus;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};

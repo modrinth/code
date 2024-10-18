@@ -77,7 +77,9 @@ pub async fn maven_metadata(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let project_id = params.into_inner().0;
-    let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
+    let Some(project) =
+        database::models::Project::get(&project_id, &**pool, &redis).await?
+    else {
         return Err(ApiError::NotFound);
     };
 
@@ -145,7 +147,11 @@ pub async fn maven_metadata(
             versions: Versions {
                 versions: new_versions,
             },
-            last_updated: project.inner.updated.format("%Y%m%d%H%M%S").to_string(),
+            last_updated: project
+                .inner
+                .updated
+                .format("%Y%m%d%H%M%S")
+                .to_string(),
         },
     };
 
@@ -164,11 +170,16 @@ async fn find_version(
         .ok()
         .map(|x| x as i64);
 
-    let all_versions = database::models::Version::get_many(&project.versions, pool, redis).await?;
+    let all_versions =
+        database::models::Version::get_many(&project.versions, pool, redis)
+            .await?;
 
     let exact_matches = all_versions
         .iter()
-        .filter(|x| &x.inner.version_number == vcoords || Some(x.inner.id.0) == id_option)
+        .filter(|x| {
+            &x.inner.version_number == vcoords
+                || Some(x.inner.id.0) == id_option
+        })
         .collect::<Vec<_>>();
 
     if exact_matches.len() == 1 {
@@ -202,11 +213,10 @@ async fn find_version(
 
             // For maven in particular, we will hardcode it to use GameVersions rather than generic loader fields, as this is minecraft-java exclusive
             if !game_versions.is_empty() {
-                let version_game_versions = x
-                    .version_fields
-                    .clone()
-                    .into_iter()
-                    .find_map(|v| MinecraftGameVersion::try_from_version_field(&v).ok());
+                let version_game_versions =
+                    x.version_fields.clone().into_iter().find_map(|v| {
+                        MinecraftGameVersion::try_from_version_field(&v).ok()
+                    });
                 if let Some(version_game_versions) = version_game_versions {
                     bool &= version_game_versions
                         .iter()
@@ -231,7 +241,9 @@ fn find_file<'a>(
     version: &'a QueryVersion,
     file: &str,
 ) -> Option<&'a QueryFile> {
-    if let Some(selected_file) = version.files.iter().find(|x| x.filename == file) {
+    if let Some(selected_file) =
+        version.files.iter().find(|x| x.filename == file)
+    {
         return Some(selected_file);
     }
 
@@ -271,7 +283,9 @@ pub async fn version_file(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
-    let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
+    let Some(project) =
+        database::models::Project::get(&project_id, &**pool, &redis).await?
+    else {
         return Err(ApiError::NotFound);
     };
 
@@ -290,7 +304,8 @@ pub async fn version_file(
         return Err(ApiError::NotFound);
     }
 
-    let Some(version) = find_version(&project, &vnum, &pool, &redis).await? else {
+    let Some(version) = find_version(&project, &vnum, &pool, &redis).await?
+    else {
         return Err(ApiError::NotFound);
     };
 
@@ -314,7 +329,9 @@ pub async fn version_file(
         return Ok(HttpResponse::Ok()
             .content_type("text/xml")
             .body(yaserde::ser::to_string(&respdata).map_err(ApiError::Xml)?));
-    } else if let Some(selected_file) = find_file(&project_id, &vnum, &version, &file) {
+    } else if let Some(selected_file) =
+        find_file(&project_id, &vnum, &version, &file)
+    {
         return Ok(HttpResponse::TemporaryRedirect()
             .append_header(("location", &*selected_file.url))
             .body(""));
@@ -332,7 +349,9 @@ pub async fn version_file_sha1(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
-    let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
+    let Some(project) =
+        database::models::Project::get(&project_id, &**pool, &redis).await?
+    else {
         return Err(ApiError::NotFound);
     };
 
@@ -351,7 +370,8 @@ pub async fn version_file_sha1(
         return Err(ApiError::NotFound);
     }
 
-    let Some(version) = find_version(&project, &vnum, &pool, &redis).await? else {
+    let Some(version) = find_version(&project, &vnum, &pool, &redis).await?
+    else {
         return Err(ApiError::NotFound);
     };
 
@@ -374,7 +394,9 @@ pub async fn version_file_sha512(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
-    let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
+    let Some(project) =
+        database::models::Project::get(&project_id, &**pool, &redis).await?
+    else {
         return Err(ApiError::NotFound);
     };
 
@@ -393,7 +415,8 @@ pub async fn version_file_sha512(
         return Err(ApiError::NotFound);
     }
 
-    let Some(version) = find_version(&project, &vnum, &pool, &redis).await? else {
+    let Some(version) = find_version(&project, &vnum, &pool, &redis).await?
+    else {
         return Err(ApiError::NotFound);
     };
 

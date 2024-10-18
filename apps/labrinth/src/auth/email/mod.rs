@@ -16,7 +16,11 @@ pub enum MailError {
     Smtp(#[from] lettre::transport::smtp::Error),
 }
 
-pub fn send_email_raw(to: String, subject: String, body: String) -> Result<(), MailError> {
+pub fn send_email_raw(
+    to: String,
+    subject: String,
+    body: String,
+) -> Result<(), MailError> {
     let email = Message::builder()
         .from(Mailbox::new(
             Some("Modrinth".to_string()),

@@ -46,7 +46,8 @@ impl NotificationBuilder {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let notification_ids =
-            generate_many_notification_ids(users.len(), &mut *transaction).await?;
+            generate_many_notification_ids(users.len(), &mut *transaction)
+                .await?;
 
         let body = serde_json::value::to_value(&self.body)?;
         let bodies = notification_ids
@@ -97,7 +98,8 @@ impl Notification {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let notification_ids_parsed: Vec<i64> = notification_ids.iter().map(|x| x.0).collect();
+        let notification_ids_parsed: Vec<i64> =
+            notification_ids.iter().map(|x| x.0).collect();
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.name, n.text, n.link, n.created, n.read, n.type notification_type, n.body,
@@ -153,7 +155,10 @@ impl Notification {
         let mut redis = redis.connect().await?;
 
         let cached_notifications: Option<Vec<Notification>> = redis
-            .get_deserialized_from_json(USER_NOTIFICATIONS_NAMESPACE, &user_id.0.to_string())
+            .get_deserialized_from_json(
+                USER_NOTIFICATIONS_NAMESPACE,
+                &user_id.0.to_string(),
+            )
             .await?;
 
         if let Some(notifications) = cached_notifications {
@@ -227,7 +232,8 @@ impl Notification {
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let notification_ids_parsed: Vec<i64> = notification_ids.iter().map(|x| x.0).collect();
+        let notification_ids_parsed: Vec<i64> =
+            notification_ids.iter().map(|x| x.0).collect();
 
         let affected_users = sqlx::query!(
             "
@@ -243,7 +249,11 @@ impl Notification {
         .try_collect::<Vec<_>>()
         .await?;
 
-        Notification::clear_user_notifications_cache(affected_users.iter(), redis).await?;
+        Notification::clear_user_notifications_cache(
+            affected_users.iter(),
+            redis,
+        )
+        .await?;
 
         Ok(Some(()))
     }
@@ -261,7 +271,8 @@ impl Notification {
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let notification_ids_parsed: Vec<i64> = notification_ids.iter().map(|x| x.0).collect();
+        let notification_ids_parsed: Vec<i64> =
+            notification_ids.iter().map(|x| x.0).collect();
 
         sqlx::query!(
             "
@@ -286,7 +297,11 @@ impl Notification {
         .try_collect::<Vec<_>>()
         .await?;
 
-        Notification::clear_user_notifications_cache(affected_users.iter(), redis).await?;
+        Notification::clear_user_notifications_cache(
+            affected_users.iter(),
+            redis,
+        )
+        .await?;
 
         Ok(Some(()))
     }
@@ -298,11 +313,9 @@ impl Notification {
         let mut redis = redis.connect().await?;
 
         redis
-            .delete_many(
-                user_ids
-                    .into_iter()
-                    .map(|id| (USER_NOTIFICATIONS_NAMESPACE, Some(id.0.to_string()))),
-            )
+            .delete_many(user_ids.into_iter().map(|id| {
+                (USER_NOTIFICATIONS_NAMESPACE, Some(id.0.to_string()))
+            }))
             .await?;
 
         Ok(())

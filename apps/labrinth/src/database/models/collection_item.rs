@@ -212,7 +212,10 @@ impl Collection {
         Ok(val)
     }
 
-    pub async fn clear_cache(id: CollectionId, redis: &RedisPool) -> Result<(), DatabaseError> {
+    pub async fn clear_cache(
+        id: CollectionId,
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
 
         redis.delete(COLLECTIONS_NAMESPACE, id.0).await?;

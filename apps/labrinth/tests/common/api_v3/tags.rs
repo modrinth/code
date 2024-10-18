@@ -6,7 +6,8 @@ use actix_web::{
 use async_trait::async_trait;
 use labrinth::routes::v3::tags::{GameData, LoaderData};
 use labrinth::{
-    database::models::loader_fields::LoaderFieldEnumValue, routes::v3::tags::CategoryData,
+    database::models::loader_fields::LoaderFieldEnumValue,
+    routes::v3::tags::CategoryData,
 };
 
 use crate::{
@@ -50,7 +51,9 @@ impl ApiTags for ApiV3 {
         self.call(req).await
     }
 
-    async fn get_categories_deserialized_common(&self) -> Vec<CommonCategoryData> {
+    async fn get_categories_deserialized_common(
+        &self,
+    ) -> Vec<CommonCategoryData> {
         let resp = self.get_categories().await;
         assert_status!(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
@@ -68,7 +71,10 @@ impl ApiV3 {
         test::read_body_json(resp).await
     }
 
-    pub async fn get_loader_field_variants(&self, loader_field: &str) -> ServiceResponse {
+    pub async fn get_loader_field_variants(
+        &self,
+        loader_field: &str,
+    ) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v3/loader_field?loader_field={}", loader_field))
             .append_pat(ADMIN_USER_PAT)

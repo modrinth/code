@@ -98,7 +98,8 @@ pub async fn playtimes_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
+    let project_ids =
+        filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the views
     let playtimes = crate::clickhouse::fetch_playtimes(
@@ -164,7 +165,8 @@ pub async fn views_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
+    let project_ids =
+        filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the views
     let views = crate::clickhouse::fetch_views(
@@ -230,7 +232,9 @@ pub async fn downloads_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user_option, &pool, &redis, None).await?;
+    let project_ids =
+        filter_allowed_ids(project_ids, user_option, &pool, &redis, None)
+            .await?;
 
     // Get the downloads
     let downloads = crate::clickhouse::fetch_downloads(
@@ -299,17 +303,26 @@ pub async fn revenue_get(
 
     // Round end_date up to nearest resolution
     let diff = end_date.timestamp() % (resolution_minutes as i64 * 60);
-    let end_date = end_date + Duration::seconds((resolution_minutes as i64 * 60) - diff);
+    let end_date =
+        end_date + Duration::seconds((resolution_minutes as i64 * 60) - diff);
 
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids =
-        filter_allowed_ids(project_ids, user.clone(), &pool, &redis, Some(true)).await?;
+    let project_ids = filter_allowed_ids(
+        project_ids,
+        user.clone(),
+        &pool,
+        &redis,
+        Some(true),
+    )
+    .await?;
 
     let duration: PgInterval = Duration::minutes(resolution_minutes as i64)
         .try_into()
-        .map_err(|_| ApiError::InvalidInput("Invalid resolution_minutes".to_string()))?;
+        .map_err(|_| {
+            ApiError::InvalidInput("Invalid resolution_minutes".to_string())
+        })?;
     // Get the revenue data
     let project_ids = project_ids.unwrap_or_default();
 
@@ -424,7 +437,8 @@ pub async fn countries_downloads_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
+    let project_ids =
+        filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the countries
     let countries = crate::clickhouse::fetch_countries_downloads(
@@ -496,7 +510,8 @@ pub async fn countries_views_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
+    let project_ids =
+        filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the countries
     let countries = crate::clickhouse::fetch_countries_views(
@@ -564,55 +579,68 @@ async fn filter_allowed_ids(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     let project_ids = if let Some(project_strings) = project_ids {
-        let projects_data =
-            database::models::Project::get_many(&project_strings, &***pool, redis).await?;
+        let projects_data = database::models::Project::get_many(
+            &project_strings,
+            &***pool,
+            redis,
+        )
+        .await?;
 
         let team_ids = projects_data
             .iter()
             .map(|x| x.inner.team_id)
             .collect::<Vec<database::models::TeamId>>();
         let team_members =
-            database::models::TeamMember::get_from_team_full_many(&team_ids, &***pool, redis)
-                .await?;
+            database::models::TeamMember::get_from_team_full_many(
+                &team_ids, &***pool, redis,
+            )
+            .await?;
 
         let organization_ids = projects_data
             .iter()
             .filter_map(|x| x.inner.organization_id)
             .collect::<Vec<database::models::OrganizationId>>();
-        let organizations =
-            database::models::Organization::get_many_ids(&organization_ids, &***pool, redis)
-                .await?;
-
-        let organization_team_ids = organizations
-            .iter()
-            .map(|x| x.team_id)
-            .collect::<Vec<database::models::TeamId>>();
-        let organization_team_members = database::models::TeamMember::get_from_team_full_many(
-            &organization_team_ids,
+        let organizations = database::models::Organization::get_many_ids(
+            &organization_ids,
             &***pool,
             redis,
         )
         .await?;
 
+        let organization_team_ids = organizations
+            .iter()
+            .map(|x| x.team_id)
+            .collect::<Vec<database::models::TeamId>>();
+        let organization_team_members =
+            database::models::TeamMember::get_from_team_full_many(
+                &organization_team_ids,
+                &***pool,
+                redis,
+            )
+            .await?;
+
         let ids = projects_data
             .into_iter()
             .filter(|project| {
-                let team_member = team_members
-                    .iter()
-                    .find(|x| x.team_id == project.inner.team_id && x.user_id == user.id.into());
+                let team_member = team_members.iter().find(|x| {
+                    x.team_id == project.inner.team_id
+                        && x.user_id == user.id.into()
+                });
 
                 let organization = project
                     .inner
                     .organization_id
                     .and_then(|oid| organizations.iter().find(|x| x.id == oid));
 
-                let organization_team_member = if let Some(organization) = organization {
-                    organization_team_members
-                        .iter()
-                        .find(|x| x.team_id == organization.team_id && x.user_id == user.id.into())
-                } else {
-                    None
-                };
+                let organization_team_member =
+                    if let Some(organization) = organization {
+                        organization_team_members.iter().find(|x| {
+                            x.team_id == organization.team_id
+                                && x.user_id == user.id.into()
+                        })
+                    } else {
+                        None
+                    };
 
                 let permissions = ProjectPermissions::get_permissions_by_role(
                     &user.role,

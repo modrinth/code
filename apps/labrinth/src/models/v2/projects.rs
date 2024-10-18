@@ -9,8 +9,8 @@ use crate::database::models::{version_item, DatabaseError};
 use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::projects::{
-    Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus, Project,
-    ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
+    Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
+    Project, ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
 };
 use crate::models::threads::ThreadId;
 use crate::routes::v2_reroute::{self, capitalize_first};
@@ -87,12 +87,13 @@ impl LegacyProject {
             .cloned()
             .unwrap_or("project".to_string()); // Default to 'project' if none are found
 
-        let project_type = if og_project_type == "datapack" || og_project_type == "plugin" {
-            // These are not supported in V2, so we'll just use 'mod' instead
-            "mod".to_string()
-        } else {
-            og_project_type.clone()
-        };
+        let project_type =
+            if og_project_type == "datapack" || og_project_type == "plugin" {
+                // These are not supported in V2, so we'll just use 'mod' instead
+                "mod".to_string()
+            } else {
+                og_project_type.clone()
+            };
 
         (project_type, og_project_type)
     }
@@ -102,7 +103,10 @@ impl LegacyProject {
     // - This can be any version, because the fields are ones that used to be on the project itself.
     // - Its conceivable that certain V3 projects that have many different ones may not have the same fields on all of them.
     // It's safe to use a db version_item for this as the only info is side types, game versions, and loader fields (for loaders), which used to be public on project anyway.
-    pub fn from(data: Project, versions_item: Option<version_item::QueryVersion>) -> Self {
+    pub fn from(
+        data: Project,
+        versions_item: Option<version_item::QueryVersion>,
+    ) -> Self {
         let mut client_side = LegacySideType::Unknown;
         let mut server_side = LegacySideType::Unknown;
 
@@ -110,7 +114,8 @@ impl LegacyProject {
         // We'll prioritize 'modpack' first, and if neither are found, use the first one.
         // If there are no project types, default to 'project'
         let project_types = data.project_types;
-        let (mut project_type, og_project_type) = Self::get_project_type(&project_types);
+        let (mut project_type, og_project_type) =
+            Self::get_project_type(&project_types);
 
         let mut loaders = data.loaders;
 
@@ -128,16 +133,22 @@ impl LegacyProject {
             let fields = versions_item
                 .version_fields
                 .iter()
-                .map(|f| (f.field_name.clone(), f.value.clone().serialize_internal()))
+                .map(|f| {
+                    (f.field_name.clone(), f.value.clone().serialize_internal())
+                })
                 .collect::<HashMap<_, _>>();
-            (client_side, server_side) =
-                v2_reroute::convert_side_types_v2(&fields, Some(&*og_project_type));
+            (client_side, server_side) = v2_reroute::convert_side_types_v2(
+                &fields,
+                Some(&*og_project_type),
+            );
 
             // - if loader is mrpack, this is a modpack
             // the loaders are whatever the corresponding loader fields are
             if loaders.contains(&"mrpack".to_string()) {
                 project_type = "modpack".to_string();
-                if let Some(mrpack_loaders) = data.fields.iter().find(|f| f.0 == "mrpack_loaders") {
+                if let Some(mrpack_loaders) =
+                    data.fields.iter().find(|f| f.0 == "mrpack_loaders")
+                {
                     let values = mrpack_loaders
                         .1
                         .iter()
@@ -227,7 +238,8 @@ impl LegacyProject {
             .iter()
             .filter_map(|p| p.versions.first().map(|i| (*i).into()))
             .collect();
-        let example_versions = version_item::Version::get_many(&version_ids, exec, redis).await?;
+        let example_versions =
+            version_item::Version::get_many(&version_ids, exec, redis).await?;
         let mut legacy_projects = Vec::new();
         for project in data {
             let version_item = example_versions
@@ -308,7 +320,9 @@ pub struct LegacyVersion {
 impl From<Version> for LegacyVersion {
     fn from(data: Version) -> Self {
         let mut game_versions = Vec::new();
-        if let Some(value) = data.fields.get("game_versions").and_then(|v| v.as_array()) {
+        if let Some(value) =
+            data.fields.get("game_versions").and_then(|v| v.as_array())
+        {
             for gv in value {
                 if let Some(game_version) = gv.as_str() {
                     game_versions.push(game_version.to_string());
@@ -318,14 +332,17 @@ impl From<Version> for LegacyVersion {
 
         // - if loader is mrpack, this is a modpack
         // the v2 loaders are whatever the corresponding loader fields are
-        let mut loaders = data.loaders.into_iter().map(|l| l.0).collect::<Vec<_>>();
+        let mut loaders =
+            data.loaders.into_iter().map(|l| l.0).collect::<Vec<_>>();
         if loaders.contains(&"mrpack".to_string()) {
             if let Some((_, mrpack_loaders)) = data
                 .fields
                 .into_iter()
                 .find(|(key, _)| key == "mrpack_loaders")
             {
-                if let Ok(mrpack_loaders) = serde_json::from_value(mrpack_loaders) {
+                if let Ok(mrpack_loaders) =
+                    serde_json::from_value(mrpack_loaders)
+                {
                     loaders = mrpack_loaders;
                 }
             }

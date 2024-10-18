@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
 use super::ApiError;
-use crate::auth::checks::{filter_visible_versions, is_visible_project, is_visible_version};
+use crate::auth::checks::{
+    filter_visible_versions, is_visible_project, is_visible_version,
+};
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::loader_fields::{
@@ -16,7 +18,9 @@ use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
 use crate::models::projects::{skip_nulls, Loader};
-use crate::models::projects::{Dependency, FileType, VersionStatus, VersionType};
+use crate::models::projects::{
+    Dependency, FileType, VersionStatus, VersionType,
+};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::search::indexing::remove_documents;
@@ -80,21 +84,31 @@ pub async fn version_project_get_helper(
     .ok();
 
     if let Some(project) = result {
-        if !is_visible_project(&project.inner, &user_option, &pool, false).await? {
+        if !is_visible_project(&project.inner, &user_option, &pool, false)
+            .await?
+        {
             return Err(ApiError::NotFound);
         }
 
-        let versions =
-            database::models::Version::get_many(&project.versions, &**pool, &redis).await?;
+        let versions = database::models::Version::get_many(
+            &project.versions,
+            &**pool,
+            &redis,
+        )
+        .await?;
 
         let id_opt = parse_base62(&id.1).ok();
-        let version = versions
-            .into_iter()
-            .find(|x| Some(x.inner.id.0 as u64) == id_opt || x.inner.version_number == id.1);
+        let version = versions.into_iter().find(|x| {
+            Some(x.inner.id.0 as u64) == id_opt
+                || x.inner.version_number == id.1
+        });
 
         if let Some(version) = version {
-            if is_visible_version(&version.inner, &user_option, &pool, &redis).await? {
-                return Ok(HttpResponse::Ok().json(models::projects::Version::from(version)));
+            if is_visible_version(&version.inner, &user_option, &pool, &redis)
+                .await?
+            {
+                return Ok(HttpResponse::Ok()
+                    .json(models::projects::Version::from(version)));
             }
         }
     }
@@ -114,11 +128,14 @@ pub async fn versions_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let version_ids = serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
-        .into_iter()
-        .map(|x| x.into())
-        .collect::<Vec<database::models::VersionId>>();
-    let versions_data = database::models::Version::get_many(&version_ids, &**pool, &redis).await?;
+    let version_ids =
+        serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
+            .into_iter()
+            .map(|x| x.into())
+            .collect::<Vec<database::models::VersionId>>();
+    let versions_data =
+        database::models::Version::get_many(&version_ids, &**pool, &redis)
+            .await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -131,7 +148,9 @@ pub async fn versions_get(
     .map(|x| x.1)
     .ok();
 
-    let versions = filter_visible_versions(versions_data, &user_option, &pool, &redis).await?;
+    let versions =
+        filter_visible_versions(versions_data, &user_option, &pool, &redis)
+            .await?;
 
     Ok(HttpResponse::Ok().json(versions))
 }
@@ -154,7 +173,8 @@ pub async fn version_get_helper(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let version_data = database::models::Version::get(id.into(), &**pool, &redis).await?;
+    let version_data =
+        database::models::Version::get(id.into(), &**pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -169,7 +189,9 @@ pub async fn version_get_helper(
 
     if let Some(data) = version_data {
         if is_visible_version(&data.inner, &user_option, &pool, &redis).await? {
-            return Ok(HttpResponse::Ok().json(models::projects::Version::from(data)));
+            return Ok(
+                HttpResponse::Ok().json(models::projects::Version::from(data))
+            );
         }
     }
 
@@ -231,7 +253,8 @@ pub async fn version_edit(
     new_version: web::Json<serde_json::Value>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let new_version: EditVersion = serde_json::from_value(new_version.into_inner())?;
+    let new_version: EditVersion =
+        serde_json::from_value(new_version.into_inner())?;
     version_edit_helper(
         req,
         info.into_inner(),
@@ -260,9 +283,9 @@ pub async fn version_edit_helper(
     .await?
     .1;
 
-    new_version
-        .validate()
-        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
+    new_version.validate().map_err(|err| {
+        ApiError::Validation(validation_errors_to_string(err, None))
+    })?;
 
     let version_id = info.0;
     let id = version_id.into();
@@ -270,21 +293,24 @@ pub async fn version_edit_helper(
     let result = database::models::Version::get(id, &**pool, &redis).await?;
 
     if let Some(version_item) = result {
-        let team_member = database::models::TeamMember::get_from_user_id_project(
-            version_item.inner.project_id,
-            user.id.into(),
-            false,
-            &**pool,
-        )
-        .await?;
+        let team_member =
+            database::models::TeamMember::get_from_user_id_project(
+                version_item.inner.project_id,
+                user.id.into(),
+                false,
+                &**pool,
+            )
+            .await?;
 
-        let organization = Organization::get_associated_organization_project_id(
-            version_item.inner.project_id,
-            &**pool,
-        )
-        .await?;
+        let organization =
+            Organization::get_associated_organization_project_id(
+                version_item.inner.project_id,
+                &**pool,
+            )
+            .await?;
 
-        let organization_team_member = if let Some(organization) = &organization {
+        let organization_team_member = if let Some(organization) = &organization
+        {
             database::models::TeamMember::get_from_user_id(
                 organization.team_id,
                 user.id.into(),
@@ -304,7 +330,8 @@ pub async fn version_edit_helper(
         if let Some(perms) = permissions {
             if !perms.contains(ProjectPermissions::UPLOAD_VERSION) {
                 return Err(ApiError::CustomAuthentication(
-                    "You do not have the permissions to edit this version!".to_string(),
+                    "You do not have the permissions to edit this version!"
+                        .to_string(),
                 ));
             }
 
@@ -372,8 +399,12 @@ pub async fn version_edit_helper(
                     })
                     .collect::<Vec<database::models::version_item::DependencyBuilder>>();
 
-                DependencyBuilder::insert_many(builders, version_item.inner.id, &mut transaction)
-                    .await?;
+                DependencyBuilder::insert_many(
+                    builders,
+                    version_item.inner.id,
+                    &mut transaction,
+                )
+                .await?;
             }
 
             if !new_version.fields.is_empty() {
@@ -383,20 +414,34 @@ pub async fn version_edit_helper(
                     .map(|x| x.to_string())
                     .collect::<Vec<String>>();
 
-                let all_loaders = loader_fields::Loader::list(&mut *transaction, &redis).await?;
+                let all_loaders =
+                    loader_fields::Loader::list(&mut *transaction, &redis)
+                        .await?;
                 let loader_ids = version_item
                     .loaders
                     .iter()
-                    .filter_map(|x| all_loaders.iter().find(|y| &y.loader == x).map(|y| y.id))
+                    .filter_map(|x| {
+                        all_loaders
+                            .iter()
+                            .find(|y| &y.loader == x)
+                            .map(|y| y.id)
+                    })
                     .collect_vec();
 
-                let loader_fields = LoaderField::get_fields(&loader_ids, &mut *transaction, &redis)
-                    .await?
-                    .into_iter()
-                    .filter(|lf| version_fields_names.contains(&lf.field))
-                    .collect::<Vec<LoaderField>>();
+                let loader_fields = LoaderField::get_fields(
+                    &loader_ids,
+                    &mut *transaction,
+                    &redis,
+                )
+                .await?
+                .into_iter()
+                .filter(|lf| version_fields_names.contains(&lf.field))
+                .collect::<Vec<LoaderField>>();
 
-                let loader_field_ids = loader_fields.iter().map(|lf| lf.id.0).collect::<Vec<i32>>();
+                let loader_field_ids = loader_fields
+                    .iter()
+                    .map(|lf| lf.id.0)
+                    .collect::<Vec<i32>>();
                 sqlx::query!(
                     "
                     DELETE FROM version_fields 
@@ -409,12 +454,13 @@ pub async fn version_edit_helper(
                 .execute(&mut *transaction)
                 .await?;
 
-                let mut loader_field_enum_values = LoaderFieldEnumValue::list_many_loader_fields(
-                    &loader_fields,
-                    &mut *transaction,
-                    &redis,
-                )
-                .await?;
+                let mut loader_field_enum_values =
+                    LoaderFieldEnumValue::list_many_loader_fields(
+                        &loader_fields,
+                        &mut *transaction,
+                        &redis,
+                    )
+                    .await?;
 
                 let mut version_fields = Vec::new();
                 for (vf_name, vf_value) in new_version.fields {
@@ -438,7 +484,8 @@ pub async fn version_edit_helper(
                     .map_err(ApiError::InvalidInput)?;
                     version_fields.push(vf);
                 }
-                VersionField::insert_many(version_fields, &mut transaction).await?;
+                VersionField::insert_many(version_fields, &mut transaction)
+                    .await?;
             }
 
             if let Some(loaders) = &new_version.loaders {
@@ -453,18 +500,23 @@ pub async fn version_edit_helper(
 
                 let mut loader_versions = Vec::new();
                 for loader in loaders {
-                    let loader_id = database::models::loader_fields::Loader::get_id(
-                        &loader.0,
-                        &mut *transaction,
-                        &redis,
-                    )
-                    .await?
-                    .ok_or_else(|| {
-                        ApiError::InvalidInput("No database entry for loader provided.".to_string())
-                    })?;
+                    let loader_id =
+                        database::models::loader_fields::Loader::get_id(
+                            &loader.0,
+                            &mut *transaction,
+                            &redis,
+                        )
+                        .await?
+                        .ok_or_else(|| {
+                            ApiError::InvalidInput(
+                                "No database entry for loader provided."
+                                    .to_string(),
+                            )
+                        })?;
                     loader_versions.push(LoaderVersion::new(loader_id, id));
                 }
-                LoaderVersion::insert_many(loader_versions, &mut transaction).await?;
+                LoaderVersion::insert_many(loader_versions, &mut transaction)
+                    .await?;
 
                 crate::database::models::Project::clear_cache(
                     version_item.inner.project_id,
@@ -531,7 +583,8 @@ pub async fn version_edit_helper(
                     WHERE (id = $2)
                     ",
                     diff as i32,
-                    version_item.inner.project_id as database::models::ids::ProjectId,
+                    version_item.inner.project_id
+                        as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -614,10 +667,17 @@ pub async fn version_edit_helper(
                 version_id: Some(version_item.inner.id.into()),
             };
 
-            img::delete_unused_images(context, checkable_strings, &mut transaction, &redis).await?;
+            img::delete_unused_images(
+                context,
+                checkable_strings,
+                &mut transaction,
+                &redis,
+            )
+            .await?;
 
             transaction.commit().await?;
-            database::models::Version::clear_cache(&version_item, &redis).await?;
+            database::models::Version::clear_cache(&version_item, &redis)
+                .await?;
             database::models::Project::clear_cache(
                 version_item.inner.project_id,
                 None,
@@ -662,7 +722,8 @@ pub async fn version_list(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result = database::models::Project::get(&string, &**pool, &redis).await?;
+    let result =
+        database::models::Project::get(&string, &**pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -676,45 +737,51 @@ pub async fn version_list(
     .ok();
 
     if let Some(project) = result {
-        if !is_visible_project(&project.inner, &user_option, &pool, false).await? {
+        if !is_visible_project(&project.inner, &user_option, &pool, false)
+            .await?
+        {
             return Err(ApiError::NotFound);
         }
 
         let loader_field_filters = filters.loader_fields.as_ref().map(|x| {
-            serde_json::from_str::<HashMap<String, Vec<serde_json::Value>>>(x).unwrap_or_default()
+            serde_json::from_str::<HashMap<String, Vec<serde_json::Value>>>(x)
+                .unwrap_or_default()
         });
-        let loader_filters = filters
-            .loaders
-            .as_ref()
-            .map(|x| serde_json::from_str::<Vec<String>>(x).unwrap_or_default());
-        let mut versions = database::models::Version::get_many(&project.versions, &**pool, &redis)
-            .await?
-            .into_iter()
-            .skip(filters.offset.unwrap_or(0))
-            .take(filters.limit.unwrap_or(usize::MAX))
-            .filter(|x| {
-                let mut bool = true;
+        let loader_filters = filters.loaders.as_ref().map(|x| {
+            serde_json::from_str::<Vec<String>>(x).unwrap_or_default()
+        });
+        let mut versions = database::models::Version::get_many(
+            &project.versions,
+            &**pool,
+            &redis,
+        )
+        .await?
+        .into_iter()
+        .skip(filters.offset.unwrap_or(0))
+        .take(filters.limit.unwrap_or(usize::MAX))
+        .filter(|x| {
+            let mut bool = true;
 
-                if let Some(version_type) = filters.version_type {
-                    bool &= &*x.inner.version_type == version_type.as_str();
+            if let Some(version_type) = filters.version_type {
+                bool &= &*x.inner.version_type == version_type.as_str();
+            }
+            if let Some(loaders) = &loader_filters {
+                bool &= x.loaders.iter().any(|y| loaders.contains(y));
+            }
+            if let Some(loader_fields) = &loader_field_filters {
+                for (key, values) in loader_fields {
+                    bool &= if let Some(x_vf) =
+                        x.version_fields.iter().find(|y| y.field_name == *key)
+                    {
+                        values.iter().any(|v| x_vf.value.contains_json_value(v))
+                    } else {
+                        true
+                    };
                 }
-                if let Some(loaders) = &loader_filters {
-                    bool &= x.loaders.iter().any(|y| loaders.contains(y));
-                }
-                if let Some(loader_fields) = &loader_field_filters {
-                    for (key, values) in loader_fields {
-                        bool &= if let Some(x_vf) =
-                            x.version_fields.iter().find(|y| y.field_name == *key)
-                        {
-                            values.iter().any(|v| x_vf.value.contains_json_value(v))
-                        } else {
-                            true
-                        };
-                    }
-                }
-                bool
-            })
-            .collect::<Vec<_>>();
+            }
+            bool
+        })
+        .collect::<Vec<_>>();
 
         let mut response = versions
             .iter()
@@ -727,10 +794,15 @@ pub async fn version_list(
             .cloned()
             .collect::<Vec<_>>();
 
-        versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));
+        versions.sort_by(|a, b| {
+            b.inner.date_published.cmp(&a.inner.date_published)
+        });
 
         // Attempt to populate versions with "auto featured" versions
-        if response.is_empty() && !versions.is_empty() && filters.featured.unwrap_or(false) {
+        if response.is_empty()
+            && !versions.is_empty()
+            && filters.featured.unwrap_or(false)
+        {
             // TODO: This is a bandaid fix for detecting auto-featured versions.
             // In the future, not all versions will have 'game_versions' fields, so this will need to be changed.
             let (loaders, game_versions) = futures::future::try_join(
@@ -777,10 +849,14 @@ pub async fn version_list(
             }
         }
 
-        response.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));
+        response.sort_by(|a, b| {
+            b.inner.date_published.cmp(&a.inner.date_published)
+        });
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let response = filter_visible_versions(response, &user_option, &pool, &redis).await?;
+        let response =
+            filter_visible_versions(response, &user_option, &pool, &redis)
+                .await?;
 
         Ok(HttpResponse::Ok().json(response))
     } else {
@@ -810,24 +886,31 @@ pub async fn version_delete(
     let version = database::models::Version::get(id.into(), &**pool, &redis)
         .await?
         .ok_or_else(|| {
-            ApiError::InvalidInput("The specified version does not exist!".to_string())
+            ApiError::InvalidInput(
+                "The specified version does not exist!".to_string(),
+            )
         })?;
 
     if !user.role.is_admin() {
-        let team_member = database::models::TeamMember::get_from_user_id_project(
-            version.inner.project_id,
-            user.id.into(),
-            false,
-            &**pool,
-        )
-        .await
-        .map_err(ApiError::Database)?;
+        let team_member =
+            database::models::TeamMember::get_from_user_id_project(
+                version.inner.project_id,
+                user.id.into(),
+                false,
+                &**pool,
+            )
+            .await
+            .map_err(ApiError::Database)?;
 
         let organization =
-            Organization::get_associated_organization_project_id(version.inner.project_id, &**pool)
-                .await?;
+            Organization::get_associated_organization_project_id(
+                version.inner.project_id,
+                &**pool,
+            )
+            .await?;
 
-        let organization_team_member = if let Some(organization) = &organization {
+        let organization_team_member = if let Some(organization) = &organization
+        {
             database::models::TeamMember::get_from_user_id(
                 organization.team_id,
                 user.id.into(),
@@ -846,7 +929,8 @@ pub async fn version_delete(
 
         if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
             return Err(ApiError::CustomAuthentication(
-                "You do not have permission to delete versions in this team".to_string(),
+                "You do not have permission to delete versions in this team"
+                    .to_string(),
             ));
         }
     }
@@ -856,17 +940,27 @@ pub async fn version_delete(
         version_id: Some(version.inner.id.into()),
     };
     let uploaded_images =
-        database::models::Image::get_many_contexted(context, &mut transaction).await?;
+        database::models::Image::get_many_contexted(context, &mut transaction)
+            .await?;
     for image in uploaded_images {
         image_item::Image::remove(image.id, &mut transaction, &redis).await?;
     }
 
-    let result =
-        database::models::Version::remove_full(version.inner.id, &redis, &mut transaction).await?;
+    let result = database::models::Version::remove_full(
+        version.inner.id,
+        &redis,
+        &mut transaction,
+    )
+    .await?;
     transaction.commit().await?;
     remove_documents(&[version.inner.id.into()], &search_config).await?;
-    database::models::Project::clear_cache(version.inner.project_id, None, Some(true), &redis)
-        .await?;
+    database::models::Project::clear_cache(
+        version.inner.project_id,
+        None,
+        Some(true),
+        &redis,
+    )
+    .await?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))

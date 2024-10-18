@@ -21,7 +21,8 @@ pub struct Pepper {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
-    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info"))
+        .init();
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
@@ -56,35 +57,38 @@ async fn main() -> std::io::Result<()> {
     // Redis connector
     let redis_pool = RedisPool::new(None);
 
-    let storage_backend = dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
+    let storage_backend =
+        dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
 
-    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> = match storage_backend.as_str() {
-        "backblaze" => Arc::new(
-            file_hosting::BackblazeHost::new(
-                &dotenvy::var("BACKBLAZE_KEY_ID").unwrap(),
-                &dotenvy::var("BACKBLAZE_KEY").unwrap(),
-                &dotenvy::var("BACKBLAZE_BUCKET_ID").unwrap(),
-            )
-            .await,
-        ),
-        "s3" => Arc::new(
-            S3Host::new(
-                &dotenvy::var("S3_BUCKET_NAME").unwrap(),
-                &dotenvy::var("S3_REGION").unwrap(),
-                &dotenvy::var("S3_URL").unwrap(),
-                &dotenvy::var("S3_ACCESS_TOKEN").unwrap(),
-                &dotenvy::var("S3_SECRET").unwrap(),
-            )
-            .unwrap(),
-        ),
-        "local" => Arc::new(file_hosting::MockHost::new()),
-        _ => panic!("Invalid storage backend specified. Aborting startup!"),
-    };
+    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
+        match storage_backend.as_str() {
+            "backblaze" => Arc::new(
+                file_hosting::BackblazeHost::new(
+                    &dotenvy::var("BACKBLAZE_KEY_ID").unwrap(),
+                    &dotenvy::var("BACKBLAZE_KEY").unwrap(),
+                    &dotenvy::var("BACKBLAZE_BUCKET_ID").unwrap(),
+                )
+                .await,
+            ),
+            "s3" => Arc::new(
+                S3Host::new(
+                    &dotenvy::var("S3_BUCKET_NAME").unwrap(),
+                    &dotenvy::var("S3_REGION").unwrap(),
+                    &dotenvy::var("S3_URL").unwrap(),
+                    &dotenvy::var("S3_ACCESS_TOKEN").unwrap(),
+                    &dotenvy::var("S3_SECRET").unwrap(),
+                )
+                .unwrap(),
+            ),
+            "local" => Arc::new(file_hosting::MockHost::new()),
+            _ => panic!("Invalid storage backend specified. Aborting startup!"),
+        };
 
     info!("Initializing clickhouse connection");
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
-    let maxmind_reader = Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
+    let maxmind_reader =
+        Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")

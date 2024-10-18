@@ -19,19 +19,23 @@ pub async fn with_test_environment<Fut, A>(
     Fut: Future<Output = ()>,
     A: ApiBuildable + 'static,
 {
-    let test_env: TestEnvironment<A> = TestEnvironment::build(max_connections).await;
+    let test_env: TestEnvironment<A> =
+        TestEnvironment::build(max_connections).await;
     let db = test_env.db.clone();
     f(test_env).await;
     db.cleanup().await;
 }
 
-pub async fn with_test_environment_all<Fut, F>(max_connections: Option<u32>, f: F)
-where
+pub async fn with_test_environment_all<Fut, F>(
+    max_connections: Option<u32>,
+    f: F,
+) where
     Fut: Future<Output = ()>,
     F: Fn(TestEnvironment<GenericApi>) -> Fut,
 {
     println!("Test environment: API v3");
-    let test_env_api_v3 = TestEnvironment::<ApiV3>::build(max_connections).await;
+    let test_env_api_v3 =
+        TestEnvironment::<ApiV3>::build(max_connections).await;
     let test_env_api_v3 = TestEnvironment {
         db: test_env_api_v3.db.clone(),
         api: GenericApi::V3(test_env_api_v3.api),
@@ -43,7 +47,8 @@ where
     db.cleanup().await;
 
     println!("Test environment: API v2");
-    let test_env_api_v2 = TestEnvironment::<ApiV2>::build(max_connections).await;
+    let test_env_api_v2 =
+        TestEnvironment::<ApiV2>::build(max_connections).await;
     let test_env_api_v2 = TestEnvironment {
         db: test_env_api_v2.db.clone(),
         api: GenericApi::V2(test_env_api_v2.api),
@@ -139,7 +144,11 @@ pub trait LocalService {
         &self,
         req: actix_http::Request,
     ) -> std::pin::Pin<
-        Box<dyn std::future::Future<Output = Result<ServiceResponse, actix_web::Error>>>,
+        Box<
+            dyn std::future::Future<
+                Output = Result<ServiceResponse, actix_web::Error>,
+            >,
+        >,
     >;
 }
 impl<S> LocalService for S
@@ -155,7 +164,11 @@ where
         &self,
         req: actix_http::Request,
     ) -> std::pin::Pin<
-        Box<dyn std::future::Future<Output = Result<ServiceResponse, actix_web::Error>>>,
+        Box<
+            dyn std::future::Future<
+                Output = Result<ServiceResponse, actix_web::Error>,
+            >,
+        >,
     > {
         Box::pin(self.call(req))
     }

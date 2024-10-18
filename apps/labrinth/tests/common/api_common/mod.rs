@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use self::models::{
-    CommonCategoryData, CommonItemType, CommonLoaderData, CommonNotification, CommonProject,
-    CommonTeamMember, CommonVersion,
+    CommonCategoryData, CommonItemType, CommonLoaderData, CommonNotification,
+    CommonProject, CommonTeamMember, CommonVersion,
 };
 use self::request_data::{ImageData, ProjectCreationRequestData};
 use actix_web::dev::ServiceResponse;
@@ -51,14 +51,26 @@ pub trait ApiProject {
         version_jar: Option<&TestFile>,
     ) -> serde_json::Value;
 
-    async fn remove_project(&self, id_or_slug: &str, pat: Option<&str>) -> ServiceResponse;
-    async fn get_project(&self, id_or_slug: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn remove_project(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
+    async fn get_project(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_project_deserialized_common(
         &self,
         id_or_slug: &str,
         pat: Option<&str>,
     ) -> CommonProject;
-    async fn get_projects(&self, ids_or_slugs: &[&str], pat: Option<&str>) -> ServiceResponse;
+    async fn get_projects(
+        &self,
+        ids_or_slugs: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_project_dependencies(
         &self,
         id_or_slug: &str,
@@ -125,7 +137,11 @@ pub trait ApiProject {
         pat: Option<&str>,
     ) -> ServiceResponse;
     async fn get_report(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
-    async fn get_reports(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
+    async fn get_reports(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_user_reports(&self, pat: Option<&str>) -> ServiceResponse;
     async fn edit_report(
         &self,
@@ -133,9 +149,17 @@ pub trait ApiProject {
         patch: serde_json::Value,
         pat: Option<&str>,
     ) -> ServiceResponse;
-    async fn delete_report(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn delete_report(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_thread(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
-    async fn get_threads(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
+    async fn get_threads(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn write_to_thread(
         &self,
         id: &str,
@@ -144,8 +168,13 @@ pub trait ApiProject {
         pat: Option<&str>,
     ) -> ServiceResponse;
     async fn get_moderation_inbox(&self, pat: Option<&str>) -> ServiceResponse;
-    async fn read_thread(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
-    async fn delete_thread_message(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn read_thread(&self, id: &str, pat: Option<&str>)
+        -> ServiceResponse;
+    async fn delete_thread_message(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
 }
 
 #[async_trait(?Send)]
@@ -153,19 +182,33 @@ pub trait ApiTags {
     async fn get_loaders(&self) -> ServiceResponse;
     async fn get_loaders_deserialized_common(&self) -> Vec<CommonLoaderData>;
     async fn get_categories(&self) -> ServiceResponse;
-    async fn get_categories_deserialized_common(&self) -> Vec<CommonCategoryData>;
+    async fn get_categories_deserialized_common(
+        &self,
+    ) -> Vec<CommonCategoryData>;
 }
 
 #[async_trait(?Send)]
 pub trait ApiTeams {
-    async fn get_team_members(&self, team_id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_team_members(
+        &self,
+        team_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_team_members_deserialized_common(
         &self,
         team_id: &str,
         pat: Option<&str>,
     ) -> Vec<CommonTeamMember>;
-    async fn get_teams_members(&self, team_ids: &[&str], pat: Option<&str>) -> ServiceResponse;
-    async fn get_project_members(&self, id_or_slug: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_teams_members(
+        &self,
+        team_ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse;
+    async fn get_project_members(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_project_members_deserialized_common(
         &self,
         id_or_slug: &str,
@@ -181,7 +224,11 @@ pub trait ApiTeams {
         id_or_title: &str,
         pat: Option<&str>,
     ) -> Vec<CommonTeamMember>;
-    async fn join_team(&self, team_id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn join_team(
+        &self,
+        team_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn remove_from_team(
         &self,
         team_id: &str,
@@ -201,20 +248,36 @@ pub trait ApiTeams {
         user_id: &str,
         pat: Option<&str>,
     ) -> ServiceResponse;
-    async fn get_user_notifications(&self, user_id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_user_notifications(
+        &self,
+        user_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_user_notifications_deserialized_common(
         &self,
         user_id: &str,
         pat: Option<&str>,
     ) -> Vec<CommonNotification>;
-    async fn get_notification(&self, notification_id: &str, pat: Option<&str>) -> ServiceResponse;
-    async fn get_notifications(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
+    async fn get_notification(
+        &self,
+        notification_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
+    async fn get_notifications(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn mark_notification_read(
         &self,
         notification_id: &str,
         pat: Option<&str>,
     ) -> ServiceResponse;
-    async fn mark_notifications_read(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
+    async fn mark_notifications_read(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn add_user_to_team(
         &self,
         team_id: &str,
@@ -228,12 +291,20 @@ pub trait ApiTeams {
         notification_id: &str,
         pat: Option<&str>,
     ) -> ServiceResponse;
-    async fn delete_notifications(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
+    async fn delete_notifications(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse;
 }
 
 #[async_trait(?Send)]
 pub trait ApiUser {
-    async fn get_user(&self, id_or_username: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_user(
+        &self,
+        id_or_username: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_current_user(&self, pat: Option<&str>) -> ServiceResponse;
     async fn edit_user(
         &self,
@@ -241,7 +312,11 @@ pub trait ApiUser {
         patch: serde_json::Value,
         pat: Option<&str>,
     ) -> ServiceResponse;
-    async fn delete_user(&self, id_or_username: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn delete_user(
+        &self,
+        id_or_username: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
 }
 
 #[async_trait(?Send)]
@@ -264,13 +339,18 @@ pub trait ApiVersion {
         modify_json: Option<json_patch::Patch>,
         pat: Option<&str>,
     ) -> CommonVersion;
-    async fn get_version(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_version(&self, id: &str, pat: Option<&str>)
+        -> ServiceResponse;
     async fn get_version_deserialized_common(
         &self,
         id_or_slug: &str,
         pat: Option<&str>,
     ) -> CommonVersion;
-    async fn get_versions(&self, ids: Vec<String>, pat: Option<&str>) -> ServiceResponse;
+    async fn get_versions(
+        &self,
+        ids: Vec<String>,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_versions_deserialized_common(
         &self,
         ids: Vec<String>,
@@ -384,8 +464,16 @@ pub trait ApiVersion {
         file: &TestFile,
         pat: Option<&str>,
     ) -> ServiceResponse;
-    async fn remove_version(&self, id_or_slug: &str, pat: Option<&str>) -> ServiceResponse;
-    async fn remove_version_file(&self, hash: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn remove_version(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
+    async fn remove_version_file(
+        &self,
+        hash: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
 }
 
 pub trait AppendsOptionalPat {

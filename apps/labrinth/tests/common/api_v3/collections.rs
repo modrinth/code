@@ -34,7 +34,11 @@ impl ApiV3 {
         self.call(req).await
     }
 
-    pub async fn get_collection(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    pub async fn get_collection(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v3/collection/{id}"))
             .append_pat(pat)
@@ -42,13 +46,21 @@ impl ApiV3 {
         self.call(req).await
     }
 
-    pub async fn get_collection_deserialized(&self, id: &str, pat: Option<&str>) -> Collection {
+    pub async fn get_collection_deserialized(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> Collection {
         let resp = self.get_collection(id, pat).await;
         assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
-    pub async fn get_collections(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse {
+    pub async fn get_collections(
+        &self,
+        ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let ids = serde_json::to_string(ids).unwrap();
         let req = test::TestRequest::get()
             .uri(&format!(
@@ -60,7 +72,11 @@ impl ApiV3 {
         self.call(req).await
     }
 
-    pub async fn get_collection_projects(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    pub async fn get_collection_projects(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v3/collection/{id}/projects"))
             .append_pat(pat)
@@ -122,7 +138,11 @@ impl ApiV3 {
         }
     }
 
-    pub async fn delete_collection(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    pub async fn delete_collection(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v3/collection/{id}"))
             .append_pat(pat)

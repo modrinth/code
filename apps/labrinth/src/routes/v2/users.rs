@@ -64,15 +64,19 @@ pub async fn users_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let response =
-        v3::users::users_get(web::Query(v3::users::UserIds { ids: ids.ids }), pool, redis)
-            .await
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::users::users_get(
+        web::Query(v3::users::UserIds { ids: ids.ids }),
+        pool,
+        redis,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<User>>(response).await {
         Ok(users) => {
-            let legacy_users: Vec<LegacyUser> = users.into_iter().map(LegacyUser::from).collect();
+            let legacy_users: Vec<LegacyUser> =
+                users.into_iter().map(LegacyUser::from).collect();
             Ok(HttpResponse::Ok().json(legacy_users))
         }
         Err(response) => Ok(response),
@@ -107,14 +111,21 @@ pub async fn projects_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::users::projects_list(req, info, pool.clone(), redis.clone(), session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::users::projects_list(
+        req,
+        info,
+        pool.clone(),
+        redis.clone(),
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
-            let legacy_projects = LegacyProject::from_many(project, &**pool, &redis).await?;
+            let legacy_projects =
+                LegacyProject::from_many(project, &**pool, &redis).await?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -230,14 +241,21 @@ pub async fn user_follows(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::users::user_follows(req, info, pool.clone(), redis.clone(), session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::users::user_follows(
+        req,
+        info,
+        pool.clone(),
+        redis.clone(),
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
-            let legacy_projects = LegacyProject::from_many(project, &**pool, &redis).await?;
+            let legacy_projects =
+                LegacyProject::from_many(project, &**pool, &redis).await?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -252,9 +270,10 @@ pub async fn user_notifications(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::users::user_notifications(req, info, pool, redis, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)?;
+    let response =
+        v3::users::user_notifications(req, info, pool, redis, session_queue)
+            .await
+            .or_else(v2_reroute::flatten_404_error)?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Notification>>(response).await {
         Ok(notifications) => {

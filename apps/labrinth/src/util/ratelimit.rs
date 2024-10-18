@@ -13,8 +13,12 @@ use actix_web::{
 use futures_util::future::LocalBoxFuture;
 use futures_util::future::{ready, Ready};
 
-pub type KeyedRateLimiter<K = String, MW = middleware::StateInformationMiddleware> =
-    Arc<RateLimiter<K, state::keyed::DefaultKeyedStateStore<K>, DefaultClock, MW>>;
+pub type KeyedRateLimiter<
+    K = String,
+    MW = middleware::StateInformationMiddleware,
+> = Arc<
+    RateLimiter<K, state::keyed::DefaultKeyedStateStore<K>, DefaultClock, MW>,
+>;
 
 pub struct RateLimit(pub KeyedRateLimiter);
 
@@ -58,7 +62,9 @@ where
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
         if let Some(key) = req.headers().get("x-ratelimit-key") {
-            if key.to_str().ok() == dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok().as_deref() {
+            if key.to_str().ok()
+                == dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok().as_deref()
+            {
                 let res = self.service.call(req);
 
                 return Box::pin(async move {
@@ -129,7 +135,8 @@ where
                     })
                 }
                 Err(negative) => {
-                    let wait_time = negative.wait_time_from(DefaultClock::default().now());
+                    let wait_time =
+                        negative.wait_time_from(DefaultClock::default().now());
 
                     let mut response = ApiError::RateLimitError(
                         wait_time.as_millis(),
@@ -140,28 +147,41 @@ where
                     let headers = response.headers_mut();
 
                     headers.insert(
-                        actix_web::http::header::HeaderName::from_str("x-ratelimit-limit").unwrap(),
+                        actix_web::http::header::HeaderName::from_str(
+                            "x-ratelimit-limit",
+                        )
+                        .unwrap(),
                         negative.quota().burst_size().get().into(),
                     );
                     headers.insert(
-                        actix_web::http::header::HeaderName::from_str("x-ratelimit-remaining")
-                            .unwrap(),
+                        actix_web::http::header::HeaderName::from_str(
+                            "x-ratelimit-remaining",
+                        )
+                        .unwrap(),
                         0.into(),
                     );
                     headers.insert(
-                        actix_web::http::header::HeaderName::from_str("x-ratelimit-reset").unwrap(),
+                        actix_web::http::header::HeaderName::from_str(
+                            "x-ratelimit-reset",
+                        )
+                        .unwrap(),
                         wait_time.as_secs().into(),
                     );
 
-                    Box::pin(async { Ok(req.into_response(response.map_into_right_body())) })
+                    Box::pin(async {
+                        Ok(req.into_response(response.map_into_right_body()))
+                    })
                 }
             }
         } else {
-            let response =
-                ApiError::CustomAuthentication("Unable to obtain user IP address!".to_string())
-                    .error_response();
+            let response = ApiError::CustomAuthentication(
+                "Unable to obtain user IP address!".to_string(),
+            )
+            .error_response();
 
-            Box::pin(async { Ok(req.into_response(response.map_into_right_body())) })
+            Box::pin(async {
+                Ok(req.into_response(response.map_into_right_body()))
+            })
         }
     }
 }

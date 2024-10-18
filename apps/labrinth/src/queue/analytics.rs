@@ -36,12 +36,14 @@ impl AnalyticsQueue {
     fn strip_ip(ip: Ipv6Addr) -> u64 {
         if let Some(ip) = ip.to_ipv4_mapped() {
             let octets = ip.octets();
-            u64::from_be_bytes([octets[0], octets[1], octets[2], octets[3], 0, 0, 0, 0])
+            u64::from_be_bytes([
+                octets[0], octets[1], octets[2], octets[3], 0, 0, 0, 0,
+            ])
         } else {
             let octets = ip.octets();
             u64::from_be_bytes([
-                octets[0], octets[1], octets[2], octets[3], octets[4], octets[5], octets[6],
-                octets[7],
+                octets[0], octets[1], octets[2], octets[3], octets[4],
+                octets[5], octets[6], octets[7],
             ])
         }
     }
@@ -98,7 +100,8 @@ impl AnalyticsQueue {
                 raw_views.push((views, true));
             }
 
-            let mut redis = redis.pool.get().await.map_err(DatabaseError::RedisPool)?;
+            let mut redis =
+                redis.pool.get().await.map_err(DatabaseError::RedisPool)?;
 
             let results = cmd("MGET")
                 .arg(
@@ -107,7 +110,7 @@ impl AnalyticsQueue {
                         .map(|x| format!("{}:{}-{}", VIEWS_NAMESPACE, x.0, x.1))
                         .collect::<Vec<_>>(),
                 )
-                .query_async::<_, Vec<Option<u32>>>(&mut redis)
+                .query_async::<Vec<Option<u32>>>(&mut redis)
                 .await
                 .map_err(DatabaseError::CacheError)?;
 
@@ -115,24 +118,25 @@ impl AnalyticsQueue {
             for (idx, count) in results.into_iter().enumerate() {
                 let key = &views_keys[idx];
 
-                let new_count = if let Some((views, monetized)) = raw_views.get_mut(idx) {
-                    if let Some(count) = count {
-                        if count > 3 {
-                            *monetized = false;
-                            continue;
-                        }
+                let new_count =
+                    if let Some((views, monetized)) = raw_views.get_mut(idx) {
+                        if let Some(count) = count {
+                            if count > 3 {
+                                *monetized = false;
+                                continue;
+                            }
 
-                        if (count + views.len() as u32) > 3 {
-                            *monetized = false;
-                        }
+                            if (count + views.len() as u32) > 3 {
+                                *monetized = false;
+                            }
 
-                        count + (views.len() as u32)
+                            count + (views.len() as u32)
+                        } else {
+                            views.len() as u32
+                        }
                     } else {
-                        views.len() as u32
-                    }
-                } else {
-                    1
-                };
+                        1
+                    };
 
                 pipe.atomic().set_ex(
                     format!("{}:{}-{}", VIEWS_NAMESPACE, key.0, key.1),
@@ -140,7 +144,7 @@ impl AnalyticsQueue {
                     6 * 60 * 60,
                 );
             }
-            pipe.query_async(&mut *redis)
+            pipe.query_async::<()>(&mut *redis)
                 .await
                 .map_err(DatabaseError::CacheError)?;
 
@@ -163,21 +167,26 @@ impl AnalyticsQueue {
             let mut downloads_keys = Vec::new();
             let raw_downloads = DashMap::new();
 
-            for (index, (key, download)) in downloads_queue.into_iter().enumerate() {
+            for (index, (key, download)) in
+                downloads_queue.into_iter().enumerate()
+            {
                 downloads_keys.push(key);
                 raw_downloads.insert(index, download);
             }
 
-            let mut redis = redis.pool.get().await.map_err(DatabaseError::RedisPool)?;
+            let mut redis =
+                redis.pool.get().await.map_err(DatabaseError::RedisPool)?;
 
             let results = cmd("MGET")
                 .arg(
                     downloads_keys
                         .iter()
-                        .map(|x| format!("{}:{}-{}", DOWNLOADS_NAMESPACE, x.0, x.1))
+                        .map(|x| {
+                            format!("{}:{}-{}", DOWNLOADS_NAMESPACE, x.0, x.1)
+                        })
                         .collect::<Vec<_>>(),
                 )
-                .query_async::<_, Vec<Option<u32>>>(&mut redis)
+                .query_async::<Vec<Option<u32>>>(&mut redis)
                 .await
                 .map_err(DatabaseError::CacheError)?;
 
@@ -202,7 +211,7 @@ impl AnalyticsQueue {
                     6 * 60 * 60,
                 );
             }
-            pipe.query_async(&mut *redis)
+            pipe.query_async::<()>(&mut *redis)
                 .await
                 .map_err(DatabaseError::CacheError)?;
 

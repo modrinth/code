@@ -67,9 +67,14 @@ pub async fn projects_list(
     if let Some(id) = id_option.map(|x| x.id) {
         let project_data = User::get_projects(id, &**pool, &redis).await?;
 
-        let projects: Vec<_> =
-            crate::database::Project::get_many_ids(&project_data, &**pool, &redis).await?;
-        let projects = filter_visible_projects(projects, &user, &pool, true).await?;
+        let projects: Vec<_> = crate::database::Project::get_many_ids(
+            &project_data,
+            &**pool,
+            &redis,
+        )
+        .await?;
+        let projects =
+            filter_visible_projects(projects, &user, &pool, true).await?;
         Ok(HttpResponse::Ok().json(projects))
     } else {
         Err(ApiError::NotFound)
@@ -116,7 +121,8 @@ pub async fn users_get(
 
     let users_data = User::get_many(&user_ids, &**pool, &redis).await?;
 
-    let users: Vec<crate::models::users::User> = users_data.into_iter().map(From::from).collect();
+    let users: Vec<crate::models::users::User> =
+        users_data.into_iter().map(From::from).collect();
 
     Ok(HttpResponse::Ok().json(users))
 }
@@ -165,13 +171,18 @@ pub async fn collections_list(
 
         let project_data = User::get_collections(id, &**pool).await?;
 
-        let response: Vec<_> =
-            crate::database::models::Collection::get_many(&project_data, &**pool, &redis)
-                .await?
-                .into_iter()
-                .filter(|x| can_view_private || matches!(x.status, CollectionStatus::Listed))
-                .map(Collection::from)
-                .collect();
+        let response: Vec<_> = crate::database::models::Collection::get_many(
+            &project_data,
+            &**pool,
+            &redis,
+        )
+        .await?
+        .into_iter()
+        .filter(|x| {
+            can_view_private || matches!(x.status, CollectionStatus::Listed)
+        })
+        .map(Collection::from)
+        .collect();
 
         Ok(HttpResponse::Ok().json(response))
     } else {
@@ -213,10 +224,11 @@ pub async fn orgs_list(
             .map(|x| x.team_id)
             .collect::<Vec<_>>();
 
-        let teams_data = crate::database::models::TeamMember::get_from_team_full_many(
-            &team_ids, &**pool, &redis,
-        )
-        .await?;
+        let teams_data =
+            crate::database::models::TeamMember::get_from_team_full_many(
+                &team_ids, &**pool, &redis,
+            )
+            .await?;
         let users = User::get_many_ids(
             &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
@@ -231,7 +243,8 @@ pub async fn orgs_list(
         }
 
         for data in organizations_data {
-            let members_data = team_groups.remove(&data.team_id).unwrap_or(vec![]);
+            let members_data =
+                team_groups.remove(&data.team_id).unwrap_or(vec![]);
             let logged_in = user
                 .as_ref()
                 .and_then(|user| {
@@ -246,12 +259,19 @@ pub async fn orgs_list(
                 .filter(|x| logged_in || x.accepted || id == x.user_id)
                 .flat_map(|data| {
                     users.iter().find(|x| x.id == data.user_id).map(|user| {
-                        crate::models::teams::TeamMember::from(data, user.clone(), !logged_in)
+                        crate::models::teams::TeamMember::from(
+                            data,
+                            user.clone(),
+                            !logged_in,
+                        )
                     })
                 })
                 .collect();
 
-            let organization = crate::models::organizations::Organization::from(data, team_members);
+            let organization = crate::models::organizations::Organization::from(
+                data,
+                team_members,
+            );
             organizations.push(organization);
         }
 
@@ -299,9 +319,9 @@ pub async fn user_edit(
     )
     .await?;
 
-    new_user
-        .validate()
-        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
+    new_user.validate().map_err(|err| {
+        ApiError::Validation(validation_errors_to_string(err, None))
+    })?;
 
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
@@ -313,7 +333,8 @@ pub async fn user_edit(
             let mut transaction = pool.begin().await?;
 
             if let Some(username) = &new_user.username {
-                let existing_user_id_option = User::get(username, &**pool, &redis).await?;
+                let existing_user_id_option =
+                    User::get(username, &**pool, &redis).await?;
 
                 if existing_user_id_option
                     .map(|x| UserId::from(x.id))
@@ -418,7 +439,8 @@ pub async fn user_edit(
             }
 
             transaction.commit().await?;
-            User::clear_caches(&[(id, Some(actual_user.username))], &redis).await?;
+            User::clear_caches(&[(id, Some(actual_user.username))], &redis)
+                .await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::CustomAuthentication(
@@ -460,7 +482,8 @@ pub async fn user_icon_edit(
     if let Some(actual_user) = id_option {
         if user.id != actual_user.id.into() && !user.role.is_mod() {
             return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this user's icon.".to_string(),
+                "You don't have permission to edit this user's icon."
+                    .to_string(),
             ));
         }
 
@@ -471,8 +494,12 @@ pub async fn user_icon_edit(
         )
         .await?;
 
-        let bytes =
-            read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
+        let bytes = read_from_payload(
+            &mut payload,
+            262144,
+            "Icons must be smaller than 256KiB",
+        )
+        .await?;
 
         let user_id: UserId = actual_user.id.into();
         let upload_result = crate::util::img::upload_image_optimized(
@@ -572,12 +599,15 @@ pub async fn user_follows(
         }
 
         let project_ids = User::get_follows(id, &**pool).await?;
-        let projects: Vec<_> =
-            crate::database::Project::get_many_ids(&project_ids, &**pool, &redis)
-                .await?
-                .into_iter()
-                .map(Project::from)
-                .collect();
+        let projects: Vec<_> = crate::database::Project::get_many_ids(
+            &project_ids,
+            &**pool,
+            &redis,
+        )
+        .await?
+        .into_iter()
+        .map(Project::from)
+        .collect();
 
         Ok(HttpResponse::Ok().json(projects))
     } else {

@@ -14,7 +14,9 @@ use crate::validate::plugin::*;
 use crate::validate::quilt::QuiltValidator;
 use crate::validate::resourcepack::{PackValidator, TexturePackValidator};
 use crate::validate::rift::RiftValidator;
-use crate::validate::shader::{CanvasShaderValidator, CoreShaderValidator, ShaderValidator};
+use crate::validate::shader::{
+    CanvasShaderValidator, CoreShaderValidator, ShaderValidator,
+};
 use chrono::{DateTime, Utc};
 use std::io::Cursor;
 use thiserror::Error;
@@ -128,7 +130,8 @@ pub async fn validate_file(
         .find_map(|v| MinecraftGameVersion::try_from_version_field(&v).ok())
         .unwrap_or_default();
     let all_game_versions =
-        MinecraftGameVersion::list(None, None, &mut *transaction, redis).await?;
+        MinecraftGameVersion::list(None, None, &mut *transaction, redis)
+            .await?;
 
     validate_minecraft_file(
         data,
@@ -224,23 +227,29 @@ fn game_version_supported(
 ) -> bool {
     match supported_game_versions {
         SupportedGameVersions::All => true,
-        SupportedGameVersions::PastDate(date) => game_versions.iter().any(|x| {
-            all_game_versions
-                .iter()
-                .find(|y| y.version == x.version)
-                .map(|x| x.created > date)
-                .unwrap_or(false)
-        }),
-        SupportedGameVersions::Range(before, after) => game_versions.iter().any(|x| {
-            all_game_versions
-                .iter()
-                .find(|y| y.version == x.version)
-                .map(|x| x.created > before && x.created < after)
-                .unwrap_or(false)
-        }),
+        SupportedGameVersions::PastDate(date) => {
+            game_versions.iter().any(|x| {
+                all_game_versions
+                    .iter()
+                    .find(|y| y.version == x.version)
+                    .map(|x| x.created > date)
+                    .unwrap_or(false)
+            })
+        }
+        SupportedGameVersions::Range(before, after) => {
+            game_versions.iter().any(|x| {
+                all_game_versions
+                    .iter()
+                    .find(|y| y.version == x.version)
+                    .map(|x| x.created > before && x.created < after)
+                    .unwrap_or(false)
+            })
+        }
         SupportedGameVersions::Custom(versions) => {
-            let version_ids = versions.iter().map(|gv| gv.id).collect::<Vec<_>>();
-            let game_version_ids: Vec<_> = game_versions.iter().map(|gv| gv.id).collect::<Vec<_>>();
+            let version_ids =
+                versions.iter().map(|gv| gv.id).collect::<Vec<_>>();
+            let game_version_ids: Vec<_> =
+                game_versions.iter().map(|gv| gv.id).collect::<Vec<_>>();
             version_ids.iter().any(|x| game_version_ids.contains(x))
         }
     }
@@ -249,7 +258,8 @@ fn game_version_supported(
 pub fn filter_out_packs(
     archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
 ) -> Result<ValidationResult, ValidationError> {
-    if (archive.by_name("modlist.html").is_ok() && archive.by_name("manifest.json").is_ok())
+    if (archive.by_name("modlist.html").is_ok()
+        && archive.by_name("manifest.json").is_ok())
         || archive
             .file_names()
             .any(|x| x.starts_with("mods/") && x.ends_with(".jar"))

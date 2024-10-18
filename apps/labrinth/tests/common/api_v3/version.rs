@@ -7,7 +7,9 @@ use super::{
 use crate::{
     assert_status,
     common::{
-        api_common::{models::CommonVersion, Api, ApiVersion, AppendsOptionalPat},
+        api_common::{
+            models::CommonVersion, Api, ApiVersion, AppendsOptionalPat,
+        },
         dummy_data::TestFile,
     },
 };
@@ -60,7 +62,11 @@ impl ApiV3 {
         test::read_body_json(version).await
     }
 
-    pub async fn get_version_deserialized(&self, id: &str, pat: Option<&str>) -> Version {
+    pub async fn get_version_deserialized(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> Version {
         let resp = self.get_version(id, pat).await;
         assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
@@ -160,7 +166,11 @@ impl ApiVersion for ApiV3 {
         serde_json::from_value(value).unwrap()
     }
 
-    async fn get_version(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn get_version(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v3/version/{id}"))
             .append_pat(pat)
@@ -168,7 +178,11 @@ impl ApiVersion for ApiV3 {
         self.call(req).await
     }
 
-    async fn get_version_deserialized_common(&self, id: &str, pat: Option<&str>) -> CommonVersion {
+    async fn get_version_deserialized_common(
+        &self,
+        id: &str,
+        pat: Option<&str>,
+    ) -> CommonVersion {
         let resp = self.get_version(id, pat).await;
         assert_status!(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
@@ -288,7 +302,8 @@ impl ApiVersion for ApiV3 {
             });
         }
         if let Some(version_types) = version_types {
-            json["version_types"] = serde_json::to_value(version_types).unwrap();
+            json["version_types"] =
+                serde_json::to_value(version_types).unwrap();
         }
 
         let req = test::TestRequest::post()
@@ -311,7 +326,14 @@ impl ApiVersion for ApiV3 {
         pat: Option<&str>,
     ) -> CommonVersion {
         let resp = self
-            .get_update_from_hash(hash, algorithm, loaders, game_versions, version_types, pat)
+            .get_update_from_hash(
+                hash,
+                algorithm,
+                loaders,
+                game_versions,
+                version_types,
+                pat,
+            )
             .await;
         assert_status!(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
@@ -338,10 +360,12 @@ impl ApiVersion for ApiV3 {
             json["loaders"] = serde_json::to_value(loaders).unwrap();
         }
         if let Some(game_versions) = game_versions {
-            json["game_versions"] = serde_json::to_value(game_versions).unwrap();
+            json["game_versions"] =
+                serde_json::to_value(game_versions).unwrap();
         }
         if let Some(version_types) = version_types {
-            json["version_types"] = serde_json::to_value(version_types).unwrap();
+            json["version_types"] =
+                serde_json::to_value(version_types).unwrap();
         }
 
         let req = test::TestRequest::post()
@@ -396,7 +420,9 @@ impl ApiVersion for ApiV3 {
         if let Some(game_versions) = game_versions {
             query_string.push_str(&format!(
                 "&game_versions={}",
-                urlencoding::encode(&serde_json::to_string(&game_versions).unwrap())
+                urlencoding::encode(
+                    &serde_json::to_string(&game_versions).unwrap()
+                )
             ));
         }
         if let Some(loaders) = loaders {
@@ -480,7 +506,11 @@ impl ApiVersion for ApiV3 {
         self.call(request).await
     }
 
-    async fn get_versions(&self, version_ids: Vec<String>, pat: Option<&str>) -> ServiceResponse {
+    async fn get_versions(
+        &self,
+        version_ids: Vec<String>,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let ids = url_encode_json_serialized_vec(&version_ids);
         let request = test::TestRequest::get()
             .uri(&format!("/v3/versions?ids={}", ids))
@@ -526,7 +556,11 @@ impl ApiVersion for ApiV3 {
         self.call(request).await
     }
 
-    async fn remove_version(&self, version_id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn remove_version(
+        &self,
+        version_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let request = test::TestRequest::delete()
             .uri(&format!(
                 "/v3/version/{version_id}",
@@ -537,7 +571,11 @@ impl ApiVersion for ApiV3 {
         self.call(request).await
     }
 
-    async fn remove_version_file(&self, hash: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn remove_version_file(
+        &self,
+        hash: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let request = test::TestRequest::delete()
             .uri(&format!("/v3/version_file/{hash}"))
             .append_pat(pat)

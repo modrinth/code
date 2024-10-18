@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use crate::common::api_common::ApiVersion;
 use crate::common::database::*;
-use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta, TestFile};
+use crate::common::dummy_data::{
+    DummyProjectAlpha, DummyProjectBeta, TestFile,
+};
 use crate::common::get_json_val_str;
 use actix_http::StatusCode;
 use actix_web::test;
@@ -53,7 +55,8 @@ async fn test_get_version() {
             .await
             .unwrap()
             .unwrap();
-        let cached_project: serde_json::Value = serde_json::from_str(&cached_project).unwrap();
+        let cached_project: serde_json::Value =
+            serde_json::from_str(&cached_project).unwrap();
         assert_eq!(
             cached_project["val"]["inner"]["project_id"],
             json!(parse_base62(alpha_project_id).unwrap())
@@ -124,7 +127,10 @@ async fn version_updates() {
                 &versions[alpha_version_hash].id.to_string(),
                 alpha_version_id
             );
-            assert_eq!(&versions[beta_version_hash].id.to_string(), beta_version_id);
+            assert_eq!(
+                &versions[beta_version_hash].id.to_string(),
+                beta_version_id
+            );
 
             // When there is only the one version, there should be no updates
             let version = api
@@ -195,90 +201,103 @@ async fn version_updates() {
                 update_ids.push(version.id);
 
                 // Patch using json
-                api.edit_version(&version.id.to_string(), patch_value.clone(), USER_USER_PAT)
-                    .await;
+                api.edit_version(
+                    &version.id.to_string(),
+                    patch_value.clone(),
+                    USER_USER_PAT,
+                )
+                .await;
             }
 
-            let check_expected = |game_versions: Option<Vec<String>>,
-                                  loaders: Option<Vec<String>>,
-                                  version_types: Option<Vec<String>>,
-                                  result_id: Option<VersionId>| async move {
-                let (success, result_id) = match result_id {
-                    Some(id) => (true, id),
-                    None => (false, VersionId(0)),
+            let check_expected =
+                |game_versions: Option<Vec<String>>,
+                 loaders: Option<Vec<String>>,
+                 version_types: Option<Vec<String>>,
+                 result_id: Option<VersionId>| async move {
+                    let (success, result_id) = match result_id {
+                        Some(id) => (true, id),
+                        None => (false, VersionId(0)),
+                    };
+                    // get_update_from_hash
+                    let resp = api
+                        .get_update_from_hash(
+                            alpha_version_hash,
+                            "sha1",
+                            loaders.clone(),
+                            game_versions.clone(),
+                            version_types.clone(),
+                            USER_USER_PAT,
+                        )
+                        .await;
+                    if success {
+                        assert_status!(&resp, StatusCode::OK);
+                        let body: serde_json::Value =
+                            test::read_body_json(resp).await;
+                        let id = body["id"].as_str().unwrap();
+                        assert_eq!(id, &result_id.to_string());
+                    } else {
+                        assert_status!(&resp, StatusCode::NOT_FOUND);
+                    }
+
+                    // update_files
+                    let versions = api
+                        .update_files_deserialized_common(
+                            "sha1",
+                            vec![alpha_version_hash.to_string()],
+                            loaders.clone(),
+                            game_versions.clone(),
+                            version_types.clone(),
+                            USER_USER_PAT,
+                        )
+                        .await;
+                    if success {
+                        assert_eq!(versions.len(), 1);
+                        let first = versions.iter().next().unwrap();
+                        assert_eq!(first.1.id, result_id);
+                    } else {
+                        assert_eq!(versions.len(), 0);
+                    }
+
+                    // update_individual_files
+                    let mut loader_fields = HashMap::new();
+                    if let Some(game_versions) = game_versions {
+                        loader_fields.insert(
+                            "game_versions".to_string(),
+                            game_versions
+                                .into_iter()
+                                .map(|v| json!(v))
+                                .collect::<Vec<_>>(),
+                        );
+                    }
+
+                    let hashes = vec![FileUpdateData {
+                        hash: alpha_version_hash.to_string(),
+                        loaders,
+                        loader_fields: Some(loader_fields),
+                        version_types: version_types.map(|v| {
+                            v.into_iter()
+                                .map(|v| {
+                                    serde_json::from_str(&format!("\"{v}\""))
+                                        .unwrap()
+                                })
+                                .collect()
+                        }),
+                    }];
+                    let versions = api
+                        .update_individual_files_deserialized(
+                            "sha1",
+                            hashes,
+                            USER_USER_PAT,
+                        )
+                        .await;
+                    if success {
+                        assert_eq!(versions.len(), 1);
+                        let first = versions.iter().next().unwrap();
+                        assert_eq!(first.1.id, result_id);
+                    } else {
+                        assert_eq!(versions.len(), 0);
+                    }
                 };
-                // get_update_from_hash
-                let resp = api
-                    .get_update_from_hash(
-                        alpha_version_hash,
-                        "sha1",
-                        loaders.clone(),
-                        game_versions.clone(),
-                        version_types.clone(),
-                        USER_USER_PAT,
-                    )
-                    .await;
-                if success {
-                    assert_status!(&resp, StatusCode::OK);
-                    let body: serde_json::Value = test::read_body_json(resp).await;
-                    let id = body["id"].as_str().unwrap();
-                    assert_eq!(id, &result_id.to_string());
-                } else {
-                    assert_status!(&resp, StatusCode::NOT_FOUND);
-                }
-
-                // update_files
-                let versions = api
-                    .update_files_deserialized_common(
-                        "sha1",
-                        vec![alpha_version_hash.to_string()],
-                        loaders.clone(),
-                        game_versions.clone(),
-                        version_types.clone(),
-                        USER_USER_PAT,
-                    )
-                    .await;
-                if success {
-                    assert_eq!(versions.len(), 1);
-                    let first = versions.iter().next().unwrap();
-                    assert_eq!(first.1.id, result_id);
-                } else {
-                    assert_eq!(versions.len(), 0);
-                }
-
-                // update_individual_files
-                let mut loader_fields = HashMap::new();
-                if let Some(game_versions) = game_versions {
-                    loader_fields.insert(
-                        "game_versions".to_string(),
-                        game_versions
-                            .into_iter()
-                            .map(|v| json!(v))
-                            .collect::<Vec<_>>(),
-                    );
-                }
-
-                let hashes = vec![FileUpdateData {
-                    hash: alpha_version_hash.to_string(),
-                    loaders,
-                    loader_fields: Some(loader_fields),
-                    version_types: version_types.map(|v| {
-                        v.into_iter()
-                            .map(|v| serde_json::from_str(&format!("\"{v}\"")).unwrap())
-                            .collect()
-                    }),
-                }];
-                let versions = api
-                    .update_individual_files_deserialized("sha1", hashes, USER_USER_PAT)
-                    .await;
-                if success {
-                    assert_eq!(versions.len(), 1);
-                    let first = versions.iter().next().unwrap();
-                    assert_eq!(first.1.id, result_id);
-                } else {
-                    assert_eq!(versions.len(), 0);
-                }
-            };
 
             let tests = vec![
                 check_expected(
@@ -513,7 +532,8 @@ pub async fn test_patch_version() {
 pub async fn test_project_versions() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
-        let alpha_project_id: &String = &test_env.dummy.project_alpha.project_id;
+        let alpha_project_id: &String =
+            &test_env.dummy.project_alpha.project_id;
         let alpha_version_id = &test_env.dummy.project_alpha.version_id;
 
         let versions = api
@@ -539,7 +559,8 @@ async fn can_create_version_with_ordering() {
     with_test_environment(
         None,
         |env: common::environment::TestEnvironment<ApiV3>| async move {
-            let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
+            let alpha_project_id_parsed =
+                env.dummy.project_alpha.project_id_parsed;
 
             let new_version_id = get_json_val_str(
                 env.api
@@ -557,7 +578,10 @@ async fn can_create_version_with_ordering() {
 
             let versions = env
                 .api
-                .get_versions_deserialized(vec![new_version_id.clone()], USER_USER_PAT)
+                .get_versions_deserialized(
+                    vec![new_version_id.clone()],
+                    USER_USER_PAT,
+                )
                 .await;
             assert_eq!(versions[0].ordering, Some(1));
         },
@@ -574,13 +598,20 @@ async fn edit_version_ordering_works() {
 
             let resp = env
                 .api
-                .edit_version_ordering(&alpha_version_id, Some(10), USER_USER_PAT)
+                .edit_version_ordering(
+                    &alpha_version_id,
+                    Some(10),
+                    USER_USER_PAT,
+                )
                 .await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
 
             let versions = env
                 .api
-                .get_versions_deserialized(vec![alpha_version_id.clone()], USER_USER_PAT)
+                .get_versions_deserialized(
+                    vec![alpha_version_id.clone()],
+                    USER_USER_PAT,
+                )
                 .await;
             assert_eq!(versions[0].ordering, Some(10));
         },
@@ -618,7 +649,10 @@ async fn version_ordering_for_specified_orderings_orders_lower_order_first() {
             )
             .await;
 
-        assert_common_version_ids(&versions, vec![new_version_id, alpha_version_id]);
+        assert_common_version_ids(
+            &versions,
+            vec![new_version_id, alpha_version_id],
+        );
     })
     .await;
 }
@@ -627,7 +661,8 @@ async fn version_ordering_for_specified_orderings_orders_lower_order_first() {
 async fn version_ordering_when_unspecified_orders_oldest_first() {
     with_test_environment_all(None, |env| async move {
         let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
-        let alpha_version_id: String = env.dummy.project_alpha.version_id.clone();
+        let alpha_version_id: String =
+            env.dummy.project_alpha.version_id.clone();
         let new_version_id = get_json_val_str(
             env.api
                 .add_public_version_deserialized_common(
@@ -649,7 +684,10 @@ async fn version_ordering_when_unspecified_orders_oldest_first() {
                 USER_USER_PAT,
             )
             .await;
-        assert_common_version_ids(&versions, vec![alpha_version_id, new_version_id]);
+        assert_common_version_ids(
+            &versions,
+            vec![alpha_version_id, new_version_id],
+        );
     })
     .await
 }
@@ -683,7 +721,10 @@ async fn version_ordering_when_specified_orders_specified_before_unspecified() {
                 USER_USER_PAT,
             )
             .await;
-        assert_common_version_ids(&versions, vec![new_version_id, alpha_version_id]);
+        assert_common_version_ids(
+            &versions,
+            vec![new_version_id, alpha_version_id],
+        );
     })
     .await;
 }

@@ -1,4 +1,6 @@
-use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
+use crate::validate::{
+    SupportedGameVersions, ValidationError, ValidationResult,
+};
 use chrono::DateTime;
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -16,7 +18,9 @@ impl super::Validator for PackValidator {
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Time since release of 13w24a which replaced texture packs with resource packs
-        SupportedGameVersions::PastDate(DateTime::from_timestamp(1371137542, 0).unwrap())
+        SupportedGameVersions::PastDate(
+            DateTime::from_timestamp(1371137542, 0).unwrap(),
+        )
     }
 
     fn validate(

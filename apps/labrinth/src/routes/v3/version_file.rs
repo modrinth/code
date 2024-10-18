@@ -65,13 +65,18 @@ pub async fn get_version_from_hash(
     )
     .await?;
     if let Some(file) = file {
-        let version = database::models::Version::get(file.version_id, &**pool, &redis).await?;
+        let version =
+            database::models::Version::get(file.version_id, &**pool, &redis)
+                .await?;
         if let Some(version) = version {
-            if !is_visible_version(&version.inner, &user_option, &pool, &redis).await? {
+            if !is_visible_version(&version.inner, &user_option, &pool, &redis)
+                .await?
+            {
                 return Err(ApiError::NotFound);
             }
 
-            Ok(HttpResponse::Ok().json(models::projects::Version::from(version)))
+            Ok(HttpResponse::Ok()
+                .json(models::projects::Version::from(version)))
         } else {
             Err(ApiError::NotFound)
         }
@@ -147,42 +152,59 @@ pub async fn get_update_from_hash(
     .await?
     {
         if let Some(project) =
-            database::models::Project::get_id(file.project_id, &**pool, &redis).await?
-        {
-            let versions = database::models::Version::get_many(&project.versions, &**pool, &redis)
+            database::models::Project::get_id(file.project_id, &**pool, &redis)
                 .await?
-                .into_iter()
-                .filter(|x| {
-                    let mut bool = true;
-                    if let Some(version_types) = &update_data.version_types {
-                        bool &= version_types
+        {
+            let versions = database::models::Version::get_many(
+                &project.versions,
+                &**pool,
+                &redis,
+            )
+            .await?
+            .into_iter()
+            .filter(|x| {
+                let mut bool = true;
+                if let Some(version_types) = &update_data.version_types {
+                    bool &= version_types
+                        .iter()
+                        .any(|y| y.as_str() == x.inner.version_type);
+                }
+                if let Some(loaders) = &update_data.loaders {
+                    bool &= x.loaders.iter().any(|y| loaders.contains(y));
+                }
+                if let Some(loader_fields) = &update_data.loader_fields {
+                    for (key, values) in loader_fields {
+                        bool &= if let Some(x_vf) = x
+                            .version_fields
                             .iter()
-                            .any(|y| y.as_str() == x.inner.version_type);
+                            .find(|y| y.field_name == *key)
+                        {
+                            values
+                                .iter()
+                                .any(|v| x_vf.value.contains_json_value(v))
+                        } else {
+                            true
+                        };
                     }
-                    if let Some(loaders) = &update_data.loaders {
-                        bool &= x.loaders.iter().any(|y| loaders.contains(y));
-                    }
-                    if let Some(loader_fields) = &update_data.loader_fields {
-                        for (key, values) in loader_fields {
-                            bool &= if let Some(x_vf) =
-                                x.version_fields.iter().find(|y| y.field_name == *key)
-                            {
-                                values.iter().any(|v| x_vf.value.contains_json_value(v))
-                            } else {
-                                true
-                            };
-                        }
-                    }
-                    bool
-                })
-                .sorted();
+                }
+                bool
+            })
+            .sorted();
 
             if let Some(first) = versions.last() {
-                if !is_visible_version(&first.inner, &user_option, &pool, &redis).await? {
+                if !is_visible_version(
+                    &first.inner,
+                    &user_option,
+                    &pool,
+                    &redis,
+                )
+                .await?
+                {
                     return Err(ApiError::NotFound);
                 }
 
-                return Ok(HttpResponse::Ok().json(models::projects::Version::from(first)));
+                return Ok(HttpResponse::Ok()
+                    .json(models::projects::Version::from(first)));
             }
         }
     }
@@ -229,7 +251,8 @@ pub async fn get_versions_from_hashes(
 
     let version_ids = files.iter().map(|x| x.version_id).collect::<Vec<_>>();
     let versions_data = filter_visible_versions(
-        database::models::Version::get_many(&version_ids, &**pool, &redis).await?,
+        database::models::Version::get_many(&version_ids, &**pool, &redis)
+            .await?,
         &user_option,
         &pool,
         &redis,
@@ -282,7 +305,8 @@ pub async fn get_projects_from_hashes(
     let project_ids = files.iter().map(|x| x.project_id).collect::<Vec<_>>();
 
     let projects_data = filter_visible_projects(
-        database::models::Project::get_many_ids(&project_ids, &**pool, &redis).await?,
+        database::models::Project::get_many_ids(&project_ids, &**pool, &redis)
+            .await?,
         &user_option,
         &pool,
         false,
@@ -456,28 +480,41 @@ pub async fn update_individual_files(
     for project in projects {
         for file in files.iter().filter(|x| x.project_id == project.inner.id) {
             if let Some(hash) = file.hashes.get(&algorithm) {
-                if let Some(query_file) = update_data.hashes.iter().find(|x| &x.hash == hash) {
+                if let Some(query_file) =
+                    update_data.hashes.iter().find(|x| &x.hash == hash)
+                {
                     let version = all_versions
                         .iter()
                         .filter(|x| x.inner.project_id == file.project_id)
                         .filter(|x| {
                             let mut bool = true;
 
-                            if let Some(version_types) = &query_file.version_types {
-                                bool &= version_types
-                                    .iter()
-                                    .any(|y| y.as_str() == x.inner.version_type);
+                            if let Some(version_types) =
+                                &query_file.version_types
+                            {
+                                bool &= version_types.iter().any(|y| {
+                                    y.as_str() == x.inner.version_type
+                                });
                             }
                             if let Some(loaders) = &query_file.loaders {
-                                bool &= x.loaders.iter().any(|y| loaders.contains(y));
+                                bool &= x
+                                    .loaders
+                                    .iter()
+                                    .any(|y| loaders.contains(y));
                             }
 
-                            if let Some(loader_fields) = &query_file.loader_fields {
+                            if let Some(loader_fields) =
+                                &query_file.loader_fields
+                            {
                                 for (key, values) in loader_fields {
-                                    bool &= if let Some(x_vf) =
-                                        x.version_fields.iter().find(|y| y.field_name == *key)
+                                    bool &= if let Some(x_vf) = x
+                                        .version_fields
+                                        .iter()
+                                        .find(|y| y.field_name == *key)
                                     {
-                                        values.iter().any(|v| x_vf.value.contains_json_value(v))
+                                        values.iter().any(|v| {
+                                            x_vf.value.contains_json_value(v)
+                                        })
                                     } else {
                                         true
                                     };
@@ -489,10 +526,19 @@ pub async fn update_individual_files(
                         .last();
 
                     if let Some(version) = version {
-                        if is_visible_version(&version.inner, &user_option, &pool, &redis).await? {
+                        if is_visible_version(
+                            &version.inner,
+                            &user_option,
+                            &pool,
+                            &redis,
+                        )
+                        .await?
+                        {
                             response.insert(
                                 hash.clone(),
-                                models::projects::Version::from(version.clone()),
+                                models::projects::Version::from(
+                                    version.clone(),
+                                ),
                             );
                         }
                     }
@@ -539,13 +585,14 @@ pub async fn delete_file(
 
     if let Some(row) = file {
         if !user.role.is_admin() {
-            let team_member = database::models::TeamMember::get_from_user_id_version(
-                row.version_id,
-                user.id.into(),
-                &**pool,
-            )
-            .await
-            .map_err(ApiError::Database)?;
+            let team_member =
+                database::models::TeamMember::get_from_user_id_version(
+                    row.version_id,
+                    user.id.into(),
+                    &**pool,
+                )
+                .await
+                .map_err(ApiError::Database)?;
 
             let organization =
                 database::models::Organization::get_associated_organization_project_id(
@@ -555,18 +602,19 @@ pub async fn delete_file(
                 .await
                 .map_err(ApiError::Database)?;
 
-            let organization_team_member = if let Some(organization) = &organization {
-                database::models::TeamMember::get_from_user_id_organization(
-                    organization.id,
-                    user.id.into(),
-                    false,
-                    &**pool,
-                )
-                .await
-                .map_err(ApiError::Database)?
-            } else {
-                None
-            };
+            let organization_team_member =
+                if let Some(organization) = &organization {
+                    database::models::TeamMember::get_from_user_id_organization(
+                        organization.id,
+                        user.id.into(),
+                        false,
+                        &**pool,
+                    )
+                    .await
+                    .map_err(ApiError::Database)?
+                } else {
+                    None
+                };
 
             let permissions = ProjectPermissions::get_permissions_by_role(
                 &user.role,
@@ -577,16 +625,20 @@ pub async fn delete_file(
 
             if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
                 return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to delete this file!".to_string(),
+                    "You don't have permission to delete this file!"
+                        .to_string(),
                 ));
             }
         }
 
-        let version = database::models::Version::get(row.version_id, &**pool, &redis).await?;
+        let version =
+            database::models::Version::get(row.version_id, &**pool, &redis)
+                .await?;
         if let Some(version) = version {
             if version.files.len() < 2 {
                 return Err(ApiError::InvalidInput(
-                    "Versions must have at least one file uploaded to them".to_string(),
+                    "Versions must have at least one file uploaded to them"
+                        .to_string(),
                 ));
             }
 
@@ -663,10 +715,14 @@ pub async fn download_version(
     .await?;
 
     if let Some(file) = file {
-        let version = database::models::Version::get(file.version_id, &**pool, &redis).await?;
+        let version =
+            database::models::Version::get(file.version_id, &**pool, &redis)
+                .await?;
 
         if let Some(version) = version {
-            if !is_visible_version(&version.inner, &user_option, &pool, &redis).await? {
+            if !is_visible_version(&version.inner, &user_option, &pool, &redis)
+                .await?
+            {
                 return Err(ApiError::NotFound);
             }
 

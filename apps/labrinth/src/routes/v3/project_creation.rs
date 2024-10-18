@@ -1,6 +1,8 @@
 use super::version_creation::{try_create_version_fields, InitialVersionData};
 use crate::auth::{get_user_from_headers, AuthenticationError};
-use crate::database::models::loader_fields::{Loader, LoaderField, LoaderFieldEnumValue};
+use crate::database::models::loader_fields::{
+    Loader, LoaderField, LoaderFieldEnumValue,
+};
 use crate::database::models::thread_item::ThreadBuilder;
 use crate::database::models::{self, image_item, User};
 use crate::database::redis::RedisPool;
@@ -11,7 +13,8 @@ use crate::models::ids::{ImageId, OrganizationId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, ProjectId, ProjectStatus, VersionId, VersionStatus,
+    License, Link, MonetizationStatus, ProjectId, ProjectStatus, VersionId,
+    VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
@@ -91,10 +94,14 @@ impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
             CreateError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::SqlxDatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            CreateError::SqlxDatabaseError(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::IndexingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::FileHostingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            CreateError::FileHostingError(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             CreateError::SerDeError(..) => StatusCode::BAD_REQUEST,
             CreateError::MultipartError(..) => StatusCode::BAD_REQUEST,
             CreateError::MissingValueError(..) => StatusCode::BAD_REQUEST,
@@ -105,7 +112,9 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
             CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
-            CreateError::CustomAuthenticationError(..) => StatusCode::UNAUTHORIZED,
+            CreateError::CustomAuthenticationError(..) => {
+                StatusCode::UNAUTHORIZED
+            }
             CreateError::SlugCollision => StatusCode::BAD_REQUEST,
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
@@ -192,7 +201,9 @@ pub struct ProjectCreateData {
     /// An optional link to the project's license page
     pub license_url: Option<String>,
     /// An optional list of all donation links the project has
-    #[validate(custom(function = "crate::util::validate::validate_url_hashmap_values"))]
+    #[validate(custom(
+        function = "crate::util::validate::validate_url_hashmap_values"
+    ))]
     #[serde(default)]
     pub link_urls: HashMap<String, String>,
 
@@ -343,8 +354,10 @@ async fn project_create_inner(
     .await?
     .1;
 
-    let project_id: ProjectId = models::generate_project_id(transaction).await?.into();
-    let all_loaders = models::loader_fields::Loader::list(&mut **transaction, redis).await?;
+    let project_id: ProjectId =
+        models::generate_project_id(transaction).await?.into();
+    let all_loaders =
+        models::loader_fields::Loader::list(&mut **transaction, redis).await?;
 
     let project_create_data: ProjectCreateData;
     let mut versions;
@@ -365,9 +378,9 @@ async fn project_create_inner(
             })?;
 
         let content_disposition = field.content_disposition();
-        let name = content_disposition
-            .get_name()
-            .ok_or_else(|| CreateError::MissingValueError(String::from("Missing content name")))?;
+        let name = content_disposition.get_name().ok_or_else(|| {
+            CreateError::MissingValueError(String::from("Missing content name"))
+        })?;
 
         if name != "data" {
             return Err(CreateError::InvalidInput(String::from(
@@ -377,19 +390,22 @@ async fn project_create_inner(
 
         let mut data = Vec::new();
         while let Some(chunk) = field.next().await {
-            data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+            data.extend_from_slice(
+                &chunk.map_err(CreateError::MultipartError)?,
+            );
         }
         let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
 
-        create_data
-            .validate()
-            .map_err(|err| CreateError::InvalidInput(validation_errors_to_string(err, None)))?;
+        create_data.validate().map_err(|err| {
+            CreateError::InvalidInput(validation_errors_to_string(err, None))
+        })?;
 
         let slug_project_id_option: Option<ProjectId> =
             serde_json::from_str(&format!("\"{}\"", create_data.slug)).ok();
 
         if let Some(slug_project_id) = slug_project_id_option {
-            let slug_project_id: models::ids::ProjectId = slug_project_id.into();
+            let slug_project_id: models::ids::ProjectId =
+                slug_project_id.into();
             let results = sqlx::query!(
                 "
                 SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
@@ -602,9 +618,14 @@ async fn project_create_inner(
         }
 
         // Convert the list of category names to actual categories
-        let mut categories = Vec::with_capacity(project_create_data.categories.len());
+        let mut categories =
+            Vec::with_capacity(project_create_data.categories.len());
         for category in &project_create_data.categories {
-            let ids = models::categories::Category::get_ids(category, &mut **transaction).await?;
+            let ids = models::categories::Category::get_ids(
+                category,
+                &mut **transaction,
+            )
+            .await?;
             if ids.is_empty() {
                 return Err(CreateError::InvalidCategory(category.clone()));
             }
@@ -617,7 +638,11 @@ async fn project_create_inner(
         let mut additional_categories =
             Vec::with_capacity(project_create_data.additional_categories.len());
         for category in &project_create_data.additional_categories {
-            let ids = models::categories::Category::get_ids(category, &mut **transaction).await?;
+            let ids = models::categories::Category::get_ids(
+                category,
+                &mut **transaction,
+            )
+            .await?;
             if ids.is_empty() {
                 return Err(CreateError::InvalidCategory(category.clone()));
             }
@@ -629,18 +654,29 @@ async fn project_create_inner(
         let mut members = vec![];
 
         if let Some(organization_id) = project_create_data.organization_id {
-            let org = models::Organization::get_id(organization_id.into(), pool, redis)
-                .await?
-                .ok_or_else(|| {
-                    CreateError::InvalidInput("Invalid organization ID specified!".to_string())
-                })?;
+            let org = models::Organization::get_id(
+                organization_id.into(),
+                pool,
+                redis,
+            )
+            .await?
+            .ok_or_else(|| {
+                CreateError::InvalidInput(
+                    "Invalid organization ID specified!".to_string(),
+                )
+            })?;
 
-            let team_member =
-                models::TeamMember::get_from_user_id(org.team_id, current_user.id.into(), pool)
-                    .await?;
+            let team_member = models::TeamMember::get_from_user_id(
+                org.team_id,
+                current_user.id.into(),
+                pool,
+            )
+            .await?;
 
-            let perms =
-                OrganizationPermissions::get_permissions_by_role(&current_user.role, &team_member);
+            let perms = OrganizationPermissions::get_permissions_by_role(
+                &current_user.role,
+                &team_member,
+            );
 
             if !perms
                 .map(|x| x.contains(OrganizationPermissions::ADD_PROJECT))
@@ -679,25 +715,32 @@ async fn project_create_inner(
             }
         }
 
-        let license_id =
-            spdx::Expression::parse(&project_create_data.license_id).map_err(|err| {
-                CreateError::InvalidInput(format!("Invalid SPDX license identifier: {err}"))
-            })?;
+        let license_id = spdx::Expression::parse(
+            &project_create_data.license_id,
+        )
+        .map_err(|err| {
+            CreateError::InvalidInput(format!(
+                "Invalid SPDX license identifier: {err}"
+            ))
+        })?;
 
         let mut link_urls = vec![];
 
         let link_platforms =
-            models::categories::LinkPlatform::list(&mut **transaction, redis).await?;
+            models::categories::LinkPlatform::list(&mut **transaction, redis)
+                .await?;
         for (platform, url) in &project_create_data.link_urls {
-            let platform_id =
-                models::categories::LinkPlatform::get_id(platform, &mut **transaction)
-                    .await?
-                    .ok_or_else(|| {
-                        CreateError::InvalidInput(format!(
-                            "Link platform {} does not exist.",
-                            platform.clone()
-                        ))
-                    })?;
+            let platform_id = models::categories::LinkPlatform::get_id(
+                platform,
+                &mut **transaction,
+            )
+            .await?
+            .ok_or_else(|| {
+                CreateError::InvalidInput(format!(
+                    "Link platform {} does not exist.",
+                    platform.clone()
+                ))
+            })?;
             let link_platform = link_platforms
                 .iter()
                 .find(|x| x.id == platform_id)
@@ -718,7 +761,9 @@ async fn project_create_inner(
         let project_builder_actual = models::project_item::ProjectBuilder {
             project_id: project_id.into(),
             team_id,
-            organization_id: project_create_data.organization_id.map(|x| x.into()),
+            organization_id: project_create_data
+                .organization_id
+                .map(|x| x.into()),
             name: project_create_data.name,
             summary: project_create_data.summary,
             description: project_create_data.description,
@@ -757,8 +802,12 @@ async fn project_create_inner(
         User::clear_project_cache(&[current_user.id.into()], redis).await?;
 
         for image_id in project_create_data.uploaded_images {
-            if let Some(db_image) =
-                image_item::Image::get(image_id.into(), &mut **transaction, redis).await?
+            if let Some(db_image) = image_item::Image::get(
+                image_id.into(),
+                &mut **transaction,
+                redis,
+            )
+            .await?
             {
                 let image: Image = db_image.into();
                 if !matches!(image.context, ImageContext::Project { .. })
@@ -884,12 +933,13 @@ async fn create_initial_version(
         )));
     }
 
-    version_data
-        .validate()
-        .map_err(|err| CreateError::ValidationError(validation_errors_to_string(err, None)))?;
+    version_data.validate().map_err(|err| {
+        CreateError::ValidationError(validation_errors_to_string(err, None))
+    })?;
 
     // Randomly generate a new id to be used for the version
-    let version_id: VersionId = models::generate_version_id(transaction).await?.into();
+    let version_id: VersionId =
+        models::generate_version_id(transaction).await?.into();
 
     let loaders = version_data
         .loaders
@@ -903,10 +953,15 @@ async fn create_initial_version(
         })
         .collect::<Result<Vec<models::LoaderId>, CreateError>>()?;
 
-    let loader_fields = LoaderField::get_fields(&loaders, &mut **transaction, redis).await?;
+    let loader_fields =
+        LoaderField::get_fields(&loaders, &mut **transaction, redis).await?;
     let mut loader_field_enum_values =
-        LoaderFieldEnumValue::list_many_loader_fields(&loader_fields, &mut **transaction, redis)
-            .await?;
+        LoaderFieldEnumValue::list_many_loader_fields(
+            &loader_fields,
+            &mut **transaction,
+            redis,
+        )
+        .await?;
 
     let version_fields = try_create_version_fields(
         version_id,
@@ -954,7 +1009,12 @@ async fn process_icon_upload(
     file_host: &dyn FileHost,
     mut field: Field,
 ) -> Result<(String, String, Option<u32>), CreateError> {
-    let data = read_from_field(&mut field, 262144, "Icons must be smaller than 256KiB").await?;
+    let data = read_from_field(
+        &mut field,
+        262144,
+        "Icons must be smaller than 256KiB",
+    )
+    .await?;
     let upload_result = crate::util::img::upload_image_optimized(
         &format!("data/{}", to_base62(id)),
         data.freeze(),

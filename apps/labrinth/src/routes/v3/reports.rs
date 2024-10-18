@@ -1,10 +1,14 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
 use crate::database::models::image_item;
-use crate::database::models::thread_item::{ThreadBuilder, ThreadMessageBuilder};
+use crate::database::models::thread_item::{
+    ThreadBuilder, ThreadMessageBuilder,
+};
 use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
-use crate::models::ids::{base62_impl::parse_base62, ProjectId, UserId, VersionId};
+use crate::models::ids::{
+    base62_impl::parse_base62, ProjectId, UserId, VersionId,
+};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::reports::{ItemType, Report};
@@ -62,19 +66,25 @@ pub async fn report_create(
     let mut bytes = web::BytesMut::new();
     while let Some(item) = body.next().await {
         bytes.extend_from_slice(&item.map_err(|_| {
-            ApiError::InvalidInput("Error while parsing request payload!".to_string())
+            ApiError::InvalidInput(
+                "Error while parsing request payload!".to_string(),
+            )
         })?);
     }
     let new_report: CreateReport = serde_json::from_slice(bytes.as_ref())?;
 
-    let id = crate::database::models::generate_report_id(&mut transaction).await?;
+    let id =
+        crate::database::models::generate_report_id(&mut transaction).await?;
     let report_type = crate::database::models::categories::ReportType::get_id(
         &new_report.report_type,
         &mut *transaction,
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInput(format!("Invalid report type: {}", new_report.report_type))
+        ApiError::InvalidInput(format!(
+            "Invalid report type: {}",
+            new_report.report_type
+        ))
     })?;
 
     let mut report = crate::database::models::report_item::Report {
@@ -91,7 +101,8 @@ pub async fn report_create(
 
     match new_report.item_type {
         ItemType::Project => {
-            let project_id = ProjectId(parse_base62(new_report.item_id.as_str())?);
+            let project_id =
+                ProjectId(parse_base62(new_report.item_id.as_str())?);
 
             let result = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1)",
@@ -110,7 +121,8 @@ pub async fn report_create(
             report.project_id = Some(project_id.into())
         }
         ItemType::Version => {
-            let version_id = VersionId(parse_base62(new_report.item_id.as_str())?);
+            let version_id =
+                VersionId(parse_base62(new_report.item_id.as_str())?);
 
             let result = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)",
@@ -159,7 +171,8 @@ pub async fn report_create(
 
     for image_id in new_report.uploaded_images {
         if let Some(db_image) =
-            image_item::Image::get(image_id.into(), &mut *transaction, &redis).await?
+            image_item::Image::get(image_id.into(), &mut *transaction, &redis)
+                .await?
         {
             let image: Image = db_image.into();
             if !matches!(image.context, ImageContext::Report { .. })
@@ -281,8 +294,11 @@ pub async fn reports(
         .await?
     };
 
-    let query_reports =
-        crate::database::models::report_item::Report::get_many(&report_ids, &**pool).await?;
+    let query_reports = crate::database::models::report_item::Report::get_many(
+        &report_ids,
+        &**pool,
+    )
+    .await?;
 
     let mut reports: Vec<Report> = Vec::new();
 
@@ -311,8 +327,11 @@ pub async fn reports_get(
             .map(|x| x.into())
             .collect();
 
-    let reports_data =
-        crate::database::models::report_item::Report::get_many(&report_ids, &**pool).await?;
+    let reports_data = crate::database::models::report_item::Report::get_many(
+        &report_ids,
+        &**pool,
+    )
+    .await?;
 
     let user = get_user_from_headers(
         &req,
@@ -351,7 +370,8 @@ pub async fn report_get(
     .1;
     let id = info.into_inner().0.into();
 
-    let report = crate::database::models::report_item::Report::get(id, &**pool).await?;
+    let report =
+        crate::database::models::report_item::Report::get(id, &**pool).await?;
 
     if let Some(report) = report {
         if !user.role.is_mod() && report.reporter != user.id.into() {
@@ -391,7 +411,8 @@ pub async fn report_edit(
     .1;
     let id = info.into_inner().0.into();
 
-    let report = crate::database::models::report_item::Report::get(id, &**pool).await?;
+    let report =
+        crate::database::models::report_item::Report::get(id, &**pool).await?;
 
     if let Some(report) = report {
         if !user.role.is_mod() && report.reporter != user.id.into() {
@@ -455,8 +476,13 @@ pub async fn report_edit(
         let image_context = ImageContext::Report {
             report_id: Some(id.into()),
         };
-        img::delete_unused_images(image_context, checkable_strings, &mut transaction, &redis)
-            .await?;
+        img::delete_unused_images(
+            image_context,
+            checkable_strings,
+            &mut transaction,
+            &redis,
+        )
+        .await?;
 
         transaction.commit().await?;
 
@@ -489,14 +515,17 @@ pub async fn report_delete(
         report_id: Some(id),
     };
     let uploaded_images =
-        database::models::Image::get_many_contexted(context, &mut transaction).await?;
+        database::models::Image::get_many_contexted(context, &mut transaction)
+            .await?;
     for image in uploaded_images {
         image_item::Image::remove(image.id, &mut transaction, &redis).await?;
     }
 
-    let result =
-        crate::database::models::report_item::Report::remove_full(id.into(), &mut transaction)
-            .await?;
+    let result = crate::database::models::report_item::Report::remove_full(
+        id.into(),
+        &mut transaction,
+    )
+    .await?;
     transaction.commit().await?;
 
     if result.is_some() {

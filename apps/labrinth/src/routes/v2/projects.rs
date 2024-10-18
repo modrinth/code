@@ -5,7 +5,9 @@ use crate::file_hosting::FileHost;
 use crate::models::projects::{
     Link, MonetizationStatus, Project, ProjectStatus, SearchRequest, Version,
 };
-use crate::models::v2::projects::{DonationLink, LegacyProject, LegacySideType, LegacyVersion};
+use crate::models::v2::projects::{
+    DonationLink, LegacyProject, LegacySideType, LegacyVersion,
+};
 use crate::models::v2::search::LegacySearchResults;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
@@ -71,7 +73,9 @@ pub async fn project_search(
                     facet
                         .into_iter()
                         .map(|facet| {
-                            if let Some((key, operator, val)) = parse_facet(&facet) {
+                            if let Some((key, operator, val)) =
+                                parse_facet(&facet)
+                            {
                                 format!(
                                     "{}{}{}",
                                     match key.as_str() {
@@ -155,15 +159,19 @@ pub async fn random_projects_get(
 ) -> Result<HttpResponse, ApiError> {
     let count = v3::projects::RandomProjects { count: count.count };
 
-    let response =
-        v3::projects::random_projects_get(web::Query(count), pool.clone(), redis.clone())
-            .await
-            .or_else(v2_reroute::flatten_404_error)
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::projects::random_projects_get(
+        web::Query(count),
+        pool.clone(),
+        redis.clone(),
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
+    .or_else(v2_reroute::flatten_404_error)?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
-            let legacy_projects = LegacyProject::from_many(project, &**pool, &redis).await?;
+            let legacy_projects =
+                LegacyProject::from_many(project, &**pool, &redis).await?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -193,7 +201,8 @@ pub async fn projects_get(
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
-            let legacy_projects = LegacyProject::from_many(project, &**pool, &redis).await?;
+            let legacy_projects =
+                LegacyProject::from_many(project, &**pool, &redis).await?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -210,15 +219,24 @@ pub async fn project_get(
 ) -> Result<HttpResponse, ApiError> {
     // Convert V2 data to V3 data
     // Call V3 project creation
-    let response = v3::projects::project_get(req, info, pool.clone(), redis.clone(), session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::projects::project_get(
+        req,
+        info,
+        pool.clone(),
+        redis.clone(),
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Project>(response).await {
         Ok(project) => {
             let version_item = match project.versions.first() {
-                Some(vid) => version_item::Version::get((*vid).into(), &**pool, &redis).await?,
+                Some(vid) => {
+                    version_item::Version::get((*vid).into(), &**pool, &redis)
+                        .await?
+                }
                 None => None,
             };
             let project = LegacyProject::from(project, version_item);
@@ -256,16 +274,28 @@ pub async fn dependency_list(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // TODO: tests, probably
-    let response =
-        v3::projects::dependency_list(req, info, pool.clone(), redis.clone(), session_queue)
-            .await
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::projects::dependency_list(
+        req,
+        info,
+        pool.clone(),
+        redis.clone(),
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
-    match v2_reroute::extract_ok_json::<crate::routes::v3::projects::DependencyInfo>(response).await
+    match v2_reroute::extract_ok_json::<
+        crate::routes::v3::projects::DependencyInfo,
+    >(response)
+    .await
     {
         Ok(dependency_info) => {
-            let converted_projects =
-                LegacyProject::from_many(dependency_info.projects, &**pool, &redis).await?;
+            let converted_projects = LegacyProject::from_many(
+                dependency_info.projects,
+                &**pool,
+                &redis,
+            )
+            .await?;
             let converted_versions = dependency_info
                 .versions
                 .into_iter()
@@ -443,7 +473,8 @@ pub async fn project_edit(
     // (resetting to the new ones)
     if let Some(donation_urls) = v2_new_project.donation_urls {
         // Fetch current donation links from project so we know what to delete
-        let fetched_example_project = project_item::Project::get(&info.0, &**pool, &redis).await?;
+        let fetched_example_project =
+            project_item::Project::get(&info.0, &**pool, &redis).await?;
         let donation_links = fetched_example_project
             .map(|x| {
                 x.urls
@@ -504,11 +535,19 @@ pub async fn project_edit(
 
     // If client and server side were set, we will call
     // the version setting route for each version to set the side types for each of them.
-    if response.status().is_success() && (client_side.is_some() || server_side.is_some()) {
-        let project_item =
-            project_item::Project::get(&new_slug.unwrap_or(project_id), &**pool, &redis).await?;
+    if response.status().is_success()
+        && (client_side.is_some() || server_side.is_some())
+    {
+        let project_item = project_item::Project::get(
+            &new_slug.unwrap_or(project_id),
+            &**pool,
+            &redis,
+        )
+        .await?;
         let version_ids = project_item.map(|x| x.versions).unwrap_or_default();
-        let versions = version_item::Version::get_many(&version_ids, &**pool, &redis).await?;
+        let versions =
+            version_item::Version::get_many(&version_ids, &**pool, &redis)
+                .await?;
         for version in versions {
             let version = Version::from(version);
             let mut fields = version.fields;
@@ -516,7 +555,10 @@ pub async fn project_edit(
                 v2_reroute::convert_side_types_v2(&fields, None);
             let client_side = client_side.unwrap_or(current_client_side);
             let server_side = server_side.unwrap_or(current_server_side);
-            fields.extend(v2_reroute::convert_side_types_v3(client_side, server_side));
+            fields.extend(v2_reroute::convert_side_types_v3(
+                client_side,
+                server_side,
+            ));
 
             response = v3::versions::version_edit_helper(
                 req.clone(),
@@ -682,8 +724,10 @@ pub async fn projects_edit(
             add_categories: bulk_edit_project.add_categories,
             remove_categories: bulk_edit_project.remove_categories,
             additional_categories: bulk_edit_project.additional_categories,
-            add_additional_categories: bulk_edit_project.add_additional_categories,
-            remove_additional_categories: bulk_edit_project.remove_additional_categories,
+            add_additional_categories: bulk_edit_project
+                .add_additional_categories,
+            remove_additional_categories: bulk_edit_project
+                .remove_additional_categories,
             link_urls: Some(link_urls),
         }),
         redis,
@@ -735,9 +779,16 @@ pub async fn delete_project_icon(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::delete_project_icon(req, info, pool, redis, file_host, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
+    v3::projects::delete_project_icon(
+        req,
+        info,
+        pool,
+        redis,
+        file_host,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -873,9 +924,16 @@ pub async fn project_delete(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_delete(req, info, pool, redis, search_config, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
+    v3::projects::project_delete(
+        req,
+        info,
+        pool,
+        redis,
+        search_config,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[post("{id}/follow")]

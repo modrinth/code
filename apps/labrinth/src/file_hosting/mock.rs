@@ -21,9 +21,12 @@ impl FileHost for MockHost {
         file_name: &str,
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError> {
-        let path = std::path::Path::new(&dotenvy::var("MOCK_FILE_PATH").unwrap())
-            .join(file_name.replace("../", ""));
-        std::fs::create_dir_all(path.parent().ok_or(FileHostingError::InvalidFilename)?)?;
+        let path =
+            std::path::Path::new(&dotenvy::var("MOCK_FILE_PATH").unwrap())
+                .join(file_name.replace("../", ""));
+        std::fs::create_dir_all(
+            path.parent().ok_or(FileHostingError::InvalidFilename)?,
+        )?;
         let content_sha1 = sha1::Sha1::from(&file_bytes).hexdigest();
         let content_sha512 = format!("{:x}", sha2::Sha512::digest(&file_bytes));
 
@@ -45,8 +48,9 @@ impl FileHost for MockHost {
         file_id: &str,
         file_name: &str,
     ) -> Result<DeleteFileData, FileHostingError> {
-        let path = std::path::Path::new(&dotenvy::var("MOCK_FILE_PATH").unwrap())
-            .join(file_name.replace("../", ""));
+        let path =
+            std::path::Path::new(&dotenvy::var("MOCK_FILE_PATH").unwrap())
+                .join(file_name.replace("../", ""));
         if path.exists() {
             std::fs::remove_file(path)?;
         }

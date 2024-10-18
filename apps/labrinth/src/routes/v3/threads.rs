@@ -27,7 +27,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{id}", web::get().to(thread_get))
             .route("{id}", web::post().to(thread_send_message)),
     );
-    cfg.service(web::scope("message").route("{id}", web::delete().to(message_delete)));
+    cfg.service(
+        web::scope("message").route("{id}", web::delete().to(message_delete)),
+    );
     cfg.route("threads", web::get().to(threads_get));
 }
 
@@ -104,7 +106,8 @@ pub async fn filter_authorized_threads(
 
     for thread in threads {
         if user.role.is_mod()
-            || (thread.type_ == ThreadType::DirectMessage && thread.members.contains(&user_id))
+            || (thread.type_ == ThreadType::DirectMessage
+                && thread.members.contains(&user_id))
         {
             return_threads.push(thread);
         } else {
@@ -226,11 +229,12 @@ pub async fn filter_authorized_threads(
             .collect::<Vec<database::models::UserId>>(),
     );
 
-    let users: Vec<User> = database::models::User::get_many_ids(&user_ids, &***pool, redis)
-        .await?
-        .into_iter()
-        .map(From::from)
-        .collect();
+    let users: Vec<User> =
+        database::models::User::get_many_ids(&user_ids, &***pool, redis)
+            .await?
+            .into_iter()
+            .map(From::from)
+            .collect();
 
     let mut final_threads = Vec::new();
 
@@ -304,13 +308,16 @@ pub async fn thread_get(
                     .collect::<Vec<_>>(),
             );
 
-            let users: Vec<User> = database::models::User::get_many_ids(authors, &**pool, &redis)
-                .await?
-                .into_iter()
-                .map(From::from)
-                .collect();
+            let users: Vec<User> =
+                database::models::User::get_many_ids(authors, &**pool, &redis)
+                    .await?
+                    .into_iter()
+                    .map(From::from)
+                    .collect();
 
-            return Ok(HttpResponse::Ok().json(Thread::from(data, users, &user)));
+            return Ok(
+                HttpResponse::Ok().json(Thread::from(data, users, &user))
+            );
         }
     }
     Err(ApiError::NotFound)
@@ -344,9 +351,11 @@ pub async fn threads_get(
             .map(|x| x.into())
             .collect();
 
-    let threads_data = database::models::Thread::get_many(&thread_ids, &**pool).await?;
+    let threads_data =
+        database::models::Thread::get_many(&thread_ids, &**pool).await?;
 
-    let threads = filter_authorized_threads(threads_data, &user, &pool, &redis).await?;
+    let threads =
+        filter_authorized_threads(threads_data, &user, &pool, &redis).await?;
 
     Ok(HttpResponse::Ok().json(threads))
 }
@@ -396,13 +405,17 @@ pub async fn thread_send_message(
         }
 
         if let Some(replying_to) = replying_to {
-            let thread_message =
-                database::models::ThreadMessage::get((*replying_to).into(), &**pool).await?;
+            let thread_message = database::models::ThreadMessage::get(
+                (*replying_to).into(),
+                &**pool,
+            )
+            .await?;
 
             if let Some(thread_message) = thread_message {
                 if thread_message.thread_id != string {
                     return Err(ApiError::InvalidInput(
-                        "Message replied to is from another thread!".to_string(),
+                        "Message replied to is from another thread!"
+                            .to_string(),
                     ));
                 }
             } else {
@@ -436,16 +449,21 @@ pub async fn thread_send_message(
         .await?;
 
         if let Some(project_id) = thread.project_id {
-            let project = database::models::Project::get_id(project_id, &**pool, &redis).await?;
+            let project =
+                database::models::Project::get_id(project_id, &**pool, &redis)
+                    .await?;
 
             if let Some(project) = project {
-                if project.inner.status != ProjectStatus::Processing && user.role.is_mod() {
-                    let members = database::models::TeamMember::get_from_team_full(
-                        project.inner.team_id,
-                        &**pool,
-                        &redis,
-                    )
-                    .await?;
+                if project.inner.status != ProjectStatus::Processing
+                    && user.role.is_mod()
+                {
+                    let members =
+                        database::models::TeamMember::get_from_team_full(
+                            project.inner.team_id,
+                            &**pool,
+                            &redis,
+                        )
+                        .await?;
 
                     NotificationBuilder {
                         body: NotificationBody::ModeratorMessage {
@@ -464,7 +482,9 @@ pub async fn thread_send_message(
                 }
             }
         } else if let Some(report_id) = thread.report_id {
-            let report = database::models::report_item::Report::get(report_id, &**pool).await?;
+            let report =
+                database::models::report_item::Report::get(report_id, &**pool)
+                    .await?;
 
             if let Some(report) = report {
                 if report.closed && !user.role.is_mod() {
@@ -493,12 +513,18 @@ pub async fn thread_send_message(
         } = &new_message.body
         {
             for image_id in associated_images {
-                if let Some(db_image) =
-                    image_item::Image::get((*image_id).into(), &mut *transaction, &redis).await?
+                if let Some(db_image) = image_item::Image::get(
+                    (*image_id).into(),
+                    &mut *transaction,
+                    &redis,
+                )
+                .await?
                 {
                     let image: Image = db_image.into();
-                    if !matches!(image.context, ImageContext::ThreadMessage { .. })
-                        || image.context.inner_id().is_some()
+                    if !matches!(
+                        image.context,
+                        ImageContext::ThreadMessage { .. }
+                    ) || image.context.inner_id().is_some()
                     {
                         return Err(ApiError::InvalidInput(format!(
                             "Image {} is not unused and in the 'thread_message' context",
@@ -518,7 +544,8 @@ pub async fn thread_send_message(
                     .execute(&mut *transaction)
                     .await?;
 
-                    image_item::Image::clear_cache(image.id.into(), &redis).await?;
+                    image_item::Image::clear_cache(image.id.into(), &redis)
+                        .await?;
                 } else {
                     return Err(ApiError::InvalidInput(format!(
                         "Image {} does not exist",
@@ -554,7 +581,11 @@ pub async fn message_delete(
     .await?
     .1;
 
-    let result = database::models::ThreadMessage::get(info.into_inner().0.into(), &**pool).await?;
+    let result = database::models::ThreadMessage::get(
+        info.into_inner().0.into(),
+        &**pool,
+    )
+    .await?;
 
     if let Some(thread) = result {
         if !user.role.is_mod() && thread.author_id != Some(user.id.into()) {
@@ -568,7 +599,9 @@ pub async fn message_delete(
         let context = ImageContext::ThreadMessage {
             thread_message_id: Some(thread.id.into()),
         };
-        let images = database::Image::get_many_contexted(context, &mut transaction).await?;
+        let images =
+            database::Image::get_many_contexted(context, &mut transaction)
+                .await?;
         let cdn_url = dotenvy::var("CDN_URL")?;
         for image in images {
             let name = image.url.split(&format!("{cdn_url}/")).nth(1);
@@ -586,7 +619,12 @@ pub async fn message_delete(
             false
         };
 
-        database::models::ThreadMessage::remove_full(thread.id, private, &mut transaction).await?;
+        database::models::ThreadMessage::remove_full(
+            thread.id,
+            private,
+            &mut transaction,
+        )
+        .await?;
         transaction.commit().await?;
 
         Ok(HttpResponse::NoContent().body(""))

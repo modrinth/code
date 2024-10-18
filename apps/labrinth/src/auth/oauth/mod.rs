@@ -84,18 +84,19 @@ pub async fn init_oauth(
             client.id,
         )?;
 
-        let requested_scopes = oauth_info
-            .scope
-            .as_ref()
-            .map_or(Ok(client.max_scopes), |s| {
-                Scopes::parse_from_oauth_scopes(s).map_err(|e| {
-                    OAuthError::redirect(
-                        OAuthErrorType::FailedScopeParse(e),
-                        &oauth_info.state,
-                        &redirect_uri,
-                    )
-                })
-            })?;
+        let requested_scopes =
+            oauth_info
+                .scope
+                .as_ref()
+                .map_or(Ok(client.max_scopes), |s| {
+                    Scopes::parse_from_oauth_scopes(s).map_err(|e| {
+                        OAuthError::redirect(
+                            OAuthErrorType::FailedScopeParse(e),
+                            &oauth_info.state,
+                            &redirect_uri,
+                        )
+                    })
+                })?;
 
         if !client.max_scopes.contains(requested_scopes) {
             return Err(OAuthError::redirect(
@@ -108,9 +109,13 @@ pub async fn init_oauth(
         let existing_authorization =
             OAuthClientAuthorization::get(client.id, user.id.into(), &**pool)
                 .await
-                .map_err(|e| OAuthError::redirect(e, &oauth_info.state, &redirect_uri))?;
-        let redirect_uris =
-            OAuthRedirectUris::new(oauth_info.redirect_uri.clone(), redirect_uri.clone());
+                .map_err(|e| {
+                    OAuthError::redirect(e, &oauth_info.state, &redirect_uri)
+                })?;
+        let redirect_uris = OAuthRedirectUris::new(
+            oauth_info.redirect_uri.clone(),
+            redirect_uri.clone(),
+        );
         match existing_authorization {
             Some(existing_authorization)
                 if existing_authorization.scopes.contains(requested_scopes) =>
@@ -130,14 +135,17 @@ pub async fn init_oauth(
                 let flow_id = Flow::InitOAuthAppApproval {
                     user_id: user.id.into(),
                     client_id: client.id,
-                    existing_authorization_id: existing_authorization.map(|a| a.id),
+                    existing_authorization_id: existing_authorization
+                        .map(|a| a.id),
                     scopes: requested_scopes,
                     redirect_uris,
                     state: oauth_info.state.clone(),
                 }
                 .insert(Duration::minutes(30), &redis)
                 .await
-                .map_err(|e| OAuthError::redirect(e, &oauth_info.state, &redirect_uri))?;
+                .map_err(|e| {
+                    OAuthError::redirect(e, &oauth_info.state, &redirect_uri)
+                })?;
 
                 let access_request = OAuthClientAccessRequest {
                     client_id: client.id.into(),
@@ -169,7 +177,15 @@ pub async fn accept_client_scopes(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
-    accept_or_reject_client_scopes(true, req, accept_body, pool, redis, session_queue).await
+    accept_or_reject_client_scopes(
+        true,
+        req,
+        accept_body,
+        pool,
+        redis,
+        session_queue,
+    )
+    .await
 }
 
 #[post("reject")]
@@ -180,7 +196,8 @@ pub async fn reject_client_scopes(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
-    accept_or_reject_client_scopes(false, req, body, pool, redis, session_queue).await
+    accept_or_reject_client_scopes(false, req, body, pool, redis, session_queue)
+        .await
 }
 
 #[derive(Serialize, Deserialize)]
@@ -231,13 +248,17 @@ pub async fn request_token(
         {
             // https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
             if req_client_id != client_id.into() {
-                return Err(OAuthError::error(OAuthErrorType::UnauthorizedClient));
+                return Err(OAuthError::error(
+                    OAuthErrorType::UnauthorizedClient,
+                ));
             }
 
             if original_redirect_uri != req_params.redirect_uri {
-                return Err(OAuthError::error(OAuthErrorType::RedirectUriChanged(
-                    req_params.redirect_uri.clone(),
-                )));
+                return Err(OAuthError::error(
+                    OAuthErrorType::RedirectUriChanged(
+                        req_params.redirect_uri.clone(),
+                    ),
+                ));
             }
 
             if req_params.grant_type != "authorization_code" {
@@ -251,7 +272,8 @@ pub async fn request_token(
             let scopes = scopes - Scopes::restricted();
 
             let mut transaction = pool.begin().await?;
-            let token_id = generate_oauth_access_token_id(&mut transaction).await?;
+            let token_id =
+                generate_oauth_access_token_id(&mut transaction).await?;
             let token = generate_access_token();
             let token_hash = OAuthAccessToken::hash_token(&token);
             let time_until_expiration = OAuthAccessToken {
@@ -323,7 +345,9 @@ pub async fn accept_or_reject_client_scopes(
     }) = flow
     {
         if current_user.id != user_id.into() {
-            return Err(OAuthError::error(AuthenticationError::InvalidCredentials));
+            return Err(OAuthError::error(
+                AuthenticationError::InvalidCredentials,
+            ));
         }
 
         if accept {
@@ -331,10 +355,19 @@ pub async fn accept_or_reject_client_scopes(
 
             let auth_id = match existing_authorization_id {
                 Some(id) => id,
-                None => generate_oauth_client_authorization_id(&mut transaction).await?,
+                None => {
+                    generate_oauth_client_authorization_id(&mut transaction)
+                        .await?
+                }
             };
-            OAuthClientAuthorization::upsert(auth_id, client_id, user_id, scopes, &mut transaction)
-                .await?;
+            OAuthClientAuthorization::upsert(
+                auth_id,
+                client_id,
+                user_id,
+                scopes,
+                &mut transaction,
+            )
+            .await?;
 
             transaction.commit().await?;
 
@@ -402,14 +435,17 @@ async fn init_oauth_code_flow(
     }
     .insert(Duration::minutes(10), redis)
     .await
-    .map_err(|e| OAuthError::redirect(e, &state, &redirect_uris.validated.clone()))?;
+    .map_err(|e| {
+        OAuthError::redirect(e, &state, &redirect_uris.validated.clone())
+    })?;
 
     let mut redirect_params = vec![format!("code={code}")];
     if let Some(state) = state {
         redirect_params.push(format!("state={state}"));
     }
 
-    let redirect_uri = append_params_to_uri(&redirect_uris.validated.0, &redirect_params);
+    let redirect_uri =
+        append_params_to_uri(&redirect_uris.validated.0, &redirect_params);
 
     // IETF RFC 6749 Section 4.1.2 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2)
     Ok(HttpResponse::Ok()

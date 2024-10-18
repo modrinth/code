@@ -1,6 +1,8 @@
 use crate::database::models::pat_item::PersonalAccessToken;
 use crate::database::models::session_item::Session;
-use crate::database::models::{DatabaseError, OAuthAccessTokenId, PatId, SessionId, UserId};
+use crate::database::models::{
+    DatabaseError, OAuthAccessTokenId, PatId, SessionId, UserId,
+};
 use crate::database::redis::RedisPool;
 use crate::routes::internal::session::SessionMetadata;
 use chrono::Utc;
@@ -38,7 +40,10 @@ impl AuthQueue {
         self.pat_queue.lock().await.insert(id);
     }
 
-    pub async fn add_oauth_access_token(&self, id: crate::database::models::OAuthAccessTokenId) {
+    pub async fn add_oauth_access_token(
+        &self,
+        id: crate::database::models::OAuthAccessTokenId,
+    ) {
         self.oauth_access_token_queue.lock().await.insert(id);
     }
 
@@ -56,10 +61,15 @@ impl AuthQueue {
         std::mem::replace(&mut queue, HashSet::with_capacity(len))
     }
 
-    pub async fn index(&self, pool: &PgPool, redis: &RedisPool) -> Result<(), DatabaseError> {
+    pub async fn index(
+        &self,
+        pool: &PgPool,
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
         let session_queue = self.take_sessions().await;
         let pat_queue = Self::take_hashset(&self.pat_queue).await;
-        let oauth_access_token_queue = Self::take_hashset(&self.oauth_access_token_queue).await;
+        let oauth_access_token_queue =
+            Self::take_hashset(&self.oauth_access_token_queue).await;
 
         if !session_queue.is_empty()
             || !pat_queue.is_empty()
@@ -104,7 +114,11 @@ impl AuthQueue {
             .await?;
 
             for (id, session, user_id) in expired_ids {
-                clear_cache_sessions.push((Some(id), Some(session), Some(user_id)));
+                clear_cache_sessions.push((
+                    Some(id),
+                    Some(session),
+                    Some(user_id),
+                ));
                 Session::remove(id, &mut transaction).await?;
             }
 
@@ -128,7 +142,11 @@ impl AuthQueue {
             .execute(&mut *transaction)
             .await?;
 
-            update_oauth_access_token_last_used(oauth_access_token_queue, &mut transaction).await?;
+            update_oauth_access_token_last_used(
+                oauth_access_token_queue,
+                &mut transaction,
+            )
+            .await?;
 
             transaction.commit().await?;
             PersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;

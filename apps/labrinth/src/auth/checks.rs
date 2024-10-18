@@ -10,11 +10,17 @@ use itertools::Itertools;
 use sqlx::PgPool;
 
 pub trait ValidateAuthorized {
-    fn validate_authorized(&self, user_option: Option<&User>) -> Result<(), ApiError>;
+    fn validate_authorized(
+        &self,
+        user_option: Option<&User>,
+    ) -> Result<(), ApiError>;
 }
 
 pub trait ValidateAllAuthorized {
-    fn validate_all_authorized(self, user_option: Option<&User>) -> Result<(), ApiError>;
+    fn validate_all_authorized(
+        self,
+        user_option: Option<&User>,
+    ) -> Result<(), ApiError>;
 }
 
 impl<'a, T, A> ValidateAllAuthorized for T
@@ -22,7 +28,10 @@ where
     T: IntoIterator<Item = &'a A>,
     A: ValidateAuthorized + 'a,
 {
-    fn validate_all_authorized(self, user_option: Option<&User>) -> Result<(), ApiError> {
+    fn validate_all_authorized(
+        self,
+        user_option: Option<&User>,
+    ) -> Result<(), ApiError> {
         self.into_iter()
             .try_for_each(|c| c.validate_authorized(user_option))
     }
@@ -34,9 +43,14 @@ pub async fn is_visible_project(
     pool: &PgPool,
     hide_unlisted: bool,
 ) -> Result<bool, ApiError> {
-    filter_visible_project_ids(vec![project_data], user_option, pool, hide_unlisted)
-        .await
-        .map(|x| !x.is_empty())
+    filter_visible_project_ids(
+        vec![project_data],
+        user_option,
+        pool,
+        hide_unlisted,
+    )
+    .await
+    .map(|x| !x.is_empty())
 }
 
 pub async fn is_team_member_project(
@@ -99,8 +113,10 @@ pub async fn filter_visible_project_ids(
 
     // For hidden projects, return a filtered list of projects for which we are enlisted on the team
     if !check_projects.is_empty() {
-        return_projects
-            .extend(filter_enlisted_projects_ids(check_projects, user_option, pool).await?);
+        return_projects.extend(
+            filter_enlisted_projects_ids(check_projects, user_option, pool)
+                .await?,
+        );
     }
 
     Ok(return_projects)
@@ -143,7 +159,8 @@ pub async fn filter_enlisted_projects_ids(
         .fetch(pool)
         .map_ok(|row| {
             for x in projects.iter() {
-                let bool = Some(x.id.0) == row.id && Some(x.team_id.0) == row.team_id;
+                let bool =
+                    Some(x.id.0) == row.id && Some(x.team_id.0) == row.team_id;
                 if bool {
                     return_projects.push(x.id);
                 }
@@ -195,7 +212,10 @@ pub async fn filter_visible_versions(
 }
 
 impl ValidateAuthorized for models::OAuthClient {
-    fn validate_authorized(&self, user_option: Option<&User>) -> Result<(), ApiError> {
+    fn validate_authorized(
+        &self,
+        user_option: Option<&User>,
+    ) -> Result<(), ApiError> {
         if let Some(user) = user_option {
             return if user.role.is_mod() || user.id == self.created_by.into() {
                 Ok(())
@@ -240,7 +260,8 @@ pub async fn filter_visible_version_ids(
 
     // Then, get enlisted versions (Versions that are a part of a project we are a member of)
     let enlisted_version_ids =
-        filter_enlisted_version_ids(versions.clone(), user_option, pool, redis).await?;
+        filter_enlisted_version_ids(versions.clone(), user_option, pool, redis)
+            .await?;
 
     // Return versions that are not hidden, we are a mod of, or we are enlisted on the team of
     for version in versions {
@@ -248,7 +269,8 @@ pub async fn filter_visible_version_ids(
         // - it's not hidden and we can see the project
         // - we are a mod
         // - we are enlisted on the team of the mod
-        if (!version.status.is_hidden() && visible_project_ids.contains(&version.project_id))
+        if (!version.status.is_hidden()
+            && visible_project_ids.contains(&version.project_id))
             || user_option
                 .as_ref()
                 .map(|x| x.role.is_mod())
@@ -292,7 +314,8 @@ pub async fn filter_enlisted_version_ids(
             .as_ref()
             .map(|x| x.role.is_mod())
             .unwrap_or(false)
-            || (user_option.is_some() && authorized_project_ids.contains(&version.project_id))
+            || (user_option.is_some()
+                && authorized_project_ids.contains(&version.project_id))
         {
             return_versions.push(version.id);
         }
@@ -307,7 +330,9 @@ pub async fn is_visible_collection(
 ) -> Result<bool, ApiError> {
     let mut authorized = !collection_data.status.is_hidden();
     if let Some(user) = &user_option {
-        if !authorized && (user.role.is_mod() || user.id == collection_data.user_id.into()) {
+        if !authorized
+            && (user.role.is_mod() || user.id == collection_data.user_id.into())
+        {
             authorized = true;
         }
     }

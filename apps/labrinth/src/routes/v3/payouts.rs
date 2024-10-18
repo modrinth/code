@@ -46,27 +46,37 @@ pub async fn paypal_webhook(
         .headers()
         .get("PAYPAL-AUTH-ALGO")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| ApiError::InvalidInput("missing auth algo".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("missing auth algo".to_string())
+        })?;
     let cert_url = req
         .headers()
         .get("PAYPAL-CERT-URL")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| ApiError::InvalidInput("missing cert url".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("missing cert url".to_string())
+        })?;
     let transmission_id = req
         .headers()
         .get("PAYPAL-TRANSMISSION-ID")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| ApiError::InvalidInput("missing transmission ID".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("missing transmission ID".to_string())
+        })?;
     let transmission_sig = req
         .headers()
         .get("PAYPAL-TRANSMISSION-SIG")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| ApiError::InvalidInput("missing transmission sig".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("missing transmission sig".to_string())
+        })?;
     let transmission_time = req
         .headers()
         .get("PAYPAL-TRANSMISSION-TIME")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| ApiError::InvalidInput("missing transmission time".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("missing transmission time".to_string())
+        })?;
 
     #[derive(Deserialize)]
     struct WebHookResponse {
@@ -190,11 +200,14 @@ pub async fn tremendous_webhook(
         .get("Tremendous-Webhook-Signature")
         .and_then(|x| x.to_str().ok())
         .and_then(|x| x.split('=').next_back())
-        .ok_or_else(|| ApiError::InvalidInput("missing webhook signature".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("missing webhook signature".to_string())
+        })?;
 
-    let mut mac: Hmac<Sha256> =
-        Hmac::new_from_slice(dotenvy::var("TREMENDOUS_PRIVATE_KEY")?.as_bytes())
-            .map_err(|_| ApiError::Payments("error initializing HMAC".to_string()))?;
+    let mut mac: Hmac<Sha256> = Hmac::new_from_slice(
+        dotenvy::var("TREMENDOUS_PRIVATE_KEY")?.as_bytes(),
+    )
+    .map_err(|_| ApiError::Payments("error initializing HMAC".to_string()))?;
     mac.update(body.as_bytes());
     let request_signature = mac.finalize().into_bytes().encode_hex::<String>();
 
@@ -300,10 +313,16 @@ pub async fn user_payouts(
     .1;
 
     let payout_ids =
-        crate::database::models::payout_item::Payout::get_all_for_user(user.id.into(), &**pool)
-            .await?;
-    let payouts =
-        crate::database::models::payout_item::Payout::get_many(&payout_ids, &**pool).await?;
+        crate::database::models::payout_item::Payout::get_all_for_user(
+            user.id.into(),
+            &**pool,
+        )
+        .await?;
+    let payouts = crate::database::models::payout_item::Payout::get_many(
+        &payout_ids,
+        &**pool,
+    )
+    .await?;
 
     Ok(HttpResponse::Ok().json(
         payouts
@@ -330,10 +349,17 @@ pub async fn create_payout(
     session_queue: web::Data<AuthQueue>,
     payouts_queue: web::Data<PayoutsQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (scopes, user) =
-        get_user_record_from_bearer_token(&req, None, &**pool, &redis, &session_queue)
-            .await?
-            .ok_or_else(|| ApiError::Authentication(AuthenticationError::InvalidCredentials))?;
+    let (scopes, user) = get_user_record_from_bearer_token(
+        &req,
+        None,
+        &**pool,
+        &redis,
+        &session_queue,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::Authentication(AuthenticationError::InvalidCredentials)
+    })?;
 
     if !scopes.contains(Scopes::PAYOUTS_WRITE) {
         return Err(ApiError::Authentication(
@@ -364,7 +390,11 @@ pub async fn create_payout(
         .await?
         .into_iter()
         .find(|x| x.id == body.method_id)
-        .ok_or_else(|| ApiError::InvalidInput("Invalid payment method specified!".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "Invalid payment method specified!".to_string(),
+            )
+        })?;
 
     let fee = std::cmp::min(
         std::cmp::max(
@@ -385,43 +415,50 @@ pub async fn create_payout(
 
     let payout_item = match body.method {
         PayoutMethodType::Venmo | PayoutMethodType::PayPal => {
-            let (wallet, wallet_type, address, display_address) =
-                if body.method == PayoutMethodType::Venmo {
-                    if let Some(venmo) = user.venmo_handle {
-                        ("Venmo", "user_handle", venmo.clone(), venmo)
-                    } else {
-                        return Err(ApiError::InvalidInput(
-                            "Venmo address has not been set for account!".to_string(),
-                        ));
-                    }
-                } else if let Some(paypal_id) = user.paypal_id {
-                    if let Some(paypal_country) = user.paypal_country {
-                        if &*paypal_country == "US" && &*body.method_id != "paypal_us" {
-                            return Err(ApiError::InvalidInput(
-                                "Please use the US PayPal transfer option!".to_string(),
-                            ));
-                        } else if &*paypal_country != "US" && &*body.method_id == "paypal_us" {
-                            return Err(ApiError::InvalidInput(
-                                "Please use the International PayPal transfer option!".to_string(),
-                            ));
-                        }
-
-                        (
-                            "PayPal",
-                            "paypal_id",
-                            paypal_id.clone(),
-                            user.paypal_email.unwrap_or(paypal_id),
-                        )
-                    } else {
-                        return Err(ApiError::InvalidInput(
-                            "Please re-link your PayPal account!".to_string(),
-                        ));
-                    }
+            let (wallet, wallet_type, address, display_address) = if body.method
+                == PayoutMethodType::Venmo
+            {
+                if let Some(venmo) = user.venmo_handle {
+                    ("Venmo", "user_handle", venmo.clone(), venmo)
                 } else {
                     return Err(ApiError::InvalidInput(
-                        "You have not linked a PayPal account!".to_string(),
+                        "Venmo address has not been set for account!"
+                            .to_string(),
                     ));
-                };
+                }
+            } else if let Some(paypal_id) = user.paypal_id {
+                if let Some(paypal_country) = user.paypal_country {
+                    if &*paypal_country == "US"
+                        && &*body.method_id != "paypal_us"
+                    {
+                        return Err(ApiError::InvalidInput(
+                            "Please use the US PayPal transfer option!"
+                                .to_string(),
+                        ));
+                    } else if &*paypal_country != "US"
+                        && &*body.method_id == "paypal_us"
+                    {
+                        return Err(ApiError::InvalidInput(
+                                "Please use the International PayPal transfer option!".to_string(),
+                            ));
+                    }
+
+                    (
+                        "PayPal",
+                        "paypal_id",
+                        paypal_id.clone(),
+                        user.paypal_email.unwrap_or(paypal_id),
+                    )
+                } else {
+                    return Err(ApiError::InvalidInput(
+                        "Please re-link your PayPal account!".to_string(),
+                    ));
+                }
+            } else {
+                return Err(ApiError::InvalidInput(
+                    "You have not linked a PayPal account!".to_string(),
+                ));
+            };
 
             #[derive(Deserialize)]
             struct PayPalLink {
@@ -433,17 +470,18 @@ pub async fn create_payout(
                 pub links: Vec<PayPalLink>,
             }
 
-            let mut payout_item = crate::database::models::payout_item::Payout {
-                id: payout_id,
-                user_id: user.id,
-                created: Utc::now(),
-                status: PayoutStatus::InTransit,
-                amount: transfer,
-                fee: Some(fee),
-                method: Some(body.method),
-                method_address: Some(display_address),
-                platform_id: None,
-            };
+            let mut payout_item =
+                crate::database::models::payout_item::Payout {
+                    id: payout_id,
+                    user_id: user.id,
+                    created: Utc::now(),
+                    status: PayoutStatus::InTransit,
+                    amount: transfer,
+                    fee: Some(fee),
+                    method: Some(body.method),
+                    method_address: Some(display_address),
+                    platform_id: None,
+                };
 
             let res: PayoutsResponse = payouts_queue.make_paypal_request(
                 Method::POST,
@@ -494,7 +532,8 @@ pub async fn create_payout(
                     .await
                 {
                     if let Some(data) = res.items.first() {
-                        payout_item.platform_id = Some(data.payout_item_id.clone());
+                        payout_item.platform_id =
+                            Some(data.payout_item_id.clone());
                     }
                 }
             }
@@ -504,17 +543,18 @@ pub async fn create_payout(
         PayoutMethodType::Tremendous => {
             if let Some(email) = user.email {
                 if user.email_verified {
-                    let mut payout_item = crate::database::models::payout_item::Payout {
-                        id: payout_id,
-                        user_id: user.id,
-                        created: Utc::now(),
-                        status: PayoutStatus::InTransit,
-                        amount: transfer,
-                        fee: Some(fee),
-                        method: Some(PayoutMethodType::Tremendous),
-                        method_address: Some(email.clone()),
-                        platform_id: None,
-                    };
+                    let mut payout_item =
+                        crate::database::models::payout_item::Payout {
+                            id: payout_id,
+                            user_id: user.id,
+                            created: Utc::now(),
+                            status: PayoutStatus::InTransit,
+                            amount: transfer,
+                            fee: Some(fee),
+                            method: Some(PayoutMethodType::Tremendous),
+                            method_address: Some(email.clone()),
+                            platform_id: None,
+                        };
 
                     #[derive(Deserialize)]
                     struct Reward {
@@ -566,12 +606,14 @@ pub async fn create_payout(
                     payout_item
                 } else {
                     return Err(ApiError::InvalidInput(
-                        "You must verify your account email to proceed!".to_string(),
+                        "You must verify your account email to proceed!"
+                            .to_string(),
                     ));
                 }
             } else {
                 return Err(ApiError::InvalidInput(
-                    "You must add an email to your account to proceed!".to_string(),
+                    "You must add an email to your account to proceed!"
+                        .to_string(),
                 ));
             }
         }
@@ -585,7 +627,8 @@ pub async fn create_payout(
     payout_item.insert(&mut transaction).await?;
 
     transaction.commit().await?;
-    crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
+    crate::database::models::User::clear_caches(&[(user.id, None)], &redis)
+        .await?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -610,7 +653,9 @@ pub async fn cancel_payout(
     .1;
 
     let id = info.into_inner().0;
-    let payout = crate::database::models::payout_item::Payout::get(id.into(), &**pool).await?;
+    let payout =
+        crate::database::models::payout_item::Payout::get(id.into(), &**pool)
+            .await?;
 
     if let Some(payout) = payout {
         if payout.user_id != user.id.into() && !user.role.is_admin() {
@@ -630,7 +675,10 @@ pub async fn cancel_payout(
                         payouts
                             .make_paypal_request::<(), ()>(
                                 Method::POST,
-                                &format!("payments/payouts-item/{}/cancel", platform_id),
+                                &format!(
+                                    "payments/payouts-item/{}/cancel",
+                                    platform_id
+                                ),
                                 None,
                                 None,
                                 None,
@@ -792,7 +840,9 @@ async fn get_user_balance(
         .unwrap_or((Decimal::ZERO, Decimal::ZERO));
 
     Ok(UserBalance {
-        available: available.round_dp(16) - withdrawn.round_dp(16) - fees.round_dp(16),
+        available: available.round_dp(16)
+            - withdrawn.round_dp(16)
+            - fees.round_dp(16),
         pending,
     })
 }
@@ -837,14 +887,19 @@ pub async fn platform_revenue(
     .and_then(|x| x.sum)
     .unwrap_or(Decimal::ZERO);
 
-    let points =
-        make_aditude_request(&["METRIC_REVENUE", "METRIC_IMPRESSIONS"], "30d", "1d").await?;
+    let points = make_aditude_request(
+        &["METRIC_REVENUE", "METRIC_IMPRESSIONS"],
+        "30d",
+        "1d",
+    )
+    .await?;
 
     let mut points_map = HashMap::new();
 
     for point in points {
         for point in point.points_list {
-            let entry = points_map.entry(point.time.seconds).or_insert((None, None));
+            let entry =
+                points_map.entry(point.time.seconds).or_insert((None, None));
 
             if let Some(revenue) = point.metric.revenue {
                 entry.0 = Some(revenue);
@@ -868,7 +923,8 @@ pub async fn platform_revenue(
             .and_utc()
             .timestamp();
 
-        if let Some((revenue, impressions)) = points_map.remove(&(start as u64)) {
+        if let Some((revenue, impressions)) = points_map.remove(&(start as u64))
+        {
             // Before 9/5/24, when legacy payouts were in effect.
             if start >= 1725494400 {
                 let revenue = revenue.unwrap_or(Decimal::ZERO);
@@ -879,8 +935,9 @@ pub async fn platform_revenue(
                 // Clean.io fee (ad antimalware). Per 1000 impressions.
                 let clean_io_fee = Decimal::from(8) / Decimal::from(1000);
 
-                let net_revenue =
-                    revenue - (clean_io_fee * Decimal::from(impressions) / Decimal::from(1000));
+                let net_revenue = revenue
+                    - (clean_io_fee * Decimal::from(impressions)
+                        / Decimal::from(1000));
 
                 let payout = net_revenue * (Decimal::from(1) - modrinth_cut);
 
@@ -903,7 +960,12 @@ pub async fn platform_revenue(
     };
 
     redis
-        .set_serialized_to_json(PLATFORM_REVENUE_NAMESPACE, 0, &res, Some(60 * 60))
+        .set_serialized_to_json(
+            PLATFORM_REVENUE_NAMESPACE,
+            0,
+            &res,
+            Some(60 * 60),
+        )
         .await?;
 
     Ok(HttpResponse::Ok().json(res))
@@ -918,7 +980,8 @@ fn get_legacy_data_point(timestamp: u64) -> RevenueData {
     let weekdays = Decimal::from(20);
     let weekend_bonus = Decimal::from(5) / Decimal::from(4);
 
-    let weekday_amount = old_payouts_budget / (weekdays + (weekend_bonus) * (days - weekdays));
+    let weekday_amount =
+        old_payouts_budget / (weekdays + (weekend_bonus) * (days - weekdays));
     let weekend_amount = weekday_amount * weekend_bonus;
 
     let payout = match start.weekday() {

@@ -51,7 +51,11 @@ impl ApiV3 {
 
 #[async_trait(?Send)]
 impl ApiTeams for ApiV3 {
-    async fn get_team_members(&self, id_or_title: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn get_team_members(
+        &self,
+        id_or_title: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v3/team/{id_or_title}/members"))
             .append_pat(pat)
@@ -89,7 +93,11 @@ impl ApiTeams for ApiV3 {
         self.call(req).await
     }
 
-    async fn get_project_members(&self, id_or_title: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn get_project_members(
+        &self,
+        id_or_title: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v3/project/{id_or_title}/members"))
             .append_pat(pat)
@@ -137,7 +145,11 @@ impl ApiTeams for ApiV3 {
         serde_json::from_value(value).unwrap()
     }
 
-    async fn join_team(&self, team_id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn join_team(
+        &self,
+        team_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::post()
             .uri(&format!("/v3/team/{team_id}/join"))
             .append_pat(pat)
@@ -189,7 +201,11 @@ impl ApiTeams for ApiV3 {
         self.call(req).await
     }
 
-    async fn get_user_notifications(&self, user_id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn get_user_notifications(
+        &self,
+        user_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v3/user/{user_id}/notifications"))
             .append_pat(pat)
@@ -211,7 +227,11 @@ impl ApiTeams for ApiV3 {
         serde_json::from_value(value).unwrap()
     }
 
-    async fn get_notification(&self, notification_id: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn get_notification(
+        &self,
+        notification_id: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v3/notification/{notification_id}"))
             .append_pat(pat)

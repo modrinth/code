@@ -86,7 +86,10 @@ impl Category {
         Ok(result.map(|r| CategoryId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<Category>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<Category>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -128,7 +131,10 @@ impl Category {
 }
 
 impl LinkPlatform {
-    pub async fn get_id<'a, E>(id: &str, exec: E) -> Result<Option<LinkPlatformId>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        id: &str,
+        exec: E,
+    ) -> Result<Option<LinkPlatformId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -145,7 +151,10 @@ impl LinkPlatform {
         Ok(result.map(|r| LinkPlatformId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<LinkPlatform>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<LinkPlatform>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -174,7 +183,12 @@ impl LinkPlatform {
         .await?;
 
         redis
-            .set_serialized_to_json(TAGS_NAMESPACE, "link_platform", &result, None)
+            .set_serialized_to_json(
+                TAGS_NAMESPACE,
+                "link_platform",
+                &result,
+                None,
+            )
             .await?;
 
         Ok(result)
@@ -182,7 +196,10 @@ impl LinkPlatform {
 }
 
 impl ReportType {
-    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<ReportTypeId>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<ReportTypeId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -199,7 +216,10 @@ impl ReportType {
         Ok(result.map(|r| ReportTypeId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<String>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -224,7 +244,12 @@ impl ReportType {
         .await?;
 
         redis
-            .set_serialized_to_json(TAGS_NAMESPACE, "report_type", &result, None)
+            .set_serialized_to_json(
+                TAGS_NAMESPACE,
+                "report_type",
+                &result,
+                None,
+            )
             .await?;
 
         Ok(result)
@@ -232,7 +257,10 @@ impl ReportType {
 }
 
 impl ProjectType {
-    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<ProjectTypeId>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<ProjectTypeId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -249,7 +277,10 @@ impl ProjectType {
         Ok(result.map(|r| ProjectTypeId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<String>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -274,7 +305,12 @@ impl ProjectType {
         .await?;
 
         redis
-            .set_serialized_to_json(TAGS_NAMESPACE, "project_type", &result, None)
+            .set_serialized_to_json(
+                TAGS_NAMESPACE,
+                "project_type",
+                &result,
+                None,
+            )
             .await?;
 
         Ok(result)

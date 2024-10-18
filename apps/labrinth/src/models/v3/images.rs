@@ -90,7 +90,9 @@ impl ImageContext {
         match self {
             ImageContext::Project { project_id } => project_id.map(|x| x.0),
             ImageContext::Version { version_id } => version_id.map(|x| x.0),
-            ImageContext::ThreadMessage { thread_message_id } => thread_message_id.map(|x| x.0),
+            ImageContext::ThreadMessage { thread_message_id } => {
+                thread_message_id.map(|x| x.0)
+            }
             ImageContext::Report { report_id } => report_id.map(|x| x.0),
             ImageContext::Unknown => None,
         }

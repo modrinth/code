@@ -36,7 +36,10 @@ use crate::{
 };
 use crate::{
     file_hosting::FileHost,
-    models::{ids::base62_impl::parse_base62, oauth_clients::DeleteOAuthClientQueryParam},
+    models::{
+        ids::base62_impl::parse_base62,
+        oauth_clients::DeleteOAuthClientQueryParam,
+    },
     util::routes::read_from_payload,
 };
 
@@ -80,13 +83,16 @@ pub async fn get_user_clients(
     let target_user = User::get(&info.into_inner(), &**pool, &redis).await?;
 
     if let Some(target_user) = target_user {
-        if target_user.id != current_user.id.into() && !current_user.role.is_admin() {
+        if target_user.id != current_user.id.into()
+            && !current_user.role.is_admin()
+        {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to see the OAuth clients of this user!".to_string(),
             ));
         }
 
-        let clients = OAuthClient::get_all_user_clients(target_user.id, &**pool).await?;
+        let clients =
+            OAuthClient::get_all_user_clients(target_user.id, &**pool).await?;
 
         let response = clients
             .into_iter()
@@ -136,7 +142,9 @@ pub struct NewOAuthApp {
     )]
     pub name: String,
 
-    #[validate(custom(function = "crate::util::validate::validate_no_restricted_scopes"))]
+    #[validate(custom(
+        function = "crate::util::validate::validate_no_restricted_scopes"
+    ))]
     pub max_scopes: Scopes,
 
     pub redirect_uris: Vec<String>,
@@ -169,9 +177,9 @@ pub async fn oauth_client_create<'a>(
     .await?
     .1;
 
-    new_oauth_app
-        .validate()
-        .map_err(|e| CreateError::ValidationError(validation_errors_to_string(e, None)))?;
+    new_oauth_app.validate().map_err(|e| {
+        CreateError::ValidationError(validation_errors_to_string(e, None))
+    })?;
 
     let mut transaction = pool.begin().await?;
 
@@ -180,8 +188,12 @@ pub async fn oauth_client_create<'a>(
     let client_secret = generate_oauth_client_secret();
     let client_secret_hash = DBOAuthClient::hash_secret(&client_secret);
 
-    let redirect_uris =
-        create_redirect_uris(&new_oauth_app.redirect_uris, client_id, &mut transaction).await?;
+    let redirect_uris = create_redirect_uris(
+        &new_oauth_app.redirect_uris,
+        client_id,
+        &mut transaction,
+    )
+    .await?;
 
     let client = OAuthClient {
         id: client_id,
@@ -226,7 +238,8 @@ pub async fn oauth_client_delete<'a>(
     .await?
     .1;
 
-    let client = OAuthClient::get(client_id.into_inner().into(), &**pool).await?;
+    let client =
+        OAuthClient::get(client_id.into_inner().into(), &**pool).await?;
     if let Some(client) = client {
         client.validate_authorized(Some(&current_user))?;
         OAuthClient::remove(client.id, &**pool).await?;
@@ -245,7 +258,9 @@ pub struct OAuthClientEdit {
     )]
     pub name: Option<String>,
 
-    #[validate(custom(function = "crate::util::validate::validate_no_restricted_scopes"))]
+    #[validate(custom(
+        function = "crate::util::validate::validate_no_restricted_scopes"
+    ))]
     pub max_scopes: Option<Scopes>,
 
     #[validate(length(min = 1))]
@@ -280,11 +295,13 @@ pub async fn oauth_client_edit(
     .await?
     .1;
 
-    client_updates
-        .validate()
-        .map_err(|e| ApiError::Validation(validation_errors_to_string(e, None)))?;
+    client_updates.validate().map_err(|e| {
+        ApiError::Validation(validation_errors_to_string(e, None))
+    })?;
 
-    if let Some(existing_client) = OAuthClient::get(client_id.into_inner().into(), &**pool).await? {
+    if let Some(existing_client) =
+        OAuthClient::get(client_id.into_inner().into(), &**pool).await?
+    {
         existing_client.validate_authorized(Some(&current_user))?;
 
         let mut updated_client = existing_client.clone();
@@ -317,7 +334,8 @@ pub async fn oauth_client_edit(
             .await?;
 
         if let Some(redirects) = redirect_uris {
-            edit_redirects(redirects, &existing_client, &mut transaction).await?;
+            edit_redirects(redirects, &existing_client, &mut transaction)
+                .await?;
         }
 
         transaction.commit().await?;
@@ -358,7 +376,9 @@ pub async fn oauth_client_icon_edit(
     let client = OAuthClient::get((*client_id).into(), &**pool)
         .await?
         .ok_or_else(|| {
-            ApiError::InvalidInput("The specified client does not exist!".to_string())
+            ApiError::InvalidInput(
+                "The specified client does not exist!".to_string(),
+            )
         })?;
 
     client.validate_authorized(Some(&user))?;
@@ -370,8 +390,12 @@ pub async fn oauth_client_icon_edit(
     )
     .await?;
 
-    let bytes =
-        read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
+    let bytes = read_from_payload(
+        &mut payload,
+        262144,
+        "Icons must be smaller than 256KiB",
+    )
+    .await?;
     let upload_result = upload_image_optimized(
         &format!("data/{}", client_id),
         bytes.freeze(),
@@ -419,7 +443,9 @@ pub async fn oauth_client_icon_delete(
     let client = OAuthClient::get((*client_id).into(), &**pool)
         .await?
         .ok_or_else(|| {
-            ApiError::InvalidInput("The specified client does not exist!".to_string())
+            ApiError::InvalidInput(
+                "The specified client does not exist!".to_string(),
+            )
         })?;
     client.validate_authorized(Some(&user))?;
 
@@ -461,8 +487,11 @@ pub async fn get_user_oauth_authorizations(
     .await?
     .1;
 
-    let authorizations =
-        OAuthClientAuthorization::get_all_for_user(current_user.id.into(), &**pool).await?;
+    let authorizations = OAuthClientAuthorization::get_all_for_user(
+        current_user.id.into(),
+        &**pool,
+    )
+    .await?;
 
     let mapped: Vec<models::oauth_clients::OAuthClientAuthorization> =
         authorizations.into_iter().map(|a| a.into()).collect_vec();
@@ -488,8 +517,12 @@ pub async fn revoke_oauth_authorization(
     .await?
     .1;
 
-    OAuthClientAuthorization::remove(info.client_id.into(), current_user.id.into(), &**pool)
-        .await?;
+    OAuthClientAuthorization::remove(
+        info.client_id.into(),
+        current_user.id.into(),
+        &**pool,
+    )
+    .await?;
 
     Ok(HttpResponse::Ok().body(""))
 }
@@ -538,12 +571,16 @@ async fn edit_redirects(
         &mut *transaction,
     )
     .await?;
-    OAuthClient::insert_redirect_uris(&redirects_to_add, &mut **transaction).await?;
+    OAuthClient::insert_redirect_uris(&redirects_to_add, &mut **transaction)
+        .await?;
 
     let mut redirects_to_remove = existing_client.redirect_uris.clone();
     redirects_to_remove.retain(|r| !updated_redirects.contains(&r.uri));
-    OAuthClient::remove_redirect_uris(redirects_to_remove.iter().map(|r| r.id), &mut **transaction)
-        .await?;
+    OAuthClient::remove_redirect_uris(
+        redirects_to_remove.iter().map(|r| r.id),
+        &mut **transaction,
+    )
+    .await?;
 
     Ok(())
 }

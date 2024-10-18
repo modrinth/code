@@ -152,7 +152,9 @@ pub async fn list(
         .and_then(|x| x.to_str().ok())
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-    let session_ids = DBSession::get_user_sessions(current_user.id.into(), &**pool, &redis).await?;
+    let session_ids =
+        DBSession::get_user_sessions(current_user.id.into(), &**pool, &redis)
+            .await?;
     let sessions = DBSession::get_many_ids(&session_ids, &**pool, &redis)
         .await?
         .into_iter()
@@ -210,19 +212,24 @@ pub async fn refresh(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
-        .await?
-        .1;
+    let current_user =
+        get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
+            .await?
+            .1;
     let session = req
         .headers()
         .get(AUTHORIZATION)
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| ApiError::Authentication(AuthenticationError::InvalidCredentials))?;
+        .ok_or_else(|| {
+            ApiError::Authentication(AuthenticationError::InvalidCredentials)
+        })?;
 
     let session = DBSession::get(session, &**pool, &redis).await?;
 
     if let Some(session) = session {
-        if current_user.id != session.user_id.into() || session.refresh_expires < Utc::now() {
+        if current_user.id != session.user_id.into()
+            || session.refresh_expires < Utc::now()
+        {
             return Err(ApiError::Authentication(
                 AuthenticationError::InvalidCredentials,
             ));
@@ -231,7 +238,9 @@ pub async fn refresh(
         let mut transaction = pool.begin().await?;
 
         DBSession::remove(session.id, &mut transaction).await?;
-        let new_session = issue_session(req, session.user_id, &mut transaction, &redis).await?;
+        let new_session =
+            issue_session(req, session.user_id, &mut transaction, &redis)
+                .await?;
         transaction.commit().await?;
         DBSession::clear_cache(
             vec![(

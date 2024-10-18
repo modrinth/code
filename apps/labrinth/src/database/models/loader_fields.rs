@@ -43,7 +43,10 @@ impl Game {
             .find(|x| x.slug == slug))
     }
 
-    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<Game>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<Game>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -72,7 +75,12 @@ impl Game {
         .await?;
 
         redis
-            .set_serialized_to_json(GAMES_LIST_NAMESPACE, "games", &result, None)
+            .set_serialized_to_json(
+                GAMES_LIST_NAMESPACE,
+                "games",
+                &result,
+                None,
+            )
             .await?;
 
         Ok(result)
@@ -99,7 +107,8 @@ impl Loader {
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let mut redis = redis.connect().await?;
-        let cached_id: Option<i32> = redis.get_deserialized_from_json(LOADER_ID, name).await?;
+        let cached_id: Option<i32> =
+            redis.get_deserialized_from_json(LOADER_ID, name).await?;
         if let Some(cached_id) = cached_id {
             return Ok(Some(LoaderId(cached_id)));
         }
@@ -124,7 +133,10 @@ impl Loader {
         Ok(result)
     }
 
-    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<Loader>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<Loader>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -169,7 +181,12 @@ impl Loader {
         .await?;
 
         redis
-            .set_serialized_to_json(LOADERS_LIST_NAMESPACE, "all", &result, None)
+            .set_serialized_to_json(
+                LOADERS_LIST_NAMESPACE,
+                "all",
+                &result,
+                None,
+            )
             .await?;
 
         Ok(result)
@@ -198,7 +215,10 @@ pub enum LoaderFieldType {
     ArrayBoolean,
 }
 impl LoaderFieldType {
-    pub fn build(field_type_name: &str, loader_field_enum: Option<i32>) -> Option<LoaderFieldType> {
+    pub fn build(
+        field_type_name: &str,
+        loader_field_enum: Option<i32>,
+    ) -> Option<LoaderFieldType> {
         Some(match (field_type_name, loader_field_enum) {
             ("integer", _) => LoaderFieldType::Integer,
             ("text", _) => LoaderFieldType::Text,
@@ -207,7 +227,9 @@ impl LoaderFieldType {
             ("array_text", _) => LoaderFieldType::ArrayText,
             ("array_boolean", _) => LoaderFieldType::ArrayBoolean,
             ("enum", Some(id)) => LoaderFieldType::Enum(LoaderFieldEnumId(id)),
-            ("array_enum", Some(id)) => LoaderFieldType::ArrayEnum(LoaderFieldEnumId(id)),
+            ("array_enum", Some(id)) => {
+                LoaderFieldType::ArrayEnum(LoaderFieldEnumId(id))
+            }
             _ => return None,
         })
     }
@@ -303,7 +325,10 @@ impl QueryVersionField {
         self
     }
 
-    pub fn with_enum_value(mut self, enum_value: LoaderFieldEnumValueId) -> Self {
+    pub fn with_enum_value(
+        mut self,
+        enum_value: LoaderFieldEnumValueId,
+    ) -> Self {
         self.enum_value = Some(enum_value);
         self
     }
@@ -359,7 +384,8 @@ impl LoaderField {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let found_loader_fields = Self::get_fields_per_loader(loader_ids, exec, redis).await?;
+        let found_loader_fields =
+            Self::get_fields_per_loader(loader_ids, exec, redis).await?;
         let result = found_loader_fields
             .into_values()
             .flatten()
@@ -464,7 +490,12 @@ impl LoaderField {
             .collect();
 
         redis
-            .set_serialized_to_json(LOADER_FIELDS_NAMESPACE_ALL, "", &result, None)
+            .set_serialized_to_json(
+                LOADER_FIELDS_NAMESPACE_ALL,
+                "",
+                &result,
+                None,
+            )
             .await?;
 
         Ok(result)
@@ -482,7 +513,10 @@ impl LoaderFieldEnum {
         let mut redis = redis.connect().await?;
 
         let cached_enum = redis
-            .get_deserialized_from_json(LOADER_FIELD_ENUMS_ID_NAMESPACE, enum_name)
+            .get_deserialized_from_json(
+                LOADER_FIELD_ENUMS_ID_NAMESPACE,
+                enum_name,
+            )
             .await?;
         if let Some(cached_enum) = cached_enum {
             return Ok(cached_enum);
@@ -507,7 +541,12 @@ impl LoaderFieldEnum {
         });
 
         redis
-            .set_serialized_to_json(LOADER_FIELD_ENUMS_ID_NAMESPACE, enum_name, &result, None)
+            .set_serialized_to_json(
+                LOADER_FIELD_ENUMS_ID_NAMESPACE,
+                enum_name,
+                &result,
+                None,
+            )
             .await?;
 
         Ok(result)
@@ -540,7 +579,9 @@ impl LoaderFieldEnumValue {
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let get_enum_id = |x: &LoaderField| match x.field_type {
-            LoaderFieldType::Enum(id) | LoaderFieldType::ArrayEnum(id) => Some(id),
+            LoaderFieldType::Enum(id) | LoaderFieldType::ArrayEnum(id) => {
+                Some(id)
+            }
             _ => None,
         };
 
@@ -556,7 +597,10 @@ impl LoaderFieldEnumValue {
         let mut res = HashMap::new();
         for lf in loader_fields {
             if let Some(id) = get_enum_id(lf) {
-                res.insert(lf.id, values.get(&id).unwrap_or(&Vec::new()).to_vec());
+                res.insert(
+                    lf.id,
+                    values.get(&id).unwrap_or(&Vec::new()).to_vec(),
+                );
             }
         }
         Ok(res)
@@ -566,7 +610,10 @@ impl LoaderFieldEnumValue {
         loader_field_enum_ids: &[LoaderFieldEnumId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<HashMap<LoaderFieldEnumId, Vec<LoaderFieldEnumValue>>, DatabaseError>
+    ) -> Result<
+        HashMap<LoaderFieldEnumId, Vec<LoaderFieldEnumValue>>,
+        DatabaseError,
+    >
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -665,34 +712,33 @@ impl VersionField {
                 VersionFieldValue::Text(s) => {
                     query_version_fields.push(base.clone().with_string_value(s))
                 }
-                VersionFieldValue::Boolean(b) => {
-                    query_version_fields.push(base.clone().with_int_value(if b { 1 } else { 0 }))
-                }
+                VersionFieldValue::Boolean(b) => query_version_fields
+                    .push(base.clone().with_int_value(if b { 1 } else { 0 })),
                 VersionFieldValue::ArrayInteger(v) => {
                     for i in v {
-                        query_version_fields.push(base.clone().with_int_value(i));
+                        query_version_fields
+                            .push(base.clone().with_int_value(i));
                     }
                 }
                 VersionFieldValue::ArrayText(v) => {
                     for s in v {
-                        query_version_fields.push(base.clone().with_string_value(s));
+                        query_version_fields
+                            .push(base.clone().with_string_value(s));
                     }
                 }
                 VersionFieldValue::ArrayBoolean(v) => {
                     for b in v {
-                        query_version_fields.push(base.clone().with_int_value(if b {
-                            1
-                        } else {
-                            0
-                        }));
+                        query_version_fields.push(
+                            base.clone().with_int_value(if b { 1 } else { 0 }),
+                        );
                     }
                 }
-                VersionFieldValue::Enum(_, v) => {
-                    query_version_fields.push(base.clone().with_enum_value(v.id))
-                }
+                VersionFieldValue::Enum(_, v) => query_version_fields
+                    .push(base.clone().with_enum_value(v.id)),
                 VersionFieldValue::ArrayEnum(_, v) => {
                     for ev in v {
-                        query_version_fields.push(base.clone().with_enum_value(ev.id));
+                        query_version_fields
+                            .push(base.clone().with_enum_value(ev.id));
                     }
                 }
             };
@@ -740,7 +786,8 @@ impl VersionField {
         value: serde_json::Value,
         enum_variants: Vec<LoaderFieldEnumValue>,
     ) -> Result<VersionField, String> {
-        let value = VersionFieldValue::parse(&loader_field, value, enum_variants)?;
+        let value =
+            VersionFieldValue::parse(&loader_field, value, enum_variants)?;
 
         // Ensure, if applicable, that the value is within the min/max bounds
         let countable = match &value {
@@ -802,11 +849,13 @@ impl VersionField {
         query_loader_fields
             .iter()
             .flat_map(|q| {
-                let loader_field_type =
-                    match LoaderFieldType::build(&q.field_type, q.enum_type.map(|l| l.0)) {
-                        Some(lft) => lft,
-                        None => return vec![],
-                    };
+                let loader_field_type = match LoaderFieldType::build(
+                    &q.field_type,
+                    q.enum_type.map(|l| l.0),
+                ) {
+                    Some(lft) => lft,
+                    None => return vec![],
+                };
                 let loader_field = LoaderField {
                     id: q.id,
                     field: q.field.clone(),
@@ -908,7 +957,8 @@ impl VersionFieldValue {
 
         Ok(match field_type {
             LoaderFieldType::Integer => VersionFieldValue::Integer(
-                serde_json::from_value(value).map_err(|_| incorrect_type_error("integer"))?,
+                serde_json::from_value(value)
+                    .map_err(|_| incorrect_type_error("integer"))?,
             ),
             LoaderFieldType::Text => VersionFieldValue::Text(
                 value
@@ -928,7 +978,9 @@ impl VersionFieldValue {
             }),
             LoaderFieldType::ArrayText => VersionFieldValue::ArrayText({
                 let array_values: Vec<String> = serde_json::from_value(value)
-                    .map_err(|_| incorrect_type_error("array of strings"))?;
+                    .map_err(|_| {
+                    incorrect_type_error("array of strings")
+                })?;
                 array_values.into_iter().collect()
             }),
             LoaderFieldType::ArrayBoolean => VersionFieldValue::ArrayBoolean({
@@ -937,8 +989,12 @@ impl VersionFieldValue {
                 array_values.into_iter().map(|v| v != 0).collect()
             }),
             LoaderFieldType::Enum(id) => VersionFieldValue::Enum(*id, {
-                let enum_value = value.as_str().ok_or_else(|| incorrect_type_error("enum"))?;
-                if let Some(ev) = enum_array.into_iter().find(|v| v.value == enum_value) {
+                let enum_value = value
+                    .as_str()
+                    .ok_or_else(|| incorrect_type_error("enum"))?;
+                if let Some(ev) =
+                    enum_array.into_iter().find(|v| v.value == enum_value)
+                {
                     ev
                 } else {
                     return Err(format!(
@@ -946,21 +1002,27 @@ impl VersionFieldValue {
                     ));
                 }
             }),
-            LoaderFieldType::ArrayEnum(id) => VersionFieldValue::ArrayEnum(*id, {
-                let array_values: Vec<String> = serde_json::from_value(value)
-                    .map_err(|_| incorrect_type_error("array of enums"))?;
-                let mut enum_values = vec![];
-                for av in array_values {
-                    if let Some(ev) = enum_array.iter().find(|v| v.value == av) {
-                        enum_values.push(ev.clone());
-                    } else {
-                        return Err(format!(
+            LoaderFieldType::ArrayEnum(id) => {
+                VersionFieldValue::ArrayEnum(*id, {
+                    let array_values: Vec<String> =
+                        serde_json::from_value(value).map_err(|_| {
+                            incorrect_type_error("array of enums")
+                        })?;
+                    let mut enum_values = vec![];
+                    for av in array_values {
+                        if let Some(ev) =
+                            enum_array.iter().find(|v| v.value == av)
+                        {
+                            enum_values.push(ev.clone());
+                        } else {
+                            return Err(format!(
                             "Provided value '{av}' is not a valid variant for {field_name}"
                         ));
+                        }
                     }
-                }
-                enum_values
-            }),
+                    enum_values
+                })
+            }
         })
     }
 
@@ -1046,141 +1108,180 @@ impl VersionFieldValue {
             )));
         }
 
-        let mut value = match field_type {
-            // Singleton fields
-            // If there are multiple, we assume multiple versions are being concatenated
-            LoaderFieldType::Integer => qvfs
-                .into_iter()
-                .map(|qvf| {
-                    Ok((
-                        qvf.version_id,
-                        VersionFieldValue::Integer(
-                            qvf.int_value
-                                .ok_or(did_not_exist_error(field_name, "int_value"))?,
-                        ),
-                    ))
-                })
-                .collect::<Result<Vec<(VersionId, VersionFieldValue)>, DatabaseError>>()?,
-            LoaderFieldType::Text => qvfs
-                .into_iter()
-                .map(|qvf| {
-                    Ok((
-                        qvf.version_id,
-                        VersionFieldValue::Text(
-                            qvf.string_value
-                                .ok_or(did_not_exist_error(field_name, "string_value"))?,
-                        ),
-                    ))
-                })
-                .collect::<Result<Vec<(VersionId, VersionFieldValue)>, DatabaseError>>()?,
-            LoaderFieldType::Boolean => qvfs
-                .into_iter()
-                .map(|qvf| {
-                    Ok((
-                        qvf.version_id,
-                        VersionFieldValue::Boolean(
-                            qvf.int_value
-                                .ok_or(did_not_exist_error(field_name, "int_value"))?
-                                != 0,
-                        ),
-                    ))
-                })
-                .collect::<Result<Vec<(VersionId, VersionFieldValue)>, DatabaseError>>()?,
-            LoaderFieldType::Enum(id) => qvfs
-                .into_iter()
-                .map(|qvf| {
-                    Ok((
-                        qvf.version_id,
-                        VersionFieldValue::Enum(*id, {
-                            let enum_id = qvf
-                                .enum_value
-                                .ok_or(did_not_exist_error(field_name, "enum_value"))?;
-                            let lfev = qlfev
-                                .iter()
-                                .find(|x| x.id == enum_id)
-                                .ok_or(did_not_exist_error(field_name, "enum_value"))?;
-                            LoaderFieldEnumValue {
-                                id: lfev.id,
-                                enum_id: lfev.enum_id,
-                                value: lfev.value.clone(),
-                                ordering: lfev.ordering,
-                                created: lfev.created,
-                                metadata: lfev.metadata.clone().unwrap_or_default(),
-                            }
-                        }),
-                    ))
-                })
-                .collect::<Result<Vec<(VersionId, VersionFieldValue)>, DatabaseError>>()?,
+        let mut value =
+            match field_type {
+                // Singleton fields
+                // If there are multiple, we assume multiple versions are being concatenated
+                LoaderFieldType::Integer => qvfs
+                    .into_iter()
+                    .map(|qvf| {
+                        Ok((
+                            qvf.version_id,
+                            VersionFieldValue::Integer(qvf.int_value.ok_or(
+                                did_not_exist_error(field_name, "int_value"),
+                            )?),
+                        ))
+                    })
+                    .collect::<Result<
+                        Vec<(VersionId, VersionFieldValue)>,
+                        DatabaseError,
+                    >>()?,
+                LoaderFieldType::Text => qvfs
+                    .into_iter()
+                    .map(|qvf| {
+                        Ok((
+                            qvf.version_id,
+                            VersionFieldValue::Text(qvf.string_value.ok_or(
+                                did_not_exist_error(field_name, "string_value"),
+                            )?),
+                        ))
+                    })
+                    .collect::<Result<
+                        Vec<(VersionId, VersionFieldValue)>,
+                        DatabaseError,
+                    >>()?,
+                LoaderFieldType::Boolean => qvfs
+                    .into_iter()
+                    .map(|qvf| {
+                        Ok((
+                            qvf.version_id,
+                            VersionFieldValue::Boolean(
+                                qvf.int_value.ok_or(did_not_exist_error(
+                                    field_name,
+                                    "int_value",
+                                ))? != 0,
+                            ),
+                        ))
+                    })
+                    .collect::<Result<
+                        Vec<(VersionId, VersionFieldValue)>,
+                        DatabaseError,
+                    >>()?,
+                LoaderFieldType::Enum(id) => qvfs
+                    .into_iter()
+                    .map(|qvf| {
+                        Ok((
+                            qvf.version_id,
+                            VersionFieldValue::Enum(*id, {
+                                let enum_id = qvf.enum_value.ok_or(
+                                    did_not_exist_error(
+                                        field_name,
+                                        "enum_value",
+                                    ),
+                                )?;
+                                let lfev = qlfev
+                                    .iter()
+                                    .find(|x| x.id == enum_id)
+                                    .ok_or(did_not_exist_error(
+                                        field_name,
+                                        "enum_value",
+                                    ))?;
+                                LoaderFieldEnumValue {
+                                    id: lfev.id,
+                                    enum_id: lfev.enum_id,
+                                    value: lfev.value.clone(),
+                                    ordering: lfev.ordering,
+                                    created: lfev.created,
+                                    metadata: lfev
+                                        .metadata
+                                        .clone()
+                                        .unwrap_or_default(),
+                                }
+                            }),
+                        ))
+                    })
+                    .collect::<Result<
+                        Vec<(VersionId, VersionFieldValue)>,
+                        DatabaseError,
+                    >>()?,
 
-            // Array fields
-            // We concatenate into one array
-            LoaderFieldType::ArrayInteger => vec![(
-                version_id,
-                VersionFieldValue::ArrayInteger(
-                    qvfs.into_iter()
-                        .map(|qvf| {
-                            qvf.int_value
-                                .ok_or(did_not_exist_error(field_name, "int_value"))
-                        })
-                        .collect::<Result<_, _>>()?,
-                ),
-            )],
-            LoaderFieldType::ArrayText => vec![(
-                version_id,
-                VersionFieldValue::ArrayText(
-                    qvfs.into_iter()
-                        .map(|qvf| {
-                            qvf.string_value
-                                .ok_or(did_not_exist_error(field_name, "string_value"))
-                        })
-                        .collect::<Result<_, _>>()?,
-                ),
-            )],
-            LoaderFieldType::ArrayBoolean => vec![(
-                version_id,
-                VersionFieldValue::ArrayBoolean(
-                    qvfs.into_iter()
-                        .map(|qvf| {
-                            Ok::<bool, DatabaseError>(
-                                qvf.int_value
-                                    .ok_or(did_not_exist_error(field_name, "int_value"))?
-                                    != 0,
-                            )
-                        })
-                        .collect::<Result<_, _>>()?,
-                ),
-            )],
-            LoaderFieldType::ArrayEnum(id) => vec![(
-                version_id,
-                VersionFieldValue::ArrayEnum(
-                    *id,
-                    qvfs.into_iter()
-                        .map(|qvf| {
-                            let enum_id = qvf
-                                .enum_value
-                                .ok_or(did_not_exist_error(field_name, "enum_value"))?;
-                            let lfev = qlfev
-                                .iter()
-                                .find(|x| x.id == enum_id)
-                                .ok_or(did_not_exist_error(field_name, "enum_value"))?;
-                            Ok::<_, DatabaseError>(LoaderFieldEnumValue {
-                                id: lfev.id,
-                                enum_id: lfev.enum_id,
-                                value: lfev.value.clone(),
-                                ordering: lfev.ordering,
-                                created: lfev.created,
-                                metadata: lfev.metadata.clone().unwrap_or_default(),
+                // Array fields
+                // We concatenate into one array
+                LoaderFieldType::ArrayInteger => vec![(
+                    version_id,
+                    VersionFieldValue::ArrayInteger(
+                        qvfs.into_iter()
+                            .map(|qvf| {
+                                qvf.int_value.ok_or(did_not_exist_error(
+                                    field_name,
+                                    "int_value",
+                                ))
                             })
-                        })
-                        .collect::<Result<_, _>>()?,
-                ),
-            )],
-        };
+                            .collect::<Result<_, _>>()?,
+                    ),
+                )],
+                LoaderFieldType::ArrayText => vec![(
+                    version_id,
+                    VersionFieldValue::ArrayText(
+                        qvfs.into_iter()
+                            .map(|qvf| {
+                                qvf.string_value.ok_or(did_not_exist_error(
+                                    field_name,
+                                    "string_value",
+                                ))
+                            })
+                            .collect::<Result<_, _>>()?,
+                    ),
+                )],
+                LoaderFieldType::ArrayBoolean => vec![(
+                    version_id,
+                    VersionFieldValue::ArrayBoolean(
+                        qvfs.into_iter()
+                            .map(|qvf| {
+                                Ok::<bool, DatabaseError>(
+                                    qvf.int_value.ok_or(
+                                        did_not_exist_error(
+                                            field_name,
+                                            "int_value",
+                                        ),
+                                    )? != 0,
+                                )
+                            })
+                            .collect::<Result<_, _>>()?,
+                    ),
+                )],
+                LoaderFieldType::ArrayEnum(id) => vec![(
+                    version_id,
+                    VersionFieldValue::ArrayEnum(
+                        *id,
+                        qvfs.into_iter()
+                            .map(|qvf| {
+                                let enum_id = qvf.enum_value.ok_or(
+                                    did_not_exist_error(
+                                        field_name,
+                                        "enum_value",
+                                    ),
+                                )?;
+                                let lfev = qlfev
+                                    .iter()
+                                    .find(|x| x.id == enum_id)
+                                    .ok_or(did_not_exist_error(
+                                        field_name,
+                                        "enum_value",
+                                    ))?;
+                                Ok::<_, DatabaseError>(LoaderFieldEnumValue {
+                                    id: lfev.id,
+                                    enum_id: lfev.enum_id,
+                                    value: lfev.value.clone(),
+                                    ordering: lfev.ordering,
+                                    created: lfev.created,
+                                    metadata: lfev
+                                        .metadata
+                                        .clone()
+                                        .unwrap_or_default(),
+                                })
+                            })
+                            .collect::<Result<_, _>>()?,
+                    ),
+                )],
+            };
 
         // Sort arrayenums by ordering, then by created
         for (_, v) in value.iter_mut() {
             if let VersionFieldValue::ArrayEnum(_, v) = v {
-                v.sort_by(|a, b| a.ordering.cmp(&b.ordering).then(a.created.cmp(&b.created)));
+                v.sort_by(|a, b| {
+                    a.ordering.cmp(&b.ordering).then(a.created.cmp(&b.created))
+                });
             }
         }
 
@@ -1190,7 +1291,9 @@ impl VersionFieldValue {
     // Serialize to internal value, such as for converting to user-facing JSON
     pub fn serialize_internal(&self) -> serde_json::Value {
         match self {
-            VersionFieldValue::Integer(i) => serde_json::Value::Number((*i).into()),
+            VersionFieldValue::Integer(i) => {
+                serde_json::Value::Number((*i).into())
+            }
             VersionFieldValue::Text(s) => serde_json::Value::String(s.clone()),
             VersionFieldValue::Boolean(b) => serde_json::Value::Bool(*b),
             VersionFieldValue::ArrayInteger(v) => serde_json::Value::Array(
@@ -1203,10 +1306,12 @@ impl VersionFieldValue {
                     .map(|s| serde_json::Value::String(s.clone()))
                     .collect(),
             ),
-            VersionFieldValue::ArrayBoolean(v) => {
-                serde_json::Value::Array(v.iter().map(|b| serde_json::Value::Bool(*b)).collect())
+            VersionFieldValue::ArrayBoolean(v) => serde_json::Value::Array(
+                v.iter().map(|b| serde_json::Value::Bool(*b)).collect(),
+            ),
+            VersionFieldValue::Enum(_, v) => {
+                serde_json::Value::String(v.value.clone())
             }
-            VersionFieldValue::Enum(_, v) => serde_json::Value::String(v.value.clone()),
             VersionFieldValue::ArrayEnum(_, v) => serde_json::Value::Array(
                 v.iter()
                     .map(|v| serde_json::Value::String(v.value.clone()))
@@ -1222,11 +1327,17 @@ impl VersionFieldValue {
             VersionFieldValue::Integer(i) => vec![i.to_string()],
             VersionFieldValue::Text(s) => vec![s.clone()],
             VersionFieldValue::Boolean(b) => vec![b.to_string()],
-            VersionFieldValue::ArrayInteger(v) => v.iter().map(|i| i.to_string()).collect(),
+            VersionFieldValue::ArrayInteger(v) => {
+                v.iter().map(|i| i.to_string()).collect()
+            }
             VersionFieldValue::ArrayText(v) => v.clone(),
-            VersionFieldValue::ArrayBoolean(v) => v.iter().map(|b| b.to_string()).collect(),
+            VersionFieldValue::ArrayBoolean(v) => {
+                v.iter().map(|b| b.to_string()).collect()
+            }
             VersionFieldValue::Enum(_, v) => vec![v.value.clone()],
-            VersionFieldValue::ArrayEnum(_, v) => v.iter().map(|v| v.value.clone()).collect(),
+            VersionFieldValue::ArrayEnum(_, v) => {
+                v.iter().map(|v| v.value.clone()).collect()
+            }
         }
     }
 

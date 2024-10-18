@@ -61,7 +61,9 @@ pub async fn forge_updates(
         return Err(ApiError::InvalidInput(ERROR.to_string()));
     }
 
-    let versions = database::models::Version::get_many(&project.versions, &**pool, &redis).await?;
+    let versions =
+        database::models::Version::get_many(&project.versions, &**pool, &redis)
+            .await?;
 
     let loaders = match &*neo.neoforge {
         "only" => |x: &String| *x == "neoforge",
@@ -105,7 +107,9 @@ pub async fn forge_updates(
             .fields
             .iter()
             .find(|(key, _)| key.as_str() == MinecraftGameVersion::FIELD_NAME)
-            .and_then(|(_, value)| serde_json::from_value::<Vec<String>>(value.clone()).ok())
+            .and_then(|(_, value)| {
+                serde_json::from_value::<Vec<String>>(value.clone()).ok()
+            })
             .unwrap_or_default();
 
         if version.version_type == VersionType::Release {

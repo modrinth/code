@@ -5,7 +5,11 @@ use async_trait::async_trait;
 
 #[async_trait(?Send)]
 impl ApiUser for ApiV2 {
-    async fn get_user(&self, user_id_or_username: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn get_user(
+        &self,
+        user_id_or_username: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v2/user/{}", user_id_or_username))
             .append_pat(pat)
@@ -36,7 +40,11 @@ impl ApiUser for ApiV2 {
         self.call(req).await
     }
 
-    async fn delete_user(&self, user_id_or_username: &str, pat: Option<&str>) -> ServiceResponse {
+    async fn delete_user(
+        &self,
+        user_id_or_username: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v2/user/{}", user_id_or_username))
             .append_pat(pat)

@@ -1,4 +1,6 @@
-use crate::validate::{filter_out_packs, SupportedGameVersions, ValidationError, ValidationResult};
+use crate::validate::{
+    filter_out_packs, SupportedGameVersions, ValidationError, ValidationResult,
+};
 use chrono::DateTime;
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -15,14 +17,17 @@ impl super::Validator for QuiltValidator {
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
-        SupportedGameVersions::PastDate(DateTime::from_timestamp(1646070100, 0).unwrap())
+        SupportedGameVersions::PastDate(
+            DateTime::from_timestamp(1646070100, 0).unwrap(),
+        )
     }
 
     fn validate(
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if archive.by_name("quilt.mod.json").is_err() && archive.by_name("fabric.mod.json").is_err()
+        if archive.by_name("quilt.mod.json").is_err()
+            && archive.by_name("fabric.mod.json").is_err()
         {
             return Ok(ValidationResult::Warning(
                 "No quilt.mod.json present for Quilt file.",

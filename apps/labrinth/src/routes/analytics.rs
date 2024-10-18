@@ -65,19 +65,22 @@ pub async fn page_view_ingest(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
-        .await
-        .ok();
+    let user =
+        get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
+            .await
+            .ok();
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
-    let url = Url::parse(&url_input.url)
-        .map_err(|_| ApiError::InvalidInput("invalid page view URL specified!".to_string()))?;
+    let url = Url::parse(&url_input.url).map_err(|_| {
+        ApiError::InvalidInput("invalid page view URL specified!".to_string())
+    })?;
 
-    let domain = url
-        .host_str()
-        .ok_or_else(|| ApiError::InvalidInput("invalid page view URL specified!".to_string()))?;
+    let domain = url.host_str().ok_or_else(|| {
+        ApiError::InvalidInput("invalid page view URL specified!".to_string())
+    })?;
 
-    let allowed_origins = parse_strings_from_var("CORS_ALLOWED_ORIGINS").unwrap_or_default();
+    let allowed_origins =
+        parse_strings_from_var("CORS_ALLOWED_ORIGINS").unwrap_or_default();
     if !(domain.ends_with(".modrinth.com")
         || domain == "modrinth.com"
         || allowed_origins.contains(&"*".to_string()))
@@ -98,11 +101,13 @@ pub async fn page_view_ingest(
         })
         .collect::<HashMap<String, String>>();
 
-    let ip = convert_to_ip_v6(if let Some(header) = headers.get("cf-connecting-ip") {
-        header
-    } else {
-        conn_info.as_deref().unwrap_or_default()
-    })
+    let ip = convert_to_ip_v6(
+        if let Some(header) = headers.get("cf-connecting-ip") {
+            header
+        } else {
+            conn_info.as_deref().unwrap_or_default()
+        },
+    )
     .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
 
     let mut view = PageView {
@@ -135,8 +140,12 @@ pub async fn page_view_ingest(
             ];
 
             if PROJECT_TYPES.contains(&segments_vec[0]) {
-                let project =
-                    crate::database::models::Project::get(segments_vec[1], &**pool, &redis).await?;
+                let project = crate::database::models::Project::get(
+                    segments_vec[1],
+                    &**pool,
+                    &redis,
+                )
+                .await?;
 
                 if let Some(project) = project {
                     view.project_id = project.inner.id.0 as u64;
@@ -167,7 +176,9 @@ pub async fn playtime_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
-    playtime_input: web::Json<HashMap<crate::models::ids::VersionId, PlaytimeInput>>,
+    playtime_input: web::Json<
+        HashMap<crate::models::ids::VersionId, PlaytimeInput>,
+    >,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
@@ -200,7 +211,8 @@ pub async fn playtime_ingest(
             continue;
         }
 
-        if let Some(version) = versions.iter().find(|x| id == x.inner.id.into()) {
+        if let Some(version) = versions.iter().find(|x| id == x.inner.id.into())
+        {
             analytics_queue.add_playtime(Playtime {
                 recorded: get_current_tenths_of_ms(),
                 seconds: playtime.seconds as u64,

@@ -98,14 +98,16 @@ impl TestFile {
             let mut zip = ZipWriter::new(&mut cursor);
             zip.start_file(
                 "fabric.mod.json",
-                FileOptions::default().compression_method(CompressionMethod::Stored),
+                FileOptions::default()
+                    .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
             zip.write_all(fabric_mod_json.as_bytes()).unwrap();
 
             zip.start_file(
                 "META-INF/mods.toml",
-                FileOptions::default().compression_method(CompressionMethod::Stored),
+                FileOptions::default()
+                    .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
             zip.write_all(fabric_mod_json.as_bytes()).unwrap();
@@ -118,7 +120,8 @@ impl TestFile {
     }
 
     pub fn build_random_mrpack() -> Self {
-        let filename = format!("random-modpack-{}.mrpack", rand::random::<u64>());
+        let filename =
+            format!("random-modpack-{}.mrpack", rand::random::<u64>());
 
         let modrinth_index_json = serde_json::json!({
             "formatVersion": 1,
@@ -156,7 +159,8 @@ impl TestFile {
             let mut zip = ZipWriter::new(&mut cursor);
             zip.start_file(
                 "modrinth.index.json",
-                FileOptions::default().compression_method(CompressionMethod::Stored),
+                FileOptions::default()
+                    .compression_method(CompressionMethod::Stored),
             )
             .unwrap();
             zip.write_all(modrinth_index_json.as_bytes()).unwrap();
@@ -217,7 +221,8 @@ impl DummyData {
                 project_id_parsed: project_alpha.id,
                 version_id: project_alpha_version.id.to_string(),
                 thread_id: project_alpha.thread_id.to_string(),
-                file_hash: project_alpha_version.files[0].hashes["sha1"].clone(),
+                file_hash: project_alpha_version.files[0].hashes["sha1"]
+                    .clone(),
             },
 
             project_beta: DummyProjectBeta {
@@ -349,7 +354,10 @@ pub async fn add_project_alpha(api: &ApiV3) -> (Project, Version) {
         )
         .await;
     let alpha_project = api
-        .get_project_deserialized(project.id.to_string().as_str(), USER_USER_PAT)
+        .get_project_deserialized(
+            project.id.to_string().as_str(),
+            USER_USER_PAT,
+        )
         .await;
     let alpha_version = api
         .get_version_deserialized(
@@ -484,15 +492,22 @@ impl TestFile {
     pub fn bytes(&self) -> Vec<u8> {
         match self {
             TestFile::DummyProjectAlpha => {
-                include_bytes!("../../tests/files/dummy-project-alpha.jar").to_vec()
+                include_bytes!("../../tests/files/dummy-project-alpha.jar")
+                    .to_vec()
             }
             TestFile::DummyProjectBeta => {
-                include_bytes!("../../tests/files/dummy-project-beta.jar").to_vec()
+                include_bytes!("../../tests/files/dummy-project-beta.jar")
+                    .to_vec()
             }
-            TestFile::BasicMod => include_bytes!("../../tests/files/basic-mod.jar").to_vec(),
-            TestFile::BasicZip => include_bytes!("../../tests/files/simple-zip.zip").to_vec(),
+            TestFile::BasicMod => {
+                include_bytes!("../../tests/files/basic-mod.jar").to_vec()
+            }
+            TestFile::BasicZip => {
+                include_bytes!("../../tests/files/simple-zip.zip").to_vec()
+            }
             TestFile::BasicModDifferent => {
-                include_bytes!("../../tests/files/basic-mod-different.jar").to_vec()
+                include_bytes!("../../tests/files/basic-mod-different.jar")
+                    .to_vec()
             }
             TestFile::BasicModRandom { bytes, .. } => bytes.clone(),
             TestFile::BasicModpackRandom { bytes, .. } => bytes.clone(),
@@ -524,7 +539,9 @@ impl TestFile {
 
             TestFile::BasicZip => Some("application/zip"),
 
-            TestFile::BasicModpackRandom { .. } => Some("application/x-modrinth-modpack+zip"),
+            TestFile::BasicModpackRandom { .. } => {
+                Some("application/x-modrinth-modpack+zip")
+            }
         }
         .map(|s| s.to_string())
     }
@@ -547,7 +564,9 @@ impl DummyImage {
 
     pub fn bytes(&self) -> Vec<u8> {
         match self {
-            DummyImage::SmallIcon => include_bytes!("../../tests/files/200x200.png").to_vec(),
+            DummyImage::SmallIcon => {
+                include_bytes!("../../tests/files/200x200.png").to_vec()
+            }
         }
     }
 

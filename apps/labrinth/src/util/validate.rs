@@ -6,11 +6,15 @@ use validator::{ValidationErrors, ValidationErrorsKind};
 use crate::models::pats::Scopes;
 
 lazy_static! {
-    pub static ref RE_URL_SAFE: Regex = Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]*$"#).unwrap();
+    pub static ref RE_URL_SAFE: Regex =
+        Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]*$"#).unwrap();
 }
 
 //TODO: In order to ensure readability, only the first error is printed, this may need to be expanded on in the future!
-pub fn validation_errors_to_string(errors: ValidationErrors, adder: Option<String>) -> String {
+pub fn validation_errors_to_string(
+    errors: ValidationErrors,
+    adder: Option<String>,
+) -> String {
     let mut output = String::new();
 
     let map = errors.into_errors();
@@ -21,7 +25,10 @@ pub fn validation_errors_to_string(errors: ValidationErrors, adder: Option<Strin
         if let Some(error) = map.get(field) {
             return match error {
                 ValidationErrorsKind::Struct(errors) => {
-                    validation_errors_to_string(*errors.clone(), Some(format!("of item {field}")))
+                    validation_errors_to_string(
+                        *errors.clone(),
+                        Some(format!("of item {field}")),
+                    )
                 }
                 ValidationErrorsKind::List(list) => {
                     if let Some((index, errors)) = list.iter().next() {
@@ -113,7 +120,9 @@ pub fn validate_url_hashmap_values(
     Ok(())
 }
 
-pub fn validate_no_restricted_scopes(value: &Scopes) -> Result<(), validator::ValidationError> {
+pub fn validate_no_restricted_scopes(
+    value: &Scopes,
+) -> Result<(), validator::ValidationError> {
     if value.is_restricted() {
         return Err(validator::ValidationError::new(
             "Restricted scopes not allowed",

@@ -88,8 +88,8 @@ rust_decimal = { version = "1.33.1", features = [
     "serde-with-float",
     "serde-with-str",
 ] }
-redis = { version = "0.24.0", features = ["tokio-comp", "ahash", "r2d2"]}
-deadpool-redis = "0.14.0"
+redis = { version = "0.27.5", features = ["tokio-comp", "ahash", "r2d2"]}
+deadpool-redis = "0.18.0"
 clickhouse = { version = "0.11.2", features = ["uuid", "time"] }
 uuid = { version = "1.2.2", features = ["v4", "fast-rng", "serde"] }
 

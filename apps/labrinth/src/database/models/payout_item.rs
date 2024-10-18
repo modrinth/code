@@ -48,7 +48,10 @@ impl Payout {
         Ok(())
     }
 
-    pub async fn get<'a, 'b, E>(id: PayoutId, executor: E) -> Result<Option<Payout>, DatabaseError>
+    pub async fn get<'a, 'b, E>(
+        id: PayoutId,
+        executor: E,
+    ) -> Result<Option<Payout>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {

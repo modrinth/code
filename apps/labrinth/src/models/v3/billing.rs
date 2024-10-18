@@ -106,7 +106,9 @@ pub struct UserSubscription {
 impl From<crate::database::models::user_subscription_item::UserSubscriptionItem>
     for UserSubscription
 {
-    fn from(x: crate::database::models::user_subscription_item::UserSubscriptionItem) -> Self {
+    fn from(
+        x: crate::database::models::user_subscription_item::UserSubscriptionItem,
+    ) -> Self {
         Self {
             id: x.id.into(),
             user_id: x.user_id.into(),

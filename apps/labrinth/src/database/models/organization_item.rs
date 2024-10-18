@@ -1,4 +1,6 @@
-use crate::{database::redis::RedisPool, models::ids::base62_impl::parse_base62};
+use crate::{
+    database::redis::RedisPool, models::ids::base62_impl::parse_base62,
+};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use std::fmt::{Debug, Display};
@@ -100,7 +102,11 @@ impl Organization {
         Self::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
+    pub async fn get_many<
+        'a,
+        E,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+    >(
         organization_strings: &[T],
         exec: E,
         redis: &RedisPool,

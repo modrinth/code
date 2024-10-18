@@ -122,9 +122,12 @@ impl ChargeItem {
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<ChargeItem>, DatabaseError> {
         let user_id = user_id.0;
-        let res = select_charges_with_predicate!("WHERE user_id = $1 ORDER BY due DESC", user_id)
-            .fetch_all(exec)
-            .await?;
+        let res = select_charges_with_predicate!(
+            "WHERE user_id = $1 ORDER BY due DESC",
+            user_id
+        )
+        .fetch_all(exec)
+        .await?;
 
         Ok(res
             .into_iter()

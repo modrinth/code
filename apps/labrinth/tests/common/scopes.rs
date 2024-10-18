@@ -4,8 +4,8 @@ use futures::Future;
 use labrinth::models::pats::Scopes;
 
 use super::{
-    api_common::Api, database::USER_USER_ID_PARSED, environment::TestEnvironment,
-    pats::create_test_pat,
+    api_common::Api, database::USER_USER_ID_PARSED,
+    environment::TestEnvironment, pats::create_test_pat,
 };
 
 // A reusable test type that works for any scope test testing an endpoint that:
@@ -74,10 +74,13 @@ impl<'a, A: Api> ScopeTest<'a, A> {
             .failure_scopes
             .unwrap_or(Scopes::all() ^ success_scopes);
         let access_token_all_others =
-            create_test_pat(failure_scopes, self.user_id, &self.test_env.db).await;
+            create_test_pat(failure_scopes, self.user_id, &self.test_env.db)
+                .await;
 
         // Create a PAT with the success scopes
-        let access_token = create_test_pat(success_scopes, self.user_id, &self.test_env.db).await;
+        let access_token =
+            create_test_pat(success_scopes, self.user_id, &self.test_env.db)
+                .await;
 
         // Perform test twice, once with each PAT
         // the first time, we expect a 401 (or known failure code)

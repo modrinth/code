@@ -2,7 +2,9 @@ use crate::common::{api_common::ApiTeams, database::*};
 use actix_http::StatusCode;
 use common::{
     api_v3::ApiV3,
-    environment::{with_test_environment, with_test_environment_all, TestEnvironment},
+    environment::{
+        with_test_environment, with_test_environment_all, TestEnvironment,
+    },
 };
 use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
 use rust_decimal::Decimal;
@@ -22,14 +24,20 @@ async fn test_get_team() {
 
         // A non-member of the team should get basic info but not be able to see private data
         let members = api
-            .get_team_members_deserialized_common(alpha_team_id, FRIEND_USER_PAT)
+            .get_team_members_deserialized_common(
+                alpha_team_id,
+                FRIEND_USER_PAT,
+            )
             .await;
         assert_eq!(members.len(), 1);
         assert_eq!(members[0].user.id.0, USER_USER_ID_PARSED as u64);
         assert!(members[0].permissions.is_none());
 
         let members = api
-            .get_project_members_deserialized_common(alpha_project_id, FRIEND_USER_PAT)
+            .get_project_members_deserialized_common(
+                alpha_project_id,
+                FRIEND_USER_PAT,
+            )
             .await;
         assert_eq!(members.len(), 1);
         assert_eq!(members[0].user.id.0, USER_USER_ID_PARSED as u64);
@@ -38,13 +46,22 @@ async fn test_get_team() {
         // - not be able to see private data about the team, but see all members including themselves
         // - should not appear in the team members list to enemy users
         let resp = api
-            .add_user_to_team(alpha_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
+            .add_user_to_team(
+                alpha_team_id,
+                FRIEND_USER_ID,
+                None,
+                None,
+                USER_USER_PAT,
+            )
             .await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Team check directly
         let members = api
-            .get_team_members_deserialized_common(alpha_team_id, FRIEND_USER_PAT)
+            .get_team_members_deserialized_common(
+                alpha_team_id,
+                FRIEND_USER_PAT,
+            )
             .await;
         assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
         let user_user = members
@@ -62,7 +79,10 @@ async fn test_get_team() {
 
         // team check via association
         let members = api
-            .get_project_members_deserialized_common(alpha_project_id, FRIEND_USER_PAT)
+            .get_project_members_deserialized_common(
+                alpha_project_id,
+                FRIEND_USER_PAT,
+            )
             .await;
         assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
         let user_user = members
@@ -86,7 +106,10 @@ async fn test_get_team() {
 
         // enemy team check via association
         let members = api
-            .get_project_members_deserialized_common(alpha_project_id, ENEMY_USER_PAT)
+            .get_project_members_deserialized_common(
+                alpha_project_id,
+                ENEMY_USER_PAT,
+            )
             .await;
         assert_eq!(members.len(), 1); // Only USER_USER_ID should be in the team
 
@@ -97,7 +120,10 @@ async fn test_get_team() {
 
         // Team check directly
         let members = api
-            .get_team_members_deserialized_common(alpha_team_id, FRIEND_USER_PAT)
+            .get_team_members_deserialized_common(
+                alpha_team_id,
+                FRIEND_USER_PAT,
+            )
             .await;
         assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
         let user_user = members
@@ -115,7 +141,10 @@ async fn test_get_team() {
 
         // team check via association
         let members = api
-            .get_project_members_deserialized_common(alpha_project_id, FRIEND_USER_PAT)
+            .get_project_members_deserialized_common(
+                alpha_project_id,
+                FRIEND_USER_PAT,
+            )
             .await;
         assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
         let user_user = members
@@ -139,169 +168,224 @@ async fn test_get_team_organization() {
     // Test setup and dummy data
     // Perform get_team related tests for an organization team
     //TODO: This needs to consider users in organizations now and how they perceive as well
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
-        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
-        let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let zeta_organization_id =
+                &test_env.dummy.organization_zeta.organization_id;
+            let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
 
-        // A non-member of the team should get basic info but not be able to see private data
-        let members = api
-            .get_team_members_deserialized_common(zeta_team_id, FRIEND_USER_PAT)
-            .await;
-        assert_eq!(members.len(), 1);
-        assert_eq!(members[0].user.id.0, USER_USER_ID_PARSED as u64);
-        assert!(members[0].permissions.is_none());
+            // A non-member of the team should get basic info but not be able to see private data
+            let members = api
+                .get_team_members_deserialized_common(
+                    zeta_team_id,
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert_eq!(members.len(), 1);
+            assert_eq!(members[0].user.id.0, USER_USER_ID_PARSED as u64);
+            assert!(members[0].permissions.is_none());
 
-        let members = api
-            .get_organization_members_deserialized_common(zeta_organization_id, FRIEND_USER_PAT)
-            .await;
-        assert_eq!(members.len(), 1);
-        assert_eq!(members[0].user.id.0, USER_USER_ID_PARSED as u64);
+            let members = api
+                .get_organization_members_deserialized_common(
+                    zeta_organization_id,
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert_eq!(members.len(), 1);
+            assert_eq!(members[0].user.id.0, USER_USER_ID_PARSED as u64);
 
-        // A non-accepted member of the team should:
-        // - not be able to see private data about the team, but see all members including themselves
-        // - should not appear in the team members list to enemy users
-        let resp = api
-            .add_user_to_team(zeta_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // A non-accepted member of the team should:
+            // - not be able to see private data about the team, but see all members including themselves
+            // - should not appear in the team members list to enemy users
+            let resp = api
+                .add_user_to_team(
+                    zeta_team_id,
+                    FRIEND_USER_ID,
+                    None,
+                    None,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        // Team check directly
-        let members = api
-            .get_team_members_deserialized_common(zeta_team_id, FRIEND_USER_PAT)
-            .await;
-        assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
-        let user_user = members
-            .iter()
-            .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
-            .unwrap();
-        let friend_user = members
-            .iter()
-            .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
-            .unwrap();
-        assert_eq!(user_user.user.id.0, USER_USER_ID_PARSED as u64);
-        assert!(user_user.permissions.is_none()); // Should not see private data of the team
-        assert_eq!(friend_user.user.id.0, FRIEND_USER_ID_PARSED as u64);
-        assert!(friend_user.permissions.is_none());
+            // Team check directly
+            let members = api
+                .get_team_members_deserialized_common(
+                    zeta_team_id,
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
+            let user_user = members
+                .iter()
+                .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
+                .unwrap();
+            let friend_user = members
+                .iter()
+                .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
+                .unwrap();
+            assert_eq!(user_user.user.id.0, USER_USER_ID_PARSED as u64);
+            assert!(user_user.permissions.is_none()); // Should not see private data of the team
+            assert_eq!(friend_user.user.id.0, FRIEND_USER_ID_PARSED as u64);
+            assert!(friend_user.permissions.is_none());
 
-        // team check via association
-        let members = api
-            .get_organization_members_deserialized_common(zeta_organization_id, FRIEND_USER_PAT)
-            .await;
+            // team check via association
+            let members = api
+                .get_organization_members_deserialized_common(
+                    zeta_organization_id,
+                    FRIEND_USER_PAT,
+                )
+                .await;
 
-        assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
-        let user_user = members
-            .iter()
-            .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
-            .unwrap();
-        let friend_user = members
-            .iter()
-            .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
-            .unwrap();
-        assert_eq!(user_user.user.id.0, USER_USER_ID_PARSED as u64);
-        assert!(user_user.permissions.is_none()); // Should not see private data of the team
-        assert_eq!(friend_user.user.id.0, FRIEND_USER_ID_PARSED as u64);
-        assert!(friend_user.permissions.is_none());
+            assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
+            let user_user = members
+                .iter()
+                .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
+                .unwrap();
+            let friend_user = members
+                .iter()
+                .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
+                .unwrap();
+            assert_eq!(user_user.user.id.0, USER_USER_ID_PARSED as u64);
+            assert!(user_user.permissions.is_none()); // Should not see private data of the team
+            assert_eq!(friend_user.user.id.0, FRIEND_USER_ID_PARSED as u64);
+            assert!(friend_user.permissions.is_none());
 
-        // enemy team check directly
-        let members = api
-            .get_team_members_deserialized_common(zeta_team_id, ENEMY_USER_PAT)
-            .await;
-        assert_eq!(members.len(), 1); // Only USER_USER_ID should be in the team
+            // enemy team check directly
+            let members = api
+                .get_team_members_deserialized_common(
+                    zeta_team_id,
+                    ENEMY_USER_PAT,
+                )
+                .await;
+            assert_eq!(members.len(), 1); // Only USER_USER_ID should be in the team
 
-        // enemy team check via association
-        let members = api
-            .get_organization_members_deserialized_common(zeta_organization_id, ENEMY_USER_PAT)
-            .await;
-        assert_eq!(members.len(), 1); // Only USER_USER_ID should be in the team
+            // enemy team check via association
+            let members = api
+                .get_organization_members_deserialized_common(
+                    zeta_organization_id,
+                    ENEMY_USER_PAT,
+                )
+                .await;
+            assert_eq!(members.len(), 1); // Only USER_USER_ID should be in the team
 
-        // An accepted member of the team should appear in the team members list
-        // and should be able to see private data about the team
-        let resp = api.join_team(zeta_team_id, FRIEND_USER_PAT).await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // An accepted member of the team should appear in the team members list
+            // and should be able to see private data about the team
+            let resp = api.join_team(zeta_team_id, FRIEND_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        // Team check directly
-        let members = api
-            .get_team_members_deserialized_common(zeta_team_id, FRIEND_USER_PAT)
-            .await;
-        assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
-        let user_user = members
-            .iter()
-            .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
-            .unwrap();
-        let friend_user = members
-            .iter()
-            .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
-            .unwrap();
-        assert_eq!(user_user.user.id.0, USER_USER_ID_PARSED as u64);
-        assert!(user_user.permissions.is_some()); // SHOULD see private data of the team
-        assert_eq!(friend_user.user.id.0, FRIEND_USER_ID_PARSED as u64);
-        assert!(friend_user.permissions.is_some());
+            // Team check directly
+            let members = api
+                .get_team_members_deserialized_common(
+                    zeta_team_id,
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
+            let user_user = members
+                .iter()
+                .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
+                .unwrap();
+            let friend_user = members
+                .iter()
+                .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
+                .unwrap();
+            assert_eq!(user_user.user.id.0, USER_USER_ID_PARSED as u64);
+            assert!(user_user.permissions.is_some()); // SHOULD see private data of the team
+            assert_eq!(friend_user.user.id.0, FRIEND_USER_ID_PARSED as u64);
+            assert!(friend_user.permissions.is_some());
 
-        // team check via association
-        let members = api
-            .get_organization_members_deserialized_common(zeta_organization_id, FRIEND_USER_PAT)
-            .await;
-        assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
-        let user_user = members
-            .iter()
-            .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
-            .unwrap();
-        let friend_user = members
-            .iter()
-            .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
-            .unwrap();
-        assert_eq!(user_user.user.id.0, USER_USER_ID_PARSED as u64);
-        assert!(user_user.permissions.is_some()); // SHOULD see private data of the team
-        assert_eq!(friend_user.user.id.0, FRIEND_USER_ID_PARSED as u64);
-        assert!(friend_user.permissions.is_some());
-    })
+            // team check via association
+            let members = api
+                .get_organization_members_deserialized_common(
+                    zeta_organization_id,
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert!(members.len() == 2); // USER_USER_ID and FRIEND_USER_ID should be in the team
+            let user_user = members
+                .iter()
+                .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
+                .unwrap();
+            let friend_user = members
+                .iter()
+                .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
+                .unwrap();
+            assert_eq!(user_user.user.id.0, USER_USER_ID_PARSED as u64);
+            assert!(user_user.permissions.is_some()); // SHOULD see private data of the team
+            assert_eq!(friend_user.user.id.0, FRIEND_USER_ID_PARSED as u64);
+            assert!(friend_user.permissions.is_some());
+        },
+    )
     .await;
 }
 
 #[actix_rt::test]
 async fn test_get_team_project_orgs() {
     // Test setup and dummy data
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let alpha_project_id = &test_env.dummy.project_alpha.project_id;
-        let alpha_team_id = &test_env.dummy.project_alpha.team_id;
-        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
-        let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let alpha_project_id = &test_env.dummy.project_alpha.project_id;
+            let alpha_team_id = &test_env.dummy.project_alpha.team_id;
+            let zeta_organization_id =
+                &test_env.dummy.organization_zeta.organization_id;
+            let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
 
-        // Attach alpha to zeta
-        let resp = test_env
-            .api
-            .organization_add_project(zeta_organization_id, alpha_project_id, USER_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::OK);
+            // Attach alpha to zeta
+            let resp = test_env
+                .api
+                .organization_add_project(
+                    zeta_organization_id,
+                    alpha_project_id,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::OK);
 
-        // Invite and add friend to zeta
-        let resp = test_env
-            .api
-            .add_user_to_team(zeta_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // Invite and add friend to zeta
+            let resp = test_env
+                .api
+                .add_user_to_team(
+                    zeta_team_id,
+                    FRIEND_USER_ID,
+                    None,
+                    None,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        let resp = test_env.api.join_team(zeta_team_id, FRIEND_USER_PAT).await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            let resp =
+                test_env.api.join_team(zeta_team_id, FRIEND_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        // The team members route from teams (on a project's team):
-        // - the members of the project team specifically
-        // - not the ones from the organization
-        // - Remember: the owner of an org will not be included in the org's team members list
-        let members = test_env
-            .api
-            .get_team_members_deserialized_common(alpha_team_id, FRIEND_USER_PAT)
-            .await;
-        assert_eq!(members.len(), 0);
+            // The team members route from teams (on a project's team):
+            // - the members of the project team specifically
+            // - not the ones from the organization
+            // - Remember: the owner of an org will not be included in the org's team members list
+            let members = test_env
+                .api
+                .get_team_members_deserialized_common(
+                    alpha_team_id,
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert_eq!(members.len(), 0);
 
-        // The team members route from project should show the same!
-        let members = test_env
-            .api
-            .get_project_members_deserialized_common(alpha_project_id, FRIEND_USER_PAT)
-            .await;
-        assert_eq!(members.len(), 0);
-    })
+            // The team members route from project should show the same!
+            let members = test_env
+                .api
+                .get_project_members_deserialized_common(
+                    alpha_project_id,
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert_eq!(members.len(), 0);
+        },
+    )
     .await;
 }
 
@@ -473,101 +557,133 @@ async fn test_patch_organization_team_member() {
 #[actix_rt::test]
 async fn transfer_ownership_v3() {
     // Test setup and dummy data
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
 
-        let alpha_team_id = &test_env.dummy.project_alpha.team_id;
+            let alpha_team_id = &test_env.dummy.project_alpha.team_id;
 
-        // Cannot set friend as owner (not a member)
-        let resp = api
-            .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::BAD_REQUEST);
-        let resp = api
-            .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, FRIEND_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::UNAUTHORIZED);
+            // Cannot set friend as owner (not a member)
+            let resp = api
+                .transfer_team_ownership(
+                    alpha_team_id,
+                    FRIEND_USER_ID,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::BAD_REQUEST);
+            let resp = api
+                .transfer_team_ownership(
+                    alpha_team_id,
+                    FRIEND_USER_ID,
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
-        // first, invite friend
-        let resp = api
-            .add_user_to_team(alpha_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // first, invite friend
+            let resp = api
+                .add_user_to_team(
+                    alpha_team_id,
+                    FRIEND_USER_ID,
+                    None,
+                    None,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        // still cannot set friend as owner (not accepted)
-        let resp = api
-            .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::BAD_REQUEST);
+            // still cannot set friend as owner (not accepted)
+            let resp = api
+                .transfer_team_ownership(
+                    alpha_team_id,
+                    FRIEND_USER_ID,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::BAD_REQUEST);
 
-        // accept
-        let resp = api.join_team(alpha_team_id, FRIEND_USER_PAT).await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // accept
+            let resp = api.join_team(alpha_team_id, FRIEND_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        // Cannot set ourselves as owner if we are not owner
-        let resp = api
-            .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, FRIEND_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::UNAUTHORIZED);
+            // Cannot set ourselves as owner if we are not owner
+            let resp = api
+                .transfer_team_ownership(
+                    alpha_team_id,
+                    FRIEND_USER_ID,
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
-        // Can set friend as owner
-        let resp = api
-            .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // Can set friend as owner
+            let resp = api
+                .transfer_team_ownership(
+                    alpha_team_id,
+                    FRIEND_USER_ID,
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        // Check
-        let members = api
-            .get_team_members_deserialized(alpha_team_id, USER_USER_PAT)
-            .await;
-        let friend_member = members
-            .iter()
-            .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
-            .unwrap();
-        assert_eq!(friend_member.role, "Member"); // her role does not actually change, but is_owner is set to true
-        assert!(friend_member.is_owner);
-        assert_eq!(
-            friend_member.permissions.unwrap(),
-            ProjectPermissions::all()
-        );
+            // Check
+            let members = api
+                .get_team_members_deserialized(alpha_team_id, USER_USER_PAT)
+                .await;
+            let friend_member = members
+                .iter()
+                .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
+                .unwrap();
+            assert_eq!(friend_member.role, "Member"); // her role does not actually change, but is_owner is set to true
+            assert!(friend_member.is_owner);
+            assert_eq!(
+                friend_member.permissions.unwrap(),
+                ProjectPermissions::all()
+            );
 
-        let user_member = members
-            .iter()
-            .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
-            .unwrap();
-        assert_eq!(user_member.role, "Member"); // We are the 'owner', but we are not actually the owner!
-        assert!(!user_member.is_owner);
-        assert_eq!(user_member.permissions.unwrap(), ProjectPermissions::all());
+            let user_member = members
+                .iter()
+                .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
+                .unwrap();
+            assert_eq!(user_member.role, "Member"); // We are the 'owner', but we are not actually the owner!
+            assert!(!user_member.is_owner);
+            assert_eq!(
+                user_member.permissions.unwrap(),
+                ProjectPermissions::all()
+            );
 
-        // Confirm that user, a user who still has full permissions, cannot then remove the owner
-        let resp = api
-            .remove_from_team(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::UNAUTHORIZED);
+            // Confirm that user, a user who still has full permissions, cannot then remove the owner
+            let resp = api
+                .remove_from_team(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
+                .await;
+            assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
-        // V3 only- confirm the owner can change their role without losing ownership
-        let resp = api
-            .edit_team_member(
-                alpha_team_id,
-                FRIEND_USER_ID,
-                json!({
-                    "role": "Member"
-                }),
-                FRIEND_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            // V3 only- confirm the owner can change their role without losing ownership
+            let resp = api
+                .edit_team_member(
+                    alpha_team_id,
+                    FRIEND_USER_ID,
+                    json!({
+                        "role": "Member"
+                    }),
+                    FRIEND_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        let members = api
-            .get_team_members_deserialized(alpha_team_id, USER_USER_PAT)
-            .await;
-        let friend_member = members
-            .iter()
-            .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
-            .unwrap();
-        assert_eq!(friend_member.role, "Member");
-        assert!(friend_member.is_owner);
-    })
+            let members = api
+                .get_team_members_deserialized(alpha_team_id, USER_USER_PAT)
+                .await;
+            let friend_member = members
+                .iter()
+                .find(|x| x.user.id.0 == FRIEND_USER_ID_PARSED as u64)
+                .unwrap();
+            assert_eq!(friend_member.role, "Member");
+            assert!(friend_member.is_owner);
+        },
+    )
     .await;
 }
 

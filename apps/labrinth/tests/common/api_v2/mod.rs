@@ -24,8 +24,11 @@ pub struct ApiV2 {
 #[async_trait(?Send)]
 impl ApiBuildable for ApiV2 {
     async fn build(labrinth_config: LabrinthConfig) -> Self {
-        let app = App::new().configure(|cfg| labrinth::app_config(cfg, labrinth_config.clone()));
-        let test_app: Rc<dyn LocalService> = Rc::new(test::init_service(app).await);
+        let app = App::new().configure(|cfg| {
+            labrinth::app_config(cfg, labrinth_config.clone())
+        });
+        let test_app: Rc<dyn LocalService> =
+            Rc::new(test::init_service(app).await);
 
         Self { test_app }
     }

@@ -1,7 +1,11 @@
 use std::collections::HashMap;
 
-use crate::common::api_common::{ApiProject, ApiTeams, ApiUser, ApiVersion, AppendsOptionalPat};
-use crate::common::dummy_data::{DummyImage, DummyProjectAlpha, DummyProjectBeta};
+use crate::common::api_common::{
+    ApiProject, ApiTeams, ApiUser, ApiVersion, AppendsOptionalPat,
+};
+use crate::common::dummy_data::{
+    DummyImage, DummyProjectAlpha, DummyProjectBeta,
+};
 use actix_http::StatusCode;
 use actix_web::test;
 use chrono::{Duration, Utc};
@@ -10,7 +14,9 @@ use common::api_common::Api;
 use common::api_v3::request_data::get_public_project_creation_data;
 use common::api_v3::ApiV3;
 use common::dummy_data::TestFile;
-use common::environment::{with_test_environment, with_test_environment_all, TestEnvironment};
+use common::environment::{
+    with_test_environment, with_test_environment_all, TestEnvironment,
+};
 use common::{database::*, scopes::ScopeTest};
 use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::pats::Scopes;
@@ -34,8 +40,9 @@ async fn user_scopes() {
         let api = &test_env.api;
         // User reading
         let read_user = Scopes::USER_READ;
-        let req_gen =
-            |pat: Option<String>| async move { api.get_current_user(pat.as_deref()).await };
+        let req_gen = |pat: Option<String>| async move {
+            api.get_current_user(pat.as_deref()).await
+        };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, read_user)
             .await
@@ -45,8 +52,9 @@ async fn user_scopes() {
 
         // Email reading
         let read_email = Scopes::USER_READ | Scopes::USER_READ_EMAIL;
-        let req_gen =
-            |pat: Option<String>| async move { api.get_current_user(pat.as_deref()).await };
+        let req_gen = |pat: Option<String>| async move {
+            api.get_current_user(pat.as_deref()).await
+        };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, read_email)
             .await
@@ -55,8 +63,9 @@ async fn user_scopes() {
 
         // Payout reading
         let read_payout = Scopes::USER_READ | Scopes::PAYOUTS_READ;
-        let req_gen =
-            |pat: Option<String>| async move { api.get_current_user(pat.as_deref()).await };
+        let req_gen = |pat: Option<String>| async move {
+            api.get_current_user(pat.as_deref()).await
+        };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, read_payout)
             .await
@@ -91,8 +100,9 @@ async fn user_scopes() {
         // User deletion
         // (The failure is first, and this is the last test for this test function, we can delete it and use the same PAT for both tests)
         let delete_user = Scopes::USER_DELETE;
-        let req_gen =
-            |pat: Option<String>| async move { api.delete_user("enemy", pat.as_deref()).await };
+        let req_gen = |pat: Option<String>| async move {
+            api.delete_user("enemy", pat.as_deref()).await
+        };
         ScopeTest::new(&test_env)
             .with_user_id(ENEMY_USER_ID_PARSED)
             .test(req_gen, delete_user)
@@ -113,7 +123,13 @@ pub async fn notifications_scopes() {
         // Get notifications
         let resp = test_env
             .api
-            .add_user_to_team(alpha_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
+            .add_user_to_team(
+                alpha_team_id,
+                FRIEND_USER_ID,
+                None,
+                None,
+                USER_USER_PAT,
+            )
             .await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
 
@@ -186,7 +202,13 @@ pub async fn notifications_scopes() {
         // We invite mod, get the notification ID, and do mass delete using that
         let resp = test_env
             .api
-            .add_user_to_team(alpha_team_id, MOD_USER_ID, None, None, USER_USER_PAT)
+            .add_user_to_team(
+                alpha_team_id,
+                MOD_USER_ID,
+                None,
+                None,
+                USER_USER_PAT,
+            )
             .await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
         let read_notifications = Scopes::NOTIFICATION_READ;
@@ -217,41 +239,47 @@ pub async fn notifications_scopes() {
 // Project version creation scopes
 #[actix_rt::test]
 pub async fn project_version_create_scopes_v3() {
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
 
-        // Create project
-        let create_project = Scopes::PROJECT_CREATE;
-        let req_gen = |pat: Option<String>| async move {
-            let creation_data =
-                get_public_project_creation_data("demo", Some(TestFile::BasicMod), None);
-            api.create_project(creation_data, pat.as_deref()).await
-        };
-        let (_, success) = ScopeTest::new(&test_env)
-            .test(req_gen, create_project)
-            .await
-            .unwrap();
-        let project_id = success["id"].as_str().unwrap();
-        let project_id = ProjectId(parse_base62(project_id).unwrap());
+            // Create project
+            let create_project = Scopes::PROJECT_CREATE;
+            let req_gen = |pat: Option<String>| async move {
+                let creation_data = get_public_project_creation_data(
+                    "demo",
+                    Some(TestFile::BasicMod),
+                    None,
+                );
+                api.create_project(creation_data, pat.as_deref()).await
+            };
+            let (_, success) = ScopeTest::new(&test_env)
+                .test(req_gen, create_project)
+                .await
+                .unwrap();
+            let project_id = success["id"].as_str().unwrap();
+            let project_id = ProjectId(parse_base62(project_id).unwrap());
 
-        // Add version to project
-        let create_version = Scopes::VERSION_CREATE;
-        let req_gen = |pat: Option<String>| async move {
-            api.add_public_version(
-                project_id,
-                "1.2.3.4",
-                TestFile::BasicModDifferent,
-                None,
-                None,
-                pat.as_deref(),
-            )
-            .await
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, create_version)
-            .await
-            .unwrap();
-    })
+            // Add version to project
+            let create_version = Scopes::VERSION_CREATE;
+            let req_gen = |pat: Option<String>| async move {
+                api.add_public_version(
+                    project_id,
+                    "1.2.3.4",
+                    TestFile::BasicModDifferent,
+                    None,
+                    None,
+                    pat.as_deref(),
+                )
+                .await
+            };
+            ScopeTest::new(&test_env)
+                .test(req_gen, create_version)
+                .await
+                .unwrap();
+        },
+    )
     .await;
 }
 
@@ -384,7 +412,11 @@ pub async fn project_version_reads_scopes() {
         let read_version = Scopes::VERSION_READ;
         let resp = test_env
             .api
-            .edit_version(beta_version_id, json!({ "status": "draft" }), USER_USER_PAT)
+            .edit_version(
+                beta_version_id,
+                json!({ "status": "draft" }),
+                USER_USER_PAT,
+            )
             .await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
 
@@ -399,8 +431,12 @@ pub async fn project_version_reads_scopes() {
             .unwrap();
 
         let req_gen = |pat: Option<String>| async move {
-            api.download_version_redirect(beta_file_hash, "sha1", pat.as_deref())
-                .await
+            api.download_version_redirect(
+                beta_file_hash,
+                "sha1",
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .with_failure_code(404)
@@ -417,8 +453,12 @@ pub async fn project_version_reads_scopes() {
         // ScopeTest::new(&test_env).with_failure_code(404).test(req_gen, read_version).await.unwrap();
 
         let req_gen = |pat: Option<String>| async move {
-            api.get_versions_from_hashes(&[beta_file_hash], "sha1", pat.as_deref())
-                .await
+            api.get_versions_from_hashes(
+                &[beta_file_hash],
+                "sha1",
+                pat.as_deref(),
+            )
+            .await
         };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
@@ -439,7 +479,8 @@ pub async fn project_version_reads_scopes() {
         // assert!(success.as_object().unwrap().contains_key(beta_file_hash));
 
         // Both project and version reading
-        let read_project_and_version = Scopes::PROJECT_READ | Scopes::VERSION_READ;
+        let read_project_and_version =
+            Scopes::PROJECT_READ | Scopes::VERSION_READ;
         let req_gen = |pat: Option<String>| async move {
             api.get_project_versions(
                 beta_project_id,
@@ -681,8 +722,12 @@ pub async fn version_write_scopes() {
 
         // Upload version file
         let req_gen = |pat: Option<String>| async move {
-            api.upload_file_to_version(alpha_version_id, &TestFile::BasicZip, pat.as_deref())
-                .await
+            api.upload_file_to_version(
+                alpha_version_id,
+                &TestFile::BasicZip,
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_version)
@@ -740,16 +785,18 @@ pub async fn report_scopes() {
 
         // Get reports
         let report_read = Scopes::REPORT_READ;
-        let req_gen =
-            |pat: Option<String>| async move { api.get_user_reports(pat.as_deref()).await };
+        let req_gen = |pat: Option<String>| async move {
+            api.get_user_reports(pat.as_deref()).await
+        };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, report_read)
             .await
             .unwrap();
         let report_id = success[0]["id"].as_str().unwrap();
 
-        let req_gen =
-            |pat: Option<String>| async move { api.get_report(report_id, pat.as_deref()).await };
+        let req_gen = |pat: Option<String>| async move {
+            api.get_report(report_id, pat.as_deref()).await
+        };
         ScopeTest::new(&test_env)
             .test(req_gen, report_read)
             .await
@@ -781,8 +828,9 @@ pub async fn report_scopes() {
         // Delete report
         // We use a moderator PAT here, as only moderators can delete reports
         let report_delete = Scopes::REPORT_DELETE;
-        let req_gen =
-            |pat: Option<String>| async move { api.delete_report(report_id, pat.as_deref()).await };
+        let req_gen = |pat: Option<String>| async move {
+            api.delete_report(report_id, pat.as_deref()).await
+        };
         ScopeTest::new(&test_env)
             .with_user_id(MOD_USER_ID_PARSED)
             .test(req_gen, report_delete)
@@ -915,101 +963,104 @@ pub async fn pat_scopes() {
 #[actix_rt::test]
 pub async fn collections_scopes() {
     // Test setup and dummy data
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
-        let alpha_project_id = &test_env.dummy.project_alpha.project_id;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let alpha_project_id = &test_env.dummy.project_alpha.project_id;
 
-        // Create collection
-        let collection_create = Scopes::COLLECTION_CREATE;
-        let req_gen = |pat: Option<String>| async move {
-            api.create_collection(
-                "Test Collection",
-                "Test Collection Description",
-                &[alpha_project_id.as_str()],
-                pat.as_deref(),
-            )
-            .await
-        };
-        let (_, success) = ScopeTest::new(&test_env)
-            .test(req_gen, collection_create)
-            .await
-            .unwrap();
-        let collection_id = success["id"].as_str().unwrap();
-
-        // Patch collection
-        // Collections always initialize to public, so we do patch before Get testing
-        let collection_write = Scopes::COLLECTION_WRITE;
-        let req_gen = |pat: Option<String>| async move {
-            api.edit_collection(
-                collection_id,
-                json!({
-                    "name": "Test Collection patch",
-                    "status": "private",
-                }),
-                pat.as_deref(),
-            )
-            .await
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, collection_write)
-            .await
-            .unwrap();
-
-        // Read collection
-        let collection_read = Scopes::COLLECTION_READ;
-        let req_gen = |pat: Option<String>| async move {
-            api.get_collection(collection_id, pat.as_deref()).await
-        };
-        ScopeTest::new(&test_env)
-            .with_failure_code(404)
-            .test(req_gen, collection_read)
-            .await
-            .unwrap();
-
-        let req_gen = |pat: Option<String>| async move {
-            api.get_collections(&[collection_id], pat.as_deref()).await
-        };
-        let (failure, success) = ScopeTest::new(&test_env)
-            .with_failure_code(200)
-            .test(req_gen, collection_read)
-            .await
-            .unwrap();
-        assert_eq!(failure.as_array().unwrap().len(), 0);
-        assert_eq!(success.as_array().unwrap().len(), 1);
-
-        let req_gen = |pat: Option<String>| async move {
-            api.get_user_collections(USER_USER_ID, pat.as_deref()).await
-        };
-        let (failure, success) = ScopeTest::new(&test_env)
-            .with_failure_code(200)
-            .test(req_gen, collection_read)
-            .await
-            .unwrap();
-        assert_eq!(failure.as_array().unwrap().len(), 0);
-        assert_eq!(success.as_array().unwrap().len(), 1);
-
-        let req_gen = |pat: Option<String>| async move {
-            api.edit_collection_icon(
-                collection_id,
-                Some(DummyImage::SmallIcon.get_icon_data()),
-                pat.as_deref(),
-            )
-            .await
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, collection_write)
-            .await
-            .unwrap();
-
-        let req_gen = |pat: Option<String>| async move {
-            api.edit_collection_icon(collection_id, None, pat.as_deref())
+            // Create collection
+            let collection_create = Scopes::COLLECTION_CREATE;
+            let req_gen = |pat: Option<String>| async move {
+                api.create_collection(
+                    "Test Collection",
+                    "Test Collection Description",
+                    &[alpha_project_id.as_str()],
+                    pat.as_deref(),
+                )
                 .await
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, collection_write)
-            .await
-            .unwrap();
-    })
+            };
+            let (_, success) = ScopeTest::new(&test_env)
+                .test(req_gen, collection_create)
+                .await
+                .unwrap();
+            let collection_id = success["id"].as_str().unwrap();
+
+            // Patch collection
+            // Collections always initialize to public, so we do patch before Get testing
+            let collection_write = Scopes::COLLECTION_WRITE;
+            let req_gen = |pat: Option<String>| async move {
+                api.edit_collection(
+                    collection_id,
+                    json!({
+                        "name": "Test Collection patch",
+                        "status": "private",
+                    }),
+                    pat.as_deref(),
+                )
+                .await
+            };
+            ScopeTest::new(&test_env)
+                .test(req_gen, collection_write)
+                .await
+                .unwrap();
+
+            // Read collection
+            let collection_read = Scopes::COLLECTION_READ;
+            let req_gen = |pat: Option<String>| async move {
+                api.get_collection(collection_id, pat.as_deref()).await
+            };
+            ScopeTest::new(&test_env)
+                .with_failure_code(404)
+                .test(req_gen, collection_read)
+                .await
+                .unwrap();
+
+            let req_gen = |pat: Option<String>| async move {
+                api.get_collections(&[collection_id], pat.as_deref()).await
+            };
+            let (failure, success) = ScopeTest::new(&test_env)
+                .with_failure_code(200)
+                .test(req_gen, collection_read)
+                .await
+                .unwrap();
+            assert_eq!(failure.as_array().unwrap().len(), 0);
+            assert_eq!(success.as_array().unwrap().len(), 1);
+
+            let req_gen = |pat: Option<String>| async move {
+                api.get_user_collections(USER_USER_ID, pat.as_deref()).await
+            };
+            let (failure, success) = ScopeTest::new(&test_env)
+                .with_failure_code(200)
+                .test(req_gen, collection_read)
+                .await
+                .unwrap();
+            assert_eq!(failure.as_array().unwrap().len(), 0);
+            assert_eq!(success.as_array().unwrap().len(), 1);
+
+            let req_gen = |pat: Option<String>| async move {
+                api.edit_collection_icon(
+                    collection_id,
+                    Some(DummyImage::SmallIcon.get_icon_data()),
+                    pat.as_deref(),
+                )
+                .await
+            };
+            ScopeTest::new(&test_env)
+                .test(req_gen, collection_write)
+                .await
+                .unwrap();
+
+            let req_gen = |pat: Option<String>| async move {
+                api.edit_collection_icon(collection_id, None, pat.as_deref())
+                    .await
+            };
+            ScopeTest::new(&test_env)
+                .test(req_gen, collection_write)
+                .await
+                .unwrap();
+        },
+    )
     .await;
 }
 
@@ -1017,140 +1068,158 @@ pub async fn collections_scopes() {
 #[actix_rt::test]
 pub async fn organization_scopes() {
     // Test setup and dummy data
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
-        let beta_project_id = &test_env.dummy.project_beta.project_id;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let beta_project_id = &test_env.dummy.project_beta.project_id;
 
-        // Create organization
-        let organization_create = Scopes::ORGANIZATION_CREATE;
-        let req_gen = |pat: Option<String>| async move {
-            api.create_organization("Test Org", "TestOrg", "TestOrg Description", pat.as_deref())
+            // Create organization
+            let organization_create = Scopes::ORGANIZATION_CREATE;
+            let req_gen = |pat: Option<String>| async move {
+                api.create_organization(
+                    "Test Org",
+                    "TestOrg",
+                    "TestOrg Description",
+                    pat.as_deref(),
+                )
                 .await
-        };
-        let (_, success) = ScopeTest::new(&test_env)
-            .test(req_gen, organization_create)
-            .await
-            .unwrap();
-        let organization_id = success["id"].as_str().unwrap();
-
-        // Patch organization
-        let organization_edit = Scopes::ORGANIZATION_WRITE;
-        let req_gen = |pat: Option<String>| async move {
-            api.edit_organization(
-                organization_id,
-                json!({
-                    "description": "TestOrg Patch Description",
-                }),
-                pat.as_deref(),
-            )
-            .await
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, organization_edit)
-            .await
-            .unwrap();
-
-        let req_gen = |pat: Option<String>| async move {
-            api.edit_organization_icon(
-                organization_id,
-                Some(DummyImage::SmallIcon.get_icon_data()),
-                pat.as_deref(),
-            )
-            .await
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, organization_edit)
-            .await
-            .unwrap();
-
-        let req_gen = |pat: Option<String>| async move {
-            api.edit_organization_icon(organization_id, None, pat.as_deref())
+            };
+            let (_, success) = ScopeTest::new(&test_env)
+                .test(req_gen, organization_create)
                 .await
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, organization_edit)
-            .await
-            .unwrap();
+                .unwrap();
+            let organization_id = success["id"].as_str().unwrap();
 
-        // add project
-        let organization_project_edit = Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE;
-        let req_gen = |pat: Option<String>| async move {
-            api.organization_add_project(organization_id, beta_project_id, pat.as_deref())
+            // Patch organization
+            let organization_edit = Scopes::ORGANIZATION_WRITE;
+            let req_gen = |pat: Option<String>| async move {
+                api.edit_organization(
+                    organization_id,
+                    json!({
+                        "description": "TestOrg Patch Description",
+                    }),
+                    pat.as_deref(),
+                )
                 .await
-        };
-        ScopeTest::new(&test_env)
-            .with_failure_scopes(Scopes::all() ^ Scopes::ORGANIZATION_WRITE)
-            .test(req_gen, organization_project_edit)
-            .await
-            .unwrap();
-
-        // Organization reads
-        let organization_read = Scopes::ORGANIZATION_READ;
-        let req_gen = |pat: Option<String>| async move {
-            api.get_organization(organization_id, pat.as_deref()).await
-        };
-        let (failure, success) = ScopeTest::new(&test_env)
-            .with_failure_code(200)
-            .test(req_gen, organization_read)
-            .await
-            .unwrap();
-        assert!(failure["members"][0]["permissions"].is_null());
-        assert!(!success["members"][0]["permissions"].is_null());
-
-        let req_gen = |pat: Option<String>| async move {
-            api.get_organizations(&[organization_id], pat.as_deref())
+            };
+            ScopeTest::new(&test_env)
+                .test(req_gen, organization_edit)
                 .await
-        };
+                .unwrap();
 
-        let (failure, success) = ScopeTest::new(&test_env)
-            .with_failure_code(200)
-            .test(req_gen, organization_read)
-            .await
-            .unwrap();
-        assert!(failure[0]["members"][0]["permissions"].is_null());
-        assert!(!success[0]["members"][0]["permissions"].is_null());
-
-        let organization_project_read = Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ;
-        let req_gen = |pat: Option<String>| async move {
-            api.get_organization_projects(organization_id, pat.as_deref())
+            let req_gen = |pat: Option<String>| async move {
+                api.edit_organization_icon(
+                    organization_id,
+                    Some(DummyImage::SmallIcon.get_icon_data()),
+                    pat.as_deref(),
+                )
                 .await
-        };
-        let (failure, success) = ScopeTest::new(&test_env)
-            .with_failure_code(200)
-            .with_failure_scopes(Scopes::all() ^ Scopes::ORGANIZATION_READ)
-            .test(req_gen, organization_project_read)
-            .await
-            .unwrap();
-        assert!(failure.as_array().unwrap().is_empty());
-        assert!(!success.as_array().unwrap().is_empty());
-
-        // remove project (now that we've checked)
-        let req_gen = |pat: Option<String>| async move {
-            api.organization_remove_project(
-                organization_id,
-                beta_project_id,
-                UserId(USER_USER_ID_PARSED as u64),
-                pat.as_deref(),
-            )
-            .await
-        };
-        ScopeTest::new(&test_env)
-            .with_failure_scopes(Scopes::all() ^ Scopes::ORGANIZATION_WRITE)
-            .test(req_gen, organization_project_edit)
-            .await
-            .unwrap();
-
-        // Delete organization
-        let organization_delete = Scopes::ORGANIZATION_DELETE;
-        let req_gen = |pat: Option<String>| async move {
-            api.delete_organization(organization_id, pat.as_deref())
+            };
+            ScopeTest::new(&test_env)
+                .test(req_gen, organization_edit)
                 .await
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, organization_delete)
-            .await
-            .unwrap();
-    })
+                .unwrap();
+
+            let req_gen = |pat: Option<String>| async move {
+                api.edit_organization_icon(
+                    organization_id,
+                    None,
+                    pat.as_deref(),
+                )
+                .await
+            };
+            ScopeTest::new(&test_env)
+                .test(req_gen, organization_edit)
+                .await
+                .unwrap();
+
+            // add project
+            let organization_project_edit =
+                Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE;
+            let req_gen = |pat: Option<String>| async move {
+                api.organization_add_project(
+                    organization_id,
+                    beta_project_id,
+                    pat.as_deref(),
+                )
+                .await
+            };
+            ScopeTest::new(&test_env)
+                .with_failure_scopes(Scopes::all() ^ Scopes::ORGANIZATION_WRITE)
+                .test(req_gen, organization_project_edit)
+                .await
+                .unwrap();
+
+            // Organization reads
+            let organization_read = Scopes::ORGANIZATION_READ;
+            let req_gen = |pat: Option<String>| async move {
+                api.get_organization(organization_id, pat.as_deref()).await
+            };
+            let (failure, success) = ScopeTest::new(&test_env)
+                .with_failure_code(200)
+                .test(req_gen, organization_read)
+                .await
+                .unwrap();
+            assert!(failure["members"][0]["permissions"].is_null());
+            assert!(!success["members"][0]["permissions"].is_null());
+
+            let req_gen = |pat: Option<String>| async move {
+                api.get_organizations(&[organization_id], pat.as_deref())
+                    .await
+            };
+
+            let (failure, success) = ScopeTest::new(&test_env)
+                .with_failure_code(200)
+                .test(req_gen, organization_read)
+                .await
+                .unwrap();
+            assert!(failure[0]["members"][0]["permissions"].is_null());
+            assert!(!success[0]["members"][0]["permissions"].is_null());
+
+            let organization_project_read =
+                Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ;
+            let req_gen = |pat: Option<String>| async move {
+                api.get_organization_projects(organization_id, pat.as_deref())
+                    .await
+            };
+            let (failure, success) = ScopeTest::new(&test_env)
+                .with_failure_code(200)
+                .with_failure_scopes(Scopes::all() ^ Scopes::ORGANIZATION_READ)
+                .test(req_gen, organization_project_read)
+                .await
+                .unwrap();
+            assert!(failure.as_array().unwrap().is_empty());
+            assert!(!success.as_array().unwrap().is_empty());
+
+            // remove project (now that we've checked)
+            let req_gen = |pat: Option<String>| async move {
+                api.organization_remove_project(
+                    organization_id,
+                    beta_project_id,
+                    UserId(USER_USER_ID_PARSED as u64),
+                    pat.as_deref(),
+                )
+                .await
+            };
+            ScopeTest::new(&test_env)
+                .with_failure_scopes(Scopes::all() ^ Scopes::ORGANIZATION_WRITE)
+                .test(req_gen, organization_project_edit)
+                .await
+                .unwrap();
+
+            // Delete organization
+            let organization_delete = Scopes::ORGANIZATION_DELETE;
+            let req_gen = |pat: Option<String>| async move {
+                api.delete_organization(organization_id, pat.as_deref())
+                    .await
+            };
+            ScopeTest::new(&test_env)
+                .test(req_gen, organization_delete)
+                .await
+                .unwrap();
+        },
+    )
     .await;
 }
 

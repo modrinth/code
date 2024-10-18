@@ -223,7 +223,10 @@ impl Image {
         Ok(val)
     }
 
-    pub async fn clear_cache(id: ImageId, redis: &RedisPool) -> Result<(), DatabaseError> {
+    pub async fn clear_cache(
+        id: ImageId,
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
 
         redis.delete(IMAGES_NAMESPACE, id.0).await?;

@@ -4,7 +4,9 @@ use actix_web::{
     test::{self, TestRequest},
 };
 use bytes::Bytes;
-use labrinth::models::{organizations::Organization, users::UserId, v3::projects::Project};
+use labrinth::models::{
+    organizations::Organization, users::UserId, v3::projects::Project,
+};
 use serde_json::json;
 
 use crate::{
@@ -34,7 +36,11 @@ impl ApiV3 {
         self.call(req).await
     }
 
-    pub async fn get_organization(&self, id_or_title: &str, pat: Option<&str>) -> ServiceResponse {
+    pub async fn get_organization(
+        &self,
+        id_or_title: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v3/organization/{id_or_title}"))
             .append_pat(pat)
