@@ -68,7 +68,7 @@
           </div>
           <span v-if="!isValidSubdomain" class="text-sm text-rose-400">
             Subdomain must be at least 5 characters long and can only contain alphanumeric
-            characters, dashes, and underscores.
+            characters and dashes.
           </span>
         </div>
 
@@ -252,7 +252,7 @@ const newAllocationPort = ref(0);
 
 const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
 
-const isValidSubdomain = computed(() => /^[a-zA-Z0-9-_]{5,}$/.test(serverSubdomain.value));
+const isValidSubdomain = computed(() => /^[a-zA-Z0-9-]{5,}$/.test(serverSubdomain.value));
 
 const addNewAllocation = async () => {
   if (!newAllocationName.value) return;
