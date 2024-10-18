@@ -112,6 +112,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { IssuesIcon, LeftArrowIcon } from "@modrinth/assets";
+import DOMPurify from "dompurify";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 
 const socket = ref<WebSocket | null>(null);
@@ -441,6 +442,11 @@ const stopPolling = () => {
 
 onMounted(() => {
   connectWebSocket();
+  DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+    if (node.tagName === "A" && node.getAttribute("target")) {
+      node.setAttribute("rel", "noopener noreferrer");
+    }
+  });
 });
 
 onUnmounted(() => {
@@ -451,6 +457,7 @@ onUnmounted(() => {
   if (socket.value) {
     socket.value.close();
   }
+  DOMPurify.removeHook("afterSanitizeAttributes");
 });
 
 watch(
