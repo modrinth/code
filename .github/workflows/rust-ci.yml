@@ -28,6 +28,11 @@ jobs:
           path: target/**
           key: ${{ runner.os }}-rust-cache
 
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
       - name: Build
         run: cargo build
 
