@@ -3,6 +3,7 @@
     <div
       v-for="(metric, index) in metrics"
       :key="index"
+      v-tooltip="memoryTooltip(index)"
       class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
       <div class="relative z-10 flex flex-row items-center gap-2">
@@ -26,6 +27,7 @@
     </div>
 
     <NuxtLink
+      v-tooltip="storageTooltip"
       :to="`/servers/manage/${serverId}/files`"
       class="relative min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
     >
@@ -42,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, markRaw } from "vue";
+import { ref, onMounted, onUnmounted, markRaw, computed } from "vue";
 import { FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 import type { Stats } from "~/types/servers";
 
@@ -155,6 +157,7 @@ const chartOptions = ref({
     type: "numeric",
     lines: { show: false },
     axisBorder: { show: false },
+    axisTicks: { show: false },
     labels: { show: false },
   },
   yaxis: {
@@ -166,6 +169,21 @@ const chartOptions = ref({
     axisTicks: { show: false },
   },
   tooltip: { enabled: false },
+});
+
+const memoryTooltip = (index: number) => {
+  if (index === 1) {
+    const used = formatBytes(props.data.current.ram_usage_bytes);
+    const total = formatBytes(props.data.current.ram_total_bytes);
+    return `${used} / ${total}`;
+  }
+  return "";
+};
+
+const storageTooltip = computed(() => {
+  const used = formatBytes(props.data.current.storage_usage_bytes);
+  const total = formatBytes(props.data.current.storage_total_bytes);
+  return `${used} / ${total}`;
 });
 
 let interval: number;
