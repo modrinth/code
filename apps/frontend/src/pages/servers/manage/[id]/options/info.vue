@@ -62,8 +62,8 @@
         >
           <tbody>
             <tr v-for="property in properties" :key="property.name">
-              <td class="py-3">{{ property.name }}</td>
-              <td class="px-4">
+              <td v-if="property.value !== 'Unknown'" class="py-3">{{ property.name }}</td>
+              <td v-if="property.value !== 'Unknown'" class="px-4">
                 <UiCopyCode :text="property.value" />
               </td>
             </tr>
@@ -107,7 +107,7 @@ const copyPassword = () => {
 
 const properties = [
   { name: "Server ID", value: serverId ?? "Unknown" },
-  { name: "Kind", value: data.value?.upstream?.kind ?? "Unknown" },
+  { name: "Kind", value: data.value?.upstream?.kind ?? data.value?.loader ?? "Unknown"},
   { name: "Project ID", value: data.value?.upstream?.project_id ?? "Unknown" },
   { name: "Version ID", value: data.value?.upstream?.version_id ?? "Unknown" },
 ];
