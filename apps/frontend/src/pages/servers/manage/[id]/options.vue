@@ -12,6 +12,7 @@ import {
   VersionIcon,
   CardIcon,
   UserIcon,
+  ListBulletedIcon,
 } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
@@ -33,14 +34,19 @@ const navLinks = [
   { icon: VersionIcon, label: "Network", href: `/servers/manage/${serverId}/options/network` },
   { icon: ListIcon, label: "Properties", href: `/servers/manage/${serverId}/options/properties` },
   {
-    icon: CardIcon,
-    label: "Billing",
-    href: `/servers/manage/${serverId}/options/billing`,
+    icon: ListBulletedIcon,
+    label: "Minecraft Logs",
+    href: `/servers/manage/${serverId}/options/logs`,
   },
   {
     icon: UserIcon,
     label: "Preferences",
     href: `/servers/manage/${serverId}/options/preferences`,
+  },
+  {
+    icon: CardIcon,
+    label: "Billing",
+    href: `/servers/manage/${serverId}/options/billing`,
   },
   { icon: InfoIcon, label: "Info", href: `/servers/manage/${serverId}/options/info` },
 ];

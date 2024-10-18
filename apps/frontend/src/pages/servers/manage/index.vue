@@ -92,6 +92,7 @@
           :loader_version="server.loader_version"
           :mc_version="server.mc_version"
           :upstream="server.upstream"
+          :net="server.net"
         />
       </ul>
       <div v-else class="flex h-full items-center justify-center">
