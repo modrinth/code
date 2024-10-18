@@ -70,7 +70,7 @@ import WarningIcon from "~/assets/images/utils/issues.svg?component";
 const route = useNativeRoute();
 const serverId = route.params.id;
 
-const userPrefrences = useStorage(`pyro-server-${serverId}-preferences`, {
+const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
   ramAsNumber: false,
   autoRestart: false,
   backupWhileRunning: false,
@@ -114,7 +114,7 @@ const metrics = ref([
   {
     title: "Memory usage",
     value: "0%",
-    max: userPrefrences.value.ramAsNumber
+    max: userPreferences.value.ramAsNumber
       ? formatBytes(props.data.current.ram_total_bytes)
       : "100%",
     icon: markRaw(DBIcon),
@@ -125,7 +125,7 @@ const metrics = ref([
 const updateMetrics = () => {
   console.log(props.data.current.ram_usage_bytes);
   metrics.value = metrics.value.map((metric, index) => {
-    if (userPrefrences.value.ramAsNumber && index === 1) {
+    if (userPreferences.value.ramAsNumber && index === 1) {
       return {
         ...metric,
         value: formatBytes(props.data.current.ram_usage_bytes),
@@ -171,7 +171,7 @@ const getPotentialWarning = (metric: (typeof metrics.value)[0]) => {
     })
     .join(" ");
   let data = metric.data.at(-1) || 0;
-  if (userPrefrences.value.ramAsNumber) {
+  if (userPreferences.value.ramAsNumber) {
     data = (props.data.current.ram_usage_bytes / props.data.current.ram_total_bytes) * 100;
   }
   switch (true) {
@@ -185,7 +185,7 @@ const getPotentialWarning = (metric: (typeof metrics.value)[0]) => {
 const generateOptions = (metric: (typeof metrics.value)[0]) => {
   let color = "var(--color-brand)";
   let data = metric.data.at(-1) || 0;
-  if (userPrefrences.value.ramAsNumber) {
+  if (userPreferences.value.ramAsNumber) {
     data = (props.data.current.ram_usage_bytes / props.data.current.ram_total_bytes) * 100;
   }
   switch (true) {

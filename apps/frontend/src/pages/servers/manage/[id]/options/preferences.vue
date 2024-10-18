@@ -2,12 +2,12 @@
   <div class="h-full w-full gap-2 overflow-y-auto">
     <div class="card flex flex-col gap-4">
       <h1 class="m-0 text-2xl font-bold">Server Preferences</h1>
-      <div v-for="(value, key) in userPrefrences" :key="key" class="flex justify-between">
+      <div v-for="(value, key) in userPreferences" :key="key" class="flex justify-between">
         <label for="server-name-field" class="flex flex-col gap-2">
           <span class="text-lg font-bold text-contrast">{{ preferences[key].displayName }}</span>
           <span> {{ preferences[key].description }} </span>
         </label>
-        <input v-model="newUserprefrences[key]" class="switch stylized-toggle" type="checkbox" />
+        <input v-model="newUserPreferences[key]" class="switch stylized-toggle" type="checkbox" />
       </div>
     </div>
   </div>
@@ -33,12 +33,12 @@ const props = defineProps<{
 }>();
 
 const hasUnsavedChanges = computed(() => {
-  return JSON.stringify(newUserprefrences.value) !== JSON.stringify(userPrefrences.value);
+  return JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value);
 });
 
 const savePreferences = () => {
-  userPrefrences.value = newUserprefrences.value;
-  newUserprefrences.value = JSON.parse(JSON.stringify(userPrefrences.value));
+  userPreferences.value = newUserPreferences.value;
+  newUserPreferences.value = JSON.parse(JSON.stringify(userPreferences.value));
   addNotification({
     group: "serverOptions",
     type: "success",
@@ -48,7 +48,7 @@ const savePreferences = () => {
 };
 
 const resetPreferences = () => {
-  newUserprefrences.value = userPrefrences.value;
+  newUserPreferences.value = userPreferences.value;
 };
 
 const preferences = {
@@ -63,7 +63,7 @@ const preferences = {
   backupWhileRunning: {
     displayName: "Backup while running (not implemented)",
     description:
-      "Allow creation of a backup without stoping the server. This may lead to corrupted backups, use with caution",
+      "Allow creation of a backup without stopping the server. This may lead to corrupted backups, use with caution",
   },
 };
 
@@ -73,6 +73,6 @@ const defaultPreferences = {
   backupWhileRunning: false,
 };
 
-const userPrefrences = useStorage(`pyro-server-${serverId}-preferences`, defaultPreferences);
-const newUserprefrences = ref(JSON.parse(JSON.stringify(userPrefrences.value)));
+const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, defaultPreferences);
+const newUserPreferences = ref(JSON.parse(JSON.stringify(userPreferences.value)));
 </script>
