@@ -6,6 +6,7 @@
   >
     <div
       v-if="inspectingError"
+      data-pyro-servers-inspecting-error
       class="flex h-full w-full items-center gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
     >
       <div class="flex w-full justify-between">
