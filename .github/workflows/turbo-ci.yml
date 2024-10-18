@@ -62,6 +62,8 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          SQLX_OFFLINE: true
 
       - name: Lint
         run: pnpm lint
