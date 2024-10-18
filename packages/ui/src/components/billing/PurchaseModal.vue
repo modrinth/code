@@ -86,7 +86,7 @@
           <div class="flex items-center gap-2">
             <InfoIcon />
             <span class="text-sm text-secondary">
-              You can change these settings later in your server settings.
+              You can change these settings later in your server options.
             </span>
           </div>
         </div>
