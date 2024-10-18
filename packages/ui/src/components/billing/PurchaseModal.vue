@@ -293,6 +293,10 @@
         {{ selectedPlan }} plus applicable taxes starting today, until you cancel. Cancel anytime
         from your settings page.
       </p>
+      <p v-if="product.metadata.type === 'pyro'" class="m-0 mt-2 text-sm text-secondary">
+        You acknowledge that you have read and agree to the
+        <a class="underline" href="https://www.minecraft.net/en-us/eula"> Minecraft EULA </a>
+      </p>
     </div>
     <div class="input-group push-right pt-4">
       <template v-if="purchaseModalStep === 0">
