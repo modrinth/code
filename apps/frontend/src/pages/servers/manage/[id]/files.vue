@@ -171,6 +171,15 @@
         </div>
 
         <div class="flex gap-2">
+          <Button
+            v-if="editingFile.path.startsWith('logs') && editingFile.path.endsWith('.log')"
+            v-tooltip="'Share your mc log'"
+            icon-only
+            transparent
+            @click="requestShareLink"
+          >
+            <ShareIcon />
+          </Button>
           <ButtonStyled type="transparent">
             <OverflowMenu
               class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
@@ -374,6 +383,7 @@ import {
   ArrowBigUpDashIcon,
   DownloadIcon,
   TrashIcon,
+  ShareIcon,
 } from "@modrinth/assets";
 import { Button, Modal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
@@ -551,6 +561,34 @@ const isEditing = ref(false);
 const fileContent = ref("");
 const editingFile = ref<any>(null);
 const closeEditor = ref(false);
+
+const requestShareLink = async () => {
+  try {
+    const response = (await $fetch("https://api.mclo.gs/1/log", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        content: fileContent.value,
+      }),
+    })) as any;
+
+    if (response.success) {
+      navigator.clipboard.writeText(response.url);
+      addNotification({
+        group: "files",
+        title: "Log URL copied",
+        text: "Your log file URL has been copied to your clipboard.",
+        type: "success",
+      });
+    } else {
+      throw new Error(response.error);
+    }
+  } catch (error) {
+    console.error("Error sharing file:", error);
+  }
+};
 
 const showCreateModal = (type: "file" | "directory") => {
   newItemType.value = type;
