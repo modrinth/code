@@ -3,11 +3,12 @@
     data-pyro-server-list-root
     class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-3"
   >
-    <div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
-      <h1 v-if="serverList.length > 0" class="text-4xl font-bold text-[--color-contrast]">
-        Servers
-      </h1>
-      <div v-if="serverList.length > 0" class="flex w-full flex-row items-center justify-end gap-4">
+    <div
+      v-if="serverList.length > 0"
+      class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row"
+    >
+      <h1 class="text-4xl font-bold text-[--color-contrast]">Servers</h1>
+      <div class="flex w-full flex-row items-center justify-end gap-4">
         <div class="relative mb-4 w-full text-sm md:mb-0 md:w-72">
           <label class="sr-only" for="search">Search</label>
           <SearchIcon
@@ -27,57 +28,7 @@
       </div>
     </div>
 
-    <div v-if="status !== 'success'" data-pyro-status>
-      <div class="relative flex max-h-[128px] w-full flex-row rounded-3xl bg-bg-raised p-4">
-        <Transition name="fade">
-          <div v-if="status === 'error'" class="flex h-full w-full items-center gap-6">
-            <img
-              alt=""
-              class="h-full w-full max-w-24 rounded-2xl object-cover align-middle"
-              height="256"
-              src="~/assets/images/servers/this-is-fine.gif"
-              width="256"
-              loading="lazy"
-              decoding="async"
-            />
-            <div class="leading-[165%]">
-              <h1 class="m-0 mb-2 text-2xl font-semibold">Unable to load servers</h1>
-              <p class="m-0 max-w-2xl">
-                Your servers are safe, but could not be loaded due to a technical issue on our end.
-                Please try again later. If this issue persists, please contact
-                <a
-                  class="text-[var(--color-link)]"
-                  href="https://support.modrinth.com/"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Modrinth support.
-                </a>
-              </p>
-            </div>
-          </div>
-
-          <div v-else-if="status === 'pending'" class="min-h-[128px]"></div>
-        </Transition>
-      </div>
-    </div>
-
-    <div
-      v-else-if="serverList.length === 0"
-      class="flex h-full flex-col items-center justify-center gap-8"
-    >
-      <img
-        src="~/assets/images/games/excitement.png"
-        alt=""
-        class="max-w-[360px]"
-        style="mask-image: radial-gradient(97% 77% at 50% 25%, #d9d9d9 0, hsla(0, 0%, 45%, 0) 100%)"
-      />
-      <h1 class="m-0 text-contrast">You don't have any servers yet!</h1>
-      <p class="m-0">Modrinth Servers is a new way to play modded Minecraft with your friends.</p>
-      <ButtonStyled size="large" type="standard" color="brand">
-        <NuxtLink to="/servers#plan">Create a Server</NuxtLink>
-      </ButtonStyled>
-    </div>
+    <UiServersServerManageEmptyState v-if="serverList.length === 0" />
 
     <template v-else>
       <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
@@ -94,6 +45,7 @@
           :upstream="server.upstream"
           :net="server.net"
         />
+        <LazyUiServersServerListingSkeleton v-if="isLoading" />
       </ul>
       <div v-else class="flex h-full items-center justify-center">
         <p class="text-contrast">No servers found.</p>
@@ -105,9 +57,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import Fuse from "fuse.js";
-import { ButtonStyled } from "@modrinth/ui";
+import { useRoute } from "vue-router";
 import { SearchIcon } from "@modrinth/assets";
 import type { Server } from "~/types/servers";
 
@@ -123,17 +75,21 @@ interface ServerResponse {
   servers: Server[];
 }
 
-const { data: serverResponse, status } = await useAsyncData<ServerResponse>(
-  "ServerList",
-  async () => {
-    try {
-      const response = await usePyroFetch<{ servers: Server[] }>("servers");
-      return response;
-    } catch {
-      throw new PyroFetchError("Unable to load servers");
-    }
-  },
-);
+const route = useRoute();
+const isLoading = ref(false);
+
+const {
+  data: serverResponse,
+  status,
+  refresh,
+} = await useAsyncData<ServerResponse>("ServerList", async () => {
+  try {
+    const response = await usePyroFetch<{ servers: Server[] }>("servers");
+    return response;
+  } catch {
+    throw new PyroFetchError("Unable to load servers");
+  }
+});
 
 const serverList = computed(() => serverResponse.value?.servers || []);
 
@@ -153,6 +109,37 @@ const filteredData = computed(() => {
     return serverList.value;
   }
   return fuse.value ? fuse.value.search(searchInput.value).map((result) => result.item) : [];
+});
+
+const previousServerList = ref<Server[]>([]);
+const refreshCount = ref(0);
+
+const checkForNewServers = async () => {
+  await refresh();
+  refreshCount.value += 1;
+  if (JSON.stringify(previousServerList.value) !== JSON.stringify(serverList.value)) {
+    isLoading.value = false;
+    clearInterval(intervalId);
+  } else if (refreshCount.value >= 5) {
+    isLoading.value = false;
+    clearInterval(intervalId);
+  }
+};
+
+let intervalId: ReturnType<typeof setInterval> | undefined;
+
+onMounted(() => {
+  if (route.query.redirect_status === "succeeded") {
+    isLoading.value = true;
+    previousServerList.value = [...serverList.value];
+    intervalId = setInterval(checkForNewServers, 5000);
+  }
+});
+
+onUnmounted(() => {
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
 });
 </script>
 
