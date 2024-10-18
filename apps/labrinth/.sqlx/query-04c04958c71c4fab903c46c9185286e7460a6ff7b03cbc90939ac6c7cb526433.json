@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT id, enum_id, value, ordering, metadata, created FROM loader_field_enum_values\n                    WHERE enum_id = ANY($1)\n                    ORDER BY enum_id, ordering, created DESC\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "enum_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "value",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "ordering",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "04c04958c71c4fab903c46c9185286e7460a6ff7b03cbc90939ac6c7cb526433"
+}

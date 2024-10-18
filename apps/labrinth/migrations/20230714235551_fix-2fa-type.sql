@@ -1,0 +1,1 @@
+ALTER TABLE users ALTER COLUMN totp_secret TYPE varchar(32);

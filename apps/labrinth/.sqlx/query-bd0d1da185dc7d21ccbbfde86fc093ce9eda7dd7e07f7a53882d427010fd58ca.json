@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM dependencies WHERE dependent_id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bd0d1da185dc7d21ccbbfde86fc093ce9eda7dd7e07f7a53882d427010fd58ca"
+}

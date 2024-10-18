@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE versions\n                    SET ordering = $1\n                    WHERE (id = $2)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "54c6b31858b7bf383f9b7118583592d694ab2d80ac0f132c5b9bc42603f336c6"
+}

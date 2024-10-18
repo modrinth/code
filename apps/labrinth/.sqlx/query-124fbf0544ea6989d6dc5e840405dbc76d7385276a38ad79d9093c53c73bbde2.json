@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                            UPDATE mods\n                            SET webhook_sent = TRUE\n                            WHERE id = $1\n                            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "124fbf0544ea6989d6dc5e840405dbc76d7385276a38ad79d9093c53c73bbde2"
+}

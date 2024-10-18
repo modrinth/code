@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE users\n                    SET microsoft_id = $2\n                    WHERE (id = $1)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "81e2e17bfbaadbb3d25072cf6cb8e8d7b3842252b3c72fcbd24aadd2ad933472"
+}

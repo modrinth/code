@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE mods\n            SET follows = follows - 1\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "371048e45dd74c855b84cdb8a6a565ccbef5ad166ec9511ab20621c336446da6"
+}

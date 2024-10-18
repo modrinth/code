@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO notifications (\n                id, user_id, body\n            )\n            SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::jsonb[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int8Array",
+        "JsonbArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8a9bf48b3d4aa665136568a9bf9ddb8e5d81ed27ce587e26672dfb45a44c7b9c"
+}

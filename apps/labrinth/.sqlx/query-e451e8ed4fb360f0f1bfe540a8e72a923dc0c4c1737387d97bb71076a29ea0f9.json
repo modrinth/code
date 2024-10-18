@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO mods_gallery (\n                mod_id, image_url, raw_image_url, featured, name, description, ordering\n            )\n            SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::varchar[], $4::bool[], $5::varchar[], $6::varchar[], $7::bigint[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "VarcharArray",
+        "VarcharArray",
+        "BoolArray",
+        "VarcharArray",
+        "VarcharArray",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e451e8ed4fb360f0f1bfe540a8e72a923dc0c4c1737387d97bb71076a29ea0f9"
+}

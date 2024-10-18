@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE reports\n                SET closed = $1\n                WHERE (id = $2)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bool",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d75b73151ba84715c06bbada22b66c819de8eac87c088b0a501212ad3fe4d618"
+}

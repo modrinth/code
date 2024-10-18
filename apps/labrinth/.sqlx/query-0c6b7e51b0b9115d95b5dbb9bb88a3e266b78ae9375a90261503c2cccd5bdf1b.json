@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE mods\n            SET organization_id = $1\n            WHERE (id = $2)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0c6b7e51b0b9115d95b5dbb9bb88a3e266b78ae9375a90261503c2cccd5bdf1b"
+}

@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT DISTINCT dependent_id as version_id, d.mod_dependency_id as dependency_project_id, d.dependency_id as dependency_version_id, d.dependency_file_name as file_name, d.dependency_type as dependency_type\n                    FROM dependencies d\n                    WHERE dependent_id = ANY($1)\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "dependency_project_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "dependency_version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "file_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "dependency_type",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "623881c24c12e77f6fc57669929be55a34800cd2269da29d555959164919c9a3"
+}
