@@ -314,7 +314,11 @@ const processImage = async (iconUrl: string | undefined) => {
         });
       }
     } catch (error) {
-      console.error("Error processing server image:", error);
+      if (error instanceof PyroFetchError && error.statusCode === 404) {
+        console.log("[PYROSERVERS] No server icon found");
+      } else {
+        console.error(error);
+      }
     }
   }
   return image.value;
