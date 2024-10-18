@@ -750,10 +750,8 @@ const downloadFile = async (item: any) => {
 
 const deleteItem = async () => {
   try {
-    await props.server.fs?.deleteFileOrFolder(
-      `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/"),
-      selectedItem.value.type === "directory",
-    );
+    const path = `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/");
+    await props.server.fs?.deleteFileOrFolder(path, selectedItem.value.type === "directory");
     currentPage.value = 1;
     items.value = [];
     await fetchData();

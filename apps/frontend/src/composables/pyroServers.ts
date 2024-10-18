@@ -719,8 +719,9 @@ const moveFileOrFolder = (path: string, newPath: string) => {
 };
 
 const deleteFileOrFolder = (path: string, recursive: boolean) => {
+  const encodedPath = encodeURIComponent(path);
   return retryWithAuth(async () => {
-    return await PyroFetch(`/delete?path=${path}&recursive=${recursive}`, {
+    return await PyroFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
       method: "DELETE",
       override: internalServerRefrence.value.fs.auth,
     });
