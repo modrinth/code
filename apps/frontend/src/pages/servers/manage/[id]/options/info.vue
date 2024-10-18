@@ -5,7 +5,7 @@
         <div class="flex justify-between">
           <label class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">SFTP</span>
-            <span> SFTP is a way to access your server's files from outside of Modrinth. </span>
+            <span> SFTP allows you to access your server's files from outside of Modrinth. </span>
           </label>
           <Button @click="openSftp"> Launch SFTP </Button>
         </div>

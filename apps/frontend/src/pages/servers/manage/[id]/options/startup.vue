@@ -9,7 +9,7 @@
         <div class="card flex flex-col gap-4">
           <label for="startup-command-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Startup Command</span>
-            <span> This is the command that starts your server. </span>
+            <span> The command that runs when your server is started. </span>
           </label>
           <textarea
             id="startup-command-field"
