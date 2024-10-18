@@ -773,6 +773,8 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
     const path = `${currentPath.value}/${item.name}`.replace("//", "/");
     const content = (await props.server.fs?.downloadFile(path)) as string;
 
+    window.scrollTo(0, 0);
+
     fileContent.value = content;
     editingFile.value = item;
     isEditing.value = true;
