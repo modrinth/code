@@ -78,18 +78,17 @@ interface ServerResponse {
 const route = useRoute();
 const isLoading = ref(false);
 
-const {
-  data: serverResponse,
-  status,
-  refresh,
-} = await useAsyncData<ServerResponse>("ServerList", async () => {
-  try {
-    const response = await usePyroFetch<{ servers: Server[] }>("servers");
-    return response;
-  } catch {
-    throw new PyroFetchError("Unable to load servers");
-  }
-});
+const { data: serverResponse, refresh } = await useAsyncData<ServerResponse>(
+  "ServerList",
+  async () => {
+    try {
+      const response = await usePyroFetch<{ servers: Server[] }>("servers");
+      return response;
+    } catch {
+      throw new PyroFetchError("Unable to load servers");
+    }
+  },
+);
 
 const serverList = computed(() => serverResponse.value?.servers || []);
 
