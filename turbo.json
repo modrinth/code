@@ -15,7 +15,11 @@
         "VERCEL_*",
         "CF_PAGES_*",
         "HEROKU_APP_NAME",
-        "STRIPE_PUBLISHABLE_KEY"
+        "STRIPE_PUBLISHABLE_KEY",
+        "PYRO_BASE_URL",
+        "PROD_OVERRIDE",
+        "PYRO_MASTER_KEY",
+        "PORT"
       ]
     },
     "lint": {},
