@@ -3,11 +3,12 @@
     data-pyro-file
     :class="[
       'group flex w-full select-none items-center justify-between border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised',
-      isEditableFile ? 'cursor-pointer' : '',
+      isEditableFile ? 'cursor-pointer' : type === 'directory' ? 'cursor-pointer' : '',
     ]"
     @contextmenu="openContextMenu"
+    @click="selectItem"
   >
-    <div class="flex w-full items-center gap-2" @click="selectItem">
+    <div data-pyro-file-metadata class="flex w-full items-center gap-2">
       <div
         class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
       >
@@ -24,7 +25,8 @@
         </span>
       </div>
     </div>
-    <div class="flex w-fit items-center gap-4">
+
+    <div data-pyro-file-actions class="flex w-fit items-center gap-4">
       <span class="w-full text-nowrap font-mono text-sm text-secondary">
         {{
           new Date(modified * 1000).toLocaleDateString("en-US", {

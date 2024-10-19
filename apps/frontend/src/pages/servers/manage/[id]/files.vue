@@ -110,9 +110,7 @@
       </Modal>
 
       <!-- Main Content -->
-      <div
-        class="flex min-h-[800px] w-full flex-col rounded-2xl border border-solid border-bg-raised"
-      >
+      <div class="flex w-full flex-col rounded-2xl border border-solid border-bg-raised">
         <nav
           v-if="!isEditing"
           class="flex h-12 select-none items-center justify-between bg-table-alternateRow p-3"
