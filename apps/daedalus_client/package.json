@@ -6,5 +6,8 @@
     "fix": "cargo fmt && cargo clippy --fix",
     "dev": "cargo run",
     "test": "cargo test"
+  },
+  "dependencies": {
+    "@modrinth/daedalus": "workspace:*"
   }
 }
