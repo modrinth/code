@@ -90,7 +90,7 @@ const data = computed(() => props.server.general);
 const showPassword = ref(false);
 
 const openSftp = () => {
-  window.open(`sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`);
+  window.open(`sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`, '_self');
 };
 
 const togglePassword = () => {
