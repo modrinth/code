@@ -8,6 +8,10 @@ RUN cargo build --release
 
 FROM debian:bookworm-slim
 
+LABEL org.opencontainers.image.source=https://github.com/modrinth/code
+LABEL org.opencontainers.image.description="Modrinth API"
+LABEL org.opencontainers.image.licenses=AGPL-3.0
+
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates openssl \
  && apt-get clean \
