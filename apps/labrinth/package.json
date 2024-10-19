@@ -5,6 +5,7 @@
     "lint": "cargo fmt --check && cargo clippy --all-targets --all-features -- -D warnings",
     "fix": "cargo fmt && cargo clippy --fix",
     "dev": "cargo run",
-    "test": "cargo test"
+    "//": "CI will fail since test takes up too much disk space. So we have it named differently.",
+    "test-labrinth": "cargo test"
   }
 }
