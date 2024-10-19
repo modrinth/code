@@ -18,11 +18,11 @@
     <div
       v-if="serverData"
       data-pyro-server-manager-root
-      class="mx-auto box-border flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
+      class="relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
     >
       <div class="flex w-full min-w-0 flex-row items-center gap-6 pt-4">
         <UiServersServerIcon :image="serverData.image" />
-        <div class="flex w-full flex-1 flex-col gap-2">
+        <div class="flex min-w-0 flex-1 flex-col gap-2">
           <div class="flex shrink-0 flex-row items-center gap-1">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
               <LeftArrowIcon />
@@ -30,13 +30,15 @@
             </NuxtLink>
           </div>
           <div class="flex w-full flex-row items-center gap-4">
-            <h1 class="m-0 w-full truncate text-4xl font-bold text-[var(--color-contrast)]">
+            <h1
+              class="m-0 w-full flex-shrink truncate text-4xl font-bold text-[var(--color-contrast)]"
+            >
               {{ serverData.name }}
             </h1>
             <div
               v-if="isConnected && serverData.status !== 'installing'"
               data-pyro-server-action-buttons
-              class="server-action-buttons-anim flex w-fit flex-1"
+              class="server-action-buttons-anim flex w-fit flex-shrink-0"
             >
               <UiServersPanelServerActionButton
                 class="flex-shrink-0"
@@ -57,7 +59,7 @@
             </ButtonStyled>
           </div>
 
-          <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
+          <div class="flex min-w-0 flex-row items-center gap-4 text-[var(--color-text-secondary)]">
             <UiServersServerGameLabel
               v-if="showGameLabel"
               :game="serverData.game!"
