@@ -59,3 +59,5 @@ app-playground-data/*
 # soley because i need the PORT to be 3002 due to WSL stuff
 .env
 apps/frontend/.env
+
+.astro

@@ -4,7 +4,7 @@
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
           <label for="server-name-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Server Name</span>
+            <span class="text-lg font-bold text-contrast">Server name</span>
             <span> Change the name of your server. This name is only visible on Modrinth.</span>
           </label>
           <div class="flex flex-col gap-2">
@@ -27,7 +27,7 @@
 
         <div class="card flex flex-col gap-4">
           <label for="server-icon-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Server Icon</span>
+            <span class="text-lg font-bold text-contrast">Server icon</span>
             <span>
               Change your server's icon. Changes will be visible on the Minecraft server list and on
               Modrinth.

@@ -24,7 +24,7 @@
       src="~/assets/images/games/maze.png"
       alt=""
       aria-hidden="true"
-      class="pointer-events-none absolute inset-0 h-full max-h-[1080px] w-screen scale-125 select-none opacity-50"
+      class="pointer-events-none absolute inset-0 hidden h-full max-h-[1080px] w-screen scale-125 select-none opacity-50 sm:visible"
       style="mask-image: linear-gradient(black, transparent 80%)"
     />
 
@@ -61,7 +61,7 @@
           class="pointer-events-none relative flex h-full w-full flex-row items-end gap-24 md:-mt-24"
         >
           <div
-            class="absolute left-0 right-0 top-0 max-h-[80%] overflow-hidden"
+            class="absolute left-0 right-0 top-0 -mt-24 max-h-[80%] overflow-hidden sm:mt-0"
             style="mask-image: linear-gradient(black, transparent 80%)"
           >
             <img

@@ -453,6 +453,7 @@ const reinstallCurrent = async () => {
 };
 
 const reinstallLoader = async (loader: string) => {
+  versionSelectModal.value.hide();
   try {
     await props.server.general?.reinstall(
       serverId,

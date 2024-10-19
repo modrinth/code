@@ -136,7 +136,7 @@ import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/t
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
-const isLoading = ref(true); // initial loading state
+const isLoading = ref(true);
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
 const route = useNativeRoute();
