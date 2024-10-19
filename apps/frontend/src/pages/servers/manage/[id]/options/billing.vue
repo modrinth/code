@@ -331,7 +331,6 @@ const cancelSubscription = async () => {
         cancelled: true,
       },
     });
-    // Refresh the subscription and charges data
     await refreshNuxtData("billing/subscriptions");
     await refreshNuxtData("billing/payments");
   } catch (err: any) {
@@ -339,7 +338,12 @@ const cancelSubscription = async () => {
       "An error occurred while cancelling the subscription:",
       err.data?.description || err.message,
     );
-    // You might want to use a notification system here
+    addNotification({
+      group: "billing",
+      title: "Error cancelling subscription",
+      text: "An error occurred while cancelling your subscription.",
+      type: "error",
+    });
   }
 };
 
@@ -355,12 +359,16 @@ const resubscribe = async () => {
         cancelled: false,
       },
     });
-    // Refresh the subscription and charges data
     await refreshNuxtData("billing/subscriptions");
     await refreshNuxtData("billing/payments");
   } catch (err: any) {
     console.error("An error occurred while resubscribing:", err.data?.description || err.message);
-    // You might want to use a notification system here
+    addNotification({
+      group: "billing",
+      title: "Error resubscribing",
+      text: "An error occurred while resubscribing to your Modrinth server.",
+      type: "error",
+    });
   }
 };
 </script>
