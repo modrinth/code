@@ -1,51 +1,47 @@
 <template>
-  <Modal ref="newAllocationModal" header="">
-    <UiServersPyroModal header="New allocation" :data="data" @modal="newAllocationModal?.hide()">
-      <div class="flex flex-col gap-2">
-        <label for="new-allocation-name" class="font-semibold text-contrast">
-          Name<span class="text-red-500">*</span>
-        </label>
-        <input
-          id="new-allocation-name"
-          v-model="newAllocationName"
-          type="text"
-          class="bg-bg-input w-full rounded-lg p-4"
-          maxlength="32"
-          placeholder="e.g. Secondary allocation"
-        />
-      </div>
-      <div class="mb-1 mt-4 flex justify-end gap-4">
-        <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
-        <Button color="primary" :disabled="!newAllocationName" @click="addNewAllocation">
-          <PlusIcon /> Create allocation
-        </Button>
-      </div>
-    </UiServersPyroModal>
-  </Modal>
+  <NewModal ref="newAllocationModal" header="New Allocation">
+    <div class="flex flex-col gap-2 md:w-[600px]">
+      <label for="new-allocation-name" class="font-semibold text-contrast">
+        Name<span class="text-red-500">*</span>
+      </label>
+      <input
+        id="new-allocation-name"
+        v-model="newAllocationName"
+        type="text"
+        class="bg-bg-input w-full rounded-lg p-4"
+        maxlength="32"
+        placeholder="e.g. Secondary allocation"
+      />
+    </div>
+    <div class="mb-1 mt-4 flex justify-end gap-4">
+      <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
+      <Button color="primary" :disabled="!newAllocationName" @click="addNewAllocation">
+        <PlusIcon /> Create allocation
+      </Button>
+    </div>
+  </NewModal>
 
-  <Modal ref="editAllocationModal" header="">
-    <UiServersPyroModal header="Edit allocation" :data="data" @modal="editAllocationModal?.hide()">
-      <div class="flex flex-col gap-2">
-        <label for="edit-allocation-name" class="font-semibold text-contrast">
-          Name<span class="text-red-500">*</span>
-        </label>
-        <input
-          id="edit-allocation-name"
-          v-model="newAllocationName"
-          type="text"
-          class="bg-bg-input w-full rounded-lg p-4"
-          maxlength="32"
-          placeholder="e.g. Secondary allocation"
-        />
-      </div>
-      <div class="mb-1 mt-4 flex justify-end gap-4">
-        <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
-        <Button color="primary" :disabled="!newAllocationName" @click="editAllocation">
-          <SaveIcon /> Update Allocation
-        </Button>
-      </div>
-    </UiServersPyroModal>
-  </Modal>
+  <NewModal ref="editAllocationModal" header="Edit Allocation">
+    <div class="flex flex-col gap-2 md:w-[600px]">
+      <label for="edit-allocation-name" class="font-semibold text-contrast">
+        Name<span class="text-red-500">*</span>
+      </label>
+      <input
+        id="edit-allocation-name"
+        v-model="newAllocationName"
+        type="text"
+        class="bg-bg-input w-full rounded-lg p-4"
+        maxlength="32"
+        placeholder="e.g. Secondary allocation"
+      />
+    </div>
+    <div class="mb-1 mt-4 flex justify-end gap-4">
+      <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
+      <Button color="primary" :disabled="!newAllocationName" @click="editAllocation">
+        <SaveIcon /> Update Allocation
+      </Button>
+    </div>
+  </NewModal>
 
   <div class="relative h-full w-full overflow-y-auto">
     <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4">
@@ -227,7 +223,7 @@
 
 <script setup lang="ts">
 import { PlusIcon, TrashIcon, EditIcon, VersionIcon, SaveIcon, InfoIcon } from "@modrinth/assets";
-import { ButtonStyled, Modal, Button } from "@modrinth/ui";
+import { ButtonStyled, NewModal, Button } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{

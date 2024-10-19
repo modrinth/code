@@ -3,7 +3,7 @@
     <div class="flex flex-col gap-6">
       <div class="flex flex-row items-center gap-6">
         <div
-          class="fade-in-up relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+          class="relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
         >
           <div class="flex flex-row items-center gap-2">
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0.00%</h2>
@@ -12,7 +12,7 @@
           <CPUIcon class="absolute right-8 top-8" />
         </div>
         <div
-          class="fade-in-up relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+          class="relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
         >
           <div class="flex flex-row items-center gap-2">
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0.00%</h2>
@@ -21,7 +21,7 @@
           <DBIcon class="absolute right-8 top-8" />
         </div>
         <div
-          class="fade-in-up relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+          class="relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
         >
           <div class="flex flex-row items-center gap-2">
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0 MB</h2>
@@ -32,7 +32,7 @@
       </div>
 
       <div
-        class="fade-in-up relative flex h-full w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised p-8"
+        class="relative flex h-full w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised p-8"
       >
         <div class="experimental-styles-within flex flex-row items-center">
           <div class="flex flex-row items-center gap-4">
@@ -50,20 +50,3 @@
 <script setup lang="ts">
 import { CPUIcon, DBIcon, FolderOpenIcon } from "@modrinth/assets";
 </script>
-
-<style scoped>
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(40px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.fade-in-up {
-  animation: fade-in-up 400ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-</style>

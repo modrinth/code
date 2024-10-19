@@ -1,6 +1,6 @@
 <template>
-  <div class="flex h-[400px] w-full flex-col overflow-clip p-2 pb-4">
-    <div class="iconified-input w-full">
+  <div class="flex h-[400px] w-full max-w-xl flex-col overflow-hidden">
+    <div class="iconified-input mb-4 w-full">
       <label class="hidden" for="search">Search</label>
       <SearchIcon aria-hidden="true" />
       <input
@@ -13,20 +13,20 @@
         @keyup.enter="resetList"
       />
     </div>
-    <div class="flex h-[93%] w-full flex-col">
+    <div class="flex h-full w-full flex-col">
       <div
         v-if="mods && mods.hits.length > 0"
         ref="scrollContainer"
-        class="flex h-full w-full flex-col gap-2 overflow-y-scroll pt-2"
+        class="flex h-full w-full flex-col gap-2 overflow-y-scroll"
       >
-        <div v-for="mod in mods.hits" :key="mod.title" class="rounded-lg p-2 hover:bg-divider-dark">
+        <div v-for="mod in mods.hits" :key="mod.title" class="rounded-lg px-2 py-2 hover:bg-bg">
           <div class="flex cursor-pointer gap-2" @click="toggleMod(mod.project_id)">
-            <UiAvatar :src="mod.icon_url" size="sm" />
+            <UiAvatar :src="mod.icon_url" class="!h-12 !min-h-12 !w-12 !min-w-12" />
             <div class="flex flex-col gap-1">
-              <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
+              <h1 class="m-0 text-2xl font-bold leading-none text-contrast">
                 {{ mod.title }}
               </h1>
-              <span class="text-sm font-semibold text-secondary">
+              <span class="text-sm text-secondary">
                 {{ mod.description.substring(0, 100) }}
                 {{ mod.description.length > 100 ? "..." : "" }}
               </span>
@@ -94,7 +94,7 @@ const loadMods = async () => {
   modsStatus.value = "loading";
 
   const newMods = (await useBaseFetch(
-    `search?query=${queryFilter.value}&facets=${buildFacetString(facets.value)}&index=relevance&limit=100&offset=${page.value * 100}`,
+    `search?query=${queryFilter.value}&facets=${buildFacetString(facets.value)}&index=relevance&limit=25&offset=${page.value * 25}`,
     {},
     false,
     prodOverride,

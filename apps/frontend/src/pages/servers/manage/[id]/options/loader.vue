@@ -1,34 +1,13 @@
 <template>
-  <Modal ref="editModal" header="">
-    <div class="h-[500px]">
-      <UiServersPyroModal header="Install Modpack" :data="data" @modal="editModal.hide()">
-        <UiServersProjectSelect type="modpack" @select="reinstallNew" />
-      </UiServersPyroModal>
-    </div>
-  </Modal>
+  <NewModal ref="editModal" header="Select modpack">
+    <UiServersProjectSelect type="modpack" @select="reinstallNew" />
+  </NewModal>
 
-  <Modal ref="versionSelectModal" header="">
-    <div class="flex flex-col gap-4 p-6">
-      <div class="flex items-center justify-between gap-4">
-        <div class="flex items-center gap-4">
-          <div class="text-2xl font-extrabold text-contrast">
-            {{ isSecondPhase ? "Are you sure?" : "Select version" }}
-          </div>
-        </div>
-        <button
-          class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-          @click="
-            versionSelectModal?.hide();
-            selectedMCVersion = '';
-            selectedLoaderVersion = '';
-            hardReset = false;
-            backupServer = false;
-            isSecondPhase = false;
-          "
-        >
-          <XIcon class="h-4 w-4" />
-        </button>
-      </div>
+  <NewModal
+    ref="versionSelectModal"
+    :header="isSecondPhase ? 'Confirm reinstallation' : 'Select version'"
+  >
+    <div class="flex flex-col gap-4 md:w-[600px]">
       <p
         :style="{
           lineHeight: isSecondPhase ? '1.5' : undefined,
@@ -109,7 +88,7 @@
         </Button>
       </div>
     </div>
-  </Modal>
+  </NewModal>
 
   <div class="flex h-full w-full flex-col">
     <div v-if="data && versions" class="flex w-full flex-col">
@@ -327,8 +306,8 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownSelect, Button, Modal } from "@modrinth/ui";
-import { ChevronRightIcon, DownloadIcon, EditIcon, XIcon, UploadIcon } from "@modrinth/assets";
+import { DropdownSelect, Button, NewModal } from "@modrinth/ui";
+import { ChevronRightIcon, DownloadIcon, EditIcon, UploadIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();

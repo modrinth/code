@@ -8,32 +8,24 @@
       @drop.prevent="handleDrop"
     >
       <!-- Create Item Modal -->
-      <Modal ref="createItemModal" header="">
-        <UiServersPyroModal
-          :header="`Create ${newItemType}`"
-          :data="data"
-          @modal="createItemModal?.hide()"
-        >
-          <div class="mt-2 flex flex-col gap-2">
+      <NewModal ref="createItemModal" :header="`Creating a ${newItemType}`">
+        <div class="flex flex-col gap-4 md:w-[600px]">
+          <div class="flex flex-col gap-2">
             <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
             <div v-if="nameError" class="text-red-500">{{ nameError }}</div>
           </div>
-          <div class="mb-1 mt-4 flex justify-end gap-4">
+          <div class="flex justify-end gap-4">
             <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
             <Button :disabled="!!nameError" color="primary" @click="createNewItem"> Create </Button>
           </div>
-        </UiServersPyroModal>
-      </Modal>
+        </div>
+      </NewModal>
 
       <!-- Rename Item Modal -->
-      <Modal ref="renameItemModal" header="">
-        <UiServersPyroModal
-          :header="`Rename ${selectedItem?.type}`"
-          :data="data"
-          @modal="renameItemModal?.hide()"
-        >
-          <div class="mt-2 flex flex-col gap-2">
+      <NewModal ref="renameItemModal" :header="`Renaming ${selectedItem?.type}`">
+        <div class="flex flex-col gap-4 md:w-[600px]">
+          <div class="flex flex-col gap-2">
             <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input
               v-model="newItemName"
@@ -42,21 +34,17 @@
               :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
             />
           </div>
-          <div class="mb-1 mt-4 flex justify-end gap-4">
+          <div class="flex justify-end gap-4">
             <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
             <Button color="primary" @click="renameItem"> Rename </Button>
           </div>
-        </UiServersPyroModal>
-      </Modal>
+        </div>
+      </NewModal>
 
       <!-- Move Item Modal -->
-      <Modal ref="moveItemModal" header="">
-        <UiServersPyroModal
-          :header="`Move ${selectedItem?.name}`"
-          :data="data"
-          @modal="moveItemModal?.hide()"
-        >
-          <div class="mt-2 flex flex-col gap-2">
+      <NewModal ref="moveItemModal" :header="`Moving ${selectedItem?.name}`">
+        <div class="flex flex-col gap-4 md:w-[600px]">
+          <div class="flex flex-col gap-2">
             <input
               v-model="destinationFolder"
               type="text"
@@ -64,50 +52,43 @@
               placeholder="e.g. mods/modname"
             />
           </div>
-          <div class="mb-1 mt-4 flex justify-end gap-4">
+          <div class="flex justify-end gap-4">
             <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
             <Button color="primary" @click="moveItem"> Move </Button>
           </div>
-        </UiServersPyroModal>
-      </Modal>
+        </div>
+      </NewModal>
 
       <!-- Delete Item Modal -->
-      <Modal ref="deleteItemModal" header="">
-        <UiServersPyroModal
-          :header="`Delete ${selectedItem?.type}`"
-          :data="data"
-          danger
-          @modal="deleteItemModal?.hide()"
-        >
-          <div class="flex flex-col gap-4">
+      <NewModal ref="deleteItemModal" :header="`Deleting ${selectedItem?.type}`">
+        <div class="flex flex-col gap-4 md:w-[600px]">
+          <div
+            class="relative flex w-full items-center gap-2 rounded-2xl border border-solid border-[#cb224436] bg-[#f57b7b0e] p-6 shadow-md dark:border-0 dark:bg-[#0e0e0ea4]"
+          >
             <div
-              class="relative flex w-full items-center gap-2 rounded-2xl border border-solid border-[#cb224436] bg-[#f57b7b0e] p-6 shadow-md dark:border-0 dark:bg-[#0e0e0ea4]"
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-[#3f1818a4] p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
             >
-              <div
-                class="flex h-9 w-9 items-center justify-center rounded-full bg-[#3f1818a4] p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+              <FolderOpenIcon v-if="selectedItem?.type === 'directory'" class="h-5 w-5" />
+              <FileIcon v-else-if="selectedItem?.type === 'file'" class="h-5 w-5" />
+            </div>
+            <div class="flex flex-col">
+              <span class="font-bold group-hover:text-contrast">{{ selectedItem?.name }}</span>
+              <span
+                v-if="selectedItem?.type === 'directory'"
+                class="text-xs text-secondary group-hover:text-primary"
+                >{{ selectedItem?.count }} items</span
               >
-                <FolderOpenIcon v-if="selectedItem?.type === 'directory'" class="h-5 w-5" />
-                <FileIcon v-else-if="selectedItem?.type === 'file'" class="h-5 w-5" />
-              </div>
-              <div class="flex flex-col">
-                <span class="font-bold group-hover:text-contrast">{{ selectedItem?.name }}</span>
-                <span
-                  v-if="selectedItem?.type === 'directory'"
-                  class="text-xs text-secondary group-hover:text-primary"
-                  >{{ selectedItem?.count }} items</span
-                >
-                <span v-else class="text-xs text-secondary group-hover:text-primary"
-                  >{{ (selectedItem?.size / 1024 / 1024).toFixed(2) }} MB</span
-                >
-              </div>
+              <span v-else class="text-xs text-secondary group-hover:text-primary"
+                >{{ (selectedItem?.size / 1024 / 1024).toFixed(2) }} MB</span
+              >
             </div>
           </div>
-          <div class="mb-1 mt-4 flex justify-end gap-4">
+          <div class="flex justify-end gap-4">
             <Button transparent @click="deleteItemModal?.hide()"> Cancel </Button>
             <Button color="danger" @click="deleteItem"> Delete {{ selectedItem?.type }} </Button>
           </div>
-        </UiServersPyroModal>
-      </Modal>
+        </div>
+      </NewModal>
 
       <!-- Main Content -->
       <div class="flex w-full flex-col rounded-2xl border border-solid border-bg-raised">
@@ -387,7 +368,7 @@ import {
   TrashIcon,
   ShareIcon,
 } from "@modrinth/assets";
-import { Button, Modal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
+import { Button, NewModal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
 import type { Server } from "~/composables/pyroServers";
 
@@ -551,10 +532,10 @@ const navigateToPage = (page: number) => {
   router.push({ query: { page, path: currentPath.value } });
 };
 
-const createItemModal = ref<typeof Modal>();
-const deleteItemModal = ref<typeof Modal>();
-const renameItemModal = ref<typeof Modal>();
-const moveItemModal = ref<typeof Modal>();
+const createItemModal = ref<typeof NewModal>();
+const deleteItemModal = ref<typeof NewModal>();
+const renameItemModal = ref<typeof NewModal>();
+const moveItemModal = ref<typeof NewModal>();
 const newItemType = ref<"file" | "directory">("file");
 const newItemName = ref("");
 const selectedItem = ref<any>(null);
