@@ -2,7 +2,7 @@
   <div class="h-full w-full">
     <div class="h-full w-full gap-2 overflow-y-auto">
       <div class="card flex flex-col gap-4">
-        <h1 class="m-0 text-2xl font-bold">Server Preferences</h1>
+        <h1 class="m-0 text-lg font-bold">Server preferences</h1>
         <div v-for="(value, key) in userPreferences" :key="key" class="flex justify-between">
           <label for="server-name-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">{{ preferences[key].displayName }}</span>
@@ -12,15 +12,14 @@
         </div>
       </div>
     </div>
-    <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
-      <UiServersSaveBanner
-        :is-visible="!!hasUnsavedChanges"
-        :server="props.server"
-        :is-updating="false"
-        :save="savePreferences"
-        :reset="resetPreferences"
-      />
-    </div>
+
+    <UiServersSaveBanner
+      :is-visible="!!hasUnsavedChanges"
+      :server="props.server"
+      :is-updating="false"
+      :save="savePreferences"
+      :reset="resetPreferences"
+    />
   </div>
 </template>
 
@@ -56,16 +55,16 @@ const resetPreferences = () => {
 const preferences = {
   ramAsNumber: {
     displayName: "RAM as bytes",
-    description: "Display RAM usage in number of bytes instead of percentage",
+    description: "Display RAM usage in number of bytes instead of a percentage.",
   },
   autoRestart: {
     displayName: "Auto restart (not implemented)",
-    description: "Automatically restart the server if it crashes",
+    description: "Automatically restart the server if it crashes.",
   },
   backupWhileRunning: {
     displayName: "Backup while running (not implemented)",
     description:
-      "Allow creation of a backup without stopping the server. This may lead to corrupted backups, use with caution",
+      "Allow creation of a backup without stopping the server. This may lead to corrupted backups, use with caution.",
   },
 };
 

@@ -94,8 +94,7 @@
     <div v-if="data && versions" class="flex w-full flex-col">
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-2xl font-bold">Modpack</h2>
-          <p class="m-0">The modpack that is currently installed on your server.</p>
+          <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
         </div>
         <div
           v-if="data.upstream"
@@ -160,7 +159,7 @@
 
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-2xl font-bold">Mod Loader</h2>
+          <h2 class="m-0 text-lg font-bold text-contrast">Mod loader</h2>
           <p class="m-0">
             The mod loader that provides the ability to load mods into your server. Changing this
             will reinstall the server.

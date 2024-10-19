@@ -49,7 +49,7 @@
         <!-- Subdomain section -->
         <div class="card flex flex-col gap-4">
           <label for="server-subdomain" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Custom Subdomain</span>
+            <span class="text-lg font-bold text-contrast">Custom subdomain</span>
             <span> Your friends can connect to your server using this URL. </span>
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
@@ -152,7 +152,7 @@
             <ButtonStyled type="standard" color="brand" @click="newAllocationModal.show()">
               <button>
                 <PlusIcon />
-                <span>New Allocation</span>
+                <span>New allocation</span>
               </button>
             </ButtonStyled>
           </div>
@@ -209,15 +209,13 @@
       </div>
     </div>
     <UiServersPyroLoading v-else />
-    <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
-      <UiServersSaveBanner
-        :is-visible="!!hasUnsavedChanges && !!isValidSubdomain"
-        :server="props.server"
-        :is-updating="isUpdating"
-        :save="saveNetwork"
-        :reset="resetNetwork"
-      />
-    </div>
+    <UiServersSaveBanner
+      :is-visible="!!hasUnsavedChanges && !!isValidSubdomain"
+      :server="props.server"
+      :is-updating="isUpdating"
+      :save="saveNetwork"
+      :reset="resetNetwork"
+    />
   </div>
 </template>
 

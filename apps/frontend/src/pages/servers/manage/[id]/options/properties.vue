@@ -3,10 +3,10 @@
     <div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto">
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-lg font-bold text-contrast">Server Properties</h2>
+          <h2 class="m-0 text-lg font-bold text-contrast">Server properties</h2>
           <p class="m-0">Edit the Minecraft server properties file.</p>
         </div>
-        <div class="flex flex-col gap-4 rounded-xl bg-table-alternateRow p-4">
+        <div class="flex flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
           <div class="relative w-full text-sm">
             <label for="search-server-properties" class="sr-only">Search server properties</label>
             <SearchIcon
