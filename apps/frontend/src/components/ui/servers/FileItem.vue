@@ -2,7 +2,7 @@
   <div
     data-pyro-file
     :class="[
-      'group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised',
+      'group flex w-full select-none items-center justify-between border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised',
       isEditableFile ? 'cursor-pointer' : '',
     ]"
     @contextmenu="openContextMenu"
@@ -175,6 +175,7 @@ const editableExtensions = [
   "cfg",
   "conf",
   "properties",
+  "log",
 ];
 
 const isEditableFile = computed(() => {

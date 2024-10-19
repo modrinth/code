@@ -17,10 +17,11 @@
           <div class="mt-2 flex flex-col gap-2">
             <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
+            <div v-if="nameError" class="text-red-500">{{ nameError }}</div>
           </div>
           <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="createNewItem"> Create </Button>
+            <Button :disabled="!!nameError" color="primary" @click="createNewItem"> Create </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
@@ -112,29 +113,30 @@
       <div
         class="flex min-h-[800px] w-full flex-col rounded-2xl border border-solid border-bg-raised"
       >
-        <div
+        <nav
           v-if="!isEditing"
           class="flex h-12 select-none items-center justify-between bg-table-alternateRow p-3"
         >
-          <div class="flex items-center gap-2 text-contrast">
-            <div
+          <ul class="flex list-none items-center p-0 text-contrast">
+            <li
+              v-tooltip="'Back to home'"
               role="link"
-              class="breadcrumb-link grid size-8 place-content-center rounded-full bg-bg-raised p-[6px]"
+              class="breadcrumb-link grid size-8 cursor-pointer place-content-center rounded-full bg-bg-raised p-[6px] hover:bg-brand-highlight hover:text-brand"
               @click="navigateToSegment(-1)"
             >
-              <BoxIcon class="size-6" />
-            </div>
-            <span class="opacity-50">/</span>
-            <span
+              <BoxIcon class="size-5" />
+            </li>
+            <UiServersSlashIcon class="h-5 w-5" />
+            <li
               v-for="(segment, index) in breadcrumbSegments"
               :key="index"
-              class="breadcrumb-link cursor-pointer"
+              class="breadcrumb-link flex cursor-pointer items-center"
               @click="navigateToSegment(index)"
             >
               {{ segment || "" }}
-              <span class="ms-1 opacity-50">/</span>
-            </span>
-          </div>
+              <UiServersSlashIcon class="h-5 w-5" />
+            </li>
+          </ul>
           <div class="flex gap-2">
             <ButtonStyled type="transparent">
               <OverflowMenu
@@ -156,16 +158,16 @@
               </OverflowMenu>
             </ButtonStyled>
           </div>
-        </div>
-        <div
+        </nav>
+        <nav
           v-else
-          class="flex h-12 items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
+          class="flex h-12 select-none items-center justify-between bg-table-alternateRow p-3"
         >
           <div class="flex items-center gap-2 text-contrast">
             <ButtonStyled type="transparent">
-              <Button @click="cancelEditing">
+              <button @click="cancelEditing">
                 <XIcon aria-hidden="true" />
-              </Button>
+              </button>
             </ButtonStyled>
             <span class="breadcrumb-link flex cursor-pointer items-center gap-2">
               <span class="text-lg font-bold">{{ editingFile?.name }}</span>
@@ -175,7 +177,7 @@
           <div class="flex gap-2">
             <Button
               v-if="editingFile.path.startsWith('logs') && editingFile.path.endsWith('.log')"
-              v-tooltip="'Share your mc log'"
+              v-tooltip="'Share to mclo.gs'"
               icon-only
               transparent
               @click="requestShareLink"
@@ -211,7 +213,7 @@
               </OverflowMenu>
             </ButtonStyled>
           </div>
-        </div>
+        </nav>
 
         <div v-if="isEditing" class="h-full w-full flex-grow">
           <component
@@ -225,11 +227,7 @@
             @init="onInit"
           />
         </div>
-        <div
-          v-else-if="items.length > 0"
-          ref="scrollContainer"
-          class="h-full w-full snap-y overflow-visible"
-        >
+        <div v-else-if="items.length > 0" ref="scrollContainer" class="h-full w-full">
           <UiServersFileItem
             v-for="item in items"
             :key="item.name"
@@ -255,7 +253,7 @@
             v-else-if="isLoading"
             class="flex h-10 animate-pulse items-center justify-center gap-2"
           >
-            <PyroIcon class="h-4 w-4" /> Loading...
+            <BrandLogoAnimated />
           </div>
         </div>
 
@@ -301,9 +299,7 @@
             </p>
           </div>
         </div>
-        <div v-else class="flex h-full w-full items-center justify-center p-20">
-          <UiServersPyroLoading />
-        </div>
+        <div v-else class="flex h-full w-full items-center justify-center p-20"></div>
       </div>
       <div
         v-if="isDragging"
@@ -386,7 +382,6 @@ import {
   DropdownIcon,
   FolderOpenIcon,
   SaveIcon,
-  PyroIcon,
   ClearIcon,
   EditIcon,
   ArrowBigUpDashIcon,
@@ -571,6 +566,17 @@ const fileContent = ref("");
 const editingFile = ref<any>(null);
 const closeEditor = ref(false);
 
+const nameError = computed(() => {
+  if (!newItemName.value) {
+    return "Name is required.";
+  }
+  const validPattern = /^[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+$/;
+  if (!validPattern.test(newItemName.value)) {
+    return "Name must contain alphanumeric characters, dashes, underscores, and a dot for the file extension.";
+  }
+  return "";
+});
+
 const requestShareLink = async () => {
   try {
     const response = (await $fetch("https://api.mclo.gs/1/log", {
@@ -693,24 +699,41 @@ const showDeleteModal = (item: any) => {
 };
 
 const createNewItem = async () => {
-  try {
-    const path = `${currentPath.value}/${newItemName.value}`.replace("//", "/");
-    await props.server.fs?.createFileOrFolder(path, newItemType.value);
+  if (!nameError.value) {
+    try {
+      const path = `${currentPath.value}/${newItemName.value}`.replace("//", "/");
+      await props.server.fs?.createFileOrFolder(path, newItemType.value);
 
-    currentPage.value = 1;
-    newItemName.value = "";
-    items.value = [];
-    await fetchData();
-    createItemModal.value?.hide();
+      currentPage.value = 1;
+      newItemName.value = "";
+      items.value = [];
+      await fetchData();
+      createItemModal.value?.hide();
 
-    addNotification({
-      group: "files",
-      title: "File created",
-      text: "Your file has been created.",
-      type: "success",
-    });
-  } catch (error) {
-    console.error("Error creating item:", error);
+      addNotification({
+        group: "files",
+        title: "File created",
+        text: "Your file has been created.",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error creating item:", error);
+      if (error instanceof PyroFetchError && error.statusCode === 400) {
+        addNotification({
+          group: "files",
+          title: "Error creating item",
+          text: "Invalid file",
+          type: "error",
+        });
+      } else if (error instanceof PyroFetchError && error.statusCode === 500) {
+        addNotification({
+          group: "files",
+          title: "Error creating item",
+          text: "File already exists",
+          type: "error",
+        });
+      }
+    }
   }
 };
 

@@ -153,178 +153,6 @@
       </div>
     </div>
   </section>
-  <section v-if="pyroSubscriptions.length > 0" class="universal-card">
-    <div class="mb-6 flex items-center">
-      <h2 class="m-0 flex-grow">{{ formatMessage(pyroMessages.pyroSubscriptionTitle) }}</h2>
-      <button
-        class="btn !hidden sm:!flex"
-        :disabled="loadingAddMethod"
-        @click="
-          // go to http://localhost:3000/servers#plan
-          $router.push({ name: 'servers', hash: '#plan' })
-        "
-      >
-        <PlusIcon />
-        {{ formatMessage(pyroMessages.pyroNewSubscription) }}
-      </button>
-    </div>
-    <p>{{ formatMessage(pyroMessages.pyroSubscriptionDescription) }}</p>
-    <div
-      v-for="subscription in pyroSubscriptions"
-      :key="subscription.id"
-      class="universal-card recessed mb-4"
-    >
-      <ConfirmModal
-        ref="modal_cancel_pyro"
-        :title="formatMessage(cancelModalMessages.title)"
-        :description="formatMessage(cancelModalMessages.description)"
-        :proceed-label="formatMessage(cancelModalMessages.action)"
-        @proceed="cancelSubscription(cancelSubscriptionId, true)"
-      />
-      <div class="flex flex-wrap justify-between gap-4 xl:flex-nowrap xl:justify-normal xl:gap-16">
-        <div class="flex flex-col gap-5 xl:flex-grow">
-          <span v-if="getPyroCharge(subscription).status === 'open'">
-            {{ formatMessage(pyroMessages.pyroActiveSubscription) }}
-          </span>
-          <span v-else-if="getPyroCharge(subscription).status === 'processing'" class="text-orange">
-            {{ formatMessage(pyroMessages.pyroProcessingPayment) }}
-          </span>
-          <span v-else-if="getPyroCharge(subscription).status === 'cancelled'">
-            {{ formatMessage(pyroMessages.pyroCancelledSubscription) }}
-          </span>
-          <span v-else-if="getPyroCharge(subscription).status === 'failed'" class="text-red">
-            {{ formatMessage(pyroMessages.pyroFailedPayment) }}
-          </span>
-          <div class="flex items-center gap-5">
-            <div
-              v-if="subscription.server.icon === 'ICON-LOADING'"
-              class="throbbing aspect-square h-24 rounded-lg"
-              :src="subscription.server.icon"
-            />
-            <img
-              v-else-if="subscription.server.icon"
-              class="aspect-square h-24 rounded-lg"
-              :src="subscription.server.icon"
-            />
-            <img
-              v-else
-              class="aspect-square h-24 rounded-lg"
-              src="~/assets/images/servers/minecraft_server_icon.png"
-            />
-            <div class="flex h-fit flex-col gap-2">
-              <span class="font-bold">{{ formatMessage(pyroMessages.pyroServerDetails) }}</span>
-              <div class="flex items-center gap-2">
-                <span>{{
-                  formatMessage(pyroMessages.pyroServerId, { id: subscription.metadata.id })
-                }}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span>{{
-                  formatMessage(pyroMessages.pyroServerName, { name: subscription.server.name })
-                }}</span>
-              </div>
-              <ButtonStyled>
-                <NuxtLink :to="'/servers/manage/' + subscription.server.server_id">
-                  View Server
-                </NuxtLink>
-              </ButtonStyled>
-            </div>
-          </div>
-        </div>
-        <div
-          class="flex w-full flex-wrap justify-between gap-4 xl:w-auto xl:flex-shrink-0 xl:flex-col"
-        >
-          <div class="flex flex-col gap-1 xl:ml-auto xl:text-right">
-            <span class="text-2xl font-bold text-dark">
-              {{
-                formatPrice(
-                  vintl.locale,
-                  getPyroCharge(subscription).amount,
-                  getPyroCharge(subscription).currency_code,
-                )
-              }}
-              / {{ subscription.interval }}
-            </span>
-            <span class="text-sm text-secondary">
-              {{
-                formatMessage(pyroMessages.pyroSubscriptionSince, {
-                  date: $dayjs(subscription.created).format("MMMM D, YYYY"),
-                })
-              }}
-            </span>
-            <span
-              v-if="getPyroCharge(subscription).status === 'open'"
-              class="text-sm text-secondary"
-            >
-              {{
-                formatMessage(pyroMessages.pyroRenewsOn, {
-                  date: $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY"),
-                })
-              }}
-            </span>
-            <span
-              v-else-if="getPyroCharge(subscription).status === 'cancelled'"
-              class="text-sm text-secondary"
-            >
-              {{
-                formatMessage(pyroMessages.pyroExpiresOn, {
-                  date: $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY"),
-                })
-              }}
-            </span>
-          </div>
-          <div
-            v-if="getPyroCharge(subscription).status === 'failed'"
-            class="ml-auto flex flex-row-reverse items-center gap-2"
-          >
-            <button
-              class="iconified-button raised-button"
-              @click="updatePaymentMethod(subscription)"
-            >
-              <UpdatedIcon />
-              {{ formatMessage(pyroMessages.pyroUpdateMethod) }}
-            </button>
-            <OverflowMenu
-              class="btn icon-only transparent"
-              :options="[
-                {
-                  id: 'cancel',
-                  action: () => {
-                    cancelSubscriptionId = subscription.id;
-                    $refs.modal_cancel_pyro[0].show();
-                  },
-                },
-              ]"
-            >
-              <MoreVerticalIcon />
-              <template #cancel
-                ><XIcon /> {{ formatMessage(commonMessages.cancelButton) }}</template
-              >
-            </OverflowMenu>
-          </div>
-          <button
-            v-else-if="getPyroCharge(subscription).status !== 'cancelled'"
-            class="iconified-button raised-button !ml-auto active:scale-95"
-            @click="
-              () => {
-                cancelSubscriptionId = subscription.id;
-                $refs.modal_cancel_pyro[0].show();
-              }
-            "
-          >
-            <XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-          </button>
-          <button
-            v-else-if="getPyroCharge(subscription).status === 'cancelled'"
-            class="btn btn-purple btn-large ml-auto"
-            @click="cancelSubscription(subscription.id, false)"
-          >
-            <RightArrowIcon /> {{ formatMessage(pyroMessages.pyroResubscribe) }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
   <section class="universal-card">
     <ConfirmModal
       ref="modal_confirm"
@@ -493,14 +321,7 @@
   </section>
 </template>
 <script setup>
-import {
-  ConfirmModal,
-  NewModal,
-  OverflowMenu,
-  AnimatedLogo,
-  PurchaseModal,
-  ButtonStyled,
-} from "@modrinth/ui";
+import { ConfirmModal, NewModal, OverflowMenu, AnimatedLogo, PurchaseModal } from "@modrinth/ui";
 import {
   PlusIcon,
   XIcon,
@@ -519,7 +340,6 @@ import {
 } from "@modrinth/assets";
 import { calculateSavings, formatPrice, createStripeElements, getCurrency } from "@modrinth/utils";
 import { ref } from "vue";
-import { asyncComputed } from "@vueuse/core";
 import { products } from "~/generated/state.json";
 
 definePageMeta({
@@ -616,71 +436,6 @@ const messages = defineMessages({
   },
 });
 
-const pyroMessages = defineMessages({
-  pyroSubscriptionTitle: {
-    id: "settings.billing.pyro_subscription.title",
-    defaultMessage: "Modrinth Servers",
-  },
-  pyroSubscriptionDescription: {
-    id: "settings.billing.pyro_subscription.description",
-    defaultMessage: "Manage your Modrinth Servers subscriptions.",
-  },
-  pyroActiveSubscription: {
-    id: "settings.billing.pyro_subscription.active",
-    defaultMessage: "You have a server subscription for:",
-  },
-  pyroProcessingPayment: {
-    id: "settings.billing.pyro_subscription.processing",
-    defaultMessage:
-      "Your payment is being processed. Server will be activated once payment is complete.",
-  },
-  pyroCancelledSubscription: {
-    id: "settings.billing.pyro_subscription.cancelled",
-    defaultMessage:
-      "You've cancelled your subscription. Your server will remain active until the end of the current billing cycle.",
-  },
-  pyroFailedPayment: {
-    id: "settings.billing.pyro_subscription.failed",
-    defaultMessage: "Your subscription payment failed. Please update your payment method.",
-  },
-  pyroServerDetails: {
-    id: "settings.billing.pyro_subscription.server_details",
-    defaultMessage: "Server Details",
-  },
-  pyroServerId: {
-    id: "settings.billing.pyro_subscription.server_id",
-    defaultMessage: "Server ID: {id}",
-  },
-  pyroServerName: {
-    id: "settings.billing.pyro_subscription.server_id",
-    defaultMessage: "Server name: {name}",
-  },
-  pyroSubscriptionSince: {
-    id: "settings.billing.pyro_subscription.since",
-    defaultMessage: "Since {date}",
-  },
-  pyroRenewsOn: {
-    id: "settings.billing.pyro_subscription.renews",
-    defaultMessage: "Renews on {date}",
-  },
-  pyroExpiresOn: {
-    id: "settings.billing.pyro_subscription.expires",
-    defaultMessage: "Expires on {date}",
-  },
-  pyroUpdateMethod: {
-    id: "settings.billing.pyro_subscription.update_method",
-    defaultMessage: "Update method",
-  },
-  pyroResubscribe: {
-    id: "settings.billing.pyro_subscription.resubscribe",
-    defaultMessage: "Resubscribe",
-  },
-  pyroNewSubscription: {
-    id: "settings.billing.pyro_subscription.new",
-    defaultMessage: "Add a new server subscription",
-  },
-});
-
 const paymentMethodTypes = defineMessages({
   visa: {
     id: "settings.billing.payment_method_type.visa",
@@ -719,26 +474,6 @@ function loadStripe() {
   } catch {}
 }
 
-const updateIcons = async (data) => {
-  await Promise.all(
-    data.map(async (server) => {
-      if (import.meta.browser) {
-        try {
-          const auth = await usePyroFetch(`servers/${server.server_id}/fs`);
-          const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
-            override: auth,
-          });
-          server.icon = URL.createObjectURL(new Blob([fileData]));
-        } catch {
-          server.icon = null;
-        }
-        return;
-      }
-      server.icon = "ICON-LOADING";
-    }),
-  );
-};
-
 const [
   { data: paymentMethods, refresh: refreshPaymentMethods },
   { data: charges, refresh: refreshCharges },
@@ -755,38 +490,13 @@ const [
   ),
 ]);
 
-onMounted(() => {
-  // re-hydrate the icons and force subscription refresh
-  updateIcons(servers.value.servers);
-  subscriptions.value = [...subscriptions.value];
-});
-
 async function refresh() {
   await Promise.all([
     refreshPaymentMethods(),
     refreshCharges(),
     refreshCustomer(),
     refreshSubscriptions(),
-    refreshServers(),
   ]);
-}
-
-const pyroSubscriptions = asyncComputed(() => {
-  return subscriptions.value
-    .filter((x) => x.status === "provisioned" && x.metadata && x.metadata.type === "pyro")
-    .map(async (x) => {
-      const server = await usePyroServer(x.metadata.id, ["general"]);
-      return {
-        ...x,
-        server,
-      };
-    });
-});
-
-function getPyroCharge(subscription) {
-  return charges.value.find(
-    (x) => x.subscription_id === subscription.id && x.status !== "succeeded",
-  );
 }
 
 const midasProduct = ref(products.find((x) => x.metadata.type === "midas"));
@@ -971,7 +681,6 @@ async function removePaymentMethod(index) {
 const cancelSubscriptionId = ref();
 async function cancelSubscription(id, cancelled) {
   startLoading();
-  console.log(id);
   try {
     await useBaseFetch(`billing/subscription/${id}`, {
       internal: true,
@@ -992,10 +701,3 @@ async function cancelSubscription(id, cancelled) {
   stopLoading();
 }
 </script>
-
-<style>
-.throbbing {
-  animation: pulse 1.5s infinite;
-  background: var(--color-raised-bg);
-}
-</style>

@@ -1,24 +1,26 @@
 <template>
-  <div class="h-full w-full gap-2 overflow-y-auto">
-    <div class="card flex flex-col gap-4">
-      <h1 class="m-0 text-2xl font-bold">Server Preferences</h1>
-      <div v-for="(value, key) in userPreferences" :key="key" class="flex justify-between">
-        <label for="server-name-field" class="flex flex-col gap-2">
-          <span class="text-lg font-bold text-contrast">{{ preferences[key].displayName }}</span>
-          <span> {{ preferences[key].description }} </span>
-        </label>
-        <input v-model="newUserPreferences[key]" class="switch stylized-toggle" type="checkbox" />
+  <div class="h-full w-full">
+    <div class="h-full w-full gap-2 overflow-y-auto">
+      <div class="card flex flex-col gap-4">
+        <h1 class="m-0 text-2xl font-bold">Server Preferences</h1>
+        <div v-for="(value, key) in userPreferences" :key="key" class="flex justify-between">
+          <label for="server-name-field" class="flex flex-col gap-2">
+            <span class="text-lg font-bold text-contrast">{{ preferences[key].displayName }}</span>
+            <span> {{ preferences[key].description }} </span>
+          </label>
+          <input v-model="newUserPreferences[key]" class="switch stylized-toggle" type="checkbox" />
+        </div>
       </div>
     </div>
-  </div>
-  <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
-    <UiServersSaveBanner
-      :is-visible="!!hasUnsavedChanges"
-      :server="props.server"
-      :is-updating="false"
-      :save="savePreferences"
-      :reset="resetPreferences"
-    />
+    <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
+      <UiServersSaveBanner
+        :is-visible="!!hasUnsavedChanges"
+        :server="props.server"
+        :is-updating="false"
+        :save="savePreferences"
+        :reset="resetPreferences"
+      />
+    </div>
   </div>
 </template>
 
