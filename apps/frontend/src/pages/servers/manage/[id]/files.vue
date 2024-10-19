@@ -110,20 +110,21 @@
 
       <!-- Main Content -->
       <div
-        class="flex min-h-[800px] w-full flex-col overflow-visible rounded-xl border border-solid border-bg-raised"
+        class="flex min-h-[800px] w-full flex-col rounded-2xl border border-solid border-bg-raised"
       >
         <div
           v-if="!isEditing"
-          class="flex h-12 select-none items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
+          class="flex h-12 select-none items-center justify-between bg-table-alternateRow p-3"
         >
           <div class="flex items-center gap-2 text-contrast">
-            <span
-              class="breadcrumb-link flex cursor-pointer items-center gap-2"
+            <div
+              role="link"
+              class="breadcrumb-link grid size-8 place-content-center rounded-full bg-bg-raised p-[6px]"
               @click="navigateToSegment(-1)"
             >
-              <BoxIcon class="h-5 w-5" />
-              <span class="opacity-50">/</span>
-            </span>
+              <BoxIcon class="size-6" />
+            </div>
+            <span class="opacity-50">/</span>
             <span
               v-for="(segment, index) in breadcrumbSegments"
               :key="index"

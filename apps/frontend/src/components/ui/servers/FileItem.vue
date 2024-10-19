@@ -1,22 +1,23 @@
 <template>
   <div
+    data-pyro-file
     :class="[
-      'group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem] last:border-none hover:bg-bg-raised',
-      isNonEditableFile ? '' : 'cursor-pointer',
+      'group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised',
+      isEditableFile ? 'cursor-pointer' : '',
     ]"
     @contextmenu="openContextMenu"
   >
     <div class="flex w-full items-center gap-2" @click="selectItem">
       <div
-        class="flex h-8 w-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+        class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
       >
-        <FolderOpenIcon v-if="type === 'directory'" class="h-6 w-6" />
-        <FileIcon v-else-if="type === 'file'" class="h-6 w-6" />
+        <FolderOpenIcon v-if="type === 'directory'" class="size-6" />
+        <FileIcon v-else-if="type === 'file'" class="size-6" />
       </div>
       <div class="flex flex-col">
         <span class="font-bold group-hover:text-contrast">{{ name }}</span>
         <span v-if="type === 'directory'" class="text-xs text-secondary group-hover:text-primary">
-          {{ count }} items
+          {{ count }} {{ count === 1 ? "item" : "items" }}
         </span>
         <span v-else class="text-xs text-secondary group-hover:text-primary">
           {{ formattedSize }}
@@ -24,8 +25,21 @@
       </div>
     </div>
     <div class="flex w-fit items-center gap-4">
-      <span class="w-full text-nowrap text-sm text-secondary">
-        {{ new Date(modified * 1000).toLocaleString() }}
+      <span class="w-full text-nowrap font-mono text-sm text-secondary">
+        {{
+          new Date(modified * 1000).toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "2-digit",
+          })
+        }},
+        {{
+          new Date(modified * 1000).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          })
+        }}
       </span>
       <ButtonStyled type="transparent">
         <OverflowMenu
@@ -119,8 +133,6 @@ const emit = defineEmits(["rename", "download", "delete", "move", "edit", "conte
 
 const openContextMenu = (event: MouseEvent) => {
   event.preventDefault();
-  // emit("contextmenu", event.clientX, event.clientY);
-  // accounting for scroll top:
   emit("contextmenu", event.clientX, event.clientY + window.scrollY);
 };
 
@@ -146,38 +158,29 @@ const navigateToFolder = () => {
   }
 };
 
-const nonEditableExtensions = [
-  "jpg",
-  "jpeg",
-  "png",
-  "gif",
-  "bmp",
-  "tiff",
-  "jar",
-  "exe",
-  "zip",
-  "rar",
-  "7z",
-  "tar",
-  "gz",
-  "bz2",
-  "xz",
-  "pdf",
-  "doc",
-  "docx",
-  "xls",
-  "xlsx",
-  "ppt",
-  "pptx",
-  "dat",
-  "lock",
-  "mca",
+const editableExtensions = [
+  "txt",
+  "md",
+  "json",
+  "java",
+  "kt",
+  "kts",
+  "sh",
+  "bat",
+  "ps1",
+  "yml",
+  "yaml",
+  "toml",
+  "ini",
+  "cfg",
+  "conf",
+  "properties",
 ];
 
-const isNonEditableFile = computed(() => {
+const isEditableFile = computed(() => {
   if (props.type === "file") {
     const fileExtension = props.name.split(".").pop()?.toLowerCase();
-    return nonEditableExtensions.includes(fileExtension || "");
+    return editableExtensions.includes(fileExtension || "");
   }
   return false;
 });
@@ -185,7 +188,7 @@ const isNonEditableFile = computed(() => {
 const selectItem = () => {
   if (props.type === "directory") {
     navigateToFolder();
-  } else if (props.type === "file" && !isNonEditableFile.value) {
+  } else if (props.type === "file" && isEditableFile.value) {
     emit("edit", { name: props.name, type: props.type, path: props.path });
   }
 };
