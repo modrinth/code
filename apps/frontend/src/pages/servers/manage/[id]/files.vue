@@ -17,10 +17,11 @@
           <div class="mt-2 flex flex-col gap-2">
             <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
+            <div v-if="nameError" class="text-red-500">{{ nameError }}</div>
           </div>
           <div class="mb-1 mt-4 flex justify-end gap-4">
             <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="createNewItem"> Create </Button>
+            <Button :disabled="!!nameError" color="primary" @click="createNewItem"> Create </Button>
           </div>
         </UiServersPyroModal>
       </Modal>
@@ -565,6 +566,17 @@ const fileContent = ref("");
 const editingFile = ref<any>(null);
 const closeEditor = ref(false);
 
+const nameError = computed(() => {
+  if (!newItemName.value) {
+    return "Name is required.";
+  }
+  const validPattern = /^[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+$/;
+  if (!validPattern.test(newItemName.value)) {
+    return "Name must contain alphanumeric characters, dashes, underscores, and a dot for the file extension.";
+  }
+  return "";
+});
+
 const requestShareLink = async () => {
   try {
     const response = (await $fetch("https://api.mclo.gs/1/log", {
@@ -687,24 +699,41 @@ const showDeleteModal = (item: any) => {
 };
 
 const createNewItem = async () => {
-  try {
-    const path = `${currentPath.value}/${newItemName.value}`.replace("//", "/");
-    await props.server.fs?.createFileOrFolder(path, newItemType.value);
+  if (!nameError.value) {
+    try {
+      const path = `${currentPath.value}/${newItemName.value}`.replace("//", "/");
+      await props.server.fs?.createFileOrFolder(path, newItemType.value);
 
-    currentPage.value = 1;
-    newItemName.value = "";
-    items.value = [];
-    await fetchData();
-    createItemModal.value?.hide();
+      currentPage.value = 1;
+      newItemName.value = "";
+      items.value = [];
+      await fetchData();
+      createItemModal.value?.hide();
 
-    addNotification({
-      group: "files",
-      title: "File created",
-      text: "Your file has been created.",
-      type: "success",
-    });
-  } catch (error) {
-    console.error("Error creating item:", error);
+      addNotification({
+        group: "files",
+        title: "File created",
+        text: "Your file has been created.",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error creating item:", error);
+      if (error instanceof PyroFetchError && error.statusCode === 400) {
+        addNotification({
+          group: "files",
+          title: "Error creating item",
+          text: "Invalid file",
+          type: "error",
+        });
+      } else if (error instanceof PyroFetchError && error.statusCode === 500) {
+        addNotification({
+          group: "files",
+          title: "Error creating item",
+          text: "File already exists",
+          type: "error",
+        });
+      }
+    }
   }
 };
 
