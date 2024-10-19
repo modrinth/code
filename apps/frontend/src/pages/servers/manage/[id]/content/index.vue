@@ -35,7 +35,12 @@
       This page is under construction - some features may not be available yet, or are subject to
       change.
     </div>
-    <div class="flex h-full w-full flex-col overflow-y-scroll">
+    <div
+      class="flex h-full w-full flex-col"
+      :style="{
+        overflowY: hasMods(mods) ? 'auto' : 'hidden',
+      }"
+    >
       <div v-if="hasMods(mods)" class="flex flex-col gap-2">
         <div
           v-for="mod in mods"
@@ -94,7 +99,9 @@
           </div>
         </div>
       </div>
-      <div v-else>You haven't added any mods yet, time to add some!</div>
+      <div v-else class="mt-4 select-none text-center opacity-50">
+        You haven't added any mods yet, time to add some!
+      </div>
     </div>
   </div>
   <UiServersPyroLoading v-else />
