@@ -15,7 +15,7 @@
     "fix": "turbo run fix --continue"
   },
   "devDependencies": {
-    "prettier": "^3.3.2",
+    "prettier": "^3.3.3",
     "turbo": "^2.2.1",
     "vue": "^3.4.31"
   },
