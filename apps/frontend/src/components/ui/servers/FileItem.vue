@@ -175,6 +175,7 @@ const editableExtensions = [
   "cfg",
   "conf",
   "properties",
+  "log",
 ];
 
 const isEditableFile = computed(() => {
