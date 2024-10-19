@@ -1,15 +1,21 @@
-name: docker-build
+name: daedalus-docker-build
 
 on:
   push:
-    branches:
-      - '**'
-    tags:
-      - 'v*'
+    branches: [ "main" ]
+    paths:
+      - .github/workflows/daedalus-docker.yml
+      - 'apps/daedalus/**'
   pull_request:
+    types: [ opened, synchronize ]
+    paths:
+      - .github/workflows/daedalus-docker.yml
+      - 'apps/daedalus/**'
+  merge_group:
+    types: [ checks_requested ]
+
 jobs:
   docker:
-    if: github.repository_owner == 'modrinth'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
