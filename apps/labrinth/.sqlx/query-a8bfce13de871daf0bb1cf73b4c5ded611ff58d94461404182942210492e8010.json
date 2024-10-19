@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split\n        FROM mods m\n        INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE\n        WHERE m.id = ANY($1) AND m.monetization_status = $2 AND m.status = ANY($3)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "payouts_split",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Text",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "a8bfce13de871daf0bb1cf73b4c5ded611ff58d94461404182942210492e8010"
+}

@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO reports (\n                id, report_type_id, mod_id, version_id, user_id,\n                body, reporter\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int4",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c3f594d8d0ffcf5df1b36759cf3088bfaec496c5dfdbf496d3b05f0b122a5d0c"
+}

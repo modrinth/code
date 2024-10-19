@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT SUM(amount) amount, SUM(fee) fee\n        FROM payouts\n        WHERE user_id = $1 AND (status = 'success' OR status = 'in-transit')\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "amount",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 1,
+        "name": "fee",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "0bd68c1b7c90ddcdde8c8bbd8362c6d0c7fb15e375d734bf34c365e71d623780"
+}
