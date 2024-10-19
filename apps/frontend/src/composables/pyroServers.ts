@@ -370,18 +370,19 @@ const reinstallServer = async (
   projectId: string,
   versionId?: string,
   loaderVersionId?: string,
+  hardReset: boolean = false,
 ) => {
   try {
     if (loader) {
       if (projectId.toLowerCase() === "neoforge") {
         projectId = "NeoForge";
       }
-      await PyroFetch(`servers/${serverId}/reinstall`, {
+      await PyroFetch(`servers/${serverId}/reinstall?hard=${hardReset}`, {
         method: "POST",
         body: { loader: projectId, loader_version: loaderVersionId, game_version: versionId },
       });
     } else {
-      await PyroFetch(`servers/${serverId}/reinstall`, {
+      await PyroFetch(`servers/${serverId}/reinstall?hard=${hardReset}`, {
         method: "POST",
         body: { project_id: projectId, version_id: versionId },
       });
@@ -849,6 +850,7 @@ type GeneralFunctions = {
     projectId: string,
     versionId?: string,
     loaderVersionId?: string,
+    hardReset?: boolean,
   ) => Promise<void>;
 
   /**

@@ -11,17 +11,38 @@
     <div class="flex flex-col gap-4 p-6">
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-4">
-          <div class="text-2xl font-extrabold text-contrast">Select version</div>
+          <div class="text-2xl font-extrabold text-contrast">
+            {{ isSecondPhase ? "Are you sure?" : "Select version" }}
+          </div>
         </div>
         <button
           class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
-          @click="versionSelectModal?.hide()"
+          @click="
+            versionSelectModal?.hide();
+            selectedMCVersion = '';
+            selectedLoaderVersion = '';
+            hardReset = false;
+            backupServer = false;
+            isSecondPhase = false;
+          "
         >
           <XIcon class="h-4 w-4" />
         </button>
       </div>
-      <p>Choose the version of Minecraft you want to use for this server.</p>
-      <div class="flex flex-col gap-2">
+      <p
+        :style="{
+          lineHeight: isSecondPhase ? '1.5' : undefined,
+          marginBottom: isSecondPhase ? '-12px' : '0',
+          marginTop: isSecondPhase ? '-4px' : '-2px',
+        }"
+      >
+        {{
+          isSecondPhase
+            ? "You are attempting to delete all of your files without backing up. Are you sure this is what you're intending to do?"
+            : "Choose the version of Minecraft you want to use for this server."
+        }}
+      </p>
+      <div v-if="!isSecondPhase" class="flex flex-col gap-2">
         <DropdownSelect
           v-model="selectedMCVersion"
           name="mcVersion"
@@ -35,28 +56,56 @@
           :options="selectedLoaderVersions"
           placeholder="Select loader version..."
         />
+        <div class="mt-2 flex items-center gap-2">
+          <input
+            id="hard-reset"
+            v-model="hardReset"
+            class="switch stylized-toggle"
+            type="checkbox"
+          />
+          <label for="hard-reset">Clean reinstall</label>
+        </div>
+        <div class="hidden items-center gap-2">
+          <input
+            id="backup-server"
+            v-model="backupServer"
+            class="switch stylized-toggle"
+            type="checkbox"
+          />
+          <label for="backup-server">Backup files</label>
+        </div>
       </div>
       <div class="mt-4 flex justify-end gap-4">
         <Button
           transparent
+          :disabled="isLoading"
           @click="
-            versionSelectModal?.hide();
-            selectedMCVersion = '';
-            selectedLoaderVersion = '';
+            if (isSecondPhase) {
+              isSecondPhase = false;
+            } else {
+              versionSelectModal?.hide();
+              selectedMCVersion = '';
+              selectedLoaderVersion = '';
+              hardReset = false;
+              backupServer = false;
+            }
           "
         >
-          Cancel
+          {{ isSecondPhase ? "No" : "Cancel" }}
         </Button>
         <Button
-          color="primary"
+          :color="isDangerous ? 'danger' : 'primary'"
           :disabled="
             selectedLoader.toLowerCase() === 'vanilla'
               ? !selectedMCVersion
-              : !selectedMCVersion || !selectedLoaderVersion
+              : !selectedMCVersion ||
+                !selectedLoaderVersion ||
+                (isBackupLimited && backupServer) ||
+                isLoading
           "
           @click="reinstallLoader(selectedLoader)"
         >
-          Reinstall
+          {{ isSecondPhase ? "Yes" : isDangerous ? "Erase and install" : "Install" }}
         </Button>
       </div>
     </div>
@@ -296,6 +345,14 @@ const emit = defineEmits<{
 const tags = useTags();
 const prodOverride = await PyroAuthOverride();
 
+const isLoading = ref(false);
+
+const hardReset = ref(false);
+const backupServer = ref(false);
+
+const isDangerous = computed(() => hardReset.value);
+const isBackupLimited = computed(() => (props.server.backups?.data?.length || 0) >= 15);
+
 const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
 
 const loaderVersions = (await Promise.all(
@@ -400,6 +457,7 @@ const currentVersion = ref();
 const selectedLoader = ref("");
 const selectedMCVersion = ref("");
 const selectedLoaderVersion = ref("");
+const isSecondPhase = ref(false);
 
 const updateData = async () => {
   if (!data.value?.upstream?.version_id) {
@@ -453,6 +511,38 @@ const reinstallCurrent = async () => {
 };
 
 const reinstallLoader = async (loader: string) => {
+  if (hardReset.value && !backupServer.value && !isSecondPhase.value) {
+    isSecondPhase.value = true;
+    return;
+  }
+  if (backupServer.value) {
+    try {
+      // format date + time based off local timezone
+      const date = new Date();
+      const format = date.toLocaleString(navigator.language || "en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        timeZoneName: "short",
+      });
+      const backupName = `Reinstallation - ${format}`;
+      isLoading.value = true;
+      await props.server.backups?.create(backupName);
+    } catch {
+      addNotification({
+        group: "server",
+        title: "Backup Failed",
+        text: "An unexpected error occurred while backing up. Please try again later.",
+        type: "error",
+      });
+      isLoading.value = false;
+      return;
+    }
+  }
+  isLoading.value = false;
   versionSelectModal.value.hide();
   try {
     await props.server.general?.reinstall(
@@ -461,6 +551,7 @@ const reinstallLoader = async (loader: string) => {
       loader,
       selectedMCVersion.value,
       loader === "Vanilla" ? "" : selectedLoaderVersion.value,
+      hardReset.value,
     );
     emit("reinstall", {
       loader,
