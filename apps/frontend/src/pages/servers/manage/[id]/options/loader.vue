@@ -567,3 +567,9 @@ const reinstallNew = async (project: any, versionNumber: string) => {
   }
 };
 </script>
+
+<style scoped>
+.stylized-toggle:checked::after {
+  background: var(--color-accent-contrast) !important;
+}
+</style>
