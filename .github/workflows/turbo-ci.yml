@@ -75,3 +75,6 @@ jobs:
 
       - name: Test
         run: pnpm test
+        env:
+          SQLX_OFFLINE: true
+          DATABASE_URL: postgresql://labrinth:labrinth@localhost/postgres
