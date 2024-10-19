@@ -113,9 +113,6 @@
         </div>
       </UiServersPanelTerminal>
     </div>
-    <div v-if="playerList && playerList.length > 0" class="card">
-      <UiServersPanelPlayerList :players="playerList" @send-command="sendConsoleCommand" />
-    </div>
   </div>
   <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
   <UiServersPyroError
@@ -133,7 +130,6 @@
 <script setup lang="ts">
 import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
-import { asyncComputed } from "@vueuse/core";
 import type { ServerState, Stats } from "~/types/servers";
 import type { Server } from "~/composables/pyroServers";
 
@@ -146,7 +142,6 @@ const props = defineProps<{
   serverPowerState: ServerState;
   isServerRunning: boolean;
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
-  players: string[];
 }>();
 
 interface ErrorData {
@@ -231,25 +226,6 @@ watch(
 if (props.serverPowerState === "crashed") {
   inspectError();
 }
-
-const playerList = asyncComputed(async () => {
-  const results = await Promise.all(
-    props.players.map(async (name) => {
-      const ply = await $fetch<any>(`https://api.ashcon.app/mojang/v2/user/${name}`, {
-        method: "GET",
-        retry: false,
-      });
-      return {
-        name,
-        id: ply.uuid,
-        avatar: `https://crafatar.com/avatars/${ply.uuid}`,
-        name_history: ply.username_history,
-        created_at: ply.created_at,
-      };
-    }),
-  );
-  return results;
-});
 
 const socket = ref(props.socket);
 
