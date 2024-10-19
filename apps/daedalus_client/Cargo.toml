@@ -7,7 +7,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-daedalus = { path = "../daedalus" }
+daedalus = { path = "../../packages/daedalus" }
 tokio = { version = "1", features = ["full"] }
 futures = "0.3.25"
 dotenvy = "0.15.6"
