@@ -107,7 +107,7 @@ const copyPassword = () => {
 
 const properties = [
   { name: "Server ID", value: serverId ?? "Unknown" },
-  { name: "Kind", value: data.value?.upstream?.kind ?? data.value?.loader ?? "Unknown"},
+  { name: "Kind", value: data.value?.upstream?.kind ?? data.value?.loader ?? "Unknown" },
   { name: "Project ID", value: data.value?.upstream?.project_id ?? "Unknown" },
   { name: "Version ID", value: data.value?.upstream?.version_id ?? "Unknown" },
 ];
