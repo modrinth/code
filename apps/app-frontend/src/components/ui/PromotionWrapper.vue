@@ -4,7 +4,7 @@ import { get as getCreds } from '@/helpers/mr_auth.js'
 import { handleError } from '@/store/notifications.js'
 import { get_user } from '@/helpers/cache.js'
 import { ChevronRightIcon } from '@modrinth/assets'
-import { init_ads_window } from '@/helpers/ads.js'
+import { init_ads_window, open_ads_link, record_ads_click } from '@/helpers/ads.js'
 import { listen } from '@tauri-apps/api/event'
 
 const showAd = ref(true)
@@ -73,6 +73,11 @@ function updateAdPosition(overrideShown = false) {
   }
 }
 
+async function openPlusLink() {
+  await record_ads_click()
+  await open_ads_link('https://modrinth.com/plus', 'https://modrinth.com')
+}
+
 const unlisten = await listen('ads-scroll', (event) => {
   if (adsWrapper.value) {
     adsWrapper.value.parentNode.scrollTop += event.payload.scroll
@@ -105,17 +110,17 @@ onUnmounted(() => {
     class="ad-parent relative mb-3 flex w-full justify-center rounded-2xl bg-bg-raised cursor-pointer"
   >
     <div class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 p-6">
-      <p class="m-0 text-2xl font-bold text-contrast">90% of ad revenue goes to creators</p>
-      <a
-        href="https://modrinth.com/plus"
-        class="mt-auto items-center gap-1 text-purple hover:underline"
+      <p class="m-0 text-2xl font-bold text-contrast">75% of ad revenue goes to creators</p>
+      <button
+        class="mt-auto items-center gap-1 text-purple hover:underline bg-transparent border-none text-left cursor-pointer outline-none"
+        @click="openPlusLink"
       >
         <span>
           Support creators and Modrinth ad-free with
           <span class="font-bold">Modrinth+</span>
         </span>
         <ChevronRightIcon class="relative top-[3px] h-5 w-5" />
-      </a>
+      </button>
     </div>
   </div>
 </template>

@@ -581,7 +581,7 @@ async function setIcon() {
 
   if (!value) return
 
-  icon.value = value.path
+  icon.value = value.path ?? value
   await edit_icon(props.instance.path, icon.value).catch(handleError)
 
   trackEvent('InstanceSetIcon')
@@ -596,12 +596,12 @@ const overrideJavaInstall = ref(!!props.instance.java_path)
 const optimalJava = readonly(await get_optimal_jre_key(props.instance.path).catch(handleError))
 const javaInstall = ref({ path: optimalJava.path ?? props.instance.java_path })
 
-const overrideJavaArgs = ref(!!props.instance.extra_launch_args)
+const overrideJavaArgs = ref(props.instance.extra_launch_args?.length !== undefined)
 const javaArgs = ref(
   (props.instance.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
 )
 
-const overrideEnvVars = ref(!!props.instance.custom_env_vars)
+const overrideEnvVars = ref(props.instance.custom_env_vars?.length !== undefined)
 const envVars = ref(
   (props.instance.custom_env_vars ?? globalSettings.custom_env_vars)
     .map((x) => x.join('='))
@@ -685,19 +685,15 @@ const editProfileObject = computed(() => {
   }
 
   if (overrideJavaArgs.value) {
-    if (javaArgs.value !== '') {
-      editProfile.extra_launch_args = javaArgs.value.trim().split(/\s+/).filter(Boolean)
-    }
+    editProfile.extra_launch_args = javaArgs.value.trim().split(/\s+/).filter(Boolean)
   }
 
   if (overrideEnvVars.value) {
-    if (envVars.value !== '') {
-      editProfile.custom_env_vars = envVars.value
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean)
-        .map((x) => x.split('=').filter(Boolean))
-    }
+    editProfile.custom_env_vars = envVars.value
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((x) => x.split('=').filter(Boolean))
   }
 
   if (overrideMemorySettings.value) {
@@ -880,7 +876,7 @@ const editing = ref(false)
 async function saveGvLoaderEdits() {
   editing.value = true
 
-  let editProfile = editProfileObject.value
+  const editProfile = editProfileObject.value
   editProfile.loader = loader.value
   editProfile.game_version = gameVersion.value
 

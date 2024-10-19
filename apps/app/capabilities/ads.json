@@ -9,7 +9,6 @@
     "ads-window"
   ],
   "permissions": [
-    "shell:allow-open",
     "ads:default"
   ]
 }

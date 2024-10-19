@@ -301,7 +301,7 @@ const canSubmit = computed(() => {
       const url = new URL(uri);
       return !!url;
     });
-  } catch (err) {
+  } catch {
     allValid = false;
   }
   return filledIn && (oneValid || allValid);

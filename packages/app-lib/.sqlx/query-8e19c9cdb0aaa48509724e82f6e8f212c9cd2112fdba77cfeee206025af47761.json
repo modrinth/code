@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated\n            FROM settings\n            ",
+  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated\n            FROM settings\n            ",
   "describe": {
     "columns": [
       {
@@ -54,73 +54,78 @@
         "type_info": "Integer"
       },
       {
-        "name": "onboarded",
+        "name": "personalized_ads",
         "ordinal": 10,
         "type_info": "Integer"
       },
       {
-        "name": "extra_launch_args",
+        "name": "onboarded",
         "ordinal": 11,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
-        "name": "custom_env_vars",
+        "name": "extra_launch_args",
         "ordinal": 12,
         "type_info": "Text"
       },
       {
-        "name": "mc_memory_max",
+        "name": "custom_env_vars",
         "ordinal": 13,
-        "type_info": "Integer"
+        "type_info": "Text"
       },
       {
-        "name": "mc_force_fullscreen",
+        "name": "mc_memory_max",
         "ordinal": 14,
         "type_info": "Integer"
       },
       {
-        "name": "mc_game_resolution_x",
+        "name": "mc_force_fullscreen",
         "ordinal": 15,
         "type_info": "Integer"
       },
       {
-        "name": "mc_game_resolution_y",
+        "name": "mc_game_resolution_x",
         "ordinal": 16,
         "type_info": "Integer"
       },
       {
-        "name": "hide_on_process_start",
+        "name": "mc_game_resolution_y",
         "ordinal": 17,
         "type_info": "Integer"
       },
       {
-        "name": "hook_pre_launch",
+        "name": "hide_on_process_start",
         "ordinal": 18,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
-        "name": "hook_wrapper",
+        "name": "hook_pre_launch",
         "ordinal": 19,
         "type_info": "Text"
       },
       {
-        "name": "hook_post_exit",
+        "name": "hook_wrapper",
         "ordinal": 20,
         "type_info": "Text"
       },
       {
-        "name": "custom_dir",
+        "name": "hook_post_exit",
         "ordinal": 21,
         "type_info": "Text"
       },
       {
-        "name": "prev_custom_dir",
+        "name": "custom_dir",
         "ordinal": 22,
         "type_info": "Text"
       },
       {
-        "name": "migrated",
+        "name": "prev_custom_dir",
         "ordinal": 23,
+        "type_info": "Text"
+      },
+      {
+        "name": "migrated",
+        "ordinal": 24,
         "type_info": "Integer"
       }
     ],
@@ -128,6 +133,7 @@
       "Right": 0
     },
     "nullable": [
+      false,
       false,
       false,
       false,
@@ -154,5 +160,5 @@
       false
     ]
   },
-  "hash": "03d1aeddf7788320530c447a82342aecdb4099ce183dd9106c4bcc47604cb080"
+  "hash": "8e19c9cdb0aaa48509724e82f6e8f212c9cd2112fdba77cfeee206025af47761"
 }

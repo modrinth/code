@@ -66,7 +66,7 @@ const selectedVersion = ref(null)
 const incompatibleModal = ref(null)
 const installing = ref(false)
 
-let onInstall = ref(() => {})
+const onInstall = ref(() => {})
 
 defineExpose({
   show: (instanceVal, projectVal, projectVersions, callback) => {

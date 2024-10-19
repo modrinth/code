@@ -48,7 +48,7 @@ const shownProfiles = computed(() =>
       return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
     })
     .filter((profile) => {
-      let loaders = versions.value.flatMap((v) => v.loaders)
+      const loaders = versions.value.flatMap((v) => v.loaders)
 
       return (
         versions.value.flatMap((v) => v.game_versions).includes(profile.game_version) &&
@@ -59,7 +59,7 @@ const shownProfiles = computed(() =>
     }),
 )
 
-let onInstall = ref(() => {})
+const onInstall = ref(() => {})
 
 defineExpose({
   show: async (projectVal, versionsVal, callback) => {
@@ -77,7 +77,7 @@ defineExpose({
     onInstall.value = callback
 
     const profilesVal = await list().catch(handleError)
-    for (let profile of profilesVal) {
+    for (const profile of profilesVal) {
       profile.installing = false
       profile.installedMod = await check_installed(profile.path, project.value.id).catch(
         handleError,
@@ -150,7 +150,7 @@ const upload_icon = async () => {
       },
     ],
   })
-  icon.value = res ? res.path : null
+  icon.value = res.path ?? res
 
   if (!icon.value) return
   display_icon.value = convertFileSrc(icon.value)
@@ -230,7 +230,7 @@ const createInstance = async () => {
             @click="installModal.hide()"
           >
             <Avatar
-              :src="profile.icon_path ? tauri.convertFileSrc(profile.icon_path) : null"
+              :src="profile.icon_path ? convertFileSrc(profile.icon_path) : null"
               class="profile-image"
             />
             {{ profile.name }}

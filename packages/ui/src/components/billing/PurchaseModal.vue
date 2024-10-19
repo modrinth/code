@@ -540,8 +540,11 @@ async function refreshPayment(confirmationId, paymentMethodId) {
         }
 
     const result = await props.sendBillingRequest({
-      product_id: props.product.id,
-      interval: selectedPlan.value,
+      charge: {
+        type: 'new',
+        product_id: props.product.id,
+        interval: selectedPlan.value,
+      },
       existing_payment_intent: paymentIntentId.value,
       ...base,
     })

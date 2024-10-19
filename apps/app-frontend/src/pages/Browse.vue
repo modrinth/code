@@ -381,20 +381,20 @@ const sortedCategories = computed(() => {
 // identifier[0], then if it ties, identifier[1], etc
 async function sortByNameOrNumber(sortable, identifiers) {
   sortable.sort((a, b) => {
-    for (let identifier of identifiers) {
-      let aNum = parseFloat(a[identifier])
-      let bNum = parseFloat(b[identifier])
+    for (const identifier of identifiers) {
+      const aNum = parseFloat(a[identifier])
+      const bNum = parseFloat(b[identifier])
       if (isNaN(aNum) && isNaN(bNum)) {
         // Both are strings, sort alphabetically
-        let stringComp = a[identifier].localeCompare(b[identifier])
+        const stringComp = a[identifier].localeCompare(b[identifier])
         if (stringComp != 0) return stringComp
       } else if (!isNaN(aNum) && !isNaN(bNum)) {
         // Both are numbers, sort numerically
-        let numComp = aNum - bNum
+        const numComp = aNum - bNum
         if (numComp != 0) return numComp
       } else {
         // One is a number and one is a string, numbers go first
-        let numStringComp = isNaN(aNum) ? 1 : -1
+        const numStringComp = isNaN(aNum) ? 1 : -1
         if (numStringComp != 0) return numStringComp
       }
     }
