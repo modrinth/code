@@ -8,29 +8,35 @@
     tabindex="-1"
   >
     <div
+      v-if="cosmetics.advancedRendering"
       class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[9999] h-[10rem] w-full overflow-hidden rounded-xl"
       :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 8))}%`"
+      aria-hidden="true"
     >
       <div
         v-for="i in progressiveBlurIterations"
         :key="i"
+        aria-hidden="true"
         class="absolute left-0 top-0 h-full w-full"
         :style="getBlurStyle(i)"
       />
     </div>
     <div
+      aria-hidden="true"
       class="pointer-events-none absolute left-0 top-0 z-[9999999] h-full w-full"
       :style="{
         visibility: isFullScreen ? 'hidden' : 'visible',
       }"
     >
       <div
+        aria-hidden="true"
         class="absolute -bottom-2 -right-2 h-7 w-7"
         :style="{
           background: `radial-gradient(circle at 0% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
         }"
       ></div>
       <div
+        aria-hidden="true"
         class="absolute -bottom-2 -left-2 h-7 w-7"
         :style="{
           background: `radial-gradient(circle at 100% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
@@ -97,6 +103,9 @@
 <script setup lang="ts">
 import { RightArrowIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
+
+const { $cosmetics } = useNuxtApp();
+const cosmetics = $cosmetics;
 
 const props = defineProps<{
   consoleOutput: string[];
