@@ -6,9 +6,8 @@
       isEditableFile ? 'cursor-pointer' : type === 'directory' ? 'cursor-pointer' : '',
     ]"
     @contextmenu="openContextMenu"
-    @click="selectItem"
   >
-    <div data-pyro-file-metadata class="flex w-full items-center gap-2">
+    <div data-pyro-file-metadata class="flex w-full items-center gap-2" @click="selectItem">
       <div
         class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
       >
