@@ -1,5 +1,6 @@
 <template>
   <div
+    data-pyro-terminal
     :class="[
       'terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl pb-4 text-sm transition-transform duration-300',
       { 'scale-fullscreen fixed inset-0 z-50 !rounded-none': isFullScreen },
@@ -39,7 +40,7 @@
     <div
       ref="scrollContainer"
       data-pyro-terminal-root
-      class="no-scrollbar absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
+      class="absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
       @scroll="handleScroll"
     >
       <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
@@ -358,13 +359,34 @@ html.oled-mode .console {
   background: black;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+[data-pyro-terminal-root]::-webkit-scrollbar {
+  background: none;
+  width: 10px;
+  height: 16px;
 }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+[data-pyro-terminal-root]::-webkit-scrollbar-thumb {
+  border: solid 0 rgb(0 0 0 / 0%);
+  border-right-width: 3px;
+  border-left-width: 3px;
+  -webkit-border-radius: 9px 4px;
+  -webkit-box-shadow: inset 0 0 0 3px var(--color-button-bg);
+}
+
+[data-pyro-terminal-root]::-webkit-scrollbar-track-piece {
+  margin: 4px 0;
+}
+
+[data-pyro-terminal-root]::-webkit-scrollbar-thumb:horizontal {
+  border-right-width: 0;
+  border-left-width: 0;
+  border-top-width: 4px;
+  border-bottom-width: 4px;
+  -webkit-border-radius: 4px 9px;
+}
+
+[data-pyro-terminal-root]::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .fixed {
