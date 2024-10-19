@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                                        UPDATE mods\n                                        SET status = 'rejected'\n                                        WHERE id = $1\n                                        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "95e17b2512494ffcbfe6278b87aa273edc5729633aeaa87f6239667d2f861e68"
+}

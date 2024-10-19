@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE versions\n                    SET status = $1\n                    WHERE (id = $2)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5c5cac91f61b0cd98d2d986e2d22e5a6b220bdd39f98520385f4ea84b3ffeeed"
+}
