@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-row items-center gap-2 rounded-lg">
     <ButtonStyled v-if="showKillButton" type="standard" color="red">
-      <button @click="killServer">
+      <button @click="handleKillClick">
         <div class="flex gap-1">
           <SlashIcon class="h-5 w-5" />
           <span>{{ killButtonText }}</span>
@@ -68,6 +68,7 @@ const currentState = ref<ServerStateType>(
 );
 
 const isStartingDelay = ref(false);
+const killConfirmation = ref(false);
 
 const showKillButton = computed(() => currentState.value === ServerState.Running);
 const showStopButton = computed(() => currentState.value === ServerState.Running);
@@ -102,7 +103,7 @@ const stopButtonText = computed(() =>
   currentState.value === ServerState.Stopping ? "Stopping..." : "Stop",
 );
 
-const killButtonText = computed(() => "Kill");
+const killButtonText = computed(() => (killConfirmation.value ? "Confirm Kill" : "Kill"));
 
 const handleAction = () => {
   if (!canTakeAction.value) return;
@@ -123,6 +124,17 @@ const stopServer = () => {
   if (!canTakeAction.value) return;
   currentState.value = ServerState.Stopping;
   emit("action", "stop");
+};
+
+const handleKillClick = () => {
+  if (killConfirmation.value) {
+    killServer();
+  } else {
+    killConfirmation.value = true;
+    setTimeout(() => {
+      killConfirmation.value = false;
+    }, 10000);
+  }
 };
 
 const killServer = () => {
