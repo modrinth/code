@@ -288,7 +288,6 @@ export default defineNuxtComponent({
     }
   }
 
-
   @media only screen and (max-width: 1250px) {
     column-count: 3;
   }
