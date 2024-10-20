@@ -1,7 +1,7 @@
 <template>
   <div data-pyro-file-manager-root class="contents">
     <div
-      class="relative flex min-h-[800px] w-full flex-col rounded-2xl border border-solid border-bg-raised"
+      class="relative isolate flex min-h-[800px] w-full flex-col rounded-2xl border border-solid border-bg-raised"
       @dragenter.prevent="handleDragEnter"
       @dragover.prevent="handleDragOver"
       @dragleave.prevent="handleDragLeave"
@@ -103,11 +103,7 @@
 
       <!-- Main Content -->
       <div class="flex w-full flex-col">
-        <nav
-          v-if="!isEditing"
-          data-pyro-files-state="browsing"
-          class="sticky top-0 z-10 flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
-        >
+        <nav v-if="!isEditing" data-pyro-files-state="browsing" :class="navClass">
           <ul class="flex list-none items-center p-0 text-contrast">
             <li
               v-tooltip="'Back to home'"
@@ -203,7 +199,7 @@
         <nav
           v-else
           data-pyro-files-state="editing"
-          class="flex h-12 select-none items-center justify-between bg-table-alternateRow p-3"
+          class="flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
         >
           <div class="flex items-center gap-2 text-contrast">
             <ButtonStyled type="transparent">
@@ -559,8 +555,22 @@ const onAnywhereClicked = (e: MouseEvent) => {
   if (!(e.target as HTMLElement).closest("#item-context-menu")) contextMenuInfo.value.item = null;
 };
 
+const isAtTop = ref(true);
+
+const checkScrollPosition = () => {
+  isAtTop.value = window.scrollY === 0;
+};
+
+const navClass = computed(() => {
+  return [
+    "sticky top-0 z-10 flex h-12 select-none items-center justify-between p-3",
+    isAtTop.value ? "bg-table-alternateRow" : "bg-table-alternateRow rounded-t-2xl",
+  ];
+});
+
 onMounted(() => {
   document.addEventListener("click", onAnywhereClicked);
+  checkScrollPosition();
 });
 
 onUnmounted(() => {
