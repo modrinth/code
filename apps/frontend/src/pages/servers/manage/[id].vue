@@ -368,6 +368,9 @@ const updateStats = (currentStats: Stats["current"]) => {
 
 const updatePowerState = (state: ServerState) => {
   serverPowerState.value = state;
+  if (state === "stopped") {
+    uptimeSeconds.value = 0;
+  }
 };
 
 const updateGraphData = (dataArray: number[], newValue: number): number[] => {
