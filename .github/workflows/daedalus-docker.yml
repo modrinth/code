@@ -17,9 +17,6 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./apps/daedalus_client
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -40,7 +37,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: ./apps/daedalus_client
+          file: ./apps/daedalus_client/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
