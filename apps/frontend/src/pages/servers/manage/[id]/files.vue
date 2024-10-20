@@ -33,10 +33,11 @@
               class="bg-bg-input w-full rounded-lg p-4"
               :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
             />
+            <div v-if="nameError" class="text-red-500">{{ nameError }}</div>
           </div>
           <div class="flex justify-end gap-4">
             <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="renameItem"> Rename </Button>
+            <Button :disabled="!!nameError" color="primary" @click="renameItem"> Rename </Button>
           </div>
         </div>
       </NewModal>
@@ -641,9 +642,16 @@ const nameError = computed(() => {
   if (!newItemName.value) {
     return "Name is required.";
   }
-  const validPattern = /^[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+$/;
-  if (!validPattern.test(newItemName.value)) {
-    return "Name must contain alphanumeric characters, dashes, underscores, and a dot for the file extension.";
+  if (newItemType.value === "file") {
+    const validPattern = /^[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+$/;
+    if (!validPattern.test(newItemName.value)) {
+      return "Name must contain alphanumeric characters, dashes, underscores, and a dot for the file extension.";
+    }
+  } else if (newItemType.value === "directory") {
+    const validPattern = /^[a-zA-Z0-9-_]+$/;
+    if (!validPattern.test(newItemName.value)) {
+      return "Name must contain only alphanumeric characters, dashes, and underscores.";
+    }
   }
   return "";
 });
