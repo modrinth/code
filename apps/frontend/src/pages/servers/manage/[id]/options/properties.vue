@@ -107,16 +107,14 @@
     </div>
 
     <UiServersPyroLoading v-else />
-    <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
-      <UiServersSaveBanner
-        :is-visible="hasUnsavedChanges"
-        :server="props.server"
-        :is-updating="isUpdating"
-        restart
-        :save="saveProperties"
-        :reset="resetProperties"
-      />
-    </div>
+    <UiServersSaveBanner
+      :is-visible="hasUnsavedChanges"
+      :server="props.server"
+      :is-updating="isUpdating"
+      restart
+      :save="saveProperties"
+      :reset="resetProperties"
+    />
   </div>
 </template>
 

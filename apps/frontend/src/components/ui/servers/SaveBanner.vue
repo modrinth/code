@@ -3,7 +3,7 @@
     <div
       v-if="props.isVisible"
       data-pyro-save-banner
-      class="save-banner fixed bottom-8 left-4 right-4 z-50 mx-auto h-fit w-full max-w-4xl rounded-2xl border-2 border-solid border-divider bg-bg-raised p-4 transition-all duration-300"
+      class="fixed bottom-8 left-4 right-4 z-50 mx-auto h-fit w-full max-w-4xl rounded-2xl border-2 border-solid border-divider bg-bg-raised p-4 transition-all duration-300"
     >
       <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
         <span class="font-bold text-contrast">Careful, you have unsaved changes!</span>
@@ -59,6 +59,18 @@ const saveAndRestart = async () => {
     transform 200ms;
 }
 
+.save-banner-enter-from,
+.save-banner-leave-to {
+  opacity: 0;
+  transform: translateY(100%) scale(0.98);
+}
+
+.save-banner-enter-to,
+.save-banner-leave-from {
+  opacity: 1;
+  transform: none;
+}
+
 .save-banner-enter-active {
   transition-timing-function: linear(
     0 0%,
@@ -89,18 +101,6 @@ const saveAndRestart = async () => {
     0.996 70.2%,
     1.001 87.2%,
     1 100%
-  );
-}
-
-.save-banner-enter-from,
-.save-banner-leave-to {
-  opacity: 0;
-  transform: translateY(100%) scale(0.98);
-}
-
-.save-banner-enter-to,
-.save-banner-leave-from {
-  opacity: 1;
-  transform: none;
+  ) !important;
 }
 </style>
