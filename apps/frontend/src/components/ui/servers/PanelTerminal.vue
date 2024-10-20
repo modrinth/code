@@ -271,6 +271,12 @@ const scrollToBottom = () => {
   }
 };
 
+const debouncedScrollToBottom = () => {
+  requestAnimationFrame(() => {
+    setTimeout(scrollToBottom, 0);
+  });
+};
+
 const enterFullScreen = () => {
   isFullScreen.value = true;
   document.body.style.overflow = "hidden";
@@ -330,7 +336,7 @@ watch(
     nextTick(() => {
       updateItemHeights();
       if (!userHasScrolled.value || isScrolledToBottom.value) {
-        scrollToBottom();
+        debouncedScrollToBottom();
       }
     });
   },
