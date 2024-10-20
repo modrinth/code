@@ -22,6 +22,15 @@
       />
     </div>
     <div
+      v-else
+      class="pointer-events-none absolute bottom-0 left-0 right-0 z-[9999] h-[196px] w-full"
+      :style="
+        bottomThreshold > 0
+          ? { background: 'linear-gradient(transparent 30%, var(--console-bg) 70%)' }
+          : {}
+      "
+    ></div>
+    <div
       aria-hidden="true"
       class="pointer-events-none absolute left-0 top-0 z-[9999999] h-full w-full"
       :style="{
@@ -350,6 +359,10 @@ watch(isFullScreen, () => {
 </script>
 
 <style scoped>
+:root {
+  --console-bg: var(--color-bg);
+}
+
 .terminal-font {
   font-family: var(--mono-font);
   font-size: 1rem;
@@ -357,15 +370,19 @@ watch(isFullScreen, () => {
 }
 
 html.light-mode .console {
-  background: var(--color-bg);
+  --console-bg: var(--color-bg);
 }
 
 html.dark-mode .console {
-  background: black;
+  --console-bg: black;
 }
 
 html.oled-mode .console {
-  background: black;
+  --console-bg: black;
+}
+
+.console {
+  background: var(--console-bg);
 }
 
 [data-pyro-terminal-root]::-webkit-scrollbar {
