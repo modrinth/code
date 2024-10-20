@@ -4,7 +4,18 @@
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
           <h2 class="m-0 text-lg font-bold text-contrast">Server properties</h2>
-          <p class="m-0">Edit the Minecraft server properties file.</p>
+          <div class="m-0">
+            Edit the Minecraft server properties file. If you're unsure about a specific property,
+            the
+            <NuxtLink
+              class="goto-link !inline-block"
+              to="https://minecraft.wiki/w/Server.properties"
+              external
+            >
+              Minecraft wiki
+            </NuxtLink>
+            has more detailed information about each property.
+          </div>
         </div>
         <div class="flex flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
           <div class="relative w-full text-sm">
