@@ -13,7 +13,7 @@
           <div class="flex flex-col gap-2">
             <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
-            <div v-if="nameError" class="text-red-500">{{ nameError }}</div>
+            <div v-if="nameError" class="text-red">{{ nameError }}</div>
           </div>
           <div class="flex justify-end gap-4">
             <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
@@ -33,7 +33,7 @@
               class="bg-bg-input w-full rounded-lg p-4"
               :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
             />
-            <div v-if="nameError" class="text-red-500">{{ nameError }}</div>
+            <div v-if="nameError" class="text-red">{{ nameError }}</div>
           </div>
           <div class="flex justify-end gap-4">
             <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
