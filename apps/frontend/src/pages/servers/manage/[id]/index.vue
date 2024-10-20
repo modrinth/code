@@ -10,21 +10,29 @@
       class="flex h-full w-full items-center gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
     >
       <div class="flex w-full justify-between">
-        <li
-          v-for="problem in inspectingError.analysis.problems"
-          :key="problem.message"
-          class="list-none"
-        >
-          <div class="flex items-center gap-2">
-            <IssuesIcon class="h-8 w-8 text-red" />
-            <h4 class="text-red-500 m-0 text-lg font-semibold">{{ problem.message }}</h4>
+        <div v-if="inspectingError.analysis.problems.length">
+          <li
+            v-for="problem in inspectingError.analysis.problems"
+            :key="problem.message"
+            class="list-none"
+          >
+            <div class="flex items-center gap-2">
+              <IssuesIcon class="h-8 w-8 text-red" />
+              <h4 class="m-0 text-lg font-semibold">{{ problem.message }}</h4>
+            </div>
+            <ul class="m-0 ml-6">
+              <li v-for="solution in problem.solutions" :key="solution.message">
+                <span class="text-green-600 m-0 text-sm">{{ solution.message }}</span>
+              </li>
+            </ul>
+          </li>
+        </div>
+        <div v-else class="flex flex-col gap-2">
+          <div class="font-semibold">{{ serverData?.name }} shut down unexpectedly.</div>
+          <div class="font-normal">
+            We could not find any specific problems, but you can try restarting the server.
           </div>
-          <ul class="m-0 ml-6">
-            <li v-for="solution in problem.solutions" :key="solution.message">
-              <span class="text-green-600 m-0 text-sm">{{ solution.message }}</span>
-            </li>
-          </ul>
-        </li>
+        </div>
         <Button icon-only color="red" @click="clearError"><XIcon /></Button>
       </div>
     </div>
