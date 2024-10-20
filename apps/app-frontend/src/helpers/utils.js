@@ -1,5 +1,5 @@
 import { get_full_path, get_mod_full_path } from '@/helpers/profile'
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/core'
 
 export async function isDev() {
   return await invoke('is_dev')
@@ -33,6 +33,10 @@ export async function highlightModInProfile(profilePath, projectPath) {
   return await highlightInFolder(fullPath)
 }
 
+export async function restartApp() {
+  return await invoke('restart_app')
+}
+
 export const releaseColor = (releaseType) => {
   switch (releaseType) {
     case 'release':
@@ -52,7 +56,7 @@ export function debounce(fn, wait) {
     if (timer) {
       clearTimeout(timer) // clear any pre-existing timer
     }
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
+
     const context = this // get the current context
     timer = setTimeout(() => {
       fn.apply(context, args) // call the function if time expires

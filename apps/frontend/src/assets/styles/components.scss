@@ -1147,7 +1147,6 @@ svg.inline-svg {
 }
 
 // START STUFF FOR OMORPHIA
-
 .experimental-styles-within {
   .tag-list {
     display: flex;
@@ -1156,7 +1155,7 @@ svg.inline-svg {
   }
 
   .tag-list__item {
-    background-color: var(--color-button-bg);
+    background-color: var(--_bg-color, var(--color-button-bg));
     padding: var(--gap-4) var(--gap-8);
     border-radius: var(--radius-max);
     font-weight: var(--weight-bold);

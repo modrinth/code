@@ -5,7 +5,7 @@ use tauri::{Manager, UserAttentionType};
 use theseus::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
-    tauri::plugin::Builder::new("mr_auth")
+    tauri::plugin::Builder::new("mr-auth")
         .invoke_handler(tauri::generate_handler![
             login_pass,
             login_2fa,
@@ -25,14 +25,14 @@ pub async fn modrinth_auth_login(
 
     let start = Utc::now();
 
-    if let Some(window) = app.get_window("modrinth-signin") {
+    if let Some(window) = app.get_webview_window("modrinth-signin") {
         window.close()?;
     }
 
-    let window = tauri::WindowBuilder::new(
+    let window = tauri::WebviewWindowBuilder::new(
         &app,
         "modrinth-signin",
-        tauri::WindowUrl::External(redirect_uri.parse().map_err(|_| {
+        tauri::WebviewUrl::External(redirect_uri.parse().map_err(|_| {
             theseus::ErrorKind::OtherError(
                 "Error parsing auth redirect URL".to_string(),
             )
@@ -53,12 +53,12 @@ pub async fn modrinth_auth_login(
         }
 
         if window
-            .url()
+            .url()?
             .as_str()
             .starts_with("https://launcher-files.modrinth.com/detect.txt")
         {
             let query = window
-                .url()
+                .url()?
                 .query_pairs()
                 .map(|(key, val)| {
                     (

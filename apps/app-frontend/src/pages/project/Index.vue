@@ -1,6 +1,6 @@
 <template>
   <div class="root-container">
-    <div v-if="data" class="project-sidebar">
+    <div v-if="data" class="project-sidebar" @scroll="$refs.promo.scroll()">
       <Card v-if="instance" class="small-instance">
         <router-link class="instance" :to="`/instance/${encodeURIComponent(instance.path)}`">
           <Avatar
@@ -20,7 +20,7 @@
         </router-link>
       </Card>
       <Card class="sidebar-card" @contextmenu.prevent.stop="handleRightClick">
-        <Avatar size="lg" :src="data.icon_url" />
+        <Avatar size="md" :src="data.icon_url" />
         <div class="instance-info">
           <h2 class="name">{{ data.title }}</h2>
           {{ data.description }}
@@ -61,7 +61,9 @@
             Site
           </a>
         </div>
-        <hr class="card-divider" />
+      </Card>
+      <PromotionWrapper ref="promo" />
+      <Card class="sidebar-card">
         <div class="stats">
           <div class="stat">
             <DownloadIcon aria-hidden="true" />
@@ -163,7 +165,6 @@
       </Card>
     </div>
     <div v-if="data" class="content-container">
-      <PromotionWrapper />
       <Card class="tabs">
         <NavRow
           v-if="data.gallery.length > 0"
@@ -231,15 +232,7 @@ import {
   GlobeIcon,
   ClipboardCopyIcon,
 } from '@modrinth/assets'
-import {
-  Categories,
-  EnvironmentIndicator,
-  Card,
-  Avatar,
-  Button,
-  Promotion,
-  NavRow,
-} from '@modrinth/ui'
+import { Categories, EnvironmentIndicator, Card, Avatar, Button, NavRow } from '@modrinth/ui'
 import { formatNumber } from '@modrinth/utils'
 import {
   BuyMeACoffeeIcon,
@@ -257,10 +250,10 @@ import { useRoute } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { install as installVersion } from '@/store/install.js'
-import { get_project, get_project_many, get_team, get_version_many } from '@/helpers/cache.js'
+import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 
 dayjs.extend(relativeTime)
@@ -309,11 +302,13 @@ async function fetchProjectData() {
 
 await fetchProjectData()
 
+const promo = ref(null)
 watch(
   () => route.params.id,
   async () => {
     if (route.params.id && route.path.startsWith('/project')) {
       await fetchProjectData()
+      promo.value.scroll()
     }
   },
 )
@@ -377,7 +372,7 @@ const handleOptionsClick = (args) => {
 
 .project-sidebar {
   position: fixed;
-  width: 20rem;
+  width: calc(300px + 1.5rem);
   min-height: calc(100vh - 3.25rem);
   height: fit-content;
   max-height: calc(100vh - 3.25rem);
@@ -403,7 +398,7 @@ const handleOptionsClick = (args) => {
   flex-direction: column;
   width: 100%;
   padding: 1rem;
-  margin-left: 19.5rem;
+  margin-left: calc(300px + 1rem);
 }
 
 .button-group {

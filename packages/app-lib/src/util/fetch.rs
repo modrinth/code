@@ -130,8 +130,7 @@ pub async fn fetch_advanced(
                                 (chunk.len() as f64 / total_size as f64)
                                     * total,
                                 None,
-                            )
-                            .await?;
+                            )?;
                         }
 
                         Ok(bytes::Bytes::from(bytes))

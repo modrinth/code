@@ -8,22 +8,20 @@
         :title="formatMessage(cancelModalMessages.title)"
         :description="formatMessage(cancelModalMessages.description)"
         :proceed-label="formatMessage(cancelModalMessages.action)"
-        @proceed="cancelSubscription(cancelSubscriptionId)"
+        @proceed="cancelSubscription(cancelSubscriptionId, true)"
       />
       <div class="flex flex-wrap justify-between gap-4">
         <div class="flex flex-col gap-4">
-          <template v-if="midasSubscription">
-            <span v-if="midasSubscription.status === 'active'">
-              You're currently subscribed to:
-            </span>
-            <span v-else-if="midasSubscription.status === 'payment-processing'" class="text-orange">
+          <template v-if="midasCharge">
+            <span v-if="midasCharge.status === 'open'"> You're currently subscribed to: </span>
+            <span v-else-if="midasCharge.status === 'processing'" class="text-orange">
               Your payment is being processed. Perks will activate once payment is complete.
             </span>
-            <span v-else-if="midasSubscription.status === 'cancelled'">
+            <span v-else-if="midasCharge.status === 'cancelled'">
               You've cancelled your subscription. <br />
               You will retain your perks until the end of the current billing cycle.
             </span>
-            <span v-else-if="midasSubscription.status === 'payment-failed'" class="text-red">
+            <span v-else-if="midasCharge.status === 'failed'" class="text-red">
               Your subscription payment failed. Please update your payment method.
             </span>
           </template>
@@ -49,34 +47,31 @@
         <div class="flex w-full flex-wrap justify-between gap-4 xl:w-auto xl:flex-col">
           <div class="flex flex-col gap-1 xl:ml-auto xl:text-right">
             <span class="text-2xl font-bold text-dark">
-              <template v-if="midasSubscription">
+              <template v-if="midasCharge">
                 {{
                   formatPrice(
                     vintl.locale,
-                    midasSubscriptionPrice.prices.intervals[midasSubscription.interval],
+                    midasSubscriptionPrice.prices.intervals[midasCharge.subscription_interval],
                     midasSubscriptionPrice.currency_code,
                   )
                 }}
                 /
-                {{ midasSubscription.interval }}
+                {{ midasCharge.subscription_interval }}
               </template>
               <template v-else>
                 {{ formatPrice(vintl.locale, price.prices.intervals.monthly, price.currency_code) }}
                 / month
               </template>
             </span>
-            <template v-if="midasSubscription">
+            <template v-if="midasCharge">
               <span class="text-sm text-secondary">
                 Since {{ $dayjs(midasSubscription.created).format("MMMM D, YYYY") }}
               </span>
-              <span v-if="midasSubscription.status === 'active'" class="text-sm text-secondary">
-                Renews {{ $dayjs(midasSubscription.expires).format("MMMM D, YYYY") }}
+              <span v-if="midasCharge.status === 'open'" class="text-sm text-secondary">
+                Renews {{ $dayjs(midasCharge.due).format("MMMM D, YYYY") }}
               </span>
-              <span
-                v-else-if="midasSubscription.status === 'cancelled'"
-                class="text-sm text-secondary"
-              >
-                Expires {{ $dayjs(midasSubscription.expires).format("MMMM D, YYYY") }}
+              <span v-else-if="midasCharge.status === 'cancelled'" class="text-sm text-secondary">
+                Expires {{ $dayjs(midasCharge.due).format("MMMM D, YYYY") }}
               </span>
             </template>
 
@@ -90,11 +85,11 @@
             </span>
           </div>
           <div
-            v-if="midasSubscription && midasSubscription.status === 'payment-failed'"
+            v-if="midasCharge && midasCharge.status === 'failed'"
             class="ml-auto flex flex-row-reverse items-center gap-2"
           >
             <button
-              v-if="midasSubscription && midasSubscription.status === 'payment-failed'"
+              v-if="midasCharge && midasCharge.status === 'failed'"
               class="iconified-button raised-button"
               @click="
                 () => {
@@ -123,7 +118,7 @@
             </OverflowMenu>
           </div>
           <button
-            v-else-if="midasSubscription && midasSubscription.status !== 'cancelled'"
+            v-else-if="midasCharge && midasCharge.status !== 'cancelled'"
             class="iconified-button raised-button !ml-auto"
             @click="
               () => {
@@ -133,6 +128,13 @@
             "
           >
             <XIcon /> Cancel
+          </button>
+          <button
+            v-else-if="midasCharge && midasCharge.status === 'cancelled'"
+            class="btn btn-purple btn-large ml-auto"
+            @click="cancelSubscription(midasSubscription.id, false)"
+          >
+            <RightArrowIcon /> Resubscribe
           </button>
           <button
             v-else
@@ -474,12 +476,14 @@ function loadStripe() {
 
 const [
   { data: paymentMethods, refresh: refreshPaymentMethods },
+  { data: charges, refresh: refreshCharges },
   { data: customer, refresh: refreshCustomer },
   { data: subscriptions, refresh: refreshSubscriptions },
 ] = await Promise.all([
   useAsyncData("billing/payment_methods", () =>
     useBaseFetch("billing/payment_methods", { internal: true }),
   ),
+  useAsyncData("billing/payments", () => useBaseFetch("billing/payments", { internal: true })),
   useAsyncData("billing/customer", () => useBaseFetch("billing/customer", { internal: true })),
   useAsyncData("billing/subscriptions", () =>
     useBaseFetch("billing/subscriptions", { internal: true }),
@@ -487,16 +491,28 @@ const [
 ]);
 
 async function refresh() {
-  await Promise.all([refreshPaymentMethods(), refreshCustomer(), refreshSubscriptions()]);
+  await Promise.all([
+    refreshPaymentMethods(),
+    refreshCharges(),
+    refreshCustomer(),
+    refreshSubscriptions(),
+  ]);
 }
 
 const midasProduct = ref(products.find((x) => x.metadata.type === "midas"));
 const midasSubscription = computed(() =>
-  subscriptions.value.find((x) => midasProduct.value.prices.find((y) => y.id === x.price_id)),
+  subscriptions.value.find(
+    (x) => x.status === "provisioned" && midasProduct.value.prices.find((y) => y.id === x.price_id),
+  ),
 );
 const midasSubscriptionPrice = computed(() =>
   midasSubscription.value
     ? midasProduct.value.prices.find((x) => x.id === midasSubscription.value.price_id)
+    : null,
+);
+const midasCharge = computed(() =>
+  midasSubscription.value
+    ? charges.value.find((x) => x.subscription_id === midasSubscription.value.id)
     : null,
 );
 
@@ -524,8 +540,16 @@ if (route.query.priceId && route.query.plan && route.query.redirect_status) {
     price_id: route.query.priceId,
     interval: route.query.plan,
     created: Date.now(),
-    expires: route.query.plan === "yearly" ? Date.now() + 31536000000 : Date.now() + 2629746000,
     status,
+  });
+
+  charges.value.push({
+    id: "temp",
+    price_id: route.query.priceId,
+    subscription_id: "temp",
+    status: "open",
+    due: Date.now() + (route.query.plan === "yearly" ? 31536000000 : 2629746000),
+    subscription_interval: route.query.plan,
   });
 
   await router.replace({ query: {} });
@@ -655,12 +679,15 @@ async function removePaymentMethod(index) {
 }
 
 const cancelSubscriptionId = ref();
-async function cancelSubscription(id) {
+async function cancelSubscription(id, cancelled) {
   startLoading();
   try {
     await useBaseFetch(`billing/subscription/${id}`, {
       internal: true,
-      method: "DELETE",
+      method: "PATCH",
+      body: {
+        cancelled,
+      },
     });
     await refresh();
   } catch (err) {

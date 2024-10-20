@@ -467,105 +467,73 @@
         </div>
       </template>
     </div>
-  </div>
-  <div class="normal-page__sidebar version-page__metadata">
-    <AdPlaceholder
-      v-if="
-        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
-        tags.approvedStatuses.includes(project.status)
-      "
-    />
-    <div class="universal-card full-width-inputs">
-      <h3>Metadata</h3>
-      <div>
-        <h4>Release channel</h4>
-        <Multiselect
-          v-if="isEditing"
-          v-model="version.version_type"
-          class="input"
-          placeholder="Select one"
-          :options="['release', 'beta', 'alpha']"
-          :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-          :searchable="false"
-          :close-on-select="true"
-          :show-labels="false"
-          :allow-empty="false"
-        />
-        <template v-else>
-          <Badge
-            v-if="version.version_type === 'release'"
-            class="value"
-            type="release"
-            color="green"
+    <div class="version-page__metadata">
+      <div class="universal-card full-width-inputs">
+        <h3>Metadata</h3>
+        <div>
+          <h4>Release channel</h4>
+          <Multiselect
+            v-if="isEditing"
+            v-model="version.version_type"
+            class="input"
+            placeholder="Select one"
+            :options="['release', 'beta', 'alpha']"
+            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :searchable="false"
+            :close-on-select="true"
+            :show-labels="false"
+            :allow-empty="false"
           />
-          <Badge
-            v-else-if="version.version_type === 'beta'"
-            class="value"
-            type="beta"
-            color="orange"
-          />
-          <Badge
-            v-else-if="version.version_type === 'alpha'"
-            class="value"
-            type="alpha"
-            color="red"
-          />
-        </template>
-      </div>
-      <div>
-        <h4>Version number</h4>
-        <div v-if="isEditing" class="iconified-input">
-          <label class="hidden" for="version-number">Version number</label>
-          <HashIcon aria-hidden="true" />
-          <input
-            id="version-number"
-            v-model="version.version_number"
-            type="text"
-            autocomplete="off"
-            maxlength="54"
-          />
+          <template v-else>
+            <Badge
+              v-if="version.version_type === 'release'"
+              class="value"
+              type="release"
+              color="green"
+            />
+            <Badge
+              v-else-if="version.version_type === 'beta'"
+              class="value"
+              type="beta"
+              color="orange"
+            />
+            <Badge
+              v-else-if="version.version_type === 'alpha'"
+              class="value"
+              type="alpha"
+              color="red"
+            />
+          </template>
         </div>
-        <span v-else>{{ version.version_number }}</span>
-      </div>
-      <div v-if="project.project_type !== 'resourcepack'">
-        <h4>Loaders</h4>
-        <Multiselect
-          v-if="isEditing"
-          v-model="version.loaders"
-          :options="
-            tags.loaders
-              .filter((x) =>
-                x.supported_project_types.includes(project.actualProjectType.toLowerCase()),
-              )
-              .map((it) => it.name)
-          "
-          :custom-label="(value) => $formatCategory(value)"
-          :loading="tags.loaders.length === 0"
-          :multiple="true"
-          :searchable="true"
-          :show-no-results="false"
-          :close-on-select="false"
-          :clear-on-select="false"
-          :show-labels="false"
-          :limit="6"
-          :hide-selected="true"
-          placeholder="Choose loaders..."
-        />
-        <Categories v-else :categories="version.loaders" :type="project.actualProjectType" />
-      </div>
-      <div>
-        <h4>Game versions</h4>
-        <template v-if="isEditing">
-          <multiselect
-            v-model="version.game_versions"
+        <div>
+          <h4>Version number</h4>
+          <div v-if="isEditing" class="iconified-input">
+            <label class="hidden" for="version-number">Version number</label>
+            <HashIcon aria-hidden="true" />
+            <input
+              id="version-number"
+              v-model="version.version_number"
+              type="text"
+              autocomplete="off"
+              maxlength="54"
+            />
+          </div>
+          <span v-else>{{ version.version_number }}</span>
+        </div>
+        <div v-if="project.project_type !== 'resourcepack'">
+          <h4>Loaders</h4>
+          <Multiselect
+            v-if="isEditing"
+            v-model="version.loaders"
             :options="
-              showSnapshots
-                ? tags.gameVersions.map((x) => x.version)
-                : tags.gameVersions
-                    .filter((it) => it.version_type === 'release')
-                    .map((x) => x.version)
+              tags.loaders
+                .filter((x) =>
+                  x.supported_project_types.includes(project.actualProjectType.toLowerCase()),
+                )
+                .map((it) => it.name)
             "
-            :loading="tags.gameVersions.length === 0"
+            :custom-label="(value) => $formatCategory(value)"
+            :loading="tags.loaders.length === 0"
             :multiple="true"
             :searchable="true"
             :show-no-results="false"
@@ -574,57 +542,84 @@
             :show-labels="false"
             :limit="6"
             :hide-selected="true"
-            placeholder="Choose versions..."
+            placeholder="Choose loaders..."
           />
-          <Checkbox
-            v-model="showSnapshots"
-            label="Show all versions"
-            description="Show all versions"
-            style="margin-top: 0.5rem"
-            :border="false"
-          />
-        </template>
-        <span v-else>{{ $formatVersion(version.game_versions) }}</span>
-      </div>
-      <div v-if="!isEditing">
-        <h4>Downloads</h4>
-        <span>{{ version.downloads }}</span>
-      </div>
-      <div v-if="!isEditing">
-        <h4>Publication date</h4>
-        <span>
-          {{ $dayjs(version.date_published).format("MMMM D, YYYY [at] h:mm A") }}
-        </span>
-      </div>
-      <div v-if="!isEditing && version.author">
-        <h4>Publisher</h4>
-        <div
-          class="team-member columns button-transparent"
-          @click="$router.push('/user/' + version.author.user.username)"
-        >
-          <Avatar
-            :src="version.author.avatar_url"
-            :alt="version.author.user.username"
-            size="sm"
-            circle
-          />
+          <Categories v-else :categories="version.loaders" :type="project.actualProjectType" />
+        </div>
+        <div>
+          <h4>Game versions</h4>
+          <template v-if="isEditing">
+            <multiselect
+              v-model="version.game_versions"
+              :options="
+                showSnapshots
+                  ? tags.gameVersions.map((x) => x.version)
+                  : tags.gameVersions
+                      .filter((it) => it.version_type === 'release')
+                      .map((x) => x.version)
+              "
+              :loading="tags.gameVersions.length === 0"
+              :multiple="true"
+              :searchable="true"
+              :show-no-results="false"
+              :close-on-select="false"
+              :clear-on-select="false"
+              :show-labels="false"
+              :limit="6"
+              :hide-selected="true"
+              :custom-label="(version) => version"
+              placeholder="Choose versions..."
+            />
+            <Checkbox
+              v-model="showSnapshots"
+              label="Show all versions"
+              description="Show all versions"
+              style="margin-top: 0.5rem"
+              :border="false"
+            />
+          </template>
+          <span v-else>{{ $formatVersion(version.game_versions) }}</span>
+        </div>
+        <div v-if="!isEditing">
+          <h4>Downloads</h4>
+          <span>{{ version.downloads }}</span>
+        </div>
+        <div v-if="!isEditing">
+          <h4>Publication date</h4>
+          <span>
+            {{ $dayjs(version.date_published).format("MMMM D, YYYY [at] h:mm A") }}
+          </span>
+        </div>
+        <div v-if="!isEditing && version.author">
+          <h4>Publisher</h4>
+          <div
+            class="team-member columns button-transparent"
+            @click="$router.push('/user/' + version.author.user.username)"
+          >
+            <Avatar
+              :src="version.author.avatar_url"
+              :alt="version.author.user.username"
+              size="sm"
+              circle
+            />
 
-          <div class="member-info">
-            <nuxt-link :to="'/user/' + version.author.user.username" class="name">
-              <p>
-                {{ version.author.name }}
+            <div class="member-info">
+              <nuxt-link :to="'/user/' + version.author.user.username" class="name">
+                <p>
+                  {{ version.author.name }}
+                </p>
+              </nuxt-link>
+              <p v-if="version.author.role" class="role">
+                {{ version.author.role }}
               </p>
-            </nuxt-link>
-            <p v-if="version.author.role" class="role">
-              {{ version.author.role }}
-            </p>
-            <p v-else-if="version.author_id === 'GVFjtWTf'" class="role">Archivist</p>
+              <p v-else-if="version.author_id === 'GVFjtWTf'" class="role">Archivist</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div v-if="!isEditing">
-        <h4>Version ID</h4>
-        <CopyCode :text="version.id" />
+        <div v-if="!isEditing">
+          <h4>Version ID</h4>
+          <CopyCode :text="version.id" />
+        </div>
       </div>
     </div>
   </div>
@@ -749,6 +744,7 @@ export default defineNuxtComponent({
 
     const auth = await useAuth();
     const tags = useTags();
+    const flags = useFeatureFlags();
 
     const path = route.name.split("-");
     const mode = path[path.length - 1];
@@ -896,6 +892,7 @@ export default defineNuxtComponent({
     return {
       auth,
       tags,
+      flags,
       fileTypes: ref(fileTypes),
       oldFileTypes: ref(oldFileTypes),
       isCreating: ref(isCreating),
@@ -1332,9 +1329,19 @@ export default defineNuxtComponent({
     "title" auto
     "changelog" auto
     "dependencies" auto
+    "metadata" auto
     "files" auto
-    "dummy" 1fr
     / 1fr;
+
+  @media (min-width: 1200px) {
+    grid-template:
+      "title title" auto
+      "changelog metadata" auto
+      "dependencies metadata" auto
+      "files metadata" auto
+      "dummy metadata" 1fr
+      / 1fr 20rem;
+  }
 
   column-gap: var(--spacing-card-md);
 
@@ -1527,6 +1534,8 @@ export default defineNuxtComponent({
 }
 
 .version-page__metadata {
+  grid-area: metadata;
+
   h4 {
     margin: 1rem 0 0.25rem 0;
   }

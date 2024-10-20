@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO mods_links (\n                joining_mod_id, joining_platform_id, url\n            )\n            SELECT * FROM UNNEST($1::bigint[], $2::int[], $3::varchar[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int4Array",
+        "VarcharArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "268af672e8e475885c18da9edd81bac19f3a78a8a462bf9bb2dbe0a72c2f1ff7"
+}

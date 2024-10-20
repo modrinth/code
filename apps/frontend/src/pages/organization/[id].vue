@@ -1,238 +1,260 @@
 <template>
-  <div v-if="organization" class="normal-page">
-    <div class="normal-page__sidebar">
-      <div v-if="routeHasSettings" class="universal-card">
-        <Breadcrumbs
-          current-title="Settings"
-          :link-stack="[
-            { href: `/dashboard/organizations`, label: 'Organizations' },
-            {
-              href: `/organization/${organization.slug}`,
-              label: organization.name,
-              allowTrimming: true,
-            },
-          ]"
-        />
-
-        <div class="page-header__settings">
-          <Avatar size="sm" :src="organization.icon_url" />
-          <div class="title-section">
-            <h2 class="settings-title">
-              <nuxt-link :to="`/organization/${organization.slug}/settings`">
-                {{ organization.name }}
-              </nuxt-link>
-            </h2>
-            <span>
-              {{ $formatNumber(acceptedMembers?.length || 0) }}
-              member<template v-if="acceptedMembers?.length !== 1">s</template>
-            </span>
-          </div>
-        </div>
-
-        <h2>Organization settings</h2>
-
-        <NavStack>
-          <NavStackItem :link="`/organization/${organization.slug}/settings`" label="Overview">
-            <SettingsIcon />
-          </NavStackItem>
-          <NavStackItem
-            :link="`/organization/${organization.slug}/settings/members`"
-            label="Members"
-          >
-            <UsersIcon />
-          </NavStackItem>
-          <NavStackItem
-            :link="`/organization/${organization.slug}/settings/projects`"
-            label="Projects"
-          >
-            <BoxIcon />
-          </NavStackItem>
-          <NavStackItem
-            :link="`/organization/${organization.slug}/settings/analytics`"
-            label="Analytics"
-          >
-            <ChartIcon />
-          </NavStackItem>
-        </NavStack>
-      </div>
-
-      <template v-else>
+  <div
+    v-if="organization"
+    class="experimental-styles-within new-page sidebar"
+    :class="{ 'alt-layout': cosmetics.leftContentLayout || routeHasSettings }"
+  >
+    <ModalCreation ref="modal_creation" :organization-id="organization.id" />
+    <template v-if="routeHasSettings">
+      <div class="normal-page__sidebar">
         <div class="universal-card">
-          <div class="page-header__icon">
-            <Avatar size="md" :src="organization.icon_url" />
-          </div>
-
-          <div class="page-header__text">
-            <h1 class="title">{{ organization.name }}</h1>
-
-            <div>
-              <span class="organization-label"><OrganizationIcon /> Organization</span>
-            </div>
-
-            <div class="organization-description">
-              <div class="metadata-item markdown-body collection-description">
-                <p>{{ organization.description }}</p>
-              </div>
-
-              <hr class="card-divider" />
-
-              <div class="primary-stat">
-                <UserIcon class="primary-stat__icon" aria-hidden="true" />
-                <div class="primary-stat__text">
-                  <span class="primary-stat__counter">
-                    {{ $formatNumber(acceptedMembers?.length || 0) }}
-                  </span>
-                  member<template v-if="acceptedMembers?.length !== 1">s</template>
-                </div>
-              </div>
-
-              <div class="primary-stat">
-                <BoxIcon class="primary-stat__icon" aria-hidden="true" />
-                <div class="primary-stat__text">
-                  <span class="primary-stat__counter">
-                    {{ $formatNumber(projects?.length || 0) }}
-                  </span>
-                  project<span v-if="projects?.length !== 1">s</span>
-                </div>
-              </div>
-
-              <div class="primary-stat no-margin">
-                <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
-                <div class="primary-stat__text">
-                  <span class="primary-stat__counter">
-                    {{ formatCompactNumber(sumDownloads) }}
-                  </span>
-                  download<span v-if="sumDownloads !== 1">s</span>
-                </div>
-              </div>
+          <Breadcrumbs
+            current-title="Settings"
+            :link-stack="[
+              { href: `/dashboard/organizations`, label: 'Organizations' },
+              {
+                href: `/organization/${organization.slug}`,
+                label: organization.name,
+                allowTrimming: true,
+              },
+            ]"
+          />
+          <div class="page-header__settings">
+            <Avatar size="sm" :src="organization.icon_url" />
+            <div class="title-section">
+              <h2 class="settings-title">
+                <nuxt-link :to="`/organization/${organization.slug}/settings`">
+                  {{ organization.name }}
+                </nuxt-link>
+              </h2>
+              <span>
+                {{ $formatNumber(acceptedMembers?.length || 0) }}
+                member<template v-if="acceptedMembers?.length !== 1">s</template>
+              </span>
             </div>
           </div>
-        </div>
 
-        <AdPlaceholder v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" />
+          <h2>Organization settings</h2>
 
-        <div class="creator-list universal-card">
-          <div class="title-and-link">
-            <h3>Members</h3>
-          </div>
-
-          <template v-for="member in acceptedMembers" :key="member.user.id">
-            <nuxt-link class="creator button-base" :to="`/user/${member.user.username}`">
-              <Avatar :src="member.user.avatar_url" circle />
-              <p class="name">
-                {{ member.user.username }}
-                <CrownIcon v-if="member.is_owner" v-tooltip="'Organization owner'" />
-              </p>
-              <p class="role">{{ member.role }}</p>
-            </nuxt-link>
-          </template>
-        </div>
-      </template>
-    </div>
-    <div v-if="!routeHasSettings" class="normal-page__content">
-      <ModalCreation ref="modal_creation" :organization-id="organization.id" />
-      <div v-if="isInvited" class="universal-card information invited">
-        <h2>Invitation to join {{ organization.name }}</h2>
-        <p>You have been invited to join {{ organization.name }}.</p>
-        <div class="input-group">
-          <button class="iconified-button brand-button" @click="onAcceptInvite">
-            <CheckIcon />Accept
-          </button>
-          <button class="iconified-button danger-button" @click="onDeclineInvite">
-            <XIcon />Decline
-          </button>
+          <NavStack>
+            <NavStackItem :link="`/organization/${organization.slug}/settings`" label="Overview">
+              <SettingsIcon />
+            </NavStackItem>
+            <NavStackItem
+              :link="`/organization/${organization.slug}/settings/members`"
+              label="Members"
+            >
+              <UsersIcon />
+            </NavStackItem>
+            <NavStackItem
+              :link="`/organization/${organization.slug}/settings/projects`"
+              label="Projects"
+            >
+              <BoxIcon />
+            </NavStackItem>
+            <NavStackItem
+              :link="`/organization/${organization.slug}/settings/analytics`"
+              label="Analytics"
+            >
+              <ChartIcon />
+            </NavStackItem>
+          </NavStack>
         </div>
       </div>
-      <nav class="navigation-card">
-        <NavRow
-          :links="[
-            {
-              label: formatMessage(commonMessages.allProjectType),
-              href: `/organization/${organization.slug}`,
-            },
-            ...projectTypes.map((x) => {
-              return {
-                label: formatMessage(getProjectTypeMessage(x, true)),
-                href: `/organization/${organization.slug}/${x}s`,
-              };
-            }),
-          ]"
+      <div class="normal-page__content">
+        <NuxtPage />
+      </div>
+    </template>
+    <template v-else>
+      <div class="normal-page__header py-4">
+        <ContentPageHeader>
+          <template #icon>
+            <Avatar :src="organization.icon_url" :alt="organization.name" size="96px" />
+          </template>
+          <template #title>
+            {{ organization.name }}
+          </template>
+          <template #title-suffix>
+            <div class="ml-1 flex items-center gap-2 font-semibold">
+              <OrganizationIcon /> Organization
+            </div>
+          </template>
+          <template #summary>
+            {{ organization.description }}
+          </template>
+          <template #stats>
+            <div
+              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+            >
+              <UsersIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(acceptedMembers?.length || 0) }}
+              members
+            </div>
+            <div
+              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+            >
+              <BoxIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(projects?.length || 0) }}
+              projects
+            </div>
+            <div class="flex items-center gap-2 font-semibold">
+              <DownloadIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(sumDownloads) }}
+              downloads
+            </div>
+          </template>
+          <template #actions>
+            <ButtonStyled v-if="auth.user && currentMember" size="large">
+              <NuxtLink :to="`/organization/${organization.slug}/settings`">
+                <SettingsIcon aria-hidden="true" />
+                Manage
+              </NuxtLink>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular type="transparent">
+              <OverflowMenu
+                :options="[
+                  {
+                    id: 'manage-projects',
+                    action: () =>
+                      navigateTo('/organization/' + organization.slug + '/settings/projects'),
+                    hoverOnly: true,
+                    shown: auth.user && currentMember,
+                  },
+                  { divider: true, shown: auth.user && currentMember },
+                  { id: 'copy-id', action: () => copyId() },
+                ]"
+                aria-label="More options"
+              >
+                <MoreVerticalIcon aria-hidden="true" />
+                <template #manage-projects>
+                  <BoxIcon aria-hidden="true" />
+                  Manage projects
+                </template>
+                <template #copy-id>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyIdButton) }}
+                </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </template>
+        </ContentPageHeader>
+      </div>
+      <div class="normal-page__sidebar">
+        <AdPlaceholder
+          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
         />
 
-        <div v-if="auth.user && currentMember" class="input-group">
-          <nuxt-link :to="`/organization/${organization.slug}/settings`" class="iconified-button">
-            <SettingsIcon /> Manage
-          </nuxt-link>
+        <div class="card flex-card">
+          <h2>Members</h2>
+          <div class="details-list">
+            <template v-for="member in acceptedMembers" :key="member.user.id">
+              <nuxt-link
+                class="details-list__item details-list__item--type-large"
+                :to="`/user/${member.user.username}`"
+              >
+                <Avatar :src="member.user.avatar_url" circle />
+                <div class="rows">
+                  <span class="flex items-center gap-1">
+                    {{ member.user.username }}
+                    <CrownIcon
+                      v-if="member.is_owner"
+                      v-tooltip="'Organization owner'"
+                      class="text-brand-orange"
+                    />
+                  </span>
+                  <span class="details-list__item__text--style-secondary">
+                    {{ member.role ? member.role : "Member" }}
+                  </span>
+                </div>
+              </nuxt-link>
+            </template>
+          </div>
         </div>
-      </nav>
-      <template v-if="projects?.length > 0">
-        <div class="project-list display-mode--list">
-          <ProjectCard
-            v-for="project in (route.params.projectType !== undefined
-              ? projects.filter((x) =>
-                  x.project_types.includes(
-                    route.params.projectType.substr(0, route.params.projectType.length - 1),
-                  ),
-                )
-              : projects
-            )
-              .slice()
-              .sort((a, b) => b.downloads - a.downloads)"
-            :id="project.slug || project.id"
-            :key="project.id"
-            :name="project.name"
-            :display="cosmetics.searchDisplayMode.user"
-            :featured-image="project.gallery.find((element) => element.featured)?.url"
-            project-type-url="project"
-            :description="project.summary"
-            :created-at="project.published"
-            :updated-at="project.updated"
-            :downloads="project.downloads.toString()"
-            :follows="project.followers.toString()"
-            :icon-url="project.icon_url"
-            :categories="project.categories"
-            :client-side="project.client_side"
-            :server-side="project.server_side"
-            :status="
-              auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
-                ? project.status
-                : null
-            "
-            :type="project.project_types[0] ?? 'project'"
-            :color="project.color"
-          />
-        </div>
-      </template>
-
-      <div v-else-if="true" class="error">
-        <UpToDate class="icon" /><br />
-        <span class="preserve-lines text">
-          This organization doesn't have any projects yet.
-          <template v-if="isPermission(currentMember?.organization_permissions, 1 << 4)">
-            Would you like to
-            <a class="link" @click="$refs.modal_creation.show()">create one</a>?
-          </template>
-        </span>
       </div>
-    </div>
-    <NuxtPage />
+      <div class="normal-page__content">
+        <div v-if="isInvited" class="universal-card information invited">
+          <h2>Invitation to join {{ organization.name }}</h2>
+          <p>You have been invited to join {{ organization.name }}.</p>
+          <div class="input-group">
+            <button class="iconified-button brand-button" @click="onAcceptInvite">
+              <CheckIcon />Accept
+            </button>
+            <button class="iconified-button danger-button" @click="onDeclineInvite">
+              <XIcon />Decline
+            </button>
+          </div>
+        </div>
+        <div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
+          <NavTabs :links="navLinks" />
+        </div>
+        <template v-if="projects?.length > 0">
+          <div class="project-list display-mode--list">
+            <ProjectCard
+              v-for="project in (route.params.projectType !== undefined
+                ? projects.filter((x) =>
+                    x.project_types.includes(
+                      route.params.projectType.substr(0, route.params.projectType.length - 1),
+                    ),
+                  )
+                : projects
+              )
+                .slice()
+                .sort((a, b) => b.downloads - a.downloads)"
+              :id="project.slug || project.id"
+              :key="project.id"
+              :name="project.name"
+              :display="cosmetics.searchDisplayMode.user"
+              :featured-image="project.gallery.find((element) => element.featured)?.url"
+              project-type-url="project"
+              :description="project.summary"
+              :created-at="project.published"
+              :updated-at="project.updated"
+              :downloads="project.downloads.toString()"
+              :follows="project.followers.toString()"
+              :icon-url="project.icon_url"
+              :categories="project.categories"
+              :client-side="project.client_side"
+              :server-side="project.server_side"
+              :status="
+                auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
+                  ? project.status
+                  : null
+              "
+              :type="project.project_types[0] ?? 'project'"
+              :color="project.color"
+            />
+          </div>
+        </template>
+
+        <div v-else-if="true" class="error">
+          <UpToDate class="icon" /><br />
+          <span class="preserve-lines text">
+            This organization doesn't have any projects yet.
+            <template v-if="isPermission(currentMember?.organization_permissions, 1 << 4)">
+              Would you like to
+              <a class="link" @click="$refs.modal_creation.show()">create one</a>?
+            </template>
+          </span>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
 import {
   BoxIcon,
-  UserIcon,
+  MoreVerticalIcon,
   UsersIcon,
   SettingsIcon,
   ChartIcon,
   CheckIcon,
   XIcon,
+  ClipboardCopyIcon,
 } from "@modrinth/assets";
-import { Avatar, Breadcrumbs } from "@modrinth/ui";
+import { Avatar, ButtonStyled, Breadcrumbs, ContentPageHeader, OverflowMenu } from "@modrinth/ui";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
-import NavRow from "~/components/ui/NavRow.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
@@ -242,6 +264,7 @@ import OrganizationIcon from "~/assets/images/utils/organization.svg?component";
 import DownloadIcon from "~/assets/images/utils/download.svg?component";
 import CrownIcon from "~/assets/images/utils/crown.svg?component";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
+import NavTabs from "~/components/ui/NavTabs.vue";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
@@ -253,6 +276,7 @@ const user = await useUser();
 const cosmetics = useCosmetics();
 const route = useNativeRoute();
 const tags = useTags();
+const flags = useFeatureFlags();
 
 let orgId = useRouteId();
 
@@ -448,6 +472,26 @@ useSeoMeta({
   ogDescription: organization.value.description,
   ogImage: organization.value.icon_url ?? "https://cdn.modrinth.com/placeholder.png",
 });
+
+const navLinks = computed(() => [
+  {
+    label: formatMessage(commonMessages.allProjectType),
+    href: `/organization/${organization.value.slug}`,
+  },
+  ...projectTypes.value
+    .map((x) => {
+      return {
+        label: formatMessage(getProjectTypeMessage(x, true)),
+        href: `/organization/${organization.value.slug}/${x}s`,
+      };
+    })
+    .slice()
+    .sort((a, b) => a.label.localeCompare(b.label)),
+]);
+
+async function copyId() {
+  await navigator.clipboard.writeText(organization.value.id);
+}
 </script>
 
 <style scoped lang="scss">

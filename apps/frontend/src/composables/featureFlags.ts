@@ -19,17 +19,8 @@ const validateValues = <K extends PropertyKey>(flags: Record<K, FlagValue>) => f
 export const DEFAULT_FEATURE_FLAGS = validateValues({
   // Developer flags
   developerMode: false,
-
-  // In-development features, flags will be removed over time
-  newProjectLinks: true,
-  newProjectMembers: false,
-  newProjectDetails: true,
-  projectCompatibility: false,
-  removeFeaturedVersions: false,
-
-  // Alt layouts
-  // searchSidebarRight: false,
-  // projectSidebarRight: false,
+  showVersionFilesInTable: false,
+  showAdsWithPlus: false,
 
   // Feature toggles
   // advancedRendering: true,

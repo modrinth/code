@@ -1,11 +1,11 @@
 <script setup>
 import { CheckIcon } from '@modrinth/assets'
-import { Button, Modal, Badge } from '@modrinth/ui'
+import { Button, Badge } from '@modrinth/ui'
 import { computed, ref } from 'vue'
-import { useTheming } from '@/store/theme'
 import { update_managed_modrinth_version } from '@/helpers/profile'
 import { releaseColor } from '@/helpers/utils'
 import { SwapIcon } from '@/assets/icons/index.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const props = defineProps({
   versions: {
@@ -33,8 +33,6 @@ const installedVersion = computed(() => props.instance?.linked_data?.version_id)
 const installing = computed(() => props.instance.install_stage !== 'installed')
 const inProgress = ref(false)
 
-const themeStore = useTheming()
-
 const switchVersion = async (versionId) => {
   inProgress.value = true
   await update_managed_modrinth_version(props.instance.path, versionId)
@@ -43,11 +41,10 @@ const switchVersion = async (versionId) => {
 </script>
 
 <template>
-  <Modal
+  <ModalWrapper
     ref="modpackVersionModal"
     class="modpack-version-modal"
     header="Change modpack version"
-    :noblur="!themeStore.advancedRendering"
   >
     <div class="modal-body">
       <Card v-if="instance.linked_data" class="mod-card">
@@ -111,7 +108,7 @@ const switchVersion = async (versionId) => {
         </div>
       </Card>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">

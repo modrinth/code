@@ -10,7 +10,7 @@ import {
 import { handleError } from '@/store/notifications.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import { install as packInstall } from '@/helpers/pack.js'
-import { mixpanel_track } from '@/helpers/mixpanel.js'
+import { trackEvent } from '@/helpers/analytics.js'
 import dayjs from 'dayjs'
 
 export const useInstall = defineStore('installStore', {
@@ -51,7 +51,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
     if (packs.length === 0 || !packs.find((pack) => pack.linked_data?.project_id === project.id)) {
       await packInstall(project.id, version, project.title, project.icon_url).catch(handleError)
 
-      mixpanel_track('PackInstall', {
+      trackEvent('PackInstall', {
         id: project.id,
         version_id: version,
         title: project.title,
@@ -107,7 +107,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
         await add_project_from_version(instance.path, version.id).catch(handleError)
         await installVersionDependencies(instance, version)
 
-        mixpanel_track('ProjectInstall', {
+        trackEvent('ProjectInstall', {
           loader: instance.loader,
           game_version: instance.game_version,
           id: project.id,

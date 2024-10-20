@@ -1,10 +1,8 @@
 [package]
 name = "theseus"
-version = "0.8.3-1"
+version = "0.8.9"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2021"
 
 [dependencies]
 bytes = "1"
@@ -38,14 +36,13 @@ tracing-error = "0.2.0"
 
 paste = { version = "1.0" }
 
-tauri = { version = "1.7.1", optional = true }
+tauri = { version = "2.0.0-rc", optional = true }
 indicatif = { version = "0.17.3", optional = true }
 
 async-tungstenite = { version = "0.27.0", features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
 futures = "0.3"
 reqwest = { version = "0.12.3", features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls", "charset", "http2", "macos-system-configuration"], default-features = false }
 tokio = { version = "1", features = ["full"] }
-tokio-stream = { version = "0.1", features = ["fs"] }
 async-recursion = "1.0.4"
 
 notify = { version = "6.1.1", default-features = false }
@@ -63,10 +60,7 @@ rand = "0.8"
 byteorder = "1.5.0"
 base64 = "0.22.0"
 
-# TODO: Remove when new SQLX version is released
-# We force-upgrade SQLite so JSONB support is added (theseus)
-# https://github.com/launchbadge/sqlx/commit/352b02de6af70f1ff1bfbd15329120589a0f7337
-sqlx = { git = "https://github.com/launchbadge/sqlx.git", rev = "352b02de6af70f1ff1bfbd15329120589a0f7337", features = [ "runtime-tokio", "sqlite", "macros"] }
+sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52.0"

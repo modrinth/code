@@ -117,9 +117,9 @@ import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
 import { ChatIcon } from '@/assets/icons'
 import { get_many } from '@/helpers/profile.js'
+import { trackEvent } from '@/helpers/analytics'
 
 const router = useRouter()
 const card = ref(null)
@@ -164,7 +164,7 @@ const stop = async (process) => {
   try {
     await killProcess(process.uuid).catch(handleError)
 
-    mixpanel_track('InstanceStop', {
+    trackEvent('InstanceStop', {
       loader: process.profile.loader,
       game_version: process.profile.game_version,
       source: 'AppBar',

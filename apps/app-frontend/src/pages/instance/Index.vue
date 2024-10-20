@@ -1,8 +1,8 @@
 <template>
   <div class="instance-container">
-    <div class="side-cards">
+    <div class="side-cards pb-4" @scroll="$refs.promo.scroll()">
       <Card class="instance-card" @contextmenu.prevent.stop="handleRightClick">
-        <Avatar size="lg" :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null" />
+        <Avatar size="md" :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null" />
         <div class="instance-info">
           <h2 class="name">{{ instance.name }}</h2>
           <span class="metadata"> {{ instance.loader }} {{ instance.game_version }} </span>
@@ -61,9 +61,9 @@
           </RouterLink>
         </div>
       </Card>
+      <PromotionWrapper ref="promo" class="mt-4" />
     </div>
     <div class="content">
-      <PromotionWrapper />
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
@@ -131,9 +131,8 @@ import { ref, onUnmounted } from 'vue'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { useFetch } from '@/helpers/fetch'
+import { trackEvent } from '@/helpers/analytics'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { handleSevereError } from '@/store/error.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import dayjs from 'dayjs'
@@ -183,7 +182,7 @@ const startInstance = async (context) => {
   }
   loading.value = false
 
-  mixpanel_track('InstanceStart', {
+  trackEvent('InstanceStart', {
     loader: instance.value.loader,
     game_version: instance.value.game_version,
     source: context,
@@ -220,7 +219,7 @@ const stopInstance = async (context) => {
   playing.value = false
   await kill(route.params.id).catch(handleError)
 
-  mixpanel_track('InstanceStop', {
+  trackEvent('InstanceStop', {
     loader: instance.value.loader,
     game_version: instance.value.game_version,
     source: context,
@@ -312,7 +311,6 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 17rem;
 }
 
 Button {
@@ -326,12 +324,13 @@ Button {
 }
 
 .side-cards {
-  position: absolute;
+  position: fixed;
+  width: 300px;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  min-height: calc(100% - 3.25rem);
-  max-height: calc(100% - 3.25rem);
+
+  min-height: calc(100vh - 3.25rem);
+  max-height: calc(100vh - 3.25rem);
   overflow-y: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -375,10 +374,7 @@ Button {
   overflow: auto;
   gap: 1rem;
   min-height: 100%;
-}
-
-.content {
-  margin-left: 19rem;
+  padding: 1rem;
 }
 
 .instance-info {
@@ -452,10 +448,10 @@ Button {
 }
 
 .content {
-  width: 100%;
+  margin: 0 1rem 0.5rem 20rem;
+  width: calc(100% - 20rem);
   display: flex;
   flex-direction: column;
-  padding: 1rem 1rem 0 0;
   overflow: auto;
 }
 

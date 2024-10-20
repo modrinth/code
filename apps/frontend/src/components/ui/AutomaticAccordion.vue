@@ -1,8 +1,8 @@
 <template>
-  <div class="accordion-wrapper">
+  <div class="accordion-wrapper" :class="{ 'has-content': hasContent }">
     <div class="accordion-content">
       <div>
-        <div class="content-container" v-bind="$attrs">
+        <div v-bind="$attrs" ref="slotContainer" class="content-container">
           <slot />
         </div>
       </div>
@@ -14,11 +14,39 @@
 defineOptions({
   inheritAttrs: false,
 });
+
+const slotContainer = ref();
+
+const hasContent = ref(false);
+
+const mutationObserver = ref<MutationObserver | null>(null);
+
+function updateContent() {
+  if (!slotContainer.value) return false;
+
+  hasContent.value = slotContainer.value ? slotContainer.value.children.length > 0 : false;
+}
+
+onMounted(() => {
+  mutationObserver.value = new MutationObserver(updateContent);
+
+  mutationObserver.value.observe(slotContainer.value, {
+    childList: true,
+  });
+
+  updateContent();
+});
+
+onUnmounted(() => {
+  if (mutationObserver.value) {
+    mutationObserver.value.disconnect();
+  }
+});
 </script>
 <style scoped>
 .accordion-content {
   display: grid;
-  grid-template-rows: 1fr;
+  grid-template-rows: 0fr;
   transition: grid-template-rows 0.3s ease-in-out;
 }
 
@@ -28,15 +56,15 @@ defineOptions({
   }
 }
 
-.accordion-content:has(* .content-container:empty) {
-  grid-template-rows: 0fr;
+.has-content .accordion-content {
+  grid-template-rows: 1fr;
 }
 
 .accordion-content > div {
   overflow: hidden;
 }
 
-.accordion-wrapper:has(* .content-container:empty) {
+.accordion-wrapper.has-content {
   display: contents;
 }
 </style>

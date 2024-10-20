@@ -2,81 +2,94 @@
   <div v-if="user" class="experimental-styles-within">
     <ModalCreation ref="modal_creation" />
     <CollectionCreateModal ref="modal_collection_creation" />
-    <div class="new-page sidebar">
-      <div class="normal-page__header pt-4">
-        <div
-          class="mb-4 grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
-        >
-          <div class="flex gap-4">
+    <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
+      <div class="normal-page__header py-4">
+        <ContentPageHeader>
+          <template #icon>
             <Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
-            <div class="flex flex-col gap-2">
-              <div class="flex flex-wrap items-center gap-2">
-                <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
-                  {{ user.username }}
-                </h1>
-              </div>
-              <p class="m-0 line-clamp-2 max-w-[40rem]">
-                {{
-                  user.bio
-                    ? user.bio
-                    : projects.length === 0
-                      ? "A Modrinth user."
-                      : "A Modrinth creator."
-                }}
-              </p>
+          </template>
+          <template #title>
+            {{ user.username }}
+          </template>
+          <template #summary>
+            {{
+              user.bio
+                ? user.bio
+                : projects.length === 0
+                  ? "A Modrinth user."
+                  : "A Modrinth creator."
+            }}
+          </template>
+          <template #stats>
+            <div
+              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+            >
+              <BoxIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(projects?.length || 0) }}
+              projects
             </div>
-          </div>
-          <div class="flex flex-col justify-center gap-4">
-            <div class="flex flex-wrap gap-2">
-              <ButtonStyled size="large">
-                <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
-                  <EditIcon aria-hidden="true" />
-                  {{ formatMessage(commonMessages.editButton) }}
-                </NuxtLink>
-              </ButtonStyled>
-              <ButtonStyled size="large" circular type="transparent">
-                <OverflowMenu
-                  :options="[
-                    {
-                      id: 'manage-projects',
-                      action: () => navigateTo('/dashboard/projects'),
-                      hoverOnly: true,
-                      shown: auth.user && auth.user.id === user.id,
-                    },
-                    { divider: true, shown: auth.user && auth.user.id === user.id },
-                    {
-                      id: 'report',
-                      action: () => reportUser(user.id),
-                      color: 'red',
-                      hoverOnly: true,
-                    },
-                    { id: 'copy-id', action: () => copyId() },
-                  ]"
-                  aria-label="More options"
-                >
-                  <MoreVerticalIcon aria-hidden="true" />
-                  <template #manage-projects>
-                    <BoxIcon aria-hidden="true" />
-                    {{ formatMessage(messages.profileManageProjectsButton) }}
-                  </template>
-                  <template #report>
-                    <ReportIcon aria-hidden="true" />
-                    {{ formatMessage(commonMessages.reportButton) }}
-                  </template>
-                  <template #copy-id>
-                    <ClipboardCopyIcon aria-hidden="true" />
-                    {{ formatMessage(commonMessages.copyIdButton) }}
-                  </template>
-                </OverflowMenu>
-              </ButtonStyled>
+            <div
+              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+            >
+              <DownloadIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(sumDownloads) }}
+              downloads
             </div>
-          </div>
-        </div>
+            <div class="flex items-center gap-2 font-semibold">
+              <CalendarIcon class="h-6 w-6 text-secondary" />
+              Joined
+              {{ formatRelativeTime(user.created) }}
+            </div>
+          </template>
+          <template #actions>
+            <ButtonStyled size="large">
+              <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
+                <EditIcon aria-hidden="true" />
+                {{ formatMessage(commonMessages.editButton) }}
+              </NuxtLink>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular type="transparent">
+              <OverflowMenu
+                :options="[
+                  {
+                    id: 'manage-projects',
+                    action: () => navigateTo('/dashboard/projects'),
+                    hoverOnly: true,
+                    shown: auth.user && auth.user.id === user.id,
+                  },
+                  { divider: true, shown: auth.user && auth.user.id === user.id },
+                  {
+                    id: 'report',
+                    action: () => reportUser(user.id),
+                    color: 'red',
+                    hoverOnly: true,
+                  },
+                  { id: 'copy-id', action: () => copyId() },
+                ]"
+                aria-label="More options"
+              >
+                <MoreVerticalIcon aria-hidden="true" />
+                <template #manage-projects>
+                  <BoxIcon aria-hidden="true" />
+                  {{ formatMessage(messages.profileManageProjectsButton) }}
+                </template>
+                <template #report>
+                  <ReportIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.reportButton) }}
+                </template>
+                <template #copy-id>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyIdButton) }}
+                </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </template>
+        </ContentPageHeader>
+      </div>
+      <div class="normal-page__content">
         <div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
           <NavTabs :links="navLinks" />
         </div>
-      </div>
-      <div class="normal-page__content">
         <div v-if="projects.length > 0">
           <div
             v-if="route.params.projectType !== 'collections'"
@@ -194,70 +207,6 @@
         </div>
       </div>
       <div class="normal-page__sidebar">
-        <AdPlaceholder v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" />
-        <div class="card flex-card">
-          <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileDetails) }}</h2>
-          <div class="flex items-center gap-2">
-            <BoxIcon aria-hidden="true" class="stroke-[3] text-secondary" />
-            <div class="text-secondary">
-              <IntlFormatted
-                :message-id="messages.profileProjectsStats"
-                :values="{ count: formatCompactNumber(projects.length) }"
-              >
-                <template #stat="{ children }">
-                  <span class="font-bold text-primary">
-                    <component :is="() => normalizeChildren(children)" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <DownloadIcon aria-hidden="true" class="stroke-[3] text-secondary" />
-            <div class="text-secondary">
-              <IntlFormatted
-                :message-id="messages.profileDownloadsStats"
-                :values="{ count: formatCompactNumber(sumDownloads) }"
-              >
-                <template #stat="{ children }">
-                  <span class="font-bold text-primary">
-                    <component :is="() => normalizeChildren(children)" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <HeartIcon aria-hidden="true" class="text-secondary *:stroke-[3]" />
-            <div class="text-secondary">
-              <IntlFormatted
-                :message-id="messages.profileProjectsFollowersStats"
-                :values="{ count: formatCompactNumber(sumFollows) }"
-              >
-                <template #stat="{ children }">
-                  <span class="font-bold text-primary">
-                    <component :is="() => normalizeChildren(children)" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <CalendarIcon aria-hidden="true" class="text-secondary *:stroke-[3]" />
-            <div class="text-secondary">
-              <IntlFormatted
-                :message-id="messages.profileJoinedAt"
-                :values="{ ago: formatRelativeTime(user.created) }"
-              >
-                <template #date="{ children }">
-                  <span class="font-bold text-primary">
-                    <component :is="() => children" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-        </div>
         <div v-if="organizations.length > 0" class="card flex-card">
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
           <div class="flex flex-wrap gap-2">
@@ -286,6 +235,9 @@
             </div>
           </div>
         </div>
+        <AdPlaceholder
+          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
+        />
       </div>
     </div>
   </div>
@@ -302,7 +254,7 @@ import {
   ClipboardCopyIcon,
   MoreVerticalIcon,
 } from "@modrinth/assets";
-import { OverflowMenu, ButtonStyled } from "@modrinth/ui";
+import { OverflowMenu, ButtonStyled, ContentPageHeader } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import { reportUser } from "~/utils/report-helpers.ts";
@@ -316,7 +268,6 @@ import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?componen
 import ReportIcon from "~/assets/images/utils/report.svg?component";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
 import EditIcon from "~/assets/images/utils/edit.svg?component";
-import HeartIcon from "~/assets/images/utils/heart.svg?component";
 import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
@@ -328,6 +279,7 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
+const flags = useFeatureFlags();
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
@@ -502,15 +454,6 @@ const sumDownloads = computed(() => {
 
   return sum;
 });
-const sumFollows = computed(() => {
-  let sum = 0;
-
-  for (const project of projects.value) {
-    sum += project.followers;
-  }
-
-  return sum;
-});
 
 const badges = computed(() => {
   const badges = [];
@@ -649,9 +592,5 @@ export default defineNuxtComponent({
       }
     }
   }
-}
-
-.normal-page__header {
-  grid-area: header;
 }
 </style>

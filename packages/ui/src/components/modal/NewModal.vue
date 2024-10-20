@@ -58,6 +58,7 @@ const props = withDefaults(
     closeOnEsc?: boolean
     warnOnClose?: boolean
     header?: string
+    onHide?: () => void
   }>(),
   {
     type: true,
@@ -65,6 +66,7 @@ const props = withDefaults(
     danger: false,
     closeOnEsc: true,
     warnOnClose: false,
+    onHide: () => {},
   },
 )
 
@@ -87,6 +89,7 @@ function show(event?: MouseEvent) {
 }
 
 function hide() {
+  props.onHide()
   visible.value = false
   window.removeEventListener('mousedown', updateMousePosition)
   window.removeEventListener('keydown', handleKeyDown)

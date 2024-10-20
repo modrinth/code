@@ -4,8 +4,8 @@ import App from '@/App.vue'
 import { createPinia } from 'pinia'
 import FloatingVue from 'floating-vue'
 import 'floating-vue/dist/style.css'
-import loadCssMixin from './mixins/macCssFix.js'
 import { createPlugin } from '@vintl/vintl/plugin'
+import * as Sentry from '@sentry/vue'
 
 const VIntlPlugin = createPlugin({
   controllerOpts: {
@@ -27,10 +27,17 @@ const VIntlPlugin = createPlugin({
 const pinia = createPinia()
 
 let app = createApp(App)
+
+Sentry.init({
+  app,
+  dsn: 'https://9508775ee5034536bc70433f5f531dd4@o485889.ingest.us.sentry.io/4504579615227904',
+  integrations: [Sentry.browserTracingIntegration({ router })],
+  tracesSampleRate: 0.1,
+})
+
 app.use(router)
 app.use(pinia)
 app.use(FloatingVue)
-app.mixin(loadCssMixin)
 app.use(VIntlPlugin)
 
 app.mount('#app')

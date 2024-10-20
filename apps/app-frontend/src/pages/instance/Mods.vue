@@ -284,7 +284,7 @@
     :link-function="(page) => `?page=${page}`"
     @switch-page="switchPage"
   />
-  <Modal ref="deleteWarning" header="Are you sure?">
+  <ModalWrapper ref="deleteWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
         <p>
@@ -302,8 +302,8 @@
         </Button>
       </div>
     </div>
-  </Modal>
-  <Modal ref="deleteDisabledWarning" header="Are you sure?">
+  </ModalWrapper>
+  <ModalWrapper ref="deleteDisabledWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
         <p>
@@ -325,8 +325,8 @@
         </Button>
       </div>
     </div>
-  </Modal>
-  <ShareModal
+  </ModalWrapper>
+  <ShareModalWrapper
     ref="shareModal"
     share-title="Sharing modpack content"
     share-text="Check out the projects I'm using in my modpack!"
@@ -360,8 +360,6 @@ import {
 import {
   Pagination,
   DropdownSelect,
-  ShareModal,
-  Modal,
   Checkbox,
   AnimatedLogo,
   Avatar,
@@ -379,8 +377,7 @@ import {
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { listen } from '@tauri-apps/api/event'
+import { trackEvent } from '@/helpers/analytics'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
@@ -393,6 +390,9 @@ import {
   get_version_many,
 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
 
 const props = defineProps({
   instance: {
@@ -682,7 +682,7 @@ const updateAll = async () => {
     projects.value[project].updating = false
   }
 
-  mixpanel_track('InstanceUpdateAll', {
+  trackEvent('InstanceUpdateAll', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     count: setProjects.length,
@@ -708,7 +708,7 @@ const updateProject = async (mod) => {
   mod.version = mod.updateVersion.version_number
   mod.updateVersion = null
 
-  mixpanel_track('InstanceProjectUpdate', {
+  trackEvent('InstanceProjectUpdate', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     id: mod.id,
@@ -717,7 +717,7 @@ const updateProject = async (mod) => {
   })
 }
 
-let locks = {}
+const locks = {}
 
 const toggleDisableMod = async (mod) => {
   // Use mod's id as the key for the lock. If mod doesn't have a unique id, replace `mod.id` with some unique property.
@@ -725,7 +725,7 @@ const toggleDisableMod = async (mod) => {
     locks[mod.id] = ref(null)
   }
 
-  let lock = locks[mod.id]
+  const lock = locks[mod.id]
 
   while (lock.value) {
     await lock.value
@@ -735,7 +735,7 @@ const toggleDisableMod = async (mod) => {
     .then((newPath) => {
       mod.path = newPath
       mod.disabled = !mod.disabled
-      mixpanel_track('InstanceProjectDisable', {
+      trackEvent('InstanceProjectDisable', {
         loader: props.instance.loader,
         game_version: props.instance.game_version,
         id: mod.id,
@@ -756,7 +756,7 @@ const removeMod = async (mod) => {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
-  mixpanel_track('InstanceProjectRemove', {
+  trackEvent('InstanceProjectRemove', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     id: mod.id,
@@ -784,6 +784,7 @@ const deleteDisabled = async () => {
 }
 
 const shareNames = async () => {
+  console.log(functionValues.value)
   await shareModal.value.show(functionValues.value.map((x) => x.name).join('\n'))
 }
 
@@ -878,8 +879,10 @@ async function refreshProjects() {
   refreshingProjects.value = false
 }
 
-const unlisten = await listen('tauri://file-drop', async (event) => {
-  for (const file of event.payload) {
+const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
+  if (event.payload.type !== 'drop') return
+
+  for (const file of event.payload.paths) {
     if (file.endsWith('.mrpack')) continue
     await add_project_from_path(props.instance.path, file).catch(handleError)
   }

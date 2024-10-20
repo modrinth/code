@@ -1,10 +1,10 @@
 <template>
   <div v-if="!hidden" class="splash-screen dark" :class="{ 'fade-out': doneLoading }">
     <div v-if="os !== 'MacOS'" class="app-buttons">
-      <button class="btn icon-only transparent" icon-only @click="() => appWindow.minimize()">
+      <button class="btn icon-only transparent" icon-only @click="() => getCurrent().minimize()">
         <MinimizeIcon />
       </button>
-      <button class="btn icon-only transparent" @click="() => appWindow.toggleMaximize()">
+      <button class="btn icon-only transparent" @click="() => getCurrent().toggleMaximize()">
         <MaximizeIcon />
       </button>
       <button class="btn icon-only transparent" @click="handleClose">
@@ -85,12 +85,9 @@
 import { ref, watch } from 'vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { loading_listener } from '@/helpers/events.js'
-import { appWindow } from '@tauri-apps/api/window'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { XIcon } from '@modrinth/assets'
 import { MaximizeIcon, MinimizeIcon } from '@/assets/icons/index.js'
-import { window as TauriWindow } from '@tauri-apps/api'
-import { TauriEvent } from '@tauri-apps/api/event'
-import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { getOS } from '@/helpers/utils.js'
 import { useLoading } from '@/store/loading.js'
 
@@ -131,20 +128,22 @@ const os = ref('')
 getOS().then((x) => (os.value = x))
 
 loading_listener(async (e) => {
+  console.log(e)
   if (e.event.type === 'directory_move') {
     loadingProgress.value = 100 * (e.fraction ?? 1)
     message.value = 'Updating app directory...'
+  } else if (e.event.type === 'launcher_update') {
+    loadingProgress.value = 100 * (e.fraction ?? 1)
+    message.value = 'Updating Modrinth App...'
+  } else if (e.event.type === 'checking_for_updates') {
+    loadingProgress.value = 100 * (e.fraction ?? 1)
+    message.value = 'Checking for updates...'
   }
 })
 
 const handleClose = async () => {
-  await saveWindowState(StateFlags.ALL)
-  await TauriWindow.getCurrent().close()
+  await getCurrentWindow().close()
 }
-
-TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-  await handleClose()
-})
 </script>
 
 <style scoped lang="scss">

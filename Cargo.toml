@@ -3,7 +3,8 @@ resolver = '2'
 members = [
   './packages/app-lib',
 	'./apps/app-playground',
-  './apps/app'
+  './apps/app',
+  './apps/labrinth'
 ]
 
 # Optimize for speed and reduce size on release builds
@@ -16,3 +17,6 @@ strip = true # Remove debug symbols
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3
+
+[patch.crates-io]
+wry = { git = "https://github.com/modrinth/wry", rev = "27fb16b" }

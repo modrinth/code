@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { DropdownIcon, FolderOpenIcon, SearchIcon } from '@modrinth/assets'
 import { Button, OverflowMenu } from '@modrinth/ui'
-import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/plugin-dialog'
 import { add_project_from_path } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { useRouter } from 'vue-router'
@@ -20,7 +20,7 @@ const handleAddContentFromFile = async () => {
   if (!newProject) return
 
   for (const project of newProject) {
-    await add_project_from_path(props.instance.path, project).catch(handleError)
+    await add_project_from_path(props.instance.path, project.path ?? project).catch(handleError)
   }
 }
 

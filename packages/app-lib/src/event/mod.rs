@@ -2,6 +2,8 @@
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
+#[cfg(feature = "tauri")]
+use tauri::Emitter;
 use tokio::sync::OnceCell;
 use uuid::Uuid;
 
@@ -43,29 +45,23 @@ impl EventState {
             .cloned()
     }
 
-    #[cfg(feature = "tauri")]
-    pub async fn get() -> crate::Result<Arc<Self>> {
+    pub fn get() -> crate::Result<Arc<Self>> {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
-    }
-
-    // Initialization requires no app handle in non-tauri mode, so we can just use the same function
-    #[cfg(not(feature = "tauri"))]
-    pub async fn get() -> crate::Result<Arc<Self>> {
-        Self::init().await
     }
 
     // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
     pub async fn list_progress_bars() -> crate::Result<DashMap<Uuid, LoadingBar>>
     {
-        let value = Self::get().await?;
+        let value = Self::get()?;
         Ok(value.loading_bars.clone())
     }
 
     #[cfg(feature = "tauri")]
-    pub async fn get_main_window() -> crate::Result<Option<tauri::Window>> {
+    pub async fn get_main_window() -> crate::Result<Option<tauri::WebviewWindow>>
+    {
         use tauri::Manager;
-        let value = Self::get().await?;
-        Ok(value.app.get_window("main"))
+        let value = Self::get()?;
+        Ok(value.app.get_webview_window("main"))
     }
 }
 
@@ -92,7 +88,7 @@ impl Drop for LoadingBarId {
     fn drop(&mut self) {
         let loader_uuid = self.0;
         tokio::spawn(async move {
-            if let Ok(event_state) = EventState::get().await {
+            if let Ok(event_state) = EventState::get() {
                 #[cfg(any(feature = "tauri", feature = "cli"))]
                 if let Some((_, bar)) =
                     event_state.loading_bars.remove(&loader_uuid)
@@ -103,8 +99,7 @@ impl Drop for LoadingBarId {
                         let event = bar.bar_type.clone();
                         let fraction = bar.current / bar.total;
 
-                        use tauri::Manager;
-                        let _ = event_state.app.emit_all(
+                        let _ = event_state.app.emit(
                             "loading",
                             LoadingPayload {
                                 fraction: None,
@@ -177,6 +172,11 @@ pub enum LoadingBarType {
     CopyProfile {
         import_location: PathBuf,
         profile_name: String,
+    },
+    CheckingForUpdates,
+    LauncherUpdate {
+        version: String,
+        current_version: String,
     },
 }
 

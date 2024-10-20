@@ -26,12 +26,12 @@
       {
         "name": "issue_instant",
         "ordinal": 4,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "not_after",
         "ordinal": 5,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "token",
@@ -41,7 +41,7 @@
       {
         "name": "display_claims!: serde_json::Value",
         "ordinal": 7,
-        "type_info": "Null"
+        "type_info": "Text"
       }
     ],
     "parameters": {

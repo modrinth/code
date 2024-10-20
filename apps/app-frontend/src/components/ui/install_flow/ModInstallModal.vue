@@ -7,7 +7,7 @@ import {
   RightArrowIcon,
   CheckIcon,
 } from '@modrinth/assets'
-import { Avatar, Modal, Button, Card } from '@modrinth/ui'
+import { Avatar, Button, Card } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 import {
   add_project_from_version as installMod,
@@ -16,15 +16,14 @@ import {
   list,
   create,
 } from '@/helpers/profile'
-import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/plugin-dialog'
 import { installVersionDependencies } from '@/store/install.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { useTheming } from '@/store/theme.js'
 import { useRouter } from 'vue-router'
-import { tauri } from '@tauri-apps/api'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { trackEvent } from '@/helpers/analytics'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
-const themeStore = useTheming()
 const router = useRouter()
 
 const versions = ref()
@@ -49,7 +48,7 @@ const shownProfiles = computed(() =>
       return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
     })
     .filter((profile) => {
-      let loaders = versions.value.flatMap((v) => v.loaders)
+      const loaders = versions.value.flatMap((v) => v.loaders)
 
       return (
         versions.value.flatMap((v) => v.game_versions).includes(profile.game_version) &&
@@ -60,7 +59,7 @@ const shownProfiles = computed(() =>
     }),
 )
 
-let onInstall = ref(() => {})
+const onInstall = ref(() => {})
 
 defineExpose({
   show: async (projectVal, versionsVal, callback) => {
@@ -78,7 +77,7 @@ defineExpose({
     onInstall.value = callback
 
     const profilesVal = await list().catch(handleError)
-    for (let profile of profilesVal) {
+    for (const profile of profilesVal) {
       profile.installing = false
       profile.installedMod = await check_installed(profile.path, project.value.id).catch(
         handleError,
@@ -88,7 +87,7 @@ defineExpose({
 
     installModal.value.show()
 
-    mixpanel_track('ProjectInstallStart', { source: 'ProjectInstallModal' })
+    trackEvent('ProjectInstallStart', { source: 'ProjectInstallModal' })
   },
 })
 
@@ -115,7 +114,7 @@ async function install(instance) {
   instance.installedMod = true
   instance.installing = false
 
-  mixpanel_track('ProjectInstall', {
+  trackEvent('ProjectInstall', {
     loader: instance.loader,
     game_version: instance.game_version,
     id: project.value.id,
@@ -137,12 +136,12 @@ const toggleCreation = () => {
   loader.value = null
 
   if (showCreation.value) {
-    mixpanel_track('InstanceCreateStart', { source: 'ProjectInstallModal' })
+    trackEvent('InstanceCreateStart', { source: 'ProjectInstallModal' })
   }
 }
 
 const upload_icon = async () => {
-  icon.value = await open({
+  const res = await open({
     multiple: false,
     filters: [
       {
@@ -151,9 +150,10 @@ const upload_icon = async () => {
       },
     ],
   })
+  icon.value = res.path ?? res
 
   if (!icon.value) return
-  display_icon.value = tauri.convertFileSrc(icon.value)
+  display_icon.value = convertFileSrc(icon.value)
 }
 
 const reset_icon = () => {
@@ -186,7 +186,7 @@ const createInstance = async () => {
   const instance = await get(id, true)
   await installVersionDependencies(instance, versions.value[0])
 
-  mixpanel_track('InstanceCreate', {
+  trackEvent('InstanceCreate', {
     profile_name: name.value,
     game_version: versions.value[0].game_versions[0],
     loader: loader,
@@ -195,7 +195,7 @@ const createInstance = async () => {
     source: 'ProjectInstallModal',
   })
 
-  mixpanel_track('ProjectInstall', {
+  trackEvent('ProjectInstall', {
     loader: loader,
     game_version: versions.value[0].game_versions[0],
     id: project.value,
@@ -213,12 +213,7 @@ const createInstance = async () => {
 </script>
 
 <template>
-  <Modal
-    ref="installModal"
-    header="Install project to instance"
-    :noblur="!themeStore.advancedRendering"
-    :on-hide="onInstall"
-  >
+  <ModalWrapper ref="installModal" header="Install project to instance" :on-hide="onInstall">
     <div class="modal-body">
       <input
         v-model="searchFilter"
@@ -235,7 +230,7 @@ const createInstance = async () => {
             @click="installModal.hide()"
           >
             <Avatar
-              :src="profile.icon_path ? tauri.convertFileSrc(profile.icon_path) : null"
+              :src="profile.icon_path ? convertFileSrc(profile.icon_path) : null"
               class="profile-image"
             />
             {{ profile.name }}
@@ -304,7 +299,7 @@ const createInstance = async () => {
         <Button @click="installModal.hide()">Cancel</Button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">

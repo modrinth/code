@@ -1,18 +1,13 @@
 <template>
-  <ConfirmModal
+  <ConfirmModalWrapper
     ref="modal_confirm"
     title="Are you sure you want to delete this instance?"
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"
     proceed-label="Delete"
-    :noblur="!themeStore.advancedRendering"
     @proceed="removeProfile"
   />
-  <Modal
-    ref="modalConfirmUnlock"
-    header="Are you sure you want to unlock this instance?"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <ModalWrapper ref="modalConfirmUnlock" header="Are you sure you want to unlock this instance?">
     <div class="modal-delete">
       <div
         class="markdown-body"
@@ -31,13 +26,9 @@
         </button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 
-  <Modal
-    ref="modalConfirmUnpair"
-    header="Are you sure you want to unpair this instance?"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <ModalWrapper ref="modalConfirmUnpair" header="Are you sure you want to unpair this instance?">
     <div class="modal-delete">
       <div
         class="markdown-body"
@@ -56,13 +47,9 @@
         </button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 
-  <Modal
-    ref="changeVersionsModal"
-    header="Change instance versions"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <ModalWrapper ref="changeVersionsModal" header="Change instance versions">
     <div class="change-versions-modal universal-body">
       <div class="input-row">
         <p class="input-label">Loader</p>
@@ -106,7 +93,7 @@
         </button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
   <section class="card">
     <div class="label">
       <h3>
@@ -511,18 +498,7 @@ import {
   DownloadIcon,
   ClipboardCopyIcon,
 } from '@modrinth/assets'
-import {
-  Button,
-  Toggle,
-  ConfirmModal,
-  Card,
-  Slider,
-  Checkbox,
-  Avatar,
-  Modal,
-  Chips,
-  DropdownSelect,
-} from '@modrinth/ui'
+import { Button, Toggle, Card, Slider, Checkbox, Avatar, Chips, DropdownSelect } from '@modrinth/ui'
 import { SwapIcon } from '@/assets/icons'
 
 import { Multiselect } from 'vue-multiselect'
@@ -541,15 +517,16 @@ import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { open } from '@tauri-apps/api/dialog'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { open } from '@tauri-apps/plugin-dialog'
 import { get_loader_versions } from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { useTheming } from '@/store/theme.js'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
+import { trackEvent } from '@/helpers/analytics'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 
 const breadcrumbs = useBreadcrumbs()
 
@@ -570,8 +547,6 @@ const props = defineProps({
   },
 })
 
-const themeStore = useTheming()
-
 const title = ref(props.instance.name)
 const icon = ref(props.instance.icon_path)
 const groups = ref(props.instance.groups)
@@ -590,7 +565,7 @@ const availableGroups = ref([
 async function resetIcon() {
   icon.value = null
   await edit_icon(props.instance.path, null).catch(handleError)
-  mixpanel_track('InstanceRemoveIcon')
+  trackEvent('InstanceRemoveIcon')
 }
 
 async function setIcon() {
@@ -606,10 +581,10 @@ async function setIcon() {
 
   if (!value) return
 
-  icon.value = value
+  icon.value = value.path ?? value
   await edit_icon(props.instance.path, icon.value).catch(handleError)
 
-  mixpanel_track('InstanceSetIcon')
+  trackEvent('InstanceSetIcon')
 }
 
 const globalSettings = await get().catch(handleError)
@@ -621,12 +596,12 @@ const overrideJavaInstall = ref(!!props.instance.java_path)
 const optimalJava = readonly(await get_optimal_jre_key(props.instance.path).catch(handleError))
 const javaInstall = ref({ path: optimalJava.path ?? props.instance.java_path })
 
-const overrideJavaArgs = ref(!!props.instance.extra_launch_args)
+const overrideJavaArgs = ref(props.instance.extra_launch_args?.length !== undefined)
 const javaArgs = ref(
   (props.instance.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
 )
 
-const overrideEnvVars = ref(!!props.instance.custom_env_vars)
+const overrideEnvVars = ref(props.instance.custom_env_vars?.length !== undefined)
 const envVars = ref(
   (props.instance.custom_env_vars ?? globalSettings.custom_env_vars)
     .map((x) => x.join('='))
@@ -710,19 +685,15 @@ const editProfileObject = computed(() => {
   }
 
   if (overrideJavaArgs.value) {
-    if (javaArgs.value !== '') {
-      editProfile.extra_launch_args = javaArgs.value.trim().split(/\s+/).filter(Boolean)
-    }
+    editProfile.extra_launch_args = javaArgs.value.trim().split(/\s+/).filter(Boolean)
   }
 
   if (overrideEnvVars.value) {
-    if (envVars.value !== '') {
-      editProfile.custom_env_vars = envVars.value
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean)
-        .map((x) => x.split('=').filter(Boolean))
-    }
+    editProfile.custom_env_vars = envVars.value
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((x) => x.split('=').filter(Boolean))
   }
 
   if (overrideMemorySettings.value) {
@@ -754,7 +725,7 @@ const repairing = ref(false)
 
 async function duplicateProfile() {
   await duplicate(props.instance.path).catch(handleError)
-  mixpanel_track('InstanceDuplicate', {
+  trackEvent('InstanceDuplicate', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
   })
@@ -765,7 +736,7 @@ async function repairProfile(force) {
   await install(props.instance.path, force).catch(handleError)
   repairing.value = false
 
-  mixpanel_track('InstanceRepair', {
+  trackEvent('InstanceRepair', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
   })
@@ -796,7 +767,7 @@ async function repairModpack() {
   await update_repair_modrinth(props.instance.path).catch(handleError)
   inProgress.value = false
 
-  mixpanel_track('InstanceRepair', {
+  trackEvent('InstanceRepair', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
   })
@@ -808,7 +779,7 @@ async function removeProfile() {
   await remove(props.instance.path).catch(handleError)
   removing.value = false
 
-  mixpanel_track('InstanceRemove', {
+  trackEvent('InstanceRemove', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
   })
@@ -905,7 +876,7 @@ const editing = ref(false)
 async function saveGvLoaderEdits() {
   editing.value = true
 
-  let editProfile = editProfileObject.value
+  const editProfile = editProfileObject.value
   editProfile.loader = loader.value
   editProfile.game_version = gameVersion.value
 

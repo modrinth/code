@@ -1,7 +1,15 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
-import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, XIcon } from '@modrinth/assets'
+import {
+  HomeIcon,
+  SearchIcon,
+  LibraryIcon,
+  PlusIcon,
+  SettingsIcon,
+  XIcon,
+  DownloadIcon,
+} from '@modrinth/assets'
 import { Button, Notifications } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -15,28 +23,26 @@ import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
-import { type } from '@tauri-apps/api/os'
-import { appWindow } from '@tauri-apps/api/window'
-import { isDev, getOS } from '@/helpers/utils.js'
-import {
-  mixpanel_track,
-  mixpanel_init,
-  mixpanel_opt_out_tracking,
-  mixpanel_is_loaded,
-} from '@/helpers/mixpanel'
-import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
+import { type } from '@tauri-apps/plugin-os'
+import { isDev, getOS, restartApp } from '@/helpers/utils.js'
+import { initAnalytics, debugAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
-import { window as TauriWindow } from '@tauri-apps/api'
-import { TauriEvent } from '@tauri-apps/api/event'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
+import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import { useInstall } from '@/store/install.js'
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/core'
+import { open } from '@tauri-apps/plugin-shell'
 import { get_opening_command, initialize_state } from '@/helpers/state'
+import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { renderString } from '@modrinth/utils'
+import { useFetch } from '@/helpers/fetch.js'
+import { check } from '@tauri-apps/plugin-updater'
 
 const themeStore = useTheming()
 
@@ -56,6 +62,12 @@ const nativeDecorations = ref(false)
 const os = ref('')
 
 const stateInitialized = ref(false)
+
+const criticalErrorMessage = ref()
+
+onMounted(async () => {
+  await useCheckDisableMouseover()
+})
 
 async function setupApp() {
   stateInitialized.value = true
@@ -79,21 +91,23 @@ async function setupApp() {
   showOnboarding.value = !onboarded
 
   nativeDecorations.value = native_decorations
-  if (os.value !== 'MacOS') await appWindow.setDecorations(native_decorations)
+  if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
 
   themeStore.setThemeState(theme)
   themeStore.collapsedNavigation = collapsed_navigation
   themeStore.advancedRendering = advanced_rendering
 
-  mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
+  initAnalytics()
   if (!telemetry) {
-    mixpanel_opt_out_tracking()
+    optOutAnalytics()
   }
-  mixpanel_track('Launched', { version, dev, onboarded })
+  if (dev) debugAnalytics()
+  trackEvent('Launched', { version, dev, onboarded })
 
   if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
-  if ((await type()) === 'Darwin') {
+  const osType = await type()
+  if (osType === 'macos') {
     document.getElementsByTagName('html')[0].classList.add('mac')
   } else {
     document.getElementsByTagName('html')[0].classList.add('windows')
@@ -107,7 +121,18 @@ async function setupApp() {
     }),
   )
 
+  useFetch(
+    `https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
+    'criticalAnnouncements',
+    true,
+  ).then((res) => {
+    if (res && res.header && res.body) {
+      criticalErrorMessage.value = res
+    }
+  })
+
   get_opening_command().then(handleCommand)
+  checkUpdates()
 }
 
 const stateFailed = ref(false)
@@ -127,18 +152,12 @@ initialize_state()
 
 const handleClose = async () => {
   await saveWindowState(StateFlags.ALL)
-  await TauriWindow.getCurrent().close()
+  await getCurrentWindow().close()
 }
-
-TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-  await handleClose()
-})
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {
-  if (mixpanel_is_loaded()) {
-    mixpanel_track('PageView', { path: to.path, fromPath: from.path, failed: failure })
-  }
+  trackEvent('PageView', { path: to.path, fromPath: from.path, failed: failure })
 })
 const route = useRoute()
 const isOnBrowse = computed(() => route.path.startsWith('/browse'))
@@ -178,15 +197,10 @@ document.querySelector('body').addEventListener('click', function (e) {
         ['http://', 'https://', 'mailto:', 'tel:'].some((v) => target.href.startsWith(v)) &&
         !target.classList.contains('router-link-active') &&
         !target.href.startsWith('http://localhost') &&
-        !target.href.startsWith('https://tauri.localhost')
+        !target.href.startsWith('https://tauri.localhost') &&
+        !target.href.startsWith('http://tauri.localhost')
       ) {
-        window.__TAURI_INVOKE__('tauri', {
-          __tauriModule: 'Shell',
-          message: {
-            cmd: 'open',
-            path: target.href,
-          },
-        })
+        open(target.href)
       }
       e.preventDefault()
       break
@@ -219,7 +233,7 @@ async function handleCommand(e) {
     // RunMRPack should directly install a local mrpack given a path
     if (e.path.endsWith('.mrpack')) {
       await install_from_file(e.path).catch(handleError)
-      mixpanel_track('InstanceCreate', {
+      trackEvent('InstanceCreate', {
         source: 'CreationModalFileDrop',
       })
     }
@@ -227,6 +241,20 @@ async function handleCommand(e) {
     // Other commands are URL-based (deep linking)
     urlModal.value.show(e)
   }
+}
+
+const updateAvailable = ref(false)
+async function checkUpdates() {
+  const update = await check()
+  console.log(update)
+  updateAvailable.value = !!update
+
+  setTimeout(
+    () => {
+      checkUpdates()
+    },
+    5 * 1000 * 60,
+  )
 }
 </script>
 
@@ -261,6 +289,14 @@ async function handleCommand(e) {
         </div>
       </div>
       <div class="settings pages-list">
+        <button
+          v-if="updateAvailable"
+          v-tooltip="'Install update'"
+          class="btn btn-outline btn-primary icon-only collapsed-button"
+          @click="restartApp()"
+        >
+          <DownloadIcon />
+        </button>
         <Button
           v-tooltip="'Create profile'"
           class="sleek-primary collapsed-button"
@@ -276,6 +312,10 @@ async function handleCommand(e) {
       </div>
     </div>
     <div class="view">
+      <div v-if="criticalErrorMessage" class="critical-error-banner" data-tauri-drag-region>
+        <h1>{{ criticalErrorMessage.header }}</h1>
+        <div class="markdown-body" v-html="renderString(criticalErrorMessage.body ?? '')"></div>
+      </div>
       <div class="appbar-row">
         <div data-tauri-drag-region class="appbar">
           <section class="navigation-controls">
@@ -288,10 +328,14 @@ async function handleCommand(e) {
           </section>
         </div>
         <section v-if="!nativeDecorations" class="window-controls">
-          <Button class="titlebar-button" icon-only @click="() => appWindow.minimize()">
+          <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
             <MinimizeIcon />
           </Button>
-          <Button class="titlebar-button" icon-only @click="() => appWindow.toggleMaximize()">
+          <Button
+            class="titlebar-button"
+            icon-only
+            @click="() => getCurrentWindow().toggleMaximize()"
+          >
             <MaximizeIcon />
           </Button>
           <Button class="titlebar-button close" icon-only @click="handleClose">
@@ -383,6 +427,16 @@ async function handleCommand(e) {
   .view {
     width: calc(100% - var(--sidebar-width));
     background-color: var(--color-raised-bg);
+
+    .critical-error-banner {
+      margin-top: -1.25rem;
+      padding: 1rem;
+      background-color: rgba(203, 34, 69, 0.1);
+      border-left: 2px solid var(--color-red);
+      border-bottom: 2px solid var(--color-red);
+      border-right: 2px solid var(--color-red);
+      border-radius: 1rem;
+    }
 
     .appbar {
       display: flex;

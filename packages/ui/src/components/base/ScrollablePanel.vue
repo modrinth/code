@@ -107,7 +107,7 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
 .scrollable-pane {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
   height: 100%;
   width: 100%;
   overflow-y: auto;

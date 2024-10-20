@@ -139,8 +139,8 @@
           class="image"
           :class="{ 'zoomed-in': zoomedIn }"
           :src="
-            expandedGalleryItem.url
-              ? expandedGalleryItem.url
+            expandedGalleryItem.raw_url
+              ? expandedGalleryItem.raw_url
               : 'https://cdn.modrinth.com/placeholder-banner.svg'
           "
           :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
@@ -165,8 +165,8 @@
                 class="open circle-button"
                 target="_blank"
                 :href="
-                  expandedGalleryItem.url
-                    ? expandedGalleryItem.url
+                  expandedGalleryItem.raw_url
+                    ? expandedGalleryItem.raw_url
                     : 'https://cdn.modrinth.com/placeholder-banner.svg'
                 "
               >

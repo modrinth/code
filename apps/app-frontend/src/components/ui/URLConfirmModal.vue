@@ -1,11 +1,12 @@
 <script setup>
-import { Modal, Button } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { ref } from 'vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_categories } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { get_version, get_project } from '@/helpers/cache.js'
 import { install as installVersion } from '@/store/install.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const confirmModal = ref(null)
 const project = ref(null)
@@ -41,7 +42,7 @@ async function install() {
 </script>
 
 <template>
-  <Modal ref="confirmModal" :header="`Install ${project?.title}`">
+  <ModalWrapper ref="confirmModal" :header="`Install ${project?.title}`">
     <div class="modal-body">
       <SearchCard
         :project="project"
@@ -60,7 +61,7 @@ async function install() {
         </div>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">

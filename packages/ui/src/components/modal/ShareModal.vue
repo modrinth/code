@@ -34,6 +34,16 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  noblur: {
+    type: Boolean,
+    default: false,
+  },
+  onHide: {
+    type: Function,
+    default() {
+      return () => {}
+    },
+  },
 })
 
 const shareModal = ref(null)
@@ -115,7 +125,7 @@ defineExpose({
 </script>
 
 <template>
-  <Modal ref="shareModal" :header="header">
+  <Modal ref="shareModal" :header="header" :noblur="noblur" :on-hide="onHide">
     <div class="share-body">
       <div v-if="link" class="qr-wrapper">
         <div ref="qrCode">

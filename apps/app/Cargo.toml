@@ -1,17 +1,14 @@
 [package]
 name = "theseus_gui"
-version = "0.8.3-1"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+version = "0.8.9"
+description = "The Modrinth App is a desktop application for managing your Minecraft mods"
+license = "GPL-3.0-only"
+repository = "https://github.com/modrinth/code/apps/app/"
 edition = "2021"
 build = "build.rs"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [build-dependencies]
-tauri-build = { version = "1.5.3", features = [] }
+tauri-build = { version = "2.0.0-rc", features = ["codegen"] }
 
 [dependencies]
 theseus = { path = "../../packages/app-lib", features = ["tauri"] }
@@ -19,14 +16,17 @@ theseus = { path = "../../packages/app-lib", features = ["tauri"] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 
-tauri = { version = "1.7.1", features = [ "app-all", "devtools", "dialog", "dialog-confirm", "dialog-open", "macos-private-api", "os-all", "protocol-asset", "shell-open", "window-close", "window-create", "window-hide", "window-maximize", "window-minimize", "window-set-decorations", "window-show", "window-start-dragging", "window-unmaximize", "window-unminimize"] }
-tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
-tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
-tauri-plugin-deep-link = "0.1.2"
+tauri = { version = "2.0.0-rc", features = ["devtools", "macos-private-api", "protocol-asset", "unstable"] }
+tauri-plugin-window-state = "2.0.0-rc"
+tauri-plugin-deep-link = "2.0.0-rc"
+tauri-plugin-os = "2.0.0-rc"
+tauri-plugin-shell = "2.0.0-rc"
+tauri-plugin-dialog = "2.0.0-rc"
+tauri-plugin-updater = { version = "2.0.0-rc" }
+tauri-plugin-single-instance = { version = "2.0.0-rc" }
 
 tokio = { version = "1", features = ["full"] }
 thiserror = "1.0"
-tokio-stream = { version = "0.1", features = ["fs"] }
 futures = "0.3"
 daedalus = "0.2.3"
 chrono = "0.4.26"
@@ -56,6 +56,10 @@ window-shadows = "0.2.1"
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.25.0"
 objc = "0.2.7"
+rand = "0.8.5"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+tauri-plugin-updater = { version = "2.0.0-rc", optional = true, features = ["native-tls-vendored", "zip"], default-features = false }
 
 [features]
 # by default Tauri runs in production mode
@@ -64,3 +68,4 @@ default = ["custom-protocol"]
 # this feature is used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = ["tauri/custom-protocol"]
+updater = []

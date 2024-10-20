@@ -1,20 +1,18 @@
 <script setup>
 import { XIcon, DownloadIcon } from '@modrinth/assets'
-import { Button, Modal } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { useTheming } from '@/store/theme.js'
+import { trackEvent } from '@/helpers/analytics'
 import { handleError } from '@/store/state.js'
-
-const themeStore = useTheming()
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const versionId = ref()
 const project = ref()
 const confirmModal = ref(null)
 const installing = ref(false)
 
-let onInstall = ref(() => {})
+const onInstall = ref(() => {})
 
 defineExpose({
   show: (projectVal, versionIdVal, callback) => {
@@ -25,7 +23,7 @@ defineExpose({
 
     onInstall.value = callback
 
-    mixpanel_track('PackInstallStart')
+    trackEvent('PackInstallStart')
   },
 })
 
@@ -39,7 +37,7 @@ async function install() {
     project.value.title,
     project.value.icon_url,
   ).catch(handleError)
-  mixpanel_track('PackInstall', {
+  trackEvent('PackInstall', {
     id: project.value.id,
     version_id: versionId.value,
     title: project.value.title,
@@ -52,12 +50,7 @@ async function install() {
 </script>
 
 <template>
-  <Modal
-    ref="confirmModal"
-    header="Are you sure?"
-    :noblur="!themeStore.advancedRendering"
-    :on-hide="onInstall"
-  >
+  <ModalWrapper ref="confirmModal" header="Are you sure?" :on-hide="onInstall">
     <div class="modal-body">
       <p>You already have this modpack installed. Are you sure you want to install it again?</p>
       <div class="input-group push-right">
@@ -67,7 +60,7 @@ async function install() {
         >
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style lang="scss" scoped>

@@ -1,16 +1,17 @@
 use crate::api::Result;
 use chrono::{Duration, Utc};
 use tauri::plugin::TauriPlugin;
-use tauri::{Manager, UserAttentionType};
+use tauri::{Manager, Runtime, UserAttentionType};
 use theseus::prelude::*;
 
-pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
-    tauri::plugin::Builder::new("auth")
+pub fn init<R: Runtime>() -> TauriPlugin<R> {
+    tauri::plugin::Builder::<R>::new("auth")
         .invoke_handler(tauri::generate_handler![
-            auth_get_default_user,
-            auth_set_default_user,
-            auth_remove_user,
-            auth_users,
+            login,
+            remove_user,
+            get_default_user,
+            set_default_user,
+            get_users,
         ])
         .build()
 }
@@ -18,19 +19,21 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
 /// Authenticate a user with Hydra - part 1
 /// This begins the authentication flow quasi-synchronously, returning a URL to visit (that the user will sign in at)
 #[tauri::command]
-pub async fn auth_login(app: tauri::AppHandle) -> Result<Option<Credentials>> {
+pub async fn login<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<Option<Credentials>> {
     let flow = minecraft_auth::begin_login().await?;
 
     let start = Utc::now();
 
-    if let Some(window) = app.get_window("signin") {
+    if let Some(window) = app.get_webview_window("signin") {
         window.close()?;
     }
 
-    let window = tauri::WindowBuilder::new(
+    let window = tauri::WebviewWindowBuilder::new(
         &app,
         "signin",
-        tauri::WindowUrl::External(flow.redirect_uri.parse().map_err(
+        tauri::WebviewUrl::External(flow.redirect_uri.parse().map_err(
             |_| {
                 theseus::ErrorKind::OtherError(
                     "Error parsing auth redirect URL".to_string(),
@@ -53,12 +56,12 @@ pub async fn auth_login(app: tauri::AppHandle) -> Result<Option<Credentials>> {
         }
 
         if window
-            .url()
+            .url()?
             .as_str()
             .starts_with("https://login.live.com/oauth20_desktop.srf")
         {
             if let Some((_, code)) =
-                window.url().query_pairs().find(|x| x.0 == "code")
+                window.url()?.query_pairs().find(|x| x.0 == "code")
             {
                 window.close()?;
                 let val =
@@ -75,23 +78,22 @@ pub async fn auth_login(app: tauri::AppHandle) -> Result<Option<Credentials>> {
     Ok(None)
 }
 #[tauri::command]
-pub async fn auth_remove_user(user: uuid::Uuid) -> Result<()> {
+pub async fn remove_user(user: uuid::Uuid) -> Result<()> {
     Ok(minecraft_auth::remove_user(user).await?)
 }
 
 #[tauri::command]
-pub async fn auth_get_default_user() -> Result<Option<uuid::Uuid>> {
+pub async fn get_default_user() -> Result<Option<uuid::Uuid>> {
     Ok(minecraft_auth::get_default_user().await?)
 }
 
 #[tauri::command]
-pub async fn auth_set_default_user(user: uuid::Uuid) -> Result<()> {
+pub async fn set_default_user(user: uuid::Uuid) -> Result<()> {
     Ok(minecraft_auth::set_default_user(user).await?)
 }
 
 /// Get a copy of the list of all user credentials
-// invoke('plugin:auth|auth_users',user)
 #[tauri::command]
-pub async fn auth_users() -> Result<Vec<Credentials>> {
+pub async fn get_users() -> Result<Vec<Credentials>> {
     Ok(minecraft_auth::users().await?)
 }

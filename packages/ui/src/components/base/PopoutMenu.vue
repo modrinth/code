@@ -4,7 +4,7 @@
       v-bind="$attrs"
       ref="dropdownButton"
       :class="{ 'popout-open': dropdownVisible }"
-      tabindex="-1"
+      :tabindex="tabInto ? -1 : 0"
       @click="toggleDropdown"
     >
       <slot></slot>
@@ -12,6 +12,7 @@
     <div
       class="popup-menu"
       :class="`position-${computedPosition}-${computedDirection} ${dropdownVisible ? 'visible' : ''}`"
+      :inert="!tabInto && !dropdownVisible"
     >
       <slot name="menu"> </slot>
     </div>
@@ -34,10 +35,16 @@ const props = defineProps({
     type: String,
     default: 'auto',
   },
+  tabInto: {
+    type: Boolean,
+    default: false,
+  },
 })
 defineOptions({
   inheritAttrs: false,
 })
+
+const emit = defineEmits(['open', 'close'])
 
 const dropdownVisible = ref(false)
 const dropdown = ref(null)
@@ -71,8 +78,11 @@ function updateDirection() {
 const toggleDropdown = () => {
   if (!props.disabled) {
     dropdownVisible.value = !dropdownVisible.value
-    if (!dropdownVisible.value) {
+    if (dropdownVisible.value) {
+      emit('open')
+    } else {
       dropdownButton.value.focus()
+      emit('close')
     }
   }
 }
@@ -80,10 +90,12 @@ const toggleDropdown = () => {
 const hide = () => {
   dropdownVisible.value = false
   dropdownButton.value.focus()
+  emit('close')
 }
 
 const show = () => {
   dropdownVisible.value = true
+  emit('open')
 }
 
 defineExpose({
@@ -99,6 +111,7 @@ const handleClickOutside = (event) => {
     !dropdown.value.contains(event.target)
   ) {
     dropdownVisible.value = false
+    emit('close')
   }
 }
 
@@ -106,6 +119,7 @@ onMounted(() => {
   window.addEventListener('click', handleClickOutside)
   window.addEventListener('resize', updateDirection)
   window.addEventListener('scroll', updateDirection)
+  window.addEventListener('keydown', handleKeyDown)
   updateDirection()
 })
 
@@ -113,7 +127,14 @@ onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutside)
   window.removeEventListener('resize', updateDirection)
   window.removeEventListener('scroll', updateDirection)
+  window.removeEventListener('keydown', handleKeyDown)
 })
+
+function handleKeyDown(event) {
+  if (event.key === 'Escape') {
+    hide()
+  }
+}
 </script>
 
 <style lang="scss" scoped>
