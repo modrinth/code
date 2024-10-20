@@ -29,7 +29,7 @@
         />
       </h3>
 
-      <component :is="metric.icon" class="absolute right-8 top-8 z-10" />
+      <component :is="metric.icon" class="absolute right-10 top-10 z-10" />
       <ClientOnly>
         <VueApexCharts
           ref="chart"
@@ -56,7 +56,7 @@
       </div>
       <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
 
-      <FolderOpenIcon class="absolute right-8 top-8 size-8" />
+      <FolderOpenIcon class="absolute right-10 top-10 size-8" />
     </NuxtLink>
   </div>
 </template>
