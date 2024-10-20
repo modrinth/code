@@ -51,6 +51,27 @@ const saveAndRestart = async () => {
   transition:
     opacity 800ms,
     transform 800ms;
+}
+
+.save-banner-leave-active {
+  transition:
+    opacity 200ms,
+    transform 200ms;
+}
+
+.save-banner-enter-from,
+.save-banner-leave-to {
+  opacity: 0;
+  transform: translateY(100%) scale(0.98);
+}
+
+.save-banner-enter-to,
+.save-banner-leave-from {
+  opacity: 1;
+  transform: none;
+}
+
+.save-banner-enter-to {
   transition-timing-function: linear(
     0 0%,
     0.01 0.8%,
@@ -81,23 +102,5 @@ const saveAndRestart = async () => {
     1.001 87.2%,
     1 100%
   ) !important;
-}
-
-.save-banner-leave-active {
-  transition:
-    opacity 200ms,
-    transform 200ms;
-}
-
-.save-banner-enter-from,
-.save-banner-leave-to {
-  opacity: 0;
-  transform: translateY(100%) scale(0.98);
-}
-
-.save-banner-enter-to,
-.save-banner-leave-from {
-  opacity: 1;
-  transform: none;
 }
 </style>
