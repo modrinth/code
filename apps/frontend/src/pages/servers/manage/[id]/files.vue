@@ -61,7 +61,7 @@
       </NewModal>
 
       <!-- Delete Item Modal -->
-      <NewModal ref="deleteItemModal" :header="`Deleting ${selectedItem?.type}`">
+      <NewModal ref="deleteItemModal" danger :header="`Deleting ${selectedItem?.type}`">
         <div class="flex flex-col gap-4 md:w-[600px]">
           <div
             class="relative flex w-full items-center gap-2 rounded-2xl border border-solid border-[#cb224436] bg-[#f57b7b0e] p-6 shadow-md dark:border-0 dark:bg-[#0e0e0ea4]"
@@ -121,7 +121,6 @@
           <div class="flex items-center gap-1">
             <ButtonStyled type="transparent">
               <UiServersTeleportOverflowMenu
-                class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
                 position="bottom"
                 direction="left"
                 aria-label="Sort files"
@@ -172,7 +171,6 @@
 
             <ButtonStyled type="transparent">
               <UiServersTeleportOverflowMenu
-                class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
                 position="bottom"
                 direction="left"
                 aria-label="Create new..."
@@ -220,7 +218,6 @@
             </Button>
             <ButtonStyled type="transparent">
               <UiServersTeleportOverflowMenu
-                class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
                 position="bottom"
                 direction="left"
                 aria-label="Save file"

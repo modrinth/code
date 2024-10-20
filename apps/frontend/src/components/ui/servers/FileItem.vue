@@ -44,7 +44,6 @@
       </span>
       <ButtonStyled type="transparent">
         <UiServersTeleportOverflowMenu
-          class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
           :options="[
             {
               id: 'rename',
