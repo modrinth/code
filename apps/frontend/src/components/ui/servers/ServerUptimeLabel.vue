@@ -1,16 +1,16 @@
 <template>
   <div
     v-if="uptimeSeconds"
-    v-tooltip="'Server Uptime'"
+    v-tooltip="`Uptime: ${verboseUptime}`"
     class="flex min-w-0 flex-row items-center gap-4"
     data-pyro-uptime
   >
     <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
 
     <UiServersTimer class="flex size-5 shrink-0" />
-    <div class="truncate text-sm font-semibold">
+    <time class="truncate text-sm font-semibold" :aria-label="verboseUptime">
       {{ formattedUptime }}
-    </div>
+    </time>
   </div>
 </template>
 
@@ -37,5 +37,26 @@ const formattedUptime = computed(() => {
   formatted += `${minutes}m ${seconds}s`;
 
   return formatted.trim();
+});
+
+const verboseUptime = computed(() => {
+  const days = Math.floor(props.uptimeSeconds / (24 * 3600));
+  const hours = Math.floor((props.uptimeSeconds % (24 * 3600)) / 3600);
+  const minutes = Math.floor((props.uptimeSeconds % 3600) / 60);
+  const seconds = props.uptimeSeconds % 60;
+
+  let verbose = "";
+  if (days > 0) {
+    verbose += `${days} day${days > 1 ? "s" : ""} `;
+  }
+  if (hours > 0) {
+    verbose += `${hours} hour${hours > 1 ? "s" : ""} `;
+  }
+  if (minutes > 0) {
+    verbose += `${minutes} minute${minutes > 1 ? "s" : ""} `;
+  }
+  verbose += `${seconds} second${seconds > 1 ? "s" : ""}`;
+
+  return verbose.trim();
 });
 </script>
