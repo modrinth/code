@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                DELETE FROM reports\n                WHERE user_id = $1 OR reporter = $1\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0461463e3e14f6c8ede5571a2905b8171e8caf4ebbd3ec844ef2cebd83980247"
+}
