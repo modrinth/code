@@ -74,6 +74,7 @@
               v-if="serverData.net.domain"
               :subdomain="serverData.net.domain"
             />
+            <UiServersServerUptimeLabel v-if="uptimeSeconds" :uptime-seconds="uptimeSeconds" />
           </div>
         </div>
       </div>
@@ -167,6 +168,7 @@ const ramData = ref<number[]>([]);
 const isActioning = ref(false);
 const isServerRunning = computed(() => serverPowerState.value === "running");
 const serverPowerState = ref<ServerState>("stopped");
+const uptimeSeconds = ref(0);
 
 const stats = ref<Stats>({
   current: {
@@ -218,6 +220,7 @@ const connectWebSocket = () => {
       isConnected.value = true;
       isReconnecting.value = false;
       isLoading.value = false;
+      consoleOutput.value.push("\nReady! Welcome to your Modrinth Server ༼ つ ◕_◕ ༽つ");
       if (reconnectInterval.value) {
         clearInterval(reconnectInterval.value);
         reconnectInterval.value = null;
@@ -282,6 +285,9 @@ const handleWebSocketMessage = (data: WSEvent) => {
       console.log("New mod:", data);
       break;
     case "auth-ok":
+      break;
+    case "uptime":
+      uptimeSeconds.value = data.uptime;
       break;
     default:
       console.warn("Unhandled WebSocket event:", data);
