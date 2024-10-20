@@ -260,6 +260,10 @@ export default defineNuxtComponent({
   }
 }
 
+.button-group {
+  justify-content: flex-start;
+}
+
 .category-list {
   column-count: 4;
   column-gap: var(--spacing-card-lg);
@@ -283,6 +287,7 @@ export default defineNuxtComponent({
       user-select: none;
     }
   }
+
 
   @media only screen and (max-width: 1250px) {
     column-count: 3;
