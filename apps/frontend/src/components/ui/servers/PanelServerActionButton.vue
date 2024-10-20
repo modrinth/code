@@ -163,4 +163,10 @@ watch(
     }
   },
 );
+
+watch(showKillButton, (newValue) => {
+  if (!newValue) {
+    killConfirmation.value = false;
+  }
+});
 </script>
