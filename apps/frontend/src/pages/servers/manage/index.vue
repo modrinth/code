@@ -9,6 +9,12 @@
     >
       <h1 class="text-4xl font-bold text-[--color-contrast]">Servers</h1>
       <div class="flex w-full flex-row items-center justify-end gap-4">
+        <ButtonStyled type="standard" color="brand">
+          <NuxtLink to="/servers#plan">
+            <PlusIcon class="h-5 w-5" />
+            Add Server
+          </NuxtLink>
+        </ButtonStyled>
         <div class="relative mb-4 w-full text-sm md:mb-0 md:w-72">
           <label class="sr-only" for="search">Search</label>
           <SearchIcon
@@ -28,7 +34,7 @@
       </div>
     </div>
 
-    <UiServersServerManageEmptyState v-if="serverList.length === 0" />
+    <LazyUiServersServerManageEmptyState v-if="serverList.length === 0" />
 
     <template v-else>
       <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
@@ -60,7 +66,8 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import Fuse from "fuse.js";
 import { useRoute } from "vue-router";
-import { SearchIcon } from "@modrinth/assets";
+import { PlusIcon, SearchIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
 import type { Server } from "~/types/servers";
 
 definePageMeta({

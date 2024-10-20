@@ -11,7 +11,7 @@
 
       <div v-if="errorTitle === 'Installation error'">
         <ButtonStyled color="red" type="standard">
-          <NuxtLink :to="`/servers/manage/${serverId}/options/loader`">Reinstall Server</NuxtLink>
+          <NuxtLink :to="`/servers/manage/${serverId}/options/loader`"> Change Loader </NuxtLink>
         </ButtonStyled>
       </div>
     </div>
