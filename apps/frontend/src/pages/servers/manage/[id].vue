@@ -20,7 +20,7 @@
       data-pyro-server-manager-root
       class="relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
     >
-      <div class="flex w-full min-w-0 flex-row items-center gap-6 pt-4">
+      <div class="flex w-full min-w-0 select-none flex-row items-center gap-6 pt-4">
         <UiServersServerIcon :image="serverData.image" />
         <div class="flex min-w-0 flex-1 flex-col gap-2">
           <div class="flex shrink-0 flex-row items-center gap-1">
@@ -78,7 +78,9 @@
         </div>
       </div>
 
-      <div class="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
+      <div
+        class="flex w-full select-none flex-col justify-between gap-4 md:flex-row md:items-center"
+      >
         <UiNavTabs :links="navLinks" />
       </div>
 

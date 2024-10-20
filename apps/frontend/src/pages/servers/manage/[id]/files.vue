@@ -1,7 +1,7 @@
 <template>
   <div data-pyro-file-manager-root class="contents">
     <div
-      class="relative flex min-h-[800px] w-full flex-col overflow-hidden rounded-xl border border-solid border-bg-raised"
+      class="relative flex min-h-[800px] w-full flex-col overflow-hidden rounded-2xl border border-solid border-bg-raised"
       @dragenter.prevent="handleDragEnter"
       @dragover.prevent="handleDragOver"
       @dragleave.prevent="handleDragLeave"
@@ -91,9 +91,10 @@
       </NewModal>
 
       <!-- Main Content -->
-      <div class="flex w-full flex-col rounded-2xl border border-solid border-bg-raised">
+      <div class="flex w-full flex-col">
         <nav
           v-if="!isEditing"
+          data-pyro-files-state="browsing"
           class="flex h-12 select-none items-center justify-between bg-table-alternateRow p-3"
         >
           <ul class="flex list-none items-center p-0 text-contrast">
@@ -116,7 +117,56 @@
               <UiServersSlashIcon class="h-5 w-5" />
             </li>
           </ul>
-          <div class="flex gap-2">
+          <div class="flex items-center gap-1">
+            <ButtonStyled type="transparent">
+              <OverflowMenu
+                class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+                position="bottom"
+                direction="left"
+                aria-label="Sort files"
+                :options="[
+                  { id: 'normal', action: () => sortFiles('default') },
+                  { id: 'modified', action: () => sortFiles('modified') },
+                  { id: 'filesOnly', action: () => sortFiles('filesOnly') },
+                  { id: 'foldersOnly', action: () => sortFiles('foldersOnly') },
+                ]"
+              >
+                <span class="whitespace-pre text-sm font-medium">
+                  {{
+                    sortMethod === "default"
+                      ? "Default Sort"
+                      : sortMethod === "modified"
+                        ? "Recently Modified"
+                        : sortMethod === "filesOnly"
+                          ? "Files Only"
+                          : "Folders Only"
+                  }}
+                </span>
+                <SortAscendingIcon aria-hidden="true" />
+                <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+                <template #normal> Default Sort </template>
+                <template #modified> Recently Modified </template>
+                <template #filesOnly> Files Only </template>
+                <template #foldersOnly> Folders Only </template>
+              </OverflowMenu>
+            </ButtonStyled>
+            <div class="relative w-full text-sm">
+              <label for="search-folder" class="sr-only">Search folder</label>
+              <SearchIcon
+                class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                aria-hidden="true"
+              />
+              <input
+                id="search-folder"
+                v-model="searchQuery"
+                type="search"
+                name="search"
+                autocomplete="off"
+                class="h-8 min-h-[unset] border-[1px] border-solid border-button-bg bg-transparent py-2 pl-9"
+                placeholder="Search..."
+              />
+            </div>
+
             <ButtonStyled type="transparent">
               <OverflowMenu
                 class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
@@ -138,8 +188,10 @@
             </ButtonStyled>
           </div>
         </nav>
+
         <nav
           v-else
+          data-pyro-files-state="editing"
           class="flex h-12 select-none items-center justify-between bg-table-alternateRow p-3"
         >
           <div class="flex items-center gap-2 text-contrast">
@@ -208,7 +260,7 @@
         </div>
         <div v-else-if="items.length > 0" ref="scrollContainer" class="h-full w-full">
           <UiServersFileItem
-            v-for="item in items"
+            v-for="item in filteredItems"
             :key="item.name"
             :count="item.count"
             :created="item.created"
@@ -278,7 +330,7 @@
             </p>
           </div>
         </div>
-        <div v-else class="flex h-full w-full items-center justify-center p-20"></div>
+        <div v-else class=""></div>
       </div>
       <div
         v-if="isDragging"
@@ -366,7 +418,9 @@ import {
   ArrowBigUpDashIcon,
   DownloadIcon,
   TrashIcon,
+  SearchIcon,
   ShareIcon,
+  SortAscendingIcon,
 } from "@modrinth/assets";
 import { Button, NewModal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
@@ -377,6 +431,46 @@ const props = defineProps<{
 }>();
 
 const VAceEditor = ref();
+
+const searchQuery = ref("");
+const sortMethod = ref("default-sort");
+
+const applyDefaultSort = (items: any[]) => {
+  return items.sort((a: any, b: any) => {
+    if (a.type === "directory" && b.type !== "directory") return -1;
+    if (a.type !== "directory" && b.type === "directory") return 1;
+    if (a.count > b.count) return -1;
+    if (a.count < b.count) return 1;
+    if (a.name > b.name) return 1;
+    if (a.name < b.name) return -1;
+    return 0;
+  });
+};
+
+const filteredItems = computed(() => {
+  let result = [...items.value];
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    result = result.filter((item) => item.name.toLowerCase().includes(query));
+  }
+
+  switch (sortMethod.value) {
+    case "modified":
+      result.sort((a, b) => new Date(b.modified).getTime() - new Date(a.modified).getTime());
+      break;
+    case "filesOnly":
+      result = result.filter((item) => item.type !== "directory");
+      break;
+    case "foldersOnly":
+      result = result.filter((item) => item.type === "directory");
+      break;
+    default:
+      result = applyDefaultSort(result);
+  }
+
+  return result;
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -459,6 +553,10 @@ onUnmounted(() => {
   document.removeEventListener("click", onAnywhereClicked);
 });
 
+const sortFiles = (method: string) => {
+  sortMethod.value = method;
+};
+
 const fetchData = async () => {
   isLoading.value = true;
   loadError.value = false;
@@ -471,15 +569,7 @@ const fetchData = async () => {
       throw new Error("Invalid data structure received from server.");
     }
 
-    data.items.sort((a: any, b: any) => {
-      if (a.type === "directory" && b.type !== "directory") return -1;
-      if (a.type !== "directory" && b.type === "directory") return 1;
-      if (a.count > b.count) return -1;
-      if (a.count < b.count) return 1;
-      if (a.name > b.name) return 1;
-      if (a.name < b.name) return -1;
-      return 0;
-    });
+    data.items = applyDefaultSort(data.items);
 
     items.value.push(...data.items);
     pages.value = data.total;
@@ -510,6 +600,8 @@ watch(
     currentPage.value = 1;
     items.value = [];
     loadError.value = false;
+    searchQuery.value = "";
+    sortMethod.value = "default";
     if (serverId) {
       await fetchData();
     }
