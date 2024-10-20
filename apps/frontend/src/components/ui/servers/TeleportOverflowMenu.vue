@@ -45,6 +45,7 @@
               :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
               @click="handleItemClick(option, index)"
               @focus="selectedIndex = index"
+              @mouseover="handleMouseOver(index)"
             >
               <slot :name="option.id">{{ option.id }}</slot>
             </button>
@@ -223,6 +224,11 @@ const handleClick = (event: MouseEvent) => {
 const handleItemClick = (option: Option, index: number) => {
   selectedIndex.value = index;
   selectOption(option);
+};
+
+const handleMouseOver = (index: number) => {
+  selectedIndex.value = index;
+  menuItemsRef.value[selectedIndex.value].focus();
 };
 
 const disableBodyScroll = () => {
