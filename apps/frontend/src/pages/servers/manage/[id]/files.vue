@@ -140,7 +140,9 @@
                         ? "Recently Modified"
                         : sortMethod === "filesOnly"
                           ? "Files Only"
-                          : "Folders Only"
+                          : sortMethod === "foldersOnly"
+                            ? "Folders Only"
+                            : "Default Sort"
                   }}
                 </span>
                 <SortAscendingIcon aria-hidden="true" />
