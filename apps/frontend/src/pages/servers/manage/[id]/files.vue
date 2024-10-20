@@ -120,7 +120,7 @@
           </ul>
           <div class="flex items-center gap-1">
             <ButtonStyled type="transparent">
-              <OverflowMenu
+              <UiServersTeleportOverflowMenu
                 class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
                 position="bottom"
                 direction="left"
@@ -151,7 +151,7 @@
                 <template #modified> Recently Modified </template>
                 <template #filesOnly> Files Only </template>
                 <template #foldersOnly> Folders Only </template>
-              </OverflowMenu>
+              </UiServersTeleportOverflowMenu>
             </ButtonStyled>
             <div class="relative w-full text-sm">
               <label for="search-folder" class="sr-only">Search folder</label>
@@ -171,7 +171,7 @@
             </div>
 
             <ButtonStyled type="transparent">
-              <OverflowMenu
+              <UiServersTeleportOverflowMenu
                 class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
                 position="bottom"
                 direction="left"
@@ -187,7 +187,7 @@
                 <template #file> <BoxIcon aria-hidden="true" /> File </template>
                 <template #directory> <FolderOpenIcon aria-hidden="true" /> Directory </template>
                 <template #upload> <UploadIcon aria-hidden="true" /> Upload </template>
-              </OverflowMenu>
+              </UiServersTeleportOverflowMenu>
             </ButtonStyled>
           </div>
         </nav>
@@ -219,7 +219,7 @@
               <ShareIcon />
             </Button>
             <ButtonStyled type="transparent">
-              <OverflowMenu
+              <UiServersTeleportOverflowMenu
                 class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
                 position="bottom"
                 direction="left"
@@ -244,7 +244,7 @@
                   </svg>
                   Save & Restart
                 </template>
-              </OverflowMenu>
+              </UiServersTeleportOverflowMenu>
             </ButtonStyled>
           </div>
         </nav>
@@ -425,7 +425,7 @@ import {
   ShareIcon,
   SortAscendingIcon,
 } from "@modrinth/assets";
-import { Button, NewModal, ButtonStyled, OverflowMenu } from "@modrinth/ui";
+import { Button, NewModal, ButtonStyled } from "@modrinth/ui";
 import { useInfiniteScroll } from "@vueuse/core";
 import type { Server } from "~/composables/pyroServers";
 

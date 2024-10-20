@@ -43,7 +43,7 @@
         }}
       </span>
       <ButtonStyled type="transparent">
-        <OverflowMenu
+        <UiServersTeleportOverflowMenu
           class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
           :options="[
             {
@@ -66,20 +66,21 @@
             },
           ]"
           direction="left"
+          position="bottom"
         >
           <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
           <template #rename> <EditIcon /> Rename </template>
           <template #move> <ArrowBigUpDashIcon /> Move </template>
           <template #download> <DownloadIcon /> Download </template>
           <template #delete> <TrashIcon /> Delete </template>
-        </OverflowMenu>
+        </UiServersTeleportOverflowMenu>
       </ButtonStyled>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { OverflowMenu, ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled } from "@modrinth/ui";
 import {
   MoreHorizontalIcon,
   EditIcon,
