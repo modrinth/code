@@ -9,60 +9,70 @@
     >
       <!-- Create Item Modal -->
       <NewModal ref="createItemModal" :header="`Creating a ${newItemType}`">
-        <div class="flex flex-col gap-4 md:w-[600px]">
-          <div class="flex flex-col gap-2">
-            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-            <input v-model="newItemName" type="text" class="bg-bg-input w-full rounded-lg p-4" />
-            <div v-if="nameError" class="text-red">{{ nameError }}</div>
-          </div>
-          <div class="flex justify-end gap-4">
-            <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
-            <Button :disabled="!!nameError" color="primary" @click="createNewItem"> Create </Button>
-          </div>
-        </div>
-      </NewModal>
-
-      <!-- Rename Item Modal -->
-      <NewModal ref="renameItemModal" :header="`Renaming ${selectedItem?.type}`">
-        <div class="flex flex-col gap-4 md:w-[600px]">
+        <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleCreateNewItem">
           <div class="flex flex-col gap-2">
             <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input
               v-model="newItemName"
+              autofocus
+              type="text"
+              class="bg-bg-input w-full rounded-lg p-4"
+              required
+            />
+            <div v-if="createItemSubmitted && nameError" class="text-red">{{ nameError }}</div>
+          </div>
+          <div class="flex justify-end gap-4">
+            <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
+            <Button :disabled="!!nameError" color="primary" type="submit"> Create </Button>
+          </div>
+        </form>
+      </NewModal>
+
+      <!-- Rename Item Modal -->
+      <NewModal ref="renameItemModal" :header="`Renaming ${selectedItem?.type}`">
+        <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleRenameItem">
+          <div class="flex flex-col gap-2">
+            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+            <input
+              v-model="newItemName"
+              autofocus
               type="text"
               class="bg-bg-input w-full rounded-lg p-4"
               :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
+              required
             />
-            <div v-if="nameError" class="text-red">{{ nameError }}</div>
+            <div v-if="renameItemSubmitted && nameError" class="text-red">{{ nameError }}</div>
           </div>
           <div class="flex justify-end gap-4">
             <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
-            <Button :disabled="!!nameError" color="primary" @click="renameItem"> Rename </Button>
+            <Button :disabled="!!nameError" color="primary" type="submit"> Rename </Button>
           </div>
-        </div>
+        </form>
       </NewModal>
 
       <!-- Move Item Modal -->
       <NewModal ref="moveItemModal" :header="`Moving ${selectedItem?.name}`">
-        <div class="flex flex-col gap-4 md:w-[600px]">
+        <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleMoveItem">
           <div class="flex flex-col gap-2">
             <input
               v-model="destinationFolder"
+              autofocus
               type="text"
               class="bg-bg-input w-full rounded-lg p-4"
               placeholder="e.g. mods/modname"
+              required
             />
           </div>
           <div class="flex justify-end gap-4">
             <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
-            <Button color="primary" @click="moveItem"> Move </Button>
+            <Button color="primary" type="submit"> Move </Button>
           </div>
-        </div>
+        </form>
       </NewModal>
 
       <!-- Delete Item Modal -->
       <NewModal ref="deleteItemModal" danger :header="`Deleting ${selectedItem?.type}`">
-        <div class="flex flex-col gap-4 md:w-[600px]">
+        <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleDeleteItem">
           <div
             class="relative flex w-full items-center gap-2 rounded-2xl border border-solid border-[#cb224436] bg-[#f57b7b0e] p-6 shadow-md dark:border-0 dark:bg-[#0e0e0ea4]"
           >
@@ -86,9 +96,9 @@
           </div>
           <div class="flex justify-end gap-4">
             <Button transparent @click="deleteItemModal?.hide()"> Cancel </Button>
-            <Button color="danger" @click="deleteItem"> Delete {{ selectedItem?.type }} </Button>
+            <Button color="danger" type="submit"> Delete {{ selectedItem?.type }} </Button>
           </div>
-        </div>
+        </form>
       </NewModal>
 
       <!-- Main Content -->
@@ -640,20 +650,22 @@ const isEditing = ref(false);
 const fileContent = ref("");
 const editingFile = ref<any>(null);
 const closeEditor = ref(false);
+const createItemSubmitted = ref(false);
+const renameItemSubmitted = ref(false);
 
 const nameError = computed(() => {
   if (!newItemName.value) {
     return "Name is required.";
   }
   if (newItemType.value === "file") {
-    const validPattern = /^[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+$/;
+    const validPattern = /^[a-zA-Z0-9-_]+$/;
     if (!validPattern.test(newItemName.value)) {
-      return "Name must contain alphanumeric characters, dashes, underscores, and a dot for the file extension.";
+      return "Name must contain only alphanumeric characters, dashes, or underscores.";
     }
   } else if (newItemType.value === "directory") {
     const validPattern = /^[a-zA-Z0-9-_]+$/;
     if (!validPattern.test(newItemName.value)) {
-      return "Name must contain only alphanumeric characters, dashes, and underscores.";
+      return "Name must contain only alphanumeric characters, dashes, or underscores.";
     }
   }
   return "";
@@ -780,6 +792,28 @@ const showDeleteModal = (item: any) => {
   contextMenuInfo.value.item = null;
 };
 
+const handleCreateNewItem = () => {
+  createItemSubmitted.value = true;
+  if (!nameError.value) {
+    createNewItem();
+  }
+};
+
+const handleRenameItem = () => {
+  renameItemSubmitted.value = true;
+  if (!nameError.value) {
+    renameItem();
+  }
+};
+
+const handleMoveItem = () => {
+  moveItem();
+};
+
+const handleDeleteItem = () => {
+  deleteItem();
+};
+
 const createNewItem = async () => {
   if (!nameError.value) {
     try {
@@ -787,10 +821,10 @@ const createNewItem = async () => {
       await props.server.fs?.createFileOrFolder(path, newItemType.value);
 
       currentPage.value = 1;
-      newItemName.value = "";
       items.value = [];
       await fetchData();
       createItemModal.value?.hide();
+      createItemSubmitted.value = false;
 
       addNotification({
         group: "files",
@@ -798,6 +832,7 @@ const createNewItem = async () => {
         text: "Your file has been created.",
         type: "success",
       });
+      newItemName.value = "";
     } catch (error) {
       console.error("Error creating item:", error);
       if (error instanceof PyroFetchError && error.statusCode === 400) {
@@ -830,6 +865,7 @@ const renameItem = async () => {
     items.value = [];
     await fetchData();
     renameItemModal.value?.hide();
+    renameItemSubmitted.value = false;
 
     if (closeEditor.value) {
       await props.server.refresh();
@@ -847,6 +883,21 @@ const renameItem = async () => {
     });
   } catch (error) {
     console.error("Error renaming item:", error);
+    if (error instanceof PyroFetchError && error.statusCode === 400) {
+      addNotification({
+        group: "files",
+        title: "Could not rename item",
+        text: "This item already exists or is invalid.",
+        type: "error",
+      });
+    } else if (error instanceof PyroFetchError && error.statusCode === 500) {
+      addNotification({
+        group: "files",
+        title: "Could not rename item",
+        text: "Invalid file",
+        type: "error",
+      });
+    }
   }
 };
 
