@@ -24,7 +24,7 @@
         top: sliderTopPx,
         right: sliderRightPx,
         bottom: sliderBottomPx,
-        opacity: sliderLeft === 4 && sliderLeft === sliderRight ? 0 : activeIndex === -1 ? 0 : 1,
+        // opacity: sliderLeft === 4 && sliderLeft === sliderRight ? 0 : activeIndex === -1 ? 0 : 1,
       }"
       aria-hidden="true"
     ></div>
@@ -64,6 +64,7 @@ const sliderRightPx = computed(() => `${sliderRight.value}px`);
 const sliderBottomPx = computed(() => `${sliderBottom.value}px`);
 
 function pickLink() {
+  if (route.path.split("/").length < 4) return;
   let index = -1;
   subpageSelected.value = false;
   for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
