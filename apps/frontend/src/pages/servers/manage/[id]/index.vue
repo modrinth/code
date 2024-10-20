@@ -532,9 +532,9 @@ const suggestions = ref<string[]>([]);
 const selectedSuggestionIndex = ref(0);
 
 const serverData = computed(() => props.server.general);
-const serverIP = computed(() => serverData.value?.net.ip ?? "");
-const serverPort = computed(() => serverData.value?.net.port ?? 0);
-const serverDomain = computed(() => serverData.value?.net.domain ?? "");
+// const serverIP = computed(() => serverData.value?.net.ip ?? "");
+// const serverPort = computed(() => serverData.value?.net.port ?? 0);
+// const serverDomain = computed(() => serverData.value?.net.domain ?? "");
 
 const suggestionsList = ref<HTMLUListElement | null>(null);
 
