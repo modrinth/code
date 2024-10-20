@@ -103,7 +103,11 @@
 
       <!-- Main Content -->
       <div class="flex w-full flex-col">
-        <nav v-if="!isEditing" data-pyro-files-state="browsing" :class="navClass">
+        <nav
+          v-if="!isEditing"
+          data-pyro-files-state="browsing"
+          class="sticky top-0 z-10 flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
+        >
           <ul class="flex list-none items-center p-0 text-contrast">
             <li
               v-tooltip="'Back to home'"
@@ -555,22 +559,8 @@ const onAnywhereClicked = (e: MouseEvent) => {
   if (!(e.target as HTMLElement).closest("#item-context-menu")) contextMenuInfo.value.item = null;
 };
 
-const isAtTop = ref(true);
-
-const checkScrollPosition = () => {
-  isAtTop.value = window.scrollY === 0;
-};
-
-const navClass = computed(() => {
-  return [
-    "sticky top-0 z-10 flex h-12 select-none items-center justify-between p-3",
-    isAtTop.value ? "bg-table-alternateRow" : "bg-table-alternateRow rounded-t-2xl",
-  ];
-});
-
 onMounted(() => {
   document.addEventListener("click", onAnywhereClicked);
-  checkScrollPosition();
 });
 
 onUnmounted(() => {
