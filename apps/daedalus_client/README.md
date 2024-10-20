@@ -6,7 +6,4 @@ and mod loaders for:
 - Ease for Launcher Devs (Metadata is served in an easy to query and use format)
 - Reliability (Provides a versioning system which ensures no breakage with updates)
 
-Daedalus is currently a work in progress, but will support the original Minecraft data and reposting for all Forge and 
-Fabric artifacts.
-
-Once Daedalus is done, Modrinth will provide full documentation for how to query from it and use it for your own launcher!
+Daedalus supports the original Minecraft data and reposting for the Forge, Fabric, Quilt, and NeoForge loaders.
