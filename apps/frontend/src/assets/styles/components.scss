@@ -648,7 +648,7 @@ tr.button-transparent {
   grid-gap: var(--spacing-card-sm);
   flex-wrap: wrap;
   margin-top: var(--spacing-card-md);
-  justify-content: right;
+  justify-content: flex-start;
 }
 
 .multiselect--above .multiselect__content-wrapper {
