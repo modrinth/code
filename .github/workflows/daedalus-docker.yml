@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./apps/daedalus
+        working-directory: ./apps/daedalus_client
     steps:
       - name: Checkout
         uses: actions/checkout@v2

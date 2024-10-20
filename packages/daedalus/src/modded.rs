@@ -26,6 +26,7 @@ pub struct SidedDataEntry {
     pub server: String,
 }
 
+#[allow(deprecated)]
 fn deserialize_date<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
 where
     D: Deserializer<'de>,
