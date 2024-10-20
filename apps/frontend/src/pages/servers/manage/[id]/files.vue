@@ -102,7 +102,7 @@
       </NewModal>
 
       <!-- Main Content -->
-      <div class="flex w-full flex-col">
+      <div ref="mainContent" class="flex w-full flex-col">
         <nav
           v-if="!isEditing"
           data-pyro-files-state="browsing"
@@ -358,7 +358,7 @@
     </div>
 
     <div
-      class="absolute left-0 top-0"
+      class="fixed"
       :style="{
         transform: `translateY(${isAtBottom ? '-100%' : '0'})`,
         top: `${contextMenuInfo.y}px`,
@@ -448,6 +448,8 @@ const VAceEditor = ref();
 
 const searchQuery = ref("");
 const sortMethod = ref("default-sort");
+
+const mainContent = ref<HTMLElement | null>(null);
 
 const applyDefaultSort = (items: any[]) => {
   return items.sort((a: any, b: any) => {
@@ -541,7 +543,28 @@ watch(contextMenuInfo, () => console.log(contextMenuInfo.value), {
   immediate: true,
 });
 
+let dY = 0;
+let oldScroll = 0;
+
+const onScroll = () => {
+  dY = window.scrollY - oldScroll;
+  oldScroll = window.scrollY;
+
+  contextMenuInfo.value.y -= dY;
+  contextMenuInfo.value.item = null;
+};
+
+onMounted(() => {
+  window.addEventListener("scroll", onScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", onScroll);
+});
+
 const showContextMenu = async (item: any, x: number, y: number) => {
+  dY = 0;
+  oldScroll = window.scrollY;
   contextMenuInfo.value = { item, x, y };
   selectedItem.value = item;
   await nextTick();

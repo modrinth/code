@@ -134,7 +134,7 @@ const emit = defineEmits(["rename", "download", "delete", "move", "edit", "conte
 
 const openContextMenu = (event: MouseEvent) => {
   event.preventDefault();
-  emit("contextmenu", event.clientX, event.clientY + window.scrollY);
+  emit("contextmenu", event.clientX, event.clientY);
 };
 
 const formattedSize = computed(() => {
