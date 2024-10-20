@@ -2,4 +2,4 @@
 
 ## Modrinth's laboratory for its backend service & API!
 
-For contributing information, please see the labrinth section of the [Modrinth contributing guide](https://docs.modrinth.com/docs/details/contributing/#labrinth-backend-and-api). For documentation on the API itself, see the [API Spec](https://docs.modrinth.com/api-spec/).
+For contributing information, please see the labrinth section of the [Modrinth contributing guide](https://docs.modrinth.com/contributing/labrinth/). For documentation on the API itself, see the [API Spec](https://docs.modrinth.com/api/).
