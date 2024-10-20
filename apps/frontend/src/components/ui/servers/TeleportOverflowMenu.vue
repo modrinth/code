@@ -5,7 +5,7 @@
       :aria-expanded="isOpen"
       :aria-haspopup="true"
       @mousedown="handleMouseDown"
-      @click="handleClick"
+      @click="toggleMenu"
     >
       <slot></slot>
     </button>
@@ -26,6 +26,7 @@
           :style="menuStyle"
           role="menu"
           tabindex="-1"
+          @mousedown.stop
         >
           <ButtonStyled
             v-for="(option, index) in filteredOptions"
@@ -79,7 +80,6 @@ const emit = defineEmits<{
 }>();
 
 const isOpen = ref(false);
-const isAnimating = ref(false);
 const selectedIndex = ref(-1);
 const menuRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLElement | null>(null);
@@ -95,58 +95,64 @@ const menuStyle = ref({
 
 const filteredOptions = computed(() => props.options.filter((option) => option.shown !== false));
 
-const updateMenuPosition = () => {
-  if (!triggerRef.value || !menuRef.value) return;
+const calculateMenuPosition = () => {
+  if (!triggerRef.value) return { top: "0px", left: "0px" };
 
   const triggerRect = triggerRef.value.getBoundingClientRect();
-  const menuRect = menuRef.value.getBoundingClientRect();
+  const menuWidth = 140;
+  const menuHeight = filteredOptions.value.length * 50;
+  const margin = 8;
 
-  let top = props.position === "bottom" ? triggerRect.bottom : triggerRect.top - menuRect.height;
-  let left = props.direction === "left" ? triggerRect.left : triggerRect.right - menuRect.width;
-  if (left + menuRect.width > window.innerWidth - 8) {
-    left = window.innerWidth - menuRect.width - 8;
-  }
-  if (left < 8) {
-    left = 8;
-  }
-  if (top + menuRect.height > window.innerHeight - 8) {
-    top = window.innerHeight - menuRect.height - 8;
-  }
-  if (top < 8) {
-    top = 8;
+  let top: number;
+  let left: number;
+
+  if (triggerRect.top + triggerRect.height + menuHeight <= window.innerHeight - margin) {
+    top = triggerRect.bottom + 8;
+  } else if (triggerRect.top - menuHeight >= margin) {
+    top = triggerRect.top - menuHeight - 8;
+  } else {
+    top = window.innerHeight - menuHeight - margin - 8;
   }
 
-  menuStyle.value = {
+  if (triggerRect.left + menuWidth <= window.innerWidth - margin) {
+    left = triggerRect.left;
+  } else {
+    left = triggerRect.right - menuWidth;
+  }
+
+  left = Math.max(margin, Math.min(left, window.innerWidth - menuWidth - margin));
+  top = Math.max(margin, Math.min(top, window.innerHeight - menuHeight - margin));
+
+  return {
     top: `${top}px`,
     left: `${left}px`,
   };
 };
 
+const toggleMenu = (event: MouseEvent) => {
+  event.stopPropagation();
+  if (isOpen.value) {
+    closeMenu();
+  } else {
+    openMenu();
+  }
+};
+
 const openMenu = () => {
-  if (isAnimating.value) return;
-  isAnimating.value = true;
+  menuStyle.value = calculateMenuPosition();
   isOpen.value = true;
   disableBodyScroll();
   nextTick(() => {
-    updateMenuPosition();
     document.addEventListener("mousemove", handleMouseMove);
-    setTimeout(() => {
-      isAnimating.value = false;
-      focusFirstMenuItem();
-    }, 125);
+    focusFirstMenuItem();
   });
 };
 
 const closeMenu = () => {
-  if (isAnimating.value) return;
-  isAnimating.value = true;
   isOpen.value = false;
   selectedIndex.value = -1;
   enableBodyScroll();
   document.removeEventListener("mousemove", handleMouseMove);
-  setTimeout(() => {
-    isAnimating.value = false;
-  }, 125);
 };
 
 const selectOption = (option: Option) => {
@@ -158,10 +164,6 @@ const selectOption = (option: Option) => {
 const handleMouseDown = (event: MouseEvent) => {
   event.preventDefault();
   isMouseDown.value = true;
-  if (!isOpen.value) {
-    openMenu();
-  }
-  document.addEventListener("mouseup", handleMouseUp);
 };
 
 const handleMouseMove = (event: MouseEvent) => {
@@ -183,40 +185,6 @@ const handleMouseMove = (event: MouseEvent) => {
     ) {
       selectedIndex.value = i;
       break;
-    }
-  }
-};
-
-const handleMouseUp = (event: MouseEvent) => {
-  if (!isOpen.value) return;
-
-  const menuRect = menuRef.value?.getBoundingClientRect();
-  if (!menuRect) return;
-
-  if (
-    event.clientX >= menuRect.left &&
-    event.clientX <= menuRect.right &&
-    event.clientY >= menuRect.top &&
-    event.clientY <= menuRect.bottom
-  ) {
-    if (selectedIndex.value >= 0 && selectedIndex.value < filteredOptions.value.length) {
-      selectOption(filteredOptions.value[selectedIndex.value]);
-    }
-  } else {
-    closeMenu();
-  }
-
-  isMouseDown.value = false;
-  document.removeEventListener("mouseup", handleMouseUp);
-};
-
-const handleClick = (event: MouseEvent) => {
-  event.stopPropagation();
-  if (!isMouseDown.value) {
-    if (isOpen.value) {
-      closeMenu();
-    } else {
-      openMenu();
     }
   }
 };
@@ -321,16 +289,31 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 onMounted(() => {
   triggerRef.value?.addEventListener("keydown", handleKeydown);
-  window.addEventListener("resize", updateMenuPosition);
-  window.addEventListener("scroll", updateMenuPosition);
+  window.addEventListener("resize", () => {
+    if (isOpen.value) {
+      menuStyle.value = calculateMenuPosition();
+    }
+  });
+  window.addEventListener("scroll", () => {
+    if (isOpen.value) {
+      menuStyle.value = calculateMenuPosition();
+    }
+  });
 });
 
 onUnmounted(() => {
   triggerRef.value?.removeEventListener("keydown", handleKeydown);
-  window.removeEventListener("resize", updateMenuPosition);
-  window.removeEventListener("scroll", updateMenuPosition);
+  window.removeEventListener("resize", () => {
+    if (isOpen.value) {
+      menuStyle.value = calculateMenuPosition();
+    }
+  });
+  window.removeEventListener("scroll", () => {
+    if (isOpen.value) {
+      menuStyle.value = calculateMenuPosition();
+    }
+  });
   document.removeEventListener("mousemove", handleMouseMove);
-  document.removeEventListener("mouseup", handleMouseUp);
   if (typeAheadTimeout.value) {
     clearTimeout(typeAheadTimeout.value);
   }
@@ -340,7 +323,6 @@ onUnmounted(() => {
 watch(isOpen, (newValue) => {
   if (newValue) {
     nextTick(() => {
-      updateMenuPosition();
       menuRef.value?.addEventListener("keydown", handleKeydown);
     });
   } else {
@@ -348,8 +330,9 @@ watch(isOpen, (newValue) => {
   }
 });
 
-onClickOutside(menuRef, () => {
-  closeMenu();
-  triggerRef.value?.focus();
+onClickOutside(menuRef, (event) => {
+  if (!triggerRef.value?.contains(event.target as Node)) {
+    closeMenu();
+  }
 });
 </script>
