@@ -182,7 +182,7 @@ const editableExtensions = [
 const isEditableFile = computed(() => {
   if (props.type === "file") {
     const fileExtension = props.name.split(".").pop()?.toLowerCase();
-    return editableExtensions.includes(fileExtension || "");
+    return !props.name.includes(".") || editableExtensions.includes(fileExtension || "");
   }
   return false;
 });
