@@ -221,6 +221,7 @@ const connectWebSocket = () => {
       isReconnecting.value = false;
       isLoading.value = false;
       consoleOutput.value.push("\nReady! Welcome to your Modrinth Server ༼ つ ◕_◕ ༽つ");
+      consoleOutput.value.push("\nPress the green start button to start your server!");
       if (reconnectInterval.value) {
         clearInterval(reconnectInterval.value);
         reconnectInterval.value = null;
@@ -233,7 +234,7 @@ const connectWebSocket = () => {
     };
 
     socket.value.onclose = () => {
-      consoleOutput.value.push("\nWS connection closed");
+      consoleOutput.value.push("\nSomething went wrong with the connection, we're reconnecting...");
       isConnected.value = false;
       scheduleReconnect();
     };

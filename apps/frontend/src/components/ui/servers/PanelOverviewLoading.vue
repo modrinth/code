@@ -3,19 +3,25 @@
     <div class="flex flex-col gap-6">
       <div class="flex flex-row items-center gap-6">
         <div
-          class="relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+          class="relative max-h-[152px] min-h-[152px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
         >
-          <div class="flex flex-row items-center gap-2">
+          <div
+            class="relative z-10 -ml-2 flex w-fit flex-row items-center gap-2 rounded-xl px-2 py-0.5"
+          >
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0.00%</h2>
+            <h3 class="relative z-10 text-sm font-normal text-secondary">/ 100%</h3>
           </div>
           <h3 class="relative z-10 text-base font-normal text-secondary">CPU usage</h3>
           <CPUIcon class="absolute right-8 top-8" />
         </div>
         <div
-          class="relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+          class="relative max-h-[152px] min-h-[152px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
         >
-          <div class="flex flex-row items-center gap-2">
+          <div
+            class="relative z-10 -ml-2 flex w-fit flex-row items-center gap-2 rounded-xl px-2 py-0.5"
+          >
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0.00%</h2>
+            <h3 class="relative z-10 text-sm font-normal text-secondary">/ 100%</h3>
           </div>
           <h3 class="relative z-10 text-base font-normal text-secondary">Memory usage</h3>
           <DBIcon class="absolute right-8 top-8" />
@@ -23,8 +29,11 @@
         <div
           class="relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
         >
-          <div class="flex flex-row items-center gap-2">
-            <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0 MB</h2>
+          <div
+            class="relative z-10 -ml-2 flex w-fit flex-row items-center gap-2 rounded-xl px-2 py-0.5"
+          >
+            <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">0.00 MB</h2>
+            <h3 class="relative z-10 text-sm font-normal text-secondary">/ 0 GB</h3>
           </div>
           <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
           <FolderOpenIcon class="absolute right-8 top-8 size-8" />
@@ -50,3 +59,17 @@
 <script setup lang="ts">
 import { CPUIcon, DBIcon, FolderOpenIcon } from "@modrinth/assets";
 </script>
+
+<style scoped>
+html.light-mode .console {
+  background: var(--color-bg);
+}
+
+html.dark-mode .console {
+  background: black;
+}
+
+html.oled-mode .console {
+  background: black;
+}
+</style>
