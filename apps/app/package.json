@@ -5,7 +5,7 @@
     "tauri": "tauri",
     "dev": "tauri dev",
     "test": "cargo test",
-    "lint": "cargo fmt --check && cargo clippy -- -D warnings",
+    "lint": "cargo fmt --check && cargo clippy --all-targets -- -D warnings",
     "fix": "cargo fmt && cargo clippy --fix"
   },
   "devDependencies": {

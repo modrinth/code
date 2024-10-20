@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT m.id FROM mods m\n                INNER JOIN organizations o ON o.id = m.organization_id\n                INNER JOIN team_members tm ON tm.team_id = o.team_id AND user_id = $2\n                WHERE m.id = ANY($1)\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e4dbbb18adfd748ab7659462f940a5d1741a16971b01662b9281eb5720e109b1"
+}
