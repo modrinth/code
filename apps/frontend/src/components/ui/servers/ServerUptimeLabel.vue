@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="uptimeSeconds || uptimeSeconds !== 0"
-    v-tooltip="`Your server has been online for ${verboseUptime}`"
+    v-tooltip="`Online for ${verboseUptime}`"
     class="flex min-w-0 flex-row items-center gap-4"
     data-pyro-uptime
   >
