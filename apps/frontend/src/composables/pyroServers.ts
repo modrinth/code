@@ -240,10 +240,11 @@ const constructServerProperties = (properties: any): string => {
 
 const processImage = async (iconUrl: string | undefined) => {
   const image = ref<string | null>(null);
-  const auth = await await PyroFetch<FSAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
+  const auth = await PyroFetch<FSAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
   try {
     const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
       override: auth,
+      retry: false,
     });
 
     if (fileData instanceof Blob) {
