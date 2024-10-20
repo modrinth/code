@@ -12,7 +12,7 @@
             <h3 class="relative z-10 text-sm font-normal text-secondary">/ 100%</h3>
           </div>
           <h3 class="relative z-10 text-base font-normal text-secondary">CPU usage</h3>
-          <CPUIcon class="absolute right-8 top-8" />
+          <CPUIcon class="absolute right-10 top-10" />
         </div>
         <div
           class="relative max-h-[152px] min-h-[152px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
@@ -24,7 +24,7 @@
             <h3 class="relative z-10 text-sm font-normal text-secondary">/ 100%</h3>
           </div>
           <h3 class="relative z-10 text-base font-normal text-secondary">Memory usage</h3>
-          <DBIcon class="absolute right-8 top-8" />
+          <DBIcon class="absolute right-10 top-10" />
         </div>
         <div
           class="relative max-h-[150px] min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
@@ -36,7 +36,7 @@
             <h3 class="relative z-10 text-sm font-normal text-secondary">/ 0 GB</h3>
           </div>
           <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
-          <FolderOpenIcon class="absolute right-8 top-8 size-8" />
+          <FolderOpenIcon class="absolute right-10 top-10 size-8" />
         </div>
       </div>
 
