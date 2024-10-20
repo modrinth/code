@@ -247,21 +247,23 @@ const processImage = async (iconUrl: string | undefined) => {
     });
 
     if (fileData instanceof Blob) {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
-      img.src = URL.createObjectURL(fileData);
-      await new Promise<void>((resolve) => {
-        img.onload = () => {
-          canvas.width = 512;
-          canvas.height = 512;
-          ctx?.drawImage(img, 0, 0, 512, 512);
-          const dataURL = canvas.toDataURL("image/png");
-          internalServerRefrence.value.general.image = dataURL;
-          image.value = dataURL;
-          resolve();
-        };
-      });
+      if (import.meta.client) {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.src = URL.createObjectURL(fileData);
+        await new Promise<void>((resolve) => {
+          img.onload = () => {
+            canvas.width = 512;
+            canvas.height = 512;
+            ctx?.drawImage(img, 0, 0, 512, 512);
+            const dataURL = canvas.toDataURL("image/png");
+            internalServerRefrence.value.general.image = dataURL;
+            image.value = dataURL;
+            resolve();
+          };
+        });
+      }
     }
   } catch (error) {
     if (error instanceof PyroFetchError && error.statusCode === 404) {
@@ -279,40 +281,42 @@ const processImage = async (iconUrl: string | undefined) => {
       const originalfile = new File([file], "server-icon-original.png", {
         type: "image/png",
       });
-      const scaledFile = await new Promise<File>((resolve, reject) => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
-        img.onload = () => {
-          canvas.width = 64;
-          canvas.height = 64;
-          ctx?.drawImage(img, 0, 0, 64, 64);
-          canvas.toBlob((blob) => {
-            if (blob) {
-              const data = new File([blob], "server-icon.png", { type: "image/png" });
-              resolve(data);
-            } else {
-              reject(new Error("Canvas toBlob failed"));
-            }
-          }, "image/png");
-        };
-        img.onerror = reject;
-      });
-      if (scaledFile) {
-        await PyroFetch(`/create?path=/server-icon.png&type=file`, {
-          method: "POST",
-          contentType: "application/octet-stream",
-          body: scaledFile,
-          override: auth,
+      if (import.meta.client) {
+        const scaledFile = await new Promise<File>((resolve, reject) => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const img = new Image();
+          img.src = URL.createObjectURL(file);
+          img.onload = () => {
+            canvas.width = 64;
+            canvas.height = 64;
+            ctx?.drawImage(img, 0, 0, 64, 64);
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const data = new File([blob], "server-icon.png", { type: "image/png" });
+                resolve(data);
+              } else {
+                reject(new Error("Canvas toBlob failed"));
+              }
+            }, "image/png");
+          };
+          img.onerror = reject;
         });
+        if (scaledFile) {
+          await PyroFetch(`/create?path=/server-icon.png&type=file`, {
+            method: "POST",
+            contentType: "application/octet-stream",
+            body: scaledFile,
+            override: auth,
+          });
 
-        await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
-          method: "POST",
-          contentType: "application/octet-stream",
-          body: originalfile,
-          override: auth,
-        });
+          await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
+            method: "POST",
+            contentType: "application/octet-stream",
+            body: originalfile,
+            override: auth,
+          });
+        }
       }
     } catch (error) {
       if (error instanceof PyroFetchError && error.statusCode === 404) {
