@@ -6,6 +6,7 @@
   <NewModal
     ref="versionSelectModal"
     :header="isSecondPhase ? 'Confirm reinstallation' : 'Select version'"
+    @hide="onHide"
   >
     <div class="flex flex-col gap-4 md:w-[600px]">
       <p
@@ -53,6 +54,9 @@
           />
           <label for="backup-server">Backup files</label>
         </div>
+        <p v-if="serverCheckError && !loadingServerCheck" class="-mb-2 mt-4 text-red">
+          {{ serverCheckError }}
+        </p>
       </div>
       <div class="mt-4 flex justify-end gap-4">
         <Button
@@ -63,10 +67,6 @@
               isSecondPhase = false;
             } else {
               versionSelectModal?.hide();
-              selectedMCVersion = '';
-              selectedLoaderVersion = '';
-              hardReset = false;
-              backupServer = false;
             }
           "
         >
@@ -74,17 +74,18 @@
         </Button>
         <Button
           :color="isDangerous ? 'danger' : 'primary'"
-          :disabled="
-            selectedLoader.toLowerCase() === 'vanilla'
-              ? !selectedMCVersion
-              : !selectedMCVersion ||
-                !selectedLoaderVersion ||
-                (isBackupLimited && backupServer) ||
-                isLoading
-          "
+          :disabled="canInstall"
           @click="reinstallLoader(selectedLoader)"
         >
-          {{ isSecondPhase ? "Yes" : isDangerous ? "Erase and install" : "Install" }}
+          {{
+            isSecondPhase
+              ? "Yes"
+              : loadingServerCheck
+                ? "Loading..."
+                : isDangerous
+                  ? "Erase and install"
+                  : "Install"
+          }}
         </Button>
       </div>
     </div>
@@ -371,6 +372,21 @@ const loaderVersions = (await Promise.all(
 const editModal = ref();
 const versionSelectModal = ref();
 
+const canInstall = computed(() => {
+  const conds =
+    !selectedMCVersion.value ||
+    isBackupLimited.value ||
+    isLoading.value ||
+    loadingServerCheck.value ||
+    serverCheckError.value.trim().length > 0;
+
+  if (selectedLoader.value.toLowerCase() === "vanilla") {
+    return conds;
+  }
+
+  return conds || !selectedLoaderVersion.value;
+});
+
 const mcVersions = tags.value.gameVersions
   .filter((x) => x.version_type === "release")
   .map((x) => x.version);
@@ -454,6 +470,47 @@ updateData();
 const selectLoader = (loader: string) => {
   selectedLoader.value = loader;
   versionSelectModal.value.show();
+};
+
+const loadingServerCheck = ref(false);
+const serverCheckError = ref("");
+
+const cachedVersions: Record<string, any> = {};
+
+watch(selectedMCVersion, async () => {
+  if (selectedMCVersion.value.trim().length < 3) return;
+  // const res = await fetch(
+  //   `/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`,
+  // ).then((r) => r.json());
+
+  loadingServerCheck.value = true;
+  const res =
+    cachedVersions[selectedMCVersion.value] ||
+    (await fetch(`/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`).then((r) =>
+      r.json(),
+    ));
+
+  cachedVersions[selectedMCVersion.value] = res;
+
+  loadingServerCheck.value = false;
+
+  if (res.downloads.server) {
+    serverCheckError.value = "";
+  } else {
+    serverCheckError.value =
+      "We couldn't find a server.jar for this version. Please pick another one.";
+  }
+});
+
+const onHide = () => {
+  selectedMCVersion.value = "";
+  selectedLoaderVersion.value = "";
+  hardReset.value = false;
+  backupServer.value = false;
+  isSecondPhase.value = false;
+  serverCheckError.value = "";
+  loadingServerCheck.value = false;
+  isLoading.value = false;
 };
 
 const handleReinstallError = (error: any) => {
