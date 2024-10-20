@@ -243,7 +243,10 @@
                       </span>
                       <span>/{{ subscription.interval.replace("ly", "") }}</span>
                     </div>
-                    <div v-if="getPyroCharge(subscription)">
+                    <div v-if="getPyroCharge(subscription)" class="mb-4 flex flex-col items-end">
+                      <span class="text-sm text-secondary">
+                        Since {{ $dayjs(subscription.created).format("MMMM D, YYYY") }}
+                      </span>
                       <span
                         v-if="getPyroCharge(subscription).status === 'open'"
                         class="text-sm text-secondary"
