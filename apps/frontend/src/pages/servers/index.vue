@@ -658,6 +658,9 @@ onUnmounted(() => {
   if (layoutDiv) {
     layoutDiv.style.background = "";
   }
+  if (window.Stripe) {
+    window.Stripe = null;
+  }
 });
 </script>
 
