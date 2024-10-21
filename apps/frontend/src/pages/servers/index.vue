@@ -232,7 +232,7 @@
         <img
           src="~/assets/images/games/waving.png"
           alt=""
-          class="absolute right-8 top-32 hidden max-w-[580px] lg:block"
+          class="absolute right-8 top-40 hidden max-w-[480px] lg:block"
         />
         <div class="grid grid-cols-1 gap-9 lg:grid-cols-2">
           <div class="grid w-full grid-cols-1 gap-8">
@@ -290,7 +290,16 @@
             </div>
           </div>
           <div
-            class="relative flex flex-col gap-4 overflow-hidden rounded-2xl bg-highlight p-6 text-left backdrop-blur-xl md:p-12"
+            style="
+              background: radial-gradient(
+                86.12% 101.64% at 95.97% 94.07%,
+                rgba(27, 217, 106, 0.23) 0%,
+                rgba(14, 115, 56, 0.2) 100%
+              );
+              border: 1px solid rgba(27, 217, 106, 0.07);
+              box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
+            "
+            class="relative flex flex-col gap-4 overflow-hidden rounded-2xl p-6 text-left backdrop-blur-xl md:p-12"
           >
             <h2 class="m-0 text-lg font-bold">Easy to use file manager</h2>
             <h3 class="m-0 text-base font-normal">
