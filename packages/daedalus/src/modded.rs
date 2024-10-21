@@ -155,7 +155,8 @@ pub fn merge_partial_version(
         downloads: merge.downloads,
         id: partial.id.replace(DUMMY_REPLACE_STRING, &merge_id),
         java_version: merge.java_version,
-        libraries: libraries.into_iter()
+        libraries: libraries
+            .into_iter()
             .chain(partial.libraries)
             .map(|mut x| {
                 x.name = x.name.replace(DUMMY_REPLACE_STRING, &merge_id);

@@ -1,6 +1,4 @@
-use crate::util::{
-    download_file, fetch_json, fetch_xml, format_url,
-};
+use crate::util::{download_file, fetch_json, fetch_xml, format_url};
 use crate::{insert_mirrored_artifact, Error, MirrorArtifact, UploadFile};
 use chrono::{DateTime, Utc};
 use daedalus::get_path_from_artifact;
