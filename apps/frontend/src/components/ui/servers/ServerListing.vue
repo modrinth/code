@@ -14,22 +14,7 @@
       @click="$router.push(`/servers/manage/${server_id}`)"
       @keydown="(e) => e.key === 'Enter' && $router.push(`/servers/manage/${server_id}`)"
     >
-      <img
-        v-if="image"
-        no-shadow
-        size="lg"
-        alt="Server Icon"
-        class="size-[96px] rounded-xl bg-bg-raised"
-        :src="image"
-      />
-      <img
-        v-else
-        no-shadow
-        size="lg"
-        alt="Server Icon"
-        class="size-[96px] rounded-xl bg-bg-raised"
-        src="~/assets/images/servers/minecraft_server_icon.png"
-      />
+      <UiServersServerIcon :image="iconUrl" />
       <div class="ml-8 flex flex-col gap-2.5">
         <div class="flex flex-col gap-2 md:flex-row md:items-center">
           <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>
@@ -91,7 +76,7 @@ const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 const showSubdomainLabel = computed(() => !!props.net?.domain);
 
-let projectData;
+let projectData: Ref<Project | null>;
 if (props.upstream) {
   const { data } = await useLazyAsyncData<Project>(
     `server-project-${props.server_id}`,
@@ -107,7 +92,7 @@ if (props.upstream) {
   );
   projectData = data;
 } else {
-  projectData = ref(undefined);
+  projectData = ref(null);
 }
 
 const image = ref<string | undefined>();
