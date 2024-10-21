@@ -106,7 +106,6 @@
       </p>
     </div>
 
-    <UiServersPyroLoading v-else />
     <UiServersSaveBanner
       :is-visible="hasUnsavedChanges"
       :server="props.server"

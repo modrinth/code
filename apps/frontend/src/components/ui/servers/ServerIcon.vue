@@ -17,6 +17,9 @@ const props = defineProps<{
 }>();
 
 const computedClass = computed(() => {
-  return props.class || "h-[6rem] w-[6rem] rounded-xl bg-bg-raised";
+  return (
+    props.class ||
+    "h-[6rem] w-[6rem] rounded-xl bg-bg-raised border-[1px] border-solid border-button-bg"
+  );
 });
 </script>
