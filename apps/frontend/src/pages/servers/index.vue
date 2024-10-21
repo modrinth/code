@@ -639,7 +639,9 @@ onMounted(() => {
 
 watch(customer, (newCustomer) => {
   if (newCustomer) {
-    openPurchaseModal();
+    if (route.query.showModal) {
+      openPurchaseModal();
+    }
   }
 });
 
