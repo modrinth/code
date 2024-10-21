@@ -426,7 +426,7 @@
               $18<span class="text-sm font-normal text-secondary">/month</span>
             </h2>
             <ButtonStyled color="brand" size="large">
-              <button class="shadow-xl" @click="selectProduct(pyroProducts[0])">
+              <button class="shadow-xl" @click="selectProduct(pyroProducts[1])">
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
@@ -454,7 +454,7 @@
             <ButtonStyled color="purple" size="large">
               <button
                 class="!bg-highlight-purple !font-medium !text-purple"
-                @click="selectProduct(pyroProducts[0])"
+                @click="selectProduct(pyroProducts[2])"
               >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
@@ -490,31 +490,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
+import { useRoute } from "vue-router";
 import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
 import { RightArrowIcon } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
-
-const title = "Modrinth Servers";
-const description =
-  "Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins, and datapacks — without the hassle of setup.";
-
-useSeoMeta({
-  title,
-  description,
-  ogTitle: title,
-  ogDescription: description,
-});
-
-useHead({
-  script: [
-    {
-      src: "https://js.stripe.com/v3/",
-      defer: true,
-      async: true,
-    },
-  ],
-});
 
 const auth = await useAuth();
 const data = useNuxtApp();
@@ -532,7 +512,7 @@ pyroProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
 
 const selectProduct = async (product) => {
   if (!auth.value.user) {
-    data.$router.push("/auth/sign-in");
+    data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?showModal=true")}`);
     return;
   }
   selectedProduct.value = product;
@@ -590,33 +570,29 @@ async function fetchPaymentData() {
   }
 }
 
-const words = ["my-smp", "medieval-masters", "create-server", "mega-smp", "spookypack"];
-const currentWordIndex = ref(0);
-const currentText = ref("");
-const isDeleting = ref(false);
-const typingSpeed = 75;
-const deletingSpeed = 25;
-const pauseTime = 2000;
-
-const startTyping = () => {
-  const currentWord = words[currentWordIndex.value];
-  if (isDeleting.value) {
-    if (currentText.value.length > 0) {
-      currentText.value = currentText.value.slice(0, -1);
-      setTimeout(startTyping, deletingSpeed);
-    } else {
-      isDeleting.value = false;
-      currentWordIndex.value = (currentWordIndex.value + 1) % words.length;
-      setTimeout(startTyping, typingSpeed);
+const route = useRoute();
+const openPurchaseModal = () => {
+  selectedProduct.value = pyroProducts[0];
+  showModal.value = true;
+  modalKey.value++;
+  nextTick(() => {
+    if (purchaseModal.value && purchaseModal.value.show) {
+      purchaseModal.value.show();
     }
-  } else if (currentText.value.length < currentWord.length) {
-    currentText.value = currentWord.slice(0, currentText.value.length + 1);
-    setTimeout(startTyping, typingSpeed);
-  } else {
-    isDeleting.value = true;
-    setTimeout(startTyping, pauseTime);
-  }
+  });
 };
+
+onMounted(() => {
+  if (route.query.showModal) {
+    openPurchaseModal();
+  }
+});
+
+watch(customer, (newCustomer) => {
+  if (newCustomer) {
+    openPurchaseModal();
+  }
+});
 
 onMounted(() => {
   document.body.style.background = "var(--color-accent-contrast)";
@@ -624,7 +600,6 @@ onMounted(() => {
   if (layoutDiv) {
     layoutDiv.style.background = "var(--color-accent-contrast)";
   }
-  startTyping();
   fetchPaymentData();
 });
 
@@ -633,18 +608,6 @@ onUnmounted(() => {
   const layoutDiv = document.querySelector(".layout");
   if (layoutDiv) {
     layoutDiv.style.background = "";
-  }
-});
-
-watch(selectedProduct, async (newProduct) => {
-  if (newProduct) {
-    showModal.value = false;
-    await nextTick();
-    showModal.value = true;
-    await nextTick();
-    if (purchaseModal.value && purchaseModal.value.show) {
-      purchaseModal.value.show();
-    }
   }
 });
 </script>

@@ -10,7 +10,7 @@
       <h1 class="text-4xl font-bold text-[--color-contrast]">Servers</h1>
       <div class="flex w-full flex-row items-center justify-end gap-4">
         <ButtonStyled type="standard" color="brand">
-          <NuxtLink to="/servers#plan">
+          <NuxtLink :to="{ path: '/servers', query: { showModal: 'true' } }">
             <PlusIcon class="h-5 w-5" />
             Add Server
           </NuxtLink>
