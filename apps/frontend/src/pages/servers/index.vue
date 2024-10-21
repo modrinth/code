@@ -491,10 +491,30 @@
 
 <script setup>
 import { ref, onMounted, watch, nextTick } from "vue";
-import { useRoute } from "vue-router";
 import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
 import { RightArrowIcon } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
+
+const title = "Modrinth Servers";
+const description =
+  "Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins, and datapacks — without the hassle of setup.";
+
+useSeoMeta({
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: description,
+});
+
+useHead({
+  script: [
+    {
+      src: "https://js.stripe.com/v3/",
+      defer: true,
+      async: true,
+    },
+  ],
+});
 
 const auth = await useAuth();
 const data = useNuxtApp();
@@ -506,6 +526,34 @@ const paymentMethods = ref([]);
 const selectedProduct = ref(null);
 const showModal = ref(false);
 const modalKey = ref(0);
+
+const words = ["my-smp", "medieval-masters", "create-server", "mega-smp", "spookypack"];
+const currentWordIndex = ref(0);
+const currentText = ref("");
+const isDeleting = ref(false);
+const typingSpeed = 75;
+const deletingSpeed = 25;
+const pauseTime = 2000;
+
+const startTyping = () => {
+  const currentWord = words[currentWordIndex.value];
+  if (isDeleting.value) {
+    if (currentText.value.length > 0) {
+      currentText.value = currentText.value.slice(0, -1);
+      setTimeout(startTyping, deletingSpeed);
+    } else {
+      isDeleting.value = false;
+      currentWordIndex.value = (currentWordIndex.value + 1) % words.length;
+      setTimeout(startTyping, typingSpeed);
+    }
+  } else if (currentText.value.length < currentWord.length) {
+    currentText.value = currentWord.slice(0, currentText.value.length + 1);
+    setTimeout(startTyping, typingSpeed);
+  } else {
+    isDeleting.value = true;
+    setTimeout(startTyping, pauseTime);
+  }
+};
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 pyroProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
@@ -583,6 +631,7 @@ const openPurchaseModal = () => {
 };
 
 onMounted(() => {
+  startTyping();
   if (route.query.showModal) {
     openPurchaseModal();
   }
