@@ -34,7 +34,7 @@
         >
           Experimental
         </div>
-        <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
+        <h1 class="relative m-0 max-w-2xl text-4xl font-extrabold leading-[120%] md:text-7xl">
           Play together on Modrinth Servers
         </h1>
         <h2
