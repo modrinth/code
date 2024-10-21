@@ -1,6 +1,5 @@
 <template>
   <div data-pyro class="servers-hero relative -mt-48 h-full min-h-screen py-48 md:-mt-20 md:py-32">
-    <!-- TODO: redirect to server url (/servers/manage/:id) -->
     <PurchaseModal
       v-if="showModal && selectedProduct && customer"
       :key="selectedProduct.id"
@@ -45,12 +44,6 @@
           and datapacks with friends — without the hassle of setup.
         </h2>
         <div class="relative flex w-fit flex-row gap-8">
-          <!--
-            Open modal, choose plan
-            Choose modpack (redirect to search page) - or choose a loader (forge/fabric/vanilla) with no mods
-            Mount stripe
-            On success, create server and redirect user to management page
-          -->
           <ButtonStyled color="brand" size="large">
             <nuxt-link class="w-fit" to="#plan"> Start your server </nuxt-link>
           </ButtonStyled>
@@ -76,18 +69,6 @@
               "
             />
           </div>
-          <img
-            src="~/assets/images/games/servers-hero-real-noshadow.png"
-            alt=""
-            class="relative mt-8 h-full w-full rounded-3xl object-cover md:w-[55%]"
-          />
-          <div class="relative hidden w-[45%] md:block">
-            <img
-              src="~/assets/images/games/combined-hero.png"
-              alt=""
-              class="relative w-full rounded-3xl object-fill"
-            />
-          </div>
         </div>
       </div>
     </section>
@@ -108,8 +89,8 @@
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          Integrated with Modrinth App. Choose from thousands of modpacks or create your own from
-          your profiles. Invite your friends when you're ready to play.
+          Choose from thousands of modpacks or create your own from a modpack. Invite your friends
+          when you're ready to play.
         </h2>
         <img
           src="~/assets/images/games/excitement.png"
@@ -161,7 +142,7 @@
               <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
-            <h2 class="m-0 text-lg font-bold">Join with a single click</h2>
+            <h2 class="m-0 text-lg font-bold">Easily join your friends</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
               Your servers are sharable with just one link. Easily invite your friends to join your
               server. Modrinth takes care of installing the mods.
@@ -217,10 +198,12 @@
               <polygon points="13 19 22 12 13 5 13 19" />
               <polygon points="2 19 11 12 2 5 2 19" />
             </svg>
-            <h2 class="m-0 text-lg font-bold">Play on the fastest servers in the world</h2>
+            <h2 class="m-0 text-lg font-bold">
+              Experience modern, reliable hosting powered by Pyro
+            </h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Modrinth Servers are hosted on the fastest, most reliable infrastructure using
-              custom-built software built by Pyro.
+              Modrinth Servers are hosted on super-fast servers, with custom-built sofware to ensure
+              your server runs smoothly.
             </h3>
           </div>
         </div>
@@ -302,7 +285,7 @@
               </svg>
               <h2 class="m-0 text-lg font-bold">Backups included</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
-                Back up your server up to 15 times and keep your data stored forever.
+                With 15 backup slots stored off-site with Backblaze, your server is always safe.
               </h3>
             </div>
           </div>
@@ -311,13 +294,13 @@
           >
             <h2 class="m-0 text-lg font-bold">Easy to use file manager</h2>
             <h3 class="m-0 text-base font-normal">
-              Store as many mods, plugins, and worlds as you need.
+              Manage, search, and upload files directly to your server with ease.
             </h3>
 
             <img
               src="~/assets/images/games/content-hero.png"
               alt=""
-              class="absolute -bottom-16 -right-[15%] max-w-2xl rounded-2xl bg-brand p-4"
+              class="absolute -bottom-12 -right-[15%] max-w-2xl rounded-2xl bg-brand p-4"
             />
             <div
               aria-hidden="true"
@@ -369,56 +352,129 @@
         <h2
           class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          Choose the plan that's right for your server.
+          There's a plan for everyone. Choose the one that fits your needs.
         </h2>
 
         <ul class="m-0 flex w-full flex-col gap-8 p-0 md:flex-row">
-          <li
-            v-for="product in pyroProducts"
-            :key="product.id"
-            :class="[
-              'm-0 flex w-full list-none flex-col gap-6 rounded-2xl p-8 text-left',
-              product.metadata.ram === 6144 ? 'bg-highlight' : 'bg-bg',
-            ]"
-          >
-            <div
-              role="heading"
-              aria-level="2"
-              class="-mb-4 text-sm"
-              :class="{ 'text-contrast': product.metadata.ram === 6144 }"
-            >
-              {{ getProductSize(product) }}
-            </div>
-            <div class="flex flex-row items-end">
-              <div class="text-5xl font-bold text-contrast">
-                {{
-                  formatPrice(
-                    vintl.locale,
-                    getProductPrice(product).prices.intervals.monthly,
-                    getProductPrice(product).currency_code,
-                  )
-                }}
+          <li class="flex w-1/3 flex-col gap-4 rounded-2xl bg-bg p-8 text-left">
+            <div class="flex flex-row items-center justify-between">
+              <h1 class="m-0">Small</h1>
+              <div
+                class="grid size-8 place-content-center rounded-full bg-highlight-blue text-xs font-bold text-blue"
+              >
+                S
               </div>
-              <div class="text-secondary">/month</div>
             </div>
-            <div>{{ product.metadata.ram / 1024 }} GB RAM</div>
-            <div
-              class="h-[1px] w-full"
-              :class="product.metadata.ram === 6144 ? 'bg-brand opacity-50' : 'bg-bg-raised'"
-            ></div>
-            <p class="m-0" :class="{ 'text-contrast': product.metadata.ram === 6 }">
-              {{ getProductDescription(product) }}
+            <p class="m-0">
+              Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding.
             </p>
-            <ButtonStyled
-              :color="product.metadata.ram === 6144 ? 'brand' : 'standard'"
-              size="large"
-            >
-              <button @click="selectProduct(product)">
-                {{ product.metadata.ram === 6144 ? "Start your server" : "Select plan" }}
+            <div class="flex flex-row items-center gap-3">
+              <p class="m-0">4 GB RAM</p>
+              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+              <p class="m-0">32 GB Storage</p>
+            </div>
+            <h2 class="m-0 text-3xl text-contrast">
+              $12<span class="text-sm font-normal text-secondary">/month</span>
+            </h2>
+            <ButtonStyled color="blue" size="large">
+              <button
+                class="!bg-highlight-blue !font-medium !text-blue"
+                @click="selectProduct(pyroProducts[0])"
+              >
+                Get Started
+                <RightArrowIcon class="!min-h-4 !min-w-4" />
+              </button>
+            </ButtonStyled>
+          </li>
+
+          <li
+            style="
+              background: radial-gradient(
+                86.12% 101.64% at 95.97% 94.07%,
+                rgba(27, 217, 106, 0.23) 0%,
+                rgba(14, 115, 56, 0.2) 100%
+              );
+              border: 1px solid rgba(27, 217, 106, 0.07);
+              box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
+            "
+            class="flex w-1/3 flex-col gap-4 rounded-2xl bg-bg p-8 text-left"
+          >
+            <div class="flex flex-row items-center justify-between">
+              <h1 class="m-0">Medium</h1>
+              <div
+                class="grid size-8 place-content-center rounded-full bg-highlight-green text-xs font-bold text-brand"
+              >
+                M
+              </div>
+            </div>
+            <p class="m-0">Great for modded multiplayer and small communities.</p>
+            <div class="flex flex-row items-center gap-3">
+              <p class="m-0">6 GB RAM</p>
+              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+              <p class="m-0">48 GB Storage</p>
+            </div>
+            <h2 class="m-0 text-3xl text-contrast">
+              $18<span class="text-sm font-normal text-secondary">/month</span>
+            </h2>
+            <ButtonStyled color="brand" size="large">
+              <button class="shadow-xl" @click="selectProduct(pyroProducts[0])">
+                Get Started
+                <RightArrowIcon class="!min-h-4 !min-w-4" />
+              </button>
+            </ButtonStyled>
+          </li>
+
+          <li class="flex w-1/3 flex-col gap-4 rounded-2xl bg-bg p-8 text-left">
+            <div class="flex flex-row items-center justify-between">
+              <h1 class="m-0">Large</h1>
+              <div
+                class="grid size-8 place-content-center rounded-full bg-highlight-purple text-xs font-bold text-purple"
+              >
+                L
+              </div>
+            </div>
+            <p class="m-0">Ideal for larger communities, modpacks, and heavy modding.</p>
+            <div class="flex flex-row items-center gap-3">
+              <p class="m-0">8 GB RAM</p>
+              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+              <p class="m-0">64 GB Storage</p>
+            </div>
+            <h2 class="m-0 text-3xl text-contrast">
+              $24<span class="text-sm font-normal text-secondary">/month</span>
+            </h2>
+            <ButtonStyled color="purple" size="large">
+              <button
+                class="!bg-highlight-purple !font-medium !text-purple"
+                @click="selectProduct(pyroProducts[0])"
+              >
+                Get Started
+                <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
             </ButtonStyled>
           </li>
         </ul>
+
+        <div
+          class="flex w-full flex-row items-start justify-between rounded-2xl bg-bg p-8 text-left"
+        >
+          <div class="flex flex-col gap-4">
+            <h1 class="m-0">Build your own</h1>
+            <h2 class="m-0 text-base font-normal">
+              If you're a more technical server administator, you can pick your own RAM and storage
+              options.
+            </h2>
+          </div>
+
+          <div class="flex flex-col items-center gap-2">
+            <ButtonStyled color="standard" size="large">
+              <NuxtLink to="/servers/custom" class="w-fit">
+                Build your own
+                <RightArrowIcon class="!min-h-4 !min-w-4" />
+              </NuxtLink>
+            </ButtonStyled>
+            <p class="m-0 text-sm">Starting at $3/GB RAM</p>
+          </div>
+        </div>
       </div>
     </section>
   </div>
@@ -427,7 +483,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
-import { formatPrice, getCurrency } from "@modrinth/utils";
+import { RightArrowIcon } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 
 const title = "Modrinth Servers";
@@ -452,7 +508,6 @@ useHead({
 });
 
 const auth = await useAuth();
-const vintl = useVIntl();
 const data = useNuxtApp();
 const config = useRuntimeConfig();
 const purchaseModal = ref(null);
@@ -465,33 +520,6 @@ const modalKey = ref(0);
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 pyroProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
-
-const getProductSize = (product) => {
-  const ramSize = parseInt(product.metadata.ram);
-  if (ramSize === 4096) return "Small";
-  if (ramSize === 6144) return "Medium";
-  if (ramSize === 8192) return "Large";
-  return "Custom";
-};
-
-const getProductPrice = (product) => {
-  // fallback to us
-  return (
-    product.prices.find((p) => p.currency_code === getCurrency(country.value)) ??
-    product.prices.find((p) => p.currency_code === "USD") ??
-    product.prices[0]
-  );
-};
-
-const getProductDescription = (product) => {
-  const ramSize = parseInt(product.metadata.ram);
-  if (ramSize === 4096)
-    return "Perfect for small modpacks and friend groups looking to play together.";
-  if (ramSize === 6144)
-    return "The best value for most players. Add more mods and friends to your server with ease.";
-  if (ramSize === 8192) return "For the biggest modpacks. Play with hundreds of mods at once.";
-  return "Custom server configuration.";
-};
 
 const selectProduct = async (product) => {
   if (!auth.value.user) {
