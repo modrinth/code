@@ -1,108 +1,107 @@
 <template>
   <div data-pyro-file-manager-root class="contents">
+    <!-- Create Item Modal -->
+    <NewModal ref="createItemModal" :header="`Creating a ${newItemType}`">
+      <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleCreateNewItem">
+        <div class="flex flex-col gap-2">
+          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+          <input
+            v-model="newItemName"
+            autofocus
+            type="text"
+            class="bg-bg-input w-full rounded-lg p-4"
+            required
+          />
+          <div v-if="createItemSubmitted && nameError" class="text-red">{{ nameError }}</div>
+        </div>
+        <div class="flex justify-end gap-4">
+          <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
+          <Button :disabled="!!nameError" color="primary" type="submit"> Create </Button>
+        </div>
+      </form>
+    </NewModal>
+
+    <!-- Rename Item Modal -->
+    <NewModal ref="renameItemModal" :header="`Renaming ${selectedItem?.type}`">
+      <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleRenameItem">
+        <div class="flex flex-col gap-2">
+          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+          <input
+            v-model="newItemName"
+            autofocus
+            type="text"
+            class="bg-bg-input w-full rounded-lg p-4"
+            :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
+            required
+          />
+          <div v-if="renameItemSubmitted && nameError" class="text-red">{{ nameError }}</div>
+        </div>
+        <div class="flex justify-end gap-4">
+          <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
+          <Button :disabled="!!nameError" color="primary" type="submit"> Rename </Button>
+        </div>
+      </form>
+    </NewModal>
+
+    <!-- Move Item Modal -->
+    <NewModal ref="moveItemModal" :header="`Moving ${selectedItem?.name}`">
+      <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleMoveItem">
+        <div class="flex flex-col gap-2">
+          <input
+            v-model="destinationFolder"
+            autofocus
+            type="text"
+            class="bg-bg-input w-full rounded-lg p-4"
+            placeholder="e.g. mods/modname"
+            required
+          />
+        </div>
+        <div class="flex justify-end gap-4">
+          <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
+          <Button color="primary" type="submit"> Move </Button>
+        </div>
+      </form>
+    </NewModal>
+
+    <!-- Delete Item Modal -->
+    <NewModal ref="deleteItemModal" danger :header="`Deleting ${selectedItem?.type}`">
+      <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleDeleteItem">
+        <div
+          class="relative flex w-full items-center gap-2 rounded-2xl border border-solid border-[#cb224436] bg-[#f57b7b0e] p-6 shadow-md dark:border-0 dark:bg-[#0e0e0ea4]"
+        >
+          <div
+            class="flex h-9 w-9 items-center justify-center rounded-full bg-[#3f1818a4] p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+          >
+            <FolderOpenIcon v-if="selectedItem?.type === 'directory'" class="h-5 w-5" />
+            <FileIcon v-else-if="selectedItem?.type === 'file'" class="h-5 w-5" />
+          </div>
+          <div class="flex flex-col">
+            <span class="font-bold group-hover:text-contrast">{{ selectedItem?.name }}</span>
+            <span
+              v-if="selectedItem?.type === 'directory'"
+              class="text-xs text-secondary group-hover:text-primary"
+              >{{ selectedItem?.count }} items</span
+            >
+            <span v-else class="text-xs text-secondary group-hover:text-primary"
+              >{{ (selectedItem?.size / 1024 / 1024).toFixed(2) }} MB</span
+            >
+          </div>
+        </div>
+        <div class="flex justify-end gap-4">
+          <Button transparent @click="deleteItemModal?.hide()"> Cancel </Button>
+          <Button color="danger" type="submit"> Delete {{ selectedItem?.type }} </Button>
+        </div>
+      </form>
+    </NewModal>
     <div
-      class="relative isolate flex min-h-[800px] w-full flex-col rounded-2xl border border-solid border-bg-raised"
+      class="relative flex min-h-[800px] w-full flex-col rounded-2xl border border-solid border-bg-raised"
       @dragenter.prevent="handleDragEnter"
       @dragover.prevent="handleDragOver"
       @dragleave.prevent="handleDragLeave"
       @drop.prevent="handleDrop"
     >
-      <!-- Create Item Modal -->
-      <NewModal ref="createItemModal" :header="`Creating a ${newItemType}`">
-        <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleCreateNewItem">
-          <div class="flex flex-col gap-2">
-            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-            <input
-              v-model="newItemName"
-              autofocus
-              type="text"
-              class="bg-bg-input w-full rounded-lg p-4"
-              required
-            />
-            <div v-if="createItemSubmitted && nameError" class="text-red">{{ nameError }}</div>
-          </div>
-          <div class="flex justify-end gap-4">
-            <Button transparent @click="createItemModal?.hide()"> Cancel </Button>
-            <Button :disabled="!!nameError" color="primary" type="submit"> Create </Button>
-          </div>
-        </form>
-      </NewModal>
-
-      <!-- Rename Item Modal -->
-      <NewModal ref="renameItemModal" :header="`Renaming ${selectedItem?.type}`">
-        <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleRenameItem">
-          <div class="flex flex-col gap-2">
-            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-            <input
-              v-model="newItemName"
-              autofocus
-              type="text"
-              class="bg-bg-input w-full rounded-lg p-4"
-              :placeholder="`e.g. ${newItemType === 'file' ? 'config.yml' : 'plugins'}`"
-              required
-            />
-            <div v-if="renameItemSubmitted && nameError" class="text-red">{{ nameError }}</div>
-          </div>
-          <div class="flex justify-end gap-4">
-            <Button transparent @click="renameItemModal?.hide()"> Cancel </Button>
-            <Button :disabled="!!nameError" color="primary" type="submit"> Rename </Button>
-          </div>
-        </form>
-      </NewModal>
-
-      <!-- Move Item Modal -->
-      <NewModal ref="moveItemModal" :header="`Moving ${selectedItem?.name}`">
-        <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleMoveItem">
-          <div class="flex flex-col gap-2">
-            <input
-              v-model="destinationFolder"
-              autofocus
-              type="text"
-              class="bg-bg-input w-full rounded-lg p-4"
-              placeholder="e.g. mods/modname"
-              required
-            />
-          </div>
-          <div class="flex justify-end gap-4">
-            <Button transparent @click="moveItemModal?.hide()"> Cancel </Button>
-            <Button color="primary" type="submit"> Move </Button>
-          </div>
-        </form>
-      </NewModal>
-
-      <!-- Delete Item Modal -->
-      <NewModal ref="deleteItemModal" danger :header="`Deleting ${selectedItem?.type}`">
-        <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleDeleteItem">
-          <div
-            class="relative flex w-full items-center gap-2 rounded-2xl border border-solid border-[#cb224436] bg-[#f57b7b0e] p-6 shadow-md dark:border-0 dark:bg-[#0e0e0ea4]"
-          >
-            <div
-              class="flex h-9 w-9 items-center justify-center rounded-full bg-[#3f1818a4] p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
-            >
-              <FolderOpenIcon v-if="selectedItem?.type === 'directory'" class="h-5 w-5" />
-              <FileIcon v-else-if="selectedItem?.type === 'file'" class="h-5 w-5" />
-            </div>
-            <div class="flex flex-col">
-              <span class="font-bold group-hover:text-contrast">{{ selectedItem?.name }}</span>
-              <span
-                v-if="selectedItem?.type === 'directory'"
-                class="text-xs text-secondary group-hover:text-primary"
-                >{{ selectedItem?.count }} items</span
-              >
-              <span v-else class="text-xs text-secondary group-hover:text-primary"
-                >{{ (selectedItem?.size / 1024 / 1024).toFixed(2) }} MB</span
-              >
-            </div>
-          </div>
-          <div class="flex justify-end gap-4">
-            <Button transparent @click="deleteItemModal?.hide()"> Cancel </Button>
-            <Button color="danger" type="submit"> Delete {{ selectedItem?.type }} </Button>
-          </div>
-        </form>
-      </NewModal>
-
       <!-- Main Content -->
-      <div ref="mainContent" class="flex w-full flex-col">
+      <div ref="mainContent" class="isolate flex w-full flex-col">
         <nav
           v-if="!isEditing"
           data-pyro-files-state="browsing"

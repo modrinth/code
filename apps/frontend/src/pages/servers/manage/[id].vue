@@ -80,7 +80,8 @@
       </div>
 
       <div
-        class="flex w-full select-none flex-col justify-between gap-4 md:flex-row md:items-center"
+        data-pyro-navigation
+        class="isolate flex w-full select-none flex-col justify-between gap-4 md:flex-row md:items-center"
       >
         <UiNavTabs :links="navLinks" />
       </div>
