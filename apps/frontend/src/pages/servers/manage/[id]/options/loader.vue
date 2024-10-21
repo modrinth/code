@@ -342,8 +342,8 @@ const loaderVersions = (await Promise.all(
       }
       try {
         // get our info
-        const res = await fetch(`/loader-versions?loader=${loader}`).then((r) => r.json());
-        return { [loader]: res.gameVersions };
+        const res = await $fetch(`/loader-versions?loader=${loader}`);
+        return { [loader]: (res as any).gameVersions };
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_) {
         return await runFetch(iterations + 1);
@@ -486,9 +486,7 @@ watch(selectedMCVersion, async () => {
   loadingServerCheck.value = true;
   const res =
     cachedVersions[selectedMCVersion.value] ||
-    (await fetch(`/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`).then((r) =>
-      r.json(),
-    ));
+    (await $fetch(`/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`));
 
   cachedVersions[selectedMCVersion.value] = res;
 
