@@ -29,7 +29,7 @@
             purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 1 : 0),
         }"
       >
-        Select plan
+        {{ product.metadata.type === 'pyro' ? 'Billing interval' : 'Select plan' }}
       </span>
       <ChevronRightIcon class="h-5 w-5 text-secondary" />
       <span
