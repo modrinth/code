@@ -89,7 +89,7 @@
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          Choose from thousands of modpacks or create your own from a modpack. Invite your friends
+          Choose from the thousands of modpacks on Modrinth or create your own. Invite your friends
           when you're ready to play.
         </h2>
         <img
@@ -221,7 +221,7 @@
           Included with your server
         </div>
         <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
-          All the features you need
+          Comes with all the features you need.
         </h1>
         <h2
           class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"

@@ -134,8 +134,7 @@
             :options="[
               {
                 id: 'servers',
-                link: 'https://bisecthosting.com/modrinth',
-                shown: false,
+                link: '/servers',
               },
               {
                 id: 'app',
@@ -224,9 +223,9 @@
           <template #profile> <UserIcon aria-hidden="true" /> Profile </template>
           <template #notifications> <BellIcon aria-hidden="true" /> Notifications </template>
           <template #saved> <BookmarkIcon aria-hidden="true" /> Saved projects </template>
+          <template #servers> <ServerIcon aria-hidden="true" /> My Servers </template>
           <template #settings> <SettingsIcon aria-hidden="true" /> Settings </template>
           <template #projects> <BoxIcon aria-hidden="true" /> Projects </template>
-          <template #servers> <ServerIcon aria-hidden="true" /> Servers </template>
           <template #organizations>
             <OrganizationIcon aria-hidden="true" /> Organizations
           </template>
@@ -776,6 +775,10 @@ const userMenuOptions = computed(() => {
       link: "/dashboard/collections",
     },
     {
+      id: "servers",
+      link: "/servers/manage",
+    },
+    {
       id: "settings",
       link: "/settings",
     },
@@ -786,10 +789,6 @@ const userMenuOptions = computed(() => {
     ...options,
     {
       divider: true,
-    },
-    {
-      id: "servers",
-      link: "/servers/manage",
     },
     {
       id: "projects",
