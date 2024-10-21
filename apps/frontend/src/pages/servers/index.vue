@@ -298,7 +298,7 @@
             </h3>
 
             <img
-              src="~/assets/images/games/content-hero.png"
+              src="~/assets/images/games/content-hero-fixed.png"
               alt=""
               class="absolute -bottom-12 -right-[15%] max-w-2xl rounded-2xl bg-brand p-4"
             />
@@ -536,7 +536,7 @@ const selectProduct = async (product) => {
 };
 
 const handleError = (err) => {
-  data.$notify({
+  addNotification({
     group: "main",
     title: "An error occurred",
     type: "error",
@@ -572,7 +572,7 @@ async function fetchPaymentData() {
     paymentMethods.value = paymentMethodsData;
   } catch (error) {
     console.error("Error fetching payment data:", error);
-    data.$notify({
+    addNotification({
       group: "main",
       title: "Error fetching payment data",
       type: "error",
