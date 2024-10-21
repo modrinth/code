@@ -3,7 +3,7 @@ ENV PKG_CONFIG_ALLOW_CROSS=1
 
 WORKDIR /usr/src/daedalus
 COPY . .
-RUN cargo build --release
+RUN cargo build --release --package daedalus_client
 
 
 FROM debian:bookworm-slim
