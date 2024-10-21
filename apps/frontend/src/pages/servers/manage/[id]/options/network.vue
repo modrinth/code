@@ -1,6 +1,6 @@
 <template>
   <NewModal ref="newAllocationModal" header="New Allocation">
-    <div class="flex flex-col gap-2 md:w-[600px]">
+    <form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="addNewAllocation">
       <label for="new-allocation-name" class="font-semibold text-contrast">
         Name<span class="text-red-500">*</span>
       </label>
@@ -12,17 +12,17 @@
         maxlength="32"
         placeholder="e.g. Secondary allocation"
       />
-    </div>
-    <div class="mb-1 mt-4 flex justify-end gap-4">
-      <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
-      <Button color="primary" :disabled="!newAllocationName" @click="addNewAllocation">
-        <PlusIcon /> Create allocation
-      </Button>
-    </div>
+      <div class="mb-1 mt-4 flex justify-end gap-4">
+        <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
+        <Button color="primary" :disabled="!newAllocationName" type="submit">
+          <PlusIcon /> Create allocation
+        </Button>
+      </div>
+    </form>
   </NewModal>
 
   <NewModal ref="editAllocationModal" header="Edit Allocation">
-    <div class="flex flex-col gap-2 md:w-[600px]">
+    <form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="editAllocation">
       <label for="edit-allocation-name" class="font-semibold text-contrast">
         Name<span class="text-red-500">*</span>
       </label>
@@ -34,13 +34,13 @@
         maxlength="32"
         placeholder="e.g. Secondary allocation"
       />
-    </div>
-    <div class="mb-1 mt-4 flex justify-end gap-4">
-      <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
-      <Button color="primary" :disabled="!newAllocationName" @click="editAllocation">
-        <SaveIcon /> Update Allocation
-      </Button>
-    </div>
+      <div class="mb-1 mt-4 flex justify-end gap-4">
+        <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
+        <Button color="primary" :disabled="!newAllocationName" type="submit">
+          <SaveIcon /> Update Allocation
+        </Button>
+      </div>
+    </form>
   </NewModal>
 
   <div class="relative h-full w-full overflow-y-auto">
