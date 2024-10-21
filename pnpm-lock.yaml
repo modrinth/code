@@ -31,6 +31,9 @@ importers:
       '@modrinth/app-lib':
         specifier: workspace:*
         version: link:../../packages/app-lib
+      '@modrinth/daedalus':
+        specifier: workspace:*
+        version: link:../../packages/daedalus
     devDependencies:
       '@tauri-apps/cli':
         specifier: 2.0.0-rc.16
@@ -149,6 +152,12 @@ importers:
         version: 2.1.6(typescript@5.5.4)
 
   apps/app-playground: {}
+
+  apps/daedalus_client:
+    dependencies:
+      '@modrinth/daedalus':
+        specifier: workspace:*
+        version: link:../../packages/daedalus
 
   apps/docs:
     dependencies:
@@ -310,6 +319,8 @@ importers:
       vue:
         specifier: ^3.4.31
         version: 3.4.31(typescript@5.5.4)
+
+  packages/daedalus: {}
 
   packages/eslint-config-custom:
     devDependencies:
@@ -10393,12 +10404,12 @@ snapshots:
   '@types/eslint-scope@3.7.7':
     dependencies:
       '@types/eslint': 9.6.0
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
     optional: true
 
   '@types/eslint@9.6.0':
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       '@types/json-schema': 7.0.15
     optional: true
 
@@ -17169,7 +17180,7 @@ snapshots:
   webpack@5.92.1:
     dependencies:
       '@types/eslint-scope': 3.7.7
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       '@webassemblyjs/ast': 1.12.1
       '@webassemblyjs/wasm-edit': 1.12.1
       '@webassemblyjs/wasm-parser': 1.12.1
