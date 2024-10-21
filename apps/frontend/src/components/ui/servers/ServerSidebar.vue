@@ -3,7 +3,7 @@
     <div class="static h-full flex-col pb-4 md:flex md:pb-0 md:pr-4">
       <div class="z-10 flex select-none flex-col gap-2 rounded-2xl bg-bg-raised p-4 md:w-[16rem]">
         <div v-for="link in navLinks" :key="link.label">
-          <nuxt-link
+          <NuxtLink
             :to="link.href"
             class="flex items-center gap-2 rounded-xl p-2 hover:bg-button-bg"
             :class="{ 'bg-button-bg text-contrast': route.path === link.href }"
@@ -12,7 +12,7 @@
               <component :is="link.icon" class="h-6 w-6" />
               {{ link.label }}
             </div>
-          </nuxt-link>
+          </NuxtLink>
         </div>
       </div>
     </div>
