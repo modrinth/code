@@ -1,7 +1,7 @@
 <template>
   <div class="static w-full grid-cols-1 md:relative md:flex">
     <div class="static h-full flex-col pb-4 md:flex md:pb-0 md:pr-4">
-      <div class="z-10 flex select-none flex-col gap-2 rounded-xl bg-bg-raised p-4 md:w-[16rem]">
+      <div class="z-10 flex select-none flex-col gap-2 rounded-2xl bg-bg-raised p-4 md:w-[16rem]">
         <div v-for="link in navLinks" :key="link.label">
           <nuxt-link
             :to="link.href"
