@@ -7,18 +7,12 @@
       v-if="serverList.length > 0"
       class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row"
     >
-      <h1 class="text-4xl font-bold text-[--color-contrast]">Servers</h1>
+      <h1 class="w-full text-4xl font-bold text-[--color-contrast]">Servers</h1>
       <div class="flex w-full flex-row items-center justify-end gap-4">
-        <ButtonStyled type="standard" color="brand">
-          <NuxtLink :to="{ path: '/servers', query: { showModal: 'true' } }">
-            <PlusIcon class="h-5 w-5" />
-            Add Server
-          </NuxtLink>
-        </ButtonStyled>
         <div class="relative mb-4 w-full text-sm md:mb-0 md:w-72">
           <label class="sr-only" for="search">Search</label>
           <SearchIcon
-            class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+            class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
             aria-hidden="true"
           />
           <input
@@ -31,6 +25,15 @@
             placeholder="Search servers..."
           />
         </div>
+        <ButtonStyled type="standard">
+          <NuxtLink
+            class="!h-10 !border-[1px] !border-solid !border-[var(--color-button-border)] text-sm !font-medium"
+            :to="{ path: '/servers', query: { showModal: 'true' } }"
+          >
+            <PlusIcon class="size-4" />
+            New Server
+          </NuxtLink>
+        </ButtonStyled>
       </div>
     </div>
 
