@@ -31,6 +31,9 @@ importers:
       '@modrinth/app-lib':
         specifier: workspace:*
         version: link:../../packages/app-lib
+      '@modrinth/daedalus':
+        specifier: workspace:*
+        version: link:../../packages/daedalus
     devDependencies:
       '@tauri-apps/cli':
         specifier: 2.0.0-rc.16
@@ -149,6 +152,12 @@ importers:
         version: 2.1.6(typescript@5.5.4)
 
   apps/app-playground: {}
+
+  apps/daedalus_client:
+    dependencies:
+      '@modrinth/daedalus':
+        specifier: workspace:*
+        version: link:../../packages/daedalus
 
   apps/docs:
     dependencies:
@@ -337,6 +346,8 @@ importers:
       vue:
         specifier: ^3.4.31
         version: 3.4.31(typescript@5.5.4)
+
+  packages/daedalus: {}
 
   packages/eslint-config-custom:
     devDependencies:
