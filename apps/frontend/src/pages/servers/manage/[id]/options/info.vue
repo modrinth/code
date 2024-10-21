@@ -1,0 +1,114 @@
+<template>
+  <div class="h-full w-full gap-2 overflow-y-auto">
+    <div class="card">
+      <div class="flex flex-col gap-4">
+        <div class="flex justify-between">
+          <label class="flex flex-col gap-2">
+            <span class="text-lg font-bold text-contrast">SFTP</span>
+            <span> SFTP allows you to access your server's files from outside of Modrinth. </span>
+          </label>
+          <Button @click="openSftp"> Launch SFTP </Button>
+        </div>
+        <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
+          <span class="font-bold text-contrast">
+            {{ data?.sftp_host }}
+          </span>
+          <span class="text-xs uppercase text-secondary">server address</span>
+        </div>
+        <div class="flex gap-2">
+          <div
+            class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
+          >
+            <span class="font-bold text-contrast"> {{ data?.sftp_username }} </span>
+            <span class="text-xs uppercase text-secondary">username</span>
+          </div>
+          <div
+            class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
+          >
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-contrast">
+                {{
+                  showPassword ? data?.sftp_password : "*".repeat(data?.sftp_password?.length ?? 0)
+                }}
+              </span>
+
+              <div class="flex flex-row items-center gap-1">
+                <ButtonStyled type="transparent">
+                  <button v-tooltip="'Copy SFTP password'" @click="copyPassword">
+                    <CopyIcon class="h-5 w-5 hover:cursor-pointer" />
+                  </button>
+                </ButtonStyled>
+                <ButtonStyled type="transparent">
+                  <button
+                    v-tooltip="showPassword ? 'Hide password' : 'Show password'"
+                    @click="togglePassword"
+                  >
+                    <EyeIcon v-if="showPassword" class="h-5 w-5 hover:cursor-pointer" />
+                    <EyeOffIcon v-else class="h-5 w-5 hover:cursor-pointer" />
+                  </button>
+                </ButtonStyled>
+              </div>
+            </div>
+            <span class="text-xs uppercase text-secondary">password</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="text-xl font-bold">Info</h2>
+      <div class="rounded-xl bg-table-alternateRow p-4">
+        <table
+          class="min-w-full border-collapse overflow-hidden rounded-lg border-2 border-gray-300"
+        >
+          <tbody>
+            <tr v-for="property in properties" :key="property.name">
+              <td v-if="property.value !== 'Unknown'" class="py-3">{{ property.name }}</td>
+              <td v-if="property.value !== 'Unknown'" class="px-4">
+                <UiCopyCode :text="property.value" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { Button, ButtonStyled } from "@modrinth/ui";
+import { CopyIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
+import type { Server } from "~/composables/pyroServers";
+
+const route = useNativeRoute();
+const serverId = route.params.id as string;
+
+const props = defineProps<{
+  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+}>();
+
+const data = computed(() => props.server.general);
+const showPassword = ref(false);
+
+const openSftp = () => {
+  window.open(`sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`, "_self");
+};
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value;
+};
+
+const copyPassword = () => {
+  navigator.clipboard.writeText(data.value?.sftp_password ?? "");
+  addNotification({
+    type: "success",
+    title: "Password copied!",
+  });
+};
+
+const properties = [
+  { name: "Server ID", value: serverId ?? "Unknown" },
+  { name: "Kind", value: data.value?.upstream?.kind ?? data.value?.loader ?? "Unknown" },
+  { name: "Project ID", value: data.value?.upstream?.project_id ?? "Unknown" },
+  { name: "Version ID", value: data.value?.upstream?.version_id ?? "Unknown" },
+];
+</script>

@@ -1,0 +1,172 @@
+<template>
+  <div class="flex flex-row items-center gap-2 rounded-lg">
+    <ButtonStyled v-if="showKillButton" type="standard" color="red">
+      <button @click="handleKillClick">
+        <div class="flex gap-1">
+          <SlashIcon class="h-5 w-5" />
+          <span>{{ killButtonText }}</span>
+        </div>
+      </button>
+    </ButtonStyled>
+    <ButtonStyled v-if="showStopButton" type="standard" color="red">
+      <button :disabled="!canTakeAction || disabled" @click="stopServer">
+        <div class="flex gap-1">
+          <StopCircleIcon class="h-5 w-5" />
+          <span>{{ stopButtonText }}</span>
+        </div>
+      </button>
+    </ButtonStyled>
+    <ButtonStyled type="standard" color="brand">
+      <button :disabled="!canTakeAction || disabled" @click="handleAction">
+        <div v-if="isStartingOrRestarting" class="grid place-content-center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div v-else class="contents">
+          <component :is="showRestartIcon ? UpdatedIcon : PlayIcon" />
+        </div>
+        <span>
+          {{ actionButtonText }}
+        </span>
+      </button>
+    </ButtonStyled>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
+import { PlayIcon, UpdatedIcon, StopCircleIcon, SlashIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
+
+const props = defineProps<{
+  isOnline: boolean;
+  isActioning: boolean;
+  disabled: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "action", action: "start" | "restart" | "stop" | "kill"): void;
+}>();
+
+const ServerState = {
+  Stopped: "Stopped",
+  Starting: "Starting",
+  Running: "Running",
+  Stopping: "Stopping",
+  Restarting: "Restarting",
+} as const;
+
+type ServerStateType = (typeof ServerState)[keyof typeof ServerState];
+
+const currentState = ref<ServerStateType>(
+  props.isOnline ? ServerState.Running : ServerState.Stopped,
+);
+
+const isStartingDelay = ref(false);
+const killConfirmation = ref(false);
+
+const showKillButton = computed(() => currentState.value === ServerState.Running);
+const showStopButton = computed(() => currentState.value === ServerState.Running);
+const showRestartIcon = computed(() => currentState.value === ServerState.Running);
+const canTakeAction = computed(
+  () =>
+    !props.isActioning &&
+    !isStartingDelay.value &&
+    currentState.value !== ServerState.Starting &&
+    currentState.value !== ServerState.Stopping,
+);
+
+const isStartingOrRestarting = computed(
+  () =>
+    currentState.value === ServerState.Starting || currentState.value === ServerState.Restarting,
+);
+
+const actionButtonText = computed(() => {
+  switch (currentState.value) {
+    case ServerState.Starting:
+      return "Starting...";
+    case ServerState.Restarting:
+      return "Restarting...";
+    case ServerState.Running:
+      return "Restart";
+    default:
+      return "Start";
+  }
+});
+
+const stopButtonText = computed(() =>
+  currentState.value === ServerState.Stopping ? "Stopping..." : "Stop",
+);
+
+const killButtonText = computed(() => (killConfirmation.value ? "Confirm Kill" : "Kill"));
+
+const handleAction = () => {
+  if (!canTakeAction.value) return;
+  if (currentState.value === ServerState.Running) {
+    currentState.value = ServerState.Restarting;
+    emit("action", "restart");
+  } else {
+    currentState.value = ServerState.Starting;
+    emit("action", "start");
+    isStartingDelay.value = true;
+    setTimeout(() => {
+      isStartingDelay.value = false;
+    }, 5000);
+  }
+};
+
+const stopServer = () => {
+  if (!canTakeAction.value) return;
+  currentState.value = ServerState.Stopping;
+  emit("action", "stop");
+};
+
+const handleKillClick = () => {
+  if (killConfirmation.value) {
+    killServer();
+  } else {
+    killConfirmation.value = true;
+    setTimeout(() => {
+      killConfirmation.value = false;
+    }, 10000);
+  }
+};
+
+const killServer = () => {
+  emit("action", "kill");
+};
+
+watch(
+  () => props.isOnline,
+  (newValue) => {
+    if (newValue) {
+      currentState.value = ServerState.Running;
+    } else if (
+      currentState.value !== ServerState.Starting &&
+      currentState.value !== ServerState.Restarting
+    ) {
+      currentState.value = ServerState.Stopped;
+    }
+  },
+);
+
+watch(
+  () => props.isActioning,
+  (newValue) => {
+    if (!newValue) {
+      currentState.value = props.isOnline ? ServerState.Running : ServerState.Stopped;
+    }
+  },
+);
+
+watch(showKillButton, (newValue) => {
+  if (!newValue) {
+    killConfirmation.value = false;
+  }
+});
+</script>

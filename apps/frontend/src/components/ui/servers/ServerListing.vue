@@ -1,0 +1,148 @@
+<template>
+  <NuxtLink custom>
+    <div
+      class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100 active:scale-95"
+      :aria-disabled="status.isInstalling || status.isFailed"
+      :tabindex="status.isInstalling || status.isFailed ? -1 : 0"
+      :class="
+        status.isInstalling || status.isFailed
+          ? 'pointer-events-none cursor-not-allowed'
+          : 'cursor-pointer'
+      "
+      data-pyro-server-listing
+      :data-pyro-server-listing-id="server_id"
+      @click="$router.push(`/servers/manage/${server_id}`)"
+      @keydown="(e) => e.key === 'Enter' && $router.push(`/servers/manage/${server_id}`)"
+    >
+      <img
+        v-if="image"
+        no-shadow
+        size="lg"
+        alt="Server Icon"
+        class="size-[96px] rounded-xl bg-bg-raised"
+        :src="image"
+      />
+      <img
+        v-else
+        no-shadow
+        size="lg"
+        alt="Server Icon"
+        class="size-[96px] rounded-xl bg-bg-raised"
+        src="~/assets/images/servers/minecraft_server_icon.png"
+      />
+      <div class="ml-8 flex flex-col gap-2.5">
+        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+          <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>
+          <UiServersServerInstallStatusPill v-if="status.state" :state="status.state" />
+          <ChevronRightIcon v-if="!status.isInstalling && !status.isFailed" />
+        </div>
+
+        <div
+          v-if="projectData?.title"
+          class="m-0 flex flex-row items-center gap-1 text-sm font-medium text-[var(--color-text-secondary)]"
+        >
+          <UiAvatar
+            :src="iconUrl"
+            no-shadow
+            style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
+            alt="Server Icon"
+          />
+          Using {{ projectData?.title || "Unknown" }}
+        </div>
+        <div v-else class="min-h-[20px]"></div>
+
+        <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
+          <UiServersServerGameLabel
+            v-if="showGameLabel"
+            :game="game!"
+            :mc-version="mc_version ?? ''"
+          />
+          <UiServersServerLoaderLabel
+            v-if="showLoaderLabel"
+            :loader="loader!"
+            :loader-version="loader_version ?? ''"
+          />
+          <UiServersServerSubdomainLabel
+            v-if="showSubdomainLabel"
+            :subdomain="props.net?.domain ?? ''"
+          />
+        </div>
+      </div>
+    </div>
+  </NuxtLink>
+</template>
+
+<script setup lang="ts">
+import { ChevronRightIcon } from "@modrinth/assets";
+import type { StatusState } from "./ServerInstallStatusPill.vue";
+import type { Project, Server } from "~/types/servers";
+
+const prodOverride = await PyroAuthOverride();
+
+const props = defineProps<Partial<Server>>();
+
+const status = computed(() => ({
+  state: props.status as StatusState | undefined,
+  isFailed: props.status === "Failed",
+  isInstalling: props.status === "Installing",
+}));
+
+const showGameLabel = computed(() => !!props.game);
+const showLoaderLabel = computed(() => !!props.loader);
+const showSubdomainLabel = computed(() => !!props.net?.domain);
+
+let projectData;
+if (props.upstream) {
+  const { data } = await useLazyAsyncData<Project>(
+    `server-project-${props.server_id}`,
+    async (): Promise<Project> => {
+      const result = await useBaseFetch(
+        `project/${props.upstream?.project_id}`,
+        {},
+        false,
+        prodOverride,
+      );
+      return result as Project;
+    },
+  );
+  projectData = data;
+} else {
+  projectData = ref(undefined);
+}
+
+const image = ref<string | undefined>();
+
+onMounted(async () => {
+  const auth = (await usePyroFetch(`servers/${props.server_id}/fs`)) as any;
+  try {
+    const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
+      override: auth,
+    });
+
+    if (fileData instanceof Blob) {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      img.src = URL.createObjectURL(fileData);
+      await new Promise<void>((resolve) => {
+        img.onload = () => {
+          canvas.width = 512;
+          canvas.height = 512;
+          ctx?.drawImage(img, 0, 0, 512, 512);
+          const dataURL = canvas.toDataURL("image/png");
+          image.value = dataURL;
+          resolve();
+        };
+      });
+    }
+  } catch (error) {
+    if (error instanceof PyroFetchError && error.statusCode === 404) {
+      image.value = undefined;
+    } else {
+      console.error(error);
+    }
+  }
+});
+
+const iconUrl = computed(() => projectData.value?.icon_url || undefined);
+</script>
