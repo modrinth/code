@@ -219,8 +219,8 @@ const connectWebSocket = () => {
       isConnected.value = true;
       isReconnecting.value = false;
       isLoading.value = false;
-      consoleOutput.value.push("\nReady! Welcome to your Modrinth Server ༼ つ ◕_◕ ༽つ");
-      consoleOutput.value.push("\nPress the green start button to start your server!");
+      consoleOutput.value.push("Ready! Welcome to your Modrinth Server ༼ つ ◕_◕ ༽つ");
+      consoleOutput.value.push("Press the green start button to start your server!");
       if (reconnectInterval.value) {
         clearInterval(reconnectInterval.value);
         reconnectInterval.value = null;

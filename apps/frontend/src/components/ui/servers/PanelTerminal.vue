@@ -2,7 +2,7 @@
   <div
     data-pyro-terminal
     :class="[
-      'terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl pb-4 text-sm transition-transform duration-300',
+      'terminal-font console relative flex h-full w-full select-text flex-col items-center justify-between overflow-hidden rounded-t-xl pb-4 text-sm transition-transform duration-300',
       { 'scale-fullscreen fixed inset-0 z-50 !rounded-none': isFullScreen },
     ]"
     tabindex="-1"
@@ -55,20 +55,23 @@
     <div
       ref="scrollContainer"
       data-pyro-terminal-root
-      class="absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
+      class="absolute left-0 top-0 h-full w-full overflow-x-auto overflow-y-auto py-6 pb-[72px]"
       @scroll="handleScroll"
     >
       <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
         <ul
-          class="m-0 select-text list-none p-0"
+          class="m-0 list-none p-0"
           data-pyro-terminal-virtual-list
           :style="{ transform: `translateY(${offsetY}px)` }"
+          aria-live="polite"
+          role="listbox"
         >
           <template v-for="(item, index) in visibleItems" :key="index">
             <li
               ref="itemRefs"
-              class="relative w-full select-text list-none"
+              class="relative w-full list-none"
               :data-pyro-terminal-recycle-tracker="index"
+              aria-setsize="-1"
             >
               <UiServersLogParser :log="item" />
             </li>
