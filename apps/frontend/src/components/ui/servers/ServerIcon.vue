@@ -1,18 +1,22 @@
 <template>
-  <client-only>
-    <img
-      v-if="image"
-      alt="Server Icon"
-      class="experimental-styles-within size-24 rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
-      :src="image"
-    />
-    <img
-      v-else
-      alt="Server Icon"
-      class="experimental-styles-within size-24 rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
-      src="~/assets/images/servers/minecraft_server_icon.png"
-    />
-  </client-only>
+  <div
+    class="experimental-styles-within size-24 overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+  >
+    <client-only>
+      <img
+        v-if="image"
+        class="h-full w-full select-none object-fill"
+        alt="Server Icon"
+        :src="image"
+      />
+      <img
+        v-else
+        class="h-full w-full select-none object-fill"
+        alt="Server Icon"
+        src="~/assets/images/servers/minecraft_server_icon.png"
+      />
+    </client-only>
+  </div>
 </template>
 
 <script setup lang="ts">
