@@ -6,28 +6,30 @@
       class="relative isolate min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
       <div
-        class="relative z-10 -ml-2 flex w-fit flex-row items-center gap-2 rounded-xl px-2 py-0.5"
+        class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1"
         :style="{
-          backdropFilter: 'blur(32px)',
+          backdropFilter: 'blur(48px)',
         }"
       >
-        <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-          {{ metric.value }}
-        </h2>
-        <h3 class="relative z-10 text-sm font-normal text-secondary">/ {{ metric.max }}</h3>
+        <div class="-mb-0.5 mt-0.5 flex flex-row items-center gap-2">
+          <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
+            {{ metric.value }}
+          </h2>
+          <h3 class="relative z-10 text-sm font-normal text-secondary">/ {{ metric.max }}</h3>
+        </div>
+        <h3 class="relative z-10 flex items-center gap-2 text-base font-normal text-secondary">
+          {{ metric.title }}
+          <WarningIcon
+            v-tooltip="getPotentialWarning(metric)"
+            :style="{
+              color: 'var(--color-orange)',
+              width: '1.25rem',
+              height: '1.25rem',
+              display: getPotentialWarning(metric) ? 'block' : 'none',
+            }"
+          />
+        </h3>
       </div>
-      <h3 class="relative z-10 flex items-center gap-2 text-base font-normal text-secondary">
-        {{ metric.title }}
-        <WarningIcon
-          v-tooltip="getPotentialWarning(metric)"
-          :style="{
-            color: 'var(--color-orange)',
-            width: '1.25rem',
-            height: '1.25rem',
-            display: getPotentialWarning(metric) ? 'block' : 'none',
-          }"
-        />
-      </h3>
 
       <component :is="metric.icon" class="absolute right-10 top-10 z-10" />
       <ClientOnly>
@@ -153,6 +155,7 @@ const updateMetrics = () => {
         ...metric,
         value: `${newValue.toFixed(2)}%`,
         data: [...metric.data.slice(-10), newValue],
+        // data: [36, 36],
       };
     }
   });
