@@ -76,7 +76,7 @@ const open = ref(false)
 const visible = ref(false)
 
 function show(event?: MouseEvent) {
-  props.onShow();
+  props.onShow()
   open.value = true
   document.body.style.overflow = 'hidden'
   window.addEventListener('mousedown', updateMousePosition)
