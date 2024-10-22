@@ -3,7 +3,7 @@
     <div
       v-for="(metric, index) in metrics"
       :key="index"
-      class="relative isolate min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
       <div
         class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1"
@@ -12,7 +12,7 @@
         }"
       >
         <div class="-mb-0.5 mt-0.5 flex flex-row items-center gap-2">
-          <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
+          <h2 class="m-0 text-3xl font-extrabold text-contrast">
             {{ metric.value }}
           </h2>
           <h3 class="relative z-10 text-sm font-normal text-secondary">/ {{ metric.max }}</h3>
@@ -46,10 +46,10 @@
 
     <NuxtLink
       :to="`/servers/manage/${serverId}/files`"
-      class="relative isolate min-h-[150px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
+      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
     >
       <div class="flex flex-row items-center gap-2">
-        <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
+        <h2 class="m-0 text-3xl font-extrabold text-contrast">
           {{ formatBytes(data.current.storage_usage_bytes) }}
         </h2>
         <h3 class="relative z-10 text-sm font-normal text-secondary">
