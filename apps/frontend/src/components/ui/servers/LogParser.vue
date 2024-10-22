@@ -16,8 +16,8 @@
         aria-label="Copy line"
         @click="copyLog"
       >
-        <span v-if="!copied">Copy</span>
-        <span v-else>Copied!</span>
+        <span v-if="!copied" class="select-none">Copy</span>
+        <span v-else class="select-none">Copied!</span>
       </button>
     </Transition>
   </div>

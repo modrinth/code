@@ -45,9 +45,6 @@
           <h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
           <UiServersPanelServerStatus :state="serverPowerState" />
         </div>
-        <!-- <div class="ml-auto mr-2 flex gap-2">
-          <UiServersPanelCopyIP :ip="serverIP" :port="serverPort" :subdomain="serverDomain" />
-        </div> -->
       </div>
       <UiServersPanelTerminal :console-output="consoleOutput" :full-screen="fullScreen">
         <div class="relative w-full px-4 pt-4">

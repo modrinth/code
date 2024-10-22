@@ -3,13 +3,13 @@
     data-pyro-terminal
     :class="[
       'terminal-font console relative flex h-full w-full select-text flex-col items-center justify-between overflow-hidden rounded-t-xl pb-4 text-sm transition-transform duration-300',
-      { 'scale-fullscreen fixed inset-0 z-50 !rounded-none': isFullScreen },
+      { 'scale-fullscreen screen-fixed inset-0 z-50 !rounded-none': isFullScreen },
     ]"
     tabindex="-1"
   >
     <div
       v-if="cosmetics.advancedRendering"
-      class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[9999] h-[10rem] w-full overflow-hidden rounded-xl"
+      class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[50] h-[10rem] w-full overflow-hidden rounded-xl"
       :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 8))}%`"
       aria-hidden="true"
     >
@@ -23,7 +23,7 @@
     </div>
     <div
       v-else
-      class="pointer-events-none absolute bottom-0 left-0 right-0 z-[9999] h-[196px] w-full"
+      class="pointer-events-none absolute bottom-0 left-0 right-0 z-[50] h-[196px] w-full"
       :style="
         bottomThreshold > 0
           ? { background: 'linear-gradient(transparent 30%, var(--console-bg) 70%)' }
@@ -32,7 +32,7 @@
     ></div>
     <div
       aria-hidden="true"
-      class="pointer-events-none absolute left-0 top-0 z-[9999999] h-full w-full"
+      class="pointer-events-none absolute left-0 top-0 z-[60] h-full w-full"
       :style="{
         visibility: isFullScreen ? 'hidden' : 'visible',
       }"
@@ -52,31 +52,56 @@
         }"
       ></div>
     </div>
-    <div
-      ref="scrollContainer"
-      data-pyro-terminal-root
-      class="absolute left-0 top-0 h-full w-full overflow-x-auto overflow-y-auto py-6 pb-[72px]"
-      @scroll="handleScroll"
-    >
-      <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
-        <ul
-          class="m-0 list-none p-0"
-          data-pyro-terminal-virtual-list
-          :style="{ transform: `translateY(${offsetY}px)` }"
-          aria-live="polite"
-          role="listbox"
+    <div data-pyro-terminal-scroll-root class="relative h-full w-full">
+      <div
+        ref="scrollbarTrack"
+        data-pyro-terminal-scrollbar-track
+        class="absolute bottom-12 right-0 top-4 z-[100] w-4"
+        @mousedown="handleTrackClick"
+      >
+        <div
+          data-pyro-terminal-scrollbar
+          class="flex h-full justify-center rounded-full transition-all"
+          :style="{ opacity: bottomThreshold > 0 ? '1' : '0.5' }"
         >
-          <template v-for="(item, index) in visibleItems" :key="index">
-            <li
-              ref="itemRefs"
-              class="relative w-full list-none"
-              :data-pyro-terminal-recycle-tracker="index"
-              aria-setsize="-1"
-            >
-              <UiServersLogParser :log="item" />
-            </li>
-          </template>
-        </ul>
+          <div
+            ref="scrollbarThumb"
+            data-pyro-terminal-scrollbar-thumb
+            class="absolute w-1.5 cursor-default rounded-full bg-button-bg"
+            :style="{
+              height: `${getThumbHeight()}px`,
+              transform: `translateY(${getThumbPosition()}px)`,
+            }"
+            @mousedown="startDragging"
+          ></div>
+        </div>
+      </div>
+      <div
+        ref="scrollContainer"
+        data-pyro-terminal-root
+        class="scrollbar-none absolute left-0 top-0 h-full w-full overflow-x-auto overflow-y-auto py-6 pb-[72px]"
+        @scroll="handleScroll"
+      >
+        <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
+          <ul
+            class="m-0 list-none p-0"
+            data-pyro-terminal-virtual-list
+            :style="{ transform: `translateY(${offsetY}px)` }"
+            aria-live="polite"
+            role="listbox"
+          >
+            <template v-for="(item, index) in visibleItems" :key="index">
+              <li
+                ref="itemRefs"
+                class="relative w-full list-none"
+                :data-pyro-terminal-recycle-tracker="index"
+                aria-setsize="-1"
+              >
+                <UiServersLogParser :log="item" />
+              </li>
+            </template>
+          </ul>
+        </div>
       </div>
     </div>
     <div
@@ -280,6 +305,111 @@ const debouncedScrollToBottom = () => {
   });
 };
 
+const scrollbarTrack = ref<HTMLElement | null>(null);
+const scrollbarThumb = ref<HTMLElement | null>(null);
+const isDragging = ref(false);
+const startY = ref(0);
+const startScrollTop = ref(0);
+
+const getThumbHeight = () => {
+  if (!scrollContainer.value || !scrollbarTrack.value) return 30;
+
+  const contentHeight = scrollContainer.value.scrollHeight;
+  const viewportHeight = scrollContainer.value.clientHeight;
+  const trackHeight = scrollbarTrack.value.clientHeight;
+
+  const heightRatio = viewportHeight / contentHeight;
+
+  const minThumbHeight = Math.min(40, trackHeight / 2);
+
+  const proposedHeight = Math.max(heightRatio * trackHeight, minThumbHeight);
+
+  return Math.min(proposedHeight, trackHeight);
+};
+
+const getThumbPosition = () => {
+  if (!scrollContainer.value || !scrollbarTrack.value) return 0;
+
+  const contentHeight = scrollContainer.value.scrollHeight;
+  const viewportHeight = scrollContainer.value.clientHeight;
+  const trackHeight = scrollbarTrack.value.clientHeight;
+  const scrollProgress = scrollTop.value / (contentHeight - viewportHeight);
+
+  const thumbHeight = getThumbHeight();
+  const availableTrackSpace = trackHeight - thumbHeight;
+
+  return Math.max(0, Math.min(scrollProgress * availableTrackSpace, availableTrackSpace));
+};
+
+const startDragging = (event: MouseEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (!scrollContainer.value || !scrollbarTrack.value) return;
+
+  isDragging.value = true;
+  startY.value = event.clientY;
+  startScrollTop.value = scrollContainer.value.scrollTop;
+
+  window.addEventListener("mousemove", handleDragging);
+  window.addEventListener("mouseup", stopDragging);
+
+  document.body.style.userSelect = "none";
+  document.body.style.pointerEvents = "none";
+};
+
+const handleDragging = (event: MouseEvent) => {
+  if (!isDragging.value || !scrollContainer.value || !scrollbarTrack.value) return;
+
+  const trackRect = scrollbarTrack.value.getBoundingClientRect();
+  const deltaY = event.clientY - startY.value;
+
+  const trackHeight = trackRect.height;
+  const contentHeight = scrollContainer.value.scrollHeight;
+  const viewportHeight = scrollContainer.value.clientHeight;
+  const maxScroll = contentHeight - viewportHeight;
+
+  const moveRatio = deltaY / trackHeight;
+  const scrollDelta = moveRatio * maxScroll;
+
+  const newScrollTop = Math.max(0, Math.min(startScrollTop.value + scrollDelta, maxScroll));
+  scrollContainer.value.scrollTop = newScrollTop;
+};
+
+const stopDragging = () => {
+  isDragging.value = false;
+
+  window.removeEventListener("mousemove", handleDragging);
+  window.removeEventListener("mouseup", stopDragging);
+
+  document.body.style.userSelect = "";
+  document.body.style.pointerEvents = "";
+};
+
+const handleTrackClick = (event: MouseEvent) => {
+  if (!scrollContainer.value || !scrollbarTrack.value || event.target === scrollbarThumb.value)
+    return;
+
+  const trackRect = scrollbarTrack.value.getBoundingClientRect();
+  const thumbHeight = getThumbHeight();
+
+  const clickOffset = event.clientY - trackRect.top;
+
+  const currentThumbPosition = getThumbPosition();
+  const thumbCenterPosition = currentThumbPosition + thumbHeight / 2;
+  const scrollAmount = clientHeight.value * (clickOffset < thumbCenterPosition ? -1 : 1);
+
+  const newScrollTop = Math.max(
+    0,
+    Math.min(
+      scrollContainer.value.scrollTop + scrollAmount,
+      scrollContainer.value.scrollHeight - scrollContainer.value.clientHeight,
+    ),
+  );
+
+  scrollContainer.value.scrollTop = newScrollTop;
+};
+
 const enterFullScreen = () => {
   isFullScreen.value = true;
   document.body.style.overflow = "hidden";
@@ -326,6 +456,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", updateClientHeight);
   window.removeEventListener("keydown", handleKeydown);
+  stopDragging();
 });
 
 watch(
@@ -394,37 +525,23 @@ html.oled-mode .console {
   background: var(--console-bg);
 }
 
-[data-pyro-terminal-root]::-webkit-scrollbar {
-  background: none;
-  width: 10px;
-  height: 16px;
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-[data-pyro-terminal-root]::-webkit-scrollbar-thumb {
-  border: solid 0 rgb(0 0 0 / 0%);
-  border-right-width: 3px;
-  border-left-width: 3px;
-  -webkit-border-radius: 9px 4px;
-  -webkit-box-shadow: inset 0 0 0 3px var(--color-button-bg);
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
-[data-pyro-terminal-root]::-webkit-scrollbar-track-piece {
-  margin: 4px 0;
-}
-
-[data-pyro-terminal-root]::-webkit-scrollbar-thumb:horizontal {
-  border-right-width: 0;
-  border-left-width: 0;
-  border-top-width: 4px;
-  border-bottom-width: 4px;
-  -webkit-border-radius: 4px 9px;
-}
-
+[data-pyro-terminal-root]::-webkit-scrollbar,
+[data-pyro-terminal-root]::-webkit-scrollbar-thumb,
+[data-pyro-terminal-root]::-webkit-scrollbar-track-piece,
 [data-pyro-terminal-root]::-webkit-scrollbar-corner {
-  background: transparent;
+  display: none;
 }
 
-.fixed {
+.screen-fixed {
   position: fixed;
   top: 0;
   left: 0;
