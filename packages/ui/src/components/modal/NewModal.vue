@@ -59,6 +59,7 @@ const props = withDefaults(
     warnOnClose?: boolean
     header?: string
     onHide?: () => void
+    onShow?: () => void
   }>(),
   {
     type: true,
@@ -67,6 +68,7 @@ const props = withDefaults(
     closeOnEsc: true,
     warnOnClose: false,
     onHide: () => {},
+    onShow: () => {},
   },
 )
 
@@ -74,6 +76,7 @@ const open = ref(false)
 const visible = ref(false)
 
 function show(event?: MouseEvent) {
+  props.onShow();
   open.value = true
   document.body.style.overflow = 'hidden'
   window.addEventListener('mousedown', updateMousePosition)

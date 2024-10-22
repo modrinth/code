@@ -7,6 +7,7 @@
     ref="versionSelectModal"
     :header="isSecondPhase ? 'Confirm reinstallation' : 'Select version'"
     @hide="onHide"
+    @show="onShow"
   >
     <div class="flex flex-col gap-4 md:w-[600px]">
       <p
@@ -143,7 +144,7 @@
                   icon-only
                   @click="reinstallCurrent"
                 >
-                  <div class="mx-4">Reinstall</div>
+                  <div class="mx-4">Reinstalls</div>
                 </Button>
               </div>
             </div>
@@ -500,9 +501,12 @@ watch(selectedMCVersion, async () => {
   }
 });
 
-const onHide = () => {
+const onShow = () => {
   selectedMCVersion.value = "";
   selectedLoaderVersion.value = "";
+};
+
+const onHide = () => {
   hardReset.value = false;
   backupServer.value = false;
   isSecondPhase.value = false;
