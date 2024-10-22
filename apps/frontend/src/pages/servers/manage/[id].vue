@@ -30,9 +30,7 @@
             </NuxtLink>
           </div>
           <div class="flex w-full flex-row items-center gap-4">
-            <h1
-              class="m-0 w-full flex-shrink truncate text-4xl font-bold text-[var(--color-contrast)]"
-            >
+            <h1 class="m-0 w-full flex-shrink truncate text-4xl font-bold text-contrast">
               {{ serverData.name }}
             </h1>
             <div
@@ -59,7 +57,7 @@
             </ButtonStyled>
           </div>
 
-          <div class="flex min-w-0 flex-row items-center gap-4 text-[var(--color-text-secondary)]">
+          <div class="flex min-w-0 flex-row items-center gap-4 text-secondary">
             <UiServersServerGameLabel
               v-if="showGameLabel"
               :game="serverData.game!"
