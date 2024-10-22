@@ -27,6 +27,7 @@
         <div class="flex flex-col gap-2">
           <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
           <input
+            ref="renameInput"
             v-model="newItemName"
             autofocus
             type="text"
@@ -450,6 +451,8 @@ const sortMethod = ref("default-sort");
 
 const mainContent = ref<HTMLElement | null>(null);
 
+const renameInput = ref<HTMLInputElement | null>(null);
+
 const applyDefaultSort = (items: any[]) => {
   return items.sort((a: any, b: any) => {
     if (a.type === "directory" && b.type !== "directory") return -1;
@@ -791,12 +794,17 @@ const initiateFileUpload = () => {
   input.remove();
 };
 
-const showRenameModal = (item: any) => {
+const showRenameModal = async (item: any) => {
   selectedItem.value = item;
   newItemName.value = item.name;
   newItemType.value = item.type;
   renameItemModal.value?.show();
   contextMenuInfo.value.item = null;
+  await nextTick();
+  // god forgive me
+  setTimeout(() => {
+    renameInput.value?.focus();
+  }, 100);
 };
 
 const showMoveModal = (item: any) => {
