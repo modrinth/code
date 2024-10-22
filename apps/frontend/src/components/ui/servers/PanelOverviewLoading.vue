@@ -1,5 +1,9 @@
 <template>
-  <div aria-hidden="true" class="pointer-events-none h-full w-full select-none">
+  <div
+    aria-hidden="true"
+    style="font-variant-numeric: tabular-nums"
+    class="pointer-events-none h-full w-full select-none"
+  >
     <div class="flex flex-col gap-6">
       <div class="flex flex-row items-center gap-6">
         <div
@@ -7,7 +11,7 @@
         >
           <div class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1">
             <div class="-mb-0.5 mt-0.5 flex flex-row items-center gap-2">
-              <h2 class="m-0 text-3xl font-extrabold text-contrast">0.00%</h2>
+              <h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">0.00%</h2>
               <h3 class="relative z-10 text-sm font-normal text-secondary">/ 100%</h3>
             </div>
             <h3 class="relative z-10 text-base font-normal text-secondary">CPU usage</h3>
@@ -19,7 +23,7 @@
         >
           <div class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1">
             <div class="-mb-0.5 mt-0.5 flex flex-row items-center gap-2">
-              <h2 class="m-0 text-3xl font-extrabold text-contrast">0.00%</h2>
+              <h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">0.00%</h2>
               <h3 class="relative z-10 text-sm font-normal text-secondary">/ 100%</h3>
             </div>
             <h3 class="relative z-10 text-base font-normal text-secondary">Memory usage</h3>
@@ -27,15 +31,13 @@
           <DBIcon class="absolute right-10 top-10" />
         </div>
         <div
-          class="relative max-h-[156px] min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+          class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
         >
-          <div class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1">
-            <div class="-mb-0.5 flex flex-row items-center gap-2">
-              <h2 class="m-0 text-3xl font-extrabold text-contrast">0.00 MB</h2>
-              <h3 class="relative z-10 text-sm font-normal text-secondary">/ 0 GB</h3>
-            </div>
-            <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
+          <div class="flex flex-row items-center gap-2">
+            <h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">0 Bytes</h2>
+            <h3 class="relative z-10 text-sm font-normal text-secondary">/ 0 Bytes</h3>
           </div>
+          <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
           <FolderOpenIcon class="absolute right-10 top-10 size-8" />
         </div>
       </div>

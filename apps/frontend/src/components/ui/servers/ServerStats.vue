@@ -1,5 +1,9 @@
 <template>
-  <div data-pyro-server-stats class="flex select-none flex-col items-center gap-6 md:flex-row">
+  <div
+    data-pyro-server-stats
+    style="font-variant-numeric: tabular-nums"
+    class="flex select-none flex-col items-center gap-6 md:flex-row"
+  >
     <div
       v-for="(metric, index) in metrics"
       :key="index"
@@ -12,7 +16,7 @@
         }"
       >
         <div class="-mb-0.5 mt-0.5 flex flex-row items-center gap-2">
-          <h2 class="m-0 text-3xl font-extrabold text-contrast">
+          <h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">
             {{ metric.value }}
           </h2>
           <h3 class="relative z-10 text-sm font-normal text-secondary">/ {{ metric.max }}</h3>
@@ -49,11 +53,11 @@
       class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
     >
       <div class="flex flex-row items-center gap-2">
-        <h2 class="m-0 text-3xl font-extrabold text-contrast">
-          {{ formatBytes(data.current.storage_usage_bytes) }}
+        <h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">
+          {{ formatBytes(animatedStorageUsage) }}
         </h2>
         <h3 class="relative z-10 text-sm font-normal text-secondary">
-          / {{ formatBytes(data.current.storage_total_bytes) }}
+          / {{ formatBytes(props.data.current.storage_total_bytes) }}
         </h3>
       </div>
       <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
@@ -64,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, watch } from "vue";
 import { FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 import { useStorage } from "@vueuse/core";
 import type { Stats } from "~/types/servers";
@@ -104,6 +109,32 @@ const formatBytes = (bytes: number) => {
 
   return `${Math.round(value * 100) / 100} ${units[unitIndex]}`;
 };
+
+const animatedStorageUsage = ref(0);
+
+const animateValue = (start: number, end: number, duration: number): void => {
+  let startTimestamp: number | null = null;
+  const step = (timestamp: number) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    animatedStorageUsage.value = Math.floor(progress * (end - start) + start);
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    }
+  };
+  requestAnimationFrame(step);
+};
+
+onMounted(() => {
+  animateValue(0, props.data.current.storage_usage_bytes, 250);
+});
+
+watch(
+  () => props.data.current.storage_usage_bytes,
+  (newValue, oldValue) => {
+    animateValue(oldValue, newValue, 250);
+  },
+);
 
 const metrics = ref([
   {
