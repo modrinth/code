@@ -144,7 +144,7 @@
                   icon-only
                   @click="reinstallCurrent"
                 >
-                  <div class="mx-4">Reinstalls</div>
+                  <div class="mx-4">Reinstall</div>
                 </Button>
               </div>
             </div>
