@@ -42,7 +42,7 @@
     >
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
+          <h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
           <UiServersPanelServerStatus :state="serverPowerState" />
         </div>
         <!-- <div class="ml-auto mr-2 flex gap-2">
@@ -125,8 +125,8 @@
   <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
   <UiServersPyroError
     v-else-if="isWsAuthIncorrect"
-    title="WebSocket authentication failed"
-    message="Indicative of a server misconfiguration. Please report this to support."
+    title="Could not connect to server"
+    message="Please refresh the page and try again. (WebSocket authentication failed)"
   />
   <UiServersPyroError
     v-else
