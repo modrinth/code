@@ -1,14 +1,7 @@
 <template>
   <NuxtLink custom>
     <div
-      class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100 active:scale-95"
-      :aria-disabled="status.isInstalling || status.isFailed"
-      :tabindex="status.isInstalling || status.isFailed ? -1 : 0"
-      :class="
-        status.isInstalling || status.isFailed
-          ? 'pointer-events-none cursor-not-allowed'
-          : 'cursor-pointer'
-      "
+      class="flex cursor-pointer flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100 active:scale-95"
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
       @click="$router.push(`/servers/manage/${server_id}`)"
@@ -18,8 +11,7 @@
       <div class="ml-8 flex flex-col gap-2.5">
         <div class="flex flex-col gap-2 md:flex-row md:items-center">
           <h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
-          <UiServersServerInstallStatusPill v-if="status.state" :state="status.state" />
-          <ChevronRightIcon v-if="!status.isInstalling && !status.isFailed" />
+          <ChevronRightIcon />
         </div>
 
         <div
@@ -59,18 +51,11 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon } from "@modrinth/assets";
-import type { StatusState } from "./ServerInstallStatusPill.vue";
 import type { Project, Server } from "~/types/servers";
 
 const prodOverride = await PyroAuthOverride();
 
 const props = defineProps<Partial<Server>>();
-
-const status = computed(() => ({
-  state: props.status as StatusState | undefined,
-  isFailed: props.status === "Failed",
-  isInstalling: props.status === "Installing",
-}));
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
