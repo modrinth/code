@@ -68,7 +68,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import Fuse from "fuse.js";
-import { useRoute } from "vue-router";
 import { PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import type { Server } from "~/types/servers";
