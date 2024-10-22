@@ -325,7 +325,7 @@
               persists, contact support.
             </p>
           </div>
-          <Button size="sm" @click="navigateToPage(1)">
+          <Button size="sm" @click="navigateToPage()">
             <XIcon class="h-5 w-5" />
             Go to homepage
           </Button>
@@ -659,8 +659,8 @@ const navigateToSegment = (index: number) => {
   router.push({ query: { path: newPath } });
 };
 
-const navigateToPage = (page: number) => {
-  router.push({ query: { page, path: currentPath.value } });
+const navigateToPage = () => {
+  router.push({ query: { path: currentPath.value } });
 };
 
 const createItemModal = ref<typeof NewModal>();

@@ -219,8 +219,24 @@ const connectWebSocket = () => {
       isConnected.value = true;
       isReconnecting.value = false;
       isLoading.value = false;
-      consoleOutput.value.push("Ready! Welcome to your Modrinth Server ༼ つ ◕_◕ ༽つ");
-      consoleOutput.value.push("Press the green start button to start your server!");
+      const frog = [
+        "   __________________________________________________",
+        " /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\",
+        "|   Press the green start button to start your server! |",
+        " \\____________________________________________________/",
+        "\x1B[32m     _    _ \x1B[37m",
+        "\x1B[32m    (o)--(o)      \x1B[37m",
+        "\x1B[32m   /.______.\\\x1B[37m",
+        "\x1B[32m   \\________/     \x1B[37m",
+        "\x1B[32m  ./        \\.    \x1B[37m",
+        "\x1B[32m ( .        , )\x1B[37m",
+        "\x1B[32m  \\ \\_\\\\ //_/ /\x1B[37m",
+        "\x1B[32m   ~~  ~~  ~~\x1B[37m",
+      ];
+
+      for (let i = 0; i < frog.length; i++) {
+        consoleOutput.value.push(frog[i]);
+      }
       if (reconnectInterval.value) {
         clearInterval(reconnectInterval.value);
         reconnectInterval.value = null;
