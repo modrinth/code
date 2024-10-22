@@ -7,7 +7,7 @@
       v-if="serverList.length > 0"
       class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row"
     >
-      <h1 class="w-full text-4xl font-bold text-[--color-contrast]">Servers</h1>
+      <h1 class="w-full text-4xl font-bold text-contrast">Servers</h1>
       <div class="flex w-full flex-row items-center justify-end gap-4">
         <div class="relative mb-4 w-full text-sm md:mb-0 md:w-72">
           <label class="sr-only" for="search">Search</label>
@@ -18,7 +18,7 @@
           <input
             id="search"
             v-model="searchInput"
-            class="w-full border-[1px] border-solid border-[var(--color-button-border)] pl-9"
+            class="w-full border-[1px] border-solid border-button-border pl-9"
             type="search"
             name="search"
             autocomplete="off"
@@ -27,7 +27,7 @@
         </div>
         <ButtonStyled type="standard">
           <NuxtLink
-            class="!h-10 !border-[1px] !border-solid !border-[var(--color-button-border)] text-sm !font-medium"
+            class="!h-10 !border-[1px] !border-solid !border-button-border text-sm !font-medium"
             :to="{ path: '/servers', query: { showModal: 'true' } }"
           >
             <PlusIcon class="size-4" />
