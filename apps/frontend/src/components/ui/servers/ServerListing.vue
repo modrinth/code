@@ -17,14 +17,14 @@
       <UiServersServerIcon :image="iconUrl" />
       <div class="ml-8 flex flex-col gap-2.5">
         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-          <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>
+          <h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
           <UiServersServerInstallStatusPill v-if="status.state" :state="status.state" />
           <ChevronRightIcon v-if="!status.isInstalling && !status.isFailed" />
         </div>
 
         <div
           v-if="projectData?.title"
-          class="m-0 flex flex-row items-center gap-1 text-sm font-medium text-[var(--color-text-secondary)]"
+          class="m-0 flex flex-row items-center gap-1 text-sm font-medium text-secondary"
         >
           <UiAvatar
             :src="iconUrl"
@@ -36,7 +36,7 @@
         </div>
         <div v-else class="min-h-[20px]"></div>
 
-        <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
+        <div class="flex flex-row items-center gap-4 text-secondary">
           <UiServersServerGameLabel
             v-if="showGameLabel"
             :game="game!"
