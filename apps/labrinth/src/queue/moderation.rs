@@ -145,7 +145,7 @@ impl ModerationMessage {
             ModerationMessage::NoPrimaryFile => "Please attach a file to this version. All files on Modrinth must have files associated with their versions.\n".to_string(),
             ModerationMessage::PackFilesNotAllowed { files, .. } => {
                 let mut str = "".to_string();
-                str.push_str("This pack redistributes copyrighted material. Please refer to [Modrinth's guide on obtaining modpack permissions](https://docs.modrinth.com/modpacks/permissions) for more information.\n\n");
+                str.push_str("This pack redistributes copyrighted material. Please refer to [Modrinth's guide on obtaining modpack permissions](https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions) for more information.\n\n");
 
                 let mut attribute_mods = Vec::new();
                 let mut no_mods = Vec::new();
