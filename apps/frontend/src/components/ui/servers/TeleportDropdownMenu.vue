@@ -205,9 +205,10 @@ const visibleOptions = computed(() => {
 });
 
 const selectedOption = computed(() => {
-  return (
-    props.displayName(selectedValue.value as OptionValue) || props.placeholder || "Select an option"
-  );
+  if (selectedValue.value !== null && selectedValue.value !== undefined) {
+    return props.displayName(selectedValue.value as OptionValue);
+  }
+  return props.placeholder || "Select an option";
 });
 
 const radioValue = computed<OptionValue>({
