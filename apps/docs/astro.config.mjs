@@ -1,10 +1,11 @@
-import { defineConfig } from 'astro/config';
-import starlight from '@astrojs/starlight';
+import { defineConfig } from 'astro/config'
+import starlight from '@astrojs/starlight'
 import starlightOpenAPI, { openAPISidebarGroups } from 'starlight-openapi'
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://docs.modrinth.com',
+  favicon: 'favicon.ico',
   integrations: [
     starlight({
       title: 'Modrinth Documentation',
@@ -12,12 +13,13 @@ export default defineConfig({
         baseUrl: 'https://github.com/modrinth/code/edit/main/apps/docs/',
       },
       social: {
-          github: 'https://github.com/modrinth/code',
-          discord: 'https://discord.modrinth.com',
-          'x.com': 'https://x.com/modrinth',
-          mastodon: 'https://floss.social/@modrinth',
-          threads: 'https://threads.net/@modrinth',
+        github: 'https://github.com/modrinth/code',
+        discord: 'https://discord.modrinth.com',
+        'x.com': 'https://x.com/modrinth',
+        mastodon: 'https://floss.social/@modrinth',
+        threads: 'https://threads.net/@modrinth',
       },
+      favicon: '/favicon.ico',
       logo: {
         light: './src/assets/light-logo.svg',
         dark: './src/assets/dark-logo.svg',
@@ -36,16 +38,16 @@ export default defineConfig({
             label: 'Modrinth API',
             schema: './public/openapi.yaml',
           },
-        ])
+        ]),
       ],
       sidebar: [
         {
-            label: 'Contributing to Modrinth',
-            autogenerate: { directory: 'contributing' },
+          label: 'Contributing to Modrinth',
+          autogenerate: { directory: 'contributing' },
         },
         // Add the generated sidebar group to the sidebar.
         ...openAPISidebarGroups,
       ],
     }),
   ],
-});
+})
