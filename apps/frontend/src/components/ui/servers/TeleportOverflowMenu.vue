@@ -73,7 +73,6 @@ const props = defineProps<{
   options: Option[];
   position?: "top" | "bottom";
   direction?: "left" | "right";
-  keepPageScroll?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -142,7 +141,7 @@ const toggleMenu = (event: MouseEvent) => {
 const openMenu = () => {
   menuStyle.value = calculateMenuPosition();
   isOpen.value = true;
-  if (props.keepPageScroll != true) disableBodyScroll();
+  disableBodyScroll();
   nextTick(() => {
     document.addEventListener("mousemove", handleMouseMove);
     focusFirstMenuItem();
@@ -200,11 +199,21 @@ const handleMouseOver = (index: number) => {
   menuItemsRef.value[selectedIndex.value].focus();
 };
 
+// scrolling is disabled for keyboard navigation
 const disableBodyScroll = () => {
+  // make opening not shift page when there's a vertical scrollbar
+  const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+  if (scrollBarWidth > 0) {
+    document.body.style.paddingRight = `${scrollBarWidth}px`;
+  } else {
+    document.body.style.paddingRight = "";
+  }
+
   document.body.style.overflow = "hidden";
 };
 
 const enableBodyScroll = () => {
+  document.body.style.paddingRight = "";
   document.body.style.overflow = "";
 };
 
@@ -318,7 +327,7 @@ onUnmounted(() => {
   if (typeAheadTimeout.value) {
     clearTimeout(typeAheadTimeout.value);
   }
-  if (props.keepPageScroll != true) enableBodyScroll();
+  enableBodyScroll();
 });
 
 watch(isOpen, (newValue) => {
