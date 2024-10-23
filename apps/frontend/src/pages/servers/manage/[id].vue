@@ -314,9 +314,10 @@ const newLoader = ref<string | null>(null);
 const newLoaderVersion = ref<string | null>(null);
 const newMCVersion = ref<string | null>(null);
 
-const handleInstallationResult = (data: WSInstallationResultEvent) => {
+const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   switch (data.result) {
     case "ok":
+      await server.refresh();
       if (!serverData.value) break;
       serverData.value.status = "available";
       if (server.general) {

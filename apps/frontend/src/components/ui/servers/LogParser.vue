@@ -11,6 +11,7 @@
     ></div>
     <Transition name="fade">
       <button
+        v-if="log !== '[m'"
         v-show="showCopyButton"
         class="absolute right-4 top-1/2 -translate-y-1/2 select-none rounded-md bg-bg-raised px-2 py-1 text-xs text-contrast opacity-0 transition-opacity duration-150 hover:bg-button-bg group-hover:opacity-100"
         aria-label="Copy line"
