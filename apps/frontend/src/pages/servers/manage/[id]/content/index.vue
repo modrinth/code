@@ -1,24 +1,23 @@
 <template>
-  <Modal ref="modModal" header="">
-    <UiServersPyroModal :header="modalHeader" :data="data" @modal="modModal.hide()">
-      <div v-if="isEditMode">
-        <div class="flex items-center gap-4">
-          <DropdownSelect
-            v-model="newModVersion"
-            name="Project"
-            :options="versionOptions"
-            placeholder="Select project..."
-          />
-          <Button icon-only @click="handleModAction(selectedMod!)">
-            <ChevronRightIcon />
-          </Button>
-        </div>
-      </div>
-      <UiServersProjectSelect v-else type="mod" @select="handleModAction" />
-    </UiServersPyroModal>
-  </Modal>
+  <NewModal ref="modModal" header="Add mod">
+    <div v-if="isEditMode">
+      <div class="flex items-center gap-4">
+        <UiServersTeleportDropdownMenu
+          v-model="newModVersion"
+          name="Project"
+          :options="versionOptions"
+          placeholder="Select project..."
+        />
 
-  <div v-if="data && mods" class="flex h-full w-full flex-col">
+        <Button icon-only @click="handleModAction(selectedMod!)">
+          <ChevronRightIcon />
+        </Button>
+      </div>
+    </div>
+    <UiServersProjectSelect v-else type="mod" @select="handleModAction" />
+  </NewModal>
+
+  <div v-if="data && localMods" class="flex h-full w-full flex-col">
     <div class="flex items-center justify-between">
       <h1 class="my-4 text-2xl font-extrabold text-contrast">Mods</h1>
       <div class="flex gap-2">
@@ -38,14 +37,14 @@
     <div
       class="flex h-full w-full flex-col"
       :style="{
-        overflowY: hasMods(mods) ? 'auto' : 'hidden',
+        overflowY: hasMods(localMods) ? 'auto' : 'hidden',
       }"
     >
-      <div v-if="hasMods(mods)" class="flex flex-col gap-2">
+      <div v-if="hasMods(localMods)" class="flex flex-col gap-2">
         <div
-          v-for="mod in mods"
+          v-for="mod in localMods"
           :key="mod.name"
-          class="relative flex w-full items-center justify-between rounded-xl bg-bg-raised"
+          class="relative flex w-full items-center justify-between rounded-xl bg-bg-raised hover:bg-table-alternateRow"
           :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
         >
           <NuxtLink
@@ -86,15 +85,21 @@
             <Button v-if="mod.project_id" icon-only transparent @click="showEditModModal(mod)">
               <EditIcon />
             </Button>
-            <Button icon-only transparent @click="removeMod(mod)">
+            <Button
+              icon-only
+              transparent
+              :disabled="mod.project_id ? modActionsInProgress[mod.project_id] : true"
+              @click="removeModOptimistic(mod)"
+            >
               <TrashIcon />
             </Button>
             <input
               id="property.id"
               :checked="!mod.disabled"
+              :disabled="mod.project_id ? modActionsInProgress[mod.project_id] : true"
               class="switch stylized-toggle"
               type="checkbox"
-              @change="toggleMod(mod)"
+              @change="toggleModOptimistic(mod)"
             />
           </div>
         </div>
@@ -109,7 +114,7 @@
 
 <script setup lang="ts">
 import { PlusIcon, ChevronRightIcon, UnknownIcon, EditIcon, TrashIcon } from "@modrinth/assets";
-import { Modal, DropdownSelect, Button } from "@modrinth/ui";
+import { Button, NewModal } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
@@ -127,9 +132,6 @@ interface Mod {
 }
 
 const prodOverride = await PyroAuthOverride();
-// const router = useRouter();
-// const route = useNativeRoute();
-// const serverId = route.params.id as string;
 
 const modModal = ref();
 const isEditMode = ref(false);
@@ -137,20 +139,23 @@ const modalHeader = ref("");
 const selectedMod = ref<Mod | null>(null);
 const newModVersion = ref("");
 const versions = ref<Record<string, any[]>>({});
+const localMods = ref<Mod[]>([]);
+const modActionsInProgress = ref<Record<string, boolean>>({});
 
 const data = computed(() => props.server.general);
-const mods = computed(() => props.server.mods?.data);
 
-// if (data.value?.loader === "Vanilla") {
-//   router.push(`/servers/manage/${serverId}/content/datapacks`);
-// }
+watch(
+  () => props.server.mods?.data,
+  (newMods) => {
+    if (newMods) {
+      localMods.value = [...newMods];
+    }
+  },
+  { immediate: true },
+);
 
 const hasMods = (mods: Mod[]) => {
-  if (mods.length > 0) {
-    return true;
-  } else {
-    return false;
-  }
+  return mods?.length > 0;
 };
 
 const fetchVersions = async (projectId: string) => {
@@ -165,28 +170,52 @@ const fetchVersions = async (projectId: string) => {
   return versions.value[projectId];
 };
 
-const toggleMod = async (mod: Mod) => {
+const toggleModOptimistic = async (mod: Mod) => {
+  if (!mod.project_id || modActionsInProgress.value[mod.project_id]) return;
+
+  modActionsInProgress.value[mod.project_id] = true;
+
+  const originalMods = [...localMods.value];
+  const originalDisabled = mod.disabled;
+
+  mod.disabled = !mod.disabled;
+
   try {
-    await props.server.fs?.renameFileOrFolder(
-      `/mods/${mod.filename}`,
-      mod.disabled ? mod.filename.replace(".disabled", "") : `${mod.filename}.disabled`,
-    );
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    const newFilename = mod.disabled
+      ? `${mod.filename}.disabled`
+      : mod.filename.replace(".disabled", "");
+
+    await props.server.fs?.renameFileOrFolder(`/mods/${mod.filename}`, newFilename);
+
+    mod.filename = newFilename;
+
     await props.server.refresh(["mods"]);
   } catch (error) {
-    console.error("Error disabling mod:", error);
+    console.error("Error toggling mod:", error);
+    localMods.value = originalMods;
+    mod.disabled = originalDisabled;
+  } finally {
+    modActionsInProgress.value[mod.project_id] = false;
   }
 };
 
-const removeMod = async (mod: Mod) => {
+const removeModOptimistic = async (mod: Mod) => {
+  if (!mod.project_id || modActionsInProgress.value[mod.project_id]) return;
+
+  modActionsInProgress.value[mod.project_id] = true;
+
+  const originalMods = [...localMods.value];
+
+  localMods.value = localMods.value.filter((m) => m.project_id !== mod.project_id);
+
   try {
-    if (!mod.project_id) {
-      throw new Error("Mod project_id is undefined");
-    }
     await props.server.mods?.remove(mod.project_id);
     await props.server.refresh();
   } catch (error) {
     console.error("Error removing mod:", error);
+    localMods.value = originalMods;
+  } finally {
+    modActionsInProgress.value[mod.project_id] = false;
   }
 };
 
