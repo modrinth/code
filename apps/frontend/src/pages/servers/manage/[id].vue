@@ -2,16 +2,49 @@
   <div class="contents">
     <div
       v-if="error"
-      class="mx-auto mb-4 flex h-full w-full max-w-[1280px] items-center justify-between gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+      class="mx-auto mb-4 flex h-full w-full max-w-[1280px] justify-between gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
     >
-      <div class="flex flex-row items-center gap-2">
+      <div class="flex flex-row gap-4">
         <IssuesIcon class="h-8 w-8 text-red" />
-        <div class="flex gap-2">{{ errorTitle }} - {{ errorMessage }}</div>
+        <div class="flex flex-col gap-2 leading-[150%]">
+          <div class="flex gap-2 text-xl font-bold">{{ errorTitle }}</div>
+          <div v-if="errorTitle === 'Installation error'" class="font-normal">
+            <div v-if="errorMessage === 'the specified version may be incorrect'">
+              An invalid loader or Minecraft version was specified and could not be installed.
+              <ul class="m-0 mt-4 p-0 pl-4">
+                <li>
+                  If this version of Minecraft was released recently, please check if Modrinth
+                  Servers supports it.
+                </li>
+                <li>
+                  If you've installed a modpack, it may have been packaged incorrectly or may not be
+                  compatible with the loader.
+                </li>
+                <li>
+                  Your server may need to be reinstalled with a valid mod loader and version. You
+                  can change the loader by clicking the "Change Loader" button.
+                </li>
+                <li>
+                  If you're stuck, please contact Modrinth support with the information below:
+                </li>
+              </ul>
+              <div class="mt-4 flex flex-wrap gap-2">
+                <UiCopyCode :text="'Server ID: ' + serverData?.server_id" />
+                <UiCopyCode :text="errorMessage" />
+                <UiCopyCode :text="'Kind: ' + serverData?.upstream?.kind" />
+                <UiCopyCode :text="'Project ID: ' + serverData?.upstream?.project_id" />
+                <UiCopyCode :text="'Version ID: ' + serverData?.upstream?.version_id" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div v-if="errorTitle === 'Installation error'">
         <ButtonStyled color="red" type="standard">
-          <NuxtLink :to="`/servers/manage/${serverId}/options/loader`"> Change Loader </NuxtLink>
+          <NuxtLink class="whitespace-pre" :to="`/servers/manage/${serverId}/options/loader`">
+            Change Loader
+          </NuxtLink>
         </ButtonStyled>
       </div>
     </div>
