@@ -49,11 +49,11 @@
               v-if="overrides[index] && overrides[index].type === 'dropdown'"
               class="flex w-[320px] justify-end"
             >
-              <DropdownSelect
+              <UiServersTeleportDropdownMenu
                 :id="`server-property-${index}`"
                 v-model="liveProperties[index]"
                 :name="formatPropertyName(index)"
-                :options="overrides[index].options"
+                :options="overrides[index].options || []"
                 :aria-labelledby="`property-label-${index}`"
                 placeholder="Select..."
               />
@@ -119,7 +119,6 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from "vue";
-import { DropdownSelect } from "@modrinth/ui";
 import { EyeIcon, SearchIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
 import type { Server } from "~/composables/pyroServers";

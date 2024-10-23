@@ -132,7 +132,7 @@
                 </span>
               </div>
               <div class="flex w-full max-w-[18rem] items-center gap-2">
-                <DropdownSelect
+                <UiServersTeleportDropdownMenu
                   v-if="versions && Array.isArray(versions) && versions.length > 0"
                   v-model="version"
                   :options="options"
