@@ -135,7 +135,7 @@
                 position="bottom"
                 direction="left"
                 aria-label="Sort files"
-                :noPageScroll="true"
+                :keepPageScroll="true"
                 :options="[
                   { id: 'normal', action: () => sortFiles('default') },
                   { id: 'modified', action: () => sortFiles('modified') },
