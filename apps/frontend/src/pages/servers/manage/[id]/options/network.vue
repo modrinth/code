@@ -362,7 +362,7 @@ const dnsRecords = computed(() => {
   return [
     {
       type: "A",
-      name: `${userDomain.value.split(".")[0]}`,
+      name: `${userDomain.value}`,
       content: data.value?.net?.ip ?? "",
     },
     {
@@ -388,7 +388,7 @@ const exportDnsRecords = () => {
 
   const text = Object.entries(records)
     .map(([type, records]) => {
-      return `; ${type} Records\n${records.map((record) => `${record.name}.	1	IN	${record.type} ${record.content}`).join("\n")}\n`;
+      return `; ${type} Records\n${records.map((record) => `${record.name}.	1	IN	${record.type} ${record.content}${record.type === "SRV" ? "." : ""}`).join("\n")}\n`;
     })
     .join("\n");
   const blob = new Blob([text], { type: "text/plain" });
