@@ -106,7 +106,7 @@
         <nav
           v-if="!isEditing"
           data-pyro-files-state="browsing"
-          class="top-0 z-10 flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
+          class="top-0 flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
         >
           <ul class="flex list-none items-center p-0 text-contrast">
             <li
