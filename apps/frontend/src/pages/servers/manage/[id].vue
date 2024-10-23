@@ -231,6 +231,7 @@ const connectWebSocket = () => {
     socket.value = new WebSocket(`wss://${wsAuth.value?.url}`);
 
     socket.value.onopen = () => {
+      consoleOutput.value = [];
       socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
       isConnected.value = true;
       isReconnecting.value = false;
@@ -283,6 +284,21 @@ const scheduleReconnect = () => {
   }
 };
 
+let uptimeIntervalId: ReturnType<typeof setInterval> | null = null;
+
+const startUptimeUpdates = () => {
+  uptimeIntervalId = setInterval(() => {
+    uptimeSeconds.value += 1;
+  }, 1000);
+};
+
+const stopUptimeUpdates = () => {
+  if (uptimeIntervalId) {
+    clearInterval(uptimeIntervalId);
+    intervalId = null;
+  }
+};
+
 const handleWebSocketMessage = (data: WSEvent) => {
   switch (data.event) {
     case "log":
@@ -310,7 +326,9 @@ const handleWebSocketMessage = (data: WSEvent) => {
     case "auth-ok":
       break;
     case "uptime":
+      stopUptimeUpdates();
       uptimeSeconds.value = data.uptime;
+      startUptimeUpdates();
       break;
     default:
       console.warn("Unhandled WebSocket event:", data);
@@ -392,6 +410,7 @@ const updateStats = (currentStats: Stats["current"]) => {
 const updatePowerState = (state: ServerState) => {
   serverPowerState.value = state;
   if (state === "stopped") {
+    stopUptimeUpdates();
     uptimeSeconds.value = 0;
   }
 };
