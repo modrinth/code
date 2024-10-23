@@ -527,7 +527,6 @@ const contextMenuInfo = ref<{
   y: 0,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { reset } = useInfiniteScroll(
   scrollContainer,
   () => {
@@ -778,7 +777,8 @@ const uploadFile = async (file: File) => {
   try {
     const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
     await props.server.fs?.uploadFile(filePath, file);
-    await fetchData();
+    fetchData();
+    reset();
 
     addNotification({
       group: "files",
@@ -862,7 +862,8 @@ const createNewItem = async () => {
 
       currentPage.value = 1;
       items.value = [];
-      await fetchData();
+      fetchData();
+      reset();
       createItemModal.value?.hide();
       createItemSubmitted.value = false;
 
@@ -903,7 +904,8 @@ const renameItem = async () => {
 
     currentPage.value = 1;
     items.value = [];
-    await fetchData();
+    fetchData();
+    reset();
     renameItemModal.value?.hide();
     renameItemSubmitted.value = false;
 
@@ -912,7 +914,8 @@ const renameItem = async () => {
       isEditing.value = false;
       editingFile.value = null;
       closeEditor.value = false;
-      await fetchData();
+      fetchData();
+      reset();
     }
 
     addNotification({
@@ -952,7 +955,8 @@ const moveItem = async () => {
 
     currentPage.value = 1;
     items.value = [];
-    await fetchData();
+    fetchData();
+    reset();
     moveItemModal.value?.hide();
 
     addNotification({
@@ -996,7 +1000,8 @@ const deleteItem = async () => {
     await props.server.fs?.deleteFileOrFolder(path, selectedItem.value.type === "directory");
     currentPage.value = 1;
     items.value = [];
-    await fetchData();
+    fetchData();
+    reset();
     deleteItemModal.value?.hide();
 
     addNotification({
@@ -1010,7 +1015,7 @@ const deleteItem = async () => {
   }
 };
 
-const imageExtensions = ["png", "jpg", "jpeg", "bmp", "gif", "webp", "svg", "svgz", "rgb"];
+const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
 
 const editFile = async (item: { name: string; type: string; path: string }) => {
   try {
