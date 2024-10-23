@@ -1,15 +1,7 @@
 <template>
   <div class="flex flex-row items-center gap-2 rounded-lg">
-    <ButtonStyled v-if="showKillButton" type="standard" color="red">
-      <button @click="handleKillClick">
-        <div class="flex gap-1">
-          <SlashIcon class="h-5 w-5" />
-          <span>{{ killButtonText }}</span>
-        </div>
-      </button>
-    </ButtonStyled>
     <ButtonStyled v-if="showStopButton" type="standard" color="red">
-      <button :disabled="!canTakeAction || disabled" @click="stopServer">
+      <button :disabled="!canTakeAction || disabled || isStopping" @click="stopServer">
         <div class="flex gap-1">
           <StopCircleIcon class="h-5 w-5" />
           <span>{{ stopButtonText }}</span>
@@ -17,7 +9,7 @@
       </button>
     </ButtonStyled>
     <ButtonStyled type="standard" color="brand">
-      <button :disabled="!canTakeAction || disabled" @click="handleAction">
+      <button :disabled="!canTakeAction || disabled || isStopping" @click="handleAction">
         <div v-if="isStartingOrRestarting" class="grid place-content-center">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path
@@ -35,12 +27,29 @@
         </span>
       </button>
     </ButtonStyled>
+
+    <!-- kill option -->
+    <ButtonStyled circular type="transparent">
+      <UiServersTeleportOverflowMenu :options="[{ id: 'kill', action: () => killServer() }]">
+        <MoreVerticalIcon aria-hidden="true" />
+        <template #kill>
+          <SlashIcon class="h-5 w-5" />
+          <span>{{ killButtonText }}</span>
+        </template>
+      </UiServersTeleportOverflowMenu>
+    </ButtonStyled>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-import { PlayIcon, UpdatedIcon, StopCircleIcon, SlashIcon } from "@modrinth/assets";
+import {
+  PlayIcon,
+  UpdatedIcon,
+  StopCircleIcon,
+  SlashIcon,
+  MoreVerticalIcon,
+} from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps<{
@@ -68,9 +77,7 @@ const currentState = ref<ServerStateType>(
 );
 
 const isStartingDelay = ref(false);
-const killConfirmation = ref(false);
 
-const showKillButton = computed(() => currentState.value === ServerState.Running);
 const showStopButton = computed(() => currentState.value === ServerState.Running);
 const showRestartIcon = computed(() => currentState.value === ServerState.Running);
 const canTakeAction = computed(
@@ -85,6 +92,8 @@ const isStartingOrRestarting = computed(
   () =>
     currentState.value === ServerState.Starting || currentState.value === ServerState.Restarting,
 );
+
+const isStopping = computed(() => currentState.value === ServerState.Stopping);
 
 const actionButtonText = computed(() => {
   switch (currentState.value) {
@@ -103,7 +112,7 @@ const stopButtonText = computed(() =>
   currentState.value === ServerState.Stopping ? "Stopping..." : "Stop",
 );
 
-const killButtonText = computed(() => (killConfirmation.value ? "Confirm Kill" : "Kill"));
+const killButtonText = computed(() => "Kill");
 
 const handleAction = () => {
   if (!canTakeAction.value) return;
@@ -124,17 +133,6 @@ const stopServer = () => {
   if (!canTakeAction.value) return;
   currentState.value = ServerState.Stopping;
   emit("action", "stop");
-};
-
-const handleKillClick = () => {
-  if (killConfirmation.value) {
-    killServer();
-  } else {
-    killConfirmation.value = true;
-    setTimeout(() => {
-      killConfirmation.value = false;
-    }, 10000);
-  }
 };
 
 const killServer = () => {
@@ -163,10 +161,4 @@ watch(
     }
   },
 );
-
-watch(showKillButton, (newValue) => {
-  if (!newValue) {
-    killConfirmation.value = false;
-  }
-});
 </script>
