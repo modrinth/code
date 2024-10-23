@@ -24,13 +24,13 @@
         }}
       </p>
       <div v-if="!isSecondPhase" class="flex flex-col gap-2">
-        <DropdownSelect
+        <UiServersTeleportDropdownMenu
           v-model="selectedMCVersion"
           name="mcVersion"
           :options="mcVersions"
           placeholder="Select Minecraft version..."
         />
-        <DropdownSelect
+        <UiServersTeleportDropdownMenu
           v-if="selectedMCVersion && selectedLoader.toLowerCase() !== 'vanilla'"
           v-model="selectedLoaderVersion"
           name="loaderVersion"
@@ -307,7 +307,7 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownSelect, Button, NewModal } from "@modrinth/ui";
+import { Button, NewModal } from "@modrinth/ui";
 import { ChevronRightIcon, DownloadIcon, EditIcon, UploadIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
@@ -411,9 +411,11 @@ const selectedLoaderVersions = computed(() => {
   if (backwardsCompatibleVersion) {
     return backwardsCompatibleVersion.loaders.map((x) => x.id);
   }
-  return loaderVersions[loader]
-    .find((x) => x.id === selectedMCVersion.value)
-    ?.loaders.map((x) => x.id);
+  return (
+    loaderVersions[loader]
+      .find((x) => x.id === selectedMCVersion.value)
+      ?.loaders.map((x) => x.id) || []
+  );
 });
 
 const data = computed(() => props.server.general);
