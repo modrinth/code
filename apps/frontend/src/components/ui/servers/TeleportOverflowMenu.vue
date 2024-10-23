@@ -73,6 +73,7 @@ const props = defineProps<{
   options: Option[];
   position?: "top" | "bottom";
   direction?: "left" | "right";
+  noPageScroll?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -141,7 +142,7 @@ const toggleMenu = (event: MouseEvent) => {
 const openMenu = () => {
   menuStyle.value = calculateMenuPosition();
   isOpen.value = true;
-  disableBodyScroll();
+  if (props.noPageScroll != true) disableBodyScroll();
   nextTick(() => {
     document.addEventListener("mousemove", handleMouseMove);
     focusFirstMenuItem();
@@ -317,7 +318,7 @@ onUnmounted(() => {
   if (typeAheadTimeout.value) {
     clearTimeout(typeAheadTimeout.value);
   }
-  enableBodyScroll();
+  if (props.noPageScroll != true) enableBodyScroll();
 });
 
 watch(isOpen, (newValue) => {
