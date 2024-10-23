@@ -63,7 +63,7 @@ const showSubdomainLabel = computed(() => !!props.net?.domain);
 
 let projectData: Ref<Project | null>;
 if (props.upstream) {
-  const { data } = await useLazyAsyncData<Project>(
+  const { data } = await useAsyncData<Project>(
     `server-project-${props.server_id}`,
     async (): Promise<Project> => {
       const result = await useBaseFetch(
