@@ -168,6 +168,22 @@ const isActioning = ref(false);
 const isServerRunning = computed(() => serverPowerState.value === "running");
 const serverPowerState = ref<ServerState>("stopped");
 const uptimeSeconds = ref(0);
+const firstConnect = ref(true);
+
+const initalConsoleMessage = [
+  "   __________________________________________________",
+  " /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\",
+  "|   Press the green start button to start your server! |",
+  " \\____________________________________________________/",
+  "\x1B[32m     _    _ \x1B[37m",
+  "\x1B[32m    (o)--(o)      \x1B[37m",
+  "\x1B[32m   /.______.\\\x1B[37m",
+  "\x1B[32m   \\________/     \x1B[37m",
+  "\x1B[32m  ./        \\.    \x1B[37m",
+  "\x1B[32m ( .        , )\x1B[37m",
+  "\x1B[32m  \\ \\_\\\\ //_/ /\x1B[37m",
+  "\x1B[32m   ~~  ~~  ~~\x1B[37m",
+];
 
 const stats = ref<Stats>({
   current: {
@@ -219,24 +235,15 @@ const connectWebSocket = () => {
       isConnected.value = true;
       isReconnecting.value = false;
       isLoading.value = false;
-      const frog = [
-        "   __________________________________________________",
-        " /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\",
-        "|   Press the green start button to start your server! |",
-        " \\____________________________________________________/",
-        "\x1B[32m     _    _ \x1B[37m",
-        "\x1B[32m    (o)--(o)      \x1B[37m",
-        "\x1B[32m   /.______.\\\x1B[37m",
-        "\x1B[32m   \\________/     \x1B[37m",
-        "\x1B[32m  ./        \\.    \x1B[37m",
-        "\x1B[32m ( .        , )\x1B[37m",
-        "\x1B[32m  \\ \\_\\\\ //_/ /\x1B[37m",
-        "\x1B[32m   ~~  ~~  ~~\x1B[37m",
-      ];
 
-      for (let i = 0; i < frog.length; i++) {
-        consoleOutput.value.push(frog[i]);
+      if (firstConnect.value) {
+        for (let i = 0; i < initalConsoleMessage.length; i++) {
+          consoleOutput.value.push(initalConsoleMessage[i]);
+        }
       }
+
+      firstConnect.value = false;
+
       if (reconnectInterval.value) {
         clearInterval(reconnectInterval.value);
         reconnectInterval.value = null;
