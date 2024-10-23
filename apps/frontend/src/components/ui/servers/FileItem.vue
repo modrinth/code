@@ -177,6 +177,12 @@ const editableExtensions = [
   "conf",
   "properties",
   "log",
+  "png",
+  "jpg",
+  "jpeg",
+  "gif",
+  "svg",
+  "webp",
 ];
 
 const isEditableFile = computed(() => {

@@ -735,14 +735,18 @@ const deleteFileOrFolder = (path: string, recursive: boolean) => {
   });
 };
 
-const downloadFile = (path: string) => {
+const downloadFile = (path: string, raw?: boolean) => {
   return retryWithAuth(async () => {
     const fileData = await PyroFetch(`/download?path=${path}`, {
       override: internalServerRefrence.value.fs.auth,
     });
 
     if (fileData instanceof Blob) {
-      return fileData.text();
+      if (raw) {
+        return fileData;
+      } else {
+        return await fileData.text();
+      }
     }
   });
 };
@@ -1024,69 +1028,62 @@ type FSFunctions = {
   get: (serverId: string) => Promise<FSAuth>;
 
   /**
-   * INTERNAL: Lists the contents of a directory.
-   * @param path
-   * @param page
-   * @param pageSize
+   * @param path - The path to list the contents of.
+   * @param page - The page to list.
+   * @param pageSize - The page size to list.
    * @returns
    */
   listDirContents: (path: string, page: number, pageSize: number) => Promise<any>;
 
   /**
-   * INTERNAL: Creates a file or folder.
-   * @param path
-   * @param type
+   * @param path - The path to create the file or folder at.
+   * @param type - The type of file or folder to create.
    * @returns
    */
   createFileOrFolder: (path: string, type: "file" | "directory") => Promise<any>;
 
   /**
-   * INTERNAL: Uploads a file.
-   * @param path
-   * @param file
+   * @param path - The path to upload the file to.
+   * @param file - The file to upload.
    * @returns
    */
   uploadFile: (path: string, file: File) => Promise<any>;
 
   /**
-   * INTERNAL: Renames a file or folder.
-   * @param path
-   * @param name
+   * @param path - The path to rename the file or folder at.
+   * @param name - The new name for the file or folder.
    * @returns
    */
   renameFileOrFolder: (path: string, name: string) => Promise<any>;
 
   /**
-   * INTERNAL: Updates a file.
-   * @param path
-   * @param content
+   * @param path - The path to update the file at.
+   * @param content - The new content for the file.
    * @returns
    */
   updateFile: (path: string, content: string) => Promise<any>;
 
   /**
-   * INTERNAL: Moves a file or folder.
-   * @param path
-   * @param newPath
+   * @param path - The path to move the file or folder at.
+   * @param newPath - The new path for the file or folder.
    * @returns
    */
   moveFileOrFolder: (path: string, newPath: string) => Promise<any>;
 
   /**
-   * INTERNAL: Deletes a file or folder.
-   * @param path
-   * @param recursive
+   * @param path - The path to delete the file or folder at.
+   * @param recursive - Whether to delete the file or folder recursively.
    * @returns
    */
   deleteFileOrFolder: (path: string, recursive: boolean) => Promise<any>;
 
   /**
-   * INTERNAL: Downloads a file.
-   * @param serverId
-   * @param path
+   * @param serverId - The ID of the server.
+   * @param path - The path to download the file from.
+   * @param raw - Whether to return the raw blob.
    * @returns
    */
-  downloadFile: (path: string) => Promise<any>;
+  downloadFile: (path: string, raw?: boolean) => Promise<any>;
 };
 
 type GeneralModule = General & GeneralFunctions;

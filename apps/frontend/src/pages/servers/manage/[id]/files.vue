@@ -94,6 +94,7 @@
         </div>
       </form>
     </NewModal>
+
     <div
       class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
       @dragenter.prevent="handleDragEnter"
@@ -216,7 +217,7 @@
             </span>
           </div>
 
-          <div class="flex gap-2">
+          <div v-if="!isEditingImage" class="flex gap-2">
             <Button
               v-if="editingFile.path.startsWith('logs') && editingFile.path.endsWith('.log')"
               v-tooltip="'Share to mclo.gs'"
@@ -256,9 +257,10 @@
           </div>
         </nav>
 
-        <div v-if="isEditing" class="h-full w-full flex-grow">
+        <div v-if="isEditing" class="flex h-full w-full flex-grow items-center justify-center">
           <component
             :is="VAceEditor"
+            v-if="!isEditingImage"
             v-model:value="fileContent"
             lang="json"
             theme="one_dark"
@@ -267,6 +269,7 @@
             class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
             @init="onInit"
           />
+          <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
         </div>
         <div
           v-else-if="items.length > 0"
@@ -443,6 +446,9 @@ import type { Server } from "~/composables/pyroServers";
 const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
+
+const isEditingImage = ref(false);
+const imagePreview = ref();
 
 const VAceEditor = ref();
 
@@ -734,16 +740,19 @@ const isDragging = ref(false);
 const dragCounter = ref(0);
 
 const handleDragEnter = (event: DragEvent) => {
+  if (isEditing.value) return;
   event.preventDefault();
   dragCounter.value++;
   isDragging.value = true;
 };
 
 const handleDragOver = (event: DragEvent) => {
+  if (isEditing.value) return;
   event.preventDefault();
 };
 
 const handleDragLeave = (event: DragEvent) => {
+  if (isEditing.value) return;
   event.preventDefault();
   dragCounter.value--;
   if (dragCounter.value === 0) {
@@ -752,6 +761,7 @@ const handleDragLeave = (event: DragEvent) => {
 };
 
 const handleDrop = async (event: DragEvent) => {
+  if (isEditing.value) return;
   event.preventDefault();
   isDragging.value = false;
   dragCounter.value = 0;
@@ -1000,16 +1010,23 @@ const deleteItem = async () => {
   }
 };
 
+const imageExtensions = ["png", "jpg", "jpeg", "bmp", "gif", "webp", "svg", "svgz", "rgb"];
+
 const editFile = async (item: { name: string; type: string; path: string }) => {
   try {
     const path = `${currentPath.value}/${item.name}`.replace("//", "/");
-    const content = (await props.server.fs?.downloadFile(path)) as string;
+    const content = (await props.server.fs?.downloadFile(path, true)) as any;
 
     window.scrollTo(0, 0);
 
-    fileContent.value = content;
+    fileContent.value = await content.text();
     editingFile.value = item;
     isEditing.value = true;
+    const extension = item.name.split(".").pop();
+    if (item.type === "file" && extension && imageExtensions.includes(extension)) {
+      isEditingImage.value = true;
+      imagePreview.value = content;
+    }
   } catch (error) {
     console.error("Error fetching file content:", error);
   }
@@ -1052,6 +1069,8 @@ const cancelEditing = () => {
   isEditing.value = false;
   editingFile.value = null;
   fileContent.value = "";
+  isEditingImage.value = false;
+  imagePreview.value = null;
 };
 </script>
 
