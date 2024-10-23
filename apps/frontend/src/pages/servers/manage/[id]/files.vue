@@ -95,18 +95,18 @@
       </form>
     </NewModal>
     <div
-      class="relative flex min-h-[800px] w-full flex-col rounded-2xl border border-solid border-bg-raised"
+      class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
       @dragenter.prevent="handleDragEnter"
       @dragover.prevent="handleDragOver"
       @dragleave.prevent="handleDragLeave"
       @drop.prevent="handleDrop"
     >
       <!-- Main Content -->
-      <div ref="mainContent" class="isolate flex w-full flex-col">
+      <div ref="mainContent" class="flex h-[40rem] w-full flex-col">
         <nav
           v-if="!isEditing"
           data-pyro-files-state="browsing"
-          class="sticky top-0 z-10 flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
+          class="top-0 z-10 flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
         >
           <ul class="flex list-none items-center p-0 text-contrast">
             <li
@@ -271,7 +271,7 @@
         <div
           v-else-if="items.length > 0"
           ref="scrollContainer"
-          class="h-full w-full overflow-hidden rounded-b-2xl"
+          class="h-full w-full overflow-y-auto rounded-b-2xl"
         >
           <UiServersFileItem
             v-for="item in filteredItems"
@@ -529,7 +529,7 @@ const { reset } = useInfiniteScroll(
       fetchData();
     }
   },
-  { distance: 200 },
+  { distance: 1000 },
 );
 
 const onInit = (editor: any) => {
