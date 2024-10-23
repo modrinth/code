@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-row items-center gap-2 rounded-lg">
-    <ButtonStyled v-if="showStopButton" type="standard" color="red">
+    <ButtonStyled v-if="showStopButton" type="transparent">
       <button :disabled="!canTakeAction || disabled || isStopping" @click="stopServer">
         <div class="flex gap-1">
           <StopCircleIcon class="h-5 w-5" />
