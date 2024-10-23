@@ -1,6 +1,9 @@
 <template>
   <div class="relative h-full w-full select-none overflow-y-auto">
-    <div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto">
+    <div
+      v-if="propsData && status === 'success'"
+      class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto"
+    >
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
           <h2 class="m-0 text-lg font-bold text-contrast">Server properties</h2>
@@ -97,10 +100,7 @@
         </div>
       </div>
     </div>
-    <div
-      v-else-if="props.server.mods?.data.length === 0"
-      class="card flex h-full w-full items-center justify-center"
-    >
+    <div v-else class="card flex h-full w-full items-center justify-center">
       <p class="text-contrast">
         The server properties file has not been generated yet. Start up your server to generate it.
       </p>
@@ -134,7 +134,7 @@ const isUpdating = ref(false);
 const searchInput = ref("");
 
 const data = computed(() => props.server.general);
-const { data: propsData } = await useAsyncData(
+const { data: propsData, status } = await useAsyncData(
   "ServerProperties",
   async () => await props.server.general?.fetchConfigFile("ServerProperties"),
 );
