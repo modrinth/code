@@ -257,7 +257,7 @@
           </div>
         </nav>
 
-        <div v-if="isEditing" class="flex h-full w-full flex-grow items-center justify-center">
+        <div v-if="isEditing" class="h-full w-full flex-grow">
           <component
             :is="VAceEditor"
             v-if="!isEditingImage"
