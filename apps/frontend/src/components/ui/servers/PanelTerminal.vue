@@ -2,7 +2,7 @@
   <div
     data-pyro-terminal
     :class="[
-      'terminal-font console relative flex h-full w-full select-text flex-col items-center justify-between overflow-hidden rounded-t-xl pb-4 text-sm transition-transform duration-300',
+      'terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
       { 'scale-fullscreen screen-fixed inset-0 z-50 !rounded-none': isFullScreen },
     ]"
     tabindex="-1"
@@ -56,7 +56,7 @@
       <div
         ref="scrollbarTrack"
         data-pyro-terminal-scrollbar-track
-        class="absolute bottom-12 right-0 top-4 z-[100] w-4"
+        class="absolute -right-1 bottom-16 top-4 z-[100] w-4"
         @mousedown="handleTrackClick"
       >
         <div
@@ -80,7 +80,7 @@
         ref="scrollContainer"
         data-pyro-terminal-root
         class="scrollbar-none absolute left-0 top-0 h-full w-full overflow-x-auto overflow-y-auto py-6 pb-[72px]"
-        @scroll="handleScroll"
+        @scroll="handleScrollEvent"
       >
         <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
           <ul
@@ -95,15 +95,45 @@
                 ref="itemRefs"
                 class="relative w-full list-none"
                 :data-pyro-terminal-recycle-tracker="index"
+                :data-pyro-terminal-selected="isSelected(visibleStartIndex + index)"
                 aria-setsize="-1"
+                @click="(e) => handleLineClick(visibleStartIndex + index, e)"
               >
-                <UiServersLogParser :log="item" />
+                <UiServersLogParser
+                  :log="item"
+                  :index="visibleStartIndex + index"
+                  :selected="isSelected(visibleStartIndex + index)"
+                />
               </li>
             </template>
           </ul>
         </div>
       </div>
     </div>
+
+    <Transition name="fade">
+      <button
+        v-if="hasSelection"
+        v-tooltip="'Copy selected lines'"
+        class="experimental-styles-within absolute right-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+        :class="bottomThreshold > 0 ? 'bottom-36' : 'bottom-20'"
+        @click="copySelectedText"
+      >
+        <span class="sr-only">Copy selected lines</span>
+        <CopyIcon
+          class="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2"
+          :class="{ 'scale-0 opacity-0 transition-all duration-200': copied }"
+        />
+        <CheckIcon
+          class="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2"
+          :class="{
+            'scale-100 opacity-100 transition-all duration-200': copied,
+            'scale-0 opacity-0 transition-all duration-200': !copied,
+          }"
+        />
+      </button>
+    </Transition>
+
     <div
       class="absolute bottom-4 z-[99999] w-full"
       :style="{
@@ -115,7 +145,7 @@
     <button
       data-pyro-fullscreen
       :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
-      class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-200 hover:scale-110 active:scale-95"
+      class="experimental-styles-within absolute right-4 top-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
       @click="toggleFullscreen"
     >
       <UiServersPanelTerminalFullscreen v-if="isFullScreen" />
@@ -127,7 +157,7 @@
         v-if="bottomThreshold > 0"
         data-pyro-scrolltobottom
         label="Scroll to bottom"
-        class="scroll-to-bottom-btn absolute bottom-20 right-4 z-[999999] grid size-12 place-content-center rounded-lg bg-bg-raised text-contrast transition-transform duration-200 hover:scale-110 active:scale-95"
+        class="scroll-to-bottom-btn experimental-styles-within absolute bottom-20 right-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
         @click="scrollToBottom"
       >
         <RightArrowIcon class="rotate-90" />
@@ -138,7 +168,7 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon } from "@modrinth/assets";
+import { RightArrowIcon, CopyIcon, CheckIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 
 const { $cosmetics } = useNuxtApp();
@@ -165,6 +195,47 @@ const isFullScreen = ref(props.fullScreen);
 const initial = ref(false);
 const userHasScrolled = ref(false);
 const isScrolledToBottom = ref(true);
+
+const { selections, clearSelections, isSelected, handleLineClick, handleScroll, getSelectedText } =
+  useTerminalSelection();
+
+const hasSelection = computed(() => selections.value.length > 0);
+const copied = ref(false);
+
+const handleScrollEvent = () => {
+  handleListScroll();
+  handleScroll();
+};
+
+const copySelectedText = async () => {
+  try {
+    const text = getSelectedText(props.consoleOutput);
+    await navigator.clipboard.writeText(text);
+    copied.value = true;
+    setTimeout(() => {
+      copied.value = false;
+      clearSelections();
+    }, 2000);
+  } catch (err) {
+    console.error("Failed to copy selected text:", err);
+  }
+};
+
+const updateSelectedClasses = () => {
+  nextTick(() => {
+    const selectedItems = document.querySelectorAll('[data-pyro-terminal-selected="true"]');
+    selectedItems.forEach((item) => {
+      item.classList.remove("first-selected", "last-selected");
+    });
+
+    if (selectedItems.length > 0) {
+      selectedItems[0].classList.add("first-selected");
+      selectedItems[selectedItems.length - 1].classList.add("last-selected");
+    }
+  });
+};
+
+watch(selections, updateSelectedClasses);
 
 const totalHeight = computed(
   () =>
@@ -248,7 +319,7 @@ const visibleItems = computed(() =>
 
 const offsetY = computed(() => getItemOffset(visibleStartIndex.value));
 
-const handleScroll = () => {
+const handleListScroll = () => {
   if (scrollContainer.value) {
     scrollTop.value = scrollContainer.value.scrollTop;
     clientHeight.value = scrollContainer.value.clientHeight;
@@ -593,5 +664,21 @@ html.dark-mode .progressive-gradient {
 .scroll-to-bottom-leave-to {
   opacity: 0;
   transform: scale(0.4) translateY(2rem);
+}
+
+[data-pyro-terminal-selected="true"] {
+  border-radius: 0;
+}
+
+[data-pyro-terminal-selected="true"].first-selected {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  overflow: hidden !important;
+}
+
+[data-pyro-terminal-selected="true"].last-selected {
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  overflow: hidden !important;
 }
 </style>

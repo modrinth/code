@@ -1,26 +1,18 @@
 <template>
   <div
     class="parsed-log group relative w-full overflow-hidden px-6 py-1"
-    @mouseenter="showCopyButton = true"
-    @mouseleave="showCopyButton = false"
+    :class="{
+      'bg-bg-raised': selected,
+      selected: selected,
+    }"
+    tabindex="0"
   >
     <div
       ref="logContent"
       class="log-content whitespace-pre-wrap selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black"
+      :class="{ selectable: selected }"
       v-html="sanitizedLog"
     ></div>
-    <Transition name="fade">
-      <button
-        v-if="log !== '[m'"
-        v-show="showCopyButton"
-        class="absolute right-4 top-1/2 -translate-y-1/2 select-none rounded-md bg-bg-raised px-2 py-1 text-xs text-contrast opacity-0 transition-opacity duration-150 hover:bg-button-bg group-hover:opacity-100"
-        aria-label="Copy line"
-        @click="copyLog"
-      >
-        <span v-if="!copied" class="select-none">Copy</span>
-        <span v-else class="select-none">Copied!</span>
-      </button>
-    </Transition>
   </div>
 </template>
 
@@ -31,11 +23,11 @@ import DOMPurify from "dompurify";
 
 const props = defineProps<{
   log: string;
+  index: number;
+  selected: boolean;
 }>();
 
 const logContent = ref<HTMLElement | null>(null);
-const showCopyButton = ref(false);
-const copied = ref(false);
 
 const colors = {
   30: "#101010",
@@ -87,41 +79,22 @@ const sanitizedLog = computed(() => {
     USE_PROFILES: { html: true },
   });
 });
-
-const copyLog = async () => {
-  if (!logContent.value) return;
-
-  try {
-    const textContent = logContent.value.textContent || "";
-    await navigator.clipboard.writeText(textContent);
-    copied.value = true;
-    setTimeout(() => {
-      copied.value = false;
-    }, 2000);
-  } catch (err) {
-    console.error("Failed to copy text:", err);
-  }
-};
 </script>
 
 <style scoped>
-.parsed-log:hover {
-  transition: none;
+.parsed-log:hover:not(.selected) {
+  border-radius: 0.5rem;
 }
 
-.parsed-log {
-  transition: 80ms;
-}
-
-html.light-mode .parsed-log:hover {
+html.light-mode .parsed-log:hover:not(.selected) {
   background-color: #ccc;
 }
 
-html.dark-mode .parsed-log:hover {
+html.dark-mode .parsed-log:hover:not(.selected) {
   background-color: #222;
 }
 
-html.oled-mode .parsed-log:hover {
+html.oled-mode .parsed-log:hover:not(.selected) {
   background-color: #222;
 }
 
@@ -129,17 +102,11 @@ html.oled-mode .parsed-log:hover {
   font-weight: bold;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: 80ms ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
 ::v-deep(.log-content) {
+  user-select: none;
+}
+
+::v-deep(.log-content.selectable) {
   user-select: text;
 }
 
