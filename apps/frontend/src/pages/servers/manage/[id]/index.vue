@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isConnected && !isWsAuthIncorrect"
-    class="relative flex select-none flex-col gap-6"
+    class="relative flex select-none flex-col-reverse gap-6 sm:flex-col"
     data-pyro-server-manager-root
   >
     <div
