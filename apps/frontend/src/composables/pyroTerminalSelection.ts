@@ -20,10 +20,14 @@ export function useTerminalSelection() {
 
   const handleLineClick = (index: number, event: MouseEvent) => {
     if (!event.shiftKey) {
-      clearSelections();
-      selections.value = [{ start: index, end: index }];
-      selectionStart.value = index;
-      isSelecting.value = true;
+      if (isSelected(index)) {
+        clearSelections();
+      } else {
+        clearSelections();
+        selections.value = [{ start: index, end: index }];
+        selectionStart.value = index;
+        isSelecting.value = true;
+      }
     } else if (selectionStart.value !== null) {
       const start = Math.min(selectionStart.value, index);
       const end = Math.max(selectionStart.value, index);
