@@ -5,7 +5,6 @@
       'bg-bg-raised': selected,
       selected: selected,
     }"
-    tabindex="0"
   >
     <div
       ref="logContent"
