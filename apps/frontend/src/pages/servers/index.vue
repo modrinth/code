@@ -365,7 +365,7 @@
         </h2>
 
         <ul class="m-0 flex w-full flex-col gap-8 p-0 md:flex-row">
-          <li class="flex w-1/3 flex-col gap-4 rounded-2xl bg-bg p-8 text-left">
+          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left md:w-1/3">
             <div class="flex flex-row items-center justify-between">
               <h1 class="m-0">Small</h1>
               <div
@@ -406,7 +406,7 @@
               border: 1px solid rgba(27, 217, 106, 0.07);
               box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
             "
-            class="flex w-1/3 flex-col gap-4 rounded-2xl bg-bg p-8 text-left"
+            class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left md:w-1/3"
           >
             <div class="flex flex-row items-center justify-between">
               <h1 class="m-0">Medium</h1>
@@ -433,7 +433,7 @@
             </ButtonStyled>
           </li>
 
-          <li class="flex w-1/3 flex-col gap-4 rounded-2xl bg-bg p-8 text-left">
+          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left md:w-1/3">
             <div class="flex flex-row items-center justify-between">
               <h1 class="m-0">Large</h1>
               <div
