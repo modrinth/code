@@ -111,7 +111,7 @@
       </div>
     </div>
 
-    <Transition name="fade">
+    <Transition name="scroll-to-bottom">
       <button
         v-if="hasSelection"
         v-tooltip="'Copy selected lines'"
