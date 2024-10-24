@@ -35,7 +35,6 @@
                       accept="image/png,image/jpeg,image/gif,image/webp"
                       class="btn btn-transparent upload"
                       style="white-space: nowrap"
-                      prompt="Upload icon"
                       aria-label="Upload icon"
                       @change="showPreviewImage"
                     >
