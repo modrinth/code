@@ -84,7 +84,7 @@
               >
                 <div
                   v-if="
-                  errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
+                    errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
                   "
                 >
                   An invalid loader or Minecraft version was specified and could not be installed.
