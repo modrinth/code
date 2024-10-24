@@ -671,9 +671,9 @@ const nameError = computed(() => {
     return "Name is required.";
   }
   if (newItemType.value === "file") {
-    const validPattern = /^[a-zA-Z0-9-_]+$/;
+    const validPattern = /^[a-zA-Z0-9-_.]+$/;
     if (!validPattern.test(newItemName.value)) {
-      return "Name must contain only alphanumeric characters, dashes, or underscores.";
+      return "Name must contain only alphanumeric characters, dashes, underscores, or dots.";
     }
   } else if (newItemType.value === "directory") {
     const validPattern = /^[a-zA-Z0-9-_]+$/;
