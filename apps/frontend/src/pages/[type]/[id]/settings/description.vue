@@ -124,8 +124,4 @@ export default defineNuxtComponent({
 .markdown-disclaimer {
   margin-block: 1rem;
 }
-
-.universal-card {
-  margin-top: 1rem;
-}
 </style>
