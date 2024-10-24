@@ -210,6 +210,51 @@
       </div>
     </section>
 
+    <section class="relative mt-24 flex flex-col px-3 pt-24 md:mt-48 md:pt-48">
+      <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
+      <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
+        <div
+          class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+        >
+          Your server's hardware
+        </div>
+        <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
+          Eye-watering performance.
+        </h1>
+        <h1>work in progress section, nothing is final, working on illustrations etc.</h1>
+        <h2
+          class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+        >
+          Modrinth Servers run on Pyro's super-fast infrastructure. Your servers always start fast,
+          run fast, and stay fast. And with direct integration with Modrinth, your servers install
+          within a second.
+        </h2>
+
+        <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-8">
+          <h1>Average time to start a Minecraft server</h1>
+          <div class="relative flex flex-row items-center gap-4">
+            <h2 class="min-w-60">Modrinth Servers</h2>
+            <div class="h-12 w-[1.4%] rounded-2xl bg-brand"></div>
+            <p class="whitespace-pre">534 ms</p>
+          </div>
+          <div class="relative flex flex-row items-center gap-4">
+            <h2 class="min-w-60">Competitors</h2>
+            <div class="h-12 w-full rounded-2xl bg-bg-raised"></div>
+            <p class="whitespace-pre">32 seconds</p>
+          </div>
+        </div>
+
+        <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-8">
+          <h1 class="m-0">4GHz+ AMD CPU, 2 vCore Minimum</h1>
+          <p>
+            All Modrinth Servers, no matter the plan, come with a minimum of 2 vCores and a 4GHz+
+            CPU. This means your server will always have the power it needs to run smoothly. Server
+            with heavy mods will run just as well as Vanilla servers.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <section
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
@@ -285,7 +330,7 @@
               </svg>
               <h2 class="m-0 text-lg font-bold">Backups included</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
-                With 15 backup slots stored off-site with Backblaze, your server is always safe.
+                Every server comes with 15 backups stored off-site with Backblaze.
               </h3>
             </div>
           </div>
@@ -303,7 +348,7 @@
           >
             <h2 class="m-0 text-lg font-bold">Easy to use file manager</h2>
             <h3 class="m-0 text-base font-normal">
-              Manage, search, and upload files directly to your server with ease.
+              Search, manage, and upload files directly to your server with ease.
             </h3>
 
             <img
@@ -319,32 +364,63 @@
             </div>
           </div>
         </div>
-        <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="size-8 text-brand"
-          >
-            <path
-              d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-            />
-            <path
-              d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"
-            />
-            <path d="m18 15-2-2" />
-            <path d="m15 18-2-2" />
-          </svg>
-          <h2 class="m-0 text-lg font-bold">Help when you need it</h2>
-          <h3 class="m-0 text-base font-normal text-secondary">
-            Reach out to the Modrinth team for help with your server at any time.
-          </h3>
+        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
+          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="size-8 text-brand"
+            >
+              <path
+                d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+              />
+              <path
+                d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"
+              />
+              <path d="m18 15-2-2" />
+              <path d="m15 18-2-2" />
+            </svg>
+            <h2 class="m-0 text-lg font-bold">
+              An easy console, server properties manager, and more
+            </h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Super powerful features with super simple access.
+            </h3>
+          </div>
+          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="size-8 text-brand"
+            >
+              <path
+                d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+              />
+              <path
+                d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"
+              />
+              <path d="m18 15-2-2" />
+              <path d="m15 18-2-2" />
+            </svg>
+            <h2 class="m-0 text-lg font-bold">Help when you need it</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Reach out to the Modrinth team for help with your server at any time.
+            </h3>
+          </div>
         </div>
       </div>
     </section>
