@@ -444,6 +444,10 @@ const onReinstall = (potentialArgs: any) => {
 
   server.refresh();
 
+  error.value = null;
+  errorTitle.value = "Error";
+  errorMessage.value = "An unexpected error occurred.";
+
   console.log(serverData.value);
 };
 
