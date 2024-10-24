@@ -116,7 +116,7 @@
         v-if="hasSelection"
         v-tooltip="'Copy selected lines'"
         class="experimental-styles-within absolute right-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
-        :class="bottomThreshold > 0 ? 'bottom-36' : 'bottom-20'"
+        :class="bottomThreshold > 0 ? 'bottom-[8.5rem]' : 'bottom-[4.5rem]'"
         @click="copySelectedText"
       >
         <span class="sr-only">Copy selected lines</span>
@@ -157,7 +157,7 @@
         v-if="bottomThreshold > 0"
         data-pyro-scrolltobottom
         label="Scroll to bottom"
-        class="scroll-to-bottom-btn experimental-styles-within absolute bottom-20 right-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+        class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
         @click="scrollToBottom"
       >
         <RightArrowIcon class="rotate-90" />
