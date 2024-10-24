@@ -148,8 +148,8 @@
       class="experimental-styles-within absolute right-4 top-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
       @click="toggleFullscreen"
     >
-      <UiServersPanelTerminalFullscreen v-if="isFullScreen" />
-      <UiServersPanelTerminalMinimize v-else />
+      <UiServersPanelTerminalMinimize v-if="isFullScreen" />
+      <UiServersPanelTerminalFullscreen v-else />
     </button>
 
     <Transition name="scroll-to-bottom">
