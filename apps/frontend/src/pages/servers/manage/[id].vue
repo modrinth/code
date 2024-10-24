@@ -1,54 +1,6 @@
 <template>
   <div class="contents">
     <div
-      v-if="error"
-      class="mx-auto mb-4 flex h-full w-full max-w-[1280px] justify-between gap-2 rounded-xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
-    >
-      <div class="flex flex-row gap-4">
-        <IssuesIcon class="h-8 w-8 text-red" />
-        <div class="flex flex-col gap-2 leading-[150%]">
-          <div class="flex gap-2 text-xl font-bold">{{ errorTitle }}</div>
-          <div v-if="errorTitle === 'Installation error'" class="font-normal">
-            <div v-if="errorMessage === 'the specified version may be incorrect'">
-              An invalid loader or Minecraft version was specified and could not be installed.
-              <ul class="m-0 mt-4 p-0 pl-4">
-                <li>
-                  If this version of Minecraft was released recently, please check if Modrinth
-                  Servers supports it.
-                </li>
-                <li>
-                  If you've installed a modpack, it may have been packaged incorrectly or may not be
-                  compatible with the loader.
-                </li>
-                <li>
-                  Your server may need to be reinstalled with a valid mod loader and version. You
-                  can change the loader by clicking the "Change Loader" button.
-                </li>
-                <li>
-                  If you're stuck, please contact Modrinth support with the information below:
-                </li>
-              </ul>
-              <div class="mt-4 flex flex-wrap gap-2">
-                <UiCopyCode :text="'Server ID: ' + serverData?.server_id" />
-                <UiCopyCode :text="errorMessage" />
-                <UiCopyCode :text="'Kind: ' + serverData?.upstream?.kind" />
-                <UiCopyCode :text="'Project ID: ' + serverData?.upstream?.project_id" />
-                <UiCopyCode :text="'Version ID: ' + serverData?.upstream?.version_id" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="errorTitle === 'Installation error'">
-        <ButtonStyled color="red" type="standard">
-          <NuxtLink class="whitespace-pre" :to="`/servers/manage/${serverId}/options/loader`">
-            Change Loader
-          </NuxtLink>
-        </ButtonStyled>
-      </div>
-    </div>
-    <div
       v-if="serverData"
       data-pyro-server-manager-root
       class="relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
@@ -119,9 +71,80 @@
 
       <div data-pyro-mount class="h-full w-full flex-1">
         <div
+          v-if="error"
+          class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+        >
+          <div class="flex flex-row gap-4">
+            <IssuesIcon class="h-8 w-8 text-red" />
+            <div class="flex flex-col gap-2 leading-[150%]">
+              <div class="flex gap-2 text-xl font-bold">{{ errorTitle }}</div>
+              <div
+                v-if="errorTitle.toLocaleLowerCase() === 'installation error'"
+                class="font-normal"
+              >
+                <div
+                  v-if="
+                    errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
+                  "
+                >
+                  An invalid loader or Minecraft version was specified and could not be installed.
+                  <ul class="m-0 mt-4 p-0 pl-4">
+                    <li>
+                      If this version of Minecraft was released recently, please check if Modrinth
+                      Servers supports it.
+                    </li>
+                    <li>
+                      If you've installed a modpack, it may have been packaged incorrectly or may
+                      not be compatible with the loader.
+                    </li>
+                    <li>
+                      Your server may need to be reinstalled with a valid mod loader and version.
+                      You can change the loader by clicking the "Change Loader" button.
+                    </li>
+                    <li>
+                      If you're stuck, please contact Modrinth support with the information below:
+                    </li>
+                  </ul>
+                  <ButtonStyled>
+                    <button class="mt-2" @click="copyServerDebugInfo">
+                      <CopyIcon />
+                      Copy Debug Info
+                    </button>
+                  </ButtonStyled>
+                </div>
+                <div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
+                  An internal error occurred while installing your server. Don't fret — try
+                  reinstalling your server, and if the problem persists, please contact Modrinth
+                  support with your server's debug information. You can also try reinstalling your
+                  server.
+                </div>
+
+                <div v-if="errorTitle === 'Installation error'" class="mt-2 flex flex-row gap-4">
+                  <ButtonStyled>
+                    <button @click="copyServerDebugInfo">
+                      <CopyIcon />
+                      Copy Debug Info
+                    </button>
+                  </ButtonStyled>
+                  <ButtonStyled color="red" type="standard">
+                    <NuxtLink
+                      class="whitespace-pre"
+                      :to="`/servers/manage/${serverId}/options/loader`"
+                    >
+                      <RightArrowIcon />
+                      Change Loader
+                    </NuxtLink>
+                  </ButtonStyled>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
           v-if="!isConnected && !isReconnecting && !isLoading"
           data-pyro-server-ws-error
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-xl bg-bg-red p-4 text-contrast"
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
         >
           <IssuesIcon class="size-5 text-red" />
           Something went wrong...
@@ -130,7 +153,7 @@
         <div
           v-if="isReconnecting"
           data-pyro-server-ws-reconnecting
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-xl bg-bg-orange p-4 text-contrast"
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
         >
           <UiServersPanelSpinner />
           Hang on, we're reconnecting to your server.
@@ -139,7 +162,7 @@
         <div
           v-if="serverData.status === 'installing'"
           data-pyro-server-installing
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-xl bg-bg-orange p-4 text-contrast"
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
         >
           <UiServersPanelSpinner />
           We're preparing your server, this may take a few minutes.
@@ -166,7 +189,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-import { IssuesIcon, LeftArrowIcon } from "@modrinth/assets";
+import { CopyIcon, IssuesIcon, LeftArrowIcon, RightArrowIcon } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
@@ -516,6 +539,11 @@ const stopPolling = () => {
     clearInterval(intervalId);
     intervalId = null;
   }
+};
+
+const copyServerDebugInfo = () => {
+  const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}`;
+  navigator.clipboard.writeText(debugInfo);
 };
 
 onMounted(() => {
