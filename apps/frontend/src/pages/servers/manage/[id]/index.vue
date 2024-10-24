@@ -38,7 +38,7 @@
     </div>
     <UiServersServerStats :data="stats" />
     <div
-      class="relative flex h-[600px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-8 transition-all duration-300 ease-in-out"
+      class="relative flex h-[600px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
     >
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
