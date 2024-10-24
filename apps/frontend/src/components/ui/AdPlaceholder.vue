@@ -52,6 +52,14 @@ useHead({
 
 onMounted(() => {
   window.tude = window.tude || { cmd: [] };
+  window.Raven = window.Raven || { cmd: [] };
+
+  window.Raven.cmd.push(({ config }) => {
+    config.setCustom({
+      param1: "web",
+    });
+  });
+
   tude.cmd.push(function () {
     tude.refreshAdsViaDivMappings([
       {
