@@ -115,8 +115,7 @@
                 <div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
                   An internal error occurred while installing your server. Don't fret — try
                   reinstalling your server, and if the problem persists, please contact Modrinth
-                  support with your server's debug information. You can also try reinstalling your
-                  server.
+                  support with your server's debug information.
                 </div>
 
                 <div v-if="errorTitle === 'Installation error'" class="mt-2 flex flex-row gap-4">
