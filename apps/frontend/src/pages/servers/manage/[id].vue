@@ -83,9 +83,7 @@
                 class="font-normal"
               >
                 <div
-                  v-if="
-                    errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
-                  "
+                  v-if="errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'"
                 >
                   An invalid loader or Minecraft version was specified and could not be installed.
                   <ul class="m-0 mt-4 p-0 pl-4">
@@ -107,7 +105,8 @@
                   </ul>
                   <ButtonStyled>
                     <button class="mt-2" @click="copyServerDebugInfo">
-                      <CopyIcon />
+                      <CopyIcon v-if="!copied" />
+                      <CheckIcon v-else />
                       Copy Debug Info
                     </button>
                   </ButtonStyled>
@@ -121,7 +120,8 @@
                 <div v-if="errorTitle === 'Installation error'" class="mt-2 flex flex-row gap-4">
                   <ButtonStyled>
                     <button @click="copyServerDebugInfo">
-                      <CopyIcon />
+                      <CopyIcon v-if="!copied" />
+                      <CheckIcon v-else />
                       Copy Debug Info
                     </button>
                   </ButtonStyled>
@@ -188,7 +188,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-import { CopyIcon, IssuesIcon, LeftArrowIcon, RightArrowIcon } from "@modrinth/assets";
+import { CopyIcon, IssuesIcon, LeftArrowIcon, RightArrowIcon, CheckIcon } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
@@ -224,6 +224,7 @@ const isServerRunning = computed(() => serverPowerState.value === "running");
 const serverPowerState = ref<ServerState>("stopped");
 const uptimeSeconds = ref(0);
 const firstConnect = ref(true);
+const copied = ref(false);
 
 const initalConsoleMessage = [
   "   __________________________________________________",
@@ -547,6 +548,10 @@ const stopPolling = () => {
 const copyServerDebugInfo = () => {
   const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}`;
   navigator.clipboard.writeText(debugInfo);
+  copied.value = true;
+  setTimeout(() => {
+    copied.value = false;
+  }, 5000);
 };
 
 onMounted(() => {
