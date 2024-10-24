@@ -40,24 +40,13 @@
         <div class="mt-2 flex items-center gap-2">
           <input
             id="hard-reset"
-            v-model="hardReset"
+            :checked="hardReset"
             class="switch stylized-toggle"
             type="checkbox"
+            @change="hardReset = ($event.target as HTMLInputElement).checked"
           />
           <label for="hard-reset">Clean reinstall</label>
         </div>
-        <div class="hidden items-center gap-2">
-          <input
-            id="backup-server"
-            v-model="backupServer"
-            class="switch stylized-toggle"
-            type="checkbox"
-          />
-          <label for="backup-server">Backup files</label>
-        </div>
-        <p v-if="serverCheckError && !loadingServerCheck" class="-mb-2 mt-4 text-red">
-          {{ serverCheckError }}
-        </p>
       </div>
       <div class="mt-4 flex justify-end gap-4">
         <Button
@@ -76,7 +65,7 @@
         <Button
           :color="isDangerous ? 'danger' : 'primary'"
           :disabled="canInstall"
-          @click="reinstallLoader(selectedLoader)"
+          @click="handleReinstall"
         >
           {{
             isSecondPhase
@@ -549,14 +538,14 @@ const reinstallCurrent = async () => {
   }
 };
 
-const reinstallLoader = async (loader: string) => {
+const handleReinstall = async () => {
   if (hardReset.value && !backupServer.value && !isSecondPhase.value) {
     isSecondPhase.value = true;
     return;
   }
+
   if (backupServer.value) {
     try {
-      // format date + time based off local timezone
       const date = new Date();
       const format = date.toLocaleString(navigator.language || "en-US", {
         month: "short",
@@ -581,26 +570,32 @@ const reinstallLoader = async (loader: string) => {
       return;
     }
   }
-  isLoading.value = false;
-  versionSelectModal.value.hide();
+
+  isLoading.value = true;
+
   try {
     await props.server.general?.reinstall(
       serverId,
       true,
-      loader,
+      selectedLoader.value,
       selectedMCVersion.value,
-      loader === "Vanilla" ? "" : selectedLoaderVersion.value,
+      selectedLoader.value === "Vanilla" ? "" : selectedLoaderVersion.value,
       hardReset.value,
     );
+
     emit("reinstall", {
-      loader,
+      loader: selectedLoader.value,
       lVersion: selectedLoaderVersion.value,
       mVersion: selectedMCVersion.value,
     });
+
     await nextTick();
     window.scrollTo(0, 0);
   } catch (error) {
     handleReinstallError(error);
+  } finally {
+    isLoading.value = false;
+    versionSelectModal.value.hide();
   }
 };
 
