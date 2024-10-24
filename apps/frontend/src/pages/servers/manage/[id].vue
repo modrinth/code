@@ -3,7 +3,7 @@
     <div
       v-if="serverData"
       data-pyro-server-manager-root
-      class="relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
+      class="experimental-styles-within relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
     >
       <div class="flex w-full min-w-0 select-none flex-row items-center gap-6 pt-4">
         <UiServersServerIcon :image="serverData.image" />

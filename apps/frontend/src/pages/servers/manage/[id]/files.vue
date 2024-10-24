@@ -103,7 +103,7 @@
       @drop.prevent="handleDrop"
     >
       <!-- Main Content -->
-      <div ref="mainContent" class="flex h-[40rem] w-full flex-col">
+      <div ref="mainContent" class="flex w-full flex-col">
         <nav
           v-if="!isEditing"
           data-pyro-files-state="browsing"
@@ -273,36 +273,19 @@
         </div>
         <div
           v-else-if="items.length > 0"
-          ref="scrollContainer"
-          class="h-full w-full overflow-y-auto rounded-b-2xl"
+          class="h-full w-full"
+          style="height: calc(100vh - var(--header-height))"
         >
-          <UiServersFileItem
-            v-for="item in filteredItems"
-            :key="item.name"
-            :count="item.count"
-            :created="item.created"
-            :modified="item.modified"
-            :name="item.name"
-            :path="item.path"
-            :type="item.type"
-            :size="item.size"
-            @delete="showDeleteModal(item)"
-            @rename="showRenameModal(item)"
-            @download="downloadFile(item)"
-            @move="showMoveModal(item)"
-            @edit="editFile(item)"
-            @contextmenu="(x, y) => showContextMenu(item, x, y)"
+          <UiServersFileVirtualList
+            :items="filteredItems"
+            @delete="showDeleteModal"
+            @rename="showRenameModal"
+            @download="downloadFile"
+            @move="showMoveModal"
+            @edit="editFile"
+            @contextmenu="showContextMenu"
+            @load-more="handleLoadMore"
           />
-          <div v-if="loadError" class="flex h-10 items-center justify-center gap-2">
-            <ClearIcon class="h-4 w-4" />
-            Error loading more directories {{ loadError }}
-          </div>
-          <div
-            v-else-if="isLoading"
-            class="flex h-10 animate-pulse items-center justify-center gap-2"
-          >
-            <BrandLogoAnimated />
-          </div>
         </div>
 
         <div
@@ -312,7 +295,7 @@
           <div class="flex flex-col items-center gap-4 text-center">
             <FolderOpenIcon class="h-16 w-16 text-secondary" />
             <h3 class="text-2xl font-bold text-contrast">This folder is empty</h3>
-            <p class="m-0 text-sm text-secondary">There are no files or folders in this folder.</p>
+            <p class="m-0 text-sm text-secondary">There are no files or folders.</p>
           </div>
         </div>
 
@@ -430,7 +413,6 @@ import {
   DropdownIcon,
   FolderOpenIcon,
   SaveIcon,
-  ClearIcon,
   EditIcon,
   ArrowBigUpDashIcon,
   DownloadIcon,
@@ -537,6 +519,12 @@ const { reset } = useInfiniteScroll(
   { distance: 1000 },
 );
 
+const handleLoadMore = async () => {
+  if (currentPage.value <= pages.value && !isLoading.value) {
+    await fetchData();
+  }
+};
+
 const onInit = (editor: any) => {
   editor.commands.addCommand({
     name: "saveFile",
@@ -544,11 +532,6 @@ const onInit = (editor: any) => {
     exec: () => saveFileContent(false),
   });
 };
-
-watch(contextMenuInfo, () => console.log(contextMenuInfo.value), {
-  deep: true,
-  immediate: true,
-});
 
 let dY = 0;
 let oldScroll = 0;
