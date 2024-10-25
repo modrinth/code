@@ -156,9 +156,7 @@
                       </div>
                     </div>
                   </NuxtLink>
-                  <div
-                    class="absolute right-2 flex items-center gap-2 pr-2 font-semibold text-contrast"
-                  >
+                  <div class="flex items-center gap-2 pr-4 font-semibold text-contrast">
                     <ButtonStyled v-if="mod.project_id" type="transparent">
                       <button
                         v-tooltip="'Edit mod version'"
