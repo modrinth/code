@@ -56,18 +56,21 @@
       </div>
 
       <div v-if="hasMods" class="flex flex-col gap-2">
-        <div v-if="filteredModrinthMods.length">
-          <h2 class="mt-8 text-xl font-bold text-contrast">Modrinth mods</h2>
-          <p>
-            These are mods installed on your server that are listed on Modrinth. You can manage them
-            here.
-          </p>
-          <div ref="modrinthListContainer" class="relative w-full">
-            <div :style="{ position: 'relative', height: `${modrinthTotalHeight}px` }">
-              <div :style="{ position: 'absolute', top: `${modrinthVisibleTop}px`, width: '100%' }">
+        <div ref="listContainer" class="relative w-full">
+          <div :style="{ position: 'relative', height: `${totalHeight}px` }">
+            <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
+              <!-- Modrinth Section -->
+              <template v-if="visibleItems.modrinth.header">
+                <div class="h-[100px]">
+                  <h2 class="mt-8 text-xl font-bold text-contrast">Modrinth mods</h2>
+                  <p class="mb-4">
+                    These are mods installed on your server that are listed on Modrinth.
+                  </p>
+                </div>
+              </template>
+
+              <template v-for="mod in visibleItems.modrinth.items" :key="mod.name">
                 <div
-                  v-for="mod in modrinthVisibleItems"
-                  :key="mod.name"
                   class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised hover:bg-table-alternateRow"
                   :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
                   style="height: 64px"
@@ -118,40 +121,35 @@
                       </button>
                     </ButtonStyled>
                     <ButtonStyled type="transparent">
-                      <button
-                        :disabled="mod.project_id ? modActionsInProgress[mod.project_id] : true"
-                        @click="removeModOptimistic(mod)"
-                      >
+                      <button @click="removeModOptimistic(mod)">
                         <TrashIcon />
                       </button>
                     </ButtonStyled>
                     <input
                       :id="`toggle-${mod.project_id}`"
                       :checked="!mod.disabled"
-                      :disabled="mod.project_id ? modActionsInProgress[mod.project_id] : true"
                       class="switch stylized-toggle"
                       type="checkbox"
                       @change="toggleModOptimistic(mod)"
                     />
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
+              </template>
 
-        <div v-if="filteredExternalMods.length">
-          <h2 class="mt-8 text-xl font-bold text-contrast">External mods</h2>
-          <p>
-            External mods are mods that are directly uploaded to your server or are part of a
-            modpack, but are not listed on Modrinth. You can manage them via the Files tab.
-          </p>
-          <div ref="externalListContainer" class="relative w-full">
-            <div :style="{ position: 'relative', height: `${externalTotalHeight}px` }">
-              <div :style="{ position: 'absolute', top: `${externalVisibleTop}px`, width: '100%' }">
+              <!-- External Section -->
+              <template v-if="visibleItems.external.header">
+                <div class="h-[100px]">
+                  <h2 class="mt-8 text-xl font-bold text-contrast">External mods</h2>
+                  <p class="mb-4">
+                    External mods are mods that are directly uploaded to your server or are part of
+                    a modpack, but are not listed on Modrinth. You can manage them via the Files
+                    tab.
+                  </p>
+                </div>
+              </template>
+
+              <template v-for="mod in visibleItems.external.items" :key="mod.name">
                 <div
-                  v-for="mod in externalVisibleItems"
-                  :key="mod.name"
                   class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised hover:bg-table-alternateRow"
                   :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
                   style="height: 64px"
@@ -189,14 +187,13 @@
                     <input
                       :id="`toggle-${mod.filename}`"
                       :checked="!mod.disabled"
-                      :disabled="true"
                       class="switch stylized-toggle"
                       type="checkbox"
                       @change="toggleModOptimistic(mod)"
                     />
                   </div>
                 </div>
-              </div>
+              </template>
             </div>
           </div>
         </div>
@@ -233,13 +230,11 @@ interface Mod {
   disabled: boolean;
 }
 
-const prodOverride = await PyroAuthOverride();
-
-const ITEM_HEIGHT = 68;
+const ITEM_HEIGHT = 64;
+const HEADER_HEIGHT = 100;
 const BUFFER_SIZE = 5;
 
-const modrinthListContainer = ref<HTMLElement | null>(null);
-const externalListContainer = ref<HTMLElement | null>(null);
+const listContainer = ref<HTMLElement | null>(null);
 const windowScrollY = ref(0);
 const windowHeight = ref(0);
 
@@ -251,54 +246,63 @@ const newModVersion = ref("");
 const versions = ref<Record<string, any[]>>({});
 const localMods = ref<Mod[]>([]);
 const modActionsInProgress = ref<Record<string, boolean>>({});
-const modSearchInput = ref("");
 const searchInput = ref("");
+const modSearchInput = ref("");
 const isFetchingVersionsForMod = ref<Record<string, boolean>>({});
 
-const modrinthTotalHeight = computed(() => filteredModrinthMods.value.length * ITEM_HEIGHT);
-const externalTotalHeight = computed(() => filteredExternalMods.value.length * ITEM_HEIGHT);
+const totalHeight = computed(() => {
+  const modrinthHeight = filteredModrinthMods.value.length * ITEM_HEIGHT;
+  const externalHeight = filteredExternalMods.value.length * ITEM_HEIGHT;
+  const headerHeights =
+    (filteredModrinthMods.value.length > 0 ? HEADER_HEIGHT : 0) +
+    (filteredExternalMods.value.length > 0 ? HEADER_HEIGHT : 0);
+  return modrinthHeight + externalHeight + headerHeights;
+});
 
-const gotoManageModPage = () => {
-  navigateTo(`/servers/manage/${props.server.serverId}/options/loader`);
-};
+const getVisibleRange = () => {
+  if (!listContainer.value) return { start: 0, end: 0 };
 
-const getVisibleRange = (containerTop: number, itemCount: number) => {
-  const relativeScrollTop = Math.max(0, windowScrollY.value - containerTop);
-  const start = Math.floor(relativeScrollTop / ITEM_HEIGHT);
+  const containerTop = listContainer.value.getBoundingClientRect().top + window.scrollY;
+  const scrollTop = Math.max(0, windowScrollY.value - containerTop);
+
+  const start = Math.floor(scrollTop / ITEM_HEIGHT);
   const visibleCount = Math.ceil(windowHeight.value / ITEM_HEIGHT);
+
   return {
     start: Math.max(0, start - BUFFER_SIZE),
-    end: Math.min(itemCount, start + visibleCount + BUFFER_SIZE * 2),
+    end: Math.min(
+      filteredModrinthMods.value.length + filteredExternalMods.value.length,
+      start + visibleCount + BUFFER_SIZE * 2,
+    ),
   };
 };
 
-const modrinthVisibleRange = computed(() => {
-  if (!modrinthListContainer.value) return { start: 0, end: 0 };
-  const containerTop = modrinthListContainer.value.getBoundingClientRect().top + window.scrollY;
-  return getVisibleRange(containerTop, filteredModrinthMods.value.length);
+const visibleTop = computed(() => {
+  const range = getVisibleRange();
+  return range.start * ITEM_HEIGHT;
 });
 
-const externalVisibleRange = computed(() => {
-  if (!externalListContainer.value) return { start: 0, end: 0 };
-  const containerTop = externalListContainer.value.getBoundingClientRect().top + window.scrollY;
-  return getVisibleRange(containerTop, filteredExternalMods.value.length);
-});
+const visibleItems = computed(() => {
+  const range = getVisibleRange();
+  const modrinthStart = 0;
+  const externalStart = filteredModrinthMods.value.length;
 
-const modrinthVisibleTop = computed(() => modrinthVisibleRange.value.start * ITEM_HEIGHT);
-const externalVisibleTop = computed(() => externalVisibleRange.value.start * ITEM_HEIGHT);
-
-const modrinthVisibleItems = computed(() => {
-  return filteredModrinthMods.value.slice(
-    modrinthVisibleRange.value.start,
-    modrinthVisibleRange.value.end,
-  );
-});
-
-const externalVisibleItems = computed(() => {
-  return filteredExternalMods.value.slice(
-    externalVisibleRange.value.start,
-    externalVisibleRange.value.end,
-  );
+  return {
+    modrinth: {
+      header: range.start <= modrinthStart && filteredModrinthMods.value.length > 0,
+      items: filteredModrinthMods.value.slice(
+        Math.max(0, range.start - modrinthStart),
+        Math.min(filteredModrinthMods.value.length, range.end - modrinthStart),
+      ),
+    },
+    external: {
+      header: range.start <= externalStart && filteredExternalMods.value.length > 0,
+      items: filteredExternalMods.value.slice(
+        Math.max(0, range.start - externalStart),
+        Math.min(filteredExternalMods.value.length, range.end - externalStart),
+      ),
+    },
+  };
 });
 
 const handleScroll = () => {
@@ -321,6 +325,7 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
 
+const prodOverride = await PyroAuthOverride();
 const { refresh: refreshData } = await useAsyncData("serverData", async () => {
   await props.server.refresh(["general", "mods"]);
   return true;
@@ -337,29 +342,6 @@ watch(
   },
   { immediate: true },
 );
-
-const hasMods = computed(() => {
-  return filteredMods.value?.length > 0;
-});
-
-const filteredMods = computed(() => {
-  if (!modSearchInput.value.trim()) {
-    return localMods.value;
-  }
-  return localMods.value.filter(
-    (mod) =>
-      mod.name?.toLowerCase().includes(modSearchInput.value.toLowerCase()) ||
-      mod.filename.toLowerCase().includes(modSearchInput.value.toLowerCase()),
-  );
-});
-
-const filteredExternalMods = computed(() => {
-  return filteredMods.value.filter((mod) => !mod.project_id);
-});
-
-const filteredModrinthMods = computed(() => {
-  return filteredMods.value.filter((mod) => mod.project_id);
-});
 
 const fetchVersions = async (projectId: string) => {
   if (!versions.value[projectId]) {
@@ -495,6 +477,33 @@ const handleModAction = async (mod: Mod, versionNumber?: string) => {
     console.error("Error handling mod action:", error);
   }
 };
+
+const gotoManageModPage = () => {
+  navigateTo(`/servers/manage/${props.server.serverId}/options/loader`);
+};
+
+const hasMods = computed(() => {
+  return filteredMods.value?.length > 0;
+});
+
+const filteredMods = computed(() => {
+  if (!modSearchInput.value.trim()) {
+    return localMods.value;
+  }
+  return localMods.value.filter(
+    (mod) =>
+      mod.name?.toLowerCase().includes(modSearchInput.value.toLowerCase()) ||
+      mod.filename.toLowerCase().includes(modSearchInput.value.toLowerCase()),
+  );
+});
+
+const filteredExternalMods = computed(() => {
+  return filteredMods.value.filter((mod) => !mod.project_id);
+});
+
+const filteredModrinthMods = computed(() => {
+  return filteredMods.value.filter((mod) => mod.project_id);
+});
 
 const versionOptions = computed(() => {
   return selectedMod.value && selectedMod.value.project_id
