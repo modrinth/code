@@ -94,8 +94,8 @@
               <div
                 class="pointer-events-none relative z-[1] flex flex-col justify-center group-hover:underline"
               >
-                <div class="font-bold text-contrast">{{ version.version_number }}</div>
-                <div class="text-xs font-medium">{{ version.name }}</div>
+                <div class="font-bold text-contrast">{{ version.name }}</div>
+                <div class="text-xs font-medium">{{ version.version_number }}</div>
               </div>
             </div>
             <div class="flex flex-col justify-center gap-2 sm:contents">
