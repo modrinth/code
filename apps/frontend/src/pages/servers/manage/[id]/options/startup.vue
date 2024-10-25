@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownSelect, Button } from "@modrinth/ui";
+import { Button } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
