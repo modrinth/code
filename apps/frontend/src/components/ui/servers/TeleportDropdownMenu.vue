@@ -166,6 +166,9 @@ const onFocus = async () => {
     lastFocusedElement.value = document.activeElement as HTMLElement;
     dropdownVisible.value = true;
     await updatePosition();
+    nextTick(() => {
+      dropdown.value?.focus();
+    });
   }
 };
 
@@ -302,6 +305,8 @@ const handleKeyDown = (event: KeyboardEvent) => {
       lastFocusedElement.value = document.activeElement as HTMLElement;
       toggleDropdown();
     }
+  } else {
+    handleDropdownKeyDown(event);
   }
 };
 
