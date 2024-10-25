@@ -154,6 +154,13 @@
             The mod loader that provides the ability to load mods into your server. Changing this
             will reinstall the server.
           </p>
+          <div v-if="data.upstream" class="flex items-center gap-2">
+            <InfoIcon />
+            <span class="text-sm text-secondary">
+              Your server was installed from a modpack. The mod loader is managed automatically by
+              the modpack.
+            </span>
+          </div>
         </div>
         <div class="flex w-full flex-col gap-4 rounded-xl bg-table-alternateRow p-4 pr-4">
           <div class="flex items-center justify-between">
@@ -207,7 +214,6 @@
             <ButtonStyled>
               <button @click="selectLoader('Fabric')">
                 {{ data.loader === "Fabric" ? "Reinstall" : "Install" }}
-                <ChevronRightIcon />
               </button>
             </ButtonStyled>
           </div>
@@ -235,7 +241,6 @@
             <ButtonStyled>
               <button @click="selectLoader('Quilt')">
                 {{ data.loader === "Quilt" ? "Reinstall" : "Install" }}
-                <ChevronRightIcon />
               </button>
             </ButtonStyled>
           </div>
@@ -263,7 +268,6 @@
             <ButtonStyled>
               <button @click="selectLoader('Forge')">
                 {{ data.loader === "Forge" ? "Reinstall" : "Install" }}
-                <ChevronRightIcon />
               </button>
             </ButtonStyled>
           </div>
@@ -291,7 +295,6 @@
             <ButtonStyled>
               <button @click="selectLoader('NeoForge')">
                 {{ data.loader?.toLowerCase() === "neoforge" ? "Reinstall" : "Install" }}
-                <ChevronRightIcon />
               </button>
             </ButtonStyled>
           </div>
@@ -305,7 +308,7 @@
 
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { ChevronRightIcon, DownloadIcon, UploadIcon } from "@modrinth/assets";
+import { DownloadIcon, UploadIcon, InfoIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();
