@@ -53,7 +53,7 @@
 
   <div v-if="data && localMods" class="flex h-full w-full flex-col">
     <div class="flex h-full w-full flex-col">
-      <div class="universal-card flex items-center justify-between">
+      <div class="mb-4 flex items-center justify-between">
         <div class="flex w-full flex-row items-center gap-4">
           <div class="relative w-full text-sm">
             <label class="sr-only" for="search">Search</label>
@@ -89,8 +89,8 @@
               <FilterIcon aria-hidden="true" />
               <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
               <template #all> All mods </template>
-              <template #enabled> Enabled mods </template>
-              <template #disabled> Disabled mods </template>
+              <template #enabled> Only enabled </template>
+              <template #disabled> Only disabled </template>
             </UiServersTeleportOverflowMenu>
           </ButtonStyled>
         </div>
@@ -100,156 +100,82 @@
         <div ref="listContainer" class="relative w-full">
           <div :style="{ position: 'relative', height: `${totalHeight}px` }">
             <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
-              <!-- Modrinth Section -->
-              <div v-if="visibleItems.modrinth.items.length > 0" class="universal-card">
-                <template v-if="visibleItems.modrinth.header">
-                  <div class="h-[72px]">
-                    <h2 class="mb-0 mt-8 text-xl font-bold text-contrast">Modrinth mods</h2>
-                    <p class="mb-4 mt-3">
-                      These are mods installed on your server that are listed on Modrinth.
-                    </p>
-                  </div>
-                </template>
-
-                <template v-for="mod in visibleItems.modrinth.items" :key="mod.name">
-                  <div
-                    class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-table-alternateRow"
-                    :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
-                    style="height: 64px"
+              <template v-for="mod in visibleItems.items" :key="mod.filename">
+                <div
+                  class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised"
+                  :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
+                  style="height: 64px"
+                >
+                  <NuxtLink
+                    :to="
+                      mod.project_id
+                        ? `/project/${mod.project_id}/version/${mod.version_id}`
+                        : `files?path=mods`
+                    "
+                    class="group flex w-full items-center rounded-xl p-2"
                   >
-                    <NuxtLink
-                      :to="`/project/${mod.project_id}/version/${mod.version_id}`"
-                      class="group flex w-full items-center rounded-xl p-2"
-                    >
-                      <div class="flex items-center gap-2">
-                        <UiAvatar
-                          :src="mod.icon_url"
-                          size="sm"
-                          alt="Server Icon"
-                          :class="mod.disabled ? 'grayscale' : ''"
-                        />
-                        <div class="flex flex-col">
-                          <span class="flex items-center gap-2 text-lg font-bold">
-                            {{ mod.name }}
-                            <span
-                              v-if="mod.disabled"
-                              class="rounded-full bg-button-bg p-1 px-2 text-xs text-contrast"
-                              >Disabled</span
-                            >
-                          </span>
-                          <span class="text-xs text-secondary">{{ mod.version_number }}</span>
-                        </div>
-                      </div>
-                    </NuxtLink>
-                    <div
-                      class="absolute right-2 flex items-center gap-2 pr-2 font-semibold text-contrast"
-                    >
-                      <ButtonStyled type="transparent">
-                        <button
-                          v-if="mod.project_id"
-                          v-tooltip="'Edit mod version'"
-                          :disabled="
-                            isFetchingVersionsForMod[mod.project_id] ||
-                            modActionsInProgress[mod.project_id]
-                          "
-                          @click="showEditModModal(mod)"
-                        >
-                          <template v-if="isFetchingVersionsForMod[mod.project_id]">
-                            <UiServersLoadingIcon />
-                          </template>
-                          <template v-else>
-                            <EditIcon />
-                          </template>
-                        </button>
-                      </ButtonStyled>
-                      <ButtonStyled type="transparent">
-                        <button
-                          v-tooltip="'Delete mod'"
-                          :disabled="mod.project_id ? modActionsInProgress[mod.project_id] : false"
-                          @click="removeModOptimistic(mod)"
-                        >
-                          <TrashIcon />
-                        </button>
-                      </ButtonStyled>
-                      <input
-                        :id="`toggle-${mod.project_id}`"
-                        :checked="!mod.disabled"
-                        :disabled="mod.project_id ? modActionsInProgress[mod.project_id] : false"
-                        class="switch stylized-toggle"
-                        type="checkbox"
-                        @change="toggleModOptimistic(mod)"
+                    <div class="flex items-center gap-2">
+                      <UiAvatar
+                        :src="mod.icon_url"
+                        size="sm"
+                        alt="Server Icon"
+                        :class="mod.disabled ? 'grayscale' : ''"
                       />
+                      <div class="flex flex-col">
+                        <span class="flex items-center gap-2 text-lg font-bold">
+                          {{ mod.name || mod.filename.replace(".disabled", "") }}
+                          <span
+                            v-if="mod.disabled"
+                            class="rounded-full bg-button-bg p-1 px-2 text-xs text-contrast"
+                            >Disabled</span
+                          >
+                        </span>
+                        <span class="text-xs text-secondary">{{
+                          mod.version_number || "External mod"
+                        }}</span>
+                      </div>
                     </div>
-                  </div>
-                </template>
-              </div>
-
-              <!-- External Section -->
-              <div v-if="visibleItems.external.items.length > 0" class="universal-card">
-                <template v-if="visibleItems.external.header">
-                  <div class="h-[72px]">
-                    <h2 class="mb-0 mt-8 text-xl font-bold text-contrast">External mods</h2>
-                    <p class="mb-4 mt-3">
-                      External mods are mods that are directly uploaded to your server or are part
-                      of a modpack, but are not listed on Modrinth.
-                    </p>
-                  </div>
-                </template>
-
-                <template v-for="mod in visibleItems.external.items" :key="mod.filename">
+                  </NuxtLink>
                   <div
-                    class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-table-alternateRow"
-                    :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
-                    style="height: 64px"
+                    class="absolute right-2 flex items-center gap-2 pr-2 font-semibold text-contrast"
                   >
-                    <NuxtLink
-                      :to="`files?path=mods`"
-                      class="group flex w-full items-center rounded-xl p-2"
-                    >
-                      <div class="flex items-center gap-2">
-                        <UiAvatar
-                          :src="mod.icon_url"
-                          size="sm"
-                          alt="Server Icon"
-                          :class="mod.disabled ? 'grayscale' : ''"
-                        />
-                        <div class="flex flex-col">
-                          <span class="flex items-center gap-2 text-lg font-bold">
-                            {{ mod.filename.replace(".disabled", "") }}
-                            <span
-                              v-if="mod.disabled"
-                              class="rounded-full bg-button-bg p-1 px-2 text-xs text-contrast"
-                              >Disabled</span
-                            >
-                          </span>
-                          <span class="text-xs text-secondary"> External Mod </span>
-                        </div>
-                      </div>
-                    </NuxtLink>
-                    <div
-                      class="absolute right-2 flex items-center gap-2 pr-2 font-semibold text-contrast"
-                    >
-                      <ButtonStyled type="transparent">
-                        <button
-                          v-tooltip="'Delete mod'"
-                          :disabled="modActionsInProgress[mod.filename]"
-                          @click="removeModOptimistic(mod)"
-                        >
-                          <TrashIcon />
-                        </button>
-                      </ButtonStyled>
-                      <input
-                        :id="`toggle-${mod.filename}`"
-                        :checked="!mod.disabled"
-                        :disabled="modActionsInProgress[mod.filename.replace('.disabled', '')]"
-                        class="switch stylized-toggle"
-                        type="checkbox"
-                        @change="toggleModOptimistic(mod)"
-                      />
-                    </div>
+                    <ButtonStyled v-if="mod.project_id" type="transparent">
+                      <button
+                        v-tooltip="'Edit mod version'"
+                        :disabled="
+                          isFetchingVersionsForMod[mod.project_id] ||
+                          modActionsInProgress[getIdentifier(mod)]
+                        "
+                        @click="showEditModModal(mod)"
+                      >
+                        <template v-if="isFetchingVersionsForMod[mod.project_id]">
+                          <UiServersLoadingIcon />
+                        </template>
+                        <template v-else>
+                          <EditIcon />
+                        </template>
+                      </button>
+                    </ButtonStyled>
+                    <ButtonStyled type="transparent">
+                      <button
+                        v-tooltip="'Delete mod'"
+                        :disabled="modActionsInProgress[getIdentifier(mod)]"
+                        @click="removeModOptimistic(mod)"
+                      >
+                        <TrashIcon />
+                      </button>
+                    </ButtonStyled>
+                    <input
+                      :id="`toggle-${getIdentifier(mod)}`"
+                      :checked="!mod.disabled"
+                      :disabled="modActionsInProgress[getIdentifier(mod)]"
+                      class="switch stylized-toggle"
+                      type="checkbox"
+                      @change="toggleModOptimistic(mod)"
+                    />
                   </div>
-                </template>
-              </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -297,7 +223,6 @@ interface Mod {
 }
 
 const ITEM_HEIGHT = 64;
-const HEADER_HEIGHT = 72;
 const BUFFER_SIZE = 5;
 
 const listContainer = ref<HTMLElement | null>(null);
@@ -333,13 +258,13 @@ const filterMods = (method: string) => {
   filterMethod.value = method;
 };
 
+const getIdentifier = (mod: Mod) => {
+  return mod.project_id || mod.filename.replace(".disabled", "");
+};
+
 const totalHeight = computed(() => {
-  const modrinthHeight = filteredModrinthMods.value.length * ITEM_HEIGHT;
-  const externalHeight = filteredExternalMods.value.length * ITEM_HEIGHT;
-  const headerHeights =
-    (filteredModrinthMods.value.length > 0 ? HEADER_HEIGHT : 0) +
-    (filteredExternalMods.value.length > 0 ? HEADER_HEIGHT : 0);
-  return modrinthHeight + externalHeight + headerHeights;
+  const itemsHeight = filteredMods.value.length * ITEM_HEIGHT;
+  return itemsHeight;
 });
 
 const getVisibleRange = () => {
@@ -353,10 +278,7 @@ const getVisibleRange = () => {
 
   return {
     start: Math.max(0, start - BUFFER_SIZE),
-    end: Math.min(
-      filteredModrinthMods.value.length + filteredExternalMods.value.length,
-      start + visibleCount + BUFFER_SIZE * 2,
-    ),
+    end: Math.min(filteredMods.value.length, start + visibleCount + BUFFER_SIZE * 2),
   };
 };
 
@@ -367,24 +289,10 @@ const visibleTop = computed(() => {
 
 const visibleItems = computed(() => {
   const range = getVisibleRange();
-  const modrinthStart = 0;
-  const externalStart = filteredModrinthMods.value.length;
+  const items = filteredMods.value;
 
   return {
-    modrinth: {
-      header: range.start <= modrinthStart && filteredModrinthMods.value.length > 0,
-      items: filteredModrinthMods.value.slice(
-        Math.max(0, range.start - modrinthStart),
-        Math.min(filteredModrinthMods.value.length, range.end - modrinthStart),
-      ),
-    },
-    external: {
-      header: range.start <= externalStart && filteredExternalMods.value.length > 0,
-      items: filteredExternalMods.value.slice(
-        Math.max(0, range.start - externalStart),
-        Math.min(filteredExternalMods.value.length, range.end - externalStart),
-      ),
-    },
+    items: items.slice(Math.max(0, range.start), Math.min(items.length, range.end)),
   };
 });
 
@@ -454,7 +362,7 @@ const debouncedSearch = debounce(() => {
 }, 300);
 
 const toggleModOptimistic = async (mod: Mod) => {
-  const identifier = mod.project_id || mod.filename;
+  const identifier = mod.project_id || mod.filename.replace(".disabled", "");
   if (modActionsInProgress.value[identifier]) return;
 
   modActionsInProgress.value[identifier] = true;
@@ -462,21 +370,32 @@ const toggleModOptimistic = async (mod: Mod) => {
   const originalMods = [...localMods.value];
   const originalDisabled = mod.disabled;
 
-  mod.disabled = !mod.disabled;
-
   try {
     const newFilename = mod.disabled
-      ? `${mod.filename}.disabled`
-      : mod.filename.replace(".disabled", "");
+      ? mod.filename.replace(".disabled", "")
+      : `${mod.filename}.disabled`;
 
-    await props.server.fs?.renameFileOrFolder(`/mods/${mod.filename}`, newFilename);
+    const sourcePath = `/mods/${mod.filename}`;
+    const destinationPath = `/mods/${newFilename}`;
 
-    mod.filename = newFilename;
+    await props.server.fs?.moveFileOrFolder(sourcePath, destinationPath);
+
+    const modIndex = localMods.value.findIndex((m) => m.filename === mod.filename);
+    if (modIndex !== -1) {
+      const updatedMod = { ...mod, disabled: !mod.disabled, filename: newFilename };
+      localMods.value = [
+        ...localMods.value.slice(0, modIndex),
+        updatedMod,
+        ...localMods.value.slice(modIndex + 1),
+      ];
+    }
 
     await refreshData();
 
     addNotification({
-      text: `${mod.disabled ? "Disabled" : "Enabled"} ${mod.name || "External mod"}. Restart your server for changes to take effect.`,
+      text: `${originalDisabled ? "Enabled" : "Disabled"} ${
+        mod.name || mod.filename.replace(".disabled", "")
+      }. Restart your server for changes to take effect.`,
       type: "success",
     });
   } catch (error) {
@@ -485,7 +404,7 @@ const toggleModOptimistic = async (mod: Mod) => {
     mod.disabled = originalDisabled;
 
     addNotification({
-      text: `Something went wrong toggling ${mod.name || "External mod"}`,
+      text: `Something went wrong toggling ${mod.name || mod.filename.replace(".disabled", "")}`,
       type: "error",
     });
   } finally {
@@ -494,7 +413,7 @@ const toggleModOptimistic = async (mod: Mod) => {
 };
 
 const removeModOptimistic = async (mod: Mod) => {
-  const identifier = mod.project_id || mod.filename;
+  const identifier = getIdentifier(mod);
   if (modActionsInProgress.value[identifier]) return;
 
   modActionsInProgress.value[identifier] = true;
@@ -508,14 +427,14 @@ const removeModOptimistic = async (mod: Mod) => {
     await refreshData();
 
     addNotification({
-      text: `Successfully removed ${mod.name || "External mod"}`,
+      text: `Successfully removed ${mod.name || mod.filename.replace(".disabled", "")}`,
       type: "success",
     });
   } catch (error) {
     console.error("Error removing mod:", error);
     localMods.value = originalMods;
     addNotification({
-      text: `couldn't remove ${mod.name || "External mod"}`,
+      text: `couldn't remove ${mod.name || mod.filename.replace(".disabled", "")}`,
       type: "error",
     });
   } finally {
@@ -580,22 +499,22 @@ const filteredMods = computed(() => {
       )
     : localMods.value;
 
-  switch (filterMethod.value) {
-    case "disabled":
-      return mods.filter((mod) => mod.disabled);
-    case "enabled":
-      return mods.filter((mod) => !mod.disabled);
-    default:
-      return mods;
-  }
-});
+  const statusFilteredMods = (() => {
+    switch (filterMethod.value) {
+      case "disabled":
+        return mods.filter((mod) => mod.disabled);
+      case "enabled":
+        return mods.filter((mod) => !mod.disabled);
+      default:
+        return mods;
+    }
+  })();
 
-const filteredExternalMods = computed(() => {
-  return filteredMods.value.filter((mod) => !mod.project_id);
-});
-
-const filteredModrinthMods = computed(() => {
-  return filteredMods.value.filter((mod) => mod.project_id);
+  return statusFilteredMods.sort((a, b) => {
+    const aName = a.name || a.filename.replace(".disabled", "");
+    const bName = b.name || b.filename.replace(".disabled", "");
+    return aName.localeCompare(bName);
+  });
 });
 
 const versionOptions = computed(() => {
