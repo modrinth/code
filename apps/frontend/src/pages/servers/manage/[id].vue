@@ -199,6 +199,7 @@ const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
 const isLoading = ref(true);
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
+const isMounted = ref(true);
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -284,11 +285,18 @@ const navLinks = [
 ];
 
 const connectWebSocket = () => {
+  if (!isMounted.value) return;
+
   try {
     const wsAuth = computed(() => server.ws);
     socket.value = new WebSocket(`wss://${wsAuth.value?.url}`);
 
     socket.value.onopen = () => {
+      if (!isMounted.value) {
+        socket.value?.close();
+        return;
+      }
+
       consoleOutput.value = [];
       socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
       isConnected.value = true;
@@ -304,40 +312,58 @@ const connectWebSocket = () => {
       firstConnect.value = false;
 
       if (reconnectInterval.value) {
-        clearInterval(reconnectInterval.value);
+        if (reconnectInterval.value !== null) {
+          clearInterval(reconnectInterval.value);
+        }
         reconnectInterval.value = null;
       }
     };
 
     socket.value.onmessage = (event) => {
-      const data: WSEvent = JSON.parse(event.data);
-      handleWebSocketMessage(data);
+      if (isMounted.value) {
+        const data: WSEvent = JSON.parse(event.data);
+        handleWebSocketMessage(data);
+      }
     };
 
     socket.value.onclose = () => {
-      consoleOutput.value.push("\nSomething went wrong with the connection, we're reconnecting...");
-      isConnected.value = false;
-      scheduleReconnect();
+      if (isMounted.value) {
+        consoleOutput.value.push(
+          "\nSomething went wrong with the connection, we're reconnecting...",
+        );
+        isConnected.value = false;
+        scheduleReconnect();
+      }
     };
 
     socket.value.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      isConnected.value = false;
-      scheduleReconnect();
+      if (isMounted.value) {
+        console.error("Failed to connect WebSocket:", error);
+        isConnected.value = false;
+        scheduleReconnect();
+      }
     };
   } catch (error) {
-    console.error("Failed to connect WebSocket:", error);
-    isConnected.value = false;
-    scheduleReconnect();
+    if (isMounted.value) {
+      console.error("Failed to connect WebSocket:", error);
+      isConnected.value = false;
+      scheduleReconnect();
+    }
   }
 };
 
 const scheduleReconnect = () => {
+  if (!isMounted.value) return;
+
   if (!reconnectInterval.value) {
     isReconnecting.value = true;
     reconnectInterval.value = setInterval(() => {
-      console.log("Attempting to reconnect...");
-      connectWebSocket();
+      if (isMounted.value) {
+        console.log("Attempting to reconnect...");
+        connectWebSocket();
+      } else {
+        reconnectInterval.value = null;
+      }
     }, 5000);
   }
 };
@@ -558,7 +584,40 @@ const copyServerDebugInfo = () => {
   }, 5000);
 };
 
+const cleanup = () => {
+  isMounted.value = false;
+
+  stopPolling();
+  stopUptimeUpdates();
+  if (reconnectInterval.value) {
+    clearInterval(reconnectInterval.value);
+    reconnectInterval.value = null;
+  }
+
+  if (socket.value) {
+    socket.value.onopen = null;
+    socket.value.onmessage = null;
+    socket.value.onclose = null;
+    socket.value.onerror = null;
+
+    if (
+      socket.value.readyState === WebSocket.OPEN ||
+      socket.value.readyState === WebSocket.CONNECTING
+    ) {
+      socket.value.close();
+    }
+    socket.value = null;
+  }
+
+  isConnected.value = false;
+  isReconnecting.value = false;
+  isLoading.value = true;
+
+  DOMPurify.removeHook("afterSanitizeAttributes");
+};
+
 onMounted(() => {
+  isMounted.value = true;
   connectWebSocket();
   DOMPurify.addHook(
     "afterSanitizeAttributes",
@@ -575,14 +634,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  stopPolling();
-  if (reconnectInterval.value) {
-    clearInterval(reconnectInterval.value);
-  }
-  if (socket.value) {
-    socket.value.close();
-  }
-  DOMPurify.removeHook("afterSanitizeAttributes");
+  cleanup();
 });
 
 watch(
