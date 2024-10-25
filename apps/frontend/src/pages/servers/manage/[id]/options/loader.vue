@@ -89,30 +89,17 @@
         </div>
         <div
           v-if="data.upstream"
-          class="flex w-full justify-between gap-2 rounded-xl bg-table-alternateRow p-4"
+          class="flex w-full justify-between gap-2 rounded-3xl bg-table-alternateRow p-4"
         >
           <div class="flex gap-4">
-            <div v-tooltip="'Change the installed modpack'" class="group relative">
-              <UiAvatar :src="data.project?.icon_url" size="120px" />
-              <div
-                class="absolute top-0 hidden size-[120px] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
-                @click="editModal.show()"
-              >
-                <EditIcon class="h-8 w-8 text-contrast" />
-              </div>
-            </div>
+            <UiAvatar :src="data.project?.icon_url" size="120px" />
+
             <div class="flex flex-col justify-between">
               <div class="flex flex-col gap-2">
                 <h1 class="m-0 flex gap-2 text-2xl font-extrabold leading-none text-contrast">
                   {{ data.project?.title }}
-                  <span
-                    v-tooltip="'Current installed Modpack version'"
-                    class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
-                  >
-                    {{ currentVersion?.version_number }}
-                  </span>
                 </h1>
-                <span class="text-md font-semibold text-secondary">
+                <span class="text-md text-secondary">
                   {{
                     data.project?.description && data.project.description.length > 150
                       ? data.project.description.substring(0, 150) + "..."
@@ -297,7 +284,7 @@
 
 <script setup lang="ts">
 import { Button, NewModal } from "@modrinth/ui";
-import { ChevronRightIcon, DownloadIcon, EditIcon, UploadIcon } from "@modrinth/assets";
+import { ChevronRightIcon, DownloadIcon, UploadIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();
