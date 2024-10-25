@@ -30,7 +30,7 @@
                 {{ data.mc_version }}
               </span>
             </div>
-            <DropdownSelect
+            <UiServersTeleportDropdownMenu
               :id="'java-version-field'"
               v-model="jdkVersion"
               name="java-version"
@@ -43,7 +43,7 @@
               <span class="text-lg font-bold text-contrast">Runtime</span>
               <span> The Java runtime your server will use. </span>
             </div>
-            <DropdownSelect
+            <UiServersTeleportDropdownMenu
               :id="'runtime-field'"
               v-model="jdkBuild"
               name="runtime"
