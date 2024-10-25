@@ -64,7 +64,7 @@
 
       <div
         data-pyro-navigation
-        class="isolate flex w-full select-none flex-col justify-between gap-4 md:flex-row md:items-center"
+        class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-x-auto md:flex-row md:items-center"
       >
         <UiNavTabs :links="navLinks" />
       </div>
@@ -119,7 +119,10 @@
                   support with your server's debug information.
                 </div>
 
-                <div v-if="errorTitle === 'Installation error'" class="mt-2 flex flex-row gap-4">
+                <div
+                  v-if="errorTitle === 'Installation error'"
+                  class="mt-2 flex flex-col gap-4 sm:flex-row"
+                >
                   <ButtonStyled v-if="errorLog">
                     <button @click="openInstallLog"><FileIcon />Open Installation Log</button>
                   </ButtonStyled>

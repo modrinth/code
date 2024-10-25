@@ -15,7 +15,7 @@
           </span>
           <span class="text-xs uppercase text-secondary">server address</span>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-col gap-2 sm:flex-row">
           <div
             class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
           >
@@ -107,6 +107,7 @@ const copyPassword = () => {
 
 const properties = [
   { name: "Server ID", value: serverId ?? "Unknown" },
+  { name: "Node", value: data.value?.datacenter ?? "Unknown" },
   { name: "Kind", value: data.value?.upstream?.kind ?? data.value?.loader ?? "Unknown" },
   { name: "Project ID", value: data.value?.upstream?.project_id ?? "Unknown" },
   { name: "Version ID", value: data.value?.upstream?.version_id ?? "Unknown" },

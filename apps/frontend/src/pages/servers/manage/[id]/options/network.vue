@@ -90,12 +90,12 @@
             placeholder="domain.com"
           />
 
-          <div class="rounded-xl bg-table-alternateRow p-4">
+          <div class="w-full rounded-xl bg-table-alternateRow p-4">
             <table
-              class="min-w-full border-collapse overflow-hidden rounded-lg border-2 border-gray-300"
+              class="flex w-full border-collapse overflow-hidden truncate rounded-lg border-2 border-gray-300"
             >
-              <tbody>
-                <tr v-for="record in dnsRecords" :key="record.content">
+              <tbody class="w-full">
+                <tr v-for="record in dnsRecords" :key="record.content" class="w-full">
                   <td class="py-3">
                     <div class="ml-2 flex flex-col gap-1" @click="copyText(record.type)">
                       <span
@@ -106,20 +106,20 @@
                       <span class="text-xs uppercase text-secondary">type</span>
                     </div>
                   </td>
-                  <td class="py-3">
-                    <div class="flex flex-col gap-1" @click="copyText(record.name)">
+                  <td class="truncate py-3">
+                    <div class="flex flex-col gap-1 truncate" @click="copyText(record.name)">
                       <span
-                        class="text-md font-bold tracking-wide text-contrast hover:cursor-pointer"
+                        class="text-md truncate font-bold tracking-wide text-contrast hover:cursor-pointer"
                       >
                         {{ record.name }}
                       </span>
                       <span class="text-xs uppercase text-secondary">name</span>
                     </div>
                   </td>
-                  <td class="px-4">
-                    <div class="flex flex-col gap-1" @click="copyText(record.content)">
+                  <td class="truncate px-4">
+                    <div class="flex flex-col gap-1 truncate" @click="copyText(record.content)">
                       <span
-                        class="text-md w-fit font-bold tracking-wide text-contrast hover:cursor-pointer"
+                        class="text-md w-fit truncate font-bold tracking-wide text-contrast hover:cursor-pointer"
                       >
                         {{ record.content }}
                       </span>

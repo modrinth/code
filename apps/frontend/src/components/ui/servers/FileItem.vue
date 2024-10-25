@@ -2,20 +2,24 @@
   <div
     data-pyro-file
     :class="[
-      'group flex w-full select-none items-center justify-between border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised',
+      'group flex w-full select-none items-center justify-between overflow-hidden border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised',
       isEditableFile ? 'cursor-pointer' : type === 'directory' ? 'cursor-pointer' : '',
     ]"
     @contextmenu="openContextMenu"
   >
-    <div data-pyro-file-metadata class="flex w-full items-center gap-2" @click="selectItem">
+    <div
+      data-pyro-file-metadata
+      class="flex w-full items-center gap-2 truncate"
+      @click="selectItem"
+    >
       <div
         class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
       >
         <FolderOpenIcon v-if="type === 'directory'" class="size-6" />
         <FileIcon v-else-if="type === 'file'" class="size-6" />
       </div>
-      <div class="flex flex-col">
-        <span class="font-bold group-hover:text-contrast">{{ name }}</span>
+      <div class="flex w-full flex-col truncate">
+        <span class="w-[98%] truncate font-bold group-hover:text-contrast">{{ name }}</span>
         <span v-if="type === 'directory'" class="text-xs text-secondary group-hover:text-primary">
           {{ count }} {{ count === 1 ? "item" : "items" }}
         </span>
@@ -25,7 +29,7 @@
       </div>
     </div>
 
-    <div data-pyro-file-actions class="flex w-fit items-center gap-4">
+    <div data-pyro-file-actions class="flex w-fit flex-shrink-0 items-center gap-4">
       <span class="w-full text-nowrap font-mono text-sm text-secondary">
         {{
           new Date(modified * 1000).toLocaleDateString("en-US", {

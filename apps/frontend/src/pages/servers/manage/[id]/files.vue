@@ -107,9 +107,9 @@
         <nav
           v-if="!isEditing"
           data-pyro-files-state="browsing"
-          class="top-0 flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
+          class="top-0 flex h-24 select-none flex-col justify-between rounded-t-2xl bg-table-alternateRow p-3 sm:h-12 sm:flex-row"
         >
-          <ul class="flex list-none items-center p-0 text-contrast">
+          <ul class="m-0 flex list-none items-center p-0 text-contrast">
             <li
               v-tooltip="'Back to home'"
               role="link"
