@@ -1,11 +1,9 @@
 <template>
-  <NuxtLink custom>
+  <NuxtLink class="contents" :to="`/servers/manage/${props.server_id}`">
     <div
       class="flex cursor-pointer flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100 active:scale-95"
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
-      @click="$router.push(`/servers/manage/${server_id}`)"
-      @keydown="(e) => e.key === 'Enter' && $router.push(`/servers/manage/${server_id}`)"
     >
       <UiServersServerIcon :image="iconUrl" />
       <div class="ml-8 flex flex-col gap-2.5">
