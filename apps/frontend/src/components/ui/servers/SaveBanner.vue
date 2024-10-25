@@ -49,8 +49,8 @@ const saveAndRestart = async () => {
 <style scoped>
 .save-banner-enter-active {
   transition:
-    opacity 400ms,
-    transform 400ms;
+    opacity 300ms,
+    transform 300ms;
 }
 
 .save-banner-leave-active {
