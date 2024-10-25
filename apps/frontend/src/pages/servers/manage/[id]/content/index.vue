@@ -32,8 +32,8 @@
 
   <div v-if="data && localMods" class="flex h-full w-full flex-col">
     <div class="flex h-full w-full flex-col">
-      <div class="flex items-center justify-between">
-        <div class="flex w-full max-w-lg flex-row items-center gap-4">
+      <div class="universal-card flex items-center justify-between">
+        <div class="flex w-full flex-row items-center gap-4">
           <div class="relative w-full text-sm">
             <label class="sr-only" for="search">Search</label>
             <SearchIcon
@@ -47,7 +47,7 @@
               type="search"
               name="search"
               autocomplete="off"
-              placeholder="Search content..."
+              placeholder="Search mods..."
               @input="debouncedSearch"
             />
           </div>
@@ -80,7 +80,7 @@
           <div :style="{ position: 'relative', height: `${totalHeight}px` }">
             <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
               <!-- Modrinth Section -->
-              <div class="universal-card">
+              <div v-if="visibleItems.modrinth.items.length > 0" class="universal-card">
                 <template v-if="visibleItems.modrinth.header">
                   <div class="h-[72px]">
                     <h2 class="mb-0 mt-8 text-xl font-bold text-contrast">Modrinth mods</h2>
@@ -164,7 +164,7 @@
               </div>
 
               <!-- External Section -->
-              <div class="universal-card">
+              <div v-if="visibleItems.external.items.length > 0" class="universal-card">
                 <template v-if="visibleItems.external.header">
                   <div class="h-[72px]">
                     <h2 class="mb-0 mt-8 text-xl font-bold text-contrast">External mods</h2>
@@ -220,7 +220,7 @@
                       <input
                         :id="`toggle-${mod.filename}`"
                         :checked="!mod.disabled"
-                        :disabled="modActionsInProgress[mod.filename]"
+                        :disabled="modActionsInProgress[mod.filename.replace('.disabled', '')]"
                         class="switch stylized-toggle"
                         type="checkbox"
                         @change="toggleModOptimistic(mod)"
@@ -297,11 +297,11 @@ const filterMethod = ref("all");
 const filterMethodLabel = computed(() => {
   switch (filterMethod.value) {
     case "disabled":
-      return "Disabled";
+      return "Only disabled";
     case "enabled":
-      return "Enabled";
+      return "Only enabled";
     default:
-      return "All";
+      return "All mods";
   }
 });
 
