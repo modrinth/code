@@ -142,6 +142,12 @@ const uploadFile = async (e: Event) => {
   // down scale the image to 64x64
   const scaledFile = await new Promise<File>((resolve, reject) => {
     if (!file) {
+      addNotification({
+        group: "serverOptions",
+        type: "error",
+        title: "No file selected",
+        text: "Please select a file to upload.",
+      });
       reject(new Error("No file selected"));
       return;
     }
@@ -173,6 +179,13 @@ const uploadFile = async (e: Event) => {
   await props.server.fs?.uploadFile("/server-icon.png", scaledFile);
   await props.server.fs?.uploadFile("/server-icon-original.png", file);
   await props.server.refresh();
+
+  addNotification({
+    group: "serverOptions",
+    type: "success",
+    title: "Server icon updated",
+    text: "Your server icon was successfully changed.",
+  });
 };
 
 const onDragOver = (e: DragEvent) => {
