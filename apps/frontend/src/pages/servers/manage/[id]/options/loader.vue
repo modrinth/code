@@ -49,34 +49,33 @@
         </div>
       </div>
       <div class="mt-4 flex justify-end gap-4">
-        <Button
-          transparent
-          :disabled="isLoading"
-          @click="
-            if (isSecondPhase) {
-              isSecondPhase = false;
-            } else {
-              versionSelectModal?.hide();
-            }
-          "
-        >
-          {{ isSecondPhase ? "No" : "Cancel" }}
-        </Button>
-        <Button
-          :color="isDangerous ? 'danger' : 'primary'"
-          :disabled="canInstall"
-          @click="handleReinstall"
-        >
-          {{
-            isSecondPhase
-              ? "Yes"
-              : loadingServerCheck
-                ? "Loading..."
-                : isDangerous
-                  ? "Erase and install"
-                  : "Install"
-          }}
-        </Button>
+        <ButtonStyled type="transparent">
+          <button
+            :disabled="isLoading"
+            @click="
+              if (isSecondPhase) {
+                isSecondPhase = false;
+              } else {
+                versionSelectModal?.hide();
+              }
+            "
+          >
+            {{ isSecondPhase ? "No" : "Cancel" }}
+          </button>
+        </ButtonStyled>
+        <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
+          <button :disabled="canInstall" @click="handleReinstall">
+            {{
+              isSecondPhase
+                ? "Yes"
+                : loadingServerCheck
+                  ? "Loading..."
+                  : isDangerous
+                    ? "Erase and install"
+                    : "Install"
+            }}
+          </button>
+        </ButtonStyled>
       </div>
     </div>
   </NewModal>
@@ -84,8 +83,11 @@
   <div class="flex h-full w-full flex-col">
     <div v-if="data && versions" class="flex w-full flex-col">
       <div class="card flex flex-col gap-4">
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-row items-center justify-between gap-2">
           <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
+          <ButtonStyled>
+            <button @click="editModal.show()">Choose modpack</button>
+          </ButtonStyled>
         </div>
         <div
           v-if="data.upstream"
@@ -115,23 +117,23 @@
                   placeholder="Change version"
                   name="version"
                 />
-                <Button
-                  v-tooltip="'Reinstall current pack with selected version'"
-                  icon-only
-                  @click="reinstallCurrent"
-                >
-                  <div class="mx-4">Reinstall</div>
-                </Button>
+                <ButtonStyled>
+                  <button @click="reinstallCurrent">Reinstall</button>
+                </ButtonStyled>
               </div>
             </div>
           </div>
         </div>
         <div v-else class="flex items-center gap-2">
-          <Button @click="editModal.show()">
-            <DownloadIcon class="size-4" /> Install modpack
-          </Button>
+          <ButtonStyled>
+            <button @click="editModal.show()">
+              <DownloadIcon class="size-4" /> Install modpack
+            </button>
+          </ButtonStyled>
           or
-          <Button> <UploadIcon class="size-4" /> Upload mrpack </Button>
+          <ButtonStyled>
+            <button><UploadIcon class="size-4" /> Upload mrpack</button>
+          </ButtonStyled>
         </div>
       </div>
 
@@ -165,10 +167,11 @@
               </span>
             </div>
 
-            <Button @click="selectLoader('Vanilla')">
-              {{ data.loader === "Vanilla" || !data.loader ? "Reinstall" : "Install" }}
-              <ChevronRightIcon />
-            </Button>
+            <ButtonStyled>
+              <button @click="selectLoader('Vanilla')">
+                {{ data.loader === "Vanilla" || !data.loader ? "Reinstall" : "Install" }}
+              </button>
+            </ButtonStyled>
           </div>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -191,10 +194,12 @@
               </span>
             </div>
 
-            <Button @click="selectLoader('Fabric')">
-              {{ data.loader === "Fabric" ? "Reinstall" : "Install" }}
-              <ChevronRightIcon />
-            </Button>
+            <ButtonStyled>
+              <button @click="selectLoader('Fabric')">
+                {{ data.loader === "Fabric" ? "Reinstall" : "Install" }}
+                <ChevronRightIcon />
+              </button>
+            </ButtonStyled>
           </div>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -217,10 +222,12 @@
               </span>
             </div>
 
-            <Button @click="selectLoader('Quilt')">
-              {{ data.loader === "Quilt" ? "Reinstall" : "Install" }}
-              <ChevronRightIcon />
-            </Button>
+            <ButtonStyled>
+              <button @click="selectLoader('Quilt')">
+                {{ data.loader === "Quilt" ? "Reinstall" : "Install" }}
+                <ChevronRightIcon />
+              </button>
+            </ButtonStyled>
           </div>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -243,10 +250,12 @@
               </span>
             </div>
 
-            <Button @click="selectLoader('Forge')">
-              {{ data.loader === "Forge" ? "Reinstall" : "Install" }}
-              <ChevronRightIcon />
-            </Button>
+            <ButtonStyled>
+              <button @click="selectLoader('Forge')">
+                {{ data.loader === "Forge" ? "Reinstall" : "Install" }}
+                <ChevronRightIcon />
+              </button>
+            </ButtonStyled>
           </div>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -269,10 +278,12 @@
               </span>
             </div>
 
-            <Button @click="selectLoader('NeoForge')">
-              {{ data.loader?.toLowerCase() === "neoforge" ? "Reinstall" : "Install" }}
-              <ChevronRightIcon />
-            </Button>
+            <ButtonStyled>
+              <button @click="selectLoader('NeoForge')">
+                {{ data.loader?.toLowerCase() === "neoforge" ? "Reinstall" : "Install" }}
+                <ChevronRightIcon />
+              </button>
+            </ButtonStyled>
           </div>
         </div>
       </div>
@@ -283,7 +294,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, NewModal } from "@modrinth/ui";
+import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ChevronRightIcon, DownloadIcon, UploadIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
