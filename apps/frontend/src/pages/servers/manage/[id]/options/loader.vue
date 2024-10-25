@@ -159,7 +159,14 @@
             </span>
           </div>
         </div>
-        <div class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2">
+        <div
+          class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2"
+          :class="{
+            'pointer-events-none cursor-not-allowed select-none opacity-50':
+              props.server.general?.status === 'installing',
+          }"
+          :tabindex="props.server.general?.status === 'installing' ? -1 : 0"
+        >
           <UiServersLoaderSelector :data="data" @select-loader="selectLoader" />
         </div>
       </div>
