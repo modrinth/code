@@ -121,7 +121,7 @@
                       </div>
                     </NuxtLink>
                     <div
-                      class="absolute right-2 flex gap-2 rounded-xl p-1 font-semibold text-contrast"
+                      class="absolute right-2 flex items-center gap-2 pr-2 font-semibold text-contrast"
                     >
                       <ButtonStyled type="transparent">
                         <button
@@ -206,7 +206,7 @@
                       </div>
                     </NuxtLink>
                     <div
-                      class="absolute right-2 flex gap-2 rounded-xl p-1 font-semibold text-contrast"
+                      class="absolute right-2 flex items-center gap-2 pr-2 font-semibold text-contrast"
                     >
                       <ButtonStyled type="transparent">
                         <button
