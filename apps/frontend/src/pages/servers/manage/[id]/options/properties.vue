@@ -278,3 +278,9 @@ const isComplexProperty = (property: any): boolean => {
   );
 };
 </script>
+
+<style scoped>
+.stylized-toggle:checked::after {
+  background: var(--color-accent-contrast) !important;
+}
+</style>
