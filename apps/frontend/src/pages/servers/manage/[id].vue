@@ -242,7 +242,7 @@ const uptimeSeconds = ref(0);
 const firstConnect = ref(true);
 const copied = ref(false);
 
-const initalConsoleMessage = [
+const initialConsoleMessage = [
   "   __________________________________________________",
   " /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\",
   "|   Press the green start button to start your server! |",
@@ -317,8 +317,8 @@ const connectWebSocket = () => {
       isLoading.value = false;
 
       if (firstConnect.value) {
-        for (let i = 0; i < initalConsoleMessage.length; i++) {
-          consoleOutput.value.push(initalConsoleMessage[i]);
+        for (let i = 0; i < initialConsoleMessage.length; i++) {
+          consoleOutput.value.push(initialConsoleMessage[i]);
         }
       }
 
@@ -524,6 +524,7 @@ const updateStats = (currentStats: Stats["current"]) => {
 };
 
 const updatePowerState = (state: ServerState) => {
+  console.log("Power state:", state);
   serverPowerState.value = state;
   if (state === "stopped") {
     stopUptimeUpdates();

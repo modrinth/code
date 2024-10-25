@@ -189,15 +189,20 @@
           </div>
         </div>
       </div>
-      <div v-else class="mt-4 select-none text-center opacity-50">
-        You haven't added any mods yet, time to add some!
+      <div v-else class="mt-4 flex h-full flex-col items-center justify-center">
+        <PackageClosedIcon class="size-24 text-neutral-500" />
+        <p class="m-0 pb-2 pt-3 text-neutral-200">No mods found!</p>
+        <p class="m-0 pb-3 text-neutral-400">Add some mods to your server to manage them here.</p>
+        <ButtonStyled color="brand" class="mt-8">
+          <button @click="gotoManageModPage">Manage mods</button>
+        </ButtonStyled>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { SearchIcon, EditIcon, TrashIcon } from "@modrinth/assets";
+import { SearchIcon, EditIcon, TrashIcon, PackageClosedIcon } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import type { Server } from "~/composables/pyroServers";
@@ -239,6 +244,10 @@ const searchInput = ref("");
 
 const modrinthTotalHeight = computed(() => filteredModrinthMods.value.length * ITEM_HEIGHT);
 const externalTotalHeight = computed(() => filteredExternalMods.value.length * ITEM_HEIGHT);
+
+const gotoManageModPage = () => {
+  navigateTo(`/servers/manage/${props.server.serverId}/options/loader`);
+};
 
 const getVisibleRange = (containerTop: number, itemCount: number) => {
   const relativeScrollTop = Math.max(0, windowScrollY.value - containerTop);

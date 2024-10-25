@@ -112,6 +112,7 @@ import _NewspaperIcon from './icons/newspaper.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
+import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PaintBrushIcon from './icons/paintbrush.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
@@ -290,6 +291,7 @@ export const NewspaperIcon = _NewspaperIcon
 export const OmorphiaIcon = _OmorphiaIcon
 export const OrganizationIcon = _OrganizationIcon
 export const PackageOpenIcon = _PackageOpenIcon
+export const PackageClosedIcon = _PackageClosedIcon
 export const PaintBrushIcon = _PaintBrushIcon
 export const PlayIcon = _PlayIcon
 export const PlusIcon = _PlusIcon
