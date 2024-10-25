@@ -73,7 +73,7 @@
             <label for="user-domain" class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Generated DNS records</span>
               <span>
-                Setup your personal domain to connect to your server via custom DNS records.
+                Set up your personal domain to connect to your server via custom DNS records.
               </span>
             </label>
 
