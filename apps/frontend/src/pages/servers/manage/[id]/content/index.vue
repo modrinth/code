@@ -222,7 +222,7 @@ interface Mod {
   disabled: boolean;
 }
 
-const ITEM_HEIGHT = 64;
+const ITEM_HEIGHT = 72;
 const BUFFER_SIZE = 5;
 
 const listContainer = ref<HTMLElement | null>(null);
