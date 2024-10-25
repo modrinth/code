@@ -28,7 +28,7 @@
         <MoreVerticalIcon aria-hidden="true" />
         <template #kill>
           <SlashIcon class="h-5 w-5" />
-          <span>{{ killButtonText }}</span>
+          <span>Kill Server</span>
         </template>
       </UiServersTeleportOverflowMenu>
     </ButtonStyled>
@@ -105,8 +105,6 @@ const actionButtonText = computed(() => {
 const stopButtonText = computed(() =>
   currentState.value === ServerState.Stopping ? "Stopping..." : "Stop",
 );
-
-const killButtonText = computed(() => "Kill");
 
 const handleAction = () => {
   if (!canTakeAction.value) return;
