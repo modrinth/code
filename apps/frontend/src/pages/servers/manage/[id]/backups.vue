@@ -33,11 +33,15 @@
           />
         </div>
         <div class="mb-1 mt-4 flex justify-end gap-4">
-          <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
-          <Button color="primary" :disabled="isCreatingBackup" @click="createBackup">
-            <PlusIcon v-if="!isCreatingBackup" />
-            Create backup
-          </Button>
+          <ButtonStyled type="transparent">
+            <button @click="createBackupModal?.hide()">Cancel</button>
+          </ButtonStyled>
+          <ButtonStyled color="brand">
+            <button :disabled="isCreatingBackup" @click="createBackup">
+              <PlusIcon v-if="!isCreatingBackup" />
+              Create backup
+            </button>
+          </ButtonStyled>
         </div>
       </NewModal>
 
@@ -52,10 +56,12 @@
           />
         </div>
         <div class="mb-1 mt-4 flex justify-end gap-4">
-          <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
-          <Button color="primary" :disabled="isRenamingBackup" @click="renameBackup">
-            Rename backup
-          </Button>
+          <ButtonStyled type="transparent">
+            <button @click="renameBackupModal?.hide()">Cancel</button>
+          </ButtonStyled>
+          <ButtonStyled color="brand">
+            <button :disabled="isRenamingBackup" @click="renameBackup">Rename backup</button>
+          </ButtonStyled>
         </div>
       </NewModal>
 
@@ -76,10 +82,12 @@
           </div>
         </div>
         <div class="mb-1 mt-4 flex justify-end gap-4">
-          <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
-          <Button color="primary" :loading="isRestoringBackup" @click="restoreBackup">
-            Restore backup
-          </Button>
+          <ButtonStyled type="transparent">
+            <button @click="restoreBackupModal?.hide()">Cancel</button>
+          </ButtonStyled>
+          <ButtonStyled color="brand">
+            <button :disabled="isRestoringBackup" @click="restoreBackup">Restore backup</button>
+          </ButtonStyled>
         </div>
       </NewModal>
 
@@ -100,10 +108,12 @@
           </div>
         </div>
         <div class="mb-1 mt-4 flex justify-end gap-4">
-          <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
-          <Button color="danger" :loading="isDeletingBackup" @click="deleteBackup">
-            Delete backup
-          </Button>
+          <ButtonStyled type="transparent">
+            <button @click="deleteBackupModal?.hide()">Cancel</button>
+          </ButtonStyled>
+          <ButtonStyled color="red">
+            <button :disabled="isDeletingBackup" @click="deleteBackup">Delete backup</button>
+          </ButtonStyled>
         </div>
       </NewModal>
 
@@ -190,7 +200,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, OverflowMenu, ButtonStyled, NewModal } from "@modrinth/ui";
+import { ButtonStyled, OverflowMenu, NewModal } from "@modrinth/ui";
 import {
   PlusIcon,
   CheckIcon,
@@ -201,7 +211,7 @@ import {
   DownloadIcon,
   TrashIcon,
 } from "@modrinth/assets";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
