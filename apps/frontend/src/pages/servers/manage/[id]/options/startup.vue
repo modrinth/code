@@ -9,7 +9,7 @@
         <div class="card flex flex-col gap-4">
           <div class="flex justify-between">
             <label for="startup-command-field" class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-contrast">Startup Command</span>
+              <span class="text-lg font-bold text-contrast">Startup command</span>
               <span> The command that runs when your server is started. </span>
             </label>
             <Button @click="resetToDefault"> Restore Default Command </Button>
@@ -24,7 +24,7 @@
         <div class="card flex flex-col gap-8">
           <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-contrast">Java Version</span>
+              <span class="text-lg font-bold text-contrast">Java version</span>
               <span>
                 The version of Java that your server will run on. Your server is running Minecraft
                 {{ data.mc_version }}
