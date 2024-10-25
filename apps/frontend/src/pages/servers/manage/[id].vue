@@ -408,6 +408,8 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
         if (newLoaderVersion.value) server.general.loader_version = newLoaderVersion.value;
         if (newMCVersion.value) server.general.mc_version = newMCVersion.value;
       }
+
+      error.value = null;
       break;
     case "err":
       console.log("failed to install");
