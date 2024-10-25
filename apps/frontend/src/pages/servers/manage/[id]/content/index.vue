@@ -9,7 +9,6 @@
               :src="selectedMod?.icon_url"
               size="24px"
               class="inline-block"
-              no-shadow
               alt="Server Icon"
             />
             <strong>{{ selectedMod?.name }}</strong>
@@ -82,7 +81,6 @@
                     <div class="flex items-center gap-2">
                       <UiAvatar
                         :src="mod.icon_url"
-                        no-shadow
                         size="sm"
                         alt="Server Icon"
                         :class="mod.disabled ? 'grayscale' : ''"
@@ -160,7 +158,6 @@
                     <div class="flex items-center gap-2">
                       <UiAvatar
                         :src="mod.icon_url"
-                        no-shadow
                         size="sm"
                         alt="Server Icon"
                         :class="mod.disabled ? 'grayscale' : ''"
