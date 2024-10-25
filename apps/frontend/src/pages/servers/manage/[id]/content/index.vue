@@ -52,7 +52,7 @@
   </NewModal>
 
   <div v-if="data && localMods" class="flex h-full w-full flex-col">
-    <div class="flex h-full w-full flex-col">
+    <div class="relative flex h-full w-full flex-col">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex w-full flex-row items-center gap-4">
           <div class="relative w-full text-sm">
@@ -96,7 +96,27 @@
         </div>
       </div>
 
-      <div v-if="hasMods" class="flex flex-col gap-2">
+      <Transition name="sync-banner">
+        <div
+          v-if="status === 'pending'"
+          class="fixed bottom-8 left-4 right-4 z-50 mx-auto flex h-fit w-full max-w-4xl flex-row items-center gap-4 rounded-2xl border-2 border-solid border-button-border bg-bg-raised p-2 shadow-2xl transition-all duration-300"
+        >
+          <div
+            class="grid size-12 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+          >
+            <UiServersLoadingIcon class="size-6 animate-spin" />
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <p class="m-0 text-sm font-bold text-contrast">Working on it...</p>
+            <p class="m-0 text-sm">We're syncing changes to your server.</p>
+          </div>
+        </div>
+      </Transition>
+
+      <!-- :class="{
+          'mt-[68px] opacity-50': status === 'pending',
+        }" -->
+      <div v-if="hasMods" class="flex flex-col gap-2 transition-all">
         <div ref="listContainer" class="relative w-full">
           <div :style="{ position: 'relative', height: `${totalHeight}px` }">
             <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
@@ -528,5 +548,29 @@ const versionOptions = computed(() => {
 <style scoped>
 .stylized-toggle:checked::after {
   background: var(--color-accent-contrast) !important;
+}
+
+.sync-banner-enter-active {
+  transition:
+    opacity 300ms,
+    transform 300ms;
+}
+
+.sync-banner-leave-active {
+  transition:
+    opacity 200ms,
+    transform 200ms;
+}
+
+.sync-banner-enter-from,
+.sync-banner-leave-to {
+  opacity: 0;
+  transform: translateY(100%) scale(0.98);
+}
+
+.sync-banner-enter-to,
+.sync-banner-leave-from {
+  opacity: 1;
+  transform: none;
 }
 </style>

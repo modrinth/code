@@ -1,5 +1,5 @@
 <template>
-  <transition name="save-banner">
+  <Transition name="save-banner">
     <div
       v-if="props.isVisible"
       data-pyro-save-banner
@@ -24,7 +24,7 @@
         </div>
       </div>
     </div>
-  </transition>
+  </Transition>
 </template>
 
 <script setup lang="ts">
