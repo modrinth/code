@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full w-full flex-col items-center bg-bg-raised">
+  <div class="flex h-[calc(100vh-12rem)] w-full flex-col items-center bg-bg-raised">
     <div
       ref="container"
       class="relative w-full flex-grow overflow-hidden bg-bg-raised"
