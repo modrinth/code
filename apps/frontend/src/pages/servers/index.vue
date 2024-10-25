@@ -566,7 +566,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick } from "vue";
 import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
 import { RightArrowIcon } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
