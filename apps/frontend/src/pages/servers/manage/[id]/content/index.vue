@@ -108,7 +108,7 @@
           </div>
           <div class="flex flex-col gap-0.5">
             <p class="m-0 text-sm font-bold text-contrast">Working on it...</p>
-            <p class="m-0 text-sm">We're syncing changes to your server.</p>
+            <p class="m-0 text-sm">We're making sure everything's 100% up to date.</p>
           </div>
         </div>
       </Transition>
