@@ -258,19 +258,26 @@ const updatePosition = async () => {
   };
 };
 
-const toggleDropdown = async () => {
+const openDropdown = async () => {
   if (!props.disabled) {
-    dropdownVisible.value = !dropdownVisible.value;
-    if (dropdownVisible.value) {
-      focusedOptionIndex.value = props.options.findIndex(
-        (option) => option === selectedValue.value,
-      );
-      lastFocusedElement.value = document.activeElement as HTMLElement;
-      await updatePosition();
+    closeAllDropdowns();
+    dropdownVisible.value = true;
+    focusedOptionIndex.value = props.options.findIndex((option) => option === selectedValue.value);
+    lastFocusedElement.value = document.activeElement as HTMLElement;
+    await updatePosition();
 
-      requestAnimationFrame(() => {
-        updatePosition();
-      });
+    requestAnimationFrame(() => {
+      updatePosition();
+    });
+  }
+};
+
+const toggleDropdown = () => {
+  if (!props.disabled) {
+    if (dropdownVisible.value) {
+      closeDropdown();
+    } else {
+      openDropdown();
     }
   }
 };
@@ -341,6 +348,11 @@ const closeDropdown = () => {
   }
 };
 
+const closeAllDropdowns = () => {
+  const event = new CustomEvent("close-all-dropdowns");
+  window.dispatchEvent(event);
+};
+
 const selectOption = (option: OptionValue, index: number) => {
   radioValue.value = option;
   emit("change", { option, index });
@@ -391,11 +403,23 @@ const scrollToFocused = () => {
 onMounted(() => {
   window.addEventListener("resize", handleResize);
   window.addEventListener("scroll", handleResize, true);
+  window.addEventListener("click", (event) => {
+    if (!isChildOfDropdown(event.target as HTMLElement)) {
+      closeDropdown();
+    }
+  });
+  window.addEventListener("close-all-dropdowns", closeDropdown);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
   window.removeEventListener("scroll", handleResize, true);
+  window.removeEventListener("click", (event) => {
+    if (!isChildOfDropdown(event.target as HTMLElement)) {
+      closeDropdown();
+    }
+  });
+  window.removeEventListener("close-all-dropdowns", closeDropdown);
   lastFocusedElement.value = null;
 });
 
