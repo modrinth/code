@@ -61,17 +61,11 @@ const preferences = {
     displayName: "Auto restart (not implemented)",
     description: "Automatically restart the server if it crashes.",
   },
-  backupWhileRunning: {
-    displayName: "Backup while running (not implemented)",
-    description:
-      "Allow creation of a backup without stopping the server. This may lead to corrupted backups, use with caution.",
-  },
 };
 
 const defaultPreferences = {
   ramAsNumber: false,
   autoRestart: false,
-  backupWhileRunning: false,
 };
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, defaultPreferences);

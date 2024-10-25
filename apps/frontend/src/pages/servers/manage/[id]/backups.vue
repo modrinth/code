@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="contents">
     <div v-if="data">
       <div
         class="over-the-top-download-animation"
@@ -19,110 +19,93 @@
           </div>
         </div>
       </div>
-      <Modal ref="createBackupModal" header="">
-        <UiServersPyroModal header="Create backup" :data="data" @modal="createBackupModal?.hide()">
-          <div class="mb-3 mt-3">
-            Your server will temporarily shutdown while the backup is being created.
-          </div>
-          <div class="flex flex-col gap-2">
-            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-            <input
-              v-model="createBackupName"
-              type="text"
-              class="bg-bg-input w-full rounded-lg p-4"
-              placeholder="e.g. Before 1.21"
-            />
-          </div>
-          <div class="mb-1 mt-4 flex justify-end gap-4">
-            <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" :disabled="isCreatingBackup" @click="createBackup">
-              <PlusIcon v-if="!isCreatingBackup" />
-              Create backup
-            </Button>
-          </div>
-        </UiServersPyroModal>
-      </Modal>
+      <NewModal ref="createBackupModal" header="Creating backup">
+        <div class="mb-3 mt-3">
+          Your server will temporarily shutdown while the backup is being created.
+        </div>
+        <div class="flex flex-col gap-2">
+          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+          <input
+            v-model="createBackupName"
+            type="text"
+            class="bg-bg-input w-full rounded-lg p-4"
+            placeholder="e.g. Before 1.21"
+          />
+        </div>
+        <div class="mb-1 mt-4 flex justify-end gap-4">
+          <Button transparent @click="createBackupModal?.hide()"> Cancel </Button>
+          <Button color="primary" :disabled="isCreatingBackup" @click="createBackup">
+            <PlusIcon v-if="!isCreatingBackup" />
+            Create backup
+          </Button>
+        </div>
+      </NewModal>
 
-      <Modal ref="renameBackupModal" header="">
-        <UiServersPyroModal header="Rename backup" :data="data" @modal="renameBackupModal?.hide()">
-          <div class="mt-2 flex flex-col gap-2">
-            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
-            <input
-              v-model="renameBackupName"
-              type="text"
-              class="bg-bg-input w-full rounded-lg p-4"
-              placeholder="e.g. Before 1.21"
-            />
-          </div>
-          <div class="mb-1 mt-4 flex justify-end gap-4">
-            <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" :disabled="isRenamingBackup" @click="renameBackup">
-              Rename backup
-            </Button>
-          </div>
-        </UiServersPyroModal>
-      </Modal>
+      <NewModal ref="renameBackupModal" header="Renaming backup">
+        <div class="mt-2 flex flex-col gap-2">
+          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+          <input
+            v-model="renameBackupName"
+            type="text"
+            class="bg-bg-input w-full rounded-lg p-4"
+            placeholder="e.g. Before 1.21"
+          />
+        </div>
+        <div class="mb-1 mt-4 flex justify-end gap-4">
+          <Button transparent @click="renameBackupModal?.hide()"> Cancel </Button>
+          <Button color="primary" :disabled="isRenamingBackup" @click="renameBackup">
+            Rename backup
+          </Button>
+        </div>
+      </NewModal>
 
-      <Modal ref="restoreBackupModal" header="">
-        <UiServersPyroModal
-          header="Restore backup"
-          :data="data"
-          @modal="restoreBackupModal?.hide()"
-        >
-          <div class="flex flex-col gap-4">
-            <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
-              <div class="text-2xl font-extrabold text-contrast">
-                {{ backups?.find((b) => b.id === currentBackup)?.name }}
-              </div>
-              <div class="flex gap-2 font-semibold text-contrast">
-                <CalendarIcon />
-                {{
-                  new Date(
-                    backups?.find((b: any) => b.id === currentBackup)?.created_at || "",
-                  ).toLocaleString()
-                }}
-              </div>
+      <NewModal ref="restoreBackupModal" header="">
+        <div class="flex flex-col gap-4">
+          <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
+            <div class="text-2xl font-extrabold text-contrast">
+              {{ backups?.find((b) => b.id === currentBackup)?.name }}
+            </div>
+            <div class="flex gap-2 font-semibold text-contrast">
+              <CalendarIcon />
+              {{
+                new Date(
+                  backups?.find((b: any) => b.id === currentBackup)?.created_at || "",
+                ).toLocaleString()
+              }}
             </div>
           </div>
-          <div class="mb-1 mt-4 flex justify-end gap-4">
-            <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
-            <Button color="primary" :loading="isRestoringBackup" @click="restoreBackup">
-              Restore backup
-            </Button>
-          </div>
-        </UiServersPyroModal>
-      </Modal>
+        </div>
+        <div class="mb-1 mt-4 flex justify-end gap-4">
+          <Button transparent @click="restoreBackupModal?.hide()"> Cancel </Button>
+          <Button color="primary" :loading="isRestoringBackup" @click="restoreBackup">
+            Restore backup
+          </Button>
+        </div>
+      </NewModal>
 
-      <Modal ref="deleteBackupModal" header="">
-        <UiServersPyroModal
-          header="Delete backup"
-          :data="data"
-          danger
-          @modal="deleteBackupModal?.hide()"
-        >
-          <div class="flex flex-col gap-4">
-            <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
-              <div class="text-2xl font-extrabold text-contrast">
-                {{ backups?.find((b) => b.id === currentBackup)?.name }}
-              </div>
-              <div class="flex gap-2 font-semibold text-contrast">
-                <CalendarIcon />
-                {{
-                  new Date(
-                    backups?.find((b: any) => b.id === currentBackup)?.created_at || "",
-                  ).toLocaleString()
-                }}
-              </div>
+      <NewModal ref="deleteBackupModal" header="">
+        <div class="flex flex-col gap-4">
+          <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
+            <div class="text-2xl font-extrabold text-contrast">
+              {{ backups?.find((b) => b.id === currentBackup)?.name }}
+            </div>
+            <div class="flex gap-2 font-semibold text-contrast">
+              <CalendarIcon />
+              {{
+                new Date(
+                  backups?.find((b: any) => b.id === currentBackup)?.created_at || "",
+                ).toLocaleString()
+              }}
             </div>
           </div>
-          <div class="mb-1 mt-4 flex justify-end gap-4">
-            <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
-            <Button color="danger" :loading="isDeletingBackup" @click="deleteBackup">
-              Delete backup
-            </Button>
-          </div>
-        </UiServersPyroModal>
-      </Modal>
+        </div>
+        <div class="mb-1 mt-4 flex justify-end gap-4">
+          <Button transparent @click="deleteBackupModal?.hide()"> Cancel </Button>
+          <Button color="danger" :loading="isDeletingBackup" @click="deleteBackup">
+            Delete backup
+          </Button>
+        </div>
+      </NewModal>
 
       <ul class="m-0 flex list-none flex-col gap-6 p-0">
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
@@ -209,7 +192,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, OverflowMenu, Modal, ButtonStyled } from "@modrinth/ui";
+import { Button, OverflowMenu, ButtonStyled, NewModal } from "@modrinth/ui";
 import {
   PlusIcon,
   CheckIcon,
@@ -240,10 +223,10 @@ const backupError = ref<string | null>(null);
 
 const overTheTopDownloadAnimation = ref();
 
-const createBackupModal = ref<typeof Modal>();
-const renameBackupModal = ref<typeof Modal>();
-const restoreBackupModal = ref<typeof Modal>();
-const deleteBackupModal = ref<typeof Modal>();
+const createBackupModal = ref<typeof NewModal>();
+const renameBackupModal = ref<typeof NewModal>();
+const restoreBackupModal = ref<typeof NewModal>();
+const deleteBackupModal = ref<typeof NewModal>();
 
 const createBackupName = ref("");
 const renameBackupName = ref("");
