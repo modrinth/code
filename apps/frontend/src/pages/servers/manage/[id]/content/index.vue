@@ -104,6 +104,7 @@
                     <ButtonStyled type="transparent">
                       <button
                         v-if="mod.project_id"
+                        v-tooltip="'Edit mod version'"
                         :disabled="
                           isFetchingVersionsForMod[mod.project_id] ||
                           modActionsInProgress[mod.project_id]
@@ -119,7 +120,11 @@
                       </button>
                     </ButtonStyled>
                     <ButtonStyled type="transparent">
-                      <button @click="removeModOptimistic(mod)">
+                      <button
+                        v-tooltip="'Delete mod'"
+                        :disabled="mod.project_id ? modActionsInProgress[mod.project_id] : false"
+                        @click="removeModOptimistic(mod)"
+                      >
                         <TrashIcon />
                       </button>
                     </ButtonStyled>
@@ -180,6 +185,7 @@
                   >
                     <ButtonStyled type="transparent">
                       <button
+                        v-tooltip="'Delete mod'"
                         :disabled="modActionsInProgress[mod.filename]"
                         @click="removeModOptimistic(mod)"
                       >
