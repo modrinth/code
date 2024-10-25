@@ -1,30 +1,41 @@
 <template>
-  <div v-for="loader in loaders" :key="loader.name" class="flex items-center justify-between">
-    <div class="flex items-center gap-2">
+  <div
+    v-for="loader in loaders"
+    :key="loader.name"
+    class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
+  >
+    <div class="flex items-center gap-4">
       <div
-        class="rounded-xl bg-button-bg p-2"
-        :class="data.loader?.toLowerCase() === loader.name.toLowerCase() ? '[&&]:bg-bg-green' : ''"
+        class="grid size-10 place-content-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+        :class="isCurrentLoader(loader.name) ? '[&&]:bg-bg-green' : ''"
       >
         <UiServersLoaderIcon
           :loader="loader.name"
-          class="[&&]:size-10"
-          :class="data.loader?.toLowerCase() === loader.name.toLowerCase() ? 'text-brand' : ''"
+          class="[&&]:size-6"
+          :class="isCurrentLoader(loader.name) ? 'text-brand' : ''"
         />
       </div>
-      <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
-        {{ loader.displayName }}
-      </h1>
-      <span
-        v-if="data.loader?.toLowerCase() === loader.name.toLowerCase()"
-        class="rounded-full bg-bg-green p-1 px-2 text-sm font-semibold text-brand"
-      >
-        Current
-      </span>
+      <div class="flex flex-col gap-0.5">
+        <div class="flex flex-row items-center gap-2">
+          <h1 class="m-0 text-xl font-bold leading-none text-contrast">
+            {{ loader.displayName }}
+          </h1>
+          <span
+            v-if="isCurrentLoader(loader.name)"
+            class="rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand"
+          >
+            Current
+          </span>
+        </div>
+        <p v-if="isCurrentLoader(loader.name)" class="m-0 text-xs text-secondary">
+          {{ data.loader_version }}
+        </p>
+      </div>
     </div>
 
     <ButtonStyled>
       <button @click="selectLoader(loader.name)">
-        {{ data.loader?.toLowerCase() === loader.name.toLowerCase() ? "Reinstall" : "Install" }}
+        {{ isCurrentLoader(loader.name) ? "Reinstall" : "Install" }}
       </button>
     </ButtonStyled>
   </div>
@@ -33,9 +44,10 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
 
-defineProps<{
+const props = defineProps<{
   data: {
     loader: string | null;
+    loader_version: string | null;
   };
 }>();
 
@@ -50,6 +62,10 @@ const loaders = [
   { name: "Forge", displayName: "Forge" },
   { name: "NeoForge", displayName: "NeoForge" },
 ];
+
+const isCurrentLoader = (loaderName: string) => {
+  return props.data.loader?.toLowerCase() === loaderName.toLowerCase();
+};
 
 const selectLoader = (loader: string) => {
   emit("selectLoader", loader);

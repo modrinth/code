@@ -150,19 +150,16 @@
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
           <h2 class="m-0 text-lg font-bold text-contrast">Mod loader</h2>
-          <p class="m-0">
-            The mod loader that provides the ability to load mods into your server. Changing this
-            will reinstall the server.
-          </p>
-          <div v-if="data.upstream" class="flex items-center gap-2">
+          <p class="m-0">Mod loaders allow you to run mods on your server.</p>
+          <div v-if="data.upstream" class="mt-2 flex items-center gap-2">
             <InfoIcon />
             <span class="text-sm text-secondary">
-              Your server was installed from a modpack. The mod loader is managed automatically by
-              the modpack.
+              Your server was installed from a modpack, which automatically chooses the appropriate
+              mod loader.
             </span>
           </div>
         </div>
-        <div class="flex w-full flex-col gap-4 rounded-xl bg-table-alternateRow p-4">
+        <div class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2">
           <UiServersLoaderSelector :data="data" @select-loader="selectLoader" />
         </div>
       </div>
