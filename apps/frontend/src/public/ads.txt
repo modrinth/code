@@ -152,27 +152,26 @@ appnexus.com, 9624, RESELLER, f5ab79cb980f11d1
 openx.com, 541079309, RESELLER, 6a698e2ec38604c6
 pubmatic.com, 160251, RESELLER, 5d62403b186f2ace
 sharethrough.com, AgltJqgT, RESELLER, d53b998a7bd4ecd2
-rubiconproject.com, 23644, RESELLER, 0bfd66d529a55807
-contextweb.com, 562263, DIRECT, 89ff185a4c4e857c
+contextweb.com, 562263, RESELLER, 89ff185a4c4e857c
 sonobi.com, da6df59178, RESELLER, d1a215d9eb5aee9e
 amxrtb.com, 105199420, DIRECT
 improvedigital.com, 2434, RESELLER
-rhythmone.com, 1838093862, DIRECT, a670c89d4a324e47
-video.unrulymedia.com, 1838093862, DIRECT
+admanmedia.com, 2199, RESELLER
+rhythmone.com, 1838093862, RESELLER, a670c89d4a324e47
+video.unrulymedia.com, 1838093862, RESELLER
 33across.com, 0010b00002QImX1AAL, DIRECT, bbea06d9c4d2853c
-rubiconproject.com, 23330, DIRECT, 0bfd66d529a55807
+adyoulike.com, 1f301d3bcd723f5c372070bdfd142940, RESELLER
+rubiconproject.com, 23330, RESLLER, 0bfd66d529a55807
 onetag.com, 753930a353d6990, DIRECT
 nobid.io, 22451303355, DIRECT
 zetaglobal.net, 693, DIRECT
-conversantmedia.com, 41848, DIRECT, 03113cd04947736d
 gumgum.com, 15729, RESELLER, ffdef49475d318a9
 insticator.com, a4be8543-c8b1-4f3a-a4c0-73cfbdc3b652, DIRECT, b3511ffcafb23a32 #Insticator_Version_748
 richaudience.com, NtMZGaQQTT, DIRECT
-e-planning.net, e91ae9f917dd018e, DIRECT, c1ba615865ed87b2
-triplelift.com, 9207, RESELLER, 6c33edb13117fd86
-triplelift.com, 9207-EB, RESELLER, 6c33edb13117fd86
+xapads.com, 209164, DIRECT
+google.com, pub-3990748024667386, DIRECT, f08c47fec0942fa0
 smartadserver.com, 4872, RESELLER, 060d053dcf45cbf3
-smilewanted.com, 4880, RESELLER
+conversantmedia.com, 100745, RESELLER, 03113cd04947736d
 
 #GumGum
 gumgum.com, 15913, DIRECT, ffdef49475d318a9
@@ -236,6 +235,11 @@ Media.net,8CU4JTRF9, RESELLER
 onetag.com,6e053d779444c00, RESELLER
 Contextweb.com,562952,RESELLER,89ff185a4c4e857c
 33across.com, 0010b00002ODU4HAAX, RESELLER, bbea06d9c4d2853c
+adform.com, 2926, RESELLER
+improvedigital.com, 2106, RESELLER
+smartadserver.com, 4288, RESELLER
+video.unrulymedia.com, 3486482593, RESELLER
+yieldmo.com, 3133660606033240149, RESELLER
 
 #Medianet
 Media.net, 8CUENMD10, RESELLER
