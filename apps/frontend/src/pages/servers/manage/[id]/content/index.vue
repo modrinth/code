@@ -61,9 +61,9 @@
             <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
               <!-- Modrinth Section -->
               <template v-if="visibleItems.modrinth.header">
-                <div class="h-[100px]">
-                  <h2 class="mt-8 text-xl font-bold text-contrast">Modrinth mods</h2>
-                  <p class="mb-4">
+                <div class="h-[72px]">
+                  <h2 class="mb-0 mt-8 text-xl font-bold text-contrast">Modrinth mods</h2>
+                  <p class="mb-4 mt-3">
                     These are mods installed on your server that are listed on Modrinth.
                   </p>
                 </div>
@@ -138,9 +138,9 @@
 
               <!-- External Section -->
               <template v-if="visibleItems.external.header">
-                <div class="h-[100px]">
-                  <h2 class="mt-8 text-xl font-bold text-contrast">External mods</h2>
-                  <p class="mb-4">
+                <div class="h-[72px]">
+                  <h2 class="mb-0 mt-8 text-xl font-bold text-contrast">External mods</h2>
+                  <p class="mb-4 mt-3">
                     External mods are mods that are directly uploaded to your server or are part of
                     a modpack, but are not listed on Modrinth. You can manage them via the Files
                     tab.
@@ -231,7 +231,7 @@ interface Mod {
 }
 
 const ITEM_HEIGHT = 64;
-const HEADER_HEIGHT = 100;
+const HEADER_HEIGHT = 72;
 const BUFFER_SIZE = 5;
 
 const listContainer = ref<HTMLElement | null>(null);
