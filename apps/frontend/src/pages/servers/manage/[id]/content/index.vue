@@ -317,7 +317,7 @@ onUnmounted(() => {
 });
 
 const prodOverride = await PyroAuthOverride();
-const { refresh: refreshData } = await useAsyncData("serverData", async () => {
+const { refresh: refreshData, status } = await useLazyAsyncData("serverData", async () => {
   await props.server.refresh(["general", "mods"]);
   return true;
 });
