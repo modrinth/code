@@ -22,7 +22,7 @@
           v-if="isOpen"
           ref="menuRef"
           data-pyro-telepopover-root
-          class="fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-xl border-[1px] border-solid border-button-bg bg-bg-raised p-2 shadow-lg"
+          class="fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-2 shadow-lg"
           :style="menuStyle"
           role="menu"
           tabindex="-1"
