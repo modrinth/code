@@ -3,7 +3,7 @@
     <div
       v-if="props.isVisible"
       data-pyro-save-banner
-      class="fixed bottom-8 left-4 right-4 z-50 mx-auto h-fit w-full max-w-4xl rounded-2xl border-2 border-solid border-divider bg-bg-raised p-4 transition-all duration-300"
+      class="fixed bottom-8 left-4 right-4 z-50 mx-auto h-fit w-full max-w-4xl rounded-2xl border-2 border-solid border-button-border bg-bg-raised p-4 transition-all duration-300"
     >
       <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
         <span class="font-bold text-contrast">Careful, you have unsaved changes!</span>
