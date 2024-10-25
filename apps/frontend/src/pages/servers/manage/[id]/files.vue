@@ -143,17 +143,7 @@
                 ]"
               >
                 <span class="whitespace-pre text-sm font-medium">
-                  {{
-                    sortMethod === "default"
-                      ? "Alphabetical"
-                      : sortMethod === "modified"
-                        ? "Modified"
-                        : sortMethod === "filesOnly"
-                          ? "Files"
-                          : sortMethod === "foldersOnly"
-                            ? "Folders"
-                            : "Alphabetical"
-                  }}
+                  {{ sortMethodLabel }}
                 </span>
                 <SortAscendingIcon aria-hidden="true" />
                 <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
@@ -364,7 +354,6 @@
             boxShadow: 'var(--shadow-floating)',
             gap: 'var(--gap-xs)',
             width: 'max-content',
-            // '--translate-y': isAtBottom ? '-100%' : '0',
           }"
           class="flex h-fit w-fit select-none flex-col"
         >
@@ -404,6 +393,7 @@
 </template>
 
 <script setup lang="ts">
+import { useInfiniteScroll } from "@vueuse/core";
 import {
   BoxIcon,
   FileIcon,
@@ -422,24 +412,76 @@ import {
   SortAscendingIcon,
 } from "@modrinth/assets";
 import { Button, NewModal, ButtonStyled } from "@modrinth/ui";
-import { useInfiniteScroll } from "@vueuse/core";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
+const route = useRoute();
+const router = useRouter();
+
+const VAceEditor = ref();
+const mainContent = ref<HTMLElement | null>(null);
+const scrollContainer = ref<HTMLElement | null>(null);
+const ctxRef = ref<HTMLElement | null>(null);
+const renameInput = ref<HTMLInputElement | null>(null);
+
+const searchQuery = ref("");
+const sortMethod = ref("default");
+
+const maxResults = 100;
+const currentPage = ref(1);
+const pages = ref(1);
+const items = ref<any[]>([]);
+const currentPath = ref(route.query.path || "");
+
+const isAtBottom = ref(false);
+const isLoading = ref(true);
+const loadError = ref(false);
+const contextMenuInfo = ref<any>({ item: null, x: 0, y: 0 });
+
+const createItemModal = ref<typeof NewModal>();
+const deleteItemModal = ref<typeof NewModal>();
+const renameItemModal = ref<typeof NewModal>();
+const moveItemModal = ref<typeof NewModal>();
+
+const createItemSubmitted = ref(false);
+const renameItemSubmitted = ref(false);
+
+const newItemType = ref<"file" | "directory">("file");
+const newItemName = ref("");
+const selectedItem = ref<any>(null);
+const destinationFolder = ref("");
+const fileContent = ref("");
+
+const isEditing = ref(false);
+const editingFile = ref<any>(null);
+const closeEditor = ref(false);
 const isEditingImage = ref(false);
 const imagePreview = ref();
 
-const VAceEditor = ref();
+const isDragging = ref(false);
+const dragCounter = ref(0);
 
-const searchQuery = ref("");
-const sortMethod = ref("default-sort");
+const data = computed(() => props.server.general);
 
-const mainContent = ref<HTMLElement | null>(null);
+useHead({
+  title: computed(() => `Files - ${data.value?.name ?? "Server"} - Modrinth`),
+});
 
-const renameInput = ref<HTMLInputElement | null>(null);
+const sortMethodLabel = computed(() => {
+  switch (sortMethod.value) {
+    case "modified":
+      return "Modified";
+    case "filesOnly":
+      return "Files";
+    case "foldersOnly":
+      return "Folders";
+    default:
+      return "Alphabetical";
+  }
+});
 
 const applyDefaultSort = (items: any[]) => {
   return items.sort((a: any, b: any) => {
@@ -447,9 +489,7 @@ const applyDefaultSort = (items: any[]) => {
     if (a.type !== "directory" && b.type === "directory") return 1;
     if (a.count > b.count) return -1;
     if (a.count < b.count) return 1;
-    if (a.name > b.name) return 1;
-    if (a.name < b.name) return -1;
-    return 0;
+    return a.name.localeCompare(b.name);
   });
 };
 
@@ -478,42 +518,11 @@ const filteredItems = computed(() => {
   return result;
 });
 
-const route = useRoute();
-const router = useRouter();
-const serverId = route.params.id.toString();
-const data = computed(() => props.server.general);
-
-const maxResults = 100;
-const currentPage = ref(1);
-const pages = ref(1);
-const currentPath = ref(route.query.path || "");
-const ctxRef = ref<HTMLElement | null>(null);
-
-const isAtBottom = ref(false);
-
-useHead({
-  title: `Files - ${data.value?.name ?? "Server"} - Modrinth`,
-});
-
-const scrollContainer = ref<HTMLElement | null>(null);
-const items = ref<any[]>([]);
-const isLoading = ref(true);
-const loadError = ref(false);
-const contextMenuInfo = ref<{
-  item: any;
-  x: number;
-  y: number;
-}>({
-  item: null,
-  x: 0,
-  y: 0,
-});
-
 const { reset } = useInfiniteScroll(
   scrollContainer,
-  () => {
+  async () => {
     if (currentPage.value <= pages.value) {
-      fetchData();
+      await fetchData();
     }
   },
   { distance: 1000 },
@@ -533,52 +542,21 @@ const onInit = (editor: any) => {
   });
 };
 
-let dY = 0;
-let oldScroll = 0;
-
-const onScroll = () => {
-  dY = window.scrollY - oldScroll;
-  oldScroll = window.scrollY;
-
-  contextMenuInfo.value.y -= dY;
-  contextMenuInfo.value.item = null;
-};
-
-onMounted(() => {
-  window.addEventListener("scroll", onScroll);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("scroll", onScroll);
-});
-
 const showContextMenu = async (item: any, x: number, y: number) => {
-  dY = 0;
-  oldScroll = window.scrollY;
   contextMenuInfo.value = { item, x, y };
   selectedItem.value = item;
   await nextTick();
   if (!ctxRef.value) return false;
   const screenHeight = window.innerHeight;
   const ctxRect = ctxRef.value.getBoundingClientRect();
-  isAtBottom.value = isAtBottom.value
-    ? ctxRect.bottom + ctxRect.height > screenHeight
-    : ctxRect.bottom > screenHeight;
-  console.log(ctxRect.bottom, screenHeight, isAtBottom.value);
+  isAtBottom.value = ctxRect.bottom > screenHeight;
 };
 
 const onAnywhereClicked = (e: MouseEvent) => {
-  // if the clicked element does not have a parent with the id of item-context-menu, hide the context menu
-  if (!(e.target as HTMLElement).closest("#item-context-menu")) contextMenuInfo.value.item = null;
+  if (!(e.target as HTMLElement).closest("#item-context-menu")) {
+    contextMenuInfo.value.item = null;
+  }
 };
-
-onMounted(() => {
-  document.addEventListener("click", onAnywhereClicked);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("click", onAnywhereClicked);
-});
 
 const sortFiles = (method: string) => {
   sortMethod.value = method;
@@ -609,30 +587,69 @@ const fetchData = async () => {
   }
 };
 
+const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
+
+const editFile = async (item: { name: string; type: string; path: string }) => {
+  try {
+    const path = `${currentPath.value}/${item.name}`.replace("//", "/");
+    const content = (await props.server.fs?.downloadFile(path, true)) as any;
+
+    window.scrollTo(0, 0);
+
+    fileContent.value = await content.text();
+    editingFile.value = item;
+    isEditing.value = true;
+    const extension = item.name.split(".").pop();
+    if (item.type === "file" && extension && imageExtensions.includes(extension)) {
+      isEditingImage.value = true;
+      imagePreview.value = content;
+    }
+    router.push({ query: { ...route.query, path: currentPath.value, editing: item.path } });
+  } catch (error) {
+    console.error("Error fetching file content:", error);
+  }
+};
+
 onMounted(async () => {
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/theme-one_dark");
   VAceEditor.value = markRaw((await import("vue3-ace-editor")).VAceEditor);
-  if (serverId) {
-    await fetchData();
-  }
+  document.addEventListener("click", onAnywhereClicked);
+  window.addEventListener("scroll", onScroll);
+});
+
+onUnmounted(() => {
+  items.value = [];
+  document.removeEventListener("click", onAnywhereClicked);
+  window.removeEventListener("scroll", onScroll);
 });
 
 watch(
-  () => route.query.path,
-  async (newPath) => {
-    console.log(`Path changed to: ${newPath}`);
-    currentPath.value = newPath || "/";
+  () => route.query,
+  async (newQuery) => {
+    currentPath.value = newQuery.path || "/";
     currentPage.value = 1;
     items.value = [];
     loadError.value = false;
     searchQuery.value = "";
     sortMethod.value = "default";
-    if (serverId) {
-      await fetchData();
+
+    if (newQuery.editing) {
+      await editFile({
+        name: newQuery.editing as string,
+        type: "file",
+        path: newQuery.editing as string,
+      });
+    } else {
+      isEditing.value = false;
+      editingFile.value = null;
     }
+
+    await fetchData();
+    reset();
   },
+  { immediate: true, deep: true },
 );
 
 const breadcrumbSegments = computed(() => {
@@ -644,27 +661,12 @@ const breadcrumbSegments = computed(() => {
 
 const navigateToSegment = (index: number) => {
   const newPath = breadcrumbSegments.value.slice(0, index + 1).join("/");
-  router.push({ query: { path: newPath } });
+  router.push({ query: { ...route.query, path: newPath } });
 };
 
 const navigateToPage = () => {
   router.push({ query: { path: currentPath.value } });
 };
-
-const createItemModal = ref<typeof NewModal>();
-const deleteItemModal = ref<typeof NewModal>();
-const renameItemModal = ref<typeof NewModal>();
-const moveItemModal = ref<typeof NewModal>();
-const newItemType = ref<"file" | "directory">("file");
-const newItemName = ref("");
-const selectedItem = ref<any>(null);
-const destinationFolder = ref("");
-const isEditing = ref(false);
-const fileContent = ref("");
-const editingFile = ref<any>(null);
-const closeEditor = ref(false);
-const createItemSubmitted = ref(false);
-const renameItemSubmitted = ref(false);
 
 const nameError = computed(() => {
   if (!newItemName.value) {
@@ -688,16 +690,12 @@ const requestShareLink = async () => {
   try {
     const response = (await $fetch("https://api.mclo.gs/1/log", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        content: fileContent.value,
-      }),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ content: fileContent.value }),
     })) as any;
 
     if (response.success) {
-      navigator.clipboard.writeText(response.url);
+      await navigator.clipboard.writeText(response.url);
       addNotification({
         group: "files",
         title: "Log URL copied",
@@ -717,9 +715,6 @@ const showCreateModal = (type: "file" | "directory") => {
   newItemName.value = "";
   createItemModal.value?.show();
 };
-
-const isDragging = ref(false);
-const dragCounter = ref(0);
 
 const handleDragEnter = (event: DragEvent) => {
   if (isEditing.value) return;
@@ -750,8 +745,7 @@ const handleDrop = async (event: DragEvent) => {
   const files = event.dataTransfer?.files;
   if (files) {
     for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      await uploadFile(file);
+      await uploadFile(files[i]);
     }
   }
 };
@@ -760,7 +754,6 @@ const uploadFile = async (file: File) => {
   try {
     const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
     await props.server.fs?.uploadFile(filePath, file);
-    fetchData();
     reset();
 
     addNotification({
@@ -784,7 +777,6 @@ const initiateFileUpload = () => {
     }
   };
   input.click();
-  input.remove();
 };
 
 const showRenameModal = async (item: any) => {
@@ -794,7 +786,6 @@ const showRenameModal = async (item: any) => {
   renameItemModal.value?.show();
   contextMenuInfo.value.item = null;
   await nextTick();
-  // god forgive me
   setTimeout(() => {
     renameInput.value?.focus();
   }, 100);
@@ -880,10 +871,8 @@ const createNewItem = async () => {
 
 const renameItem = async () => {
   try {
-    await props.server.fs?.renameFileOrFolder(
-      `${currentPath.value}/${selectedItem.value.name}`,
-      newItemName.value,
-    );
+    const path = `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/");
+    await props.server.fs?.renameFileOrFolder(path, newItemName.value);
 
     currentPage.value = 1;
     items.value = [];
@@ -897,8 +886,8 @@ const renameItem = async () => {
       isEditing.value = false;
       editingFile.value = null;
       closeEditor.value = false;
-      fetchData();
       reset();
+      router.push({ query: { ...route.query, path: currentPath.value } });
     }
 
     addNotification({
@@ -959,8 +948,6 @@ const downloadFile = async (item: any) => {
       const path = `${currentPath.value}/${item.name}`.replace("//", "/");
       const fileData = await props.server.fs?.downloadFile(path);
       if (fileData) {
-        console.log(fileData);
-
         const blob = new Blob([fileData], { type: "application/octet-stream" });
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
@@ -998,28 +985,6 @@ const deleteItem = async () => {
   }
 };
 
-const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
-
-const editFile = async (item: { name: string; type: string; path: string }) => {
-  try {
-    const path = `${currentPath.value}/${item.name}`.replace("//", "/");
-    const content = (await props.server.fs?.downloadFile(path, true)) as any;
-
-    window.scrollTo(0, 0);
-
-    fileContent.value = await content.text();
-    editingFile.value = item;
-    isEditing.value = true;
-    const extension = item.name.split(".").pop();
-    if (item.type === "file" && extension && imageExtensions.includes(extension)) {
-      isEditingImage.value = true;
-      imagePreview.value = content;
-    }
-  } catch (error) {
-    console.error("Error fetching file content:", error);
-  }
-};
-
 const saveFileContent = async (exit: boolean = true) => {
   if (!editingFile.value) return;
 
@@ -1029,6 +994,7 @@ const saveFileContent = async (exit: boolean = true) => {
       await props.server.refresh();
       isEditing.value = false;
       editingFile.value = null;
+      router.push({ query: { ...route.query, path: currentPath.value } });
     }
 
     addNotification({
@@ -1059,6 +1025,16 @@ const cancelEditing = () => {
   fileContent.value = "";
   isEditingImage.value = false;
   imagePreview.value = null;
+  router.push({ query: { ...route.query, path: currentPath.value } });
+  const newQuery = { ...route.query };
+  delete newQuery.editing;
+  router.replace({ query: newQuery });
+};
+
+const onScroll = () => {
+  if (contextMenuInfo.value.item) {
+    contextMenuInfo.value.y = Math.max(0, contextMenuInfo.value.y - window.scrollY);
+  }
 };
 </script>
 

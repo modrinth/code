@@ -120,6 +120,9 @@
                 </div>
 
                 <div v-if="errorTitle === 'Installation error'" class="mt-2 flex flex-row gap-4">
+                  <ButtonStyled v-if="errorLog">
+                    <button @click="openInstallLog"><FileIcon />Open Installation Log</button>
+                  </ButtonStyled>
                   <ButtonStyled>
                     <button @click="copyServerDebugInfo">
                       <CopyIcon v-if="!copied" />
@@ -190,7 +193,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-import { CopyIcon, IssuesIcon, LeftArrowIcon, RightArrowIcon, CheckIcon } from "@modrinth/assets";
+import {
+  CopyIcon,
+  IssuesIcon,
+  LeftArrowIcon,
+  RightArrowIcon,
+  CheckIcon,
+  FileIcon,
+} from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
@@ -202,6 +212,7 @@ const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
 const isMounted = ref(true);
 
 const route = useNativeRoute();
+const router = useRouter();
 const serverId = route.params.id as string;
 const server = await usePyroServer(serverId, [
   "general",
@@ -215,6 +226,8 @@ const server = await usePyroServer(serverId, [
 
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
+const errorLog = ref("");
+const errorLogFile = ref("");
 const serverData = computed(() => server.general);
 const error = ref<Error | null>(null);
 const isConnected = ref(false);
@@ -437,13 +450,26 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
 
       error.value = null;
       break;
-    case "err":
+    case "err": {
       console.log("failed to install");
       console.log(data);
       errorTitle.value = "Installation error";
       errorMessage.value = data.reason ?? "Unknown error";
       error.value = new Error(data.reason ?? "Unknown error");
+      let files = await server.fs?.listDirContents("/", 1, 100);
+      if (files.total > 1) {
+        for (let i = 1; i < files.total; i++) {
+          files = await server.fs?.listDirContents("/", i, 100);
+          if (files.items?.length === 0) break;
+        }
+      }
+      const fileName = await files.items?.find((file: { name: string }) =>
+        file.name.startsWith("modrinth-installation"),
+      )?.name;
+      errorLogFile.value = fileName;
+      errorLog.value = await server.fs?.downloadFile(fileName);
       break;
+    }
   }
 };
 
@@ -576,12 +602,19 @@ const stopPolling = () => {
 };
 
 const copyServerDebugInfo = () => {
-  const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}`;
+  const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}\nLog: ${errorLog.value}`;
   navigator.clipboard.writeText(debugInfo);
   copied.value = true;
   setTimeout(() => {
     copied.value = false;
   }, 5000);
+};
+
+const openInstallLog = () => {
+  router.push({
+    path: `${serverId}/files`,
+    query: { ...route.query, path: "/", editing: errorLogFile.value },
+  });
 };
 
 const cleanup = () => {

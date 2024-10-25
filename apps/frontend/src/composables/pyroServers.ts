@@ -455,6 +455,7 @@ const setMotd = async (motd: string) => {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const reinstallFromMrpack = async (mrpack: File) => {
   try {
     const auth = await PyroFetch<JWTAuth>(
