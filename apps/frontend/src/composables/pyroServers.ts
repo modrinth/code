@@ -212,12 +212,7 @@ interface Backup {
   created_at: string;
 }
 
-interface WSAuth {
-  url: string;
-  token: string;
-}
-
-interface FSAuth {
+interface JWTAuth {
   url: string;
   token: string;
 }
@@ -240,7 +235,7 @@ const constructServerProperties = (properties: any): string => {
 
 const processImage = async (iconUrl: string | undefined) => {
   const image = ref<string | null>(null);
-  const auth = await PyroFetch<FSAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
+  const auth = await PyroFetch<JWTAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
   try {
     const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
       override: auth,
@@ -444,7 +439,7 @@ const setMotd = async (motd: string) => {
       props.motd = motd;
       const newProps = constructServerProperties(props);
       const octetStream = new Blob([newProps], { type: "application/octet-stream" });
-      const auth = await await PyroFetch<FSAuth>(
+      const auth = await await PyroFetch<JWTAuth>(
         `servers/${internalServerRefrence.value.serverId}/fs`,
       );
 
@@ -457,6 +452,24 @@ const setMotd = async (motd: string) => {
     }
   } catch (error) {
     console.error("Error setting motd:", error);
+  }
+};
+
+const reinstallFromMrpack = async (mrpack: File) => {
+  try {
+    const auth = await PyroFetch<JWTAuth>(
+      `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`,
+    );
+
+    return await PyroFetch(`/reinstallMrpack&hard=true`, {
+      method: "POST",
+      contentType: "application/octet-stream",
+      body: mrpack,
+      override: auth,
+    });
+  } catch (error) {
+    console.error("Error reinstalling from mrpack:", error);
+    throw error;
   }
 };
 
@@ -812,11 +825,11 @@ const modules: any = {
     update: updateStartupSettings,
   },
   ws: {
-    get: async (serverId: string) => await PyroFetch<WSAuth>(`servers/${serverId}/ws`),
+    get: async (serverId: string) => await PyroFetch<JWTAuth>(`servers/${serverId}/ws`),
   },
   fs: {
     get: async (serverId: string) => {
-      return { auth: await PyroFetch<FSAuth>(`servers/${serverId}/fs`) };
+      return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`) };
     },
     listDirContents,
     createFileOrFolder,
@@ -1027,7 +1040,7 @@ type FSFunctions = {
    * @param serverId
    * @returns
    */
-  get: (serverId: string) => Promise<FSAuth>;
+  get: (serverId: string) => Promise<JWTAuth>;
 
   /**
    * @param path - The path to list the contents of.
@@ -1093,7 +1106,7 @@ type ModsModule = { data: Mod[] } & ModFunctions;
 type BackupsModule = { data: Backup[] } & BackupFunctions;
 type NetworkModule = { allocations: Allocation[] } & NetworkFunctions;
 type StartupModule = Startup & StartupFunctions;
-type FSModule = { auth: FSAuth } & FSFunctions;
+type FSModule = { auth: JWTAuth } & FSFunctions;
 
 type ModulesMap = {
   general: GeneralModule;
@@ -1101,7 +1114,7 @@ type ModulesMap = {
   backups: BackupsModule;
   network: NetworkModule;
   startup: StartupModule;
-  ws: WSAuth;
+  ws: JWTAuth;
   fs: FSModule;
 };
 
