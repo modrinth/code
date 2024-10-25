@@ -59,7 +59,7 @@
         </div>
       </NewModal>
 
-      <NewModal ref="restoreBackupModal" header="">
+      <NewModal ref="restoreBackupModal" header="Restoring backup">
         <div class="flex flex-col gap-4">
           <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
             <div class="text-2xl font-extrabold text-contrast">
@@ -83,7 +83,7 @@
         </div>
       </NewModal>
 
-      <NewModal ref="deleteBackupModal" header="">
+      <NewModal ref="deleteBackupModal" danger header="Deleting backup">
         <div class="flex flex-col gap-4">
           <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
             <div class="text-2xl font-extrabold text-contrast">
@@ -114,9 +114,7 @@
               <div class="text-2xl font-extrabold text-contrast">
                 {{ data.used_backup_quota }} Backups
               </div>
-              <div class="font-semibold text-contrast">
-                {{ data.backup_quota - data.used_backup_quota }} Slots avaliable
-              </div>
+              <div class="">{{ data.backup_quota - data.used_backup_quota }} slots avaliable</div>
             </div>
             <ButtonStyled type="standard" color="brand">
               <button @click="showCreateModel">
