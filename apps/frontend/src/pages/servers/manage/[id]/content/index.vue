@@ -101,8 +101,20 @@
                     class="absolute right-2 flex gap-2 rounded-xl p-1 font-semibold text-contrast"
                   >
                     <ButtonStyled type="transparent">
-                      <button v-if="mod.project_id" @click="showEditModModal(mod)">
-                        <EditIcon />
+                      <button
+                        v-if="mod.project_id"
+                        :disabled="
+                          isFetchingVersionsForMod[mod.project_id] ||
+                          modActionsInProgress[mod.project_id]
+                        "
+                        @click="showEditModModal(mod)"
+                      >
+                        <template v-if="isFetchingVersionsForMod[mod.project_id]">
+                          <UiServersLoadingIcon />
+                        </template>
+                        <template v-else>
+                          <EditIcon />
+                        </template>
                       </button>
                     </ButtonStyled>
                     <ButtonStyled type="transparent">
@@ -241,6 +253,7 @@ const localMods = ref<Mod[]>([]);
 const modActionsInProgress = ref<Record<string, boolean>>({});
 const modSearchInput = ref("");
 const searchInput = ref("");
+const isFetchingVersionsForMod = ref<Record<string, boolean>>({});
 
 const modrinthTotalHeight = computed(() => filteredModrinthMods.value.length * ITEM_HEIGHT);
 const externalTotalHeight = computed(() => filteredExternalMods.value.length * ITEM_HEIGHT);
@@ -374,6 +387,7 @@ const debounce = <T extends (...args: any[]) => void>(
 const debouncedSearch = debounce(() => {
   modSearchInput.value = searchInput.value;
 }, 300);
+
 const toggleModOptimistic = async (mod: Mod) => {
   if (!mod.project_id || modActionsInProgress.value[mod.project_id]) return;
 
@@ -442,22 +456,23 @@ const removeModOptimistic = async (mod: Mod) => {
   }
 };
 
-// const showAddModModal = () => {
-//   isEditMode.value = false;
-//   modalHeader.value = "Add mod";
-//   modModal.value.show();
-// };
-
 const showEditModModal = async (mod: Mod) => {
   if (!mod.project_id) {
     throw new Error("Mod project_id is undefined");
   }
+  isFetchingVersionsForMod.value[mod.project_id] = true;
   isEditMode.value = true;
   modalHeader.value = "Editing mod version";
   selectedMod.value = mod;
   newModVersion.value = mod.version_number || "";
-  await fetchVersions(mod.project_id);
-  modModal.value.show();
+  try {
+    await fetchVersions(mod.project_id);
+    modModal.value.show();
+  } catch (error) {
+    console.error("Error fetching versions:", error);
+  } finally {
+    isFetchingVersionsForMod.value[mod.project_id] = false;
+  }
 };
 
 const handleModAction = async (mod: Mod, versionNumber?: string) => {
