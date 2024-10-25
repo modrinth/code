@@ -612,9 +612,9 @@ const copyServerDebugInfo = () => {
 };
 
 const openInstallLog = () => {
-  router.push({
-    path: `${serverId}/files`,
-    query: { ...route.query, path: "/", editing: errorLogFile.value },
+  router.replace({
+    path: `/servers/manage/${serverId}/files`,
+    query: { ...route.query, editing: errorLogFile.value },
   });
 };
 
