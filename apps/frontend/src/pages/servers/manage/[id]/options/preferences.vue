@@ -3,18 +3,22 @@
     <div class="h-full w-full gap-2 overflow-y-auto">
       <div class="card flex flex-col gap-4">
         <h1 class="m-0 text-lg font-bold">Server preferences</h1>
-        <div v-for="(value, key) in userPreferences" :key="key" class="flex justify-between">
-          <label for="server-name-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">{{ preferences[key].displayName }}</span>
-            <span> {{ preferences[key].description }} </span>
+        <div v-for="(prefConfig, key) in preferences" :key="key" class="flex justify-between">
+          <label :for="`pref-${key}`" class="flex flex-col gap-2">
+            <span class="text-lg font-bold text-contrast">{{ prefConfig.displayName }}</span>
+            <span>{{ prefConfig.description }}</span>
           </label>
-          <input v-model="newUserPreferences[key]" class="switch stylized-toggle" type="checkbox" />
+          <input
+            :id="`pref-${key}`"
+            v-model="newUserPreferences[key]"
+            class="switch stylized-toggle"
+            type="checkbox"
+          />
         </div>
       </div>
     </div>
-
     <UiServersSaveBanner
-      :is-visible="!!hasUnsavedChanges"
+      :is-visible="hasUnsavedChanges"
       :server="props.server"
       :is-updating="false"
       :save="savePreferences"
@@ -29,28 +33,10 @@ import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
+
 const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
-
-const hasUnsavedChanges = computed(() => {
-  return JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value);
-});
-
-const savePreferences = () => {
-  userPreferences.value = newUserPreferences.value;
-  newUserPreferences.value = JSON.parse(JSON.stringify(userPreferences.value));
-  addNotification({
-    group: "serverOptions",
-    type: "success",
-    title: "Preferences saved",
-    text: "Your preferences have been saved.",
-  });
-};
-
-const resetPreferences = () => {
-  newUserPreferences.value = userPreferences.value;
-};
 
 const preferences = {
   ramAsNumber: {
@@ -61,13 +47,41 @@ const preferences = {
     displayName: "Auto restart (not implemented)",
     description: "Automatically restart the server if it crashes.",
   },
+} as const;
+
+type PreferenceKeys = keyof typeof preferences;
+
+type UserPreferences = {
+  [K in PreferenceKeys]: boolean;
 };
 
-const defaultPreferences = {
+const defaultPreferences: UserPreferences = {
   ramAsNumber: false,
   autoRestart: false,
 };
 
-const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, defaultPreferences);
-const newUserPreferences = ref(JSON.parse(JSON.stringify(userPreferences.value)));
+const userPreferences = useStorage<UserPreferences>(
+  `pyro-server-${serverId}-preferences`,
+  defaultPreferences,
+);
+
+const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)));
+
+const hasUnsavedChanges = computed(() => {
+  return JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value);
+});
+
+const savePreferences = () => {
+  userPreferences.value = { ...newUserPreferences.value };
+  addNotification({
+    group: "serverOptions",
+    type: "success",
+    title: "Preferences saved",
+    text: "Your preferences have been saved.",
+  });
+};
+
+const resetPreferences = () => {
+  newUserPreferences.value = { ...userPreferences.value };
+};
 </script>
