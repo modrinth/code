@@ -1,7 +1,7 @@
 <template>
   <div class="relative h-full w-full">
     <div v-if="data" class="flex h-full w-full flex-col gap-4">
-      <div class="rounded-xl border-solid border-rose-500 bg-rose-500/20 p-4">
+      <div class="rounded-2xl border-solid border-orange bg-bg-orange p-4 text-contrast">
         These settings are for advanced users. Changing them can break your server.
       </div>
 
@@ -54,7 +54,6 @@
         </div>
       </div>
     </div>
-    <UiServersPyroLoading v-else />
     <UiServersSaveBanner
       :is-visible="!!hasUnsavedChanges"
       :server="props.server"
