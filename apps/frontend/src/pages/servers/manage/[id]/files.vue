@@ -145,22 +145,22 @@
                 <span class="whitespace-pre text-sm font-medium">
                   {{
                     sortMethod === "default"
-                      ? "Default Sort"
+                      ? "Alphabetical"
                       : sortMethod === "modified"
-                        ? "Recently Modified"
+                        ? "Modified"
                         : sortMethod === "filesOnly"
-                          ? "Files Only"
+                          ? "Files"
                           : sortMethod === "foldersOnly"
-                            ? "Folders Only"
-                            : "Default Sort"
+                            ? "Folders"
+                            : "Alphabetical"
                   }}
                 </span>
                 <SortAscendingIcon aria-hidden="true" />
                 <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-                <template #normal> Default Sort </template>
-                <template #modified> Recently Modified </template>
-                <template #filesOnly> Files Only </template>
-                <template #foldersOnly> Folders Only </template>
+                <template #normal> Alphabetical </template>
+                <template #modified> Modified </template>
+                <template #filesOnly> Files </template>
+                <template #foldersOnly> Folders </template>
               </UiServersTeleportOverflowMenu>
             </ButtonStyled>
             <div class="relative w-full text-sm">
