@@ -86,7 +86,12 @@
         <div class="flex flex-row items-center justify-between gap-2">
           <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
           <ButtonStyled>
-            <button @click="editModal.show()">Choose modpack</button>
+            <button
+              :disabled="props.server.general?.status === 'installing'"
+              @click="editModal.show()"
+            >
+              Choose modpack
+            </button>
           </ButtonStyled>
         </div>
         <div
@@ -118,7 +123,12 @@
                   name="version"
                 />
                 <ButtonStyled>
-                  <button @click="reinstallCurrent">Reinstall</button>
+                  <button
+                    :disabled="isLoading || props.server.general?.status === 'installing'"
+                    @click="reinstallCurrent"
+                  >
+                    Reinstall
+                  </button>
                 </ButtonStyled>
               </div>
             </div>
@@ -531,6 +541,7 @@ const reinstallCurrent = async () => {
   const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
   try {
     await props.server.general?.reinstall(serverId, false, projectId, versionId);
+    emit("reinstall");
   } catch (error) {
     handleReinstallError(error);
   }
