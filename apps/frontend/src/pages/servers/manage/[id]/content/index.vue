@@ -153,6 +153,7 @@
                       <input
                         :id="`toggle-${mod.project_id}`"
                         :checked="!mod.disabled"
+                        :disabled="mod.project_id ? modActionsInProgress[mod.project_id] : false"
                         class="switch stylized-toggle"
                         type="checkbox"
                         @change="toggleModOptimistic(mod)"
