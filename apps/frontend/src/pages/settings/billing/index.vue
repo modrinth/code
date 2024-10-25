@@ -4,7 +4,7 @@
     <p>{{ formatMessage(messages.subscriptionDescription) }}</p>
     <div class="universal-card recessed">
       <ConfirmModal
-        ref="modal_cancel"
+        ref="modalCancel"
         :title="formatMessage(cancelModalMessages.title)"
         :description="formatMessage(cancelModalMessages.description)"
         :proceed-label="formatMessage(cancelModalMessages.action)"
@@ -108,7 +108,7 @@
                   id: 'cancel',
                   action: () => {
                     cancelSubscriptionId = midasSubscription.id;
-                    $refs.modal_cancel.show();
+                    $refs.modalCancel.show();
                   },
                 },
               ]"
@@ -123,7 +123,7 @@
             @click="
               () => {
                 cancelSubscriptionId = midasSubscription.id;
-                $refs.modal_cancel.show();
+                $refs.modalCancel.show();
               }
             "
           >
@@ -152,7 +152,163 @@
         </div>
       </div>
     </div>
+    <div v-if="pyroSubscriptions.length > 0">
+      <div
+        v-for="(subscription, index) in pyroSubscriptions"
+        :key="index"
+        class="universal-card recessed mt-4"
+      >
+        <div class="flex flex-col justify-between gap-4">
+          <div class="flex flex-col gap-4">
+            <LazyUiServersModrinthServersIcon class="flex h-8 w-fit" />
+            <div class="flex flex-col gap-2">
+              <UiServersServerListing
+                v-if="subscription.serverInfo"
+                :server_id="subscription.serverInfo.server_id"
+                :name="subscription.serverInfo.name"
+                :status="subscription.serverInfo.status"
+                :game="subscription.serverInfo.game"
+                :loader="subscription.serverInfo.loader"
+                :loader_version="subscription.serverInfo.loader_version"
+                :mc_version="subscription.serverInfo.mc_version"
+                :upstream="subscription.serverInfo.upstream"
+                :net="subscription.serverInfo.net"
+              />
+              <div v-else class="w-fit">
+                <p>
+                  A linked server couldn't be found with this subscription. It may have been deleted
+                  or suspended. Please contact Modrinth support with the following information:
+                </p>
+                <div class="flex w-full flex-col gap-2">
+                  <CopyCode
+                    class="whitespace-nowrap"
+                    :text="'Server ID: ' + subscription.metadata.id"
+                  />
+                  <CopyCode class="whitespace-nowrap" :text="'Stripe ID: ' + subscription.id" />
+                </div>
+              </div>
+              <h3 class="m-0 mt-4 text-xl font-semibold leading-none text-contrast">
+                {{ getProductSize(getPyroProduct(subscription)) }} Plan
+              </h3>
+              <div class="flex flex-row justify-between">
+                <div class="mt-2 flex flex-col gap-2">
+                  <div class="flex items-center gap-2">
+                    <CheckCircleIcon class="h-5 w-5 text-brand" />
+                    <span> {{ getPyroProduct(subscription)?.metadata?.cpu }} vCores (CPU) </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <CheckCircleIcon class="h-5 w-5 text-brand" />
+                    <span>
+                      {{
+                        getPyroProduct(subscription)?.metadata?.ram
+                          ? getPyroProduct(subscription).metadata.ram / 1024 + " GB RAM"
+                          : ""
+                      }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <CheckCircleIcon class="h-5 w-5 text-brand" />
+                    <span>
+                      {{
+                        getPyroProduct(subscription)?.metadata?.swap
+                          ? getPyroProduct(subscription).metadata.swap / 1024 + " GB Swap"
+                          : ""
+                      }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <CheckCircleIcon class="h-5 w-5 text-brand" />
+                    <span>
+                      {{
+                        getPyroProduct(subscription)?.metadata?.storage
+                          ? getPyroProduct(subscription).metadata.storage / 1024 + " GB SSD"
+                          : ""
+                      }}
+                    </span>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end justify-between">
+                  <div class="flex flex-col items-end gap-2">
+                    <div class="flex text-2xl font-bold text-contrast">
+                      <span class="text-contrast">
+                        {{
+                          formatPrice(
+                            vintl.locale,
+                            getProductPrice(getPyroProduct(subscription), subscription.interval)
+                              .prices.intervals[subscription.interval],
+                            getProductPrice(getPyroProduct(subscription), subscription.interval)
+                              .currency_code,
+                          )
+                        }}
+                      </span>
+                      <span>/{{ subscription.interval.replace("ly", "") }}</span>
+                    </div>
+                    <div v-if="getPyroCharge(subscription)" class="mb-4 flex flex-col items-end">
+                      <span class="text-sm text-secondary">
+                        Since {{ $dayjs(subscription.created).format("MMMM D, YYYY") }}
+                      </span>
+                      <span
+                        v-if="getPyroCharge(subscription).status === 'open'"
+                        class="text-sm text-secondary"
+                      >
+                        Renews {{ $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY") }}
+                      </span>
+                      <span
+                        v-else-if="getPyroCharge(subscription).status === 'processing'"
+                        class="text-sm text-orange"
+                      >
+                        Your payment is being processed. Perks will activate once payment is
+                        complete.
+                      </span>
+                      <span
+                        v-else-if="getPyroCharge(subscription).status === 'cancelled'"
+                        class="text-sm text-secondary"
+                      >
+                        Expires {{ $dayjs(getPyroCharge(subscription).due).format("MMMM D, YYYY") }}
+                      </span>
+                      <span
+                        v-else-if="getPyroCharge(subscription).status === 'failed'"
+                        class="text-sm text-red"
+                      >
+                        Your subscription payment failed. Please update your payment method.
+                      </span>
+                    </div>
+                  </div>
+                  <div class="flex gap-2">
+                    <ButtonStyled
+                      v-if="
+                        getPyroCharge(subscription) &&
+                        getPyroCharge(subscription).status !== 'cancelled'
+                      "
+                      type="standard"
+                      @click="showPyroCancelModal(subscription.id)"
+                    >
+                      <button class="text-contrast">
+                        <XIcon />
+                        Cancel
+                      </button>
+                    </ButtonStyled>
+                    <ButtonStyled
+                      v-else-if="
+                        getPyroCharge(subscription) &&
+                        getPyroCharge(subscription).status === 'cancelled'
+                      "
+                      type="standard"
+                      color="green"
+                      @click="resubscribePyro(subscription.id)"
+                    >
+                      <button class="text-contrast">Resubscribe</button>
+                    </ButtonStyled>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
+
   <section class="universal-card">
     <ConfirmModal
       ref="modal_confirm"
@@ -320,8 +476,17 @@
     </div>
   </section>
 </template>
+
 <script setup>
-import { ConfirmModal, NewModal, OverflowMenu, AnimatedLogo, PurchaseModal } from "@modrinth/ui";
+import {
+  ConfirmModal,
+  NewModal,
+  OverflowMenu,
+  AnimatedLogo,
+  PurchaseModal,
+  ButtonStyled,
+  CopyCode,
+} from "@modrinth/ui";
 import {
   PlusIcon,
   XIcon,
@@ -339,7 +504,7 @@ import {
   HistoryIcon,
 } from "@modrinth/assets";
 import { calculateSavings, formatPrice, createStripeElements, getCurrency } from "@modrinth/utils";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { products } from "~/generated/state.json";
 
 definePageMeta({
@@ -434,6 +599,14 @@ const messages = defineMessages({
     id: "settings.billing.payment_method.card_expiry",
     defaultMessage: "Expires {month}/{year}",
   },
+  pyroSubscriptionTitle: {
+    id: "settings.billing.pyro_subscription.title",
+    defaultMessage: "Modrinth Server Subscriptions",
+  },
+  pyroSubscriptionDescription: {
+    id: "settings.billing.pyro_subscription.description",
+    defaultMessage: "Manage your Modrinth Server subscriptions.",
+  },
 });
 
 const paymentMethodTypes = defineMessages({
@@ -471,7 +644,9 @@ function loadStripe() {
     if (!stripe) {
       stripe = Stripe(config.public.stripePublishableKey);
     }
-  } catch {}
+  } catch (error) {
+    console.error("Error loading Stripe:", error);
+  }
 }
 
 const [
@@ -479,6 +654,8 @@ const [
   { data: charges, refresh: refreshCharges },
   { data: customer, refresh: refreshCustomer },
   { data: subscriptions, refresh: refreshSubscriptions },
+  { data: productsData, refresh: refreshProducts },
+  { data: serversData, refresh: refreshServers },
 ] = await Promise.all([
   useAsyncData("billing/payment_methods", () =>
     useBaseFetch("billing/payment_methods", { internal: true }),
@@ -488,81 +665,51 @@ const [
   useAsyncData("billing/subscriptions", () =>
     useBaseFetch("billing/subscriptions", { internal: true }),
   ),
+  useAsyncData("billing/products", () => useBaseFetch("billing/products", { internal: true })),
+  useAsyncData("servers", () => usePyroFetch("servers")),
 ]);
 
-async function refresh() {
-  await Promise.all([
-    refreshPaymentMethods(),
-    refreshCharges(),
-    refreshCustomer(),
-    refreshSubscriptions(),
-  ]);
-}
-
-const midasProduct = ref(products.find((x) => x.metadata.type === "midas"));
+const midasProduct = ref(products.find((x) => x.metadata?.type === "midas"));
 const midasSubscription = computed(() =>
-  subscriptions.value.find(
-    (x) => x.status === "provisioned" && midasProduct.value.prices.find((y) => y.id === x.price_id),
+  subscriptions.value?.find(
+    (x) =>
+      x.status === "provisioned" && midasProduct.value?.prices?.find((y) => y.id === x.price_id),
   ),
 );
 const midasSubscriptionPrice = computed(() =>
   midasSubscription.value
-    ? midasProduct.value.prices.find((x) => x.id === midasSubscription.value.price_id)
+    ? midasProduct.value?.prices?.find((x) => x.id === midasSubscription.value.price_id)
     : null,
 );
 const midasCharge = computed(() =>
   midasSubscription.value
-    ? charges.value.find((x) => x.subscription_id === midasSubscription.value.id)
+    ? charges.value?.find((x) => x.subscription_id === midasSubscription.value.id)
     : null,
 );
+
+const pyroSubscriptions = computed(() => {
+  const pyroSubs = subscriptions.value?.filter((s) => s?.metadata?.type === "pyro") || [];
+  const servers = serversData.value?.servers || [];
+
+  return pyroSubs.map((subscription) => {
+    const server = servers.find((s) => s.server_id === subscription.metadata.id);
+    return {
+      ...subscription,
+      serverInfo: server,
+    };
+  });
+});
 
 const purchaseModal = ref();
 const country = useUserCountry();
 const price = computed(() =>
-  midasProduct.value.prices.find((x) => x.currency_code === getCurrency(country.value)),
+  midasProduct.value?.prices?.find((x) => x.currency_code === getCurrency(country.value)),
 );
 
-// Initialize subscription with fake data if redirected from checkout
-const route = useRoute();
-const router = useRouter();
-if (route.query.priceId && route.query.plan && route.query.redirect_status) {
-  let status;
-  if (route.query.redirect_status === "succeeded") {
-    status = "active";
-  } else if (route.query.redirect_status === "processing") {
-    status = "payment-processing";
-  } else {
-    status = "payment-failed";
-  }
-
-  subscriptions.value.push({
-    id: "temp",
-    price_id: route.query.priceId,
-    interval: route.query.plan,
-    created: Date.now(),
-    status,
-  });
-
-  charges.value.push({
-    id: "temp",
-    price_id: route.query.priceId,
-    subscription_id: "temp",
-    status: "open",
-    due: Date.now() + (route.query.plan === "yearly" ? 31536000000 : 2629746000),
-    subscription_interval: route.query.plan,
-  });
-
-  await router.replace({ query: {} });
-}
-
 const primaryPaymentMethodId = computed(() => {
-  if (
-    customer.value &&
-    customer.value.invoice_settings &&
-    customer.value.invoice_settings.default_payment_method
-  ) {
+  if (customer.value?.invoice_settings?.default_payment_method) {
     return customer.value.invoice_settings.default_payment_method;
-  } else if (paymentMethods.value && paymentMethods.value[0] && paymentMethods.value[0].id) {
+  } else if (paymentMethods.value?.[0]?.id) {
     return paymentMethods.value[0].id;
   } else {
     return null;
@@ -678,7 +825,7 @@ async function removePaymentMethod(index) {
   stopLoading();
 }
 
-const cancelSubscriptionId = ref();
+const cancelSubscriptionId = ref(null);
 async function cancelSubscription(id, cancelled) {
   startLoading();
   try {
@@ -700,4 +847,79 @@ async function cancelSubscription(id, cancelled) {
   }
   stopLoading();
 }
+
+const getPyroProduct = (subscription) => {
+  if (!subscription || !productsData.value) return null;
+  return productsData.value.find((p) => p.prices?.some((x) => x.id === subscription.price_id));
+};
+
+const getPyroCharge = (subscription) => {
+  if (!subscription || !charges.value) return null;
+  return charges.value.find(
+    (charge) => charge.subscription_id === subscription.id && charge.status !== "succeeded",
+  );
+};
+
+const getProductSize = (product) => {
+  if (!product || !product.metadata) return "Unknown";
+  const ramSize = product.metadata.ram;
+  if (ramSize === 4096) return "Small";
+  if (ramSize === 6144) return "Medium";
+  if (ramSize === 8192) return "Large";
+  return "Custom";
+};
+
+const getProductPrice = (product, interval) => {
+  if (!product || !product.prices) return null;
+  const countryValue = country.value;
+  return (
+    product.prices.find(
+      (p) => p.currency_code === getCurrency(countryValue) && p.prices?.intervals?.[interval],
+    ) ??
+    product.prices.find((p) => p.currency_code === "USD" && p.prices?.intervals?.[interval]) ??
+    product.prices[0]
+  );
+};
+
+const modalCancel = ref(null);
+
+const showPyroCancelModal = (subscriptionId) => {
+  cancelSubscriptionId.value = subscriptionId;
+  if (modalCancel.value) {
+    modalCancel.value.show();
+  } else {
+    console.error("modalCancel ref is undefined");
+  }
+};
+
+const resubscribePyro = async (subscriptionId) => {
+  try {
+    await useBaseFetch(`billing/subscription/${subscriptionId}`, {
+      internal: true,
+      method: "PATCH",
+      body: {
+        cancelled: false,
+      },
+    });
+    await refresh();
+  } catch {
+    data.$notify({
+      group: "main",
+      title: "Error resubscribing",
+      text: "An error occurred while resubscribing to your Modrinth server.",
+      type: "error",
+    });
+  }
+};
+
+const refresh = async () => {
+  await Promise.all([
+    refreshPaymentMethods(),
+    refreshCharges(),
+    refreshCustomer(),
+    refreshSubscriptions(),
+    refreshProducts(),
+    refreshServers(),
+  ]);
+};
 </script>

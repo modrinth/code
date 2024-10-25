@@ -1,6 +1,10 @@
 export const BASE62_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 type Base62Char = (typeof BASE62_CHARS)[number]
 
+export function formatPrice(locale: string, price: number, currency: string): string
+
+export function getCurrency(userCountry: string): string
+
 declare global {
   type ModrinthId = `${Base62Char}`[]
 

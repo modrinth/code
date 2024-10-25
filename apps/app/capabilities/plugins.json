@@ -2,9 +2,7 @@
   "identifier": "plugins",
   "description": "",
   "local": true,
-  "windows": [
-    "main"
-  ],
+  "windows": ["main"],
   "permissions": [
     "dialog:allow-open",
     "dialog:allow-confirm",
