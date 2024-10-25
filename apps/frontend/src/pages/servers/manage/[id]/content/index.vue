@@ -2,7 +2,7 @@
   <NewModal ref="modModal" :header="modalHeader">
     <div v-if="isEditMode">
       <div class="mb-4 flex flex-col gap-4">
-        <div class="inline-flex items-center">
+        <div class="inline-flex flex-wrap items-center">
           You're changing the version of
           <div class="ml-2 inline-flex items-center gap-1">
             <UiAvatar
@@ -11,7 +11,17 @@
               class="inline-block"
               alt="Server Icon"
             />
-            <strong>{{ selectedMod?.name }}</strong>
+            <strong>{{ selectedMod?.name + "." }}</strong> The latest version is
+            <strong>{{ versionOptions[0] + "." }}</strong>
+          </div>
+        </div>
+        <div>
+          <div v-if="props.server.general?.upstream" class="flex items-center gap-2">
+            <InfoIcon />
+            <span class="text-sm text-secondary">
+              Your server was created from a modpack. Changing the mod version may cause unexpected
+              issues.
+            </span>
           </div>
         </div>
       </div>
@@ -23,8 +33,19 @@
           placeholder="Select project..."
           class="!w-full"
         />
+      </div>
+      <div class="mt-4 flex flex-row items-center gap-4">
         <ButtonStyled color="brand">
-          <button @click="handleModAction(selectedMod!)">Install</button>
+          <button @click="handleModAction(selectedMod!)">
+            <PlusIcon />
+            Install
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="modModal.value.hide()">
+            <XIcon />
+            Cancel
+          </button>
         </ButtonStyled>
       </div>
     </div>
@@ -253,6 +274,9 @@ import {
   PackageClosedIcon,
   FilterIcon,
   DropdownIcon,
+  InfoIcon,
+  XIcon,
+  PlusIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
