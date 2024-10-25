@@ -142,13 +142,12 @@
                   <h2 class="mb-0 mt-8 text-xl font-bold text-contrast">External mods</h2>
                   <p class="mb-4 mt-3">
                     External mods are mods that are directly uploaded to your server or are part of
-                    a modpack, but are not listed on Modrinth. You can manage them via the Files
-                    tab.
+                    a modpack, but are not listed on Modrinth.
                   </p>
                 </div>
               </template>
 
-              <template v-for="mod in visibleItems.external.items" :key="mod.name">
+              <template v-for="mod in visibleItems.external.items" :key="mod.filename">
                 <div
                   class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised hover:bg-table-alternateRow"
                   :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
@@ -168,25 +167,32 @@
                       />
                       <div class="flex flex-col">
                         <span class="flex items-center gap-2 text-lg font-bold">
-                          External Mod
+                          {{ mod.filename.replace(".disabled", "") }}
                           <span
                             v-if="mod.disabled"
                             class="rounded-full bg-button-bg p-1 px-2 text-xs text-contrast"
                             >Disabled</span
                           >
                         </span>
-                        <span class="text-xs text-secondary">{{
-                          mod.filename.replace(".disabled", "")
-                        }}</span>
+                        <span class="text-xs text-secondary"> External Mod </span>
                       </div>
                     </div>
                   </NuxtLink>
                   <div
                     class="absolute right-2 flex gap-2 rounded-xl p-1 font-semibold text-contrast"
                   >
+                    <ButtonStyled type="transparent">
+                      <button
+                        :disabled="modActionsInProgress[mod.filename]"
+                        @click="removeModOptimistic(mod)"
+                      >
+                        <TrashIcon />
+                      </button>
+                    </ButtonStyled>
                     <input
                       :id="`toggle-${mod.filename}`"
                       :checked="!mod.disabled"
+                      :disabled="modActionsInProgress[mod.filename]"
                       class="switch stylized-toggle"
                       type="checkbox"
                       @change="toggleModOptimistic(mod)"
@@ -371,9 +377,10 @@ const debouncedSearch = debounce(() => {
 }, 300);
 
 const toggleModOptimistic = async (mod: Mod) => {
-  if (!mod.project_id || modActionsInProgress.value[mod.project_id]) return;
+  const identifier = mod.project_id || mod.filename;
+  if (modActionsInProgress.value[identifier]) return;
 
-  modActionsInProgress.value[mod.project_id] = true;
+  modActionsInProgress.value[identifier] = true;
 
   const originalMods = [...localMods.value];
   const originalDisabled = mod.disabled;
@@ -392,7 +399,7 @@ const toggleModOptimistic = async (mod: Mod) => {
     await refreshData();
 
     addNotification({
-      text: `${mod.disabled ? "Disabled" : "Enabled"} ${mod.name}. Restart your server for changes to take effect.`,
+      text: `${mod.disabled ? "Disabled" : "Enabled"} ${mod.name || "External mod"}. Restart your server for changes to take effect.`,
       type: "success",
     });
   } catch (error) {
@@ -401,18 +408,19 @@ const toggleModOptimistic = async (mod: Mod) => {
     mod.disabled = originalDisabled;
 
     addNotification({
-      text: `Something went wrong toggling ${mod.name}`,
+      text: `Something went wrong toggling ${mod.name || "External mod"}`,
       type: "error",
     });
   } finally {
-    modActionsInProgress.value[mod.project_id] = false;
+    modActionsInProgress.value[identifier] = false;
   }
 };
 
 const removeModOptimistic = async (mod: Mod) => {
-  if (!mod.filename || modActionsInProgress.value[mod.filename]) return;
+  const identifier = mod.project_id || mod.filename;
+  if (modActionsInProgress.value[identifier]) return;
 
-  modActionsInProgress.value[mod.filename] = true;
+  modActionsInProgress.value[identifier] = true;
 
   const originalMods = [...localMods.value];
 
@@ -423,18 +431,18 @@ const removeModOptimistic = async (mod: Mod) => {
     await refreshData();
 
     addNotification({
-      text: `Successfully removed ${mod.name}`,
+      text: `Successfully removed ${mod.name || "External mod"}`,
       type: "success",
     });
   } catch (error) {
     console.error("Error removing mod:", error);
     localMods.value = originalMods;
     addNotification({
-      text: `couldn't remove ${mod.name}`,
+      text: `couldn't remove ${mod.name || "External mod"}`,
       type: "error",
     });
   } finally {
-    modActionsInProgress.value[mod.filename] = false;
+    modActionsInProgress.value[identifier] = false;
   }
 };
 
