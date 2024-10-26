@@ -211,9 +211,8 @@ const fetchDirectoryContents = async (): Promise<{ items: any[]; total: number }
   } catch (error) {
     console.error("Error fetching directory contents:", error);
     if (error instanceof PyroFetchError && error.statusCode === 400) {
-      return { items: directoryData.value?.items || [], total: 0 };
+      return directoryData.value || { items: [], total: 0 };
     }
-
     throw error;
   }
 };
@@ -224,8 +223,9 @@ const {
   status,
   error: loadError,
 } = useLazyAsyncData(() => fetchDirectoryContents(), {
-  watch: [currentPath],
+  watch: [],
   default: () => ({ items: [], total: 0 }),
+  immediate: true,
 });
 
 const isLoading = computed(() => status.value === "pending");
@@ -423,7 +423,8 @@ const { reset } = useInfiniteScroll(
     if (status.value === "pending") return;
 
     try {
-      const totalPages = Math.ceil((directoryData.value?.total || 0) / maxResults);
+      const totalPages = directoryData.value?.total || 0;
+
       if (currentPage.value < totalPages) {
         currentPage.value++;
         const newData = await fetchDirectoryContents();
@@ -443,7 +444,11 @@ const { reset } = useInfiniteScroll(
 );
 
 const handleLoadMore = async () => {
-  if (currentPage.value <= (directoryData.value?.total || 0) && status.value !== "pending") {
+  if (status.value === "pending") return;
+
+  const totalPages = directoryData.value?.total || 0;
+
+  if (currentPage.value < totalPages) {
     currentPage.value++;
     await refreshData();
   }
@@ -517,12 +522,13 @@ onUnmounted(() => {
 watch(
   () => route.query,
   async (newQuery) => {
-    currentPath.value = Array.isArray(newQuery.path)
-      ? newQuery.path.join("")
-      : newQuery.path || "/";
     currentPage.value = 1;
     searchQuery.value = "";
     sortMethod.value = "default";
+
+    currentPath.value = Array.isArray(newQuery.path)
+      ? newQuery.path.join("")
+      : newQuery.path || "/";
 
     if (newQuery.editing) {
       await editFile({
