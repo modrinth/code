@@ -10,8 +10,28 @@
       @wheel.prevent="handleWheel"
     >
       <UiServersPyroLoading v-if="loading" />
+      <div v-if="error" class="flex h-full w-full flex-col items-center justify-center gap-8">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="size-12"
+        >
+          <path d="M4 13c3.5-2 8-2 10 2a5.5 5.5 0 0 1 8 5" />
+          <path
+            d="M5.15 17.89c5.52-1.52 8.65-6.89 7-12C11.55 4 11.5 2 13 2c3.22 0 5 5.5 5 8 0 6.5-4.2 12-10.49 12C5.11 22 2 22 2 20c0-1.5 1.14-1.55 3.15-2.11Z"
+          />
+        </svg>
+        <p class="m-0">Invalid or empty image file.</p>
+      </div>
       <img
-        v-show="!loading"
+        v-show="!loading && !error"
         ref="image"
         :src="imageUrl"
         class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"
@@ -21,9 +41,13 @@
         }"
         alt="Viewed image"
         @load="onImageLoad"
+        @error="onImageError"
       />
     </div>
-    <div class="absolute bottom-0 mb-2 flex w-fit justify-center space-x-4 rounded-xl bg-bg p-2">
+    <div
+      v-if="!error"
+      class="absolute bottom-0 mb-2 flex w-fit justify-center space-x-4 rounded-xl bg-bg p-2"
+    >
       <Button icon-only transparent @click="zoomIn">
         <ZoomInIcon />
       </Button>
@@ -59,6 +83,7 @@ const startX = ref(0);
 const startY = ref(0);
 const imageUrl = ref("");
 const loading = ref(true);
+const error = ref(false);
 
 const createImageUrl = (blob) => {
   if (imageUrl.value) {
@@ -72,6 +97,7 @@ watch(
   (newBlob) => {
     if (newBlob) {
       loading.value = true;
+      error.value = false;
       createImageUrl(newBlob);
     }
   },
@@ -86,6 +112,11 @@ onMounted(() => {
 const onImageLoad = () => {
   loading.value = false;
   resetZoom();
+};
+
+const onImageError = () => {
+  loading.value = false;
+  error.value = true;
 };
 
 const zoomIn = () => {
