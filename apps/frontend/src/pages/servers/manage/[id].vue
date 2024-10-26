@@ -167,7 +167,7 @@
         </div>
 
         <div
-          v-if="serverData.status === 'installing'"
+          v-if="serverData.status === 'installing' && !error"
           data-pyro-server-installing
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
         >
@@ -180,6 +180,7 @@
           :is-connected="isConnected"
           :is-ws-auth-incorrect="isWSAuthIncorrect"
           :is-server-running="isServerRunning"
+          :is-error="!!error"
           :stats="stats"
           :server-power-state="serverPowerState"
           :console-output="consoleOutput"

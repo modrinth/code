@@ -87,7 +87,7 @@
           <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
           <ButtonStyled>
             <button
-              :disabled="props.server.general?.status === 'installing'"
+              :disabled="props.server.general?.status === 'installing' && isError"
               @click="editModal.show()"
             >
               Choose modpack
@@ -124,7 +124,9 @@
                 />
                 <ButtonStyled>
                   <button
-                    :disabled="isLoading || props.server.general?.status === 'installing'"
+                    :disabled="
+                      isLoading || (props.server.general?.status === 'installing' && isError)
+                    "
                     @click="reinstallCurrent"
                   >
                     Reinstall
@@ -163,7 +165,7 @@
           class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2"
           :class="{
             'pointer-events-none cursor-not-allowed select-none opacity-50':
-              props.server.general?.status === 'installing',
+              props.server.general?.status === 'installing' && isError,
           }"
           :tabindex="props.server.general?.status === 'installing' ? -1 : 0"
         >
@@ -186,6 +188,7 @@ const serverId = route.params.id as string;
 
 const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  isError: boolean;
 }>();
 
 const emit = defineEmits<{
