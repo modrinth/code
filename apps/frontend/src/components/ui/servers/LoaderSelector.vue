@@ -9,7 +9,7 @@
         class="grid size-10 place-content-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
         :class="isCurrentLoader(loader.name) ? '[&&]:bg-bg-green' : ''"
       >
-        <UiServersLoaderIcon
+        <UiServersIconsLoaderIcon
           :loader="loader.name"
           class="[&&]:size-6"
           :class="isCurrentLoader(loader.name) ? 'text-brand' : ''"

@@ -12,8 +12,18 @@
       <div
         class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
       >
-        <FolderOpenIcon v-if="type === 'directory'" class="size-6" />
-        <FileIcon v-else-if="type === 'file'" class="size-6" />
+        <template v-if="type === 'directory'">
+          <UiServersIconsCogFolderIcon v-if="name === 'config'" class="size-6" />
+          <UiServersIconsEarthIcon v-else-if="name === 'world'" class="size-6" />
+          <PaletteIcon v-else-if="name === 'resourcepacks'" class="size-6" />
+          <FolderOpenIcon v-else class="size-6" />
+        </template>
+        <template v-else>
+          <UiServersIconsCodeFileIcon v-if="isCodeFile" class="size-6" />
+          <UiServersIconsTextFileIcon v-else-if="isTextFile" class="size-6" />
+          <UiServersIconsImageFileIcon v-else-if="isImageFile" class="size-6" />
+          <FileIcon v-else class="size-6" />
+        </template>
       </div>
       <div class="flex w-full flex-col truncate">
         <span class="w-[98%] truncate font-bold group-hover:text-contrast">{{ name }}</span>
@@ -92,6 +102,7 @@ import {
 } from "@modrinth/assets";
 import { computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import PaletteIcon from "~/assets/icons/palette.svg?component";
 
 const router = useRouter();
 const route = useRoute();
@@ -133,6 +144,51 @@ const props = defineProps({
 
 const emit = defineEmits(["rename", "download", "delete", "move", "edit", "contextmenu"]);
 
+const fileExtension = computed(() => props.name.split(".").pop()?.toLowerCase() || "");
+
+// i dont expect many people to actually see these being used
+// but json and yaml for sure
+const codeExtensions = [
+  "json",
+  "java",
+  "kt",
+  "kts",
+  "sh",
+  "bat",
+  "ps1",
+  "yml",
+  "yaml",
+  "toml",
+  "js",
+  "ts",
+  "py",
+  "rb",
+  "php",
+  "html",
+  "css",
+  "cpp",
+  "c",
+  "h",
+  "rs",
+  "go",
+];
+
+const textExtensions = ["txt", "md", "log", "cfg", "conf", "properties", "ini"];
+
+const imageExtensions = ["png", "jpg", "jpeg", "gif", "svg", "webp"];
+
+const isCodeFile = computed(
+  () => props.type === "file" && codeExtensions.includes(fileExtension.value),
+);
+
+const isTextFile = computed(
+  () => props.type === "file" && textExtensions.includes(fileExtension.value),
+);
+
+const isImageFile = computed(
+  () => props.type === "file" && imageExtensions.includes(fileExtension.value),
+);
+
 const openContextMenu = (event: MouseEvent) => {
   event.preventDefault();
   emit("contextmenu", event.clientX, event.clientY);
@@ -160,36 +216,11 @@ const navigateToFolder = () => {
   }
 };
 
-const editableExtensions = [
-  "txt",
-  "md",
-  "json",
-  "java",
-  "kt",
-  "kts",
-  "sh",
-  "bat",
-  "ps1",
-  "yml",
-  "yaml",
-  "toml",
-  "ini",
-  "cfg",
-  "conf",
-  "properties",
-  "log",
-  "png",
-  "jpg",
-  "jpeg",
-  "gif",
-  "svg",
-  "webp",
-];
+const editableExtensions = [...textExtensions, ...codeExtensions, ...imageExtensions];
 
 const isEditableFile = computed(() => {
   if (props.type === "file") {
-    const fileExtension = props.name.split(".").pop()?.toLowerCase();
-    return !props.name.includes(".") || editableExtensions.includes(fileExtension || "");
+    return !props.name.includes(".") || editableExtensions.includes(fileExtension.value);
   }
   return false;
 });

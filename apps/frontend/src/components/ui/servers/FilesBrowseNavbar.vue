@@ -16,7 +16,7 @@
           <HomeIcon class="h-5 w-5" />
         </li>
       </a>
-      <UiServersSlashIcon class="ml-8 h-5 w-5" />
+      <UiServersIconsSlashIcon class="ml-8 h-5 w-5" />
       <li
         v-for="(segment, index) in breadcrumbSegments"
         :key="index"
@@ -24,7 +24,7 @@
         @click="$emit('navigate', index)"
       >
         {{ segment || "" }}
-        <UiServersSlashIcon class="h-5 w-5" />
+        <UiServersIconsSlashIconclass class="h-5 w-5" />
       </li>
     </ul>
     <div class="flex items-center gap-1">

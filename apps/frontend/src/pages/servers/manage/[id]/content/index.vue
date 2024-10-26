@@ -104,7 +104,7 @@
           <div
             class="grid size-12 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
           >
-            <UiServersLoadingIcon class="size-6 animate-spin" />
+            <UiServersIconsLoadingIcon class="size-6 animate-spin" />
           </div>
           <div class="flex flex-col gap-0.5">
             <p class="m-0 text-sm font-bold text-contrast">Working on it...</p>
@@ -167,7 +167,7 @@
                         @click="showEditModModal(mod)"
                       >
                         <template v-if="isFetchingVersionsForMod[mod.project_id]">
-                          <UiServersLoadingIcon />
+                          <UiServersIconsLoadingIcon />
                         </template>
                         <template v-else>
                           <EditIcon />

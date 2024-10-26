@@ -44,7 +44,7 @@
       <ButtonStyled type="standard" color="brand">
         <button :disabled="!canTakeAction || disabled || isStopping" @click="handleAction">
           <div v-if="isStartingOrRestarting" class="grid place-content-center">
-            <UiServersLoadingIcon />
+            <UiServersIconsLoadingIcon />
           </div>
           <div v-else class="contents">
             <component :is="showRestartIcon ? UpdatedIcon : PlayIcon" />

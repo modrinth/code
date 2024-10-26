@@ -9,7 +9,7 @@
       <div class="flex gap-2">
         <ButtonStyled>
           <button size="sm" @click="$emit('refetch')">
-            <UiServersLoadingIcon class="h-5 w-5" />
+            <UiServersIconsLoadingIcon class="h-5 w-5" />
             Try again
           </button>
         </ButtonStyled>
