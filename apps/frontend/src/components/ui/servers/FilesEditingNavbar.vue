@@ -4,15 +4,19 @@
     class="flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
   >
     <ul class="m-0 flex list-none items-center p-0 text-contrast">
-      <li
+      <a
         v-tooltip="'Back to home'"
         role="link"
-        class="breadcrumb-link grid size-8 cursor-pointer place-content-center rounded-full bg-bg-raised p-[6px] hover:bg-brand-highlight hover:text-brand"
+        class="group absolute left-0 top-0 grid h-12 w-14 place-content-center"
         @click="goHome"
       >
-        <HomeIcon class="size-5" />
-      </li>
-      <UiServersIconsSlashIcon class="h-5 w-5" />
+        <li
+          class="grid size-8 place-content-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+        >
+          <HomeIcon class="h-5 w-5" />
+        </li>
+      </a>
+      <UiServersIconsSlashIcon class="ml-8 h-5 w-5" />
       <li
         v-for="(segment, index) in breadcrumbSegments"
         :key="index"
@@ -71,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon, SaveIcon, ShareIcon, BoxIcon } from "@modrinth/assets";
+import { DropdownIcon, SaveIcon, ShareIcon, HomeIcon } from "@modrinth/assets";
 import { Button, ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps<{
