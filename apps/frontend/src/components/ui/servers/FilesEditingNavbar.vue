@@ -6,7 +6,7 @@
     <div class="flex items-center gap-2 text-contrast">
       <ButtonStyled type="transparent">
         <button @click="$emit('cancel')">
-          <XIcon aria-hidden="true" />
+          <LeftArrowIcon class="h-5 w-5" />
         </button>
       </ButtonStyled>
 
@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { XIcon, DropdownIcon, SaveIcon, ShareIcon } from "@modrinth/assets";
+import { XIcon, DropdownIcon, SaveIcon, ShareIcon, LeftArrowIcon } from "@modrinth/assets";
 import { Button, ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps<{
