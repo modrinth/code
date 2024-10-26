@@ -2,7 +2,7 @@
   <NewModal ref="modal" :header="`Creating a ${type}`">
     <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-2">
-        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <div class="font-semibold text-contrast">Name</div>
         <input
           ref="createInput"
           v-model="itemName"
@@ -14,12 +14,18 @@
         />
         <div v-if="submitted && error" class="text-red">{{ error }}</div>
       </div>
-      <div class="flex justify-end gap-4">
-        <ButtonStyled type="transparent">
-          <button @click="hide">Cancel</button>
-        </ButtonStyled>
+      <div class="flex justify-start gap-4">
         <ButtonStyled color="brand">
-          <button :disabled="!!error" type="submit">Create</button>
+          <button :disabled="!!error" type="submit">
+            <PlusIcon class="h-5 w-5" />
+            Create
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="hide">
+            <XIcon class="h-5 w-5" />
+            Cancel
+          </button>
         </ButtonStyled>
       </div>
     </form>
@@ -27,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { PlusIcon, XIcon } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
 

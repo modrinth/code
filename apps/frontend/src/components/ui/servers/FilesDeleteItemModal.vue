@@ -23,12 +23,18 @@
           </span>
         </div>
       </div>
-      <div class="flex justify-end gap-4">
-        <ButtonStyled type="transparent">
-          <button @click="hide">Cancel</button>
-        </ButtonStyled>
+      <div class="flex justify-start gap-4">
         <ButtonStyled color="red">
-          <button type="submit">Delete {{ item?.type }}</button>
+          <button type="submit">
+            <TrashIcon class="h-5 w-5" />
+            Delete {{ item?.type }}
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="hide">
+            <XIcon class="h-5 w-5" />
+            Cancel
+          </button>
         </ButtonStyled>
       </div>
     </form>
@@ -37,7 +43,7 @@
 
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { FileIcon, FolderOpenIcon } from "@modrinth/assets";
+import { FileIcon, FolderOpenIcon, TrashIcon, XIcon } from "@modrinth/assets";
 
 defineProps<{
   item: {

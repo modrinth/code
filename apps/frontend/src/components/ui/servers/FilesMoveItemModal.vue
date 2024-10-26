@@ -11,12 +11,18 @@
           required
         />
       </div>
-      <div class="flex justify-end gap-4">
-        <ButtonStyled type="transparent">
-          <button @click="hide">Cancel</button>
-        </ButtonStyled>
+      <div class="flex justify-start gap-4">
         <ButtonStyled color="brand">
-          <button type="submit">Move</button>
+          <button type="submit">
+            <ArrowBigUpDashIcon class="h-5 w-5" />
+            Move
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="hide">
+            <XIcon class="h-5 w-5" />
+            Cancel
+          </button>
         </ButtonStyled>
       </div>
     </form>
@@ -24,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { ArrowBigUpDashIcon, XIcon } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 
 const props = defineProps<{
