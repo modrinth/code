@@ -635,7 +635,7 @@ const uploadFile = async (file: File) => {
   try {
     const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
     await props.server.fs?.uploadFile(filePath, file);
-    reset();
+    refreshList();
 
     addNotification({
       group: "files",
