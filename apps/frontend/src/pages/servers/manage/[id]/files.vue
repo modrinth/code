@@ -486,8 +486,7 @@ const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
 
 const editFile = async (item: { name: string; type: string; path: string }) => {
   try {
-    const path = `${currentPath.value}/${item.name}`.replace("//", "/");
-    const content = (await props.server.fs?.downloadFile(path, true)) as any;
+    const content = (await props.server.fs?.downloadFile(item.path, true)) as any;
 
     window.scrollTo(0, 0);
 
