@@ -5,13 +5,10 @@
       'group flex w-full select-none items-center justify-between overflow-hidden border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised',
       isEditableFile ? 'cursor-pointer' : type === 'directory' ? 'cursor-pointer' : '',
     ]"
+    @click="selectItem"
     @contextmenu="openContextMenu"
   >
-    <div
-      data-pyro-file-metadata
-      class="flex w-full items-center gap-2 truncate"
-      @click="selectItem"
-    >
+    <div data-pyro-file-metadata class="flex w-full items-center gap-2 truncate">
       <div
         class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
       >
