@@ -46,7 +46,7 @@
                 clip-rule="evenodd"
               />
             </svg>
-            Save & Restart
+            Save & restart
           </template>
         </UiServersTeleportOverflowMenu>
       </ButtonStyled>
