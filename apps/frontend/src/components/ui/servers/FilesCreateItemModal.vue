@@ -4,6 +4,7 @@
       <div class="flex flex-col gap-2">
         <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
         <input
+          ref="createInput"
           v-model="itemName"
           autofocus
           type="text"
@@ -27,6 +28,7 @@
 
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { ref, computed, nextTick } from "vue";
 
 const props = defineProps<{
   type: "file" | "directory";
@@ -37,6 +39,7 @@ const emit = defineEmits<{
 }>();
 
 const modal = ref<typeof NewModal>();
+const createInput = ref<HTMLInputElement | null>(null);
 const itemName = ref("");
 const submitted = ref(false);
 
@@ -70,6 +73,11 @@ const show = () => {
   itemName.value = "";
   submitted.value = false;
   modal.value?.show();
+  nextTick(() => {
+    setTimeout(() => {
+      createInput.value?.focus();
+    }, 100);
+  });
 };
 
 const hide = () => {
