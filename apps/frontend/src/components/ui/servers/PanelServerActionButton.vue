@@ -165,13 +165,10 @@ const createPendingAction = () => {
   if (currentState.value === ServerState.Running) {
     currentPendingAction.value = "restart";
     currentPendingState.value = ServerState.Restarting;
+    confirmActionModal.value?.show();
   } else {
-    currentPendingAction.value = "start";
-    currentPendingState.value = ServerState.Starting;
+    runAction("start", ServerState.Starting);
   }
-
-  // Show modal
-  confirmActionModal.value?.show();
 };
 
 const handleAction = () => {
