@@ -7,11 +7,14 @@
       }"
       data-pyro-files-virtual-height-watcher
     >
-      <div
+      <ul
+        class="list-none"
         :style="{
           position: 'absolute',
           top: `${visibleTop}px`,
           width: '100%',
+          margin: 0,
+          padding: 0,
         }"
         data-pyro-files-virtual-list
       >
@@ -32,7 +35,7 @@
           @edit="$emit('edit', item)"
           @contextmenu="(x, y) => $emit('contextmenu', item, x, y)"
         />
-      </div>
+      </ul>
     </div>
   </div>
 </template>

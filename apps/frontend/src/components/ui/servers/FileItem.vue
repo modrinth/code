@@ -1,13 +1,24 @@
 <template>
-  <div data-pyro-file :class="containerClasses" @click="selectItem" @contextmenu="openContextMenu">
+  <li
+    role="button"
+    data-pyro-file
+    :class="containerClasses"
+    tabindex="0"
+    @click="selectItem"
+    @contextmenu="openContextMenu"
+    @keydown="(e) => e.key === 'Enter' && selectItem()"
+  >
     <div data-pyro-file-metadata class="flex w-full items-center gap-2 truncate">
       <div
-        class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+        class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand group-focus:bg-brand-highlight group-focus:text-brand"
       >
         <component :is="iconComponent" class="size-6" />
       </div>
       <div class="flex w-full flex-col truncate">
-        <span class="w-[98%] truncate font-bold group-hover:text-contrast">{{ name }}</span>
+        <span
+          class="w-[98%] truncate font-bold group-hover:text-contrast group-focus:text-contrast"
+          >{{ name }}</span
+        >
         <span class="text-xs text-secondary group-hover:text-primary">
           {{ subText }}
         </span>
@@ -28,7 +39,7 @@
         </UiServersTeleportOverflowMenu>
       </ButtonStyled>
     </div>
-  </div>
+  </li>
 </template>
 
 <script setup lang="ts">
@@ -101,7 +112,7 @@ const route = shallowRef(useRoute());
 const router = useRouter();
 
 const containerClasses = computed(() => [
-  "group flex w-full select-none items-center justify-between overflow-hidden border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised",
+  "group m-0 p-0 focus:!outline-none flex w-full select-none items-center justify-between overflow-hidden border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised focus:bg-bg-raised",
   isEditableFile.value ? "cursor-pointer" : props.type === "directory" ? "cursor-pointer" : "",
 ]);
 
