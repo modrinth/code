@@ -7,7 +7,7 @@
     >
       <UiServersServerIcon :image="iconUrl" />
       <div class="ml-8 flex flex-col gap-2.5">
-        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+        <div class="flex flex-row items-center gap-2">
           <h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
           <ChevronRightIcon />
         </div>
