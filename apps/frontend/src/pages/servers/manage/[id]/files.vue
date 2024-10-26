@@ -35,7 +35,6 @@
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
         <UiServersFilesBrowseNavbar
           v-if="!isEditing"
-          class="sticky top-0 z-20"
           :breadcrumb-segments="breadcrumbSegments"
           :search-query="searchQuery"
           :sort-method="sortMethod"
@@ -74,7 +73,7 @@
           />
           <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
         </div>
-        <div v-else-if="items.length > 0" class="h-full w-full">
+        <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
           <UiServersFileVirtualList
             :items="filteredItems"
             @delete="showDeleteModal"

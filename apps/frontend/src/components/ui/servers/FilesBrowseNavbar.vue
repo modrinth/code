@@ -1,7 +1,12 @@
 <template>
+  <div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
   <nav
+    ref="navbar"
+    :class="[
+      'top-0 flex h-24 select-none flex-col justify-between bg-table-alternateRow p-3 transition-[border-radius] duration-200 sm:h-12 sm:flex-row',
+      !isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
+    ]"
     data-pyro-files-state="browsing"
-    class="top-0 flex h-24 select-none flex-col justify-between rounded-t-2xl bg-table-alternateRow p-3 sm:h-12 sm:flex-row"
   >
     <ul class="m-0 flex list-none items-center p-0 text-contrast">
       <a
@@ -103,6 +108,8 @@ import {
   HomeIcon,
 } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
+import { ref } from "vue";
+import { useIntersectionObserver } from "@vueuse/core";
 
 const props = defineProps<{
   breadcrumbSegments: string[];
@@ -118,6 +125,18 @@ defineEmits<{
   (e: "update:searchQuery", value: string): void;
 }>();
 
+const navbar = ref<HTMLElement | null>(null);
+const pyroFilesSentinel = ref<HTMLElement | null>(null);
+const isStuck = ref(false);
+
+useIntersectionObserver(
+  pyroFilesSentinel,
+  ([{ isIntersecting }]) => {
+    isStuck.value = !isIntersecting;
+  },
+  { threshold: [0, 1] },
+);
+
 const sortMethodLabel = computed(() => {
   switch (props.sortMethod) {
     case "modified":
@@ -131,3 +150,14 @@ const sortMethodLabel = computed(() => {
   }
 });
 </script>
+
+<style scoped>
+.sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  visibility: hidden;
+}
+</style>
