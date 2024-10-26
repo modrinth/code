@@ -574,6 +574,18 @@ const downloadBackup = async (backupId: string) => {
   }
 };
 
+const updateAutoBackup = async (autoBackup: boolean, interval: number) => {
+  try {
+    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`, {
+      method: "POST",
+      body: { set: autoBackup, interval },
+    });
+  } catch (error) {
+    console.error("Error updating auto backup:", error);
+    throw error;
+  }
+};
+
 // ------------------ NETWORK ------------------ //
 
 const reserveAllocation = async (name: string): Promise<Allocation> => {
@@ -811,6 +823,7 @@ const modules: any = {
     delete: deleteBackup,
     restore: restoreBackup,
     download: downloadBackup,
+    updateAutoBackup,
   },
   network: {
     get: async (serverId: string) => {
@@ -971,6 +984,13 @@ type BackupFunctions = {
    * @param backupId - The ID of the backup.
    */
   download: (backupId: string) => Promise<void>;
+
+  /**
+   * Updates the auto backup settings of the server.
+   * @param autoBackup - Whether to enable auto backup.
+   * @param interval - The interval to backup at (in Hours).
+   */
+  updateAutoBackup: (autoBackup: boolean, interval: number) => Promise<void>;
 };
 
 type NetworkFunctions = {

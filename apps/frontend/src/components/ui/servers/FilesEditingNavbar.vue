@@ -3,17 +3,33 @@
     data-pyro-files-state="editing"
     class="flex h-12 select-none items-center justify-between rounded-t-2xl bg-table-alternateRow p-3"
   >
-    <div class="flex items-center gap-2 text-contrast">
+    <ul class="m-0 flex list-none items-center p-0 text-contrast">
+      <li
+        v-tooltip="'Back to home'"
+        role="link"
+        class="breadcrumb-link grid size-8 cursor-pointer place-content-center rounded-full bg-bg-raised p-[6px] hover:bg-brand-highlight hover:text-brand"
+        @click="goHome"
+      >
+        <BoxIcon class="size-5" />
+      </li>
+      <UiServersIconsSlashIcon class="h-5 w-5" />
+      <li
+        v-for="(segment, index) in breadcrumbSegments"
+        :key="index"
+        class="breadcrumb-link flex cursor-pointer items-center"
+        @click="$emit('navigate', index)"
+      >
+        {{ segment || "" }}
+        <UiServersIconsSlashIcon class="h-5 w-5" />
+      </li>
+      <li class="breadcrumb-link flex cursor-pointer items-center">{{ fileName }}</li>
+    </ul>
+    <div v-if="!isImage" class="flex gap-2">
       <ButtonStyled type="transparent">
         <button @click="$emit('cancel')">
           <LeftArrowIcon class="h-5 w-5" />
         </button>
       </ButtonStyled>
-
-      <div class="">{{ fileName }}</div>
-    </div>
-
-    <div v-if="!isImage" class="flex gap-2">
       <Button
         v-if="isLogFile"
         v-tooltip="'Share to mclo.gs'"
@@ -55,10 +71,11 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon, SaveIcon, ShareIcon, LeftArrowIcon } from "@modrinth/assets";
+import { DropdownIcon, SaveIcon, ShareIcon, BoxIcon, SlashIcon } from "@modrinth/assets";
 import { Button, ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps<{
+  breadcrumbSegments: string[];
   fileName?: string;
   isImage: boolean;
   filePath?: string;
@@ -68,11 +85,20 @@ const isLogFile = computed(() => {
   return props.filePath?.startsWith("logs") || props.filePath?.endsWith(".log");
 });
 
-defineEmits<{
+const route = useRoute();
+const router = useRouter();
+
+const emit = defineEmits<{
   (e: "cancel"): void;
   (e: "save"): void;
   (e: "save-as"): void;
   (e: "save-restart"): void;
   (e: "share"): void;
+  (e: "navigate", index: number): void;
 }>();
+
+const goHome = () => {
+  emit("cancel");
+  router.push({ path: "/servers/manage/" + route.params.id + "/files" });
+};
 </script>

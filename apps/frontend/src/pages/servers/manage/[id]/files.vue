@@ -50,11 +50,13 @@
           :file-name="editingFile?.name"
           :is-image="isEditingImage"
           :file-path="editingFile?.path"
+          :breadcrumb-segments="breadcrumbSegments"
           @cancel="cancelEditing"
           @save="() => saveFileContent(true)"
           @save-as="saveFileContentAs"
           @save-restart="saveFileContentRestart"
           @share="requestShareLink"
+          @navigate="navigateToSegment"
         />
 
         <div v-if="isEditing" class="h-full w-full flex-grow">
@@ -486,8 +488,8 @@ const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
 
 const editFile = async (item: { name: string; type: string; path: string }) => {
   try {
-    const content = (await props.server.fs?.downloadFile(item.path, true)) as any;
-
+    const path = `${currentPath.value}/${item.name}`.replace("//", "/");
+    const content = (await props.server.fs?.downloadFile(path, true)) as any;
     window.scrollTo(0, 0);
 
     fileContent.value = await content.text();
@@ -556,6 +558,9 @@ const breadcrumbSegments = computed(() => {
 const navigateToSegment = (index: number) => {
   const newPath = breadcrumbSegments.value.slice(0, index + 1).join("/");
   router.push({ query: { ...route.query, path: newPath } });
+  const newQuery = { ...route.query };
+  delete newQuery.editing;
+  router.replace({ query: newQuery });
 };
 
 // const navigateToPage = () => {

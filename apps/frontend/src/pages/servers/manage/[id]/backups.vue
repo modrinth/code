@@ -117,6 +117,68 @@
         </div>
       </NewModal>
 
+      <NewModal ref="backupSettingsModal" header="Settings">
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <div class="font-semibold text-contrast">Auto backup</div>
+            <p class="m-0">
+              Automatically backup your server every hour. This will create a backup of your server
+              every x amount of hours.
+            </p>
+          </div>
+
+          <input
+            id="auto-backup-toggle"
+            v-model="autoBackup"
+            class="switch stylized-toggle"
+            type="checkbox"
+          />
+
+          <div class="flex flex-col gap-2">
+            <div class="font-semibold text-contrast">Interval</div>
+            <p class="m-0">
+              The amount of hours between each backup. This will only backup your server if it has
+              been modified since the last backup.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2 text-contrast">
+            <div
+              class="flex w-fit items-center gap-2 rounded-xl border border-solid border-button-border bg-table-alternateRow"
+            >
+              <button
+                class="rounded-l-xl p-3 text-secondary hover:text-contrast [&&]:bg-transparent [&&]:hover:bg-button-bg"
+                @click="autoBackupInterval = Math.min(autoBackupInterval + 1, 24)"
+              >
+                <PlusIcon />
+              </button>
+              <input
+                id="auto-backup-interval"
+                v-model="autoBackupInterval"
+                class="w-16 text-center [&&]:bg-transparent [&&]:focus:shadow-none"
+              />
+              <button
+                class="rounded-r-xl p-3 text-secondary hover:text-contrast [&&]:bg-transparent [&&]:hover:bg-button-bg"
+                @click="autoBackupInterval = Math.max(autoBackupInterval - 1, 1)"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="2" viewBox="-2 0 18 2">
+                  <path
+                    d="M18,12H6"
+                    transform="translate(-5 -11)"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                  />
+                </svg>
+              </button>
+            </div>
+            {{ autoBackupInterval == 1 ? "hour" : "hours" }}
+          </div>
+        </div>
+      </NewModal>
+
       <ul class="m-0 flex list-none flex-col gap-6 p-0">
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6">
           <div class="flex items-center justify-between">
@@ -126,12 +188,19 @@
               </div>
               <div class="">{{ data.backup_quota - data.used_backup_quota }} slots avaliable</div>
             </div>
-            <ButtonStyled type="standard" color="brand">
-              <button @click="showCreateModel">
-                <PlusIcon class="h-5 w-5" />
-                Create backup
-              </button>
-            </ButtonStyled>
+            <div class="flex gap-2">
+              <ButtonStyled type="standard" color="brand">
+                <button @click="showCreateModel">
+                  <PlusIcon class="h-5 w-5" />
+                  Create backup
+                </button>
+              </ButtonStyled>
+              <ButtonStyled type="standard">
+                <button @click="showbackupSettingsModal">
+                  <SettingsIcon class="h-5 w-5" />
+                </button>
+              </ButtonStyled>
+            </div>
           </div>
         </div>
 
@@ -209,6 +278,7 @@ import {
   ClipboardCopyIcon,
   DownloadIcon,
   TrashIcon,
+  SettingsIcon,
 } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
@@ -234,11 +304,13 @@ const createBackupModal = ref<typeof NewModal>();
 const renameBackupModal = ref<typeof NewModal>();
 const restoreBackupModal = ref<typeof NewModal>();
 const deleteBackupModal = ref<typeof NewModal>();
+const backupSettingsModal = ref<typeof NewModal>();
 
 const createBackupName = ref("");
 const renameBackupName = ref("");
-
 const currentBackup = ref("");
+const autoBackup = ref(false);
+const autoBackupInterval = ref(1);
 
 const isCreatingBackup = ref(false);
 const isRenamingBackup = ref(false);
@@ -247,6 +319,10 @@ const isDeletingBackup = ref(false);
 
 const showCreateModel = () => {
   createBackupModal.value?.show();
+};
+
+const showbackupSettingsModal = () => {
+  backupSettingsModal.value?.show();
 };
 
 const createBackup = async () => {
