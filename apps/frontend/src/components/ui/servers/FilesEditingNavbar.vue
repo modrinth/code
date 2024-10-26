@@ -10,7 +10,7 @@
         class="breadcrumb-link grid size-8 cursor-pointer place-content-center rounded-full bg-bg-raised p-[6px] hover:bg-brand-highlight hover:text-brand"
         @click="goHome"
       >
-        <BoxIcon class="size-5" />
+        <HomeIcon class="size-5" />
       </li>
       <UiServersIconsSlashIcon class="h-5 w-5" />
       <li
@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon, SaveIcon, ShareIcon, BoxIcon, SlashIcon } from "@modrinth/assets";
+import { DropdownIcon, SaveIcon, ShareIcon, BoxIcon } from "@modrinth/assets";
 import { Button, ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps<{

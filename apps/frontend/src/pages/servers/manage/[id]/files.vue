@@ -558,9 +558,15 @@ const breadcrumbSegments = computed(() => {
 const navigateToSegment = (index: number) => {
   const newPath = breadcrumbSegments.value.slice(0, index + 1).join("/");
   router.push({ query: { ...route.query, path: newPath } });
-  const newQuery = { ...route.query };
-  delete newQuery.editing;
-  router.replace({ query: newQuery });
+  if (isEditing.value) {
+    isEditing.value = false;
+    editingFile.value = null;
+    closeEditor.value = false;
+
+    const newQuery = { ...route.query };
+    delete newQuery.editing;
+    router.replace({ query: newQuery });
+  }
 };
 
 // const navigateToPage = () => {
