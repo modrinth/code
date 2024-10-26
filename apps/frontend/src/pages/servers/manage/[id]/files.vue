@@ -32,9 +32,10 @@
       @dragleave.prevent="handleDragLeave"
       @drop.prevent="handleDrop"
     >
-      <div ref="mainContent" class="flex w-full flex-col">
+      <div ref="mainContent" class="relative isolate flex w-full flex-col">
         <UiServersFilesBrowseNavbar
           v-if="!isEditing"
+          class="sticky top-0 z-20"
           :breadcrumb-segments="breadcrumbSegments"
           :search-query="searchQuery"
           :sort-method="sortMethod"
