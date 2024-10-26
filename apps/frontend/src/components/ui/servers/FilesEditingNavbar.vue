@@ -9,9 +9,8 @@
           <XIcon aria-hidden="true" />
         </button>
       </ButtonStyled>
-      <span class="breadcrumb-link flex cursor-pointer items-center gap-2">
-        <span class="text-lg font-bold">{{ fileName }}</span>
-      </span>
+
+      <div class="">{{ fileName }}</div>
     </div>
 
     <div v-if="!isImage" class="flex gap-2">
