@@ -82,9 +82,9 @@
         >
           <PlusIcon aria-hidden="true" />
           <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-          <template #file> <BoxIcon aria-hidden="true" /> File </template>
-          <template #directory> <FolderOpenIcon aria-hidden="true" /> Directory </template>
-          <template #upload> <UploadIcon aria-hidden="true" /> Upload </template>
+          <template #file> <BoxIcon aria-hidden="true" /> New file </template>
+          <template #directory> <FolderOpenIcon aria-hidden="true" /> New folder </template>
+          <template #upload> <UploadIcon aria-hidden="true" /> Upload file </template>
         </UiServersTeleportOverflowMenu>
       </ButtonStyled>
     </div>
