@@ -4,7 +4,9 @@ members = [
   './packages/app-lib',
 	'./apps/app-playground',
   './apps/app',
-  './apps/labrinth'
+  './apps/labrinth',
+    './apps/daedalus_client',
+    './packages/daedalus',
 ]
 
 # Optimize for speed and reduce size on release builds
