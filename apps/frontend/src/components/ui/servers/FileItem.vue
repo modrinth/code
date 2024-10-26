@@ -87,6 +87,8 @@ const emit = defineEmits(["rename", "download", "delete", "move", "edit", "conte
 
 const codeExtensions = Object.freeze([
   "json",
+  "json5",
+  "jsonc",
   "java",
   "kt",
   "kts",
