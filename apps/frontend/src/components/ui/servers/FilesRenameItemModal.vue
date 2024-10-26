@@ -54,14 +54,14 @@ const error = computed(() => {
     return "Name is required.";
   }
   if (props.item?.type === "file") {
-    const validPattern = /^[a-zA-Z0-9-_.]+$/;
+    const validPattern = /^[a-zA-Z0-9-_.\s]+$/;
     if (!validPattern.test(itemName.value)) {
-      return "Name must contain only alphanumeric characters, dashes, underscores, or dots.";
+      return "Name must contain only alphanumeric characters, dashes, underscores, dots, or spaces.";
     }
   } else {
-    const validPattern = /^[a-zA-Z0-9-_]+$/;
+    const validPattern = /^[a-zA-Z0-9-_\s]+$/;
     if (!validPattern.test(itemName.value)) {
-      return "Name must contain only alphanumeric characters, dashes, or underscores.";
+      return "Name must contain only alphanumeric characters, dashes, underscores, or spaces.";
     }
   }
   return "";
