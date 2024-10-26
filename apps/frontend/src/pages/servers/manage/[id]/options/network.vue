@@ -1,9 +1,7 @@
 <template>
   <NewModal ref="newAllocationModal" header="New Allocation">
     <form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="addNewAllocation">
-      <label for="new-allocation-name" class="font-semibold text-contrast">
-        Name<span class="text-red-500">*</span>
-      </label>
+      <label for="new-allocation-name" class="font-semibold text-contrast"> Name </label>
       <input
         id="new-allocation-name"
         ref="newAllocationInput"
@@ -28,9 +26,7 @@
 
   <NewModal ref="editAllocationModal" header="Edit Allocation">
     <form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="editAllocation">
-      <label for="edit-allocation-name" class="font-semibold text-contrast">
-        Name<span class="text-red-500">*</span>
-      </label>
+      <label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
       <input
         id="edit-allocation-name"
         ref="editAllocationInput"
@@ -40,14 +36,14 @@
         maxlength="32"
         placeholder="e.g. Secondary allocation"
       />
-      <div class="mb-1 mt-4 flex justify-end gap-4">
-        <ButtonStyled type="transparent">
-          <button @click="editAllocationModal?.hide()">Cancel</button>
-        </ButtonStyled>
+      <div class="mb-1 mt-4 flex justify-start gap-4">
         <ButtonStyled color="brand">
           <button :disabled="!newAllocationName" type="submit">
             <SaveIcon /> Update Allocation
           </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="editAllocationModal?.hide()">Cancel</button>
         </ButtonStyled>
       </div>
     </form>
@@ -211,12 +207,16 @@
               </div>
 
               <div class="flex flex-row items-center gap-2">
-                <Button icon-only @click="showEditAllocationModal(allocation.port)">
-                  <EditIcon />
-                </Button>
-                <Button icon-only color="danger" @click="removeAllocation(allocation.port)">
-                  <TrashIcon />
-                </Button>
+                <ButtonStyled icon-only>
+                  <button @click="showEditAllocationModal(allocation.port)">
+                    <EditIcon />
+                  </button>
+                </ButtonStyled>
+                <ButtonStyled icon-only color="red">
+                  <button @click="removeAllocation(allocation.port)">
+                    <TrashIcon />
+                  </button>
+                </ButtonStyled>
               </div>
             </div>
           </div>
