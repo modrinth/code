@@ -65,7 +65,7 @@ const props = defineProps<{
 }>();
 
 const isLogFile = computed(() => {
-  return props.filePath?.startsWith("logs") && props.filePath?.endsWith(".log");
+  return props.filePath?.startsWith("logs") || props.filePath?.endsWith(".log");
 });
 
 defineEmits<{
