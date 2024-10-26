@@ -1,68 +1,71 @@
 <template>
-  <NewModal
-    ref="confirmActionModal"
-    :noblur="true"
-    header="Confirm power action"
-    @close="closeModal"
-  >
-    <div class="flex flex-col gap-4">
-      <p class="m-0">Are you sure you want to {{ currentPendingAction }} the server?</p>
+  <div class="contents">
+    <NewModal ref="confirmActionModal" header="Confirming power action" @close="closeModal">
+      <div class="flex flex-col gap-4 md:w-[400px]">
+        <p class="m-0">Are you sure you want to {{ currentPendingAction }} the server?</p>
 
-      <!-- Check to not ask again -->
-      <UiCheckbox label="Don't ask me again" class="text-sm" :disabled="!currentPendingAction" />
-      <div class="flex flex-row gap-4">
-        <ButtonStyled type="transparent" @click="closeModal">
-          <button>Cancel Action</button>
-        </ButtonStyled>
-        <ButtonStyled
-          type="standard"
-          color="brand"
-          @click="
-            runAction(
-              currentPendingAction as 'start' | 'restart' | 'stop' | 'kill',
-              currentPendingState!,
-            )
-          "
-        >
-          <button>{{ currentPendingActionFriendly }} Server</button>
-        </ButtonStyled>
+        <!-- Check to not ask again -->
+        <UiCheckbox label="Don't ask me again" class="text-sm" :disabled="!currentPendingAction" />
+        <div class="flex flex-row gap-4">
+          <ButtonStyled
+            type="standard"
+            color="brand"
+            @click="
+              runAction(
+                currentPendingAction as 'start' | 'restart' | 'stop' | 'kill',
+                currentPendingState!,
+              )
+            "
+          >
+            <button>
+              <CheckIcon class="h-5 w-5" />
+              {{ currentPendingActionFriendly }} Server
+            </button>
+          </ButtonStyled>
+          <ButtonStyled @click="closeModal">
+            <button>
+              <XIcon class="h-5 w-5" />
+              Cancel
+            </button>
+          </ButtonStyled>
+        </div>
       </div>
+    </NewModal>
+
+    <div class="flex flex-row items-center gap-2 rounded-lg">
+      <ButtonStyled v-if="showStopButton" type="transparent">
+        <button :disabled="!canTakeAction || disabled || isStopping" @click="stopServer">
+          <div class="flex gap-1">
+            <StopCircleIcon class="h-5 w-5" />
+            <span>{{ stopButtonText }}</span>
+          </div>
+        </button>
+      </ButtonStyled>
+      <ButtonStyled type="standard" color="brand">
+        <button :disabled="!canTakeAction || disabled || isStopping" @click="handleAction">
+          <div v-if="isStartingOrRestarting" class="grid place-content-center">
+            <UiServersLoadingIcon />
+          </div>
+          <div v-else class="contents">
+            <component :is="showRestartIcon ? UpdatedIcon : PlayIcon" />
+          </div>
+          <span>
+            {{ actionButtonText }}
+          </span>
+        </button>
+      </ButtonStyled>
+
+      <!-- kill option -->
+      <ButtonStyled circular type="transparent">
+        <UiServersTeleportOverflowMenu :options="[{ id: 'kill', action: () => killServer() }]">
+          <MoreVerticalIcon aria-hidden="true" />
+          <template #kill>
+            <SlashIcon class="h-5 w-5" />
+            <span>Kill Server</span>
+          </template>
+        </UiServersTeleportOverflowMenu>
+      </ButtonStyled>
     </div>
-  </NewModal>
-
-  <div class="flex flex-row items-center gap-2 rounded-lg">
-    <ButtonStyled v-if="showStopButton" type="transparent">
-      <button :disabled="!canTakeAction || disabled || isStopping" @click="stopServer">
-        <div class="flex gap-1">
-          <StopCircleIcon class="h-5 w-5" />
-          <span>{{ stopButtonText }}</span>
-        </div>
-      </button>
-    </ButtonStyled>
-    <ButtonStyled type="standard" color="brand">
-      <button :disabled="!canTakeAction || disabled || isStopping" @click="handleAction">
-        <div v-if="isStartingOrRestarting" class="grid place-content-center">
-          <UiServersLoadingIcon />
-        </div>
-        <div v-else class="contents">
-          <component :is="showRestartIcon ? UpdatedIcon : PlayIcon" />
-        </div>
-        <span>
-          {{ actionButtonText }}
-        </span>
-      </button>
-    </ButtonStyled>
-
-    <!-- kill option -->
-    <ButtonStyled circular type="transparent">
-      <UiServersTeleportOverflowMenu :options="[{ id: 'kill', action: () => killServer() }]">
-        <MoreVerticalIcon aria-hidden="true" />
-        <template #kill>
-          <SlashIcon class="h-5 w-5" />
-          <span>Kill Server</span>
-        </template>
-      </UiServersTeleportOverflowMenu>
-    </ButtonStyled>
   </div>
 </template>
 
@@ -74,6 +77,8 @@ import {
   StopCircleIcon,
   SlashIcon,
   MoreVerticalIcon,
+  XIcon,
+  CheckIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 
