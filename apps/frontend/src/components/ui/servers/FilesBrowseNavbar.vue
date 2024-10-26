@@ -24,7 +24,7 @@
         @click="$emit('navigate', index)"
       >
         {{ segment || "" }}
-        <UiServersIconsSlashIcon class class="h-5 w-5" />
+        <UiServersIconsSlashIcon class="h-5 w-5" />
       </li>
     </ul>
     <div class="flex items-center gap-1">
