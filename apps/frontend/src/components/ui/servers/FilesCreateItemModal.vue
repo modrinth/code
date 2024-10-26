@@ -1,0 +1,80 @@
+<template>
+  <NewModal ref="modal" :header="`Creating a ${type}`">
+    <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
+      <div class="flex flex-col gap-2">
+        <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <input
+          v-model="itemName"
+          autofocus
+          type="text"
+          class="bg-bg-input w-full rounded-lg p-4"
+          :placeholder="`e.g. ${type === 'file' ? 'config.yml' : 'plugins'}`"
+          required
+        />
+        <div v-if="submitted && error" class="text-red">{{ error }}</div>
+      </div>
+      <div class="flex justify-end gap-4">
+        <ButtonStyled type="transparent">
+          <button @click="hide">Cancel</button>
+        </ButtonStyled>
+        <ButtonStyled color="brand">
+          <button :disabled="!!error" type="submit">Create</button>
+        </ButtonStyled>
+      </div>
+    </form>
+  </NewModal>
+</template>
+
+<script setup lang="ts">
+import { ButtonStyled, NewModal } from "@modrinth/ui";
+
+const props = defineProps<{
+  type: "file" | "directory";
+}>();
+
+const emit = defineEmits<{
+  (e: "create", name: string): void;
+}>();
+
+const modal = ref<typeof NewModal>();
+const itemName = ref("");
+const submitted = ref(false);
+
+const error = computed(() => {
+  if (!itemName.value) {
+    return "Name is required.";
+  }
+  if (props.type === "file") {
+    const validPattern = /^[a-zA-Z0-9-_.]+$/;
+    if (!validPattern.test(itemName.value)) {
+      return "Name must contain only alphanumeric characters, dashes, underscores, or dots.";
+    }
+  } else {
+    const validPattern = /^[a-zA-Z0-9-_]+$/;
+    if (!validPattern.test(itemName.value)) {
+      return "Name must contain only alphanumeric characters, dashes, or underscores.";
+    }
+  }
+  return "";
+});
+
+const handleSubmit = () => {
+  submitted.value = true;
+  if (!error.value) {
+    emit("create", itemName.value);
+    hide();
+  }
+};
+
+const show = () => {
+  itemName.value = "";
+  submitted.value = false;
+  modal.value?.show();
+};
+
+const hide = () => {
+  modal.value?.hide();
+};
+
+defineExpose({ show, hide });
+</script>
