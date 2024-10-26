@@ -1,7 +1,6 @@
 <template>
   <div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
   <nav
-    ref="navbar"
     :class="[
       'top-0 flex h-24 select-none flex-col justify-between bg-table-alternateRow p-3 transition-[border-radius] duration-200 sm:h-12 sm:flex-row',
       !isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
@@ -125,7 +124,6 @@ defineEmits<{
   (e: "update:searchQuery", value: string): void;
 }>();
 
-const navbar = ref<HTMLElement | null>(null);
 const pyroFilesSentinel = ref<HTMLElement | null>(null);
 const isStuck = ref(false);
 
