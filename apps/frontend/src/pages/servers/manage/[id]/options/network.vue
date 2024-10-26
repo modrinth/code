@@ -6,6 +6,7 @@
       </label>
       <input
         id="new-allocation-name"
+        ref="newAllocationInput"
         v-model="newAllocationName"
         type="text"
         class="bg-bg-input w-full rounded-lg p-4"
@@ -32,6 +33,7 @@
       </label>
       <input
         id="edit-allocation-name"
+        ref="editAllocationInput"
         v-model="newAllocationName"
         type="text"
         class="bg-bg-input w-full rounded-lg p-4"
@@ -39,10 +41,14 @@
         placeholder="e.g. Secondary allocation"
       />
       <div class="mb-1 mt-4 flex justify-end gap-4">
-        <Button transparent @click="editAllocationModal?.hide()"> Cancel </Button>
-        <Button color="primary" :disabled="!newAllocationName" type="submit">
-          <SaveIcon /> Update Allocation
-        </Button>
+        <ButtonStyled type="transparent">
+          <button @click="editAllocationModal?.hide()">Cancel</button>
+        </ButtonStyled>
+        <ButtonStyled color="brand">
+          <button :disabled="!newAllocationName" type="submit">
+            <SaveIcon /> Update Allocation
+          </button>
+        </ButtonStyled>
       </div>
     </form>
   </NewModal>
@@ -158,7 +164,7 @@
               </span>
             </div>
 
-            <ButtonStyled type="standard" color="brand" @click="newAllocationModal.show()">
+            <ButtonStyled type="standard" color="brand" @click="showNewAllocationModal">
               <button>
                 <PlusIcon />
                 <span>New allocation</span>
@@ -205,7 +211,7 @@
               </div>
 
               <div class="flex flex-row items-center gap-2">
-                <Button icon-only @click="showEditAllocation(allocation.port)">
+                <Button icon-only @click="showEditAllocationModal(allocation.port)">
                   <EditIcon />
                 </Button>
                 <Button icon-only color="danger" @click="removeAllocation(allocation.port)">
@@ -237,7 +243,8 @@ import {
   InfoIcon,
   UploadIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, NewModal, Button } from "@modrinth/ui";
+import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { ref, computed, nextTick } from "vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
@@ -255,8 +262,10 @@ const userDomain = ref("play.yourdomain.com");
 const network = computed(() => props.server.network);
 const allocations = computed(() => network.value?.allocations);
 
-const newAllocationModal = ref();
-const editAllocationModal = ref();
+const newAllocationModal = ref<typeof NewModal>();
+const editAllocationModal = ref<typeof NewModal>();
+const newAllocationInput = ref<HTMLInputElement | null>(null);
+const editAllocationInput = ref<HTMLInputElement | null>(null);
 const newAllocationName = ref("");
 const newAllocationPort = ref(0);
 
@@ -270,7 +279,7 @@ const addNewAllocation = async () => {
   try {
     await props.server.network?.reserveAllocation(newAllocationName.value);
 
-    newAllocationModal.value.hide();
+    newAllocationModal.value?.hide();
     newAllocationName.value = "";
 
     await props.server.refresh();
@@ -286,9 +295,24 @@ const addNewAllocation = async () => {
   }
 };
 
-const showEditAllocation = (port: number) => {
+const showNewAllocationModal = () => {
+  newAllocationName.value = "";
+  newAllocationModal.value?.show();
+  nextTick(() => {
+    setTimeout(() => {
+      newAllocationInput.value?.focus();
+    }, 100);
+  });
+};
+
+const showEditAllocationModal = (port: number) => {
   newAllocationPort.value = port;
-  editAllocationModal.value.show();
+  editAllocationModal.value?.show();
+  nextTick(() => {
+    setTimeout(() => {
+      editAllocationInput.value?.focus();
+    }, 100);
+  });
 };
 
 const editAllocation = async () => {
@@ -297,7 +321,7 @@ const editAllocation = async () => {
   try {
     await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value);
 
-    editAllocationModal.value.hide();
+    editAllocationModal.value?.hide();
     newAllocationName.value = "";
 
     await props.server.refresh();
