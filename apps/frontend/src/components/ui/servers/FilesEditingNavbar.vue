@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { XIcon, DropdownIcon, SaveIcon, ShareIcon, LeftArrowIcon } from "@modrinth/assets";
+import { DropdownIcon, SaveIcon, ShareIcon, LeftArrowIcon } from "@modrinth/assets";
 import { Button, ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps<{
