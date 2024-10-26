@@ -8,8 +8,8 @@
       class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row"
     >
       <h1 class="w-full text-4xl font-bold text-contrast">Servers</h1>
-      <div class="flex w-full flex-row items-center justify-end gap-4">
-        <div class="relative mb-4 w-full text-sm md:mb-0 md:w-72">
+      <div class="mb-4 flex w-full flex-row items-center justify-end gap-4 md:mb-0">
+        <div class="relative w-full text-sm md:w-72">
           <label class="sr-only" for="search">Search</label>
           <SearchIcon
             class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
@@ -27,7 +27,7 @@
         </div>
         <ButtonStyled type="standard">
           <NuxtLink
-            class="!h-10 !border-[1px] !border-solid !border-button-border text-sm !font-medium"
+            class="!h-10 whitespace-pre !border-[1px] !border-solid !border-button-border text-sm !font-medium"
             :to="{ path: '/servers', query: { showModal: 'true' } }"
           >
             <PlusIcon class="size-4" />
