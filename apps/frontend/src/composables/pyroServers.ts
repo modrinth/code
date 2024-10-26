@@ -673,6 +673,7 @@ const listDirContents = (path: string, page: number, pageSize: number) => {
   return retryWithAuth(async () => {
     return await PyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
       override: internalServerRefrence.value.fs.auth,
+      retry: false,
     });
   });
 };
