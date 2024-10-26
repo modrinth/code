@@ -158,13 +158,10 @@ const sortMethod = ref("default");
 
 const maxResults = 100;
 const currentPage = ref(1);
-const pages = ref(1);
-const items = ref<any[]>([]);
+
 const currentPath = ref(typeof route.query.path === "string" ? route.query.path : "");
 
 const isAtBottom = ref(false);
-const isLoading = ref(true);
-const loadError = ref(false);
 const contextMenuInfo = ref<any>({ item: null, x: 0, y: 0 });
 
 const createItemModal = ref();
@@ -190,6 +187,56 @@ const data = computed(() => props.server.general);
 useHead({
   title: computed(() => `Files - ${data.value?.name ?? "Server"} - Modrinth`),
 });
+
+const fetchDirectoryContents = async (): Promise<{ items: any[]; total: number }> => {
+  const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
+  try {
+    const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
+
+    if (!data || !data.items) {
+      throw new Error("Invalid data structure received from server.");
+    }
+
+    if (currentPage.value === 1) {
+      return {
+        items: applyDefaultSort(data.items),
+        total: data.total,
+      };
+    }
+
+    return {
+      items: [...(directoryData.value?.items || []), ...applyDefaultSort(data.items)],
+      total: data.total,
+    };
+  } catch (error) {
+    console.error("Error fetching directory contents:", error);
+    if (error instanceof PyroFetchError && error.statusCode === 400) {
+      return { items: directoryData.value?.items || [], total: 0 };
+    }
+
+    throw error;
+  }
+};
+
+const {
+  data: directoryData,
+  refresh: refreshData,
+  status,
+  error: loadError,
+} = useLazyAsyncData(() => fetchDirectoryContents(), {
+  watch: [currentPath],
+  default: () => ({ items: [], total: 0 }),
+});
+
+const isLoading = computed(() => status.value === "pending");
+
+const items = computed(() => directoryData.value?.items || []);
+
+const refreshList = () => {
+  currentPage.value = 1;
+  refreshData();
+  reset();
+};
 
 const handleCreateNewItem = async (name: string) => {
   try {
@@ -293,13 +340,6 @@ const showDeleteModal = (item: any) => {
   contextMenuInfo.value.item = null;
 };
 
-const refreshList = () => {
-  currentPage.value = 1;
-  items.value = [];
-  fetchData();
-  reset();
-};
-
 const handleCreateError = (error: any) => {
   console.error("Error creating item:", error);
   if (error instanceof PyroFetchError) {
@@ -380,16 +420,32 @@ const filteredItems = computed(() => {
 const { reset } = useInfiniteScroll(
   scrollContainer,
   async () => {
-    if (currentPage.value <= pages.value) {
-      await fetchData();
+    if (status.value === "pending") return;
+
+    try {
+      const totalPages = Math.ceil((directoryData.value?.total || 0) / maxResults);
+      if (currentPage.value < totalPages) {
+        currentPage.value++;
+        const newData = await fetchDirectoryContents();
+
+        if (newData && newData.items) {
+          directoryData.value = {
+            items: [...directoryData.value.items, ...newData.items],
+            total: newData.total,
+          };
+        }
+      }
+    } catch (error) {
+      console.error("Error during infinite scroll:", error);
     }
   },
   { distance: 1000 },
 );
 
 const handleLoadMore = async () => {
-  if (currentPage.value <= pages.value && !isLoading.value) {
-    await fetchData();
+  if (currentPage.value <= (directoryData.value?.total || 0) && status.value !== "pending") {
+    currentPage.value++;
+    await refreshData();
   }
 };
 
@@ -419,31 +475,6 @@ const onAnywhereClicked = (e: MouseEvent) => {
 
 const sortFiles = (method: string) => {
   sortMethod.value = method;
-};
-
-const fetchData = async () => {
-  isLoading.value = true;
-  loadError.value = false;
-
-  try {
-    const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
-    const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
-
-    if (!data || !data.items) {
-      throw new Error("Invalid data structure received from server.");
-    }
-
-    data.items = applyDefaultSort(data.items);
-
-    items.value.push(...data.items);
-    pages.value = data.total;
-
-    currentPage.value++;
-    isLoading.value = false;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    loadError.value = true;
-  }
 };
 
 const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
@@ -479,7 +510,6 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  items.value = [];
   document.removeEventListener("click", onAnywhereClicked);
   window.removeEventListener("scroll", onScroll);
 });
@@ -491,8 +521,6 @@ watch(
       ? newQuery.path.join("")
       : newQuery.path || "/";
     currentPage.value = 1;
-    items.value = [];
-    loadError.value = false;
     searchQuery.value = "";
     sortMethod.value = "default";
 
@@ -507,7 +535,7 @@ watch(
       editingFile.value = null;
     }
 
-    await fetchData();
+    await refreshData();
     reset();
   },
   { immediate: true, deep: true },
