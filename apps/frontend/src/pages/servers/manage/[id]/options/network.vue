@@ -77,7 +77,12 @@
               </span>
             </label>
 
-            <Button @click="exportDnsRecords"> Export DNS records </Button>
+            <ButtonStyled>
+              <button @click="exportDnsRecords">
+                <UploadIcon />
+                <span>Export DNS Records</span>
+              </button>
+            </ButtonStyled>
           </div>
 
           <input
@@ -208,7 +213,6 @@
         </div>
       </div>
     </div>
-    <UiServersPyroLoading v-else />
     <UiServersSaveBanner
       :is-visible="!!hasUnsavedChanges && !!isValidSubdomain"
       :server="props.server"
@@ -220,7 +224,15 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon, TrashIcon, EditIcon, VersionIcon, SaveIcon, InfoIcon } from "@modrinth/assets";
+import {
+  PlusIcon,
+  TrashIcon,
+  EditIcon,
+  VersionIcon,
+  SaveIcon,
+  InfoIcon,
+  UploadIcon,
+} from "@modrinth/assets";
 import { ButtonStyled, NewModal, Button } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
