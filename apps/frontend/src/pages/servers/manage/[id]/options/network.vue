@@ -12,11 +12,15 @@
         maxlength="32"
         placeholder="e.g. Secondary allocation"
       />
-      <div class="mb-1 mt-4 flex justify-end gap-4">
-        <Button transparent @click="newAllocationModal?.hide()"> Cancel </Button>
-        <Button color="primary" :disabled="!newAllocationName" type="submit">
-          <PlusIcon /> Create allocation
-        </Button>
+      <div class="mb-1 mt-4 flex justify-start gap-4">
+        <ButtonStyled color="brand">
+          <button :disabled="!newAllocationName" type="submit">
+            <PlusIcon /> Create allocation
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="newAllocationModal?.hide()">Cancel</button>
+        </ButtonStyled>
       </div>
     </form>
   </NewModal>
