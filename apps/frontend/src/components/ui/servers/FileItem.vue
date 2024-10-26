@@ -15,7 +15,9 @@
     </div>
 
     <div data-pyro-file-actions class="flex w-fit flex-shrink-0 items-center gap-4">
-      <span class="w-full text-nowrap font-mono text-sm text-secondary">{{ formattedDate }}</span>
+      <span class="w-[160px] text-nowrap text-left font-mono text-sm text-secondary">{{
+        formattedDate
+      }}</span>
       <ButtonStyled type="transparent">
         <UiServersTeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
           <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
