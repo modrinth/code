@@ -1,4 +1,35 @@
 <template>
+  <NewModal
+    ref="confirmActionModal"
+    :noblur="true"
+    header="Confirm power action"
+    @close="closeModal"
+  >
+    <div class="flex flex-col gap-4">
+      <p class="m-0">Are you sure you want to {{ currentPendingAction }} the server?</p>
+
+      <!-- Check to not ask again -->
+      <UiCheckbox label="Don't ask me again" class="text-sm" :disabled="!currentPendingAction" />
+      <div class="flex flex-row gap-4">
+        <ButtonStyled type="transparent" @click="closeModal">
+          <button>Cancel Action</button>
+        </ButtonStyled>
+        <ButtonStyled
+          type="standard"
+          color="brand"
+          @click="
+            runAction(
+              currentPendingAction as 'start' | 'restart' | 'stop' | 'kill',
+              currentPendingState!,
+            )
+          "
+        >
+          <button>{{ currentPendingActionFriendly }} Server</button>
+        </ButtonStyled>
+      </div>
+    </div>
+  </NewModal>
+
   <div class="flex flex-row items-center gap-2 rounded-lg">
     <ButtonStyled v-if="showStopButton" type="transparent">
       <button :disabled="!canTakeAction || disabled || isStopping" @click="stopServer">
@@ -44,7 +75,7 @@ import {
   SlashIcon,
   MoreVerticalIcon,
 } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, NewModal } from "@modrinth/ui";
 
 const props = defineProps<{
   isOnline: boolean;
@@ -56,6 +87,9 @@ const emit = defineEmits<{
   (e: "action", action: "start" | "restart" | "stop" | "kill"): void;
 }>();
 
+const currentPendingAction = ref<string | null>(null);
+const confirmActionModal = ref<InstanceType<typeof NewModal> | null>(null);
+
 const ServerState = {
   Stopped: "Stopped",
   Starting: "Starting",
@@ -65,13 +99,13 @@ const ServerState = {
 } as const;
 
 type ServerStateType = (typeof ServerState)[keyof typeof ServerState];
+const currentPendingState = ref<ServerStateType | null>(null);
 
 const currentState = ref<ServerStateType>(
   props.isOnline ? ServerState.Running : ServerState.Stopped,
 );
 
 const isStartingDelay = ref(false);
-
 const showStopButton = computed(() => currentState.value === ServerState.Running);
 const showRestartIcon = computed(() => currentState.value === ServerState.Running);
 const canTakeAction = computed(
@@ -102,33 +136,73 @@ const actionButtonText = computed(() => {
   }
 });
 
+const currentPendingActionFriendly = computed(() => {
+  switch (currentPendingAction.value) {
+    case "start":
+      return "Start";
+    case "restart":
+      return "Restart";
+    case "stop":
+      return "Stop";
+    case "kill":
+      return "Kill";
+    default:
+      return null;
+  }
+});
+
 const stopButtonText = computed(() =>
   currentState.value === ServerState.Stopping ? "Stopping..." : "Stop",
 );
 
-const handleAction = () => {
+const createPendingAction = () => {
   if (!canTakeAction.value) return;
   if (currentState.value === ServerState.Running) {
-    currentState.value = ServerState.Restarting;
-    emit("action", "restart");
+    currentPendingAction.value = "restart";
+    currentPendingState.value = ServerState.Restarting;
   } else {
-    currentState.value = ServerState.Starting;
-    emit("action", "start");
+    currentPendingAction.value = "start";
+    currentPendingState.value = ServerState.Starting;
+  }
+
+  // Show modal
+  confirmActionModal.value?.show();
+};
+
+const handleAction = () => {
+  createPendingAction();
+};
+
+const runAction = (action: "start" | "restart" | "stop" | "kill", serverState: ServerStateType) => {
+  emit("action", action);
+  currentState.value = serverState;
+
+  if (action === "start") {
     isStartingDelay.value = true;
     setTimeout(() => {
       isStartingDelay.value = false;
     }, 5000);
   }
+
+  confirmActionModal.value?.hide();
 };
 
 const stopServer = () => {
   if (!canTakeAction.value) return;
-  currentState.value = ServerState.Stopping;
-  emit("action", "stop");
+  currentPendingAction.value = "stop";
+  currentPendingState.value = ServerState.Stopping;
+  confirmActionModal.value?.show();
 };
 
 const killServer = () => {
-  emit("action", "kill");
+  currentPendingAction.value = "kill";
+  currentPendingState.value = ServerState.Stopping;
+  confirmActionModal.value?.show();
+};
+
+const closeModal = () => {
+  confirmActionModal.value?.hide();
+  currentPendingAction.value = null;
 };
 
 watch(

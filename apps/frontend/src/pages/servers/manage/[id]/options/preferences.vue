@@ -47,6 +47,11 @@ const preferences = {
     displayName: "Auto restart (not implemented)",
     description: "Automatically restart the server if it crashes.",
   },
+  dontAskAgain: {
+    displayName: "Power actions confirmation",
+    description:
+      "Don't ask for confirmation when starting, stopping, restarting, or killing the server.",
+  },
 } as const;
 
 type PreferenceKeys = keyof typeof preferences;
@@ -58,6 +63,7 @@ type UserPreferences = {
 const defaultPreferences: UserPreferences = {
   ramAsNumber: false,
   autoRestart: false,
+  dontAskAgain: false,
 };
 
 const userPreferences = useStorage<UserPreferences>(
