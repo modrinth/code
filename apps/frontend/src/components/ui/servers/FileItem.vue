@@ -53,35 +53,16 @@ import {
 } from "#components";
 import PaletteIcon from "~/assets/icons/palette.svg?component";
 
-const props = defineProps({
-  name: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String as PropType<"directory" | "file">,
-    required: true,
-  },
-  size: {
-    type: Number,
-    required: false,
-    default: 0,
-  },
-  count: {
-    type: Number,
-    required: false,
-    default: 0,
-  },
-  modified: {
-    type: Number,
-    required: false,
-    default: 0,
-  },
-  path: {
-    type: String,
-    required: true,
-  },
-});
+interface FileItemProps {
+  name: string;
+  type: "directory" | "file";
+  size?: number;
+  count?: number;
+  modified: number;
+  path: string;
+}
+
+const props = defineProps<FileItemProps>();
 
 const emit = defineEmits(["rename", "download", "delete", "move", "edit", "contextmenu"]);
 
@@ -196,6 +177,7 @@ const isEditableFile = computed(() => {
 });
 
 const formattedSize = computed(() => {
+  if (props.size === undefined) return "";
   const bytes = props.size;
   if (bytes === 0) return "0 B";
 
