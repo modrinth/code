@@ -91,3 +91,9 @@ const resetPreferences = () => {
   newUserPreferences.value = { ...userPreferences.value };
 };
 </script>
+
+<style scoped>
+.stylized-toggle:checked::after {
+  background: var(--color-accent-contrast) !important;
+}
+</style>
