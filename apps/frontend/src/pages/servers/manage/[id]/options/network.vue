@@ -49,6 +49,14 @@
     </form>
   </NewModal>
 
+  <ConfirmModal
+    ref="confirmDeleteModal"
+    title="Are you sure you want to delete this allocation?"
+    description="This will permanently delete this allocation."
+    proceed-label="Delete"
+    @proceed="confirmDeleteAllocation"
+  />
+
   <div class="relative h-full w-full overflow-y-auto">
     <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4">
       <div class="flex h-full flex-col">
@@ -213,7 +221,7 @@
                   </button>
                 </ButtonStyled>
                 <ButtonStyled icon-only color="red">
-                  <button @click="removeAllocation(allocation.port)">
+                  <button @click="showConfirmDeleteModal(allocation.port)">
                     <TrashIcon />
                   </button>
                 </ButtonStyled>
@@ -243,7 +251,7 @@ import {
   InfoIcon,
   UploadIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
 import type { Server } from "~/composables/pyroServers";
 
@@ -264,10 +272,12 @@ const allocations = computed(() => network.value?.allocations);
 
 const newAllocationModal = ref<typeof NewModal>();
 const editAllocationModal = ref<typeof NewModal>();
+const confirmDeleteModal = ref<typeof ConfirmModal>();
 const newAllocationInput = ref<HTMLInputElement | null>(null);
 const editAllocationInput = ref<HTMLInputElement | null>(null);
 const newAllocationName = ref("");
 const newAllocationPort = ref(0);
+const allocationToDelete = ref<number | null>(null);
 
 const hasUnsavedChanges = computed(() => serverSubdomain.value !== data?.value?.net?.domain);
 
@@ -315,6 +325,27 @@ const showEditAllocationModal = (port: number) => {
   });
 };
 
+const showConfirmDeleteModal = (port: number) => {
+  allocationToDelete.value = port;
+  confirmDeleteModal.value?.show();
+};
+
+const confirmDeleteAllocation = async () => {
+  if (allocationToDelete.value === null) return;
+
+  await props.server.network?.deleteAllocation(allocationToDelete.value);
+
+  await props.server.refresh();
+  addNotification({
+    group: "serverOptions",
+    type: "success",
+    title: "Allocation removed",
+    text: "Your allocation has been removed.",
+  });
+
+  allocationToDelete.value = null;
+};
+
 const editAllocation = async () => {
   if (!newAllocationName.value) return;
 
@@ -335,18 +366,6 @@ const editAllocation = async () => {
   } catch (error) {
     console.error("Failed to reserve new allocation:", error);
   }
-};
-
-const removeAllocation = async (port: number) => {
-  await props.server.network?.deleteAllocation(port);
-
-  await props.server.refresh();
-  addNotification({
-    group: "serverOptions",
-    type: "success",
-    title: "Allocation removed",
-    text: "Your allocation has been removed.",
-  });
 };
 
 const saveNetwork = async () => {
