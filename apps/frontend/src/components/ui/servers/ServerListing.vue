@@ -5,7 +5,7 @@
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
     >
-      <UiServersServerIcon :image="iconUrl" />
+      <UiServersServerIcon :image="image" />
       <div class="ml-8 flex flex-col gap-2.5">
         <div class="flex flex-row items-center gap-2">
           <h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
@@ -14,7 +14,7 @@
 
         <div
           v-if="projectData?.title"
-          class="m-0 flex flex-row items-center gap-1 text-sm font-medium text-secondary"
+          class="m-0 flex flex-row items-center gap-2 text-sm font-medium text-secondary"
         >
           <UiAvatar
             :src="iconUrl"
