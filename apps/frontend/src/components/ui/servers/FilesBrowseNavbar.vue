@@ -50,9 +50,9 @@
           <SortAscendingIcon aria-hidden="true" />
           <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
           <template #normal> Alphabetical </template>
-          <template #modified> Modified </template>
-          <template #filesOnly> Files </template>
-          <template #foldersOnly> Folders </template>
+          <template #modified> Date modified </template>
+          <template #filesOnly> Files only </template>
+          <template #foldersOnly> Folders only </template>
         </UiServersTeleportOverflowMenu>
       </ButtonStyled>
       <div class="relative w-full text-sm">
@@ -138,11 +138,11 @@ useIntersectionObserver(
 const sortMethodLabel = computed(() => {
   switch (props.sortMethod) {
     case "modified":
-      return "Modified";
+      return "Date modified";
     case "filesOnly":
-      return "Files";
+      return "Files only";
     case "foldersOnly":
-      return "Folders";
+      return "Folders only";
     default:
       return "Alphabetical";
   }
