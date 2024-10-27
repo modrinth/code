@@ -344,7 +344,7 @@
               border: 1px solid rgba(27, 217, 106, 0.07);
               box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
             "
-            class="relative flex flex-col gap-4 overflow-hidden rounded-2xl p-6 text-left backdrop-blur-xl md:p-12"
+            class="relative flex flex-col gap-4 overflow-hidden rounded-2xl p-6 text-left sm:backdrop-blur-xl md:p-12"
           >
             <h2 class="m-0 text-lg font-bold">Easy to use file manager</h2>
             <h3 class="m-0 text-base font-normal">
@@ -354,13 +354,28 @@
             <img
               src="~/assets/images/games/content-hero-fixed.png"
               alt=""
-              class="absolute -bottom-12 -right-[15%] max-w-2xl rounded-2xl bg-brand p-4"
+              class="absolute -bottom-12 -right-[15%] hidden max-w-2xl rounded-2xl bg-brand p-4 sm:block"
             />
-            <div
-              aria-hidden="true"
-              class="absolute bottom-8 right-8 rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)]"
-            >
-              8.49 GB used
+            <div class="flex flex-row items-center gap-3">
+              <div
+                aria-hidden="true"
+                class="max-w-fit rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)] sm:absolute sm:bottom-8 sm:right-8"
+              >
+                8.49 GB used
+              </div>
+              <div
+                aria-hidden="true"
+                class="flex w-fit items-center gap-2 rounded-full bg-button-bg p-3 sm:hidden"
+              >
+                <SortAscendingIcon class="h-6 w-6" />
+                Sort
+              </div>
+              <div
+                aria-hidden="true"
+                class="flex w-fit items-center rounded-full bg-button-bg p-3 sm:hidden"
+              >
+                <SearchIcon class="h-6 w-6" />
+              </div>
             </div>
           </div>
         </div>
@@ -567,7 +582,7 @@
 
 <script setup>
 import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
-import { RightArrowIcon } from "@modrinth/assets";
+import { RightArrowIcon, SearchIcon, SortAscendingIcon } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 
 const title = "Modrinth Servers";
