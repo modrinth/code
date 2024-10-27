@@ -53,7 +53,7 @@ import {
   FileIcon,
   ArrowBigUpDashIcon,
 } from "@modrinth/assets";
-import { computed, shallowRef } from "vue";
+import { computed, shallowRef, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import {
   UiServersIconsCogFolderIcon,
@@ -210,11 +210,20 @@ const navigateToFolder = () => {
   router.push({ query: { path: newPath, page: 1 } });
 };
 
+const isNavigating = ref(false);
+
 const selectItem = () => {
+  if (isNavigating.value) return;
+  isNavigating.value = true;
+
   if (props.type === "directory") {
     navigateToFolder();
   } else if (props.type === "file" && isEditableFile.value) {
     emit("edit", { name: props.name, type: props.type, path: props.path });
   }
+
+  setTimeout(() => {
+    isNavigating.value = false;
+  }, 500);
 };
 </script>
