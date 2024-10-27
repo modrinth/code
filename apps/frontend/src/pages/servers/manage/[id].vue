@@ -215,13 +215,11 @@ import {
   RightArrowIcon,
   CheckIcon,
   FileIcon,
-  HomeIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { refThrottled } from "@vueuse/core";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
-// import defaultServerIcon from "@assets/images/servers/minecraft_server_icon.png";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
