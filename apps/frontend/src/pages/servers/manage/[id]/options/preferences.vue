@@ -2,7 +2,7 @@
   <div class="h-full w-full">
     <div class="h-full w-full gap-2 overflow-y-auto">
       <div class="card flex flex-col gap-4">
-        <h1 class="m-0 text-lg font-bold">Server preferences</h1>
+        <h1 class="m-0 text-lg font-bold text-contrast">Server preferences</h1>
         <div v-for="(prefConfig, key) in preferences" :key="key" class="flex justify-between">
           <label :for="`pref-${key}`" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">{{ prefConfig.displayName }}</span>
