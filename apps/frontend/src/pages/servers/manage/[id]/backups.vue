@@ -19,48 +19,60 @@
           </div>
         </div>
       </div>
-      <NewModal ref="createBackupModal" header="Creating backup">
-        <div class="mb-3 mt-3">
+
+      <NewModal ref="createBackupModal" header="Creating backup" @show="focusCreateInput">
+        <div v-if="autoBackup" class="mb-3 mt-3">
           Your server will temporarily shutdown while the backup is being created.
         </div>
-        <div class="flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+        <div class="flex flex-col gap-2 md:w-[600px]">
+          <div class="font-semibold text-contrast">Name</div>
           <input
+            ref="createBackupInput"
             v-model="createBackupName"
             type="text"
             class="bg-bg-input w-full rounded-lg p-4"
             placeholder="e.g. Before 1.21"
           />
         </div>
-        <div class="mb-1 mt-4 flex justify-end gap-4">
-          <ButtonStyled type="transparent">
-            <button @click="createBackupModal?.hide()">Cancel</button>
-          </ButtonStyled>
+        <div class="mb-1 mt-4 flex justify-start gap-4">
           <ButtonStyled color="brand">
             <button :disabled="isCreatingBackup" @click="createBackup">
-              <PlusIcon v-if="!isCreatingBackup" />
+              <PlusIcon />
               Create backup
+            </button>
+          </ButtonStyled>
+          <ButtonStyled>
+            <button @click="createBackupModal?.hide()">
+              <XIcon />
+              Cancel
             </button>
           </ButtonStyled>
         </div>
       </NewModal>
 
-      <NewModal ref="renameBackupModal" header="Renaming backup">
-        <div class="mt-2 flex flex-col gap-2">
-          <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
+      <NewModal ref="renameBackupModal" header="Renaming backup" @show="focusRenameInput">
+        <div class="flex flex-col gap-2 md:w-[600px]">
+          <div class="font-semibold text-contrast">Name</div>
           <input
+            ref="renameBackupInput"
             v-model="renameBackupName"
             type="text"
             class="bg-bg-input w-full rounded-lg p-4"
             placeholder="e.g. Before 1.21"
           />
         </div>
-        <div class="mb-1 mt-4 flex justify-end gap-4">
-          <ButtonStyled type="transparent">
-            <button @click="renameBackupModal?.hide()">Cancel</button>
-          </ButtonStyled>
+        <div class="mb-1 mt-4 flex justify-start gap-4">
           <ButtonStyled color="brand">
-            <button :disabled="isRenamingBackup" @click="renameBackup">Rename backup</button>
+            <button :disabled="isRenamingBackup" @click="renameBackup">
+              <SaveIcon />
+              Rename backup
+            </button>
+          </ButtonStyled>
+          <ButtonStyled>
+            <button @click="renameBackupModal?.hide()">
+              <XIcon />
+              Cancel
+            </button>
           </ButtonStyled>
         </div>
       </NewModal>
@@ -82,11 +94,11 @@
           </div>
         </div>
         <div class="mb-1 mt-4 flex justify-end gap-4">
-          <ButtonStyled type="transparent">
-            <button @click="restoreBackupModal?.hide()">Cancel</button>
-          </ButtonStyled>
           <ButtonStyled color="brand">
             <button :disabled="isRestoringBackup" @click="restoreBackup">Restore backup</button>
+          </ButtonStyled>
+          <ButtonStyled type="transparent">
+            <button @click="restoreBackupModal?.hide()">Cancel</button>
           </ButtonStyled>
         </div>
       </NewModal>
@@ -108,11 +120,14 @@
           </div>
         </div>
         <div class="mb-1 mt-4 flex justify-end gap-4">
+          <ButtonStyled color="red">
+            <button :disabled="isDeletingBackup" @click="deleteBackup">
+              <TrashIcon />
+              Delete backup
+            </button>
+          </ButtonStyled>
           <ButtonStyled type="transparent">
             <button @click="deleteBackupModal?.hide()">Cancel</button>
-          </ButtonStyled>
-          <ButtonStyled color="red">
-            <button :disabled="isDeletingBackup" @click="deleteBackup">Delete backup</button>
           </ButtonStyled>
         </div>
       </NewModal>
@@ -279,6 +294,8 @@ import {
   DownloadIcon,
   TrashIcon,
   SettingsIcon,
+  XIcon,
+  SaveIcon,
 } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
@@ -306,6 +323,9 @@ const restoreBackupModal = ref<typeof NewModal>();
 const deleteBackupModal = ref<typeof NewModal>();
 const backupSettingsModal = ref<typeof NewModal>();
 
+const createBackupInput = ref<HTMLInputElement>();
+const renameBackupInput = ref<HTMLInputElement>();
+
 const createBackupName = ref("");
 const renameBackupName = ref("");
 const currentBackup = ref("");
@@ -316,6 +336,22 @@ const isCreatingBackup = ref(false);
 const isRenamingBackup = ref(false);
 const isRestoringBackup = ref(false);
 const isDeletingBackup = ref(false);
+
+const focusCreateInput = () => {
+  nextTick(() => {
+    setTimeout(() => {
+      createBackupInput.value?.focus();
+    }, 100);
+  });
+};
+
+const focusRenameInput = () => {
+  nextTick(() => {
+    setTimeout(() => {
+      renameBackupInput.value?.focus();
+    }, 100);
+  });
+};
 
 const showCreateModel = () => {
   createBackupModal.value?.show();
