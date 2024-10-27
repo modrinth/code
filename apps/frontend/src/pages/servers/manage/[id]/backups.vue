@@ -199,7 +199,7 @@
           <div class="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-0">
             <div class="flex items-baseline gap-2 sm:flex-col">
               <div class="text-2xl font-extrabold text-contrast">
-                {{ data.used_backup_quota }} Backups
+                {{ data.used_backup_quota }} Backup{{ data.used_backup_quota > 1 ? "s" : "" }}
               </div>
               <div class="">({{ data.backup_quota - data.used_backup_quota }} slots available)</div>
             </div>
