@@ -540,19 +540,19 @@
         </ul>
 
         <div
-          class="flex w-full flex-row items-start justify-between rounded-2xl bg-bg p-8 text-left"
+          class="flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left sm:flex-row sm:gap-0"
         >
           <div class="flex flex-col gap-4">
             <h1 class="m-0">Build your own</h1>
             <h2 class="m-0 text-base font-normal">
-              If you're a more technical server administator, you can pick your own RAM and storage
+              If you're a more technical server administrator, you can pick your own RAM and storage
               options.
             </h2>
           </div>
 
-          <div class="flex flex-col items-center gap-2">
+          <div class="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-col sm:items-center">
             <ButtonStyled color="standard" size="large">
-              <NuxtLink to="/servers/custom" class="w-fit">
+              <NuxtLink to="/servers/custom" class="w-full sm:w-fit">
                 Build your own
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </NuxtLink>
