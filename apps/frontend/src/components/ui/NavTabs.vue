@@ -1,7 +1,7 @@
 <template>
   <nav
     ref="scrollContainer"
-    class="relative flex w-full overflow-x-auto overflow-y-hidden rounded-full bg-bg-raised p-1 text-sm font-bold"
+    class="relative flex w-fit overflow-x-auto overflow-y-hidden rounded-full bg-bg-raised p-1 text-sm font-bold"
   >
     <div class="flex min-w-fit">
       <NuxtLink
