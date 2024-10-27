@@ -11,12 +11,9 @@
       }"
     >
       <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-        <UiServersServerIcon
-          :image="serverData.image"
-          class="z-10 drop-shadow-lg sm:drop-shadow-none"
-        />
+        <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
         <div
-          class="z-10 flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
+          class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
         >
           <div class="hidden shrink-0 flex-row items-center gap-1 sm:flex">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
