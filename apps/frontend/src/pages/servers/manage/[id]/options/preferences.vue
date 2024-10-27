@@ -3,6 +3,7 @@
     <div class="h-full w-full gap-2 overflow-y-auto">
       <div class="card flex flex-col gap-4">
         <h1 class="m-0 text-lg font-bold text-contrast">Server preferences</h1>
+        <p class="m-0">Preferences apply per server and changes are only saved in your browser.</p>
         <div v-for="(prefConfig, key) in preferences" :key="key" class="flex justify-between">
           <label :for="`pref-${key}`" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">{{ prefConfig.displayName }}</span>
