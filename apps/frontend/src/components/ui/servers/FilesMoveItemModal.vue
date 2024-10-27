@@ -3,6 +3,7 @@
     <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-2">
         <input
+          ref="destinationInput"
           v-model="destination"
           autofocus
           type="text"
@@ -32,6 +33,9 @@
 <script setup lang="ts">
 import { ArrowBigUpDashIcon, XIcon } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { ref, nextTick } from "vue";
+
+const destinationInput = ref<HTMLInputElement | null>(null);
 
 const props = defineProps<{
   item: { name: string } | null;
@@ -53,6 +57,11 @@ const handleSubmit = () => {
 const show = () => {
   destination.value = props.currentPath;
   modal.value?.show();
+  nextTick(() => {
+    setTimeout(() => {
+      destinationInput.value?.focus();
+    }, 100);
+  });
 };
 
 const hide = () => {
