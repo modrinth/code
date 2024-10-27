@@ -2,9 +2,9 @@
   <div
     v-if="game"
     v-tooltip="'Change server version'"
-    class="flex min-w-0 flex-row items-center gap-2"
+    class="min-w-0 flex-none flex-row items-center gap-2 first:!flex"
   >
-    <GameIcon aria-hidden="true" class="size-5 shrink-0 text-secondary" />
+    <GameIcon aria-hidden="true" class="size-5 shrink-0" />
     <NuxtLink
       :to="serverId ? `/servers/manage/${serverId}/options/loader` : ''"
       class="min-w-0 truncate text-sm font-semibold"

@@ -3,19 +3,29 @@
     <div
       v-if="serverData"
       data-pyro-server-manager-root
-      class="experimental-styles-within relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
+      class="experimental-styles-within mobile-blurred-servericon relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
+      :style="{
+        '--server-bg-image': serverData.image
+          ? `url(${serverData.image})`
+          : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
+      }"
     >
-      <div class="flex w-full min-w-0 select-none flex-row items-center gap-6 pt-4">
-        <UiServersServerIcon :image="serverData.image" />
-        <div class="flex min-w-0 flex-1 flex-col gap-2">
-          <div class="flex shrink-0 flex-row items-center gap-1">
+      <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
+        <UiServersServerIcon
+          :image="serverData.image"
+          class="z-10 drop-shadow-lg sm:drop-shadow-none"
+        />
+        <div
+          class="z-10 flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
+        >
+          <div class="hidden shrink-0 flex-row items-center gap-1 sm:flex">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
               <LeftArrowIcon />
               All servers
             </NuxtLink>
           </div>
-          <div class="flex w-full flex-row items-center gap-4">
-            <h1 class="m-0 w-full flex-shrink truncate text-4xl font-bold text-contrast">
+          <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
+            <h1 class="m-0 flex-shrink gap-3 truncate text-4xl font-bold text-contrast sm:w-full">
               {{ serverData.name }}
             </h1>
             <div
@@ -42,7 +52,9 @@
             </ButtonStyled>
           </div>
 
-          <div class="flex min-w-0 flex-row items-center gap-4 text-secondary">
+          <div
+            class="flex min-w-0 flex-col items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+          >
             <UiServersServerGameLabel
               v-if="showGameLabel"
               :game="serverData.game!"
@@ -203,11 +215,13 @@ import {
   RightArrowIcon,
   CheckIcon,
   FileIcon,
+  HomeIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { refThrottled } from "@vueuse/core";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
+// import defaultServerIcon from "@assets/images/servers/minecraft_server_icon.png";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
@@ -710,5 +724,16 @@ definePageMeta({
 
 .server-action-buttons-anim {
   animation: server-action-buttons-anim 0.2s ease-out;
+}
+
+.mobile-blurred-servericon::before {
+  @apply absolute left-0 top-0 block h-36 w-full bg-cover bg-center bg-no-repeat blur-2xl sm:hidden;
+  content: "";
+  background-image: linear-gradient(
+      to bottom,
+      rgba(from var(--color-raised-bg) r g b / 0.2),
+      rgb(from var(--color-raised-bg) r g b / 0.8)
+    ),
+    var(--server-bg-image);
 }
 </style>

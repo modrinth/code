@@ -1,6 +1,6 @@
 <template>
   <div class="contents">
-    <NewModal ref="confirmActionModal" header="Confirming power action" @close="closeModal">
+    <NewModal ref="confirmActionModal" header="Confirming power action" @close="closePowerModal">
       <div class="flex flex-col gap-4 md:w-[400px]">
         <p class="m-0">Are you sure you want to {{ currentPendingAction }} the server?</p>
 
@@ -22,7 +22,7 @@
               {{ currentPendingActionFriendly }} Server
             </button>
           </ButtonStyled>
-          <ButtonStyled @click="closeModal">
+          <ButtonStyled @click="closePowerModal">
             <button>
               <XIcon class="h-5 w-5" />
               Cancel
@@ -30,6 +30,14 @@
           </ButtonStyled>
         </div>
       </div>
+    </NewModal>
+
+    <NewModal
+      ref="detailsModal"
+      :header="`${props.serverName ? props.serverName : 'Server'} Details`"
+      @close="closeDetailsModal"
+    >
+      Under construction 😺
     </NewModal>
 
     <div class="flex flex-row items-center gap-2 rounded-lg">
@@ -57,11 +65,25 @@
 
       <!-- kill option -->
       <ButtonStyled circular type="transparent">
-        <UiServersTeleportOverflowMenu :options="[{ id: 'kill', action: () => killServer() }]">
+        <UiServersTeleportOverflowMenu
+          :options="[
+            { id: 'kill', action: () => killServer() },
+            { id: 'allServers', action: () => router.push('/servers/manage') },
+            { id: 'details', action: () => showDetailsModal() },
+          ]"
+        >
           <MoreVerticalIcon aria-hidden="true" />
           <template #kill>
             <SlashIcon class="h-5 w-5" />
             <span>Kill Server</span>
+          </template>
+          <template #allServers>
+            <ServerIcon class="h-5 w-5" />
+            <span>All servers</span>
+          </template>
+          <template #details>
+            <InfoIcon class="h-5 w-5" />
+            <span>Details</span>
           </template>
         </UiServersTeleportOverflowMenu>
       </ButtonStyled>
@@ -79,14 +101,20 @@ import {
   MoreVerticalIcon,
   XIcon,
   CheckIcon,
+  ServerIcon,
+  InfoIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { useRouter } from "vue-router";
 
 const props = defineProps<{
   isOnline: boolean;
   isActioning: boolean;
   disabled: boolean;
+  serverName?: string;
 }>();
+
+const router = useRouter();
 
 const emit = defineEmits<{
   (e: "action", action: "start" | "restart" | "stop" | "kill"): void;
@@ -94,6 +122,7 @@ const emit = defineEmits<{
 
 const currentPendingAction = ref<string | null>(null);
 const confirmActionModal = ref<InstanceType<typeof NewModal> | null>(null);
+const detailsModal = ref<InstanceType<typeof NewModal> | null>(null);
 
 const ServerState = {
   Stopped: "Stopped",
@@ -202,9 +231,17 @@ const killServer = () => {
   confirmActionModal.value?.show();
 };
 
-const closeModal = () => {
+const closePowerModal = () => {
   confirmActionModal.value?.hide();
   currentPendingAction.value = null;
+};
+
+const closeDetailsModal = () => {
+  detailsModal.value?.hide();
+};
+
+const showDetailsModal = () => {
+  detailsModal.value?.show();
 };
 
 watch(
