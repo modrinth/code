@@ -2,14 +2,14 @@
   <div
     data-pyro-terminal
     :class="[
-      'terminal-font console relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
+      'terminal-font console relative z-[1] flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
       { 'scale-fullscreen screen-fixed inset-0 z-50 !rounded-none': isFullScreen },
     ]"
     tabindex="-1"
   >
     <div
       v-if="cosmetics.advancedRendering"
-      class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[50] h-[10rem] w-full overflow-hidden rounded-xl"
+      class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[2] h-[10rem] w-full overflow-hidden rounded-xl"
       :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 8))}%`"
       aria-hidden="true"
     >
@@ -23,7 +23,7 @@
     </div>
     <div
       v-else
-      class="pointer-events-none absolute bottom-0 left-0 right-0 z-[50] h-[196px] w-full"
+      class="pointer-events-none absolute bottom-0 left-0 right-0 z-[2] h-[196px] w-full"
       :style="
         bottomThreshold > 0
           ? { background: 'linear-gradient(transparent 30%, var(--console-bg) 70%)' }
@@ -56,7 +56,7 @@
       <div
         ref="scrollbarTrack"
         data-pyro-terminal-scrollbar-track
-        class="absolute -right-1 bottom-16 top-4 z-[100] w-4"
+        class="absolute -right-1 bottom-16 top-4 z-[4] w-4"
         @mousedown="handleTrackClick"
       >
         <div
@@ -115,7 +115,7 @@
       <button
         v-if="hasSelection"
         v-tooltip="'Copy selected lines'"
-        class="experimental-styles-within absolute right-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+        class="experimental-styles-within absolute right-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
         :class="bottomThreshold > 0 ? 'bottom-[8.5rem]' : 'bottom-[4.5rem]'"
         @click="copySelectedText"
       >
@@ -135,7 +135,7 @@
     </Transition>
 
     <div
-      class="absolute bottom-4 z-[99999] w-full"
+      class="absolute bottom-4 z-[3] w-full"
       :style="{
         filter: `drop-shadow(0 8px 12px rgba(0, 0, 0, ${lerp(0.1, 0.5, bottomThreshold)}))`,
       }"
@@ -145,7 +145,7 @@
     <button
       data-pyro-fullscreen
       :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
-      class="experimental-styles-within absolute right-4 top-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+      class="experimental-styles-within absolute right-4 top-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
       @click="toggleFullscreen"
     >
       <UiServersPanelTerminalMinimize v-if="isFullScreen" />
@@ -157,7 +157,7 @@
         v-if="bottomThreshold > 0"
         data-pyro-scrolltobottom
         label="Scroll to bottom"
-        class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[999999] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+        class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
         @click="scrollToBottom"
       >
         <RightArrowIcon class="rotate-90" />
