@@ -26,7 +26,9 @@
         </div>
         <div v-else class="min-h-[20px]"></div>
 
-        <div class="flex w-full flex-row flex-wrap items-center gap-4 text-secondary">
+        <div
+          class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary"
+        >
           <UiServersServerGameLabel
             v-if="showGameLabel"
             :game="game!"
