@@ -1,36 +1,70 @@
 <template>
   <div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
-  <nav
+  <header
     :class="[
       'top-0 flex h-24 select-none flex-col justify-between bg-table-alternateRow p-3 transition-[border-radius] duration-200 sm:h-12 sm:flex-row',
       !isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
     ]"
     data-pyro-files-state="browsing"
+    aria-label="File navigation"
   >
-    <ul class="m-0 flex list-none items-center p-0 text-contrast">
-      <a
-        v-tooltip="'Back to home'"
-        role="link"
-        class="group absolute left-0 top-0 grid h-12 w-14 place-content-center"
-        @click="$emit('navigate', -1)"
-      >
-        <li
-          class="grid size-8 place-content-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
-        >
-          <HomeIcon class="h-5 w-5" />
+    <nav
+      aria-label="Breadcrumb navigation"
+      class="m-0 flex list-none items-center p-0 text-contrast"
+    >
+      <ol class="m-0 flex list-none items-center p-0">
+        <li class="-ml-1">
+          <ButtonStyled type="transparent">
+            <button
+              v-tooltip="'Back to home'"
+              type="button"
+              class="grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              @click="$emit('navigate', -1)"
+            >
+              <span
+                class="grid size-8 place-content-center rounded-full bg-button-bg p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+              >
+                <HomeIcon class="h-5 w-5" />
+                <span class="sr-only">Home</span>
+              </span>
+            </button>
+          </ButtonStyled>
         </li>
-      </a>
-      <UiServersIconsSlashIcon class="ml-8 h-5 w-5" />
-      <li
-        v-for="(segment, index) in breadcrumbSegments"
-        :key="index"
-        class="breadcrumb-link flex cursor-pointer items-center"
-        @click="$emit('navigate', index)"
-      >
-        {{ segment || "" }}
-        <UiServersIconsSlashIcon class="h-5 w-5" />
-      </li>
-    </ul>
+        <li class="m-0 -ml-2 p-0">
+          <ol class="m-0 flex items-center overflow-hidden p-0">
+            <TransitionGroup name="breadcrumb" tag="span" class="relative flex items-center">
+              <li
+                v-for="(segment, index) in breadcrumbSegments"
+                :key="`${segment || index}-group`"
+                class="relative flex items-center text-sm"
+              >
+                <div class="flex items-center">
+                  <ButtonStyled type="transparent">
+                    <button
+                      class="cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                      :aria-current="
+                        index === breadcrumbSegments.length - 1 ? 'location' : undefined
+                      "
+                      :class="{
+                        '!text-contrast': index === breadcrumbSegments.length - 1,
+                      }"
+                      @click="$emit('navigate', index)"
+                    >
+                      {{ segment || "" }}
+                    </button>
+                  </ButtonStyled>
+                  <ChevronRightIcon
+                    v-if="index < breadcrumbSegments.length - 1"
+                    class="size-4 text-secondary"
+                    aria-hidden="true"
+                  />
+                </div>
+              </li>
+            </TransitionGroup>
+          </ol>
+        </li>
+      </ol>
+    </nav>
     <div class="flex items-center gap-1">
       <ButtonStyled type="transparent">
         <UiServersTeleportOverflowMenu
@@ -92,7 +126,7 @@
         </UiServersTeleportOverflowMenu>
       </ButtonStyled>
     </div>
-  </nav>
+  </header>
 </template>
 
 <script setup lang="ts">
@@ -105,9 +139,10 @@ import {
   SearchIcon,
   SortAscendingIcon,
   HomeIcon,
+  ChevronRightIcon,
 } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useIntersectionObserver } from "@vueuse/core";
 
 const props = defineProps<{
@@ -157,5 +192,31 @@ const sortMethodLabel = computed(() => {
   right: 0;
   height: 1px;
   visibility: hidden;
+}
+
+.breadcrumb-move,
+.breadcrumb-enter-active,
+.breadcrumb-leave-active {
+  transition: all 0.2s ease;
+}
+
+.breadcrumb-enter-from {
+  opacity: 0;
+  transform: translateX(-10px) scale(0.9);
+}
+
+.breadcrumb-leave-to {
+  opacity: 0;
+  transform: translateX(-10px) scale(0.8);
+  filter: blur(4px);
+}
+
+.breadcrumb-leave-active {
+  position: relative;
+  pointer-events: none;
+}
+
+.breadcrumb-move {
+  z-index: 1;
 }
 </style>
