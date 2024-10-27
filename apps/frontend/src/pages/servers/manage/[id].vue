@@ -182,7 +182,7 @@
           :is-server-running="isServerRunning"
           :stats="stats"
           :server-power-state="serverPowerState"
-          :console-output="consoleOutput"
+          :console-output="throttledConsoleOutput"
           :socket="socket"
           :server="server"
           @reinstall="onReinstall"
@@ -206,6 +206,7 @@ import {
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
+import { refThrottled } from "@vueuse/core";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 
 const socket = ref<WebSocket | null>(null);
@@ -235,7 +236,9 @@ const serverData = computed(() => server.general);
 const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
+const maxConsoleOutput = 5000;
 const consoleOutput = ref<string[]>([]);
+const throttledConsoleOutput = refThrottled(consoleOutput, 200);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
@@ -404,6 +407,9 @@ const handleWebSocketMessage = (data: WSEvent) => {
     case "log":
       // eslint-disable-next-line no-case-declarations
       const log = data.message.split("\n").filter((l) => l.trim());
+      if (consoleOutput.value.length > maxConsoleOutput) {
+        consoleOutput.value.shift();
+      }
       consoleOutput.value.push(...log);
       break;
     case "stats":

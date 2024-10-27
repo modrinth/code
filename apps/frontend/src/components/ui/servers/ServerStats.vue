@@ -12,7 +12,7 @@
       <div
         class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1"
         :style="{
-          backdropFilter: 'blur(48px)',
+          backdropFilter: 'blur(6px)',
         }"
       >
         <div class="-mb-0.5 mt-0.5 flex flex-row items-center gap-2">
