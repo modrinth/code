@@ -10,10 +10,10 @@
   >
     <nav
       aria-label="Breadcrumb navigation"
-      class="m-0 flex list-none items-center p-0 text-contrast"
+      class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
     >
-      <ol class="m-0 flex list-none items-center p-0">
-        <li class="-ml-1">
+      <ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
+        <li class="-ml-1 flex-shrink-0">
           <ButtonStyled type="transparent">
             <button
               v-tooltip="'Back to home'"
@@ -30,18 +30,22 @@
             </button>
           </ButtonStyled>
         </li>
-        <li class="m-0 -ml-2 p-0">
-          <ol class="m-0 flex items-center overflow-hidden p-0">
-            <TransitionGroup name="breadcrumb" tag="span" class="relative flex items-center">
+        <li class="m-0 -ml-2 min-w-0 flex-shrink p-0">
+          <ol class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0">
+            <TransitionGroup
+              name="breadcrumb"
+              tag="span"
+              class="relative flex min-w-0 flex-shrink items-center"
+            >
               <li
                 v-for="(segment, index) in breadcrumbSegments"
                 :key="`${segment || index}-group`"
-                class="relative flex items-center text-sm"
+                class="relative flex min-w-0 flex-shrink items-center text-sm"
               >
-                <div class="flex items-center">
+                <div class="flex min-w-0 flex-shrink items-center">
                   <ButtonStyled type="transparent">
                     <button
-                      class="cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                      class="cursor-pointer truncate focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                       :aria-current="
                         index === breadcrumbSegments.length - 1 ? 'location' : undefined
                       "
@@ -55,7 +59,7 @@
                   </ButtonStyled>
                   <ChevronRightIcon
                     v-if="index < breadcrumbSegments.length - 1"
-                    class="size-4 text-secondary"
+                    class="size-4 flex-shrink-0 text-secondary"
                     aria-hidden="true"
                   />
                 </div>
@@ -65,7 +69,8 @@
         </li>
       </ol>
     </nav>
-    <div class="flex items-center gap-1">
+
+    <div class="flex flex-shrink-0 items-center gap-1">
       <ButtonStyled type="transparent">
         <UiServersTeleportOverflowMenu
           position="bottom"
@@ -89,7 +94,7 @@
           <template #foldersOnly> Folders only </template>
         </UiServersTeleportOverflowMenu>
       </ButtonStyled>
-      <div class="relative w-full text-sm">
+      <div class="relative w-40 flex-shrink-0 text-sm">
         <label for="search-folder" class="sr-only">Search folder</label>
         <SearchIcon
           class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
@@ -101,7 +106,7 @@
           type="search"
           name="search"
           autocomplete="off"
-          class="h-8 min-h-[unset] border-[1px] border-solid border-button-bg bg-transparent py-2 pl-9"
+          class="h-8 min-h-[unset] w-full border-[1px] border-solid border-button-bg bg-transparent py-2 pl-9"
           placeholder="Search..."
           @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
         />
