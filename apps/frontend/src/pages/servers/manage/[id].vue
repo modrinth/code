@@ -73,7 +73,7 @@
 
       <div
         data-pyro-navigation
-        class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-x-auto md:flex-row md:items-center"
+        class="isolate flex w-full select-none flex-col justify-between gap-4 md:flex-row md:items-center"
       >
         <UiNavTabs :links="navLinks" />
       </div>
