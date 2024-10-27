@@ -196,16 +196,16 @@
 
       <ul class="m-0 flex list-none flex-col gap-6 p-0">
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6">
-          <div class="flex items-center justify-between">
-            <div class="flex flex-col gap-2">
+          <div class="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-0">
+            <div class="flex items-baseline gap-2 sm:flex-col">
               <div class="text-2xl font-extrabold text-contrast">
                 {{ data.used_backup_quota }} Backups
               </div>
-              <div class="">{{ data.backup_quota - data.used_backup_quota }} slots avaliable</div>
+              <div class="">({{ data.backup_quota - data.used_backup_quota }} slots available)</div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex w-full gap-2 sm:w-fit">
               <ButtonStyled type="standard" color="brand">
-                <button @click="showCreateModel">
+                <button @click="showCreateModel" class="w-full sm:w-fit">
                   <PlusIcon class="h-5 w-5" />
                   Create backup
                 </button>
