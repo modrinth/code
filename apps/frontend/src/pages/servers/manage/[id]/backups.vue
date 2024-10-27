@@ -205,7 +205,7 @@
             </div>
             <div class="flex w-full gap-2 sm:w-fit">
               <ButtonStyled type="standard" color="brand">
-                <button @click="showCreateModel" class="w-full sm:w-fit">
+                <button class="w-full sm:w-fit" @click="showCreateModel">
                   <PlusIcon class="h-5 w-5" />
                   Create backup
                 </button>
