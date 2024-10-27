@@ -132,7 +132,7 @@
         </div>
       </NewModal>
 
-      <NewModal ref="backupSettingsModal" header="Settings">
+      <NewModal ref="backupSettingsModal" header="Editing backup settings">
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-2">
             <div class="font-semibold text-contrast">Auto backup</div>
