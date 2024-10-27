@@ -222,7 +222,7 @@
         <li
           v-for="(backup, index) in backups"
           :key="backup.id"
-          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised px-8 py-4"
+          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised px-6 py-4"
         >
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between">
