@@ -7,7 +7,12 @@
             <span class="text-lg font-bold text-contrast">SFTP</span>
             <span> SFTP allows you to access your server's files from outside of Modrinth. </span>
           </label>
-          <Button @click="openSftp"> Launch SFTP </Button>
+          <ButtonStyled>
+            <button @click="openSftp">
+              <ExternalIcon class="h-5 w-5" />
+              Launch SFTP
+            </button>
+          </ButtonStyled>
         </div>
         <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
           <span class="font-bold text-contrast">
@@ -75,8 +80,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ButtonStyled } from "@modrinth/ui";
-import { CopyIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
+import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();

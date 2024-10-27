@@ -12,12 +12,14 @@
               <span class="text-lg font-bold text-contrast">Startup command</span>
               <span> The command that runs when your server is started. </span>
             </label>
-            <Button
-              :disabled="invocation === startupSettings?.original_invocation"
-              @click="resetToDefault"
-            >
-              Restore default command
-            </Button>
+            <ButtonStyled>
+              <button
+                :disabled="invocation === startupSettings?.original_invocation"
+                @click="resetToDefault"
+              >
+                Restore default command
+              </button>
+            </ButtonStyled>
           </div>
           <textarea
             id="startup-command-field"
@@ -70,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from "@modrinth/ui";
+import { ButtonStyled } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
