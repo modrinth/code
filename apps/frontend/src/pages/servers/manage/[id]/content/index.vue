@@ -99,7 +99,7 @@
       <Transition name="sync-banner">
         <div
           v-if="status === 'pending'"
-          class="fixed bottom-8 left-4 right-4 z-50 mx-auto flex h-fit w-full max-w-4xl flex-row items-center gap-4 rounded-2xl border-2 border-solid border-button-border bg-bg-raised p-2 shadow-2xl transition-all duration-300"
+          class="fixed bottom-16 left-2 z-50 mx-auto flex h-fit w-[96%] max-w-4xl flex-row items-center gap-4 rounded-2xl border-2 border-solid border-button-border bg-bg-raised p-2 transition-all duration-300 sm:bottom-8 sm:left-4 sm:right-4 sm:w-full sm:shadow-2xl"
         >
           <div
             class="grid size-12 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
