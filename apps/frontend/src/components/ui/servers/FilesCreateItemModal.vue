@@ -22,7 +22,7 @@
           </button>
         </ButtonStyled>
         <ButtonStyled>
-          <button @click="hide">
+          <button type="button" @click="hide">
             <XIcon class="h-5 w-5" />
             Cancel
           </button>
