@@ -31,12 +31,14 @@
     </div>
 
     <div class="h-full w-full">
-      <NuxtPage
-        :key="route.path"
-        :route="props.route"
-        :server="props.server"
-        @reinstall="onReinstall"
-      />
+      <Suspense>
+        <NuxtPage
+          :key="route.path"
+          :route="props.route"
+          :server="props.server"
+          @reinstall="onReinstall"
+        />
+      </Suspense>
     </div>
   </div>
 </template>
