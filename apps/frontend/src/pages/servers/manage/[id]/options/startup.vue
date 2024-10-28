@@ -17,6 +17,7 @@
                 :disabled="invocation === startupSettings?.original_invocation"
                 @click="resetToDefault"
               >
+                <UpdatedIcon class="h-5 w-5" />
                 Restore default command
               </button>
             </ButtonStyled>
@@ -72,6 +73,7 @@
 </template>
 
 <script setup lang="ts">
+import { UpdatedIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 

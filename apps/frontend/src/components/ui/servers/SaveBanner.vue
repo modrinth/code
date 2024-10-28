@@ -8,10 +8,10 @@
       <div class="flex flex-col items-center justify-between gap-2 md:flex-row">
         <span class="font-bold text-contrast">Careful, you have unsaved changes!</span>
         <div class="flex gap-2">
-          <ButtonStyled type="transparent" color="standard" transparent>
+          <ButtonStyled type="transparent" color="standard">
             <button :disabled="props.isUpdating" @click="props.reset">Reset</button>
           </ButtonStyled>
-          <ButtonStyled type="standard" color="brand">
+          <ButtonStyled type="standard" :color="props.restart ? 'standard' : 'brand'">
             <button :disabled="props.isUpdating" @click="props.save">
               {{ props.isUpdating ? "Saving..." : "Save" }}
             </button>

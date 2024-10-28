@@ -22,8 +22,9 @@
           </h1>
           <span
             v-if="isCurrentLoader(loader.name)"
-            class="rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand"
+            class="flex items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand"
           >
+            <CheckIcon class="h-4 w-4" />
             Current
           </span>
         </div>
@@ -35,6 +36,7 @@
 
     <ButtonStyled>
       <button @click="selectLoader(loader.name)">
+        <DownloadIcon class="h-5 w-5" />
         {{ isCurrentLoader(loader.name) ? "Reinstall" : "Install" }}
       </button>
     </ButtonStyled>
@@ -42,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+import { CheckIcon, DownloadIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps<{

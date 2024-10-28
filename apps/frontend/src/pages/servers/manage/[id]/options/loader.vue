@@ -129,6 +129,7 @@
                     "
                     @click="reinstallCurrent"
                   >
+                    <DownloadIcon class="size-4" />
                     Reinstall
                   </button>
                 </ButtonStyled>
