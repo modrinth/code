@@ -1,5 +1,5 @@
 <template>
-  <div data-pyro class="servers-hero relative -mt-48 h-full min-h-screen py-48 md:-mt-20 md:py-32">
+  <div data-pyro class="relative -mt-48 h-full min-h-screen py-48 md:-mt-20 md:py-32">
     <PurchaseModal
       v-if="showModal && selectedProduct && customer"
       :key="selectedProduct.id"
@@ -19,29 +19,19 @@
       :server-name="`${auth?.user?.username}'s server`"
       @hidden="handleModalHidden"
     />
-    <img
-      src="~/assets/images/games/maze.png"
-      alt=""
-      aria-hidden="true"
-      class="pointer-events-none absolute inset-0 hidden h-full max-h-[1080px] w-screen scale-125 select-none opacity-50 sm:visible"
-      style="mask-image: linear-gradient(black, transparent 80%)"
-    />
 
-    <section class="relative mx-auto flex max-w-7xl flex-col px-3">
+    <section
+      class="relative mx-auto flex min-h-[calc(100vh-24rem)] max-w-7xl flex-col justify-center px-3"
+    >
       <div class="flex w-full flex-col gap-10">
-        <div
-          class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
-        >
-          Experimental
-        </div>
-        <h1 class="relative m-0 max-w-2xl text-4xl font-extrabold leading-[120%] md:text-7xl">
-          Play together on Modrinth Servers
+        <h1 class="relative m-0 max-w-2xl text-4xl font-bold !leading-[110%] md:text-7xl">
+          Play together with Modrinth Servers
         </h1>
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
         >
-          Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins,
-          and datapacks with friends — without the hassle of setup.
+          Start your own Minecraft server directly on Modrinth. Add thousands of mods and invite
+          your friends to play, without the hassle of setup.
         </h2>
         <div class="relative flex w-fit flex-row gap-8">
           <ButtonStyled color="brand" size="large">
@@ -84,7 +74,7 @@
           Why Modrinth Servers?
         </div>
         <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
-          Make a modpack. Now it's a server.
+          Find a modpack. Now it's a server.
         </h1>
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
@@ -95,7 +85,7 @@
         <img
           src="~/assets/images/games/excitement.png"
           alt=""
-          class="absolute right-8 top-0 hidden max-w-[360px] lg:block"
+          class="absolute right-14 top-0 hidden max-w-[360px] lg:block"
         />
         <div class="relative grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
           <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
@@ -206,51 +196,6 @@
               your server runs smoothly.
             </h3>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="relative mt-24 flex flex-col px-3 pt-24 md:mt-48 md:pt-48">
-      <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
-      <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
-        <div
-          class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
-        >
-          Your server's hardware
-        </div>
-        <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
-          Eye-watering performance.
-        </h1>
-        <h1>work in progress section, nothing is final, working on illustrations etc.</h1>
-        <h2
-          class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
-        >
-          Modrinth Servers run on Pyro's super-fast infrastructure. Your servers always start fast,
-          run fast, and stay fast. And with direct integration with Modrinth, your servers install
-          within a second.
-        </h2>
-
-        <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-8">
-          <h1>Average time to start a Minecraft server</h1>
-          <div class="relative flex flex-row items-center gap-4">
-            <h2 class="min-w-60">Modrinth Servers</h2>
-            <div class="h-12 w-[1.4%] rounded-2xl bg-brand"></div>
-            <p class="whitespace-pre">534 ms</p>
-          </div>
-          <div class="relative flex flex-row items-center gap-4">
-            <h2 class="min-w-60">Competitors</h2>
-            <div class="h-12 w-full rounded-2xl bg-bg-raised"></div>
-            <p class="whitespace-pre">32 seconds</p>
-          </div>
-        </div>
-
-        <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-8">
-          <h1 class="m-0">4GHz+ AMD CPU, 2 vCore Minimum</h1>
-          <p>
-            All Modrinth Servers, no matter the plan, come with a minimum of 2 vCores and a 4GHz+
-            CPU. This means your server will always have the power it needs to run smoothly. Server
-            with heavy mods will run just as well as Vanilla servers.
-          </p>
         </div>
       </div>
     </section>
