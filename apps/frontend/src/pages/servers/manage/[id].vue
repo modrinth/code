@@ -35,6 +35,9 @@
                 :is-online="isServerRunning"
                 :is-actioning="isActioning"
                 :disabled="isActioning || !!error"
+                :server-name="serverData.name"
+                :server-data="serverData"
+                :uptime-seconds="uptimeSeconds"
                 @action="sendPowerAction"
               />
             </div>

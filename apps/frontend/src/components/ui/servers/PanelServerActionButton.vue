@@ -34,10 +34,20 @@
 
     <NewModal
       ref="detailsModal"
-      :header="`${props.serverName ? props.serverName : 'Server'} Details`"
+      :header="`All of ${props.serverName ? props.serverName : 'Server'} info`"
       @close="closeDetailsModal"
     >
-      Under construction 😺
+      <UiServersServerInfoLabels
+        :server-data="serverData"
+        :show-game-label="true"
+        :show-loader-label="true"
+        :uptime-seconds="uptimeSeconds"
+        :column="true"
+        class="mb-6 flex flex-col gap-2"
+      />
+      <ButtonStyled type="standard" color="brand" @click="closeDetailsModal">
+        <button class="w-full">Close</button>
+      </ButtonStyled>
     </NewModal>
 
     <div class="flex flex-row items-center gap-2 rounded-lg">
@@ -112,6 +122,8 @@ const props = defineProps<{
   isActioning: boolean;
   disabled: boolean;
   serverName?: string;
+  serverData: object;
+  uptimeSeconds: number;
 }>();
 
 const router = useRouter();
@@ -255,6 +267,13 @@ watch(
     ) {
       currentState.value = ServerState.Stopped;
     }
+  },
+);
+
+watch(
+  () => router.currentRoute.value.fullPath,
+  () => {
+    closeDetailsModal();
   },
 );
 

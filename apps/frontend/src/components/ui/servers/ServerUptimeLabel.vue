@@ -5,12 +5,14 @@
     class="flex min-w-0 flex-row items-center gap-4"
     data-pyro-uptime
   >
-    <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
+    <div v-if="!noSeparator" class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
 
-    <UiServersTimer class="flex size-5 shrink-0" />
-    <time class="truncate text-sm font-semibold" :aria-label="verboseUptime">
-      {{ formattedUptime }}
-    </time>
+    <div class="flex gap-2">
+      <UiServersTimer class="flex size-5 shrink-0" />
+      <time class="truncate text-sm font-semibold" :aria-label="verboseUptime">
+        {{ formattedUptime }}
+      </time>
+    </div>
   </div>
 </template>
 
@@ -19,6 +21,7 @@ import { computed } from "vue";
 
 const props = defineProps<{
   uptimeSeconds: number;
+  noSeparator?: boolean;
 }>();
 
 const formattedUptime = computed(() => {

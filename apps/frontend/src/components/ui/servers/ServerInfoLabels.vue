@@ -9,12 +9,18 @@
       v-if="showLoaderLabel"
       :loader="serverData.loader!"
       :loader-version="serverData.loader_version ?? ''"
+      :no-separator="column"
     />
     <UiServersServerSubdomainLabel
       v-if="serverData.net.domain"
       :subdomain="serverData.net.domain"
+      :no-separator="column"
     />
-    <UiServersServerUptimeLabel v-if="uptimeSeconds" :uptime-seconds="uptimeSeconds" />
+    <UiServersServerUptimeLabel
+      v-if="uptimeSeconds"
+      :uptime-seconds="uptimeSeconds"
+      :no-separator="column"
+    />
   </div>
 </template>
 
@@ -34,6 +40,10 @@ defineProps({
   },
   uptimeSeconds: {
     type: Number,
+    required: false,
+  },
+  column: {
+    type: Boolean,
     required: false,
   },
 });

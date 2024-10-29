@@ -4,7 +4,7 @@
     v-tooltip="'Copy subdomain'"
     class="flex min-w-0 flex-row items-center gap-4 truncate hover:cursor-pointer"
   >
-    <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
+    <div v-if="!noSeparator" class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
     <div class="flex flex-row items-center gap-2">
       <LinkIcon class="flex size-5 shrink-0" />
       <div
@@ -22,6 +22,7 @@
 import { LinkIcon } from "@modrinth/assets";
 const props = defineProps<{
   subdomain: string;
+  noSeparator?: boolean;
 }>();
 
 const copySubdomain = () => {
