@@ -2,7 +2,7 @@
   <div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
   <header
     :class="[
-      'top-0 flex h-24 select-none flex-col justify-between bg-table-alternateRow p-3 transition-[border-radius] duration-200 sm:h-12 sm:flex-row',
+      'duration-20 h-26 top-0 flex select-none flex-col justify-between gap-2 bg-table-alternateRow p-3 transition-[border-radius] sm:h-12 sm:flex-row',
       !isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
     ]"
     data-pyro-files-state="browsing"
@@ -71,45 +71,49 @@
     </nav>
 
     <div class="flex flex-shrink-0 items-center gap-1">
-      <ButtonStyled type="transparent">
-        <UiServersTeleportOverflowMenu
-          position="bottom"
-          direction="left"
-          aria-label="Sort files"
-          :options="[
-            { id: 'normal', action: () => $emit('sort', 'default') },
-            { id: 'modified', action: () => $emit('sort', 'modified') },
-            { id: 'filesOnly', action: () => $emit('sort', 'filesOnly') },
-            { id: 'foldersOnly', action: () => $emit('sort', 'foldersOnly') },
-          ]"
-        >
-          <span class="whitespace-pre text-sm font-medium">
-            {{ sortMethodLabel }}
-          </span>
-          <SortAscendingIcon aria-hidden="true" />
-          <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-          <template #normal> Alphabetical </template>
-          <template #modified> Date modified </template>
-          <template #filesOnly> Files only </template>
-          <template #foldersOnly> Folders only </template>
-        </UiServersTeleportOverflowMenu>
-      </ButtonStyled>
-      <div class="relative w-40 flex-shrink-0 text-sm">
-        <label for="search-folder" class="sr-only">Search folder</label>
-        <SearchIcon
-          class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-          aria-hidden="true"
-        />
-        <input
-          id="search-folder"
-          :value="searchQuery"
-          type="search"
-          name="search"
-          autocomplete="off"
-          class="h-8 min-h-[unset] w-full border-[1px] border-solid border-button-bg bg-transparent py-2 pl-9"
-          placeholder="Search..."
-          @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
-        />
+      <div class="flex w-full flex-row-reverse sm:flex-row">
+        <ButtonStyled type="transparent">
+          <UiServersTeleportOverflowMenu
+            position="bottom"
+            direction="left"
+            aria-label="Sort files"
+            :options="[
+              { id: 'normal', action: () => $emit('sort', 'default') },
+              { id: 'modified', action: () => $emit('sort', 'modified') },
+              { id: 'filesOnly', action: () => $emit('sort', 'filesOnly') },
+              { id: 'foldersOnly', action: () => $emit('sort', 'foldersOnly') },
+            ]"
+          >
+            <span class="hidden whitespace-pre text-sm font-medium sm:block">
+              {{ sortMethodLabel }}
+            </span>
+            <SortAscendingIcon aria-hidden="true" />
+            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+            <template #normal> Alphabetical </template>
+            <template #modified> Date modified </template>
+            <template #filesOnly> Files only </template>
+            <template #foldersOnly> Folders only </template>
+          </UiServersTeleportOverflowMenu>
+        </ButtonStyled>
+        <div class="mx-1 w-full text-sm sm:w-40">
+          <label for="search-folder" class="sr-only">Search folder</label>
+          <div class="relative">
+            <SearchIcon
+              class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+              aria-hidden="true"
+            />
+            <input
+              id="search-folder"
+              :value="searchQuery"
+              type="search"
+              name="search"
+              autocomplete="off"
+              class="h-8 min-h-[unset] w-full border-[1px] border-solid border-button-bg bg-transparent py-2 pl-9"
+              placeholder="Search..."
+              @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
+            />
+          </div>
+        </div>
       </div>
 
       <ButtonStyled type="transparent">
