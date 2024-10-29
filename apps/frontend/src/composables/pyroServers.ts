@@ -574,7 +574,7 @@ const downloadBackup = async (backupId: string) => {
   }
 };
 
-const updateAutoBackup = async (autoBackup: boolean, interval: number) => {
+const updateAutoBackup = async (autoBackup: "enabled" | "disabled", interval: number) => {
   try {
     return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`, {
       method: "POST",
