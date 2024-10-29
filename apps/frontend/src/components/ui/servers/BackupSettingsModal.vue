@@ -33,24 +33,7 @@
             class="flex w-fit items-center rounded-xl border border-solid border-button-border bg-table-alternateRow"
           >
             <button
-              class="rounded-l-xl p-3 text-secondary hover:text-contrast [&&]:bg-transparent [&&]:hover:bg-button-bg"
-              :disabled="!autoBackupEnabled || isSaving"
-              @click="autoBackupInterval = Math.min(autoBackupInterval + 1, 24)"
-            >
-              <PlusIcon />
-            </button>
-            <input
-              id="auto-backup-interval"
-              v-model="autoBackupInterval"
-              class="w-16 !appearance-none text-center [&&]:bg-transparent [&&]:focus:shadow-none"
-              type="number"
-              style="-moz-appearance: textfield; appearance: none"
-              min="1"
-              max="24"
-              :disabled="!autoBackupEnabled || isSaving"
-            />
-            <button
-              class="rounded-r-xl p-3 text-secondary hover:text-contrast [&&]:bg-transparent [&&]:hover:bg-button-bg"
+              class="rounded-l-xl p-3 text-secondary enabled:hover:text-contrast [&&]:bg-transparent enabled:[&&]:hover:bg-button-bg"
               :disabled="!autoBackupEnabled || isSaving"
               @click="autoBackupInterval = Math.max(autoBackupInterval - 1, 1)"
             >
@@ -65,6 +48,24 @@
                   stroke-width="2"
                 />
               </svg>
+            </button>
+            <input
+              id="auto-backup-interval"
+              v-model="autoBackupInterval"
+              class="w-16 !appearance-none text-center [&&]:bg-transparent [&&]:focus:shadow-none"
+              type="number"
+              style="-moz-appearance: textfield; appearance: none"
+              min="1"
+              max="24"
+              :disabled="!autoBackupEnabled || isSaving"
+            />
+
+            <button
+              class="rounded-r-xl p-3 text-secondary enabled:hover:text-contrast [&&]:bg-transparent enabled:[&&]:hover:bg-button-bg"
+              :disabled="!autoBackupEnabled || isSaving"
+              @click="autoBackupInterval = Math.min(autoBackupInterval + 1, 24)"
+            >
+              <PlusIcon />
             </button>
           </div>
           {{ autoBackupInterval == 1 ? "hour" : "hours" }}
