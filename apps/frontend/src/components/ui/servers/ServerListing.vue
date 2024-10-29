@@ -26,24 +26,13 @@
         </div>
         <div v-else class="min-h-[20px]"></div>
 
-        <div
+        <UiServersServerInfoLabels
+          :server-data="{ game, mc_version, loader, loader_version, net }"
+          :show-game-label="showGameLabel"
+          :show-loader-label="showLoaderLabel"
+          :show-subdomain-label="showSubdomainLabel"
           class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary"
-        >
-          <UiServersServerGameLabel
-            v-if="showGameLabel"
-            :game="game!"
-            :mc-version="mc_version ?? ''"
-          />
-          <UiServersServerLoaderLabel
-            v-if="showLoaderLabel"
-            :loader="loader!"
-            :loader-version="loader_version ?? ''"
-          />
-          <UiServersServerSubdomainLabel
-            v-if="showSubdomainLabel"
-            :subdomain="props.net?.domain ?? ''"
-          />
-        </div>
+        />
       </div>
     </div>
   </NuxtLink>

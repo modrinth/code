@@ -49,31 +49,19 @@
             </ButtonStyled>
           </div>
 
-          <div
+          <UiServersServerInfoLabels
+            :server-data="serverData"
+            :show-game-label="showGameLabel"
+            :show-loader-label="showLoaderLabel"
+            :uptime-seconds="uptimeSeconds"
             class="flex min-w-0 flex-col items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
-          >
-            <UiServersServerGameLabel
-              v-if="showGameLabel"
-              :game="serverData.game!"
-              :mc-version="serverData.mc_version ?? ''"
-            />
-            <UiServersServerLoaderLabel
-              v-if="showLoaderLabel"
-              :loader="serverData.loader!"
-              :loader-version="serverData.loader_version ?? ''"
-            />
-            <UiServersServerSubdomainLabel
-              v-if="serverData.net.domain"
-              :subdomain="serverData.net.domain"
-            />
-            <UiServersServerUptimeLabel v-if="uptimeSeconds" :uptime-seconds="uptimeSeconds" />
-          </div>
+          />
         </div>
       </div>
 
       <div
         data-pyro-navigation
-        class="isolate flex w-full select-none flex-col justify-between gap-4 md:flex-row md:items-center"
+        class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
       >
         <UiNavTabs :links="navLinks" />
       </div>
