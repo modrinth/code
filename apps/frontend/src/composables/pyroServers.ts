@@ -212,6 +212,11 @@ interface Backup {
   created_at: string;
 }
 
+interface AutoBackupSettings {
+  enabled: boolean;
+  interval: number;
+}
+
 interface JWTAuth {
   url: string;
   token: string;
@@ -574,7 +579,7 @@ const downloadBackup = async (backupId: string) => {
   }
 };
 
-const updateAutoBackup = async (autoBackup: "enabled" | "disabled", interval: number) => {
+const updateAutoBackup = async (autoBackup: "enable" | "disable", interval: number) => {
   try {
     return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`, {
       method: "POST",
@@ -1000,7 +1005,12 @@ type BackupFunctions = {
    * @param autoBackup - Whether to enable auto backup.
    * @param interval - The interval to backup at (in Hours).
    */
-  updateAutoBackup: (autoBackup: boolean, interval: number) => Promise<void>;
+  updateAutoBackup: (autoBackup: "enable" | "disable", interval: number) => Promise<void>;
+
+  /**
+   * Gets the auto backup settings of the server.
+   */
+  getAutoBackup: () => Promise<AutoBackupSettings>;
 };
 
 type NetworkFunctions = {
