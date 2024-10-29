@@ -307,7 +307,13 @@ const props = defineProps<{
 defineEmits(["onDownload"]);
 
 const data = computed(() => props.server.general);
-const backups = computed(() => props.server.backups?.data);
+const backups = computed(() => {
+  if (!props.server.backups?.data) return [];
+
+  return [...props.server.backups.data].sort((a, b) => {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+});
 
 useHead({
   title: `Backups - ${data.value?.name ?? "Server"} - Modrinth`,
