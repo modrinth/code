@@ -53,6 +53,10 @@ const preferences = {
     description:
       "Don't ask for confirmation when starting, stopping, restarting, or killing the server.",
   },
+  backupWhileRunning: {
+    displayName: "Create backups while running",
+    description: "Allow backups to be created while the server is online.",
+  },
 } as const;
 
 type PreferenceKeys = keyof typeof preferences;
@@ -65,6 +69,7 @@ const defaultPreferences: UserPreferences = {
   ramAsNumber: false,
   autoRestart: false,
   dontAskAgain: false,
+  backupWhileRunning: false,
 };
 
 const userPreferences = useStorage<UserPreferences>(

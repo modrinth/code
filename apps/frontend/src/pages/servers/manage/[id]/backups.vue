@@ -142,7 +142,16 @@
             </div>
             <div class="flex w-full gap-2 sm:w-fit">
               <ButtonStyled type="standard" color="brand">
-                <button class="w-full sm:w-fit" @click="showCreateModel">
+                <button
+                  v-tooltip="
+                    isServerRunning && !userPreferences.backupWhileRunning
+                      ? 'Cannot create backup while server is running. You can disable this from your server Options > Preferences.'
+                      : ''
+                  "
+                  class="w-full sm:w-fit"
+                  :disabled="isServerRunning && !userPreferences.backupWhileRunning"
+                  @click="showCreateModel"
+                >
                   <PlusIcon class="h-5 w-5" />
                   Create backup
                 </button>
@@ -221,6 +230,7 @@
 
 <script setup lang="ts">
 import { ButtonStyled, OverflowMenu, NewModal } from "@modrinth/ui";
+import { useStorage } from "@vueuse/core";
 import {
   PlusIcon,
   CheckIcon,
@@ -239,7 +249,15 @@ import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  isServerRunning: boolean;
 }>();
+
+const route = useNativeRoute();
+const serverId = route.params.id;
+
+const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
+  backupWhileRunning: false,
+});
 
 defineEmits(["onDownload"]);
 
