@@ -42,9 +42,12 @@
               We could not find any specific problems, but you can try restarting the server.
             </div>
           </div>
-          "
         </div>
-        <Button icon-only color="red" @click="clearError"><XIcon /></Button>
+        <ButtonStyled color="red" @click="clearError">
+          <button>
+            <XIcon />
+          </button>
+        </ButtonStyled>
       </div>
     </div>
     <UiServersServerStats :data="stats" />
@@ -145,7 +148,7 @@
 
 <script setup lang="ts">
 import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
-import { Button } from "@modrinth/ui";
+import { ButtonStyled } from "@modrinth/ui";
 import type { ServerState, Stats } from "~/types/servers";
 import type { Server } from "~/composables/pyroServers";
 
