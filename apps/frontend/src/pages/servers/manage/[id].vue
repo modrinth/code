@@ -57,7 +57,7 @@
             :show-game-label="showGameLabel"
             :show-loader-label="showLoaderLabel"
             :uptime-seconds="uptimeSeconds"
-            class="flex min-w-0 flex-col items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+            class="flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
           />
         </div>
       </div>
