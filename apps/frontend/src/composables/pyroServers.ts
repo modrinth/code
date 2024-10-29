@@ -586,6 +586,15 @@ const updateAutoBackup = async (autoBackup: boolean, interval: number) => {
   }
 };
 
+const getAutoBackup = async () => {
+  try {
+    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`);
+  } catch (error) {
+    console.error("Error getting auto backup settings:", error);
+    throw error;
+  }
+};
+
 // ------------------ NETWORK ------------------ //
 
 const reserveAllocation = async (name: string): Promise<Allocation> => {
@@ -824,6 +833,7 @@ const modules: any = {
     restore: restoreBackup,
     download: downloadBackup,
     updateAutoBackup,
+    getAutoBackup,
   },
   network: {
     get: async (serverId: string) => {
