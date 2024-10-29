@@ -8,7 +8,7 @@
       class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row"
     >
       <h1 class="w-full text-4xl font-bold text-contrast">Servers</h1>
-      <div class="mb-4 flex w-full flex-row items-center justify-end gap-4 md:mb-0">
+      <div class="mb-4 flex w-full flex-row items-center justify-end gap-2 md:mb-0 md:gap-4">
         <div class="relative w-full text-sm md:w-72">
           <label class="sr-only" for="search">Search</label>
           <SearchIcon

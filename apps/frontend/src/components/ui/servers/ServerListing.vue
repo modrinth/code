@@ -31,7 +31,7 @@
           :show-game-label="showGameLabel"
           :show-loader-label="showLoaderLabel"
           :show-subdomain-label="showSubdomainLabel"
-          class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary"
+          class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
         />
       </div>
     </div>
