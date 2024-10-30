@@ -33,10 +33,17 @@
           Start your own Minecraft server directly on Modrinth. Add thousands of mods and invite
           your friends to play, without the hassle of setup.
         </h2>
-        <div class="relative flex w-fit flex-row gap-8">
-          <ButtonStyled color="brand" size="large">
-            <nuxt-link class="w-fit" to="#plan"> Start your server </nuxt-link>
-          </ButtonStyled>
+        <div class="relative flex w-full flex-wrap items-center gap-8 sm:w-fit">
+          <div class="flex w-full gap-4 text-center sm:w-fit">
+            <ButtonStyled color="brand" size="large">
+              <nuxt-link class="w-full sm:w-fit" to="#plan"> Start your server </nuxt-link>
+            </ButtonStyled>
+            <ButtonStyled color="purple" size="large" v-if="hasServers">
+              <nuxt-link class="w-full sm:w-fit" to="/servers/manage">
+                Manage your servers
+              </nuxt-link>
+            </ButtonStyled>
+          </div>
           <UiServersPoweredByPyro class="!mt-0" />
         </div>
 
@@ -569,6 +576,15 @@ const isDeleting = ref(false);
 const typingSpeed = 75;
 const deletingSpeed = 25;
 const pauseTime = 2000;
+
+const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
+  try {
+    const response = await usePyroFetch("servers");
+    return response.servers && response.servers.length > 0;
+  } catch {
+    return false;
+  }
+});
 
 const startTyping = () => {
   const currentWord = words[currentWordIndex.value];
