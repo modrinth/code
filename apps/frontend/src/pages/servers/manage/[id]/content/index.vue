@@ -54,7 +54,7 @@
   <div v-if="data && localMods" class="flex h-full w-full flex-col">
     <div class="relative flex h-full w-full flex-col">
       <div class="mb-4 flex items-center justify-between">
-        <div class="flex w-full flex-row items-center gap-4">
+        <div class="flex w-full flex-row items-center gap-2 sm:gap-4">
           <div class="relative w-full text-sm">
             <label class="sr-only" for="search">Search</label>
             <SearchIcon
@@ -198,7 +198,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="mt-4 flex h-full flex-col items-center justify-center">
+      <div v-else class="mt-4 flex h-full flex-col items-center justify-center text-center">
         <PackageClosedIcon class="size-24 text-neutral-500" />
         <p class="m-0 pb-2 pt-3 text-neutral-200">No mods found!</p>
         <p class="m-0 pb-3 text-neutral-400">Add some mods to your server to manage them here.</p>

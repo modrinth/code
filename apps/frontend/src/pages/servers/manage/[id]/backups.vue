@@ -173,14 +173,15 @@
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between">
               <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-2">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <div class="text-xl font-bold text-contrast">{{ backup.name }}</div>
                   <div v-if="index == 0" class="flex gap-2 font-bold text-brand">
                     <CheckIcon class="h-5 w-5" /> Latest
                   </div>
                 </div>
                 <div class="flex items-center gap-2 text-sm font-semibold text-contrast">
-                  <CalendarIcon /> {{ new Date(backup.created_at).toLocaleString() }}
+                  <CalendarIcon class="h-5 w-5" />
+                  {{ new Date(backup.created_at).toLocaleString() }}
                 </div>
               </div>
               <OverflowMenu
