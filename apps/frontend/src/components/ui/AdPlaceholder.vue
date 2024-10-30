@@ -23,10 +23,16 @@ import { ChevronRightIcon } from "@modrinth/assets";
 useHead({
   script: [
     {
+      // Clean.io
+      src: "https://cadmus.script.ac/d14pdm1b7fi5kh/script.js",
+    },
+    {
+      // Aditude
       src: "https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js",
       async: true,
     },
     {
+      // Optima
       src: "https://bservr.com/o.js?uid=8118d1fdb2e0d6f32180bd27",
       async: true,
     },
@@ -46,11 +52,22 @@ useHead({
 
 onMounted(() => {
   window.tude = window.tude || { cmd: [] };
+  window.Raven = window.Raven || { cmd: [] };
+
+  window.Raven.cmd.push(({ config }) => {
+    config.setCustom({
+      param1: "web",
+    });
+  });
+
   tude.cmd.push(function () {
     tude.refreshAdsViaDivMappings([
       {
         divId: "modrinth-rail-1",
         baseDivId: "pb-slot-square-2",
+        targeting: {
+          location: "web",
+        },
       },
     ]);
   });

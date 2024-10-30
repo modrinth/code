@@ -62,9 +62,19 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          SQLX_OFFLINE: true
 
       - name: Lint
         run: pnpm lint
+        env:
+          SQLX_OFFLINE: true
+
+      - name: Start docker compose
+        run: docker compose up -d
 
       - name: Test
         run: pnpm test
+        env:
+          SQLX_OFFLINE: true
+          DATABASE_URL: postgresql://labrinth:labrinth@localhost/postgres
