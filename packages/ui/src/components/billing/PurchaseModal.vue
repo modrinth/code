@@ -17,7 +17,8 @@
             'font-bold': purchaseModalStep === 0,
           }"
         >
-          Configure server
+          Configure
+          <span class="hidden sm:inline">server</span>
         </span>
         <ChevronRightIcon class="h-5 w-5 text-secondary" />
       </template>
@@ -29,7 +30,10 @@
             purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 1 : 0),
         }"
       >
-        {{ product.metadata.type === 'pyro' ? 'Billing interval' : 'Select plan' }}
+        {{ product.metadata.type === 'pyro' ? 'Billing' : 'Plan' }}
+        <span class="hidden sm:inline">{{
+          product.metadata.type === 'pyro' ? 'interval' : 'selection'
+        }}</span>
       </span>
       <ChevronRightIcon class="h-5 w-5 text-secondary" />
       <span
@@ -69,11 +73,11 @@
             :options="['Vanilla', 'Fabric', 'Forge']"
             placeholder="Select mod loader..."
           /> -->
-          <div class="flex justify-between h-24 gap-4">
+          <div class="flex flex-wrap justify-between gap-4">
             <button
               v-for="loader in ['Vanilla', 'Fabric', 'Forge', 'Quilt', 'NeoForge']"
               :key="loader"
-              class="!w-full !h-full btn flex !flex-col !items-center !justify-between !pt-4 !pb-3"
+              class="!h-24 btn flex !flex-col !items-center !justify-between !pt-4 !pb-3 grow"
               :style="{
                 filter: serverLoader === loader ? 'brightness(1.5)' : '',
               }"
@@ -84,7 +88,7 @@
             </button>
           </div>
           <div class="flex items-center gap-2">
-            <InfoIcon />
+            <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
               You can change these settings later in your server options.
             </span>
@@ -135,7 +139,7 @@
         </div>
 
         <div class="flex items-center gap-2 pt-4">
-          <InfoIcon />
+          <InfoIcon class="hidden sm:block" />
           <span class="text-sm text-secondary">
             Final price and currency will be based on your selected payment method.
           </span>
@@ -182,18 +186,20 @@
               >{{ product.metadata.type === 'midas' ? 'Modrinth+' : 'Modrinth Servers' }}
               {{ selectedPlan }}</span
             >
-            <span class="text-secondary">
+            <span class="text-secondary text-end">
               {{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }} /
               {{ selectedPlan }}
             </span>
           </div>
           <div class="flex justify-between">
             <span class="text-secondary">Tax</span>
-            <span class="text-secondary">{{ formatPrice(locale, tax, price.currency_code) }}</span>
+            <span class="text-secondary text-end">{{
+              formatPrice(locale, tax, price.currency_code)
+            }}</span>
           </div>
           <div class="mt-4 flex justify-between border-0 border-t border-solid border-code-bg pt-4">
             <span class="text-lg font-bold">Today's total</span>
-            <span class="text-lg font-extrabold text-primary">
+            <span class="text-lg font-extrabold text-primary text-end">
               {{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }}
             </span>
           </div>
