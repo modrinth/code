@@ -40,7 +40,7 @@
           <div
             v-for="(property, index) in filteredProperties"
             :key="index"
-            class="flex items-center justify-between py-2"
+            class="flex flex-row flex-wrap items-center justify-between py-2"
           >
             <div class="flex items-center">
               <span :id="`property-label-${index}`">{{ formatPropertyName(index) }}</span>
@@ -50,7 +50,7 @@
             </div>
             <div
               v-if="overrides[index] && overrides[index].type === 'dropdown'"
-              class="flex w-[320px] justify-end"
+              class="mt-2 flex w-full sm:w-[320px] sm:justify-end"
             >
               <UiServersTeleportDropdownMenu
                 :id="`server-property-${index}`"
@@ -61,7 +61,7 @@
                 placeholder="Select..."
               />
             </div>
-            <div v-else-if="typeof property === 'boolean'" class="flex w-[320px] justify-end">
+            <div v-else-if="typeof property === 'boolean'" class="flex justify-end">
               <input
                 :id="`server-property-${index}`"
                 v-model="liveProperties[index]"
@@ -70,7 +70,7 @@
                 :aria-labelledby="`property-label-${index}`"
               />
             </div>
-            <div v-else-if="typeof property === 'number'" class="w-[320px]">
+            <div v-else-if="typeof property === 'number'" class="mt-2 w-full sm:w-[320px]">
               <input
                 :id="`server-property-${index}`"
                 v-model.number="liveProperties[index]"
@@ -79,7 +79,7 @@
                 :aria-labelledby="`property-label-${index}`"
               />
             </div>
-            <div v-else-if="isComplexProperty(property)" class="w-[320px]">
+            <div v-else-if="isComplexProperty(property)" class="mt-2 w-full sm:w-[320px]">
               <textarea
                 :id="`server-property-${index}`"
                 v-model="liveProperties[index]"
@@ -87,7 +87,7 @@
                 :aria-labelledby="`property-label-${index}`"
               ></textarea>
             </div>
-            <div v-else class="flex w-[320px] justify-end">
+            <div v-else class="mt-2 flex w-full justify-end sm:w-[320px]">
               <input
                 :id="`server-property-${index}`"
                 v-model="liveProperties[index]"

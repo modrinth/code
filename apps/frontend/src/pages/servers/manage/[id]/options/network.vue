@@ -84,7 +84,7 @@
           </div>
 
           <div class="card flex flex-col gap-4">
-            <div class="flex w-full flex-row items-center justify-between">
+            <div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
               <label for="user-domain" class="flex flex-col gap-2">
                 <span class="text-lg font-bold text-contrast">Generated DNS records</span>
                 <span>
@@ -93,7 +93,7 @@
               </label>
 
               <ButtonStyled>
-                <button @click="exportDnsRecords">
+                <button @click="exportDnsRecords" class="!w-full sm:!w-auto">
                   <UploadIcon />
                   <span>Export DNS Records</span>
                 </button>
@@ -154,7 +154,7 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <InfoIcon />
+              <InfoIcon class="hidden sm:block" />
               <span class="text-sm text-secondary">
                 You must own your own domain to use this feature.
               </span>
@@ -163,7 +163,7 @@
 
           <!-- Allocations section -->
           <div class="card flex flex-col gap-4">
-            <div class="flex w-full flex-row items-center justify-between">
+            <div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
               <div class="flex flex-col gap-2">
                 <span class="text-lg font-bold text-contrast">Allocations</span>
                 <span>
@@ -173,7 +173,7 @@
               </div>
 
               <ButtonStyled type="standard" color="brand" @click="showNewAllocationModal">
-                <button>
+                <button class="!w-full sm:!w-auto">
                   <PlusIcon />
                   <span>New allocation</span>
                 </button>
@@ -182,7 +182,7 @@
 
             <div class="flex w-full flex-col overflow-hidden rounded-xl bg-table-alternateRow p-4">
               <!-- Primary allocation -->
-              <div class="flex flex-row items-center justify-between">
+              <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                 <span class="text-md font-bold capitalize tracking-wide text-contrast">
                   Primary Allocation
                 </span>
@@ -198,34 +198,42 @@
               <div
                 v-for="allocation in allocations"
                 :key="allocation.port"
-                class="border-border flex flex-row items-center justify-between"
+                class="border-border flex flex-col justify-between gap-4 sm:flex-row sm:items-center"
               >
-                <div class="flex flex-row items-center gap-4">
-                  <VersionIcon class="h-7 w-7 rotate-90" />
-                  <div class="flex w-[20rem] flex-row items-center justify-between">
+                <div class="flex flex-row gap-4 sm:items-center">
+                  <VersionIcon class="h-7 w-7 flex-none rotate-90" />
+                  <div class="flex w-[20rem] flex-col justify-between sm:flex-row sm:items-center">
                     <div class="flex flex-col gap-1">
                       <span class="text-md font-bold capitalize tracking-wide text-contrast">
                         {{ allocation.name }}
                       </span>
-                      <span class="text-xs uppercase text-secondary">name</span>
+                      <span class="hidden text-xs uppercase text-secondary sm:block">name</span>
                     </div>
                     <div class="flex flex-col gap-1">
-                      <span class="text-md w-10 font-bold capitalize tracking-wide text-contrast">
+                      <span
+                        class="text-md w-10 capitalize tracking-wide text-secondary sm:font-bold sm:text-contrast"
+                      >
                         {{ allocation.port }}
                       </span>
-                      <span class="text-xs uppercase text-secondary">port</span>
+                      <span class="hidden text-xs uppercase text-secondary sm:block">port</span>
                     </div>
                   </div>
                 </div>
 
-                <div class="flex flex-row items-center gap-2">
+                <div class="flex w-full flex-row items-center gap-2">
                   <ButtonStyled icon-only>
-                    <button @click="showEditAllocationModal(allocation.port)">
+                    <button
+                      @click="showEditAllocationModal(allocation.port)"
+                      class="!w-full sm:!w-auto"
+                    >
                       <EditIcon />
                     </button>
                   </ButtonStyled>
                   <ButtonStyled icon-only color="red">
-                    <button @click="showConfirmDeleteModal(allocation.port)">
+                    <button
+                      @click="showConfirmDeleteModal(allocation.port)"
+                      class="!w-full sm:!w-auto"
+                    >
                       <TrashIcon />
                     </button>
                   </ButtonStyled>

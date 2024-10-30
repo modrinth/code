@@ -137,15 +137,15 @@
             </div>
           </div>
         </div>
-        <div v-else class="flex items-center gap-2">
+        <div v-else class="flex w-full flex-col items-center gap-2 sm:w-fit sm:flex-row">
           <ButtonStyled>
-            <button @click="editModal.show()">
+            <button @click="editModal.show()" class="!w-full sm:!w-auto">
               <DownloadIcon class="size-4" /> Install modpack
             </button>
           </ButtonStyled>
-          or
+          <span class="hidden sm:block">or</span>
           <ButtonStyled>
-            <button><UploadIcon class="size-4" /> Upload mrpack</button>
+            <button class="!w-full sm:!w-auto"><UploadIcon class="size-4" /> Upload mrpack</button>
           </ButtonStyled>
         </div>
       </div>

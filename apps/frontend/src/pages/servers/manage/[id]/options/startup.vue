@@ -7,7 +7,7 @@
 
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
-          <div class="flex justify-between">
+          <div class="flex flex-col justify-between gap-4 sm:flex-row">
             <label for="startup-command-field" class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Startup command</span>
               <span> The command that runs when your server is started. </span>
@@ -15,6 +15,7 @@
             <ButtonStyled>
               <button
                 :disabled="invocation === startupSettings?.original_invocation"
+                class="!w-full sm:!w-auto"
                 @click="resetToDefault"
               >
                 <UpdatedIcon class="h-5 w-5" />

@@ -22,7 +22,7 @@
           </h1>
           <span
             v-if="isCurrentLoader(loader.name)"
-            class="flex items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand"
+            class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
           >
             <CheckIcon class="h-4 w-4" />
             Current

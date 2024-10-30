@@ -2,13 +2,13 @@
   <div class="h-full w-full gap-2 overflow-y-auto">
     <div class="card">
       <div class="flex flex-col gap-4">
-        <div class="flex justify-between">
+        <div class="flex flex-col justify-between gap-4 sm:flex-row">
           <label class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">SFTP</span>
             <span> SFTP allows you to access your server's files from outside of Modrinth. </span>
           </label>
           <ButtonStyled>
-            <button @click="openSftp">
+            <button @click="openSftp" class="!w-full sm:!w-auto">
               <ExternalIcon class="h-5 w-5" />
               Launch SFTP
             </button>
@@ -20,7 +20,7 @@
           </span>
           <span class="text-xs uppercase text-secondary">server address</span>
         </div>
-        <div class="flex flex-col gap-2 sm:flex-row">
+        <div class="-mt-2 flex flex-col gap-2 sm:mt-0 sm:flex-row">
           <div
             class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
           >
