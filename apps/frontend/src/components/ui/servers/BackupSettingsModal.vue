@@ -57,6 +57,7 @@
               style="-moz-appearance: textfield; appearance: none"
               min="1"
               max="24"
+              step="1"
               :disabled="!autoBackupEnabled || isSaving"
             />
 
@@ -107,6 +108,17 @@ const autoBackupEnabled = ref(false);
 const autoBackupInterval = ref(1);
 const isLoadingSettings = ref(true);
 const isSaving = ref(false);
+
+const validatedBackupInterval = computed(() => {
+  const roundedValue = Math.round(autoBackupInterval.value);
+
+  if (roundedValue < 1) {
+    return 1;
+  } else if (roundedValue > 24) {
+    return 24;
+  }
+  return roundedValue;
+});
 
 const hasChanges = computed(() => {
   if (!initialSettings.value) return false;
@@ -170,6 +182,10 @@ const saveSettings = async () => {
     isSaving.value = false;
   }
 };
+
+watch(autoBackupInterval, () => {
+  autoBackupInterval.value = validatedBackupInterval.value;
+});
 
 defineExpose({
   show: async () => {
