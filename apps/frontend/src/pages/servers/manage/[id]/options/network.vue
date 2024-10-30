@@ -220,7 +220,7 @@
                   </div>
                 </div>
 
-                <div class="flex w-full flex-row items-center gap-2">
+                <div class="flex w-full flex-row items-center gap-2 sm:w-auto">
                   <ButtonStyled icon-only>
                     <button
                       @click="showEditAllocationModal(allocation.port)"
