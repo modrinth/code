@@ -18,7 +18,7 @@
             <button
               v-tooltip="'Back to home'"
               type="button"
-              class="grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              class="mr-2 grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
               @click="$emit('navigate', -1)"
             >
               <span
