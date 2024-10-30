@@ -66,7 +66,7 @@
     <section
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
-      <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
+      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
       <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
           class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
@@ -203,7 +203,7 @@
     <section
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
-      <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
+      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
       <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
           class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
@@ -389,7 +389,7 @@
       id="plan"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
-      <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
+      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
       <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
         <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
           Start your server on Modrinth
