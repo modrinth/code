@@ -28,7 +28,7 @@
         <ButtonStyled type="standard">
           <NuxtLink
             class="!h-10 whitespace-pre !border-[1px] !border-solid !border-button-border text-sm !font-medium"
-            :to="{ path: '/servers', query: { showModal: 'true' } }"
+            :to="{ path: '/servers', hash: '#plan' }"
           >
             <PlusIcon class="size-4" />
             New Server
