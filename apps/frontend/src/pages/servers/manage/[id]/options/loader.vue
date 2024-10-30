@@ -98,7 +98,7 @@
           v-if="data.upstream"
           class="flex w-full justify-between gap-2 rounded-3xl bg-table-alternateRow p-4"
         >
-          <div class="flex gap-4">
+          <div class="flex flex-col gap-4 sm:flex-row">
             <UiAvatar :src="data.project?.icon_url" size="120px" />
 
             <div class="flex flex-col justify-between">
@@ -114,7 +114,7 @@
                   }}
                 </span>
               </div>
-              <div class="flex w-full max-w-[18rem] items-center gap-2">
+              <div class="mt-2 flex w-full max-w-[18rem] items-center gap-2 sm:mt-0">
                 <UiServersTeleportDropdownMenu
                   v-if="versions && Array.isArray(versions) && versions.length > 0"
                   v-model="version"
@@ -155,7 +155,7 @@
           <h2 class="m-0 text-lg font-bold text-contrast">Mod loader</h2>
           <p class="m-0">Mod loaders allow you to run mods on your server.</p>
           <div v-if="data.upstream" class="mt-2 flex items-center gap-2">
-            <InfoIcon />
+            <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
               Your server was installed from a modpack, which automatically chooses the appropriate
               mod loader.
