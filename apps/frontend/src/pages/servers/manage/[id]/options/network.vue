@@ -110,14 +110,16 @@
               placeholder="domain.com"
             />
 
-            <div class="w-full rounded-xl bg-table-alternateRow p-4">
+            <div
+              class="flex max-w-full flex-none overflow-auto rounded-xl bg-table-alternateRow p-4"
+            >
               <table
-                class="flex w-full border-collapse overflow-hidden truncate rounded-lg border-2 border-gray-300"
+                class="w-full flex-none border-collapse truncate rounded-lg border-2 border-gray-300"
               >
                 <tbody class="w-full">
                   <tr v-for="record in dnsRecords" :key="record.content" class="w-full">
-                    <td class="py-3">
-                      <div class="ml-2 flex flex-col gap-1" @click="copyText(record.type)">
+                    <td class="w-1/6 py-3 pr-4 md:w-1/5 md:pr-8 lg:w-1/4 lg:pr-12">
+                      <div class="flex flex-col gap-1" @click="copyText(record.type)">
                         <span
                           class="text-md font-bold tracking-wide text-contrast hover:cursor-pointer"
                         >
@@ -126,8 +128,8 @@
                         <span class="text-xs uppercase text-secondary">type</span>
                       </div>
                     </td>
-                    <td class="truncate py-3">
-                      <div class="flex flex-col gap-1 truncate" @click="copyText(record.name)">
+                    <td class="w-2/6 py-3 md:w-1/3">
+                      <div class="flex flex-col gap-1" @click="copyText(record.name)">
                         <span
                           class="text-md truncate font-bold tracking-wide text-contrast hover:cursor-pointer"
                         >
@@ -136,8 +138,8 @@
                         <span class="text-xs uppercase text-secondary">name</span>
                       </div>
                     </td>
-                    <td class="truncate px-4">
-                      <div class="flex flex-col gap-1 truncate" @click="copyText(record.content)">
+                    <td class="w-3/6 py-3 pl-4 md:w-5/12 lg:w-5/12">
+                      <div class="flex flex-col gap-1" @click="copyText(record.content)">
                         <span
                           class="text-md w-fit truncate font-bold tracking-wide text-contrast hover:cursor-pointer"
                         >
@@ -150,6 +152,7 @@
                 </tbody>
               </table>
             </div>
+
             <div class="flex items-center gap-2">
               <InfoIcon />
               <span class="text-sm text-secondary">
