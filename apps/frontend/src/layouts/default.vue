@@ -302,6 +302,10 @@
               <LibraryIcon class="icon" />
               {{ formatMessage(commonMessages.collectionsLabel) }}
             </NuxtLink>
+            <NuxtLink class="iconified-button" to="/servers/manage">
+              <ServerIcon class="icon" />
+              {{ formatMessage(commonMessages.serversLabel) }}
+            </NuxtLink>
             <NuxtLink
               v-if="auth.user.role === 'moderator' || auth.user.role === 'admin'"
               class="iconified-button"
