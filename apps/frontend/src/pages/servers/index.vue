@@ -579,6 +579,7 @@ const pauseTime = 2000;
 
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
   try {
+    if (!auth.value.user) return false;
     const response = await usePyroFetch("servers");
     return response.servers && response.servers.length > 0;
   } catch {
