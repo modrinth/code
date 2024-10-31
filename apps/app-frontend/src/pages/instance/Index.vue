@@ -103,6 +103,9 @@
             :versions="modrinthVersions"
             :installed="instance.install_stage !== 'installed'"
           ></component>
+          <template #fallback>
+            <LoadingIndicator />
+          </template>
         </Suspense>
       </template>
     </RouterView>
@@ -134,7 +137,7 @@ import {
   Avatar,
   ContentPageHeader,
   ButtonStyled,
-  OverflowMenu
+  OverflowMenu, LoadingIndicator
 } from '@modrinth/ui'
 import {
   UserPlusIcon,

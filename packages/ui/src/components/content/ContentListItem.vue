@@ -44,7 +44,7 @@ const emit = defineEmits(['update:selected'])
 </script>
 <template>
   <div
-    class="grid grid-cols-[min-content,4fr,2fr,3fr,min-content] gap-2 items-center rounded-xl bg-bg-raised p-2"
+    class="grid grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center p-2 h-[64px] border-solid border-0 border-b-[1px] border-b-button-bg relative"
   >
     <Checkbox
       v-model="selected"
@@ -52,29 +52,30 @@ const emit = defineEmits(['update:selected'])
       class="select-checkbox"
       @update:model-value="emit('update:selected', $event)"
     />
-    <AutoLink :to="item.project?.link ?? ''" v-bind="item.project?.linkProps ?? {}">
       <div
         class="flex items-center gap-2 text-contrast font-medium"
         :class="{ 'opacity-50': item.disabled }"
       >
-        <Avatar :src="item.icon ?? ''" :class="{ grayscale: item.disabled }" />
+        <AutoLink :to="item.project?.link ?? ''" tabindex="-1" v-bind="item.project?.linkProps ?? {}">
+          <Avatar :src="item.icon ?? ''" :class="{ grayscale: item.disabled }" size="48px" />
+        </AutoLink>
         <div class="flex flex-col">
-          <span :class="item.disabled ? `line-clamp-1 line-through` : `line-clamp-2`">
-            {{ item.title ?? item.filename }}
-          </span>
-          <span v-if="item.disabled" class="flex gap-1 items-center text-sm leading-tight">
-            <SlashIcon /> Disabled
-          </span>
+          <AutoLink :to="item.project?.link ?? ''" v-bind="item.project?.linkProps ?? {}">
+            <div class="text-contrast line-clamp-1" :class="{ 'line-through': item.disabled }">
+                {{ item.title ?? item.filename }}
+            </div>
+          </AutoLink>
+          <AutoLink :to="item.creator?.link ?? ''" v-bind="item.creator?.linkProps ?? {}">
+            <div class="line-clamp-1 break-all" :class="{ 'opacity-50': item.disabled }">
+              <slot v-if="item.creator" :item="item">
+                <span class="text-secondary">
+                 by {{ item.creator.name }}
+                </span>
+              </slot>
+            </div>
+          </AutoLink>
         </div>
       </div>
-    </AutoLink>
-    <AutoLink :to="item.creator?.link ?? ''" v-bind="item.creator?.linkProps ?? {}">
-      <div class="line-clamp-1 break-all text-primary" :class="{ 'opacity-50': item.disabled }">
-        <slot v-if="item.creator" :item="item">
-          {{ item.creator.name }}
-        </slot>
-      </div>
-    </AutoLink>
     <div class="flex flex-col max-w-60" :class="{ 'opacity-50': item.disabled }">
       <div v-if="item.version" class="line-clamp-1 break-all">
         <slot :creator="item.creator">
@@ -83,7 +84,7 @@ const emit = defineEmits(['update:selected'])
       </div>
       <div class="text-secondary text-xs line-clamp-1 break-all">{{ item.filename }}</div>
     </div>
-    <div class="flex gap-1">
+    <div class="flex justify-end gap-1">
       <slot name="actions" :item="item" />
     </div>
   </div>

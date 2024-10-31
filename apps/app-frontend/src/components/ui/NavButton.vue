@@ -47,8 +47,6 @@ withDefaults(defineProps<{
   position: absolute;
   background-color: var(--_tooltip-bg);
   color: var(--_tooltip-color);
-  //background-color: black;
-  //color: var(--dark-color-contrast);
   text-wrap: nowrap;
   padding: 0.5rem 0.5rem;
   border-radius: var(--radius-sm);

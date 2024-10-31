@@ -3,8 +3,6 @@
     ref="dropdown"
     v-bind="$attrs"
     :disabled="disabled"
-    :position="position"
-    :direction="direction"
   >
     <slot></slot>
     <template #menu>
@@ -21,6 +19,7 @@
           :hover-filled="option.hoverFilled"
           :hover-filled-only="option.hoverFilledOnly"
           transparent
+          :v-close-popper="!option.remainOnClick"
           :action="
             option.action
               ? (event) => {
@@ -88,14 +87,10 @@ const props = withDefaults(
   defineProps<{
     options: Option[]
     disabled?: boolean
-    position?: string
-    direction?: string
   }>(),
   {
     options: () => [],
     disabled: false,
-    position: 'auto',
-    direction: 'auto',
   },
 )
 

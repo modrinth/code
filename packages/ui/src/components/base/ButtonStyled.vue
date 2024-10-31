@@ -162,6 +162,7 @@ const colorVariables = computed(() => {
 }
 
 /* Searches up to 4 children deep for valid button */
+.btn-wrapper :deep(:is(button, a, .button-like):first-child),
 .btn-wrapper :slotted(:is(button, a, .button-like):first-child),
 .btn-wrapper :slotted(*) > :is(button, a, .button-like):first-child,
 .btn-wrapper :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
@@ -194,6 +195,7 @@ const colorVariables = computed(() => {
   }
 }
 
+.btn-wrapper.outline :deep(:is(button, a, .button-like):first-child),
 .btn-wrapper.outline :slotted(:is(button, a, .button-like):first-child),
 .btn-wrapper.outline :slotted(*) > :is(button, a, .button-like):first-child,
 .btn-wrapper.outline :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
@@ -206,6 +208,7 @@ const colorVariables = computed(() => {
 }
 
 /*noinspection CssUnresolvedCustomProperty*/
+.btn-wrapper :deep(:is(button, a, .button-like):first-child) > svg:first-child,
 .btn-wrapper :slotted(:is(button, a, .button-like):first-child) > svg:first-child,
 .btn-wrapper :slotted(*) > :is(button, a, .button-like):first-child > svg:first-child,
 .btn-wrapper
@@ -228,6 +231,7 @@ const colorVariables = computed(() => {
   gap: 1px;
 
   > .btn-wrapper:not(:first-child) {
+    :deep(:is(button, a, .button-like):first-child),
     :slotted(:is(button, a, .button-like):first-child),
     :slotted(*) > :is(button, a, .button-like):first-child,
     :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
@@ -238,6 +242,7 @@ const colorVariables = computed(() => {
   }
 
   > :not(:last-child) {
+    :deep(:is(button, a, .button-like):first-child),
     :slotted(:is(button, a, .button-like):first-child),
     :slotted(*) > :is(button, a, .button-like):first-child,
     :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,

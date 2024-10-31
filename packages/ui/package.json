@@ -35,6 +35,7 @@
     "qrcode.vue": "^3.4.1",
     "vue-multiselect": "3.0.0",
     "vue-select": "4.0.0-beta.6",
+    "vue-virtual-scroller": "v2.0.0-beta.8",
     "vue3-apexcharts": "^1.4.4",
     "xss": "^1.0.14"
   }

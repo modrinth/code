@@ -113,7 +113,13 @@
   >
     <template #actions="{ item }">
       <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
-        <button @click="removeMod(item)">
+        <button v-tooltip="item.disabled ? `Enable` : `Disable`" @click="toggleDisableMod(item.data)">
+          <CheckCircleIcon v-if="item.disabled" />
+          <SlashIcon v-else />
+        </button>
+      </ButtonStyled>
+      <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
+        <button v-tooltip="'Delete'" @click="removeMod(item)">
           <TrashIcon />
         </button>
       </ButtonStyled>
@@ -121,18 +127,24 @@
         <OverflowMenu
           :options="[
             {
+              id: 'show-file',
+              action: () => {},
+            },
+            {
+              divider: true,
+            },
+            {
               id: 'copy-link',
               shown: item.project,
               action: () => toggleDisableMod(item.data),
             },
-            {
-              id: 'toggle',
-              shown: !isPackLocked,
-              action: () => toggleDisableMod(item.data),
-            },
           ]"
+          direction="left"
         >
           <MoreVerticalIcon />
+          <template #show-file>
+            <ClipboardCopyIcon /> Show file
+          </template>
           <template #copy-link>
             <ClipboardCopyIcon /> Copy link
           </template>
