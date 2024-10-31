@@ -54,8 +54,7 @@ const preferences = {
   },
   powerDontAskAgain: {
     displayName: "Power actions confirmation",
-    description:
-      "Don't ask for confirmation when starting, stopping, restarting, or killing the server.",
+    description: "When enabled, you will be prompted before stopping and restarting your server.",
   },
   backupWhileRunning: {
     displayName: "Create backups while running",
