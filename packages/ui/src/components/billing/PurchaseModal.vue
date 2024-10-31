@@ -294,14 +294,25 @@
       </div>
       <p class="m-0 mt-9 text-sm text-secondary">
         <strong>By clicking "Subscribe", you are purchasing a recurring subscription.</strong>
+        <br />
         You'll be charged
         {{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }} /
-        {{ selectedPlan }} plus applicable taxes starting today, until you cancel. Cancel anytime
-        from your settings page.
+        {{ selectedPlan }} plus applicable taxes starting today, until you cancel.
+        <br />
+        You can cancel anytime from your settings page.
       </p>
-      <p v-if="product.metadata.type === 'pyro'" class="m-0 mt-2 text-sm text-secondary">
-        You acknowledge that you have read and agree to the
-        <a class="underline" href="https://www.minecraft.net/en-us/eula"> Minecraft EULA </a>
+      <p
+        v-if="product.metadata.type === 'pyro'"
+        class="m-0 mt-2 text-sm text-secondary inline-flex items-center"
+      >
+        <Checkbox
+          v-model="eulaAccepted"
+          label="I acknowledge that I have read and agree to the&nbsp;"
+          class="text-sm"
+        />
+        <a class="underline text-sm" target="_blank" href="https://www.minecraft.net/en-us/eula"
+          >Minecraft EULA</a
+        >
       </p>
     </div>
     <div class="input-group push-right pt-4">
@@ -365,7 +376,16 @@
           <XIcon />
           Cancel
         </button>
-        <button class="btn btn-primary" :disabled="paymentLoading" @click="submitPayment">
+        <button
+          v-if="product.metadata.type === 'pyro'"
+          class="btn btn-primary"
+          :disabled="paymentLoading || !eulaAccepted"
+          @click="submitPayment"
+        >
+          <CheckCircleIcon /> Subscribe
+        </button>
+        <!-- Default Subscribe Button, so M+ still works -->
+        <button v-else class="btn btn-primary" :disabled="paymentLoading" @click="submitPayment">
           <CheckCircleIcon /> Subscribe
         </button>
       </template>
@@ -393,6 +413,7 @@ import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import { getCurrency, calculateSavings, formatPrice, createStripeElements } from '@modrinth/utils'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import { Multiselect } from 'vue-multiselect'
+import Checkbox from '../base/Checkbox.vue'
 
 const { locale, formatMessage } = useVIntl()
 
@@ -534,6 +555,7 @@ const total = ref()
 
 const serverName = ref(props.serverName || '')
 const serverLoader = ref('Vanilla')
+const eulaAccepted = ref(false)
 
 const selectedPaymentMethod = ref()
 const inputtedPaymentMethod = ref()
