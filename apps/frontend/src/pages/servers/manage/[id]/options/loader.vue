@@ -114,7 +114,7 @@
                   }}
                 </span>
               </div>
-              <div class="mt-2 flex w-full max-w-[18rem] items-center gap-2 sm:mt-0">
+              <div class="mt-2 flex w-full max-w-[24rem] items-center gap-2 sm:mt-0">
                 <UiServersTeleportDropdownMenu
                   v-if="versions && Array.isArray(versions) && versions.length > 0"
                   v-model="version"
