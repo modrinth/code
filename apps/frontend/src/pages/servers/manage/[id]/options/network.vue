@@ -95,7 +95,7 @@
               <ButtonStyled>
                 <button class="!w-full sm:!w-auto" @click="exportDnsRecords">
                   <UploadIcon />
-                  <span>Export DNS Records</span>
+                  <span>Export DNS records</span>
                 </button>
               </ButtonStyled>
             </div>
