@@ -80,7 +80,7 @@
           <MoreVerticalIcon aria-hidden="true" />
           <template #kill>
             <SlashIcon class="h-5 w-5" />
-            <span>Kill Server</span>
+            <span>Kill server</span>
           </template>
           <template #allServers>
             <ServerIcon class="h-5 w-5" />
