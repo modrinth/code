@@ -53,7 +53,7 @@
     <ConfirmModal
       ref="confirmDeleteModal"
       title="Are you sure you want to delete this allocation?"
-      description="This will permanently delete this allocation."
+      :description="`You are deleting the allocation ${allocationToDelete}. This cannot be reserved again.`"
       proceed-label="Delete"
       @proceed="confirmDeleteAllocation"
     />
