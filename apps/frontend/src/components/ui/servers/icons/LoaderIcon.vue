@@ -166,10 +166,7 @@
 <script setup lang="ts">
 import { LoaderIcon } from "@modrinth/assets";
 
-defineProps({
-  loader: {
-    type: String,
-    default: "",
-  },
-});
+defineProps<{
+  loader: "Fabric" | "Quilt" | "Forge" | "NeoForge" | "Paper" | "Spigot" | "Bukkit" | "Vanilla";
+}>();
 </script>
