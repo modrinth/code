@@ -139,7 +139,7 @@
         </div>
         <div v-else class="flex w-full flex-col items-center gap-2 sm:w-fit sm:flex-row">
           <ButtonStyled>
-            <button @click="editModal.show()" class="!w-full sm:!w-auto">
+            <button class="!w-full sm:!w-auto" @click="editModal.show()">
               <DownloadIcon class="size-4" /> Install modpack
             </button>
           </ButtonStyled>
