@@ -51,7 +51,7 @@
           <UiServersPanelSpinner class="size-5" /> Installing...
         </button>
       </ButtonStyled>
-      <div v-else>
+      <div v-else class="contents">
         <ButtonStyled v-if="showStopButton" type="transparent">
           <button :disabled="!canTakeAction || disabled || isStopping" @click="stopServer">
             <div class="flex gap-1">

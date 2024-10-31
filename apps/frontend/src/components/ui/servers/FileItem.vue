@@ -25,11 +25,11 @@
       </div>
     </div>
 
-    <div data-pyro-file-actions class="flex w-fit flex-shrink-0 items-center gap-4">
-      <span class="w-[160px] text-nowrap text-left font-mono text-sm text-secondary">{{
+    <div data-pyro-file-actions class="flex w-fit flex-shrink-0 items-center gap-12">
+      <span class="w-[160px] text-nowrap text-right font-mono text-sm text-secondary">{{
         formattedDate
       }}</span>
-      <ButtonStyled type="transparent">
+      <ButtonStyled circular type="transparent">
         <UiServersTeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
           <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
           <template #rename> <EditIcon /> Rename </template>

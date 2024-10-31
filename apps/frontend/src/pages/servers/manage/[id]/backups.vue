@@ -184,7 +184,7 @@
                   {{ new Date(backup.created_at).toLocaleString() }}
                 </div>
               </div>
-              <ButtonStyled type="transparent">
+              <ButtonStyled circular type="transparent">
                 <UiServersTeleportOverflowMenu
                   direction="left"
                   position="bottom"
