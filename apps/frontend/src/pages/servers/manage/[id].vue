@@ -7,7 +7,7 @@
       <div class="flex max-w-lg flex-col items-center">
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-3">
-            <TransferIcon class="size-16 text-purple" />
+            <TransferIcon class="size-16 text-orange" />
             <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Oops! Connection Lost</h1>
           </div>
           <p class="text-lg text-secondary">
