@@ -8,23 +8,55 @@
             <span> SFTP allows you to access your server's files from outside of Modrinth. </span>
           </label>
           <ButtonStyled>
-            <button class="!w-full sm:!w-auto" @click="openSftp">
+            <button
+              v-tooltip="'This button only works with compatible SFTP clients (e.g. WinSCP)'"
+              class="!w-full sm:!w-auto"
+              @click="openSftp"
+            >
               <ExternalIcon class="h-5 w-5" />
               Launch SFTP
             </button>
           </ButtonStyled>
         </div>
-        <div class="flex w-full flex-col gap-2 rounded-xl bg-table-alternateRow p-4">
-          <span class="font-bold text-contrast">
-            {{ data?.sftp_host }}
-          </span>
-          <span class="text-xs uppercase text-secondary">server address</span>
+
+        <div
+          class="flex w-full flex-row justify-between gap-2 rounded-xl bg-table-alternateRow p-4"
+        >
+          <div class="flex flex-col gap-2">
+            <span class="cursor-pointer font-bold text-contrast">
+              {{ data?.sftp_host }}
+            </span>
+
+            <span class="text-xs uppercase text-secondary">server address</span>
+          </div>
+
+          <ButtonStyled type="transparent">
+            <button
+              v-tooltip="'Copy SFTP server address'"
+              @click="copyToClipboard('Server address', data?.sftp_host)"
+            >
+              <CopyIcon class="h-5 w-5 hover:cursor-pointer" />
+            </button>
+          </ButtonStyled>
         </div>
         <div class="-mt-2 flex flex-col gap-2 sm:mt-0 sm:flex-row">
           <div
             class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
           >
-            <span class="font-bold text-contrast"> {{ data?.sftp_username }} </span>
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-contrast">
+                {{ data?.sftp_username }}
+              </span>
+
+              <ButtonStyled type="transparent">
+                <button
+                  v-tooltip="'Copy SFTP username'"
+                  @click="copyToClipboard('Username', data?.sftp_username)"
+                >
+                  <CopyIcon class="h-5 w-5 hover:cursor-pointer" />
+                </button>
+              </ButtonStyled>
+            </div>
             <span class="text-xs uppercase text-secondary">username</span>
           </div>
           <div
@@ -39,7 +71,10 @@
 
               <div class="flex flex-row items-center gap-1">
                 <ButtonStyled type="transparent">
-                  <button v-tooltip="'Copy SFTP password'" @click="copyPassword">
+                  <button
+                    v-tooltip="'Copy SFTP password'"
+                    @click="copyToClipboard('Password', data?.sftp_password)"
+                  >
                     <CopyIcon class="h-5 w-5 hover:cursor-pointer" />
                   </button>
                 </ButtonStyled>
@@ -103,11 +138,11 @@ const togglePassword = () => {
   showPassword.value = !showPassword.value;
 };
 
-const copyPassword = () => {
-  navigator.clipboard.writeText(data.value?.sftp_password ?? "");
+const copyToClipboard = (name: string, textToCopy?: string) => {
+  navigator.clipboard.writeText(textToCopy || "");
   addNotification({
     type: "success",
-    title: "Password copied!",
+    title: `${name} copied to clipboard!`,
   });
 };
 
