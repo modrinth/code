@@ -31,7 +31,7 @@
             :to="{ path: '/servers', hash: '#plan' }"
           >
             <PlusIcon class="size-4" />
-            New Server
+            New server
           </NuxtLink>
         </ButtonStyled>
       </div>

@@ -223,7 +223,7 @@
           <template #profile> <UserIcon aria-hidden="true" /> Profile </template>
           <template #notifications> <BellIcon aria-hidden="true" /> Notifications </template>
           <template #saved> <BookmarkIcon aria-hidden="true" /> Saved projects </template>
-          <template #servers> <ServerIcon aria-hidden="true" /> My Servers </template>
+          <template #servers> <ServerIcon aria-hidden="true" /> My servers </template>
           <template #settings> <SettingsIcon aria-hidden="true" /> Settings </template>
           <template #projects> <BoxIcon aria-hidden="true" /> Projects </template>
           <template #organizations>
