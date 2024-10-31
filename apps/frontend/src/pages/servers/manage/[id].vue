@@ -227,7 +227,6 @@ import {
   RightArrowIcon,
   CheckIcon,
   FileIcon,
-  ServerIcon,
   TransferIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
@@ -650,7 +649,7 @@ const startPolling = () => {
   countdown.value = 15;
   intervalId = setInterval(() => {
     if (countdown.value <= 0) {
-      // reloadNuxtApp();
+      reloadNuxtApp();
     } else {
       countdown.value--;
     }
