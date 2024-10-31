@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <div data-pyro-file-actions class="flex w-fit flex-shrink-0 items-center gap-12">
+    <div data-pyro-file-actions class="flex w-fit flex-shrink-0 items-center gap-4 md:gap-12">
       <span class="w-[160px] text-nowrap text-right font-mono text-sm text-secondary">{{
         formattedDate
       }}</span>
