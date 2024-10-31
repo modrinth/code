@@ -5,7 +5,7 @@
     tabindex="0"
     role="combobox"
     :aria-expanded="dropdownVisible"
-    class="relative inline-block h-9 w-80"
+    class="relative inline-block h-9 w-full max-w-80"
     @focus="onFocus"
     @blur="onBlur"
     @mousedown.prevent
