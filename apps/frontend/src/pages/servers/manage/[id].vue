@@ -1,7 +1,30 @@
 <template>
   <div class="contents">
     <div
-      v-if="serverData"
+      v-if="server.error"
+      class="flex min-h-screen items-center justify-center p-6 text-contrast"
+    >
+      <div class="card flex max-w-3xl flex-col items-center">
+        <div class="mb-8 flex flex-col items-center text-center">
+          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Oops! Connection Lost</h1>
+          <p class="text-xl text-gray-400">
+            We couldn't reach our servers, Don't worry, we're working on it. We'll automatically try
+            to reconnect you
+          </p>
+        </div>
+        <p class="text-center text-xl text-contrast">
+          {{ server.error }}
+        </p>
+        <div class="mb-4 text-center text-5xl font-bold">
+          {{ formattedTime == "00" ? "Reconnecting..." : formattedTime }}
+        </div>
+        <ButtonStyled color="brand" @click="() => reloadNuxtApp()">
+          <button>Reload Now</button>
+        </ButtonStyled>
+      </div>
+    </div>
+    <div
+      v-else-if="serverData"
       data-pyro-server-manager-root
       class="experimental-styles-within mobile-blurred-servericon relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
       :style="{
@@ -223,6 +246,15 @@ const server = await usePyroServer(serverId, [
   "ws",
   "fs",
 ]);
+
+watch(
+  () => server.error,
+  (newError) => {
+    if (newError) {
+      startPolling();
+    }
+  },
+);
 
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
@@ -593,18 +625,29 @@ const notifyError = (title: string, text: string) => {
 };
 
 let intervalId: ReturnType<typeof setInterval> | null = null;
+const countdown = ref(15);
 
-const startPolling = () => {
-  intervalId = setInterval(async () => {
-    await server.refresh();
-  }, 10000);
-};
+const formattedTime = computed(() => {
+  const seconds = countdown.value % 60;
+  return `${seconds.toString().padStart(2, "0")}`;
+});
 
 const stopPolling = () => {
   if (intervalId) {
     clearInterval(intervalId);
     intervalId = null;
   }
+};
+
+const startPolling = () => {
+  countdown.value = 15;
+  intervalId = setInterval(() => {
+    if (countdown.value <= 0) {
+      reloadNuxtApp();
+    } else {
+      countdown.value--;
+    }
+  }, 1000);
 };
 
 const copyServerDebugInfo = () => {
@@ -657,7 +700,12 @@ const cleanup = () => {
 
 onMounted(() => {
   isMounted.value = true;
-  connectWebSocket();
+  if (server.error) {
+    startPolling();
+  } else {
+    connectWebSocket();
+  }
+
   DOMPurify.addHook(
     "afterSanitizeAttributes",
     (node: {

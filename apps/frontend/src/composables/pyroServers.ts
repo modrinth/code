@@ -816,19 +816,24 @@ const downloadFile = (path: string, raw?: boolean) => {
 const modules: any = {
   general: {
     get: async (serverId: string) => {
-      const data = await PyroFetch<General>(`servers/${serverId}`);
-      if (data.upstream?.project_id) {
-        data.project = await fetchProject(data.upstream.project_id);
+      try {
+        const data = await PyroFetch<General>(`servers/${serverId}`);
+        if (data.upstream?.project_id) {
+          data.project = await fetchProject(data.upstream.project_id);
+        }
+        data.image = (await processImage(data.project?.icon_url)) ?? undefined;
+        const motd = await getMotd();
+        if (motd === "A Minecraft Server") {
+          await setMotd(
+            `§b${data.project?.title || data.loader + " " + data.mc_version} §f♦ §aModrinth Servers`,
+          );
+        }
+        data.motd = motd;
+        return data;
+      } catch (error) {
+        internalServerRefrence.value.setError(error);
+        return undefined;
       }
-      data.image = (await processImage(data.project?.icon_url)) ?? undefined;
-      const motd = await getMotd();
-      if (motd === "A Minecraft Server") {
-        await setMotd(
-          `§b${data.project?.title || data.loader + " " + data.mc_version} §f♦ §aModrinth Servers`,
-        );
-      }
-      data.motd = motd;
-      return data;
     },
     updateName,
     power: sendPowerAction,
@@ -840,8 +845,18 @@ const modules: any = {
   },
   mods: {
     get: async (serverId: string) => {
-      const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`);
-      return { data: mods.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? "")) };
+      try {
+        const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`);
+        return {
+          data:
+            internalServerRefrence.value.error === undefined
+              ? mods.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? ""))
+              : [],
+        };
+      } catch (error) {
+        internalServerRefrence.value.setError(error);
+        return undefined;
+      }
     },
     install: installMod,
     remove: removeMod,
@@ -849,7 +864,12 @@ const modules: any = {
   },
   backups: {
     get: async (serverId: string) => {
-      return { data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`) };
+      try {
+        return { data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`) };
+      } catch (error) {
+        internalServerRefrence.value.setError(error);
+        return undefined;
+      }
     },
     create: createBackup,
     rename: renameBackup,
@@ -861,7 +881,12 @@ const modules: any = {
   },
   network: {
     get: async (serverId: string) => {
-      return { allocations: await PyroFetch<Allocation[]>(`servers/${serverId}/allocations`) };
+      try {
+        return { allocations: await PyroFetch<Allocation[]>(`servers/${serverId}/allocations`) };
+      } catch (error) {
+        internalServerRefrence.value.setError(error);
+        return undefined;
+      }
     },
     reserveAllocation,
     updateAllocation,
@@ -870,15 +895,34 @@ const modules: any = {
     changeSubdomain,
   },
   startup: {
-    get: async (serverId: string) => await PyroFetch<Startup>(`servers/${serverId}/startup`),
+    get: async (serverId: string) => {
+      try {
+        return await PyroFetch<Startup>(`servers/${serverId}/startup`);
+      } catch (error) {
+        internalServerRefrence.value.setError(error);
+        return undefined;
+      }
+    },
     update: updateStartupSettings,
   },
   ws: {
-    get: async (serverId: string) => await PyroFetch<JWTAuth>(`servers/${serverId}/ws`),
+    get: async (serverId: string) => {
+      try {
+        return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`);
+      } catch (error) {
+        internalServerRefrence.value.setError(error);
+        return undefined;
+      }
+    },
   },
   fs: {
     get: async (serverId: string) => {
-      return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`) };
+      try {
+        return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`) };
+      } catch (error) {
+        internalServerRefrence.value.setError(error);
+        return undefined;
+      }
     },
     listDirContents,
     createFileOrFolder,
@@ -1189,6 +1233,8 @@ export type Server<T extends avaliableModules> = {
    * @param refreshModules - The modules to refresh.
    */
   refresh: (refreshModules?: avaliableModules) => Promise<void>;
+  setError: (error: Error) => void;
+  error?: Error;
   serverId: string;
 };
 
@@ -1222,6 +1268,9 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
         }
       }
       await Promise.all(promises);
+    },
+    setError: (error: Error) => {
+      server.error = error;
     },
     serverId,
   });
