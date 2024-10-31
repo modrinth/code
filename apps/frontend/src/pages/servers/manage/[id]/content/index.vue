@@ -99,16 +99,20 @@
       <Transition name="sync-banner">
         <div
           v-if="status === 'pending'"
-          class="fixed bottom-16 left-2 z-50 mx-auto flex h-fit w-[96%] max-w-4xl flex-row items-center gap-4 rounded-2xl border-2 border-solid border-button-border bg-bg-raised p-2 transition-all duration-300 sm:bottom-8 sm:left-4 sm:right-4 sm:w-full sm:shadow-2xl"
+          class="fixed bottom-16 left-0 right-0 z-[6] mx-auto h-fit w-full max-w-4xl transition-all duration-300 sm:bottom-8"
         >
           <div
-            class="grid size-12 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+            class="mx-2 flex flex-row items-center gap-4 rounded-2xl border-2 border-solid border-button-border bg-bg-raised p-2 transition-all duration-300 sm:shadow-2xl"
           >
-            <UiServersIconsLoadingIcon class="size-6 animate-spin" />
-          </div>
-          <div class="flex flex-col gap-0.5">
-            <p class="m-0 text-sm font-bold text-contrast">Working on it...</p>
-            <p class="m-0 text-sm">We're making sure everything's 100% up to date.</p>
+            <div
+              class="grid size-12 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+            >
+              <UiServersIconsLoadingIcon class="size-6 animate-spin" />
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <p class="m-0 text-sm font-bold text-contrast">Working on it...</p>
+              <p class="m-0 text-sm">We're making sure everything's 100% up to date.</p>
+            </div>
           </div>
         </div>
       </Transition>
