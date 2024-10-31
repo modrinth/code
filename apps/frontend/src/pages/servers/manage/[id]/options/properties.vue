@@ -15,7 +15,7 @@
               to="https://minecraft.wiki/w/Server.properties"
               external
             >
-              Minecraft wiki
+              Minecraft Wiki
             </NuxtLink>
             has more detailed information about each property.
           </div>
