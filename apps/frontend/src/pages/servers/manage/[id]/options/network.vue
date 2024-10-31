@@ -183,8 +183,8 @@
             <div class="flex w-full flex-col overflow-hidden rounded-xl bg-table-alternateRow p-4">
               <!-- Primary allocation -->
               <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-                <span class="text-md font-bold capitalize tracking-wide text-contrast">
-                  Primary Allocation
+                <span class="text-md font-bold tracking-wide text-contrast">
+                  Primary allocation
                 </span>
 
                 <UiCopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
@@ -200,18 +200,18 @@
                 :key="allocation.port"
                 class="border-border flex flex-col justify-between gap-4 sm:flex-row sm:items-center"
               >
-                <div class="flex flex-row gap-4 sm:items-center">
+                <div class="flex flex-row items-center gap-4">
                   <VersionIcon class="h-7 w-7 flex-none rotate-90" />
                   <div class="flex w-[20rem] flex-col justify-between sm:flex-row sm:items-center">
                     <div class="flex flex-col gap-1">
-                      <span class="text-md font-bold capitalize tracking-wide text-contrast">
+                      <span class="text-md font-bold tracking-wide text-contrast">
                         {{ allocation.name }}
                       </span>
                       <span class="hidden text-xs uppercase text-secondary sm:block">name</span>
                     </div>
                     <div class="flex flex-col gap-1">
                       <span
-                        class="text-md w-10 capitalize tracking-wide text-secondary sm:font-bold sm:text-contrast"
+                        class="text-md w-10 tracking-wide text-secondary sm:font-bold sm:text-contrast"
                       >
                         {{ allocation.port }}
                       </span>
