@@ -10,7 +10,15 @@
           class="flex items-center justify-between gap-2"
         >
           <label :for="`pref-${key}`" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">{{ prefConfig.displayName }}</span>
+            <div class="flex flex-row gap-2">
+              <span class="text-lg font-bold text-contrast">{{ prefConfig.displayName }}</span>
+              <div
+                v-if="prefConfig.implemented === false"
+                class="hidden items-center gap-1 rounded-full bg-table-alternateRow p-1 px-1.5 text-xs font-semibold sm:flex"
+              >
+                Coming Soon
+              </div>
+            </div>
             <span>{{ prefConfig.description }}</span>
           </label>
           <input
@@ -18,6 +26,7 @@
             v-model="newUserPreferences[key]"
             class="switch stylized-toggle flex-none"
             type="checkbox"
+            :disabled="prefConfig.implemented === false"
           />
         </div>
       </div>
@@ -46,19 +55,24 @@ const props = defineProps<{
 const preferences = {
   ramAsNumber: {
     displayName: "RAM as bytes",
-    description: "Display RAM usage in number of bytes instead of a percentage.",
+    description:
+      "When enabled, RAM will be displayed as bytes instead of a percentage in your server's Overview.",
+    implemented: true,
   },
   autoRestart: {
-    displayName: "Auto restart (not implemented)",
-    description: "Automatically restart the server if it crashes.",
+    displayName: "Auto restart",
+    description: "When enabled, your server will automatically restart if it crashes.",
+    implemented: false,
   },
   powerDontAskAgain: {
     displayName: "Power actions confirmation",
     description: "When enabled, you will be prompted before stopping and restarting your server.",
+    implemented: true,
   },
   backupWhileRunning: {
     displayName: "Create backups while running",
-    description: "Allow backups to be created while the server is online.",
+    description: "When enabled, backups will be created even if the server is running.",
+    implemented: true,
   },
 } as const;
 
