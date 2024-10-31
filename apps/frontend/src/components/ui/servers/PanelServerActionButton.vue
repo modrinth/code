@@ -46,33 +46,40 @@
     </NewModal>
 
     <div class="flex flex-row items-center gap-2 rounded-lg">
-      <ButtonStyled v-if="showStopButton" type="transparent">
-        <button :disabled="!canTakeAction || disabled || isStopping" @click="stopServer">
-          <div class="flex gap-1">
-            <StopCircleIcon class="h-5 w-5" />
-            <span>{{ stopButtonText }}</span>
-          </div>
+      <ButtonStyled v-if="isInstalling" type="standard" color="brand">
+        <button disabled class="flex-shrink-0">
+          <UiServersPanelSpinner class="size-5" /> Installing...
         </button>
       </ButtonStyled>
-      <ButtonStyled type="standard" color="brand">
-        <button :disabled="!canTakeAction || disabled || isStopping" @click="handleAction">
-          <div v-if="isStartingOrRestarting" class="grid place-content-center">
-            <UiServersIconsLoadingIcon />
-          </div>
-          <div v-else class="contents">
-            <component :is="showRestartIcon ? UpdatedIcon : PlayIcon" />
-          </div>
-          <span>
-            {{ actionButtonText }}
-          </span>
-        </button>
-      </ButtonStyled>
+      <div v-else>
+        <ButtonStyled v-if="showStopButton" type="transparent">
+          <button :disabled="!canTakeAction || disabled || isStopping" @click="stopServer">
+            <div class="flex gap-1">
+              <StopCircleIcon class="h-5 w-5" />
+              <span>{{ stopButtonText }}</span>
+            </div>
+          </button>
+        </ButtonStyled>
+        <ButtonStyled type="standard" color="brand">
+          <button :disabled="!canTakeAction || disabled || isStopping" @click="handleAction">
+            <div v-if="isStartingOrRestarting" class="grid place-content-center">
+              <UiServersIconsLoadingIcon />
+            </div>
+            <div v-else class="contents">
+              <component :is="showRestartIcon ? UpdatedIcon : PlayIcon" />
+            </div>
+            <span>
+              {{ actionButtonText }}
+            </span>
+          </button>
+        </ButtonStyled>
+      </div>
 
-      <!-- Kill option -->
+      <!-- Dropdown options -->
       <ButtonStyled circular type="transparent">
         <UiServersTeleportOverflowMenu
           :options="[
-            { id: 'kill', action: () => killServer() },
+            ...(props.isInstalling ? [] : [{ id: 'kill', action: () => killServer() }]),
             { id: 'allServers', action: () => router.push('/servers/manage') },
             { id: 'details', action: () => showDetailsModal() },
           ]"
@@ -116,6 +123,7 @@ import { useStorage } from "@vueuse/core";
 const props = defineProps<{
   isOnline: boolean;
   isActioning: boolean;
+  isInstalling: boolean;
   disabled: boolean;
   serverName?: string;
   serverData: object;

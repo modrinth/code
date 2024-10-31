@@ -26,7 +26,7 @@
               {{ serverData.name }}
             </h1>
             <div
-              v-if="isConnected && serverData.status !== 'installing'"
+              v-if="isConnected"
               data-pyro-server-action-buttons
               class="server-action-buttons-anim flex w-fit flex-shrink-0"
             >
@@ -34,6 +34,7 @@
                 class="flex-shrink-0"
                 :is-online="isServerRunning"
                 :is-actioning="isActioning"
+                :is-installing="serverData.status === 'installing'"
                 :disabled="isActioning || !!error"
                 :server-name="serverData.name"
                 :server-data="serverData"
@@ -41,15 +42,6 @@
                 @action="sendPowerAction"
               />
             </div>
-            <ButtonStyled
-              v-else-if="serverData.status === 'installing'"
-              type="standard"
-              color="brand"
-            >
-              <button disabled class="flex-shrink-0">
-                <UiServersPanelSpinner class="size-5" /> Installing...
-              </button>
-            </ButtonStyled>
           </div>
 
           <UiServersServerInfoLabels
