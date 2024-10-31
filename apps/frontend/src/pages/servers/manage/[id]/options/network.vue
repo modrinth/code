@@ -1,6 +1,6 @@
 <template>
   <div class="contents">
-    <NewModal ref="newAllocationModal" header="New Allocation">
+    <NewModal ref="newAllocationModal" header="New allocation">
       <form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="addNewAllocation">
         <label for="new-allocation-name" class="font-semibold text-contrast"> Name </label>
         <input
