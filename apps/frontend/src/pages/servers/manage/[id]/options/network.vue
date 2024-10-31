@@ -93,7 +93,11 @@
               </label>
 
               <ButtonStyled>
-                <button class="!w-full sm:!w-auto" @click="exportDnsRecords">
+                <button
+                  class="!w-full sm:!w-auto"
+                  :disabled="userDomain == ''"
+                  @click="exportDnsRecords"
+                >
                   <UploadIcon />
                   <span>Export DNS records</span>
                 </button>
@@ -107,7 +111,7 @@
               maxlength="64"
               minlength="1"
               type="text"
-              placeholder="domain.com"
+              :placeholder="exampleDomain"
             />
 
             <div
@@ -278,7 +282,8 @@ const data = computed(() => props.server.general);
 const serverIP = ref(data?.value?.net?.ip ?? "");
 const serverSubdomain = ref(data?.value?.net?.domain ?? "");
 const serverPrimaryPort = ref(data?.value?.net?.port ?? 0);
-const userDomain = ref("play.yourdomain.com");
+const userDomain = ref("");
+const exampleDomain = "play.example.com";
 
 const network = computed(() => props.server.network);
 const allocations = computed(() => network.value?.allocations);
@@ -431,16 +436,17 @@ const resetNetwork = () => {
 };
 
 const dnsRecords = computed(() => {
+  const domain = userDomain.value === "" ? exampleDomain : userDomain.value;
   return [
     {
       type: "A",
-      name: `${userDomain.value}`,
+      name: `${domain}`,
       content: data.value?.net?.ip ?? "",
     },
     {
       type: "SRV",
-      name: `_minecraft._tcp.${userDomain.value}`,
-      content: `0 10 ${data.value?.net?.port} ${userDomain.value}`,
+      name: `_minecraft._tcp.${domain}`,
+      content: `0 10 ${data.value?.net?.port} ${domain}`,
     },
   ];
 });
