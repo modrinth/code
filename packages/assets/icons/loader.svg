@@ -6,7 +6,6 @@
     stroke-linejoin="round"
     clip-rule="evenodd"
     viewBox="0 0 24 24"
-    class="size-5"
 >
     <path fill="none" d="M0 0h24v24H0z"></path>
     <path
