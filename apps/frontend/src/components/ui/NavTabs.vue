@@ -157,13 +157,13 @@ function startAnimation() {
 }
 
 onMounted(() => {
-  window.addEventListener("resize", pickLink);
+  // window.addEventListener("resize", pickLink);
   pickLink();
 });
 
-onUnmounted(() => {
-  window.removeEventListener("resize", pickLink);
-});
+// onUnmounted(() => {
+//   window.removeEventListener("resize", pickLink);
+// });
 
 watch(route, () => pickLink());
 </script>
