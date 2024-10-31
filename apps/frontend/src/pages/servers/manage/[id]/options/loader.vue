@@ -264,7 +264,12 @@ const canInstall = computed(() => {
 
 const mcVersions = tags.value.gameVersions
   .filter((x) => x.version_type === "release")
-  .map((x) => x.version);
+  .map((x) => x.version)
+  .filter((x) => {
+    const num = parseInt(x.replace(/\./g, ""), 10);
+    // Versions 1.2.4 and below don't have server jars from Mojang
+    return isNaN(num) || num >= 125;
+  });
 
 const selectedLoaderVersions = computed(() => {
   /*
