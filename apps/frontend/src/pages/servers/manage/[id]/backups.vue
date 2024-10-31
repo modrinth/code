@@ -184,43 +184,45 @@
                   {{ new Date(backup.created_at).toLocaleString() }}
                 </div>
               </div>
-              <OverflowMenu
-                :options="[
-                  {
-                    id: 'rename',
-                    action: () => {
-                      renameBackupName = backup.name;
-                      currentBackup = backup.id;
-                      renameBackupModal?.show();
+              <ButtonStyled type="transparent">
+                <UiServersTeleportOverflowMenu
+                  direction="left"
+                  position="bottom"
+                  class="bg-transparent"
+                  :options="[
+                    {
+                      id: 'rename',
+                      action: () => {
+                        renameBackupName = backup.name;
+                        currentBackup = backup.id;
+                        renameBackupModal?.show();
+                      },
                     },
-                  },
-                  {
-                    id: 'restore',
-                    action: () => {
-                      currentBackup = backup.id;
-                      restoreBackupModal?.show();
+                    {
+                      id: 'restore',
+                      action: () => {
+                        currentBackup = backup.id;
+                        restoreBackupModal?.show();
+                      },
                     },
-                  },
-                  { id: 'download', action: () => initiateDownload(backup.id) },
-                  {
-                    id: 'delete',
-                    action: () => {
-                      currentBackup = backup.id;
-                      deleteBackupModal?.show();
+                    { id: 'download', action: () => initiateDownload(backup.id) },
+                    {
+                      id: 'delete',
+                      action: () => {
+                        currentBackup = backup.id;
+                        deleteBackupModal?.show();
+                      },
+                      color: 'red',
                     },
-                    color: 'red',
-                  },
-                ]"
-                direction="right"
-                class="bg-transparent"
-              >
-                <MoreHorizontalIcon class="h-5 w-5 bg-transparent text-contrast" />
-
-                <template #rename> <EditIcon /> Rename </template>
-                <template #restore> <ClipboardCopyIcon /> Restore </template>
-                <template #download> <DownloadIcon /> Download </template>
-                <template #delete> <TrashIcon /> Delete </template>
-              </OverflowMenu>
+                  ]"
+                >
+                  <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+                  <template #rename> <EditIcon /> Rename </template>
+                  <template #restore> <ClipboardCopyIcon /> Restore </template>
+                  <template #download> <DownloadIcon /> Download </template>
+                  <template #delete> <TrashIcon /> Delete </template>
+                </UiServersTeleportOverflowMenu>
+              </ButtonStyled>
             </div>
           </div>
         </li>
