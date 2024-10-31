@@ -140,7 +140,7 @@
               </div>
               <div class="">({{ data.backup_quota - data.used_backup_quota }} slots available)</div>
             </div>
-            <div class="flex w-full gap-2 sm:w-fit">
+            <div class="flex w-full flex-col gap-2 sm:w-fit sm:flex-row">
               <ButtonStyled type="standard" color="brand">
                 <button
                   v-tooltip="
@@ -159,6 +159,7 @@
               <ButtonStyled type="standard">
                 <button @click="showbackupSettingsModal">
                   <SettingsIcon class="h-5 w-5" />
+                  Auto backups
                 </button>
               </ButtonStyled>
             </div>
