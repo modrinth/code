@@ -4,22 +4,17 @@
       <div class="flex flex-col gap-4 md:w-[400px]">
         <p class="m-0">Are you sure you want to {{ currentPendingAction }} the server?</p>
 
-        <!-- Check to not ask again -->
-        <UiCheckbox label="Don't ask me again" class="text-sm" :disabled="!currentPendingAction" />
+        <UiCheckbox
+          v-model="powerDontAskAgainCheckbox"
+          label="Don't ask me again"
+          class="text-sm"
+          :disabled="!currentPendingAction"
+        />
         <div class="flex flex-row gap-4">
-          <ButtonStyled
-            type="standard"
-            color="brand"
-            @click="
-              runAction(
-                currentPendingAction as 'start' | 'restart' | 'stop' | 'kill',
-                currentPendingState!,
-              )
-            "
-          >
+          <ButtonStyled type="standard" color="brand" @click="confirmAction">
             <button>
               <CheckIcon class="h-5 w-5" />
-              {{ currentPendingActionFriendly }} Server
+              {{ currentPendingActionFriendly }} server
             </button>
           </ButtonStyled>
           <ButtonStyled @click="closePowerModal">
@@ -73,7 +68,7 @@
         </button>
       </ButtonStyled>
 
-      <!-- kill option -->
+      <!-- Kill option -->
       <ButtonStyled circular type="transparent">
         <UiServersTeleportOverflowMenu
           :options="[
@@ -116,6 +111,7 @@ import {
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { useRouter } from "vue-router";
+import { useStorage } from "@vueuse/core";
 
 const props = defineProps<{
   isOnline: boolean;
@@ -127,12 +123,16 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
+const serverId = router.currentRoute.value.params.id;
+
+const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
+  powerDontAskAgain: false,
+});
 
 const emit = defineEmits<{
   (e: "action", action: "start" | "restart" | "stop" | "kill"): void;
 }>();
 
-const currentPendingAction = ref<string | null>(null);
 const confirmActionModal = ref<InstanceType<typeof NewModal> | null>(null);
 const detailsModal = ref<InstanceType<typeof NewModal> | null>(null);
 
@@ -145,14 +145,19 @@ const ServerState = {
 } as const;
 
 type ServerStateType = (typeof ServerState)[keyof typeof ServerState];
+
+const currentPendingAction = ref<string | null>(null);
 const currentPendingState = ref<ServerStateType | null>(null);
+const powerDontAskAgainCheckbox = ref(false);
 
 const currentState = ref<ServerStateType>(
   props.isOnline ? ServerState.Running : ServerState.Stopped,
 );
 
 const isStartingDelay = ref(false);
-const showStopButton = computed(() => currentState.value === ServerState.Running);
+const showStopButton = computed(
+  () => currentState.value === ServerState.Running || currentState.value === ServerState.Stopping,
+);
 const showRestartIcon = computed(() => currentState.value === ServerState.Running);
 const canTakeAction = computed(
   () =>
@@ -177,6 +182,8 @@ const actionButtonText = computed(() => {
       return "Restarting...";
     case ServerState.Running:
       return "Restart";
+    case ServerState.Stopping:
+      return "Stopping...";
     default:
       return "Start";
   }
@@ -206,7 +213,7 @@ const createPendingAction = () => {
   if (currentState.value === ServerState.Running) {
     currentPendingAction.value = "restart";
     currentPendingState.value = ServerState.Restarting;
-    confirmActionModal.value?.show();
+    showPowerModal();
   } else {
     runAction("start", ServerState.Starting);
   }
@@ -214,6 +221,28 @@ const createPendingAction = () => {
 
 const handleAction = () => {
   createPendingAction();
+};
+
+const showPowerModal = () => {
+  if (userPreferences.value.powerDontAskAgain) {
+    runAction(
+      currentPendingAction.value as "start" | "restart" | "stop" | "kill",
+      currentPendingState.value!,
+    );
+  } else {
+    confirmActionModal.value?.show();
+  }
+};
+
+const confirmAction = () => {
+  if (powerDontAskAgainCheckbox.value) {
+    userPreferences.value.powerDontAskAgain = true;
+  }
+  runAction(
+    currentPendingAction.value as "start" | "restart" | "stop" | "kill",
+    currentPendingState.value!,
+  );
+  closePowerModal();
 };
 
 const runAction = (action: "start" | "restart" | "stop" | "kill", serverState: ServerStateType) => {
@@ -226,26 +255,25 @@ const runAction = (action: "start" | "restart" | "stop" | "kill", serverState: S
       isStartingDelay.value = false;
     }, 5000);
   }
-
-  confirmActionModal.value?.hide();
 };
 
 const stopServer = () => {
   if (!canTakeAction.value) return;
   currentPendingAction.value = "stop";
   currentPendingState.value = ServerState.Stopping;
-  confirmActionModal.value?.show();
+  showPowerModal();
 };
 
 const killServer = () => {
   currentPendingAction.value = "kill";
   currentPendingState.value = ServerState.Stopping;
-  confirmActionModal.value?.show();
+  showPowerModal();
 };
 
 const closePowerModal = () => {
   confirmActionModal.value?.hide();
   currentPendingAction.value = null;
+  powerDontAskAgainCheckbox.value = false;
 };
 
 const closeDetailsModal = () => {
@@ -261,10 +289,7 @@ watch(
   (newValue) => {
     if (newValue) {
       currentState.value = ServerState.Running;
-    } else if (
-      currentState.value !== ServerState.Starting &&
-      currentState.value !== ServerState.Restarting
-    ) {
+    } else {
       currentState.value = ServerState.Stopped;
     }
   },
@@ -274,15 +299,6 @@ watch(
   () => router.currentRoute.value.fullPath,
   () => {
     closeDetailsModal();
-  },
-);
-
-watch(
-  () => props.isActioning,
-  (newValue) => {
-    if (!newValue) {
-      currentState.value = props.isOnline ? ServerState.Running : ServerState.Stopped;
-    }
   },
 );
 </script>
