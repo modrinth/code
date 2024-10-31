@@ -232,7 +232,7 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, OverflowMenu, NewModal } from "@modrinth/ui";
+import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { useStorage } from "@vueuse/core";
 import {
   PlusIcon,
