@@ -93,7 +93,7 @@
               </label>
 
               <ButtonStyled>
-                <button @click="exportDnsRecords" class="!w-full sm:!w-auto">
+                <button class="!w-full sm:!w-auto" @click="exportDnsRecords">
                   <UploadIcon />
                   <span>Export DNS Records</span>
                 </button>
@@ -223,16 +223,16 @@
                 <div class="flex w-full flex-row items-center gap-2 sm:w-auto">
                   <ButtonStyled icon-only>
                     <button
-                      @click="showEditAllocationModal(allocation.port)"
                       class="!w-full sm:!w-auto"
+                      @click="showEditAllocationModal(allocation.port)"
                     >
                       <EditIcon />
                     </button>
                   </ButtonStyled>
                   <ButtonStyled icon-only color="red">
                     <button
-                      @click="showConfirmDeleteModal(allocation.port)"
                       class="!w-full sm:!w-auto"
+                      @click="showConfirmDeleteModal(allocation.port)"
                     >
                       <TrashIcon />
                     </button>
