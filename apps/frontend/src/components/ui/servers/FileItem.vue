@@ -33,7 +33,7 @@
         <UiServersTeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
           <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
           <template #rename> <EditIcon /> Rename </template>
-          <template #move> <ArrowBigUpDashIcon /> Move </template>
+          <template #move> <RightArrowIcon /> Move </template>
           <template #download> <DownloadIcon /> Download </template>
           <template #delete> <TrashIcon /> Delete </template>
         </UiServersTeleportOverflowMenu>
@@ -51,7 +51,7 @@ import {
   TrashIcon,
   FolderOpenIcon,
   FileIcon,
-  ArrowBigUpDashIcon,
+  RightArrowIcon,
 } from "@modrinth/assets";
 import { computed, shallowRef, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
