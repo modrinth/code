@@ -121,6 +121,7 @@
                   :options="options"
                   placeholder="Change version"
                   name="version"
+                  class="w-full"
                 />
                 <ButtonStyled>
                   <button
