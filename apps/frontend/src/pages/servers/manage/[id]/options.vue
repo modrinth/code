@@ -40,7 +40,8 @@ const navLinks = [
   {
     icon: CardIcon,
     label: "Billing",
-    href: `/servers/manage/${serverId}/options/billing`,
+    href: `/settings/billing#server-${serverId}`,
+    external: true,
   },
   { icon: InfoIcon, label: "Info", href: `/servers/manage/${serverId}/options/info` },
 ];

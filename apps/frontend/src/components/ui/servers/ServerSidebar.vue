@@ -9,9 +9,12 @@
             :class="{ 'bg-button-bg text-contrast': route.path === link.href }"
           >
             <div class="flex items-center gap-2 font-bold">
-              <component :is="link.icon" class="h-6 w-6" />
+              <component :is="link.icon" class="size-4" />
               {{ link.label }}
             </div>
+
+            <div class="flex-grow" />
+            <RightArrowIcon v-if="link.external" class="size-4" />
           </NuxtLink>
         </div>
       </div>
@@ -24,13 +27,14 @@
 </template>
 
 <script setup lang="ts">
+import { RightArrowIcon } from "@modrinth/assets";
 import type { RouteLocationNormalized } from "vue-router";
 import type { Server } from "~/composables/pyroServers";
 
 const emit = defineEmits(["reinstall"]);
 
 const props = defineProps<{
-  navLinks: { label: string; href: string; icon: Component }[];
+  navLinks: { label: string; href: string; icon: Component; external?: boolean }[];
   route: RouteLocationNormalized;
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
 }>();
