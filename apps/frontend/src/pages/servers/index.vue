@@ -43,7 +43,7 @@
                 {{ hasServers ? "Start a new server" : "Start your server" }}
               </nuxt-link>
             </ButtonStyled>
-            <ButtonStyled type="outlined" size="large" v-if="hasServers">
+            <ButtonStyled v-if="hasServers" type="outlined" size="large">
               <nuxt-link class="w-fit" to="/servers/manage">
                 <BoxIcon aria-hidden="true" /> Manage your servers
               </nuxt-link>

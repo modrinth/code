@@ -8,7 +8,7 @@
             <span> SFTP allows you to access your server's files from outside of Modrinth. </span>
           </label>
           <ButtonStyled>
-            <button @click="openSftp" class="!w-full sm:!w-auto">
+            <button class="!w-full sm:!w-auto" @click="openSftp">
               <ExternalIcon class="h-5 w-5" />
               Launch SFTP
             </button>
