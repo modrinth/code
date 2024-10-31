@@ -4,19 +4,24 @@
       v-if="server.error"
       class="flex min-h-screen items-center justify-center p-6 text-contrast"
     >
-      <div class="card flex max-w-3xl flex-col items-center">
-        <div class="mb-8 flex flex-col items-center text-center">
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Oops! Connection Lost</h1>
-          <p class="text-xl text-gray-400">
-            We couldn't reach our servers, Don't worry, we're working on it. We'll automatically try
-            to reconnect you
+      <div class="flex max-w-lg flex-col items-center">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center gap-3">
+            <TransferIcon class="size-16 text-purple" />
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Oops! Connection Lost</h1>
+          </div>
+          <p class="text-lg text-secondary">
+            We couldn't reach our servers. Don't worry, we're working on it. We're automatically
+            trying to reconnect you.
           </p>
         </div>
-        <p class="text-center text-xl text-contrast">
-          {{ server.error }}
-        </p>
-        <div class="mb-4 text-center text-5xl font-bold">
-          {{ formattedTime == "00" ? "Reconnecting..." : formattedTime }}
+        <UiCopyCode :text="String(server.error)" />
+        <div class="mb-2 mt-4 text-center text-sm text-secondary">
+          {{
+            formattedTime == "00"
+              ? "Reconnecting..."
+              : `${formattedTime} seconds until next retry...`
+          }}
         </div>
         <ButtonStyled color="brand" @click="() => reloadNuxtApp()">
           <button>Reload Now</button>
@@ -222,6 +227,8 @@ import {
   RightArrowIcon,
   CheckIcon,
   FileIcon,
+  ServerIcon,
+  TransferIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
@@ -643,7 +650,7 @@ const startPolling = () => {
   countdown.value = 15;
   intervalId = setInterval(() => {
     if (countdown.value <= 0) {
-      reloadNuxtApp();
+      // reloadNuxtApp();
     } else {
       countdown.value--;
     }
