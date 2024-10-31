@@ -19,7 +19,7 @@
             </ButtonStyled>
             <ButtonStyled v-if="props.restart" type="standard" color="brand">
               <button :disabled="props.isUpdating" @click="saveAndRestart">
-                {{ props.isUpdating ? "Saving..." : "Save & Restart" }}
+                {{ props.isUpdating ? "Saving..." : "Save & restart" }}
               </button>
             </ButtonStyled>
           </div>
