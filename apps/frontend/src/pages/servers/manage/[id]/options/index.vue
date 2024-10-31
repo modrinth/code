@@ -24,7 +24,7 @@
             </span>
           </div>
         </div>
-
+        <!-- WIP - disable for now
         <div class="card flex flex-col gap-4">
           <label for="server-motd-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server MOTD</span>
@@ -34,6 +34,7 @@
           </label>
           <UiServersMOTDEditor :server="props.server" />
         </div>
+        -->
 
         <div class="card flex flex-col gap-4">
           <label for="server-icon-field" class="flex flex-col gap-2">
