@@ -67,9 +67,13 @@
           class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
         >
           <div class="flex flex-row gap-4">
-            <IssuesIcon class="h-8 w-8 text-red" />
+            <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
             <div class="flex flex-col gap-2 leading-[150%]">
-              <div class="flex gap-2 text-xl font-bold">{{ errorTitle }}</div>
+              <div class="flex items-center gap-3">
+                <IssuesIcon class="block h-8 w-8 text-red sm:hidden" />
+                <div class="flex gap-2 text-xl font-bold">{{ errorTitle }}</div>
+              </div>
+
               <div
                 v-if="errorTitle.toLocaleLowerCase() === 'installation error'"
                 class="font-normal"
