@@ -41,7 +41,7 @@
                   if (el) menuItemsRef[index] = el as HTMLElement;
                 }
               "
-              class="w-full !justify-start focus-visible:!outline-none"
+              class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
               :aria-selected="index === selectedIndex"
               :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
               @click="handleItemClick(option, index)"
@@ -96,32 +96,36 @@ const menuStyle = ref({
 const filteredOptions = computed(() => props.options.filter((option) => option.shown !== false));
 
 const calculateMenuPosition = () => {
-  if (!triggerRef.value) return { top: "0px", left: "0px" };
+  if (!triggerRef.value || !menuRef.value) return { top: "0px", left: "0px" };
 
   const triggerRect = triggerRef.value.getBoundingClientRect();
-  const menuWidth = 140;
-  const menuHeight = filteredOptions.value.length * 50;
+  const menuRect = menuRef.value.getBoundingClientRect();
+  const menuWidth = menuRect.width;
+  const menuHeight = menuRect.height;
   const margin = 8;
 
   let top: number;
   let left: number;
 
-  if (triggerRect.top + triggerRect.height + menuHeight <= window.innerHeight - margin) {
-    top = triggerRect.bottom + 8;
-  } else if (triggerRect.top - menuHeight >= margin) {
-    top = triggerRect.top - menuHeight - 8;
+  // okay gang lets calculate this shit
+  // from the top now yall
+  // y
+  if (triggerRect.bottom + menuHeight + margin <= window.innerHeight) {
+    top = triggerRect.bottom + margin;
+  } else if (triggerRect.top - menuHeight - margin >= 0) {
+    top = triggerRect.top - menuHeight - margin;
   } else {
-    top = window.innerHeight - menuHeight - margin - 8;
+    top = Math.max(margin, window.innerHeight - menuHeight - margin);
   }
 
-  if (triggerRect.left + menuWidth <= window.innerWidth - margin) {
+  // x
+  if (triggerRect.left + menuWidth + margin <= window.innerWidth) {
     left = triggerRect.left;
-  } else {
+  } else if (triggerRect.right - menuWidth - margin >= 0) {
     left = triggerRect.right - menuWidth;
+  } else {
+    left = Math.max(margin, window.innerWidth - menuWidth - margin);
   }
-
-  left = Math.max(margin, Math.min(left, window.innerWidth - menuWidth - margin));
-  top = Math.max(margin, Math.min(top, window.innerHeight - menuHeight - margin));
 
   return {
     top: `${top}px`,
@@ -139,10 +143,10 @@ const toggleMenu = (event: MouseEvent) => {
 };
 
 const openMenu = () => {
-  menuStyle.value = calculateMenuPosition();
   isOpen.value = true;
   disableBodyScroll();
   nextTick(() => {
+    menuStyle.value = calculateMenuPosition();
     document.addEventListener("mousemove", handleMouseMove);
     focusFirstMenuItem();
   });
@@ -199,9 +203,9 @@ const handleMouseOver = (index: number) => {
   menuItemsRef.value[selectedIndex.value].focus();
 };
 
-// scrolling is disabled for keyboard navigation
+// Scrolling is disabled for keyboard navigation
 const disableBodyScroll = () => {
-  // make opening not shift page when there's a vertical scrollbar
+  // Make opening not shift page when there's a vertical scrollbar
   const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
   if (scrollBarWidth > 0) {
     document.body.style.paddingRight = `${scrollBarWidth}px`;
@@ -297,32 +301,35 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
+const handleResizeOrScroll = () => {
+  if (isOpen.value) {
+    menuStyle.value = calculateMenuPosition();
+  }
+};
+
+const throttle = (func: (...args: any[]) => void, limit: number): ((...args: any[]) => void) => {
+  let inThrottle: boolean;
+  return function (...args: any[]) {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+};
+
+const throttledHandleResizeOrScroll = throttle(handleResizeOrScroll, 100);
+
 onMounted(() => {
   triggerRef.value?.addEventListener("keydown", handleKeydown);
-  window.addEventListener("resize", () => {
-    if (isOpen.value) {
-      menuStyle.value = calculateMenuPosition();
-    }
-  });
-  window.addEventListener("scroll", () => {
-    if (isOpen.value) {
-      menuStyle.value = calculateMenuPosition();
-    }
-  });
+  window.addEventListener("resize", throttledHandleResizeOrScroll);
+  window.addEventListener("scroll", throttledHandleResizeOrScroll);
 });
 
 onUnmounted(() => {
   triggerRef.value?.removeEventListener("keydown", handleKeydown);
-  window.removeEventListener("resize", () => {
-    if (isOpen.value) {
-      menuStyle.value = calculateMenuPosition();
-    }
-  });
-  window.removeEventListener("scroll", () => {
-    if (isOpen.value) {
-      menuStyle.value = calculateMenuPosition();
-    }
-  });
+  window.removeEventListener("resize", throttledHandleResizeOrScroll);
+  window.removeEventListener("scroll", throttledHandleResizeOrScroll);
   document.removeEventListener("mousemove", handleMouseMove);
   if (typeAheadTimeout.value) {
     clearTimeout(typeAheadTimeout.value);
