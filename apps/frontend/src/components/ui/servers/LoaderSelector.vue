@@ -59,11 +59,11 @@ const emit = defineEmits<{
 }>();
 
 const loaders = [
-  { name: "Vanilla", displayName: "Vanilla" },
-  { name: "Fabric", displayName: "Fabric" },
-  { name: "Quilt", displayName: "Quilt" },
-  { name: "Forge", displayName: "Forge" },
-  { name: "NeoForge", displayName: "NeoForge" },
+  { name: "Vanilla" as const, displayName: "Vanilla" },
+  { name: "Fabric" as const, displayName: "Fabric" },
+  { name: "Quilt" as const, displayName: "Quilt" },
+  { name: "Forge" as const, displayName: "Forge" },
+  { name: "NeoForge" as const, displayName: "NeoForge" },
 ];
 
 const isCurrentLoader = (loaderName: string) => {
