@@ -19,7 +19,7 @@
       >
         {{
           isSecondPhase
-            ? "You are attempting to delete all of your files without backing up. Are you sure this is what you're intending to do?"
+            ? "This will reinstall your server and erase all data. You may want to back up your server before proceeding. Are you sure you want to continue?"
             : "Choose the version of Minecraft you want to use for this server."
         }}
       </p>
@@ -48,8 +48,22 @@
           <label for="hard-reset">Clean reinstall</label>
         </div>
       </div>
-      <div class="mt-4 flex justify-end gap-4">
-        <ButtonStyled type="transparent">
+      <div class="mt-4 flex justify-start gap-4">
+        <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
+          <button :disabled="canInstall" @click="handleReinstall">
+            <RightArrowIcon />
+            {{
+              isSecondPhase
+                ? "Erase and install"
+                : loadingServerCheck
+                  ? "Loading..."
+                  : isDangerous
+                    ? "Erase and install"
+                    : "Install"
+            }}
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
           <button
             :disabled="isLoading"
             @click="
@@ -60,20 +74,8 @@
               }
             "
           >
+            <XIcon />
             {{ isSecondPhase ? "No" : "Cancel" }}
-          </button>
-        </ButtonStyled>
-        <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="canInstall" @click="handleReinstall">
-            {{
-              isSecondPhase
-                ? "Yes"
-                : loadingServerCheck
-                  ? "Loading..."
-                  : isDangerous
-                    ? "Erase and install"
-                    : "Install"
-            }}
           </button>
         </ButtonStyled>
       </div>
@@ -181,7 +183,7 @@
 
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { DownloadIcon, UploadIcon, InfoIcon } from "@modrinth/assets";
+import { DownloadIcon, UploadIcon, InfoIcon, RightArrowIcon, XIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();
