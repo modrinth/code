@@ -479,11 +479,26 @@ function triggerDownloadAnimation() {
 const initiateDownload = async (backupId: string) => {
   triggerDownloadAnimation();
 
-  const downloadurl: any = await props.server.backups?.download(backupId);
-  const a = document.createElement("a");
-  a.href = downloadurl.download_url;
-  a.click();
-  a.remove();
+  try {
+    const downloadurl: any = await props.server.backups?.download(backupId);
+    if (!downloadurl || !downloadurl.download_url) {
+      throw new Error("Invalid download URL.");
+    }
+
+    let finalDownloadUrl = downloadurl.download_url;
+
+    if (!/^https?:\/\//i.test(finalDownloadUrl)) {
+      finalDownloadUrl = `${window.location.origin}${finalDownloadUrl.startsWith("/") ? "" : "/"}${finalDownloadUrl}`;
+    }
+
+    const a = document.createElement("a");
+    a.href = finalDownloadUrl;
+    a.setAttribute("download", "");
+    a.click();
+    a.remove();
+  } catch (error) {
+    console.error("Download failed:", error);
+  }
 };
 </script>
 
