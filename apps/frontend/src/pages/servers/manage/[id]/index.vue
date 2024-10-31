@@ -36,7 +36,7 @@
           </div>
         </div>
         <div v-else class="flex flex-row gap-4">
-          <IssuesIcon class="h-8 w-8 text-red" />
+          <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
 
           <div class="flex flex-col gap-2">
             <div class="font-semibold">{{ serverData?.name }} shut down unexpectedly.</div>
