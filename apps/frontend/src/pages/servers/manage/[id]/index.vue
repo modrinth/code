@@ -140,16 +140,20 @@
     </div>
   </div>
   <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
-  <UiServersPyroError
-    v-else-if="isWsAuthIncorrect"
-    title="Could not connect to server"
-    message="Please refresh the page and try again. (WebSocket authentication failed)"
-  />
-  <UiServersPyroError
-    v-else
-    title="An error occurred"
-    message="Something went wrong while attempting to connect to your server. Your data is safe, and we're working to resolve the issue."
-  />
+  <div v-else-if="isWsAuthIncorrect" class="flex flex-col">
+    <h2>Could not connect to the server.</h2>
+    <p>
+      An error occurred while attempting to connect to your server. Please try refreshing the page.
+      (WebSocket Authentication Failed)
+    </p>
+  </div>
+  <div v-else class="flex flex-col">
+    <h2>Could not connect to the server.</h2>
+    <p>
+      An error occurred while attempting to connect to your server. Please try refreshing the page.
+      (No further information)
+    </p>
+  </div>
 </template>
 
 <script setup lang="ts">
