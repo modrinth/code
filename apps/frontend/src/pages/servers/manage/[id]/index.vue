@@ -162,7 +162,7 @@ import { ButtonStyled } from "@modrinth/ui";
 import type { ServerState, Stats } from "~/types/servers";
 import type { Server } from "~/composables/pyroServers";
 
-const props = defineProps<{
+type ServerProps = {
   socket: WebSocket | null;
   isConnected: boolean;
   isWsAuthIncorrect: boolean;
@@ -171,7 +171,9 @@ const props = defineProps<{
   serverPowerState: ServerState;
   isServerRunning: boolean;
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
-}>();
+};
+
+const props = defineProps<ServerProps>();
 
 interface ErrorData {
   id: string;
