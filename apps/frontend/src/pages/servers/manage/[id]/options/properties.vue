@@ -134,7 +134,7 @@ const isUpdating = ref(false);
 const searchInput = ref("");
 
 const data = computed(() => props.server.general);
-const { data: propsData, status } = await useLazyAsyncData(
+const { data: propsData, status } = await useAsyncData(
   "ServerProperties",
   async () => await props.server.general?.fetchConfigFile("ServerProperties"),
 );
