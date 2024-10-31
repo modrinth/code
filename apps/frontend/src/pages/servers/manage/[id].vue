@@ -1,30 +1,37 @@
 <template>
   <div class="contents">
     <div
-      v-if="server.error"
-      class="flex min-h-screen items-center justify-center p-6 text-contrast"
+      v-if="!server.error"
+      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
-      <div class="flex max-w-lg flex-col items-center">
+      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
         <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-3">
-            <TransferIcon class="size-16 text-orange" />
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Oops! Connection Lost</h1>
+          <div class="flex flex-col items-center gap-4">
+            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+              <TransferIcon class="size-12 text-orange" />
+            </div>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Connection lost</h1>
+            <div class="text-center text-secondary">
+              {{
+                formattedTime == "00"
+                  ? "Reconnecting..."
+                  : `Retrying in ${formattedTime} seconds...`
+              }}
+            </div>
           </div>
           <p class="text-lg text-secondary">
-            We couldn't reach our servers. Don't worry, we're working on it. We're automatically
-            trying to reconnect you.
+            Something went wrong, and we couldn't connect to your server. This is likely due to a
+            temporary network issue. You'll be reconnected automatically.
           </p>
         </div>
-        <UiCopyCode :text="String(server.error)" />
-        <div class="mb-2 mt-4 text-center text-sm text-secondary">
-          {{
-            formattedTime == "00"
-              ? "Reconnecting..."
-              : `${formattedTime} seconds until next retry...`
-          }}
-        </div>
-        <ButtonStyled color="brand" @click="() => reloadNuxtApp()">
-          <button>Reload Now</button>
+        <UiCopyCode :text="server.error ? String(server.error) : 'Unknown error'" />
+        <ButtonStyled
+          :disabled="formattedTime !== '00'"
+          size="large"
+          color="brand"
+          @click="() => reloadNuxtApp()"
+        >
+          <button class="mt-6 !w-full">Reload</button>
         </ButtonStyled>
       </div>
     </div>
