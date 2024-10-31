@@ -689,9 +689,11 @@ const updateStartupSettings = async (
 const retryWithAuth = async (requestFn: () => Promise<any>) => {
   try {
     return await requestFn();
-  } catch {
-    await internalServerRefrence.value.refresh(["fs"]);
-    return await requestFn();
+  } catch (error) {
+    if (error instanceof PyroFetchError && error.statusCode === 401) {
+      await internalServerRefrence.value.refresh(["fs"]);
+      return await requestFn();
+    }
   }
 };
 
@@ -704,11 +706,7 @@ const listDirContents = (path: string, page: number, pageSize: number) => {
   });
 };
 
-const createFileOrFolder = (
-  path: string,
-  // name: string,
-  type: "file" | "directory",
-) => {
+const createFileOrFolder = (path: string, type: "file" | "directory") => {
   return retryWithAuth(async () => {
     return await PyroFetch(`/create?path=${path}&type=${type}`, {
       method: "POST",
@@ -755,8 +753,29 @@ const updateFile = (path: string, content: string) => {
   });
 };
 
+const createMissingFolders = async (path: string) => {
+  if (path.startsWith("/")) {
+    path = path.substring(1);
+  }
+  const folders = path.split("/");
+  console.log(folders);
+  let currentPath = "";
+
+  for (const folder of folders) {
+    currentPath += "/" + folder;
+    try {
+      await createFileOrFolder(currentPath, "directory");
+    } catch {}
+  }
+};
+
 const moveFileOrFolder = (path: string, newPath: string) => {
   return retryWithAuth(async () => {
+    console.log(path);
+    console.log(newPath);
+    console.log(newPath.substring(0, newPath.lastIndexOf("/")));
+    await createMissingFolders(newPath.substring(0, newPath.lastIndexOf("/")));
+
     return await PyroFetch(`/move`, {
       method: "POST",
       override: internalServerRefrence.value.fs.auth,

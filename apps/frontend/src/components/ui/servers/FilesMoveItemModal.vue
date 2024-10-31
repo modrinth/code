@@ -12,6 +12,12 @@
           required
         />
       </div>
+      <div class="flex items-center gap-2 text-nowrap">
+        New location:
+        <div class="w-full rounded-lg bg-table-alternateRow p-2 font-bold text-contrast">
+          <span class="text-secondary">/root</span>{{ newpath }}
+        </div>
+      </div>
       <div class="flex justify-start gap-4">
         <ButtonStyled color="brand">
           <button type="submit">
@@ -48,6 +54,9 @@ const emit = defineEmits<{
 
 const modal = ref<typeof NewModal>();
 const destination = ref("");
+const newpath = computed(() => {
+  return destination.value.replace("//", "/");
+});
 
 const handleSubmit = () => {
   emit("move", destination.value);
