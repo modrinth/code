@@ -33,14 +33,19 @@
           Start your own Minecraft server directly on Modrinth. Add thousands of mods and invite
           your friends to play, without the hassle of setup.
         </h2>
-        <div class="relative flex w-full flex-wrap items-center gap-8 sm:w-fit">
-          <div class="flex w-full gap-4 text-center sm:w-fit">
+        <div class="relative flex w-full flex-wrap items-center gap-8 align-middle sm:w-fit">
+          <div
+            class="flex w-full flex-col items-center gap-5 text-center align-middle sm:w-fit sm:flex-row"
+          >
             <ButtonStyled color="brand" size="large">
-              <nuxt-link class="w-full sm:w-fit" to="#plan"> Start your server </nuxt-link>
+              <nuxt-link class="w-fit" to="#plan">
+                <GameIcon aria-hidden="true" />
+                {{ hasServers ? "Start a new server" : "Start your server" }}
+              </nuxt-link>
             </ButtonStyled>
-            <ButtonStyled color="purple" size="large" v-if="hasServers">
-              <nuxt-link class="w-full sm:w-fit" to="/servers/manage">
-                Manage your servers
+            <ButtonStyled type="outlined" size="large" v-if="hasServers">
+              <nuxt-link class="w-fit" to="/servers/manage">
+                <BoxIcon aria-hidden="true" /> Manage your servers
               </nuxt-link>
             </ButtonStyled>
           </div>
@@ -534,7 +539,7 @@
 
 <script setup>
 import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
-import { RightArrowIcon, SearchIcon, SortAscendingIcon } from "@modrinth/assets";
+import { BoxIcon, GameIcon, RightArrowIcon, SearchIcon, SortAscendingIcon } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 
 const title = "Modrinth Servers";
