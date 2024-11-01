@@ -209,7 +209,7 @@ interface Mod {
 interface Backup {
   id: string;
   name: string;
-  created_at: string;
+  created_at: number;
 }
 
 interface AutoBackupSettings {
