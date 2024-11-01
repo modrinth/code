@@ -51,11 +51,12 @@ const input = ref<HTMLInputElement>();
 const isCreating = ref(false);
 const backupError = ref<string | null>(null);
 const backupName = ref("");
-const newBackupAmount =
-  props.server.backups?.data?.length === undefined ? 1 : props.server.backups?.data?.length + 1;
+const newBackupAmount = computed(() =>
+  props.server.backups?.data?.length === undefined ? 1 : props.server.backups?.data?.length + 1,
+);
 
 const focusInput = () => {
-  backupName.value = `Backup #${newBackupAmount}`;
+  backupName.value = `Backup #${newBackupAmount.value}`;
   nextTick(() => {
     setTimeout(() => {
       input.value?.focus();
@@ -65,12 +66,12 @@ const focusInput = () => {
 
 const hideModal = () => {
   modal.value?.hide();
-  backupName.value = `Backup #${newBackupAmount}`;
+  backupName.value = `Backup #${newBackupAmount.value}`;
 };
 
 const createBackup = async () => {
   if (!backupName.value.trim()) {
-    backupName.value = `Backup #${newBackupAmount}`;
+    backupName.value = `Backup #${newBackupAmount.value}`;
   }
 
   isCreating.value = true;
