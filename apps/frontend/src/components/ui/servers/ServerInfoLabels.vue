@@ -10,11 +10,13 @@
       :loader="serverData.loader!"
       :loader-version="serverData.loader_version ?? ''"
       :no-separator="column"
+      :is-link="linked"
     />
     <UiServersServerSubdomainLabel
       v-if="serverData.net.domain"
       :subdomain="serverData.net.domain"
       :no-separator="column"
+      :is-link="linked"
     />
     <UiServersServerUptimeLabel
       v-if="uptimeSeconds"
@@ -25,27 +27,14 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
-  serverData: {
-    type: Object,
-    required: true,
-  },
-  showGameLabel: {
-    type: Boolean,
-    required: true,
-  },
-  showLoaderLabel: {
-    type: Boolean,
-    required: true,
-  },
-  uptimeSeconds: {
-    type: Number,
-    required: false,
-    default: 0,
-  },
-  column: {
-    type: Boolean,
-    required: false,
-  },
-});
+interface ServerInfoLabelsProps {
+  serverData: Record<string, any>;
+  showGameLabel: boolean;
+  showLoaderLabel: boolean;
+  uptimeSeconds?: number;
+  column?: boolean;
+  linked?: boolean;
+}
+
+defineProps<ServerInfoLabelsProps>();
 </script>

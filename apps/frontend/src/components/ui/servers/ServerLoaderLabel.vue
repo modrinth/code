@@ -8,12 +8,16 @@
     <div class="flex flex-row items-center gap-2">
       <UiServersIconsLoaderIcon :loader="loader" class="flex shrink-0 [&&]:size-5" />
       <NuxtLink
+        v-if="isLink"
         :to="serverId ? `/servers/manage/${serverId}/options/loader` : ''"
         class="min-w-0 text-sm font-semibold"
         :class="serverId ? 'hover:underline' : ''"
       >
         {{ loader }} <span v-if="loaderVersion">{{ loaderVersion }}</span>
       </NuxtLink>
+      <div v-else class="min-w-0 text-sm font-semibold">
+        {{ loader }} <span v-if="loaderVersion">{{ loaderVersion }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -23,6 +27,7 @@ defineProps<{
   noSeparator?: boolean;
   loader: "Fabric" | "Quilt" | "Forge" | "NeoForge" | "Paper" | "Spigot" | "Bukkit" | "Vanilla";
   loaderVersion: string;
+  isLink?: boolean;
 }>();
 
 const route = useNativeRoute();
