@@ -32,8 +32,8 @@
 
       <LazyUiServersBackupSettingsModal ref="backupSettingsModal" :server="server" />
 
-      <ul class="m-0 flex list-none flex-col gap-6 p-0">
-        <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6">
+      <ul class="m-0 flex list-none flex-col gap-4 p-0">
+        <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6 shadow-md">
           <div class="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-0">
             <div class="flex items-baseline gap-2 sm:flex-col">
               <div class="text-2xl font-bold text-contrast">
@@ -80,7 +80,7 @@
         <li
           v-for="(backup, index) in backups"
           :key="backup.id"
-          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-4"
+          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-4 shadow-md"
         >
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between">
