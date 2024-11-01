@@ -1,6 +1,27 @@
 <template>
   <div class="relative h-full w-full overflow-y-auto">
-    <div v-if="data" class="flex h-full w-full flex-col justify-between gap-6">
+    <div v-if="data" class="flex h-full w-full flex-col">
+      <div class="card flex flex-col gap-4">
+        <label for="server-subdomain" class="flex flex-col gap-2">
+          <span class="text-lg font-bold text-contrast">Custom URL</span>
+          <span> Your friends can connect to your server using this URL. </span>
+        </label>
+        <div class="flex w-full items-center gap-2 md:w-[60%]">
+          <input
+            id="server-subdomain"
+            v-model="serverSubdomain"
+            class="h-[50%] w-[63%]"
+            maxlength="32"
+            @keyup.enter="saveGeneral"
+          />
+          .modrinth.gg
+        </div>
+        <span v-if="!isValidSubdomain" class="text-sm text-rose-400">
+          Subdomain must be at least 5 characters long and can only contain alphanumeric characters
+          and dashes.
+        </span>
+      </div>
+
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
           <label for="server-name-field" class="flex flex-col gap-2">
@@ -105,10 +126,15 @@ const props = defineProps<{
 
 const data = computed(() => props.server.general);
 const serverName = ref(data.value?.name);
+const serverSubdomain = ref(data.value?.net?.domain ?? "");
+const isValidSubdomain = computed(() => /^[a-zA-Z0-9-]{5,}$/.test(serverSubdomain.value));
 
 const isUpdating = ref(false);
-const hasUnsavedChanges = computed(() => serverName.value && serverName.value !== data.value?.name);
-
+const hasUnsavedChanges = computed(
+  () =>
+    (serverName.value && serverName.value !== data.value?.name) ||
+    serverSubdomain.value !== data.value?.net?.domain,
+);
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0);
 
 watch(serverName, (oldValue) => {
@@ -118,11 +144,50 @@ watch(serverName, (oldValue) => {
 });
 
 const saveGeneral = async () => {
-  if (!isValidServerName.value) return;
+  if (!isValidServerName.value || !isValidSubdomain.value) return;
 
   try {
     isUpdating.value = true;
-    await data.value?.updateName(serverName.value ?? "");
+    if (serverName.value !== data.value?.name) {
+      await data.value?.updateName(serverName.value ?? "");
+    }
+    if (serverSubdomain.value !== data.value?.net?.domain) {
+      try {
+        // type shit backend makes me do
+        const response = await props.server.network?.checkSubdomainAvailability(
+          serverSubdomain.value,
+        );
+        if (response === undefined) {
+          throw new Error("Failed to check subdomain availability");
+        }
+
+        if (typeof response === "object" && response !== null && "available" in response) {
+          const typedResponse = response as { available: boolean };
+          if (!typedResponse.available) {
+            addNotification({
+              group: "serverOptions",
+              type: "error",
+              title: "Subdomain not available",
+              text: "The subdomain you entered is already in use.",
+            });
+            return;
+          }
+        } else {
+          throw new Error("Invalid response format from availability check");
+        }
+
+        await props.server.network?.changeSubdomain(serverSubdomain.value);
+      } catch (error) {
+        console.error("Error checking subdomain availability:", error);
+        addNotification({
+          group: "serverOptions",
+          type: "error",
+          title: "Error checking availability",
+          text: "Failed to verify if the subdomain is available.",
+        });
+        return;
+      }
+    }
     await new Promise((resolve) => setTimeout(resolve, 500));
     await props.server.refresh();
     addNotification({
@@ -146,6 +211,7 @@ const saveGeneral = async () => {
 
 const resetGeneral = () => {
   serverName.value = data.value?.name || "";
+  serverSubdomain.value = data.value?.net?.domain ?? "";
 };
 
 const uploadFile = async (e: Event) => {

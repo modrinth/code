@@ -63,27 +63,6 @@
         <div class="flex h-full flex-col">
           <!-- Subdomain section -->
           <div class="card flex flex-col gap-4">
-            <label for="server-subdomain" class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-contrast">Custom subdomain</span>
-              <span> Your friends can connect to your server using this URL. </span>
-            </label>
-            <div class="flex w-full items-center gap-2 md:w-[60%]">
-              <input
-                id="server-subdomain"
-                v-model="serverSubdomain"
-                class="h-[50%] w-[63%]"
-                maxlength="32"
-                @keyup.enter="saveNetwork"
-              />
-              .modrinth.gg
-            </div>
-            <span v-if="!isValidSubdomain" class="text-sm text-rose-400">
-              Subdomain must be at least 5 characters long and can only contain alphanumeric
-              characters and dashes.
-            </span>
-          </div>
-
-          <div class="card flex flex-col gap-4">
             <div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
               <label for="user-domain" class="flex flex-col gap-2">
                 <span class="text-lg font-bold text-contrast">Generated DNS records</span>
