@@ -210,6 +210,7 @@ interface Backup {
   id: string;
   name: string;
   created_at: number;
+  ongoing: boolean;
 }
 
 interface AutoBackupSettings {
