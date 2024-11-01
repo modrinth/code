@@ -807,13 +807,18 @@ const downloadFile = (path: string, raw?: boolean) => {
 const modules: any = {
   general: {
     get: async (serverId: string) => {
-<<<<<<< Updated upstream
       try {
         const data = await PyroFetch<General>(`servers/${serverId}`);
+        // TODO: temp hack to fix hydration error
         if (data.upstream?.project_id) {
-          data.project = await fetchProject(data.upstream.project_id);
+          const res = await $fetch(
+            `https://api.modrinth.com/v2/project/${data.upstream.project_id}`,
+          );
+          data.project = res as Project;
         }
-        data.image = (await processImage(data.project?.icon_url)) ?? undefined;
+        if (import.meta.client) {
+          data.image = (await processImage(data.project?.icon_url)) ?? undefined;
+        }
         const motd = await getMotd();
         if (motd === "A Minecraft Server") {
           await setMotd(
@@ -826,25 +831,6 @@ const modules: any = {
         internalServerRefrence.value.setError(error);
         return undefined;
       }
-=======
-      const data = await PyroFetch<General>(`servers/${serverId}`);
-      // TODO: temp hack to fix hydration error
-      if (data.upstream?.project_id) {
-        const res = await $fetch(`https://api.modrinth.com/v2/project/${data.upstream.project_id}`);
-        data.project = res as Project;
-      }
-      if (import.meta.client) {
-        data.image = (await processImage(data.project?.icon_url)) ?? undefined;
-      }
-      const motd = await getMotd();
-      if (motd === "A Minecraft Server") {
-        await setMotd(
-          `§b${data.project?.title || data.loader + " " + data.mc_version} §f♦ §aModrinth Servers`,
-        );
-      }
-      data.motd = motd;
-      return data;
->>>>>>> Stashed changes
     },
     updateName,
     power: sendPowerAction,
