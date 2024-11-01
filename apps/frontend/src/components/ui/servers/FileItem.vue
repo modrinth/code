@@ -8,7 +8,7 @@
     @contextmenu="openContextMenu"
     @keydown="(e) => e.key === 'Enter' && selectItem()"
   >
-    <div data-pyro-file-metadata class="flex w-full items-center gap-2 truncate">
+    <div data-pyro-file-metadata class="flex w-full items-center gap-4 truncate">
       <div
         class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand group-focus:bg-brand-highlight group-focus:text-brand"
       >
