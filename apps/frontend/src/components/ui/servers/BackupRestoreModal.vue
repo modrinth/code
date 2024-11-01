@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits } from "vue";
+import { ref } from "vue";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { CalendarIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";

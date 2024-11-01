@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, nextTick } from "vue";
+import { ref, nextTick } from "vue";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { SaveIcon, XIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
