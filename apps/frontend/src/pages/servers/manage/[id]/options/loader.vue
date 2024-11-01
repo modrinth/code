@@ -205,6 +205,7 @@ const isLoading = ref(false);
 const hardReset = ref(false);
 const backupServer = ref(false);
 
+const isError = computed(() => props.server.general?.status === "error");
 const isDangerous = computed(() => hardReset.value);
 const isBackupLimited = computed(() => (props.server.backups?.data?.length || 0) >= 15);
 
