@@ -8,6 +8,7 @@
         type="text"
         class="bg-bg-input w-full rounded-lg p-4"
         placeholder="e.g. Before 1.21"
+        maxlength="32"
       />
       <div class="flex items-center gap-2">
         <InfoIcon class="hidden sm:block" />
@@ -56,7 +57,6 @@ const newBackupAmount = computed(() =>
 );
 
 const focusInput = () => {
-  backupName.value = `Backup #${newBackupAmount.value}`;
   nextTick(() => {
     setTimeout(() => {
       input.value?.focus();
@@ -66,7 +66,7 @@ const focusInput = () => {
 
 const hideModal = () => {
   modal.value?.hide();
-  backupName.value = `Backup #${newBackupAmount.value}`;
+  backupName.value = "";
 };
 
 const createBackup = async () => {
