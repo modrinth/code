@@ -35,7 +35,7 @@
       <ul class="m-0 flex list-none flex-col gap-4 p-0">
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6 shadow-md">
           <div class="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-0">
-            <div class="flex items-baseline gap-2 sm:flex-col">
+            <div class="flex flex-col items-baseline gap-2">
               <div class="text-2xl font-bold text-contrast">
                 {{
                   data.used_backup_quota === 0
@@ -84,9 +84,9 @@
         >
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between">
-              <div class="flex flex-row items-center gap-4">
+              <div class="flex min-w-0 flex-row items-center gap-4">
                 <div
-                  class="grid size-14 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border shadow-sm"
+                  class="grid size-14 shrink-0 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border shadow-sm"
                   :class="backup.ongoing ? 'text-green [&&]:bg-bg-green' : 'bg-button-bg'"
                 >
                   <UiServersIconsLoadingIcon
@@ -96,9 +96,12 @@
                   />
                   <BoxIcon v-else class="size-8" />
                 </div>
-                <div class="flex flex-col gap-2">
-                  <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <div class="text-xl font-bold text-contrast">{{ backup.name }}</div>
+                <div class="flex min-w-0 flex-col gap-2">
+                  <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+                    <div class="max-w-full truncate text-xl font-bold text-contrast">
+                      {{ backup.name }}
+                    </div>
+
                     <div
                       v-if="index == 0"
                       class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
