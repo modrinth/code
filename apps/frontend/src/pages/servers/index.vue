@@ -410,6 +410,11 @@
           class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
           There's a plan for everyone. Choose the one that fits your needs.
+
+          {{
+            isAtCapacity &&
+            "We're excited that you're excited about Modrinth Servers, but we are currently at capacity. Please check back later!"
+          }}
         </h2>
 
         <ul class="m-0 flex w-full flex-col gap-8 p-0 md:flex-row">
@@ -435,6 +440,7 @@
             </h2>
             <ButtonStyled color="blue" size="large">
               <button
+                :disabled="isAtCapacity"
                 class="!bg-highlight-blue !font-medium !text-blue"
                 @click="selectProduct(pyroProducts[0])"
               >
@@ -474,7 +480,11 @@
               $18<span class="text-sm font-normal text-secondary">/month</span>
             </h2>
             <ButtonStyled color="brand" size="large">
-              <button class="shadow-xl" @click="selectProduct(pyroProducts[1])">
+              <button
+                :disabled="isAtCapacity"
+                class="shadow-xl"
+                @click="selectProduct(pyroProducts[1])"
+              >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
@@ -501,6 +511,7 @@
             </h2>
             <ButtonStyled color="purple" size="large">
               <button
+                :disabled="isAtCapacity"
                 class="!bg-highlight-purple !font-medium !text-purple"
                 @click="selectProduct(pyroProducts[2])"
               >
@@ -592,6 +603,25 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
   }
 });
 
+const { data: capacityStatus } = await useAsyncData("ServerCapacity", async () => {
+  try {
+    const lowestPlan = pyroProducts[0];
+    const response = await usePyroFetch("capacity", {
+      method: "POST",
+      body: {
+        cpu: lowestPlan.metadata.cpu,
+        memory_mb: lowestPlan.metadata.ram,
+        swap_mb: lowestPlan.metadata.swap,
+        storage_mb: lowestPlan.metadata.storage,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error checking server capacity:", error);
+    return { available: 0 };
+  }
+});
+
 const startTyping = () => {
   const currentWord = words[currentWordIndex.value];
   if (isDeleting.value) {
@@ -614,20 +644,6 @@ const startTyping = () => {
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 pyroProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
-
-const selectProduct = async (product) => {
-  if (!auth.value.user) {
-    data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?showModal=true")}`);
-    return;
-  }
-  selectedProduct.value = product;
-  showModal.value = true;
-  modalKey.value++;
-  await nextTick();
-  if (purchaseModal.value && purchaseModal.value.show) {
-    purchaseModal.value.show();
-  }
-};
 
 const handleError = (err) => {
   addNotification({
@@ -676,7 +692,45 @@ async function fetchPaymentData() {
 }
 
 const route = useRoute();
+const isAtCapacity = computed(() => {
+  return capacityStatus.value?.available === 0;
+});
+
+const selectProduct = async (product) => {
+  if (isAtCapacity.value) {
+    addNotification({
+      group: "main",
+      title: "Server Capacity Full",
+      type: "error",
+      text: "We are currently at capacity. Please try again later.",
+    });
+    return;
+  }
+
+  if (!auth.value.user) {
+    data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?showModal=true")}`);
+    return;
+  }
+  selectedProduct.value = product;
+  showModal.value = true;
+  modalKey.value++;
+  await nextTick();
+  if (purchaseModal.value && purchaseModal.value.show) {
+    purchaseModal.value.show();
+  }
+};
+
 const openPurchaseModal = () => {
+  if (isAtCapacity.value) {
+    addNotification({
+      group: "main",
+      title: "Server Capacity Full",
+      type: "error",
+      text: "We are currently at capacity. Please try again later.",
+    });
+    return;
+  }
+
   selectedProduct.value = pyroProducts[0];
   showModal.value = true;
   modalKey.value++;
