@@ -116,7 +116,9 @@
                   }}
                 </span>
               </div>
-              <div class="mt-2 flex w-full max-w-[24rem] items-center gap-2 sm:mt-0">
+              <div
+                class="mt-2 flex w-full max-w-[24rem] flex-col items-center gap-2 sm:mt-0 sm:flex-row"
+              >
                 <UiServersTeleportDropdownMenu
                   v-if="versions && Array.isArray(versions) && versions.length > 0"
                   v-model="version"
@@ -129,6 +131,7 @@
                     :disabled="
                       isLoading || (props.server.general?.status === 'installing' && isError)
                     "
+                    class="!w-full sm:!w-auto"
                     @click="reinstallCurrent"
                   >
                     <DownloadIcon class="size-4" />
