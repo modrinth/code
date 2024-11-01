@@ -9,7 +9,7 @@
             :class="{ 'bg-button-bg text-contrast': route.path === link.href }"
           >
             <div class="flex items-center gap-2 font-bold">
-              <component :is="link.icon" class="size-4" />
+              <component :is="link.icon" class="size-6" />
               {{ link.label }}
             </div>
 
