@@ -523,7 +523,7 @@
         </ul>
 
         <div
-          class="flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left sm:flex-row sm:gap-0"
+          class="flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left md:flex-row md:gap-0"
         >
           <div class="flex flex-col gap-4">
             <h1 class="m-0">Build your own</h1>
@@ -533,9 +533,9 @@
             </h2>
           </div>
 
-          <div class="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-col sm:items-center">
+          <div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
             <ButtonStyled color="standard" size="large">
-              <NuxtLink to="/servers/custom" class="w-full sm:w-fit">
+              <NuxtLink to="/servers/custom" class="w-full md:w-fit">
                 Build your own
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </NuxtLink>
