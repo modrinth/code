@@ -1,7 +1,30 @@
 <template>
   <div class="contents">
     <div
-      v-if="server.error"
+      v-if="server.error && server.error.message.includes('Forbidden')"
+      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    >
+      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+              <TransferIcon class="size-12 text-orange" />
+            </div>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server not found</h1>
+          </div>
+          <p class="text-lg text-secondary">
+            You don't have permission to view this server or it no longer exists. If you believe
+            this is an error, please contact Modrinth support.
+          </p>
+        </div>
+        <UiCopyCode :text="server.error ? String(server.error) : 'Unknown error'" />
+        <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
+          <button class="mt-6 !w-full">Go to server</button>
+        </ButtonStyled>
+      </div>
+    </div>
+    <div
+      v-else-if="server.error"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -263,7 +286,7 @@ const server = await usePyroServer(serverId, [
 watch(
   () => server.error,
   (newError) => {
-    if (newError) {
+    if (newError && !newError.message.includes("Forbidden")) {
       startPolling();
     }
   },
@@ -714,7 +737,9 @@ const cleanup = () => {
 onMounted(() => {
   isMounted.value = true;
   if (server.error) {
-    startPolling();
+    if (!server.error.message.includes("Forbidden")) {
+      startPolling();
+    }
   } else {
     connectWebSocket();
   }

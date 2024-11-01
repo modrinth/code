@@ -5,7 +5,7 @@
         <div class="font-semibold text-contrast">Auto backup</div>
         <p class="m-0">
           Automatically create a backup of your server every
-          <strong>{{ autoBackupInterval }} {{ autoBackupInterval == 1 ? "hour" : "hours" }}</strong>
+          <strong>{{ autoBackupInterval == 1 ? "hour" : `${autoBackupInterval} hours` }}</strong>
         </p>
       </div>
 

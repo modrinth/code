@@ -359,7 +359,6 @@ const updateName = async (newName: string) => {
   }
 };
 
-// lord forgive me, for i have sinned and should not be forgiven -maddie
 const reinstallServer = async (
   serverId: string,
   loader: boolean,
@@ -369,7 +368,6 @@ const reinstallServer = async (
   hardReset: boolean = false,
 ) => {
   try {
-    // yeah
     const hardResetParam = hardReset ? "true" : "false";
     if (loader) {
       if (projectId.toLowerCase() === "neoforge") {
@@ -387,6 +385,25 @@ const reinstallServer = async (
     }
   } catch (error) {
     console.error("Error reinstalling server:", error);
+    throw error;
+  }
+};
+
+const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => {
+  const hardResetParam = hardReset ? "true" : "false";
+  try {
+    const auth = await PyroFetch<JWTAuth>(
+      `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`,
+    );
+
+    return await PyroFetch(`/reinstallMrpack&hard=${hardResetParam}`, {
+      method: "POST",
+      contentType: "application/octet-stream",
+      body: mrpack,
+      override: auth,
+    });
+  } catch (error) {
+    console.error("Error reinstalling from mrpack:", error);
     throw error;
   }
 };
@@ -448,25 +465,6 @@ const setMotd = async (motd: string) => {
     }
   } catch (error) {
     console.error("Error setting motd:", error);
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const reinstallFromMrpack = async (mrpack: File) => {
-  try {
-    const auth = await PyroFetch<JWTAuth>(
-      `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`,
-    );
-
-    return await PyroFetch(`/reinstallMrpack&hard=true`, {
-      method: "POST",
-      contentType: "application/octet-stream",
-      body: mrpack,
-      override: auth,
-    });
-  } catch (error) {
-    console.error("Error reinstalling from mrpack:", error);
-    throw error;
   }
 };
 
@@ -835,6 +833,7 @@ const modules: any = {
     updateName,
     power: sendPowerAction,
     reinstall: reinstallServer,
+    reinstallFromMrpack,
     suspend: suspendServer,
     getMotd,
     setMotd,
@@ -957,6 +956,8 @@ type GeneralFunctions = {
    * @param loader - Whether to use a loader.
    * @param projectId - The ID of the project.
    * @param versionId - Optional version ID.
+   * @param loaderVersionId - Optional loader version ID.
+   * @param hardReset - Whether to perform a hard reset.
    */
   reinstall: (
     serverId: string,
@@ -966,6 +967,13 @@ type GeneralFunctions = {
     loaderVersionId?: string,
     hardReset?: boolean,
   ) => Promise<void>;
+
+  /**
+   * Reinstalls the server from a mrpack.
+   * @param mrpack - The mrpack file.
+   * @param hardReset - Whether to perform a hard reset.
+   */
+  reinstallFromMrpack: (mrpack: File, hardReset?: boolean) => Promise<void>;
 
   /**
    * Suspends or resumes the server.

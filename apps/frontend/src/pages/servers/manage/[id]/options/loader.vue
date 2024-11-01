@@ -82,6 +82,50 @@
     </div>
   </NewModal>
 
+  <NewModal ref="mrpackModal" header="Upload mrpack" @hide="onHide" @show="onShow">
+    <div>
+      <div class="mt-2 flex items-center gap-2">
+        <input
+          id="hard-reset"
+          :checked="hardReset"
+          class="switch stylized-toggle"
+          type="checkbox"
+          @change="hardReset = ($event.target as HTMLInputElement).checked"
+        />
+        <label for="hard-reset">Clean reinstall</label>
+      </div>
+      <input
+        type="file"
+        accept=".mrpack"
+        class="mt-4"
+        :disabled="isLoading"
+        @change="uploadMrpack"
+      />
+      <div class="mt-4 flex justify-start gap-4">
+        <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
+          <button :disabled="!mrpackFile" @click="reinstallMrpack">
+            <RightArrowIcon />
+            {{
+              isSecondPhase
+                ? "Erase and install"
+                : loadingServerCheck
+                  ? "Loading..."
+                  : isDangerous
+                    ? "Erase and install"
+                    : "Install"
+            }}
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button :disabled="isLoading" @click="mrpackModal?.hide">
+            <XIcon />
+            Cancel
+          </button>
+        </ButtonStyled>
+      </div>
+    </div>
+  </NewModal>
+
   <div class="flex h-full w-full flex-col">
     <div v-if="data && versions" class="flex w-full flex-col">
       <div class="card flex flex-col gap-4">
@@ -150,7 +194,9 @@
           </ButtonStyled>
           <span class="hidden sm:block">or</span>
           <ButtonStyled>
-            <button class="!w-full sm:!w-auto"><UploadIcon class="size-4" /> Upload mrpack</button>
+            <button class="!w-full sm:!w-auto" @click="mrpackModal.show()">
+              <UploadIcon class="size-4" /> Upload mrpack
+            </button>
           </ButtonStyled>
         </div>
       </div>
@@ -251,6 +297,7 @@ const loaderVersions = (await Promise.all(
 
 const editModal = ref();
 const versionSelectModal = ref();
+const mrpackModal = ref();
 
 const canInstall = computed(() => {
   const conds =
@@ -399,6 +446,7 @@ const onHide = () => {
   serverCheckError.value = "";
   loadingServerCheck.value = false;
   isLoading.value = false;
+  mrpackFile.value = null;
 };
 
 const handleReinstallError = (error: any) => {
@@ -515,6 +563,39 @@ const reinstallNew = async (project: any, versionNumber: string) => {
     window.scrollTo(0, 0);
   } catch (error) {
     handleReinstallError(error);
+  }
+};
+
+const mrpackFile = ref<File | null>(null);
+
+const uploadMrpack = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (!target.files || target.files.length === 0) {
+    return;
+  }
+  mrpackFile.value = target.files[0];
+};
+
+const reinstallMrpack = async () => {
+  if (!mrpackFile.value) {
+    return;
+  }
+
+  const mrpack = new File([mrpackFile.value], mrpackFile.value.name, {
+    type: mrpackFile.value.type,
+  });
+
+  try {
+    isLoading.value = true;
+    await props.server.general?.reinstallFromMrpack(mrpack, hardReset.value);
+    emit("reinstall");
+    await nextTick();
+    window.scrollTo(0, 0);
+  } catch (error) {
+    handleReinstallError(error);
+  } finally {
+    isLoading.value = false;
+    mrpackModal.value.hide();
   }
 };
 </script>
