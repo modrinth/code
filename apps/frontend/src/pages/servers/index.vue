@@ -429,10 +429,12 @@
             <p class="m-0">
               Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding.
             </p>
-            <div class="flex flex-row items-center gap-3">
+            <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
               <p class="m-0">4 GB RAM</p>
               <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
               <p class="m-0">32 GB Storage</p>
+              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+              <p class="m-0">2 vCPUs</p>
             </div>
             <h2 class="m-0 text-3xl text-contrast">
               $12<span class="text-sm font-normal text-secondary">/month</span>
@@ -470,10 +472,12 @@
               </div>
             </div>
             <p class="m-0">Great for modded multiplayer and small communities.</p>
-            <div class="flex flex-row items-center gap-3">
+            <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
               <p class="m-0">6 GB RAM</p>
               <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
               <p class="m-0">48 GB Storage</p>
+              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+              <p class="m-0">3 vCPUs</p>
             </div>
             <h2 class="m-0 text-3xl text-contrast">
               $18<span class="text-sm font-normal text-secondary">/month</span>
@@ -500,10 +504,12 @@
               </div>
             </div>
             <p class="m-0">Ideal for larger communities, modpacks, and heavy modding.</p>
-            <div class="flex flex-row items-center gap-3">
+            <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
               <p class="m-0">8 GB RAM</p>
               <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
               <p class="m-0">64 GB Storage</p>
+              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+              <p class="m-0">4 vCPUs</p>
             </div>
             <h2 class="m-0 text-3xl text-contrast">
               $24<span class="text-sm font-normal text-secondary">/month</span>
