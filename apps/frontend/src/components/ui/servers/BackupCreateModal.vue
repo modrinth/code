@@ -9,6 +9,13 @@
         class="bg-bg-input w-full rounded-lg p-4"
         placeholder="e.g. Before 1.21"
       />
+      <div class="flex items-center gap-2">
+        <InfoIcon class="hidden sm:block" />
+        <span class="text-sm text-secondary">
+          If left empty, the backup name will default to
+          <span class="font-semibold"> Backup #{{ newBackupAmount }}</span>
+        </span>
+      </div>
     </div>
     <div class="mb-1 mt-4 flex justify-start gap-4">
       <ButtonStyled color="brand">
@@ -30,7 +37,7 @@
 <script setup lang="ts">
 import { ref, nextTick } from "vue";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { PlusIcon, XIcon } from "@modrinth/assets";
+import { PlusIcon, XIcon, InfoIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
@@ -41,11 +48,14 @@ const emit = defineEmits(["backupCreated"]);
 
 const modal = ref<InstanceType<typeof NewModal>>();
 const input = ref<HTMLInputElement>();
-const backupName = ref("");
 const isCreating = ref(false);
 const backupError = ref<string | null>(null);
+const backupName = ref("");
+const newBackupAmount =
+  props.server.backups?.data?.length === undefined ? 1 : props.server.backups?.data?.length + 1;
 
 const focusInput = () => {
+  backupName.value = `Backup #${newBackupAmount}`;
   nextTick(() => {
     setTimeout(() => {
       input.value?.focus();
@@ -54,14 +64,13 @@ const focusInput = () => {
 };
 
 const hideModal = () => {
-  backupName.value = "";
   modal.value?.hide();
+  backupName.value = `Backup #${newBackupAmount}`;
 };
 
 const createBackup = async () => {
   if (!backupName.value.trim()) {
-    emit("backupCreated", { success: false, message: "Backup name cannot be empty" });
-    return;
+    backupName.value = `Backup #${newBackupAmount}`;
   }
 
   isCreating.value = true;
