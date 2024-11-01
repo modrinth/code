@@ -1,11 +1,10 @@
 <template>
-  <NewModal ref="modal" header="Editing backup settings">
+  <NewModal ref="modal" header="Editing auto backup settings">
     <div class="flex flex-col gap-4 md:w-[600px]">
       <div class="flex flex-col gap-2">
         <div class="font-semibold text-contrast">Auto backup</div>
         <p class="m-0">
-          Automatically backup your server periodically. This will create a backup of your server
-          every
+          Automatically create a backup of your server every
           <strong>{{ autoBackupInterval }} {{ autoBackupInterval == 1 ? "hour" : "hours" }}</strong>
         </p>
       </div>
