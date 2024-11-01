@@ -51,50 +51,56 @@
     </div>
   </NewModal>
 
-  <div v-if="data && localMods" class="flex h-full w-full flex-col">
+  <div v-if="data && localMods" class="relative isolate flex h-full w-full flex-col">
+    <div ref="pyroContentSentinel" class="sentinel" data-pyro-content-sentinel />
     <div class="relative flex h-full w-full flex-col">
-      <div class="mb-4 flex items-center justify-between">
-        <div class="flex w-full flex-row items-center gap-2 sm:gap-4">
-          <div class="relative flex-1 text-sm">
-            <label class="sr-only" for="search">Search</label>
-            <SearchIcon
-              class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
-              aria-hidden="true"
-            />
-            <input
-              id="search"
-              v-model="searchInput"
-              class="!h-9 !min-h-0 w-full border-[1px] border-solid border-button-border pl-9"
-              type="search"
-              name="search"
-              autocomplete="off"
-              placeholder="Search mods..."
-              @input="debouncedSearch"
-            />
+      <div class="sticky top-0 z-20 -mt-4 flex items-center justify-between bg-bg py-4">
+        <div class="flex w-full flex-col items-center gap-2 sm:flex-row sm:gap-4">
+          <div class="flex w-full items-center gap-2 sm:gap-4">
+            <div class="relative flex-1 text-sm">
+              <label class="sr-only" for="search">Search</label>
+              <SearchIcon
+                class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
+                aria-hidden="true"
+              />
+              <input
+                id="search"
+                v-model="searchInput"
+                class="!h-9 !min-h-0 w-full border-[1px] border-solid border-button-border pl-9"
+                type="search"
+                name="search"
+                autocomplete="off"
+                placeholder="Search mods..."
+                @input="debouncedSearch"
+              />
+            </div>
+            <ButtonStyled>
+              <UiServersTeleportOverflowMenu
+                position="bottom"
+                direction="left"
+                aria-label="Filter mods"
+                :options="[
+                  { id: 'all', action: () => filterMods('all') },
+                  { id: 'enabled', action: () => filterMods('enabled') },
+                  { id: 'disabled', action: () => filterMods('disabled') },
+                ]"
+              >
+                <span class="whitespace-pre text-sm font-medium">
+                  {{ filterMethodLabel }}
+                </span>
+                <FilterIcon aria-hidden="true" />
+                <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+                <template #all> All mods </template>
+                <template #enabled> Only enabled </template>
+                <template #disabled> Only disabled </template>
+              </UiServersTeleportOverflowMenu>
+            </ButtonStyled>
           </div>
-          <ButtonStyled>
-            <UiServersTeleportOverflowMenu
-              position="bottom"
-              direction="left"
-              aria-label="Filter mods"
-              :options="[
-                { id: 'all', action: () => filterMods('all') },
-                { id: 'enabled', action: () => filterMods('enabled') },
-                { id: 'disabled', action: () => filterMods('disabled') },
-              ]"
-            >
-              <span class="whitespace-pre text-sm font-medium">
-                {{ filterMethodLabel }}
-              </span>
-              <FilterIcon aria-hidden="true" />
-              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-              <template #all> All mods </template>
-              <template #enabled> Only enabled </template>
-              <template #disabled> Only disabled </template>
-            </UiServersTeleportOverflowMenu>
-          </ButtonStyled>
           <ButtonStyled color="brand" type="outlined">
-            <nuxt-link :to="`/mods?sid=${props.server.serverId}`">
+            <nuxt-link
+              class="w-full text-nowrap sm:w-fit"
+              :to="`/mods?sid=${props.server.serverId}`"
+            >
               <PlusIcon />
               Add content
             </nuxt-link>
@@ -385,8 +391,16 @@ const debounce = <T extends (...args: any[]) => void>(
   };
 };
 
+const pyroContentSentinel = ref<HTMLElement | null>(null);
 const debouncedSearch = debounce(() => {
   modSearchInput.value = searchInput.value;
+
+  if (pyroContentSentinel.value) {
+    pyroContentSentinel.value.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
 }, 300);
 
 const toggleModOptimistic = async (mod: Mod) => {
@@ -550,6 +564,15 @@ const versionOptions = computed(() => {
 </script>
 
 <style scoped>
+.sentinel {
+  position: absolute;
+  top: -1rem;
+  left: 0;
+  right: 0;
+  height: 1px;
+  visibility: hidden;
+}
+
 .stylized-toggle:checked::after {
   background: var(--color-accent-contrast) !important;
 }
