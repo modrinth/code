@@ -409,11 +409,10 @@
         <h2
           class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          There's a plan for everyone. Choose the one that fits your needs.
-
           {{
-            isAtCapacity &&
-            "We're excited that you're excited about Modrinth Servers, but we are currently at capacity. Please check back later!"
+            isAtCapacity
+              ? "We are currently at capacity. Please try again later."
+              : "There's a plan for everyone! Choose the one that fits your needs."
           }}
         </h2>
 
