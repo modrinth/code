@@ -21,7 +21,7 @@
 <script setup lang="ts">
 defineProps<{
   noSeparator?: boolean;
-  loader: string;
+  loader: "Fabric" | "Quilt" | "Forge" | "NeoForge" | "Paper" | "Spigot" | "Bukkit" | "Vanilla";
   loaderVersion: string;
 }>();
 
