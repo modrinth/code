@@ -135,7 +135,7 @@ export default defineNuxtConfig({
         await fs.mkdir("./src/generated", { recursive: true });
       }
 
-      const API_URL = getApiUrl();
+      const API_URL = "https://api.modrinth.com/v2/";
 
       if (
         // Skip regeneration if within TTL...

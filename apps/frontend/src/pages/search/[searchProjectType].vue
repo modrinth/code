@@ -13,8 +13,26 @@
       aria-label="Filters"
     >
       <AdPlaceholder
-        v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
+        v-if="
+          (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
+          !server
+        "
       />
+      <section v-if="server" class="card">
+        <nuxt-link
+          :to="`/servers/manage/${server.serverId}/content`"
+          class="mb-2 flex items-center gap-2"
+        >
+          <Avatar :src="server.general.image" size="sm" />
+          <div class="flex flex-col gap-2">
+            <span class="font-bold">{{ server.general.name }}</span>
+            <span>{{ server.general.loader }} {{ server.general.mc_version }}</span>
+          </div>
+        </nuxt-link>
+        <Checkbox v-model="serverOverrideGameVersions" label="Override game versions" />
+        <Checkbox v-model="serverOverrideLoaders" label="Override loaders" />
+        <Checkbox v-model="serverHideInstalled" label="Hide already installed" />
+      </section>
       <section class="card gap-1" :class="{ 'max-lg:!hidden': !sidebarMenuOpen }">
         <div class="flex items-center gap-2">
           <div class="iconified-input w-full">
@@ -204,14 +222,6 @@
           </button>
         </div>
       </div>
-      <pagination
-        v-if="false"
-        :page="currentPage"
-        :count="pageCount"
-        :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
-        class="mb-3 justify-end"
-        @switch-page="onSearchChangeToTop"
-      />
       <LogoAnimated v-if="searchLoading && !noLoad" />
       <div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
         <p>No results found for your query!</p>
@@ -243,10 +253,32 @@
             :server-side="result.server_side"
             :categories="result.display_categories"
             :search="true"
-            :show-updated-date="sortType.name !== 'newest'"
+            :show-updated-date="!server && sortType.name !== 'newest'"
+            :show-created-date="!server"
             :hide-loaders="['resourcepack', 'datapack'].includes(projectType.id)"
             :color="result.color"
-          />
+          >
+            <template v-if="server">
+              <button
+                v-if="
+                  result.installed ||
+                  server.mods.data.find((x) => x.project_id === result.project_id)
+                "
+                disabled
+                class="btn btn-outline btn-primary"
+              >
+                <CheckIcon />
+                Installed
+              </button>
+              <button v-else-if="result.installing" disabled class="btn btn-outline btn-primary">
+                Installing...
+              </button>
+              <button v-else class="btn btn-outline btn-primary" @click="serverInstall(result)">
+                <DownloadIcon />
+                Install
+              </button>
+            </template>
+          </ProjectCard>
         </div>
       </div>
       <div class="pagination-after">
@@ -263,8 +295,8 @@
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
-import { Pagination, ScrollablePanel, Checkbox } from "@modrinth/ui";
-import { BanIcon, DropdownIcon, CheckIcon, FilterXIcon } from "@modrinth/assets";
+import { Pagination, ScrollablePanel, Checkbox, Avatar } from "@modrinth/ui";
+import { BanIcon, DropdownIcon, CheckIcon, FilterXIcon, DownloadIcon } from "@modrinth/assets";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 
@@ -379,6 +411,48 @@ if (route.query.o) {
   currentPage.value = Math.ceil(route.query.o / maxResults.value) + 1;
 }
 
+const server = ref();
+const serverHideInstalled = ref(false);
+const serverOverrideGameVersions = ref(false);
+const serverOverrideLoaders = ref(false);
+
+if (route.query.sid) {
+  server.value = await usePyroServer(route.query.sid, ["general", "mods"]);
+}
+
+if (route.query.shi) {
+  serverHideInstalled.value = route.query.shi === "true";
+}
+
+if (route.query.sogv) {
+  serverOverrideGameVersions.value = route.query.sogv === "true";
+}
+
+if (route.query.sol) {
+  serverOverrideLoaders.value = route.query.sol === "true";
+}
+
+async function serverInstall(project) {
+  project.installing = true;
+  try {
+    const versions = await useBaseFetch(`project/${project.project_id}/version`, {}, false, true);
+
+    const version =
+      versions.find(
+        (x) =>
+          x.game_versions.includes(server.value.general.mc_version) &&
+          x.loaders.includes(server.value.general.loader.toLowerCase()),
+      ) ?? versions[0];
+
+    await server.value.mods.install(version.project_id, version.id);
+    await server.value.refresh(["mods"]);
+    project.installed = true;
+  } catch (e) {
+    console.error(e);
+  }
+  project.installing = false;
+}
+
 projectType.value = tags.value.projectTypes.find(
   (x) => x.id === route.path.substring(1, route.path.length - 1),
 );
@@ -390,9 +464,9 @@ const {
   pending: searchLoading,
 } = useLazyFetch(
   () => {
-    const config = useRuntimeConfig();
-    const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
-
+    // const config = useRuntimeConfig();
+    // const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
+    const base = "https://api.modrinth.com/v2/";
     const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`];
 
     if (query.value.length > 0) {
@@ -416,8 +490,20 @@ const {
         formattedFacets.push([facet.replace(":", "!=")]);
       }
 
+      if (server.value && serverHideInstalled.value) {
+        const installedMods = server.value.mods.data
+          .filter((x) => x.project_id)
+          .map((x) => x.project_id);
+
+        installedMods.map((x) => [`project_id != ${x}`]).forEach((x) => formattedFacets.push(x));
+      }
+
       // loaders specifier
-      if (orFacets.value.length > 0) {
+      if (server.value && !serverOverrideLoaders.value) {
+        formattedFacets.push([
+          `categories:${encodeURIComponent(server.value.general.loader.toLowerCase())}`,
+        ]);
+      } else if (orFacets.value.length > 0) {
         formattedFacets.push(orFacets.value);
       } else if (projectType.value.id === "plugin") {
         formattedFacets.push(
@@ -435,7 +521,9 @@ const {
         );
       }
 
-      if (selectedVersions.value.length > 0) {
+      if (server.value && !serverOverrideGameVersions.value) {
+        formattedFacets.push([`versions:${encodeURIComponent(server.value.general.mc_version)}`]);
+      } else if (selectedVersions.value.length > 0) {
         const versionFacets = [];
         for (const facet of selectedVersions.value) {
           versionFacets.push("versions:" + facet);
@@ -574,6 +662,22 @@ function getSearchUrl(offset, useObj) {
     queryItems.push(`m=${encodeURIComponent(maxResults.value)}`);
     obj.m = maxResults.value;
   }
+  if (server.value) {
+    queryItems.push(`sid=${encodeURIComponent(server.value.serverId)}`);
+    obj.sid = server.value.serverId;
+  }
+  if (serverHideInstalled.value) {
+    queryItems.push("shi=true");
+    obj.shi = true;
+  }
+  if (serverOverrideGameVersions.value) {
+    queryItems.push("sogv=true");
+    obj.sogv = true;
+  }
+  if (serverOverrideLoaders.value) {
+    queryItems.push("sol=true");
+    obj.sol = true;
+  }
 
   let url = `${route.path}`;
 
@@ -648,7 +752,11 @@ const queryFilter = ref("");
 const filters = computed(() => {
   const filters = {};
 
-  if (projectType.value.id !== "resourcepack" && projectType.value.id !== "datapack") {
+  if (
+    projectType.value.id !== "resourcepack" &&
+    projectType.value.id !== "datapack" &&
+    (!server || serverOverrideLoaders.value)
+  ) {
     const loaders = tags.value.loaders
       .filter((x) => {
         if (projectType.value.id === "mod" && !showAllLoaders.value) {
@@ -701,9 +809,11 @@ const filters = computed(() => {
     }
   }
 
-  filters.gameVersion = tags.value.gameVersions
-    .filter((x) => (showSnapshots.value ? true : x.version_type === "release"))
-    .map((x) => ({ name: x.version, type: "gameVersion" }));
+  if (!server || serverOverrideGameVersions.value) {
+    filters.gameVersion = tags.value.gameVersions
+      .filter((x) => (showSnapshots.value ? true : x.version_type === "release"))
+      .map((x) => ({ name: x.version, type: "gameVersion" }));
+  }
 
   if (!["resourcepack", "plugin", "shader", "datapack"].includes(projectType.value.id)) {
     filters.environment = [

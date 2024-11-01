@@ -55,7 +55,7 @@
     <div class="relative flex h-full w-full flex-col">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex w-full flex-row items-center gap-2 sm:gap-4">
-          <div class="relative w-full text-sm">
+          <div class="relative flex-1 text-sm">
             <label class="sr-only" for="search">Search</label>
             <SearchIcon
               class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
@@ -92,6 +92,12 @@
               <template #enabled> Only enabled </template>
               <template #disabled> Only disabled </template>
             </UiServersTeleportOverflowMenu>
+          </ButtonStyled>
+          <ButtonStyled color="brand" type="outlined">
+            <nuxt-link :to="`/mods?sid=${props.server.serverId}`">
+              <PlusIcon />
+              Add content
+            </nuxt-link>
           </ButtonStyled>
         </div>
       </div>
@@ -207,7 +213,7 @@
         <p class="m-0 pb-2 pt-3 text-neutral-200">No mods found!</p>
         <p class="m-0 pb-3 text-neutral-400">Add some mods to your server to manage them here.</p>
         <ButtonStyled color="brand" class="mt-8">
-          <button @click="gotoManageModPage">Manage mods</button>
+          <nuxt-link :to="`/mods?sid=${props.server.serverId}`">Add content</nuxt-link>
         </ButtonStyled>
       </div>
     </div>
@@ -502,10 +508,6 @@ const handleModAction = async (mod: Mod, versionNumber?: string) => {
   } catch (error) {
     console.error("Error handling mod action:", error);
   }
-};
-
-const gotoManageModPage = () => {
-  navigateTo(`/servers/manage/${props.server.serverId}/options/loader`);
 };
 
 const hasMods = computed(() => {
