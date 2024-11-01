@@ -41,6 +41,7 @@ defineProps({
   uptimeSeconds: {
     type: Number,
     required: false,
+    default: 0,
   },
   column: {
     type: Boolean,
