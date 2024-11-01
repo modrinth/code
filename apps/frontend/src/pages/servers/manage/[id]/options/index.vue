@@ -16,10 +16,14 @@
           />
           .modrinth.gg
         </div>
-        <span v-if="!isValidSubdomain" class="text-sm text-rose-400">
-          Subdomain must be at least 5 characters long and can only contain alphanumeric characters
-          and dashes.
-        </span>
+        <div class="flex flex-col text-sm text-rose-400">
+          <span v-if="!isValidLengthSubdomain">
+            Subdomain must be at least 5 characters long.
+          </span>
+          <span v-if="!isValidCharsSubdomain">
+            Subdomain can only contain alphanumeric characters and dashes.
+          </span>
+        </div>
       </div>
 
       <div class="gap-2">
@@ -127,7 +131,11 @@ const props = defineProps<{
 const data = computed(() => props.server.general);
 const serverName = ref(data.value?.name);
 const serverSubdomain = ref(data.value?.net?.domain ?? "");
-const isValidSubdomain = computed(() => /^[a-zA-Z0-9-]{5,}$/.test(serverSubdomain.value));
+const isValidLengthSubdomain = computed(() => serverSubdomain.value.length >= 5);
+const isValidCharsSubdomain = computed(() => /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value));
+const isValidSubdomain = computed(
+  () => isValidLengthSubdomain.value && isValidCharsSubdomain.value,
+);
 
 const isUpdating = ref(false);
 const hasUnsavedChanges = computed(
