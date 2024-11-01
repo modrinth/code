@@ -209,7 +209,7 @@ interface Mod {
 interface Backup {
   id: string;
   name: string;
-  created_at: number;
+  created_at: string;
   ongoing: boolean;
 }
 

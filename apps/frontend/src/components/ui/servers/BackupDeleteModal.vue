@@ -7,7 +7,7 @@
         </div>
         <div class="flex gap-2 font-semibold text-contrast">
           <CalendarIcon />
-          {{ backupDate }}
+          {{ formattedDate }}
         </div>
       </div>
     </div>
@@ -35,7 +35,7 @@ const props = defineProps<{
   server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
   backupId: string;
   backupName: string;
-  backupCreatedAt: number;
+  backupCreatedAt: string;
 }>();
 
 const emit = defineEmits(["backupDeleted"]);
@@ -44,7 +44,16 @@ const modal = ref<InstanceType<typeof NewModal>>();
 const isDeleting = ref(false);
 const backupError = ref<string | null>(null);
 
-const backupDate = new Date(props.backupCreatedAt).toLocaleString();
+const formattedDate = computed(() => {
+  return new Date(props.backupCreatedAt).toLocaleString("en-US", {
+    month: "numeric",
+    day: "numeric",
+    year: "2-digit",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+});
 
 const hideModal = () => {
   modal.value?.hide();

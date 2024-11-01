@@ -18,7 +18,7 @@
         :server="server"
         :backup-id="currentBackup"
         :backup-name="currentBackupDetails?.name ?? ''"
-        :backup-created-at="currentBackupDetails?.created_at ?? 0"
+        :backup-created-at="currentBackupDetails?.created_at ?? ''"
         @backup-restored="handleBackupRestored"
       />
       <LazyUiServersBackupDeleteModal
@@ -26,7 +26,7 @@
         :server="server"
         :backup-id="currentBackup"
         :backup-name="currentBackupDetails?.name ?? ''"
-        :backup-created-at="currentBackupDetails?.created_at ?? 0"
+        :backup-created-at="currentBackupDetails?.created_at ?? ''"
         @backup-deleted="handleBackupDeleted"
       />
 
@@ -36,12 +36,28 @@
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6">
           <div class="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-0">
             <div class="flex items-baseline gap-2 sm:flex-col">
-              <div class="text-2xl font-extrabold text-contrast">
-                {{ data.used_backup_quota }} Backup{{ data.used_backup_quota == 1 ? "" : "s" }}
+              <div class="text-2xl font-bold text-contrast">
+                {{
+                  data.used_backup_quota === 0
+                    ? "No backups"
+                    : `You've created ${data.used_backup_quota} backup${data.used_backup_quota === 1 ? "" : "s"}`
+                }}
               </div>
-              <div class="">({{ data.backup_quota - data.used_backup_quota }} slots available)</div>
+              <div>
+                {{
+                  data.backup_quota - data.used_backup_quota === 0
+                    ? "You have reached your backup limit. Consider removing old backups to create new ones."
+                    : `You can create ${data.backup_quota - data.used_backup_quota} more backups for your server.`
+                }}
+              </div>
             </div>
             <div class="flex w-full flex-col gap-2 sm:w-fit sm:flex-row">
+              <ButtonStyled type="standard">
+                <button @click="showbackupSettingsModal">
+                  <SettingsIcon class="h-5 w-5" />
+                  Auto backups
+                </button>
+              </ButtonStyled>
               <ButtonStyled type="standard" color="brand">
                 <button
                   v-tooltip="
@@ -57,12 +73,6 @@
                   Create backup
                 </button>
               </ButtonStyled>
-              <ButtonStyled type="standard">
-                <button @click="showbackupSettingsModal">
-                  <SettingsIcon class="h-5 w-5" />
-                  Auto backups
-                </button>
-              </ButtonStyled>
             </div>
           </div>
         </div>
@@ -70,32 +80,48 @@
         <li
           v-for="(backup, index) in backups"
           :key="backup.id"
-          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised px-6 py-4"
+          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-4"
         >
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between">
-              <div class="flex flex-col gap-2">
-                <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <div class="text-xl font-bold text-contrast">{{ backup.name }}</div>
-                  <div v-if="index == 0" class="flex gap-2 font-bold text-brand">
-                    <CheckIcon class="h-5 w-5" /> Latest
+              <div class="flex flex-row items-center gap-4">
+                <div
+                  class="grid size-14 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border shadow-sm"
+                  :class="backup.ongoing ? 'text-green [&&]:bg-bg-green' : 'bg-button-bg'"
+                >
+                  <UiServersIconsLoadingIcon
+                    v-if="backup.ongoing"
+                    v-tooltip="'Backup in progress'"
+                    class="size-6 animate-spin"
+                  />
+                  <BoxIcon v-else class="size-8" />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <div class="text-xl font-bold text-contrast">{{ backup.name }}</div>
+                    <div
+                      v-if="index == 0"
+                      class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
+                    >
+                      <CheckIcon class="size-4" /> Latest
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 text-sm font-semibold">
+                    <CalendarIcon class="size-4" />
+                    {{
+                      new Date(backup.created_at).toLocaleString("en-US", {
+                        month: "numeric",
+                        day: "numeric",
+                        year: "2-digit",
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true,
+                      })
+                    }}
                   </div>
                 </div>
-                <div class="flex items-center gap-2 text-sm font-semibold">
-                  <CalendarIcon class="h-5 w-5" />
-                  {{
-                    new Date(backup.created_at).toLocaleString("en-US", {
-                      month: "numeric",
-                      day: "numeric",
-                      year: "2-digit",
-                      hour: "numeric",
-                      minute: "numeric",
-                      hour12: true,
-                    })
-                  }}
-                </div>
               </div>
-              <ButtonStyled circular type="transparent">
+              <ButtonStyled v-if="!backup.ongoing" circular type="transparent">
                 <UiServersTeleportOverflowMenu
                   direction="left"
                   position="bottom"
@@ -174,6 +200,7 @@ import {
   DownloadIcon,
   TrashIcon,
   SettingsIcon,
+  BoxIcon,
 } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
