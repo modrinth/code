@@ -38,6 +38,9 @@
       <component :is="metric.icon" class="absolute right-10 top-10 z-10" />
       <ClientOnly>
         <VueApexCharts
+          v-if="
+            metric.data.length && !(metric.title === 'Memory usage' && userPreferences.ramAsNumber)
+          "
           ref="chart"
           type="area"
           height="142"
