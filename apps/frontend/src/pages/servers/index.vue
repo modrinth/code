@@ -553,6 +553,9 @@ import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
 import { BoxIcon, GameIcon, RightArrowIcon, SearchIcon, SortAscendingIcon } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 
+const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
+pyroProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
+
 const title = "Modrinth Servers";
 const description =
   "Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins, and datapacks — without the hassle of setup.";
@@ -603,24 +606,39 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
   }
 });
 
-const { data: capacityStatus } = await useAsyncData("ServerCapacity", async () => {
+const { data: capacityStatuses } = await useAsyncData("ServerCapacityAll", async () => {
   try {
-    const lowestPlan = pyroProducts[0];
-    const response = await usePyroFetch("capacity", {
-      method: "POST",
-      body: {
-        cpu: lowestPlan.metadata.cpu,
-        memory_mb: lowestPlan.metadata.ram,
-        swap_mb: lowestPlan.metadata.swap,
-        storage_mb: lowestPlan.metadata.storage,
-      },
-    });
-    return response;
+    const capacityChecks = pyroProducts.map((product) =>
+      usePyroFetch("capacity", {
+        method: "POST",
+        body: {
+          cpu: product.metadata.cpu,
+          memory_mb: product.metadata.ram,
+          swap_mb: product.metadata.swap,
+          storage_mb: product.metadata.storage,
+        },
+      }),
+    );
+
+    const results = await Promise.all(capacityChecks);
+    return {
+      small: results[0],
+      medium: results[1],
+      large: results[2],
+    };
   } catch (error) {
-    console.error("Error checking server capacity:", error);
-    return { available: 0 };
+    console.error("Error checking server capacities:", error);
+    return {
+      small: { available: 0 },
+      medium: { available: 0 },
+      large: { available: 0 },
+    };
   }
 });
+
+const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
+const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0);
+const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0);
 
 const startTyping = () => {
   const currentWord = words[currentWordIndex.value];
@@ -641,9 +659,6 @@ const startTyping = () => {
     setTimeout(startTyping, pauseTime);
   }
 };
-
-const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
-pyroProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
 
 const handleError = (err) => {
   addNotification({
@@ -692,9 +707,9 @@ async function fetchPaymentData() {
 }
 
 const route = useRoute();
-const isAtCapacity = computed(() => {
-  return capacityStatus.value?.available === 0;
-});
+const isAtCapacity = computed(
+  () => isSmallAtCapacity.value && isMediumAtCapacity.value && isLargeAtCapacity.value,
+);
 
 const selectProduct = async (product) => {
   if (isAtCapacity.value) {
