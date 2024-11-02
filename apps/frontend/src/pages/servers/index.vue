@@ -467,7 +467,7 @@
                 rgba(27, 217, 106, 0.23) 0%,
                 rgba(14, 115, 56, 0.2) 100%
               );
-              border: 1px solid rgba(27, 217, 106, 0.07);
+              border: 1px solid rgb(12 107 52);
               box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
             "
             class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left md:w-1/3"
