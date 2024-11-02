@@ -23,7 +23,7 @@
     <section
       class="relative mx-auto flex min-h-[calc(100vh-200px)] max-w-7xl flex-col justify-center px-3"
     >
-      <div class="relative z-10 flex w-full flex-col items-center gap-10 text-center">
+      <div class="relative z-[5] flex w-full flex-col items-center gap-10 text-center">
         <div class="flex flex-col items-center gap-4">
           <div
             class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
