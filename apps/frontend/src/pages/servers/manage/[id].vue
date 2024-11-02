@@ -80,7 +80,9 @@
             </NuxtLink>
           </div>
           <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
-            <h1 class="m-0 flex-shrink gap-3 truncate text-4xl font-bold text-contrast sm:w-full">
+            <h1
+              class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0"
+            >
               {{ serverData.name }}
             </h1>
             <div
