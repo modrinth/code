@@ -62,7 +62,7 @@
         </NuxtLink>
       </div>
       <div
-        class="col-span-2 row-start-2 flex flex-wrap justify-center gap-1 lg:col-span-1 lg:row-start-auto"
+        class="col-span-2 row-start-2 flex flex-wrap justify-center gap-4 lg:col-span-1 lg:row-start-auto"
       >
         <template v-if="flags.projectTypesPrimaryNav">
           <ButtonStyled
@@ -159,7 +159,33 @@
               ]"
               hoverable
             >
-              <CompassIcon aria-hidden="true" />
+              <BoxIcon
+                v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
+                aria-hidden="true"
+              />
+              <PaintBrushIcon
+                v-else-if="
+                  route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
+                "
+                aria-hidden="true"
+              />
+              <BracesIcon
+                v-else-if="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
+                aria-hidden="true"
+              />
+              <PackageOpenIcon
+                v-else-if="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
+                aria-hidden="true"
+              />
+              <GlassesIcon
+                v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
+                aria-hidden="true"
+              />
+              <ServerIcon
+                v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
+                aria-hidden="true"
+              />
+              <CompassIcon v-else aria-hidden="true" />
               <span class="hidden md:contents">Discover content</span>
               <span class="contents md:hidden">Discover</span>
               <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
@@ -190,20 +216,8 @@
           <ButtonStyled type="transparent" :highlighted="route.name === 'app'">
             <nuxt-link to="/app">
               <DownloadIcon aria-hidden="true" />
-              <span class="hidden xl:contents">Get Modrinth App</span>
-              <span class="contents xl:hidden">Modrinth App</span>
-            </nuxt-link>
-          </ButtonStyled>
-          <ButtonStyled
-            v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)"
-            type="transparent"
-            color="purple"
-            :highlighted="route.name === 'plus'"
-          >
-            <nuxt-link to="/plus">
-              <ArrowBigUpDashIcon aria-hidden="true" />
-              <span class="hidden xl:contents">Upgrade to Modrinth+</span>
-              <span class="contents xl:hidden">Modrinth+</span>
+              <span class="hidden md:contents">Get Modrinth App</span>
+              <span class="contents md:hidden">Modrinth App</span>
             </nuxt-link>
           </ButtonStyled>
         </template>
@@ -255,7 +269,11 @@
           <template #notifications> <BellIcon aria-hidden="true" /> Notifications </template>
           <template #saved> <BookmarkIcon aria-hidden="true" /> Saved projects </template>
           <template #servers> <ServerIcon aria-hidden="true" /> My servers </template>
+          <template #plus>
+            <ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
+          </template>
           <template #settings> <SettingsIcon aria-hidden="true" /> Settings </template>
+          <template #flags> <ReportIcon aria-hidden="true" /> Feature flags </template>
           <template #projects> <BoxIcon aria-hidden="true" /> Projects </template>
           <template #organizations>
             <OrganizationIcon aria-hidden="true" /> Organizations
@@ -804,6 +822,12 @@ const userMenuOptions = computed(() => {
       link: `/user/${auth.value.user.username}`,
     },
     {
+      id: "plus",
+      link: "/plus",
+      color: "purple",
+      shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(auth.value.user.badges, 1 << 0),
+    },
+    {
       id: "notifications",
       link: "/dashboard/notifications",
     },
@@ -814,6 +838,11 @@ const userMenuOptions = computed(() => {
     {
       id: "servers",
       link: "/servers/manage",
+    },
+    {
+      id: "flags",
+      link: "/flags",
+      shown: flags.value.developerMode,
     },
     {
       id: "settings",
