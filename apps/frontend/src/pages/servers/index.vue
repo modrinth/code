@@ -1,5 +1,5 @@
 <template>
-  <div data-pyro class="servers-hero relative -mt-24 h-full min-h-screen pt-24">
+  <div data-pyro class="servers-hero relative isolate -mt-24 h-full min-h-screen pt-8">
     <PurchaseModal
       v-if="showModal && selectedProduct && customer"
       :key="selectedProduct.id"
@@ -21,24 +21,24 @@
     />
 
     <section
-      class="relative mx-auto flex min-h-[calc(100vh-200px)] max-w-7xl flex-col justify-center px-3"
+      class="relative mx-auto flex min-h-[calc(100vh-0px)] max-w-7xl flex-col justify-center px-3"
     >
-      <div class="relative z-[5] flex w-full flex-col items-center gap-10 text-center">
-        <div class="flex flex-col items-center gap-4">
+      <div class="relative z-[5] flex w-full flex-col gap-8">
+        <div class="flex flex-col gap-4">
           <div
             class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
           >
             Beta Release
           </div>
-          <h1 class="relative m-0 max-w-4xl text-3xl font-bold !leading-[110%] md:text-7xl">
-            Modrinth Servers
+          <h1 class="relative m-0 max-w-3xl text-3xl font-bold !leading-[110%] md:text-6xl">
+            Host your next server with Modrinth Servers
           </h1>
         </div>
         <h2
-          class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
+          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
         >
-          Start your own Minecraft server directly on Modrinth. Play with your favorite mods,
-          plugins, and datapacks — without the hassle of setup — then invite your friends to join.
+          Modrinth Servers is the easiest way to host your own Minecraft server. Seamlessly install
+          and play your favorite mods and modpacks, all within the Modrinth platform.
         </h2>
         <div class="relative flex w-full flex-wrap items-center gap-8 align-middle sm:w-fit">
           <div
@@ -55,15 +55,25 @@
                 <BoxIcon aria-hidden="true" /> Manage your servers
               </nuxt-link>
             </ButtonStyled>
+            <UiServersPoweredByPyro class="mx-0 !mt-0" />
           </div>
         </div>
-        <UiServersPoweredByPyro class="!mt-0" />
       </div>
+
+      <div class="absolute -right-1/3 top-24 z-[5] h-full max-h-[calc(100vh-10rem)]">
+        <img
+          src="~/assets/images/games/panel-hero.png"
+          alt=""
+          aria-hidden="true"
+          class="pointer-events-none h-full w-full select-none"
+        />
+      </div>
+
       <div
-        class="pointer-events-none absolute left-0 right-0 top-0 z-0 flex h-screen w-full flex-row items-end gap-24"
+        class="pointer-events-none absolute -right-1/4 top-14 z-[4] flex h-screen w-full flex-row items-end gap-24"
       >
         <div
-          class="absolute left-0 right-0 top-8 max-h-[90%] overflow-hidden sm:mt-0"
+          class="pointer-events-none absolute left-0 right-0 top-8 max-h-[90%] overflow-hidden sm:mt-0"
           style="mask-image: linear-gradient(black, transparent 80%)"
         >
           <img
@@ -82,7 +92,7 @@
     </section>
 
     <section
-      class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
+      class="relative flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:pt-48"
     >
       <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
       <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
