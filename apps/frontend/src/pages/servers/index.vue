@@ -1,5 +1,5 @@
 <template>
-  <div data-pyro class="relative -mt-48 h-full min-h-screen py-48 md:-mt-20 md:py-32">
+  <div data-pyro class="servers-hero relative -mt-24 h-full min-h-screen pt-24">
     <PurchaseModal
       v-if="showModal && selectedProduct && customer"
       :key="selectedProduct.id"
@@ -21,17 +21,17 @@
     />
 
     <section
-      class="relative mx-auto flex min-h-[calc(100vh-24rem)] max-w-7xl flex-col justify-center px-3"
+      class="relative mx-auto flex min-h-[calc(100vh)] max-w-7xl flex-col justify-center px-3"
     >
-      <div class="flex w-full flex-col gap-10">
-        <h1 class="relative m-0 max-w-2xl text-4xl font-bold !leading-[110%] md:text-7xl">
-          Play together with Modrinth Servers
+      <div class="flex w-full flex-col items-center gap-10 text-center">
+        <h1 class="relative m-0 max-w-4xl text-3xl font-bold !leading-[110%] md:text-7xl">
+          Modrinth Servers
         </h1>
         <h2
-          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
+          class="relative m-0 max-w-3xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
         >
-          Start your own Minecraft server directly on Modrinth. Add thousands of mods and invite
-          your friends to play, without the hassle of setup.
+          Start your own Minecraft server directly on Modrinth. Play with your favorite mods,
+          plugins, and datapacks — without the hassle of setup — then invite your friends to join.
         </h2>
         <div class="relative flex w-full flex-wrap items-center gap-8 align-middle sm:w-fit">
           <div
@@ -56,14 +56,14 @@
         class="pointer-events-none absolute left-0 right-0 top-0 flex h-screen w-full flex-row items-end gap-24"
       >
         <div
-          class="absolute left-0 right-0 top-0 -mt-24 max-h-[80%] overflow-hidden sm:mt-0"
+          class="absolute left-0 right-0 top-8 max-h-[90%] overflow-hidden sm:mt-0"
           style="mask-image: linear-gradient(black, transparent 80%)"
         >
           <img
             src="~/assets/images/games/rinth.png"
             alt=""
             aria-hidden="true"
-            class="pointer-events-none w-full animate-spin select-none pt-8 opacity-50"
+            class="pointer-events-none w-full animate-spin select-none p-4 opacity-50"
             style="
               animation-duration: 172s !important;
               animation-timing-function: linear;
