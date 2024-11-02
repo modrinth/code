@@ -23,7 +23,7 @@
     <section
       class="relative mx-auto -mt-4 flex min-h-[calc(100vh)] max-w-7xl flex-col justify-center px-3"
     >
-      <div class="flex w-full flex-col items-center gap-10 text-center">
+      <div class="relative z-10 flex w-full flex-col items-center gap-10 text-center">
         <div class="flex flex-col items-center gap-4">
           <div
             class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
@@ -60,7 +60,7 @@
         <UiServersPoweredByPyro class="!mt-0" />
       </div>
       <div
-        class="pointer-events-none absolute left-0 right-0 top-0 flex h-screen w-full flex-row items-end gap-24"
+        class="pointer-events-none absolute left-0 right-0 top-0 z-0 flex h-screen w-full flex-row items-end gap-24"
       >
         <div
           class="absolute left-0 right-0 top-8 max-h-[90%] overflow-hidden sm:mt-0"
