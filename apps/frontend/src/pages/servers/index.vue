@@ -763,7 +763,7 @@ const selectProduct = async (product) => {
     return;
   }
 
-  refreshCapacity();
+  await refreshCapacity();
 
   if (isAtCapacity.value) {
     addNotification({
@@ -779,6 +779,7 @@ const selectProduct = async (product) => {
     data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?showModal=true")}`);
     return;
   }
+
   selectedProduct.value = product;
   showModal.value = true;
   modalKey.value++;
