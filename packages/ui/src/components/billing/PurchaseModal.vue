@@ -301,18 +301,15 @@
         <br />
         You can cancel anytime from your settings page.
       </p>
-      <p
-        v-if="product.metadata.type === 'pyro'"
-        class="m-0 mt-2 text-sm text-secondary inline-flex items-center"
-      >
-        <Checkbox
-          v-model="eulaAccepted"
-          label="I acknowledge that I have read and agree to the&nbsp;"
-          class="text-sm"
-        />
-        <a class="underline text-sm" target="_blank" href="https://www.minecraft.net/en-us/eula"
-          >Minecraft EULA</a
-        >
+      <p v-if="product.metadata.type === 'pyro'" class="m-0 mt-2 text-secondary">
+        <Checkbox v-model="eulaAccepted" class="text-sm" :disabled="paymentLoading">
+          <label>
+            I acknowledge that I have read and agree to the
+            <a class="underline text-sm" target="_blank" href="https://aka.ms/MinecraftEULA">
+              Minecraft EULA
+            </a>
+          </label>
+        </Checkbox>
       </p>
     </div>
     <div class="input-group push-right pt-4">
