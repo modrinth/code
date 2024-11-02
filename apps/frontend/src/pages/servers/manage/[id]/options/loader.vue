@@ -131,14 +131,21 @@
       <div class="card flex flex-col gap-4">
         <div class="flex flex-row items-center justify-between gap-2">
           <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
-          <ButtonStyled>
-            <button
-              :disabled="props.server.general?.status === 'installing' && isError"
-              @click="editModal.show()"
-            >
-              Choose modpack
-            </button>
-          </ButtonStyled>
+          <div v-if="data.upstream" class="flex gap-4">
+            <ButtonStyled>
+              <button class="!w-full sm:!w-auto" @click="mrpackModal.show()">
+                <UploadIcon class="size-4" /> Upload mrpack
+              </button>
+            </ButtonStyled>
+            <ButtonStyled>
+              <button
+                :disabled="props.server.general?.status === 'installing' && isError"
+                @click="editModal.show()"
+              >
+                Choose modpack
+              </button>
+            </ButtonStyled>
+          </div>
         </div>
         <div
           v-if="data.upstream"
