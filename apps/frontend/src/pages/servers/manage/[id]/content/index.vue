@@ -1,18 +1,17 @@
 <template>
-  <NewModal ref="modModal" :header="modalHeader">
-    <div v-if="isEditMode">
+  <NewModal ref="modModal" header="Edit mod version">
+    <div>
       <div class="mb-4 flex flex-col gap-4">
         <div class="inline-flex flex-wrap items-center">
-          You're changing the version of&nbsp;
+          You're changing the version of
           <div class="inline-flex flex-wrap items-center gap-1 text-nowrap">
             <UiAvatar
-              :src="selectedMod?.icon_url"
+              :src="currentMod?.icon_url"
               size="24px"
               class="inline-block"
               alt="Server Icon"
             />
-            <strong>{{ selectedMod?.name + "." }}</strong> The latest version is
-            <strong>{{ versionOptions[0] + "." }}</strong>
+            <strong>{{ currentMod?.name + "." }}</strong>
           </div>
         </div>
         <div>
@@ -27,16 +26,17 @@
       </div>
       <div class="flex items-center gap-4">
         <UiServersTeleportDropdownMenu
-          v-model="newModVersion"
+          v-model="currentVersion"
           name="Project"
-          :options="versionOptions"
+          :options="currentVersions"
           placeholder="Select project..."
           class="!w-full"
+          :display-name="(version) => version.version_number"
         />
       </div>
       <div class="mt-4 flex flex-row items-center gap-4">
         <ButtonStyled color="brand">
-          <button @click="handleModAction(selectedMod!)">
+          <button :disabled="currentMod.changing" @click="changeModVersion">
             <PlusIcon />
             Install
           </button>
@@ -51,7 +51,7 @@
     </div>
   </NewModal>
 
-  <div v-if="data && localMods" class="relative isolate flex h-full w-full flex-col">
+  <div v-if="server.general && localMods" class="relative isolate flex h-full w-full flex-col">
     <div ref="pyroContentSentinel" class="sentinel" data-pyro-content-sentinel />
     <div class="relative flex h-full w-full flex-col">
       <div class="sticky top-0 z-20 -mt-4 flex items-center justify-between bg-bg py-4">
@@ -80,9 +80,9 @@
                 direction="left"
                 aria-label="Filter mods"
                 :options="[
-                  { id: 'all', action: () => filterMods('all') },
-                  { id: 'enabled', action: () => filterMods('enabled') },
-                  { id: 'disabled', action: () => filterMods('disabled') },
+                  { id: 'all', action: () => (filterMethod = 'all') },
+                  { id: 'enabled', action: () => (filterMethod = 'enabled') },
+                  { id: 'disabled', action: () => (filterMethod = 'disabled') },
                 ]"
               >
                 <span class="whitespace-pre text-sm font-medium">
@@ -96,7 +96,7 @@
               </UiServersTeleportOverflowMenu>
             </ButtonStyled>
           </div>
-          <ButtonStyled color="brand" type="outlined">
+          <ButtonStyled v-if="hasMods" color="brand" type="outlined">
             <nuxt-link
               class="w-full text-nowrap sm:w-fit"
               :to="`/mods?sid=${props.server.serverId}`"
@@ -107,31 +107,6 @@
           </ButtonStyled>
         </div>
       </div>
-
-      <Transition name="sync-banner">
-        <div
-          v-if="status === 'pending'"
-          class="fixed bottom-16 left-0 right-0 z-[6] mx-auto h-fit w-full max-w-4xl transition-all duration-300 sm:bottom-8"
-        >
-          <div
-            class="mx-2 flex flex-row items-center gap-4 rounded-2xl border-2 border-solid border-button-border bg-bg-raised p-2 transition-all duration-300 sm:shadow-2xl"
-          >
-            <div
-              class="grid size-12 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
-            >
-              <UiServersIconsLoadingIcon class="size-6 animate-spin" />
-            </div>
-            <div class="flex flex-col gap-0.5">
-              <p class="m-0 text-sm font-bold text-contrast">Working on it...</p>
-              <p class="m-0 text-sm">We're making sure everything's 100% up to date.</p>
-            </div>
-          </div>
-        </div>
-      </Transition>
-
-      <!-- :class="{
-          'mt-[68px] opacity-50': status === 'pending',
-        }" -->
       <div v-if="hasMods" class="flex flex-col gap-2 transition-all">
         <div ref="listContainer" class="relative w-full">
           <div :style="{ position: 'relative', height: `${totalHeight}px` }">
@@ -178,14 +153,11 @@
                     <ButtonStyled v-if="mod.project_id" type="transparent">
                       <button
                         v-tooltip="'Edit mod version'"
-                        :disabled="
-                          isFetchingVersionsForMod[mod.project_id] ||
-                          modActionsInProgress[getIdentifier(mod)]
-                        "
+                        :disabled="mod.changing"
                         class="!hidden sm:!block"
-                        @click="showEditModModal(mod)"
+                        @click="beginChangeModVersion(mod)"
                       >
-                        <template v-if="isFetchingVersionsForMod[mod.project_id]">
+                        <template v-if="mod.changing">
                           <UiServersIconsLoadingIcon />
                         </template>
                         <template v-else>
@@ -196,9 +168,9 @@
                     <ButtonStyled type="transparent">
                       <button
                         v-tooltip="'Delete mod'"
-                        :disabled="modActionsInProgress[getIdentifier(mod)]"
+                        :disabled="mod.changing"
                         class="!hidden sm:!block"
-                        @click="removeModOptimistic(mod)"
+                        @click="removeMod(mod)"
                       >
                         <TrashIcon />
                       </button>
@@ -207,7 +179,7 @@
                     <!-- Dropdown for mobile -->
                     <div class="mr-2 flex items-center sm:hidden">
                       <UiServersIconsLoadingIcon
-                        v-if="modActionsInProgress[getIdentifier(mod)]"
+                        v-if="mod.changing"
                         class="mr-2 h-5 w-5 animate-spin"
                         style="color: var(--color-base)"
                       />
@@ -216,14 +188,12 @@
                           :options="[
                             {
                               id: 'edit',
-                              action: () => showEditModModal(mod),
-                              shown: !!(
-                                mod.project_id && !isFetchingVersionsForMod[mod.project_id]
-                              ),
+                              action: () => beginChangeModVersion(mod),
+                              shown: !!(mod.project_id && !mod.changing),
                             },
                             {
                               id: 'delete',
-                              action: () => removeModOptimistic(mod),
+                              action: () => removeMod(mod),
                             },
                           ]"
                         >
@@ -241,12 +211,12 @@
                     </div>
 
                     <input
-                      :id="`toggle-${getIdentifier(mod)}`"
+                      :id="`toggle-${mod.filename}`"
                       :checked="!mod.disabled"
-                      :disabled="modActionsInProgress[getIdentifier(mod)]"
+                      :disabled="mod.changing"
                       class="switch stylized-toggle"
                       type="checkbox"
-                      @change="toggleModOptimistic(mod)"
+                      @change="toggleMod(mod)"
                     />
                   </div>
                 </div>
@@ -296,6 +266,7 @@ interface Mod {
   version_number?: string;
   icon_url?: string;
   disabled: boolean;
+  changing?: boolean;
 }
 
 const ITEM_HEIGHT = 72;
@@ -305,18 +276,10 @@ const listContainer = ref<HTMLElement | null>(null);
 const windowScrollY = ref(0);
 const windowHeight = ref(0);
 
-const modModal = ref();
-const isEditMode = ref(false);
-const modalHeader = ref("");
-const selectedMod = ref<Mod | null>(null);
-const newModVersion = ref("");
-const versions = ref<Record<string, any[]>>({});
 const localMods = ref<Mod[]>([]);
-const modActionsInProgress = ref<Record<string, boolean>>({});
+
 const searchInput = ref("");
 const modSearchInput = ref("");
-const isFetchingVersionsForMod = ref<Record<string, boolean>>({});
-
 const filterMethod = ref("all");
 
 const filterMethodLabel = computed(() => {
@@ -329,14 +292,6 @@ const filterMethodLabel = computed(() => {
       return "All mods";
   }
 });
-
-const filterMods = (method: string) => {
-  filterMethod.value = method;
-};
-
-const getIdentifier = (mod: Mod) => {
-  return mod.project_id || mod.filename.replace(".disabled", "");
-};
 
 const totalHeight = computed(() => {
   const itemsHeight = filteredMods.value.length * ITEM_HEIGHT;
@@ -392,14 +347,6 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
 
-const prodOverride = await PyroAuthOverride();
-const { refresh: refreshData, status } = await useLazyAsyncData("serverData", async () => {
-  await props.server.refresh(["general", "mods"]);
-  return true;
-});
-
-const data = computed(() => props.server.general);
-
 watch(
   () => props.server.mods?.data,
   (newMods) => {
@@ -409,18 +356,6 @@ watch(
   },
   { immediate: true },
 );
-
-const fetchVersions = async (projectId: string) => {
-  if (!versions.value[projectId]) {
-    versions.value[projectId] = (await useBaseFetch(
-      `project/${projectId}/version`,
-      {},
-      false,
-      prodOverride,
-    )) as any[];
-  }
-  return versions.value[projectId];
-};
 
 const debounce = <T extends (...args: any[]) => void>(
   func: T,
@@ -445,126 +380,80 @@ const debouncedSearch = debounce(() => {
   }
 }, 300);
 
-const toggleModOptimistic = async (mod: Mod) => {
-  const identifier = mod.project_id || mod.filename.replace(".disabled", "");
-  if (modActionsInProgress.value[identifier]) return;
+async function toggleMod(mod: Mod) {
+  mod.changing = true;
 
-  modActionsInProgress.value[identifier] = true;
-
-  const originalMods = [...localMods.value];
-  const originalDisabled = mod.disabled;
-
+  const originalFilename = mod.filename;
   try {
-    const newFilename = mod.disabled
+    const newFilename = mod.filename.endsWith(".disabled")
       ? mod.filename.replace(".disabled", "")
       : `${mod.filename}.disabled`;
 
     const sourcePath = `/mods/${mod.filename}`;
     const destinationPath = `/mods/${newFilename}`;
 
+    mod.disabled = newFilename.endsWith(".disabled");
+    mod.filename = newFilename;
+
     await props.server.fs?.moveFileOrFolder(sourcePath, destinationPath);
 
-    const modIndex = localMods.value.findIndex((m) => m.filename === mod.filename);
-    if (modIndex !== -1) {
-      const updatedMod = { ...mod, disabled: !mod.disabled, filename: newFilename };
-      localMods.value = [
-        ...localMods.value.slice(0, modIndex),
-        updatedMod,
-        ...localMods.value.slice(modIndex + 1),
-      ];
-    }
-
-    await refreshData();
-
-    addNotification({
-      text: `${originalDisabled ? "Enabled" : "Disabled"} ${
-        mod.name || mod.filename.replace(".disabled", "")
-      }. Restart your server for changes to take effect.`,
-      type: "success",
-    });
+    await props.server.refresh(["general", "mods"]);
   } catch (error) {
-    console.error("Error toggling mod:", error);
-    localMods.value = originalMods;
-    mod.disabled = originalDisabled;
+    mod.filename = originalFilename;
+    mod.disabled = originalFilename.endsWith(".disabled");
 
+    console.error("Error toggling mod:", error);
     addNotification({
       text: `Something went wrong toggling ${mod.name || mod.filename.replace(".disabled", "")}`,
       type: "error",
     });
-  } finally {
-    modActionsInProgress.value[identifier] = false;
   }
-};
 
-const removeModOptimistic = async (mod: Mod) => {
-  const identifier = getIdentifier(mod);
-  if (modActionsInProgress.value[identifier]) return;
+  mod.changing = false;
+}
 
-  modActionsInProgress.value[identifier] = true;
-
-  const originalMods = [...localMods.value];
-
-  localMods.value = localMods.value.filter((m) => m.filename !== mod.filename);
+async function removeMod(mod: Mod) {
+  mod.changing = true;
 
   try {
     await props.server.mods?.remove(`/mods/${mod.filename}`);
-    await refreshData();
-
-    addNotification({
-      text: `Successfully removed ${mod.name || mod.filename.replace(".disabled", "")}`,
-      type: "success",
-    });
+    await props.server.refresh(["general", "mods"]);
   } catch (error) {
     console.error("Error removing mod:", error);
-    localMods.value = originalMods;
+
     addNotification({
-      text: `couldn't remove ${mod.name || mod.filename.replace(".disabled", "")}`,
+      text: `couldn't remove ${mod.name || mod.filename}`,
       type: "error",
     });
-  } finally {
-    modActionsInProgress.value[identifier] = false;
   }
-};
 
-const showEditModModal = async (mod: Mod) => {
-  if (!mod.project_id) {
-    throw new Error("Mod project_id is undefined");
-  }
-  isFetchingVersionsForMod.value[mod.project_id] = true;
-  isEditMode.value = true;
-  modalHeader.value = "Editing mod version";
-  selectedMod.value = mod;
-  newModVersion.value = mod.version_number || "";
-  try {
-    await fetchVersions(mod.project_id);
-    modModal.value.show();
-  } catch (error) {
-    console.error("Error fetching versions:", error);
-  } finally {
-    isFetchingVersionsForMod.value[mod.project_id] = false;
-  }
-};
+  mod.changing = false;
+}
 
-const handleModAction = async (mod: Mod, versionNumber?: string) => {
+const modModal = ref();
+const currentMod = ref();
+const currentVersions = ref();
+const currentVersion = ref();
+
+async function beginChangeModVersion(mod: Mod) {
+  currentMod.value = mod;
+  currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false, true);
+  currentVersion.value = currentVersions.value.find((version) => version.id === mod.version_id);
+  modModal.value.show();
+}
+
+async function changeModVersion() {
+  currentMod.value.changing = true;
   try {
-    if (!mod.project_id) {
-      throw new Error("Mod project_id is undefined");
-    }
-    const versionList = await fetchVersions(mod.project_id);
-    const versionId = versionList.find((x: any) =>
-      x.version_number === versionNumber ? versionNumber : mod.version_number,
-    )?.id;
-    if (isEditMode.value) {
-      await props.server.mods?.reinstall(mod.project_id, versionId);
-    } else {
-      await props.server.mods?.install(mod.project_id, versionId);
-    }
-    await refreshData();
     modModal.value.hide();
+    await props.server.mods?.remove(`/mods/${currentMod.value.filename}`);
+    await props.server.mods?.install(currentMod.value.project_id, currentVersion.value.id);
+    await props.server.refresh(["general", "mods"]);
   } catch (error) {
-    console.error("Error handling mod action:", error);
+    console.error("Error changing mod version:", error);
   }
-};
+  currentMod.value.changing = false;
+}
 
 const hasMods = computed(() => {
   return filteredMods.value?.length > 0;
@@ -596,13 +485,6 @@ const filteredMods = computed(() => {
     return aName.localeCompare(bName);
   });
 });
-
-const versionOptions = computed(() => {
-  return selectedMod.value && selectedMod.value.project_id
-    ? versions.value[selectedMod.value.project_id]?.map((version: any) => version.version_number) ||
-        []
-    : [];
-});
 </script>
 
 <style scoped>
@@ -617,29 +499,5 @@ const versionOptions = computed(() => {
 
 .stylized-toggle:checked::after {
   background: var(--color-accent-contrast) !important;
-}
-
-.sync-banner-enter-active {
-  transition:
-    opacity 300ms,
-    transform 300ms;
-}
-
-.sync-banner-leave-active {
-  transition:
-    opacity 200ms,
-    transform 200ms;
-}
-
-.sync-banner-enter-from,
-.sync-banner-leave-to {
-  opacity: 0;
-  transform: translateY(100%) scale(0.98);
-}
-
-.sync-banner-enter-to,
-.sync-banner-leave-from {
-  opacity: 1;
-  transform: none;
 }
 </style>
