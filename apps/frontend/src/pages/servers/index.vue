@@ -310,12 +310,12 @@
             <img
               src="~/assets/images/games/content-hero-fixed.png"
               alt=""
-              class="absolute -bottom-12 -right-[15%] hidden max-w-2xl rounded-2xl bg-brand p-4 sm:block"
+              class="absolute -bottom-12 -right-[15%] hidden max-w-2xl rounded-2xl bg-brand p-4 lg:block"
             />
             <div class="flex flex-row items-center gap-3">
               <div
                 aria-hidden="true"
-                class="max-w-fit rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)] sm:absolute sm:bottom-8 sm:right-8"
+                class="hidden max-w-fit rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)] sm:absolute sm:bottom-8 sm:right-8 lg:block"
               >
                 8.49 GB used
               </div>
