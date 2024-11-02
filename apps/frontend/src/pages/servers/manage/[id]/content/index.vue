@@ -3,8 +3,8 @@
     <div v-if="isEditMode">
       <div class="mb-4 flex flex-col gap-4">
         <div class="inline-flex flex-wrap items-center">
-          You're changing the version of
-          <div class="ml-2 inline-flex items-center gap-1">
+          You're changing the version of&nbsp;
+          <div class="inline-flex flex-wrap items-center gap-1 text-nowrap">
             <UiAvatar
               :src="selectedMod?.icon_url"
               size="24px"
@@ -17,7 +17,7 @@
         </div>
         <div>
           <div v-if="props.server.general?.upstream" class="flex items-center gap-2">
-            <InfoIcon />
+            <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
               Your server was created from a modpack. Changing the mod version may cause unexpected
               issues.
@@ -148,25 +148,27 @@
                         ? `/project/${mod.project_id}/version/${mod.version_id}`
                         : `files?path=mods`
                     "
-                    class="group flex w-full items-center rounded-xl p-2"
+                    class="group flex min-w-0 items-center rounded-xl p-2"
                   >
-                    <div class="flex items-center gap-2">
+                    <div class="flex min-w-0 items-center gap-2">
                       <UiAvatar
                         :src="mod.icon_url"
                         size="sm"
                         alt="Server Icon"
                         :class="mod.disabled ? 'grayscale' : ''"
                       />
-                      <div class="flex flex-col">
-                        <span class="flex items-center gap-2 text-lg font-bold">
-                          {{ mod.name || mod.filename.replace(".disabled", "") }}
+                      <div class="flex min-w-0 flex-col">
+                        <span class="flex min-w-0 items-center gap-2 text-lg font-bold">
+                          <span class="truncate">{{
+                            mod.name || mod.filename.replace(".disabled", "")
+                          }}</span>
                           <span
                             v-if="mod.disabled"
-                            class="rounded-full bg-button-bg p-1 px-2 text-xs text-contrast"
+                            class="hidden rounded-full bg-button-bg p-1 px-2 text-xs text-contrast sm:block"
                             >Disabled</span
                           >
                         </span>
-                        <span class="text-xs text-secondary">{{
+                        <span class="min-w-0 text-xs text-secondary">{{
                           mod.version_number || "External mod"
                         }}</span>
                       </div>
@@ -180,6 +182,7 @@
                           isFetchingVersionsForMod[mod.project_id] ||
                           modActionsInProgress[getIdentifier(mod)]
                         "
+                        class="!hidden sm:!block"
                         @click="showEditModModal(mod)"
                       >
                         <template v-if="isFetchingVersionsForMod[mod.project_id]">
@@ -194,11 +197,49 @@
                       <button
                         v-tooltip="'Delete mod'"
                         :disabled="modActionsInProgress[getIdentifier(mod)]"
+                        class="!hidden sm:!block"
                         @click="removeModOptimistic(mod)"
                       >
                         <TrashIcon />
                       </button>
                     </ButtonStyled>
+
+                    <!-- Dropdown for mobile -->
+                    <div class="mr-2 flex items-center sm:hidden">
+                      <UiServersIconsLoadingIcon
+                        v-if="modActionsInProgress[getIdentifier(mod)]"
+                        class="mr-2 h-5 w-5 animate-spin"
+                        style="color: var(--color-base)"
+                      />
+                      <ButtonStyled v-else circular type="transparent">
+                        <UiServersTeleportOverflowMenu
+                          :options="[
+                            {
+                              id: 'edit',
+                              action: () => showEditModModal(mod),
+                              shown: !!(
+                                mod.project_id && !isFetchingVersionsForMod[mod.project_id]
+                              ),
+                            },
+                            {
+                              id: 'delete',
+                              action: () => removeModOptimistic(mod),
+                            },
+                          ]"
+                        >
+                          <MoreVerticalIcon aria-hidden="true" />
+                          <template #edit>
+                            <EditIcon class="h-5 w-5" />
+                            <span>Edit</span>
+                          </template>
+                          <template #delete>
+                            <TrashIcon class="h-5 w-5" />
+                            <span>Delete</span>
+                          </template>
+                        </UiServersTeleportOverflowMenu>
+                      </ButtonStyled>
+                    </div>
+
                     <input
                       :id="`toggle-${getIdentifier(mod)}`"
                       :checked="!mod.disabled"
@@ -237,6 +278,7 @@ import {
   InfoIcon,
   XIcon,
   PlusIcon,
+  MoreVerticalIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
