@@ -2,9 +2,12 @@
   <div data-pyro-telepopover-wrapper class="relative">
     <button
       ref="triggerRef"
+      class="teleport-overflow-menu-trigger"
       :aria-expanded="isOpen"
       :aria-haspopup="true"
       @mousedown="handleMouseDown"
+      @mouseenter="handleMouseEnter"
+      @mouseleave="handleMouseLeave"
       @click="toggleMenu"
     >
       <slot></slot>
@@ -22,11 +25,12 @@
           v-if="isOpen"
           ref="menuRef"
           data-pyro-telepopover-root
-          class="fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-2 shadow-lg"
+          class="experimental-styles-within fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-2 shadow-lg"
           :style="menuStyle"
           role="menu"
           tabindex="-1"
           @mousedown.stop
+          @mouseleave="handleMouseLeave"
         >
           <ButtonStyled
             v-for="(option, index) in filteredOptions"
@@ -36,6 +40,7 @@
             :color="option.color"
           >
             <button
+              v-if="typeof option.action === 'function'"
               :ref="
                 (el) => {
                   if (el) menuItemsRef[index] = el as HTMLElement;
@@ -50,6 +55,44 @@
             >
               <slot :name="option.id">{{ option.id }}</slot>
             </button>
+            <nuxt-link
+              v-else-if="typeof option.action === 'string' && option.action.startsWith('/')"
+              :ref="
+                (el) => {
+                  if (el) menuItemsRef[index] = el as HTMLElement;
+                }
+              "
+              :to="option.action"
+              class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+              :aria-selected="index === selectedIndex"
+              :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
+              @click="handleItemClick(option, index)"
+              @focus="selectedIndex = index"
+              @mouseover="handleMouseOver(index)"
+            >
+              <slot :name="option.id">{{ option.id }}</slot>
+            </nuxt-link>
+            <a
+              v-else-if="typeof option.action === 'string' && !option.action.startsWith('http')"
+              :ref="
+                (el) => {
+                  if (el) menuItemsRef[index] = el as HTMLElement;
+                }
+              "
+              :href="option.action"
+              target="_blank"
+              class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
+              :aria-selected="index === selectedIndex"
+              :style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
+              @click="handleItemClick(option, index)"
+              @focus="selectedIndex = index"
+              @mouseover="handleMouseOver(index)"
+            >
+              <slot :name="option.id">{{ option.id }}</slot>
+            </a>
+            <span v-else>
+              <slot :name="option.id">{{ option.id }}</slot>
+            </span>
           </ButtonStyled>
         </div>
       </Transition>
@@ -60,20 +103,24 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, onMounted, onUnmounted, watch, nextTick, computed } from "vue";
-import { onClickOutside } from "@vueuse/core";
+import { onClickOutside, useElementHover } from "@vueuse/core";
 
 interface Option {
   id: string;
-  action: () => void;
+  action?: (() => void) | string;
   shown?: boolean;
   color?: "standard" | "brand" | "red" | "orange" | "green" | "blue" | "purple";
 }
 
-const props = defineProps<{
-  options: Option[];
-  position?: "top" | "bottom";
-  direction?: "left" | "right";
-}>();
+const props = withDefaults(
+  defineProps<{
+    options: Option[];
+    hoverable: boolean;
+  }>(),
+  {
+    hoverable: false,
+  },
+);
 
 const emit = defineEmits<{
   (e: "select", option: Option): void;
@@ -87,6 +134,11 @@ const isMouseDown = ref(false);
 const typeAheadBuffer = ref("");
 const typeAheadTimeout = ref<number | null>(null);
 const menuItemsRef = ref<HTMLElement[]>([]);
+
+const hoveringTrigger = useElementHover(triggerRef);
+const hoveringMenu = useElementHover(menuRef);
+
+const hovering = computed(() => hoveringTrigger.value || hoveringMenu.value);
 
 const menuStyle = ref({
   top: "0px",
@@ -135,10 +187,12 @@ const calculateMenuPosition = () => {
 
 const toggleMenu = (event: MouseEvent) => {
   event.stopPropagation();
-  if (isOpen.value) {
-    closeMenu();
-  } else {
-    openMenu();
+  if (!props.hoverable) {
+    if (isOpen.value) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
   }
 };
 
@@ -161,13 +215,31 @@ const closeMenu = () => {
 
 const selectOption = (option: Option) => {
   emit("select", option);
-  option.action();
+  if (typeof option.action === "function") {
+    option.action();
+  }
   closeMenu();
 };
 
 const handleMouseDown = (event: MouseEvent) => {
   event.preventDefault();
   isMouseDown.value = true;
+};
+
+const handleMouseEnter = () => {
+  if (props.hoverable) {
+    openMenu();
+  }
+};
+
+const handleMouseLeave = () => {
+  if (props.hoverable) {
+    setTimeout(() => {
+      if (!hovering.value) {
+        closeMenu();
+      }
+    }, 250);
+  }
 };
 
 const handleMouseMove = (event: MouseEvent) => {
@@ -250,13 +322,17 @@ const handleKeydown = (event: KeyboardEvent) => {
       break;
     case "Home":
       event.preventDefault();
-      selectedIndex.value = 0;
-      menuItemsRef.value[selectedIndex.value].focus();
+      if (menuItemsRef.value.length > 0) {
+        selectedIndex.value = 0;
+        menuItemsRef.value[selectedIndex.value].focus();
+      }
       break;
     case "End":
       event.preventDefault();
-      selectedIndex.value = filteredOptions.value.length - 1;
-      menuItemsRef.value[selectedIndex.value].focus();
+      if (menuItemsRef.value.length > 0) {
+        selectedIndex.value = filteredOptions.value.length - 1;
+        menuItemsRef.value[selectedIndex.value].focus();
+      }
       break;
     case "Enter":
     case " ":
@@ -272,13 +348,15 @@ const handleKeydown = (event: KeyboardEvent) => {
       break;
     case "Tab":
       event.preventDefault();
-      if (event.shiftKey) {
-        selectedIndex.value =
-          (selectedIndex.value - 1 + filteredOptions.value.length) % filteredOptions.value.length;
-      } else {
-        selectedIndex.value = (selectedIndex.value + 1) % filteredOptions.value.length;
+      if (menuItemsRef.value.length > 0) {
+        if (event.shiftKey) {
+          selectedIndex.value =
+            (selectedIndex.value - 1 + filteredOptions.value.length) % filteredOptions.value.length;
+        } else {
+          selectedIndex.value = (selectedIndex.value + 1) % filteredOptions.value.length;
+        }
+        menuItemsRef.value[selectedIndex.value].focus();
       }
-      menuItemsRef.value[selectedIndex.value].focus();
       break;
     default:
       if (event.key.length === 1) {
