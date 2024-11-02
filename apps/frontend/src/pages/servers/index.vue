@@ -51,26 +51,25 @@
           </div>
           <UiServersPoweredByPyro class="!mt-0" />
         </div>
-
+      </div>
+      <div
+        class="pointer-events-none absolute left-0 right-0 top-0 flex h-screen w-full flex-row items-end gap-24"
+      >
         <div
-          class="pointer-events-none relative flex h-full w-full flex-row items-end gap-24 md:-mt-24"
+          class="absolute left-0 right-0 top-0 -mt-24 max-h-[80%] overflow-hidden sm:mt-0"
+          style="mask-image: linear-gradient(black, transparent 80%)"
         >
-          <div
-            class="absolute left-0 right-0 top-0 -mt-24 max-h-[80%] overflow-hidden sm:mt-0"
-            style="mask-image: linear-gradient(black, transparent 80%)"
-          >
-            <img
-              src="~/assets/images/games/rinth.png"
-              alt=""
-              aria-hidden="true"
-              class="pointer-events-none w-full animate-spin select-none pt-8 opacity-50"
-              style="
-                animation-duration: 128s !important;
-                animation-timing-function: linear;
-                animation-iteration-count: infinite;
-              "
-            />
-          </div>
+          <img
+            src="~/assets/images/games/rinth.png"
+            alt=""
+            aria-hidden="true"
+            class="pointer-events-none w-full animate-spin select-none pt-8 opacity-50"
+            style="
+              animation-duration: 172s !important;
+              animation-timing-function: linear;
+              animation-iteration-count: infinite;
+            "
+          />
         </div>
       </div>
     </section>
