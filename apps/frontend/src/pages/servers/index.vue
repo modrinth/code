@@ -21,12 +21,19 @@
     />
 
     <section
-      class="relative mx-auto flex min-h-[calc(100vh)] max-w-7xl flex-col justify-center px-3"
+      class="relative mx-auto -mt-4 flex min-h-[calc(100vh)] max-w-7xl flex-col justify-center px-3"
     >
       <div class="flex w-full flex-col items-center gap-10 text-center">
-        <h1 class="relative m-0 max-w-4xl text-3xl font-bold !leading-[110%] md:text-7xl">
-          Modrinth Servers
-        </h1>
+        <div class="flex flex-col items-center gap-4">
+          <div
+            class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+          >
+            Beta Release
+          </div>
+          <h1 class="relative m-0 max-w-4xl text-3xl font-bold !leading-[110%] md:text-7xl">
+            Modrinth Servers
+          </h1>
+        </div>
         <h2
           class="relative m-0 max-w-3xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
         >
@@ -49,8 +56,8 @@
               </nuxt-link>
             </ButtonStyled>
           </div>
-          <UiServersPoweredByPyro class="!mt-0" />
         </div>
+        <UiServersPoweredByPyro class="!mt-0" />
       </div>
       <div
         class="pointer-events-none absolute left-0 right-0 top-0 flex h-screen w-full flex-row items-end gap-24"
@@ -126,27 +133,11 @@
           </div>
 
           <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="size-8 text-brand"
-            >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-            <h2 class="m-0 text-lg font-bold">Easily join your friends</h2>
+            <LoaderIcon loader="fabric" class="size-8 text-brand" />
+            <h2 class="m-0 text-lg font-bold">All your favorite mods</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Your servers are sharable with just one link. Easily invite your friends to join your
-              server. Modrinth takes care of installing the mods.
+              Choose between Vanilla, Fabric, Forge, Quilt and NeoForge, so you never have to
+              sacrifice any mod.
             </h3>
           </div>
         </div>
@@ -592,6 +583,7 @@ import {
   TerminalSquareIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
+import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 pyroProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
