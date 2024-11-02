@@ -445,15 +445,21 @@
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
-              <a
+              <NuxtLink
                 v-else
-                href="https://support.modrinth.com"
-                target="_blank"
+                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
+                :target="loggedOut ? '_self' : '_blank'"
                 class="!bg-highlight-blue !font-medium !text-blue"
               >
-                Out of Stock
-                <ExternalIcon class="!min-h-4 !min-w-4" />
-              </a>
+                <template v-if="loggedOut">
+                  Login
+                  <UserIcon class="!min-h-4 !min-w-4" />
+                </template>
+                <template v-else>
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4" />
+                </template>
+              </NuxtLink>
             </ButtonStyled>
           </li>
 
@@ -497,15 +503,21 @@
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
-              <a
+              <NuxtLink
                 v-else
-                href="https://support.modrinth.com"
-                target="_blank"
+                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
+                :target="loggedOut ? '_self' : '_blank'"
                 class="!bg-highlight-green !font-medium !text-green"
               >
-                Out of Stock
-                <ExternalIcon class="!min-h-4 !min-w-4" />
-              </a>
+                <template v-if="loggedOut">
+                  Login
+                  <UserIcon class="!min-h-4 !min-w-4" />
+                </template>
+                <template v-else>
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4" />
+                </template>
+              </NuxtLink>
             </ButtonStyled>
           </li>
 
@@ -538,15 +550,21 @@
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
-              <a
+              <NuxtLink
                 v-else
-                href="https://support.modrinth.com"
-                target="_blank"
+                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
+                :target="loggedOut ? '_self' : '_blank'"
                 class="!bg-highlight-purple !font-medium !text-purple"
               >
-                Out of Stock
-                <ExternalIcon class="!min-h-4 !min-w-4" />
-              </a>
+                <template v-if="loggedOut">
+                  Login
+                  <UserIcon class="!min-h-4 !min-w-4" />
+                </template>
+                <template v-else>
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4" />
+                </template>
+              </NuxtLink>
             </ButtonStyled>
           </li>
         </ul>
@@ -564,9 +582,15 @@
 
           <div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
             <ButtonStyled color="standard" size="large">
-              <NuxtLink to="/servers/custom" class="w-full md:w-fit">
-                Build your own
-                <RightArrowIcon class="!min-h-4 !min-w-4" />
+              <NuxtLink :to="loggedOut ? redirectUrl : '/servers/custom'" class="w-full md:w-fit">
+                <template v-if="loggedOut">
+                  Login
+                  <UserIcon class="!min-h-4 !min-w-4" />
+                </template>
+                <template v-else>
+                  Build your own
+                  <RightArrowIcon class="!min-h-4 !min-w-4" />
+                </template>
               </NuxtLink>
             </ButtonStyled>
             <p class="m-0 text-sm">Starting at $3/GB RAM</p>
@@ -587,6 +611,7 @@ import {
   SortAscendingIcon,
   ExternalIcon,
   TerminalSquareIcon,
+  UserIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
@@ -633,6 +658,9 @@ const isDeleting = ref(false);
 const typingSpeed = 75;
 const deletingSpeed = 25;
 const pauseTime = 2000;
+
+const loggedOut = computed(() => !auth.value.user);
+const redirectUrl = `/auth/sign-in?redirect=${encodeURIComponent("/servers#plan")}`;
 
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
   try {
@@ -776,7 +804,7 @@ const selectProduct = async (product) => {
   }
 
   if (!auth.value.user) {
-    data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?showModal=true")}`);
+    data.$router.push(redirectUrl);
     return;
   }
 
