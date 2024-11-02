@@ -441,13 +441,22 @@
             </h2>
             <ButtonStyled color="blue" size="large">
               <button
-                :disabled="isAtCapacity"
+                v-if="!isSmallAtCapacity"
                 class="!bg-highlight-blue !font-medium !text-blue"
                 @click="selectProduct(pyroProducts[0])"
               >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
+              <a
+                v-else
+                href="https://support.modrinth.com"
+                target="_blank"
+                class="!bg-highlight-blue !font-medium !text-blue"
+              >
+                Out of Stock
+                <ExternalIcon class="!min-h-4 !min-w-4" />
+              </a>
             </ButtonStyled>
           </li>
 
@@ -484,13 +493,22 @@
             </h2>
             <ButtonStyled color="brand" size="large">
               <button
-                :disabled="isAtCapacity"
+                v-if="!isMediumAtCapacity"
                 class="shadow-xl"
                 @click="selectProduct(pyroProducts[1])"
               >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
+              <a
+                v-else
+                href="https://support.modrinth.com"
+                target="_blank"
+                class="!bg-highlight-green !font-medium !text-green"
+              >
+                Out of Stock
+                <ExternalIcon class="!min-h-4 !min-w-4" />
+              </a>
             </ButtonStyled>
           </li>
 
@@ -516,13 +534,22 @@
             </h2>
             <ButtonStyled color="purple" size="large">
               <button
-                :disabled="isAtCapacity"
+                v-if="!isLargeAtCapacity"
                 class="!bg-highlight-purple !font-medium !text-purple"
                 @click="selectProduct(pyroProducts[2])"
               >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
+              <a
+                v-else
+                href="https://support.modrinth.com"
+                target="_blank"
+                class="!bg-highlight-purple !font-medium !text-purple"
+              >
+                Out of Stock
+                <ExternalIcon class="!min-h-4 !min-w-4" />
+              </a>
             </ButtonStyled>
           </li>
         </ul>
@@ -555,7 +582,14 @@
 
 <script setup>
 import { ButtonStyled, PurchaseModal } from "@modrinth/ui";
-import { BoxIcon, GameIcon, RightArrowIcon, SearchIcon, SortAscendingIcon } from "@modrinth/assets";
+import {
+  BoxIcon,
+  GameIcon,
+  RightArrowIcon,
+  SearchIcon,
+  SortAscendingIcon,
+  ExternalIcon,
+} from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
