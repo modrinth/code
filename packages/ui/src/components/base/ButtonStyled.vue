@@ -9,6 +9,8 @@ const props = withDefaults(
     type?: 'standard' | 'outlined' | 'transparent'
     colorFill?: 'auto' | 'background' | 'text' | 'none'
     hoverColorFill?: 'auto' | 'background' | 'text' | 'none'
+    highlightedStyle?: 'main-nav-primary' | 'main-nav-secondary'
+    highlighted?: boolean
   }>(),
   {
     color: 'standard',
@@ -17,6 +19,8 @@ const props = withDefaults(
     type: 'standard',
     colorFill: 'auto',
     hoverColorFill: 'auto',
+    highlightedStyle: 'main-nav-primary',
+    highlighted: false,
   },
 )
 
@@ -117,6 +121,16 @@ function setColorFill(
 }
 
 const colorVariables = computed(() => {
+  if (props.highlighted) {
+    let colors = {
+      bg: props.highlightedStyle === 'main-nav-primary' ? 'var(--color-brand-highlight)' : 'var(--color-button-bg)',
+      text: 'var(--color-contrast)',
+      icon: props.highlightedStyle === 'main-nav-primary' ? 'var(--color-brand)' : 'var(--color-contrast)',
+    }
+    let hoverColors = JSON.parse(JSON.stringify(colors))
+    return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon};`
+  }
+
   let colors = {
     bg: 'var(--color-button-bg)',
     text: 'var(--color-base)',
@@ -175,6 +189,10 @@ const colorVariables = computed(() => {
     scale 0.125s ease-in-out,
     background-color 0.25s ease-in-out,
     color 0.25s ease-in-out;
+
+  svg:first-child {
+    color: var(--_icon, var(--_text));
+  }
 
   &[disabled],
   &[disabled='true'],

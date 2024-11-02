@@ -54,7 +54,7 @@
       </div>
     </div>
     <header
-      class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-3 py-4 sm:grid-cols-[auto_1fr_auto]"
+      class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-3 py-4 lg:grid-cols-[auto_1fr_auto]"
     >
       <div>
         <NuxtLink to="/" aria-label="Modrinth home page">
@@ -62,61 +62,108 @@
         </NuxtLink>
       </div>
       <div
-        class="col-span-2 row-start-2 flex flex-wrap justify-center gap-1 sm:col-span-1 sm:row-start-auto"
+        class="col-span-2 row-start-2 flex flex-wrap justify-center gap-1 lg:col-span-1 lg:row-start-auto"
       >
-        <div class="hidden xl:contents">
-          <ButtonStyled type="transparent">
-            <nuxt-link to="/mods" class="temp-nav-buttons"> Mods </nuxt-link>
+        <template v-if="flags.projectTypesPrimaryNav">
+          <ButtonStyled
+            type="transparent"
+            :highlighted="route.name === 'search-mods' || route.path.startsWith('/mod/')"
+            :highlighted-style="
+              route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+            "
+          >
+            <nuxt-link to="/mods"> <BoxIcon aria-hidden="true" /> Mods </nuxt-link>
           </ButtonStyled>
-          <ButtonStyled type="transparent">
-            <nuxt-link to="/resourcepacks" class="temp-nav-buttons"> Resource Packs </nuxt-link>
+          <ButtonStyled
+            type="transparent"
+            :highlighted="
+              route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
+            "
+            :highlighted-style="
+              route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+            "
+          >
+            <nuxt-link to="/resourcepacks">
+              <PaintBrushIcon aria-hidden="true" /> Resource Packs
+            </nuxt-link>
           </ButtonStyled>
-          <ButtonStyled type="transparent">
-            <nuxt-link to="/datapacks" class="temp-nav-buttons"> Data Packs </nuxt-link>
+          <ButtonStyled
+            type="transparent"
+            :highlighted="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
+            :highlighted-style="
+              route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+            "
+          >
+            <nuxt-link to="/datapacks"> <BracesIcon aria-hidden="true" /> Data Packs </nuxt-link>
           </ButtonStyled>
-          <ButtonStyled type="transparent">
-            <nuxt-link to="/modpacks" class="temp-nav-buttons"> Modpacks </nuxt-link>
+          <ButtonStyled
+            type="transparent"
+            :highlighted="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
+            :highlighted-style="
+              route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+            "
+          >
+            <nuxt-link to="/modpacks"> <PackageOpenIcon aria-hidden="true" /> Modpacks </nuxt-link>
           </ButtonStyled>
-          <ButtonStyled type="transparent">
-            <nuxt-link to="/shaders" class="temp-nav-buttons"> Shaders </nuxt-link>
+          <ButtonStyled
+            type="transparent"
+            :highlighted="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
+            :highlighted-style="
+              route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+            "
+          >
+            <nuxt-link to="/shaders"> <GlassesIcon aria-hidden="true" /> Shaders </nuxt-link>
           </ButtonStyled>
-          <ButtonStyled type="transparent">
-            <nuxt-link to="/plugins" class="temp-nav-buttons"> Plugins </nuxt-link>
+          <ButtonStyled
+            type="transparent"
+            :highlighted="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
+            :highlighted-style="
+              route.name === 'search-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
+            "
+          >
+            <nuxt-link to="/plugins"> <ServerIcon aria-hidden="true" /> Plugins </nuxt-link>
           </ButtonStyled>
-        </div>
-        <div class="contents xl:hidden">
-          <ButtonStyled type="transparent">
-            <OverflowMenu
-              class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+        </template>
+        <template v-else>
+          <ButtonStyled
+            type="transparent"
+            :highlighted="isDiscovering || isDiscoveringSubpage"
+            :highlighted-style="isDiscoveringSubpage ? 'main-nav-secondary' : 'main-nav-primary'"
+          >
+            <TeleportOverflowMenu
               :options="[
                 {
                   id: 'mods',
-                  link: '/mods',
+                  action: '/mods',
                 },
                 {
                   id: 'resourcepacks',
-                  link: '/resourcepacks',
+                  action: '/resourcepacks',
                 },
                 {
                   id: 'datapacks',
-                  link: '/datapacks',
-                },
-                {
-                  id: 'plugins',
-                  link: '/plugins',
+                  action: '/datapacks',
                 },
                 {
                   id: 'shaders',
-                  link: '/shaders',
+                  action: '/shaders',
                 },
                 {
                   id: 'modpacks',
-                  link: '/modpacks',
+                  action: '/modpacks',
+                },
+                {
+                  id: 'plugins',
+                  action: '/plugins',
                 },
               ]"
+              hoverable
             >
-              <CompassIcon aria-hidden="true" /> Browse
+              <CompassIcon aria-hidden="true" />
+              <span class="hidden md:contents">Discover content</span>
+              <span class="contents md:hidden">Discover</span>
               <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+
               <template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
               <template #resourcepacks>
                 <PaintBrushIcon aria-hidden="true" /> Resource Packs
@@ -125,57 +172,41 @@
               <template #plugins> <ServerIcon aria-hidden="true" /> Plugins </template>
               <template #shaders> <GlassesIcon aria-hidden="true" /> Shaders </template>
               <template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
-            </OverflowMenu>
+            </TeleportOverflowMenu>
           </ButtonStyled>
-        </div>
-        <ButtonStyled type="transparent">
-          <OverflowMenu
-            class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-            :options="[
-              {
-                id: 'servers',
-                link: '/servers',
-              },
-              {
-                id: 'app',
-                link: '/app',
-              },
-              {
-                id: 'plus',
-                color: 'purple',
-                link: '/plus',
-                shown: !auth.user || !isPermission(auth.user.badges, 1 << 0),
-              },
-            ]"
+
+          <ButtonStyled
+            type="transparent"
+            :highlighted="route.name.startsWith('servers')"
+            :highlighted-style="
+              route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
+            "
           >
-            <HamburgerIcon aria-hidden="true" /> More
-            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-            <template #servers> <ServerIcon aria-hidden="true" /> Host a server </template>
-            <template #app> <DownloadIcon aria-hidden="true" /> Get Modrinth App </template>
-            <template #plus>
-              <ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
-            </template>
-          </OverflowMenu>
-        </ButtonStyled>
-        <div v-if="false" class="hidden lg:contents">
-          <ButtonStyled v-if="false" type="transparent">
-            <a href="https://bisecthosting.com/modrinth">
-              <ServerIcon aria-hidden="true" /> Host a server
-            </a>
+            <nuxt-link to="/servers">
+              <ServerIcon aria-hidden="true" />
+              Host a server
+            </nuxt-link>
           </ButtonStyled>
-          <ButtonStyled type="transparent">
-            <NuxtLink to="/app"> <DownloadIcon aria-hidden="true" /> Get Modrinth App </NuxtLink>
+          <ButtonStyled type="transparent" :highlighted="route.name === 'app'">
+            <nuxt-link to="/app">
+              <DownloadIcon aria-hidden="true" />
+              <span class="hidden xl:contents">Get Modrinth App</span>
+              <span class="contents xl:hidden">Modrinth App</span>
+            </nuxt-link>
           </ButtonStyled>
           <ButtonStyled
             v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)"
             type="transparent"
             color="purple"
+            :highlighted="route.name === 'plus'"
           >
-            <NuxtLink to="/plus">
-              <ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
-            </NuxtLink>
+            <nuxt-link to="/plus">
+              <ArrowBigUpDashIcon aria-hidden="true" />
+              <span class="hidden xl:contents">Upgrade to Modrinth+</span>
+              <span class="contents xl:hidden">Modrinth+</span>
+            </nuxt-link>
           </ButtonStyled>
-        </div>
+        </template>
       </div>
       <div class="flex items-center gap-2">
         <ButtonStyled type="transparent">
@@ -549,6 +580,7 @@ import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import { commonMessages } from "~/utils/common-messages.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
+import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -739,6 +771,7 @@ const isMobileMenuOpen = ref(false);
 const isBrowseMenuOpen = ref(false);
 const navRoutes = computed(() => [
   {
+    id: "mods",
     label: formatMessage(getProjectTypeMessage("mod", true)),
     href: "/mods",
   },
@@ -843,6 +876,10 @@ const userMenuOptions = computed(() => {
   ];
   return options;
 });
+
+const isDiscovering = computed(() => route.name && route.name.startsWith("search-"));
+
+const isDiscoveringSubpage = computed(() => route.name && route.name.startsWith("type-id"));
 
 onMounted(() => {
   if (window && import.meta.client) {
@@ -1365,11 +1402,6 @@ function hideStagingBanner() {
   main {
     padding-top: 0.75rem;
   }
-}
-
-.temp-nav-buttons.router-link-exact-active {
-  color: var(--color-contrast) !important;
-  background-color: var(--color-brand-highlight) !important;
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
