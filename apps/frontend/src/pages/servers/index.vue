@@ -49,8 +49,8 @@
               </nuxt-link>
             </ButtonStyled>
           </div>
+          <UiServersPoweredByPyro class="!mt-0" />
         </div>
-        <UiServersPoweredByPyro class="!mt-0" />
       </div>
       <div
         class="pointer-events-none absolute left-0 right-0 top-0 flex h-screen w-full flex-row items-end gap-24"
