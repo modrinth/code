@@ -410,6 +410,7 @@
               ? "We are currently at capacity. Please try again later."
               : "There's a plan for everyone! Choose the one that fits your needs."
           }}
+          <span class="font-bold"> Servers are currently US only. More regions coming soon!</span>
         </h2>
 
         <ul class="m-0 flex w-full flex-col gap-8 p-0 md:flex-row">
