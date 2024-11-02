@@ -38,7 +38,7 @@
         config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
         !cosmetics.hideStagingBanner
       "
-      class="site-banner site-banner--warning"
+      class="site-banner site-banner--warning [&>*]:z-[6]"
     >
       <div class="site-banner__title">
         <IssuesIcon aria-hidden="true" />
@@ -1092,6 +1092,8 @@ function hideStagingBanner() {
 }
 
 .email-nag {
+  z-index: 6;
+  position: relative;
   background-color: var(--color-raised-bg);
   width: 100%;
   display: flex;
@@ -1102,13 +1104,28 @@ function hideStagingBanner() {
 }
 
 .site-banner--warning {
-  background-color: var(--color-red-bg);
+  // On some pages, there's gradient backgrounds that seep underneath
+  // the banner, so we need to add a solid color underlay.
+  background-color: black;
   border-bottom: 2px solid var(--color-red);
   display: grid;
   gap: 0.5rem;
   grid-template: "title actions" "description actions";
   padding-block: var(--gap-xl);
   padding-inline: max(calc((100% - 80rem) / 2 + var(--gap-md)), var(--gap-xl));
+  z-index: 4;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-red-bg);
+    z-index: 5;
+  }
 
   .site-banner__title {
     grid-area: title;
