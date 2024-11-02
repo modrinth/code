@@ -81,7 +81,7 @@
           </div>
           <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
             <h1
-              class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0"
+              class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
             >
               {{ serverData.name }}
             </h1>
