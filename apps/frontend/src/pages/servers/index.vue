@@ -760,6 +760,26 @@ const selectProduct = async (product) => {
     return;
   }
 
+  const capacityCheck = await usePyroFetch("capacity", {
+    method: "POST",
+    body: {
+      cpu: product.metadata.cpu,
+      memory_mb: product.metadata.ram,
+      swap_mb: product.metadata.swap,
+      storage_mb: product.metadata.storage,
+    },
+  });
+
+  if (capacityCheck.available === 0) {
+    addNotification({
+      group: "main",
+      title: "Capacity Full",
+      type: "error",
+      text: "We are currently at capacity. Please try again later.",
+    });
+    return;
+  }
+
   if (!auth.value.user) {
     data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?showModal=true")}`);
     return;
