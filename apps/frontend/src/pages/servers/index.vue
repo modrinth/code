@@ -293,7 +293,7 @@
                 rgba(27, 217, 106, 0.23) 0%,
                 rgba(14, 115, 56, 0.2) 100%
               );
-              border: 1px solid rgba(27, 217, 106, 0.07);
+              border: 1px solid rgba(12, 107, 52, 0.55);
               box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
             "
             class="relative flex flex-col gap-4 overflow-hidden rounded-2xl p-6 text-left sm:backdrop-blur-xl md:p-12"
@@ -311,20 +311,20 @@
             <div class="flex flex-row items-center gap-3">
               <div
                 aria-hidden="true"
-                class="hidden max-w-fit rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)] sm:absolute sm:bottom-8 sm:right-8 lg:block"
+                class="max-w-fit rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)] lg:absolute lg:bottom-8 lg:right-8 lg:block"
               >
                 8.49 GB used
               </div>
               <div
                 aria-hidden="true"
-                class="flex w-fit items-center gap-2 rounded-full bg-button-bg p-3 sm:hidden"
+                class="flex w-fit items-center gap-2 rounded-full bg-button-bg p-3 lg:hidden"
               >
                 <SortAscendingIcon class="h-6 w-6" />
                 Sort
               </div>
               <div
                 aria-hidden="true"
-                class="flex w-fit items-center rounded-full bg-button-bg p-3 sm:hidden"
+                class="flex w-fit items-center rounded-full bg-button-bg p-3 lg:hidden"
               >
                 <SearchIcon class="h-6 w-6" />
               </div>
@@ -463,7 +463,7 @@
                 rgba(27, 217, 106, 0.23) 0%,
                 rgba(14, 115, 56, 0.2) 100%
               );
-              border: 1px solid rgb(12 107 52);
+              border: 1px solid rgba(12, 107, 52, 0.55);
               box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
             "
             class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left md:w-1/3"
