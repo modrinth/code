@@ -39,6 +39,7 @@
 
     <LazyUiServersServerManageEmptyState v-if="serverList.length === 0" />
 
+    <LazyUiServersServerListingSkeleton v-if="isLoading" />
     <template v-else>
       <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
         <UiServersServerListing
@@ -54,7 +55,6 @@
           :upstream="server.upstream"
           :net="server.net"
         />
-        <LazyUiServersServerListingSkeleton v-if="isLoading" />
       </ul>
       <div v-else class="flex h-full items-center justify-center">
         <p class="text-contrast">No servers found.</p>
