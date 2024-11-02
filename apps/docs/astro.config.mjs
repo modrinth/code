@@ -1,5 +1,5 @@
-import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
+import { defineConfig } from 'astro/config'
 import starlightOpenAPI, { openAPISidebarGroups } from 'starlight-openapi'
 
 // https://astro.build/config
@@ -9,6 +9,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Modrinth Documentation',
+      favicon: '/favicon.ico',
       editLink: {
         baseUrl: 'https://github.com/modrinth/code/edit/main/apps/docs/',
       },
