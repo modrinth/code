@@ -644,35 +644,38 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
   }
 });
 
-const { data: capacityStatuses } = await useAsyncData("ServerCapacityAll", async () => {
-  try {
-    const capacityChecks = pyroProducts.map((product) =>
-      usePyroFetch("capacity", {
-        method: "POST",
-        body: {
-          cpu: product.metadata.cpu,
-          memory_mb: product.metadata.ram,
-          swap_mb: product.metadata.swap,
-          storage_mb: product.metadata.storage,
-        },
-      }),
-    );
+const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
+  "ServerCapacityAll",
+  async () => {
+    try {
+      const capacityChecks = pyroProducts.map((product) =>
+        usePyroFetch("capacity", {
+          method: "POST",
+          body: {
+            cpu: product.metadata.cpu,
+            memory_mb: product.metadata.ram,
+            swap_mb: product.metadata.swap,
+            storage_mb: product.metadata.storage,
+          },
+        }),
+      );
 
-    const results = await Promise.all(capacityChecks);
-    return {
-      small: results[0],
-      medium: results[1],
-      large: results[2],
-    };
-  } catch (error) {
-    console.error("Error checking server capacities:", error);
-    return {
-      small: { available: 0 },
-      medium: { available: 0 },
-      large: { available: 0 },
-    };
-  }
-});
+      const results = await Promise.all(capacityChecks);
+      return {
+        small: results[0],
+        medium: results[1],
+        large: results[2],
+      };
+    } catch (error) {
+      console.error("Error checking server capacities:", error);
+      return {
+        small: { available: 0 },
+        medium: { available: 0 },
+        large: { available: 0 },
+      };
+    }
+  },
+);
 
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
 const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0);
@@ -760,20 +763,12 @@ const selectProduct = async (product) => {
     return;
   }
 
-  const capacityCheck = await usePyroFetch("capacity", {
-    method: "POST",
-    body: {
-      cpu: product.metadata.cpu,
-      memory_mb: product.metadata.ram,
-      swap_mb: product.metadata.swap,
-      storage_mb: product.metadata.storage,
-    },
-  });
+  refreshCapacity();
 
-  if (capacityCheck.available === 0) {
+  if (isAtCapacity.value) {
     addNotification({
       group: "main",
-      title: "Capacity Full",
+      title: "Server Capacity Full",
       type: "error",
       text: "We are currently at capacity. Please try again later.",
     });
@@ -794,6 +789,18 @@ const selectProduct = async (product) => {
 };
 
 const openPurchaseModal = () => {
+  if (isAtCapacity.value) {
+    addNotification({
+      group: "main",
+      title: "Server Capacity Full",
+      type: "error",
+      text: "We are currently at capacity. Please try again later.",
+    });
+    return;
+  }
+
+  refreshCapacity();
+
   if (isAtCapacity.value) {
     addNotification({
       group: "main",
