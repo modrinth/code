@@ -8,7 +8,7 @@
         type="text"
         class="bg-bg-input w-full rounded-lg p-4"
         placeholder="e.g. Before 1.21"
-        maxlength="32"
+        maxlength="64"
       />
       <div class="flex items-center gap-2">
         <InfoIcon class="hidden sm:block" />
