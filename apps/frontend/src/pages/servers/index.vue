@@ -21,7 +21,7 @@
     />
 
     <section
-      class="relative mx-auto -mt-4 flex min-h-[calc(100vh)] max-w-7xl flex-col justify-center px-3"
+      class="relative mx-auto flex min-h-[calc(100vh-200px)] max-w-7xl flex-col justify-center px-3"
     >
       <div class="relative z-10 flex w-full flex-col items-center gap-10 text-center">
         <div class="flex flex-col items-center gap-4">
