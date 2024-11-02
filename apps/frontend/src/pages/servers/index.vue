@@ -153,12 +153,12 @@
         </div>
         <div class="relative">
           <img
-            src="~/assets/images/games/servers-hero-square-fixed-forreal-updated.png"
+            src="~/assets/images/games/installation-hero.png"
             alt=""
             class="hidden w-full rounded-2xl sm:block"
           />
           <img
-            src="~/assets/images/games/servers-hero-square-fixed-forreal-updated-mobile.png"
+            src="~/assets/images/games/installation-hero-mobile.png"
             alt=""
             class="block w-full rounded-2xl sm:hidden"
           />
