@@ -56,12 +56,12 @@
       class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
     >
       <div class="flex flex-row items-center gap-2">
-        <h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">
+        <h2 class="m-0 -ml-0.5 mt-1 text-3xl font-extrabold text-contrast">
           {{ formatBytes(animatedStorageUsage) }}
         </h2>
-        <h3 class="relative z-10 text-sm font-normal text-secondary">
+        <!-- <h3 class="relative z-10 text-sm font-normal text-secondary">
           / {{ formatBytes(props.data.current.storage_total_bytes) }}
-        </h3>
+        </h3> -->
       </div>
       <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
 
