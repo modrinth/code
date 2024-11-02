@@ -337,7 +337,7 @@
         </div>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
           <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <svg
+            <!-- <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -357,7 +357,8 @@
               />
               <path d="m18 15-2-2" />
               <path d="m15 18-2-2" />
-            </svg>
+            </svg> -->
+            <TerminalSquareIcon class="size-8 text-brand" />
             <h2 class="m-0 text-lg font-bold">
               An easy console, server properties manager, and more
             </h2>
@@ -588,6 +589,7 @@ import {
   SearchIcon,
   SortAscendingIcon,
   ExternalIcon,
+  TerminalSquareIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 
