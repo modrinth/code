@@ -145,7 +145,12 @@
           <img
             src="~/assets/images/games/servers-hero-square-fixed-forreal-updated.png"
             alt=""
-            class="w-full rounded-2xl"
+            class="hidden w-full rounded-2xl sm:block"
+          />
+          <img
+            src="~/assets/images/games/servers-hero-square-fixed-forreal-updated-mobile.png"
+            alt=""
+            class="block w-full rounded-2xl sm:hidden"
           />
         </div>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
