@@ -35,7 +35,7 @@
           </h1>
         </div>
         <h2
-          class="relative m-0 max-w-3xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
+          class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
         >
           Start your own Minecraft server directly on Modrinth. Play with your favorite mods,
           plugins, and datapacks — without the hassle of setup — then invite your friends to join.
