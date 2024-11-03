@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full flex-col items-center justify-center gap-8">
     <img
-      src="~/assets/images/games/excitement.png"
+      src="https://cdn.modrinth.com/servers/excitement.webp"
       alt=""
       class="max-w-[360px]"
       style="mask-image: radial-gradient(97% 77% at 50% 25%, #d9d9d9 0, hsla(0, 0%, 45%, 0) 100%)"
