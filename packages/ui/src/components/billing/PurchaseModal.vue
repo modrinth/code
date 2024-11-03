@@ -644,7 +644,6 @@ const updateCustomServerProduct = () => {
     customMatchingProduct.value = props.product.find(
       (product) => product.metadata.ram === customServerConfig.ram,
     )
-    console.log('Found:', customMatchingProduct.value)
 
     if (customMatchingProduct.value) mutatedProduct.value = { ...customMatchingProduct.value }
   }
