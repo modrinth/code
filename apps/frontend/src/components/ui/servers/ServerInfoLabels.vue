@@ -4,6 +4,7 @@
       v-if="showGameLabel"
       :game="serverData.game!"
       :mc-version="serverData.mc_version ?? ''"
+      :is-link="linked"
     />
     <UiServersServerLoaderLabel
       v-if="showLoaderLabel"
