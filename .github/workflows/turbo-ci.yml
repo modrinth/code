@@ -71,7 +71,7 @@ jobs:
           SQLX_OFFLINE: true
 
       - name: Start docker compose
-        run: docker compose up -d -f ./docker-compose.example.yml
+        run: docker compose -f ./docker-compose.example.yml up -d
 
       - name: Test
         run: pnpm test
