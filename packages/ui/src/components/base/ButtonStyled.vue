@@ -127,9 +127,15 @@ function setColorFill(
 const colorVariables = computed(() => {
   if (props.highlighted) {
     let colors = {
-      bg: props.highlightedStyle === 'main-nav-primary' ? 'var(--color-brand-highlight)' : 'var(--color-button-bg)',
+      bg:
+        props.highlightedStyle === 'main-nav-primary'
+          ? 'var(--color-brand-highlight)'
+          : 'var(--color-button-bg)',
       text: 'var(--color-contrast)',
-      icon: props.highlightedStyle === 'main-nav-primary' ? 'var(--color-brand)' : 'var(--color-contrast)',
+      icon:
+        props.highlightedStyle === 'main-nav-primary'
+          ? 'var(--color-brand)'
+          : 'var(--color-contrast)',
     }
     let hoverColors = JSON.parse(JSON.stringify(colors))
     return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon};`
