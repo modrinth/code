@@ -445,4 +445,8 @@ svg {
 .small-multiselect {
   max-width: 15rem;
 }
+
+.button-group {
+  justify-content: flex-start;
+}
 </style>
