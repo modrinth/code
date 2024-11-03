@@ -772,6 +772,7 @@ watch(
       startPolling();
     } else {
       stopPolling();
+      server.refresh();
     }
   },
 );
