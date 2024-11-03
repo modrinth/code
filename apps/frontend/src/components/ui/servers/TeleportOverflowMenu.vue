@@ -115,7 +115,7 @@ interface Option {
 const props = withDefaults(
   defineProps<{
     options: Option[];
-    hoverable: boolean;
+    hoverable?: boolean;
   }>(),
   {
     hoverable: false,
