@@ -211,8 +211,9 @@
               Experience modern, reliable hosting powered by Pyro
             </h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Modrinth Servers are hosted on super-fast servers, with custom-built sofware to ensure
-              your server runs smoothly.
+              Modrinth Servers are hosted on
+              <span class="text-contrast">2023 Ryzen 7/9 CPUs with DDR5 RAM</span>, running on
+              custom-built software to ensure your server performs smoothly.
             </h3>
           </div>
         </div>
@@ -294,7 +295,7 @@
               </svg>
               <h2 class="m-0 text-lg font-bold">Backups included</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
-                Every server comes with 15 backups stored off-site with Backblaze.
+                Every server comes with 15 backups stored securely off-site with Backblaze.
               </h3>
             </div>
           </div>
@@ -312,7 +313,7 @@
           >
             <h2 class="m-0 text-lg font-bold">Easy to use file manager</h2>
             <h3 class="m-0 text-base font-normal">
-              Search, manage, and upload files directly to your server with ease.
+              Search, manage, edit, and upload files directly to your server with ease.
             </h3>
 
             <img
@@ -345,33 +346,12 @@
         </div>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
           <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-            <!-- <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="size-8 text-brand"
-            >
-              <path
-                d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-              />
-              <path
-                d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"
-              />
-              <path d="m18 15-2-2" />
-              <path d="m15 18-2-2" />
-            </svg> -->
             <TerminalSquareIcon class="size-8 text-brand" />
             <h2 class="m-0 text-lg font-bold">
-              An easy console, server properties manager, and more
+              A powerful console, server properties manager, and more
             </h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Super powerful features with super simple access.
+              Modrinth Servers come with powerful tools to manage your server.
             </h3>
           </div>
           <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
@@ -402,6 +382,97 @@
             </h3>
           </div>
         </div>
+
+        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
+          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+            <TransferIcon class="size-8 text-brand" />
+            <h2 class="m-0 text-lg font-bold">SFTP access</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Access your server files directly with SFTP built into Modrinth Servers.
+            </h3>
+          </div>
+          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+            <VersionIcon class="size-8 text-brand" />
+            <h2 class="m-0 text-lg font-bold">Advanced networking management</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Add your own domain to your server, reserve up to 15 ports for mods that require them,
+              and more.
+            </h3>
+          </div>
+        </div>
+        <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+          <h1 class="m-0 text-lg font-bold">Frequently Asked Questions</h1>
+          <div class="flex flex-col gap-1">
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                What kind of CPUs do Modrinth Servers run on?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                Modrinth Servers use 2023 Ryzen 7 and Ryzen 9 CPUs at 4+ GHz, paired with DDR5
+                memory.
+              </p>
+            </details>
+
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                Do Modrinth Servers have DDoS protection?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                Yes. All Modrinth Servers come with DDoS protection. Protection is powered by a
+                combination of in-house network filtering by Pyro as well as with our data center
+                provider. Your server is safe on Modrinth.
+              </p>
+            </details>
+
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                Where are Modrinth Servers located? Can I choose a region?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                Currently, Modrinth Servers are located in New York and Los Angeles. More regions
+                are coming soon! Your server's location is currently chosen algorithmically, but you
+                will be able to choose a region in the future.
+              </p>
+            </details>
+
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                Can I increase the storage on my server?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                Yes, storage can be increased on your server at no additional cost. If you need more
+                storage, reach out to Modrinth Support.
+              </p>
+            </details>
+
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                How fast are Modrinth Servers? How many players can they handle?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                During the Modrinth "Emergency SMP" test, we had over 80 players on a server running
+                on the Large plan. The server ran smoothly and was only limited by RAM. We're
+                confident that Modrinth Servers can handle a large number of players, with any kind
+                of modpack.
+              </p>
+            </details>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -422,7 +493,10 @@
               ? "We are currently at capacity. Please try again later."
               : "There's a plan for everyone! Choose the one that fits your needs."
           }}
-          <span class="font-bold"> Servers are currently US only. More regions coming soon!</span>
+          <span class="font-bold">
+            Servers are currently US only, in New York and Los Angeles. More regions coming
+            soon!</span
+          >
         </h2>
 
         <ul class="m-0 flex w-full flex-col gap-8 p-0 lg:flex-row">
@@ -637,6 +711,8 @@ import {
   ExternalIcon,
   TerminalSquareIcon,
   UserIcon,
+  TransferIcon,
+  VersionIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";

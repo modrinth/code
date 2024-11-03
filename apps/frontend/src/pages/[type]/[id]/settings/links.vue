@@ -268,4 +268,8 @@ function checkDifference(newLink, existingLink) {
     height: 40px;
   }
 }
+
+.button-group {
+  justify-content: flex-start;
+}
 </style>
