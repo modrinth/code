@@ -79,7 +79,7 @@
       <div
         ref="scrollContainer"
         data-pyro-terminal-root
-        class="scrollbar-none absolute left-0 top-0 h-full w-full overflow-x-auto overflow-y-auto py-6 pb-[72px]"
+        class="scrollbar-none absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
         @scroll="handleScrollEvent"
       >
         <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
@@ -91,48 +91,14 @@
             role="listbox"
           >
             <template v-for="(item, index) in visibleItems" :key="index">
-              <li
-                ref="itemRefs"
-                class="relative w-full list-none"
-                :data-pyro-terminal-recycle-tracker="index"
-                :data-pyro-terminal-selected="isSelected(visibleStartIndex + index)"
-                aria-setsize="-1"
-                @click="(e) => handleLineClick(visibleStartIndex + index, e)"
-              >
-                <UiServersLogParser
-                  :log="item"
-                  :index="visibleStartIndex + index"
-                  :selected="isSelected(visibleStartIndex + index)"
-                />
+              <li>
+                <UiServersLogParser :log="item" :index="visibleStartIndex + index" />
               </li>
             </template>
           </ul>
         </div>
       </div>
     </div>
-
-    <Transition name="scroll-to-bottom">
-      <button
-        v-if="hasSelection"
-        v-tooltip="'Copy selected lines'"
-        class="experimental-styles-within absolute right-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
-        :class="bottomThreshold > 0 ? 'bottom-[8.5rem]' : 'bottom-[4.5rem]'"
-        @click="copySelectedText"
-      >
-        <span class="sr-only">Copy selected lines</span>
-        <CopyIcon
-          class="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2"
-          :class="{ 'scale-0 opacity-0 transition-all duration-200': copied }"
-        />
-        <CheckIcon
-          class="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2"
-          :class="{
-            'scale-100 opacity-100 transition-all duration-200': copied,
-            'scale-0 opacity-0 transition-all duration-200': !copied,
-          }"
-        />
-      </button>
-    </Transition>
 
     <div
       class="absolute bottom-4 z-[3] w-full"
@@ -168,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon, CopyIcon, CheckIcon } from "@modrinth/assets";
+import { RightArrowIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 
 const { $cosmetics } = useNuxtApp();
@@ -196,46 +162,9 @@ const initial = ref(false);
 const userHasScrolled = ref(false);
 const isScrolledToBottom = ref(true);
 
-const { selections, clearSelections, isSelected, handleLineClick, handleScroll, getSelectedText } =
-  useTerminalSelection();
-
-const hasSelection = computed(() => selections.value.length > 0);
-const copied = ref(false);
-
 const handleScrollEvent = () => {
   handleListScroll();
-  handleScroll();
 };
-
-const copySelectedText = async () => {
-  try {
-    const text = getSelectedText(props.consoleOutput);
-    await navigator.clipboard.writeText(text);
-    copied.value = true;
-    setTimeout(() => {
-      copied.value = false;
-      clearSelections();
-    }, 2000);
-  } catch (err) {
-    console.error("Failed to copy selected text:", err);
-  }
-};
-
-const updateSelectedClasses = () => {
-  nextTick(() => {
-    const selectedItems = document.querySelectorAll('[data-pyro-terminal-selected="true"]');
-    selectedItems.forEach((item) => {
-      item.classList.remove("first-selected", "last-selected");
-    });
-
-    if (selectedItems.length > 0) {
-      selectedItems[0].classList.add("first-selected");
-      selectedItems[selectedItems.length - 1].classList.add("last-selected");
-    }
-  });
-};
-
-watch(selections, updateSelectedClasses);
 
 const totalHeight = computed(
   () =>
@@ -680,5 +609,17 @@ html.dark-mode .progressive-gradient {
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
   overflow: hidden !important;
+}
+
+[data-pyro-terminal-root] {
+  user-select: none;
+}
+
+[data-pyro-terminal-root] * {
+  user-select: text;
+}
+
+.selection-in-progress {
+  pointer-events: none;
 }
 </style>

@@ -1,15 +1,8 @@
 <template>
-  <div
-    class="parsed-log group relative w-full overflow-hidden px-6 py-1"
-    :class="{
-      'bg-bg-raised': selected,
-      selected: selected,
-    }"
-  >
+  <div class="parsed-log group relative w-full overflow-hidden px-6 py-1">
     <div
       ref="logContent"
-      class="log-content whitespace-pre-wrap selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black"
-      :class="{ selectable: selected }"
+      class="log-content selectable whitespace-pre-wrap selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black"
       v-html="sanitizedLog"
     ></div>
   </div>
@@ -23,7 +16,6 @@ import DOMPurify from "dompurify";
 const props = defineProps<{
   log: string;
   index: number;
-  selected: boolean;
 }>();
 
 const logContent = ref<HTMLElement | null>(null);
