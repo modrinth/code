@@ -77,10 +77,10 @@
       </div>
 
       <div
-        class="pointer-events-none absolute left-0 top-16 z-[4] flex h-screen w-full flex-row items-end gap-24 sm:-right-1/4 sm:top-14"
+        class="top-26 pointer-events-none absolute left-0 z-[4] flex h-screen w-full flex-row items-end gap-24 sm:-right-1/4 sm:top-14"
       >
         <div
-          class="pointer-events-none absolute left-0 right-0 top-8 max-h-[90%] overflow-hidden sm:mt-0"
+          class="pointer-events-none absolute left-0 right-0 top-8 max-h-[90%] overflow-hidden sm:top-28 sm:mt-0"
           style="mask-image: linear-gradient(black, transparent 80%)"
         >
           <img
