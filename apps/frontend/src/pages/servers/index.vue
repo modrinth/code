@@ -425,8 +425,8 @@
               </summary>
               <p class="m-0 !leading-[190%]">
                 Yes. All Modrinth Servers come with DDoS protection. Protection is powered by a
-                combination of in-house network filtering by Pyro, as well as at the network level,
-                with Cloudflare and our data center provider. Your server is safe on Modrinth.
+                combination of in-house network filtering by Pyro as well as with our data center
+                provider. Your server is safe on Modrinth.
               </p>
             </details>
 
