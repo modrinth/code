@@ -19,7 +19,7 @@
         </div>
         <UiCopyCode :text="server.error ? String(server.error) : 'Unknown error'" />
         <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
-          <button class="mt-6 !w-full">Go to server</button>
+          <button class="mt-6 !w-full">Go back to all servers</button>
         </ButtonStyled>
       </div>
     </div>
