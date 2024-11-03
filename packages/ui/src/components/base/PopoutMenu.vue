@@ -104,19 +104,30 @@ defineExpose({
 })
 
 const handleClickOutside = (event) => {
+  if (!dropdown.value) return
+
+  const isContextMenuClick = event.button === 2 || event.which === 3
   const elements = document.elementsFromPoint(event.clientX, event.clientY)
   if (
-    dropdown.value.$el !== event.target &&
-    !elements.includes(dropdown.value.$el) &&
-    !dropdown.value.contains(event.target)
+    (dropdown.value !== event.target &&
+      !elements.includes(dropdown.value) &&
+      !dropdown.value.contains(event.target)) ||
+    isContextMenuClick
   ) {
     dropdownVisible.value = false
     emit('close')
   }
 }
 
+const handleKeyDown = (event) => {
+  if (event.key === 'Escape') {
+    hide()
+  }
+}
+
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
+  window.addEventListener('mouseup', handleClickOutside)
   window.addEventListener('resize', updateDirection)
   window.addEventListener('scroll', updateDirection)
   window.addEventListener('keydown', handleKeyDown)
@@ -125,16 +136,11 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('mouseup', handleClickOutside)
   window.removeEventListener('resize', updateDirection)
   window.removeEventListener('scroll', updateDirection)
   window.removeEventListener('keydown', handleKeyDown)
 })
-
-function handleKeyDown(event) {
-  if (event.key === 'Escape') {
-    hide()
-  }
-}
 </script>
 
 <style lang="scss" scoped>
