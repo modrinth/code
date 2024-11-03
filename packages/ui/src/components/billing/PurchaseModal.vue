@@ -99,7 +99,7 @@
         <div class="flex gap-2 items-center">
           <p class="my-2 text-lg font-bold">Configure your RAM</p>
           <IssuesIcon
-            v-if="customRamGb < 4"
+            v-if="customServerConfig.ramInGb < 4"
             v-tooltip="'This might not be enough resources for your Minecraft server.'"
             class="h-6 w-6 text-orange"
           />
