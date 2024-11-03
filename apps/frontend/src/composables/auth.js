@@ -113,7 +113,7 @@ export const getAuthUrl = (provider, redirect = "") => {
   }
   const fullURL = `${config.public.siteUrl}${redirect}`;
 
-  return `${config.public.apiBaseUrl}auth/init?url=${fullURL}&provider=${provider}`;
+  return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${fullURL}`;
 };
 
 export const removeAuthProvider = async (provider) => {
