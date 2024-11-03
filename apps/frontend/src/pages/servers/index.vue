@@ -10,6 +10,7 @@
       ref="purchaseModal"
       :product="selectedProduct"
       :country="country"
+      :custom-server="customServer"
       :publishable-key="config.public.stripePublishableKey"
       :send-billing-request="
         async (body) =>
@@ -456,7 +457,7 @@
               <button
                 v-if="!isSmallAtCapacity"
                 class="!bg-highlight-blue !font-medium !text-blue"
-                @click="selectProduct(pyroProducts[0])"
+                @click="selectProduct(pyroPlanProducts[0])"
               >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
@@ -514,7 +515,7 @@
               <button
                 v-if="!isMediumAtCapacity"
                 class="shadow-xl"
-                @click="selectProduct(pyroProducts[1])"
+                @click="selectProduct(pyroPlanProducts[1])"
               >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
@@ -561,7 +562,7 @@
               <button
                 v-if="!isLargeAtCapacity"
                 class="!bg-highlight-purple !font-medium !text-purple"
-                @click="selectProduct(pyroProducts[2])"
+                @click="selectProduct(pyroPlanProducts[2])"
               >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
@@ -598,14 +599,27 @@
 
           <div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
             <ButtonStyled color="standard" size="large">
-              <NuxtLink :to="loggedOut ? redirectUrl : '/servers/custom'" class="w-full md:w-fit">
+              <button
+                v-if="!isLargeAtCapacity"
+                class="w-full md:w-fit"
+                @click="selectProduct(pyroProducts, true)"
+              >
+                Build your own
+                <RightArrowIcon class="!min-h-4 !min-w-4" />
+              </button>
+              <NuxtLink
+                v-else
+                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
+                :target="loggedOut ? '_self' : '_blank'"
+                class="w-full md:w-fit"
+              >
                 <template v-if="loggedOut">
                   Login
                   <UserIcon class="!min-h-4 !min-w-4" />
                 </template>
                 <template v-else>
-                  Build your own
-                  <RightArrowIcon class="!min-h-4 !min-w-4" />
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4" />
                 </template>
               </NuxtLink>
             </ButtonStyled>
@@ -633,7 +647,15 @@ import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
-pyroProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
+const pyroPlanProducts = pyroProducts.filter(
+  (p) => p.metadata.ram === 4096 || p.metadata.ram === 6144 || p.metadata.ram === 8192,
+);
+pyroPlanProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
+// yep. this is a thing.
+if (!pyroProducts.metadata) {
+  pyroProducts.metadata = {};
+}
+pyroProducts.metadata.type = "pyro";
 
 const title = "Modrinth Servers";
 const description =
@@ -664,6 +686,7 @@ const country = useUserCountry();
 const customer = ref(null);
 const paymentMethods = ref([]);
 const selectedProduct = ref(null);
+const customServer = ref(false);
 const showModal = ref(false);
 const modalKey = ref(0);
 
@@ -692,7 +715,7 @@ const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
   "ServerCapacityAll",
   async () => {
     try {
-      const capacityChecks = pyroProducts.map((product) =>
+      const capacityChecks = pyroPlanProducts.map((product) =>
         usePyroFetch("capacity", {
           method: "POST",
           body: {
@@ -796,7 +819,7 @@ const isAtCapacity = computed(
   () => isSmallAtCapacity.value && isMediumAtCapacity.value && isLargeAtCapacity.value,
 );
 
-const selectProduct = async (product) => {
+const selectProduct = async (product, custom) => {
   if (isAtCapacity.value) {
     addNotification({
       group: "main",
@@ -824,6 +847,7 @@ const selectProduct = async (product) => {
     return;
   }
 
+  customServer.value = !!custom;
   selectedProduct.value = product;
   showModal.value = true;
   modalKey.value++;
@@ -856,7 +880,8 @@ const openPurchaseModal = () => {
     return;
   }
 
-  selectedProduct.value = pyroProducts[0];
+  customServer.value = false;
+  selectedProduct.value = pyroPlanProducts[0];
   showModal.value = true;
   modalKey.value++;
   nextTick(() => {
