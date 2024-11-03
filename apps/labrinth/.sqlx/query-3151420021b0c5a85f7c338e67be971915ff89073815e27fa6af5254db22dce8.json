@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO loaders_versions (loader_id, version_id)\n            SELECT * FROM UNNEST($1::integer[], $2::bigint[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4Array",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3151420021b0c5a85f7c338e67be971915ff89073815e27fa6af5254db22dce8"
+}

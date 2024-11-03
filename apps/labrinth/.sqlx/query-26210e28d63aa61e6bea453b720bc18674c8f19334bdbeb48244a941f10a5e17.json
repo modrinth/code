@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT v.id version_id, v.mod_id mod_id\n        FROM mods m\n        INNER JOIN versions v ON m.id = v.mod_id AND (cardinality($4::varchar[]) = 0 OR v.version_type = ANY($4))\n        INNER JOIN version_fields vf ON vf.field_id = 3 AND v.id = vf.version_id\n        INNER JOIN loader_field_enum_values lfev ON vf.enum_value = lfev.id AND (cardinality($2::varchar[]) = 0 OR lfev.value = ANY($2::varchar[]))\n        INNER JOIN loaders_versions lv ON lv.version_id = v.id\n        INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))\n        WHERE m.id = ANY($1)\n        ORDER BY v.date_published ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "mod_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "VarcharArray",
+        "VarcharArray",
+        "VarcharArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "26210e28d63aa61e6bea453b720bc18674c8f19334bdbeb48244a941f10a5e17"
+}

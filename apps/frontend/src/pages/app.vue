@@ -27,6 +27,7 @@ const windowsLink = ref(null);
 const linuxLinks = {
   appImage: null,
   deb: null,
+  rpm: null,
   thirdParty: "https://support.modrinth.com/en/articles/9298760",
 };
 const macLinks = {
@@ -57,6 +58,7 @@ macLinks.intel = launcherUpdates.value.platforms["darwin-x86_64"].install_urls[0
 windowsLink.value = launcherUpdates.value.platforms["windows-x86_64"].install_urls[0];
 linuxLinks.appImage = launcherUpdates.value.platforms["linux-x86_64"].install_urls[1];
 linuxLinks.deb = launcherUpdates.value.platforms["linux-x86_64"].install_urls[0];
+linuxLinks.rpm = launcherUpdates.value.platforms["linux-x86_64"].install_urls[2];
 
 onMounted(() => {
   os.value = navigator?.platform.toString();
@@ -879,7 +881,11 @@ useSeoMeta({
             </a>
             <a :href="linuxLinks.deb" download="">
               <DownloadIcon />
-              <span> Download the Deb </span>
+              <span> Download the DEB </span>
+            </a>
+            <a :href="linuxLinks.rpm" download="">
+              <DownloadIcon />
+              <span> Download the RPM </span>
             </a>
             <a :href="linuxLinks.thirdParty" download="">
               <LinkIcon />

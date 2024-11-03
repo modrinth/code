@@ -23,6 +23,8 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
   showAdsWithPlus: false,
 
   // Feature toggles
+  projectTypesPrimaryNav: false,
+  hidePlusPromoInUserMenu: false,
   // advancedRendering: true,
   // externalLinksNewTab: true,
   // notUsingBlockers: false,

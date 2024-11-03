@@ -176,7 +176,6 @@ export default defineNuxtConfig({
         $fetch(`${API_URL}projects_random?count=60`, headers),
         $fetch(`${API_URL}search?limit=3&query=leave&index=relevance`, headers),
         $fetch(`${API_URL}search?limit=3&query=&index=updated`, headers),
-        // TODO: dehardcode
         $fetch(`${API_URL.replace("/v2/", "/_internal/")}billing/products`, headers),
       ]);
 
@@ -321,8 +320,10 @@ export default defineNuxtConfig({
     apiBaseUrl: process.env.BASE_URL ?? globalThis.BASE_URL ?? getApiUrl(),
     // @ts-ignore
     rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
+    pyroBaseUrl: process.env.PYRO_BASE_URL,
     public: {
       apiBaseUrl: getApiUrl(),
+      pyroBaseUrl: process.env.PYRO_BASE_URL,
       siteUrl: getDomain(),
       production: isProduction(),
       featureFlagOverrides: getFeatureFlagOverrides(),
@@ -361,7 +362,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@vintl/nuxt", "@nuxtjs/turnstile"],
+  modules: ["@vintl/nuxt", "@nuxtjs/turnstile", "@pinia/nuxt"],
   vintl: {
     defaultLocale: "en-US",
     locales: [
@@ -462,6 +463,7 @@ function getDomain() {
       return "https://modrinth.com";
     }
   } else {
-    return "http://localhost:3000";
+    const port = process.env.PORT || 3000;
+    return `http://localhost:${port}`;
   }
 }
