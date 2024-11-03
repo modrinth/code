@@ -571,6 +571,10 @@ function getMessages() {
     gap: var(--spacing-card-sm);
   }
 
+  .notification__actions .iconified-button.square-button svg {
+    margin-right: 0;
+  }
+
   .unknown-type {
     color: var(--color-red);
   }
