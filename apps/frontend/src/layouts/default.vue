@@ -62,7 +62,7 @@
         </NuxtLink>
       </div>
       <div
-        class="col-span-2 row-start-2 flex flex-wrap justify-center gap-4 lg:col-span-1 lg:row-start-auto"
+        :class="`col-span-2 row-start-2 flex flex-wrap justify-center ${flags.projectTypesPrimaryNav ? 'gap-2' : 'gap-4'} lg:col-span-1 lg:row-start-auto`"
       >
         <template v-if="flags.projectTypesPrimaryNav">
           <ButtonStyled
@@ -80,7 +80,7 @@
               route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
             "
             :highlighted-style="
-              route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+              route.name === 'search-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
             <nuxt-link to="/resourcepacks">
@@ -91,7 +91,7 @@
             type="transparent"
             :highlighted="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
             :highlighted-style="
-              route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+              route.name === 'search-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
             <nuxt-link to="/datapacks"> <BracesIcon aria-hidden="true" /> Data Packs </nuxt-link>
@@ -100,7 +100,7 @@
             type="transparent"
             :highlighted="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
             :highlighted-style="
-              route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+              route.name === 'search-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
             <nuxt-link to="/modpacks"> <PackageOpenIcon aria-hidden="true" /> Modpacks </nuxt-link>
@@ -109,7 +109,7 @@
             type="transparent"
             :highlighted="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
             :highlighted-style="
-              route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+              route.name === 'search-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
             <nuxt-link to="/shaders"> <GlassesIcon aria-hidden="true" /> Shaders </nuxt-link>
