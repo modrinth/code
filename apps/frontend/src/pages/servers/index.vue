@@ -402,7 +402,7 @@
         </div>
         <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
           <h1 class="m-0 text-lg font-bold">Frequently Asked Questions</h1>
-          <div class="flex flex-col gap-1">
+          <div class="details-hide flex flex-col gap-1">
             <details pyro-hash="cpus" class="group" :open="route.hash === '#cpus'">
               <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
@@ -1027,5 +1027,9 @@ onUnmounted(() => {
 
 .faded-brand-line {
   background: linear-gradient(to right, var(--color-brand-highlight), transparent);
+}
+
+.details-hide summary::-webkit-details-marker {
+  display: none;
 }
 </style>
