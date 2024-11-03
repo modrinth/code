@@ -470,11 +470,11 @@
               >
                 <template v-if="loggedOut">
                   Login
-                  <UserIcon class="!min-h-4 !min-w-4" />
+                  <UserIcon class="!min-h-4 !min-w-4 !text-blue" />
                 </template>
                 <template v-else>
                   Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4" />
+                  <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
                 </template>
               </NuxtLink>
             </ButtonStyled>
@@ -528,11 +528,11 @@
               >
                 <template v-if="loggedOut">
                   Login
-                  <UserIcon class="!min-h-4 !min-w-4" />
+                  <UserIcon class="!min-h-4 !min-w-4 !text-green" />
                 </template>
                 <template v-else>
                   Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4" />
+                  <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
                 </template>
               </NuxtLink>
             </ButtonStyled>
@@ -575,11 +575,11 @@
               >
                 <template v-if="loggedOut">
                   Login
-                  <UserIcon class="!min-h-4 !min-w-4" />
+                  <UserIcon class="!min-h-4 !min-w-4 !text-purple" />
                 </template>
                 <template v-else>
                   Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4" />
+                  <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
                 </template>
               </NuxtLink>
             </ButtonStyled>
