@@ -830,7 +830,7 @@ const filters = computed(() => {
     }
   }
 
-  if (!server || serverOverrideGameVersions.value || projectType.value.id === "modpack") {
+  if (!server.value || serverOverrideGameVersions.value || projectType.value.id === "modpack") {
     filters.gameVersion = tags.value.gameVersions
       .filter((x) => (showSnapshots.value ? true : x.version_type === "release"))
       .map((x) => ({ name: x.version, type: "gameVersion" }));
