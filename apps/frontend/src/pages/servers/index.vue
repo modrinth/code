@@ -400,7 +400,77 @@
           </div>
         </div>
         <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-          Frequently Asked Questions
+          <h1 class="m-0 text-lg font-bold">Frequently Asked Questions</h1>
+          <div class="flex flex-col gap-1">
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                What kind of CPUs do Modrinth Servers run on?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                Modrinth Servers use 2023 Ryzen 7 and Ryzen 9 CPUs at 4+ GHz, paired with DDR5
+                memory.
+              </p>
+            </details>
+
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                Do Modrinth Servers have DDoS protection?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                Yes. All Modrinth Servers come with DDoS protection. Protection is powered by a
+                combination of in-house network filtering by Pyro, as well as at the network level,
+                with Cloudflare and our data center provider. Your server is safe on Modrinth.
+              </p>
+            </details>
+
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                Where are Modrinth Servers located? Can I choose a region?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                Currently, Modrinth Servers are located in New York and Los Angeles. More regions
+                are coming soon! Your server's location is currently chosen algorithmically, but you
+                will be able to choose a region in the future.
+              </p>
+            </details>
+
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                Can I increase the storage on my server?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                Yes, storage can be increased on your server at no additional cost. If you need more
+                storage, reach out to Modrinth Support.
+              </p>
+            </details>
+
+            <details class="group">
+              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                How fast are Modrinth Servers? How many players can they handle?
+              </summary>
+              <p class="m-0 !leading-[190%]">
+                During the Modrinth "Emergency SMP" test, we had over 80 players on a server running
+                on the Large plan. The server ran smoothly and was only limited by RAM. We're
+                confident that Modrinth Servers can handle a large number of players, with any kind
+                of modpack.
+              </p>
+            </details>
+          </div>
         </div>
       </div>
     </section>
@@ -642,6 +712,7 @@ import {
   UserIcon,
   TransferIcon,
   VersionIcon,
+  ArrowBigUpDashIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
