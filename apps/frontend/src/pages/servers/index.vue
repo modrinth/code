@@ -403,7 +403,7 @@
         <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
           <h1 class="m-0 text-lg font-bold">Frequently Asked Questions</h1>
           <div class="details-hide flex flex-col gap-1">
-            <details pyro-hash="cpus" class="group" :open="route.hash === '#cpus'">
+            <details pyro-hash="cpus" class="group" :open="$route.hash === '#cpus'">
               <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
@@ -416,7 +416,7 @@
               </p>
             </details>
 
-            <details pyro-hash="ddos" class="group" :open="route.hash === '#ddos'">
+            <details pyro-hash="ddos" class="group" :open="$route.hash === '#ddos'">
               <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
@@ -430,7 +430,7 @@
               </p>
             </details>
 
-            <details pyro-hash="region" class="group" :open="route.hash === '#region'">
+            <details pyro-hash="region" class="group" :open="$route.hash === '#region'">
               <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
@@ -444,7 +444,7 @@
               </p>
             </details>
 
-            <details pyro-hash="storage" class="group" :open="route.hash === '#storage'">
+            <details pyro-hash="storage" class="group" :open="$route.hash === '#storage'">
               <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
@@ -457,7 +457,7 @@
               </p>
             </details>
 
-            <details pyro-hash="players" class="group" :open="route.hash === '#players'">
+            <details pyro-hash="players" class="group" :open="$route.hash === '#players'">
               <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
@@ -895,6 +895,7 @@ const scrollToFaq = () => {
     // where pyro-hash === route.hash
     const faq = document.querySelector(`[pyro-hash="${route.hash.slice(1)}"]`);
     if (faq) {
+      faq.open = true;
       const top = faq.getBoundingClientRect().top;
       const offset = window.innerHeight / 2 - faq.clientHeight / 2;
       window.scrollTo({ top: window.scrollY + top - offset, behavior: "smooth" });
