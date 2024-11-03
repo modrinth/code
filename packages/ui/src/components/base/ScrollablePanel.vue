@@ -113,6 +113,7 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
+  max-height: 19rem;
 
   ::-webkit-scrollbar {
     transition: all;
