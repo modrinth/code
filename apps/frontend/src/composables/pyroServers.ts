@@ -396,7 +396,7 @@ const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => 
       `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`,
     );
 
-    return await PyroFetch(`/reinstallMrpack&hard=${hardResetParam}`, {
+    return await PyroFetch(`/reinstallMrpack?hard=${hardResetParam}`, {
       method: "POST",
       contentType: "application/octet-stream",
       body: mrpack,
