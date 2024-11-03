@@ -26,7 +26,7 @@
     />
 
     <section
-      class="mx-auto mt-20 flex min-h-[calc(80vh-0px)] max-w-7xl flex-col justify-center px-5 sm:min-h-[calc(100vh-0px)] sm:pl-10 lg:pl-3"
+      class="mx-auto mt-32 flex min-h-[calc(80vh-0px)] max-w-7xl flex-col justify-center px-5 sm:mt-20 sm:min-h-[calc(100vh-0px)] sm:pl-10 lg:pl-3"
     >
       <div class="z-[5] flex w-full flex-col gap-8">
         <div class="flex flex-col gap-4">
