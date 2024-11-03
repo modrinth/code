@@ -211,8 +211,8 @@
               Experience modern, reliable hosting powered by Pyro
             </h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Modrinth Servers are hosted on super-fast servers, with custom-built software to
-              ensure your server runs smoothly.
+              Modrinth Servers are hosted on 4GHz+ Ryzen 9 CPUs with DDR5 RAM, running on
+              custom-built software to ensure your server performs smoothly.
             </h3>
           </div>
         </div>
