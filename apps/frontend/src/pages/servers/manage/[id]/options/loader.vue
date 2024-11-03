@@ -133,16 +133,19 @@
           <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
           <div v-if="data.upstream" class="flex gap-4">
             <ButtonStyled>
-              <button class="!w-full sm:!w-auto" @click="mrpackModal.show()">
-                <UploadIcon class="size-4" /> Upload mrpack
-              </button>
+              <nuxt-link
+                :class="{
+                  'looks-disabled': props.server.general?.status === 'installing' && isError,
+                }"
+                :to="`/modpacks?sid=${props.server.serverId}`"
+              >
+                <TransferIcon class="size-4" />
+                Change modpack
+              </nuxt-link>
             </ButtonStyled>
             <ButtonStyled>
-              <button
-                :disabled="props.server.general?.status === 'installing' && isError"
-                @click="editModal.show()"
-              >
-                Choose modpack
+              <button class="!w-full sm:!w-auto" @click="mrpackModal.show()">
+                <UploadIcon class="size-4" /> Upload .mrpack file
               </button>
             </ButtonStyled>
           </div>
@@ -195,14 +198,14 @@
         </div>
         <div v-else class="flex w-full flex-col items-center gap-2 sm:w-fit sm:flex-row">
           <ButtonStyled>
-            <button class="!w-full sm:!w-auto" @click="editModal.show()">
-              <DownloadIcon class="size-4" /> Install modpack
-            </button>
+            <nuxt-link class="!w-full sm:!w-auto" :to="`/modpacks?sid=${props.server.serverId}`">
+              <DownloadIcon class="size-4" /> Install a modpack
+            </nuxt-link>
           </ButtonStyled>
           <span class="hidden sm:block">or</span>
           <ButtonStyled>
             <button class="!w-full sm:!w-auto" @click="mrpackModal.show()">
-              <UploadIcon class="size-4" /> Upload mrpack
+              <UploadIcon class="size-4" /> Upload .mrpack file
             </button>
           </ButtonStyled>
         </div>
@@ -239,7 +242,14 @@
 
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { DownloadIcon, UploadIcon, InfoIcon, RightArrowIcon, XIcon } from "@modrinth/assets";
+import {
+  TransferIcon,
+  DownloadIcon,
+  UploadIcon,
+  InfoIcon,
+  RightArrowIcon,
+  XIcon,
+} from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();

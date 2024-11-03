@@ -29,9 +29,21 @@
             <span>{{ server.general.loader }} {{ server.general.mc_version }}</span>
           </div>
         </nuxt-link>
-        <Checkbox v-model="serverOverrideGameVersions" label="Override game versions" />
-        <Checkbox v-model="serverOverrideLoaders" label="Override loaders" />
-        <Checkbox v-model="serverHideInstalled" label="Hide already installed" />
+        <Checkbox
+          v-if="projectType.id !== 'modpack'"
+          v-model="serverOverrideGameVersions"
+          label="Override game versions"
+        />
+        <Checkbox
+          v-if="projectType.id !== 'modpack'"
+          v-model="serverOverrideLoaders"
+          label="Override loaders"
+        />
+        <Checkbox
+          v-if="projectType.id !== 'modpack'"
+          v-model="serverHideInstalled"
+          label="Hide already installed"
+        />
       </section>
       <section class="card gap-1" :class="{ 'max-lg:!hidden': !sidebarMenuOpen }">
         <div class="flex items-center gap-2">
@@ -262,7 +274,8 @@
               <button
                 v-if="
                   result.installed ||
-                  server.mods.data.find((x) => x.project_id === result.project_id)
+                  server.mods.data.find((x) => x.project_id === result.project_id) ||
+                  server.general?.project?.id === result.project_id
                 "
                 disabled
                 class="btn btn-outline btn-primary"
@@ -420,15 +433,15 @@ if (route.query.sid) {
   server.value = await usePyroServer(route.query.sid, ["general", "mods"]);
 }
 
-if (route.query.shi) {
+if (route.query.shi && projectType.value.id !== "modpack") {
   serverHideInstalled.value = route.query.shi === "true";
 }
 
-if (route.query.sogv) {
+if (route.query.sogv && projectType.value.id !== "modpack") {
   serverOverrideGameVersions.value = route.query.sogv === "true";
 }
 
-if (route.query.sol) {
+if (route.query.sol && projectType.value.id !== "modpack") {
   serverOverrideLoaders.value = route.query.sol === "true";
 }
 
@@ -444,9 +457,15 @@ async function serverInstall(project) {
           x.loaders.includes(server.value.general.loader.toLowerCase()),
       ) ?? versions[0];
 
-    await server.value.mods.install(version.project_id, version.id);
-    await server.value.refresh(["mods"]);
-    project.installed = true;
+    if (projectType.value.id === "modpack") {
+      await server.value.general?.reinstall(route.query.sid, false, project.project_id, version.id);
+      project.installed = true;
+      navigateTo(`/servers/manage/${route.query.sid}/options/loader`);
+    } else if (projectType.value.id === "mod") {
+      await server.value.mods.install(version.project_id, version.id);
+      await server.value.refresh(["mods"]);
+      project.installed = true;
+    }
   } catch (e) {
     console.error(e);
   }
@@ -499,7 +518,7 @@ const {
       }
 
       // loaders specifier
-      if (server.value && !serverOverrideLoaders.value) {
+      if (server.value && !(serverOverrideLoaders.value || projectType.value.id === "modpack")) {
         formattedFacets.push([
           `categories:${encodeURIComponent(server.value.general.loader.toLowerCase())}`,
         ]);
@@ -521,7 +540,10 @@ const {
         );
       }
 
-      if (server.value && !serverOverrideGameVersions.value) {
+      if (
+        server.value &&
+        !(serverOverrideGameVersions.value || projectType.value.id === "modpack")
+      ) {
         formattedFacets.push([`versions:${encodeURIComponent(server.value.general.mc_version)}`]);
       } else if (selectedVersions.value.length > 0) {
         const versionFacets = [];
@@ -755,7 +777,7 @@ const filters = computed(() => {
   if (
     projectType.value.id !== "resourcepack" &&
     projectType.value.id !== "datapack" &&
-    (!server || serverOverrideLoaders.value)
+    (!server || serverOverrideLoaders.value || projectType.value.id === "modpack")
   ) {
     const loaders = tags.value.loaders
       .filter((x) => {
@@ -809,7 +831,7 @@ const filters = computed(() => {
     }
   }
 
-  if (!server || serverOverrideGameVersions.value) {
+  if (!server || serverOverrideGameVersions.value || projectType.value.id === "modpack") {
     filters.gameVersion = tags.value.gameVersions
       .filter((x) => (showSnapshots.value ? true : x.version_type === "release"))
       .map((x) => ({ name: x.version, type: "gameVersion" }));
