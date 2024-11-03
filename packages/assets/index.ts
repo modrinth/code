@@ -115,6 +115,7 @@ import _PackageOpenIcon from './icons/package-open.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PaintBrushIcon from './icons/paintbrush.svg?component'
 import _PlayIcon from './icons/play.svg?component'
+import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonChecked from './icons/radio-button-checked.svg?component'
@@ -294,6 +295,7 @@ export const PackageOpenIcon = _PackageOpenIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PaintBrushIcon = _PaintBrushIcon
 export const PlayIcon = _PlayIcon
+export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const RadioButtonChecked = _RadioButtonChecked

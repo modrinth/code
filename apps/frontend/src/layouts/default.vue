@@ -121,7 +121,7 @@
               route.name === 'search-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
-            <nuxt-link to="/plugins"> <ServerIcon aria-hidden="true" /> Plugins </nuxt-link>
+            <nuxt-link to="/plugins"> <PlugIcon aria-hidden="true" /> Plugins </nuxt-link>
           </ButtonStyled>
         </template>
         <template v-else>
@@ -181,7 +181,7 @@
                 v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
                 aria-hidden="true"
               />
-              <ServerIcon
+              <PlugIcon
                 v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
                 aria-hidden="true"
               />
@@ -195,7 +195,7 @@
                 <PaintBrushIcon aria-hidden="true" /> Resource Packs
               </template>
               <template #datapacks> <BracesIcon aria-hidden="true" /> Data Packs </template>
-              <template #plugins> <ServerIcon aria-hidden="true" /> Plugins </template>
+              <template #plugins> <PlugIcon aria-hidden="true" /> Plugins </template>
               <template #shaders> <GlassesIcon aria-hidden="true" /> Shaders </template>
               <template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
             </TeleportOverflowMenu>
@@ -574,6 +574,7 @@ import {
   HomeIcon,
   MoonIcon,
   SunIcon,
+  PlugIcon,
   PlusIcon,
   DropdownIcon,
   LogOutIcon,
