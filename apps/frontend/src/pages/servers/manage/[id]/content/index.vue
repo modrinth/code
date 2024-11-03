@@ -31,7 +31,9 @@
           :options="currentVersions"
           placeholder="Select project..."
           class="!w-full"
-          :display-name="(version) => version.version_number"
+          :display-name="
+            (version) => (typeof version === 'object' ? version?.version_number : version)
+          "
         />
       </div>
       <div class="mt-4 flex flex-row items-center gap-4">
@@ -438,7 +440,9 @@ const currentVersion = ref();
 async function beginChangeModVersion(mod: Mod) {
   currentMod.value = mod;
   currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false, true);
-  currentVersion.value = currentVersions.value.find((version) => version.id === mod.version_id);
+  currentVersion.value = currentVersions.value.find(
+    (version: any) => version.id === mod.version_id,
+  );
   modModal.value.show();
 }
 
