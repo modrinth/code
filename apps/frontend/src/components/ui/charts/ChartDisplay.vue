@@ -193,15 +193,20 @@
                 class="country-value"
               >
                 <div class="country-flag-container">
-                  <img
-                    :src="
-                      name.toLowerCase() === 'xx' || !name
-                        ? 'https://cdn.modrinth.com/placeholder-banner.svg'
-                        : countryCodeToFlag(name)
-                    "
-                    alt="Hidden country"
-                    class="country-flag"
-                  />
+                  <template v-if="name.toLowerCase() === 'xx' || !name">
+                    <img
+                      src="https://cdn.modrinth.com/placeholder-banner.svg"
+                      alt="Placeholder flag"
+                      class="country-flag"
+                    />
+                  </template>
+                  <template v-else>
+                    <img
+                      :src="countryCodeToFlag(name)"
+                      :alt="`${countryCodeToName(name)}'s flag`"
+                      class="country-flag"
+                    />
+                  </template>
                 </div>
                 <div class="country-text">
                   <strong class="country-name"
@@ -247,15 +252,20 @@
                 class="country-value"
               >
                 <div class="country-flag-container">
-                  <img
-                    :src="
-                      name.toLowerCase() === 'xx' || !name
-                        ? 'https://cdn.modrinth.com/placeholder-banner.svg'
-                        : countryCodeToFlag(name)
-                    "
-                    alt="Hidden country"
-                    class="country-flag"
-                  />
+                  <template v-if="name.toLowerCase() === 'xx' || !name">
+                    <img
+                      src="https://cdn.modrinth.com/placeholder-banner.svg"
+                      alt="Placeholder flag"
+                      class="country-flag"
+                    />
+                  </template>
+                  <template v-else>
+                    <img
+                      :src="countryCodeToFlag(name)"
+                      :alt="`${countryCodeToName(name)}'s flag`"
+                      class="country-flag"
+                    />
+                  </template>
                 </div>
                 <div class="country-text">
                   <strong class="country-name">
