@@ -39,7 +39,7 @@ pub fn send_email_raw(
     let creds = Credentials::new(username, password);
     let tls_settings =
         if dotenvy::var("SMTP_TLS")?.parse::<bool>().unwrap_or(true) {
-            Tls::Wrapper(TlsParameters::new(host.clone().into())?)
+            Tls::Wrapper(TlsParameters::new(host.clone())?)
         } else {
             Tls::None
         };
