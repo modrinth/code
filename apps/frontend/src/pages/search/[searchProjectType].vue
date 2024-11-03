@@ -776,7 +776,7 @@ const filters = computed(() => {
   if (
     projectType.value.id !== "resourcepack" &&
     projectType.value.id !== "datapack" &&
-    (!server || serverOverrideLoaders.value || projectType.value.id === "modpack")
+    (!server.value || serverOverrideLoaders.value || projectType.value.id === "modpack")
   ) {
     const loaders = tags.value.loaders
       .filter((x) => {
