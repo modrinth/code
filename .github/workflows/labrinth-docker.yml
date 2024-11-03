@@ -1,0 +1,46 @@
+name: docker-build
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - .github/workflows/labrinth-docker.yml
+      - 'apps/labrinth/**'
+  pull_request:
+    types: [ opened, synchronize ]
+    paths:
+      - .github/workflows/labrinth-docker.yml
+      - 'apps/labrinth/**'
+  merge_group:
+    types: [ checks_requested ]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/labrinth
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Fetch docker metadata
+        id: docker_meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ghcr.io/modrinth/labrinth
+      -
+        name: Login to GitHub Images
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./apps/labrinth
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}

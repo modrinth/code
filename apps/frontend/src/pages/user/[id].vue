@@ -498,7 +498,7 @@ const badges = computed(() => {
 });
 
 async function copyId() {
-  await navigator.clipboard.writeText(project.value.id);
+  await navigator.clipboard.writeText(user.value.id);
 }
 
 const navLinks = computed(() => [

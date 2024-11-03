@@ -1,0 +1,124 @@
+[package]
+name = "labrinth"
+version = "2.7.0"
+authors = ["geometrically <jai@modrinth.com>"]
+edition = "2018"
+license = "AGPL-3.0"
+
+# This seems redundant, but it's necessary for Docker to work
+[[bin]]
+name = "labrinth"
+path = "src/main.rs"
+
+[dependencies]
+actix-web = "4.4.1"
+actix-rt = "2.9.0"
+actix-multipart = "0.6.1"
+actix-cors = "0.7.0"
+actix-ws = "0.2.5"
+actix-files = "0.6.5"
+actix-web-prom = { version = "0.8.0", features = ["process"]}
+governor = "0.6.3"
+
+tokio = { version = "1.35.1", features = ["sync"] }
+tokio-stream = "0.1.14"
+
+futures = "0.3.30"
+futures-timer = "3.0.2"
+futures-util = "0.3.30"
+async-trait = "0.1.70"
+dashmap = "5.4.0"
+lazy_static = "1.4.0"
+
+meilisearch-sdk = "0.24.3"
+rust-s3 = "0.33.0"
+reqwest = { version = "0.11.18", features = ["json", "multipart"] }
+hyper = { version = "0.14", features = ["full"] }
+hyper-tls = "0.5.0"
+
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_with = "3.0.0"
+chrono = { version = "0.4.26", features = ["serde"] }
+yaserde = "0.8.0"
+yaserde_derive = "0.8.0"
+xml-rs = "0.8.15"
+
+rand = "0.8.5"
+rand_chacha = "0.3.1"
+bytes = "1.4.0"
+base64 = "0.21.7"
+sha1 = { version = "0.6.1", features = ["std"] }
+sha2 = "0.9.9"
+hmac = "0.11.0"
+argon2 = { version = "0.5.0", features = ["std"] }
+murmur2 = "0.1.0"
+bitflags = "2.4.0"
+hex = "0.4.3"
+zxcvbn = "2.2.2"
+totp-rs = { version = "5.0.2", features = ["gen_secret"] }
+
+url = "2.4.0"
+urlencoding = "2.1.2"
+
+zip = "0.6.6"
+
+itertools = "0.12.0"
+
+validator = { version = "0.16.1", features = ["derive", "phone"] }
+regex = "1.10.2"
+censor = "0.3.0"
+spdx = { version = "0.10.3", features = ["text"] }
+
+dotenvy = "0.15.7"
+log = "0.4.20"
+env_logger = "0.10.1"
+thiserror = "1.0.56"
+
+sqlx = { version = "0.8.2", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "chrono",
+    "macros",
+    "migrate",
+    "rust_decimal",
+    "json",
+] }
+rust_decimal = { version = "1.33.1", features = [
+    "serde-with-float",
+    "serde-with-str",
+] }
+redis = { version = "0.27.5", features = ["tokio-comp", "ahash", "r2d2"]}
+deadpool-redis = "0.18.0"
+clickhouse = { version = "0.11.2", features = ["uuid", "time"] }
+uuid = { version = "1.2.2", features = ["v4", "fast-rng", "serde"] }
+
+maxminddb = "0.24.0"
+flate2 = "1.0.25"
+tar = "0.4.38"
+
+sentry = { version = "0.32.1" }
+sentry-actix = "0.32.1"
+
+image = "0.24.6"
+color-thief = "0.2.2"
+webp = "0.3.0"
+
+woothee = "0.13.0"
+
+lettre = "0.11.3"
+
+derive-new = "0.6.0"
+rust_iso3166 = "0.1.11"
+
+jemallocator = {version = "0.5.4", optional = true}
+
+async-stripe = { version = "0.37.3", features = ["runtime-tokio-hyper-rustls"] }
+rusty-money = "0.4.1"
+json-patch = "*"
+
+[dev-dependencies]
+actix-http = "3.4.0"
+
+[features]
+jemalloc = ["jemallocator"]

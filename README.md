@@ -22,7 +22,7 @@ This repository contains two primary packages. For detailed development informat
 
 ## Contributing
 
-We welcome contributions! Before submitting any contributions, please read our [contributing guidelines](https://support.modrinth.com/en/articles/8802215-contributing-to-modrinth).
+We welcome contributions! Before submitting any contributions, please read our [contributing guidelines](https://docs.modrinth.com/contributing/getting-started/).
 
 If you plan to fork this repository for your own purposes, please review our [copying guidelines](COPYING.md).
 

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                        DELETE FROM mods_links\n                        WHERE joining_mod_id = $1 AND joining_platform_id IN (\n                            SELECT id FROM link_platforms WHERE name = ANY($2)\n                        )\n                        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "TextArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "186d0e933ece20163915926293a01754ff571de4f06e521bb4f7c0207268e03b"
+}
