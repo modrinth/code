@@ -4,7 +4,7 @@
     class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-3"
   >
     <div
-      v-if="serverList.length > 0"
+      v-if="serverList.length > 0 || isPollingForNewServers"
       class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row"
     >
       <h1 class="w-full text-4xl font-bold text-contrast">Servers</h1>
@@ -37,9 +37,10 @@
       </div>
     </div>
 
-    <LazyUiServersServerManageEmptyState v-if="serverList.length === 0" />
+    <LazyUiServersServerManageEmptyState
+      v-if="serverList.length === 0 && !isPollingForNewServers"
+    />
 
-    <LazyUiServersServerListingSkeleton v-if="isLoading" />
     <template v-else>
       <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
         <UiServersServerListing
@@ -55,6 +56,7 @@
           :upstream="server.upstream"
           :net="server.net"
         />
+        <LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
       </ul>
       <div v-else class="flex h-full items-center justify-center">
         <p class="text-contrast">No servers found.</p>
@@ -85,7 +87,7 @@ interface ServerResponse {
 }
 
 const route = useRoute();
-const isLoading = ref(false);
+const isPollingForNewServers = ref(false);
 
 const { data: serverResponse, refresh } = await useAsyncData<ServerResponse>(
   "ServerList",
@@ -126,10 +128,10 @@ const checkForNewServers = async () => {
   await refresh();
   refreshCount.value += 1;
   if (JSON.stringify(previousServerList.value) !== JSON.stringify(serverList.value)) {
-    isLoading.value = false;
+    isPollingForNewServers.value = false;
     clearInterval(intervalId);
   } else if (refreshCount.value >= 5) {
-    isLoading.value = false;
+    isPollingForNewServers.value = false;
     clearInterval(intervalId);
   }
 };
@@ -138,7 +140,7 @@ let intervalId: ReturnType<typeof setInterval> | undefined;
 
 onMounted(() => {
   if (route.query.redirect_status === "succeeded") {
-    isLoading.value = true;
+    isPollingForNewServers.value = true;
     previousServerList.value = [...serverList.value];
     intervalId = setInterval(checkForNewServers, 5000);
   }
