@@ -118,7 +118,7 @@
           when you're ready to play.
         </h2>
         <img
-          src="~/assets/images/games/excitement.png"
+          src="https://cdn.modrinth.com/servers/excitement.webp"
           alt=""
           class="absolute right-14 top-0 hidden max-w-[360px] lg:block"
         />
@@ -239,7 +239,7 @@
           that only Modrinth can offer.
         </h2>
         <img
-          src="~/assets/images/games/waving.png"
+          src="https://cdn.modrinth.com/servers/waving.webp"
           alt=""
           class="absolute right-8 top-40 hidden max-w-[480px] lg:block"
         />
@@ -316,7 +316,7 @@
             </h3>
 
             <img
-              src="~/assets/images/games/content-hero-fixed.png"
+              src="https://cdn.modrinth.com/servers/content-dark.webp"
               alt=""
               class="absolute -bottom-12 -right-[15%] hidden max-w-2xl rounded-2xl bg-brand p-4 lg:block"
             />
