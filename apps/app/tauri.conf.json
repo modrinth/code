@@ -21,8 +21,9 @@
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
       "timestampUrl": "http://timestamp.digicert.com",
-      "wix": {
-        "template": "./msi/main.wxs"
+      "nsis": {
+        "installMode": "perMachine",
+        "installerHooks": "./nsis/hooks.nsi"
       }
     },
     "longDescription": "",
@@ -48,7 +49,8 @@
     ]
   },
   "productName": "Modrinth App",
-  "version": "0.8.5",
+  "version": "0.8.9",
+  "mainBinaryName": "Modrinth App",
   "identifier": "ModrinthApp",
   "plugins": {
     "deep-link": {
@@ -95,7 +97,7 @@
         ],
         "img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost blob: data:",
         "style-src": "'unsafe-inline' 'self'",
-        "script-src": "https://cmp.inmobi.com https://*.cloudflare.com 'self'",
+        "script-src": "https://cmp.inmobi.com https://*.cloudflare.com https://*.posthog.com 'self'",
         "frame-src": "https://*.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'"
       }
     }

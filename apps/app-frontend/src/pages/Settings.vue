@@ -17,7 +17,7 @@ import { hide_ads_window } from '@/helpers/ads.js'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 
 onMounted(() => {
-  hide_ads_window()
+  hide_ads_window(true)
 })
 
 const pageOptions = ['Home', 'Library']
@@ -365,6 +365,25 @@ async function purgeCache() {
       </div>
       <div class="adjacent-input">
         <label for="opt-out-analytics">
+          <span class="label__title">Personalized ads</span>
+          <span class="label__description">
+            Modrinth's ad provider, Aditude, shows ads based on your preferences. By disabling this
+            option, you opt out and ads will no longer be shown based on your interests.
+          </span>
+        </label>
+        <Toggle
+          id="opt-out-analytics"
+          :model-value="settings.personalized_ads"
+          :checked="settings.personalized_ads"
+          @update:model-value="
+            (e) => {
+              settings.personalized_ads = e
+            }
+          "
+        />
+      </div>
+      <div class="adjacent-input">
+        <label for="opt-out-analytics">
           <span class="label__title">Telemetry</span>
           <span class="label__description">
             Modrinth collects anonymized analytics and usage data to improve our user experience and
@@ -406,14 +425,14 @@ async function purgeCache() {
           <span class="label__title size-card-header">Java settings</span>
         </h3>
       </div>
-      <template v-for="version in [21, 17, 8]">
-        <label :for="'java-' + version">
-          <span class="label__title">Java {{ version }} location</span>
+      <template v-for="javaVersion in [21, 17, 8]" :key="`java-${javaVersion}`">
+        <label :for="'java-' + javaVersion">
+          <span class="label__title">Java {{ javaVersion }} location</span>
         </label>
         <JavaSelector
-          :id="'java-selector-' + version"
-          v-model="javaVersions[version]"
-          :version="version"
+          :id="'java-selector-' + javaVersion"
+          v-model="javaVersions[javaVersion]"
+          :version="javaVersion"
           @update:model-value="updateJavaVersion"
         />
       </template>

@@ -501,13 +501,8 @@ impl Profile {
 
     pub async fn remove(
         profile_path: &str,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
-        if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
-        {
-            io::remove_dir_all(&path).await?;
-        }
-
         sqlx::query!(
             "
             DELETE FROM profiles
@@ -515,8 +510,13 @@ impl Profile {
             ",
             profile_path
         )
-        .execute(&mut **transaction)
+        .execute(pool)
         .await?;
+
+        if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
+        {
+            io::remove_dir_all(&path).await?;
+        }
 
         Ok(())
     }

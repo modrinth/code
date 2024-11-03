@@ -296,7 +296,7 @@ if (logs.value.length > 1 && !props.playing) {
 
 const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
-    let deleteIndex = selectedLogIndex.value
+    const deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
     await delete_logs_by_filename(
       props.instance.path,

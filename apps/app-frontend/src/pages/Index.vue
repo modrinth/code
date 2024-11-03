@@ -47,7 +47,7 @@ const getInstances = async () => {
     return dateB - dateA
   })
 
-  let filters = []
+  const filters = []
   for (const instance of recentInstances.value) {
     if (instance.linked_data && instance.linked_data.project_id) {
       filters.push(`NOT"project_id"="${instance.linked_data.project_id}"`)

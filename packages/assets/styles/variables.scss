@@ -26,7 +26,8 @@ html {
 }
 
 .light-mode,
-.light {
+.light,
+:root[data-theme='light'] {
   --color-bg: #e5e7eb;
   --color-raised-bg: #ffffff;
   --color-super-raised-bg: #e9e9e9;
@@ -71,7 +72,8 @@ html {
 }
 
 .dark-mode,
-.dark {
+.dark,
+:root[data-theme='dark'] {
   --color-bg: #16181c;
   --color-raised-bg: #26292f;
   --color-super-raised-bg: #40434a;

@@ -134,9 +134,9 @@ const logout = async (id) => {
   trackEvent('AccountLogOut')
 }
 
-let showCard = ref(false)
-let card = ref(null)
-let button = ref(null)
+const showCard = ref(false)
+const card = ref(null)
+const button = ref(null)
 const handleClickOutside = (event) => {
   const elements = document.elementsFromPoint(event.clientX, event.clientY)
   if (
