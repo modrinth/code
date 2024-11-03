@@ -211,7 +211,8 @@
               Experience modern, reliable hosting powered by Pyro
             </h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Modrinth Servers are hosted on 4GHz+ Ryzen 9 CPUs with DDR5 RAM, running on
+              Modrinth Servers are hosted on
+              <span class="text-contrast">2023 Ryzen 7/9 CPUs with DDR5 RAM</span>, running on
               custom-built software to ensure your server performs smoothly.
             </h3>
           </div>
@@ -712,7 +713,6 @@ import {
   UserIcon,
   TransferIcon,
   VersionIcon,
-  ArrowBigUpDashIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
