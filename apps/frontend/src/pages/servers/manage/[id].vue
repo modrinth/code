@@ -601,7 +601,7 @@ const updateStats = (currentStats: Stats["current"]) => {
 const updatePowerState = (state: ServerState) => {
   console.log("Power state:", state);
   serverPowerState.value = state;
-  if (state === "stopped") {
+  if (state === "stopped" || state === "crashed") {
     stopUptimeUpdates();
     uptimeSeconds.value = 0;
   }
