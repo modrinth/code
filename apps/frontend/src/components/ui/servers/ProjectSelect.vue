@@ -63,7 +63,6 @@ const props = defineProps<{
 }>();
 
 const route = useNativeRoute();
-const prodOverride = await PyroAuthOverride();
 const serverId = route.params.id as string;
 const server = serverId ? await usePyroServer(serverId, ["general"]) : null;
 
@@ -97,7 +96,6 @@ const loadMods = async () => {
     `search?query=${queryFilter.value}&facets=${buildFacetString(facets.value)}&index=relevance&limit=25&offset=${page.value * 25}`,
     {},
     false,
-    prodOverride,
   )) as any;
   pages.value = newMods.total_hits;
   mods.value.hits.push(...newMods.hits);
@@ -108,12 +106,7 @@ const versions = reactive<{ [key: string]: any[] }>({});
 
 const getVersions = async (projectId: string) => {
   if (!versions[projectId]) {
-    const allVersions = (await useBaseFetch(
-      `project/${projectId}/version`,
-      {},
-      false,
-      prodOverride,
-    )) as any;
+    const allVersions = (await useBaseFetch(`project/${projectId}/version`, {}, false)) as any;
 
     if (props.isserver === false && props.type !== "modpack") {
       versions[projectId] = allVersions

@@ -135,7 +135,7 @@ export default defineNuxtConfig({
         await fs.mkdir("./src/generated", { recursive: true });
       }
 
-      const API_URL = "https://api.modrinth.com/v2/";
+      const API_URL = getApiUrl();
 
       if (
         // Skip regeneration if within TTL...
@@ -176,9 +176,7 @@ export default defineNuxtConfig({
         $fetch(`${API_URL}projects_random?count=60`, headers),
         $fetch(`${API_URL}search?limit=3&query=leave&index=relevance`, headers),
         $fetch(`${API_URL}search?limit=3&query=&index=updated`, headers),
-        // TODO: dehardcode
-        $fetch(`${STAGING_API_URL.replace("/v2/", "/_internal/")}billing/products`, headers),
-        // SET TO API_URL WHEN MERGING WITH UPSTREAM
+        $fetch(`${API_URL.replace("/v2/", "/_internal/")}billing/products`, headers),
       ]);
 
       state.categories = categories;
@@ -323,11 +321,9 @@ export default defineNuxtConfig({
     // @ts-ignore
     rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
     pyroBaseUrl: process.env.PYRO_BASE_URL,
-    prodOverride: process.env.PROD_OVERRIDE,
     public: {
       apiBaseUrl: getApiUrl(),
       pyroBaseUrl: process.env.PYRO_BASE_URL,
-      prodOverride: process.env.PROD_OVERRIDE,
       siteUrl: getDomain(),
       production: isProduction(),
       featureFlagOverrides: getFeatureFlagOverrides(),
@@ -450,24 +446,22 @@ function getFeatureFlagOverrides() {
 
 function getDomain() {
   if (process.env.NODE_ENV === "production") {
-    // if (process.env.SITE_URL) {
-    //   return process.env.SITE_URL;
-    // }
-    // // @ts-ignore
-    // else if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
-    //   // @ts-ignore
-    //   return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL;
-    // } else if (process.env.HEROKU_APP_NAME) {
-    //   return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
-    // } else if (process.env.VERCEL_URL) {
-    //   return `https://${process.env.VERCEL_URL}`;
-    // } else if (getApiUrl() === STAGING_API_URL) {
-    //   return "https://staging.modrinth.com";
-    // } else {
-    //   return "https://modrinth.com";
-    // }
-    // TODO: remove on merge
-    return "https://redacted.modrinth.com";
+    if (process.env.SITE_URL) {
+      return process.env.SITE_URL;
+    }
+    // @ts-ignore
+    else if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
+      // @ts-ignore
+      return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL;
+    } else if (process.env.HEROKU_APP_NAME) {
+      return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`;
+    } else if (process.env.VERCEL_URL) {
+      return `https://${process.env.VERCEL_URL}`;
+    } else if (getApiUrl() === STAGING_API_URL) {
+      return "https://staging.modrinth.com";
+    } else {
+      return "https://modrinth.com";
+    }
   } else {
     const port = process.env.PORT || 3000;
     return `http://localhost:${port}`;

@@ -43,8 +43,6 @@
 import { ChevronRightIcon } from "@modrinth/assets";
 import type { Project, Server } from "~/types/servers";
 
-const prodOverride = await PyroAuthOverride();
-
 const props = defineProps<Partial<Server>>();
 
 const showGameLabel = computed(() => !!props.game);
@@ -56,12 +54,7 @@ if (props.upstream) {
   const { data } = await useAsyncData<Project>(
     `server-project-${props.server_id}`,
     async (): Promise<Project> => {
-      const result = await useBaseFetch(
-        `project/${props.upstream?.project_id}`,
-        {},
-        false,
-        prodOverride,
-      );
+      const result = await useBaseFetch(`project/${props.upstream?.project_id}`);
       return result as Project;
     },
   );

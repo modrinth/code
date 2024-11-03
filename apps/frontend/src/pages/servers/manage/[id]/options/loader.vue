@@ -264,7 +264,6 @@ const emit = defineEmits<{
 }>();
 
 const tags = useTags();
-const prodOverride = await PyroAuthOverride();
 
 const isLoading = ref(false);
 
@@ -380,13 +379,7 @@ watch(
 const { data: versions } = data?.value?.upstream
   ? await useLazyAsyncData(
       `content-loader-versions`,
-      () =>
-        useBaseFetch(
-          `project/${data?.value?.upstream?.project_id}/version`,
-          {},
-          false,
-          prodOverride,
-        ) as any,
+      () => useBaseFetch(`project/${data?.value?.upstream?.project_id}/version`) as any,
     )
   : { data: { value: [] } };
 
@@ -408,12 +401,7 @@ const updateData = async () => {
   if (!data.value?.upstream?.version_id) {
     return;
   }
-  currentVersion.value = await useBaseFetch(
-    `version/${data?.value?.upstream?.version_id}`,
-    {},
-    false,
-    prodOverride,
-  );
+  currentVersion.value = await useBaseFetch(`version/${data?.value?.upstream?.version_id}`);
   version.value = currentVersion.value.version_number;
 };
 updateData();
@@ -563,12 +551,7 @@ const handleReinstall = async () => {
 const reinstallNew = async (project: any, versionNumber: string) => {
   editModal.value.hide();
   try {
-    const versions = (await useBaseFetch(
-      `project/${project.project_id}/version`,
-      {},
-      false,
-      prodOverride,
-    )) as any;
+    const versions = (await useBaseFetch(`project/${project.project_id}/version`)) as any;
     const version = versions.find((x: any) => x.version_number === versionNumber);
 
     if (!version?.id) {

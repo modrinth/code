@@ -483,9 +483,8 @@ const {
   pending: searchLoading,
 } = useLazyFetch(
   () => {
-    // const config = useRuntimeConfig();
-    // const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
-    const base = "https://api.modrinth.com/v2/";
+    const config = useRuntimeConfig();
+    const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
     const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`];
 
     if (query.value.length > 0) {

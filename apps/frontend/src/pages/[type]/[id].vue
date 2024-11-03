@@ -1354,27 +1354,23 @@ try {
     { data: versions },
     { data: organization, refresh: resetOrganization },
   ] = await Promise.all([
-    useAsyncData(
-      `project/${route.params.id}`,
-      () => useBaseFetch(`project/${route.params.id}`, {}, false, true),
-      {
-        transform: (project) => {
-          if (project) {
-            project.actualProjectType = JSON.parse(JSON.stringify(project.project_type));
-            project.project_type = data.$getProjectTypeForUrl(
-              project.project_type,
-              project.loaders,
-              tags.value,
-            );
-          }
+    useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
+      transform: (project) => {
+        if (project) {
+          project.actualProjectType = JSON.parse(JSON.stringify(project.project_type));
+          project.project_type = data.$getProjectTypeForUrl(
+            project.project_type,
+            project.loaders,
+            tags.value,
+          );
+        }
 
-          return project;
-        },
+        return project;
       },
-    ),
+    }),
     useAsyncData(
       `project/${route.params.id}/members`,
-      () => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }, false, true),
+      () => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }),
       {
         transform: (members) => {
           members.forEach((it, index) => {
@@ -1387,16 +1383,16 @@ try {
       },
     ),
     useAsyncData(`project/${route.params.id}/dependencies`, () =>
-      useBaseFetch(`project/${route.params.id}/dependencies`, {}, false, true),
+      useBaseFetch(`project/${route.params.id}/dependencies`, {}),
     ),
     useAsyncData(`project/${route.params.id}/version?featured=true`, () =>
-      useBaseFetch(`project/${route.params.id}/version?featured=true`, {}, false, true),
+      useBaseFetch(`project/${route.params.id}/version?featured=true`),
     ),
     useAsyncData(`project/${route.params.id}/version`, () =>
-      useBaseFetch(`project/${route.params.id}/version`, {}, false, true),
+      useBaseFetch(`project/${route.params.id}/version`),
     ),
     useAsyncData(`project/${route.params.id}/organization`, () =>
-      useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 }, false, true),
+      useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 }),
     ),
   ]);
 

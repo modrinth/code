@@ -23,11 +23,6 @@ export class PyroFetchError extends Error {
   }
 }
 
-// eslint-disable-next-line require-await
-export async function PyroAuthOverride() {
-  return true;
-}
-
 export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promise<T> {
   const config = useRuntimeConfig();
   const auth = await useAuth();
