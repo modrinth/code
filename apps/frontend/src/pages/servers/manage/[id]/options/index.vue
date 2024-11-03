@@ -1,31 +1,6 @@
 <template>
   <div class="relative h-full w-full overflow-y-auto">
     <div v-if="data" class="flex h-full w-full flex-col">
-      <div class="card flex flex-col gap-4">
-        <label for="server-subdomain" class="flex flex-col gap-2">
-          <span class="text-lg font-bold text-contrast">Custom URL</span>
-          <span> Your friends can connect to your server using this URL. </span>
-        </label>
-        <div class="flex w-full items-center gap-2 md:w-[60%]">
-          <input
-            id="server-subdomain"
-            v-model="serverSubdomain"
-            class="h-[50%] w-[63%]"
-            maxlength="32"
-            @keyup.enter="saveGeneral"
-          />
-          .modrinth.gg
-        </div>
-        <div class="flex flex-col text-sm text-rose-400">
-          <span v-if="!isValidLengthSubdomain">
-            Subdomain must be at least 5 characters long.
-          </span>
-          <span v-if="!isValidCharsSubdomain">
-            Subdomain can only contain alphanumeric characters and dashes.
-          </span>
-        </div>
-      </div>
-
       <div class="gap-2">
         <div class="card flex flex-col gap-4">
           <label for="server-name-field" class="flex flex-col gap-2">
@@ -62,6 +37,31 @@
         -->
 
         <div class="card flex flex-col gap-4">
+          <label for="server-subdomain" class="flex flex-col gap-2">
+            <span class="text-lg font-bold text-contrast">Custom URL</span>
+            <span> Your friends can connect to your server using this URL. </span>
+          </label>
+          <div class="flex w-full items-center gap-2 md:w-[60%]">
+            <input
+              id="server-subdomain"
+              v-model="serverSubdomain"
+              class="h-[50%] w-[63%]"
+              maxlength="32"
+              @keyup.enter="saveGeneral"
+            />
+            .modrinth.gg
+          </div>
+          <div class="flex flex-col text-sm text-rose-400">
+            <span v-if="!isValidLengthSubdomain">
+              Subdomain must be at least 5 characters long.
+            </span>
+            <span v-if="!isValidCharsSubdomain">
+              Subdomain can only contain alphanumeric characters and dashes.
+            </span>
+          </div>
+        </div>
+
+        <div class="card flex flex-col gap-4">
           <label for="server-icon-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server icon</span>
             <span>
@@ -69,41 +69,49 @@
               Modrinth.
             </span>
           </label>
-          <div
-            v-tooltip="'Upload a custom Icon'"
-            class="group relative flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-table-alternateRow"
-            @dragover.prevent="onDragOver"
-            @dragleave.prevent="onDragLeave"
-            @drop.prevent="onDrop"
-            @click="triggerFileInput"
-          >
-            <input
-              v-if="data?.image"
-              id="server-icon-field"
-              type="file"
-              accept="image/png,image/jpeg,image/gif,image/webp"
-              hidden
-              @change="uploadFile"
-            />
+          <div class="flex gap-4">
             <div
-              class="absolute top-0 hidden size-[6rem] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
+              v-tooltip="'Upload a custom Icon'"
+              class="group relative flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-table-alternateRow"
+              @dragover.prevent="onDragOver"
+              @dragleave.prevent="onDragLeave"
+              @drop.prevent="onDrop"
+              @click="triggerFileInput"
             >
-              <EditIcon class="h-8 w-8 text-contrast" />
+              <input
+                v-if="icon"
+                id="server-icon-field"
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                hidden
+                @change="uploadFile"
+              />
+              <div
+                class="absolute top-0 hidden size-[6rem] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
+              >
+                <EditIcon class="h-8 w-8 text-contrast" />
+              </div>
+              <img
+                v-if="icon"
+                no-shadow
+                alt="Server Icon"
+                class="h-[6rem] w-[6rem] rounded-xl"
+                :src="icon"
+              />
+              <img
+                v-else
+                no-shadow
+                alt="Server Icon"
+                class="h-[6rem] w-[6rem] rounded-xl"
+                src="~/assets/images/servers/minecraft_server_icon.png"
+              />
             </div>
-            <img
-              v-if="data?.image"
-              no-shadow
-              alt="Server Icon"
-              class="h-[6rem] w-[6rem] rounded-xl"
-              :src="data.image"
-            />
-            <img
-              v-else
-              no-shadow
-              alt="Server Icon"
-              class="h-[6rem] w-[6rem] rounded-xl"
-              src="~/assets/images/servers/minecraft_server_icon.png"
-            />
+            <ButtonStyled>
+              <button v-tooltip="'Synchronize icon with installed modpack'" @click="resetIcon">
+                <TransferIcon class="h-6 w-6" />
+                <span>Sync icon</span>
+              </button>
+            </ButtonStyled>
           </div>
         </div>
       </div>
@@ -120,7 +128,8 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon } from "@modrinth/assets";
+import { EditIcon, TransferIcon } from "@modrinth/assets";
+import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 
 import type { Server } from "~/composables/pyroServers";
 
@@ -136,6 +145,7 @@ const isValidCharsSubdomain = computed(() => /^[a-zA-Z0-9-]+$/.test(serverSubdom
 const isValidSubdomain = computed(
   () => isValidLengthSubdomain.value && isValidCharsSubdomain.value,
 );
+const icon = computed(() => data.value?.image);
 
 const isUpdating = ref(false);
 const hasUnsavedChanges = computed(
@@ -271,6 +281,21 @@ const uploadFile = async (e: Event) => {
     title: "Server icon updated",
     text: "Your server icon was successfully changed.",
   });
+};
+
+const resetIcon = async () => {
+  if (data.value?.image) {
+    await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
+    await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await reloadNuxtApp();
+    addNotification({
+      group: "serverOptions",
+      type: "success",
+      title: "Server icon reset",
+      text: "Your server icon was successfully reset.",
+    });
+  }
 };
 
 const onDragOver = (e: DragEvent) => {
