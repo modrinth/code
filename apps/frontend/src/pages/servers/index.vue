@@ -66,10 +66,10 @@
       </div>
 
       <div
-        class="absolute left-[65%] top-56 z-[5] hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 lg:block"
+        class="absolute left-[55%] top-56 z-[5] hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 xl:block"
       >
         <img
-          src="~/assets/images/games/panel-hero.png"
+          src="~/assets/images/games/panel-hero-fixed.png"
           alt=""
           aria-hidden="true"
           class="pointer-events-none h-full w-fit select-none"
