@@ -84,7 +84,7 @@
           style="mask-image: linear-gradient(black, transparent 80%)"
         >
           <img
-            src="~/assets/images/games/rinth.png"
+            src="https://cdn.modrinth.com/servers/bigrinth.webp"
             alt=""
             aria-hidden="true"
             class="pointer-events-none w-full animate-spin select-none p-4 opacity-50"
