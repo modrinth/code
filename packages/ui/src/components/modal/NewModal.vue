@@ -59,6 +59,7 @@ const props = withDefaults(
     warnOnClose?: boolean
     header?: string
     onHide?: () => void
+    onShow?: () => void
   }>(),
   {
     type: true,
@@ -67,14 +68,29 @@ const props = withDefaults(
     closeOnEsc: true,
     warnOnClose: false,
     onHide: () => {},
+    onShow: () => {},
   },
 )
 
 const open = ref(false)
 const visible = ref(false)
 
+// make modal opening not shift page when there's a vertical scrollbar
+function addBodyPadding() {
+  const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
+  if (scrollBarWidth > 0) {
+    document.body.style.paddingRight = `${scrollBarWidth}px`
+  } else {
+    document.body.style.paddingRight = ''
+  }
+}
+
 function show(event?: MouseEvent) {
+  props.onShow()
   open.value = true
+
+  addBodyPadding()
+  document.body.style.overflow = 'hidden'
   window.addEventListener('mousedown', updateMousePosition)
   window.addEventListener('keydown', handleKeyDown)
   if (event) {
@@ -91,6 +107,8 @@ function show(event?: MouseEvent) {
 function hide() {
   props.onHide()
   visible.value = false
+  document.body.style.overflow = ''
+  document.body.style.paddingRight = ''
   window.removeEventListener('mousedown', updateMousePosition)
   window.removeEventListener('keydown', handleKeyDown)
   setTimeout(() => {
@@ -143,12 +161,6 @@ function handleKeyDown(event: KeyboardEvent) {
   opacity: 0;
   transition: all 0.2s ease-out;
   background: linear-gradient(to bottom, rgba(29, 48, 43, 0.52) 0%, rgba(14, 21, 26, 0.95) 100%);
-  //transform: translate(
-  //    calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 2),
-  //    calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 2)
-  //  )
-  //  scaleX(0.8) scaleY(0.5);
-  border-radius: 180px;
   filter: blur(5px);
 
   @media (prefers-reduced-motion) {
@@ -159,8 +171,6 @@ function handleKeyDown(event: KeyboardEvent) {
     opacity: 1;
     visibility: visible;
     backdrop-filter: blur(5px);
-    transform: translate(0, 0) scaleX(1) scaleY(1);
-    border-radius: 0px;
   }
 
   &.noblur {

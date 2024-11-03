@@ -1383,7 +1383,7 @@ try {
       },
     ),
     useAsyncData(`project/${route.params.id}/dependencies`, () =>
-      useBaseFetch(`project/${route.params.id}/dependencies`),
+      useBaseFetch(`project/${route.params.id}/dependencies`, {}),
     ),
     useAsyncData(`project/${route.params.id}/version?featured=true`, () =>
       useBaseFetch(`project/${route.params.id}/version?featured=true`),
