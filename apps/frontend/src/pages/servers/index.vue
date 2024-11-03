@@ -312,7 +312,7 @@
           >
             <h2 class="m-0 text-lg font-bold">Easy to use file manager</h2>
             <h3 class="m-0 text-base font-normal">
-              Search, manage, and upload files directly to your server with ease.
+              Search, manage, edit, and upload files directly to your server with ease.
             </h3>
 
             <img
@@ -398,6 +398,9 @@
               and more.
             </h3>
           </div>
+        </div>
+        <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+          Frequently Asked Questions
         </div>
       </div>
     </section>
