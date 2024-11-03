@@ -1,5 +1,9 @@
 <template>
-  <div data-pyro class="servers-hero relative isolate -mt-24 h-full min-h-screen pt-8">
+  <div
+    ref="scrollListener"
+    data-pyro
+    class="servers-hero relative isolate -mt-24 h-full min-h-screen pt-8"
+  >
     <PurchaseModal
       v-if="showModal && selectedProduct && customer"
       :key="selectedProduct.id"
@@ -21,9 +25,9 @@
     />
 
     <section
-      class="relative mx-auto flex min-h-[calc(100vh-0px)] max-w-7xl flex-col justify-center px-3"
+      class="mx-auto flex min-h-[calc(100vh-0px)] max-w-7xl flex-col justify-center px-3 pl-10 lg:pl-3"
     >
-      <div class="relative z-[5] flex w-full flex-col gap-8">
+      <div class="z-[5] flex w-full flex-col gap-8">
         <div class="flex flex-col gap-4">
           <div
             class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
@@ -60,12 +64,14 @@
         </div>
       </div>
 
-      <div class="absolute -right-1/3 top-24 z-[5] h-full max-h-[calc(100vh-10rem)] lg:hidden">
+      <div
+        class="absolute left-[65%] top-36 z-[5] hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 lg:block"
+      >
         <img
           src="~/assets/images/games/panel-hero.png"
           alt=""
           aria-hidden="true"
-          class="pointer-events-none h-full w-full select-none"
+          class="pointer-events-none h-full w-fit select-none"
         />
       </div>
 
@@ -423,8 +429,8 @@
           <span class="font-bold"> Servers are currently US only. More regions coming soon!</span>
         </h2>
 
-        <ul class="m-0 flex w-full flex-col gap-8 p-0 md:flex-row">
-          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left md:w-1/3">
+        <ul class="m-0 flex w-full flex-col gap-8 p-0 lg:flex-row">
+          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3">
             <div class="flex flex-row items-center justify-between">
               <h1 class="m-0">Small</h1>
               <div
@@ -453,7 +459,7 @@
                 @click="selectProduct(pyroProducts[0])"
               >
                 Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4" />
+                <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
               </button>
               <NuxtLink
                 v-else
@@ -483,7 +489,7 @@
               border: 1px solid rgba(12, 107, 52, 0.55);
               box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
             "
-            class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left md:w-1/3"
+            class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3"
           >
             <div class="flex flex-row items-center justify-between">
               <h1 class="m-0">Medium</h1>
@@ -531,7 +537,7 @@
             </ButtonStyled>
           </li>
 
-          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left md:w-1/3">
+          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3">
             <div class="flex flex-row items-center justify-between">
               <h1 class="m-0">Large</h1>
               <div
@@ -558,7 +564,7 @@
                 @click="selectProduct(pyroProducts[2])"
               >
                 Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4" />
+                <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
               </button>
               <NuxtLink
                 v-else
