@@ -1,6 +1,7 @@
 use lettre::message::header::ContentType;
 use lettre::message::Mailbox;
 use lettre::transport::smtp::authentication::Credentials;
+use lettre::transport::smtp::client::{Tls, TlsParameters};
 use lettre::{Address, Message, SmtpTransport, Transport};
 use thiserror::Error;
 
@@ -34,9 +35,20 @@ pub fn send_email_raw(
     let username = dotenvy::var("SMTP_USERNAME")?;
     let password = dotenvy::var("SMTP_PASSWORD")?;
     let host = dotenvy::var("SMTP_HOST")?;
+    let port = dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(25);
     let creds = Credentials::new(username, password);
+    let tls_settings =
+        if dotenvy::var("SMTP_TLS")?.parse::<bool>().unwrap_or(true) {
+            Tls::Wrapper(TlsParameters::new(host.clone().into())?)
+        } else {
+            Tls::None
+        };
 
-    let mailer = SmtpTransport::relay(&host)?.credentials(creds).build();
+    let mailer = SmtpTransport::relay(&host)?
+        .port(port)
+        .tls(tls_settings)
+        .credentials(creds)
+        .build();
 
     mailer.send(&email)?;
 
