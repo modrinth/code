@@ -4,7 +4,7 @@
       <div class="mb-4 flex flex-col gap-4">
         <div class="inline-flex flex-wrap items-center">
           You're changing the version of
-          <div class="inline-flex flex-wrap items-center gap-1 text-nowrap">
+          <div class="inline-flex flex-wrap items-center gap-1 text-nowrap pl-2">
             <UiAvatar
               :src="currentMod?.icon_url"
               size="24px"
