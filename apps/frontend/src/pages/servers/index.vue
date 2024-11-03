@@ -69,7 +69,7 @@
         class="absolute left-[55%] top-56 z-[5] hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 xl:block"
       >
         <img
-          src="~/assets/images/games/panel-hero-fixed.png"
+          src="https://cdn.modrinth.com/servers/panel-right-dark.webp"
           alt=""
           aria-hidden="true"
           class="pointer-events-none h-full w-fit select-none"
@@ -144,8 +144,8 @@
             </svg>
             <h2 class="m-0 text-lg font-bold">Play where your mods are</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Experience a seamless integration between your mods and your servers. Modpacks install
-              within seconds and run without a hitch.
+              Modrinth Servers seamlessly integrates the mod and modpack installation process into
+              your server.
             </h3>
           </div>
 
@@ -153,21 +153,16 @@
             <LoaderIcon loader="fabric" class="size-8 text-brand" />
             <h2 class="m-0 text-lg font-bold">All your favorite mods</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Choose between Vanilla, Fabric, Forge, Quilt and NeoForge, so you never have to
-              sacrifice any mod.
+              Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can
+              run on your server.
             </h3>
           </div>
         </div>
         <div class="relative">
           <img
-            src="~/assets/images/games/installation-hero.png"
+            src="https://cdn.modrinth.com/servers/installation-dark.webp"
             alt=""
             class="hidden w-full rounded-2xl sm:block"
-          />
-          <img
-            src="~/assets/images/games/installation-hero-mobile.png"
-            alt=""
-            class="block w-full rounded-2xl sm:hidden"
           />
         </div>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
@@ -191,8 +186,8 @@
             </svg>
             <h2 class="m-0 text-lg font-bold">Manage it all on Modrinth</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Manage your server, mods, and players all in one place. No need to switch between
-              different platforms just to play.
+              Your server, mods, players, and more are all on Modrinth. No need to switch between
+              platforms.
             </h3>
           </div>
 
