@@ -2,7 +2,7 @@
   <div
     ref="scrollListener"
     data-pyro
-    class="servers-hero relative isolate -mt-24 h-full min-h-screen pt-8"
+    class="servers-hero relative isolate -mt-44 h-full min-h-screen pt-8"
   >
     <PurchaseModal
       v-if="showModal && selectedProduct && customer"
@@ -26,7 +26,7 @@
     />
 
     <section
-      class="mx-auto flex min-h-[calc(100vh-0px)] max-w-7xl flex-col justify-center px-3 pl-10 lg:pl-3"
+      class="mx-auto mt-20 flex min-h-[calc(80vh-0px)] max-w-7xl flex-col justify-center px-5 sm:min-h-[calc(100vh-0px)] sm:pl-10 lg:pl-3"
     >
       <div class="z-[5] flex w-full flex-col gap-8">
         <div class="flex flex-col gap-4">
@@ -66,7 +66,7 @@
       </div>
 
       <div
-        class="absolute left-[65%] top-36 z-[5] hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 lg:block"
+        class="absolute left-[65%] top-56 z-[5] hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 lg:block"
       >
         <img
           src="~/assets/images/games/panel-hero.png"
@@ -77,7 +77,7 @@
       </div>
 
       <div
-        class="pointer-events-none absolute -right-1/4 top-14 z-[4] flex h-screen w-full flex-row items-end gap-24"
+        class="pointer-events-none absolute left-0 top-16 z-[4] flex h-screen w-full flex-row items-end gap-24 sm:-right-1/4 sm:top-14"
       >
         <div
           class="pointer-events-none absolute left-0 right-0 top-8 max-h-[90%] overflow-hidden sm:mt-0"
