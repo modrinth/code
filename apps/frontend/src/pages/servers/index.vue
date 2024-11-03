@@ -908,6 +908,7 @@ watch(customer, (newCustomer) => {
 
 onMounted(() => {
   document.body.style.background = "var(--color-accent-contrast)";
+  document.body.style.overflowX = "hidden !important";
   const layoutDiv = document.querySelector(".layout");
   if (layoutDiv) {
     layoutDiv.style.background = "var(--color-accent-contrast)";
@@ -917,6 +918,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.body.style.background = "";
+  document.body.style.overflowX = "";
   const layoutDiv = document.querySelector(".layout");
   if (layoutDiv) {
     layoutDiv.style.background = "";
