@@ -6,9 +6,11 @@ const props = withDefaults(
     color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
     size?: 'standard' | 'large'
     circular?: boolean
-    type?: 'standard' | 'outlined' | 'transparent'
+    type?: 'standard' | 'outlined' | 'transparent' | 'highlight'
     colorFill?: 'auto' | 'background' | 'text' | 'none'
     hoverColorFill?: 'auto' | 'background' | 'text' | 'none'
+    highlightedStyle?: 'main-nav-primary' | 'main-nav-secondary'
+    highlighted?: boolean
   }>(),
   {
     color: 'standard',
@@ -17,23 +19,25 @@ const props = withDefaults(
     type: 'standard',
     colorFill: 'auto',
     hoverColorFill: 'auto',
+    highlightedStyle: 'main-nav-primary',
+    highlighted: false,
   },
 )
 
 const colorVar = computed(() => {
   switch (props.color) {
     case 'brand':
-      return 'var(--color-brand)'
+      return props.type === 'highlight' ? 'var(--color-brand-highlight)' : 'var(--color-brand)'
     case 'red':
-      return 'var(--color-red)'
+      return props.type === 'highlight' ? 'var(--color-red-highlight)' : 'var(--color-red)'
     case 'orange':
-      return 'var(--color-orange)'
+      return props.type === 'highlight' ? 'var(--color-orange-highlight)' : 'var(--color-orange)'
     case 'green':
-      return 'var(--color-green)'
+      return props.type === 'highlight' ? 'var(--color-green-highlight)' : 'var(--color-green)'
     case 'blue':
-      return 'var(--color-blue)'
+      return props.type === 'highlight' ? 'var(--color-blue-highlight)' : 'var(--color-blue)'
     case 'purple':
-      return 'var(--color-purple)'
+      return props.type === 'highlight' ? 'var(--color-purple-highlight)' : 'var(--color-purple)'
     case 'standard':
     default:
       return null
@@ -108,7 +112,11 @@ function setColorFill(
   if (colorVar.value) {
     if (fill === 'background') {
       colors.bg = colorVar.value
-      colors.text = 'var(--color-accent-contrast)'
+      if (props.type === 'highlight') {
+        colors.text = 'var(--color-contrast)'
+      } else {
+        colors.text = 'var(--color-accent-contrast)'
+      }
     } else if (fill === 'text') {
       colors.text = colorVar.value
     }
@@ -117,6 +125,22 @@ function setColorFill(
 }
 
 const colorVariables = computed(() => {
+  if (props.highlighted) {
+    let colors = {
+      bg:
+        props.highlightedStyle === 'main-nav-primary'
+          ? 'var(--color-brand-highlight)'
+          : 'var(--color-button-bg)',
+      text: 'var(--color-contrast)',
+      icon:
+        props.highlightedStyle === 'main-nav-primary'
+          ? 'var(--color-brand)'
+          : 'var(--color-contrast)',
+    }
+    let hoverColors = JSON.parse(JSON.stringify(colors))
+    return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon};`
+  }
+
   let colors = {
     bg: 'var(--color-button-bg)',
     text: 'var(--color-base)',
@@ -175,6 +199,10 @@ const colorVariables = computed(() => {
     scale 0.125s ease-in-out,
     background-color 0.25s ease-in-out,
     color 0.25s ease-in-out;
+
+  svg:first-child {
+    color: var(--_icon, var(--_text));
+  }
 
   &[disabled],
   &[disabled='true'],

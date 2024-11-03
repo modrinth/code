@@ -115,6 +115,10 @@ export const commonMessages = defineMessages({
     id: "label.scopes",
     defaultMessage: "Scopes",
   },
+  serversLabel: {
+    id: "label.servers",
+    defaultMessage: "Servers",
+  },
   settingsLabel: {
     id: "label.settings",
     defaultMessage: "Settings",
