@@ -60,7 +60,7 @@
         </div>
       </div>
 
-      <div class="absolute -right-1/3 top-24 z-[5] h-full max-h-[calc(100vh-10rem)]">
+      <div class="absolute -right-1/3 top-24 z-[5] h-full max-h-[calc(100vh-10rem)] lg:hidden">
         <img
           src="~/assets/images/games/panel-hero.png"
           alt=""
