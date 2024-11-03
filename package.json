@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "prettier": "^3.3.2",
-    "turbo": "^2.0.6",
+    "turbo": "^2.2.3",
     "vue": "^3.4.31"
   },
   "packageManager": "pnpm@9.4.0",
