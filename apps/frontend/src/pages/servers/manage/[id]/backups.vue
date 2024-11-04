@@ -304,10 +304,10 @@ const initiateDownload = async (backupId: string) => {
       throw new Error("Invalid download URL.");
     }
 
-    let finalDownloadUrl = downloadurl.download_url;
+    let finalDownloadUrl: string = downloadurl.download_url;
 
     if (!/^https?:\/\//i.test(finalDownloadUrl)) {
-      finalDownloadUrl = `${window.location.origin}${finalDownloadUrl.startsWith("/") ? "" : "/"}${finalDownloadUrl}`;
+      finalDownloadUrl = `https://${finalDownloadUrl.startsWith("/") ? finalDownloadUrl.substring(1) : finalDownloadUrl}`;
     }
 
     const a = document.createElement("a");
