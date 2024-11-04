@@ -36,13 +36,13 @@
               downloads
             </div>
             <div
-              class="flex items-center gap-2 font-semibold"
               v-tooltip="
                 formatMessage(commonMessages.dateAtTimeTooltip, {
                   date: new Date(user.created),
                   time: new Date(user.created),
                 })
               "
+              class="flex items-center gap-2 font-semibold"
             >
               <CalendarIcon class="h-6 w-6 text-secondary" />
               Joined
