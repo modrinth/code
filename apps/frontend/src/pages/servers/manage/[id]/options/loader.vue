@@ -83,6 +83,15 @@
   </NewModal>
 
   <NewModal ref="mrpackModal" header="Uploading .mrpack file" @hide="onHide" @show="onShow">
+    <div class="mt-2 flex gap-2">
+      <InfoIcon class="mt-1 hidden sm:block" />
+      <span class="max-w-lg text-sm text-secondary">
+        Currently, .mrpack upload sizes are limited to 100MB. Uploads larger than 100MB may be
+        dropped or corrupted, and leave your server in a broken state. If you need to upload a
+        larger .mrpack, consider alternative methods of installation, like uploading over SFTP.
+      </span>
+    </div>
+    <input type="file" accept=".mrpack" class="mt-4" :disabled="isLoading" @change="uploadMrpack" />
     <div class="mt-2 flex items-center gap-2">
       <input
         id="hard-reset"
@@ -93,7 +102,7 @@
       />
       <label for="hard-reset">Clean reinstall</label>
     </div>
-    <input type="file" accept=".mrpack" class="mt-4" :disabled="isLoading" @change="uploadMrpack" />
+
     <div class="mt-4 flex justify-start gap-4">
       <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
         <button :disabled="!mrpackFile" @click="reinstallMrpack">
