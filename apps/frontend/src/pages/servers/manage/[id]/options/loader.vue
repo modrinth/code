@@ -83,46 +83,38 @@
   </NewModal>
 
   <NewModal ref="mrpackModal" header="Uploading .mrpack file" @hide="onHide" @show="onShow">
-    <div>
-      <div class="mt-2 flex items-center gap-2">
-        <input
-          id="hard-reset"
-          :checked="hardReset"
-          class="switch stylized-toggle"
-          type="checkbox"
-          @change="hardReset = ($event.target as HTMLInputElement).checked"
-        />
-        <label for="hard-reset">Clean reinstall</label>
-      </div>
+    <div class="mt-2 flex items-center gap-2">
       <input
-        type="file"
-        accept=".mrpack"
-        class="mt-4"
-        :disabled="isLoading"
-        @change="uploadMrpack"
+        id="hard-reset"
+        :checked="hardReset"
+        class="switch stylized-toggle"
+        type="checkbox"
+        @change="hardReset = ($event.target as HTMLInputElement).checked"
       />
-      <div class="mt-4 flex justify-start gap-4">
-        <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="!mrpackFile" @click="reinstallMrpack">
-            <RightArrowIcon />
-            {{
-              isSecondPhase
-                ? "Erase and install"
-                : loadingServerCheck
-                  ? "Loading..."
-                  : isDangerous
-                    ? "Erase and install"
-                    : "Install"
-            }}
-          </button>
-        </ButtonStyled>
-        <ButtonStyled>
-          <button :disabled="isLoading" @click="mrpackModal?.hide">
-            <XIcon />
-            Cancel
-          </button>
-        </ButtonStyled>
-      </div>
+      <label for="hard-reset">Clean reinstall</label>
+    </div>
+    <input type="file" accept=".mrpack" class="mt-4" :disabled="isLoading" @change="uploadMrpack" />
+    <div class="mt-4 flex justify-start gap-4">
+      <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
+        <button :disabled="!mrpackFile" @click="reinstallMrpack">
+          <RightArrowIcon />
+          {{
+            isSecondPhase
+              ? "Erase and install"
+              : loadingServerCheck
+                ? "Loading..."
+                : isDangerous
+                  ? "Erase and install"
+                  : "Install"
+          }}
+        </button>
+      </ButtonStyled>
+      <ButtonStyled>
+        <button :disabled="isLoading" @click="mrpackModal?.hide">
+          <XIcon />
+          Cancel
+        </button>
+      </ButtonStyled>
     </div>
   </NewModal>
 
