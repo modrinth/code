@@ -82,7 +82,7 @@
     </div>
   </NewModal>
 
-  <NewModal ref="mrpackModal" header="Upload mrpack" @hide="onHide" @show="onShow">
+  <NewModal ref="mrpackModal" header="Uploading .mrpack file" @hide="onHide" @show="onShow">
     <div>
       <div class="mt-2 flex items-center gap-2">
         <input
