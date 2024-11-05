@@ -109,14 +109,17 @@
             <Slider
               v-model="customServerConfig.ramInGb"
               class="fix-slider"
-              :min="2"
-              :max="12"
+              :min="customMinRam"
+              :max="customMaxRam"
               :step="2"
               unit="GB"
             />
             <div class="font-semibold text-nowrap"></div>
           </div>
-          <div v-if="customMatchingProduct" class="flex sm:flex-row flex-col gap-4 w-full">
+          <div
+            v-if="customMatchingProduct && !customOutOfStock"
+            class="flex sm:flex-row flex-col gap-4 w-full"
+          >
             <div class="flex flex-col w-full gap-2">
               <div class="font-semibold">vCPUs</div>
               <input v-model="mutatedProduct.metadata.cpu" disabled class="input" />
@@ -134,7 +137,15 @@
               <div class="flex flex-row gap-4">
                 <InfoIcon class="hidden flex-none h-8 w-8 text-blue sm:block" />
 
-                <div class="flex flex-col gap-2">
+                <div v-if="customOutOfStock && customMatchingProduct" class="flex flex-col gap-2">
+                  <div class="font-semibold">This plan is currently out of stock</div>
+                  <div class="font-normal">
+                    We are currently
+                    <a :href="outOfStockUrl" class="underline" target="_blank">out of capacity</a>
+                    for your selected RAM amount. Please try again later, or try a different amount.
+                  </div>
+                </div>
+                <div v-else class="flex flex-col gap-2">
                   <div class="font-semibold">We can't seem to find your selected plan</div>
                   <div class="font-normal">
                     We are currently unable to find a server for your selected RAM amount. Please
@@ -383,7 +394,7 @@
           :disabled="
             paymentLoading ||
             (mutatedProduct.metadata.type === 'pyro' && !projectId && !serverName) ||
-            (customServer && !customMatchingProduct)
+            customAllowedToContinue
           "
           @click="nextStep"
         >
@@ -545,6 +556,16 @@ const props = defineProps({
     type: Boolean,
     required: false,
   },
+  fetchCapacityStatuses: {
+    type: Function,
+    required: false,
+    default: null,
+  },
+  outOfStockUrl: {
+    type: String,
+    required: false,
+    default: '',
+  },
 })
 
 const messages = defineMessages({
@@ -631,7 +652,16 @@ const serverLoader = ref('Vanilla')
 const eulaAccepted = ref(false)
 
 const mutatedProduct = ref({ ...props.product })
+const customMinRam = ref(0)
+const customMaxRam = ref(0)
 const customMatchingProduct = ref()
+const customOutOfStock = ref(false)
+const customLoading = ref(true)
+const customAllowedToContinue = computed(
+  () =>
+    props.customServer &&
+    (!customMatchingProduct.value || customLoading.value || customOutOfStock.value),
+)
 
 const customServerConfig = reactive({
   ramInGb: 4,
@@ -640,23 +670,48 @@ const customServerConfig = reactive({
 })
 
 const updateCustomServerProduct = () => {
-  if (props.customServer) {
-    customMatchingProduct.value = props.product.find(
-      (product) => product.metadata.ram === customServerConfig.ram,
-    )
+  customMatchingProduct.value = props.product.find(
+    (product) => product.metadata.ram === customServerConfig.ram,
+  )
 
-    if (customMatchingProduct.value) mutatedProduct.value = { ...customMatchingProduct.value }
+  if (customMatchingProduct.value) mutatedProduct.value = { ...customMatchingProduct.value }
+}
+
+let updateCustomServerStockTimeout = null
+const updateCustomServerStock = async () => {
+  if (updateCustomServerStockTimeout) {
+    clearTimeout(updateCustomServerStockTimeout)
+    customLoading.value = true
   }
+
+  updateCustomServerStockTimeout = setTimeout(async () => {
+    if (props.fetchCapacityStatuses) {
+      const capacityStatus = await props.fetchCapacityStatuses(mutatedProduct.value)
+      if (capacityStatus.custom?.available === 0) {
+        customOutOfStock.value = true
+      } else {
+        customOutOfStock.value = false
+      }
+      customLoading.value = false
+    } else {
+      console.error('No fetchCapacityStatuses function provided.')
+      customOutOfStock.value = true
+    }
+  }, 300)
 }
 
 if (props.customServer) {
-  updateCustomServerProduct()
-  watch(
-    () => customServerConfig.ram,
-    () => {
-      updateCustomServerProduct()
-    },
-  )
+  const ramValues = props.product.map((product) => product.metadata.ram / 1024)
+  customMinRam.value = Math.min(...ramValues)
+  customMaxRam.value = Math.max(...ramValues)
+
+  const updateProductAndStock = () => {
+    updateCustomServerProduct()
+    updateCustomServerStock()
+  }
+
+  updateProductAndStock()
+  watch(() => customServerConfig.ram, updateProductAndStock)
 }
 
 const selectedPaymentMethod = ref()
