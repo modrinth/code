@@ -11,7 +11,7 @@ use image::codecs::webp::WebPDecoder;
 use image::imageops::FilterType;
 use image::{
     AnimationDecoder, DynamicImage, EncodableLayout, Frame, GenericImageView,
-    ImageError, ImageFormat
+    ImageError, ImageFormat,
 };
 use std::io::Cursor;
 use std::ops::Div;
@@ -145,7 +145,7 @@ fn process_image(
                     min_aspect_ratio,
                 )
             }
-        },
+        }
         "image/webp" => process_animated_image(
             image_bytes,
             content_type,
