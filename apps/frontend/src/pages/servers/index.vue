@@ -22,6 +22,8 @@
       :payment-methods="paymentMethods"
       :return-url="`${config.public.siteUrl}/servers/manage`"
       :server-name="`${auth?.user?.username}'s server`"
+      :fetch-capacity-statuses="fetchCapacityStatuses"
+      :out-of-stock-url="outOfStockUrl"
       @hidden="handleModalHidden"
     />
 
@@ -523,29 +525,34 @@
               $12<span class="text-sm font-normal text-secondary">/month</span>
             </h2>
             <ButtonStyled color="blue" size="large">
-              <button
-                v-if="!isSmallAtCapacity"
-                class="!bg-highlight-blue !font-medium !text-blue"
-                @click="selectProduct(pyroPlanProducts[0])"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
-              </button>
               <NuxtLink
-                v-else
-                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
-                :target="loggedOut ? '_self' : '_blank'"
+                v-if="loggedOut"
+                :to="loginUrl"
+                target="_self"
                 class="!bg-highlight-blue !font-medium !text-blue"
               >
-                <template v-if="loggedOut">
-                  Login
-                  <UserIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </template>
-                <template v-else>
+                Login
+                <UserIcon class="!min-h-4 !min-w-4 !text-blue" />
+              </NuxtLink>
+              <template v-else>
+                <NuxtLink
+                  v-if="isSmallAtCapacity"
+                  :to="outOfStockUrl"
+                  target="_blank"
+                  class="!bg-highlight-blue !font-medium !text-blue"
+                >
                   Out of Stock
                   <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </template>
-              </NuxtLink>
+                </NuxtLink>
+                <button
+                  v-else
+                  class="!bg-highlight-blue !font-medium !text-blue"
+                  @click="selectProduct(pyroPlanProducts[0])"
+                >
+                  Get Started
+                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
+                </button>
+              </template>
             </ButtonStyled>
           </li>
 
@@ -581,29 +588,34 @@
               $18<span class="text-sm font-normal text-secondary">/month</span>
             </h2>
             <ButtonStyled color="brand" size="large">
-              <button
-                v-if="!isMediumAtCapacity"
-                class="shadow-xl"
-                @click="selectProduct(pyroPlanProducts[1])"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4" />
-              </button>
               <NuxtLink
-                v-else
-                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
-                :target="loggedOut ? '_self' : '_blank'"
+                v-if="loggedOut"
+                :to="loginUrl"
+                target="_self"
                 class="!bg-highlight-green !font-medium !text-green"
               >
-                <template v-if="loggedOut">
-                  Login
-                  <UserIcon class="!min-h-4 !min-w-4 !text-green" />
-                </template>
-                <template v-else>
+                Login
+                <UserIcon class="!min-h-4 !min-w-4 !text-green" />
+              </NuxtLink>
+              <template v-else>
+                <NuxtLink
+                  v-if="isMediumAtCapacity"
+                  :to="outOfStockUrl"
+                  target="_blank"
+                  class="!bg-highlight-green !font-medium !text-green"
+                >
                   Out of Stock
                   <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
-                </template>
-              </NuxtLink>
+                </NuxtLink>
+                <button
+                  v-else
+                  class="!bg-highlight-green !font-medium !text-green"
+                  @click="selectProduct(pyroPlanProducts[1])"
+                >
+                  Get Started
+                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-green" />
+                </button>
+              </template>
             </ButtonStyled>
           </li>
 
@@ -628,29 +640,34 @@
               $24<span class="text-sm font-normal text-secondary">/month</span>
             </h2>
             <ButtonStyled color="purple" size="large">
-              <button
-                v-if="!isLargeAtCapacity"
-                class="!bg-highlight-purple !font-medium !text-purple"
-                @click="selectProduct(pyroPlanProducts[2])"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
-              </button>
               <NuxtLink
-                v-else
-                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
-                :target="loggedOut ? '_self' : '_blank'"
+                v-if="loggedOut"
+                :to="loginUrl"
+                target="_self"
                 class="!bg-highlight-purple !font-medium !text-purple"
               >
-                <template v-if="loggedOut">
-                  Login
-                  <UserIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </template>
-                <template v-else>
+                Login
+                <UserIcon class="!min-h-4 !min-w-4 !text-purple" />
+              </NuxtLink>
+              <template v-else>
+                <NuxtLink
+                  v-if="isLargeAtCapacity"
+                  :to="outOfStockUrl"
+                  target="_blank"
+                  class="!bg-highlight-purple !font-medium !text-purple"
+                >
                   Out of Stock
                   <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </template>
-              </NuxtLink>
+                </NuxtLink>
+                <button
+                  v-else
+                  class="!bg-highlight-purple !font-medium !text-purple"
+                  @click="selectProduct(pyroPlanProducts[2])"
+                >
+                  Get Started
+                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
+                </button>
+              </template>
             </ButtonStyled>
           </li>
         </ul>
@@ -668,29 +685,14 @@
 
           <div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
             <ButtonStyled color="standard" size="large">
-              <button
-                v-if="!isLargeAtCapacity"
-                class="w-full md:w-fit"
-                @click="selectProduct(pyroProducts, true)"
-              >
+              <NuxtLink v-if="loggedOut" :to="loginUrl" target="_self" class="w-full md:w-fit">
+                Login
+                <UserIcon class="!min-h-4 !min-w-4" />
+              </NuxtLink>
+              <button v-else class="w-full md:w-fit" @click="selectProduct(pyroProducts, true)">
                 Build your own
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
-              <NuxtLink
-                v-else
-                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
-                :target="loggedOut ? '_self' : '_blank'"
-                class="w-full md:w-fit"
-              >
-                <template v-if="loggedOut">
-                  Login
-                  <UserIcon class="!min-h-4 !min-w-4" />
-                </template>
-                <template v-else>
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4" />
-                </template>
-              </NuxtLink>
             </ButtonStyled>
             <p class="m-0 text-sm">Starting at $3/GB RAM</p>
           </div>
@@ -770,7 +772,8 @@ const deletingSpeed = 25;
 const pauseTime = 2000;
 
 const loggedOut = computed(() => !auth.value.user);
-const redirectUrl = `/auth/sign-in?redirect=${encodeURIComponent("/servers#plan")}`;
+const loginUrl = `/auth/sign-in?redirect=${encodeURIComponent("/servers#plan")}`;
+const outOfStockUrl = "https://support.modrinth.com";
 
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
   try {
@@ -782,37 +785,47 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
   }
 });
 
-const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
-  "ServerCapacityAll",
-  async () => {
-    try {
-      const capacityChecks = pyroPlanProducts.map((product) =>
-        usePyroFetch("capacity", {
-          method: "POST",
-          body: {
-            cpu: product.metadata.cpu,
-            memory_mb: product.metadata.ram,
-            swap_mb: product.metadata.swap,
-            storage_mb: product.metadata.storage,
-          },
-        }),
-      );
+async function fetchCapacityStatuses(customProduct = null) {
+  try {
+    const productsToCheck = customProduct?.metadata ? [customProduct] : pyroPlanProducts;
+    const capacityChecks = productsToCheck.map((product) =>
+      usePyroFetch("capacity", {
+        method: "POST",
+        body: {
+          cpu: product.metadata.cpu,
+          memory_mb: product.metadata.ram,
+          swap_mb: product.metadata.swap,
+          storage_mb: product.metadata.storage,
+        },
+      }),
+    );
 
-      const results = await Promise.all(capacityChecks);
+    const results = await Promise.all(capacityChecks);
+    if (customProduct?.metadata) {
+      return {
+        custom: results[0],
+      };
+    } else {
       return {
         small: results[0],
         medium: results[1],
         large: results[2],
       };
-    } catch (error) {
-      console.error("Error checking server capacities:", error);
-      return {
-        small: { available: 0 },
-        medium: { available: 0 },
-        large: { available: 0 },
-      };
     }
-  },
+  } catch (error) {
+    console.error("Error checking server capacities:", error);
+    return {
+      custom: { available: 0 },
+      small: { available: 0 },
+      medium: { available: 0 },
+      large: { available: 0 },
+    };
+  }
+}
+
+const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
+  "ServerCapacityAll",
+  fetchCapacityStatuses,
 );
 
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
@@ -931,7 +944,7 @@ const selectProduct = async (product, custom) => {
   }
 
   if (!auth.value.user) {
-    data.$router.push(redirectUrl);
+    data.$router.push(loginUrl);
     return;
   }
 
