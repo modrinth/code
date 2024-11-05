@@ -402,20 +402,21 @@ const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => 
     const formData = new FormData();
     formData.append("file", mrpack);
 
-    return await PyroFetch(`/reinstallMrpackMultiparted?hard=${hardResetParam}`, {
-      method: "POST",
-      contentType: "none",
-      body: formData,
-      override: {
-        ...auth,
-        // @ts-ignore
+    const response = await fetch(
+      `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`,
+      {
+        method: "POST",
         headers: {
-          // @ts-ignore
-          ...auth.headers,
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${auth.token}`,
         },
+        body: formData,
+        signal: AbortSignal.timeout(30 * 60 * 1000),
       },
-    });
+    );
+
+    if (!response.ok) {
+      throw new Error(`[pyroservers] native fetch err status: ${response.status}`);
+    }
   } catch (error) {
     console.error("Error reinstalling from mrpack:", error);
     throw error;
