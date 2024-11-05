@@ -672,7 +672,7 @@
           </li>
         </ul>
 
-        <div
+        <!-- <div
           class="flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left md:flex-row md:gap-0"
         >
           <div class="flex flex-col gap-4">
@@ -696,7 +696,7 @@
             </ButtonStyled>
             <p class="m-0 text-sm">Starting at $3/GB RAM</p>
           </div>
-        </div>
+        </div> -->
       </div>
     </section>
   </div>
