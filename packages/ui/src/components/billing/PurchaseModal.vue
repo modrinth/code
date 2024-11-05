@@ -109,8 +109,8 @@
             <Slider
               v-model="customServerConfig.ramInGb"
               class="fix-slider"
-              :min="2"
-              :max="12"
+              :min="customMinRam"
+              :max="customMaxRam"
               :step="2"
               unit="GB"
             />
@@ -652,6 +652,8 @@ const serverLoader = ref('Vanilla')
 const eulaAccepted = ref(false)
 
 const mutatedProduct = ref({ ...props.product })
+const customMinRam = ref(0)
+const customMaxRam = ref(0)
 const customMatchingProduct = ref()
 const customOutOfStock = ref(false)
 const customLoading = ref(true)
@@ -699,6 +701,10 @@ const updateCustomServerStock = async () => {
 }
 
 if (props.customServer) {
+  const ramValues = props.product.map((product) => product.metadata.ram / 1024)
+  customMinRam.value = Math.min(...ramValues)
+  customMaxRam.value = Math.max(...ramValues)
+
   const updateProductAndStock = () => {
     customOutOfStock.value = false
     updateCustomServerProduct()
