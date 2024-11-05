@@ -22,6 +22,8 @@
       :payment-methods="paymentMethods"
       :return-url="`${config.public.siteUrl}/servers/manage`"
       :server-name="`${auth?.user?.username}'s server`"
+      :fetch-capacity-statuses="fetchCapacityStatuses"
+      :out-of-stock-url="outOfStockUrl"
       @hidden="handleModalHidden"
     />
 
@@ -770,7 +772,6 @@ const deletingSpeed = 25;
 const pauseTime = 2000;
 
 const loggedOut = computed(() => !auth.value.user);
-const redirectUrl = `/auth/sign-in?redirect=${encodeURIComponent("/servers#plan")}`;
 const loginUrl = `/auth/sign-in?redirect=${encodeURIComponent("/servers#plan")}`;
 const outOfStockUrl = "https://support.modrinth.com";
 
@@ -784,37 +785,47 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
   }
 });
 
-const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
-  "ServerCapacityAll",
-  async () => {
-    try {
-      const capacityChecks = pyroPlanProducts.map((product) =>
-        usePyroFetch("capacity", {
-          method: "POST",
-          body: {
-            cpu: product.metadata.cpu,
-            memory_mb: product.metadata.ram,
-            swap_mb: product.metadata.swap,
-            storage_mb: product.metadata.storage,
-          },
-        }),
-      );
+async function fetchCapacityStatuses(customProduct = null) {
+  try {
+    const productsToCheck = customProduct?.metadata ? [customProduct] : pyroPlanProducts;
+    const capacityChecks = productsToCheck.map((product) =>
+      usePyroFetch("capacity", {
+        method: "POST",
+        body: {
+          cpu: product.metadata.cpu,
+          memory_mb: product.metadata.ram,
+          swap_mb: product.metadata.swap,
+          storage_mb: product.metadata.storage,
+        },
+      }),
+    );
 
-      const results = await Promise.all(capacityChecks);
+    const results = await Promise.all(capacityChecks);
+    if (customProduct?.metadata) {
+      return {
+        custom: results[0],
+      };
+    } else {
       return {
         small: results[0],
         medium: results[1],
         large: results[2],
       };
-    } catch (error) {
-      console.error("Error checking server capacities:", error);
-      return {
-        small: { available: 0 },
-        medium: { available: 0 },
-        large: { available: 0 },
-      };
     }
-  },
+  } catch (error) {
+    console.error("Error checking server capacities:", error);
+    return {
+      custom: { available: 0 },
+      small: { available: 0 },
+      medium: { available: 0 },
+      large: { available: 0 },
+    };
+  }
+}
+
+const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
+  "ServerCapacityAll",
+  fetchCapacityStatuses,
 );
 
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
