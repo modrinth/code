@@ -406,7 +406,15 @@ const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => 
       method: "POST",
       contentType: "none",
       body: formData,
-      override: auth,
+      override: {
+        ...auth,
+        // @ts-ignore
+        headers: {
+          // @ts-ignore
+          ...auth.headers,
+          "Content-Type": "multipart/form-data",
+        },
+      },
     });
   } catch (error) {
     console.error("Error reinstalling from mrpack:", error);
