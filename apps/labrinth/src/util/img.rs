@@ -163,8 +163,8 @@ fn process_animated_image(
     min_aspect_ratio: Option<f32>,
 ) -> Result<(bytes::Bytes, String), ImageError> {
     let dimensions =
-        image::load_from_memory(&*image_bytes.clone())?.dimensions();
-    let mut frames2: Vec<Frame> = match content_type {
+        image::load_from_memory(&image_bytes.clone())?.dimensions();
+    let frames2: Vec<Frame> = match content_type {
         "image/gif" => GifDecoder::new(Cursor::new(image_bytes))?
             .into_frames()
             .collect_frames()?,
@@ -231,7 +231,7 @@ fn process_animated_image(
 
     let mut t = 0;
     for f in &frames {
-        encoder.add_frame(AnimFrame::from_rgba(&*f.0, width, height, t));
+        encoder.add_frame(AnimFrame::from_rgba(&f.0, width, height, t));
         t += f.1.numer_denom_ms().0.div(f.1.numer_denom_ms().1) as i32;
     }
 
