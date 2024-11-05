@@ -5,16 +5,16 @@ use crate::file_hosting::FileHost;
 use crate::models::images::ImageContext;
 use crate::routes::ApiError;
 use color_thief::ColorFormat;
-use image::imageops::FilterType;
-use image::{
-    AnimationDecoder, DynamicImage, EncodableLayout, Frame,
-    GenericImageView, ImageError, ImageFormat
-};
-use std::io::Cursor;
-use std::ops::Div;
 use image::codecs::gif::GifDecoder;
 use image::codecs::png::PngDecoder;
 use image::codecs::webp::WebPDecoder;
+use image::imageops::FilterType;
+use image::{
+    AnimationDecoder, DynamicImage, EncodableLayout, Frame, GenericImageView,
+    ImageError, ImageFormat
+};
+use std::io::Cursor;
+use std::ops::Div;
 use webp::{AnimEncoder, AnimFrame, Encoder, WebPConfig};
 
 pub fn get_color_from_img(data: &[u8]) -> Result<Option<u32>, ImageError> {
@@ -123,16 +123,35 @@ fn process_image(
     min_aspect_ratio: Option<f32>,
 ) -> Result<(bytes::Bytes, String), ImageError> {
     match content_type {
-        "image/gif" => process_animated_image(image_bytes, content_type, target_width, min_aspect_ratio),
+        "image/gif" => process_animated_image(
+            image_bytes,
+            content_type,
+            target_width,
+            min_aspect_ratio,
+        ),
         "image/png" => {
             let decoder = PngDecoder::new(Cursor::new(image_bytes.clone()))?;
             if decoder.is_apng()? {
-                process_animated_image(image_bytes, content_type, target_width, min_aspect_ratio)
+                process_animated_image(
+                    image_bytes,
+                    content_type,
+                    target_width,
+                    min_aspect_ratio,
+                )
             } else {
-                process_static_image(image_bytes, target_width, min_aspect_ratio)
+                process_static_image(
+                    image_bytes,
+                    target_width,
+                    min_aspect_ratio,
+                )
             }
         },
-        "image/webp" => process_animated_image(image_bytes, content_type, target_width, min_aspect_ratio),
+        "image/webp" => process_animated_image(
+            image_bytes,
+            content_type,
+            target_width,
+            min_aspect_ratio,
+        ),
         _ => process_static_image(image_bytes, target_width, min_aspect_ratio),
     }
 }
@@ -143,11 +162,19 @@ fn process_animated_image(
     target_width: Option<u32>,
     min_aspect_ratio: Option<f32>,
 ) -> Result<(bytes::Bytes, String), ImageError> {
-    let dimensions = image::load_from_memory(&*image_bytes.clone())?.dimensions();
+    let dimensions =
+        image::load_from_memory(&*image_bytes.clone())?.dimensions();
     let mut frames2: Vec<Frame> = match content_type {
-        "image/gif" => GifDecoder::new(Cursor::new(image_bytes))?.into_frames().collect_frames()?,
-        "image/png" => PngDecoder::new(Cursor::new(image_bytes))?.apng()?.into_frames().collect_frames()?,
-        "image/webp" => WebPDecoder::new(Cursor::new(image_bytes))?.into_frames().collect_frames()?,
+        "image/gif" => GifDecoder::new(Cursor::new(image_bytes))?
+            .into_frames()
+            .collect_frames()?,
+        "image/png" => PngDecoder::new(Cursor::new(image_bytes))?
+            .apng()?
+            .into_frames()
+            .collect_frames()?,
+        "image/webp" => WebPDecoder::new(Cursor::new(image_bytes))?
+            .into_frames()
+            .collect_frames()?,
         _ => unimplemented!(),
     };
 
@@ -180,11 +207,24 @@ fn process_animated_image(
 
     let mut frames = vec![];
     frames2.iter().for_each(|frame| {
-        let mut img = image::imageops::resize(frame.buffer(), width, height, FilterType::Lanczos3);
-        if (crop_image) {
-            let crop_height = (width as f32 / min_aspect_ratio.unwrap()).round() as u32;
+        let mut img = image::imageops::resize(
+            frame.buffer(),
+            width,
+            height,
+            FilterType::Lanczos3,
+        );
+        if crop_image {
+            let crop_height =
+                (width as f32 / min_aspect_ratio.unwrap()).round() as u32;
             let y_offset = (height - crop_height) / 2;
-            img = image::imageops::crop_imm(&img, 0, y_offset, img.width(), crop_height).to_image();
+            img = image::imageops::crop_imm(
+                &img,
+                0,
+                y_offset,
+                img.width(),
+                crop_height,
+            )
+            .to_image();
         }
         frames.push((img.clone(), frame.delay()));
     });
@@ -195,7 +235,7 @@ fn process_animated_image(
         t += f.1.numer_denom_ms().0.div(f.1.numer_denom_ms().1) as i32;
     }
 
-    let webp_bytes =  encoder.encode();
+    let webp_bytes = encoder.encode();
 
     Ok((bytes::Bytes::from(webp_bytes.to_vec()), "webp".to_string()))
 }
