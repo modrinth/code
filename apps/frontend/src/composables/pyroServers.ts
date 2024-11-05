@@ -47,8 +47,11 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
     "Access-Control-Allow-Headers": "Authorization",
     "User-Agent": "Pyro/1.0 (https://pyro.host)",
     Vary: "Accept, Origin",
-    "Content-Type": contentType,
   };
+
+  if (contentType !== "none") {
+    headers["Content-Type"] = contentType;
+  }
 
   if (import.meta.client && typeof window !== "undefined") {
     headers.Origin = window.location.origin;
@@ -396,10 +399,13 @@ const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => 
       `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`,
     );
 
-    return await PyroFetch(`/reinstallMrpack?hard=${hardResetParam}`, {
+    const formData = new FormData();
+    formData.append("file", mrpack);
+
+    return await PyroFetch(`/reinstallMrpackMultiparted?hard=${hardResetParam}`, {
       method: "POST",
-      contentType: "application/octet-stream",
-      body: mrpack,
+      contentType: "none",
+      body: formData,
       override: auth,
     });
   } catch (error) {
