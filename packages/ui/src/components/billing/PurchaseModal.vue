@@ -706,7 +706,6 @@ if (props.customServer) {
   customMaxRam.value = Math.max(...ramValues)
 
   const updateProductAndStock = () => {
-    customOutOfStock.value = false
     updateCustomServerProduct()
     updateCustomServerStock()
   }

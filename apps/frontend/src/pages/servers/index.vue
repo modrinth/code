@@ -536,7 +536,7 @@
               </NuxtLink>
               <template v-else>
                 <NuxtLink
-                  v-if="isLargeAtCapacity"
+                  v-if="isSmallAtCapacity"
                   :to="outOfStockUrl"
                   target="_blank"
                   class="!bg-highlight-blue !font-medium !text-blue"
@@ -599,7 +599,7 @@
               </NuxtLink>
               <template v-else>
                 <NuxtLink
-                  v-if="isLargeAtCapacity"
+                  v-if="isMediumAtCapacity"
                   :to="outOfStockUrl"
                   target="_blank"
                   class="!bg-highlight-green !font-medium !text-green"
