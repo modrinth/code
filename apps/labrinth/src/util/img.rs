@@ -7,11 +7,15 @@ use crate::routes::ApiError;
 use color_thief::ColorFormat;
 use image::imageops::FilterType;
 use image::{
-    DynamicImage, EncodableLayout, GenericImageView, ImageError,
-    ImageOutputFormat,
+    AnimationDecoder, DynamicImage, EncodableLayout, Frame,
+    GenericImageView, ImageError, ImageFormat
 };
 use std::io::Cursor;
-use webp::Encoder;
+use std::ops::Div;
+use image::codecs::gif::GifDecoder;
+use image::codecs::png::PngDecoder;
+use image::codecs::webp::WebPDecoder;
+use webp::{AnimEncoder, AnimFrame, Encoder, WebPConfig};
 
 pub fn get_color_from_img(data: &[u8]) -> Result<Option<u32>, ImageError> {
     let image = image::load_from_memory(data)?
@@ -118,10 +122,89 @@ fn process_image(
     target_width: Option<u32>,
     min_aspect_ratio: Option<f32>,
 ) -> Result<(bytes::Bytes, String), ImageError> {
-    if content_type.to_lowercase() == "image/gif" {
-        return Ok((image_bytes.clone(), "gif".to_string()));
+    match content_type {
+        "image/gif" => process_animated_image(image_bytes, content_type, target_width, min_aspect_ratio),
+        "image/png" => {
+            let decoder = PngDecoder::new(Cursor::new(image_bytes.clone()))?;
+            if decoder.is_apng()? {
+                process_animated_image(image_bytes, content_type, target_width, min_aspect_ratio)
+            } else {
+                process_static_image(image_bytes, target_width, min_aspect_ratio)
+            }
+        },
+        "image/webp" => process_animated_image(image_bytes, content_type, target_width, min_aspect_ratio),
+        _ => process_static_image(image_bytes, target_width, min_aspect_ratio),
+    }
+}
+
+fn process_animated_image(
+    image_bytes: bytes::Bytes,
+    content_type: &str,
+    target_width: Option<u32>,
+    min_aspect_ratio: Option<f32>,
+) -> Result<(bytes::Bytes, String), ImageError> {
+    let dimensions = image::load_from_memory(&*image_bytes.clone())?.dimensions();
+    let mut frames2: Vec<Frame> = match content_type {
+        "image/gif" => GifDecoder::new(Cursor::new(image_bytes))?.into_frames().collect_frames()?,
+        "image/png" => PngDecoder::new(Cursor::new(image_bytes))?.apng()?.into_frames().collect_frames()?,
+        "image/webp" => WebPDecoder::new(Cursor::new(image_bytes))?.into_frames().collect_frames()?,
+        _ => unimplemented!(),
+    };
+
+    // Resize the image
+    let (orig_width, orig_height) = dimensions;
+    let og_aspect_ratio = orig_width as f32 / orig_height as f32;
+    let mut width = orig_width;
+    let mut height = orig_height;
+    let mut crop_image = false;
+
+    if let Some(target_width) = target_width {
+        if dimensions.0 > target_width {
+            width = target_width;
+            height = (target_width as f32 / og_aspect_ratio).round() as u32;
+        }
     }
 
+    if let Some(min_aspect_ratio) = min_aspect_ratio {
+        // Crop if necessary
+        if og_aspect_ratio < min_aspect_ratio {
+            crop_image = true;
+        }
+    }
+
+    let mut config = WebPConfig::new().unwrap();
+    config.quality = 75f32;
+    config.method = 6;
+    let mut encoder = AnimEncoder::new(width, height, &config);
+    encoder.set_loop_count(0);
+
+    let mut frames = vec![];
+    frames2.iter().for_each(|frame| {
+        let mut img = image::imageops::resize(frame.buffer(), width, height, FilterType::Lanczos3);
+        if (crop_image) {
+            let crop_height = (width as f32 / min_aspect_ratio.unwrap()).round() as u32;
+            let y_offset = (height - crop_height) / 2;
+            img = image::imageops::crop_imm(&img, 0, y_offset, img.width(), crop_height).to_image();
+        }
+        frames.push((img.clone(), frame.delay()));
+    });
+
+    let mut t = 0;
+    for f in &frames {
+        encoder.add_frame(AnimFrame::from_rgba(&*f.0, width, height, t));
+        t += f.1.numer_denom_ms().0.div(f.1.numer_denom_ms().1) as i32;
+    }
+
+    let webp_bytes =  encoder.encode();
+
+    Ok((bytes::Bytes::from(webp_bytes.to_vec()), "webp".to_string()))
+}
+
+fn process_static_image(
+    image_bytes: bytes::Bytes,
+    target_width: Option<u32>,
+    min_aspect_ratio: Option<f32>,
+) -> Result<(bytes::Bytes, String), ImageError> {
     let mut img = image::load_from_memory(&image_bytes)?;
 
     let webp_bytes = convert_to_webp(&img)?;
@@ -151,7 +234,7 @@ fn process_image(
 
     // Optimize and compress
     let mut output = Vec::new();
-    img.write_to(&mut Cursor::new(&mut output), ImageOutputFormat::WebP)?;
+    img.write_to(&mut Cursor::new(&mut output), ImageFormat::WebP)?;
 
     Ok((bytes::Bytes::from(output), "webp".to_string()))
 }

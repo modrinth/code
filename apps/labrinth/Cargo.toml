@@ -120,7 +120,7 @@ sentry = { version = "0.32.1", default-features = false, features = [
 ] }
 sentry-actix = "0.32.1"
 
-image = "0.24.6"
+image = "0.25.4"
 color-thief = "0.2.2"
 webp = "0.3.0"
 
