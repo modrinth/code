@@ -187,8 +187,11 @@ const updateMetrics = () => {
       const newValue = lerp(currentValue, pastValue);
       return {
         ...metric,
-        value: `${newValue.toFixed(2)}%`,
-        data: [...metric.data.slice(-10), newValue],
+        value: `${index === 0 ? (newValue * 10).toFixed(2) : newValue.toFixed(2)}%`,
+        data:
+          index === 0
+            ? [...metric.data.slice(-10), newValue * 10]
+            : [...metric.data.slice(-10), newValue],
         // data: [36, 36],
       };
     }
