@@ -271,6 +271,7 @@ const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
 const isLoading = ref(true);
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
+const isFirstMount = ref(true);
 const isMounted = ref(true);
 
 const route = useNativeRoute();
@@ -515,9 +516,13 @@ const newMCVersion = ref<string | null>(null);
 const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   switch (data.result) {
     case "ok":
-      await server.refresh();
       if (!serverData.value) break;
       serverData.value.status = "available";
+
+      if (!isFirstMount.value) {
+        await server.refresh();
+      }
+
       if (server.general) {
         if (newLoader.value) server.general.loader = newLoader.value;
         if (newLoaderVersion.value) server.general.loader_version = newLoaderVersion.value;
@@ -575,7 +580,9 @@ const onReinstall = (potentialArgs: any) => {
     newMCVersion.value = potentialArgs.mVersion;
   }
 
-  server.refresh();
+  if (!isFirstMount.value) {
+    server.refresh();
+  }
 
   error.value = null;
   errorTitle.value = "Error";
@@ -768,6 +775,11 @@ onUnmounted(() => {
 watch(
   () => serverData.value?.status,
   (newStatus) => {
+    if (isFirstMount.value) {
+      isFirstMount.value = false;
+      return;
+    }
+
     if (newStatus === "installing") {
       startPolling();
     } else {
