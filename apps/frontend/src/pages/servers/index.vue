@@ -406,7 +406,7 @@
           <h1 class="m-0 text-lg font-bold">Frequently Asked Questions</h1>
           <div class="details-hide flex flex-col gap-1">
             <details pyro-hash="cpus" class="group" :open="$route.hash === '#cpus'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -419,7 +419,7 @@
             </details>
 
             <details pyro-hash="ddos" class="group" :open="$route.hash === '#ddos'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -433,7 +433,7 @@
             </details>
 
             <details pyro-hash="region" class="group" :open="$route.hash === '#region'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -447,7 +447,7 @@
             </details>
 
             <details pyro-hash="storage" class="group" :open="$route.hash === '#storage'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -460,7 +460,7 @@
             </details>
 
             <details pyro-hash="players" class="group" :open="$route.hash === '#players'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
