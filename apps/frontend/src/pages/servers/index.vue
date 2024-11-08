@@ -542,33 +542,22 @@
             </h2>
             <ButtonStyled color="blue" size="large">
               <NuxtLink
-                v-if="loggedOut"
-                :to="loginUrl"
-                target="_self"
+                v-if="!loggedOut && isSmallAtCapacity"
+                :to="outOfStockUrl"
+                target="_blank"
                 class="!bg-highlight-blue !font-medium !text-blue"
               >
-                Sign in
-                <LogInIcon class="!min-h-4 !min-w-4 !text-blue" />
+                Out of Stock
+                <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
               </NuxtLink>
-              <template v-else>
-                <NuxtLink
-                  v-if="isSmallAtCapacity"
-                  :to="outOfStockUrl"
-                  target="_blank"
-                  class="!bg-highlight-blue !font-medium !text-blue"
-                >
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </NuxtLink>
-                <button
-                  v-else
-                  class="!bg-highlight-blue !font-medium !text-blue"
-                  @click="selectProduct(pyroPlanProducts[0])"
-                >
-                  Get Started
-                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </button>
-              </template>
+              <button
+                v-else
+                class="!bg-highlight-blue !font-medium !text-blue"
+                @click="selectProduct('small')"
+              >
+                Get Started
+                <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
+              </button>
             </ButtonStyled>
           </li>
 
@@ -605,33 +594,22 @@
             </h2>
             <ButtonStyled color="brand" size="large">
               <NuxtLink
-                v-if="loggedOut"
-                :to="loginUrl"
-                target="_self"
+                v-if="!loggedOut && isMediumAtCapacity"
+                :to="outOfStockUrl"
+                target="_blank"
                 class="!bg-highlight-green !font-medium !text-green"
               >
-                Sign in
-                <LogInIcon class="!min-h-4 !min-w-4 !text-green" />
+                Out of Stock
+                <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
               </NuxtLink>
-              <template v-else>
-                <NuxtLink
-                  v-if="isMediumAtCapacity"
-                  :to="outOfStockUrl"
-                  target="_blank"
-                  class="!bg-highlight-green !font-medium !text-green"
-                >
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
-                </NuxtLink>
-                <button
-                  v-else
-                  class="!bg-highlight-green !font-medium !text-green"
-                  @click="selectProduct(pyroPlanProducts[1])"
-                >
-                  Get Started
-                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-green" />
-                </button>
-              </template>
+              <button
+                v-else
+                class="!bg-highlight-green !font-medium !text-green"
+                @click="selectProduct('medium')"
+              >
+                Get Started
+                <RightArrowIcon class="!min-h-4 !min-w-4 !text-green" />
+              </button>
             </ButtonStyled>
           </li>
 
@@ -655,35 +633,24 @@
             <h2 class="m-0 text-3xl text-contrast">
               $24<span class="text-sm font-normal text-secondary">/month</span>
             </h2>
-            <ButtonStyled color="purple" size="large">
+            <ButtonStyled color="brand" size="large">
               <NuxtLink
-                v-if="loggedOut"
-                :to="loginUrl"
-                target="_self"
+                v-if="!loggedOut && isLargeAtCapacity"
+                :to="outOfStockUrl"
+                target="_blank"
                 class="!bg-highlight-purple !font-medium !text-purple"
               >
-                Sign in
-                <LogInIcon class="!min-h-4 !min-w-4 !text-purple" />
+                Out of Stock
+                <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
               </NuxtLink>
-              <template v-else>
-                <NuxtLink
-                  v-if="isLargeAtCapacity"
-                  :to="outOfStockUrl"
-                  target="_blank"
-                  class="!bg-highlight-purple !font-medium !text-purple"
-                >
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </NuxtLink>
-                <button
-                  v-else
-                  class="!bg-highlight-purple !font-medium !text-purple"
-                  @click="selectProduct(pyroPlanProducts[2])"
-                >
-                  Get Started
-                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </button>
-              </template>
+              <button
+                v-else
+                class="!bg-highlight-purple !font-medium !text-purple"
+                @click="selectProduct('large')"
+              >
+                Get Started
+                <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
+              </button>
             </ButtonStyled>
           </li>
         </ul>
@@ -701,11 +668,7 @@
 
           <div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
             <ButtonStyled color="standard" size="large">
-              <NuxtLink v-if="loggedOut" :to="loginUrl" target="_self" class="w-full md:w-fit">
-                Sign in
-                <LogInIcon class="!min-h-4 !min-w-4" />
-              </NuxtLink>
-              <button v-else class="w-full md:w-fit" @click="selectProduct(pyroProducts, true)">
+              <button class="w-full md:w-fit" @click="selectProduct('custom')">
                 Build your own
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
@@ -730,7 +693,6 @@ import {
   TerminalSquareIcon,
   TransferIcon,
   VersionIcon,
-  LogInIcon,
   ServerIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
@@ -741,11 +703,6 @@ const pyroPlanProducts = pyroProducts.filter(
   (p) => p.metadata.ram === 4096 || p.metadata.ram === 6144 || p.metadata.ram === 8192,
 );
 pyroPlanProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
-// yep. this is a thing.
-if (!pyroProducts.metadata) {
-  pyroProducts.metadata = {};
-}
-pyroProducts.metadata.type = "pyro";
 
 const title = "Modrinth Servers";
 const description =
@@ -789,7 +746,6 @@ const deletingSpeed = 25;
 const pauseTime = 2000;
 
 const loggedOut = computed(() => !auth.value.user);
-const loginUrl = `/auth/sign-in?redirect=${encodeURIComponent("/servers#plan")}`;
 const outOfStockUrl = "https://support.modrinth.com";
 
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
@@ -937,19 +893,20 @@ onMounted(scrollToFaq);
 
 watch(() => route.hash, scrollToFaq);
 
-const selectProduct = async (product, custom) => {
-  if (isAtCapacity.value) {
-    addNotification({
-      group: "main",
-      title: "Server Capacity Full",
-      type: "error",
-      text: "We are currently at capacity. Please try again later.",
-    });
+const plans = {
+  small: pyroPlanProducts?.[0],
+  medium: pyroPlanProducts?.[1],
+  large: pyroPlanProducts?.[2],
+  custom: pyroProducts || [],
+};
+
+const selectProduct = async (product) => {
+  if (loggedOut.value) {
+    data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?plan=" + product)}`);
     return;
   }
 
   await refreshCapacity();
-
   if (isAtCapacity.value) {
     addNotification({
       group: "main",
@@ -960,68 +917,53 @@ const selectProduct = async (product, custom) => {
     return;
   }
 
-  if (!auth.value.user) {
-    data.$router.push(loginUrl);
+  const selectedPlan = plans[product];
+  if (!selectedPlan) return;
+
+  if (
+    (product === "custom" && !selectedPlan.length) ||
+    (product !== "custom" && !selectedPlan.metadata)
+  ) {
+    addNotification({
+      group: "main",
+      title: "Invalid product",
+      type: "error",
+      text: "The selected product was found but lacks necessary data. Please contact support.",
+    });
     return;
   }
 
-  customServer.value = !!custom;
-  selectedProduct.value = product;
+  // required for the purchase modal
+  if (!pyroProducts.metadata) {
+    pyroProducts.metadata = {};
+  }
+  pyroProducts.metadata.type = "pyro";
+
+  customServer.value = product === "custom";
+  selectedProduct.value = selectedPlan;
   showModal.value = true;
   modalKey.value++;
   await nextTick();
+
   if (purchaseModal.value && purchaseModal.value.show) {
     purchaseModal.value.show();
   }
 };
 
-const openPurchaseModal = () => {
-  if (isAtCapacity.value) {
-    addNotification({
-      group: "main",
-      title: "Server Capacity Full",
-      type: "error",
-      text: "We are currently at capacity. Please try again later.",
-    });
-    return;
+const planQuery = () => {
+  if (route.query.plan) {
+    document.getElementById("plan").scrollIntoView();
+    selectProduct(route.query.plan);
   }
-
-  refreshCapacity();
-
-  if (isAtCapacity.value) {
-    addNotification({
-      group: "main",
-      title: "Server Capacity Full",
-      type: "error",
-      text: "We are currently at capacity. Please try again later.",
-    });
-    return;
-  }
-
-  customServer.value = false;
-  selectedProduct.value = pyroPlanProducts[0];
-  showModal.value = true;
-  modalKey.value++;
-  nextTick(() => {
-    if (purchaseModal.value && purchaseModal.value.show) {
-      purchaseModal.value.show();
-    }
-  });
 };
 
 onMounted(() => {
   startTyping();
-  if (route.query.showModal) {
-    openPurchaseModal();
-  }
+  planQuery();
 });
 
 watch(customer, (newCustomer) => {
-  if (newCustomer) {
-    if (route.query.showModal) {
-      openPurchaseModal();
-    }
-  }
+  if (newCustomer) planQuery();
 });
 
 onMounted(() => {
