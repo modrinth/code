@@ -167,7 +167,7 @@
             class="hidden w-full rounded-2xl sm:block"
           />
         </div>
-        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
+        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-3">
           <div class="flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -216,6 +216,22 @@
               Modrinth Servers are hosted on
               <span class="text-contrast">2023 Ryzen 7/9 CPUs with DDR5 RAM</span>, running on
               custom-built software to ensure your server performs smoothly.
+            </h3>
+          </div>
+
+          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+            <ServerIcon class="size-8 text-brand" />
+            <h2 class="m-0 text-lg font-bold">Consistently fast</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Under Pyro, infrastructure is never overloaded, meaning each Modrinth server always
+              runs at its full performance.
+              <a
+                class="mt-2 flex items-center gap-2 font-medium text-contrast transition-all hover:gap-3"
+                href="https://status.pyro.host/"
+                target="_blank"
+              >
+                See the infrastructure <RightArrowIcon class="flex-none" />
+              </a>
             </h3>
           </div>
         </div>
@@ -715,6 +731,7 @@ import {
   UserIcon,
   TransferIcon,
   VersionIcon,
+  ServerIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
