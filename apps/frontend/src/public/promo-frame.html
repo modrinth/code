@@ -106,7 +106,9 @@
 
       let attempts = 0;
       function syncAgreeState() {
-        const primaryButton = document.querySelector('.qc-cmp2-summary-buttons button:last-of-type');
+        const primaryButton = document.querySelector(
+          ".qc-cmp2-summary-buttons button:last-of-type",
+        );
 
         if (primaryButton) {
           primaryButton.click();
