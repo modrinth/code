@@ -763,7 +763,7 @@ const metadata = computed(() => {
             },
     }
   }
-  return {}
+  return null
 })
 
 function nextStep() {
