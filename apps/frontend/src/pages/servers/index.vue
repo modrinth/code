@@ -547,8 +547,8 @@
                 target="_self"
                 class="!bg-highlight-blue !font-medium !text-blue"
               >
-                Login
-                <UserIcon class="!min-h-4 !min-w-4 !text-blue" />
+                Sign in
+                <LogInIcon class="!min-h-4 !min-w-4 !text-blue" />
               </NuxtLink>
               <template v-else>
                 <NuxtLink
@@ -610,8 +610,8 @@
                 target="_self"
                 class="!bg-highlight-green !font-medium !text-green"
               >
-                Login
-                <UserIcon class="!min-h-4 !min-w-4 !text-green" />
+                Sign in
+                <LogInIcon class="!min-h-4 !min-w-4 !text-green" />
               </NuxtLink>
               <template v-else>
                 <NuxtLink
@@ -662,8 +662,8 @@
                 target="_self"
                 class="!bg-highlight-purple !font-medium !text-purple"
               >
-                Login
-                <UserIcon class="!min-h-4 !min-w-4 !text-purple" />
+                Sign in
+                <LogInIcon class="!min-h-4 !min-w-4 !text-purple" />
               </NuxtLink>
               <template v-else>
                 <NuxtLink
@@ -702,8 +702,8 @@
           <div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
             <ButtonStyled color="standard" size="large">
               <NuxtLink v-if="loggedOut" :to="loginUrl" target="_self" class="w-full md:w-fit">
-                Login
-                <UserIcon class="!min-h-4 !min-w-4" />
+                Sign in
+                <LogInIcon class="!min-h-4 !min-w-4" />
               </NuxtLink>
               <button v-else class="w-full md:w-fit" @click="selectProduct(pyroProducts, true)">
                 Build your own
@@ -728,9 +728,9 @@ import {
   SortAscendingIcon,
   ExternalIcon,
   TerminalSquareIcon,
-  UserIcon,
   TransferIcon,
   VersionIcon,
+  LogInIcon,
   ServerIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
