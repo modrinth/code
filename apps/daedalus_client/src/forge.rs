@@ -749,7 +749,7 @@ async fn fetch(
         let manifest = daedalus::modded::Manifest {
             game_versions: forge_versions
                 .into_iter()
-                .rev()
+                .sorted_by(|a, b| b.game_version.cmp(&a.game_version))
                 .chunk_by(|x| x.game_version.clone())
                 .into_iter()
                 .map(|(game_version, loaders)| daedalus::modded::Version {
