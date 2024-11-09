@@ -16,6 +16,10 @@ pub use super::users::UserId;
 pub use crate::models::billing::{
     ChargeId, ProductId, ProductPriceId, UserSubscriptionId,
 };
+pub use crate::models::shared_instances::{
+    SharedInstanceFileId, SharedInstanceId,
+    SharedInstanceInviteId,
+};
 use thiserror::Error;
 
 /// Generates a random 64 bit integer that is exactly `n` characters
@@ -143,6 +147,9 @@ base62_id_impl!(ProductId, ProductId);
 base62_id_impl!(ProductPriceId, ProductPriceId);
 base62_id_impl!(UserSubscriptionId, UserSubscriptionId);
 base62_id_impl!(ChargeId, ChargeId);
+base62_id_impl!(SharedInstanceId, SharedInstanceId);
+base62_id_impl!(SharedInstanceInviteId, SharedInstanceInviteId);
+base62_id_impl!(SharedInstanceFileId, SharedInstanceFileId);
 
 pub mod base62_impl {
     use serde::de::{self, Deserializer, Visitor};

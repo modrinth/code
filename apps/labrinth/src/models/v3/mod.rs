@@ -15,3 +15,4 @@ pub mod sessions;
 pub mod teams;
 pub mod threads;
 pub mod users;
+pub mod shared_instances;

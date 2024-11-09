@@ -22,6 +22,7 @@ pub mod version_file;
 pub mod versions;
 
 pub mod oauth_clients;
+mod shared_instances;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(

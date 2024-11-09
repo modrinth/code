@@ -24,6 +24,7 @@ pub mod thread_item;
 pub mod user_item;
 pub mod user_subscription_item;
 pub mod version_item;
+mod shared_instance_item;
 
 pub use collection_item::Collection;
 pub use ids::*;

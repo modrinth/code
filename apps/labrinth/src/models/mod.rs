@@ -19,3 +19,4 @@ pub use v3::sessions;
 pub use v3::teams;
 pub use v3::threads;
 pub use v3::users;
+pub use v3::shared_instances;
