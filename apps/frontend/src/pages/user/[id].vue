@@ -35,7 +35,15 @@
               {{ formatCompactNumber(sumDownloads) }}
               downloads
             </div>
-            <div class="flex items-center gap-2 font-semibold">
+            <div
+              v-tooltip="
+                formatMessage(commonMessages.dateAtTimeTooltip, {
+                  date: new Date(user.created),
+                  time: new Date(user.created),
+                })
+              "
+              class="flex items-center gap-2 font-semibold"
+            >
               <CalendarIcon class="h-6 w-6 text-secondary" />
               Joined
               {{ formatRelativeTime(user.created) }}
@@ -508,7 +516,7 @@ const badges = computed(() => {
 });
 
 async function copyId() {
-  await navigator.clipboard.writeText(project.value.id);
+  await navigator.clipboard.writeText(user.value.id);
 }
 
 const navLinks = computed(() => [

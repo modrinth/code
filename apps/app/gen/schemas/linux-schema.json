@@ -300,6 +300,69 @@
     "Identifier": {
       "oneOf": [
         {
+          "description": "ads:default -> Default plugin permissions.",
+          "type": "string",
+          "enum": [
+            "ads:default"
+          ]
+        },
+        {
+          "description": "ads:allow-hide-ads-window -> Enables the hide_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:allow-hide-ads-window"
+          ]
+        },
+        {
+          "description": "ads:allow-init-ads-window -> Enables the init_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:allow-init-ads-window"
+          ]
+        },
+        {
+          "description": "ads:allow-scroll-ads-window -> Enables the scroll_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:allow-scroll-ads-window"
+          ]
+        },
+        {
+          "description": "ads:allow-show-ads-window -> Enables the show_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:allow-show-ads-window"
+          ]
+        },
+        {
+          "description": "ads:deny-hide-ads-window -> Denies the hide_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:deny-hide-ads-window"
+          ]
+        },
+        {
+          "description": "ads:deny-init-ads-window -> Denies the init_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:deny-init-ads-window"
+          ]
+        },
+        {
+          "description": "ads:deny-scroll-ads-window -> Denies the scroll_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:deny-scroll-ads-window"
+          ]
+        },
+        {
+          "description": "ads:deny-show-ads-window -> Denies the show_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:deny-show-ads-window"
+          ]
+        },
+        {
           "description": "auth:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
@@ -2785,10 +2848,10 @@
           ]
         },
         {
-          "description": "jre:allow-set-java-versions -> Enables the set_java_versions command without any pre-configured scope.",
+          "description": "jre:allow-set-java-version -> Enables the set_java_version command without any pre-configured scope.",
           "type": "string",
           "enum": [
-            "jre:allow-set-java-versions"
+            "jre:allow-set-java-version"
           ]
         },
         {
@@ -2834,10 +2897,10 @@
           ]
         },
         {
-          "description": "jre:deny-set-java-versions -> Denies the set_java_versions command without any pre-configured scope.",
+          "description": "jre:deny-set-java-version -> Denies the set_java_version command without any pre-configured scope.",
           "type": "string",
           "enum": [
-            "jre:deny-set-java-versions"
+            "jre:deny-set-java-version"
           ]
         },
         {

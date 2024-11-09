@@ -1,7 +1,7 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
-import { Card, Slider, DropdownSelect, Toggle, ConfirmModal, Button } from '@modrinth/ui'
+import { Card, Slider, DropdownSelect, Toggle, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/jre'
@@ -13,6 +13,12 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
 import { get_user, purge_cache_types } from '@/helpers/cache.js'
+import { hide_ads_window } from '@/helpers/ads.js'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+
+onMounted(() => {
+  hide_ads_window(true)
+})
 
 const pageOptions = ['Home', 'Library']
 
@@ -169,13 +175,12 @@ async function purgeCache() {
           Sign in
         </button>
       </div>
-      <ConfirmModal
+      <ConfirmModalWrapper
         ref="purgeCacheConfirmModal"
         title="Are you sure you want to purge the cache?"
         description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
         :has-to-type="false"
         proceed-label="Purge cache"
-        :noblur="!themeStore.advancedRendering"
         @proceed="purgeCache"
       />
       <div class="adjacent-input">
@@ -360,6 +365,25 @@ async function purgeCache() {
       </div>
       <div class="adjacent-input">
         <label for="opt-out-analytics">
+          <span class="label__title">Personalized ads</span>
+          <span class="label__description">
+            Modrinth's ad provider, Aditude, shows ads based on your preferences. By disabling this
+            option, you opt out and ads will no longer be shown based on your interests.
+          </span>
+        </label>
+        <Toggle
+          id="opt-out-analytics"
+          :model-value="settings.personalized_ads"
+          :checked="settings.personalized_ads"
+          @update:model-value="
+            (e) => {
+              settings.personalized_ads = e
+            }
+          "
+        />
+      </div>
+      <div class="adjacent-input">
+        <label for="opt-out-analytics">
           <span class="label__title">Telemetry</span>
           <span class="label__description">
             Modrinth collects anonymized analytics and usage data to improve our user experience and
@@ -401,14 +425,14 @@ async function purgeCache() {
           <span class="label__title size-card-header">Java settings</span>
         </h3>
       </div>
-      <template v-for="version in [21, 17, 8]">
-        <label :for="'java-' + version">
-          <span class="label__title">Java {{ version }} location</span>
+      <template v-for="javaVersion in [21, 17, 8]" :key="`java-${javaVersion}`">
+        <label :for="'java-' + javaVersion">
+          <span class="label__title">Java {{ javaVersion }} location</span>
         </label>
         <JavaSelector
-          :id="'java-selector-' + version"
-          v-model="javaVersions[version]"
-          :version="version"
+          :id="'java-selector-' + javaVersion"
+          v-model="javaVersions[javaVersion]"
+          :version="javaVersion"
           @update:model-value="updateJavaVersion"
         />
       </template>
@@ -449,7 +473,7 @@ async function purgeCache() {
           :min="8"
           :max="maxMemory"
           :step="64"
-          unit="mb"
+          unit="MB"
         />
       </div>
     </Card>

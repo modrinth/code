@@ -7,7 +7,7 @@ import {
   RightArrowIcon,
   CheckIcon,
 } from '@modrinth/assets'
-import { Avatar, Modal, Button, Card } from '@modrinth/ui'
+import { Avatar, Button, Card } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 import {
   add_project_from_version as installMod,
@@ -19,12 +19,11 @@ import {
 import { open } from '@tauri-apps/plugin-dialog'
 import { installVersionDependencies } from '@/store/install.js'
 import { handleError } from '@/store/notifications.js'
-import { useTheming } from '@/store/theme.js'
 import { useRouter } from 'vue-router'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { trackEvent } from '@/helpers/analytics'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
-const themeStore = useTheming()
 const router = useRouter()
 
 const versions = ref()
@@ -49,7 +48,7 @@ const shownProfiles = computed(() =>
       return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
     })
     .filter((profile) => {
-      let loaders = versions.value.flatMap((v) => v.loaders)
+      const loaders = versions.value.flatMap((v) => v.loaders)
 
       return (
         versions.value.flatMap((v) => v.game_versions).includes(profile.game_version) &&
@@ -60,7 +59,7 @@ const shownProfiles = computed(() =>
     }),
 )
 
-let onInstall = ref(() => {})
+const onInstall = ref(() => {})
 
 defineExpose({
   show: async (projectVal, versionsVal, callback) => {
@@ -78,7 +77,7 @@ defineExpose({
     onInstall.value = callback
 
     const profilesVal = await list().catch(handleError)
-    for (let profile of profilesVal) {
+    for (const profile of profilesVal) {
       profile.installing = false
       profile.installedMod = await check_installed(profile.path, project.value.id).catch(
         handleError,
@@ -142,7 +141,7 @@ const toggleCreation = () => {
 }
 
 const upload_icon = async () => {
-  icon.value = await open({
+  const res = await open({
     multiple: false,
     filters: [
       {
@@ -151,6 +150,7 @@ const upload_icon = async () => {
       },
     ],
   })
+  icon.value = res.path ?? res
 
   if (!icon.value) return
   display_icon.value = convertFileSrc(icon.value)
@@ -213,12 +213,7 @@ const createInstance = async () => {
 </script>
 
 <template>
-  <Modal
-    ref="installModal"
-    header="Install project to instance"
-    :noblur="!themeStore.advancedRendering"
-    :on-hide="onInstall"
-  >
+  <ModalWrapper ref="installModal" header="Install project to instance" :on-hide="onInstall">
     <div class="modal-body">
       <input
         v-model="searchFilter"
@@ -235,7 +230,7 @@ const createInstance = async () => {
             @click="installModal.hide()"
           >
             <Avatar
-              :src="profile.icon_path ? tauri.convertFileSrc(profile.icon_path) : null"
+              :src="profile.icon_path ? convertFileSrc(profile.icon_path) : null"
               class="profile-image"
             />
             {{ profile.name }}
@@ -304,7 +299,7 @@ const createInstance = async () => {
         <Button @click="installModal.hide()">Cancel</Button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">

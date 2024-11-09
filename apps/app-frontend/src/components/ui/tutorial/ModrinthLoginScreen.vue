@@ -1,6 +1,6 @@
 <script setup>
 import { UserIcon, LockIcon, MailIcon } from '@modrinth/assets'
-import { Button, Card, Checkbox, Modal } from '@modrinth/ui'
+import { Button, Card, Checkbox } from '@modrinth/ui'
 import {
   DiscordIcon,
   GithubIcon,
@@ -13,6 +13,7 @@ import { login, login_2fa, create_account, login_pass } from '@/helpers/mr_auth.
 import { handleError, useNotifications } from '@/store/state.js'
 import { ref } from 'vue'
 import { handleSevereError } from '@/store/error.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const props = defineProps({
   callback: {
@@ -132,7 +133,7 @@ async function createAccount() {
 </script>
 
 <template>
-  <Modal ref="modal" :on-hide="removeWidget">
+  <ModalWrapper ref="modal" :on-hide="removeWidget">
     <Card>
       <template v-if="twoFactorFlow">
         <h1>Enter two-factor code</h1>
@@ -217,17 +218,17 @@ async function createAccount() {
           v-else-if="loggingIn"
           color="primary"
           large
-          @click="signIn"
           :disabled="!turnstileToken"
+          @click="signIn"
         >
           Login
         </Button>
-        <Button v-else color="primary" large @click="createAccount" :disabled="!turnstileToken">
+        <Button v-else color="primary" large :disabled="!turnstileToken" @click="createAccount">
           Create account
         </Button>
       </div>
     </Card>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">

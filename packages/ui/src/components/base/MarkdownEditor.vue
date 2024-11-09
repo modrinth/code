@@ -237,7 +237,7 @@
           >This editor supports
           <a
             class="markdown-resource-link"
-            href="https://docs.modrinth.com/markdown"
+            href="https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting"
             target="_blank"
             >Markdown formatting</a
           >.</span
@@ -797,7 +797,7 @@ function openVideoModal() {
 
 .markdown-resource-link {
   cursor: pointer;
-  color: var(--color-link);
+  color: var(--color-blue);
 
   &:focus-visible,
   &:hover {

@@ -1,7 +1,15 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
-import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, XIcon } from '@modrinth/assets'
+import {
+  HomeIcon,
+  SearchIcon,
+  LibraryIcon,
+  PlusIcon,
+  SettingsIcon,
+  XIcon,
+  DownloadIcon,
+} from '@modrinth/assets'
 import { Button, Notifications } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -16,7 +24,7 @@ import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/plugin-os'
-import { isDev, getOS } from '@/helpers/utils.js'
+import { isDev, getOS, restartApp } from '@/helpers/utils.js'
 import { initAnalytics, debugAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
@@ -31,6 +39,10 @@ import { useInstall } from '@/store/install.js'
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-shell'
 import { get_opening_command, initialize_state } from '@/helpers/state'
+import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { renderString } from '@modrinth/utils'
+import { useFetch } from '@/helpers/fetch.js'
+import { check } from '@tauri-apps/plugin-updater'
 
 const themeStore = useTheming()
 
@@ -50,6 +62,8 @@ const nativeDecorations = ref(false)
 const os = ref('')
 
 const stateInitialized = ref(false)
+
+const criticalErrorMessage = ref()
 
 onMounted(async () => {
   await useCheckDisableMouseover()
@@ -107,7 +121,18 @@ async function setupApp() {
     }),
   )
 
+  useFetch(
+    `https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
+    'criticalAnnouncements',
+    true,
+  ).then((res) => {
+    if (res && res.header && res.body) {
+      criticalErrorMessage.value = res
+    }
+  })
+
   get_opening_command().then(handleCommand)
+  checkUpdates()
 }
 
 const stateFailed = ref(false)
@@ -126,6 +151,7 @@ initialize_state()
   })
 
 const handleClose = async () => {
+  await saveWindowState(StateFlags.ALL)
   await getCurrentWindow().close()
 }
 
@@ -171,7 +197,8 @@ document.querySelector('body').addEventListener('click', function (e) {
         ['http://', 'https://', 'mailto:', 'tel:'].some((v) => target.href.startsWith(v)) &&
         !target.classList.contains('router-link-active') &&
         !target.href.startsWith('http://localhost') &&
-        !target.href.startsWith('https://tauri.localhost')
+        !target.href.startsWith('https://tauri.localhost') &&
+        !target.href.startsWith('http://tauri.localhost')
       ) {
         open(target.href)
       }
@@ -215,6 +242,20 @@ async function handleCommand(e) {
     urlModal.value.show(e)
   }
 }
+
+const updateAvailable = ref(false)
+async function checkUpdates() {
+  const update = await check()
+  console.log(update)
+  updateAvailable.value = !!update
+
+  setTimeout(
+    () => {
+      checkUpdates()
+    },
+    5 * 1000 * 60,
+  )
+}
 </script>
 
 <template>
@@ -248,6 +289,14 @@ async function handleCommand(e) {
         </div>
       </div>
       <div class="settings pages-list">
+        <button
+          v-if="updateAvailable"
+          v-tooltip="'Install update'"
+          class="btn btn-outline btn-primary icon-only collapsed-button"
+          @click="restartApp()"
+        >
+          <DownloadIcon />
+        </button>
         <Button
           v-tooltip="'Create profile'"
           class="sleek-primary collapsed-button"
@@ -263,6 +312,10 @@ async function handleCommand(e) {
       </div>
     </div>
     <div class="view">
+      <div v-if="criticalErrorMessage" class="critical-error-banner" data-tauri-drag-region>
+        <h1>{{ criticalErrorMessage.header }}</h1>
+        <div class="markdown-body" v-html="renderString(criticalErrorMessage.body ?? '')"></div>
+      </div>
       <div class="appbar-row">
         <div data-tauri-drag-region class="appbar">
           <section class="navigation-controls">
@@ -374,6 +427,16 @@ async function handleCommand(e) {
   .view {
     width: calc(100% - var(--sidebar-width));
     background-color: var(--color-raised-bg);
+
+    .critical-error-banner {
+      margin-top: -1.25rem;
+      padding: 1rem;
+      background-color: rgba(203, 34, 69, 0.1);
+      border-left: 2px solid var(--color-red);
+      border-bottom: 2px solid var(--color-red);
+      border-right: 2px solid var(--color-red);
+      border-radius: 1rem;
+    }
 
     .appbar {
       display: flex;

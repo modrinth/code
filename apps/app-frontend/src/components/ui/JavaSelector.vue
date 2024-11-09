@@ -124,20 +124,19 @@ async function testJava() {
 }
 
 async function handleJavaFileInput() {
-  let filePath = await open()
+  const filePath = await open()
 
   if (filePath) {
-    let result = await get_jre(filePath)
+    let result = await get_jre(filePath.path ?? filePath)
     if (!result) {
       result = {
-        path: filePath,
+        path: filePath.path ?? filePath,
         version: props.version.toString(),
         architecture: 'x86',
       }
     }
 
     trackEvent('JavaManualSelect', {
-      path: filePath,
       version: props.version,
     })
 
@@ -150,7 +149,7 @@ async function autoDetect() {
   if (!props.compact) {
     detectJavaModal.value.show(props.version, props.modelValue)
   } else {
-    let versions = await find_filtered_jres(props.version).catch(handleError)
+    const versions = await find_filtered_jres(props.version).catch(handleError)
     if (versions.length > 0) {
       emit('update:modelValue', versions[0])
     }
