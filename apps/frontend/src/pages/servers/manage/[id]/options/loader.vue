@@ -103,7 +103,7 @@
       />
       <div class="mt-4 flex justify-start gap-4">
         <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="!mrpackFile" @click="reinstallMrpack">
+          <button :disabled="!mrpackFile || isLoading" @click="reinstallMrpack">
             <RightArrowIcon />
             {{
               isSecondPhase
@@ -334,9 +334,12 @@ const mcVersions = tags.value.gameVersions
   .filter((x) => x.version_type === "release")
   .map((x) => x.version)
   .filter((x) => {
-    const num = parseInt(x.replace(/\./g, ""), 10);
+    // const num = parseInt(x.replace(/\./g, ""), 10);
     // Versions 1.2.4 and below don't have server jars from Mojang
-    return isNaN(num) || num >= 125;
+    // return isNaN(num) || num >= 125;
+    // above code broke singular versions up until 1.24 (ie 1.25 showed)
+    const segment = parseInt(x.split(".")[1], 10);
+    return !isNaN(segment) && segment > 2;
   });
 
 const selectedLoaderVersions = computed(() => {
