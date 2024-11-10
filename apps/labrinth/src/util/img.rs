@@ -8,7 +8,6 @@ use color_thief::ColorFormat;
 use image::codecs::gif::GifDecoder;
 use image::codecs::png::PngDecoder;
 use image::codecs::webp::WebPDecoder;
-use image::error::{UnsupportedError, UnsupportedErrorKind};
 use image::imageops::FilterType;
 use image::{
     AnimationDecoder, DynamicImage, EncodableLayout, Frame, GenericImageView,
