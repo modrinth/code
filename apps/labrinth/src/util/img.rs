@@ -124,33 +124,12 @@ fn process_image(
     min_aspect_ratio: Option<f32>,
 ) -> Result<(bytes::Bytes, String), ImageError> {
     match content_type {
-        "image/gif" => {
-            if target_width.is_none() && min_aspect_ratio.is_none() {
-                process_animated_image(
-                    image_bytes,
-                    content_type,
-                    target_width,
-                    min_aspect_ratio,
-                )
-            } else {
-                // Skip animated image processing for GIFs that won't be modified
-                // But not before checking if it's indeed a GIF
-                let format = image::guess_format(&image_bytes)?;
-                if format == ImageFormat::Gif {
-                    Ok((image_bytes.clone(), "gif".to_string()))
-                } else {
-                    Err(ImageError::Unsupported(
-                        UnsupportedError::from_format_and_kind(
-                            ImageFormat::Gif.into(),
-                            UnsupportedErrorKind::GenericFeature(
-                                "Attempted to process an invalid GIF!"
-                                    .to_owned()
-                            ),
-                        ),
-                    ))
-                }
-            }
-        }
+        "image/gif" => process_animated_image(
+            image_bytes,
+            content_type,
+            target_width,
+            min_aspect_ratio,
+        ),
         "image/png" => {
             let decoder = PngDecoder::new(Cursor::new(image_bytes.clone()))?;
             if decoder.is_apng()? {
