@@ -86,7 +86,7 @@
           <ul
             class="m-0 list-none p-0"
             data-pyro-terminal-virtual-list
-            :style="{ transform: `translateY(${offsetY}px)` }"
+            :style="virtualListStyle"
             aria-live="polite"
             role="listbox"
           >
@@ -120,7 +120,7 @@
 
     <Transition name="scroll-to-bottom">
       <button
-        v-if="bottomThreshold > 0"
+        v-if="bottomThreshold > 0 && !isScrolledToBottom"
         data-pyro-scrolltobottom
         label="Scroll to bottom"
         class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
@@ -146,11 +146,12 @@ const props = defineProps<{
 }>();
 
 const scrollContainer = ref<HTMLElement | null>(null);
-const itemRefs = ref<HTMLElement[]>([]);
 const itemHeights = ref<number[]>([]);
 const averageItemHeight = ref(36);
 const bottomThreshold = ref(0);
 const bufferSize = 5;
+const cachedHeights = ref<Map<string, number>>(new Map());
+const isAutoScrolling = ref(false);
 
 const progressiveBlurIterations = ref(8);
 
@@ -173,10 +174,12 @@ const totalHeight = computed(
 );
 
 watch(totalHeight, () => {
-  if (!initial.value) {
+  if (isScrolledToBottom.value) {
     scrollToBottom();
   }
-  initial.value = true;
+  if (!initial.value) {
+    initial.value = true;
+  }
 });
 
 const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
@@ -249,38 +252,37 @@ const visibleItems = computed(() =>
 const offsetY = computed(() => getItemOffset(visibleStartIndex.value));
 
 const handleListScroll = () => {
-  if (scrollContainer.value) {
-    scrollTop.value = scrollContainer.value.scrollTop;
-    clientHeight.value = scrollContainer.value.clientHeight;
+  if (!scrollContainer.value) return;
 
-    const scrollHeight = scrollContainer.value.scrollHeight;
-    isScrolledToBottom.value = scrollTop.value + clientHeight.value >= scrollHeight - 32; // threshold
+  const container = scrollContainer.value;
+  scrollTop.value = container.scrollTop;
+  clientHeight.value = container.clientHeight;
 
-    if (!isScrolledToBottom.value) {
-      userHasScrolled.value = true;
-    }
+  const scrollHeight = container.scrollHeight;
+  const threshold = 32;
+
+  isScrolledToBottom.value = scrollHeight - scrollTop.value - clientHeight.value <= threshold;
+
+  if (!isScrolledToBottom.value && !isAutoScrolling.value) {
+    userHasScrolled.value = true;
   }
 
-  const maxBottom = 256;
-  bottomThreshold.value = Math.min(
-    1,
-    ((scrollContainer.value?.scrollHeight || 1) - scrollTop.value - clientHeight.value) / maxBottom,
-  );
+  bottomThreshold.value = Math.min(1, (scrollHeight - scrollTop.value - clientHeight.value) / 256);
 };
 
-const updateItemHeights = () => {
-  nextTick(() => {
-    itemRefs.value.forEach((el, index) => {
-      if (el) {
-        const actualIndex = visibleStartIndex.value + index;
-        itemHeights.value[actualIndex] = el.offsetHeight;
-      }
-    });
+const updateItemHeights = async () => {
+  if (!scrollContainer.value) return;
 
-    const measuredHeights = itemHeights.value.filter((h) => h > 0);
-    if (measuredHeights.length > 0) {
-      averageItemHeight.value =
-        measuredHeights.reduce((sum, height) => sum + height, 0) / measuredHeights.length;
+  await nextTick();
+  const items =
+    scrollContainer.value?.querySelectorAll("[data-pyro-terminal-virtual-list] li") || [];
+  items.forEach((el, idx) => {
+    const index = visibleStartIndex.value + idx;
+    const height = el.getBoundingClientRect().height;
+    itemHeights.value[index] = height;
+    const content = props.consoleOutput[index];
+    if (content) {
+      cachedHeights.value.set(content, height);
     }
   });
 };
@@ -292,16 +294,24 @@ const updateClientHeight = () => {
 };
 
 const scrollToBottom = () => {
-  if (scrollContainer.value) {
-    scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight + 99999999;
-    userHasScrolled.value = false;
-    isScrolledToBottom.value = true;
-  }
-};
+  if (!scrollContainer.value) return;
 
-const debouncedScrollToBottom = () => {
-  requestAnimationFrame(() => {
-    setTimeout(scrollToBottom, 0);
+  isAutoScrolling.value = true;
+  const container = scrollContainer.value;
+
+  nextTick(() => {
+    const maxScroll = container.scrollHeight - container.clientHeight;
+    container.scrollTop = maxScroll;
+
+    setTimeout(() => {
+      if (container.scrollTop < maxScroll) {
+        container.scrollTop = maxScroll;
+      }
+      isAutoScrolling.value = false;
+      userHasScrolled.value = false;
+      isScrolledToBottom.value = true;
+      handleListScroll();
+    }, 50);
   });
 };
 
@@ -442,13 +452,30 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
-onMounted(() => {
+const initializeTerminal = async () => {
+  if (!scrollContainer.value) return;
+
   updateClientHeight();
-  updateItemHeights();
-  nextTick(() => {
-    updateItemHeights();
-    setTimeout(scrollToBottom, 200);
-  });
+
+  const initialHeights = props.consoleOutput.map(
+    (content) => cachedHeights.value.get(content) || averageItemHeight.value,
+  );
+  itemHeights.value = initialHeights;
+
+  await nextTick();
+  await updateItemHeights();
+  await nextTick();
+
+  const container = scrollContainer.value;
+  container.scrollTop = container.scrollHeight;
+
+  handleListScroll();
+  initial.value = true;
+};
+
+onMounted(async () => {
+  await initializeTerminal();
+
   window.addEventListener("resize", updateClientHeight);
   window.addEventListener("keydown", handleKeydown);
 });
@@ -461,21 +488,37 @@ onUnmounted(() => {
 
 watch(
   () => props.consoleOutput,
-  () => {
-    const newItemsCount = props.consoleOutput.length - itemHeights.value.length;
-    if (newItemsCount > 0) {
-      itemHeights.value.push(...Array(newItemsCount).fill(averageItemHeight.value));
-    }
+  async (newOutput) => {
+    const newItemsCount = newOutput.length - itemHeights.value.length;
 
-    nextTick(() => {
-      updateItemHeights();
-      if (!userHasScrolled.value || isScrolledToBottom.value) {
-        debouncedScrollToBottom();
+    if (newItemsCount > 0) {
+      const shouldScroll = isScrolledToBottom.value || !userHasScrolled.value;
+
+      const newHeights = Array(newItemsCount)
+        .fill(0)
+        .map((_, i) => {
+          const index = itemHeights.value.length + i;
+          const content = newOutput[index];
+          return cachedHeights.value.get(content) || averageItemHeight.value;
+        });
+
+      itemHeights.value.push(...newHeights);
+
+      if (shouldScroll) {
+        await nextTick();
+        scrollToBottom();
+
+        await nextTick();
+        await updateItemHeights();
+        scrollToBottom();
       }
-    });
+    }
   },
-  { deep: true, immediate: true },
+  { deep: true },
 );
+const virtualListStyle = computed(() => ({
+  transform: `translateY(${offsetY.value}px)`,
+}));
 
 watch([visibleStartIndex, visibleEndIndex], updateItemHeights);
 
@@ -496,6 +539,15 @@ watch(isFullScreen, () => {
     updateItemHeights();
   });
 });
+
+watch(
+  itemHeights,
+  () => {
+    const totalHeight = itemHeights.value.reduce((sum, height) => sum + height, 0);
+    averageItemHeight.value = totalHeight / itemHeights.value.length || averageItemHeight.value;
+  },
+  { deep: true },
+);
 </script>
 
 <style scoped>
@@ -609,6 +661,13 @@ html.dark-mode .progressive-gradient {
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
   overflow: hidden !important;
+}
+
+[data-pyro-terminal-root] {
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 [data-pyro-terminal-root] {

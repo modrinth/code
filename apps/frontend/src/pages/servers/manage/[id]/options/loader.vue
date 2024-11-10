@@ -103,7 +103,7 @@
       />
       <div class="mt-4 flex justify-start gap-4">
         <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="!mrpackFile" @click="reinstallMrpack">
+          <button :disabled="!mrpackFile || isLoading" @click="reinstallMrpack">
             <RightArrowIcon />
             {{
               isSecondPhase

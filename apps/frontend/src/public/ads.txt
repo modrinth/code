@@ -642,3 +642,6 @@ inmobi.com, ba5fd3fb82c5412989b23c3eec71baf7, RESELLER, 83e75a7ae333ca9d
 
 #Criteo
 themediagrid.com, 4R7XKQ, DIRECT, 35d5010d7789b49d
+
+#Rev.IQ
+managerdomain=rev.iq, US
