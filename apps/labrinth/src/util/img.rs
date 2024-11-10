@@ -143,13 +143,14 @@ fn process_image(
                         UnsupportedError::from_format_and_kind(
                             ImageFormat::Gif.into(),
                             UnsupportedErrorKind::GenericFeature(
-                                "Attempted to process an invalid GIF!".to_owned()
-                            )
-                        )
+                                "Attempted to process an invalid GIF!"
+                                    .to_owned()
+                            ),
+                        ),
                     ))
                 }
             }
-        },
+        }
         "image/png" => {
             let decoder = PngDecoder::new(Cursor::new(image_bytes.clone()))?;
             if decoder.is_apng()? {
