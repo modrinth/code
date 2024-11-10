@@ -107,7 +107,14 @@ sentry = { version = "0.34.0", default-features = false, features = [
 ] }
 sentry-actix = "0.34.0"
 
-image = "0.25.5"
+image = { version = "0.25.5", default-features = false, features = [
+    "rayon",
+    "bmp",
+    "gif",
+    "jpeg",
+    "png",
+    "webp",
+] }
 color-thief = "0.2.2"
 webp = "0.3.0"
 
