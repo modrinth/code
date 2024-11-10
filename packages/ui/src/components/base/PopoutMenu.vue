@@ -15,7 +15,7 @@
 
 <script setup>
 import { Dropdown } from 'floating-vue'
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount, defineEmits, defineOptions } from 'vue'
 
 const trigger = ref()
 const menu = ref()

@@ -35,26 +35,29 @@ export interface ContentItem<T> {
   versionId?: string
 }
 
-defineProps<{
+withDefaults(defineProps<{
   item: ContentItem<T>
-}>()
+  locked?: boolean
+}>(), {
+  locked: false,
+})
 
-const selected = ref(false)
-const emit = defineEmits(['update:selected'])
+const model = defineModel()
 </script>
 <template>
   <div
     class="grid grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center p-2 h-[64px] border-solid border-0 border-b-[1px] border-b-button-bg relative"
   >
     <Checkbox
-      v-model="selected"
+      v-if="!locked"
+      v-model="model"
       :description="``"
       class="select-checkbox"
-      @update:model-value="emit('update:selected', $event)"
     />
       <div
         class="flex items-center gap-2 text-contrast font-medium"
-        :class="{ 'opacity-50': item.disabled }"
+        :class="{ 'opacity-50': item.disabled,
+         'col-span-2': locked}"
       >
         <AutoLink :to="item.project?.link ?? ''" tabindex="-1" v-bind="item.project?.linkProps ?? {}">
           <Avatar :src="item.icon ?? ''" :class="{ grayscale: item.disabled }" size="48px" />
@@ -67,7 +70,7 @@ const emit = defineEmits(['update:selected'])
           </AutoLink>
           <AutoLink :to="item.creator?.link ?? ''" v-bind="item.creator?.linkProps ?? {}">
             <div class="line-clamp-1 break-all" :class="{ 'opacity-50': item.disabled }">
-              <slot v-if="item.creator" :item="item">
+              <slot v-if="item.creator && item.creator.name" :item="item">
                 <span class="text-secondary">
                  by {{ item.creator.name }}
                 </span>

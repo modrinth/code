@@ -21,17 +21,12 @@
         <XIcon />
       </Button>
     </div>
-    <ButtonStyled v-if="!isPackLocked" type="transparent" color="green" @click="updateAll">
-      <button>
-        <DownloadIcon /> Update all
-      </button>
-    </ButtonStyled>
     <AddContentButton v-if="!isPackLocked" :instance="instance" />
   </div>
-  <div class="flex flex-wrap gap-1 items-center pb-4">
+  <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
     <FilterIcon class="unlocked-size text-secondary h-5 w-5 mr-1" />
-    <button v-for="filter in ['Mods', 'Resource Packs', 'Shaders', 'Updates available'].filter((x) => isPackLocked ? x !== 'Updates available' : true)" :key="filter" class="px-2 py-1 rounded-full bg-bg-raised text-secondary font-semibold leading-none border-none">
-      {{ filter }}
+    <button v-for="filter in filterOptions" :key="filter" :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`" @click="toggleArray(selectedFilters, filter.id)">
+      {{ filter.formattedName }}
     </button>
   </div>
   <Card v-if="false && projects.length > 0" class="mod-card">
@@ -89,6 +84,8 @@
   </Card>
   <ContentListPanel
       v-if="projects.length > 0"
+      ref="contentList"
+      :locked="isPackLocked"
       :items="search.map((x) => ({
         disabled: x.disabled,
         filename: x.file_name,
@@ -111,7 +108,71 @@
         data: x,
       }))"
   >
+    <template v-if="selectedProjects.length > 0" #headers>
+      <div class="flex gap-2">
+        <ButtonStyled v-if="selectedProjects.some((m) => m.outdated)" color="brand" color-fill="text" hover-color-fill="text">
+          <button><DownloadIcon /> Update</button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <OverflowMenu
+            :options="[
+        {
+          id: 'share-names',
+          action: () => shareNames(),
+        },
+        {
+          id: 'share-file-names',
+          action: () => shareFileNames(),
+        },
+        {
+          id: 'share-urls',
+          action: () => shareUrls(),
+        },
+        {
+          id: 'share-markdown',
+          action: () => shareMarkdown(),
+        }
+      ]">
+            <ShareIcon /> Share <DropdownIcon />
+            <template #share-names>
+              <TextInputIcon /> Project names
+            </template>
+            <template #share-file-names>
+              <FileIcon /> File names
+            </template>
+            <template #share-urls>
+              <LinkIcon /> Project links
+            </template>
+            <template #share-markdown>
+              <CodeIcon /> Markdown links
+            </template>
+          </OverflowMenu>
+        </ButtonStyled>
+        <ButtonStyled v-if="selectedProjects.some((m) => m.disabled)">
+          <button><CheckCircleIcon /> Enable</button>
+        </ButtonStyled>
+        <ButtonStyled v-if="selectedProjects.some((m) => !m.disabled)">
+          <button><SlashIcon /> Disable</button>
+        </ButtonStyled>
+        <ButtonStyled color="red">
+          <button><TrashIcon /> Remove</button>
+        </ButtonStyled>
+      </div>
+    </template>
+    <template #header-actions>
+      <ButtonStyled v-if="!isPackLocked && projects.some((m) => (m as any).outdated)" type="transparent" color="brand" color-fill="text" hover-color-fill="text">
+        <button>
+          <DownloadIcon /> Update all
+        </button>
+      </ButtonStyled>
+    </template>
     <template #actions="{ item }">
+      <ButtonStyled v-if="!isPackLocked && (item.data as any).outdated" type="transparent" color="brand" circular>
+        <button v-tooltip="`Update`" @click="updateProject(item.data)">
+          <DownloadIcon />
+        </button>
+      </ButtonStyled>
+      <div v-else class="w-[36px]"></div>
       <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
         <button v-tooltip="item.disabled ? `Enable` : `Disable`" @click="toggleDisableMod(item.data)">
           <CheckCircleIcon v-if="item.disabled" />
@@ -119,7 +180,7 @@
         </button>
       </ButtonStyled>
       <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
-        <button v-tooltip="'Delete'" @click="removeMod(item)">
+        <button v-tooltip="'Remove'" @click="removeMod(item)">
           <TrashIcon />
         </button>
       </ButtonStyled>
@@ -131,19 +192,24 @@
               action: () => {},
             },
             {
+              id: 'copy-link',
+              shown: item.project !== undefined,
+              action: () => toggleDisableMod(item.data),
+            },
+            {
               divider: true,
             },
             {
-              id: 'copy-link',
-              shown: item.project,
-              action: () => toggleDisableMod(item.data),
-            },
+              id: 'remove',
+              color: 'red',
+              action: () => removeMod(item),
+            }
           ]"
           direction="left"
         >
           <MoreVerticalIcon />
           <template #show-file>
-            <ClipboardCopyIcon /> Show file
+            <ExternalIcon /> Show file
           </template>
           <template #copy-link>
             <ClipboardCopyIcon /> Copy link
@@ -153,6 +219,9 @@
           </template>
           <template v-else #toggle>
             <SlashIcon /> Disable
+          </template>
+          <template #remove>
+            <TrashIcon /> Remove
           </template>
         </OverflowMenu>
       </ButtonStyled>
@@ -428,11 +497,12 @@
     :versions="props.versions"
   />
 </template>
-<script setup>
+<script setup lang="ts">
 import {
+  ExternalIcon,
+  LinkIcon,
   LockIcon,
   ClipboardCopyIcon,
-  CompassIcon,
   TrashIcon,
   CheckIcon,
   SearchIcon,
@@ -461,7 +531,9 @@ import {
   Card, ButtonStyled, ContentListPanel, OverflowMenu
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
+import type { ComputedRef } from 'vue';
 import { computed, onUnmounted, ref, watch } from 'vue'
+import { useVIntl, defineMessages } from '@vintl/vintl'
 import {
   add_project_from_path,
   get_projects,
@@ -473,7 +545,7 @@ import {
 import { handleError } from '@/store/notifications.js'
 import { trackEvent } from '@/helpers/analytics'
 import { listen } from '@tauri-apps/api/event'
-import { highlightModInProfile, showProfileInFolder } from '@/helpers/utils.js'
+import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
@@ -487,6 +559,9 @@ import {
 import { profile_listener } from '@/helpers/events.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
+
+const contentList = ref<InstanceType<typeof ContentListPanel> | null>(null)
 
 const props = defineProps({
   instance: {
@@ -538,6 +613,8 @@ const canUpdatePack = computed(() => {
 const exportModal = ref(null)
 
 const projects = ref([])
+const selectedProjects = computed(() => projects.value.filter((x) => contentList.value ? contentList.value.selected.includes(x.file_name) : []))
+
 const selectionMap = ref(new Map())
 
 const initProjects = async (cacheBehaviour) => {
@@ -639,6 +716,67 @@ await initProjects()
 const modpackVersionModal = ref(null)
 const installing = computed(() => props.instance.install_stage !== 'installed')
 
+const vintl = useVIntl();
+const { formatMessage } = vintl;
+
+type FilterOption = {
+  id: string;
+  formattedName: string;
+}
+
+const messages = defineMessages({
+  updatesAvailableFilter: {
+    id: "instance.filter.updates-available",
+    defaultMessage: "Updates available",
+  },
+})
+
+const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
+  const options: FilterOption[] = [];
+
+  const frequency = projects.value.reduce((map, item) => {
+    map[item.project_type] = (map[item.project_type] || 0) + 1;
+    return map;
+  }, {});
+
+  const types = Object.keys(frequency).sort((a, b) => frequency[b] - frequency[a])
+
+  types.forEach(type => {
+    options.push({
+      id: type,
+      formattedName: formatProjectType(type) + "s"
+    });
+  });
+
+  if (!isPackLocked.value && projects.value.some((m) => m.outdated)) {
+    options.push({
+      id: 'updates',
+      formattedName: formatMessage(messages.updatesAvailableFilter)
+    });
+  }
+
+  return options;
+})
+
+const selectedFilters = ref([]);
+const filteredProjects = computed(() => {
+  const updatesFilter = selectedFilters.value.includes('updates');
+
+  const typeFilters = selectedFilters.value.filter(filter => filter !== 'updates');
+
+  return projects.value.filter(project => {
+    return (typeFilters.length === 0 || typeFilters.includes(project.project_type)) && (!updatesFilter || project.outdated);
+  });
+});
+
+function toggleArray(array, value) {
+  if (array.includes(value)) {
+    array.splice(array.indexOf(value), 1);
+  } else {
+    array.push(value);
+  }
+}
+
 const searchFilter = ref('')
 const selectAll = ref(false)
 const selectedProjectType = ref('All')
@@ -661,7 +799,7 @@ const selected = computed(() =>
 )
 
 const functionValues = computed(() =>
-  selected.value.length > 0 ? selected.value : Array.from(projects.value.values()),
+  selectedProjects.value.length > 0 ? selectedProjects.value : Array.from(projects.value.values()),
 )
 
 const selectableProjectTypes = computed(() => {
@@ -677,7 +815,7 @@ const selectableProjectTypes = computed(() => {
 
 const search = computed(() => {
   const projectType = selectableProjectTypes.value[selectedProjectType.value]
-  const filtered = projects.value
+  const filtered = filteredProjects.value
     .filter((mod) => {
       return (
         mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&

@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T">
-import { ref, type Ref } from 'vue'
+import { ref, computed } from 'vue'
+import type { Ref } from 'vue'
 import Checkbox from '../base/Checkbox.vue'
 import ContentListItem from './ContentListItem.vue'
 import { type ContentItem } from './ContentListItem.vue'
@@ -9,37 +10,45 @@ import {
 // @ts-ignore
 import { RecycleScroller } from 'vue-virtual-scroller'
 
-defineProps<{
-  items: ContentItem<T>[]
-}>()
+const props = withDefaults(defineProps<{
+  items: ContentItem<T>[],
+  locked?: boolean,
+}>(), {
+  locked: false,
+})
 
-const selected: Ref<string[]> = ref([])
+const manualSelections: Ref<Record<string, boolean>> = ref({})
+const selected: Ref<string[]> = computed(() => Object.keys(manualSelections.value).filter((item) => manualSelections.value[item]))
 
-function toggle(filename: string) {
-  setSelected(filename, !selected.value.includes(filename))
-}
+const allSelected = ref(false)
 
-function setSelected(filename: string, value: boolean) {
-  if (value) {
-    selected.value.push(filename)
-  } else {
-    selected.value = selected.value.filter((item) => item !== filename)
+function setSelected(value: boolean) {
+  for (const item of props.items) {
+    manualSelections.value[item.filename] = value
   }
 }
+
+defineExpose({
+  selected,
+})
 </script>
 
 <template>
   <div class="flex flex-col grid-cols-[min-content,auto,auto,auto,auto]">
     <div
-      class="grid grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center px-2 pt-1 pb-4 text-contrast font-bold"
+      :class="`${$slots.headers ? 'flex' : 'grid'} grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center px-2 pt-1 h-10 mb-3 text-contrast font-bold`"
     >
-      <Checkbox :model-value="false" class="select-checkbox" />
-      <div class="flex items-center gap-2">
-<!--        <div class="w-[48px]"></div>-->
-        Name <DropdownIcon />
-      </div>
-      <div class="flex items-center gap-1 max-w-60">Updated <DropdownIcon v-if="false" /></div>
-      <div class="flex"></div>
+      <Checkbox v-if="!locked" v-model="allSelected" class="select-checkbox" @update:model-value="setSelected" :indeterminate="selected.length > 0 && selected.length < items.length" />
+      <slot name="headers">
+        <div class="flex items-center gap-2" :class="{ 'col-span-2': locked }">
+          <!--        <div class="w-[48px]"></div>-->
+          Name <DropdownIcon />
+        </div>
+        <div class="flex items-center gap-1 max-w-60">Updated <DropdownIcon v-if="false" /></div>
+        <div class="flex">
+          <slot name="header-actions" />
+        </div>
+      </slot>
     </div>
     <div class="bg-bg-raised rounded-xl">
       <RecycleScroller
@@ -52,6 +61,8 @@ function setSelected(filename: string, value: boolean) {
       >
         <ContentListItem
           :item="item"
+          :locked="locked"
+          v-model="manualSelections[item.filename]"
           class="mb-2"
         >
           <template #actions="{ item }">

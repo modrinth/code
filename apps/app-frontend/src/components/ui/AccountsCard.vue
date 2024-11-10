@@ -14,8 +14,11 @@
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
-    <span class="w-full">{{ selectedAccount ? selectedAccount.username : 'Select account' }}</span>
-    <DropdownIcon class="unlocked-size w-5 h-5" />
+    <div class="flex flex-col w-full">
+      <span >{{ selectedAccount ? selectedAccount.username : 'Select account' }}</span>
+      <span class="text-secondary text-xs">Minecraft account</span>
+    </div>
+    <DropdownIcon class="unlocked-size w-5 h-5 shrink-0" />
   </div>
   <transition name="fade">
     <Card

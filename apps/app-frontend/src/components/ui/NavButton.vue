@@ -1,8 +1,11 @@
 <template>
   <div class="tooltip-parent flex items-center justify-center">
-    <RouterLink :to="to" class="w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast">
+    <RouterLink v-if="typeof to === 'string'" :to="to" v-bind="$attrs" class="w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast">
       <slot />
     </RouterLink>
+    <button v-else v-bind="$attrs" class="button-animation border-none cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast" @click="to">
+      <slot />
+    </button>
     <div class="tooltip-label">
       <slot name="label" />
     </div>
@@ -12,10 +15,12 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 
-withDefaults(defineProps<{
-  to: string
-}>(), {
-  to: '/'
+defineProps<{
+  to: (() => void) | string
+}>()
+
+defineOptions({
+  inheritAttrs: false,
 })
 
 </script>

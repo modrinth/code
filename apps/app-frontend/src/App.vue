@@ -232,7 +232,7 @@ async function fetchCredentials() {
 }
 
 const MIDAS_BITFLAG = 1 << 0
-const hasPlus = computed(() => credentials.value && credentials.value.user && (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG)
+const hasPlus = computed(() => true || credentials.value && credentials.value.user && (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG)
 
 onMounted(() => {
   invoke('show_window')
@@ -321,6 +321,9 @@ async function checkUpdates() {
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
   <AppSettingsModal ref="settingsTest" />
+  <Suspense>
+    <InstanceCreationModal ref="installationModal" />
+  </Suspense>
   <div v-if="stateInitialized" class="app-grid-layout relative">
     <div class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10">
       <NavButton to="/">
@@ -338,7 +341,7 @@ async function checkUpdates() {
         <template #label>Library</template>
       </NavButton>
       <div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
-      <NavButton to="/settings">
+      <NavButton :to="() => $refs.installationModal.show()" :disabled="offline">
         <PlusIcon />
         <template #label>Create new instance</template>
       </NavButton>
@@ -401,14 +404,14 @@ async function checkUpdates() {
       </RouterView>
     </div>
     <div class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto" :class="{ 'has-plus': hasPlus }">
-      <div class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative" :class="{ 'pb-4': !hasPlus }">
+      <div class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative" :class="{ 'pb-12': !hasPlus }">
         <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
           <h3 class="text-base m-0">Playing as</h3>
           <suspense>
             <AccountsCard ref="accounts" mode="small" />
           </suspense>
         </div>
-        <div v-if="false" class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+        <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
           <h3 class="text-base m-0">Friends</h3>
           <p class="m-0">you have no friends :c</p>
           <p class="m-0">what's up with that?</p>
@@ -458,9 +461,6 @@ async function checkUpdates() {
           <RouterLink v-tooltip="'Library'" to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
           </RouterLink>
-          <Suspense>
-            <InstanceCreationModal ref="installationModal" />
-          </Suspense>
         </div>
       </div>
       <div class="settings pages-list">
