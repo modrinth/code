@@ -5,7 +5,6 @@ import starlightOpenAPI, { openAPISidebarGroups } from 'starlight-openapi'
 // https://astro.build/config
 export default defineConfig({
   site: 'https://docs.modrinth.com',
-  favicon: 'favicon.ico',
   integrations: [
     starlight({
       title: 'Modrinth Documentation',
@@ -20,7 +19,6 @@ export default defineConfig({
         mastodon: 'https://floss.social/@modrinth',
         threads: 'https://threads.net/@modrinth',
       },
-      favicon: '/favicon.ico',
       logo: {
         light: './src/assets/light-logo.svg',
         dark: './src/assets/dark-logo.svg',
