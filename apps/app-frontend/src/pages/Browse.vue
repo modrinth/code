@@ -1,6 +1,15 @@
 <script setup>
-import { computed, nextTick, ref, readonly, shallowRef, watch } from 'vue'
-import { ClearIcon, SearchIcon, ClientIcon, ServerIcon, XIcon } from '@modrinth/assets'
+import { computed, nextTick, ref, readonly, shallowRef, watch, Teleport } from 'vue'
+import {
+  ClearIcon,
+  SearchIcon,
+  ClientIcon,
+  ServerIcon,
+  XIcon,
+  CheckIcon,
+  BanIcon,
+  DropdownIcon,
+} from '@modrinth/assets'
 import {
   Pagination,
   Checkbox,
@@ -10,6 +19,7 @@ import {
   Card,
   SearchFilter,
   Avatar,
+  BrowseFiltersPanel
 } from '@modrinth/ui'
 import { formatCategoryHeader, formatCategory } from '@modrinth/utils'
 import Multiselect from 'vue-multiselect'
@@ -23,9 +33,13 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { get_search_results } from '@/helpers/cache.js'
 import { debounce } from '@/helpers/utils.js'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
+import AccountsCard from '@/components/ui/AccountsCard.vue'
+import NavTabs from '@/components/ui/NavTabs.vue'
 
 const router = useRouter()
 const route = useRoute()
+
+const filterAccordions = ref([]);
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -42,6 +56,7 @@ const loading = ref(false)
 const query = ref('')
 const facets = ref([])
 const orFacets = ref([])
+const negativeFacets = ref([]);
 const selectedVersions = ref([])
 const onlyOpenSource = ref(false)
 const showSnapshots = ref(false)
@@ -49,10 +64,10 @@ const hideAlreadyInstalled = ref(false)
 const selectedEnvironments = ref([])
 const sortTypes = readonly([
   { display: 'Relevance', name: 'relevance' },
-  { display: 'Download count', name: 'downloads' },
-  { display: 'Follow count', name: 'follows' },
-  { display: 'Recently published', name: 'newest' },
-  { display: 'Recently updated', name: 'updated' },
+  { display: 'Downloads', name: 'downloads' },
+  { display: 'Followers', name: 'follows' },
+  { display: 'Date published', name: 'newest' },
+  { display: 'Date updated', name: 'updated' },
 ])
 const sortType = ref(sortTypes[0])
 const maxResults = ref(20)
@@ -96,6 +111,9 @@ if (route.query.f) {
 }
 if (route.query.g) {
   orFacets.value = getArrayOrString(route.query.g)
+}
+if (route.query.nf) {
+  negativeFacets.value = getArrayOrString(route.query.nf);
 }
 if (route.query.v) {
   selectedVersions.value = getArrayOrString(route.query.v)
@@ -157,6 +175,7 @@ async function refreshSearch() {
   if (
     facets.value.length > 0 ||
     orFacets.value.length > 0 ||
+    negativeFacets.value.length > 0 ||
     selectedVersions.value.length > 0 ||
     selectedEnvironments.value.length > 0 ||
     projectType.value
@@ -165,6 +184,11 @@ async function refreshSearch() {
     for (const facet of facets.value) {
       formattedFacets.push([facet])
     }
+
+    for (const facet of negativeFacets.value) {
+      formattedFacets.push([facet.replace(":", "!=")]);
+    }
+
     // loaders specifier
     if (orFacets.value.length > 0) {
       formattedFacets.push(orFacets.value)
@@ -310,6 +334,10 @@ function getSearchUrl(offset, useObj) {
     queryItems.push(`g=${encodeURIComponent(orFacets.value)}`)
     obj.g = orFacets.value
   }
+  if (negativeFacets.value.length > 0) {
+    queryItems.push(`nf=${encodeURIComponent(negativeFacets.value)}`);
+    obj.nf = negativeFacets.value;
+  }
   if (selectedVersions.value.length > 0) {
     queryItems.push(`v=${encodeURIComponent(selectedVersions.value)}`)
     obj.v = selectedVersions.value
@@ -410,6 +438,9 @@ async function clearFilters() {
   for (const facet of [...orFacets.value]) {
     await toggleOrFacet(facet, true)
   }
+  for (const facet of [...negativeFacets.value]) {
+    await toggleNegativeFacet(facet, true)
+  }
   onlyOpenSource.value = false
   selectedVersions.value = []
   selectedEnvironments.value = []
@@ -436,6 +467,19 @@ async function toggleOrFacet(elementName, doNotSendRequest) {
     orFacets.value.splice(index, 1)
   } else {
     orFacets.value.push(elementName)
+  }
+
+  if (!doNotSendRequest) {
+    await onSearchChangeToTop(1)
+  }
+}
+
+async function toggleNegativeFacet(elementName, doNotSendRequest) {
+  const index = negativeFacets.value.indexOf(elementName)
+  if (index !== -1) {
+    negativeFacets.value.splice(index, 1)
+  } else {
+    negativeFacets.value.push(elementName)
   }
 
   if (!doNotSendRequest) {
@@ -493,10 +537,7 @@ const filteredLoaders = computed(() => {
 })
 
 const selectableProjectTypes = computed(() => {
-  const values = [
-    { label: 'Shaders', href: `/browse/shader` },
-    { label: 'Resource Packs', href: `/browse/resourcepack` },
-  ]
+  let dataPacks, mods, modpacks;
 
   if (instanceContext.value) {
     if (
@@ -504,17 +545,25 @@ const selectableProjectTypes = computed(() => {
         (x) => x.version === instanceContext.value.game_version,
       ) <= availableGameVersions.value.findIndex((x) => x.version === '1.13')
     ) {
-      values.unshift({ label: 'Data Packs', href: `/browse/datapack` })
+      dataPacks = true;
     }
 
     if (instanceContext.value.loader !== 'vanilla') {
-      values.unshift({ label: 'Mods', href: '/browse/mod' })
+      mods = true;
     }
   } else {
-    values.unshift({ label: 'Data Packs', href: `/browse/datapack` })
-    values.unshift({ label: 'Mods', href: '/browse/mod' })
-    values.unshift({ label: 'Modpacks', href: '/browse/modpack' })
+    dataPacks = true;
+    mods = true;
+    modpacks = true;
   }
+
+  const values = [
+    { label: 'Modpacks', href: `/browse/modpack`, shown: modpacks },
+    { label: 'Mods', href: `/browse/mod`, shown: mods },
+    { label: 'Resource Packs', href: `/browse/resourcepack` },
+    { label: 'Data Packs', href: `/browse/datapack`, shown: dataPacks && false },
+    { label: 'Shaders', href: `/browse/shader` },
+  ]
 
   return values
 })
@@ -524,206 +573,424 @@ const showVersions = computed(
 )
 
 const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.value))
+
+function filterSelected(filter) {
+  if (filter.type === "or") {
+    return orFacets.value.includes(filter.facet);
+  } else if (filter.type === "normal") {
+    return facets.value.includes(filter.facet);
+  } else if (filter.type === "env") {
+    return selectedEnvironments.value.includes(filter.name);
+  } else if (filter.type === "gameVersion") {
+    return selectedVersions.value.includes(filter.name);
+  } else if (filter.type === "license") {
+    return onlyOpenSource.value;
+  }
+}
+
+function negativeFilterSelected(filter) {
+  if (filter.type === "or" || filter.type === "normal") {
+    return negativeFacets.value.includes(filter.facet);
+  }
+}
+
+function toggleNegativeFilter(filter) {
+  const elementName = filter.facet;
+
+  if (filterSelected(filter)) {
+    if (filter.type === "or") {
+      const index = orFacets.value.indexOf(elementName);
+      orFacets.value.splice(index, 1);
+    } else if (filter.type === "normal") {
+      const index = facets.value.indexOf(elementName);
+      facets.value.splice(index, 1);
+    }
+  }
+
+  if (filter.type === "or" || filter.type === "normal") {
+    const index = negativeFacets.value.indexOf(elementName);
+    if (index !== -1) {
+      negativeFacets.value.splice(index, 1);
+    } else {
+      negativeFacets.value.push(elementName);
+    }
+  }
+
+  onSearchChange(1);
+}
+
+function toggleFilter(filter, doNotSendRequest) {
+  const elementName = filter.facet;
+
+  if (negativeFilterSelected(filter)) {
+    const index = negativeFacets.value.indexOf(elementName);
+    negativeFacets.value.splice(index, 1);
+  }
+
+  if (filter.type === "or") {
+    const index = orFacets.value.indexOf(elementName);
+    if (index !== -1) {
+      orFacets.value.splice(index, 1);
+    } else {
+      if (elementName === "categories:purpur") {
+        if (!orFacets.value.includes("categories:paper")) {
+          orFacets.value.push("categories:paper");
+        }
+        if (!orFacets.value.includes("categories:spigot")) {
+          orFacets.value.push("categories:spigot");
+        }
+        if (!orFacets.value.includes("categories:bukkit")) {
+          orFacets.value.push("categories:bukkit");
+        }
+      } else if (elementName === "categories:paper") {
+        if (!orFacets.value.includes("categories:spigot")) {
+          orFacets.value.push("categories:spigot");
+        }
+        if (!orFacets.value.includes("categories:bukkit")) {
+          orFacets.value.push("categories:bukkit");
+        }
+      } else if (elementName === "categories:spigot") {
+        if (!orFacets.value.includes("categories:bukkit")) {
+          orFacets.value.push("categories:bukkit");
+        }
+      } else if (elementName === "categories:waterfall") {
+        if (!orFacets.value.includes("categories:bungeecord")) {
+          orFacets.value.push("categories:bungeecord");
+        }
+      }
+      orFacets.value.push(elementName);
+    }
+  } else if (filter.type === "normal") {
+    const index = facets.value.indexOf(elementName);
+
+    if (index !== -1) {
+      facets.value.splice(index, 1);
+    } else {
+      facets.value.push(elementName);
+    }
+  } else if (filter.type === "env") {
+    const index = selectedEnvironments.value.indexOf(filter.name);
+    if (index !== -1) {
+      selectedEnvironments.value.splice(index, 1);
+    } else {
+      selectedEnvironments.value.push(filter.name);
+    }
+  } else if (filter.type === "gameVersion") {
+    const index = selectedVersions.value.indexOf(filter.name);
+    if (index !== -1) {
+      selectedVersions.value.splice(index, 1);
+    } else {
+      selectedVersions.value.push(filter.name);
+    }
+  } else if (filter.type === "license") {
+    onlyOpenSource.value = !onlyOpenSource.value;
+  }
+
+  if (!doNotSendRequest) {
+    onSearchChange(1);
+  }
+}
+
 </script>
 
 <template>
-  <div ref="searchWrapper" class="search-container">
-    <aside class="filter-panel" @scroll="$refs.promo.scroll()">
-      <PromotionWrapper ref="promo" />
-      <Card v-if="instanceContext" class="small-instance">
-        <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
-          <Avatar
-            :src="instanceContext.icon_path ? convertFileSrc(instanceContext.icon_path) : null"
-            :alt="instanceContext.name"
-            size="sm"
-          />
-          <div class="small-instance_info">
+  <Teleport to="#sidebar-teleport-target">
+    <BrowseFiltersPanel class="border-0 border-b-[1px] last:border-b-0 border-[--brand-gradient-border] border-solid" button-class="button-animation flex p-4 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg" content-class="mb-3" :game-versions="availableGameVersions" :platforms="loaders.map((x) => ({ ...x, formatted_name: formatCategory(x.name), default: !['rift', 'liteloader', 'modloader'].includes(x.name) }))">
+      <template #header="{ filter }">
+        <h3 class="text-base m-0">{{ filter.formatted_name }}</h3>
+      </template>
+      <template #option="{ option }">
+        <button class="px-4 py-1 flex items-center gap-2 bg-transparent border-none cursor-pointer hover:bg-button-bg w-full button-animation">
+          <div v-if="option.data.icon" class="contents text-sm text-secondary" v-html="option.data.icon" />
+          <span class="font-medium text-sm text-secondary">{{ option.formatted_name }}</span>
+        </button>
+      </template>
+    </BrowseFiltersPanel>
+<!--    <div class="p-4 border-0 border-b-[1px] border-[&#45;&#45;brand-gradient-border] border-solid">-->
+<!--      <h3 class="text-base m-0">Game version</h3>-->
+<!--    </div>-->
+<!--    <div class="p-4 border-0 border-b-[1px] border-[&#45;&#45;brand-gradient-border] border-solid">-->
+<!--      <h3 class="text-base m-0">Environment</h3>-->
+<!--    </div>-->
+<!--    <div class="p-4 border-0 border-[&#45;&#45;brand-gradient-border] border-solid">-->
+<!--      <h3 class="text-base m-0">Category</h3>-->
+<!--    </div>-->
+<!--    <template v-if="false">-->
+<!--      <div-->
+<!--        v-for="(categories, header, index) in filters"-->
+<!--        :key="header"-->
+<!--        :class="`border-0 border-b border-solid border-button-bg py-2 last:border-b-0`"-->
+<!--      >-->
+<!--        <button-->
+<!--          class="flex !w-full bg-transparent border-none px-0 py-2 font-extrabold text-contrast transition-all active:scale-[0.98]"-->
+<!--          @click="-->
+<!--              () => {-->
+<!--                filterAccordions[index].isOpen-->
+<!--                  ? filterAccordions[index].close()-->
+<!--                  : filterAccordions[index].open();-->
+<!--              }-->
+<!--            "-->
+<!--        >-->
+<!--          <template v-if="header === 'gameVersion'"> Game versions </template>-->
+<!--          <template v-else>-->
+<!--            {{ formatCategoryHeader(header) }}-->
+<!--          </template>-->
+<!--          <DropdownIcon-->
+<!--            class="ml-auto h-5 w-5 transition-transform"-->
+<!--            :class="{ 'rotate-180': filterAccordions[index]?.isOpen }"-->
+<!--          />-->
+<!--        </button>-->
+<!--        <Accordion ref="filterAccordions" :open-by-default="true">-->
+<!--          <ScrollablePanel-->
+<!--            :class="{ 'h-[18rem]': categories.length >= 8 && header === 'gameVersion' }"-->
+<!--            :no-max-height="header !== 'gameVersion'"-->
+<!--          >-->
+<!--            <div class="mr-1 flex flex-col gap-1">-->
+<!--              <div v-for="category in categories" :key="category.name" class="group flex gap-1">-->
+<!--                <button-->
+<!--                  :class="`flex !w-full border-none items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all active:scale-[0.98] ${filterSelected(category) ? 'bg-brand-highlight text-contrast hover:brightness-125' : negativeFilterSelected(category) ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg'}`"-->
+<!--                  @click="-->
+<!--                      negativeFilterSelected(category)-->
+<!--                        ? toggleNegativeFilter(category)-->
+<!--                        : toggleFilter(category)-->
+<!--                    "-->
+<!--                >-->
+<!--                  <ClientIcon v-if="category.name === 'client'" class="h-4 w-4" />-->
+<!--                  <ServerIcon v-else-if="category.name === 'server'" class="h-4 w-4" />-->
+<!--                  <div v-if="category.icon" class="h-4" v-html="category.icon" />-->
+<!--                  <span class="truncate text-sm">{{ formatCategory(category.name) }}</span>-->
+<!--                  <BanIcon-->
+<!--                    v-if="negativeFilterSelected(category)"-->
+<!--                    :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${negativeFilterSelected(category) ? '' : 'opacity-0'}`"-->
+<!--                    aria-hidden="true"-->
+<!--                  />-->
+<!--                  <CheckIcon-->
+<!--                    v-else-->
+<!--                    :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${filterSelected(category) ? '' : 'opacity-0'}`"-->
+<!--                    aria-hidden="true"-->
+<!--                  />-->
+<!--                </button>-->
+<!--                <button-->
+<!--                  v-if="-->
+<!--                      (category.type === 'or' || category.type === 'normal') &&-->
+<!--                      !negativeFilterSelected(category)-->
+<!--                    "-->
+<!--                  v-tooltip="negativeFilterSelected(category) ? 'Include' : 'Exclude'"-->
+<!--                  class="flex items-center border-none justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary opacity-0 transition-all hover:bg-button-bg hover:text-red active:scale-[0.96] group-hover:opacity-100"-->
+<!--                  @click="toggleNegativeFilter(category)"-->
+<!--                >-->
+<!--                  <BanIcon class="h-4 w-4" aria-hidden="true" />-->
+<!--                </button>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </ScrollablePanel>-->
+<!--          <Checkbox-->
+<!--            v-if="header === 'gameVersion'"-->
+<!--            v-model="showSnapshots"-->
+<!--            class="mx-2"-->
+<!--            :label="`Show all versions`"-->
+<!--          />-->
+<!--        </Accordion>-->
+<!--      </div>-->
+<!--    </template>-->
+    <div v-if="instanceContext" class="small-instance">
+      <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
+        <Avatar
+          :src="instanceContext.icon_path ? convertFileSrc(instanceContext.icon_path) : null"
+          :alt="instanceContext.name"
+          size="sm"
+        />
+        <div class="small-instance_info">
             <span class="title">{{
-              instanceContext.name.length > 20
-                ? instanceContext.name.substring(0, 20) + '...'
-                : instanceContext.name
-            }}</span>
-            <span>
+                instanceContext.name.length > 20
+                  ? instanceContext.name.substring(0, 20) + '...'
+                  : instanceContext.name
+              }}</span>
+          <span>
               {{ instanceContext.loader.charAt(0).toUpperCase() + instanceContext.loader.slice(1) }}
               {{ instanceContext.game_version }}
             </span>
-          </div>
-        </router-link>
-        <Checkbox
-          v-model="ignoreInstanceGameVersions"
-          label="Override game versions"
-          class="filter-checkbox"
-          @update:model-value="onSearchChangeToTop(1)"
-          @click.prevent.stop
-        />
-        <Checkbox
-          v-model="ignoreInstanceLoaders"
-          label="Override loaders"
-          class="filter-checkbox"
-          @update:model-value="onSearchChangeToTop(1)"
-          @click.prevent.stop
-        />
-        <Checkbox
-          v-model="hideAlreadyInstalled"
-          label="Hide already installed"
-          class="filter-checkbox"
-          @update:model-value="onSearchChangeToTop(1)"
-          @click.prevent.stop
-        />
-      </Card>
-      <Card class="search-panel-card">
-        <Button
-          role="button"
-          :disabled="
+        </div>
+      </router-link>
+      <Checkbox
+        v-model="ignoreInstanceGameVersions"
+        label="Override game versions"
+        class="filter-checkbox"
+        @update:model-value="onSearchChangeToTop(1)"
+        @click.prevent.stop
+      />
+      <Checkbox
+        v-model="ignoreInstanceLoaders"
+        label="Override loaders"
+        class="filter-checkbox"
+        @update:model-value="onSearchChangeToTop(1)"
+        @click.prevent.stop
+      />
+      <Checkbox
+        v-model="hideAlreadyInstalled"
+        label="Hide already installed"
+        class="filter-checkbox"
+        @update:model-value="onSearchChangeToTop(1)"
+        @click.prevent.stop
+      />
+    </div>
+    <div v-if="false" class="search-panel-card">
+      <Button
+        role="button"
+        :disabled="
             onlyOpenSource === false &&
             selectedEnvironments.length === 0 &&
             selectedVersions.length === 0 &&
             facets.length === 0 &&
             orFacets.length === 0
           "
-          @click="clearFilters"
-        >
-          <ClearIcon /> Clear filters
-        </Button>
-        <div
-          v-if="
+        @click="clearFilters"
+      >
+        <ClearIcon /> Clear filters
+      </Button>
+      <div
+        v-if="
             (isModProject && (ignoreInstanceLoaders || !instanceContext)) ||
             projectType === 'shader'
           "
-          class="loaders"
-        >
-          <h2>Loaders</h2>
-          <div v-for="loader in filteredLoaders" :key="loader">
-            <SearchFilter
-              :active-filters="orFacets"
-              :icon="loader.icon"
-              :display-name="formatCategory(loader.name)"
-              :facet-name="`categories:${encodeURIComponent(loader.name)}`"
-              class="filter-checkbox"
-              @toggle="toggleOrFacet"
-            />
-          </div>
+        class="loaders"
+      >
+        <h2>Loaders</h2>
+        <div v-for="loader in filteredLoaders" :key="loader">
+          <SearchFilter
+            :active-filters="orFacets"
+            :icon="loader.icon"
+            :display-name="formatCategory(loader.name)"
+            :facet-name="`categories:${encodeURIComponent(loader.name)}`"
+            class="filter-checkbox"
+            @toggle="toggleOrFacet"
+          />
         </div>
-        <div v-if="showVersions" class="versions">
-          <h2>Minecraft versions</h2>
-          <Checkbox v-model="showSnapshots" class="filter-checkbox" label="Include snapshots" />
-          <multiselect
-            v-model="selectedVersions"
-            :options="
+      </div>
+      <div v-if="showVersions" class="versions">
+        <h2>Minecraft versions</h2>
+        <Checkbox v-model="showSnapshots" class="filter-checkbox" label="Include snapshots" />
+        <multiselect
+          v-model="selectedVersions"
+          :options="
               showSnapshots
                 ? availableGameVersions.map((x) => x.version)
                 : availableGameVersions
                     .filter((it) => it.version_type === 'release')
                     .map((x) => x.version)
             "
-            :multiple="true"
-            :searchable="true"
-            :show-no-results="false"
-            :close-on-select="false"
-            :clear-search-on-select="false"
-            :show-labels="false"
-            placeholder="Choose versions..."
-            @update:model-value="onSearchChangeToTop(1)"
+          :multiple="true"
+          :searchable="true"
+          :show-no-results="false"
+          :close-on-select="false"
+          :clear-search-on-select="false"
+          :show-labels="false"
+          placeholder="Choose versions..."
+          @update:model-value="onSearchChangeToTop(1)"
+        />
+      </div>
+      <div
+        v-for="categoryList in Array.from(sortedCategories)"
+        :key="categoryList[0]"
+        class="categories"
+      >
+        <h2>{{ formatCategoryHeader(categoryList[0]) }}</h2>
+        <div v-for="category in categoryList[1]" :key="category.name">
+          <SearchFilter
+            :active-filters="facets"
+            :icon="category.icon"
+            :display-name="formatCategory(category.name)"
+            :facet-name="`categories:${encodeURIComponent(category.name)}`"
+            class="filter-checkbox"
+            @toggle="toggleFacet"
           />
         </div>
-        <div
-          v-for="categoryList in Array.from(sortedCategories)"
-          :key="categoryList[0]"
-          class="categories"
+      </div>
+      <div v-if="isModProject" class="environment">
+        <h2>Environments</h2>
+        <SearchFilter
+          :active-filters="selectedEnvironments"
+          display-name="Client"
+          facet-name="client"
+          class="filter-checkbox"
+          @toggle="toggleEnv"
         >
-          <h2>{{ formatCategoryHeader(categoryList[0]) }}</h2>
-          <div v-for="category in categoryList[1]" :key="category.name">
-            <SearchFilter
-              :active-filters="facets"
-              :icon="category.icon"
-              :display-name="formatCategory(category.name)"
-              :facet-name="`categories:${encodeURIComponent(category.name)}`"
-              class="filter-checkbox"
-              @toggle="toggleFacet"
-            />
-          </div>
-        </div>
-        <div v-if="isModProject" class="environment">
-          <h2>Environments</h2>
-          <SearchFilter
-            :active-filters="selectedEnvironments"
-            display-name="Client"
-            facet-name="client"
-            class="filter-checkbox"
-            @toggle="toggleEnv"
-          >
-            <ClientIcon aria-hidden="true" />
-          </SearchFilter>
-          <SearchFilter
-            :active-filters="selectedEnvironments"
-            display-name="Server"
-            facet-name="server"
-            class="filter-checkbox"
-            @toggle="toggleEnv"
-          >
-            <ServerIcon aria-hidden="true" />
-          </SearchFilter>
-        </div>
-        <div class="open-source">
-          <h2>Open source</h2>
-          <Checkbox
-            v-model="onlyOpenSource"
-            label="Open source only"
-            class="filter-checkbox"
-            @update:model-value="onSearchChangeToTop(1)"
-          />
-        </div>
-      </Card>
-    </aside>
-    <div class="search">
-      <Card class="project-type-container mt-4">
-        <NavRow :links="selectableProjectTypes" />
-      </Card>
-      <Card class="search-panel-container">
-        <div class="iconified-input">
-          <SearchIcon aria-hidden="true" />
-          <input
-            v-model="query"
-            autocomplete="off"
-            spellcheck="false"
-            type="text"
-            :placeholder="`Search ${projectType}s...`"
-            @input="debouncedSearchChange()"
-          />
-          <Button class="r-btn" @click="() => clearSearch()">
-            <XIcon />
-          </Button>
-        </div>
-        <div class="inline-option">
-          <span>Sort by</span>
-          <DropdownSelect
-            v-model="sortType"
-            name="Sort by"
-            :options="sortTypes"
-            :display-name="(option) => option?.display"
-            @change="onSearchChange(1)"
-          />
-        </div>
-        <div class="inline-option">
-          <span>Show per page</span>
-          <DropdownSelect
-            v-model="maxResults"
-            name="Max results"
-            :options="[5, 10, 15, 20, 50, 100]"
-            :default-value="maxResults"
-            :model-value="maxResults"
-            class="limit-dropdown"
-            @change="onSearchChange(1)"
-          />
-        </div>
-      </Card>
+          <ClientIcon aria-hidden="true" />
+        </SearchFilter>
+        <SearchFilter
+          :active-filters="selectedEnvironments"
+          display-name="Server"
+          facet-name="server"
+          class="filter-checkbox"
+          @toggle="toggleEnv"
+        >
+          <ServerIcon aria-hidden="true" />
+        </SearchFilter>
+      </div>
+      <div class="open-source">
+        <h2>Open source</h2>
+        <Checkbox
+          v-model="onlyOpenSource"
+          label="Open source only"
+          class="filter-checkbox"
+          @update:model-value="onSearchChangeToTop(1)"
+        />
+      </div>
+    </div>
+  </Teleport>
+  <div ref="searchWrapper" class="flex flex-col gap-3 p-6">
+    <h1 class="m-0 mb-1 text-2xl">Discover content</h1>
+    <NavTabs :links="selectableProjectTypes" />
+    <div class="iconified-input">
+      <SearchIcon aria-hidden="true" class="text-lg" />
+      <input
+        v-model="query"
+        class="h-12"
+        autocomplete="off"
+        spellcheck="false"
+        type="text"
+        :placeholder="`Search ${projectType}s...`"
+        @input="debouncedSearchChange()"
+      />
+      <Button class="r-btn" @click="() => clearSearch()">
+        <XIcon />
+      </Button>
+    </div>
+    <div class="flex gap-2">
+      <DropdownSelect
+        v-slot="{ selected }"
+        v-model="sortType"
+        class="max-w-[16rem]"
+        name="Sort by"
+        :options="sortTypes"
+        :display-name="(option) => option?.display"
+        @change="onSearchChange(1)"
+      >
+        <span class="font-semibold text-primary">Sort by: </span>
+        <span class="font-semibold text-secondary">{{ selected }}</span>
+      </DropdownSelect>
+      <DropdownSelect
+        v-slot="{ selected }"
+        v-model="maxResults"
+        name="Max results"
+        :options="[5, 10, 15, 20, 50, 100]"
+        :default-value="maxResults"
+        :model-value="maxResults"
+        class="max-w-[14rem]"
+        @change="onSearchChange(1)"
+      >
+        <span class="font-semibold text-primary">View: </span>
+        <span class="font-semibold text-secondary">{{ selected }}</span>
+      </DropdownSelect>
       <Pagination
         :page="currentPage"
         :count="pageCount"
         :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
-        class="pagination-before"
+        class="ml-auto"
         @switch-page="onSearchChange"
       />
+    </div>
+    <div class="search">
       <section v-if="loading" class="offline">Loading...</section>
       <section v-else-if="offline && results.total_hits === 0" class="offline">
         You are currently offline. Connect to the internet to browse Modrinth!
@@ -748,14 +1015,15 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
           :installed="result.installed"
         />
       </section>
-      <pagination
-        :page="currentPage"
-        :count="pageCount"
-        :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
-        class="pagination-after"
-        @switch-page="onSearchChangeToTop"
-      />
-      <br />
+      <div class="flex justify-end">
+        <pagination
+          :page="currentPage"
+          :count="pageCount"
+          :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
+          class="pagination-after"
+          @switch-page="onSearchChangeToTop"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -903,8 +1171,7 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
   }
 
   .search {
-    margin: 0 1rem 0.5rem calc(20rem + 1rem);
-    width: calc(100% - calc(20rem + 1rem));
+    padding: 1rem;
 
     .offline {
       margin: 1rem;

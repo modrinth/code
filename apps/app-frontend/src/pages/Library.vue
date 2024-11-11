@@ -40,17 +40,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <GridDisplay v-if="instances.length > 0" label="Instances" :instances="instances" />
-  <div v-else class="no-instance">
-    <div class="icon">
-      <NewInstanceImage />
+  <div class="p-6 flex flex-col gap-3">
+    <h1 class="m-0 text-2xl">Library</h1>
+    <GridDisplay v-if="instances.length > 0" label="Instances" :instances="instances" />
+    <div v-else class="no-instance">
+      <div class="icon">
+        <NewInstanceImage />
+      </div>
+      <h3>No instances found</h3>
+      <Button color="primary" :disabled="offline" @click="$refs.installationModal.show()">
+        <PlusIcon />
+        Create new instance
+      </Button>
+      <InstanceCreationModal ref="installationModal" />
     </div>
-    <h3>No instances found</h3>
-    <Button color="primary" :disabled="offline" @click="$refs.installationModal.show()">
-      <PlusIcon />
-      Create new instance
-    </Button>
-    <InstanceCreationModal ref="installationModal" />
   </div>
 </template>
 

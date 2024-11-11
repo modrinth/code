@@ -72,7 +72,7 @@ function pickLink() {
       index = i
       break
     } else if (
-      route.path.includes(link.href) ||
+      route.path === link.href ||
       (link.subpages &&
         link.subpages.some((subpage) => route.path.includes(subpage)))
     ) {

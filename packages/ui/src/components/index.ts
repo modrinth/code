@@ -1,4 +1,5 @@
 // Base content
+export { default as Accordion } from './base/Accordion.vue'
 export { default as AutoLink } from './base/AutoLink.vue'
 export { default as Avatar } from './base/Avatar.vue'
 export { default as Badge } from './base/Badge.vue'
@@ -53,6 +54,7 @@ export { default as NavRow } from './nav/NavRow.vue'
 export { default as NavStack } from './nav/NavStack.vue'
 
 // Search
+export { default as BrowseFiltersPanel } from './search/BrowseFiltersPanel.vue'
 export { default as Categories } from './search/Categories.vue'
 export { default as SearchDropdown } from './search/SearchDropdown.vue'
 export { default as SearchFilter } from './search/SearchFilter.vue'

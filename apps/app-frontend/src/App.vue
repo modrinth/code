@@ -405,28 +405,32 @@ async function checkUpdates() {
     </div>
     <div class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto" :class="{ 'has-plus': hasPlus }">
       <div class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative" :class="{ 'pb-12': !hasPlus }">
-        <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-          <h3 class="text-base m-0">Playing as</h3>
-          <suspense>
-            <AccountsCard ref="accounts" mode="small" />
-          </suspense>
+        <div id="sidebar-teleport-target" class="sidebar-teleport-content">
         </div>
-        <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-          <h3 class="text-base m-0">Friends</h3>
-          <p class="m-0">you have no friends :c</p>
-          <p class="m-0">what's up with that?</p>
-        </div>
-        <div class="pt-4 flex flex-col">
-          <h3 class="px-4 text-base m-0">News</h3>
-          <template v-for="(item, index) in news" :key="`news-${index}`">
-            <a :class="`flex flex-col outline-offset-[-4px] hover:bg-[--brand-gradient-border] focus:bg-[--brand-gradient-border] px-4 transition-colors ${index === 0 ? 'pt-2 pb-4' : 'py-4'}`" :href="item.link" target="_blank" rel="external">
-              <img :src="item.thumbnail" alt="News thumbnail" aria-hidden="true" class="w-full aspect-[3/1] object-cover rounded-2xl"/>
-              <h4 class="mt-2 mb-0 text-sm leading-none text-contrast font-semibold">{{item.title}}</h4>
-              <p class="my-1 text-sm text-secondary leading-tight">{{item.summary}}</p>
-              <p class="text-right text-sm text-secondary opacity-60 leading-tight m-0"> {{ dayjs(item.date).fromNow() }}</p>
-            </a>
-            <hr v-if="index !== news.length - 1" class="h-px my-[-2px] mx-4 border-0 m-0 bg-[--brand-gradient-border]"/>
-          </template>
+        <div class="sidebar-default-content">
+          <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+            <h3 class="text-base m-0">Playing as</h3>
+            <suspense>
+              <AccountsCard ref="accounts" mode="small" />
+            </suspense>
+          </div>
+          <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+            <h3 class="text-base m-0">Friends</h3>
+            <p class="m-0">you have no friends :c</p>
+            <p class="m-0">what's up with that?</p>
+          </div>
+          <div class="pt-4 flex flex-col">
+            <h3 class="px-4 text-base m-0">News</h3>
+            <template v-for="(item, index) in news" :key="`news-${index}`">
+              <a :class="`flex flex-col outline-offset-[-4px] hover:bg-[--brand-gradient-border] focus:bg-[--brand-gradient-border] px-4 transition-colors ${index === 0 ? 'pt-2 pb-4' : 'py-4'}`" :href="item.link" target="_blank" rel="external">
+                <img :src="item.thumbnail" alt="News thumbnail" aria-hidden="true" class="w-full aspect-[3/1] object-cover rounded-2xl"/>
+                <h4 class="mt-2 mb-0 text-sm leading-none text-contrast font-semibold">{{item.title}}</h4>
+                <p class="my-1 text-sm text-secondary leading-tight">{{item.summary}}</p>
+                <p class="text-right text-sm text-secondary opacity-60 leading-tight m-0"> {{ dayjs(item.date).fromNow() }}</p>
+              </a>
+              <hr v-if="index !== news.length - 1" class="h-px my-[-2px] mx-4 border-0 m-0 bg-[--brand-gradient-border]"/>
+            </template>
+          </div>
         </div>
       </div>
       <template v-if="!hasPlus">
@@ -813,6 +817,18 @@ async function checkUpdates() {
 
 .app-sidebar {
   background: var(--brand-gradient-bg);
+}
+
+.sidebar-teleport-content {
+  display: contents;
+}
+
+.sidebar-default-content {
+  display: none;
+}
+
+.sidebar-teleport-content:empty + .sidebar-default-content {
+  display: contents;
 }
 </style>
 <style>
