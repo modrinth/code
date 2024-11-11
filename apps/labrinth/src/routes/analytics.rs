@@ -13,7 +13,7 @@ use actix_web::{HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
-use std::net::{AddrParseError, IpAddr, Ipv4Addr, Ipv6Addr};
+use std::net::Ipv4Addr;
 use std::sync::Arc;
 use url::Url;
 
@@ -39,16 +39,6 @@ pub const FILTERED_HEADERS: &[&str] = &[
     "x-vercel-ip-latitude",
     "x-vercel-ip-country",
 ];
-
-pub fn convert_to_ip_v6(src: &str) -> Result<Ipv6Addr, AddrParseError> {
-    let ip_addr: IpAddr = src.parse()?;
-
-    Ok(match ip_addr {
-        IpAddr::V4(x) => x.to_ipv6_mapped(),
-        IpAddr::V6(x) => x,
-    })
-}
-
 #[derive(Deserialize)]
 pub struct UrlInput {
     url: String,
@@ -101,7 +91,7 @@ pub async fn page_view_ingest(
         })
         .collect::<HashMap<String, String>>();
 
-    let ip = convert_to_ip_v6(
+    let ip = crate::util::ip::convert_to_ip_v6(
         if let Some(header) = headers.get("cf-connecting-ip") {
             header
         } else {
