@@ -36,14 +36,25 @@
               <span class="text-lg font-bold text-contrast">Java version</span>
               <span>
                 The version of Java that your server will run on. Your server is running Minecraft
-                {{ data.mc_version }}
+                {{ data.mc_version }}. By default, only the Java versions compatible with this
+                version of Minecraft are shown. Some mods or modpacks may require a specific Java
+                version.
               </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input
+                id="show-all-versions"
+                v-model="showAllVersions"
+                class="switch stylized-toggle flex-none"
+                type="checkbox"
+              />
+              <label for="show-all-versions" class="text-sm">Show all Java versions</label>
             </div>
             <UiServersTeleportDropdownMenu
               :id="'java-version-field'"
               v-model="jdkVersion"
               name="java-version"
-              :options="compatibleJavaVersions"
+              :options="displayedJavaVersions"
               placeholder="Java Version"
             />
           </div>
@@ -83,8 +94,8 @@ const props = defineProps<{
 }>();
 
 const data = computed(() => props.server.general);
-
 const startupSettings = computed(() => props.server.startup);
+const showAllVersions = ref(false);
 
 const jdkVersionMap = [
   { value: "lts8", label: "Java 8" },
@@ -123,6 +134,10 @@ const compatibleJavaVersions = computed(() => {
   }
 
   return ["Java 8"];
+});
+
+const displayedJavaVersions = computed(() => {
+  return showAllVersions.value ? jdkVersionMap.map((v) => v.label) : compatibleJavaVersions.value;
 });
 
 const hasUnsavedChanges = computed(
@@ -174,3 +189,9 @@ const resetToDefault = () => {
   invocation.value = startupSettings.value?.original_invocation;
 };
 </script>
+
+<style scoped>
+.stylized-toggle:checked::after {
+  background: var(--color-accent-contrast) !important;
+}
+</style>

@@ -71,6 +71,7 @@
                     action: () => reportUser(user.id),
                     color: 'red',
                     hoverOnly: true,
+                    shown: auth.user?.id !== user.id,
                   },
                   { id: 'copy-id', action: () => copyId() },
                 ]"
