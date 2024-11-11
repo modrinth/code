@@ -33,7 +33,7 @@ const emit = defineEmits<{
 
 const props = withDefaults(
   defineProps<{
-    label: string
+    label?: string
     disabled?: boolean
     description: string
     modelValue: boolean

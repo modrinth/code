@@ -17,20 +17,25 @@ const props = withDefaults(defineProps<{
   locked: false,
 })
 
-const manualSelections: Ref<Record<string, boolean>> = ref({})
-const selected: Ref<string[]> = computed(() => Object.keys(manualSelections.value).filter((item) => manualSelections.value[item]))
+const selectionStates: Ref<Record<string, boolean>> = ref({})
+const selected: Ref<string[]> = computed(() => Object.keys(selectionStates.value).filter((item) => selectionStates.value[item] && props.items.some((x) => x.filename === item)))
 
 const allSelected = ref(false)
 
-function setSelected(value: boolean) {
-  for (const item of props.items) {
-    manualSelections.value[item.filename] = value
-  }
+const model = defineModel()
+
+function updateSelection() {
+  model.value = selected.value
 }
 
-defineExpose({
-  selected,
-})
+function setSelected(value: boolean) {
+  if (value) {
+    selectionStates.value = Object.fromEntries(props.items.map((item) => [item.filename, true]))
+  } else {
+    selectionStates.value = {}
+  }
+  updateSelection()
+}
 </script>
 
 <template>
@@ -57,12 +62,14 @@ defineExpose({
         disable-transform
         key-field="filename"
         style="height: 100%"
-        v-slot="{ item }"
+        v-slot="{ item, index }"
       >
         <ContentListItem
           :item="item"
           :locked="locked"
-          v-model="manualSelections[item.filename]"
+          v-model="selectionStates[item.filename]"
+          @update:model-value="updateSelection"
+          :last="props.items.length - 1 === index"
           class="mb-2"
         >
           <template #actions="{ item }">

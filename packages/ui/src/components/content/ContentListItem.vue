@@ -38,19 +38,23 @@ export interface ContentItem<T> {
 withDefaults(defineProps<{
   item: ContentItem<T>
   locked?: boolean
+  last?: boolean
 }>(), {
   locked: false,
+  last: false,
 })
 
 const model = defineModel()
 </script>
 <template>
   <div
-    class="grid grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center p-2 h-[64px] border-solid border-0 border-b-[1px] border-b-button-bg relative"
+    class="grid grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center p-2 h-[64px] border-solid border-0 border-b-button-bg relative"
+    :class="{ 'border-b-[1px]': !last }"
   >
     <Checkbox
       v-if="!locked"
       v-model="model"
+
       :description="``"
       class="select-checkbox"
     />

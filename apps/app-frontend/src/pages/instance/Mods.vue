@@ -83,8 +83,8 @@
     <AddContentButton v-if="!isPackLocked" :instance="instance" />
   </Card>
   <ContentListPanel
-      v-if="projects.length > 0"
-      ref="contentList"
+    v-if="projects.length > 0"
+      v-model="selectedFiles"
       :locked="isPackLocked"
       :items="search.map((x) => ({
         disabled: x.disabled,
@@ -109,9 +109,9 @@
       }))"
   >
     <template v-if="selectedProjects.length > 0" #headers>
-      <div class="flex gap-2">
+       <div class="flex gap-2">
         <ButtonStyled v-if="selectedProjects.some((m) => m.outdated)" color="brand" color-fill="text" hover-color-fill="text">
-          <button><DownloadIcon /> Update</button>
+          <button @click="updateSelected()"><DownloadIcon /> Update</button>
         </ButtonStyled>
         <ButtonStyled>
           <OverflowMenu
@@ -149,13 +149,13 @@
           </OverflowMenu>
         </ButtonStyled>
         <ButtonStyled v-if="selectedProjects.some((m) => m.disabled)">
-          <button><CheckCircleIcon /> Enable</button>
+          <button @click="enableAll()"><CheckCircleIcon /> Enable</button>
         </ButtonStyled>
         <ButtonStyled v-if="selectedProjects.some((m) => !m.disabled)">
-          <button><SlashIcon /> Disable</button>
+          <button @click="disableAll()"><SlashIcon /> Disable</button>
         </ButtonStyled>
         <ButtonStyled color="red">
-          <button><TrashIcon /> Remove</button>
+          <button @click="deleteSelected()"><TrashIcon /> Remove</button>
         </ButtonStyled>
       </div>
     </template>
@@ -179,11 +179,6 @@
           <SlashIcon v-else />
         </button>
       </ButtonStyled>
-      <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
-        <button v-tooltip="'Remove'" @click="removeMod(item)">
-          <TrashIcon />
-        </button>
-      </ButtonStyled>
       <ButtonStyled type="transparent" circular>
         <OverflowMenu
           :options="[
@@ -198,10 +193,12 @@
             },
             {
               divider: true,
+              shown: !isPackLocked,
             },
             {
               id: 'remove',
               color: 'red',
+              shown: !isPackLocked,
               action: () => removeMod(item),
             }
           ]"
@@ -561,8 +558,6 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 
-const contentList = ref<InstanceType<typeof ContentListPanel> | null>(null)
-
 const props = defineProps({
   instance: {
     type: Object,
@@ -613,7 +608,8 @@ const canUpdatePack = computed(() => {
 const exportModal = ref(null)
 
 const projects = ref([])
-const selectedProjects = computed(() => projects.value.filter((x) => contentList.value ? contentList.value.selected.includes(x.file_name) : []))
+const selectedFiles = ref([])
+const selectedProjects = computed(() => projects.value.filter((x) => selectedFiles.value.includes(x.file_name)))
 
 const selectionMap = ref(new Map())
 
