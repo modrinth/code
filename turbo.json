@@ -16,13 +16,15 @@
         "CF_PAGES_*",
         "HEROKU_APP_NAME",
         "STRIPE_PUBLISHABLE_KEY",
+        "PYRO_BASE_URL",
+        "PROD_OVERRIDE",
+        "PYRO_MASTER_KEY",
+        "PORT",
         "SQLX_OFFLINE"
       ]
     },
     "lint": {
-      "env": [
-        "SQLX_OFFLINE"
-      ]
+      "env": ["SQLX_OFFLINE"]
     },
     "dev": {
       "cache": false,
@@ -31,10 +33,7 @@
       "env": ["DISPLAY", "WEBKIT_DISABLE_DMABUF_RENDERER"]
     },
     "test": {
-      "env": [
-        "SQLX_OFFLINE",
-        "DATABASE_URL"
-      ]
+      "env": ["SQLX_OFFLINE", "DATABASE_URL"]
     },
     "fix": {
       "cache": false

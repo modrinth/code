@@ -3,23 +3,45 @@
     <template #title>
       <span class="text-contrast text-xl font-extrabold">
         <template v-if="product.metadata.type === 'midas'">Subscribe to Modrinth Plus!</template>
+        <template v-else-if="product.metadata.type === 'pyro'"
+          >Subscribe to Modrinth Servers!</template
+        >
         <template v-else>Purchase product</template>
       </span>
     </template>
     <div class="flex items-center gap-1 pb-4">
+      <template v-if="product.metadata.type === 'pyro' && !projectId">
+        <span
+          :class="{
+            'text-secondary': purchaseModalStep !== 0,
+            'font-bold': purchaseModalStep === 0,
+          }"
+        >
+          Configure
+          <span class="hidden sm:inline">server</span>
+        </span>
+        <ChevronRightIcon class="h-5 w-5 text-secondary" />
+      </template>
       <span
         :class="{
-          'text-secondary': purchaseModalStep !== 0,
-          'font-bold': purchaseModalStep === 0,
+          'text-secondary':
+            purchaseModalStep !== (product.metadata.type === 'pyro' && !projectId ? 1 : 0),
+          'font-bold':
+            purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 1 : 0),
         }"
       >
-        Select plan
+        {{ product.metadata.type === 'pyro' ? 'Billing' : 'Plan' }}
+        <span class="hidden sm:inline">{{
+          product.metadata.type === 'pyro' ? 'interval' : 'selection'
+        }}</span>
       </span>
       <ChevronRightIcon class="h-5 w-5 text-secondary" />
       <span
         :class="{
-          'text-secondary': purchaseModalStep !== 1,
-          'font-bold': purchaseModalStep === 1,
+          'text-secondary':
+            purchaseModalStep !== (product.metadata.type === 'pyro' && !projectId ? 2 : 1),
+          'font-bold':
+            purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 2 : 1),
         }"
       >
         Payment
@@ -27,14 +49,126 @@
       <ChevronRightIcon class="h-5 w-5 text-secondary" />
       <span
         :class="{
-          'text-secondary': purchaseModalStep !== 2,
-          'font-bold': purchaseModalStep === 2,
+          'text-secondary':
+            purchaseModalStep !== (product.metadata.type === 'pyro' && !projectId ? 3 : 2),
+          'font-bold':
+            purchaseModalStep === (product.metadata.type === 'pyro' && !projectId ? 3 : 2),
         }"
       >
         Review
       </span>
     </div>
-    <div v-if="purchaseModalStep === 0" class="md:w-[600px]">
+    <div
+      v-if="product.metadata.type === 'pyro' && !projectId && purchaseModalStep === 0"
+      class="md:w-[600px] flex flex-col gap-4"
+    >
+      <div>
+        <p class="my-2 text-lg font-bold">Configure your server</p>
+        <div class="flex flex-col gap-4">
+          <input v-model="serverName" placeholder="Server name" class="input" maxlength="48" />
+          <!-- <DropdownSelect
+            v-model="serverLoader"
+            v-tooltip="'Select the mod loader for your server'"
+            name="server-loader"
+            :options="['Vanilla', 'Fabric', 'Forge']"
+            placeholder="Select mod loader..."
+          /> -->
+          <div class="grid lg:grid-cols-5 grid-cols-3 gap-4">
+            <button
+              v-for="loader in ['Vanilla', 'Fabric', 'Forge', 'Quilt', 'NeoForge']"
+              :key="loader"
+              class="!h-24 btn flex !flex-col !items-center !justify-between !pt-4 !pb-3 !w-full"
+              :style="{
+                filter: serverLoader === loader ? 'brightness(1.5)' : '',
+              }"
+              @click="serverLoader = loader"
+            >
+              <UiServersIconsLoaderIcon :loader="loader" class="!h-12 !w-12" />
+              <p class="text-lg font-bold m-0">{{ loader }}</p>
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <InfoIcon class="hidden sm:block" />
+            <span class="text-sm text-secondary">
+              You can change these settings later in your server options.
+            </span>
+          </div>
+        </div>
+      </div>
+      <div v-if="customServer">
+        <div class="flex gap-2 items-center">
+          <p class="my-2 text-lg font-bold">Configure your RAM</p>
+          <IssuesIcon
+            v-if="customServerConfig.ramInGb < 4"
+            v-tooltip="'This might not be enough resources for your Minecraft server.'"
+            class="h-6 w-6 text-orange"
+          />
+        </div>
+        <div class="flex flex-col gap-4">
+          <div class="flex w-full gap-2 items-center">
+            <Slider
+              v-model="customServerConfig.ramInGb"
+              class="fix-slider"
+              :min="customMinRam"
+              :max="customMaxRam"
+              :step="2"
+              unit="GB"
+            />
+            <div class="font-semibold text-nowrap"></div>
+          </div>
+          <div
+            v-if="customMatchingProduct && !customOutOfStock"
+            class="flex sm:flex-row flex-col gap-4 w-full"
+          >
+            <div class="flex flex-col w-full gap-2">
+              <div class="font-semibold">vCPUs</div>
+              <input v-model="mutatedProduct.metadata.cpu" disabled class="input" />
+            </div>
+            <div class="flex flex-col w-full gap-2">
+              <div class="font-semibold">Storage</div>
+              <input v-model="customServerConfig.storageGbFormatted" disabled class="input" />
+            </div>
+          </div>
+          <div
+            v-else
+            class="flex justify-between rounded-2xl border-2 border-solid border-blue bg-bg-blue p-4 font-semibold text-contrast"
+          >
+            <div class="flex w-full justify-between gap-2">
+              <div class="flex flex-row gap-4">
+                <InfoIcon class="hidden flex-none h-8 w-8 text-blue sm:block" />
+
+                <div v-if="customOutOfStock && customMatchingProduct" class="flex flex-col gap-2">
+                  <div class="font-semibold">This plan is currently out of stock</div>
+                  <div class="font-normal">
+                    We are currently
+                    <a :href="outOfStockUrl" class="underline" target="_blank">out of capacity</a>
+                    for your selected RAM amount. Please try again later, or try a different amount.
+                  </div>
+                </div>
+                <div v-else class="flex flex-col gap-2">
+                  <div class="font-semibold">We can't seem to find your selected plan</div>
+                  <div class="font-normal">
+                    We are currently unable to find a server for your selected RAM amount. Please
+                    try again later, or try a different amount.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <InfoIcon class="hidden sm:block" />
+            <span class="text-sm text-secondary">
+              Storage and vCPUs are currently not configurable.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      v-if="purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 1 : 0)"
+      class="md:w-[600px]"
+    >
       <div>
         <p class="my-2 text-lg font-bold">Choose billing interval</p>
         <div class="flex flex-col gap-4">
@@ -74,14 +208,16 @@
         </div>
 
         <div class="flex items-center gap-2 pt-4">
-          <InfoIcon />
+          <InfoIcon class="hidden sm:block" />
           <span class="text-sm text-secondary">
             Final price and currency will be based on your selected payment method.
           </span>
         </div>
       </div>
     </div>
-    <template v-if="purchaseModalStep === 1">
+    <template
+      v-if="purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 2 : 1)"
+    >
       <div
         v-show="loadingPaymentMethodModal !== 2"
         class="flex min-h-[16rem] items-center justify-center md:w-[600px]"
@@ -93,24 +229,48 @@
         <div id="payment-element" class="mt-4"></div>
       </div>
     </template>
-    <div v-if="purchaseModalStep === 2" class="md:w-[650px]">
+    <div
+      v-if="purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 3 : 2)"
+      class="md:w-[650px]"
+    >
+      <div v-if="mutatedProduct.metadata.type === 'pyro'" class="r-4 rounded-xl bg-bg p-4 mb-4">
+        <p class="my-2 text-lg font-bold text-primary">Server details</p>
+        <div class="flex items-center gap-4">
+          <img
+            v-if="projectImage"
+            :src="projectImage"
+            alt="Project image"
+            class="w-16 h-16 rounded"
+          />
+          <div>
+            <p v-if="projectName" class="font-bold">{{ projectName }}</p>
+            <p>Server name: {{ serverName }}</p>
+            <p v-if="!projectId">Loader: {{ serverLoader }}</p>
+          </div>
+        </div>
+      </div>
       <div>
         <div class="r-4 rounded-xl bg-bg p-4">
           <p class="my-2 text-lg font-bold text-primary">Purchase details</p>
           <div class="mb-2 flex justify-between">
-            <span class="text-secondary">Modrinth+ {{ selectedPlan }}</span>
-            <span class="text-secondary">
+            <span class="text-secondary"
+              >{{ mutatedProduct.metadata.type === 'midas' ? 'Modrinth+' : 'Modrinth Servers' }}
+              {{ selectedPlan }}</span
+            >
+            <span class="text-secondary text-end">
               {{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }} /
               {{ selectedPlan }}
             </span>
           </div>
           <div class="flex justify-between">
             <span class="text-secondary">Tax</span>
-            <span class="text-secondary">{{ formatPrice(locale, tax, price.currency_code) }}</span>
+            <span class="text-secondary text-end">{{
+              formatPrice(locale, tax, price.currency_code)
+            }}</span>
           </div>
           <div class="mt-4 flex justify-between border-0 border-t border-solid border-code-bg pt-4">
             <span class="text-lg font-bold">Today's total</span>
-            <span class="text-lg font-extrabold text-primary">
+            <span class="text-lg font-extrabold text-primary text-end">
               {{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }}
             </span>
           </div>
@@ -131,7 +291,7 @@
           class="max-w-[20rem]"
           @select="selectPaymentMethod"
         >
-          <!-- TODO: Move this to component to remove duplicated code -->
+          <!-- eslint-disable-next-line vue/no-template-shadow -->
           <template #singleLabel="props">
             <div class="flex items-center gap-2">
               <CardIcon v-if="props.option.type === 'card'" class="h-8 w-8" />
@@ -163,6 +323,7 @@
               </span>
             </div>
           </template>
+          <!-- eslint-disable-next-line vue/no-template-shadow -->
           <template #option="props">
             <div class="flex items-center gap-2">
               <template v-if="props.option.id === 'new'">
@@ -204,10 +365,22 @@
       </div>
       <p class="m-0 mt-9 text-sm text-secondary">
         <strong>By clicking "Subscribe", you are purchasing a recurring subscription.</strong>
+        <br />
         You'll be charged
         {{ formatPrice(locale, price.prices.intervals[selectedPlan], price.currency_code) }} /
-        {{ selectedPlan }} plus applicable taxes starting today, until you cancel. Cancel anytime
-        from your settings page.
+        {{ selectedPlan }} plus applicable taxes starting today, until you cancel.
+        <br />
+        You can cancel anytime from your settings page.
+      </p>
+      <p v-if="mutatedProduct.metadata.type === 'pyro'" class="mb-2 mt-4 text-secondary">
+        <Checkbox v-model="eulaAccepted" :disabled="paymentLoading">
+          <label>
+            I acknowledge that I have read and agree to the
+            <a class="underline" target="_blank" href="https://aka.ms/MinecraftEULA">
+              Minecraft EULA
+            </a>
+          </label>
+        </Checkbox>
       </p>
     </div>
     <div class="input-group push-right pt-4">
@@ -216,17 +389,48 @@
           <XIcon />
           Cancel
         </button>
+        <button
+          class="btn btn-primary"
+          :disabled="
+            paymentLoading ||
+            (mutatedProduct.metadata.type === 'pyro' && !projectId && !serverName) ||
+            customAllowedToContinue
+          "
+          @click="nextStep"
+        >
+          <RightArrowIcon />
+          {{ mutatedProduct.metadata.type === 'pyro' && !projectId ? 'Next' : 'Select' }}
+        </button>
+      </template>
+      <template
+        v-else-if="
+          purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 1 : 0)
+        "
+      >
+        <button
+          class="btn"
+          @click="
+            purchaseModalStep =
+              mutatedProduct.metadata.type === 'pyro' && !projectId ? 0 : purchaseModalStep
+          "
+        >
+          Back
+        </button>
         <button class="btn btn-primary" :disabled="paymentLoading" @click="beginPurchaseFlow(true)">
           <RightArrowIcon />
           Select
         </button>
       </template>
-      <template v-else-if="purchaseModalStep === 1">
+      <template
+        v-else-if="
+          purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 2 : 1)
+        "
+      >
         <button
           class="btn"
           @click="
             () => {
-              purchaseModalStep = 0
+              purchaseModalStep = mutatedProduct.metadata.type === 'pyro' && !projectId ? 1 : 0
               loadingPaymentMethodModal = 0
               paymentLoading = false
             }
@@ -239,20 +443,34 @@
           Continue
         </button>
       </template>
-      <template v-else-if="purchaseModalStep === 2">
+      <template
+        v-else-if="
+          purchaseModalStep === (mutatedProduct.metadata.type === 'pyro' && !projectId ? 3 : 2)
+        "
+      >
         <button class="btn" @click="$refs.purchaseModal.hide()">
           <XIcon />
           Cancel
         </button>
-        <button class="btn btn-primary" :disabled="paymentLoading" @click="submitPayment">
+        <button
+          v-if="mutatedProduct.metadata.type === 'pyro'"
+          class="btn btn-primary"
+          :disabled="paymentLoading || !eulaAccepted"
+          @click="submitPayment"
+        >
+          <CheckCircleIcon /> Subscribe
+        </button>
+        <!-- Default Subscribe Button, so M+ still works -->
+        <button v-else class="btn btn-primary" :disabled="paymentLoading" @click="submitPayment">
           <CheckCircleIcon /> Subscribe
         </button>
       </template>
     </div>
   </NewModal>
 </template>
+
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, reactive, watch } from 'vue'
 import NewModal from '../modal/NewModal.vue'
 import {
   CardIcon,
@@ -260,6 +478,7 @@ import {
   ChevronRightIcon,
   CurrencyIcon,
   InfoIcon,
+  IssuesIcon,
   PayPalIcon,
   PlusIcon,
   RadioButtonChecked,
@@ -271,6 +490,8 @@ import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import { getCurrency, calculateSavings, formatPrice, createStripeElements } from '@modrinth/utils'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import { Multiselect } from 'vue-multiselect'
+import Checkbox from '../base/Checkbox.vue'
+import Slider from '../base/Slider.vue'
 
 const { locale, formatMessage } = useVIntl()
 
@@ -310,6 +531,40 @@ const props = defineProps({
   onError: {
     type: Function,
     required: true,
+  },
+  projectName: {
+    type: String,
+    default: null,
+  },
+  projectImage: {
+    type: String,
+    default: null,
+  },
+  projectId: {
+    type: String,
+    default: null,
+  },
+  versionId: {
+    type: String,
+    default: null,
+  },
+  serverName: {
+    type: String,
+    default: null,
+  },
+  customServer: {
+    type: Boolean,
+    required: false,
+  },
+  fetchCapacityStatuses: {
+    type: Function,
+    required: false,
+    default: null,
+  },
+  outOfStockUrl: {
+    type: String,
+    required: false,
+    default: '',
   },
 })
 
@@ -372,49 +627,92 @@ let stripe = null
 let elements = null
 
 const purchaseModal = ref()
-
-const primaryPaymentMethodId = computed(() => {
-  if (
-    props.customer &&
-    props.customer.invoice_settings &&
-    props.customer.invoice_settings.default_payment_method
-  ) {
-    return props.customer.invoice_settings.default_payment_method
-  } else if (props.paymentMethods && props.paymentMethods[0] && props.paymentMethods[0].id) {
-    return props.paymentMethods[0].id
-  } else {
-    return null
-  }
-})
-
-defineExpose({
-  show: () => {
-    // eslint-disable-next-line no-undef
-    stripe = Stripe(props.publishableKey)
-
-    selectedPlan.value = 'yearly'
-
-    purchaseModalStep.value = 0
-    loadingPaymentMethodModal.value = 0
-    paymentLoading.value = false
-
-    purchaseModal.value.show()
-  },
-})
-
 const purchaseModalStep = ref(0)
 const loadingPaymentMethodModal = ref(0)
+const paymentLoading = ref(false)
 
 const selectedPlan = ref('yearly')
 const currency = computed(() => getCurrency(props.country))
-
-const price = ref(props.product.prices.find((x) => x.currency_code === currency.value))
+const price = computed(() => {
+  return (
+    mutatedProduct.value?.prices?.find((x) => x.currency_code === currency.value) ??
+    mutatedProduct.value?.prices?.find((x) => x.currency_code === 'USD') ??
+    null
+  )
+})
 
 const clientSecret = ref()
 const paymentIntentId = ref()
 const confirmationToken = ref()
 const tax = ref()
 const total = ref()
+
+const serverName = ref(props.serverName || '')
+const serverLoader = ref('Vanilla')
+const eulaAccepted = ref(false)
+
+const mutatedProduct = ref({ ...props.product })
+const customMinRam = ref(0)
+const customMaxRam = ref(0)
+const customMatchingProduct = ref()
+const customOutOfStock = ref(false)
+const customLoading = ref(true)
+const customAllowedToContinue = computed(
+  () =>
+    props.customServer &&
+    (!customMatchingProduct.value || customLoading.value || customOutOfStock.value),
+)
+
+const customServerConfig = reactive({
+  ramInGb: 4,
+  storageGbFormatted: computed(() => `${mutatedProduct.value.metadata.storage / 1024} GB`),
+  ram: computed(() => customServerConfig.ramInGb * 1024),
+})
+
+const updateCustomServerProduct = () => {
+  customMatchingProduct.value = props.product.find(
+    (product) => product.metadata.ram === customServerConfig.ram,
+  )
+
+  if (customMatchingProduct.value) mutatedProduct.value = { ...customMatchingProduct.value }
+}
+
+let updateCustomServerStockTimeout = null
+const updateCustomServerStock = async () => {
+  if (updateCustomServerStockTimeout) {
+    clearTimeout(updateCustomServerStockTimeout)
+    customLoading.value = true
+  }
+
+  updateCustomServerStockTimeout = setTimeout(async () => {
+    if (props.fetchCapacityStatuses) {
+      const capacityStatus = await props.fetchCapacityStatuses(mutatedProduct.value)
+      if (capacityStatus.custom?.available === 0) {
+        customOutOfStock.value = true
+      } else {
+        customOutOfStock.value = false
+      }
+      customLoading.value = false
+    } else {
+      console.error('No fetchCapacityStatuses function provided.')
+      customOutOfStock.value = true
+    }
+  }, 300)
+}
+
+if (props.customServer) {
+  const ramValues = props.product.map((product) => product.metadata.ram / 1024)
+  customMinRam.value = Math.min(...ramValues)
+  customMaxRam.value = Math.max(...ramValues)
+
+  const updateProductAndStock = () => {
+    updateCustomServerProduct()
+    updateCustomServerStock()
+  }
+
+  updateProductAndStock()
+  watch(() => customServerConfig.ram, updateProductAndStock)
+}
 
 const selectedPaymentMethod = ref()
 const inputtedPaymentMethod = ref()
@@ -433,7 +731,52 @@ const selectablePaymentMethods = computed(() => {
   return values
 })
 
-const paymentLoading = ref(false)
+const primaryPaymentMethodId = computed(() => {
+  if (
+    props.customer &&
+    props.customer.invoice_settings &&
+    props.customer.invoice_settings.default_payment_method
+  ) {
+    return props.customer.invoice_settings.default_payment_method
+  } else if (props.paymentMethods && props.paymentMethods[0] && props.paymentMethods[0].id) {
+    return props.paymentMethods[0].id
+  } else {
+    return null
+  }
+})
+
+const metadata = computed(() => {
+  if (mutatedProduct.value.metadata.type === 'pyro') {
+    return {
+      type: 'pyro',
+      server_name: serverName.value,
+      source:
+        props.projectId && props.versionId
+          ? {
+              project_id: props.projectId,
+              version_id: props.versionId,
+            }
+          : {
+              loader: serverLoader.value,
+              loader_version: '',
+              game_version: 'latest',
+            },
+    }
+  }
+  return null
+})
+
+function nextStep() {
+  if (
+    mutatedProduct.value.metadata.type === 'pyro' &&
+    !props.projectId &&
+    purchaseModalStep.value === 0
+  ) {
+    purchaseModalStep.value = 1
+  } else {
+    beginPurchaseFlow(true)
+  }
+}
 
 async function beginPurchaseFlow(skip = false) {
   if (!props.customer) {
@@ -446,11 +789,13 @@ async function beginPurchaseFlow(skip = false) {
     paymentLoading.value = true
     await refreshPayment(null, primaryPaymentMethodId.value)
     paymentLoading.value = false
-    purchaseModalStep.value = 2
+    purchaseModalStep.value =
+      mutatedProduct.value.metadata.type === 'pyro' && !props.projectId ? 3 : 2
   } else {
     try {
       loadingPaymentMethodModal.value = 0
-      purchaseModalStep.value = 1
+      purchaseModalStep.value =
+        mutatedProduct.value.metadata.type === 'pyro' && !props.projectId ? 2 : 1
 
       await nextTick()
 
@@ -486,7 +831,6 @@ async function createConfirmationToken() {
 
   if (error) {
     props.onError(error)
-
     return
   }
 
@@ -509,7 +853,8 @@ async function validatePayment() {
 
   loadingPaymentMethodModal.value = 0
   confirmationToken.value = await createConfirmationToken()
-  purchaseModalStep.value = 2
+  purchaseModalStep.value =
+    mutatedProduct.value.metadata.type === 'pyro' && !props.projectId ? 3 : 2
   paymentLoading.value = false
 }
 
@@ -542,10 +887,11 @@ async function refreshPayment(confirmationId, paymentMethodId) {
     const result = await props.sendBillingRequest({
       charge: {
         type: 'new',
-        product_id: props.product.id,
+        product_id: mutatedProduct.value.id,
         interval: selectedPlan.value,
       },
       existing_payment_intent: paymentIntentId.value,
+      metadata: metadata.value,
       ...base,
     })
 
@@ -554,7 +900,7 @@ async function refreshPayment(confirmationId, paymentMethodId) {
       clientSecret.value = result.client_secret
     }
 
-    price.value = props.product.prices.find((x) => x.id === result.price_id)
+    price.value = mutatedProduct.value.prices.find((x) => x.id === result.price_id)
     currency.value = price.value.currency_code
     tax.value = result.tax
     total.value = result.total
@@ -585,5 +931,22 @@ async function submitPayment() {
   }
   paymentLoading.value = false
 }
+
+defineExpose({
+  show: () => {
+    // eslint-disable-next-line no-undef
+    stripe = Stripe(props.publishableKey)
+
+    selectedPlan.value = 'yearly'
+    serverName.value = props.serverName || ''
+    serverLoader.value = 'Vanilla'
+
+    purchaseModalStep.value = 0
+    loadingPaymentMethodModal.value = 0
+    paymentLoading.value = false
+
+    purchaseModal.value.show()
+  },
+})
 </script>
 <style scoped lang="scss"></style>

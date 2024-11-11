@@ -1468,6 +1468,8 @@ pub struct NewAccount {
     pub sign_up_newsletter: Option<bool>,
 }
 
+const NEW_ACCOUNT_LIMITER_NAMESPACE: &str = "new_account_ips";
+
 #[post("create")]
 pub async fn create_account_with_password(
     req: HttpRequest,
@@ -1533,19 +1535,6 @@ pub async fn create_account_with_password(
         ));
     }
 
-    let flow = Flow::ConfirmEmail {
-        user_id,
-        confirm_email: new_account.email.clone(),
-    }
-    .insert(Duration::hours(24), &redis)
-    .await?;
-
-    send_email_verify(
-        new_account.email.clone(),
-        flow,
-        &format!("Welcome to Modrinth, {}!", new_account.username),
-    )?;
-
     crate::database::models::User {
         id: user_id,
         github_id: None,
@@ -1576,6 +1565,49 @@ pub async fn create_account_with_password(
 
     let session = issue_session(req, user_id, &mut transaction, &redis).await?;
     let res = crate::models::sessions::Session::from(session, true, None);
+
+    // We limit each ip to creating 5 accounts in a six hour period
+    let ip = crate::util::ip::convert_to_ip_v6(&res.ip).map_err(|_| {
+        ApiError::InvalidInput("unable to parse user ip!".to_string())
+    })?;
+    let stripped_ip = crate::util::ip::strip_ip(ip).to_string();
+
+    let mut conn = redis.connect().await?;
+    let uses = if let Some(res) = conn
+        .get(NEW_ACCOUNT_LIMITER_NAMESPACE, &stripped_ip)
+        .await?
+    {
+        res.parse::<u64>().unwrap_or(0)
+    } else {
+        0
+    };
+
+    if uses >= 5 {
+        return Err(ApiError::InvalidInput(
+            "IP has been rate-limited.".to_string(),
+        ));
+    }
+
+    conn.set(
+        NEW_ACCOUNT_LIMITER_NAMESPACE,
+        &stripped_ip,
+        &(uses + 1).to_string(),
+        Some(60 * 60 * 6),
+    )
+    .await?;
+
+    let flow = Flow::ConfirmEmail {
+        user_id,
+        confirm_email: new_account.email.clone(),
+    }
+    .insert(Duration::hours(24), &redis)
+    .await?;
+
+    send_email_verify(
+        new_account.email.clone(),
+        flow,
+        &format!("Welcome to Modrinth, {}!", new_account.username),
+    )?;
 
     if new_account.sign_up_newsletter.unwrap_or(false) {
         sign_up_beehiiv(&new_account.email).await?;

@@ -158,7 +158,7 @@
             Report
           </nuxt-link>
         </ButtonStyled>
-        <ButtonStyled v-else>
+        <ButtonStyled v-else-if="!currentMember">
           <button @click="() => reportVersion(version.id)">
             <ReportIcon aria-hidden="true" />
             Report

@@ -35,7 +35,15 @@
               {{ formatCompactNumber(sumDownloads) }}
               downloads
             </div>
-            <div class="flex items-center gap-2 font-semibold">
+            <div
+              v-tooltip="
+                formatMessage(commonMessages.dateAtTimeTooltip, {
+                  date: new Date(user.created),
+                  time: new Date(user.created),
+                })
+              "
+              class="flex items-center gap-2 font-semibold"
+            >
               <CalendarIcon class="h-6 w-6 text-secondary" />
               Joined
               {{ formatRelativeTime(user.created) }}
@@ -63,6 +71,7 @@
                     action: () => reportUser(user.id),
                     color: 'red',
                     hoverOnly: true,
+                    shown: auth.user?.id !== user.id,
                   },
                   { id: 'copy-id', action: () => copyId() },
                 ]"
@@ -232,6 +241,8 @@
               </nuxt-link>
               <TenMClubBadge v-else-if="badge === '10m-club'" class="h-14 w-14" />
               <EarlyAdopterBadge v-else-if="badge === 'early-adopter'" class="h-14 w-14" />
+              <AlphaTesterBadge v-else-if="badge === 'alpha-tester'" class="h-14 w-14" />
+              <BetaTesterBadge v-else-if="badge === 'beta-tester'" class="h-14 w-14" />
             </div>
           </div>
         </div>
@@ -264,6 +275,8 @@ import ModBadge from "~/assets/images/badges/mod.svg?component";
 import PlusBadge from "~/assets/images/badges/plus.svg?component";
 import TenMClubBadge from "~/assets/images/badges/10m-club.svg?component";
 import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?component";
+import AlphaTesterBadge from "~/assets/images/badges/alpha-tester.svg?component";
+import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
 
 import ReportIcon from "~/assets/images/utils/report.svg?component";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
@@ -455,6 +468,10 @@ const sumDownloads = computed(() => {
   return sum;
 });
 
+const joinDate = computed(() => new Date(user.value.created));
+const MODRINTH_BETA_END_DATE = new Date("2022-02-27T08:00:00.000Z");
+const MODRINTH_ALPHA_END_DATE = new Date("2020-11-30T08:00:00.000Z");
+
 const badges = computed(() => {
   const badges = [];
 
@@ -482,8 +499,10 @@ const badges = computed(() => {
     badges.push("early-adopter");
   }
 
-  if (isPermission(user.value.badges, 1 << 4)) {
+  if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_ALPHA_END_DATE) {
     badges.push("alpha-tester");
+  } else if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_BETA_END_DATE) {
+    badges.push("beta-tester");
   }
 
   if (isPermission(user.value.badges, 1 << 5)) {
@@ -498,7 +517,7 @@ const badges = computed(() => {
 });
 
 async function copyId() {
-  await navigator.clipboard.writeText(project.value.id);
+  await navigator.clipboard.writeText(user.value.id);
 }
 
 const navLinks = computed(() => [

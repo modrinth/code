@@ -5,12 +5,12 @@ on:
     branches: [ "main" ]
     paths:
       - .github/workflows/daedalus-docker.yml
-      - 'apps/daedalus/**'
+      - 'apps/daedalus_client/**'
   pull_request:
     types: [ opened, synchronize ]
     paths:
       - .github/workflows/daedalus-docker.yml
-      - 'apps/daedalus/**'
+      - 'apps/daedalus_client/**'
   merge_group:
     types: [ checks_requested ]
 
