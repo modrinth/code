@@ -50,7 +50,7 @@ function setSelected(value: boolean) {
           Name <DropdownIcon />
         </div>
         <div class="flex items-center gap-1 max-w-60">Updated <DropdownIcon v-if="false" /></div>
-        <div class="flex">
+        <div class="flex justify-end gap-2">
           <slot name="header-actions" />
         </div>
       </slot>
