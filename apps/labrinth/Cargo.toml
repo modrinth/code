@@ -31,19 +31,10 @@ dashmap = "5.4.0"
 lazy_static = "1.4.0"
 
 meilisearch-sdk = "0.24.3"
-rust-s3 = { version = "0.33.0", default-features = false, features = [
-    "fail-on-err",
-    "tags",
-    "tokio-rustls-tls",
-    "reqwest",
-] }
-reqwest = { version = "0.11.18", default-features = false, features = [
-    "json",
-    "multipart",
-    "rustls-tls-native-roots",
-] }
-hyper-rustls = "0.27.3"
-hyper-util = "0.1.9"
+rust-s3 = "0.33.0"
+reqwest = { version = "0.11.18", features = ["json", "multipart"] }
+hyper = { version = "0.14", features = ["full"] }
+hyper-tls = "0.5.0"
 
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
@@ -99,18 +90,14 @@ rust_decimal = { version = "1.33.1", features = [
 ] }
 redis = { version = "0.27.5", features = ["tokio-comp", "ahash", "r2d2"] }
 deadpool-redis = "0.18.0"
-clickhouse = { version = "0.13.1", features = [
-    "uuid",
-    "time",
-    "rustls-tls-native-roots",
-] }
+clickhouse = { version = "0.11.2", features = ["uuid", "time"] }
 uuid = { version = "1.2.2", features = ["v4", "fast-rng", "serde"] }
 
 maxminddb = "0.24.0"
 flate2 = "1.0.25"
 tar = "0.4.38"
 
-sentry = { version = "0.32.1", default-features = false, features = [
+sentry = { version = "0.34.0", default-features = false, features = [
     "backtrace",
     "contexts",
     "debug-images",
@@ -118,7 +105,7 @@ sentry = { version = "0.32.1", default-features = false, features = [
     "rustls",
     "reqwest",
 ] }
-sentry-actix = "0.32.1"
+sentry-actix = "0.34.0"
 
 image = "0.24.6"
 color-thief = "0.2.2"
@@ -126,13 +113,7 @@ webp = "0.3.0"
 
 woothee = "0.13.0"
 
-lettre = { version = "0.11.10", default-features = false, features = [
-    "builder",
-    "hostname",
-    "pool",
-    "smtp-transport",
-    "tokio1-rustls-tls",
-] }
+lettre = "0.11.3"
 
 derive-new = "0.6.0"
 rust_iso3166 = "0.1.11"
