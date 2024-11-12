@@ -384,6 +384,8 @@ const submitForReview = async () => {
 }
 
 .author-actions {
+  margin-top: var(--spacing-card-md);
+
   &:empty {
     display: none;
   }

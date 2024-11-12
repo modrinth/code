@@ -201,7 +201,6 @@ const colorVariables = computed(() => {
     background-color 0.25s ease-in-out,
     color 0.25s ease-in-out;
 
-
   svg:first-child {
     color: var(--_icon, var(--_text));
     transition: color 0.25s ease-in-out;

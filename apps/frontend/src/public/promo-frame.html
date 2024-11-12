@@ -4,10 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Modrinth App Ad</title>
-    <script
-      src="https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js"
-      async
-    ></script>
+    <script src="/inmobi.js"></script>
+    <script src="https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js"></script>
     <link rel="preload" href="https://www.googletagservices.com/tag/js/gpt.js" as="script" />
     <style>
       * {
@@ -45,30 +43,30 @@
   <body>
     <div class="ads-container">
       <div id="plus-link"></div>
-      <div id="modrinth-rail-1" />
+      <div id="modrinth-rail-1"></div>
     </div>
     <script>
-      function initAds(personalized) {
-        window.tude = window.tude || { cmd: [] };
+      window.tude = window.tude || { cmd: [] };
 
-        tude.cmd.push(function () {
-          tude.refreshAdsViaDivMappings([
-            {
-              divId: "modrinth-rail-1",
-              baseDivId: "pb-slot-square-2",
-            },
-          ]);
+      window.Raven = window.Raven || { cmd: [] };
 
-          tude.setPrivacySettings({
-            personalizedAds: personalized ?? true,
-          });
+      window.Raven.cmd.push(({ config }) => {
+        config.setCustom({
+          param1: "app",
         });
-      }
+      });
 
-      window.__TAURI_INTERNALS__
-        .invoke("plugin:ads|get_ads_personalization", {})
-        .then(initAds)
-        .catch(() => initAds(true));
+      tude.cmd.push(function () {
+        tude.refreshAdsViaDivMappings([
+          {
+            divId: "modrinth-rail-1",
+            baseDivId: "pb-slot-square-2",
+            targeting: {
+              location: "app",
+            },
+          },
+        ]);
+      });
 
       window.addEventListener(
         "message",
@@ -105,6 +103,23 @@
           origin: "https://modrinth.com",
         });
       });
+
+      let attempts = 0;
+      function syncAgreeState() {
+        const primaryButton = document.querySelector(
+          ".qc-cmp2-summary-buttons button:last-of-type",
+        );
+
+        if (primaryButton) {
+          primaryButton.click();
+        } else {
+          attempts++;
+          if (attempts < 10) {
+            setTimeout(syncAgreeState, 1000);
+          }
+        }
+      }
+      syncAgreeState();
     </script>
   </body>
 </html>

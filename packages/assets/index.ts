@@ -23,7 +23,8 @@ import _PayPalIcon from './external/paypal.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
 import _TwitterIcon from './external/twitter.svg?component'
 import _WindowsIcon from './external/windows.svg?component'
-import _YouTubeIcon from './icons/youtube.svg?component'
+import _YouTubeIcon from './external/youtube.svg?component'
+import _PyroIcon from './external/pyro.svg?component'
 
 // Icons
 import _AlignLeftIcon from './icons/align-left.svg?component'
@@ -118,8 +119,10 @@ import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
 import _PackageIcon from './icons/package.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
+import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PaintBrushIcon from './icons/paintbrush.svg?component'
 import _PlayIcon from './icons/play.svg?component'
+import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonChecked from './icons/radio-button-checked.svg?component'
@@ -168,6 +171,13 @@ import _XIcon from './icons/x.svg?component'
 import _XCircleIcon from './icons/x-circle.svg?component'
 import _ZoomInIcon from './icons/zoom-in.svg?component'
 import _ZoomOutIcon from './icons/zoom-out.svg?component'
+import _CubeIcon from './icons/cube.svg?component'
+import _CloudIcon from './icons/cloud.svg?component'
+import _CogIcon from './icons/cog.svg?component'
+import _CPUIcon from './icons/cpu.svg?component'
+import _DBIcon from './icons/db.svg?component'
+import _LoaderIcon from './icons/loader.svg?component'
+import _ImportIcon from './icons/import.svg?component'
 
 // Editor Icons
 import _BoldIcon from './icons/bold.svg?component'
@@ -204,6 +214,7 @@ export const RedditIcon = _RedditIcon
 export const TwitterIcon = _TwitterIcon
 export const WindowsIcon = _WindowsIcon
 export const YouTubeIcon = _YouTubeIcon
+export const PyroIcon = _PyroIcon
 export const AlignLeftIcon = _AlignLeftIcon
 export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
@@ -296,8 +307,10 @@ export const OmorphiaIcon = _OmorphiaIcon
 export const OrganizationIcon = _OrganizationIcon
 export const PackageIcon = _PackageIcon
 export const PackageOpenIcon = _PackageOpenIcon
+export const PackageClosedIcon = _PackageClosedIcon
 export const PaintBrushIcon = _PaintBrushIcon
 export const PlayIcon = _PlayIcon
+export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const RadioButtonChecked = _RadioButtonChecked
@@ -355,5 +368,12 @@ export const TextQuoteIcon = _TextQuoteIcon
 export const Heading1Icon = _Heading1Icon
 export const Heading2Icon = _Heading2Icon
 export const Heading3Icon = _Heading3Icon
+export const CubeIcon = _CubeIcon
+export const CloudIcon = _CloudIcon
+export const CogIcon = _CogIcon
+export const CPUIcon = _CPUIcon
+export const DBIcon = _DBIcon
+export const LoaderIcon = _LoaderIcon
+export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
 export const SparklesIcon = _SparklesIcon

@@ -230,7 +230,7 @@ async function repairInstance() {
           </p>
           <p>You may be able to fix it through one of the following ways:</p>
           <ul>
-            <li>Ennsuring you are connected to the internet, then try restarting the app.</li>
+            <li>Ensuring you are connected to the internet, then try restarting the app.</li>
             <li>Redownloading the app.</li>
           </ul>
         </template>
