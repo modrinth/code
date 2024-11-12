@@ -6,7 +6,7 @@ COPY . .
 RUN cargo build --release
 
 
-FROM ubuntu:latest
+FROM debian:bookworm-slim
 
 LABEL org.opencontainers.image.source=https://github.com/modrinth/code
 LABEL org.opencontainers.image.description="Modrinth API"
