@@ -2,7 +2,8 @@ name: daedalus-docker-build
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - '**'
     paths:
       - .github/workflows/daedalus-docker.yml
       - 'apps/daedalus_client/**'
