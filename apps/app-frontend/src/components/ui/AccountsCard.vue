@@ -15,7 +15,7 @@
       "
     />
     <div class="flex flex-col w-full">
-      <span >{{ selectedAccount ? selectedAccount.username : 'Select account' }}</span>
+      <span>{{ selectedAccount ? selectedAccount.username : 'Select account' }}</span>
       <span class="text-secondary text-xs">Minecraft account</span>
     </div>
     <DropdownIcon class="unlocked-size w-5 h-5 shrink-0" />
@@ -101,7 +101,7 @@ defineExpose({
 })
 await refreshValues()
 
-const menuOpened = ref(false);
+const menuOpened = ref(false)
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => defaultUser.value !== account.id),
@@ -294,7 +294,10 @@ onUnmounted(() => {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.25s ease, translate 0.25s ease, scale 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    translate 0.25s ease,
+    scale 0.25s ease;
 }
 
 .fade-enter-from,

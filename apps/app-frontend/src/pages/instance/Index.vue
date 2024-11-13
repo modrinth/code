@@ -7,79 +7,71 @@
       <template #title>
         {{ instance.name }}
       </template>
-      <template #summary>
-
-      </template>
+      <template #summary> </template>
       <template #stats>
-        <div
-          class="flex items-center gap-2 font-semibold transform capitalize"
-        >
+        <div class="flex items-center gap-2 font-semibold transform capitalize">
           <GameIcon class="h-6 w-6 text-secondary" />
           {{ instance.loader }} {{ instance.game_version }}
         </div>
       </template>
       <template #actions>
-        <template v-if="instance.install_stage !== 'installed'">
-          Installing...
-        </template>
+        <template v-if="instance.install_stage !== 'installed'"> Installing... </template>
         <template v-else>
           <div class="flex gap-2">
             <ButtonStyled v-if="playing === true" color="red" size="large">
-              <button @click="stopInstance('InstancePage')" >
+              <button @click="stopInstance('InstancePage')">
                 <StopCircleIcon />
                 Stop
               </button>
             </ButtonStyled>
-            <ButtonStyled v-else-if="playing === false && loading === false" color="brand" size="large">
-              <button @click="startInstance('InstancePage')" >
+            <ButtonStyled
+              v-else-if="playing === false && loading === false"
+              color="brand"
+              size="large"
+            >
+              <button @click="startInstance('InstancePage')">
                 <PlayIcon />
                 Play
               </button>
             </ButtonStyled>
-            <div v-else-if="loading === true && playing === false">
-              Loading...
-            </div>
+            <div v-else-if="loading === true && playing === false">Loading...</div>
             <ButtonStyled size="large" circular>
-              <RouterLink v-tooltip="'Instance settings'" :to="`/instance/${encodeURIComponent(route.params.id)}/options`">
+              <RouterLink
+                v-tooltip="'Instance settings'"
+                :to="`/instance/${encodeURIComponent(route.params.id)}/options`"
+              >
                 <SettingsIcon />
               </RouterLink>
             </ButtonStyled>
             <ButtonStyled size="large" type="transparent" circular>
               <OverflowMenu
                 :options="[
-                {
-                  id: 'share-instance',
-                  action: () => {},
-                },
-                {
-                  id: 'host-a-server',
-                  action: () => {},
-                },
-                {
-                  divider: true,
-                },
-                {
-                  id: 'open-folder',
-                  action: () => showProfileInFolder(instance.path),
-                },
-                {
-                  id: 'export-mrpack',
-                  action: () => {},
-                },
-              ]">
+                  {
+                    id: 'share-instance',
+                    action: () => {},
+                  },
+                  {
+                    id: 'host-a-server',
+                    action: () => {},
+                  },
+                  {
+                    divider: true,
+                  },
+                  {
+                    id: 'open-folder',
+                    action: () => showProfileInFolder(instance.path),
+                  },
+                  {
+                    id: 'export-mrpack',
+                    action: () => {},
+                  },
+                ]"
+              >
                 <MoreVerticalIcon />
-                <template #share-instance>
-                  <UserPlusIcon /> Share instance
-                </template>
-                <template #host-a-server>
-                  <ServerIcon /> Create a server
-                </template>
-                <template #open-folder>
-                  <FolderOpenIcon /> Open folder
-                </template>
-                <template #export-mrpack>
-                  <PackageIcon /> Export modpack
-                </template>
+                <template #share-instance> <UserPlusIcon /> Share instance </template>
+                <template #host-a-server> <ServerIcon /> Create a server </template>
+                <template #open-folder> <FolderOpenIcon /> Open folder </template>
+                <template #export-mrpack> <PackageIcon /> Export modpack </template>
               </OverflowMenu>
             </ButtonStyled>
           </div>
@@ -137,7 +129,8 @@ import {
   Avatar,
   ContentPageHeader,
   ButtonStyled,
-  OverflowMenu, LoadingIndicator
+  OverflowMenu,
+  LoadingIndicator,
 } from '@modrinth/ui'
 import {
   UserPlusIcon,
@@ -198,8 +191,8 @@ const tabs = computed(() => [
   {
     label: 'Logs',
     href: `/instance/${encodeURIComponent(route.params.id)}/logs`,
-  }
-]);
+  },
+])
 
 breadcrumbs.setName(
   'Instance',
@@ -356,7 +349,9 @@ const unlistenProcesses = await process_listener((e) => {
   if (e.event === 'finished' && e.profile_path_id === route.params.id) playing.value = false
 })
 
-const icon = computed(() => instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null)
+const icon = computed(() =>
+  instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+)
 
 onUnmounted(() => {
   unlistenProcesses()

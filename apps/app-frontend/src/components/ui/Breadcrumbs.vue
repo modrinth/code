@@ -3,7 +3,12 @@
     <Button v-if="false" class="breadcrumbs__back transparent" icon-only @click="$router.back()">
       <ChevronLeftIcon />
     </Button>
-    <Button v-if="false" class="breadcrumbs__forward transparent" icon-only @click="$router.forward()">
+    <Button
+      v-if="false"
+      class="breadcrumbs__forward transparent"
+      icon-only
+      @click="$router.forward()"
+    >
       <ChevronRightIcon />
     </Button>
     {{ breadcrumbData.resetToNames(breadcrumbs) }}
@@ -20,12 +25,21 @@
             : breadcrumb.name
         }}
       </router-link>
-      <span v-else data-tauri-drag-region class="text-contrast font-semibold cursor-default select-none">{{
-        breadcrumb.name.charAt(0) === '?'
-          ? breadcrumbData.getName(breadcrumb.name.slice(1))
-          : breadcrumb.name
-      }}</span>
-      <ChevronRightIcon v-if="breadcrumb.link" data-tauri-drag-region class="unlocked-size w-5 h-5" />
+      <span
+        v-else
+        data-tauri-drag-region
+        class="text-contrast font-semibold cursor-default select-none"
+        >{{
+          breadcrumb.name.charAt(0) === '?'
+            ? breadcrumbData.getName(breadcrumb.name.slice(1))
+            : breadcrumb.name
+        }}</span
+      >
+      <ChevronRightIcon
+        v-if="breadcrumb.link"
+        data-tauri-drag-region
+        class="unlocked-size w-5 h-5"
+      />
     </template>
   </div>
 </template>

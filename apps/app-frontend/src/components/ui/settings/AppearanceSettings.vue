@@ -1,30 +1,112 @@
 <script setup lang="ts">
-import { PreviewSelectButton } from '@modrinth/ui'
+import { DropdownSelect, PreviewSelectButton, Toggle } from '@modrinth/ui'
 import { useTheming } from '@/store/state'
+import { get, set } from '@/helpers/settings'
+import { watch, ref } from 'vue'
+import { getOS } from '@/helpers/utils'
 
 const themeStore = useTheming()
 
-const emit = defineEmits(['update:theme'])
+const os = ref(await getOS())
+const settings = ref(await get())
 
-function setTheme(theme: string) {
-  emit('update:theme', theme);
-}
+watch(settings, async () => {
+  await set(settings.value)
+})
 </script>
 <template>
   <h2 class="m-0 text-2xl">Color theme</h2>
   <p class="m-0 mt-1">Select your preferred color theme for Modrinth App.</p>
 
-  <PreviewSelectButton v-for="(option, index) in themeStore.themeOptions" :key="`theme-${index}`" :checked="themeStore.selectedTheme === option" class="mt-4" @click="() => setTheme(option)">
+  <PreviewSelectButton
+    v-for="(option, index) in themeStore.themeOptions"
+    :key="`theme-${index}`"
+    :checked="themeStore.selectedTheme === option"
+    class="mt-4"
+    @click="
+      (e) => {
+        themeStore.setThemeState(e.option.toLowerCase())
+        settings.theme = themeStore.selectedTheme
+      }
+    "
+  >
     <template #preview> PREVIEW </template>
     {{ option }}
   </PreviewSelectButton>
 
-  <h2 class="m-0 mt-4 text-2xl">Accent color</h2>
-  <p class="m-0 mt-1">
-    Thank you for supporting Modrinth! You can choose to make the Modrinth App accent color purple
-    if you’d like.
-  </p>
+  <div class="mt-4 flex items-center justify-between">
+    <div>
+      <h2 class="m-0 text-2xl">Advanced rendering</h2>
+      <p class="m-0 mt-1">
+        Enables advanced rendering such as blur effects that may cause performance issues without
+        hardware-accelerated rendering.
+      </p>
+    </div>
 
-  <h2 class="m-0 mt-4 text-2xl">Feature flags</h2>
-  <p class="m-0 mt-1">Enable or disable certain features.</p>
+    <Toggle
+      id="advanced-rendering"
+      :model-value="themeStore.advancedRendering"
+      :checked="themeStore.advancedRendering"
+      @update:model-value="
+        (e) => {
+          themeStore.advancedRendering = e
+          settings.advanced_rendering = themeStore.advancedRendering
+        }
+      "
+    />
+  </div>
+
+  <div v-if="os !== 'MacOS'" class="mt-4 flex items-center justify-between gap-4">
+    <div>
+      <h2 class="m-0 mt-4 text-2xl">Native Decorations</h2>
+      <p class="m-0 mt-1">Use system window frame (app restart required).</p>
+    </div>
+    <Toggle
+      id="native-decorations"
+      :model-value="settings.native_decorations"
+      :checked="settings.native_decorations"
+      @update:model-value="
+        (e) => {
+          settings.native_decorations = e
+        }
+      "
+    />
+  </div>
+
+  <div class="mt-4 flex items-center justify-between">
+    <div>
+      <h2 class="m-0 mt-4 text-2xl">Minimize launcher</h2>
+      <p class="m-0 mt-1">Minimize the launcher when a Minecraft process starts.</p>
+    </div>
+    <Toggle
+      id="minimize-launcher"
+      :model-value="settings.hide_on_process_start"
+      :checked="settings.hide_on_process_start"
+      @update:model-value="
+        (e) => {
+          settings.hide_on_process_start = e
+        }
+      "
+    />
+  </div>
+
+  <div class="mt-4 flex items-center justify-between">
+    <div>
+      <h2 class="m-0 mt-4 text-2xl">Default landing page</h2>
+      <p class="m-0 mt-1">Change the page to which the launcher opens on.</p>
+    </div>
+    <DropdownSelect
+      id="opening-page"
+      name="Opening page dropdown"
+      :options="['Home', 'Library']"
+      :default-value="settings.default_page"
+      :model-value="settings.default_page"
+      class="opening-page"
+      @change="
+        (e) => {
+          settings.default_page = e.option
+        }
+      "
+    />
+  </div>
 </template>

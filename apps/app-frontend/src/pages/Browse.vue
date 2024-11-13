@@ -19,7 +19,7 @@ import {
   Card,
   SearchFilter,
   Avatar,
-  BrowseFiltersPanel
+  BrowseFiltersPanel,
 } from '@modrinth/ui'
 import { formatCategoryHeader, formatCategory } from '@modrinth/utils'
 import Multiselect from 'vue-multiselect'
@@ -39,7 +39,7 @@ import NavTabs from '@/components/ui/NavTabs.vue'
 const router = useRouter()
 const route = useRoute()
 
-const filterAccordions = ref([]);
+const filterAccordions = ref([])
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -56,7 +56,7 @@ const loading = ref(false)
 const query = ref('')
 const facets = ref([])
 const orFacets = ref([])
-const negativeFacets = ref([]);
+const negativeFacets = ref([])
 const selectedVersions = ref([])
 const onlyOpenSource = ref(false)
 const showSnapshots = ref(false)
@@ -113,7 +113,7 @@ if (route.query.g) {
   orFacets.value = getArrayOrString(route.query.g)
 }
 if (route.query.nf) {
-  negativeFacets.value = getArrayOrString(route.query.nf);
+  negativeFacets.value = getArrayOrString(route.query.nf)
 }
 if (route.query.v) {
   selectedVersions.value = getArrayOrString(route.query.v)
@@ -186,7 +186,7 @@ async function refreshSearch() {
     }
 
     for (const facet of negativeFacets.value) {
-      formattedFacets.push([facet.replace(":", "!=")]);
+      formattedFacets.push([facet.replace(':', '!=')])
     }
 
     // loaders specifier
@@ -335,8 +335,8 @@ function getSearchUrl(offset, useObj) {
     obj.g = orFacets.value
   }
   if (negativeFacets.value.length > 0) {
-    queryItems.push(`nf=${encodeURIComponent(negativeFacets.value)}`);
-    obj.nf = negativeFacets.value;
+    queryItems.push(`nf=${encodeURIComponent(negativeFacets.value)}`)
+    obj.nf = negativeFacets.value
   }
   if (selectedVersions.value.length > 0) {
     queryItems.push(`v=${encodeURIComponent(selectedVersions.value)}`)
@@ -537,7 +537,7 @@ const filteredLoaders = computed(() => {
 })
 
 const selectableProjectTypes = computed(() => {
-  let dataPacks, mods, modpacks;
+  let dataPacks, mods, modpacks
 
   if (instanceContext.value) {
     if (
@@ -545,16 +545,16 @@ const selectableProjectTypes = computed(() => {
         (x) => x.version === instanceContext.value.game_version,
       ) <= availableGameVersions.value.findIndex((x) => x.version === '1.13')
     ) {
-      dataPacks = true;
+      dataPacks = true
     }
 
     if (instanceContext.value.loader !== 'vanilla') {
-      mods = true;
+      mods = true
     }
   } else {
-    dataPacks = true;
-    mods = true;
-    modpacks = true;
+    dataPacks = true
+    mods = true
+    modpacks = true
   }
 
   const values = [
@@ -575,224 +575,241 @@ const showVersions = computed(
 const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.value))
 
 function filterSelected(filter) {
-  if (filter.type === "or") {
-    return orFacets.value.includes(filter.facet);
-  } else if (filter.type === "normal") {
-    return facets.value.includes(filter.facet);
-  } else if (filter.type === "env") {
-    return selectedEnvironments.value.includes(filter.name);
-  } else if (filter.type === "gameVersion") {
-    return selectedVersions.value.includes(filter.name);
-  } else if (filter.type === "license") {
-    return onlyOpenSource.value;
+  if (filter.type === 'or') {
+    return orFacets.value.includes(filter.facet)
+  } else if (filter.type === 'normal') {
+    return facets.value.includes(filter.facet)
+  } else if (filter.type === 'env') {
+    return selectedEnvironments.value.includes(filter.name)
+  } else if (filter.type === 'gameVersion') {
+    return selectedVersions.value.includes(filter.name)
+  } else if (filter.type === 'license') {
+    return onlyOpenSource.value
   }
 }
 
 function negativeFilterSelected(filter) {
-  if (filter.type === "or" || filter.type === "normal") {
-    return negativeFacets.value.includes(filter.facet);
+  if (filter.type === 'or' || filter.type === 'normal') {
+    return negativeFacets.value.includes(filter.facet)
   }
 }
 
 function toggleNegativeFilter(filter) {
-  const elementName = filter.facet;
+  const elementName = filter.facet
 
   if (filterSelected(filter)) {
-    if (filter.type === "or") {
-      const index = orFacets.value.indexOf(elementName);
-      orFacets.value.splice(index, 1);
-    } else if (filter.type === "normal") {
-      const index = facets.value.indexOf(elementName);
-      facets.value.splice(index, 1);
+    if (filter.type === 'or') {
+      const index = orFacets.value.indexOf(elementName)
+      orFacets.value.splice(index, 1)
+    } else if (filter.type === 'normal') {
+      const index = facets.value.indexOf(elementName)
+      facets.value.splice(index, 1)
     }
   }
 
-  if (filter.type === "or" || filter.type === "normal") {
-    const index = negativeFacets.value.indexOf(elementName);
+  if (filter.type === 'or' || filter.type === 'normal') {
+    const index = negativeFacets.value.indexOf(elementName)
     if (index !== -1) {
-      negativeFacets.value.splice(index, 1);
+      negativeFacets.value.splice(index, 1)
     } else {
-      negativeFacets.value.push(elementName);
+      negativeFacets.value.push(elementName)
     }
   }
 
-  onSearchChange(1);
+  onSearchChange(1)
 }
 
 function toggleFilter(filter, doNotSendRequest) {
-  const elementName = filter.facet;
+  const elementName = filter.facet
 
   if (negativeFilterSelected(filter)) {
-    const index = negativeFacets.value.indexOf(elementName);
-    negativeFacets.value.splice(index, 1);
+    const index = negativeFacets.value.indexOf(elementName)
+    negativeFacets.value.splice(index, 1)
   }
 
-  if (filter.type === "or") {
-    const index = orFacets.value.indexOf(elementName);
+  if (filter.type === 'or') {
+    const index = orFacets.value.indexOf(elementName)
     if (index !== -1) {
-      orFacets.value.splice(index, 1);
+      orFacets.value.splice(index, 1)
     } else {
-      if (elementName === "categories:purpur") {
-        if (!orFacets.value.includes("categories:paper")) {
-          orFacets.value.push("categories:paper");
+      if (elementName === 'categories:purpur') {
+        if (!orFacets.value.includes('categories:paper')) {
+          orFacets.value.push('categories:paper')
         }
-        if (!orFacets.value.includes("categories:spigot")) {
-          orFacets.value.push("categories:spigot");
+        if (!orFacets.value.includes('categories:spigot')) {
+          orFacets.value.push('categories:spigot')
         }
-        if (!orFacets.value.includes("categories:bukkit")) {
-          orFacets.value.push("categories:bukkit");
+        if (!orFacets.value.includes('categories:bukkit')) {
+          orFacets.value.push('categories:bukkit')
         }
-      } else if (elementName === "categories:paper") {
-        if (!orFacets.value.includes("categories:spigot")) {
-          orFacets.value.push("categories:spigot");
+      } else if (elementName === 'categories:paper') {
+        if (!orFacets.value.includes('categories:spigot')) {
+          orFacets.value.push('categories:spigot')
         }
-        if (!orFacets.value.includes("categories:bukkit")) {
-          orFacets.value.push("categories:bukkit");
+        if (!orFacets.value.includes('categories:bukkit')) {
+          orFacets.value.push('categories:bukkit')
         }
-      } else if (elementName === "categories:spigot") {
-        if (!orFacets.value.includes("categories:bukkit")) {
-          orFacets.value.push("categories:bukkit");
+      } else if (elementName === 'categories:spigot') {
+        if (!orFacets.value.includes('categories:bukkit')) {
+          orFacets.value.push('categories:bukkit')
         }
-      } else if (elementName === "categories:waterfall") {
-        if (!orFacets.value.includes("categories:bungeecord")) {
-          orFacets.value.push("categories:bungeecord");
+      } else if (elementName === 'categories:waterfall') {
+        if (!orFacets.value.includes('categories:bungeecord')) {
+          orFacets.value.push('categories:bungeecord')
         }
       }
-      orFacets.value.push(elementName);
+      orFacets.value.push(elementName)
     }
-  } else if (filter.type === "normal") {
-    const index = facets.value.indexOf(elementName);
+  } else if (filter.type === 'normal') {
+    const index = facets.value.indexOf(elementName)
 
     if (index !== -1) {
-      facets.value.splice(index, 1);
+      facets.value.splice(index, 1)
     } else {
-      facets.value.push(elementName);
+      facets.value.push(elementName)
     }
-  } else if (filter.type === "env") {
-    const index = selectedEnvironments.value.indexOf(filter.name);
+  } else if (filter.type === 'env') {
+    const index = selectedEnvironments.value.indexOf(filter.name)
     if (index !== -1) {
-      selectedEnvironments.value.splice(index, 1);
+      selectedEnvironments.value.splice(index, 1)
     } else {
-      selectedEnvironments.value.push(filter.name);
+      selectedEnvironments.value.push(filter.name)
     }
-  } else if (filter.type === "gameVersion") {
-    const index = selectedVersions.value.indexOf(filter.name);
+  } else if (filter.type === 'gameVersion') {
+    const index = selectedVersions.value.indexOf(filter.name)
     if (index !== -1) {
-      selectedVersions.value.splice(index, 1);
+      selectedVersions.value.splice(index, 1)
     } else {
-      selectedVersions.value.push(filter.name);
+      selectedVersions.value.push(filter.name)
     }
-  } else if (filter.type === "license") {
-    onlyOpenSource.value = !onlyOpenSource.value;
+  } else if (filter.type === 'license') {
+    onlyOpenSource.value = !onlyOpenSource.value
   }
 
   if (!doNotSendRequest) {
-    onSearchChange(1);
+    onSearchChange(1)
   }
 }
-
 </script>
 
 <template>
   <Teleport to="#sidebar-teleport-target">
-    <BrowseFiltersPanel class="border-0 border-b-[1px] last:border-b-0 border-[--brand-gradient-border] border-solid" button-class="button-animation flex p-4 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg" content-class="mb-3" :game-versions="availableGameVersions" :platforms="loaders.map((x) => ({ ...x, formatted_name: formatCategory(x.name), default: !['rift', 'liteloader', 'modloader'].includes(x.name) }))">
+    <BrowseFiltersPanel
+      class="border-0 border-b-[1px] last:border-b-0 border-[--brand-gradient-border] border-solid"
+      button-class="button-animation flex p-4 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
+      content-class="mb-3"
+      :game-versions="availableGameVersions"
+      :platforms="
+        loaders.map((x) => ({
+          ...x,
+          formatted_name: formatCategory(x.name),
+          default: !['rift', 'liteloader', 'modloader'].includes(x.name),
+        }))
+      "
+    >
       <template #header="{ filter }">
         <h3 class="text-base m-0">{{ filter.formatted_name }}</h3>
       </template>
       <template #option="{ option }">
-        <button class="px-4 py-1 flex items-center gap-2 bg-transparent border-none cursor-pointer hover:bg-button-bg w-full button-animation">
-          <div v-if="option.data.icon" class="contents text-sm text-secondary" v-html="option.data.icon" />
+        <button
+          class="px-4 py-1 flex items-center gap-2 bg-transparent border-none cursor-pointer hover:bg-button-bg w-full button-animation"
+        >
+          <div
+            v-if="option.data.icon"
+            class="contents text-sm text-secondary"
+            v-html="option.data.icon"
+          />
           <span class="font-medium text-sm text-secondary">{{ option.formatted_name }}</span>
         </button>
       </template>
     </BrowseFiltersPanel>
-<!--    <div class="p-4 border-0 border-b-[1px] border-[&#45;&#45;brand-gradient-border] border-solid">-->
-<!--      <h3 class="text-base m-0">Game version</h3>-->
-<!--    </div>-->
-<!--    <div class="p-4 border-0 border-b-[1px] border-[&#45;&#45;brand-gradient-border] border-solid">-->
-<!--      <h3 class="text-base m-0">Environment</h3>-->
-<!--    </div>-->
-<!--    <div class="p-4 border-0 border-[&#45;&#45;brand-gradient-border] border-solid">-->
-<!--      <h3 class="text-base m-0">Category</h3>-->
-<!--    </div>-->
-<!--    <template v-if="false">-->
-<!--      <div-->
-<!--        v-for="(categories, header, index) in filters"-->
-<!--        :key="header"-->
-<!--        :class="`border-0 border-b border-solid border-button-bg py-2 last:border-b-0`"-->
-<!--      >-->
-<!--        <button-->
-<!--          class="flex !w-full bg-transparent border-none px-0 py-2 font-extrabold text-contrast transition-all active:scale-[0.98]"-->
-<!--          @click="-->
-<!--              () => {-->
-<!--                filterAccordions[index].isOpen-->
-<!--                  ? filterAccordions[index].close()-->
-<!--                  : filterAccordions[index].open();-->
-<!--              }-->
-<!--            "-->
-<!--        >-->
-<!--          <template v-if="header === 'gameVersion'"> Game versions </template>-->
-<!--          <template v-else>-->
-<!--            {{ formatCategoryHeader(header) }}-->
-<!--          </template>-->
-<!--          <DropdownIcon-->
-<!--            class="ml-auto h-5 w-5 transition-transform"-->
-<!--            :class="{ 'rotate-180': filterAccordions[index]?.isOpen }"-->
-<!--          />-->
-<!--        </button>-->
-<!--        <Accordion ref="filterAccordions" :open-by-default="true">-->
-<!--          <ScrollablePanel-->
-<!--            :class="{ 'h-[18rem]': categories.length >= 8 && header === 'gameVersion' }"-->
-<!--            :no-max-height="header !== 'gameVersion'"-->
-<!--          >-->
-<!--            <div class="mr-1 flex flex-col gap-1">-->
-<!--              <div v-for="category in categories" :key="category.name" class="group flex gap-1">-->
-<!--                <button-->
-<!--                  :class="`flex !w-full border-none items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all active:scale-[0.98] ${filterSelected(category) ? 'bg-brand-highlight text-contrast hover:brightness-125' : negativeFilterSelected(category) ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg'}`"-->
-<!--                  @click="-->
-<!--                      negativeFilterSelected(category)-->
-<!--                        ? toggleNegativeFilter(category)-->
-<!--                        : toggleFilter(category)-->
-<!--                    "-->
-<!--                >-->
-<!--                  <ClientIcon v-if="category.name === 'client'" class="h-4 w-4" />-->
-<!--                  <ServerIcon v-else-if="category.name === 'server'" class="h-4 w-4" />-->
-<!--                  <div v-if="category.icon" class="h-4" v-html="category.icon" />-->
-<!--                  <span class="truncate text-sm">{{ formatCategory(category.name) }}</span>-->
-<!--                  <BanIcon-->
-<!--                    v-if="negativeFilterSelected(category)"-->
-<!--                    :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${negativeFilterSelected(category) ? '' : 'opacity-0'}`"-->
-<!--                    aria-hidden="true"-->
-<!--                  />-->
-<!--                  <CheckIcon-->
-<!--                    v-else-->
-<!--                    :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${filterSelected(category) ? '' : 'opacity-0'}`"-->
-<!--                    aria-hidden="true"-->
-<!--                  />-->
-<!--                </button>-->
-<!--                <button-->
-<!--                  v-if="-->
-<!--                      (category.type === 'or' || category.type === 'normal') &&-->
-<!--                      !negativeFilterSelected(category)-->
-<!--                    "-->
-<!--                  v-tooltip="negativeFilterSelected(category) ? 'Include' : 'Exclude'"-->
-<!--                  class="flex items-center border-none justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary opacity-0 transition-all hover:bg-button-bg hover:text-red active:scale-[0.96] group-hover:opacity-100"-->
-<!--                  @click="toggleNegativeFilter(category)"-->
-<!--                >-->
-<!--                  <BanIcon class="h-4 w-4" aria-hidden="true" />-->
-<!--                </button>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </ScrollablePanel>-->
-<!--          <Checkbox-->
-<!--            v-if="header === 'gameVersion'"-->
-<!--            v-model="showSnapshots"-->
-<!--            class="mx-2"-->
-<!--            :label="`Show all versions`"-->
-<!--          />-->
-<!--        </Accordion>-->
-<!--      </div>-->
-<!--    </template>-->
+    <!--    <div class="p-4 border-0 border-b-[1px] border-[&#45;&#45;brand-gradient-border] border-solid">-->
+    <!--      <h3 class="text-base m-0">Game version</h3>-->
+    <!--    </div>-->
+    <!--    <div class="p-4 border-0 border-b-[1px] border-[&#45;&#45;brand-gradient-border] border-solid">-->
+    <!--      <h3 class="text-base m-0">Environment</h3>-->
+    <!--    </div>-->
+    <!--    <div class="p-4 border-0 border-[&#45;&#45;brand-gradient-border] border-solid">-->
+    <!--      <h3 class="text-base m-0">Category</h3>-->
+    <!--    </div>-->
+    <!--    <template v-if="false">-->
+    <!--      <div-->
+    <!--        v-for="(categories, header, index) in filters"-->
+    <!--        :key="header"-->
+    <!--        :class="`border-0 border-b border-solid border-button-bg py-2 last:border-b-0`"-->
+    <!--      >-->
+    <!--        <button-->
+    <!--          class="flex !w-full bg-transparent border-none px-0 py-2 font-extrabold text-contrast transition-all active:scale-[0.98]"-->
+    <!--          @click="-->
+    <!--              () => {-->
+    <!--                filterAccordions[index].isOpen-->
+    <!--                  ? filterAccordions[index].close()-->
+    <!--                  : filterAccordions[index].open();-->
+    <!--              }-->
+    <!--            "-->
+    <!--        >-->
+    <!--          <template v-if="header === 'gameVersion'"> Game versions </template>-->
+    <!--          <template v-else>-->
+    <!--            {{ formatCategoryHeader(header) }}-->
+    <!--          </template>-->
+    <!--          <DropdownIcon-->
+    <!--            class="ml-auto h-5 w-5 transition-transform"-->
+    <!--            :class="{ 'rotate-180': filterAccordions[index]?.isOpen }"-->
+    <!--          />-->
+    <!--        </button>-->
+    <!--        <Accordion ref="filterAccordions" :open-by-default="true">-->
+    <!--          <ScrollablePanel-->
+    <!--            :class="{ 'h-[18rem]': categories.length >= 8 && header === 'gameVersion' }"-->
+    <!--            :no-max-height="header !== 'gameVersion'"-->
+    <!--          >-->
+    <!--            <div class="mr-1 flex flex-col gap-1">-->
+    <!--              <div v-for="category in categories" :key="category.name" class="group flex gap-1">-->
+    <!--                <button-->
+    <!--                  :class="`flex !w-full border-none items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all active:scale-[0.98] ${filterSelected(category) ? 'bg-brand-highlight text-contrast hover:brightness-125' : negativeFilterSelected(category) ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg'}`"-->
+    <!--                  @click="-->
+    <!--                      negativeFilterSelected(category)-->
+    <!--                        ? toggleNegativeFilter(category)-->
+    <!--                        : toggleFilter(category)-->
+    <!--                    "-->
+    <!--                >-->
+    <!--                  <ClientIcon v-if="category.name === 'client'" class="h-4 w-4" />-->
+    <!--                  <ServerIcon v-else-if="category.name === 'server'" class="h-4 w-4" />-->
+    <!--                  <div v-if="category.icon" class="h-4" v-html="category.icon" />-->
+    <!--                  <span class="truncate text-sm">{{ formatCategory(category.name) }}</span>-->
+    <!--                  <BanIcon-->
+    <!--                    v-if="negativeFilterSelected(category)"-->
+    <!--                    :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${negativeFilterSelected(category) ? '' : 'opacity-0'}`"-->
+    <!--                    aria-hidden="true"-->
+    <!--                  />-->
+    <!--                  <CheckIcon-->
+    <!--                    v-else-->
+    <!--                    :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${filterSelected(category) ? '' : 'opacity-0'}`"-->
+    <!--                    aria-hidden="true"-->
+    <!--                  />-->
+    <!--                </button>-->
+    <!--                <button-->
+    <!--                  v-if="-->
+    <!--                      (category.type === 'or' || category.type === 'normal') &&-->
+    <!--                      !negativeFilterSelected(category)-->
+    <!--                    "-->
+    <!--                  v-tooltip="negativeFilterSelected(category) ? 'Include' : 'Exclude'"-->
+    <!--                  class="flex items-center border-none justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary opacity-0 transition-all hover:bg-button-bg hover:text-red active:scale-[0.96] group-hover:opacity-100"-->
+    <!--                  @click="toggleNegativeFilter(category)"-->
+    <!--                >-->
+    <!--                  <BanIcon class="h-4 w-4" aria-hidden="true" />-->
+    <!--                </button>-->
+    <!--              </div>-->
+    <!--            </div>-->
+    <!--          </ScrollablePanel>-->
+    <!--          <Checkbox-->
+    <!--            v-if="header === 'gameVersion'"-->
+    <!--            v-model="showSnapshots"-->
+    <!--            class="mx-2"-->
+    <!--            :label="`Show all versions`"-->
+    <!--          />-->
+    <!--        </Accordion>-->
+    <!--      </div>-->
+    <!--    </template>-->
     <div v-if="instanceContext" class="small-instance">
       <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
         <Avatar
@@ -801,15 +818,15 @@ function toggleFilter(filter, doNotSendRequest) {
           size="sm"
         />
         <div class="small-instance_info">
-            <span class="title">{{
-                instanceContext.name.length > 20
-                  ? instanceContext.name.substring(0, 20) + '...'
-                  : instanceContext.name
-              }}</span>
+          <span class="title">{{
+            instanceContext.name.length > 20
+              ? instanceContext.name.substring(0, 20) + '...'
+              : instanceContext.name
+          }}</span>
           <span>
-              {{ instanceContext.loader.charAt(0).toUpperCase() + instanceContext.loader.slice(1) }}
-              {{ instanceContext.game_version }}
-            </span>
+            {{ instanceContext.loader.charAt(0).toUpperCase() + instanceContext.loader.slice(1) }}
+            {{ instanceContext.game_version }}
+          </span>
         </div>
       </router-link>
       <Checkbox
@@ -838,21 +855,20 @@ function toggleFilter(filter, doNotSendRequest) {
       <Button
         role="button"
         :disabled="
-            onlyOpenSource === false &&
-            selectedEnvironments.length === 0 &&
-            selectedVersions.length === 0 &&
-            facets.length === 0 &&
-            orFacets.length === 0
-          "
+          onlyOpenSource === false &&
+          selectedEnvironments.length === 0 &&
+          selectedVersions.length === 0 &&
+          facets.length === 0 &&
+          orFacets.length === 0
+        "
         @click="clearFilters"
       >
         <ClearIcon /> Clear filters
       </Button>
       <div
         v-if="
-            (isModProject && (ignoreInstanceLoaders || !instanceContext)) ||
-            projectType === 'shader'
-          "
+          (isModProject && (ignoreInstanceLoaders || !instanceContext)) || projectType === 'shader'
+        "
         class="loaders"
       >
         <h2>Loaders</h2>
@@ -873,12 +889,12 @@ function toggleFilter(filter, doNotSendRequest) {
         <multiselect
           v-model="selectedVersions"
           :options="
-              showSnapshots
-                ? availableGameVersions.map((x) => x.version)
-                : availableGameVersions
-                    .filter((it) => it.version_type === 'release')
-                    .map((x) => x.version)
-            "
+            showSnapshots
+              ? availableGameVersions.map((x) => x.version)
+              : availableGameVersions
+                  .filter((it) => it.version_type === 'release')
+                  .map((x) => x.version)
+          "
           :multiple="true"
           :searchable="true"
           :show-no-results="false"

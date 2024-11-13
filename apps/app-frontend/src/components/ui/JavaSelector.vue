@@ -187,6 +187,7 @@ async function reinstallJava() {
 
 .toggle-setting {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;

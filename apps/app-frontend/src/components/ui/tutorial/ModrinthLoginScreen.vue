@@ -1,6 +1,6 @@
 <script setup>
 import { UserIcon, LockIcon, MailIcon } from '@modrinth/assets'
-import { Button, Card, Checkbox } from '@modrinth/ui'
+import { Button, Checkbox } from '@modrinth/ui'
 import {
   DiscordIcon,
   GithubIcon,
@@ -11,7 +11,7 @@ import {
 } from '@/assets/external'
 import { login, login_2fa, create_account, login_pass } from '@/helpers/mr_auth.js'
 import { handleError, useNotifications } from '@/store/state.js'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { handleSevereError } from '@/store/error.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
@@ -130,19 +130,26 @@ async function createAccount() {
     modal.value.hide()
   }
 }
+
+const modalHeader = computed(() => {
+  if (twoFactorFlow.value) {
+    return 'Enter two-factor code'
+  } else if (loggingIn.value) {
+    return 'Login to Modrinth'
+  } else {
+    return 'Create an account'
+  }
+})
 </script>
 
 <template>
-  <ModalWrapper ref="modal" :on-hide="removeWidget">
-    <Card>
+  <ModalWrapper ref="modal" :on-hide="removeWidget" :header="modalHeader">
+    <div class="w-[25rem]">
       <template v-if="twoFactorFlow">
-        <h1>Enter two-factor code</h1>
         <p>Please enter a two-factor code to proceed.</p>
         <input v-model="twoFactorCode" maxlength="11" type="text" placeholder="Enter code..." />
       </template>
       <template v-else>
-        <h1 v-if="loggingIn">Login to Modrinth</h1>
-        <h1 v-else>Create an account</h1>
         <div class="button-grid">
           <Button class="discord" large @click="signInOauth('discord')">
             <DiscordIcon />
@@ -227,25 +234,11 @@ async function createAccount() {
           Create account
         </Button>
       </div>
-    </Card>
+    </div>
   </ModalWrapper>
 </template>
 
 <style scoped lang="scss">
-:deep(.modal-container) {
-  .modal-body {
-    width: auto;
-
-    .content {
-      background: none;
-    }
-  }
-}
-
-.card {
-  width: 25rem;
-}
-
 .button-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

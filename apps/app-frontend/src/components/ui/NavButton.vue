@@ -1,9 +1,19 @@
 <template>
   <div class="tooltip-parent flex items-center justify-center">
-    <RouterLink v-if="typeof to === 'string'" :to="to" v-bind="$attrs" class="w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast">
+    <RouterLink
+      v-if="typeof to === 'string'"
+      :to="to"
+      v-bind="$attrs"
+      class="w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast"
+    >
       <slot />
     </RouterLink>
-    <button v-else v-bind="$attrs" class="button-animation border-none cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast" @click="to">
+    <button
+      v-else
+      v-bind="$attrs"
+      class="button-animation border-none cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast"
+      @click="to"
+    >
       <slot />
     </button>
     <div class="tooltip-label">
@@ -22,7 +32,6 @@ defineProps<{
 defineOptions({
   inheritAttrs: false,
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -70,7 +79,7 @@ defineOptions({
 }
 
 .tooltip-label:not(:empty)::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   right: 100%; /* To the left of the tooltip */

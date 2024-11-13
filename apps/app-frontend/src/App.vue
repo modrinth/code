@@ -14,9 +14,10 @@ import {
   CompassIcon,
   MinimizeIcon,
   MaximizeIcon,
-  RestoreIcon
+  RestoreIcon,
+  LogOutIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Notifications } from '@modrinth/ui'
+import { Avatar, Button, ButtonStyled, Notifications, OverflowMenu } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -50,36 +51,41 @@ import { renderString } from '@modrinth/utils'
 import { useFetch } from '@/helpers/fetch.js'
 import { check } from '@tauri-apps/plugin-updater'
 import NavButton from '@/components/ui/NavButton.vue'
-import { get as getCreds } from '@/helpers/mr_auth.js'
+import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import { get_user } from '@/helpers/cache.js'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
+import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 
 const themeStore = useTheming()
 
 const news = ref([
   {
-    title: "Modrinth App 0.9.0",
-    summary: "An all-new UI, Modrinth Servers, and support for collections.",
-    thumbnail: "https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/publication/thumbnail/a49f8e1b-3835-4ea1-a85b-118c6425ebc3/landscape_1667087426098458.png",
-    date: "2024-10-11T00:00:00Z",
-    link: "https://blog.modrinth.com/p/creator-revenue-update",
+    title: 'Modrinth App 0.9.0',
+    summary: 'An all-new UI, Modrinth Servers, and support for collections.',
+    thumbnail:
+      'https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/publication/thumbnail/a49f8e1b-3835-4ea1-a85b-118c6425ebc3/landscape_1667087426098458.png',
+    date: '2024-10-11T00:00:00Z',
+    link: 'https://blog.modrinth.com/p/creator-revenue-update',
   },
   {
-    title: "Becoming Sustainable",
-    summary: "Announcing 5x creator revenue and updates to the monetization program.",
-    thumbnail: "https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/asset/file/c99b9885-8248-4d7a-b19a-3ae2c902fdd5/revenue.png",
-    date: "2024-09-13T00:00:00Z",
-    link: "https://blog.modrinth.com/p/creator-revenue-update",
+    title: 'Becoming Sustainable',
+    summary: 'Announcing 5x creator revenue and updates to the monetization program.',
+    thumbnail:
+      'https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/asset/file/c99b9885-8248-4d7a-b19a-3ae2c902fdd5/revenue.png',
+    date: '2024-09-13T00:00:00Z',
+    link: 'https://blog.modrinth.com/p/creator-revenue-update',
   },
   {
-    title: "Modrinth+ and New Ads",
-    summary: "Introducing a new advertising system, a subscription to remove ads, and a redesign of the website!\n",
-    thumbnail: "https://media.beehiiv.com/cdn-cgi/image/fit=scale-down,format=auto,onerror=redirect,quality=80/uploads/asset/file/38ce85e4-5d93-43eb-b61b-b6296f6b9e66/things.png?t=1724260059",
-    date: "2024-08-21T00:00:00Z",
-    link: "https://blog.modrinth.com/p/introducing-modrinth-refreshed-site-look-new-advertising-system",
-  }
-]);
+    title: 'Modrinth+ and New Ads',
+    summary:
+      'Introducing a new advertising system, a subscription to remove ads, and a redesign of the website!\n',
+    thumbnail:
+      'https://media.beehiiv.com/cdn-cgi/image/fit=scale-down,format=auto,onerror=redirect,quality=80/uploads/asset/file/38ce85e4-5d93-43eb-b61b-b6296f6b9e66/things.png?t=1724260059',
+    date: '2024-08-21T00:00:00Z',
+    link: 'https://blog.modrinth.com/p/introducing-modrinth-refreshed-site-look-new-advertising-system',
+  },
+])
 
 const urlModal = ref(null)
 
@@ -219,8 +225,6 @@ const modInstallModal = ref()
 const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
 
-const settingsTest = ref()
-
 const credentials = ref()
 
 async function fetchCredentials() {
@@ -231,8 +235,23 @@ async function fetchCredentials() {
   credentials.value = creds
 }
 
+async function signInAfter() {
+  await fetchCredentials()
+}
+
+async function logOut() {
+  await logout().catch(handleError)
+  await fetchCredentials()
+}
+
 const MIDAS_BITFLAG = 1 << 0
-const hasPlus = computed(() => true || credentials.value && credentials.value.user && (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG)
+const hasPlus = computed(
+  () =>
+    true ||
+    (credentials.value &&
+      credentials.value.user &&
+      (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG),
+)
 
 onMounted(() => {
   invoke('show_window')
@@ -245,7 +264,7 @@ onMounted(() => {
   install.setInstallConfirmModal(installConfirmModal)
   install.setModInstallModal(modInstallModal)
 
-  fetchCredentials();
+  fetchCredentials()
 })
 
 document.querySelector('body').addEventListener('click', function (e) {
@@ -306,7 +325,6 @@ async function handleCommand(e) {
 const updateAvailable = ref(false)
 async function checkUpdates() {
   const update = await check()
-  console.log(update)
   updateAvailable.value = !!update
 
   setTimeout(
@@ -320,7 +338,9 @@ async function checkUpdates() {
 
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
-  <AppSettingsModal ref="settingsTest" />
+  <Suspense>
+    <AppSettingsModal ref="settingsModal" />
+  </Suspense>
   <Suspense>
     <InstanceCreationModal ref="installationModal" />
   </Suspense>
@@ -330,9 +350,7 @@ async function checkUpdates() {
         <HomeIcon />
         <template #label>Home</template>
       </NavButton>
-      <NavButton
-        to="/browse/modpack"
-      >
+      <NavButton to="/browse/modpack">
         <CompassIcon />
         <template #label>Discover content</template>
       </NavButton>
@@ -346,15 +364,35 @@ async function checkUpdates() {
         <template #label>Create new instance</template>
       </NavButton>
       <div class="flex flex-grow"></div>
-      <NavButton to="/settings" @click="settingsTest.show()">
+      <NavButton v-if="updateAvailable" :to="() => restartApp()">
+        <DownloadIcon />
+        <template #label>Install update</template>
+      </NavButton>
+      <NavButton :to="() => $refs.settingsModal.show()">
         <SettingsIcon />
         <template #label>Settings</template>
       </NavButton>
-      <NavButton v-if="credentials" to="/settings">
-        <Avatar :src="credentials.user.avatar_url" :alt="credentials.user.username" size="32px" circle />
-        <template #label>User options</template>
-      </NavButton>
-      <NavButton v-else to="/settings">
+      <ButtonStyled v-if="credentials" type="transparent" circular>
+        <OverflowMenu
+          :options="[
+            {
+              id: 'sign-out',
+              action: () => logOut(),
+              color: 'danger',
+            },
+          ]"
+          direction="left"
+        >
+          <Avatar
+            :src="credentials.user.avatar_url"
+            :alt="credentials.user.username"
+            size="32px"
+            circle
+          />
+          <template #sign-out> <LogOutIcon /> Sign out </template>
+        </OverflowMenu>
+      </ButtonStyled>
+      <NavButton v-else :to="() => $refs.loginScreenModal.show()">
         <LogInIcon />
         <template #label>Sign in</template>
       </NavButton>
@@ -403,10 +441,15 @@ async function checkUpdates() {
         </template>
       </RouterView>
     </div>
-    <div class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto" :class="{ 'has-plus': hasPlus }">
-      <div class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative" :class="{ 'pb-12': !hasPlus }">
-        <div id="sidebar-teleport-target" class="sidebar-teleport-content">
-        </div>
+    <div
+      class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto"
+      :class="{ 'has-plus': hasPlus }"
+    >
+      <div
+        class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative"
+        :class="{ 'pb-12': !hasPlus }"
+      >
+        <div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
         <div class="sidebar-default-content">
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
             <h3 class="text-base m-0">Playing as</h3>
@@ -422,22 +465,41 @@ async function checkUpdates() {
           <div class="pt-4 flex flex-col">
             <h3 class="px-4 text-base m-0">News</h3>
             <template v-for="(item, index) in news" :key="`news-${index}`">
-              <a :class="`flex flex-col outline-offset-[-4px] hover:bg-[--brand-gradient-border] focus:bg-[--brand-gradient-border] px-4 transition-colors ${index === 0 ? 'pt-2 pb-4' : 'py-4'}`" :href="item.link" target="_blank" rel="external">
-                <img :src="item.thumbnail" alt="News thumbnail" aria-hidden="true" class="w-full aspect-[3/1] object-cover rounded-2xl"/>
-                <h4 class="mt-2 mb-0 text-sm leading-none text-contrast font-semibold">{{item.title}}</h4>
-                <p class="my-1 text-sm text-secondary leading-tight">{{item.summary}}</p>
-                <p class="text-right text-sm text-secondary opacity-60 leading-tight m-0"> {{ dayjs(item.date).fromNow() }}</p>
+              <a
+                :class="`flex flex-col outline-offset-[-4px] hover:bg-[--brand-gradient-border] focus:bg-[--brand-gradient-border] px-4 transition-colors ${index === 0 ? 'pt-2 pb-4' : 'py-4'}`"
+                :href="item.link"
+                target="_blank"
+                rel="external"
+              >
+                <img
+                  :src="item.thumbnail"
+                  alt="News thumbnail"
+                  aria-hidden="true"
+                  class="w-full aspect-[3/1] object-cover rounded-2xl"
+                />
+                <h4 class="mt-2 mb-0 text-sm leading-none text-contrast font-semibold">
+                  {{ item.title }}
+                </h4>
+                <p class="my-1 text-sm text-secondary leading-tight">{{ item.summary }}</p>
+                <p class="text-right text-sm text-secondary opacity-60 leading-tight m-0">
+                  {{ dayjs(item.date).fromNow() }}
+                </p>
               </a>
-              <hr v-if="index !== news.length - 1" class="h-px my-[-2px] mx-4 border-0 m-0 bg-[--brand-gradient-border]"/>
+              <hr
+                v-if="index !== news.length - 1"
+                class="h-px my-[-2px] mx-4 border-0 m-0 bg-[--brand-gradient-border]"
+              />
             </template>
           </div>
         </div>
       </div>
       <template v-if="!hasPlus">
-        <a href="https://modrinth.plus?app" class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"><ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+</a>
-        <div class="w-[300px] h-[250px] bg-white text-black p-4 shrink-0">
-          Ad!
-        </div>
+        <a
+          href="https://modrinth.plus?app"
+          class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
+          ><ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+</a
+        >
+        <div class="w-[300px] h-[250px] bg-white text-black p-4 shrink-0">Ad!</div>
       </template>
     </div>
   </div>
@@ -468,14 +530,6 @@ async function checkUpdates() {
         </div>
       </div>
       <div class="settings pages-list">
-        <button
-          v-if="updateAvailable"
-          v-tooltip="'Install update'"
-          class="btn btn-outline btn-primary icon-only collapsed-button"
-          @click="restartApp()"
-        >
-          <DownloadIcon />
-        </button>
         <Button
           v-tooltip="'Create profile'"
           class="sleek-primary collapsed-button"
@@ -503,6 +557,7 @@ async function checkUpdates() {
   <ModInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
   <InstallConfirmModal ref="installConfirmModal" />
+  <ModrinthLoginScreen ref="loginScreenModal" :callback="signInAfter" />
 </template>
 
 <style lang="scss" scoped>
@@ -811,7 +866,9 @@ async function checkUpdates() {
   bottom: -5rem;
   border-radius: var(--radius-xl);
   //box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.2) inset;
-  box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.2) inset, inset 1px 1px 1px rgba(255, 255, 255, 0.23);
+  box-shadow:
+    1px 1px 15px rgba(0, 0, 0, 0.2) inset,
+    inset 1px 1px 1px rgba(255, 255, 255, 0.23);
   pointer-events: none;
 }
 

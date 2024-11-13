@@ -772,7 +772,7 @@ a,
   box-sizing: content-box;
   min-height: 32px;
   height: 32px;
-  width: 52px;
+  min-width: 52px;
   max-width: 52px;
   border-radius: var(--radius-max);
   display: inline-block;

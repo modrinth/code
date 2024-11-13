@@ -43,11 +43,11 @@ const handleSearchContent = async () => {
     <ButtonStyled>
       <OverflowMenu
         :options="[
-        {
-          id: 'from_file',
-          action: handleAddContentFromFile,
-        },
-      ]"
+          {
+            id: 'from_file',
+            action: handleAddContentFromFile,
+          },
+        ]"
       >
         <DropdownIcon />
         <template #from_file>

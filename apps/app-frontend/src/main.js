@@ -40,13 +40,13 @@ app.use(pinia)
 app.use(FloatingVue, {
   themes: {
     'ribbit-popout': {
-      '$extend': 'dropdown',
+      $extend: 'dropdown',
       placement: 'bottom-end',
       instantMove: true,
       distance: 8,
       triggers: ['click'],
-    }
-  }
+    },
+  },
 })
 app.use(VIntlPlugin)
 

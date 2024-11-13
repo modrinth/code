@@ -1,9 +1,5 @@
 <template>
-  <PopoutMenu
-    ref="dropdown"
-    v-bind="$attrs"
-    :disabled="disabled"
-  >
+  <PopoutMenu ref="dropdown" v-bind="$attrs" :disabled="disabled">
     <slot></slot>
     <template #menu>
       <template v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)">
@@ -101,7 +97,6 @@ defineOptions({
 const dropdown = ref(null)
 
 const close = () => {
-  console.log('closing!')
   dropdown.value.hide()
 }
 </script>

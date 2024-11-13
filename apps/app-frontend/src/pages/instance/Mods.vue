@@ -1,11 +1,25 @@
 <template>
-  <div v-if="isPackLocked" class="border-2 border-solid rounded-2xl border-bg-raised p-4 flex flex-col mb-4 gap-2">
+  <div
+    v-if="isPackLocked"
+    class="border-2 border-solid rounded-2xl border-bg-raised p-4 flex flex-col mb-4 gap-2"
+  >
     <div class="flex items-center text-lg font-semibold text-contrast">
       <LockIcon class="mr-2" />
       Content locked
     </div>
-    <p class="m-0">This instance is linked to the modpack <router-link :to="{ path: `/project/${instance.linked_data.project_id}/`, query: { i: props.instance.path } }">{{ instance.name }}</router-link>. Adding or removing content may break the modpack or cause unexpected behavior.</p>
-    <p class="m-0 text-sm text-secondary">You can unlock content in this instance's settings if you know what you're doing.</p>
+    <p class="m-0">
+      This instance is linked to the modpack
+      <router-link
+        :to="{
+          path: `/project/${instance.linked_data.project_id}/`,
+          query: { i: props.instance.path },
+        }"
+        >{{ instance.name }}</router-link
+      >. Adding or removing content may break the modpack or cause unexpected behavior.
+    </p>
+    <p class="m-0 text-sm text-secondary">
+      You can unlock content in this instance's settings if you know what you're doing.
+    </p>
   </div>
   <div class="flex items-center gap-2 mb-4">
     <div class="iconified-input flex-grow">
@@ -14,7 +28,7 @@
         v-model="searchFilter"
         type="text"
         :placeholder="`Search content...`"
-        class="text-input"
+        class="text-input search-input"
         autocomplete="off"
       />
       <Button class="r-btn" @click="() => (searchFilter = '')">
@@ -25,7 +39,12 @@
   </div>
   <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
     <FilterIcon class="unlocked-size text-secondary h-5 w-5 mr-1" />
-    <button v-for="filter in filterOptions" :key="filter" :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`" @click="toggleArray(selectedFilters, filter.id)">
+    <button
+      v-for="filter in filterOptions"
+      :key="filter"
+      :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
+      @click="toggleArray(selectedFilters, filter.id)"
+    >
       {{ filter.formattedName }}
     </button>
   </div>
@@ -84,9 +103,10 @@
   </Card>
   <ContentListPanel
     v-if="projects.length > 0"
-      v-model="selectedFiles"
-      :locked="isPackLocked"
-      :items="search.map((x) => ({
+    v-model="selectedFiles"
+    :locked="isPackLocked"
+    :items="
+      search.map((x) => ({
         disabled: x.disabled,
         filename: x.file_name,
         icon: x.icon,
@@ -94,58 +114,57 @@
         creator: {
           name: x.author,
           type: 'user',
-          id: x.author ,
+          id: x.author,
           link: 'https://modrinth.com/user/' + x.author,
-          linkProps: { target: '_blank' }
+          linkProps: { target: '_blank' },
         },
         project: {
           id: x.id,
           link: { path: `/project/${x.id}/`, query: { i: props.instance.path } },
-          linkProps: {}
+          linkProps: {},
         },
         version: x.version,
         versionId: x.version,
         data: x,
-      }))"
+      }))
+    "
   >
     <template v-if="selectedProjects.length > 0" #headers>
-       <div class="flex gap-2">
-        <ButtonStyled v-if="selectedProjects.some((m) => m.outdated)" color="brand" color-fill="text" hover-color-fill="text">
+      <div class="flex gap-2">
+        <ButtonStyled
+          v-if="selectedProjects.some((m) => m.outdated)"
+          color="brand"
+          color-fill="text"
+          hover-color-fill="text"
+        >
           <button @click="updateSelected()"><DownloadIcon /> Update</button>
         </ButtonStyled>
         <ButtonStyled>
           <OverflowMenu
             :options="[
-        {
-          id: 'share-names',
-          action: () => shareNames(),
-        },
-        {
-          id: 'share-file-names',
-          action: () => shareFileNames(),
-        },
-        {
-          id: 'share-urls',
-          action: () => shareUrls(),
-        },
-        {
-          id: 'share-markdown',
-          action: () => shareMarkdown(),
-        }
-      ]">
+              {
+                id: 'share-names',
+                action: () => shareNames(),
+              },
+              {
+                id: 'share-file-names',
+                action: () => shareFileNames(),
+              },
+              {
+                id: 'share-urls',
+                action: () => shareUrls(),
+              },
+              {
+                id: 'share-markdown',
+                action: () => shareMarkdown(),
+              },
+            ]"
+          >
             <ShareIcon /> Share <DropdownIcon />
-            <template #share-names>
-              <TextInputIcon /> Project names
-            </template>
-            <template #share-file-names>
-              <FileIcon /> File names
-            </template>
-            <template #share-urls>
-              <LinkIcon /> Project links
-            </template>
-            <template #share-markdown>
-              <CodeIcon /> Markdown links
-            </template>
+            <template #share-names> <TextInputIcon /> Project names </template>
+            <template #share-file-names> <FileIcon /> File names </template>
+            <template #share-urls> <LinkIcon /> Project links </template>
+            <template #share-markdown> <CodeIcon /> Markdown links </template>
           </OverflowMenu>
         </ButtonStyled>
         <ButtonStyled v-if="selectedProjects.some((m) => m.disabled)">
@@ -160,21 +179,33 @@
       </div>
     </template>
     <template #header-actions>
-      <ButtonStyled v-if="!isPackLocked && projects.some((m) => (m as any).outdated)" type="transparent" color="brand" color-fill="text" hover-color-fill="text">
-        <button>
-          <DownloadIcon /> Update all
-        </button>
+      <ButtonStyled
+        v-if="!isPackLocked && projects.some((m) => (m as any).outdated)"
+        type="transparent"
+        color="brand"
+        color-fill="text"
+        hover-color-fill="text"
+      >
+        <button><DownloadIcon /> Update all</button>
       </ButtonStyled>
     </template>
     <template #actions="{ item }">
-      <ButtonStyled v-if="!isPackLocked && (item.data as any).outdated" type="transparent" color="brand" circular>
+      <ButtonStyled
+        v-if="!isPackLocked && (item.data as any).outdated"
+        type="transparent"
+        color="brand"
+        circular
+      >
         <button v-tooltip="`Update`" @click="updateProject(item.data)">
           <DownloadIcon />
         </button>
       </ButtonStyled>
       <div v-else class="w-[36px]"></div>
       <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
-        <button v-tooltip="item.disabled ? `Enable` : `Disable`" @click="toggleDisableMod(item.data)">
+        <button
+          v-tooltip="item.disabled ? `Enable` : `Disable`"
+          @click="toggleDisableMod(item.data)"
+        >
           <CheckCircleIcon v-if="item.disabled" />
           <SlashIcon v-else />
         </button>
@@ -200,26 +231,16 @@
               color: 'red',
               shown: !isPackLocked,
               action: () => removeMod(item),
-            }
+            },
           ]"
           direction="left"
         >
           <MoreVerticalIcon />
-          <template #show-file>
-            <ExternalIcon /> Show file
-          </template>
-          <template #copy-link>
-            <ClipboardCopyIcon /> Copy link
-          </template>
-          <template v-if="item.disabled" #toggle>
-            <CheckCircleIcon /> Enable
-          </template>
-          <template v-else #toggle>
-            <SlashIcon /> Disable
-          </template>
-          <template #remove>
-            <TrashIcon /> Remove
-          </template>
+          <template #show-file> <ExternalIcon /> Show file </template>
+          <template #copy-link> <ClipboardCopyIcon /> Copy link </template>
+          <template v-if="item.disabled" #toggle> <CheckCircleIcon /> Enable </template>
+          <template v-else #toggle> <SlashIcon /> Disable </template>
+          <template #remove> <TrashIcon /> Remove </template>
         </OverflowMenu>
       </ButtonStyled>
     </template>
@@ -525,10 +546,13 @@ import {
   AnimatedLogo,
   Avatar,
   Button,
-  Card, ButtonStyled, ContentListPanel, OverflowMenu
+  Card,
+  ButtonStyled,
+  ContentListPanel,
+  OverflowMenu,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import type { ComputedRef } from 'vue';
+import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import {
@@ -608,7 +632,9 @@ const exportModal = ref(null)
 
 const projects = ref([])
 const selectedFiles = ref([])
-const selectedProjects = computed(() => projects.value.filter((x) => selectedFiles.value.includes(x.file_name)))
+const selectedProjects = computed(() =>
+  projects.value.filter((x) => selectedFiles.value.includes(x.file_name)),
+)
 
 const selectionMap = ref(new Map())
 
@@ -711,64 +737,67 @@ await initProjects()
 const modpackVersionModal = ref(null)
 const installing = computed(() => props.instance.install_stage !== 'installed')
 
-const vintl = useVIntl();
-const { formatMessage } = vintl;
+const vintl = useVIntl()
+const { formatMessage } = vintl
 
 type FilterOption = {
-  id: string;
-  formattedName: string;
+  id: string
+  formattedName: string
 }
 
 const messages = defineMessages({
   updatesAvailableFilter: {
-    id: "instance.filter.updates-available",
-    defaultMessage: "Updates available",
+    id: 'instance.filter.updates-available',
+    defaultMessage: 'Updates available',
   },
 })
 
 const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
-  const options: FilterOption[] = [];
+  const options: FilterOption[] = []
 
   const frequency = projects.value.reduce((map, item) => {
-    map[item.project_type] = (map[item.project_type] || 0) + 1;
-    return map;
-  }, {});
+    map[item.project_type] = (map[item.project_type] || 0) + 1
+    return map
+  }, {})
 
   const types = Object.keys(frequency).sort((a, b) => frequency[b] - frequency[a])
 
-  types.forEach(type => {
+  types.forEach((type) => {
     options.push({
       id: type,
-      formattedName: formatProjectType(type) + "s"
-    });
-  });
+      formattedName: formatProjectType(type) + 's',
+    })
+  })
 
   if (!isPackLocked.value && projects.value.some((m) => m.outdated)) {
     options.push({
       id: 'updates',
-      formattedName: formatMessage(messages.updatesAvailableFilter)
-    });
+      formattedName: formatMessage(messages.updatesAvailableFilter),
+    })
   }
 
-  return options;
+  return options
 })
 
-const selectedFilters = ref([]);
+const selectedFilters = ref([])
 const filteredProjects = computed(() => {
-  const updatesFilter = selectedFilters.value.includes('updates');
+  const updatesFilter = selectedFilters.value.includes('updates')
 
-  const typeFilters = selectedFilters.value.filter(filter => filter !== 'updates');
+  const typeFilters = selectedFilters.value.filter((filter) => filter !== 'updates')
 
-  return projects.value.filter(project => {
-    return (typeFilters.length === 0 || typeFilters.includes(project.project_type)) && (!updatesFilter || project.outdated);
-  });
-});
+  return projects.value.filter((project) => {
+    return (
+      (typeFilters.length === 0 || typeFilters.includes(project.project_type)) &&
+      (!updatesFilter || project.outdated)
+    )
+  })
+})
 
 function toggleArray(array, value) {
   if (array.includes(value)) {
-    array.splice(array.indexOf(value), 1);
+    array.splice(array.indexOf(value), 1)
   } else {
-    array.push(value);
+    array.push(value)
   }
 }
 
@@ -1420,10 +1449,8 @@ onUnmounted(() => {
   margin-bottom: 5rem;
 }
 
-.iconified-input {
-  input {
-    min-height: 2.25rem;
-    background-color: var(--color-raised-bg);
-  }
+.search-input {
+  min-height: 2.25rem;
+  background-color: var(--color-raised-bg);
 }
 </style>
