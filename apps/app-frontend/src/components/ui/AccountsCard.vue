@@ -18,7 +18,7 @@
       <span>{{ selectedAccount ? selectedAccount.username : 'Select account' }}</span>
       <span class="text-secondary text-xs">Minecraft account</span>
     </div>
-    <DropdownIcon class="unlocked-size w-5 h-5 shrink-0" />
+    <DropdownIcon class="w-5 h-5 shrink-0" />
   </div>
   <transition name="fade">
     <Card

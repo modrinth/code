@@ -34,14 +34,6 @@ export default new createRouter({
       },
     },
     {
-      path: '/settings',
-      name: 'Settings',
-      component: Pages.Settings,
-      meta: {
-        breadcrumb: [{ name: 'Settings' }],
-      },
-    },
-    {
       path: '/project/:id',
       name: 'Project',
       component: Project.Index,

@@ -38,7 +38,7 @@
     <AddContentButton v-if="!isPackLocked" :instance="instance" />
   </div>
   <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
-    <FilterIcon class="unlocked-size text-secondary h-5 w-5 mr-1" />
+    <FilterIcon class="text-secondary h-5 w-5 mr-1" />
     <button
       v-for="filter in filterOptions"
       :key="filter"

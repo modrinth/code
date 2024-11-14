@@ -399,7 +399,7 @@ async function checkUpdates() {
     </div>
     <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[3.75rem] flex">
       <div data-tauri-drag-region class="flex p-4">
-        <ModrinthAppLogo class="unlocked-size h-full w-auto text-contrast pointer-events-none" />
+        <ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
         <Breadcrumbs />
       </div>
       <section class="flex ml-auto">
@@ -475,7 +475,7 @@ async function checkUpdates() {
                   :src="item.thumbnail"
                   alt="News thumbnail"
                   aria-hidden="true"
-                  class="w-full aspect-[3/1] object-cover rounded-2xl"
+                  class="w-full aspect-[3/1] object-cover rounded-2xl border-[1px] border-solid border-[--brand-gradient-border]"
                 />
                 <h4 class="mt-2 mb-0 text-sm leading-none text-contrast font-semibold">
                   {{ item.title }}
