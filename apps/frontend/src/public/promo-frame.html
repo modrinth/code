@@ -68,22 +68,22 @@
         ]);
       });
 
-      window.addEventListener(
-        "message",
-        (event) => {
-          if (event.data.modrinthAdClick && window.__TAURI_INTERNALS__) {
-            window.__TAURI_INTERNALS__.invoke("plugin:ads|record_ads_click", {});
-          }
-
-          if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__) {
-            window.__TAURI_INTERNALS__.invoke("plugin:ads|open_link", {
-              path: event.data.modrinthOpenUrl,
-              origin: event.origin,
-            });
-          }
-        },
-        false,
-      );
+      // window.addEventListener(
+      //   "message",
+      //   (event) => {
+      //     if (event.data.modrinthAdClick && window.__TAURI_INTERNALS__) {
+      //       window.__TAURI_INTERNALS__.invoke("plugin:ads|record_ads_click", {});
+      //     }
+      //
+      //     if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__) {
+      //       window.__TAURI_INTERNALS__.invoke("plugin:ads|open_link", {
+      //         path: event.data.modrinthOpenUrl,
+      //         origin: event.origin,
+      //       });
+      //     }
+      //   },
+      //   false,
+      // );
 
       window.addEventListener("mousewheel", (event) => {
         if (window.__TAURI_INTERNALS__) {
