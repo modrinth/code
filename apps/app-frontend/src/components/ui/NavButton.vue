@@ -4,6 +4,11 @@
       v-if="typeof to === 'string'"
       :to="to"
       v-bind="$attrs"
+      :class="{
+        'router-link-active': isPrimary && isPrimary(route),
+        'subpage-active': isSubpage && isSubpage(route),
+
+      }"
       class="w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast"
     >
       <slot />
@@ -11,7 +16,7 @@
     <button
       v-else
       v-bind="$attrs"
-      class="button-animation border-none cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast"
+      class="button-animation border-none text-primary cursor-pointer w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast"
       @click="to"
     >
       <slot />
@@ -23,10 +28,17 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
+import type { RouteLocationNormalizedLoaded} from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router'
+
+const route = useRoute()
+
+type RouteFunction = ((route: RouteLocationNormalizedLoaded ) => boolean);
 
 defineProps<{
   to: (() => void) | string
+  isPrimary?: RouteFunction
+  isSubpage?: RouteFunction
 }>()
 
 defineOptions({
@@ -35,12 +47,18 @@ defineOptions({
 </script>
 
 <style lang="scss" scoped>
-.router-link-active {
-  @apply text-[--selected-button-text] bg-[--selected-button-bg];
-
+.router-link-active, .subpage-active {
   svg {
     filter: drop-shadow(0 0 0.5rem black);
   }
+}
+
+.router-link-active {
+  @apply text-[--selected-button-text] bg-[--selected-button-bg];
+}
+
+.subpage-active {
+  @apply text-contrast bg-button-bg;
 }
 
 .tooltip-parent {

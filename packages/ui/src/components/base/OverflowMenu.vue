@@ -1,5 +1,5 @@
 <template>
-  <PopoutMenu ref="dropdown" v-bind="$attrs" :disabled="disabled">
+  <PopoutMenu ref="dropdown" v-bind="$attrs" :disabled="disabled" :dropdown-id="dropdownId" :tooltip="tooltip">
     <slot></slot>
     <template #menu>
       <template v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)">
@@ -28,6 +28,8 @@
           "
           :link="option.link ? option.link : null"
           :external="option.external ? option.external : false"
+          v-tooltip="option.tooltip"
+          :disabled="option.disabled"
           @click="
             () => {
               if (option.link && !option.remainOnClick) {
@@ -75,6 +77,8 @@ interface Item extends BaseOption {
   hoverFilled?: boolean
   hoverFilledOnly?: boolean
   remainOnClick?: boolean
+  disabled?: boolean
+  tooltip?: string
 }
 
 type Option = Divider | Item
@@ -83,10 +87,14 @@ const props = withDefaults(
   defineProps<{
     options: Option[]
     disabled?: boolean
+    dropdownId?: string
+    tooltip?: string
   }>(),
   {
     options: () => [],
     disabled: false,
+    dropdownId: null,
+    tooltip: null,
   },
 )
 

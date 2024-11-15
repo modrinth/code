@@ -5,7 +5,7 @@
       () => {
         emits('open')
         $router.push({
-          path: `/project/${project.project_id ?? project.id}/`,
+          path: `/project/${project.project_id ?? project.id}`,
           query: { i: props.instance ? props.instance.path : undefined },
         })
       }
@@ -52,12 +52,15 @@
             {{ dayjs(project.date_modified ?? project.updated).fromNow() }}
           </span>
         </div>
-        <div class="opacity-0 scale-95 translate-y-3 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:opacity-100 group-focus-within:scale-100 absolute bottom-0 right-0 transition-all">
+        <div class="opacity-0 scale-95 translate-y-3 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:opacity-100 group-focus-within:scale-100 absolute bottom-0 right-0 transition-all w-fit">
           <ButtonStyled color="brand">
-            <button :disabled="installed || installing" @click.stop="install()">
-              <DownloadIcon v-if="!installed" />
+            <button :disabled="installed || installing" class="shrink-0 no-wrap" @click.stop="install()">
+              <template v-if="!installed">
+                <DownloadIcon v-if="modpack || instance" />
+                <PlusIcon v-else />
+              </template>
               <CheckIcon v-else />
-              {{ installing ? 'Installing' : installed ? 'Installed' : 'Install' }}
+              {{ installing ? 'Installing' : installed ? 'Installed' : modpack || instance ? 'Install' : 'Add to an instance' }}
             </button>
           </ButtonStyled>
         </div>
@@ -67,12 +70,12 @@
 </template>
 
 <script setup>
-import { TagsIcon, DownloadIcon, HeartIcon, CalendarIcon, CheckIcon, HistoryIcon } from '@modrinth/assets'
-import { ButtonStyled, Avatar, Card, Categories, EnvironmentIndicator, Button } from '@modrinth/ui'
+import { TagsIcon, DownloadIcon, HeartIcon, PlusIcon, CheckIcon, HistoryIcon } from '@modrinth/assets'
+import { ButtonStyled, Avatar } from '@modrinth/ui'
 import { formatNumber, formatCategory } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { install as installVersion } from '@/store/install.js'
 dayjs.extend(relativeTime)
 
@@ -124,4 +127,6 @@ async function install() {
     },
   )
 }
+
+const modpack = computed(() => props.project.project_type === 'modpack')
 </script>

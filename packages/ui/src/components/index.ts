@@ -53,6 +53,13 @@ export { default as NavItem } from './nav/NavItem.vue'
 export { default as NavRow } from './nav/NavRow.vue'
 export { default as NavStack } from './nav/NavStack.vue'
 
+// Project
+export { default as ProjectHeader } from './project/ProjectHeader.vue'
+export { default as ProjectSidebarCompatibility } from './project/ProjectSidebarCompatibility.vue'
+export { default as ProjectSidebarCreators } from './project/ProjectSidebarCreators.vue'
+export { default as ProjectSidebarDetails } from './project/ProjectSidebarDetails.vue'
+export { default as ProjectSidebarLinks } from './project/ProjectSidebarLinks.vue'
+
 // Search
 export { default as BrowseFiltersPanel } from './search/BrowseFiltersPanel.vue'
 export { default as Categories } from './search/Categories.vue'

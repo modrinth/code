@@ -1,6 +1,13 @@
 <template>
-  <Dropdown theme="ribbit-popout" no-auto-focus @hide="focusTrigger" @apply-show="focusMenuChild">
-    <button ref="trigger">
+  <Dropdown
+    ref="dropdown"
+    theme="ribbit-popout"
+    no-auto-focus
+    :aria-id="dropdownId || null"
+    @hide="focusTrigger"
+    @apply-show="focusMenuChild"
+  >
+    <button ref="trigger" v-bind="$attrs" v-tooltip="tooltip">
       <slot></slot>
     </button>
     <template #popper="{ hide }">
@@ -15,10 +22,24 @@
 
 <script setup>
 import { Dropdown } from 'floating-vue'
-import { ref, onMounted, onBeforeUnmount, defineEmits, defineOptions } from 'vue'
+import { ref, defineOptions } from 'vue'
 
 const trigger = ref()
 const menu = ref()
+const dropdown = ref()
+
+defineProps({
+  dropdownId: {
+    type: String,
+    default: null,
+    required: false,
+  },
+  tooltip: {
+    type: String,
+    default: null,
+    required: false,
+  },
+})
 
 function focusMenuChild() {
   setTimeout(() => {
@@ -34,12 +55,24 @@ function hideAndFocusTrigger(hide) {
 }
 
 function focusTrigger() {
-  console.log(trigger.value)
   trigger.value.focus()
 }
 
 defineOptions({
   inheritAttrs: false,
+})
+
+function hide() {
+  dropdown.value.hide()
+}
+
+function show() {
+  dropdown.value.show()
+}
+
+defineExpose({
+  show,
+  hide,
 })
 </script>
 <style scoped>

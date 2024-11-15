@@ -26,7 +26,7 @@ const handleAddContentFromFile = async () => {
 
 const handleSearchContent = async () => {
   await router.push({
-    path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+    path: `/browse/${props.instance.loader === 'vanilla' ? 'resourcepack' : 'mod'}`,
     query: { i: props.instance.path },
   })
 }

@@ -27,7 +27,7 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
-import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
+import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { type } from '@tauri-apps/plugin-os'
@@ -345,16 +345,16 @@ async function checkUpdates() {
     <InstanceCreationModal ref="installationModal" />
   </Suspense>
   <div v-if="stateInitialized" class="app-grid-layout relative">
-    <div class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10">
+    <div class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10 w-[--left-bar-width]">
       <NavButton to="/">
         <HomeIcon />
         <template #label>Home</template>
       </NavButton>
-      <NavButton to="/browse/modpack">
+      <NavButton to="/browse/modpack" :is-primary="() => route.path.startsWith('/browse') && !route.query.i" :is-subpage="route => route.path.startsWith('/project') && !route.query.i">
         <CompassIcon />
         <template #label>Discover content</template>
       </NavButton>
-      <NavButton to="/library">
+      <NavButton to="/library" :is-subpage="() => route.path.startsWith('/instance') || ((route.path.startsWith('/browse') || route.path.startsWith('/project')) && route.query.i)">
         <LibraryIcon />
         <template #label>Library</template>
       </NavButton>
@@ -397,7 +397,7 @@ async function checkUpdates() {
         <template #label>Sign in</template>
       </NavButton>
     </div>
-    <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[3.75rem] flex">
+    <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
       <div data-tauri-drag-region class="flex p-4">
         <ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
         <Breadcrumbs />
@@ -428,11 +428,10 @@ async function checkUpdates() {
     </div>
   </div>
   <div v-if="stateInitialized" class="app-contents experimental-styles-within">
-    <div class="app-viewport flex-grow">
-      <ModrinthLoadingIndicator
-        offset-height="var(--appbar-height)"
-        offset-width="var(--sidebar-width)"
-      />
+    <div class="app-viewport flex-grow router-view">
+      <div class="loading-indicator-container h-8 fixed z-50" :style="{ top: 'calc(var(--top-bar-height))', left: 'calc(var(--left-bar-width))', width: 'calc(100% - var(--left-bar-width) - var(--right-bar-width))' }">
+        <ModrinthLoadingIndicator />
+      </div>
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
@@ -452,18 +451,18 @@ async function checkUpdates() {
         <div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
         <div class="sidebar-default-content">
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-            <h3 class="text-base m-0">Playing as</h3>
+            <h3 class="text-lg m-0">Playing as</h3>
             <suspense>
               <AccountsCard ref="accounts" mode="small" />
             </suspense>
           </div>
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-            <h3 class="text-base m-0">Friends</h3>
+            <h3 class="text-lg m-0">Friends</h3>
             <p class="m-0">you have no friends :c</p>
             <p class="m-0">what's up with that?</p>
           </div>
           <div class="pt-4 flex flex-col">
-            <h3 class="px-4 text-base m-0">News</h3>
+            <h3 class="px-4 text-lg m-0">News</h3>
             <template v-for="(item, index) in news" :key="`news-${index}`">
               <a
                 :class="`flex flex-col outline-offset-[-4px] hover:bg-[--brand-gradient-border] focus:bg-[--brand-gradient-border] px-4 transition-colors ${index === 0 ? 'pt-2 pb-4' : 'py-4'}`"
@@ -501,48 +500,6 @@ async function checkUpdates() {
         >
         <div class="w-[300px] h-[250px] bg-white text-black p-4 shrink-0">Ad!</div>
       </template>
-    </div>
-  </div>
-  <!-- TODO: remove old UI -->
-  <div class="app-container">
-    <div v-if="false" class="nav-container">
-      <div class="nav-section">
-        <suspense>
-          <AccountsCard ref="accounts" mode="small" />
-        </suspense>
-        <div class="pages-list">
-          <RouterLink v-tooltip="'Home'" to="/" class="btn icon-only collapsed-button">
-            <HomeIcon />
-          </RouterLink>
-          <RouterLink
-            v-tooltip="'Browse'"
-            to="/browse/modpack"
-            class="btn icon-only collapsed-button"
-            :class="{
-              'router-link-active': isOnBrowse,
-            }"
-          >
-            <SearchIcon />
-          </RouterLink>
-          <RouterLink v-tooltip="'Library'" to="/library" class="btn icon-only collapsed-button">
-            <LibraryIcon />
-          </RouterLink>
-        </div>
-      </div>
-      <div class="settings pages-list">
-        <Button
-          v-tooltip="'Create profile'"
-          class="sleek-primary collapsed-button"
-          icon-only
-          :disabled="offline"
-          @click="() => $refs.installationModal.show()"
-        >
-          <PlusIcon />
-        </Button>
-        <RouterLink v-tooltip="'Settings'" to="/settings" class="btn icon-only collapsed-button">
-          <SettingsIcon />
-        </RouterLink>
-      </div>
     </div>
     <div class="view">
       <div v-if="criticalErrorMessage" class="critical-error-banner" data-tauri-drag-region>
@@ -643,8 +600,6 @@ async function checkUpdates() {
 }
 
 .app-container {
-  --appbar-height: 3.25rem;
-  --sidebar-width: 4.5rem;
 
   height: 100vh;
   display: flex;
@@ -774,6 +729,12 @@ async function checkUpdates() {
   }
 }
 
+.app-grid-layout, .app-contents {
+  --top-bar-height: 3.75rem;
+  --left-bar-width: 5rem;
+  --right-bar-width: 300px;
+}
+
 .app-grid-layout {
   display: grid;
   grid-template: 'status status' 'nav dummy';
@@ -808,6 +769,11 @@ async function checkUpdates() {
   grid-template-columns: 1fr 300px;
   //grid-template-columns: 1fr 0px;
   transition: grid-template-columns 0.4s ease-in-out;
+}
+
+.loading-indicator-container {
+  border-top-left-radius: var(--radius-xl);
+  overflow: hidden;
 }
 
 .app-sidebar {

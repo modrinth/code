@@ -72,7 +72,7 @@
           </g>
         </g>
       </svg>
-      <ProgressBar class="loading-bar" :progress="loadingProgress" />
+      <ProgressBar class="loading-bar" :progress="Math.min(loadingProgress, 100)" />
       <span v-if="message">{{ message }}</span>
     </div>
     <div class="gradient-bg" data-tauri-drag-region></div>

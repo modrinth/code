@@ -65,6 +65,7 @@ export default {
           textHover: 'var(--color-button-text-hover)',
           bgActive: 'var(--color-button-bg-active)',
           textActive: 'var(--color-button-text-active)',
+          border: 'var(--color-button-border)'
         },
         toggleHandle: 'var(--color-toggle-handle)',
         dropdown: {

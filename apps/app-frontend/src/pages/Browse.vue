@@ -1,39 +1,36 @@
 <script setup>
-import { computed, nextTick, ref, readonly, shallowRef, watch, Teleport } from 'vue'
+import { computed, nextTick, readonly, ref, shallowRef, Teleport, watch } from 'vue'
 import {
   ClearIcon,
-  SearchIcon,
   ClientIcon,
+  GameIcon,
+  LeftArrowIcon,
+  SearchIcon,
   ServerIcon,
   XIcon,
-  CheckIcon,
-  BanIcon,
-  DropdownIcon,
 } from '@modrinth/assets'
 import {
-  Pagination,
-  Checkbox,
-  Button,
-  DropdownSelect,
-  NavRow,
-  Card,
-  SearchFilter,
   Avatar,
   BrowseFiltersPanel,
+  Button,
+  ButtonStyled,
+  Checkbox,
+  DropdownSelect,
+  LoadingIndicator,
+  Pagination,
+  SearchFilter,
 } from '@modrinth/ui'
-import { formatCategoryHeader, formatCategory } from '@modrinth/utils'
+import { formatCategory, formatCategoryHeader } from '@modrinth/utils'
 import Multiselect from 'vue-multiselect'
 import { handleError } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
+import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useRoute, useRouter } from 'vue-router'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { get_search_results } from '@/helpers/cache.js'
 import { debounce } from '@/helpers/utils.js'
-import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
-import AccountsCard from '@/components/ui/AccountsCard.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 
 const router = useRouter()
@@ -50,7 +47,7 @@ window.addEventListener('online', () => {
 })
 
 const breadcrumbs = useBreadcrumbs()
-breadcrumbs.setContext({ name: 'Browse', link: route.path, query: route.query })
+breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: route.query })
 
 const loading = ref(false)
 const query = ref('')
@@ -296,7 +293,7 @@ async function onSearchChange(newPageNumber) {
   // Only replace in router if the query is different
   if (JSON.stringify(obj) != JSON.stringify(route.query)) {
     await router.replace({ path: route.path, query: obj })
-    breadcrumbs.setContext({ name: 'Browse', link: route.path, query: obj })
+    breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: obj })
   }
 }
 
@@ -507,7 +504,7 @@ watch(
     if (!newType || newType === projectType.value) return
 
     projectType.value = newType
-    breadcrumbs.setContext({ name: 'Browse', link: `/browse/${projectType.value}` })
+    breadcrumbs.setContext({ name: 'Discover content', link: `/browse/${projectType.value}` })
 
     sortType.value = { display: 'Relevance', name: 'relevance' }
     query.value = ''
@@ -537,7 +534,7 @@ const filteredLoaders = computed(() => {
 })
 
 const selectableProjectTypes = computed(() => {
-  let dataPacks, mods, modpacks
+  let dataPacks = false, mods = false, modpacks = false
 
   if (instanceContext.value) {
     if (
@@ -557,15 +554,13 @@ const selectableProjectTypes = computed(() => {
     modpacks = true
   }
 
-  const values = [
+  return [
     { label: 'Modpacks', href: `/browse/modpack`, shown: modpacks },
     { label: 'Mods', href: `/browse/mod`, shown: mods },
     { label: 'Resource Packs', href: `/browse/resourcepack` },
-    { label: 'Data Packs', href: `/browse/datapack`, shown: dataPacks && false },
+    { label: 'Data Packs', href: `/browse/datapack`, shown: dataPacks },
     { label: 'Shaders', href: `/browse/shader` },
   ]
-
-  return values
 })
 
 const showVersions = computed(
@@ -694,6 +689,48 @@ function toggleFilter(filter, doNotSendRequest) {
 
 <template>
   <Teleport to="#sidebar-teleport-target">
+    <div v-if="instanceContext" class="small-instance p-4">
+      TODO: remove
+      <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
+        <Avatar
+          :src="instanceContext.icon_path ? convertFileSrc(instanceContext.icon_path) : null"
+          :alt="instanceContext.name"
+          size="sm"
+        />
+        <div class="small-instance_info">
+          <span class="title">{{
+            instanceContext.name.length > 20
+              ? instanceContext.name.substring(0, 20) + '...'
+              : instanceContext.name
+          }}</span>
+          <span>
+            {{ instanceContext.loader.charAt(0).toUpperCase() + instanceContext.loader.slice(1) }}
+            {{ instanceContext.game_version }}
+          </span>
+        </div>
+      </router-link>
+      <Checkbox
+        v-model="ignoreInstanceGameVersions"
+        label="Override game versions"
+        class="filter-checkbox"
+        @update:model-value="onSearchChangeToTop(1)"
+        @click.prevent.stop
+      />
+      <Checkbox
+        v-model="ignoreInstanceLoaders"
+        label="Override loaders"
+        class="filter-checkbox"
+        @update:model-value="onSearchChangeToTop(1)"
+        @click.prevent.stop
+      />
+      <Checkbox
+        v-model="hideAlreadyInstalled"
+        label="Hide already installed"
+        class="filter-checkbox"
+        @update:model-value="onSearchChangeToTop(1)"
+        @click.prevent.stop
+      />
+    </div>
     <BrowseFiltersPanel
       class="border-0 border-b-[1px] last:border-b-0 border-[--brand-gradient-border] border-solid"
       button-class="button-animation flex p-4 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
@@ -708,7 +745,7 @@ function toggleFilter(filter, doNotSendRequest) {
       "
     >
       <template #header="{ filter }">
-        <h3 class="text-base m-0">{{ filter.formatted_name }}</h3>
+        <h3 class="text-lg m-0">{{ filter.formatted_name }}</h3>
       </template>
       <template #option="{ option }">
         <button
@@ -724,13 +761,13 @@ function toggleFilter(filter, doNotSendRequest) {
       </template>
     </BrowseFiltersPanel>
     <!--    <div class="p-4 border-0 border-b-[1px] border-[&#45;&#45;brand-gradient-border] border-solid">-->
-    <!--      <h3 class="text-base m-0">Game version</h3>-->
+    <!--      <h3 class="text-lg m-0">Game version</h3>-->
     <!--    </div>-->
     <!--    <div class="p-4 border-0 border-b-[1px] border-[&#45;&#45;brand-gradient-border] border-solid">-->
-    <!--      <h3 class="text-base m-0">Environment</h3>-->
+    <!--      <h3 class="text-lg m-0">Environment</h3>-->
     <!--    </div>-->
     <!--    <div class="p-4 border-0 border-[&#45;&#45;brand-gradient-border] border-solid">-->
-    <!--      <h3 class="text-base m-0">Category</h3>-->
+    <!--      <h3 class="text-lg m-0">Category</h3>-->
     <!--    </div>-->
     <!--    <template v-if="false">-->
     <!--      <div-->
@@ -810,47 +847,6 @@ function toggleFilter(filter, doNotSendRequest) {
     <!--        </Accordion>-->
     <!--      </div>-->
     <!--    </template>-->
-    <div v-if="instanceContext" class="small-instance">
-      <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
-        <Avatar
-          :src="instanceContext.icon_path ? convertFileSrc(instanceContext.icon_path) : null"
-          :alt="instanceContext.name"
-          size="sm"
-        />
-        <div class="small-instance_info">
-          <span class="title">{{
-            instanceContext.name.length > 20
-              ? instanceContext.name.substring(0, 20) + '...'
-              : instanceContext.name
-          }}</span>
-          <span>
-            {{ instanceContext.loader.charAt(0).toUpperCase() + instanceContext.loader.slice(1) }}
-            {{ instanceContext.game_version }}
-          </span>
-        </div>
-      </router-link>
-      <Checkbox
-        v-model="ignoreInstanceGameVersions"
-        label="Override game versions"
-        class="filter-checkbox"
-        @update:model-value="onSearchChangeToTop(1)"
-        @click.prevent.stop
-      />
-      <Checkbox
-        v-model="ignoreInstanceLoaders"
-        label="Override loaders"
-        class="filter-checkbox"
-        @update:model-value="onSearchChangeToTop(1)"
-        @click.prevent.stop
-      />
-      <Checkbox
-        v-model="hideAlreadyInstalled"
-        label="Hide already installed"
-        class="filter-checkbox"
-        @update:model-value="onSearchChangeToTop(1)"
-        @click.prevent.stop
-      />
-    </div>
     <div v-if="false" class="search-panel-card">
       <Button
         role="button"
@@ -955,7 +951,41 @@ function toggleFilter(filter, doNotSendRequest) {
     </div>
   </Teleport>
   <div ref="searchWrapper" class="flex flex-col gap-3 p-6">
-    <h1 class="m-0 mb-1 text-2xl">Discover content</h1>
+    <template v-if="instanceContext">
+      <div
+        class="flex justify-between items-center border-0 border-b border-solid border-button-bg pb-4"
+      >
+        <router-link
+          :to="`/instance/${encodeURIComponent(instanceContext.path)}`"
+          tabindex="-1"
+          class="flex flex-col gap-4 text-primary"
+        >
+          <span class="flex items-center gap-2">
+            <Avatar
+              :src="instanceContext.icon_path ? convertFileSrc(instanceContext.icon_path) : null"
+              :alt="instanceContext.name"
+              size="48px"
+            />
+            <span class="flex flex-col gap-2">
+              <span class="font-extrabold bold text-contrast">
+                {{ instanceContext.name }}
+              </span>
+              <span class="text-secondary flex items-center gap-2 font-semibold">
+                <GameIcon class="h-5 w-5 text-secondary" />
+                {{ formatCategory(instanceContext.loader) }} {{ instanceContext.game_version }}
+              </span>
+            </span>
+          </span>
+        </router-link>
+        <ButtonStyled>
+          <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`">
+            <LeftArrowIcon /> Back to instance
+          </router-link>
+        </ButtonStyled>
+      </div>
+      <h1 class="m-0 mb-1 text-xl">Install content to instance</h1>
+    </template>
+    <h1 v-else class="m-0 mb-1 text-2xl">Discover content</h1>
     <NavTabs :links="selectableProjectTypes" />
     <div class="iconified-input">
       <SearchIcon aria-hidden="true" class="text-lg" />
@@ -1007,7 +1037,9 @@ function toggleFilter(filter, doNotSendRequest) {
       />
     </div>
     <div class="search">
-      <section v-if="loading" class="offline">Loading...</section>
+      <section v-if="loading" class="offline">
+        <LoadingIndicator />
+      </section>
       <section v-else-if="offline && results.total_hits === 0" class="offline">
         You are currently offline. Connect to the internet to browse Modrinth!
       </section>

@@ -494,6 +494,14 @@ a,
   }
 }
 
+.btn-dropdown-animation svg:last-child {
+  transition: transform 0.125s ease-in-out;
+}
+
+.v-popper--shown .btn-dropdown-animation svg:last-child {
+  transform: rotate(180deg);
+}
+
 .btn-group {
   display: flex;
   grid-gap: var(--gap-sm);
@@ -816,8 +824,8 @@ a,
 
 .v-popper--theme-tooltip {
   .v-popper__inner {
-    background: var(--color-tooltip-bg);
-    color: var(--color-tooltip-text);
+    background: var(--color-tooltip-bg)!important;
+    color: var(--color-tooltip-text)!important;
     padding: 0.5rem 0.5rem !important;
     border-radius: var(--radius-sm) !important;
     filter: drop-shadow(5px 5px 0.8rem rgba(0, 0, 0, 0.35));
@@ -1221,17 +1229,19 @@ select {
 }
 
 .v-popper__popper.v-popper__popper--show-from .v-popper__wrapper {
-  transform: scale(.9);
-  opacity: 1;
+  transform: scale(.85);
+  opacity: 0;
 }
 
 .v-popper__popper.v-popper__popper--show-to .v-popper__wrapper {
-  transform: none;
-  transition: transform 0.125s;
+  transform: scale(1);
+  opacity: 1;
+  transition: transform 0.125s ease-in-out, opacity 0.125s ease-in-out;
 }
 
 .v-popper__popper.v-popper__popper--hide-from .v-popper__wrapper {
   transform: none;
+  opacity: 1;
   transition: transform 0.0625s;
 }
 

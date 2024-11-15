@@ -1,5 +1,9 @@
 <template>
-  <span :class="'version-badge ' + color + ' type--' + type">
+  <span v-if="type === 'project-status'" class="inline-flex items-center gap-1 font-semibold text-secondary">
+    <component :is="metadata.icon" :aria-hidden="true" class="shrink-0" />
+    {{ metadata.formattedName }}
+  </span>
+  <span v-else :class="'version-badge ' + color + ' type--' + type">
     <template v-if="color"> <span class="circle" /> {{ capitalizeString(type) }}</template>
 
     <!-- User roles -->
@@ -74,7 +78,7 @@
   </span>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   ModrinthIcon,
   ScaleIcon,
@@ -88,9 +92,53 @@ import {
   CheckIcon,
   LockIcon,
   CalendarIcon,
+  GlobeIcon,
+  LinkIcon,
+  UnknownIcon,
 } from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
 import { useVIntl, defineMessages } from '@vintl/vintl'
+import type { Component, ComputedRef } from 'vue'
+import { computed } from 'vue'
+
+const statusMessages = defineMessages({
+  public: {
+    id: 'project.visibility.public',
+    defaultMessage: 'Public',
+  },
+  unlisted: {
+    id: 'project.visibility.unlisted',
+    defaultMessage: 'Unlisted',
+  },
+  unlistedByStaff: {
+    id: 'project.visibility.unlisted-by-staff',
+    defaultMessage: 'Unlisted by staff',
+  },
+  private: {
+    id: 'project.visibility.private',
+    defaultMessage: 'Private',
+  },
+  scheduled: {
+    id: 'project.visibility.scheduled',
+    defaultMessage: 'Scheduled',
+  },
+  draft: {
+    id: 'project.visibility.draft',
+    defaultMessage: 'Draft',
+  },
+  archived: {
+    id: 'project.visibility.archived',
+    defaultMessage: 'Archived',
+  },
+  underReview: {
+    id: 'project.visibility.under-review',
+    defaultMessage: 'Under review',
+  },
+  unknown: {
+    id: 'project.visibility.unknown',
+    defaultMessage: 'Unknown',
+  },
+})
 
 const messages = defineMessages({
   acceptedLabel: {
@@ -172,15 +220,95 @@ const messages = defineMessages({
 })
 const { formatMessage } = useVIntl()
 
-defineProps({
-  type: {
-    type: String,
-    required: true,
-  },
-  color: {
-    type: String,
-    default: '',
-  },
+interface LegacyProps {
+  type: string,
+  color?: string,
+}
+
+interface ProjectStatusProps {
+  type: 'project-status'
+  value:
+    | 'approved'
+    | 'unlisted'
+    | 'withheld'
+    | 'private'
+    | 'scheduled'
+    | 'draft'
+    | 'archived'
+    | 'processing'
+    | 'unknown'
+}
+
+interface BadgeMetadata {
+  icon: Component,
+  formattedName: string,
+  color?: 'brand' | 'green' | 'blue' | 'purple' | 'orange' | 'red',
+}
+
+const metadata: ComputedRef<Component> = computed(() => {
+  const unknown = {
+    icon: UnknownIcon,
+    formattedName: formatMessage(statusMessages.unknown),
+    color: 'blue',
+  }
+
+  if (props.type === 'project-status') {
+    switch (props.value) {
+      case 'approved':
+        return {
+          icon: GlobeIcon,
+          formattedName: formatMessage(statusMessages.public),
+        }
+      case 'unlisted':
+        return {
+          icon: LinkIcon,
+          formattedName: formatMessage(statusMessages.unlisted),
+        }
+      case 'withheld':
+        return {
+          icon: LinkIcon,
+          formattedName: formatMessage(statusMessages.unlistedByStaff),
+          color: 'red',
+        }
+      case 'private':
+        return {
+          icon: LockIcon,
+          formattedName: formatMessage(statusMessages.private),
+        }
+      case 'scheduled':
+        return {
+          icon: CalendarIcon,
+          formattedName: formatMessage(statusMessages.scheduled),
+        }
+      case 'draft':
+        return {
+          icon: FileTextIcon,
+          formattedName: formatMessage(statusMessages.draft),
+        }
+      case 'archived':
+        return {
+          icon: ArchiveIcon,
+          formattedName: formatMessage(statusMessages.archived),
+        }
+      case 'processing':
+        return {
+          icon: UpdatedIcon,
+          formattedName: formatMessage(statusMessages.underReview),
+          color: 'orange',
+        }
+      default:
+        return unknown
+    }
+  } else {
+    return unknown
+  }
+})
+
+type Props = LegacyProps | ProjectStatusProps
+
+const props = withDefaults(defineProps<Props>(), {
+  type: undefined,
+  color: '',
 })
 </script>
 <style lang="scss" scoped>

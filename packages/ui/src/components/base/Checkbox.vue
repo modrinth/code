@@ -35,7 +35,7 @@ const props = withDefaults(
   defineProps<{
     label?: string
     disabled?: boolean
-    description: string
+    description?: string
     modelValue: boolean
     clickEvent?: () => void
     collapsingToggleStyle?: boolean

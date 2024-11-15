@@ -56,6 +56,8 @@
 
   --selected-button-bg: var(--color-brand);
   --selected-button-text: var(--color-accent-contrast);
+
+  --loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #00af5c 100%);
 }
 
 html {
@@ -139,6 +141,8 @@ html {
 
   --selected-button-bg: var(--color-brand-highlight);
   --selected-button-text: var(--color-brand);
+
+  --loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #1ffa9a 100%);
 }
 
 .oled-mode {
@@ -183,57 +187,78 @@ html {
   --color-link-active: var(--color-blue) !important; // DEPRECATED, use filters in future
 }
 
+.light-experiments {
+  --color-bg: #ebebeb;
+  --color-raised-bg: #ffffff;
+  --color-button-bg: #f5f5f5;
+  --color-base: #2c2e31;
+  --color-secondary: #484d54;
+  --color-accent-contrast: #ffffff;
+
+  --color-platform-fabric: #8a7b71;
+  --color-platform-quilt: #8b61b4;
+  --color-platform-forge: #5b6197;
+  --color-platform-neoforge: #dc895c;
+  --color-platform-liteloader: #4c90de;
+  --color-platform-bukkit: #e78362;
+  --color-platform-bungeecord: #c69e39;
+  --color-platform-folia: #6aa54f;
+  --color-platform-paper: #e67e7e;
+  --color-platform-purpur: #7763a3;
+  --color-platform-spigot: #cd7a21;
+  --color-platform-velocity: #4b98b0;
+  --color-platform-waterfall: #5f83cb;
+  --color-platform-sponge: #c49528;
+
+  --color-button-border: rgba(161, 161, 161, 0.35);
+}
+
 .light-mode,
 .light {
   .experimental-styles-within,
   &.experimental-styles-within {
-    --color-bg: #ebebeb;
-    --color-raised-bg: #ffffff;
-    --color-button-bg: #f5f5f5;
-    --color-base: #2c2e31;
-    --color-secondary: #484d54;
-    --color-accent-contrast: #ffffff;
-
-    --color-platform-fabric: #8a7b71;
-    --color-platform-quilt: #8b61b4;
-    --color-platform-forge: #5b6197;
-    --color-platform-neoforge: #dc895c;
-    --color-platform-liteloader: #4c90de;
-    --color-platform-bukkit: #e78362;
-    --color-platform-bungeecord: #c69e39;
-    --color-platform-folia: #6aa54f;
-    --color-platform-paper: #e67e7e;
-    --color-platform-purpur: #7763a3;
-    --color-platform-spigot: #cd7a21;
-    --color-platform-velocity: #4b98b0;
-    --color-platform-waterfall: #5f83cb;
-    --color-platform-sponge: #c49528;
-
-    --color-button-border: rgba(161, 161, 161, 0.35);
+    @extend .light-experiments;
   }
+}
+
+.experimental-styles-within {
+  .light-mode,
+  .light {
+    @extend .light-experiments;
+  }
+}
+
+.dark-experiments {
+  --color-button-bg: #33363d;
+
+  --color-platform-fabric: #dbb69b;
+  --color-platform-quilt: #c796f9;
+  --color-platform-forge: #959eef;
+  --color-platform-neoforge: #f99e6b;
+  --color-platform-liteloader: #7ab0ee;
+  --color-platform-bukkit: #f6af7b;
+  --color-platform-bungeecord: #d2c080;
+  --color-platform-folia: #a5e388;
+  --color-platform-paper: #eeaaaa;
+  --color-platform-purpur: #c3abf7;
+  --color-platform-spigot: #f1cc84;
+  --color-platform-velocity: #83d5ef;
+  --color-platform-waterfall: #78a4fb;
+  --color-platform-sponge: #f9e580;
+
+  --color-button-border: rgba(193, 190, 209, 0.12);
 }
 
 .dark-mode,
 .dark {
   .experimental-styles-within,
   &.experimental-styles-within {
-    --color-button-bg: #33363d;
+    @extend .dark-experiments;
+  }
+}
 
-    --color-platform-fabric: #dbb69b;
-    --color-platform-quilt: #c796f9;
-    --color-platform-forge: #959eef;
-    --color-platform-neoforge: #f99e6b;
-    --color-platform-liteloader: #7ab0ee;
-    --color-platform-bukkit: #f6af7b;
-    --color-platform-bungeecord: #d2c080;
-    --color-platform-folia: #a5e388;
-    --color-platform-paper: #eeaaaa;
-    --color-platform-purpur: #c3abf7;
-    --color-platform-spigot: #f1cc84;
-    --color-platform-velocity: #83d5ef;
-    --color-platform-waterfall: #78a4fb;
-    --color-platform-sponge: #f9e580;
-
-    --color-button-border: rgba(193, 190, 209, 0.12);
+.experimental-styles-within {
+  .dark-mode, .dark {
+    @extend .dark-experiments;
   }
 }

@@ -186,7 +186,7 @@ const instance = ref(await get(route.params.id).catch(handleError))
 const tabs = computed(() => [
   {
     label: 'Content',
-    href: `/instance/${encodeURIComponent(route.params.id)}/`,
+    href: `/instance/${encodeURIComponent(route.params.id)}`,
   },
   {
     label: 'Logs',

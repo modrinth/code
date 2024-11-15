@@ -229,6 +229,7 @@
             class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
             position="bottom"
             direction="left"
+            :dropdown-id="createPopoutId"
             aria-label="Create new..."
             :options="[
               {
@@ -260,6 +261,7 @@
         </ButtonStyled>
         <OverflowMenu
           v-if="auth.user"
+          :dropdown-id="userPopoutId"
           class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
           :options="userMenuOptions"
         >
@@ -613,6 +615,9 @@ const flags = useFeatureFlags();
 const config = useRuntimeConfig();
 const route = useNativeRoute();
 const link = config.public.siteUrl + route.path.replace(/\/+$/, "");
+
+const createPopoutId = useId();
+const userPopoutId = useId();
 
 const verifyEmailBannerMessages = defineMessages({
   title: {

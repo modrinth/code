@@ -21,6 +21,7 @@
       You can unlock content in this instance's settings if you know what you're doing.
     </p>
   </div>
+  <template v-if="projects.length > 0">
   <div class="flex items-center gap-2 mb-4">
     <div class="iconified-input flex-grow">
       <SearchIcon />
@@ -48,61 +49,7 @@
       {{ filter.formattedName }}
     </button>
   </div>
-  <Card v-if="false && projects.length > 0" class="mod-card">
-    <div class="dropdown-input">
-      <DropdownSelect
-        v-model="selectedProjectType"
-        :options="Object.keys(selectableProjectTypes)"
-        default-value="All"
-        name="project-type-dropdown"
-        color="primary"
-      />
-      <div class="iconified-input">
-        <SearchIcon />
-        <input
-          v-model="searchFilter"
-          type="text"
-          :placeholder="`Search ${search.length} ${(['All', 'Other'].includes(selectedProjectType)
-            ? 'projects'
-            : selectedProjectType.toLowerCase()
-          ).slice(0, search.length === 1 ? -1 : 64)}...`"
-          class="text-input"
-          autocomplete="off"
-        />
-        <Button class="r-btn" @click="() => (searchFilter = '')">
-          <XIcon />
-        </Button>
-      </div>
-    </div>
-    <Button
-      v-tooltip="'Refresh projects'"
-      icon-only
-      :disabled="refreshingProjects"
-      @click="refreshProjects"
-    >
-      <UpdatedIcon />
-    </Button>
-    <Button
-      v-if="canUpdatePack"
-      :disabled="installing"
-      color="secondary"
-      @click="modpackVersionModal.show()"
-    >
-      <DownloadIcon />
-      {{ installing ? 'Updating' : 'Update modpack' }}
-    </Button>
-    <Button v-else-if="!isPackLocked" @click="exportModal.show()">
-      <PackageIcon />
-      Export modpack
-    </Button>
-    <Button v-if="!isPackLocked && projects.some((m) => m.outdated)" @click="updateAll">
-      <DownloadIcon />
-      Update all
-    </Button>
-    <AddContentButton v-if="!isPackLocked" :instance="instance" />
-  </Card>
   <ContentListPanel
-    v-if="projects.length > 0"
     v-model="selectedFiles"
     :locked="isPackLocked"
     :items="
@@ -245,6 +192,19 @@
       </ButtonStyled>
     </template>
   </ContentListPanel>
+</template>
+  <div v-else class="w-full flex flex-col items-center justify-center mt-6 max-w-[48rem] mx-auto">
+    <div class="top-box w-full">
+      <div class="flex items-center gap-6 w-[32rem] mx-auto">
+        <img src="@/assets/sad-modrinth-bot.webp" class="h-24" />
+        <span class="text-contrast font-bold text-xl">You haven't added any content to this instance yet.</span>
+      </div>
+    </div>
+    <div class="top-box-divider"></div>
+    <div class="flex items-center gap-6 py-4">
+      <AddContentButton v-if="!isPackLocked" :instance="instance" />
+    </div>
+  </div>
   <div v-if="false && projects.length > 0" class="table bg-bg-raised">
     <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
       <div class="table-cell table-text">
@@ -517,6 +477,7 @@
 </template>
 <script setup lang="ts">
 import {
+  PlusIcon,
   ExternalIcon,
   LinkIcon,
   LockIcon,
@@ -1452,5 +1413,16 @@ onUnmounted(() => {
 .search-input {
   min-height: 2.25rem;
   background-color: var(--color-raised-bg);
+}
+
+.top-box {
+  background-image: radial-gradient(50% 100% at 50% 100%, var(--color-brand-highlight) 10%, #FFFFFF00 100%);
+}
+
+.top-box-divider {
+  background-image: linear-gradient(90deg, #FFFFFF00 0%, var(--color-brand) 50%, #FFFFFF00 100%);
+  width: 100%;
+  height: 1px;
+  opacity: 0.8;
 }
 </style>

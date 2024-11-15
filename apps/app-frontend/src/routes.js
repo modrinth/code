@@ -19,10 +19,10 @@ export default new createRouter({
     },
     {
       path: '/browse/:projectType',
-      name: 'Browse',
+      name: 'Discover content',
       component: Pages.Browse,
       meta: {
-        breadcrumb: [{ name: 'Browse' }],
+        breadcrumb: [{ name: 'Discover content' }],
       },
     },
     {
