@@ -4,34 +4,35 @@
     :header="
       isSecondPhase
         ? 'Confirming reinstallation'
-        : `Selecting
-      ${selectedLoader.toLowerCase() === 'vanilla' ? 'Minecraft' : selectedLoader}
-    version`
+        : `Installing
+      ${selectedLoader.toLowerCase() === 'vanilla' ? 'Minecraft' : selectedLoader}`
     "
     @hide="onHide"
     @show="onShow"
   >
     <div class="flex flex-col gap-4 md:w-[600px]">
       <p
+        v-if="isSecondPhase"
         :style="{
           lineHeight: isSecondPhase ? '1.5' : undefined,
           marginBottom: isSecondPhase ? '-12px' : '0',
           marginTop: isSecondPhase ? '-4px' : '-2px',
         }"
       >
-        {{
-          isSecondPhase
-            ? "This will reinstall your server and erase all data. You may want to back up your server before proceeding. Are you sure you want to continue?"
-            : "Choose the Minecraft version."
-        }}
+        This will reinstall your server and erase all data. You may want to back up your server
+        before proceeding. Are you sure you want to continue?
       </p>
-      <div v-if="!isSecondPhase" class="flex flex-col gap-2">
-        <UiServersTeleportDropdownMenu
-          v-model="selectedMCVersion"
-          name="mcVersion"
-          :options="mcVersions"
-          placeholder="Select Minecraft version..."
-        />
+      <div v-if="!isSecondPhase" class="flex flex-col gap-4">
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="text-sm font-bold text-contrast">Minecraft version</div>
+          <UiServersTeleportDropdownMenu
+            v-model="selectedMCVersion"
+            name="mcVersion"
+            :options="mcVersions"
+            class="w-full max-w-[100%]"
+            placeholder="Select Minecraft version..."
+          />
+        </div>
 
         <div
           v-if="
@@ -39,34 +40,44 @@
             selectedLoader.toLowerCase() !== 'vanilla' &&
             selectedLoaderVersions.length > 0
           "
-          class="mt-2"
+          class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4"
         >
-          Choose the {{ selectedLoader }} version.
+          <div class="text-sm font-bold text-contrast">{{ selectedLoader }} version</div>
+          <UiServersTeleportDropdownMenu
+            v-model="selectedLoaderVersion"
+            name="loaderVersion"
+            :options="selectedLoaderVersions"
+            class="w-full max-w-[100%]"
+            :placeholder="
+              selectedLoader.toLowerCase() === 'paper' || selectedLoader.toLowerCase() === 'purpur'
+                ? `Select build number...`
+                : `Select loader version...`
+            "
+          />
         </div>
-        <UiServersTeleportDropdownMenu
+
+        <div
           v-if="
             selectedMCVersion &&
             selectedLoader.toLowerCase() !== 'vanilla' &&
             selectedLoaderVersions.length > 0
           "
-          v-model="selectedLoaderVersion"
-          name="loaderVersion"
-          :options="selectedLoaderVersions"
-          :placeholder="
-            selectedLoader.toLowerCase() === 'paper' || selectedLoader.toLowerCase() === 'purpur'
-              ? `Select build number...`
-              : `Select loader version...`
-          "
-        />
-        <div class="mt-2 flex items-center gap-2">
-          <input
-            id="hard-reset"
-            :checked="hardReset"
-            class="switch stylized-toggle"
-            type="checkbox"
-            @change="hardReset = ($event.target as HTMLInputElement).checked"
-          />
-          <label for="hard-reset">Erase all data</label>
+          class="flex w-full flex-col gap-4 rounded-2xl bg-table-alternateRow p-4"
+        >
+          <div class="flex w-full flex-row items-center justify-between">
+            <label class="w-full font-bold text-contrast" for="hard-reset">Erase all data</label>
+            <input
+              id="hard-reset"
+              :checked="hardReset"
+              class="switch stylized-toggle shrink-0"
+              type="checkbox"
+              @change="hardReset = ($event.target as HTMLInputElement).checked"
+            />
+          </div>
+          <div>
+            Removes all data on your server, including your worlds, mods, and configuration files,
+            then reinstalls it with the selected version.
+          </div>
         </div>
       </div>
       <div class="mt-4 flex justify-start gap-4">
