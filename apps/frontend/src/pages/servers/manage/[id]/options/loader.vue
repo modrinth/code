@@ -243,7 +243,7 @@
             <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
               Your server was installed from a modpack, which automatically chooses the appropriate
-              mod loader.
+              platform.
             </span>
           </div>
         </div>
