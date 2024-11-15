@@ -1,11 +1,13 @@
 <template>
-  <NewModal ref="editModal" header="Select modpack">
-    <UiServersProjectSelect type="modpack" @select="reinstallNew" />
-  </NewModal>
-
   <NewModal
     ref="versionSelectModal"
-    :header="isSecondPhase ? 'Confirm reinstallation' : 'Select version'"
+    :header="
+      isSecondPhase
+        ? 'Confirming reinstallation'
+        : `Selecting
+      ${selectedLoader.toLowerCase() === 'vanilla' ? 'Minecraft' : selectedLoader}
+    version`
+    "
     @hide="onHide"
     @show="onShow"
   >
@@ -20,7 +22,7 @@
         {{
           isSecondPhase
             ? "This will reinstall your server and erase all data. You may want to back up your server before proceeding. Are you sure you want to continue?"
-            : "Choose the version of Minecraft you want to use for this server."
+            : "Choose the Minecraft version."
         }}
       </p>
       <div v-if="!isSecondPhase" class="flex flex-col gap-2">
@@ -30,12 +32,31 @@
           :options="mcVersions"
           placeholder="Select Minecraft version..."
         />
+
+        <div
+          v-if="
+            selectedMCVersion &&
+            selectedLoader.toLowerCase() !== 'vanilla' &&
+            selectedLoaderVersions.length > 0
+          "
+          class="mt-2"
+        >
+          Choose the {{ selectedLoader }} version.
+        </div>
         <UiServersTeleportDropdownMenu
-          v-if="selectedMCVersion && selectedLoader.toLowerCase() !== 'vanilla'"
+          v-if="
+            selectedMCVersion &&
+            selectedLoader.toLowerCase() !== 'vanilla' &&
+            selectedLoaderVersions.length > 0
+          "
           v-model="selectedLoaderVersion"
           name="loaderVersion"
           :options="selectedLoaderVersions"
-          placeholder="Select loader version..."
+          :placeholder="
+            selectedLoader.toLowerCase() === 'paper' || selectedLoader.toLowerCase() === 'purpur'
+              ? `Select build number...`
+              : `Select loader version...`
+          "
         />
         <div class="mt-2 flex items-center gap-2">
           <input
@@ -45,7 +66,7 @@
             type="checkbox"
             @change="hardReset = ($event.target as HTMLInputElement).checked"
           />
-          <label for="hard-reset">Clean reinstall</label>
+          <label for="hard-reset">Erase all data</label>
         </div>
       </div>
       <div class="mt-4 flex justify-start gap-4">
@@ -75,14 +96,14 @@
             "
           >
             <XIcon />
-            {{ isSecondPhase ? "No" : "Cancel" }}
+            {{ isSecondPhase ? "Go back" : "Cancel" }}
           </button>
         </ButtonStyled>
       </div>
     </div>
   </NewModal>
 
-  <NewModal ref="mrpackModal" header="Upload mrpack" @hide="onHide" @show="onShow">
+  <NewModal ref="mrpackModal" header="Uploading mrpack" @hide="onHide" @show="onShow">
     <div>
       <div class="mt-2 flex items-center gap-2">
         <input
@@ -92,7 +113,7 @@
           type="checkbox"
           @change="hardReset = ($event.target as HTMLInputElement).checked"
         />
-        <label for="hard-reset">Clean reinstall</label>
+        <label for="hard-reset">Erase all data</label>
       </div>
       <input
         type="file"
@@ -199,7 +220,7 @@
         <div v-else class="flex w-full flex-col items-center gap-2 sm:w-fit sm:flex-row">
           <ButtonStyled>
             <nuxt-link class="!w-full sm:!w-auto" :to="`/modpacks?sid=${props.server.serverId}`">
-              <DownloadIcon class="size-4" /> Install a modpack
+              <CompassIcon class="size-4" /> Find a modpack
             </nuxt-link>
           </ButtonStyled>
           <span class="hidden sm:block">or</span>
@@ -213,8 +234,11 @@
 
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-lg font-bold text-contrast">Mod loader</h2>
-          <p class="m-0">Mod loaders allow you to run mods on your server.</p>
+          <h2 class="m-0 text-lg font-bold text-contrast">Platform</h2>
+          <p class="m-0">
+            Your server's platform is the software that runs your server. Different platforms
+            support different mods and plugins.
+          </p>
           <div v-if="data.upstream" class="mt-2 flex items-center gap-2">
             <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
@@ -224,7 +248,7 @@
           </div>
         </div>
         <div
-          class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2"
+          class="flex w-full flex-col gap-1 rounded-2xl"
           :class="{
             'pointer-events-none cursor-not-allowed select-none opacity-50':
               props.server.general?.status === 'installing' && isError,
@@ -249,6 +273,7 @@ import {
   InfoIcon,
   RightArrowIcon,
   XIcon,
+  CompassIcon,
 } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
@@ -311,7 +336,6 @@ const loaderVersions = (await Promise.all(
   }[]
 >;
 
-const editModal = ref();
 const versionSelectModal = ref();
 const mrpackModal = ref();
 
@@ -343,27 +367,37 @@ const mcVersions = tags.value.gameVersions
   });
 
 const selectedLoaderVersions = computed(() => {
-  /*
-      loaderVersions[
-      selectedLoader.value.toLowerCase() === "neoforge" ? "neo" : selectedLoader.toLowerCase()
-    ]
-      .find((x) => x.id === selectedMCVersion)
-      ?.loaders.map((x) => x.id) || []
-      */
-  let loader = selectedLoader.value.toLowerCase();
-  if (loader === "neoforge") {
-    loader = "neo";
+  const loader = selectedLoader.value.toLowerCase();
+
+  if (loader === "paper") {
+    return paperVersions.value[selectedMCVersion.value] || [];
   }
-  const backwardsCompatibleVersion = loaderVersions[loader].find(
+
+  if (loader === "purpur") {
+    return purpurVersions.value[selectedMCVersion.value] || [];
+  }
+
+  if (loader === "vanilla") {
+    return [];
+  }
+
+  let apiLoader = loader;
+  if (loader === "neoforge") {
+    apiLoader = "neo";
+  }
+
+  const backwardsCompatibleVersion = loaderVersions[apiLoader]?.find(
     // eslint-disable-next-line no-template-curly-in-string
     (x) => x.id === "${modrinth.gameVersion}",
   );
+
   if (backwardsCompatibleVersion) {
     return backwardsCompatibleVersion.loaders.map((x) => x.id);
   }
+
   return (
-    loaderVersions[loader]
-      .find((x) => x.id === selectedMCVersion.value)
+    loaderVersions[apiLoader]
+      ?.find((x) => x.id === selectedMCVersion.value)
       ?.loaders.map((x) => x.id) || []
   );
 });
@@ -409,6 +443,31 @@ const updateData = async () => {
 };
 updateData();
 
+const paperVersions = ref<Record<string, number[]>>({});
+const purpurVersions = ref<Record<string, string[]>>({});
+
+const fetchPaperVersions = async (mcVersion: string) => {
+  try {
+    const res = await $fetch(`https://api.papermc.io/v2/projects/paper/versions/${mcVersion}`);
+    paperVersions.value[mcVersion] = (res as any).builds;
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+const fetchPurpurVersions = async (mcVersion: string) => {
+  try {
+    const res = await $fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`);
+    purpurVersions.value[mcVersion] = (res as any).builds.all;
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 const selectLoader = (loader: string) => {
   selectedLoader.value = loader;
   versionSelectModal.value.show();
@@ -421,25 +480,44 @@ const cachedVersions: Record<string, any> = {};
 
 watch(selectedMCVersion, async () => {
   if (selectedMCVersion.value.trim().length < 3) return;
-  // const res = await fetch(
-  //   `/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`,
-  // ).then((r) => r.json());
 
   loadingServerCheck.value = true;
-  const res =
+
+  // Check if Minecraft version exists
+  const mcRes =
     cachedVersions[selectedMCVersion.value] ||
     (await $fetch(`/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`));
 
-  cachedVersions[selectedMCVersion.value] = res;
+  cachedVersions[selectedMCVersion.value] = mcRes;
 
-  loadingServerCheck.value = false;
-
-  if (res.downloads.server) {
-    serverCheckError.value = "";
-  } else {
+  if (!mcRes.downloads?.server) {
     serverCheckError.value =
       "We couldn't find a server.jar for this version. Please pick another one.";
+    loadingServerCheck.value = false;
+    return;
   }
+
+  // Fetch Paper/Purpur versions if needed
+  if (selectedLoader.value.toLowerCase() === "paper") {
+    const paperRes = await fetchPaperVersions(selectedMCVersion.value);
+    if (!paperRes) {
+      serverCheckError.value = "This Minecraft version is not supported by Paper.";
+      loadingServerCheck.value = false;
+      return;
+    }
+  }
+
+  if (selectedLoader.value.toLowerCase() === "purpur") {
+    const purpurRes = await fetchPurpurVersions(selectedMCVersion.value);
+    if (!purpurRes) {
+      serverCheckError.value = "This Minecraft version is not supported by Purpur.";
+      loadingServerCheck.value = false;
+      return;
+    }
+  }
+
+  serverCheckError.value = "";
+  loadingServerCheck.value = false;
 });
 
 const onShow = () => {
@@ -548,24 +626,6 @@ const handleReinstall = async () => {
   } finally {
     isLoading.value = false;
     versionSelectModal.value.hide();
-  }
-};
-
-const reinstallNew = async (project: any, versionNumber: string) => {
-  editModal.value.hide();
-  try {
-    const versions = (await useBaseFetch(`project/${project.project_id}/version`)) as any;
-    const version = versions.find((x: any) => x.version_number === versionNumber);
-
-    if (!version?.id) {
-      throw new Error("Version not found");
-    }
-    await props.server.general?.reinstall(serverId, false, project.project_id, version.id);
-    emit("reinstall");
-    await nextTick();
-    window.scrollTo(0, 0);
-  } catch (error) {
-    handleReinstallError(error);
   }
 };
 
