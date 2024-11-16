@@ -1,8 +1,8 @@
-use std::collections::HashMap;
 use crate::routes::ApiError;
 use crate::util::env::parse_var;
 use actix_web::HttpRequest;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 pub async fn check_hcaptcha(
     req: &HttpRequest,
