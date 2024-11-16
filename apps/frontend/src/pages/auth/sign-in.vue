@@ -81,12 +81,7 @@
           />
         </div>
 
-        <NuxtTurnstile
-          ref="turnstile"
-          v-model="token"
-          class="turnstile"
-          :options="{ theme: $theme.active === 'light' ? 'light' : 'dark' }"
-        />
+        <HCaptcha ref="captcha" v-model="token" />
 
         <button
           class="btn btn-primary continue-btn centered-btn"
@@ -127,6 +122,7 @@ import {
   KeyIcon,
   MailIcon,
 } from "@modrinth/assets";
+import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -189,7 +185,7 @@ if (auth.value.user) {
   await finishSignIn();
 }
 
-const turnstile = ref();
+const captcha = ref();
 
 const email = ref("");
 const password = ref("");
@@ -225,7 +221,7 @@ async function beginPasswordSignIn() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }
@@ -250,7 +246,7 @@ async function begin2FASignIn() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }

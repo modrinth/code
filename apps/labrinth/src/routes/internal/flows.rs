@@ -12,7 +12,7 @@ use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
 use crate::routes::internal::session::issue_session;
 use crate::routes::ApiError;
-use crate::util::captcha::check_turnstile_captcha;
+use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
@@ -1468,8 +1468,6 @@ pub struct NewAccount {
     pub sign_up_newsletter: Option<bool>,
 }
 
-const NEW_ACCOUNT_LIMITER_NAMESPACE: &str = "new_account_ips";
-
 #[post("create")]
 pub async fn create_account_with_password(
     req: HttpRequest,
@@ -1481,7 +1479,7 @@ pub async fn create_account_with_password(
         ApiError::InvalidInput(validation_errors_to_string(err, None))
     })?;
 
-    if !check_turnstile_captcha(&req, &new_account.challenge).await? {
+    if !check_hcaptcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -1566,36 +1564,6 @@ pub async fn create_account_with_password(
     let session = issue_session(req, user_id, &mut transaction, &redis).await?;
     let res = crate::models::sessions::Session::from(session, true, None);
 
-    // We limit each ip to creating 5 accounts in a six hour period
-    let ip = crate::util::ip::convert_to_ip_v6(&res.ip).map_err(|_| {
-        ApiError::InvalidInput("unable to parse user ip!".to_string())
-    })?;
-    let stripped_ip = crate::util::ip::strip_ip(ip).to_string();
-
-    let mut conn = redis.connect().await?;
-    let uses = if let Some(res) = conn
-        .get(NEW_ACCOUNT_LIMITER_NAMESPACE, &stripped_ip)
-        .await?
-    {
-        res.parse::<u64>().unwrap_or(0)
-    } else {
-        0
-    };
-
-    if uses >= 5 {
-        return Err(ApiError::InvalidInput(
-            "IP has been rate-limited.".to_string(),
-        ));
-    }
-
-    conn.set(
-        NEW_ACCOUNT_LIMITER_NAMESPACE,
-        &stripped_ip,
-        &(uses + 1).to_string(),
-        Some(60 * 60 * 6),
-    )
-    .await?;
-
     let flow = Flow::ConfirmEmail {
         user_id,
         confirm_email: new_account.email.clone(),
@@ -1632,7 +1600,7 @@ pub async fn login_password(
     redis: Data<RedisPool>,
     login: web::Json<Login>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_turnstile_captcha(&req, &login.challenge).await? {
+    if !check_hcaptcha(&req, &login.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -2082,7 +2050,7 @@ pub async fn reset_password_begin(
     redis: Data<RedisPool>,
     reset_password: web::Json<ResetPassword>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_turnstile_captcha(&req, &reset_password.challenge).await? {
+    if !check_hcaptcha(&req, &reset_password.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 

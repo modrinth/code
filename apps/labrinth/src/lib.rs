@@ -450,7 +450,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("PAYPAL_CLIENT_ID");
     failed |= check_var::<String>("PAYPAL_CLIENT_SECRET");
 
-    failed |= check_var::<String>("TURNSTILE_SECRET");
+    failed |= check_var::<String>("HCAPTCHA_SECRET");
 
     failed |= check_var::<String>("SMTP_USERNAME");
     failed |= check_var::<String>("SMTP_PASSWORD");

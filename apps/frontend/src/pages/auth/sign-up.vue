@@ -106,12 +106,7 @@
         </IntlFormatted>
       </p>
 
-      <NuxtTurnstile
-        ref="turnstile"
-        v-model="token"
-        class="turnstile"
-        :options="{ theme: $theme.active === 'light' ? 'light' : 'dark' }"
-      />
+      <HCaptcha ref="captcha" v-model="token" />
 
       <button
         class="btn btn-primary continue-btn centered-btn"
@@ -145,6 +140,7 @@ import {
   SSOGitLabIcon,
 } from "@modrinth/assets";
 import { Checkbox } from "@modrinth/ui";
+import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -209,7 +205,7 @@ if (auth.value.user) {
   await navigateTo("/dashboard");
 }
 
-const turnstile = ref();
+const captcha = ref();
 
 const email = ref("");
 const username = ref("");
@@ -235,7 +231,7 @@ async function createAccount() {
         }),
         type: "error",
       });
-      turnstile.value?.reset();
+      captcha.value?.reset();
     }
 
     const res = await useBaseFetch("auth/create", {
@@ -264,7 +260,7 @@ async function createAccount() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }
