@@ -111,6 +111,7 @@
         v-model="token"
         class="turnstile"
         :options="{ theme: $theme.active === 'light' ? 'light' : 'dark' }"
+        data-size="flexible"
       />
 
       <button
@@ -144,7 +145,7 @@ import {
   MailIcon,
   SSOGitLabIcon,
 } from "@modrinth/assets";
-import { Checkbox } from "@modrinth/ui";
+import { Checkbox, commonMessages } from "@modrinth/ui";
 
 const { formatMessage } = useVIntl();
 

@@ -1,6 +1,10 @@
 <template>
   <div v-bind="$attrs">
-    <button v-if="!!slots.title" @click="() => (isOpen ? close() : open())" :class="buttonClass ? buttonClass : ''">
+    <button
+      v-if="!!slots.title"
+      @click="() => (isOpen ? close() : open())"
+      :class="buttonClass ? buttonClass : ''"
+    >
       <slot name="button" :open="isOpen">
         <slot name="title" />
         <DropdownIcon
@@ -20,45 +24,45 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon } from "@modrinth/assets";
-import { ref, useSlots } from "vue";
+import { DropdownIcon } from '@modrinth/assets'
+import { ref, useSlots } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    openByDefault?: boolean;
-    type?: "standard" | "outlined" | "transparent";
-    buttonClass?: string;
-    contentClass?: string;
+    openByDefault?: boolean
+    type?: 'standard' | 'outlined' | 'transparent'
+    buttonClass?: string
+    contentClass?: string
   }>(),
   {
-    type: "standard",
+    type: 'standard',
     openByDefault: false,
   },
-);
+)
 
-const isOpen = ref(props.openByDefault);
-const emit = defineEmits(["onOpen", "onClose"]);
+const isOpen = ref(props.openByDefault)
+const emit = defineEmits(['onOpen', 'onClose'])
 
-const slots = useSlots();
+const slots = useSlots()
 
 function open() {
-  isOpen.value = true;
-  emit("onOpen");
+  isOpen.value = true
+  emit('onOpen')
 }
 function close() {
-  isOpen.value = false;
-  emit("onClose");
+  isOpen.value = false
+  emit('onClose')
 }
 
 defineExpose({
   open,
   close,
   isOpen,
-});
+})
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 </script>
 <style scoped>
 .accordion-content {

@@ -12,7 +12,9 @@
             <span class="group-hover:underline">
               {{ organization.name }}
             </span>
-            <span class="text-secondary text-sm font-medium flex items-center gap-1"><OrganizationIcon /> Organization</span>
+            <span class="text-secondary text-sm font-medium flex items-center gap-1"
+              ><OrganizationIcon /> Organization</span
+            >
           </div>
         </AutoLink>
         <hr v-if="sortedMembers.length > 0" class="w-full border-button-border my-0.5" />
@@ -25,14 +27,14 @@
       >
         <Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
         <div class="flex flex-col">
-            <span class="flex flex-row flex-nowrap items-center gap-1 group-hover:underline">
-              {{ member.user.username }}
-              <CrownIcon
-                v-if="member.is_owner"
-                v-tooltip="formatMessage(messages.owner)"
-                class="text-brand-orange"
-              />
-            </span>
+          <span class="flex flex-row flex-nowrap items-center gap-1 group-hover:underline">
+            {{ member.user.username }}
+            <CrownIcon
+              v-if="member.is_owner"
+              v-tooltip="formatMessage(messages.owner)"
+              class="text-brand-orange"
+            />
+          </span>
           <span class="text-secondary text-sm font-medium">{{ member.role }}</span>
         </div>
       </AutoLink>
@@ -40,10 +42,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import {
-  CrownIcon,
-  OrganizationIcon,
-} from '@modrinth/assets'
+import { CrownIcon, OrganizationIcon } from '@modrinth/assets'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import Avatar from '../base/Avatar.vue'
 import AutoLink from '../base/AutoLink.vue'
@@ -52,64 +51,64 @@ import { computed } from 'vue'
 const { formatMessage } = useVIntl()
 
 type TeamMember = {
-  id: string,
-  role: string,
-  is_owner: boolean,
-  accepted: boolean,
+  id: string
+  role: string
+  is_owner: boolean
+  accepted: boolean
   user: {
-    id: string,
-    username: string,
-    avatar_url: string,
+    id: string
+    username: string
+    avatar_url: string
   }
 }
 
 const props = defineProps<{
   organization?: {
-    id: string,
-    slug: string,
-    name: string,
-    icon_url: string,
-    avatar_url: string,
-    members: TeamMember[],
-  } | null,
-  members: TeamMember[],
-  orgLink: (slug: string) => string,
-  userLink: (username: string) => string,
+    id: string
+    slug: string
+    name: string
+    icon_url: string
+    avatar_url: string
+    members: TeamMember[]
+  } | null
+  members: TeamMember[]
+  orgLink: (slug: string) => string
+  userLink: (username: string) => string
 }>()
 
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
 // The rest of the members should be sorted by role, then by name
 const sortedMembers = computed(() => {
-  const acceptedMembers = props.members.filter((x) => x.accepted === undefined || x.accepted);
+  const acceptedMembers = props.members.filter((x) => x.accepted === undefined || x.accepted)
   const owner = acceptedMembers.find((x) =>
     props.organization
       ? props.organization.members.some(
-        (orgMember) => orgMember.user.id === x.user.id && orgMember.is_owner,
-      )
+          (orgMember) => orgMember.user.id === x.user.id && orgMember.is_owner,
+        )
       : x.is_owner,
-  );
+  )
 
-  const rest = acceptedMembers.filter((x) => !owner || x.user.id !== owner.user.id) || [];
+  const rest = acceptedMembers.filter((x) => !owner || x.user.id !== owner.user.id) || []
 
   rest.sort((a, b) => {
     if (a.role === b.role) {
-      return a.user.username.localeCompare(b.user.username);
+      return a.user.username.localeCompare(b.user.username)
     } else {
-      return a.role.localeCompare(b.role);
+      return a.role.localeCompare(b.role)
     }
-  });
+  })
 
-  return owner ? [owner, ...rest] : rest;
-});
+  return owner ? [owner, ...rest] : rest
+})
 
 const messages = defineMessages({
   title: {
-    id: "project.about.creators.title",
-    defaultMessage: "Creators",
+    id: 'project.about.creators.title',
+    defaultMessage: 'Creators',
   },
   owner: {
-    id: "project.about.creators.owner",
-    defaultMessage: "Project owner",
+    id: 'project.about.creators.owner',
+    defaultMessage: 'Project owner',
   },
-});
+})
 </script>

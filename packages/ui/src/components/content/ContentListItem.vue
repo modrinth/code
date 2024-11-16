@@ -35,14 +35,17 @@ export interface ContentItem<T> {
   versionId?: string
 }
 
-withDefaults(defineProps<{
-  item: ContentItem<T>
-  locked?: boolean
-  last?: boolean
-}>(), {
-  locked: false,
-  last: false,
-})
+withDefaults(
+  defineProps<{
+    item: ContentItem<T>
+    locked?: boolean
+    last?: boolean
+  }>(),
+  {
+    locked: false,
+    last: false,
+  },
+)
 
 const model = defineModel()
 </script>
@@ -51,38 +54,29 @@ const model = defineModel()
     class="grid grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center p-2 h-[64px] border-solid border-0 border-b-button-bg relative"
     :class="{ 'border-b-[1px]': !last }"
   >
-    <Checkbox
-      v-if="!locked"
-      v-model="model"
-
-      :description="``"
-      class="select-checkbox"
-    />
-      <div
-        class="flex items-center gap-2 text-contrast font-medium"
-        :class="{ 'opacity-50': item.disabled,
-         'col-span-2': locked}"
-      >
-        <AutoLink :to="item.project?.link ?? ''" tabindex="-1" v-bind="item.project?.linkProps ?? {}">
-          <Avatar :src="item.icon ?? ''" :class="{ grayscale: item.disabled }" size="48px" />
+    <Checkbox v-if="!locked" v-model="model" :description="``" class="select-checkbox" />
+    <div
+      class="flex items-center gap-2 text-contrast font-medium"
+      :class="{ 'opacity-50': item.disabled, 'col-span-2': locked }"
+    >
+      <AutoLink :to="item.project?.link ?? ''" tabindex="-1" v-bind="item.project?.linkProps ?? {}">
+        <Avatar :src="item.icon ?? ''" :class="{ grayscale: item.disabled }" size="48px" />
+      </AutoLink>
+      <div class="flex flex-col">
+        <AutoLink :to="item.project?.link ?? ''" v-bind="item.project?.linkProps ?? {}">
+          <div class="text-contrast line-clamp-1" :class="{ 'line-through': item.disabled }">
+            {{ item.title ?? item.filename }}
+          </div>
         </AutoLink>
-        <div class="flex flex-col">
-          <AutoLink :to="item.project?.link ?? ''" v-bind="item.project?.linkProps ?? {}">
-            <div class="text-contrast line-clamp-1" :class="{ 'line-through': item.disabled }">
-                {{ item.title ?? item.filename }}
-            </div>
-          </AutoLink>
-          <AutoLink :to="item.creator?.link ?? ''" v-bind="item.creator?.linkProps ?? {}">
-            <div class="line-clamp-1 break-all" :class="{ 'opacity-50': item.disabled }">
-              <slot v-if="item.creator && item.creator.name" :item="item">
-                <span class="text-secondary">
-                 by {{ item.creator.name }}
-                </span>
-              </slot>
-            </div>
-          </AutoLink>
-        </div>
+        <AutoLink :to="item.creator?.link ?? ''" v-bind="item.creator?.linkProps ?? {}">
+          <div class="line-clamp-1 break-all" :class="{ 'opacity-50': item.disabled }">
+            <slot v-if="item.creator && item.creator.name" :item="item">
+              <span class="text-secondary"> by {{ item.creator.name }} </span>
+            </slot>
+          </div>
+        </AutoLink>
       </div>
+    </div>
     <div class="flex flex-col max-w-60" :class="{ 'opacity-50': item.disabled }">
       <div v-if="item.version" class="line-clamp-1 break-all">
         <slot :creator="item.creator">

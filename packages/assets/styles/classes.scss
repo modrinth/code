@@ -824,8 +824,8 @@ a,
 
 .v-popper--theme-tooltip {
   .v-popper__inner {
-    background: var(--color-tooltip-bg)!important;
-    color: var(--color-tooltip-text)!important;
+    background: var(--color-tooltip-bg) !important;
+    color: var(--color-tooltip-text) !important;
     padding: 0.5rem 0.5rem !important;
     border-radius: var(--radius-sm) !important;
     filter: drop-shadow(5px 5px 0.8rem rgba(0, 0, 0, 0.35));
@@ -1212,31 +1212,33 @@ select {
   }
 }
 
-.v-popper__popper[data-popper-placement="bottom-end"] .v-popper__wrapper {
+.v-popper__popper[data-popper-placement='bottom-end'] .v-popper__wrapper {
   transform-origin: top right;
 }
 
-.v-popper__popper[data-popper-placement="top-end"] .v-popper__wrapper {
+.v-popper__popper[data-popper-placement='top-end'] .v-popper__wrapper {
   transform-origin: bottom right;
 }
 
-.v-popper__popper[data-popper-placement="bottom-start"] .v-popper__wrapper {
+.v-popper__popper[data-popper-placement='bottom-start'] .v-popper__wrapper {
   transform-origin: top left;
 }
 
-.v-popper__popper[data-popper-placement="top-start"] .v-popper__wrapper {
+.v-popper__popper[data-popper-placement='top-start'] .v-popper__wrapper {
   transform-origin: bottom left;
 }
 
 .v-popper__popper.v-popper__popper--show-from .v-popper__wrapper {
-  transform: scale(.85);
+  transform: scale(0.85);
   opacity: 0;
 }
 
 .v-popper__popper.v-popper__popper--show-to .v-popper__wrapper {
   transform: scale(1);
   opacity: 1;
-  transition: transform 0.125s ease-in-out, opacity 0.125s ease-in-out;
+  transition:
+    transform 0.125s ease-in-out,
+    opacity 0.125s ease-in-out;
 }
 
 .v-popper__popper.v-popper__popper--hide-from .v-popper__wrapper {
@@ -1248,4 +1250,3 @@ select {
 .v-popper__popper.v-popper__popper--hide-to .v-popper__wrapper {
   //transform: scale(.9);
 }
-

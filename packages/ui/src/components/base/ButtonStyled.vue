@@ -206,7 +206,7 @@ const colorVariables = computed(() => {
     transition: color 0.25s ease-in-out;
   }
 
-  &:hover svg:first-child{
+  &:hover svg:first-child {
     color: var(--_hover-text);
   }
 

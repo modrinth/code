@@ -1,14 +1,7 @@
 <script setup>
-import { UserIcon, LockIcon, MailIcon } from '@modrinth/assets'
-import { Button, Checkbox } from '@modrinth/ui'
-import {
-  DiscordIcon,
-  GithubIcon,
-  MicrosoftIcon,
-  GoogleIcon,
-  SteamIcon,
-  GitLabIcon,
-} from '@/assets/external'
+import { UserIcon, LockIcon, MailIcon, RightArrowIcon } from '@modrinth/assets'
+import { ButtonStyled, Checkbox, ThirdPartyAuthButtons } from '@modrinth/ui'
+
 import { login, login_2fa, create_account, login_pass } from '@/helpers/mr_auth.js'
 import { handleError, useNotifications } from '@/store/state.js'
 import { ref, computed } from 'vue'
@@ -135,50 +128,25 @@ const modalHeader = computed(() => {
   if (twoFactorFlow.value) {
     return 'Enter two-factor code'
   } else if (loggingIn.value) {
-    return 'Login to Modrinth'
+    return 'Sign in to Modrinth'
   } else {
-    return 'Create an account'
+    return 'Create a Modrinth account'
   }
 })
 </script>
 
 <template>
   <ModalWrapper ref="modal" :on-hide="removeWidget" :header="modalHeader">
-    <div class="w-[25rem]">
+    <div class="flex flex-col w-[25rem]">
       <template v-if="twoFactorFlow">
         <p>Please enter a two-factor code to proceed.</p>
         <input v-model="twoFactorCode" maxlength="11" type="text" placeholder="Enter code..." />
       </template>
       <template v-else>
-        <div class="button-grid">
-          <Button class="discord" large @click="signInOauth('discord')">
-            <DiscordIcon />
-            Discord
-          </Button>
-          <Button class="github" large @click="signInOauth('github')">
-            <GithubIcon />
-            Github
-          </Button>
-          <Button class="white" large @click="signInOauth('microsoft')">
-            <MicrosoftIcon />
-            Microsoft
-          </Button>
-          <Button class="google" large @click="signInOauth('google')">
-            <GoogleIcon />
-            Google
-          </Button>
-          <Button class="white" large @click="signInOauth('steam')">
-            <SteamIcon />
-            Steam
-          </Button>
-          <Button class="gitlab" large @click="signInOauth('gitlab')">
-            <GitLabIcon />
-            GitLab
-          </Button>
-        </div>
+        <ThirdPartyAuthButtons type="action" :handler="(service) => signInOauth(service)" />
         <div class="divider">
           <hr />
-          <p>Or</p>
+          <p>or</p>
         </div>
         <div v-if="!loggingIn" class="iconified-input username">
           <MailIcon />
@@ -200,40 +168,43 @@ const modalHeader = computed(() => {
           <LockIcon />
           <input v-model="confirmPassword" type="password" placeholder="Confirm password" />
         </div>
-        <div class="turnstile">
-          <div id="turnstile-container"></div>
-          <div id="turnstile-container-2"></div>
-        </div>
         <Checkbox
           v-if="!loggingIn"
           v-model="subscribe"
           class="subscribe-btn"
           label="Subscribe to updates about Modrinth"
         />
-        <div class="link-row">
-          <a v-if="loggingIn" class="button-base" @click="loggingIn = false"> Create account </a>
-          <a v-else class="button-base" @click="loggingIn = true">Sign in</a>
-          <a class="button-base" href="https://modrinth.com/auth/reset-password">
-            Forgot password?
-          </a>
+        <div class="turnstile mt-4">
+          <div id="turnstile-container"></div>
+          <div id="turnstile-container-2"></div>
+        </div>
+        <div class="mx-auto mt-4">
+          <ButtonStyled color="brand" size="large">
+            <button v-if="twoFactorCode" @click="signIn2fa">
+              Sign in <RightArrowIcon />
+            </button>
+            <button
+              v-else-if="loggingIn"
+              :disabled="!turnstileToken"
+              @click="signIn"
+            >
+              Sign in <RightArrowIcon />
+            </button>
+            <button v-else :disabled="!turnstileToken" @click="createAccount">
+              Create account
+            </button>
+          </ButtonStyled>
+        </div>
+        <div class="flex items-center justify-center gap-6 mt-3 flex-wrap">
+          <a v-if="!loggingIn" class="button-base hover:underline" @click="loggingIn = true">I already have an account</a>
+          <template v-else>
+            <a class="button-base hover:underline" @click="loggingIn = false"> Create account </a>
+            <a class="button-base hover:underline" href="https://modrinth.com/auth/reset-password">
+              Forgot password?
+            </a>
+          </template>
         </div>
       </template>
-      <div class="button-row">
-        <Button class="transparent" large>Close</Button>
-        <Button v-if="twoFactorCode" color="primary" large @click="signIn2fa"> Login </Button>
-        <Button
-          v-else-if="loggingIn"
-          color="primary"
-          large
-          :disabled="!turnstileToken"
-          @click="signIn"
-        >
-          Login
-        </Button>
-        <Button v-else color="primary" large :disabled="!turnstileToken" @click="createAccount">
-          Create account
-        </Button>
-      </div>
     </div>
   </ModalWrapper>
 </template>
@@ -247,31 +218,6 @@ const modalHeader = computed(() => {
   .btn {
     width: 100%;
     justify-content: center;
-  }
-
-  .discord {
-    background-color: #5865f2;
-    color: var(--color-contrast);
-  }
-
-  .github {
-    background-color: #8740f1;
-    color: var(--color-contrast);
-  }
-
-  .white {
-    background-color: var(--color-contrast);
-    color: var(--color-accent-contrast);
-  }
-
-  .google {
-    background-color: #4285f4;
-    color: var(--color-contrast);
-  }
-
-  .gitlab {
-    background-color: #fc6d26;
-    color: var(--color-contrast);
   }
 }
 
@@ -350,12 +296,13 @@ const modalHeader = computed(() => {
   overflow: hidden;
   border-radius: var(--radius-md);
   border: 2px solid var(--color-button-bg);
-  height: 66px;
-  margin-top: var(--gap-md);
+  height: 65px;
+  width: 100%;
 
-  iframe {
-    margin: -1px;
-    min-width: calc(100% + 2px);
+  > div {
+    position: relative;
+    top: -2px;
+    min-width: calc(100% + 4px);
   }
 }
 </style>

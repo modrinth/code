@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 pr-2 pb-4">
+  <div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)">
     <ContentPageHeader>
       <template #icon>
         <Avatar :src="icon" :alt="instance.name" size="96px" />
@@ -150,16 +150,8 @@ import {
   XIcon,
   CheckCircleIcon,
   UpdatedIcon,
-  ChartIcon,
-  TagsIcon,
-  HeartIcon,
-  BookmarkIcon,
   MoreVerticalIcon,
-  ReportIcon,
-  DownloadIcon,
-  ScaleIcon,
   GameIcon,
-  WrenchIcon,
 } from '@modrinth/assets'
 import { get, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'

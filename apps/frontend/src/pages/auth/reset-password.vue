@@ -27,6 +27,7 @@
           v-model="token"
           class="turnstile"
           :options="{ theme: $theme.active === 'light' ? 'light' : 'dark' }"
+          data-size="flexible"
         />
 
         <button class="btn btn-primary centered-btn" :disabled="!token" @click="recovery">
@@ -73,6 +74,7 @@
 </template>
 <script setup>
 import { SendIcon, MailIcon, KeyIcon } from "@modrinth/assets";
+import { commonMessages } from "@modrinth/ui";
 
 const { formatMessage } = useVIntl();
 

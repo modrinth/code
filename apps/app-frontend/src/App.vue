@@ -1,11 +1,10 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
+import { RouterView, useRouter, useRoute } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
   LogInIcon,
   HomeIcon,
-  SearchIcon,
   LibraryIcon,
   PlusIcon,
   SettingsIcon,
@@ -44,7 +43,6 @@ import IncompatibilityWarningModal from '@/components/ui/install_flow/Incompatib
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import { useInstall } from '@/store/install.js'
 import { invoke } from '@tauri-apps/api/core'
-import { open } from '@tauri-apps/plugin-shell'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { renderString } from '@modrinth/utils'
@@ -766,6 +764,10 @@ async function checkUpdates() {
   width: 300px;
   position: relative;
   height: calc(100vh - 3.75rem);
+  background: var(--brand-gradient-bg);
+
+  --color-button-bg: rgba(255, 255, 255, 0.08);
+  --color-button-bg-hover: var(--brand-gradient-border);
 }
 
 .app-sidebar::after {
@@ -821,10 +823,6 @@ async function checkUpdates() {
     1px 1px 15px rgba(0, 0, 0, 0.2) inset,
     inset 1px 1px 1px rgba(255, 255, 255, 0.23);
   pointer-events: none;
-}
-
-.app-sidebar {
-  background: var(--brand-gradient-bg);
 }
 
 .sidebar-teleport-content {

@@ -2,7 +2,7 @@
   <div
     v-if="mode !== 'isolated'"
     ref="button"
-    class="experimental-styles-within button-base mt-2 px-3 py-2 bg-button-bg rounded-xl flex items-center gap-2"
+    class="button-base mt-2 px-3 py-2 bg-button-bg rounded-xl flex items-center gap-2"
     :class="{ expanded: mode === 'expanded' }"
     @click="toggleMenu"
   >
@@ -100,8 +100,6 @@ defineExpose({
   refreshValues,
 })
 await refreshValues()
-
-const menuOpened = ref(false)
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => defaultUser.value !== account.id),

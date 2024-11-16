@@ -1,5 +1,8 @@
 <template>
-  <span v-if="type === 'project-status'" class="inline-flex items-center gap-1 font-semibold text-secondary">
+  <span
+    v-if="type === 'project-status'"
+    class="inline-flex items-center gap-1 font-semibold text-secondary"
+  >
     <component :is="metadata.icon" :aria-hidden="true" class="shrink-0" />
     {{ metadata.formattedName }}
   </span>
@@ -221,8 +224,8 @@ const messages = defineMessages({
 const { formatMessage } = useVIntl()
 
 interface LegacyProps {
-  type: string,
-  color?: string,
+  type: string
+  color?: string
 }
 
 interface ProjectStatusProps {
@@ -240,9 +243,9 @@ interface ProjectStatusProps {
 }
 
 interface BadgeMetadata {
-  icon: Component,
-  formattedName: string,
-  color?: 'brand' | 'green' | 'blue' | 'purple' | 'orange' | 'red',
+  icon: Component
+  formattedName: string
+  color?: 'brand' | 'green' | 'blue' | 'purple' | 'orange' | 'red'
 }
 
 const metadata: ComputedRef<Component> = computed(() => {

@@ -42,9 +42,9 @@
   --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
 
   --brand-gradient-bg: linear-gradient(
-      0deg,
-      rgba(68, 182, 138, 0.175) 0%,
-      rgba(58, 250, 112, 0.125) 100%
+    0deg,
+    rgba(68, 182, 138, 0.175) 0%,
+    rgba(58, 250, 112, 0.125) 100%
   );
   //--brand-gradient-bg: linear-gradient(
   //    0deg,
@@ -153,7 +153,11 @@ html {
 
   --color-ad: #0d1828;
 
-  --brand-gradient-bg: linear-gradient(0deg, rgba(22, 66, 51, 0.3) 0%, rgba(55, 137, 73, 0.15) 100%);
+  --brand-gradient-bg: linear-gradient(
+    0deg,
+    rgba(22, 66, 51, 0.3) 0%,
+    rgba(55, 137, 73, 0.15) 100%
+  );
 }
 
 .experimental-styles-within {
@@ -258,7 +262,8 @@ html {
 }
 
 .experimental-styles-within {
-  .dark-mode, .dark {
+  .dark-mode,
+  .dark {
     @extend .dark-experiments;
   }
 }

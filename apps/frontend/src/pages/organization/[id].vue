@@ -252,7 +252,14 @@ import {
   XIcon,
   ClipboardCopyIcon,
 } from "@modrinth/assets";
-import { Avatar, ButtonStyled, Breadcrumbs, ContentPageHeader, OverflowMenu } from "@modrinth/ui";
+import {
+  Avatar,
+  ButtonStyled,
+  Breadcrumbs,
+  ContentPageHeader,
+  OverflowMenu,
+  commonMessages,
+} from "@modrinth/ui";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";

@@ -479,7 +479,6 @@
 </template>
 <script setup lang="ts">
 import {
-  PlusIcon,
   ExternalIcon,
   LinkIcon,
   LockIcon,
@@ -504,12 +503,10 @@ import {
   SlashIcon,
 } from '@modrinth/assets'
 import {
-  DropdownSelect,
   Checkbox,
   AnimatedLogo,
   Avatar,
   Button,
-  Card,
   ButtonStyled,
   ContentListPanel,
   OverflowMenu,
@@ -529,7 +526,7 @@ import {
 import { handleError } from '@/store/notifications.js'
 import { trackEvent } from '@/helpers/analytics'
 import { highlightModInProfile } from '@/helpers/utils.js'
-import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
+import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import AddContentButton from '@/components/ui/AddContentButton.vue'
