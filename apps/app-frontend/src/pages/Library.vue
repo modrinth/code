@@ -10,11 +10,6 @@ import { Button } from '@modrinth/ui'
 import { PlusIcon } from '@modrinth/assets'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { NewInstanceImage } from '@/assets/icons'
-import { hide_ads_window } from '@/helpers/ads.js'
-
-onMounted(() => {
-  hide_ads_window(true)
-})
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()

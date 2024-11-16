@@ -22,182 +22,184 @@
     </p>
   </div>
   <template v-if="projects.length > 0">
-  <div class="flex items-center gap-2 mb-4">
-    <div class="iconified-input flex-grow">
-      <SearchIcon />
-      <input
-        v-model="searchFilter"
-        type="text"
-        :placeholder="`Search content...`"
-        class="text-input search-input"
-        autocomplete="off"
-      />
-      <Button class="r-btn" @click="() => (searchFilter = '')">
-        <XIcon />
-      </Button>
+    <div class="flex items-center gap-2 mb-4">
+      <div class="iconified-input flex-grow">
+        <SearchIcon />
+        <input
+          v-model="searchFilter"
+          type="text"
+          :placeholder="`Search content...`"
+          class="text-input search-input"
+          autocomplete="off"
+        />
+        <Button class="r-btn" @click="() => (searchFilter = '')">
+          <XIcon />
+        </Button>
+      </div>
+      <AddContentButton v-if="!isPackLocked" :instance="instance" />
     </div>
-    <AddContentButton v-if="!isPackLocked" :instance="instance" />
-  </div>
-  <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
-    <FilterIcon class="text-secondary h-5 w-5 mr-1" />
-    <button
-      v-for="filter in filterOptions"
-      :key="filter"
-      :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
-      @click="toggleArray(selectedFilters, filter.id)"
+    <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
+      <FilterIcon class="text-secondary h-5 w-5 mr-1" />
+      <button
+        v-for="filter in filterOptions"
+        :key="filter"
+        :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
+        @click="toggleArray(selectedFilters, filter.id)"
+      >
+        {{ filter.formattedName }}
+      </button>
+    </div>
+    <ContentListPanel
+      v-model="selectedFiles"
+      :locked="isPackLocked"
+      :items="
+        search.map((x) => ({
+          disabled: x.disabled,
+          filename: x.file_name,
+          icon: x.icon,
+          title: x.name,
+          creator: {
+            name: x.author,
+            type: 'user',
+            id: x.author,
+            link: 'https://modrinth.com/user/' + x.author,
+            linkProps: { target: '_blank' },
+          },
+          project: {
+            id: x.id,
+            link: { path: `/project/${x.id}/`, query: { i: props.instance.path } },
+            linkProps: {},
+          },
+          version: x.version,
+          versionId: x.version,
+          data: x,
+        }))
+      "
     >
-      {{ filter.formattedName }}
-    </button>
-  </div>
-  <ContentListPanel
-    v-model="selectedFiles"
-    :locked="isPackLocked"
-    :items="
-      search.map((x) => ({
-        disabled: x.disabled,
-        filename: x.file_name,
-        icon: x.icon,
-        title: x.name,
-        creator: {
-          name: x.author,
-          type: 'user',
-          id: x.author,
-          link: 'https://modrinth.com/user/' + x.author,
-          linkProps: { target: '_blank' },
-        },
-        project: {
-          id: x.id,
-          link: { path: `/project/${x.id}/`, query: { i: props.instance.path } },
-          linkProps: {},
-        },
-        version: x.version,
-        versionId: x.version,
-        data: x,
-      }))
-    "
-  >
-    <template v-if="selectedProjects.length > 0" #headers>
-      <div class="flex gap-2">
+      <template v-if="selectedProjects.length > 0" #headers>
+        <div class="flex gap-2">
+          <ButtonStyled
+            v-if="selectedProjects.some((m) => m.outdated)"
+            color="brand"
+            color-fill="text"
+            hover-color-fill="text"
+          >
+            <button @click="updateSelected()"><DownloadIcon /> Update</button>
+          </ButtonStyled>
+          <ButtonStyled>
+            <OverflowMenu
+              :options="[
+                {
+                  id: 'share-names',
+                  action: () => shareNames(),
+                },
+                {
+                  id: 'share-file-names',
+                  action: () => shareFileNames(),
+                },
+                {
+                  id: 'share-urls',
+                  action: () => shareUrls(),
+                },
+                {
+                  id: 'share-markdown',
+                  action: () => shareMarkdown(),
+                },
+              ]"
+            >
+              <ShareIcon /> Share <DropdownIcon />
+              <template #share-names> <TextInputIcon /> Project names </template>
+              <template #share-file-names> <FileIcon /> File names </template>
+              <template #share-urls> <LinkIcon /> Project links </template>
+              <template #share-markdown> <CodeIcon /> Markdown links </template>
+            </OverflowMenu>
+          </ButtonStyled>
+          <ButtonStyled v-if="selectedProjects.some((m) => m.disabled)">
+            <button @click="enableAll()"><CheckCircleIcon /> Enable</button>
+          </ButtonStyled>
+          <ButtonStyled v-if="selectedProjects.some((m) => !m.disabled)">
+            <button @click="disableAll()"><SlashIcon /> Disable</button>
+          </ButtonStyled>
+          <ButtonStyled color="red">
+            <button @click="deleteSelected()"><TrashIcon /> Remove</button>
+          </ButtonStyled>
+        </div>
+      </template>
+      <template #header-actions>
         <ButtonStyled
-          v-if="selectedProjects.some((m) => m.outdated)"
+          v-if="!isPackLocked && projects.some((m) => (m as any).outdated)"
+          type="transparent"
           color="brand"
           color-fill="text"
           hover-color-fill="text"
         >
-          <button @click="updateSelected()"><DownloadIcon /> Update</button>
+          <button><DownloadIcon /> Update all</button>
         </ButtonStyled>
-        <ButtonStyled>
+      </template>
+      <template #actions="{ item }">
+        <ButtonStyled
+          v-if="!isPackLocked && (item.data as any).outdated"
+          type="transparent"
+          color="brand"
+          circular
+        >
+          <button v-tooltip="`Update`" @click="updateProject(item.data)">
+            <DownloadIcon />
+          </button>
+        </ButtonStyled>
+        <div v-else class="w-[36px]"></div>
+        <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
+          <button
+            v-tooltip="item.disabled ? `Enable` : `Disable`"
+            @click="toggleDisableMod(item.data)"
+          >
+            <CheckCircleIcon v-if="item.disabled" />
+            <SlashIcon v-else />
+          </button>
+        </ButtonStyled>
+        <ButtonStyled type="transparent" circular>
           <OverflowMenu
             :options="[
               {
-                id: 'share-names',
-                action: () => shareNames(),
+                id: 'show-file',
+                action: () => {},
               },
               {
-                id: 'share-file-names',
-                action: () => shareFileNames(),
+                id: 'copy-link',
+                shown: item.project !== undefined,
+                action: () => toggleDisableMod(item.data),
               },
               {
-                id: 'share-urls',
-                action: () => shareUrls(),
+                divider: true,
+                shown: !isPackLocked,
               },
               {
-                id: 'share-markdown',
-                action: () => shareMarkdown(),
+                id: 'remove',
+                color: 'red',
+                shown: !isPackLocked,
+                action: () => removeMod(item),
               },
             ]"
+            direction="left"
           >
-            <ShareIcon /> Share <DropdownIcon />
-            <template #share-names> <TextInputIcon /> Project names </template>
-            <template #share-file-names> <FileIcon /> File names </template>
-            <template #share-urls> <LinkIcon /> Project links </template>
-            <template #share-markdown> <CodeIcon /> Markdown links </template>
+            <MoreVerticalIcon />
+            <template #show-file> <ExternalIcon /> Show file </template>
+            <template #copy-link> <ClipboardCopyIcon /> Copy link </template>
+            <template v-if="item.disabled" #toggle> <CheckCircleIcon /> Enable </template>
+            <template v-else #toggle> <SlashIcon /> Disable </template>
+            <template #remove> <TrashIcon /> Remove </template>
           </OverflowMenu>
         </ButtonStyled>
-        <ButtonStyled v-if="selectedProjects.some((m) => m.disabled)">
-          <button @click="enableAll()"><CheckCircleIcon /> Enable</button>
-        </ButtonStyled>
-        <ButtonStyled v-if="selectedProjects.some((m) => !m.disabled)">
-          <button @click="disableAll()"><SlashIcon /> Disable</button>
-        </ButtonStyled>
-        <ButtonStyled color="red">
-          <button @click="deleteSelected()"><TrashIcon /> Remove</button>
-        </ButtonStyled>
-      </div>
-    </template>
-    <template #header-actions>
-      <ButtonStyled
-        v-if="!isPackLocked && projects.some((m) => (m as any).outdated)"
-        type="transparent"
-        color="brand"
-        color-fill="text"
-        hover-color-fill="text"
-      >
-        <button><DownloadIcon /> Update all</button>
-      </ButtonStyled>
-    </template>
-    <template #actions="{ item }">
-      <ButtonStyled
-        v-if="!isPackLocked && (item.data as any).outdated"
-        type="transparent"
-        color="brand"
-        circular
-      >
-        <button v-tooltip="`Update`" @click="updateProject(item.data)">
-          <DownloadIcon />
-        </button>
-      </ButtonStyled>
-      <div v-else class="w-[36px]"></div>
-      <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
-        <button
-          v-tooltip="item.disabled ? `Enable` : `Disable`"
-          @click="toggleDisableMod(item.data)"
-        >
-          <CheckCircleIcon v-if="item.disabled" />
-          <SlashIcon v-else />
-        </button>
-      </ButtonStyled>
-      <ButtonStyled type="transparent" circular>
-        <OverflowMenu
-          :options="[
-            {
-              id: 'show-file',
-              action: () => {},
-            },
-            {
-              id: 'copy-link',
-              shown: item.project !== undefined,
-              action: () => toggleDisableMod(item.data),
-            },
-            {
-              divider: true,
-              shown: !isPackLocked,
-            },
-            {
-              id: 'remove',
-              color: 'red',
-              shown: !isPackLocked,
-              action: () => removeMod(item),
-            },
-          ]"
-          direction="left"
-        >
-          <MoreVerticalIcon />
-          <template #show-file> <ExternalIcon /> Show file </template>
-          <template #copy-link> <ClipboardCopyIcon /> Copy link </template>
-          <template v-if="item.disabled" #toggle> <CheckCircleIcon /> Enable </template>
-          <template v-else #toggle> <SlashIcon /> Disable </template>
-          <template #remove> <TrashIcon /> Remove </template>
-        </OverflowMenu>
-      </ButtonStyled>
-    </template>
-  </ContentListPanel>
-</template>
+      </template>
+    </ContentListPanel>
+  </template>
   <div v-else class="w-full flex flex-col items-center justify-center mt-6 max-w-[48rem] mx-auto">
     <div class="top-box w-full">
       <div class="flex items-center gap-6 w-[32rem] mx-auto">
         <img src="@/assets/sad-modrinth-bot.webp" class="h-24" />
-        <span class="text-contrast font-bold text-xl">You haven't added any content to this instance yet.</span>
+        <span class="text-contrast font-bold text-xl"
+          >You haven't added any content to this instance yet.</span
+        >
       </div>
     </div>
     <div class="top-box-divider"></div>
@@ -1416,11 +1418,15 @@ onUnmounted(() => {
 }
 
 .top-box {
-  background-image: radial-gradient(50% 100% at 50% 100%, var(--color-brand-highlight) 10%, #FFFFFF00 100%);
+  background-image: radial-gradient(
+    50% 100% at 50% 100%,
+    var(--color-brand-highlight) 10%,
+    #ffffff00 100%
+  );
 }
 
 .top-box-divider {
-  background-image: linear-gradient(90deg, #FFFFFF00 0%, var(--color-brand) 50%, #FFFFFF00 100%);
+  background-image: linear-gradient(90deg, #ffffff00 0%, var(--color-brand) 50%, #ffffff00 100%);
   width: 100%;
   height: 1px;
   opacity: 0.8;

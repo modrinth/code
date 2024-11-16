@@ -534,7 +534,9 @@ const filteredLoaders = computed(() => {
 })
 
 const selectableProjectTypes = computed(() => {
-  let dataPacks = false, mods = false, modpacks = false
+  let dataPacks = false,
+    mods = false,
+    modpacks = false
 
   if (instanceContext.value) {
     if (

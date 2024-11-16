@@ -30,20 +30,24 @@
             size="sm"
           />
           <div class="small-instance_info">
-          <span class="title">{{
+            <span class="title">{{
               instance.name.length > 20 ? instance.name.substring(0, 20) + '...' : instance.name
             }}</span>
             <span>
-            {{ instance.loader.charAt(0).toUpperCase() + instance.loader.slice(1) }}
-            {{ instance.game_version }}
-          </span>
+              {{ instance.loader.charAt(0).toUpperCase() + instance.loader.slice(1) }}
+              {{ instance.game_version }}
+            </span>
           </div>
         </router-link>
       </Card>
       <ProjectHeader :project="data">
         <template #actions>
           <ButtonStyled size="large" color="brand">
-            <button v-tooltip="installed ? `This project is already installed` : null" :disabled="installed || installing" @click="install(null)">
+            <button
+              v-tooltip="installed ? `This project is already installed` : null"
+              :disabled="installed || installing"
+              @click="install(null)"
+            >
               <DownloadIcon v-if="!installed && !installing" />
               <CheckIcon v-else-if="installed" />
               {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
@@ -53,32 +57,32 @@
             <OverflowMenu
               :tooltip="`More options`"
               :options="[
-              {
-                id: 'follow',
-                disabled: true,
-                tooltip: 'Coming soon',
-                action: () => {},
-              },
-              {
-                id: 'save',
-                disabled: true,
-                tooltip: 'Coming soon',
-                action: () => {},
-              },
-              {
-                id: 'open-in-browser',
-                link: `https://modrinth.com/${data.project_type}/${data.slug}`,
-              },
-              {
-                divider: true,
-              },
-              {
-                id: 'report',
-                color: 'red',
-                hoverFilled: true,
-                link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
-              },
-            ]"
+                {
+                  id: 'follow',
+                  disabled: true,
+                  tooltip: 'Coming soon',
+                  action: () => {},
+                },
+                {
+                  id: 'save',
+                  disabled: true,
+                  tooltip: 'Coming soon',
+                  action: () => {},
+                },
+                {
+                  id: 'open-in-browser',
+                  link: `https://modrinth.com/${data.project_type}/${data.slug}`,
+                },
+                {
+                  divider: true,
+                },
+                {
+                  id: 'report',
+                  color: 'red',
+                  hoverFilled: true,
+                  link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
+                },
+              ]"
               aria-label="More options"
             >
               <MoreVerticalIcon aria-hidden="true" />
@@ -119,9 +123,7 @@
           :installed-version="installedVersion"
         />
       </template>
-      <template v-else>
-        Project data coult not be loaded.
-      </template>
+      <template v-else> Project data coult not be loaded. </template>
     </div>
     <ContextMenu ref="options" @option-clicked="handleOptionsClick">
       <template #install> <DownloadIcon /> Install </template>
@@ -149,7 +151,10 @@ import {
   ProjectHeader,
   ProjectSidebarCompatibility,
   ButtonStyled,
-  OverflowMenu, ProjectSidebarLinks, ProjectSidebarCreators, ProjectSidebarDetails
+  OverflowMenu,
+  ProjectSidebarLinks,
+  ProjectSidebarCreators,
+  ProjectSidebarDetails,
 } from '@modrinth/ui'
 
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'

@@ -35,11 +35,7 @@
             : breadcrumb.name
         }}</span
       >
-      <ChevronRightIcon
-        v-if="breadcrumb.link"
-        data-tauri-drag-region
-        class="w-5 h-5"
-      />
+      <ChevronRightIcon v-if="breadcrumb.link" data-tauri-drag-region class="w-5 h-5" />
     </template>
   </div>
 </template>

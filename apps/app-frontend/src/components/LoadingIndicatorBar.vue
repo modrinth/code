@@ -2,26 +2,24 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useLoading } from '@/store/state.js'
 
-const props = defineProps(
-  {
-    throttle: {
-      type: Number,
-      default: 0,
-    },
-    duration: {
-      type: Number,
-      default: 1000,
-    },
-    height: {
-      type: Number,
-      default: 2,
-    },
-    color: {
-      type: String,
-      default: 'var(--loading-bar-gradient)',
-    },
-  }
-)
+const props = defineProps({
+  throttle: {
+    type: Number,
+    default: 0,
+  },
+  duration: {
+    type: Number,
+    default: 1000,
+  },
+  height: {
+    type: Number,
+    default: 2,
+  },
+  color: {
+    type: String,
+    default: 'var(--loading-bar-gradient)',
+  },
+})
 
 const indicator = useLoadingIndicator({
   duration: props.duration,
@@ -136,6 +134,8 @@ function useLoadingIndicator(opts) {
   background-image: radial-gradient(80% 100% at 20% 0%, var(--color-brand) 0%, transparent 80%);
   opacity: calc(var(--_opacity) * 0.1);
   z-index: 5;
-  transition: width 0.1s ease-in-out, opacity 0.1s ease-out;
+  transition:
+    width 0.1s ease-in-out,
+    opacity 0.1s ease-out;
 }
 </style>

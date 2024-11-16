@@ -56,6 +56,7 @@ import { get_user } from '@/helpers/cache.js'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
+import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 
 const themeStore = useTheming()
 
@@ -209,7 +210,6 @@ router.afterEach((to, from, failure) => {
   trackEvent('PageView', { path: to.path, fromPath: from.path, failed: failure })
 })
 const route = useRoute()
-const isOnBrowse = computed(() => route.path.startsWith('/browse'))
 
 const loading = useLoading()
 loading.setEnabled(false)
@@ -247,10 +247,9 @@ async function logOut() {
 const MIDAS_BITFLAG = 1 << 0
 const hasPlus = computed(
   () =>
-    true ||
-    (credentials.value &&
-      credentials.value.user &&
-      (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG),
+    credentials.value &&
+    credentials.value.user &&
+    (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
 )
 
 onMounted(() => {
@@ -265,41 +264,6 @@ onMounted(() => {
   install.setModInstallModal(modInstallModal)
 
   fetchCredentials()
-})
-
-document.querySelector('body').addEventListener('click', function (e) {
-  let target = e.target
-  while (target != null) {
-    if (target.matches('a')) {
-      if (
-        target.href &&
-        ['http://', 'https://', 'mailto:', 'tel:'].some((v) => target.href.startsWith(v)) &&
-        !target.classList.contains('router-link-active') &&
-        !target.href.startsWith('http://localhost') &&
-        !target.href.startsWith('https://tauri.localhost') &&
-        !target.href.startsWith('http://tauri.localhost')
-      ) {
-        open(target.href)
-      }
-      e.preventDefault()
-      break
-    }
-    target = target.parentElement
-  }
-})
-
-document.querySelector('body').addEventListener('auxclick', function (e) {
-  // disables middle click -> new tab
-  if (e.button === 1) {
-    e.preventDefault()
-    // instead do a left click
-    const event = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-    })
-    e.target.dispatchEvent(event)
-  }
 })
 
 const accounts = ref(null)
@@ -345,16 +309,30 @@ async function checkUpdates() {
     <InstanceCreationModal ref="installationModal" />
   </Suspense>
   <div v-if="stateInitialized" class="app-grid-layout relative">
-    <div class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10 w-[--left-bar-width]">
+    <div
+      class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10 w-[--left-bar-width]"
+    >
       <NavButton to="/">
         <HomeIcon />
         <template #label>Home</template>
       </NavButton>
-      <NavButton to="/browse/modpack" :is-primary="() => route.path.startsWith('/browse') && !route.query.i" :is-subpage="route => route.path.startsWith('/project') && !route.query.i">
+      <NavButton
+        to="/browse/modpack"
+        :is-primary="() => route.path.startsWith('/browse') && !route.query.i"
+        :is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
+      >
         <CompassIcon />
         <template #label>Discover content</template>
       </NavButton>
-      <NavButton to="/library" :is-subpage="() => route.path.startsWith('/instance') || ((route.path.startsWith('/browse') || route.path.startsWith('/project')) && route.query.i)">
+      <NavButton
+        to="/library"
+        :is-subpage="
+          () =>
+            route.path.startsWith('/instance') ||
+            ((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
+              route.query.i)
+        "
+      >
         <LibraryIcon />
         <template #label>Library</template>
       </NavButton>
@@ -429,7 +407,14 @@ async function checkUpdates() {
   </div>
   <div v-if="stateInitialized" class="app-contents experimental-styles-within">
     <div class="app-viewport flex-grow router-view">
-      <div class="loading-indicator-container h-8 fixed z-50" :style="{ top: 'calc(var(--top-bar-height))', left: 'calc(var(--left-bar-width))', width: 'calc(100% - var(--left-bar-width) - var(--right-bar-width))' }">
+      <div
+        class="loading-indicator-container h-8 fixed z-50"
+        :style="{
+          top: 'calc(var(--top-bar-height))',
+          left: 'calc(var(--left-bar-width))',
+          width: 'calc(100% - var(--left-bar-width) - var(--right-bar-width))',
+        }"
+      >
         <ModrinthLoadingIndicator />
       </div>
       <RouterView v-slot="{ Component }">
@@ -498,7 +483,7 @@ async function checkUpdates() {
           class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
           ><ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+</a
         >
-        <div class="w-[300px] h-[250px] bg-white text-black p-4 shrink-0">Ad!</div>
+        <PromotionWrapper />
       </template>
     </div>
     <div class="view">
@@ -600,7 +585,6 @@ async function checkUpdates() {
 }
 
 .app-container {
-
   height: 100vh;
   display: flex;
   flex-direction: row;
@@ -729,7 +713,8 @@ async function checkUpdates() {
   }
 }
 
-.app-grid-layout, .app-contents {
+.app-grid-layout,
+.app-contents {
   --top-bar-height: 3.75rem;
   --left-bar-width: 5rem;
   --right-bar-width: 300px;
