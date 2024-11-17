@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import * as Pages from '@/pages'
 import * as Project from '@/pages/project'
 import * as Instance from '@/pages/instance'
+import * as Library from '@/pages/library'
 
 /**
  * Configures application routing. Add page to pages/index and then add to route table here.
@@ -28,10 +29,27 @@ export default new createRouter({
     {
       path: '/library',
       name: 'Library',
-      component: Pages.Library,
+      component: Library.Index,
       meta: {
         breadcrumb: [{ name: 'Library' }],
       },
+      children: [
+        {
+          path: '',
+          name: 'Overview',
+          component: Library.Overview,
+        },
+        {
+          path: 'downloaded',
+          name: 'Downloaded',
+          component: Library.Downloaded,
+        },
+        {
+          path: 'custom',
+          name: 'Custom',
+          component: Library.Custom,
+        },
+      ]
     },
     {
       path: '/project/:id',

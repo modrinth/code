@@ -121,11 +121,10 @@ const handleOptionsClick = async (args) => {
 
 const search = ref('')
 const group = ref('Category')
-const filters = ref('All')
 const sortBy = ref('Name')
 
 const filteredResults = computed(() => {
-  let instances = props.instances.filter((instance) => {
+  const instances = props.instances.filter((instance) => {
     return instance.name.toLowerCase().includes(search.value.toLowerCase())
   })
 
@@ -156,16 +155,6 @@ const filteredResults = computed(() => {
   if (sortBy.value === 'Date modified') {
     instances.sort((a, b) => {
       return dayjs(b.date_modified).diff(dayjs(a.date_modified))
-    })
-  }
-
-  if (filters.value === 'Custom') {
-    instances = instances.filter((instance) => {
-      return !instance.linked_data
-    })
-  } else if (filters.value === 'Downloaded') {
-    instances = instances.filter((instance) => {
-      return instance.linked_data
     })
   }
 
@@ -231,7 +220,7 @@ const filteredResults = computed(() => {
 <template>
   <div class="iconified-input">
     <SearchIcon />
-    <input v-model="search" type="text" placeholder="Search" class="search-input" />
+    <input v-model="search" type="text" class="h-12" placeholder="Search" />
     <Button class="r-btn" @click="() => (search = '')">
       <XIcon />
     </Button>
@@ -241,26 +230,17 @@ const filteredResults = computed(() => {
       v-slot="{ selected }"
       v-model="sortBy"
       name="Sort Dropdown"
+      class="max-w-[16rem]"
       :options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
       placeholder="Select..."
     >
       <span class="font-semibold text-primary">Sort by: </span>
       <span class="font-semibold text-secondary">{{ selected }}</span>
     </DropdownSelect>
-    <!-- TODO: Make this NavTabs -->
-    <DropdownSelect
-      v-slot="{ selected }"
-      v-model="filters"
-      name="Filter Dropdown"
-      :options="['All', 'Custom', 'Downloaded']"
-      placeholder="Select..."
-    >
-      <span class="font-semibold text-primary">Filter by: </span>
-      <span class="font-semibold text-secondary">{{ selected }}</span>
-    </DropdownSelect>
     <DropdownSelect
       v-slot="{ selected }"
       v-model="group"
+      class="max-w-[16rem]"
       name="Group Dropdown"
       :options="['Category', 'Loader', 'Game version', 'None']"
       placeholder="Select..."

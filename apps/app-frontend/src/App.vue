@@ -773,6 +773,10 @@ async function checkUpdates() {
   width: 300px;
   position: relative;
   height: calc(100vh - 3.75rem);
+  background: var(--brand-gradient-bg);
+
+  --color-button-bg: rgba(255, 255, 255, 0.08);
+  --color-button-bg-hover: var(--brand-gradient-border);
 }
 
 .app-sidebar::after {
@@ -828,10 +832,6 @@ async function checkUpdates() {
     1px 1px 15px rgba(0, 0, 0, 0.2) inset,
     inset 1px 1px 1px rgba(255, 255, 255, 0.23);
   pointer-events: none;
-}
-
-.app-sidebar {
-  background: var(--brand-gradient-bg);
 }
 
 .sidebar-teleport-content {

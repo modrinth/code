@@ -1,15 +1,15 @@
 <script setup>
-import { onMounted, onUnmounted, ref, shallowRef } from 'vue'
-import GridDisplay from '@/components/GridDisplay.vue'
+import { onUnmounted, ref, shallowRef } from 'vue'
 import { list } from '@/helpers/profile.js'
 import { useRoute } from 'vue-router'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useBreadcrumbs } from '@/store/breadcrumbs.js'
 import { profile_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { Button } from '@modrinth/ui'
 import { PlusIcon } from '@modrinth/assets'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { NewInstanceImage } from '@/assets/icons'
+import NavTabs from '@/components/ui/NavTabs.vue'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -37,7 +37,12 @@ onUnmounted(() => {
 <template>
   <div class="p-6 flex flex-col gap-3">
     <h1 class="m-0 text-2xl">Library</h1>
-    <GridDisplay v-if="instances.length > 0" label="Instances" :instances="instances" />
+    <NavTabs :links="[ { label: 'All instances', href: `/library` }, { label: 'Downloaded', href: `/library/downloaded` }, { label: 'Custom', href: `/library/custom` }, { label: 'Shared with me', href: `/library/shared`, shown: false }, { label: 'Saved', href: `/library/saved`, shown: false } ]" />
+    <template v-if="instances.length > 0">
+      <RouterView
+        :instances="instances"
+      />
+    </template>
     <div v-else class="no-instance">
       <div class="icon">
         <NewInstanceImage />

@@ -590,15 +590,14 @@ import {
   GlassesIcon,
   PaintBrushIcon,
   PackageOpenIcon,
+  XIcon as CrossIcon,
+  ScaleIcon as ModerationIcon,
+  BellIcon as NotificationIcon,
 } from "@modrinth/assets";
-import { Button, ButtonStyled, OverflowMenu, Avatar } from "@modrinth/ui";
+import { Button, ButtonStyled, OverflowMenu, Avatar, commonMessages } from "@modrinth/ui";
 
-import CrossIcon from "assets/images/utils/x.svg";
-import NotificationIcon from "assets/images/sidebar/notifications.svg";
-import ModerationIcon from "assets/images/sidebar/admin.svg";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
-import { commonMessages } from "~/utils/common-messages.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
 import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";

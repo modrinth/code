@@ -807,7 +807,6 @@ import {
   WrenchIcon,
   BookTextIcon,
   CalendarIcon,
-  CrownIcon,
 } from "@modrinth/assets";
 import {
   Avatar,

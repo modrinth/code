@@ -1,5 +1,8 @@
 <template>
-  <div class="p-6 pr-2 pb-4">
+  <div
+    class="p-6 pr-2 pb-4"
+    @contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
+  >
     <ExportModal ref="exportModal" :instance="instance" />
     <ContentPageHeader>
       <template #icon>
