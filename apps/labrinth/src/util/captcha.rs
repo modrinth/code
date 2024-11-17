@@ -2,9 +2,9 @@ use crate::routes::ApiError;
 use crate::util::env::parse_var;
 use actix_web::HttpRequest;
 use serde::Deserialize;
-use serde_json::json;
+use std::collections::HashMap;
 
-pub async fn check_turnstile_captcha(
+pub async fn check_hcaptcha(
     req: &HttpRequest,
     challenge: &str,
 ) -> Result<bool, ApiError> {
@@ -19,6 +19,8 @@ pub async fn check_turnstile_captcha(
         conn_info.peer_addr()
     };
 
+    let ip_addr = ip_addr.ok_or(ApiError::Turnstile)?;
+
     let client = reqwest::Client::new();
 
     #[derive(Deserialize)]
@@ -26,13 +28,16 @@ pub async fn check_turnstile_captcha(
         success: bool,
     }
 
+    let mut form = HashMap::new();
+
+    let secret = dotenvy::var("HCAPTCHA_SECRET")?;
+    form.insert("response", challenge);
+    form.insert("secret", &*secret);
+    form.insert("remoteip", ip_addr);
+
     let val: Response = client
-        .post("https://challenges.cloudflare.com/turnstile/v0/siteverify")
-        .json(&json!({
-            "secret": dotenvy::var("TURNSTILE_SECRET")?,
-            "response": challenge,
-            "remoteip": ip_addr,
-        }))
+        .post("https://api.hcaptcha.com/siteverify")
+        .form(&form)
         .send()
         .await
         .map_err(|_| ApiError::Turnstile)?
