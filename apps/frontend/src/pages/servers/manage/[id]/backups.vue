@@ -81,6 +81,15 @@
           </div>
         </div>
 
+        <div
+          v-if="backups.some((backup) => backup.ongoing)"
+          data-pyro-server-backup-ongoing
+          class="flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
+        >
+          A backup is currently being created. This may take a few minutes. This page will
+          automatically refresh when the backup is complete.
+        </div>
+
         <li
           v-for="(backup, index) in backups"
           :key="backup.id"
