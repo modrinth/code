@@ -66,7 +66,11 @@
                       : ''
                   "
                   class="w-full sm:w-fit"
-                  :disabled="isServerRunning && !userPreferences.backupWhileRunning"
+                  :disabled="
+                    (isServerRunning && !userPreferences.backupWhileRunning) ||
+                    data.used_backup_quota >= data.backup_quota ||
+                    backups.some((backup) => backup.ongoing)
+                  "
                   @click="showCreateModel"
                 >
                   <PlusIcon class="h-5 w-5" />
@@ -319,6 +323,31 @@ const initiateDownload = async (backupId: string) => {
     console.error("Download failed:", error);
   }
 };
+
+const refreshInterval = ref<ReturnType<typeof setInterval>>();
+
+onMounted(() => {
+  watchEffect(() => {
+    const hasOngoingBackups = backups.value.some((backup) => backup.ongoing);
+
+    if (refreshInterval.value) {
+      clearInterval(refreshInterval.value);
+      refreshInterval.value = undefined;
+    }
+
+    if (hasOngoingBackups) {
+      refreshInterval.value = setInterval(() => {
+        props.server.refresh(["backups"]);
+      }, 5000);
+    }
+  });
+});
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value);
+  }
+});
 </script>
 
 <style scoped>
