@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'

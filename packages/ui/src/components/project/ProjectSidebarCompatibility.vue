@@ -27,28 +27,28 @@
     </section>
     <section
       v-if="
-              (project.actualProjectType === 'mod' || project.project_type === 'modpack') &&
-              !(project.client_side === 'unsupported' && project.server_side === 'unsupported') &&
-              !(project.client_side === 'unknown' && project.server_side === 'unknown')
-            "
+        (project.actualProjectType === 'mod' || project.project_type === 'modpack') &&
+        !(project.client_side === 'unsupported' && project.server_side === 'unsupported') &&
+        !(project.client_side === 'unknown' && project.server_side === 'unknown')
+      "
       class="flex flex-col gap-2"
     >
       <h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }}</h3>
       <div class="flex flex-wrap gap-1">
         <TagItem
           v-if="
-                  (project.client_side === 'required' && project.server_side !== 'required') ||
-                  (project.client_side === 'optional' && project.server_side === 'optional')
-                "
+            (project.client_side === 'required' && project.server_side !== 'required') ||
+            (project.client_side === 'optional' && project.server_side === 'optional')
+          "
         >
           <ClientIcon aria-hidden="true" />
           Client-side
         </TagItem>
         <div
           v-if="
-                  (project.server_side === 'required' && project.client_side !== 'required') ||
-                  (project.client_side === 'optional' && project.server_side === 'optional')
-                "
+            (project.server_side === 'required' && project.client_side !== 'required') ||
+            (project.client_side === 'optional' && project.server_side === 'optional')
+          "
           class="tag-list__item"
         >
           <ServerIcon aria-hidden="true" />
@@ -60,13 +60,13 @@
         </div>
         <div
           v-if="
-                  project.project_type !== 'datapack' &&
-                  ((project.client_side === 'required' && project.server_side === 'required') ||
-                    project.client_side === 'optional' ||
-                    (project.client_side === 'required' && project.server_side === 'optional') ||
-                    project.server_side === 'optional' ||
-                    (project.server_side === 'required' && project.client_side === 'optional'))
-                "
+            project.project_type !== 'datapack' &&
+            ((project.client_side === 'required' && project.server_side === 'required') ||
+              project.client_side === 'optional' ||
+              (project.client_side === 'required' && project.server_side === 'optional') ||
+              project.server_side === 'optional' ||
+              (project.server_side === 'required' && project.client_side === 'optional'))
+          "
           class="tag-list__item"
         >
           <MonitorSmartphoneIcon aria-hidden="true" />
@@ -83,40 +83,40 @@ import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import TagItem from '../base/TagItem.vue'
 
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
 type EnvironmentValue = 'optional' | 'required' | 'unsupported' | 'unknown'
 
 defineProps<{
   project: {
-    project_type: string,
-    loaders: string[],
-    client_side: EnvironmentValue,
-    server_side: EnvironmentValue,
-    versions: any[],
-  },
+    project_type: string
+    loaders: string[]
+    client_side: EnvironmentValue
+    server_side: EnvironmentValue
+    versions: any[]
+  }
   tags: {
-    gameVersions: GameVersionTag[],
-    loaders: PlatformTag[],
+    gameVersions: GameVersionTag[]
+    loaders: PlatformTag[]
   }
 }>()
 
 const messages = defineMessages({
   title: {
-    id: "project.about.compatibility.title",
-    defaultMessage: "Compatibility",
+    id: 'project.about.compatibility.title',
+    defaultMessage: 'Compatibility',
   },
   minecraftJava: {
-    id: "project.about.compatibility.game.minecraftJava",
-    defaultMessage: "Minecraft: Java Edition",
+    id: 'project.about.compatibility.game.minecraftJava',
+    defaultMessage: 'Minecraft: Java Edition',
   },
   platforms: {
-    id: "project.about.compatibility.platforms",
-    defaultMessage: "Platforms",
+    id: 'project.about.compatibility.platforms',
+    defaultMessage: 'Platforms',
   },
   environments: {
-    id: "project.about.compatibility.environments",
-    defaultMessage: "Supported environments",
+    id: 'project.about.compatibility.environments',
+    defaultMessage: 'Supported environments',
   },
-});
+})
 </script>

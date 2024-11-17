@@ -35,7 +35,7 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-col gap-2 items-end shrink-0">
+    <div class="flex flex-col gap-2 items-end shrink-0 ml-auto">
       <div class="flex items-center gap-2">
         <DownloadIcon class="shrink-0" />
         <span>

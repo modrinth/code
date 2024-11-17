@@ -19,6 +19,7 @@ You can use `pnpm run lint` to find any eslint problems, and `pnpm run fix` to t
 ### Theseus Architecture
 
 Theseus is split up into three parts:
+
 - `apps/app-frontend`: The Vue.JS frontend for the app
 - `packages/app-lib`: The library holding all the core logic for the desktop app
 - `apps/app`: The Tauri-based Rust app. This primarily wraps around the library with some additional logic for Tauri.

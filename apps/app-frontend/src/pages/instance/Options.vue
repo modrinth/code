@@ -897,7 +897,6 @@ async function saveGvLoaderEdits() {
 .change-versions-modal {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
   gap: 1rem;
 
   :deep(.animated-dropdown .options) {

@@ -32,6 +32,7 @@ If you wish to contribute code to a specific project, here's the place to start.
 Most of Modrinth's code is in our monorepo, which you can find [here](https://github.com/modrinth/code). Our monorepo is powered by [Turborepo](https://turborepo.org).
 
 Follow the project-specific instructions below to get started:
+
 - [Knossos (frontend)](/contributing/knossos)
 - [Theseus (Modrinth App)](/contributing/theseus)
 - [Minotaur (Gradle plugin)](/contributing/minotaur)

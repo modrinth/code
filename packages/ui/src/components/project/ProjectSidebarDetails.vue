@@ -17,10 +17,13 @@
             <ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
           </a>
           <span
-            v-else-if="project.license.id === 'LicenseRef-All-Rights-Reserved' || !project.license.id.includes('LicenseRef')"
+            v-else-if="
+              project.license.id === 'LicenseRef-All-Rights-Reserved' ||
+              !project.license.id.includes('LicenseRef')
+            "
           >
-                  {{ licenseIdDisplay }}
-                </span>
+            {{ licenseIdDisplay }}
+          </span>
           <span v-else>{{ licenseIdDisplay }}</span>
         </div>
       </div>
@@ -33,10 +36,7 @@
           {{ formatMessage(messages.published, { date: publishedDate }) }}
         </div>
       </div>
-      <div
-        v-else
-        v-tooltip="dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
-      >
+      <div v-else v-tooltip="dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')">
         <CalendarIcon aria-hidden="true" />
         <div>
           {{ formatMessage(messages.created, { date: createdDate }) }}
@@ -64,13 +64,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import {
-  BookTextIcon,
-  CalendarIcon,
-  ScaleIcon,
-  VersionIcon,
-  ExternalIcon,
-} from '@modrinth/assets'
+import { BookTextIcon, CalendarIcon, ScaleIcon, VersionIcon, ExternalIcon } from '@modrinth/assets'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import { computed, ref } from 'vue'
 import dayjs from 'dayjs'
@@ -79,70 +73,70 @@ const { formatMessage } = useVIntl()
 
 const props = defineProps<{
   project: {
-    id: string,
-    published: string,
-    updated: string,
-    approved: string,
-    queued: string,
-    status: string,
+    id: string
+    published: string
+    updated: string
+    approved: string
+    queued: string
+    status: string
     license: {
-      id: string,
+      id: string
       url: string
     }
-  },
-  linkTarget: string,
-  hasVersions: boolean,
+  }
+  linkTarget: string
+  hasVersions: boolean
 }>()
 
 const createdDate = computed(() =>
-  props.project.published ? dayjs(props.project.published).fromNow() : "unknown",
-);
+  props.project.published ? dayjs(props.project.published).fromNow() : 'unknown',
+)
 const submittedDate = computed(() =>
-  props.project.queued ? dayjs(props.project.queued).fromNow() : "unknown",
-);
+  props.project.queued ? dayjs(props.project.queued).fromNow() : 'unknown',
+)
 const publishedDate = computed(() =>
-  props.project.approved ? dayjs(props.project.approved).fromNow() : "unknown",
-);
+  props.project.approved ? dayjs(props.project.approved).fromNow() : 'unknown',
+)
 const updatedDate = computed(() =>
-  props.project.updated ? dayjs(props.project.updated).fromNow() : "unknown",
-);
+  props.project.updated ? dayjs(props.project.updated).fromNow() : 'unknown',
+)
 
 const licenseIdDisplay = computed(() => {
-  const id = props.project.license.id;
+  const id = props.project.license.id
 
-  if (id === "LicenseRef-All-Rights-Reserved") {
-    return "ARR";
-  } else if (id.includes("LicenseRef")) {
-    return id.replaceAll("LicenseRef-", "").replaceAll("-", " ");
+  if (id === 'LicenseRef-All-Rights-Reserved') {
+    return 'ARR'
+  } else if (id.includes('LicenseRef')) {
+    return id.replaceAll('LicenseRef-', '').replaceAll('-', ' ')
   } else {
-    return id;
+    return id
   }
-});
+})
 
 const messages = defineMessages({
   title: {
-    id: "project.about.details.title",
-    defaultMessage: "Details",
+    id: 'project.about.details.title',
+    defaultMessage: 'Details',
   },
   licensed: {
-    id: "project.about.details.licensed",
-    defaultMessage: "Licensed {license}",
+    id: 'project.about.details.licensed',
+    defaultMessage: 'Licensed {license}',
   },
   created: {
-    id: "project.about.details.created",
-    defaultMessage: "Created {date}",
+    id: 'project.about.details.created',
+    defaultMessage: 'Created {date}',
   },
   submitted: {
-    id: "project.about.details.submitted",
-    defaultMessage: "Submitted {date}",
+    id: 'project.about.details.submitted',
+    defaultMessage: 'Submitted {date}',
   },
   published: {
-    id: "project.about.details.published",
-    defaultMessage: "Published {date}",
+    id: 'project.about.details.published',
+    defaultMessage: 'Published {date}',
   },
   updated: {
-    id: "project.about.details.updated",
-    defaultMessage: "Updated {date}",
+    id: 'project.about.details.updated',
+    defaultMessage: 'Updated {date}',
   },
-});
+})
 </script>

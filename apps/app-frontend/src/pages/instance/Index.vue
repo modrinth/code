@@ -1,5 +1,6 @@
 <template>
   <div class="p-6 pr-2 pb-4">
+    <ExportModal ref="exportModal" :instance="instance" />
     <ContentPageHeader>
       <template #icon>
         <Avatar :src="icon" :alt="instance.name" size="96px" />
@@ -15,7 +16,9 @@
         </div>
       </template>
       <template #actions>
-        <template v-if="instance.install_stage !== 'installed'"> Installing... </template>
+        <ButtonStyled v-if="instance.install_stage !== 'installed'" color="brand" size="large">
+          <button disabled>Installing...</button>
+        </ButtonStyled>
         <template v-else>
           <div class="flex gap-2">
             <ButtonStyled v-if="playing === true" color="red" size="large">
@@ -34,7 +37,13 @@
                 Play
               </button>
             </ButtonStyled>
-            <div v-else-if="loading === true && playing === false">Loading...</div>
+            <ButtonStyled
+              v-else-if="loading === true && playing === false"
+              color="brand"
+              size="large"
+            >
+              <button disabled>Loading...</button>
+            </ButtonStyled>
             <ButtonStyled size="large" circular>
               <RouterLink
                 v-tooltip="'Instance settings'"
@@ -47,23 +56,12 @@
               <OverflowMenu
                 :options="[
                   {
-                    id: 'share-instance',
-                    action: () => {},
-                  },
-                  {
-                    id: 'host-a-server',
-                    action: () => {},
-                  },
-                  {
-                    divider: true,
-                  },
-                  {
                     id: 'open-folder',
                     action: () => showProfileInFolder(instance.path),
                   },
                   {
                     id: 'export-mrpack',
-                    action: () => {},
+                    action: () => $refs.exportModal.show(),
                   },
                 ]"
               >
@@ -150,16 +148,8 @@ import {
   XIcon,
   CheckCircleIcon,
   UpdatedIcon,
-  ChartIcon,
-  TagsIcon,
-  HeartIcon,
-  BookmarkIcon,
   MoreVerticalIcon,
-  ReportIcon,
-  DownloadIcon,
-  ScaleIcon,
   GameIcon,
-  WrenchIcon,
 } from '@modrinth/assets'
 import { get, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
@@ -175,6 +165,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { handleSevereError } from '@/store/error.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import dayjs from 'dayjs'
+import ExportModal from '@/components/ui/ExportModal.vue'
 
 const route = useRoute()
 

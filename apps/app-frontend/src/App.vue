@@ -1,11 +1,10 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
-import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
+import { computed, ref, onMounted, watch } from 'vue'
+import { RouterView, useRouter, useRoute } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
   LogInIcon,
   HomeIcon,
-  SearchIcon,
   LibraryIcon,
   PlusIcon,
   SettingsIcon,
@@ -44,7 +43,6 @@ import IncompatibilityWarningModal from '@/components/ui/install_flow/Incompatib
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import { useInstall } from '@/store/install.js'
 import { invoke } from '@tauri-apps/api/core'
-import { open } from '@tauri-apps/plugin-shell'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { renderString } from '@modrinth/utils'
@@ -57,6 +55,7 @@ import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
+import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 
 const themeStore = useTheming()
 
@@ -251,6 +250,14 @@ const hasPlus = computed(
     credentials.value.user &&
     (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
 )
+
+watch(hasPlus, () => {
+  if (hasPlus.value) {
+    hide_ads_window()
+  } else {
+    show_ads_window()
+  }
+})
 
 onMounted(() => {
   invoke('show_window')

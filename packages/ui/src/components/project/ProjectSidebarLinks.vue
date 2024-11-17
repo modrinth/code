@@ -10,7 +10,9 @@
     class="flex flex-col gap-3"
   >
     <h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
-    <div class="flex flex-col gap-3 font-semibold [&>a]:flex [&>a]:gap-2 [&>a]:items-center [&>a]:w-fit [&>a]:text-primary [&>a]:leading-[1.2] [&>a:hover]:underline">
+    <div
+      class="flex flex-col gap-3 font-semibold [&>a]:flex [&>a]:gap-2 [&>a]:items-center [&>a]:w-fit [&>a]:text-primary [&>a]:leading-[1.2] [&>a:hover]:underline"
+    >
       <a
         v-if="project.issues_url"
         :href="project.issues_url"
@@ -106,15 +108,15 @@ const { formatMessage } = useVIntl()
 
 defineProps<{
   project: {
-    issues_url: string,
-    source_url: string,
-    wiki_url: string,
-    discord_url: string,
+    issues_url: string
+    source_url: string
+    wiki_url: string
+    discord_url: string
     donation_urls: {
-      id: string,
-      url: string,
-    }[],
-  },
+      id: string
+      url: string
+    }[]
+  }
   linkTarget: string
 }>()
 

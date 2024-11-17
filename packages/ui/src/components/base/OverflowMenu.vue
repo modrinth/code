@@ -1,5 +1,11 @@
 <template>
-  <PopoutMenu ref="dropdown" v-bind="$attrs" :disabled="disabled" :dropdown-id="dropdownId" :tooltip="tooltip">
+  <PopoutMenu
+    ref="dropdown"
+    v-bind="$attrs"
+    :disabled="disabled"
+    :dropdown-id="dropdownId"
+    :tooltip="tooltip"
+  >
     <slot></slot>
     <template #menu>
       <template v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)">

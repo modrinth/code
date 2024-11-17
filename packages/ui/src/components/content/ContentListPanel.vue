@@ -4,21 +4,26 @@ import type { Ref } from 'vue'
 import Checkbox from '../base/Checkbox.vue'
 import ContentListItem from './ContentListItem.vue'
 import { type ContentItem } from './ContentListItem.vue'
-import {
-  DropdownIcon,
-} from '@modrinth/assets'
+import { DropdownIcon } from '@modrinth/assets'
 // @ts-ignore
 import { RecycleScroller } from 'vue-virtual-scroller'
 
-const props = withDefaults(defineProps<{
-  items: ContentItem<T>[],
-  locked?: boolean,
-}>(), {
-  locked: false,
-})
+const props = withDefaults(
+  defineProps<{
+    items: ContentItem<T>[]
+    locked?: boolean
+  }>(),
+  {
+    locked: false,
+  },
+)
 
 const selectionStates: Ref<Record<string, boolean>> = ref({})
-const selected: Ref<string[]> = computed(() => Object.keys(selectionStates.value).filter((item) => selectionStates.value[item] && props.items.some((x) => x.filename === item)))
+const selected: Ref<string[]> = computed(() =>
+  Object.keys(selectionStates.value).filter(
+    (item) => selectionStates.value[item] && props.items.some((x) => x.filename === item),
+  ),
+)
 
 const allSelected = ref(false)
 
@@ -43,7 +48,13 @@ function setSelected(value: boolean) {
     <div
       :class="`${$slots.headers ? 'flex' : 'grid'} grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center px-2 pt-1 h-10 mb-3 text-contrast font-bold`"
     >
-      <Checkbox v-if="!locked" v-model="allSelected" class="select-checkbox" @update:model-value="setSelected" :indeterminate="selected.length > 0 && selected.length < items.length" />
+      <Checkbox
+        v-if="!locked"
+        v-model="allSelected"
+        class="select-checkbox"
+        @update:model-value="setSelected"
+        :indeterminate="selected.length > 0 && selected.length < items.length"
+      />
       <slot name="headers">
         <div class="flex items-center gap-2" :class="{ 'col-span-2': locked }">
           <!--        <div class="w-[48px]"></div>-->

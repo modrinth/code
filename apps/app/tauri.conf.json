@@ -11,12 +11,7 @@
     "copyright": "",
     "targets": "all",
     "externalBin": [],
-    "icon": [
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ],
+    "icon": ["icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
@@ -81,20 +76,14 @@
     ],
     "security": {
       "assetProtocol": {
-        "scope": [
-          "$APPDATA/caches/icons/*",
-          "$APPCONFIG/caches/icons/*",
-          "$CONFIG/caches/icons/*"
-        ],
+        "scope": ["$APPDATA/caches/icons/*", "$APPCONFIG/caches/icons/*", "$CONFIG/caches/icons/*"],
         "enable": true
       },
       "capabilities": ["ads", "core", "plugins"],
       "csp": {
         "default-src": "'self' customprotocol: asset:",
         "connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://*.cloudflare.com https://api.mclo.gs https://cmp.inmobi.com",
-        "font-src": [
-          "https://cdn-raw.modrinth.com/fonts/inter/"
-        ],
+        "font-src": ["https://cdn-raw.modrinth.com/fonts/inter/"],
         "img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost blob: data:",
         "style-src": "'unsafe-inline' 'self'",
         "script-src": "https://cmp.inmobi.com https://*.cloudflare.com https://*.posthog.com 'self'",
