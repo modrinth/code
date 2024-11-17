@@ -1,28 +1,34 @@
 <script setup>
 const token = defineModel();
+const id = ref(null);
 
-useHead({
-  script: [
-    {
-      src: "https://js.hcaptcha.com/1/api.js",
-      async: true,
-      defer: true,
-    },
-  ],
-});
-
-function updateToken(newToken) {
+function hCaptchaUpdateToken(newToken) {
   token.value = newToken;
 }
 
+function hCaptchaReady() {
+  window.hCaptchaUpdateToken = hCaptchaUpdateToken;
+  id.value = window.hcaptcha.render("h-captcha");
+}
+
 onMounted(() => {
-  window.updateCatpchaToken = updateToken;
+  window.hCaptchaReady = hCaptchaReady;
+
+  useHead({
+    script: [
+      {
+        src: "https://js.hcaptcha.com/1/api.js?render=explicit&onload=hCaptchaReady",
+        async: true,
+        defer: true,
+      },
+    ],
+  });
 });
 
 defineExpose({
   reset: () => {
     token.value = null;
-    window.hcaptcha.reset();
+    window.hcaptcha.reset(id.value);
   },
 });
 </script>
@@ -33,7 +39,7 @@ defineExpose({
     class="h-captcha"
     data-sitekey="4a7a2c80-68f2-4190-9d52-131c76e0c14e"
     :data-theme="$theme.active === 'light' ? 'light' : 'dark'"
-    data-callback="updateCatpchaToken"
+    data-callback="hCaptchaUpdateToken"
   ></div>
 </template>
 
