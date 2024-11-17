@@ -338,7 +338,7 @@ onMounted(() => {
     if (hasOngoingBackups) {
       refreshInterval.value = setInterval(() => {
         props.server.refresh(["backups"]);
-      }, 5000);
+      }, 10000);
     }
   });
 });
