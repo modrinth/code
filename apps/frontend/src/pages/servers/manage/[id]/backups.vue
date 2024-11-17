@@ -250,6 +250,8 @@ const backupSettingsModal = ref<typeof NewModal>();
 const renameBackupName = ref("");
 const currentBackup = ref("");
 
+const refreshInterval = ref<ReturnType<typeof setInterval>>();
+
 const currentBackupDetails = computed(() => {
   return backups.value.find((backup) => backup.id === currentBackup.value);
 });
@@ -323,8 +325,6 @@ const initiateDownload = async (backupId: string) => {
     console.error("Download failed:", error);
   }
 };
-
-const refreshInterval = ref<ReturnType<typeof setInterval>>();
 
 onMounted(() => {
   watchEffect(() => {
