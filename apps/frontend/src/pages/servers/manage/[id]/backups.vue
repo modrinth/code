@@ -66,7 +66,11 @@
                       : ''
                   "
                   class="w-full sm:w-fit"
-                  :disabled="isServerRunning && !userPreferences.backupWhileRunning"
+                  :disabled="
+                    (isServerRunning && !userPreferences.backupWhileRunning) ||
+                    data.used_backup_quota >= data.backup_quota ||
+                    backups.some((backup) => backup.ongoing)
+                  "
                   @click="showCreateModel"
                 >
                   <PlusIcon class="h-5 w-5" />
@@ -75,6 +79,15 @@
               </ButtonStyled>
             </div>
           </div>
+        </div>
+
+        <div
+          v-if="backups.some((backup) => backup.ongoing)"
+          data-pyro-server-backup-ongoing
+          class="flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
+        >
+          A backup is currently being created. This may take a few minutes. This page will
+          automatically refresh when the backup is complete.
         </div>
 
         <li
@@ -246,6 +259,8 @@ const backupSettingsModal = ref<typeof NewModal>();
 const renameBackupName = ref("");
 const currentBackup = ref("");
 
+const refreshInterval = ref<ReturnType<typeof setInterval>>();
+
 const currentBackupDetails = computed(() => {
   return backups.value.find((backup) => backup.id === currentBackup.value);
 });
@@ -319,6 +334,29 @@ const initiateDownload = async (backupId: string) => {
     console.error("Download failed:", error);
   }
 };
+
+onMounted(() => {
+  watchEffect(() => {
+    const hasOngoingBackups = backups.value.some((backup) => backup.ongoing);
+
+    if (refreshInterval.value) {
+      clearInterval(refreshInterval.value);
+      refreshInterval.value = undefined;
+    }
+
+    if (hasOngoingBackups) {
+      refreshInterval.value = setInterval(() => {
+        props.server.refresh(["backups"]);
+      }, 10000);
+    }
+  });
+});
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value);
+  }
+});
 </script>
 
 <style scoped>
