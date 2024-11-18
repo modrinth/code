@@ -239,6 +239,7 @@
           :is-server-running="isServerRunning"
           :stats="stats"
           :server-power-state="serverPowerState"
+          :power-state-details="powerStateDetails"
           :console-output="throttledConsoleOutput"
           :socket="socket"
           :server="server"
@@ -312,6 +313,8 @@ const ramData = ref<number[]>([]);
 const isActioning = ref(false);
 const isServerRunning = computed(() => serverPowerState.value === "running");
 const serverPowerState = ref<ServerState>("stopped");
+const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>();
+
 const uptimeSeconds = ref(0);
 const firstConnect = ref(true);
 const copied = ref(false);
@@ -488,7 +491,14 @@ const handleWebSocketMessage = (data: WSEvent) => {
       reauthenticate();
       break;
     case "power-state":
-      updatePowerState(data.state);
+      if (data.state === "crashed") {
+        updatePowerState(data.state, {
+          oom_killed: data.oom_killed,
+          exit_code: data.exit_code,
+        });
+      } else {
+        updatePowerState(data.state);
+      }
       break;
     case "installation-result":
       handleInstallationResult(data);
@@ -606,9 +616,19 @@ const updateStats = (currentStats: Stats["current"]) => {
   };
 };
 
-const updatePowerState = (state: ServerState) => {
-  console.log("Power state:", state);
+const updatePowerState = (
+  state: ServerState,
+  details?: { oom_killed?: boolean; exit_code?: number },
+) => {
+  console.log("Power state:", state, details);
   serverPowerState.value = state;
+
+  if (state === "crashed") {
+    powerStateDetails.value = details;
+  } else {
+    powerStateDetails.value = undefined;
+  }
+
   if (state === "stopped" || state === "crashed") {
     stopUptimeUpdates();
     uptimeSeconds.value = 0;
