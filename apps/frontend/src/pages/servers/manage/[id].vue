@@ -175,6 +175,14 @@
                   reinstalling your server, and if the problem persists, please contact Modrinth
                   support with your server's debug information.
                 </div>
+                <div
+                  v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
+                >
+                  An error occurred while installing your server because Modrinth Servers does not
+                  support the version of Minecraft or the loader you specified. Try reinstalling
+                  your server with a different version or loader, and if the problem persists,
+                  please contact Modrinth support with your server's debug information.
+                </div>
 
                 <div
                   v-if="errorTitle === 'Installation error'"
