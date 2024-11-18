@@ -1,8 +1,8 @@
 <template>
   <div>
-    <template v-if="flow">
+    <template v-if="false">
       <label for="two-factor-code">
-        <span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
+        <span class="label__title">输入双重验证码</span>
         <span class="label__description">
           {{ formatMessage(messages.twoFactorCodeLabelDescription) }}
         </span>
@@ -23,40 +23,41 @@
       </button>
     </template>
     <template v-else>
-      <h1>{{ formatMessage(messages.signInWithLabel) }}</h1>
 
-      <section class="third-party">
-        <a class="btn" :href="getAuthUrl('discord', redirectTarget)">
-          <SSODiscordIcon />
-          <span>Discord</span>
-        </a>
-        <a class="btn" :href="getAuthUrl('github', redirectTarget)">
-          <SSOGitHubIcon />
-          <span>GitHub</span>
-        </a>
-        <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-          <SSOMicrosoftIcon />
-          <span>Microsoft</span>
-        </a>
-        <a class="btn" :href="getAuthUrl('google', redirectTarget)">
-          <SSOGoogleIcon />
-          <span>Google</span>
-        </a>
-        <a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-          <SSOSteamIcon />
-          <span>Steam</span>
-        </a>
-        <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-          <SSOGitLabIcon />
-          <span>GitLab</span>
-        </a>
-      </section>
+<!--      <h1>第三方登录</h1>-->
 
-      <h1>{{ formatMessage(messages.usePasswordLabel) }}</h1>
+<!--      <section class="third-party">-->
+<!--        <a class="btn" :href="getAuthUrl('discord', redirectTarget)">-->
+<!--          <SSODiscordIcon />-->
+<!--          <span>Discord</span>-->
+<!--        </a>-->
+<!--        <a class="btn" :href="getAuthUrl('github', redirectTarget)">-->
+<!--          <SSOGitHubIcon />-->
+<!--          <span>GitHub</span>-->
+<!--        </a>-->
+<!--        <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">-->
+<!--          <SSOMicrosoftIcon />-->
+<!--          <span>Microsoft</span>-->
+<!--        </a>-->
+<!--        <a class="btn" :href="getAuthUrl('google', redirectTarget)">-->
+<!--          <SSOGoogleIcon />-->
+<!--          <span>Google</span>-->
+<!--        </a>-->
+<!--        <a class="btn" :href="getAuthUrl('steam', redirectTarget)">-->
+<!--          <SSOSteamIcon />-->
+<!--          <span>Steam</span>-->
+<!--        </a>-->
+<!--        <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">-->
+<!--          <SSOGitLabIcon />-->
+<!--          <span>GitLab</span>-->
+<!--        </a>-->
+<!--      </section>-->
+
+      <h1>登 录</h1>
 
       <section class="auth-form">
         <div class="iconified-input">
-          <label for="email" hidden>{{ formatMessage(messages.emailUsernameLabel) }}</label>
+          <label for="email" hidden>请输入邮箱或用户名</label>
           <MailIcon />
           <input
             id="email"
@@ -64,12 +65,12 @@
             type="text"
             autocomplete="username"
             class="auth-form__input"
-            :placeholder="formatMessage(messages.emailUsernameLabel)"
+            placeholder="请输入邮箱或用户名"
           />
         </div>
 
         <div class="iconified-input">
-          <label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
+          <label for="password" hidden>密码</label>
           <KeyIcon />
           <input
             id="password"
@@ -77,7 +78,7 @@
             type="password"
             autocomplete="current-password"
             class="auth-form__input"
-            :placeholder="formatMessage(messages.passwordLabel)"
+            placeholder="密码"
           />
         </div>
 

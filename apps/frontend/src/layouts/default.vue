@@ -186,40 +186,40 @@
                 aria-hidden="true"
               />
               <CompassIcon v-else aria-hidden="true" />
-              <span class="hidden md:contents">Discover content</span>
+              <span class="hidden md:contents">发现内容</span>
               <span class="contents md:hidden">Discover</span>
               <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
 
-              <template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
+              <template #mods> <BoxIcon aria-hidden="true" /> 模组 </template>
               <template #resourcepacks>
-                <PaintBrushIcon aria-hidden="true" /> Resource Packs
+                <PaintBrushIcon aria-hidden="true" /> 资源包
               </template>
-              <template #datapacks> <BracesIcon aria-hidden="true" /> Data Packs </template>
-              <template #plugins> <PlugIcon aria-hidden="true" /> Plugins </template>
-              <template #shaders> <GlassesIcon aria-hidden="true" /> Shaders </template>
-              <template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
+              <template #datapacks> <BracesIcon aria-hidden="true" /> 数据包 </template>
+              <template #plugins> <PlugIcon aria-hidden="true" /> 插件 </template>
+              <template #shaders> <GlassesIcon aria-hidden="true" /> 光影 </template>
+              <template #modpacks> <PackageOpenIcon aria-hidden="true" /> 整合包 </template>
             </TeleportOverflowMenu>
           </ButtonStyled>
 
-          <ButtonStyled
-            type="transparent"
-            :highlighted="route.name.startsWith('servers')"
-            :highlighted-style="
-              route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
-            "
-          >
-            <nuxt-link to="/servers">
-              <ServerIcon aria-hidden="true" />
-              Host a server
-            </nuxt-link>
-          </ButtonStyled>
-          <ButtonStyled type="transparent" :highlighted="route.name === 'app'">
-            <nuxt-link to="/app">
-              <DownloadIcon aria-hidden="true" />
-              <span class="hidden md:contents">Get Modrinth App</span>
-              <span class="contents md:hidden">Modrinth App</span>
-            </nuxt-link>
-          </ButtonStyled>
+<!--          <ButtonStyled-->
+<!--            type="transparent"-->
+<!--            :highlighted="route.name.startsWith('servers')"-->
+<!--            :highlighted-style="-->
+<!--              route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'-->
+<!--            "-->
+<!--          >-->
+<!--            <nuxt-link to="/servers">-->
+<!--              <ServerIcon aria-hidden="true" />-->
+<!--              服务器租用-->
+<!--            </nuxt-link>-->
+<!--          </ButtonStyled>-->
+<!--          <ButtonStyled type="transparent" :highlighted="route.name === 'app'">-->
+<!--            <nuxt-link to="/app">-->
+<!--              <DownloadIcon aria-hidden="true" />-->
+<!--              <span class="hidden md:contents">Get Modrinth App</span>-->
+<!--              <span class="contents md:hidden">Modrinth App</span>-->
+<!--            </nuxt-link>-->
+<!--          </ButtonStyled>-->
         </template>
       </div>
       <div class="flex items-center gap-2">
@@ -286,7 +286,7 @@
         <ButtonStyled v-else color="brand">
           <nuxt-link to="/auth/sign-in">
             <LogInIcon aria-hidden="true" />
-            Sign in
+            登录
           </nuxt-link>
         </ButtonStyled>
       </div>
@@ -482,63 +482,44 @@
             </template>
           </IntlFormatted>
         </p>
-        <p class="mb-4">
-          {{ config.public.branch }}@<a
-            :target="$external()"
-            :href="
-              'https://github.com/' +
-              config.public.owner +
-              '/' +
-              config.public.slug +
-              '/tree/' +
-              config.public.hash
-            "
-            class="text-link"
-            rel="noopener"
-            >{{ config.public.hash.substring(0, 7) }}</a
-          >
-        </p>
-        <p>© Rinth, Inc.</p>
+
       </div>
-      <div class="links links-1" role="region" aria-label="Legal">
-        <h4 aria-hidden="true">{{ formatMessage(footerMessages.companyTitle) }}</h4>
-        <nuxt-link to="/legal/terms"> {{ formatMessage(footerMessages.terms) }}</nuxt-link>
-        <nuxt-link to="/legal/privacy"> {{ formatMessage(footerMessages.privacy) }}</nuxt-link>
-        <nuxt-link to="/legal/rules"> {{ formatMessage(footerMessages.rules) }}</nuxt-link>
-        <a :target="$external()" href="https://careers.modrinth.com">
-          {{ formatMessage(footerMessages.careers) }}
-          <span v-if="false" class="count-bubble">0</span>
-        </a>
-      </div>
-      <div class="links links-2" role="region" aria-label="Resources">
-        <h4 aria-hidden="true">{{ formatMessage(footerMessages.resourcesTitle) }}</h4>
-        <a :target="$external()" href="https://support.modrinth.com">
-          {{ formatMessage(footerMessages.support) }}
-        </a>
-        <a :target="$external()" href="https://blog.modrinth.com">
-          {{ formatMessage(footerMessages.blog) }}
-        </a>
-        <a :target="$external()" href="https://docs.modrinth.com">
-          {{ formatMessage(footerMessages.docs) }}
-        </a>
-        <a :target="$external()" href="https://status.modrinth.com">
-          {{ formatMessage(footerMessages.status) }}
-        </a>
-      </div>
-      <div class="links links-3" role="region" aria-label="Interact">
-        <h4 aria-hidden="true">{{ formatMessage(footerMessages.interactTitle) }}</h4>
-        <a rel="noopener" :target="$external()" href="https://discord.modrinth.com"> Discord </a>
-        <a rel="noopener" :target="$external()" href="https://x.com/modrinth"> X (Twitter) </a>
-        <a rel="noopener" :target="$external()" href="https://floss.social/@modrinth"> Mastodon </a>
-        <a rel="noopener" :target="$external()" href="https://crowdin.com/project/modrinth">
-          Crowdin
-        </a>
-      </div>
+<!--      <div class="links links-1" role="region" aria-label="Legal">-->
+<!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.companyTitle) }}</h4>-->
+<!--        <nuxt-link to="/legal/terms"> {{ formatMessage(footerMessages.terms) }}</nuxt-link>-->
+<!--        <nuxt-link to="/legal/privacy"> {{ formatMessage(footerMessages.privacy) }}</nuxt-link>-->
+<!--        <nuxt-link to="/legal/rules"> {{ formatMessage(footerMessages.rules) }}</nuxt-link>-->
+
+<!--      </div>-->
+<!--      <div class="links links-2" role="region" aria-label="Resources">-->
+<!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.resourcesTitle) }}</h4>-->
+<!--        <a :target="$external()" href="https://support.modrinth.com">-->
+<!--          {{ formatMessage(footerMessages.support) }}-->
+<!--        </a>-->
+<!--        <a :target="$external()" href="https://blog.modrinth.com">-->
+<!--          {{ formatMessage(footerMessages.blog) }}-->
+<!--        </a>-->
+<!--        <a :target="$external()" href="https://docs.modrinth.com">-->
+<!--          {{ formatMessage(footerMessages.docs) }}-->
+<!--        </a>-->
+<!--        <a :target="$external()" href="https://status.modrinth.com">-->
+<!--          {{ formatMessage(footerMessages.status) }}-->
+<!--        </a>-->
+<!--      </div>-->
+<!--      <div class="links links-3" role="region" aria-label="Interact">-->
+<!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.interactTitle) }}</h4>-->
+<!--        <a rel="noopener" :target="$external()" href="https://discord.modrinth.com"> Discord </a>-->
+<!--        <a rel="noopener" :target="$external()" href="https://x.com/modrinth"> X (Twitter) </a>-->
+<!--        <a rel="noopener" :target="$external()" href="https://floss.social/@modrinth"> Mastodon </a>-->
+<!--        <a rel="noopener" :target="$external()" href="https://crowdin.com/project/modrinth">-->
+<!--          Crowdin-->
+<!--        </a>-->
+<!--      </div>-->
       <div class="buttons">
-        <nuxt-link class="btn btn-outline btn-primary" to="/app">
-          <DownloadIcon aria-hidden="true" />
-          {{ formatMessage(messages.getModrinthApp) }}
-        </nuxt-link>
+<!--        <nuxt-link class="btn btn-outline btn-primary" to="/app">-->
+<!--          <DownloadIcon aria-hidden="true" />-->
+<!--          {{ formatMessage(messages.getModrinthApp) }}-->
+<!--        </nuxt-link>-->
         <button class="iconified-button raised-button" @click="changeTheme">
           <MoonIcon v-if="$theme.active === 'light'" aria-hidden="true" />
           <SunIcon v-else aria-hidden="true" />
@@ -693,7 +674,7 @@ const messages = defineMessages({
 const footerMessages = defineMessages({
   openSource: {
     id: "layout.footer.open-source",
-    defaultMessage: "Modrinth is <github-link>open source</github-link>.",
+    defaultMessage: "BBSMC基于Modrinth的开源网站程序修改 <github-link>Github</github-link>.",
   },
   companyTitle: {
     id: "layout.footer.company.title",
@@ -701,15 +682,15 @@ const footerMessages = defineMessages({
   },
   terms: {
     id: "layout.footer.company.terms",
-    defaultMessage: "Terms",
+    defaultMessage: "条款",
   },
   privacy: {
     id: "layout.footer.company.privacy",
-    defaultMessage: "Privacy",
+    defaultMessage: "隐私",
   },
   rules: {
     id: "layout.footer.company.rules",
-    defaultMessage: "Rules",
+    defaultMessage: "规则",
   },
   careers: {
     id: "layout.footer.company.careers",
@@ -742,7 +723,7 @@ const footerMessages = defineMessages({
   legalDisclaimer: {
     id: "layout.footer.legal-disclaimer",
     defaultMessage:
-      "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
+      "非官方 MINECRAFT 服务。未获得 MOJANG 或 MICROSOFT 批准或与其相关。",
   },
 });
 

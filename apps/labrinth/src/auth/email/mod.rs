@@ -24,7 +24,7 @@ pub fn send_email_raw(
     let email = Message::builder()
         .from(Mailbox::new(
             Some("Modrinth".to_string()),
-            Address::new("no-reply", "mail.modrinth.com")?,
+            Address::new("bbsmc", "mc9y.net")?,
         ))
         .to(to.parse()?)
         .subject(subject)
@@ -36,7 +36,7 @@ pub fn send_email_raw(
     let host = dotenvy::var("SMTP_HOST")?;
     let creds = Credentials::new(username, password);
 
-    let mailer = SmtpTransport::relay(&host)?.credentials(creds).build();
+    let mailer = SmtpTransport::relay(&host)?.port(465).credentials(creds).build();
 
     mailer.send(&email)?;
 

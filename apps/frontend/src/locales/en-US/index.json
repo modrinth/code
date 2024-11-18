@@ -1,1241 +1,1040 @@
 {
   "auth.authorize.action.authorize": {
-    "message": "Authorize"
+    "message": "授权"
   },
   "auth.authorize.action.decline": {
-    "message": "Decline"
+    "message": "拒绝"
   },
   "auth.authorize.app-info": {
-    "message": "<strong>{appName}</strong> by <creator-link>{creator}</creator-link> will be able to:"
+    "message": "<creator-link>{creator}</creator-link> 的 <strong>{appName}</strong> 将能够："
   },
   "auth.authorize.authorize-app-name": {
-    "message": "Authorize {appName}"
+    "message": "授权给 {appName}"
   },
   "auth.authorize.error.no-redirect-url": {
-    "message": "No redirect location found in response"
+    "message": "在响应中未找到重定向位置"
   },
   "auth.authorize.redirect-url": {
-    "message": "You will be redirected to <redirect-url>{url}</redirect-url>"
+    "message": "您将跳转至<redirect-url>{url}</redirect-url>"
   },
   "auth.reset-password.method-choice.action": {
-    "message": "Send recovery email"
+    "message": "发送恢复电子邮件"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Enter your email below and we'll send a recovery link to allow you to recover your account."
+    "message": "在下方输入您的电子邮箱地址，我们将发送恢复链接以允许您恢复您的账户。"
   },
   "auth.reset-password.method-choice.email-username.label": {
-    "message": "Email or username"
+    "message": "电子邮箱或用户名"
   },
   "auth.reset-password.method-choice.email-username.placeholder": {
-    "message": "Email"
+    "message": "电子邮箱"
   },
   "auth.reset-password.notification.email-sent.text": {
-    "message": "An email with instructions has been sent to you if the email was previously saved on your account."
+    "message": "若填入邮箱之前已保存在您的账户中，那么一封电子邮件已经发送至此电子邮箱"
   },
   "auth.reset-password.notification.email-sent.title": {
-    "message": "Email sent"
+    "message": "电子邮件已发送"
   },
   "auth.reset-password.notification.password-reset.text": {
-    "message": "You can now log-in into your account with your new password."
+    "message": "现在你可以尝试使用新密码来登录到你的账户"
   },
   "auth.reset-password.notification.password-reset.title": {
-    "message": "Password successfully reset"
+    "message": "重置密码成功"
   },
   "auth.reset-password.post-challenge.action": {
-    "message": "Reset password"
+    "message": "重置密码"
   },
   "auth.reset-password.post-challenge.confirm-password.label": {
-    "message": "Confirm password"
+    "message": "确认密码"
   },
   "auth.reset-password.post-challenge.description": {
-    "message": "Enter your new password below to gain access to your account."
+    "message": "在下方输入您的新密码以访问您的账户。"
   },
   "auth.reset-password.title": {
-    "message": "Reset Password"
+    "message": "重置密码"
   },
   "auth.reset-password.title.long": {
-    "message": "Reset your password"
+    "message": "重置密码"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Please enter a two-factor code to proceed."
+    "message": "请输入双因素验证代码以继续。"
   },
   "auth.sign-in.2fa.label": {
-    "message": "Enter two-factor code"
+    "message": "输入双重身份验证代码"
   },
   "auth.sign-in.2fa.placeholder": {
-    "message": "Enter code..."
+    "message": "请输入2FA代码..."
   },
   "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>"
+    "message": "<forgot-password-link>忘记密码？</forgot-password-link> • <create-account-link>创建一个账户</create-account-link>"
   },
   "auth.sign-in.email-username.label": {
-    "message": "Email or username"
+    "message": "电子邮箱或用户名"
   },
   "auth.sign-in.password.label": {
-    "message": "Password"
+    "message": "密码"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Sign in with"
+    "message": "登录方式"
   },
   "auth.sign-in.title": {
-    "message": "Sign In"
+    "message": "登录"
   },
   "auth.sign-in.use-password": {
-    "message": "Or use a password"
+    "message": "或者使用密码"
   },
   "auth.sign-up.action.create-account": {
-    "message": "Create account"
+    "message": "创建账户"
   },
   "auth.sign-up.confirm-password.label": {
-    "message": "Confirm password"
+    "message": "确认密码"
   },
   "auth.sign-up.email.label": {
-    "message": "Email"
+    "message": "电子邮箱"
   },
   "auth.sign-up.label.username": {
-    "message": "Username"
+    "message": "用户名"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
+    "message": "创建账户即表示您同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
   },
   "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Passwords do not match!"
+    "message": "密码不正确！"
   },
   "auth.sign-up.password.label": {
-    "message": "Password"
+    "message": "密码"
   },
   "auth.sign-up.sign-in-option.title": {
-    "message": "Already have an account?"
+    "message": "已有一个账户？"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Subscribe to updates about Modrinth"
+    "message": "订阅有关 Modrinth 的更新"
   },
   "auth.sign-up.title": {
-    "message": "Sign Up"
+    "message": "注册"
   },
   "auth.sign-up.title.create-account": {
-    "message": "Or create an account yourself"
+    "message": "或者创建一个你自己的账户"
   },
   "auth.sign-up.title.sign-up-with": {
-    "message": "Sign up with"
+    "message": "通过以下方式注册"
   },
   "auth.verify-email.action.account-settings": {
-    "message": "Account settings"
+    "message": "账户设置"
   },
   "auth.verify-email.action.sign-in": {
-    "message": "Sign in"
+    "message": "登录"
   },
   "auth.verify-email.already-verified.description": {
-    "message": "Your email is already verified!"
+    "message": "您的电子邮箱已验证！"
   },
   "auth.verify-email.already-verified.title": {
-    "message": "Email already verified"
+    "message": "已验证电子邮箱"
   },
   "auth.verify-email.failed-verification.action": {
-    "message": "Resend verification email"
+    "message": "重新发送验证邮件"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "We were unable to verify your email. Try re-sending the verification email through your dashboard by signing in."
+    "message": "我们目前无法验证你的电子邮箱，请尝试登录后通过工作台的账户设置重新发送验证电子邮件以验证该邮箱。"
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "We were unable to verify your email. Try re-sending the verification email through the button below."
+    "message": "我们无法验证你的电子邮箱。尝试使用下面的按钮再次发送验证电子邮件。"
   },
   "auth.verify-email.failed-verification.title": {
-    "message": "Email verification failed"
+    "message": "电子邮箱验证失败"
   },
   "auth.verify-email.post-verification.description": {
-    "message": "Your email address has been successfully verified!"
+    "message": "您的电子邮件地址已成功验证！"
   },
   "auth.verify-email.post-verification.title": {
-    "message": "Email verification"
+    "message": "验证电子邮件"
   },
   "auth.verify-email.title": {
-    "message": "Verify Email"
+    "message": "电子邮件验证"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Subscribe to updates about Modrinth"
+    "message": "订阅有关 Modrinth 的更新"
   },
   "auth.welcome.description": {
-    "message": "Thank you for creating an account. You can now follow and create projects, receive updates about your favorite projects, and more!"
+    "message": "感谢您创建账户。您现在可以关注和创建项目，接收有关您喜爱的项目的更新，还有更多！"
   },
   "auth.welcome.label.tos": {
-    "message": "By creating an account, you have agreed to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
+    "message": "创建账户即代您同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
   },
   "auth.welcome.long-title": {
-    "message": "Welcome to Modrinth!"
+    "message": "欢迎来到 Modrinth！"
   },
   "auth.welcome.title": {
-    "message": "Welcome"
+    "message": "欢迎"
   },
   "button.cancel": {
-    "message": "Cancel"
+    "message": "取消"
   },
   "button.continue": {
-    "message": "Continue"
-  },
-  "button.copy-id": {
-    "message": "Copy ID"
+    "message": "继续"
   },
   "button.create-a-project": {
-    "message": "Create a project"
+    "message": "创建一个项目"
   },
   "button.edit": {
-    "message": "Edit"
-  },
-  "button.report": {
-    "message": "Report"
+    "message": "编辑"
   },
   "button.save": {
-    "message": "Save"
+    "message": "保存"
   },
   "button.save-changes": {
-    "message": "Save changes"
+    "message": "保存更改"
   },
   "button.sign-in": {
-    "message": "Sign in"
+    "message": "登录"
   },
   "button.sign-out": {
-    "message": "Sign out"
+    "message": "退出登录"
   },
   "button.upload-image": {
-    "message": "Upload image"
+    "message": "上传图片"
   },
   "collection.button.delete-icon": {
-    "message": "Delete icon"
+    "message": "删除图标"
   },
   "collection.button.edit-icon": {
-    "message": "Edit icon"
+    "message": "编辑图标"
   },
   "collection.button.remove-project": {
-    "message": "Remove project"
+    "message": "移除项目"
   },
   "collection.button.unfollow-project": {
-    "message": "Unfollow project"
+    "message": "取消关注项目"
   },
   "collection.button.upload-icon": {
-    "message": "Upload icon"
+    "message": "上传图标"
   },
   "collection.delete-modal.description": {
-    "message": "This will remove this collection forever. This action cannot be undone."
+    "message": "这将永久删除该收藏夹。此操作无法撤消。"
   },
   "collection.delete-modal.title": {
-    "message": "Are you sure you want to delete this collection?"
+    "message": "你确定要删除该收藏夹吗？"
   },
   "collection.description": {
-    "message": "{description} - View the collection {name} by {username} on Modrinth"
+    "message": "{description} - 前往 Modrinth 查看 {username} 的收藏夹 {name}"
   },
   "collection.description.following": {
-    "message": "Auto-generated collection of all the projects you're following."
+    "message": "自动生成你关注的所有项目的收藏夹。"
   },
   "collection.error.not-found": {
-    "message": "Collection not found"
+    "message": "未找到收藏夹"
   },
   "collection.label.collection": {
-    "message": "Collection"
+    "message": "收藏"
   },
   "collection.label.created-at": {
-    "message": "Created {ago}"
+    "message": "创建于 {ago}"
   },
   "collection.label.curated-by": {
-    "message": "Curated by"
+    "message": "策划人"
   },
   "collection.label.no-projects": {
-    "message": "This collection has no projects!"
+    "message": "该收藏夹没有项目！"
   },
   "collection.label.no-projects-auth": {
-    "message": "You don't have any projects.\nWould you like to <create-link>add one</create-link>?"
+    "message": "您没有任何项目。\n您想<create-link>添加一个</create-link>吗？"
   },
   "collection.label.owner": {
-    "message": "Owner"
+    "message": "所有者"
   },
   "collection.label.private": {
-    "message": "Private"
+    "message": "私有"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
+    "message": "{count, plural, other {<stat>{count}</stat> 个项目}}"
   },
   "collection.label.updated-at": {
-    "message": "Updated {ago}"
+    "message": "更新于 {ago}"
   },
   "collection.title": {
-    "message": "{name} - Collection"
+    "message": "{name} - 收藏夹"
   },
   "dashboard.collections.button.create-new": {
-    "message": "Create new"
+    "message": "新建"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} project} other {{count} projects}}"
+    "message": "{count, plural, other {{count} 个项目}}"
   },
   "dashboard.collections.label.search-input": {
-    "message": "Search your collections"
+    "message": "搜索你的收藏夹"
   },
   "dashboard.collections.long-title": {
-    "message": "Your collections"
+    "message": "你的收藏夹"
   },
   "frog": {
-    "message": "You've been frogged! 🐸"
+    "message": "你被耍了！🐸"
   },
   "frog.altText": {
-    "message": "A photorealistic painting of a frog labyrinth"
+    "message": "一幅逼真的青蛙迷宫图"
   },
   "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} more person} other {{count} more people}} were also frogged!"
+    "message": "{count, plural, other {还有 {count} 个人}}也被这只青蛙耍了！"
   },
   "frog.sinceOpened": {
-    "message": "This page was opened {ago}"
+    "message": "该页面打开于 {ago}"
   },
   "frog.title": {
-    "message": "Frog"
+    "message": "青蛙"
   },
   "input.view.gallery": {
-    "message": "Gallery view"
+    "message": "画廊视图"
   },
   "input.view.grid": {
-    "message": "Grid view"
+    "message": "网格视图"
   },
   "input.view.list": {
-    "message": "Rows view"
+    "message": "行视图"
   },
   "label.changes-saved": {
-    "message": "Changes saved"
+    "message": "更改已保存"
   },
   "label.collections": {
-    "message": "Collections"
+    "message": "收藏夹"
   },
   "label.created-ago": {
-    "message": "Created {ago}"
+    "message": "创建于 {ago}"
   },
   "label.dashboard": {
-    "message": "Dashboard"
+    "message": "仪表板"
   },
   "label.delete": {
-    "message": "Delete"
+    "message": "删除"
   },
   "label.description": {
-    "message": "Description"
+    "message": "描述"
   },
   "label.error": {
-    "message": "Error"
+    "message": "错误"
   },
   "label.followed-projects": {
-    "message": "Followed projects"
+    "message": "已关注的项目"
   },
   "label.moderation": {
-    "message": "Moderation"
+    "message": "管理"
   },
   "label.notifications": {
-    "message": "Notifications"
+    "message": "通知"
   },
   "label.password": {
-    "message": "Password"
+    "message": "密码"
   },
   "label.public": {
-    "message": "Public"
+    "message": "公开"
   },
   "label.rejected": {
-    "message": "Rejected"
+    "message": "已拒绝"
   },
   "label.scopes": {
-    "message": "Scopes"
+    "message": "范围"
   },
   "label.settings": {
-    "message": "Settings"
+    "message": "设置"
   },
   "label.title": {
-    "message": "Title"
+    "message": "标题"
   },
   "label.unlisted": {
-    "message": "Unlisted"
+    "message": "未列出"
   },
   "label.visibility": {
-    "message": "Visibility"
+    "message": "公开范围"
   },
   "label.visit-your-profile": {
-    "message": "Visit your profile"
+    "message": "访问你的个人资料"
   },
   "layout.action.change-theme": {
-    "message": "Change theme"
+    "message": "更改主题"
   },
   "layout.action.get-modrinth-app": {
-    "message": "Get Modrinth App"
+    "message": "获取 Modrinth 应用"
   },
   "layout.avatar.alt": {
-    "message": "Your avatar"
+    "message": "你的头像"
   },
   "layout.banner.add-email.button": {
-    "message": "Visit account settings"
+    "message": "访问账户设置"
   },
   "layout.banner.add-email.title": {
-    "message": "For security purposes, please enter your email on Modrinth."
+    "message": "为了安全起见，请在 Modrinth 上输入你的电子邮箱地址。"
   },
   "layout.banner.staging.description": {
-    "message": "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
+    "message": "暂存环境在生产 Modrinth 数据库的副本上运行。这用于测试和调试目的，并且可能运行比生产实例更新的 Modrinth 后端或前端的开发版本。"
   },
   "layout.banner.staging.title": {
-    "message": "You’re viewing Modrinth’s staging environment."
-  },
-  "layout.banner.subscription-payment-failed.button": {
-    "message": "Update billing info"
-  },
-  "layout.banner.subscription-payment-failed.title": {
-    "message": "Your subscription failed to renew. Please update your payment method to prevent losing access."
+    "message": "你正在查看 Modrinth 的暂存环境。"
   },
   "layout.banner.verify-email.action": {
-    "message": "Re-send verification email"
+    "message": "重新发送验证邮件"
   },
   "layout.banner.verify-email.title": {
-    "message": "For security purposes, please verify your email address on Modrinth."
+    "message": "为了安全起见，请在 Modrinth 上验证你的电子邮箱地址。"
   },
   "layout.footer.company.careers": {
-    "message": "Careers"
+    "message": "招贤纳士"
   },
   "layout.footer.company.privacy": {
-    "message": "Privacy"
+    "message": "隐私政策"
   },
   "layout.footer.company.rules": {
-    "message": "Rules"
+    "message": "社区守则"
   },
   "layout.footer.company.terms": {
-    "message": "Terms"
+    "message": "服务条款"
   },
   "layout.footer.company.title": {
-    "message": "Company"
+    "message": "公司"
   },
   "layout.footer.interact.title": {
-    "message": "Interact"
+    "message": "交互"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT."
+    "message": "非官方 MINECRAFT 服务。未经 MOJANG 或 MICROSOFT 批准或与之关联。"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth is <github-link>open source</github-link>."
+    "message": "Modrinth 是<github-link>开源项目</github-link>。"
   },
   "layout.footer.resources.blog": {
-    "message": "Blog"
+    "message": "博客"
   },
   "layout.footer.resources.docs": {
-    "message": "Docs"
+    "message": "文档"
   },
   "layout.footer.resources.status": {
-    "message": "Status"
+    "message": "状态"
   },
   "layout.footer.resources.support": {
-    "message": "Support"
+    "message": "支持"
   },
   "layout.footer.resources.title": {
-    "message": "Resources"
+    "message": "资源"
   },
   "layout.menu-toggle.action": {
-    "message": "Toggle menu"
+    "message": "切换菜单"
   },
   "layout.meta.description": {
-    "message": "Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. Discover and publish projects on Modrinth with a modern, easy to use interface and API."
+    "message": "在 Modrinth 上下载 Minecraft 模组、插件、数据包、光影、资源包和整合包。通过现代化、易于使用的界面和 API 在 Modrinth 上发现和发布项目。"
   },
   "layout.meta.og-description": {
-    "message": "Discover and publish Minecraft content!"
+    "message": "发现并发布 Minecraft 内容！"
   },
   "layout.nav.home": {
-    "message": "Home"
+    "message": "首页"
   },
   "layout.nav.search": {
-    "message": "Search"
+    "message": "搜索"
   },
   "notification.error.title": {
-    "message": "An error occurred"
+    "message": "出了点错误"
   },
   "profile.button.manage-projects": {
-    "message": "Manage projects"
+    "message": "管理项目"
+  },
+  "profile.button.report": {
+    "message": "举报"
   },
   "profile.error.not-found": {
-    "message": "User not found"
+    "message": "用户不存在"
   },
   "profile.joined-at": {
-    "message": "Joined <date>{ago}</date>"
-  },
-  "profile.label.badges": {
-    "message": "Badges"
-  },
-  "profile.label.details": {
-    "message": "Details"
+    "message": "加入于 {ago}"
   },
   "profile.label.no-collections": {
-    "message": "This user has no collections!"
+    "message": "该用户没有收藏项目！"
   },
   "profile.label.no-collections-auth": {
-    "message": "You don't have any collections.\nWould you like to <create-link>create one</create-link>?"
+    "message": "你还没有收藏夹。\n是否想要 <create-link>创建一个</create-link>？"
   },
   "profile.label.no-projects": {
-    "message": "This user has no projects!"
+    "message": "该用户没有项目！"
   },
   "profile.label.no-projects-auth": {
-    "message": "You don't have any projects.\nWould you like to <create-link>create one</create-link>?"
+    "message": "您没有任何项目。\n您想要<create-link>创建一个</create-link>吗？"
   },
   "profile.label.organizations": {
-    "message": "Organizations"
+    "message": "组织"
   },
   "profile.meta.description": {
-    "message": "Download {username}'s projects on Modrinth"
+    "message": "前往 Modrinth 下载 {username} 的项目"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} - Download {username}'s projects on Modrinth"
+    "message": "{bio} - 前往 Modrinth 下载 {username} 的项目"
   },
   "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
+    "message": "{count, plural,other {<stat>{count}</stat> 次下载}}"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
+    "message": "{count, plural, other {<stat>{count}</stat> 位关注者}}"
   },
   "profile.user-id": {
-    "message": "User ID: {id}"
+    "message": "用户 ID：{id}"
   },
   "project-type.all": {
-    "message": "All"
+    "message": "所有项目"
   },
   "project-type.collection.plural": {
-    "message": "Collections"
+    "message": "收藏夹"
   },
   "project-type.collection.singular": {
-    "message": "Collection"
+    "message": "收藏"
   },
   "project-type.datapack.plural": {
-    "message": "Data Packs"
+    "message": "数据包"
   },
   "project-type.datapack.singular": {
-    "message": "Data Pack"
+    "message": "数据包"
   },
   "project-type.mod.plural": {
-    "message": "Mods"
+    "message": "模组"
   },
   "project-type.mod.singular": {
-    "message": "Mod"
+    "message": "模组"
   },
   "project-type.modpack.plural": {
-    "message": "Modpacks"
+    "message": "整合包"
   },
   "project-type.modpack.singular": {
-    "message": "Modpack"
+    "message": "整合包"
   },
   "project-type.plugin.plural": {
-    "message": "Plugins"
+    "message": "插件"
   },
   "project-type.plugin.singular": {
-    "message": "Plugin"
+    "message": "插件"
   },
   "project-type.project.plural": {
-    "message": "Projects"
+    "message": "项目"
   },
   "project-type.project.singular": {
-    "message": "Project"
+    "message": "项目"
   },
   "project-type.resourcepack.plural": {
-    "message": "Resource Packs"
+    "message": "资源包"
   },
   "project-type.resourcepack.singular": {
-    "message": "Resource Pack"
+    "message": "资源包"
   },
   "project-type.shader.plural": {
-    "message": "Shaders"
+    "message": "光影"
   },
   "project-type.shader.singular": {
-    "message": "Shader"
-  },
-  "project.about.compatibility.environments": {
-    "message": "Supported environments"
-  },
-  "project.about.compatibility.game.minecraftJava": {
-    "message": "Minecraft: Java Edition"
-  },
-  "project.about.compatibility.platforms": {
-    "message": "Platforms"
-  },
-  "project.about.compatibility.title": {
-    "message": "Compatibility"
-  },
-  "project.about.creators.owner": {
-    "message": "Project owner"
-  },
-  "project.about.creators.title": {
-    "message": "Creators"
-  },
-  "project.about.details.created": {
-    "message": "Created {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licensed {license}"
-  },
-  "project.about.details.published": {
-    "message": "Published {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Submitted {date}"
-  },
-  "project.about.details.title": {
-    "message": "Details"
-  },
-  "project.about.details.updated": {
-    "message": "Updated {date}"
-  },
-  "project.about.links.discord": {
-    "message": "Join Discord server"
-  },
-  "project.about.links.donate.bmac": {
-    "message": "Buy Me a Coffee"
-  },
-  "project.about.links.donate.generic": {
-    "message": "Donate"
-  },
-  "project.about.links.donate.github": {
-    "message": "Sponsor on GitHub"
-  },
-  "project.about.links.donate.kofi": {
-    "message": "Donate on Ko-fi"
-  },
-  "project.about.links.donate.patreon": {
-    "message": "Donate on Patreon"
-  },
-  "project.about.links.donate.paypal": {
-    "message": "Donate on PayPal"
-  },
-  "project.about.links.issues": {
-    "message": "Report issues"
-  },
-  "project.about.links.source": {
-    "message": "View source"
-  },
-  "project.about.links.title": {
-    "message": "Links"
-  },
-  "project.about.links.wiki": {
-    "message": "Visit wiki"
-  },
-  "project.description.title": {
-    "message": "Description"
-  },
-  "project.gallery.title": {
-    "message": "Gallery"
-  },
-  "project.moderation.title": {
-    "message": "Moderation"
-  },
-  "project.stats.downloads-label": {
-    "message": "download{count, plural, one {} other {s}}"
-  },
-  "project.stats.followers-label": {
-    "message": "follower{count, plural, one {} other {s}}"
-  },
-  "project.version.all-versions": {
-    "message": "All versions"
-  },
-  "project.version.back-to-versions": {
-    "message": "Back to versions"
-  },
-  "project.versions.title": {
-    "message": "Versions"
+    "message": "光影"
   },
   "revenue.transfers.total": {
-    "message": "You have withdrawn {amount} in total."
+    "message": "您总共提现了 {amount} 。"
   },
   "revenue.transfers.total.method": {
-    "message": "You have withdrawn {amount} through {method}."
+    "message": "你通过 {method} 提现了 {amount} 。"
   },
   "revenue.transfers.total.year": {
-    "message": "You have withdrawn {amount} in {year}."
+    "message": "你在 {year} 提现了 {amount} 。"
   },
   "revenue.transfers.total.year_method": {
-    "message": "You have withdrawn {amount} in {year} through {method}."
+    "message": "你在 {year} 通过 {method} 提现了 {amount} 。"
   },
   "scopes.analytics.description": {
-    "message": "Access your analytics data"
+    "message": "访问你的分析数据"
   },
   "scopes.analytics.label": {
-    "message": "Read analytics"
+    "message": "读取分析"
   },
   "scopes.collectionCreate.description": {
-    "message": "Create collections"
+    "message": "创建收藏夹"
   },
   "scopes.collectionCreate.label": {
-    "message": "Create collections"
+    "message": "创建收藏夹"
   },
   "scopes.collectionDelete.description": {
-    "message": "Delete collections"
+    "message": "删除收藏夹"
   },
   "scopes.collectionDelete.label": {
-    "message": "Delete collections"
+    "message": "删除收藏夹"
   },
   "scopes.collectionRead.description": {
-    "message": "Read collections"
+    "message": "读取收藏夹"
   },
   "scopes.collectionRead.label": {
-    "message": "Read collections"
+    "message": "读取收藏夹"
   },
   "scopes.collectionWrite.description": {
-    "message": "Write to collections"
+    "message": "写入收藏夹"
   },
   "scopes.collectionWrite.label": {
-    "message": "Write collections"
+    "message": "写入收藏夹"
   },
   "scopes.notificationRead.description": {
-    "message": "Read your notifications"
+    "message": "读取你的通知"
   },
   "scopes.notificationRead.label": {
-    "message": "Read notifications"
+    "message": "读取通知"
   },
   "scopes.notificationWrite.description": {
-    "message": "Delete/View your notifications"
+    "message": "删除/查看你的通知"
   },
   "scopes.notificationWrite.label": {
-    "message": "Write notifications"
+    "message": "写入通知"
   },
   "scopes.organizationCreate.description": {
-    "message": "Create organizations"
+    "message": "创建组织"
   },
   "scopes.organizationCreate.label": {
-    "message": "Create organizations"
+    "message": "创建组织"
   },
   "scopes.organizationDelete.description": {
-    "message": "Delete organizations"
+    "message": "删除组织"
   },
   "scopes.organizationDelete.label": {
-    "message": "Delete organizations"
+    "message": "删除组织"
   },
   "scopes.organizationRead.description": {
-    "message": "Read organizations"
+    "message": "读取组织"
   },
   "scopes.organizationRead.label": {
-    "message": "Read organizations"
+    "message": "读取组织"
   },
   "scopes.organizationWrite.description": {
-    "message": "Write to organizations"
+    "message": "写入组织"
   },
   "scopes.organizationWrite.label": {
-    "message": "Write organizations"
+    "message": "写入组织"
   },
   "scopes.patCreate.description": {
-    "message": "Create personal API tokens"
+    "message": "创建个人 API 令牌"
   },
   "scopes.patCreate.label": {
-    "message": "Create PATs"
+    "message": "创建个人访问令牌"
   },
   "scopes.patDelete.description": {
-    "message": "Delete your personal API tokens"
+    "message": "删除您的个人 API 令牌"
   },
   "scopes.patDelete.label": {
-    "message": "Delete PATs"
+    "message": "删除个人访问令牌"
   },
   "scopes.patRead.description": {
-    "message": "View created API tokens"
+    "message": "查看已创建的 API 令牌"
   },
   "scopes.patRead.label": {
-    "message": "Read PATs"
+    "message": "读取个人访问令牌"
   },
   "scopes.patWrite.description": {
-    "message": "Edit personal API tokens"
+    "message": "编辑个人 API 令牌"
   },
   "scopes.patWrite.label": {
-    "message": "Write PATs"
+    "message": "写入个人访问令牌"
   },
   "scopes.payoutsRead.description": {
-    "message": "Read your payouts data"
+    "message": "读取你的付款数据"
   },
   "scopes.payoutsRead.label": {
-    "message": "Read payouts"
+    "message": "读取付款"
   },
   "scopes.payoutsWrite.description": {
-    "message": "Withdraw money"
+    "message": "提现"
   },
   "scopes.payoutsWrite.label": {
-    "message": "Write payouts"
+    "message": "写入支出"
   },
   "scopes.performAnalytics.description": {
-    "message": "Perform analytics actions"
+    "message": "进行分析操作"
   },
   "scopes.performAnalytics.label": {
-    "message": "Perform analytics"
+    "message": "进行分析"
   },
   "scopes.projectCreate.description": {
-    "message": "Create new projects"
+    "message": "创建新项目"
   },
   "scopes.projectCreate.label": {
-    "message": "Create projects"
+    "message": "创建项目"
   },
   "scopes.projectDelete.description": {
-    "message": "Delete your projects"
+    "message": "删除您的项目"
   },
   "scopes.projectDelete.label": {
-    "message": "Delete projects"
+    "message": "删除项目"
   },
   "scopes.projectRead.description": {
-    "message": "Read all your projects"
+    "message": "读取你的所有项目"
   },
   "scopes.projectRead.label": {
-    "message": "Read projects"
+    "message": "读取项目"
   },
   "scopes.projectWrite.description": {
-    "message": "Write to project data"
+    "message": "写入项目数据"
   },
   "scopes.projectWrite.label": {
-    "message": "Write projects"
+    "message": "写入项目"
   },
   "scopes.reportCreate.description": {
-    "message": "Create reports"
+    "message": "创建举报"
   },
   "scopes.reportCreate.label": {
-    "message": "Create reports"
+    "message": "创建举报"
   },
   "scopes.reportDelete.description": {
-    "message": "Delete reports"
+    "message": "删除举报"
   },
   "scopes.reportDelete.label": {
-    "message": "Delete reports"
+    "message": "删除举报"
   },
   "scopes.reportRead.description": {
-    "message": "Read reports"
+    "message": "读取举报"
   },
   "scopes.reportRead.label": {
-    "message": "Read reports"
+    "message": "读取举报"
   },
   "scopes.reportWrite.description": {
-    "message": "Edit reports"
+    "message": "编辑举报"
   },
   "scopes.reportWrite.label": {
-    "message": "Write reports"
+    "message": "写入举报"
   },
   "scopes.sessionAccess.description": {
-    "message": "Access modrinth-issued sessions"
+    "message": "访问 modrinth-issued 会话"
   },
   "scopes.sessionAccess.label": {
-    "message": "Access sessions"
+    "message": "访问会话"
   },
   "scopes.sessionDelete.description": {
-    "message": "Delete sessions"
+    "message": "删除会话"
   },
   "scopes.sessionDelete.label": {
-    "message": "Delete sessions"
+    "message": "删除会话"
   },
   "scopes.sessionRead.description": {
-    "message": "Read active sessions"
+    "message": "读取活动会话"
   },
   "scopes.sessionRead.label": {
-    "message": "Read sessions"
+    "message": "读取会话"
   },
   "scopes.threadRead.description": {
-    "message": "Read threads"
+    "message": "读取帖子"
   },
   "scopes.threadRead.label": {
-    "message": "Read threads"
+    "message": "读取帖子"
   },
   "scopes.threadWrite.description": {
-    "message": "Write to threads"
+    "message": "写入帖子"
   },
   "scopes.threadWrite.label": {
-    "message": "Write threads"
+    "message": "写入帖子"
   },
   "scopes.userAuthWrite.description": {
-    "message": "Modify your authentication data"
+    "message": "修改你的身份验证数据"
   },
   "scopes.userAuthWrite.label": {
-    "message": "Write auth data"
+    "message": "写入身份验证数据"
   },
   "scopes.userDelete.description": {
-    "message": "Delete your account"
+    "message": "删除你的账户"
   },
   "scopes.userDelete.label": {
-    "message": "Delete your account"
+    "message": "删除你的账户"
   },
   "scopes.userRead.description": {
-    "message": "Access your public profile information"
+    "message": "访问你的公开资料信息"
   },
   "scopes.userRead.label": {
-    "message": "Read user data"
+    "message": "读取用户数据"
   },
   "scopes.userReadEmail.description": {
-    "message": "Read your email"
+    "message": "读取你的邮箱地址"
   },
   "scopes.userReadEmail.label": {
-    "message": "Read user email"
+    "message": "读取用户邮箱地址"
   },
   "scopes.userWrite.description": {
-    "message": "Write to your profile"
+    "message": "写入您的个人资料"
   },
   "scopes.userWrite.label": {
-    "message": "Write user data"
+    "message": "写入用户数据"
   },
   "scopes.versionCreate.description": {
-    "message": "Create new versions"
+    "message": "创建新版本"
   },
   "scopes.versionCreate.label": {
-    "message": "Create versions"
+    "message": "创建版本"
   },
   "scopes.versionDelete.description": {
-    "message": "Delete a version"
+    "message": "删除一个版本"
   },
   "scopes.versionDelete.label": {
-    "message": "Delete versions"
+    "message": "删除版本"
   },
   "scopes.versionRead.description": {
-    "message": "Read all versions"
+    "message": "读取所有版本"
   },
   "scopes.versionRead.label": {
-    "message": "Read versions"
+    "message": "读取版本"
   },
   "scopes.versionWrite.description": {
-    "message": "Write to version data"
+    "message": "写入版本数据"
   },
   "scopes.versionWrite.label": {
-    "message": "Write versions"
+    "message": "写入版本"
   },
   "settings.account.title": {
-    "message": "Account and security"
+    "message": "账户与安全"
   },
   "settings.appearance.title": {
-    "message": "Appearance"
+    "message": "外观"
   },
   "settings.applications.title": {
-    "message": "Your applications"
+    "message": "您的应用程序"
   },
   "settings.authorized-apps.title": {
-    "message": "Authorized apps"
-  },
-  "settings.billing.modal.cancel.action": {
-    "message": "Cancel subscription"
-  },
-  "settings.billing.modal.cancel.description": {
-    "message": "This will cancel your subscription. You will retain your perks until the end of the current billing cycle."
-  },
-  "settings.billing.modal.cancel.title": {
-    "message": "Are you sure you want to cancel your subscription?"
-  },
-  "settings.billing.modal.delete.action": {
-    "message": "Remove this payment method"
-  },
-  "settings.billing.modal.delete.description": {
-    "message": "This will remove this payment method forever (like really forever)."
-  },
-  "settings.billing.modal.delete.title": {
-    "message": "Are you sure you want to remove this payment method?"
-  },
-  "settings.billing.payment_method.action.add": {
-    "message": "Add payment method"
-  },
-  "settings.billing.payment_method.action.history": {
-    "message": "View past charges"
-  },
-  "settings.billing.payment_method.action.primary": {
-    "message": "Make primary"
-  },
-  "settings.billing.payment_method.card_display": {
-    "message": "{card_brand} ending in {last_four}"
-  },
-  "settings.billing.payment_method.card_expiry": {
-    "message": "Expires {month}/{year}"
-  },
-  "settings.billing.payment_method.none": {
-    "message": "You have not added any payment methods."
-  },
-  "settings.billing.payment_method.primary": {
-    "message": "Primary"
-  },
-  "settings.billing.payment_method.title": {
-    "message": "Payment methods"
-  },
-  "settings.billing.payment_method_type.amazon_pay": {
-    "message": "Amazon Pay"
-  },
-  "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
-  },
-  "settings.billing.payment_method_type.cashapp": {
-    "message": "Cash App"
-  },
-  "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
-  },
-  "settings.billing.payment_method_type.discover": {
-    "message": "Discover"
-  },
-  "settings.billing.payment_method_type.eftpos": {
-    "message": "EFTPOS"
-  },
-  "settings.billing.payment_method_type.jcb": {
-    "message": "JCB"
-  },
-  "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
-  },
-  "settings.billing.payment_method_type.paypal": {
-    "message": "PayPal"
-  },
-  "settings.billing.payment_method_type.unionpay": {
-    "message": "UnionPay"
-  },
-  "settings.billing.payment_method_type.unknown": {
-    "message": "Unknown payment method"
-  },
-  "settings.billing.payment_method_type.visa": {
-    "message": "Visa"
-  },
-  "settings.billing.subscription.description": {
-    "message": "Manage your Modrinth subscriptions."
-  },
-  "settings.billing.subscription.title": {
-    "message": "Subscriptions"
-  },
-  "settings.billing.title": {
-    "message": "Billing and subscriptions"
+    "message": "已授权的应用"
   },
   "settings.display.banner.developer-mode.button": {
-    "message": "Deactivate developer mode"
+    "message": "停用开发者模式"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Developer mode</strong> is active. This will allow you to view the internal IDs of various things throughout Modrinth that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode."
+    "message": "<strong>开发者模式</strong>处于激活状态 。 这将允许你查看 Modrinth 的各种事物的内部 ID，如果你是使用 Modrinth API 的开发者，可能会有所帮助。点击页面底部的 Modrinth 徽标 5 次以切换开发者模式。"
   },
   "settings.display.flags.description": {
-    "message": "Enable or disable certain features on this device."
+    "message": "在此设备上启用或禁用某些功能。"
   },
   "settings.display.flags.title": {
-    "message": "Toggle features"
+    "message": "切换功能"
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Data Packs page"
+    "message": "数据包页面"
   },
   "settings.display.project-list-layouts.description": {
-    "message": "Select your preferred layout for each page that displays project lists on this device."
+    "message": "为此设备上显示项目列表的每个页面选择您的首选布局。"
   },
   "settings.display.project-list-layouts.mod": {
-    "message": "Mods page"
+    "message": "模组页面"
   },
   "settings.display.project-list-layouts.modpack": {
-    "message": "Modpacks page"
+    "message": "整合包页面"
   },
   "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins page"
+    "message": "插件页面"
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "message": "Resource Packs page"
+    "message": "资源包页面"
   },
   "settings.display.project-list-layouts.shader": {
-    "message": "Shaders page"
+    "message": "光影页面"
   },
   "settings.display.project-list-layouts.title": {
-    "message": "Project list layouts"
+    "message": "项目列表布局"
   },
   "settings.display.project-list-layouts.user": {
-    "message": "User profile pages"
-  },
-  "settings.display.project-list.layouts.collection": {
-    "message": "Collection"
+    "message": "用户个人资料页面"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
+    "message": "启用高级渲染，例如模糊效果。可能会在没有硬件加速渲染的情况下造成性能问题。"
   },
   "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Advanced rendering"
+    "message": "高级渲染"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Make links which go outside of Modrinth open in a new tab. No matter this setting, links on the same domain and in Markdown descriptions will open in the same tab, and links on ads and edit pages will open in a new tab."
+    "message": "使离开 Modrinth 的链接在新标签页中打开。 无论如何设置，同一域名和 Markdown 描述中的链接将在同一标签页中打开，而广告和编辑页面的链接将在新标签页中打开。"
   },
   "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Open external links in new tab"
+    "message": "始终在新标签页打开外部链接"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Hides the \"Get Modrinth App\" buttons from primary navigation. The Modrinth App page can still be found on the landing page or in the footer."
+    "message": "隐藏主页中的“获取 Modrinth 应用”按钮。Modrinth 应用页面仍然可以在登录页面或页脚中找到。"
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Hide Modrinth App promotions"
+    "message": "隐藏 Modrinth 应用程序推荐"
   },
-  "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Left-aligned sidebar on content pages"
+  "settings.display.sidebar.right-aligned-project-sidebar.description": {
+    "message": "将项目详细信息侧栏与页面内容的右侧对齐。"
   },
-  "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Aligns the sidebar to the left of the page's content."
+  "settings.display.sidebar.right-aligned-project-sidebar.title": {
+    "message": "右对齐项目侧边栏"
   },
-  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Aligns the filters sidebar to the right of the search results."
+  "settings.display.sidebar.right-aligned-search-sidebar.description": {
+    "message": "使搜索筛选器侧边栏与搜索结果的右侧对齐。"
   },
-  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Right-aligned filters sidebar on search pages"
+  "settings.display.sidebar.right-aligned-search-sidebar.title": {
+    "message": "右对齐搜索侧边栏"
   },
   "settings.display.theme.dark": {
-    "message": "Dark"
+    "message": "深色"
   },
   "settings.display.theme.description": {
-    "message": "Select your preferred color theme for Modrinth on this device."
+    "message": "在此设备上为 Modrinth 选择您首选的颜色主题。"
   },
   "settings.display.theme.light": {
-    "message": "Light"
+    "message": "浅色"
   },
   "settings.display.theme.oled": {
     "message": "OLED"
   },
   "settings.display.theme.preferred-dark-theme": {
-    "message": "Preferred dark theme"
+    "message": "首选深色主题"
   },
   "settings.display.theme.preferred-light-theme": {
-    "message": "Preferred light theme"
+    "message": "首选浅色主题"
   },
   "settings.display.theme.retro": {
-    "message": "Retro"
+    "message": "复古"
   },
   "settings.display.theme.system": {
-    "message": "Sync with system"
+    "message": "跟随系统"
   },
   "settings.display.theme.title": {
-    "message": "Color theme"
+    "message": "主题颜色"
   },
   "settings.language.categories.auto": {
-    "message": "Automatic"
+    "message": "自动"
   },
   "settings.language.categories.default": {
-    "message": "Standard languages"
+    "message": "标准语言"
   },
   "settings.language.categories.experimental": {
-    "message": "Experimental languages"
+    "message": "实验性语言"
   },
   "settings.language.categories.fun": {
-    "message": "Fun languages"
+    "message": "趣味性语言"
   },
   "settings.language.categories.search-result": {
-    "message": "Search results"
+    "message": "搜索结果"
   },
   "settings.language.description": {
-    "message": "Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
+    "message": "选择您希望网站所呈现的语言。翻译由 <crowdin-link>Crowdin</crowdin-link> 上的志愿者们所贡献。"
   },
   "settings.language.languages.automatic": {
-    "message": "Sync with the system language"
+    "message": "跟随系统语言"
   },
   "settings.language.languages.language-label-applying": {
-    "message": "{label}. Applying..."
+    "message": "{label}. 应用中……"
   },
   "settings.language.languages.language-label-error": {
-    "message": "{label}. Error"
+    "message": "{label}. 出现错误"
   },
   "settings.language.languages.load-failed": {
-    "message": "Cannot load this language. Try again in a bit."
+    "message": "无法加载此语言。请稍后再试。"
   },
   "settings.language.languages.search-field.description": {
-    "message": "Submit to focus the first search result"
+    "message": "提交以聚焦第一个搜索结果"
   },
   "settings.language.languages.search-field.placeholder": {
-    "message": "Search for a language..."
+    "message": "搜索语言…"
   },
   "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search."
+    "message": "{matches, plural,=0 {没有语言}other {有 # 种语言}}匹配你的搜索。"
   },
   "settings.language.languages.search.no-results": {
-    "message": "No languages match your search."
+    "message": "没有符合搜索条件的语言。"
   },
   "settings.language.title": {
-    "message": "Language"
+    "message": "语言"
   },
   "settings.pats.action.create": {
-    "message": "Create a PAT"
+    "message": "创建个人访问令牌"
   },
   "settings.pats.description": {
-    "message": "PATs can be used to access Modrinth's API. For more information, see <doc-link>Modrinth's API documentation</doc-link>. They can be created and revoked at any time."
+    "message": "个人访问令牌可用于访问 Modrinth 的 API。请参阅 <doc-link>Modrinth 的 API 文档</doc-link>，以获取更多有关信息。您可以随时创建和撤销这些令牌。"
   },
   "settings.pats.modal.create.action": {
-    "message": "Create PAT"
+    "message": "创建个人访问令牌"
   },
   "settings.pats.modal.create.expires.label": {
-    "message": "Expires"
+    "message": "过期时间"
   },
   "settings.pats.modal.create.name.label": {
-    "message": "Name"
+    "message": "名称"
   },
   "settings.pats.modal.create.name.placeholder": {
-    "message": "Enter the PAT's name..."
+    "message": "输入个人访问令牌的名称..."
   },
   "settings.pats.modal.create.title": {
-    "message": "Create personal access token"
+    "message": "创建个人访问令牌"
   },
   "settings.pats.modal.delete.action": {
-    "message": "Delete this token"
+    "message": "删除该令牌"
   },
   "settings.pats.modal.delete.description": {
-    "message": "This will remove this token forever (like really forever)."
+    "message": "这将永久删除此令牌（真的很久）。"
   },
   "settings.pats.modal.delete.title": {
-    "message": "Are you sure you want to delete this token?"
+    "message": "您确定要删除这个令牌吗？"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Edit personal access token"
+    "message": "编辑个人访问令牌"
   },
   "settings.pats.title": {
-    "message": "Personal access tokens"
+    "message": "个人访问令牌"
   },
   "settings.pats.token.action.edit": {
-    "message": "Edit token"
+    "message": "编辑令牌"
   },
   "settings.pats.token.action.revoke": {
-    "message": "Revoke token"
+    "message": "撤销令牌"
   },
   "settings.pats.token.expired-ago": {
-    "message": "Expired {ago}"
+    "message": "过期于 {ago}"
   },
   "settings.pats.token.expires-in": {
-    "message": "Expires {inTime}"
+    "message": "{inTime}过期"
   },
   "settings.pats.token.last-used": {
-    "message": "Last used {ago}"
+    "message": "上次使用于 {ago}"
   },
   "settings.pats.token.never-used": {
-    "message": "Never used"
+    "message": "从未使用"
   },
   "settings.profile.bio.description": {
-    "message": "A short description to tell everyone a little bit about you."
+    "message": "做个简短的自我介绍吧。"
   },
   "settings.profile.bio.title": {
-    "message": "Bio"
+    "message": "简介"
   },
   "settings.profile.description": {
-    "message": "Your profile information is publicly viewable on Modrinth and through the <docs-link>Modrinth API</docs-link>."
+    "message": "您的个人资料信息可在 Modrinth 和通过 <docs-link>Modrinth API</docs-link> 公开查看。"
   },
   "settings.profile.profile-info": {
-    "message": "Profile information"
+    "message": "个人资料信息"
   },
   "settings.profile.profile-picture.reset": {
-    "message": "Reset"
+    "message": "重置"
   },
   "settings.profile.profile-picture.title": {
-    "message": "Profile picture"
+    "message": "头像"
   },
   "settings.profile.title": {
-    "message": "Public profile"
+    "message": "公开信息"
   },
   "settings.profile.username.description": {
-    "message": "A unique case-insensitive name to identify your profile."
+    "message": "不区分大小写的唯一名称，用于识别你的个人资料。"
   },
   "settings.profile.username.title": {
-    "message": "Username"
+    "message": "用户名"
   },
   "settings.sessions.action.revoke-session": {
-    "message": "Revoke session"
+    "message": "撤销会话"
   },
   "settings.sessions.created-ago": {
-    "message": "Created {ago}"
+    "message": "创建于 {ago}"
   },
   "settings.sessions.current-session": {
-    "message": "Current session"
+    "message": "当前会话"
   },
   "settings.sessions.description": {
-    "message": "Here are all the devices that are currently logged in with your Modrinth account. You can log out of each one individually.\n\nIf you see an entry you don't recognize, log out of that device and change your Modrinth account password immediately."
+    "message": "以下是你目前已登录 Modrinth 账号的所有设备。你可以单独登出任意一项。\n\n如果你看到一条无法辨认的记录，请立即登出该设备并更改你的 Modrinth 账号密码。"
   },
   "settings.sessions.last-accessed-ago": {
-    "message": "Last accessed {ago}"
+    "message": "上次访问于 {ago}"
   },
   "settings.sessions.title": {
-    "message": "Sessions"
+    "message": "会话"
   },
   "settings.sessions.unknown-os": {
-    "message": "Unknown OS"
+    "message": "未知操作系统"
   },
   "settings.sessions.unknown-platform": {
-    "message": "Unknown platform"
+    "message": "未知平台"
   },
   "tooltip.date-at-time": {
-    "message": "{date, date, long} at {time, time, short}"
+    "message": "{date, date, long} {time, time, short}"
   }
 }

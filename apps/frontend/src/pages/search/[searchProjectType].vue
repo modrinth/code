@@ -4,7 +4,7 @@
     :class="{ 'alt-layout': !cosmetics.rightSearchLayout }"
   >
     <Head>
-      <Title>Search {{ projectType.display }}s - Modrinth</Title>
+      <Title> {{ projectType.display }} - BBSMC</Title>
     </Head>
     <aside
       :class="{
@@ -55,7 +55,7 @@
               v-model="queryFilter"
               name="search"
               type="search"
-              placeholder="Search filters..."
+              placeholder="搜索..."
               autocomplete="off"
             />
           </div>
@@ -70,7 +70,7 @@
                 negativeFacets.length === 0
               )
             "
-            v-tooltip="`Reset all filters`"
+            v-tooltip="`重置所有筛选`"
             class="btn icon-only"
             aria-label="Reset all filters"
             @click="clearFilters"
@@ -93,7 +93,7 @@
               }
             "
           >
-            <template v-if="header === 'gameVersion'"> Game versions </template>
+            <template v-if="header === 'gameVersion'"> 游戏版本 </template>
             <template v-else>
               {{ $formatCategoryHeader(header) }}
             </template>
@@ -150,13 +150,13 @@
               v-if="header === 'gameVersion'"
               v-model="showSnapshots"
               class="mx-2"
-              :label="`Show all versions`"
+              :label="`显示所有版本`"
             />
             <Checkbox
               v-if="header === 'loaders' && projectType.id === 'mod'"
               v-model="showAllLoaders"
               class="mx-2"
-              :label="`Show all loaders`"
+              :label="`显示所有加载器`"
             />
           </Accordion>
         </div>
@@ -181,7 +181,7 @@
               v-model="query"
               type="search"
               name="search"
-              :placeholder="`Search ${projectType.display}s...`"
+              :placeholder="`搜索 ${projectType.display}...`"
               autocomplete="off"
               @input="onSearchChange(1)"
             />
@@ -189,7 +189,7 @@
         </div>
         <div class="sort-controls">
           <div class="labeled-control">
-            <span class="labeled-control__label">Sort by</span>
+            <span class="labeled-control__label">筛选</span>
             <Multiselect
               v-model="sortType"
               placeholder="Select one"
@@ -209,7 +209,7 @@
             </Multiselect>
           </div>
           <div class="labeled-control">
-            <span class="labeled-control__label">Show per page</span>
+            <span class="labeled-control__label">页数</span>
             <Multiselect
               v-model="maxResults"
               placeholder="Select one"
@@ -236,7 +236,7 @@
       </div>
       <LogoAnimated v-if="searchLoading && !noLoad" />
       <div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
-        <p>No results found for your query!</p>
+        <p>无搜索结果</p>
       </div>
       <div v-else class="search-results-container">
         <div
@@ -346,23 +346,23 @@ const onlyOpenSource = ref(false);
 const showSnapshots = ref(false);
 const selectedEnvironments = ref([]);
 const sortTypes = shallowReadonly([
-  { display: "Relevance", name: "relevance" },
-  { display: "Download count", name: "downloads" },
-  { display: "Follow count", name: "follows" },
-  { display: "Recently published", name: "newest" },
-  { display: "Recently updated", name: "updated" },
+  { display: "相关", name: "relevance" },
+  { display: "下载数", name: "downloads" },
+  { display: "关注度", name: "follows" },
+  { display: "最近发布", name: "newest" },
+  { display: "最近更新", name: "updated" },
 ]);
-const sortType = ref({ display: "Relevance", name: "relevance" });
+const sortType = ref({ display: "相关", name: "relevance" });
 const maxResults = ref(20);
 const currentPage = ref(1);
 const projectType = ref({ id: "mod", display: "mod", actual: "mod" });
 
 const ogTitle = computed(
-  () => `Search ${projectType.value.display}s${query.value ? " | " + query.value : ""}`,
+  () => `搜索 ${projectType.value.display} ${query.value ? " | " + query.value : ""}`,
 );
 const description = computed(
   () =>
-    `Search and browse thousands of Minecraft ${projectType.value.display}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value.display}s.`,
+    `快速在BBSMC上搜索 ${projectType.value.display} 的准确结果. 我们的过滤器可帮助您快速找到最佳的 Minecraft ${projectType.value.display}`,
 );
 
 useSeoMeta({
@@ -400,19 +400,19 @@ if (route.query.s) {
 
   switch (sortType.value.name) {
     case "relevance":
-      sortType.value.display = "Relevance";
+      sortType.value.display = "相关";
       break;
     case "downloads":
-      sortType.value.display = "Downloads";
+      sortType.value.display = "下载数";
       break;
     case "newest":
-      sortType.value.display = "Recently published";
+      sortType.value.display = "最近发布";
       break;
     case "updated":
-      sortType.value.display = "Recently updated";
+      sortType.value.display = "最近更新";
       break;
     case "follows":
-      sortType.value.display = "Follow count";
+      sortType.value.display = "关注度";
       break;
   }
 }
