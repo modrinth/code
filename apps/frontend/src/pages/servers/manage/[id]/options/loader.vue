@@ -35,15 +35,34 @@
         </div>
 
         <div
-          v-if="
-            selectedMCVersion &&
-            selectedLoader.toLowerCase() !== 'vanilla' &&
-            selectedLoaderVersions.length > 0
-          "
-          class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4"
+          v-if="selectedMCVersion && selectedLoader.toLowerCase() !== 'vanilla'"
+          class="flex w-full flex-col gap-2 rounded-2xl p-4"
+          :class="{
+            'bg-table-alternateRow': isLoading || selectedLoaderVersions.length > 0,
+            'bg-highlight-red': !isLoading && selectedLoaderVersions.length === 0,
+          }"
         >
-          <div class="text-sm font-bold text-contrast">{{ selectedLoader }} version</div>
+          <div class="flex flex-col gap-2 text-sm font-bold text-contrast">
+            <template v-if="isLoading">
+              <div>
+                Loading
+                {{ selectedLoader }}
+                versions...
+              </div>
+              <div class="relative flex h-9 w-full items-center rounded-2xl bg-button-bg">
+                <DropdownIcon class="absolute right-4" />
+              </div>
+            </template>
+            <template v-else-if="selectedLoaderVersions.length > 0">
+              {{ selectedLoader }} version
+            </template>
+            <template v-else>
+              <div>No loaders are available to install for this Minecraft version.</div>
+            </template>
+          </div>
+
           <UiServersTeleportDropdownMenu
+            v-if="!isLoading && selectedLoaderVersions.length > 0"
             v-model="selectedLoaderVersion"
             name="loaderVersion"
             :options="selectedLoaderVersions"
@@ -56,14 +75,7 @@
           />
         </div>
 
-        <div
-          v-if="
-            selectedMCVersion &&
-            selectedLoader.toLowerCase() !== 'vanilla' &&
-            selectedLoaderVersions.length > 0
-          "
-          class="flex w-full flex-col gap-4 rounded-2xl bg-table-alternateRow p-4"
-        >
+        <div class="flex w-full flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
           <div class="flex w-full flex-row items-center justify-between">
             <label class="w-full font-bold text-contrast" for="hard-reset">Erase all data</label>
             <input
@@ -271,7 +283,7 @@
       </div>
     </div>
 
-    <UiServersPyroLoading v-else />
+    <div v-else />
   </div>
 </template>
 
@@ -285,6 +297,7 @@ import {
   RightArrowIcon,
   XIcon,
   CompassIcon,
+  DropdownIcon,
 } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 
@@ -492,43 +505,48 @@ const cachedVersions: Record<string, any> = {};
 watch(selectedMCVersion, async () => {
   if (selectedMCVersion.value.trim().length < 3) return;
 
+  isLoading.value = true;
   loadingServerCheck.value = true;
 
-  // Check if Minecraft version exists
-  const mcRes =
-    cachedVersions[selectedMCVersion.value] ||
-    (await $fetch(`/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`));
+  try {
+    // Check if Minecraft version exists
+    const mcRes =
+      cachedVersions[selectedMCVersion.value] ||
+      (await $fetch(`/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`));
 
-  cachedVersions[selectedMCVersion.value] = mcRes;
+    cachedVersions[selectedMCVersion.value] = mcRes;
 
-  if (!mcRes.downloads?.server) {
-    serverCheckError.value =
-      "We couldn't find a server.jar for this version. Please pick another one.";
+    if (!mcRes.downloads?.server) {
+      serverCheckError.value =
+        "We couldn't find a server.jar for this version. Please pick another one.";
+      return;
+    }
+
+    // Fetch Paper/Purpur versions if needed
+    if (selectedLoader.value.toLowerCase() === "paper") {
+      const paperRes = await fetchPaperVersions(selectedMCVersion.value);
+      if (!paperRes) {
+        serverCheckError.value = "This Minecraft version is not supported by Paper.";
+        return;
+      }
+    }
+
+    if (selectedLoader.value.toLowerCase() === "purpur") {
+      const purpurRes = await fetchPurpurVersions(selectedMCVersion.value);
+      if (!purpurRes) {
+        serverCheckError.value = "This Minecraft version is not supported by Purpur.";
+        return;
+      }
+    }
+
+    serverCheckError.value = "";
+  } catch (error) {
+    console.error(error);
+    serverCheckError.value = "Failed to fetch versions. Please try again.";
+  } finally {
     loadingServerCheck.value = false;
-    return;
+    isLoading.value = false;
   }
-
-  // Fetch Paper/Purpur versions if needed
-  if (selectedLoader.value.toLowerCase() === "paper") {
-    const paperRes = await fetchPaperVersions(selectedMCVersion.value);
-    if (!paperRes) {
-      serverCheckError.value = "This Minecraft version is not supported by Paper.";
-      loadingServerCheck.value = false;
-      return;
-    }
-  }
-
-  if (selectedLoader.value.toLowerCase() === "purpur") {
-    const purpurRes = await fetchPurpurVersions(selectedMCVersion.value);
-    if (!purpurRes) {
-      serverCheckError.value = "This Minecraft version is not supported by Purpur.";
-      loadingServerCheck.value = false;
-      return;
-    }
-  }
-
-  serverCheckError.value = "";
-  loadingServerCheck.value = false;
 });
 
 const onShow = () => {
