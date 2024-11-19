@@ -5,7 +5,7 @@
       isSecondPhase
         ? 'Confirming reinstallation'
         : `Installing
-      ${selectedLoader.toLowerCase() === 'vanilla' ? 'Minecraft' : selectedLoader}`
+      ${selectedLoader.toLowerCase() === 'vanilla' ? 'Vanilla Minecraft' : selectedLoader}`
     "
     @hide="onHide"
     @show="onShow"

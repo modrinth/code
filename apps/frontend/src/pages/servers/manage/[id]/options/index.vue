@@ -5,7 +5,7 @@
         <div class="card flex flex-col gap-4">
           <label for="server-name-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server name</span>
-            <span> Change the name of your server. This name is only visible on Modrinth.</span>
+            <span> Change your server's name. This name is only visible on Modrinth.</span>
           </label>
           <div class="flex flex-col gap-2">
             <input
