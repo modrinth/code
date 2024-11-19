@@ -491,6 +491,25 @@ sharethrough.com, FhiWXM0L, RESELLER, d53b998a7bd4ecd2
 amxrtb.com, 105199776, RESELLER
 33across.com, 0015a00003ALsDfAAL, DIRECT, bbea06d9c4d2853c
 risecodes.com, 661fc591c3a3ef0001984071, DIRECT
+admanmedia.com, 2209, RESELLER
+themediagrid.com, A8X5S7, RESELLER, 35d5010d7789b49d
+pubmatic.com, 158481, RESELLER, 5d62403b186f2ace
+smartadserver.com, 3713, RESELLER, 060d053dcf45cbf3
+smartadserver.com, 3713-OB, RESELLER, 060d053dcf45cbf3
+openx.com, 540866936, RESELLER, 6a698e2ec38604c6
+rubiconproject.com, 14558, RESELLER, 0bfd66d529a55807
+appnexus.com, 15349, RESELLER, f5ab79cb980f11d1
+zetaglobal.net, 757, RESELLER
+video.unrulymedia.com, 3948367200, RESELLER
+sharethrough.com, XeKuhSkz, RESELLER, d53b998a7bd4ecd2
+adyoulike.com, a2226c27fc2a6773f6a2b365e013513a, RESELLER
+loopme.com,11386,RESELLER,6c8d5f95897a5a3b
+improvedigital.com, 2316, RESELLER
+lijit.com, 417620, RESELLER, fafdf38b16bf6b2b
+conversantmedia.com, 100308, RESELLER, 03113cd04947736d
+33across.com, 0015a00002egvRSAAY, RESELLER, bbea06d9c4d2853c
+sonobi.com, 7b37f8ccbc, RESELLER, d1a215d9eb5aee9e
+pubmatic.com, 165117, RESELLER, 5d62403b186f2ace
 
 optimanetwork.com, 10581, DIRECT
 rubiconproject.com, 23404, DIRECT, 0bfd66d529a55807
