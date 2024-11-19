@@ -12,17 +12,21 @@ function hCaptchaReady() {
 }
 
 onMounted(() => {
-  window.hCaptchaReady = hCaptchaReady;
+  if (window.hcaptcha) {
+    hCaptchaReady();
+  } else {
+    window.hCaptchaReady = hCaptchaReady;
 
-  useHead({
-    script: [
-      {
-        src: "https://js.hcaptcha.com/1/api.js?render=explicit&onload=hCaptchaReady",
-        async: true,
-        defer: true,
-      },
-    ],
-  });
+    useHead({
+      script: [
+        {
+          src: "https://js.hcaptcha.com/1/api.js?render=explicit&onload=hCaptchaReady",
+          async: true,
+          defer: true,
+        },
+      ],
+    });
+  }
 });
 
 defineExpose({
