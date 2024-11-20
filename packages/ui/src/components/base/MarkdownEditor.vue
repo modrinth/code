@@ -34,7 +34,7 @@
         </span>
       </template>
       <span class="label">
-        <span class="label__title">Preview</span>
+        <span class="label__title">预览</span>
         <span class="label__description"></span>
       </span>
       <div class="markdown-body-wrapper">
@@ -60,12 +60,12 @@
       </div>
     </div>
   </Modal>
-  <Modal ref="imageModal" header="Insert image">
+  <Modal ref="imageModal" header="插入图片">
     <div class="modal-insert">
       <label class="label" for="insert-image-alt">
-        <span class="label__title">Description (alt text)<span class="required">*</span></span>
+        <span class="label__title">描述<span class="required">*</span></span>
         <span class="label__description">
-          Describe the image completely as you would to someone who could not see the image.
+          描述用于向无法加载出图片的人描述
         </span>
       </label>
       <div class="iconified-input">
@@ -74,7 +74,7 @@
           id="insert-image-alt"
           v-model="linkText"
           type="text"
-          placeholder="Describe the image..."
+          placeholder="描述图像.."
         />
         <Button class="r-btn" @click="() => (linkText = '')">
           <XIcon />
@@ -84,15 +84,15 @@
         <span class="label__title">URL<span class="required">*</span></span>
       </label>
       <div v-if="props.onImageUpload" class="image-strategy-chips">
-        <Chips v-model="imageUploadOption" :items="['upload', 'link']" />
+        <Chips v-model="imageUploadOption" :items="['上传', '链接']" />
       </div>
       <div
-        v-if="props.onImageUpload && imageUploadOption === 'upload'"
+        v-if="props.onImageUpload && imageUploadOption === '上传'"
         class="btn-input-alternative"
       >
         <FileInput
           accept="image/png,image/jpeg,image/gif,image/webp"
-          prompt="Drag and drop to upload or click to select file"
+          prompt="拖放即可上传或单击即可选择文件"
           long-style
           should-always-reset
           class="file-input"
@@ -101,13 +101,13 @@
           <UploadIcon />
         </FileInput>
       </div>
-      <div v-if="!props.onImageUpload || imageUploadOption === 'link'" class="iconified-input">
+      <div v-if="!props.onImageUpload || imageUploadOption === '链接'" class="iconified-input">
         <ImageIcon />
         <input
           id="insert-link-url"
           v-model="linkUrl"
           type="text"
-          placeholder="Enter the image URL..."
+          placeholder="请填入被上传到图床得到的静态URL"
           @input="validateURL"
         />
         <Button class="r-btn" @click="() => (linkUrl = '')">
@@ -121,7 +121,7 @@
         </span>
       </template>
       <span class="label">
-        <span class="label__title">Preview</span>
+        <span class="label__title">预览</span>
         <span class="label__description"></span>
       </span>
       <div class="markdown-body-wrapper">
@@ -174,7 +174,7 @@
         </span>
       </template>
       <span class="label">
-        <span class="label__title">Preview</span>
+        <span class="label__title">预览</span>
         <span class="label__description"></span>
       </span>
 
@@ -226,22 +226,22 @@
       </div>
       <div class="preview">
         <Toggle id="preview" v-model="previewMode" :checked="previewMode" />
-        <label class="label" for="preview"> Preview </label>
+        <label class="label" for="preview"> 预览 </label>
       </div>
     </div>
     <div ref="editorRef" :class="{ hide: previewMode }" />
     <div v-if="!previewMode" class="info-blurb">
       <div class="info-blurb">
-        <InfoIcon />
-        <span
-          >This editor supports
-          <a
-            class="markdown-resource-link"
-            href="https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting"
-            target="_blank"
-            >Markdown formatting</a
-          >.</span
-        >
+<!--        <InfoIcon />-->
+<!--        <span-->
+<!--          >This editor supports-->
+<!--          <a-->
+<!--            class="markdown-resource-link"-->
+<!--            href="https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting"-->
+<!--            target="_blank"-->
+<!--            >Markdown formatting</a-->
+<!--          >.</span-->
+<!--        >-->
       </div>
       <div :class="{ hide: !props.maxLength }" class="max-length-label">
         <span>Max length: </span>
@@ -316,7 +316,7 @@ const props = withDefaults(
     disabled: false,
     headingButtons: true,
     onImageUpload: undefined,
-    placeholder: 'Write something...',
+    placeholder: '写点什么...',
     maxLength: undefined,
     maxHeight: undefined,
   },
@@ -505,33 +505,33 @@ const BUTTONS: ButtonGroupMap = {
     display: props.headingButtons,
     hideOnMobile: false,
     buttons: [
-      composeCommandButton('Heading 1', Heading1Icon, markdownCommands.toggleHeader),
-      composeCommandButton('Heading 2', Heading2Icon, markdownCommands.toggleHeader2),
-      composeCommandButton('Heading 3', Heading3Icon, markdownCommands.toggleHeader3),
+      composeCommandButton('标题 1', Heading1Icon, markdownCommands.toggleHeader),
+      composeCommandButton('标题 2', Heading2Icon, markdownCommands.toggleHeader2),
+      composeCommandButton('标题 3', Heading3Icon, markdownCommands.toggleHeader3),
     ],
   },
   stylizing: {
     display: true,
     hideOnMobile: false,
     buttons: [
-      composeCommandButton('Bold', BoldIcon, markdownCommands.toggleBold),
-      composeCommandButton('Italic', ItalicIcon, markdownCommands.toggleItalic),
+      composeCommandButton('加粗', BoldIcon, markdownCommands.toggleBold),
+      composeCommandButton('斜体', ItalicIcon, markdownCommands.toggleItalic),
       composeCommandButton(
-        'Strikethrough',
+        '删除线',
         StrikethroughIcon,
         markdownCommands.toggleStrikethrough,
       ),
-      composeCommandButton('Code', CodeIcon, markdownCommands.toggleCodeBlock),
-      composeCommandButton('Spoiler', ScanEyeIcon, markdownCommands.toggleSpoiler),
+      composeCommandButton('代码', CodeIcon, markdownCommands.toggleCodeBlock),
+      composeCommandButton('折叠', ScanEyeIcon, markdownCommands.toggleSpoiler),
     ],
   },
   lists: {
     display: true,
     hideOnMobile: false,
     buttons: [
-      composeCommandButton('Bulleted list', ListBulletedIcon, markdownCommands.toggleBulletList),
-      composeCommandButton('Ordered list', ListOrderedIcon, markdownCommands.toggleOrderedList),
-      composeCommandButton('Quote', TextQuoteIcon, markdownCommands.toggleQuote),
+      composeCommandButton('符号列表', ListBulletedIcon, markdownCommands.toggleBulletList),
+      composeCommandButton('数字列表', ListOrderedIcon, markdownCommands.toggleOrderedList),
+      composeCommandButton('引用', TextQuoteIcon, markdownCommands.toggleQuote),
     ],
   },
   components: {
@@ -539,20 +539,20 @@ const BUTTONS: ButtonGroupMap = {
     hideOnMobile: false,
     buttons: [
       {
-        label: 'Link',
+        label: '链接',
         icon: LinkIcon,
         action: () => openLinkModal(),
       },
       {
-        label: 'Image',
+        label: '图片',
         icon: ImageIcon,
         action: () => openImageModal(),
       },
-      {
-        label: 'Video',
-        icon: YouTubeIcon,
-        action: () => openVideoModal(),
-      },
+      // {
+      //   label: '视频',
+      //   icon: YouTubeIcon,
+      //   action: () => openVideoModal(),
+      // },
     ],
   },
 }

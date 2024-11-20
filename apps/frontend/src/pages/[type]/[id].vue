@@ -3,13 +3,13 @@
     <div class="normal-page__sidebar">
       <aside class="universal-card">
         <Breadcrumbs
-          current-title="Settings"
+          current-title="设置"
           :link-stack="[
             {
               href: organization
                 ? `/organization/${organization.slug}/settings/projects`
                 : `/dashboard/projects`,
-              label: 'Projects',
+              label: '资源',
             },
             {
               href: `/${project.project_type}/${project.slug ? project.slug : project.id}`,
@@ -32,11 +32,11 @@
             <Badge :type="project.status" />
           </div>
         </div>
-        <h2>Project settings</h2>
+        <h2>资源设置</h2>
         <NavStack>
           <NavStackItem
             :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-            label="General"
+            label="基本"
           >
             <SettingsIcon aria-hidden="true" />
           </NavStackItem>
@@ -44,7 +44,7 @@
             :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/tags`"
-            label="Tags"
+            label="标签"
           >
             <TagsIcon aria-hidden="true" />
           </NavStackItem>
@@ -52,7 +52,7 @@
             :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/description`"
-            label="Description"
+            label="介绍"
           >
             <DescriptionIcon aria-hidden="true" />
           </NavStackItem>
@@ -60,7 +60,7 @@
             :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/license`"
-            label="License"
+            label="许可证"
           >
             <CopyrightIcon aria-hidden="true" />
           </NavStackItem>
@@ -68,7 +68,7 @@
             :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/links`"
-            label="Links"
+            label="链接"
           >
             <LinksIcon aria-hidden="true" />
           </NavStackItem>
@@ -76,31 +76,31 @@
             :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/members`"
-            label="Members"
+            label="成员"
           >
             <UsersIcon aria-hidden="true" />
           </NavStackItem>
-          <h3>View</h3>
+          <h3>视图</h3>
           <NavStackItem
             :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/analytics`"
-            label="Analytics"
+            label="分析"
             chevron
           >
             <ChartIcon aria-hidden="true" />
           </NavStackItem>
-          <h3>Upload</h3>
+          <h3>上传</h3>
           <NavStackItem
             :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
-            label="Gallery"
+            label="渲染图"
             chevron
           >
             <GalleryIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
             :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
-            label="Versions"
+            label="版本"
             chevron
           >
             <VersionIcon aria-hidden="true" />
@@ -146,20 +146,20 @@
     <NewModal ref="settingsModal">
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-        <span class="text-lg font-extrabold text-contrast"> Settings </span>
+        <span class="text-lg font-extrabold text-contrast"> 设置 </span>
       </template>
     </NewModal>
     <NewModal ref="modalLicense" :header="project.license.name ? project.license.name : 'License'">
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
         <span class="text-lg font-extrabold text-contrast">
-          {{ project.license.name ? project.license.name : "License" }}
+          {{ project.license.name ? project.license.name : "许可证" }}
         </span>
       </template>
       <div
         class="markdown-body"
         v-html="
-          renderString(licenseText).isEmpty ? 'Loading license text...' : renderString(licenseText)
+          renderString(licenseText).isEmpty ? '正在加载许可证...' : renderString(licenseText)
         "
       />
     </NewModal>
@@ -615,19 +615,19 @@
                 <MoreVerticalIcon aria-hidden="true" />
                 <template #analytics>
                   <ChartIcon aria-hidden="true" />
-                  Analytics
+                  分析
                 </template>
                 <template #moderation-checklist>
                   <ScaleIcon aria-hidden="true" />
-                  Review project
+                  审查项目
                 </template>
                 <template #report>
                   <ReportIcon aria-hidden="true" />
-                  Report
+                  报告
                 </template>
                 <template #copy-id>
                   <ClipboardCopyIcon aria-hidden="true" />
-                  Copy ID
+                  复制资源 ID
                 </template>
               </OverflowMenu>
             </ButtonStyled>
@@ -649,8 +649,7 @@
           :tags="tags"
         />
         <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="mb-4">
-          {{ project.title }} has been archived. {{ project.title }} will not receive any further
-          updates unless the author decides to unarchive the project.
+          {{ project.title }} 已归档. {{ project.title }} 将不会再进行任何更新,除非作者取消归档状态
         </MessageBanner>
       </div>
       <div class="normal-page__sidebar">
@@ -699,7 +698,7 @@
                 class="tag-list__item"
               >
                 <ClientIcon aria-hidden="true" />
-                Client-side
+                客户端
               </div>
               <div
                 v-if="
@@ -709,11 +708,11 @@
                 class="tag-list__item"
               >
                 <ServerIcon aria-hidden="true" />
-                Server-side
+                服务端
               </div>
               <div v-if="false" class="tag-list__item">
                 <UserIcon aria-hidden="true" />
-                Singleplayer
+                单人
               </div>
               <div
                 v-if="
@@ -727,7 +726,7 @@
                 class="tag-list__item"
               >
                 <MonitorSmartphoneIcon aria-hidden="true" />
-                Client and server
+                客户端和服务端
               </div>
             </div>
           </section>
@@ -881,7 +880,7 @@
             <div class="details-list__item">
               <BookTextIcon aria-hidden="true" />
               <div>
-                Licensed
+                许可证
                 <a
                   v-if="project.license.url"
                   class="text-link hover:underline"
@@ -1114,105 +1113,105 @@ const formatRelativeTime = useRelativeTime();
 const compatibilityMessages = defineMessages({
   title: {
     id: "project.about.compatibility.title",
-    defaultMessage: "Compatibility",
+    defaultMessage: "兼容度",
   },
   minecraftJava: {
     id: "project.about.compatibility.game.minecraftJava",
-    defaultMessage: "Minecraft: Java Edition",
+    defaultMessage: "我的世界Java版本",
   },
   platforms: {
     id: "project.about.compatibility.platforms",
-    defaultMessage: "Platforms",
+    defaultMessage: "平台",
   },
   environments: {
     id: "project.about.compatibility.environments",
-    defaultMessage: "Supported environments",
+    defaultMessage: "运行环境",
   },
 });
 const linksMessages = defineMessages({
   title: {
     id: "project.about.links.title",
-    defaultMessage: "Links",
+    defaultMessage: "链接",
   },
   issues: {
     id: "project.about.links.issues",
-    defaultMessage: "Report issues",
+    defaultMessage: "反馈问题",
   },
   source: {
     id: "project.about.links.source",
-    defaultMessage: "View source",
+    defaultMessage: "查看源码",
   },
   wiki: {
     id: "project.about.links.wiki",
-    defaultMessage: "Visit wiki",
+    defaultMessage: "访问 wiki",
   },
   discord: {
     id: "project.about.links.discord",
-    defaultMessage: "Join Discord server",
+    defaultMessage: "加入discord服务器",
   },
   donateGeneric: {
     id: "project.about.links.donate.generic",
-    defaultMessage: "Donate",
+    defaultMessage: "捐赠",
   },
   donateGitHub: {
     id: "project.about.links.donate.github",
-    defaultMessage: "Sponsor on GitHub",
+    defaultMessage: "Github赞助商",
   },
   donateBmac: {
     id: "project.about.links.donate.bmac",
-    defaultMessage: "Buy Me a Coffee",
+    defaultMessage: "为我买一杯咖啡",
   },
   donatePatreon: {
     id: "project.about.links.donate.patreon",
-    defaultMessage: "Donate on Patreon",
+    defaultMessage: "在 Patreon 上捐赠",
   },
   donatePayPal: {
     id: "project.about.links.donate.paypal",
-    defaultMessage: "Donate on PayPal",
+    defaultMessage: "在 PayPal 上捐赠",
   },
   donateKoFi: {
     id: "project.about.links.donate.kofi",
-    defaultMessage: "Donate on Ko-fi",
+    defaultMessage: "在 Ko-fi 上捐赠",
   },
   donateGithub: {
     id: "project.about.links.donate.github",
-    defaultMessage: "Sponsor on GitHub",
+    defaultMessage: "在 Github 上捐赠",
   },
 });
 const creatorsMessages = defineMessages({
   title: {
     id: "project.about.creators.title",
-    defaultMessage: "Creators",
+    defaultMessage: "创作者",
   },
   owner: {
     id: "project.about.creators.owner",
-    defaultMessage: "Project owner",
+    defaultMessage: "负责人",
   },
 });
 const detailsMessages = defineMessages({
   title: {
     id: "project.about.details.title",
-    defaultMessage: "Details",
+    defaultMessage: "详情信息",
   },
   licensed: {
     id: "project.about.details.licensed",
-    defaultMessage: "Licensed {license}",
+    defaultMessage: "许可证 {license}",
   },
   created: {
     id: "project.about.details.created",
-    defaultMessage: "Created {date}",
+    defaultMessage: "创建于 {date}",
   },
   submitted: {
     id: "project.about.details.submitted",
-    defaultMessage: "Submitted {date}",
+    defaultMessage: "提交于 {date}",
   },
   published: {
     id: "project.about.details.published",
-    defaultMessage: "Published {date}",
+    defaultMessage: "发布于 {date}",
   },
   updated: {
     id: "project.about.details.updated",
-    defaultMessage: "Updated {date}",
+    defaultMessage: "更新于 {date}",
   },
 });
 
@@ -1249,9 +1248,9 @@ async function getLicenseData(event) {
 
   try {
     const text = await useBaseFetch(`tag/license/${project.value.license.id}`);
-    licenseText.value = text.body || "License text could not be retrieved.";
+    licenseText.value = text.body || "无法检索许可证文本.";
   } catch {
-    licenseText.value = "License text could not be retrieved.";
+    licenseText.value = "无法检索许可证文本.";
   }
 }
 
@@ -1290,27 +1289,27 @@ const filteredAlpha = computed(() => {
 const messages = defineMessages({
   downloadsStat: {
     id: "project.stats.downloads-label",
-    defaultMessage: "download{count, plural, one {} other {s}}",
+    defaultMessage: "下载{count, plural, one {} other {s}}",
   },
   followersStat: {
     id: "project.stats.followers-label",
-    defaultMessage: "follower{count, plural, one {} other {s}}",
+    defaultMessage: "关注者{count, plural, one {} other {s}}",
   },
   descriptionTab: {
     id: "project.description.title",
-    defaultMessage: "Description",
+    defaultMessage: "简介",
   },
   galleryTab: {
     id: "project.gallery.title",
-    defaultMessage: "Gallery",
+    defaultMessage: "渲染图",
   },
   versionsTab: {
     id: "project.versions.title",
-    defaultMessage: "Versions",
+    defaultMessage: "版本",
   },
   moderationTab: {
     id: "project.moderation.title",
-    defaultMessage: "Moderation",
+    defaultMessage: "管理",
   },
 });
 
@@ -1333,7 +1332,7 @@ if (
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: "The page could not be found",
+    message: "找不到该页面",
   });
 }
 
@@ -1403,7 +1402,7 @@ try {
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: "Project not found",
+    message: "资源不存在",
   });
 }
 
@@ -1411,7 +1410,7 @@ if (!project.value) {
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: "Project not found",
+    message: "资源不存在",
   });
 }
 
@@ -1504,12 +1503,12 @@ const following = computed(
     user.value && user.value.follows && user.value.follows.find((x) => x.id === project.value.id),
 );
 
-const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`);
+const title = computed(() => `${project.value.title} - 我的世界 ${projectTypeDisplay.value}`);
 const description = computed(
   () =>
     `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
       project.value.title
-    } by ${members.value.find((x) => x.is_owner)?.user?.username || "a Creator"} on Modrinth`,
+    } by ${members.value.find((x) => x.is_owner)?.user?.username || "创作者"} 在 BBSMC`,
 );
 
 if (!route.name.startsWith("type-id-settings")) {
@@ -1543,7 +1542,7 @@ async function setProcessing() {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });
@@ -1577,8 +1576,8 @@ async function patchProject(resData, quiet = false) {
     if (!quiet) {
       data.$notify({
         group: "main",
-        title: "Project updated",
-        text: "Your project has been updated.",
+        title: "资源已更新",
+        text: "您的资源已更新",
         type: "success",
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1586,7 +1585,7 @@ async function patchProject(resData, quiet = false) {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });
@@ -1616,14 +1615,14 @@ async function patchIcon(icon) {
     result = true;
     data.$notify({
       group: "main",
-      title: "Project icon updated",
-      text: "Your project's icon has been updated.",
+      title: "资源图标更新",
+      text: "您的资源图标已更新",
       type: "success",
     });
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });
@@ -1698,7 +1697,7 @@ const navLinks = computed(() => {
       shown: project.value.gallery.length > 0 || !!currentMember.value,
     },
     {
-      label: "Changelog",
+      label: "更新日志",
       href: `${projectUrl}/changelog`,
       shown: versions.value.length > 0,
     },

@@ -232,7 +232,7 @@ import { formatProjectType } from "~/plugins/shorthands.js";
 import { isDarkTheme, type Theme } from "~/plugins/theme/index.ts";
 
 useHead({
-  title: "Display settings - Modrinth",
+  title: "外观设置 - BBSMC",
 });
 
 const { formatMessage } = useVIntl();
@@ -241,26 +241,26 @@ const developerModeBanner = defineMessages({
   description: {
     id: "settings.display.banner.developer-mode.description",
     defaultMessage:
-      "<strong>Developer mode</strong> is active. This will allow you to view the internal IDs of various things throughout Modrinth that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode.",
+      "<strong>开发者模式</strong> 已启用. This will allow you to view the internal IDs of various things throughout Modrinth that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode.",
   },
   deactivate: {
     id: "settings.display.banner.developer-mode.button",
-    defaultMessage: "Deactivate developer mode",
+    defaultMessage: "停用开发者模式",
   },
 });
 
 const colorTheme = defineMessages({
   title: {
     id: "settings.display.theme.title",
-    defaultMessage: "Color theme",
+    defaultMessage: "主题",
   },
   description: {
     id: "settings.display.theme.description",
-    defaultMessage: "Select your preferred color theme for Modrinth on this device.",
+    defaultMessage: "在此设备上为 BBSMC 选择您喜欢的颜色主题。",
   },
   system: {
     id: "settings.display.theme.system",
-    defaultMessage: "Sync with system",
+    defaultMessage: "与系统同步",
   },
   light: {
     id: "settings.display.theme.light",
@@ -272,7 +272,7 @@ const colorTheme = defineMessages({
   },
   oled: {
     id: "settings.display.theme.oled",
-    defaultMessage: "OLED",
+    defaultMessage: "黑色",
   },
   retro: {
     id: "settings.display.theme.retro",
@@ -370,19 +370,19 @@ const toggleFeatures = defineMessages({
   },
   rightAlignedFiltersSidebarTitle: {
     id: "settings.display.sidebar.right-aligned-filters-sidebar.title",
-    defaultMessage: "Right-aligned filters sidebar on search pages",
+    defaultMessage: "搜索页面上右对齐的过滤器侧栏s",
   },
   rightAlignedFiltersSidebarDescription: {
     id: "settings.display.sidebar.right-aligned-filters-sidebar.description",
-    defaultMessage: "Aligns the filters sidebar to the right of the search results.",
+    defaultMessage: "将过滤器侧边栏与搜索结果右侧对齐。",
   },
   leftAlignedContentSidebarTitle: {
     id: "settings.display.sidebar.left-aligned-content-sidebar.title",
-    defaultMessage: "Left-aligned sidebar on content pages",
+    defaultMessage: "内容页左对齐侧边栏",
   },
   leftAlignedContentSidebarDescription: {
     id: "settings.display.sidebar.right-aligned-content-sidebar.description",
-    defaultMessage: "Aligns the sidebar to the left of the page's content.",
+    defaultMessage: "将侧边栏与页面内容左侧对齐.",
   },
 });
 
@@ -432,7 +432,7 @@ function disableDeveloperMode() {
   saveFeatureFlags();
   addNotification({
     group: "main",
-    title: "Developer mode deactivated",
+    title: "开发者模式已停用",
     text: "Developer mode has been disabled",
     type: "success",
   });

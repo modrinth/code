@@ -3,40 +3,35 @@
     <section class="universal-card">
       <div class="adjacent-input">
         <label for="license-multiselect">
-          <span class="label__title size-card-header">License</span>
+          <span class="label__title size-card-header">许可证</span>
           <span class="label__description">
-            It is very important to choose a proper license for your
-            {{ $formatProjectType(project.project_type).toLowerCase() }}. You may choose one from
-            our list or provide a custom license. You may also provide a custom URL to your chosen
-            license; otherwise, the license text will be displayed.
+            为您的项目选择合适的许可证非常重要。您可以从我们的列表中选择一个许可证，也可以提供自定义许可证。您还可以为所选许可证提供自定义 URL；否则，将显示许可证文本。
             <span v-if="license && license.friendly === 'Custom'" class="label__subdescription">
-              Enter a valid
+              请输入有效的
               <a href="https://spdx.org/licenses/" target="_blank" rel="noopener" class="text-link">
-                SPDX license identifier</a
+                SPDX 许可证</a
               >
-              in the marked area. If your license does not have a SPDX identifier (for example, if
-              you created the license yourself or if the license is Minecraft-specific), simply
-              check the box and enter the name of the license instead.
+              如果您的许可证没有 SPDX 标识符（例如，如果您自己创建了许可证，或者许可证是 Minecraft 专用的），只需选中该框并输入许可证的名称即可。
             </span>
-            <span class="label__subdescription">
-              Confused? See our
-              <a
-                href="https://blog.modrinth.com/licensing-guide/"
-                target="_blank"
-                rel="noopener"
-                class="text-link"
-              >
-                licensing guide</a
-              >
-              for more information.
-            </span>
+<!--            <span class="label__subdescription">-->
+<!--              Confused? See our-->
+<!--              <a-->
+<!--                href="https://blog.modrinth.com/licensing-guide/"-->
+<!--                target="_blank"-->
+<!--                rel="noopener"-->
+<!--                class="text-link"-->
+<!--              >-->
+<!--                licensing guide</a-->
+<!--              >-->
+<!--              for more information.-->
+<!--            </span>-->
           </span>
         </label>
         <div class="input-stack">
           <Multiselect
             id="license-multiselect"
             v-model="license"
-            placeholder="Select license..."
+            placeholder="选择一个许可..."
             track-by="short"
             label="friendly"
             :options="defaultLicenses"
@@ -62,7 +57,7 @@
             :disabled="!hasPermission"
             description="License does not have a SPDX identifier"
           >
-            License does not have a SPDX identifier
+            许可证没有 SPDX 标识符
           </Checkbox>
           <input
             v-if="license?.friendly === 'Custom'"
@@ -79,7 +74,7 @@
             v-model="licenseUrl"
             type="url"
             maxlength="2048"
-            placeholder="License URL (optional)"
+            placeholder="许可证 URL（可选）"
             :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
           />
         </div>
@@ -92,7 +87,7 @@
           @click="saveChanges()"
         >
           <SaveIcon />
-          Save changes
+          保存
         </button>
       </div>
     </section>
@@ -129,7 +124,7 @@ export default defineNuxtComponent({
         return () => {
           this.$notify({
             group: "main",
-            title: "An error occurred",
+            title: "发生错误",
             text: "Patch project function not found",
             type: "error",
           });
@@ -148,22 +143,22 @@ export default defineNuxtComponent({
   },
   async setup(props) {
     const defaultLicenses = shallowRef([
-      { friendly: "Custom", short: "" },
+      { friendly: "自定义", short: "" },
       {
-        friendly: "All Rights Reserved/No License",
+        friendly: "保留所有权利/无许可",
         short: "All-Rights-Reserved",
       },
-      { friendly: "Apache License 2.0", short: "Apache-2.0" },
+      { friendly: "Apache 许可证 2.0", short: "Apache-2.0" },
       {
-        friendly: 'BSD 2-Clause "Simplified" License',
+        friendly: 'BSD 2-Clause "简化" 许可证',
         short: "BSD-2-Clause",
       },
       {
-        friendly: 'BSD 3-Clause "New" or "Revised" License',
+        friendly: 'BSD 3-Clause "新" 或 "修订" 许可证',
         short: "BSD-3-Clause",
       },
       {
-        friendly: "CC Zero (Public Domain equivalent)",
+        friendly: "CC Zero （相当于公共领域）",
         short: "CC0-1.0",
       },
       { friendly: "CC-BY 4.0", short: "CC-BY-4.0" },
@@ -188,34 +183,34 @@ export default defineNuxtComponent({
         short: "CC-BY-NC-ND-4.0",
       },
       {
-        friendly: "GNU Affero General Public License v3",
+        friendly: "GNU Affero 通用公共许可证 v3",
         short: "AGPL-3.0",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: "GNU Lesser General Public License v2.1",
+        friendly: "GNU 较宽松通用公共许可证 v2.1",
         short: "LGPL-2.1",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: "GNU Lesser General Public License v3",
+        friendly: "GNU 较宽松通用公共许可证 v3",
         short: "LGPL-3.0",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: "GNU General Public License v2",
+        friendly: "GNU 通用公共许可证 v2",
         short: "GPL-2.0",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: "GNU General Public License v3",
+        friendly: "GNU 通用公共许可证 v3",
         short: "GPL-3.0",
         requiresOnlyOrLater: true,
       },
-      { friendly: "ISC License", short: "ISC" },
-      { friendly: "MIT License", short: "MIT" },
-      { friendly: "Mozilla Public License 2.0", short: "MPL-2.0" },
-      { friendly: "zlib License", short: "Zlib" },
+      { friendly: "ISC 许可证", short: "ISC" },
+      { friendly: "MIT 许可证", short: "MIT" },
+      { friendly: "Mozilla 公共许可证 2.0", short: "MPL-2.0" },
+      { friendly: "Zlib许可证", short: "Zlib" },
     ]);
 
     const licenseUrl = ref(props.project.license.url);

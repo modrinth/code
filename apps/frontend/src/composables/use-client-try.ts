@@ -11,7 +11,7 @@ type useClientTry = <TArgs extends any[], TResult>(
 const defaultOnError: ErrorFunction = (error) => {
   addNotification({
     group: "main",
-    title: "An error occurred",
+    title: "发生错误",
     text: error?.data?.description || error.message || error || "Unknown error",
     type: "error",
   });

@@ -3,11 +3,11 @@
     <OrganizationCreateModal ref="createOrgModal" />
     <section class="universal-card">
       <div class="header__row">
-        <h2 class="header__title text-2xl">Organizations</h2>
+        <h2 class="header__title text-2xl">我的团队</h2>
         <div class="input-group">
           <button class="iconified-button brand-button" @click="openCreateOrgModal">
             <PlusIcon aria-hidden="true" />
-            Create organization
+            创建团队
           </button>
         </div>
       </div>
@@ -43,7 +43,7 @@
           </nuxt-link>
         </div>
       </template>
-      <template v-else> Make an organization! </template>
+      <template v-else> 创建你的团队吧！ </template>
     </section>
   </div>
 </template>

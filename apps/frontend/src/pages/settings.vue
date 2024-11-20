@@ -7,22 +7,22 @@
       <div class="normal-page__sidebar">
         <aside class="universal-card">
           <NavStack>
-            <h3>Display</h3>
+            <h3>显示</h3>
             <NavStackItem
               link="/settings"
               :label="formatMessage(commonSettingsMessages.appearance)"
             >
               <PaintBrushIcon />
             </NavStackItem>
-            <NavStackItem
-              v-if="isStaging"
-              link="/settings/language"
-              :label="formatMessage(commonSettingsMessages.language)"
-            >
-              <LanguagesIcon />
-            </NavStackItem>
+<!--            <NavStackItem-->
+<!--              v-if="isStaging"-->
+<!--              link="/settings/language"-->
+<!--              :label="formatMessage(commonSettingsMessages.language)"-->
+<!--            >-->
+<!--              <LanguagesIcon />-->
+<!--            </NavStackItem>-->
             <template v-if="auth.user">
-              <h3>Account</h3>
+              <h3>账户</h3>
               <NavStackItem
                 link="/settings/profile"
                 :label="formatMessage(commonSettingsMessages.profile)"
@@ -35,40 +35,40 @@
               >
                 <ShieldIcon />
               </NavStackItem>
-              <NavStackItem
-                link="/settings/authorizations"
-                :label="formatMessage(commonSettingsMessages.authorizedApps)"
-              >
-                <GridIcon />
-              </NavStackItem>
+<!--              <NavStackItem-->
+<!--                link="/settings/authorizations"-->
+<!--                :label="formatMessage(commonSettingsMessages.authorizedApps)"-->
+<!--              >-->
+<!--                <GridIcon />-->
+<!--              </NavStackItem>-->
               <NavStackItem
                 link="/settings/sessions"
                 :label="formatMessage(commonSettingsMessages.sessions)"
               >
                 <MonitorSmartphoneIcon />
               </NavStackItem>
-              <NavStackItem
-                link="/settings/billing"
-                :label="formatMessage(commonSettingsMessages.billing)"
-              >
-                <CardIcon />
-              </NavStackItem>
+<!--              <NavStackItem-->
+<!--                link="/settings/billing"-->
+<!--                :label="formatMessage(commonSettingsMessages.billing)"-->
+<!--              >-->
+<!--                <CardIcon />-->
+<!--              </NavStackItem>-->
             </template>
-            <template v-if="auth.user">
-              <h3>Developer</h3>
-              <NavStackItem
-                link="/settings/pats"
-                :label="formatMessage(commonSettingsMessages.pats)"
-              >
-                <KeyIcon />
-              </NavStackItem>
-              <NavStackItem
-                link="/settings/applications"
-                :label="formatMessage(commonSettingsMessages.applications)"
-              >
-                <ServerIcon />
-              </NavStackItem>
-            </template>
+<!--            <template v-if="auth.user">-->
+<!--              <h3>开发</h3>-->
+<!--              <NavStackItem-->
+<!--                link="/settings/pats"-->
+<!--                :label="formatMessage(commonSettingsMessages.pats)"-->
+<!--              >-->
+<!--                <KeyIcon />-->
+<!--              </NavStackItem>-->
+<!--              <NavStackItem-->
+<!--                link="/settings/applications"-->
+<!--                :label="formatMessage(commonSettingsMessages.applications)"-->
+<!--              >-->
+<!--                <ServerIcon />-->
+<!--              </NavStackItem>-->
+<!--            </template>-->
           </NavStack>
         </aside>
       </div>

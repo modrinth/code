@@ -1,18 +1,16 @@
 <template>
   <div class="normal-page__content">
-    <Modal ref="editLinksModal" header="Edit links">
+    <Modal ref="editLinksModal" header="编辑链接">
       <div class="universal-modal links-modal">
         <p>
-          Any links you specify below will be overwritten on each of the selected projects. Any you
-          leave blank will be ignored. You can clear a link from all selected projects using the
-          trash can button.
+          您在下面指定的任何链接都将被每个选定项目覆盖。您留空的任何链接都将被忽略。您可以使用删除按钮清除所有选定项目中的链接。
         </p>
         <section class="links">
           <label
             for="issue-tracker-input"
             title="A place for users to report bugs, issues, and concerns about your project."
           >
-            <span class="label__title">Issue tracker</span>
+            <span class="label__title">问题反馈</span>
           </label>
           <div class="input-group shrink-first">
             <input
@@ -21,7 +19,7 @@
               :disabled="editLinks.issues.clear"
               type="url"
               :placeholder="
-                editLinks.issues.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
+                editLinks.issues.clear ? '现有链接将被清除' : '输入有效URL'
               "
               maxlength="2048"
             />
@@ -40,7 +38,7 @@
             for="source-code-input"
             title="A page/repository containing the source code for your project"
           >
-            <span class="label__title">Source code</span>
+            <span class="label__title">开源地址</span>
           </label>
           <div class="input-group shrink-first">
             <input
@@ -50,7 +48,7 @@
               type="url"
               maxlength="2048"
               :placeholder="
-                editLinks.source.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
+                editLinks.source.clear ? '现有链接将被清除' : '输入有效URL'
               "
             />
             <Button
@@ -67,7 +65,7 @@
             for="wiki-page-input"
             title="A page containing information, documentation, and help for the project."
           >
-            <span class="label__title">Wiki page</span>
+            <span class="label__title">Wiki地址</span>
           </label>
           <div class="input-group shrink-first">
             <input
@@ -77,7 +75,7 @@
               type="url"
               maxlength="2048"
               :placeholder="
-                editLinks.wiki.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
+                editLinks.wiki.clear ? '现有链接将被清除' : '输入有效URL'
               "
             />
             <Button
@@ -91,7 +89,7 @@
             </Button>
           </div>
           <label for="discord-invite-input" title="An invitation link to your Discord server.">
-            <span class="label__title">Discord invite</span>
+            <span class="label__title">KOOK邀请链接</span>
           </label>
           <div class="input-group shrink-first">
             <input
@@ -102,13 +100,13 @@
               maxlength="2048"
               :placeholder="
                 editLinks.discord.clear
-                  ? 'Existing link will be cleared'
-                  : 'Enter a valid Discord invite URL'
+                  ? '现有链接将被清除'
+                  : '请输入KOOK邀请链接'
               "
             />
             <Button
-              v-tooltip="'Clear link'"
-              aria-label="Clear link"
+              v-tooltip="'删除'"
+              aria-label="删除"
               :data-active="editLinks.discord.clear"
               icon-only
               @click="editLinks.discord.clear = !editLinks.discord.clear"
@@ -118,9 +116,9 @@
           </div>
         </section>
         <p>
-          Changes will be applied to
-          <strong>{{ selectedProjects.length }}</strong> project{{
-            selectedProjects.length > 1 ? "s" : ""
+          变更将应用于
+          <strong>{{ selectedProjects.length }}</strong> 个资源{{
+            selectedProjects.length > 1 ? "" : ""
           }}.
         </p>
         <ul>
@@ -141,25 +139,25 @@
           v-if="selectedProjects.length > 3"
           v-model="editLinks.showAffected"
           :label="editLinks.showAffected ? 'Less' : 'More'"
-          description="Show all loaders"
+          description="显示全部"
           :border="false"
           :collapsing-toggle-style="true"
         />
         <div class="push-right input-group">
           <Button @click="$refs.editLinksModal.hide()">
             <XIcon />
-            Cancel
+            取消
           </Button>
           <Button color="primary" @click="onBulkEditLinks">
             <SaveIcon />
-            Save changes
+            保存
           </Button>
         </div>
       </div>
     </Modal>
     <ModalCreation ref="modal_creation" :organization-id="organization.id" />
     <div class="universal-card">
-      <h2>Projects</h2>
+      <h2>资源</h2>
       <div class="input-group">
         <Button color="primary" @click="$refs.modal_creation.show()">
           <PlusIcon />
@@ -171,23 +169,34 @@
         />
       </div>
       <p v-if="sortedProjects.length < 1">
-        You don't have any projects yet. Click the green button above to begin.
+        您还没有任何资源,点击上方的绿色按钮即可开始
       </p>
       <template v-else>
-        <p>You can edit multiple projects at once by selecting them below.</p>
+        <p>您可以通过选择下面来同时编辑多个项目.</p>
         <div class="input-group">
           <Button :disabled="selectedProjects.length === 0" @click="$refs.editLinksModal.show()">
             <EditIcon />
-            Edit links
+            编辑链接
           </Button>
           <div class="push-right">
             <div class="labeled-control-row">
-              Sort by
+              筛选
               <Multiselect
                 v-model="sortBy"
                 :searchable="false"
                 class="small-select"
                 :options="['Name', 'Status', 'Type']"
+                :custom-label="(value) => {
+                  switch(value){
+                    case 'Name':{
+                      return '名称'
+                    }case 'Status':{
+                      return '状态'
+                    }case 'Type':{
+                      return '类型'
+                    }
+                  }
+                }"
                 :close-on-select="true"
                 :show-labels="false"
                 :allow-empty="false"
@@ -196,7 +205,7 @@
                 "
               />
               <Button
-                v-tooltip="descending ? 'Descending' : 'Ascending'"
+                v-tooltip="descending ? '降序' : '升序'"
                 class="square-button"
                 icon-only
                 @click="updateDescending()"
@@ -219,11 +228,11 @@
                 "
               />
             </div>
-            <div class="table-cell">Icon</div>
-            <div class="table-cell">Name</div>
+            <div class="table-cell">图标</div>
+            <div class="table-cell">名称</div>
             <div class="table-cell">ID</div>
-            <div class="table-cell">Type</div>
-            <div class="table-cell">Status</div>
+            <div class="table-cell">类型</div>
+            <div class="table-cell">状态</div>
             <div class="table-cell" />
           </div>
           <div v-for="project in sortedProjects" :key="`project-${project.id}`" class="table-row">
@@ -273,7 +282,7 @@
               <BoxIcon />
               <span>{{
                 $formatProjectType(
-                  $getProjectTypeForDisplay(project.project_types[0] ?? "project", project.loaders),
+                  $getProjectTypeForDisplay(project.project_types[0] ?? "资源", project.loaders),
                 )
               }}</span>
             </div>
@@ -375,15 +384,15 @@ const onProjectTransferSubmit = async (projects) => {
 
     addNotification({
       group: "main",
-      title: "Success",
-      text: "Transferred selected projects to organization.",
+      title: "完成",
+      text: "将选定的资源转移给团队。",
       type: "success",
     });
   } catch (err) {
     addNotification({
       group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
+      title: "发生错误",
+      text: err?.data?.description || err?.message || err || "未知错误",
       type: "error",
     });
     console.error(err);
@@ -511,8 +520,8 @@ const onBulkEditLinks = useClientTry(async () => {
 
   addNotification({
     group: "main",
-    title: "Success",
-    text: "Bulk edited selected project's links.",
+    title: "成功",
+    text: "批量编辑选定的资源链接。",
     type: "success",
   });
 

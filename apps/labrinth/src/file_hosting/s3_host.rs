@@ -16,7 +16,6 @@ pub struct S3Host {
 impl S3Host {
     pub fn new(
         bucket_name: &str,
-        bucket_region: &str,
         url: &str,
         access_token: &str,
         secret: &str,

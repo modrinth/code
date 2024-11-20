@@ -157,7 +157,7 @@ async function cancelPayout(id) {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });

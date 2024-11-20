@@ -95,7 +95,7 @@
           >
             <template v-if="header === 'gameVersion'"> 游戏版本 </template>
             <template v-else>
-              {{ $formatCategoryHeader(header) }}
+              {{ formatCategoryHeader(header) }}
             </template>
             <DropdownIcon
               class="ml-auto h-5 w-5 transition-transform"
@@ -117,8 +117,8 @@
                         : toggleFilter(category)
                     "
                   >
-                    <ClientIcon v-if="category.name === 'client'" class="h-4 w-4" />
-                    <ServerIcon v-else-if="category.name === 'server'" class="h-4 w-4" />
+                    <ClientIcon v-if="category.name === '客户端'" class="h-4 w-4" />
+                    <ServerIcon v-else-if="category.name === '服务端'" class="h-4 w-4" />
                     <div v-if="category.icon" class="h-4" v-html="category.icon" />
                     <span class="truncate text-sm">{{ $formatCategory(category.name) }}</span>
                     <BanIcon
@@ -223,8 +223,8 @@
             />
           </div>
           <button
-            v-tooltip="$capitalizeString(cosmetics.searchDisplayMode[projectType.id]) + ' view'"
-            :aria-label="$capitalizeString(cosmetics.searchDisplayMode[projectType.id]) + ' view'"
+            v-tooltip="localString(cosmetics.searchDisplayMode[projectType.id]) + ' 视图'"
+            :aria-label="localString(cosmetics.searchDisplayMode[projectType.id]) + ' 视图'"
             class="square-button"
             @click="cycleSearchDisplayMode()"
           >
@@ -307,6 +307,8 @@
   </div>
 </template>
 <script setup>
+import { formatCategoryHeader,localString } from "@modrinth/utils";
+
 import { Multiselect } from "vue-multiselect";
 import { Pagination, ScrollablePanel, Checkbox, Avatar } from "@modrinth/ui";
 import { BanIcon, DropdownIcon, CheckIcon, FilterXIcon, DownloadIcon } from "@modrinth/assets";
@@ -838,8 +840,8 @@ const filters = computed(() => {
 
   if (!["resourcepack", "plugin", "shader", "datapack"].includes(projectType.value.id)) {
     filters.environment = [
-      { name: "client", type: "env" },
-      { name: "server", type: "env" },
+      { name: "客户端", type: "env" },
+      { name: "服务端", type: "env" },
     ];
   }
 
@@ -860,7 +862,7 @@ const filters = computed(() => {
     }
   }
 
-  filters.license = [{ name: "Open source only", type: "license" }];
+  filters.license = [{ name: "进筛选开源", type: "license" }];
 
   const filteredObj = {};
 
@@ -972,11 +974,17 @@ function toggleFilter(filter, doNotSendRequest) {
       facets.value.push(elementName);
     }
   } else if (filter.type === "env") {
-    const index = selectedEnvironments.value.indexOf(filter.name);
+    let name = ""
+    if (filter.name === '客户端'){
+      name = 'client'
+    }else if (filter.name === '服务端'){
+      name = "server"
+    }
+    const index = selectedEnvironments.value.indexOf(name);
     if (index !== -1) {
       selectedEnvironments.value.splice(index, 1);
     } else {
-      selectedEnvironments.value.push(filter.name);
+      selectedEnvironments.value.push(name);
     }
   } else if (filter.type === "gameVersion") {
     const index = selectedVersions.value.indexOf(filter.name);

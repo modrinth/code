@@ -56,14 +56,14 @@
         <DownloadIcon aria-hidden="true" />
         <p>
           <strong>{{ $formatNumber(downloads) }}</strong
-          ><span class="stat-label"> download<span v-if="downloads !== '1'">s</span></span>
+          ><span class="stat-label"> 次下载</span>
         </p>
       </div>
       <div v-if="follows" class="stat">
         <HeartIcon aria-hidden="true" />
         <p>
           <strong>{{ $formatNumber(follows) }}</strong
-          ><span class="stat-label"> follower<span v-if="follows !== '1'">s</span></span>
+          ><span class="stat-label"> 个关注者</span>
         </p>
       </div>
       <div class="buttons">
@@ -75,7 +75,7 @@
         class="stat date"
       >
         <EditIcon aria-hidden="true" />
-        <span class="date-label">Updated </span>{{ fromNow(updatedAt) }}
+        <span class="date-label">更新于 </span>{{ fromNow(updatedAt) }}
       </div>
       <div
         v-else-if="showCreatedDate"
@@ -83,7 +83,7 @@
         class="stat date"
       >
         <CalendarIcon aria-hidden="true" />
-        <span class="date-label">Published </span>{{ fromNow(createdAt) }}
+        <span class="date-label">发布于 </span>{{ fromNow(createdAt) }}
       </div>
     </div>
   </article>
@@ -99,6 +99,9 @@ import EditIcon from "~/assets/images/utils/updated.svg?component";
 import DownloadIcon from "~/assets/images/utils/download.svg?component";
 import HeartIcon from "~/assets/images/utils/heart.svg?component";
 import Avatar from "~/components/ui/Avatar.vue";
+import dayjs from "dayjs";
+import 'dayjs/locale/zh-cn';
+dayjs.locale('zh-cn');
 
 export default {
   components: {

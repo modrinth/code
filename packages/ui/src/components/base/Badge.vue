@@ -95,79 +95,79 @@ import { useVIntl, defineMessages } from '@vintl/vintl'
 const messages = defineMessages({
   acceptedLabel: {
     id: 'omorphia.component.badge.label.accepted',
-    defaultMessage: 'Accepted',
+    defaultMessage: '已接受',
   },
   approvedLabel: {
     id: 'omorphia.component.badge.label.approved',
-    defaultMessage: 'Approved',
+    defaultMessage: '已批准',
   },
   archivedLabel: {
     id: 'omorphia.component.badge.label.archived',
-    defaultMessage: 'Archived',
+    defaultMessage: '已归档',
   },
   closedLabel: {
     id: 'omorphia.component.badge.label.closed',
-    defaultMessage: 'Closed',
+    defaultMessage: '已关闭',
   },
   creatorLabel: {
     id: 'omorphia.component.badge.label.creator',
-    defaultMessage: 'Creator',
+    defaultMessage: '创建者',
   },
   draftLabel: {
     id: 'omorphia.component.badge.label.draft',
-    defaultMessage: 'Draft',
+    defaultMessage: '草稿',
   },
   failedLabel: {
     id: 'omorphia.component.badge.label.failed',
-    defaultMessage: 'Failed',
+    defaultMessage: '失败',
   },
   listedLabel: {
     id: 'omorphia.component.badge.label.listed',
-    defaultMessage: 'Listed',
+    defaultMessage: '已列出',
   },
   moderatorLabel: {
     id: 'omorphia.component.badge.label.moderator',
-    defaultMessage: 'Moderator',
+    defaultMessage: '版主',
   },
   modrinthTeamLabel: {
     id: 'omorphia.component.badge.label.modrinth-team',
-    defaultMessage: 'Modrinth Team',
+    defaultMessage: 'BBSMC 团队',
   },
   pendingLabel: {
     id: 'omorphia.component.badge.label.pending',
-    defaultMessage: 'Pending',
+    defaultMessage: '待处理',
   },
   privateLabel: {
     id: 'omorphia.component.badge.label.private',
-    defaultMessage: 'Private',
+    defaultMessage: '私有',
   },
   processedLabel: {
     id: 'omorphia.component.badge.label.processed',
-    defaultMessage: 'Processed',
+    defaultMessage: '已处理',
   },
   rejectedLabel: {
     id: 'omorphia.component.badge.label.rejected',
-    defaultMessage: 'Rejected',
+    defaultMessage: '已拒绝',
   },
   returnedLabel: {
     id: 'omorphia.component.badge.label.returned',
-    defaultMessage: 'Returned',
+    defaultMessage: '已退回',
   },
   scheduledLabel: {
     id: 'omorphia.component.badge.label.scheduled',
-    defaultMessage: 'Scheduled',
+    defaultMessage: '已安排',
   },
   underReviewLabel: {
     id: 'omorphia.component.badge.label.under-review',
-    defaultMessage: 'Under review',
+    defaultMessage: '审核中',
   },
   unlistedLabel: {
     id: 'omorphia.component.badge.label.unlisted',
-    defaultMessage: 'Unlisted',
+    defaultMessage: '列出',
   },
   withheldLabel: {
     id: 'omorphia.component.badge.label.withheld',
-    defaultMessage: 'Withheld',
+    defaultMessage: '暂扣',
   },
 })
 const { formatMessage } = useVIntl()

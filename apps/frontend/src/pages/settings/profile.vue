@@ -3,13 +3,7 @@
     <section class="card">
       <h2 class="text-2xl">{{ formatMessage(messages.title) }}</h2>
       <p class="mb-4">
-        <IntlFormatted :message-id="messages.description">
-          <template #docs-link="{ children }">
-            <a href="https://docs.modrinth.com/" target="_blank" class="text-link">
-              <component :is="() => children" />
-            </a>
-          </template>
-        </IntlFormatted>
+        您的个人资料信息可在 BBSMC 公开查看。
       </p>
       <label>
         <span class="label__title">{{ formatMessage(messages.profilePicture) }}</span>
@@ -205,7 +199,7 @@ async function saveChanges() {
   } catch (err) {
     addNotification({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err
         ? err.data
           ? err.data.description

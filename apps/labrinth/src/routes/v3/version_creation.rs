@@ -783,9 +783,9 @@ async fn upload_file_to_version_inner(
 
     Ok(HttpResponse::NoContent().body(""))
 }
-
 // This function is used for adding a file to a version, uploading the initial
 // files for a version, and for uploading the initial version files for a project
+
 #[allow(clippy::too_many_arguments)]
 pub async fn upload_file(
     field: &mut Field,
@@ -1032,13 +1032,22 @@ pub fn try_create_version_fields(
         Vec<LoaderFieldEnumValue>,
     >,
 ) -> Result<Vec<VersionField>, CreateError> {
+    // info!(submitted_fields);
     let mut version_fields = vec![];
     let mut remaining_mandatory_loader_fields = loader_fields
         .iter()
         .filter(|lf| !lf.optional)
         .map(|lf| lf.field.clone())
         .collect::<HashSet<_>>();
+
+    println!("{}",loader_fields.len());
+    for loader_field in loader_fields {
+        println!("{}",loader_field.field);
+    }
+
     for (key, value) in submitted_fields.iter() {
+        println!("{key}");
+        println!("{}",value.to_string());
         let loader_field = loader_fields
             .iter()
             .find(|lf| &lf.field == key)

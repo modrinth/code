@@ -14,7 +14,7 @@
     :auth="auth"
     class="universal-card recessed"
   />
-  <p v-if="reports.length === 0">You don't have any active reports.</p>
+  <p v-if="reports.length === 0">你没有任何报告.</p>
 </template>
 <script setup>
 import Chips from "~/components/ui/Chips.vue";

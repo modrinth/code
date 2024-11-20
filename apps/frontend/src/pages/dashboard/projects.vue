@@ -1,18 +1,16 @@
 <template>
   <div>
-    <Modal ref="editLinksModal" header="Edit links">
+    <Modal ref="editLinksModal" header="编辑 URL">
       <div class="universal-modal links-modal">
         <p>
-          Any links you specify below will be overwritten on each of the selected projects. Any you
-          leave blank will be ignored. You can clear a link from all selected projects using the
-          trash can button.
+          在资源管理页面中，您可以为每个选定的项目指定URL。任何您在下方指定的URL将覆盖选定项目中的现有URL。任何空白的URL将被忽略。您可以使用垃圾桶按钮从所有选定项目中清除某个URL。
         </p>
         <section class="links">
           <label
             for="issue-tracker-input"
-            title="A place for users to report bugs, issues, and concerns about your project."
+            title="反馈BUG"
           >
-            <span class="label__title">Issue tracker</span>
+            <span class="label__title">反馈BUG</span>
           </label>
           <div class="input-group shrink-first">
             <input
@@ -21,7 +19,7 @@
               :disabled="editLinks.issues.clear"
               type="url"
               :placeholder="
-                editLinks.issues.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
+                editLinks.issues.clear ? '现有 URL 将被清除' : '输入可用访问URL'
               "
               maxlength="2048"
             />
@@ -39,7 +37,7 @@
             for="source-code-input"
             title="A page/repository containing the source code for your project"
           >
-            <span class="label__title">Source code</span>
+            <span class="label__title">开源地址</span>
           </label>
           <div class="input-group shrink-first">
             <input
@@ -49,7 +47,7 @@
               type="url"
               maxlength="2048"
               :placeholder="
-                editLinks.source.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
+                editLinks.source.clear ? '现有 URL 将被清除' : '输入可用访问URL'
               "
             />
             <button
@@ -66,7 +64,7 @@
             for="wiki-page-input"
             title="A page containing information, documentation, and help for the project."
           >
-            <span class="label__title">Wiki page</span>
+            <span class="label__title">WIKI</span>
           </label>
           <div class="input-group shrink-first">
             <input
@@ -76,7 +74,7 @@
               type="url"
               maxlength="2048"
               :placeholder="
-                editLinks.wiki.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
+                editLinks.wiki.clear ? '现有 URL 将被清除' : '输入可用访问URL'
               "
             />
             <button
@@ -89,36 +87,36 @@
               <TrashIcon />
             </button>
           </div>
-          <label for="discord-invite-input" title="An invitation link to your Discord server.">
-            <span class="label__title">Discord invite</span>
-          </label>
-          <div class="input-group shrink-first">
-            <input
-              id="discord-invite-input"
-              v-model="editLinks.discord.val"
-              :disabled="editLinks.discord.clear"
-              type="url"
-              maxlength="2048"
-              :placeholder="
-                editLinks.discord.clear
-                  ? 'Existing link will be cleared'
-                  : 'Enter a valid Discord invite URL'
-              "
-            />
-            <button
-              v-tooltip="'Clear link'"
-              aria-label="Clear link"
-              class="square-button label-button"
-              :data-active="editLinks.discord.clear"
-              @click="editLinks.discord.clear = !editLinks.discord.clear"
-            >
-              <TrashIcon />
-            </button>
-          </div>
+<!--          <label for="discord-invite-input" title="An invitation link to your Discord server.">-->
+<!--            <span class="label__title">Discord invite</span>-->
+<!--          </label>-->
+<!--          <div class="input-group shrink-first">-->
+<!--            <input-->
+<!--              id="discord-invite-input"-->
+<!--              v-model="editLinks.discord.val"-->
+<!--              :disabled="editLinks.discord.clear"-->
+<!--              type="url"-->
+<!--              maxlength="2048"-->
+<!--              :placeholder="-->
+<!--                editLinks.discord.clear-->
+<!--                  ? '现有 URL 将被清除'-->
+<!--                  : 'Enter a valid Discord invite URL'-->
+<!--              "-->
+<!--            />-->
+<!--            <button-->
+<!--              v-tooltip="'Clear link'"-->
+<!--              aria-label="Clear link"-->
+<!--              class="square-button label-button"-->
+<!--              :data-active="editLinks.discord.clear"-->
+<!--              @click="editLinks.discord.clear = !editLinks.discord.clear"-->
+<!--            >-->
+<!--              <TrashIcon />-->
+<!--            </button>-->
+<!--          </div>-->
         </section>
         <p>
-          Changes will be applied to
-          <strong>{{ selectedProjects.length }}</strong> project{{
+          变更将应用于
+          <strong>{{ selectedProjects.length }}</strong> 个资源{{
             selectedProjects.length > 1 ? "s" : ""
           }}.
         </p>
@@ -159,7 +157,7 @@
     <ModalCreation ref="modal_creation" />
     <section class="universal-card">
       <div class="header__row">
-        <h2 class="header__title text-2xl">Projects</h2>
+        <h2 class="header__title text-2xl">资源</h2>
         <div class="input-group">
           <button class="iconified-button brand-button" @click="$refs.modal_creation.show()">
             <PlusIcon />
@@ -168,10 +166,10 @@
         </div>
       </div>
       <p v-if="projects.length < 1">
-        You don't have any projects yet. Click the green button above to begin.
+        您还没有任何资源。点击上方的绿色按钮即可开始创建。
       </p>
       <template v-else>
-        <p>You can edit multiple projects at once by selecting them below.</p>
+        <p>您可以通过选择下面多个资源来同时编辑它们。</p>
         <div class="input-group">
           <button
             class="iconified-button"
@@ -179,23 +177,23 @@
             @click="$refs.editLinksModal.show()"
           >
             <EditIcon />
-            Edit links
+            编辑URL
           </button>
           <div class="push-right">
             <div class="labeled-control-row">
-              Sort by
+              筛选
               <Multiselect
                 v-model="sortBy"
                 :searchable="false"
                 class="small-select"
-                :options="['Name', 'Status', 'Type']"
+                :options="['标题', '状态', '类型']"
                 :close-on-select="true"
                 :show-labels="false"
                 :allow-empty="false"
                 @update:model-value="projects = updateSort(projects, sortBy, descending)"
               />
               <button
-                v-tooltip="descending ? 'Descending' : 'Ascending'"
+                v-tooltip="descending ? '降序' : '升序'"
                 class="square-button"
                 @click="updateDescending()"
               >
@@ -217,11 +215,11 @@
                 "
               />
             </div>
-            <div>Icon</div>
-            <div>Name</div>
+            <div>图标</div>
+            <div>标题</div>
             <div>ID</div>
-            <div>Type</div>
-            <div>Status</div>
+            <div>类型</div>
+            <div>状态</div>
             <div />
           </div>
           <div v-for="project in projects" :key="`project-${project.id}`" class="grid-table__row">
@@ -484,7 +482,7 @@ export default defineNuxtComponent({
       } catch (e) {
         this.$notify({
           group: "main",
-          title: "An error occurred",
+          title: "发生错误",
           text: e,
           type: "error",
         });

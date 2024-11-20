@@ -248,13 +248,13 @@
           >
             <PlusIcon aria-hidden="true" />
             <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-            <template #new-project> <BoxIcon aria-hidden="true" /> New project </template>
+            <template #new-project> <BoxIcon aria-hidden="true" /> 创建资源 </template>
             <!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
             <template #new-collection>
-              <CollectionIcon aria-hidden="true" /> New collection
+              <CollectionIcon aria-hidden="true" /> 创建收藏夹
             </template>
             <template #new-organization>
-              <OrganizationIcon aria-hidden="true" /> New organization
+              <OrganizationIcon aria-hidden="true" /> 创建团队
             </template>
           </OverflowMenu>
         </ButtonStyled>
@@ -265,23 +265,23 @@
         >
           <Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
           <DropdownIcon class="h-5 w-5 text-secondary" />
-          <template #profile> <UserIcon aria-hidden="true" /> Profile </template>
-          <template #notifications> <BellIcon aria-hidden="true" /> Notifications </template>
-          <template #saved> <BookmarkIcon aria-hidden="true" /> Saved projects </template>
-          <template #servers> <ServerIcon aria-hidden="true" /> My servers </template>
+          <template #profile> <UserIcon aria-hidden="true" /> 个人资料 </template>
+          <template #notifications> <BellIcon aria-hidden="true" /> 通知 </template>
+          <template #saved> <BookmarkIcon aria-hidden="true" /> 收藏夹 </template>
+<!--          <template #servers> <ServerIcon aria-hidden="true" /> My servers </template>-->
           <template #plus>
             <ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
           </template>
-          <template #settings> <SettingsIcon aria-hidden="true" /> Settings </template>
-          <template #flags> <ReportIcon aria-hidden="true" /> Feature flags </template>
-          <template #projects> <BoxIcon aria-hidden="true" /> Projects </template>
+          <template #settings> <SettingsIcon aria-hidden="true" /> 设置 </template>
+          <template #flags> <ReportIcon aria-hidden="true" /> 标签 </template>
+          <template #projects> <BoxIcon aria-hidden="true" /> 我的资源 </template>
           <template #organizations>
-            <OrganizationIcon aria-hidden="true" /> Organizations
+            <OrganizationIcon aria-hidden="true" /> 团队
           </template>
-          <template #revenue> <CurrencyIcon aria-hidden="true" /> Revenue </template>
-          <template #analytics> <ChartIcon aria-hidden="true" /> Analytics </template>
-          <template #moderation> <ModerationIcon aria-hidden="true" /> Moderation </template>
-          <template #sign-out> <LogOutIcon aria-hidden="true" /> Sign out </template>
+          <template #revenue> <CurrencyIcon aria-hidden="true" /> 收入 </template>
+          <template #analytics> <ChartIcon aria-hidden="true" /> 统计 </template>
+          <template #moderation> <ModerationIcon aria-hidden="true" /> 管理 </template>
+          <template #sign-out> <LogOutIcon aria-hidden="true" /> 登出 </template>
         </OverflowMenu>
         <ButtonStyled v-else color="brand">
           <nuxt-link to="/auth/sign-in">
@@ -462,28 +462,28 @@
       <slot id="main" />
     </main>
     <footer>
-      <div class="logo-info" role="region" aria-label="Modrinth information">
-        <BrandTextLogo
-          aria-hidden="true"
-          class="text-logo button-base mx-auto mb-4 lg:mx-0"
-          @click="developerModeIncrement()"
-        />
-        <p class="mb-4">
-          <IntlFormatted :message-id="footerMessages.openSource">
-            <template #github-link="{ children }">
-              <a
-                :target="$external()"
-                href="https://github.com/modrinth"
-                class="text-link"
-                rel="noopener"
-              >
-                <component :is="() => children" />
-              </a>
-            </template>
-          </IntlFormatted>
-        </p>
+<!--      <div class="logo-info" role="region" aria-label="Modrinth information">-->
+<!--        <BrandTextLogo-->
+<!--          aria-hidden="true"-->
+<!--          class="text-logo button-base mx-auto mb-4 lg:mx-0"-->
+<!--          @click="developerModeIncrement()"-->
+<!--        />-->
+<!--        <p class="mb-4">-->
+<!--          <IntlFormatted :message-id="footerMessages.openSource">-->
+<!--            <template #github-link="{ children }">-->
+<!--              <a-->
+<!--                :target="$external()"-->
+<!--                href="https://github.com/modrinth"-->
+<!--                class="text-link"-->
+<!--                rel="noopener"-->
+<!--              >-->
+<!--                <component :is="() => children" />-->
+<!--              </a>-->
+<!--            </template>-->
+<!--          </IntlFormatted>-->
+<!--        </p>-->
 
-      </div>
+<!--      </div>-->
 <!--      <div class="links links-1" role="region" aria-label="Legal">-->
 <!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.companyTitle) }}</h4>-->
 <!--        <nuxt-link to="/legal/terms"> {{ formatMessage(footerMessages.terms) }}</nuxt-link>-->
@@ -803,12 +803,7 @@ const userMenuOptions = computed(() => {
       id: "profile",
       link: `/user/${auth.value.user.username}`,
     },
-    {
-      id: "plus",
-      link: "/plus",
-      color: "purple",
-      shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(auth.value.user.badges, 1 << 0),
-    },
+
     {
       id: "notifications",
       link: "/dashboard/notifications",
@@ -817,10 +812,10 @@ const userMenuOptions = computed(() => {
       id: "saved",
       link: "/dashboard/collections",
     },
-    {
-      id: "servers",
-      link: "/servers/manage",
-    },
+    // {
+    //   id: "servers",
+    //   link: "/servers/manage",
+    // },
     {
       id: "flags",
       link: "/flags",
@@ -846,10 +841,10 @@ const userMenuOptions = computed(() => {
       id: "organizations",
       link: "/dashboard/organizations",
     },
-    {
-      id: "revenue",
-      link: "/dashboard/revenue",
-    },
+    // {
+    //   id: "revenue",
+    //   link: "/dashboard/revenue",
+    // },
     {
       id: "analytics",
       link: "/dashboard/analytics",

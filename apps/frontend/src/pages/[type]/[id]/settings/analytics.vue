@@ -1,12 +1,10 @@
 <template>
   <div>
     <div class="universal-card">
-      <h2>Analytics</h2>
+      <h2>分析</h2>
 
       <p>
-        This page shows you the analytics for your project, <strong>{{ project.title }}</strong
-        >. You can see the number of downloads, page views and revenue earned for your project, as
-        well as the total downloads and page views for {{ project.title }} by country.
+        该页面显示您<strong>{{ project.title }}</strong>的分析数据 . 您可以查看该资源的到下载次数, 浏览量等
       </p>
     </div>
 

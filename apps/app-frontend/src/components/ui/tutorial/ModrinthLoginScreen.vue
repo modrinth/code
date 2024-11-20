@@ -109,8 +109,8 @@ async function createAccount() {
   if (password.value !== confirmPassword.value) {
     const notifs = useNotifications()
     notifs.addNotification({
-      title: 'An error occurred',
-      text: 'Passwords do not match!',
+      title: '发生错误',
+      text: '密码不匹配！',
       type: 'error',
     })
     return

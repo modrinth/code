@@ -4,14 +4,14 @@
     class="experimental-styles-within new-page sidebar"
     :class="{ 'alt-layout': cosmetics.leftContentLayout || routeHasSettings }"
   >
-    <ModalCreation ref="modal_creation" :organization-id="organization.id" />
+    <ModalCreation ref="" :organization-id="organization.id" />
     <template v-if="routeHasSettings">
       <div class="normal-page__sidebar">
         <div class="universal-card">
           <Breadcrumbs
-            current-title="Settings"
+            current-title="设置"
             :link-stack="[
-              { href: `/dashboard/organizations`, label: 'Organizations' },
+              { href: `/dashboard/organizations`, label: '团队' },
               {
                 href: `/organization/${organization.slug}`,
                 label: organization.name,
@@ -29,32 +29,32 @@
               </h2>
               <span>
                 {{ $formatNumber(acceptedMembers?.length || 0) }}
-                member<template v-if="acceptedMembers?.length !== 1">s</template>
+                成员<template v-if="acceptedMembers?.length !== 1"></template>
               </span>
             </div>
           </div>
 
-          <h2>Organization settings</h2>
+          <h2>团队设置</h2>
 
           <NavStack>
-            <NavStackItem :link="`/organization/${organization.slug}/settings`" label="Overview">
+            <NavStackItem :link="`/organization/${organization.slug}/settings`" label="主要">
               <SettingsIcon />
             </NavStackItem>
             <NavStackItem
               :link="`/organization/${organization.slug}/settings/members`"
-              label="Members"
+              label="成员"
             >
               <UsersIcon />
             </NavStackItem>
             <NavStackItem
               :link="`/organization/${organization.slug}/settings/projects`"
-              label="Projects"
+              label="资源"
             >
               <BoxIcon />
             </NavStackItem>
             <NavStackItem
               :link="`/organization/${organization.slug}/settings/analytics`"
-              label="Analytics"
+              label="分析"
             >
               <ChartIcon />
             </NavStackItem>
@@ -76,7 +76,7 @@
           </template>
           <template #title-suffix>
             <div class="ml-1 flex items-center gap-2 font-semibold">
-              <OrganizationIcon /> Organization
+              <OrganizationIcon /> 团队
             </div>
           </template>
           <template #summary>
@@ -88,26 +88,26 @@
             >
               <UsersIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(acceptedMembers?.length || 0) }}
-              members
+              成员
             </div>
             <div
               class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
             >
               <BoxIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(projects?.length || 0) }}
-              projects
+              资源
             </div>
             <div class="flex items-center gap-2 font-semibold">
               <DownloadIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(sumDownloads) }}
-              downloads
+              次下载
             </div>
           </template>
           <template #actions>
             <ButtonStyled v-if="auth.user && currentMember" size="large">
               <NuxtLink :to="`/organization/${organization.slug}/settings`">
                 <SettingsIcon aria-hidden="true" />
-                Manage
+                管理
               </NuxtLink>
             </ButtonStyled>
             <ButtonStyled size="large" circular type="transparent">
@@ -128,7 +128,7 @@
                 <MoreVerticalIcon aria-hidden="true" />
                 <template #manage-projects>
                   <BoxIcon aria-hidden="true" />
-                  Manage projects
+                  管理资源
                 </template>
                 <template #copy-id>
                   <ClipboardCopyIcon aria-hidden="true" />
@@ -173,14 +173,14 @@
       </div>
       <div class="normal-page__content">
         <div v-if="isInvited" class="universal-card information invited">
-          <h2>Invitation to join {{ organization.name }}</h2>
-          <p>You have been invited to join {{ organization.name }}.</p>
+          <h2>邀请你加入 {{ organization.name }}</h2>
+          <p>您被邀请加入 {{ organization.name }}.</p>
           <div class="input-group">
             <button class="iconified-button brand-button" @click="onAcceptInvite">
-              <CheckIcon />Accept
+              <CheckIcon />接受
             </button>
             <button class="iconified-button danger-button" @click="onDeclineInvite">
-              <XIcon />Decline
+              <XIcon />拒绝
             </button>
           </div>
         </div>
@@ -229,10 +229,10 @@
         <div v-else-if="true" class="error">
           <UpToDate class="icon" /><br />
           <span class="preserve-lines text">
-            This organization doesn't have any projects yet.
+            该团队尚未发布项目。
             <template v-if="isPermission(currentMember?.organization_permissions, 1 << 4)">
-              Would you like to
-              <a class="link" @click="$refs.modal_creation.show()">create one</a>?
+              你想要
+              <a class="link" @click="$refs.modal_creation.show()">发布一个资源吗</a>?
             </template>
           </span>
         </div>

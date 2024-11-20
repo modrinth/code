@@ -1,15 +1,15 @@
 <template>
   <div v-if="showInvitation" class="universal-card information invited">
-    <h2>Invitation to join project</h2>
+    <h2>邀请加入资源</h2>
     <p>
-      You've been invited be a member of this project with the role of '{{ currentMember.role }}'.
+      您已被邀请成为该项目的成员，权限为 '{{ currentMember.role }}'.
     </p>
     <div class="input-group">
       <button class="iconified-button brand-button" @click="acceptInvite()">
-        <CheckIcon />Accept
+        <CheckIcon />接收
       </button>
       <button class="iconified-button danger-button" @click="declineInvite()">
-        <CrossIcon />Decline
+        <CrossIcon />拒绝
       </button>
     </div>
   </div>
@@ -23,9 +23,9 @@
   >
     <div class="header__row">
       <div class="header__title">
-        <h2>Publishing checklist</h2>
+        <h2>发布前检查</h2>
         <div class="checklist">
-          <span class="checklist__title">Progress:</span>
+          <span class="checklist__title">进度:</span>
           <div class="checklist__items">
             <div
               v-for="nag in nags"
@@ -163,7 +163,7 @@ const props = defineProps({
       return () => {
         addNotification({
           group: "main",
-          title: "An error occurred",
+          title: "发生错误",
           text: "setProcessing function not found",
           type: "error",
         });
@@ -176,8 +176,8 @@ const props = defineProps({
       return () => {
         addNotification({
           group: "main",
-          title: "An error occurred",
-          text: "toggleCollapsed function not found",
+          title: "发生错误",
+          text: "未找到 toggleCollapsed 函数",
           type: "error",
         });
       };
@@ -189,8 +189,8 @@ const props = defineProps({
       return () => {
         addNotification({
           group: "main",
-          title: "An error occurred",
-          text: "updateMembers function not found",
+          title: "发生错误",
+          text: "updateMembers 函数未找到",
           type: "error",
         });
       };
@@ -203,65 +203,65 @@ const featuredGalleryImage = computed(() => props.project.gallery.find((img) => 
 const nags = computed(() => [
   {
     condition: props.versions.length < 1,
-    title: "Upload a version",
+    title: "上传版本",
     id: "upload-version",
-    description: "At least one version is required for a project to be submitted for review.",
+    description: "资源至少需要一个版本才能提交审核。",
     status: "required",
     link: {
       path: "versions",
-      title: "Visit versions page",
+      title: "访问版本页面",
       hide: props.routeName === "type-id-versions",
     },
   },
   {
     condition:
       props.project.body === "" || props.project.body.startsWith("# Placeholder description"),
-    title: "Add a description",
+    title: "介绍",
     id: "add-description",
     description:
-      "A description that clearly describes the project's purpose and function is required.",
+      "需要清晰的介绍资源和基本功能，请尽量丰富一些.",
     status: "required",
     link: {
       path: "settings/description",
-      title: "Visit description settings",
+      title: "访问介绍页面",
       hide: props.routeName === "type-id-settings-description",
     },
   },
   {
     condition: !props.project.icon_url,
-    title: "Add an icon",
+    title: "设置图标",
     id: "add-icon",
     description:
-      "Your project should have a nice-looking icon to uniquely identify your project at a glance.",
+      "设置一个一眼就能记住的LOGO图标.",
     status: "suggestion",
     link: {
       path: "settings",
-      title: "Visit general settings",
+      title: "访问图标页面",
       hide: props.routeName === "type-id-settings",
     },
   },
   {
     condition: props.project.gallery.length === 0 || !featuredGalleryImage,
-    title: "Feature a gallery image",
+    title: "渲染图",
     id: "feature-gallery-image",
-    description: "Featured gallery images may be the first impression of many users.",
+    description: "设置一个精致的渲染图,一张大图被用于宣传推广",
     status: "suggestion",
     link: {
       path: "gallery",
-      title: "Visit gallery page",
+      title: "访问渲染图页面",
       hide: props.routeName === "type-id-gallery",
     },
   },
   {
     hide: props.project.versions.length === 0,
     condition: props.project.categories.length < 1,
-    title: "Select tags",
+    title: "选择标签",
     id: "select-tags",
-    description: "Select all tags that apply to your project.",
+    description: "选择适合你资源的标签",
     status: "suggestion",
     link: {
       path: "settings/tags",
-      title: "Visit tag settings",
+      title: "访问标签设置页面",
       hide: props.routeName === "type-id-settings-tags",
     },
   },
@@ -273,14 +273,14 @@ const nags = computed(() => [
       props.project.discord_url ||
       props.project.donation_urls.length > 0
     ),
-    title: "Add external links",
+    title: "更多URL",
     id: "add-links",
     description:
-      "Add any relevant links targeted outside of Modrinth, such as sources, issues, or a Discord invite.",
+      "BUG反馈地址,开源地址等本网站之外的第三方网站链接",
     status: "suggestion",
     link: {
       path: "settings/links",
-      title: "Visit links settings",
+      title: "访问URL设置页面",
       hide: props.routeName === "type-id-settings-links",
     },
   },
@@ -295,57 +295,55 @@ const nags = computed(() => [
       props.project.client_side === "unknown" ||
       props.project.server_side === "unknown" ||
       (props.project.client_side === "unsupported" && props.project.server_side === "unsupported"),
-    title: "Select supported environments",
+    title: "运行环境",
     id: "select-environments",
-    description: `Select if the ${formatProjectType(
+    description: `选择资源 ${formatProjectType(
       props.project.project_type,
-    ).toLowerCase()} functions on the client-side and/or server-side.`,
+    ).toLowerCase()} 适用于服务端还是客户端`,
     status: "required",
     link: {
       path: "settings",
-      title: "Visit general settings",
+      title: "访问常规设置页面",
       hide: props.routeName === "type-id-settings",
     },
   },
   {
     condition: props.project.license.id === "LicenseRef-Unknown",
-    title: "Select license",
+    title: "选择许可证",
     id: "select-license",
-    description: `Select the license your ${formatProjectType(
+    description: `选择您 ${formatProjectType(
       props.project.project_type,
-    ).toLowerCase()} is distributed under.`,
+    ).toLowerCase()} 所遵循的许可证.`,
     status: "required",
     link: {
       path: "settings/license",
-      title: "Visit license settings",
+      title: "访问许可证页面",
       hide: props.routeName === "type-id-settings-license",
     },
   },
   {
     condition: props.project.status === "draft",
-    title: "Submit for review",
+    title: "提交审核",
     id: "submit-for-review",
     description:
-      "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published.",
+      "您的项目暂时仅供项目成员查看,必须经过版主审核才能发布.",
     status: "review",
     link: null,
     action: {
       onClick: submitForReview,
-      title: "Submit for review",
+      title: "提交审核.",
       disabled: () => nags.value.filter((x) => x.condition && x.status === "required").length > 0,
     },
   },
   {
     condition: props.tags.rejectedStatuses.includes(props.project.status),
-    title: "Resubmit for review",
+    title: "重新提交审核",
     id: "resubmit-for-review",
-    description: `Your project has been ${props.project.status} by
-            Modrinth's staff. In most cases, you can resubmit for review after
-            addressing the staff's message.`,
+    description: `您的项目被版主设置为 ${props.project.status} . 您可以在回复后重新提交审核`,
     status: "review",
     link: {
       path: "moderation",
-      title: "Visit moderation page",
+      title: "访问审核页面",
       hide: props.routeName === "type-id-moderation",
     },
   },

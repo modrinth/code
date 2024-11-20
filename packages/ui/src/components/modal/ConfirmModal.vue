@@ -9,9 +9,9 @@
       <div class="markdown-body" v-html="renderString(description)" />
       <label v-if="hasToType" for="confirmation" class="confirmation-label">
         <span>
-          <strong>To verify, type</strong>
-          <em class="confirmation-text">{{ confirmationText }}</em>
-          <strong>below:</strong>
+          <strong>请手动输入 </strong>
+          <em class="confirmation-text">{{ confirmationText }} </em>
+          <strong>  到下方输入框:</strong>
         </span>
       </label>
       <div class="confirmation-input">
@@ -20,7 +20,7 @@
           id="confirmation"
           v-model="confirmation_typed"
           type="text"
-          placeholder="Type here..."
+          placeholder="在此处输入..."
           @input="type"
         />
       </div>
@@ -34,7 +34,7 @@
         <ButtonStyled>
           <button @click="modal.hide()">
             <XIcon />
-            Cancel
+            取消
           </button>
         </ButtonStyled>
       </div>

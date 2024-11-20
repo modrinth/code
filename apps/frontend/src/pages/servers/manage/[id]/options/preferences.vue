@@ -105,7 +105,7 @@ const savePreferences = () => {
   addNotification({
     group: "serverOptions",
     type: "success",
-    title: "Preferences saved",
+    title: "偏好设置已保存",
     text: "Your preferences have been saved.",
   });
 };

@@ -4,9 +4,9 @@
       <div class="markdown-body" v-html="renderString(description)" />
       <label v-if="hasToType" for="confirmation" class="confirmation-label">
         <span>
-          <strong>To verify, type</strong>
+          <strong>请输入</strong>
           <em class="confirmation-text">{{ confirmationText }}</em>
-          <strong>below:</strong>
+          <strong>在下面:</strong>
         </span>
       </label>
       <div class="confirmation-input">
@@ -15,14 +15,14 @@
           id="confirmation"
           v-model="confirmation_typed"
           type="text"
-          placeholder="Type here..."
+          placeholder="在此输入..."
           @input="type"
         />
       </div>
       <div class="button-group">
         <button class="iconified-button" @click="cancel">
           <CrossIcon />
-          Cancel
+          取消
         </button>
         <button class="iconified-button danger-button" :disabled="action_disabled" @click="proceed">
           <TrashIcon />

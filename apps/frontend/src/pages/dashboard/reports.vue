@@ -1,7 +1,7 @@
 <template>
   <div>
     <section class="universal-card">
-      <h2 class="text-2xl">Reports</h2>
+      <h2 class="text-2xl">报告</h2>
       <ReportsList :auth="auth" />
     </section>
   </div>

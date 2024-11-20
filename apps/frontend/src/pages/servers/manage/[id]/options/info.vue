@@ -142,7 +142,7 @@ const copyToClipboard = (name: string, textToCopy?: string) => {
   navigator.clipboard.writeText(textToCopy || "");
   addNotification({
     type: "success",
-    title: `${name} copied to clipboard!`,
+    title: `${name} 已复制到剪贴板！`,
   });
 };
 

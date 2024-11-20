@@ -3,16 +3,14 @@
     <section class="universal-card">
       <div class="label">
         <h3>
-          <span class="label__title size-card-header">Tags</span>
+          <span class="label__title size-card-header">标签</span>
         </h3>
       </div>
       <p>
-        Accurate tagging is important to help people find your
-        {{ $formatProjectType(project.project_type).toLowerCase() }}. Make sure to select all tags
-        that apply.
+        准确的标记对于帮助人们找到您的项目非常重要。请确保选择所有适用的标签。
       </p>
       <p v-if="project.versions.length === 0" class="known-errors">
-        Please upload a version first in order to select tags!
+        请先上传一个版本以后再选择
       </p>
       <template v-else>
         <template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
@@ -22,22 +20,17 @@
             </h4>
             <span class="label__description">
               <template v-if="header === 'categories'">
-                Select all categories that reflect the themes or function of your
+                选择所有能反映您主题或功能的分类
                 {{ $formatProjectType(project.project_type).toLowerCase() }}.
               </template>
               <template v-else-if="header === 'features'">
-                Select all of the features that your
-                {{ $formatProjectType(project.project_type).toLowerCase() }} makes use of.
+                选择您资源所具有的的功能
               </template>
               <template v-else-if="header === 'resolutions'">
-                Select the resolution(s) of textures in your
-                {{ $formatProjectType(project.project_type).toLowerCase() }}.
+                请选择您资源的纹理分辨率
               </template>
               <template v-else-if="header === 'performance impact'">
-                Select the realistic performance impact of your
-                {{ $formatProjectType(project.project_type).toLowerCase() }}. Select multiple if the
-                {{ $formatProjectType(project.project_type).toLowerCase() }} is configurable to
-                different levels of performance impact.
+                选择您资源对性能的影响, 可以选择多个
               </template>
             </span>
           </div>
@@ -64,15 +57,14 @@
         </template>
         <div class="label">
           <h4>
-            <span class="label__title"><StarIcon /> Featured tags</span>
+            <span class="label__title"><StarIcon /> 精选标签</span>
           </h4>
           <span class="label__description">
-            You can feature up to 3 of your most relevant tags. Other tags may be promoted to
-            featured if you do not select all 3.
+            您最多可以推荐 3 个最相关的标签。如果您没有选择全部 3 个,其他标签可能会被提升为精选.
           </span>
         </div>
         <p v-if="selectedTags.length < 1">
-          Select at least one category in order to feature a category.
+          选择至少一个分类以便突出显示该分类
         </p>
         <div class="category-list input-div">
           <Checkbox
@@ -105,7 +97,7 @@
           @click="saveChanges()"
         >
           <SaveIcon />
-          Save changes
+          保存
         </button>
       </div>
     </section>
@@ -148,7 +140,7 @@ export default defineNuxtComponent({
         return () => {
           this.$notify({
             group: "main",
-            title: "An error occurred",
+            title: "发生错误",
             text: "Patch project function not found",
             type: "error",
           });

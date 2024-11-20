@@ -48,7 +48,7 @@
               :title="`Download ${version.name}`"
             >
               <DownloadIcon aria-hidden="true" />
-              Download
+              下载
             </a>
           </div>
           <div
@@ -96,8 +96,8 @@ const props = defineProps({
   },
 });
 
-const title = `${props.project.title} - Changelog`;
-const description = `View the changelog of ${props.project.title}'s ${props.versions.length} versions.`;
+const title = `${props.project.title} - 更新日志`;
+const description = `查看 ${props.project.title}的 ${props.versions.length} 个版本的更新日志.`;
 
 useSeoMeta({
   title,

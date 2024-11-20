@@ -7,15 +7,15 @@
       <FileInput
         :max-size="524288000"
         :accept="acceptFileFromProjectType(project.project_type)"
-        prompt="Upload a version"
+        prompt="上传版本"
         class="btn btn-primary"
-        aria-label="Upload a version"
+        aria-label="上传版本"
         @change="handleFiles"
       >
         <UploadIcon aria-hidden="true" />
       </FileInput>
       <span class="flex items-center gap-2">
-        <InfoIcon aria-hidden="true" /> Click to choose a file or drag one onto this page
+        <InfoIcon aria-hidden="true" /> 单击选择文件或将其拖到此页面
       </span>
       <DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
     </div>
@@ -39,29 +39,29 @@
     >
       <div class="versions-grid-row">
         <div class="w-9 max-sm:hidden"></div>
-        <div class="text-sm font-bold text-contrast max-sm:hidden">Name</div>
+        <div class="text-sm font-bold text-contrast max-sm:hidden">名字</div>
         <div
           class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
-          Game version
+          游戏版本
         </div>
         <div
           class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
-          Platforms
+          平台
         </div>
         <div
           class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
-          Published
+          发布
         </div>
         <div
           class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
-          Downloads
+          下载量
         </div>
         <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">
-          Compatibility
+          兼容度
         </div>
         <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">Stats</div>
         <div class="w-9 max-sm:hidden"></div>
@@ -228,31 +228,31 @@
                 <MoreVerticalIcon aria-hidden="true" />
                 <template #download>
                   <DownloadIcon aria-hidden="true" />
-                  Download
+                  下载
                 </template>
                 <template #new-tab>
                   <ExternalIcon aria-hidden="true" />
-                  Open in new tab
+                  打开一个新的页面
                 </template>
                 <template #copy-link>
                   <LinkIcon aria-hidden="true" />
-                  Copy link
+                  复制URL
                 </template>
                 <template #share>
                   <ShareIcon aria-hidden="true" />
-                  Share
+                  分享
                 </template>
                 <template #report>
                   <ReportIcon aria-hidden="true" />
-                  Report
+                  反馈
                 </template>
                 <template #edit>
                   <EditIcon aria-hidden="true" />
-                  Edit
+                  编辑
                 </template>
                 <template #delete>
                   <TrashIcon aria-hidden="true" />
-                  Delete
+                  删除
                 </template>
               </OverflowMenu>
             </ButtonStyled>

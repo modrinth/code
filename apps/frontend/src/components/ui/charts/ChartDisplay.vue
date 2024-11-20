@@ -14,7 +14,7 @@
           <CompactChart
             v-if="analytics.formattedData.value.downloads"
             ref="tinyDownloadChart"
-            :title="`Downloads since ${dayjs(startDate).format('MMM D, YYYY')}`"
+            :title="` ${dayjs(startDate).format('YYYY-MM-D')} - ${dayjs(endDate).format('YYYY-MM-D')}`"
             color="var(--color-brand)"
             :value="formatNumber(analytics.formattedData.value.downloads.sum, false)"
             :data="analytics.formattedData.value.downloads.chart.sumData"
@@ -33,7 +33,7 @@
           <CompactChart
             v-if="analytics.formattedData.value.views"
             ref="tinyViewChart"
-            :title="`Page views since ${dayjs(startDate).format('MMM D, YYYY')}`"
+            :title="` ${dayjs(startDate).format('YYYY-MM-D')} - ${dayjs(endDate).format('YYYY-MM-D')}`"
             color="var(--color-blue)"
             :value="formatNumber(analytics.formattedData.value.views.sum, false)"
             :data="analytics.formattedData.value.views.chart.sumData"
@@ -46,23 +46,23 @@
             role="button"
           />
         </client-only>
-        <client-only>
-          <CompactChart
-            v-if="analytics.formattedData.value.revenue"
-            ref="tinyRevenueChart"
-            :title="`Revenue since ${dayjs(startDate).format('MMM D, YYYY')}`"
-            color="var(--color-purple)"
-            :value="formatMoney(analytics.formattedData.value.revenue.sum, false)"
-            :data="analytics.formattedData.value.revenue.chart.sumData"
-            :labels="analytics.formattedData.value.revenue.chart.labels"
-            is-money
-            :class="`clickable chart-button-base button-base ${
-              selectedChart === 'revenue' ? 'chart-button-base__selected button-base__selected' : ''
-            }`"
-            :onclick="() => (selectedChart = 'revenue')"
-            role="button"
-          />
-        </client-only>
+<!--        <client-only>-->
+<!--          <CompactChart-->
+<!--            v-if="analytics.formattedData.value.revenue"-->
+<!--            ref="tinyRevenueChart"-->
+<!--            :title="` ${dayjs(startDate).format('YYYY-MM-D')} - ${dayjs(endDate).format('YYYY-MM-D')}`"-->
+<!--            color="var(&#45;&#45;color-purple)"-->
+<!--            :value="formatMoney(analytics.formattedData.value.revenue.sum, false)"-->
+<!--            :data="analytics.formattedData.value.revenue.chart.sumData"-->
+<!--            :labels="analytics.formattedData.value.revenue.chart.labels"-->
+<!--            is-money-->
+<!--            :class="`clickable chart-button-base button-base ${-->
+<!--              selectedChart === 'revenue' ? 'chart-button-base__selected button-base__selected' : ''-->
+<!--            }`"-->
+<!--            :onclick="() => (selectedChart = 'revenue')"-->
+<!--            role="button"-->
+<!--          />-->
+<!--        </client-only>-->
       </div>
       <div class="graphs__main-graph">
         <div class="universal-card">
@@ -73,19 +73,19 @@
               </span>
             </h2>
             <div class="chart-controls__buttons">
-              <Button v-tooltip="'Toggle project colors'" icon-only @click="onToggleColors">
+              <Button v-tooltip="'切换颜色'" icon-only @click="onToggleColors">
                 <PaletteIcon />
               </Button>
-              <Button v-tooltip="'Download this data as CSV'" icon-only @click="onDownloadSetAsCSV">
+              <Button v-tooltip="'导出统计表'" icon-only @click="onDownloadSetAsCSV">
                 <DownloadIcon />
               </Button>
-              <Button v-tooltip="'Refresh the chart'" icon-only @click="resetCharts">
+              <Button v-tooltip="'刷新'" icon-only @click="resetCharts">
                 <UpdatedIcon />
               </Button>
               <DropdownSelect
                 v-model="selectedRange"
                 :options="selectableRanges"
-                name="Time range"
+                name="区间"
                 :display-name="
                   (o: (typeof selectableRanges)[number] | undefined) => o?.label || 'Custom'
                 "
@@ -304,6 +304,9 @@ import { Button, Card, DropdownSelect } from "@modrinth/ui";
 import { formatMoney, formatNumber, formatCategoryHeader } from "@modrinth/utils";
 import { UpdatedIcon, DownloadIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
+import 'dayjs/locale/zh-cn';
+dayjs.locale('zh-cn');
+
 import { computed } from "vue";
 
 import { analyticsSetToCSVString, intToRgba } from "~/utils/analytics.js";
@@ -485,24 +488,24 @@ const onToggleColors = () => {
 
 <script lang="ts">
 const defaultResoloutions: Record<string, number> = {
-  "5 minutes": 5,
-  "30 minutes": 30,
-  "An hour": 60,
-  "12 hours": 720,
-  "A day": 1440,
-  "A week": 10080,
+  "5 分钟": 5,
+  "30 分钟": 30,
+  "1 小时": 60,
+  "12 小时": 720,
+  "一天": 1440,
+  "一周": 10080,
 };
 
 const defaultRanges: Record<number, [string, number] | string> = {
-  30: ["Last 30 minutes", 1],
-  60: ["Last hour", 5],
-  720: ["Last 12 hours", 15],
-  1440: ["Last day", 60],
-  10080: ["Last week", 720],
-  43200: ["Last month", 1440],
-  129600: ["Last quarter", 10080],
-  525600: ["Last year", 20160],
-  1051200: ["Last two years", 40320],
+  30: ["最近 30 分钟", 1],
+  60: ["最近 1 小时", 5],
+  720: ["最近 12 小时", 15],
+  1440: ["最近 1 天", 60],
+  10080: ["最近 1 周", 720],
+  43200: ["最近 1 月", 1440],
+  129600: ["最近 3 个月", 10080],
+  525600: ["最近 1 年", 20160],
+  1051200: ["最近 2 年", 40320],
 };
 </script>
 

@@ -16,8 +16,8 @@
               user.bio
                 ? user.bio
                 : projects.length === 0
-                  ? "A Modrinth user."
-                  : "A Modrinth creator."
+                  ? "BBSMC 用户"
+                  : "BBSMC 创作者"
             }}
           </template>
           <template #stats>
@@ -26,14 +26,14 @@
             >
               <BoxIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(projects?.length || 0) }}
-              projects
+              个资源
             </div>
             <div
               class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
             >
               <DownloadIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(sumDownloads) }}
-              downloads
+              下载量
             </div>
             <div
               v-tooltip="
@@ -45,7 +45,7 @@
               class="flex items-center gap-2 font-semibold"
             >
               <CalendarIcon class="h-6 w-6 text-secondary" />
-              Joined
+              注册日期
               {{ formatRelativeTime(user.created) }}
             </div>
           </template>

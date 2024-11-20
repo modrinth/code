@@ -184,7 +184,7 @@ const submitReport = async () => {
     if (error instanceof Error) {
       addNotification({
         group: "main",
-        title: "An error occurred",
+        title: "发生错误",
         text: error.message,
         type: "error",
       });
@@ -210,7 +210,7 @@ const submitReport = async () => {
     if (error instanceof Error) {
       addNotification({
         group: "main",
-        title: "An error occurred",
+        title: "发生错误",
         text: error.message,
         type: "error",
       });

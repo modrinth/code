@@ -2,26 +2,26 @@
   <div class="normal-page">
     <div class="normal-page__sidebar">
       <aside class="universal-card">
-        <h1>Dashboard</h1>
+        <h1>仪表盘</h1>
         <NavStack>
-          <NavStackItem link="/dashboard" label="Overview">
+          <NavStackItem link="/dashboard" label="主页">
             <DashboardIcon aria-hidden="true" />
           </NavStackItem>
-          <NavStackItem link="/dashboard/notifications" label="Notifications">
+          <NavStackItem link="/dashboard/notifications" label="通知">
             <NotificationsIcon aria-hidden="true" />
           </NavStackItem>
-          <NavStackItem link="/dashboard/reports" label="Active reports">
+          <NavStackItem link="/dashboard/reports" label="活跃报告">
             <ReportIcon aria-hidden="true" />
           </NavStackItem>
-          <NavStackItem link="/dashboard/analytics" label="Analytics">
+          <NavStackItem link="/dashboard/analytics" label="统计">
             <ChartIcon aria-hidden="true" />
           </NavStackItem>
 
-          <h3>Manage</h3>
-          <NavStackItem v-if="true" link="/dashboard/projects" label="Projects">
+          <h3>管理</h3>
+          <NavStackItem v-if="true" link="/dashboard/projects" label="我的资源">
             <ListIcon aria-hidden="true" />
           </NavStackItem>
-          <NavStackItem v-if="true" link="/dashboard/organizations" label="Organizations">
+          <NavStackItem v-if="true" link="/dashboard/organizations" label="团队">
             <OrganizationIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
@@ -30,9 +30,9 @@
           >
             <LibraryIcon aria-hidden="true" />
           </NavStackItem>
-          <NavStackItem link="/dashboard/revenue" label="Revenue">
-            <CurrencyIcon aria-hidden="true" />
-          </NavStackItem>
+<!--          <NavStackItem link="/dashboard/revenue" label="收入">-->
+<!--            <CurrencyIcon aria-hidden="true" />-->
+<!--          </NavStackItem>-->
         </NavStack>
       </aside>
     </div>

@@ -1,10 +1,10 @@
 <template>
-  <NewModal ref="modal" header="Creating an organization">
+  <NewModal ref="modal" header="创建团队">
     <div class="flex flex-col gap-3">
       <div class="flex flex-col gap-2">
         <label for="name">
           <span class="text-lg font-semibold text-contrast">
-            Name
+            名称
             <span class="text-brand-red">*</span>
           </span>
         </label>
@@ -13,7 +13,7 @@
           v-model="name"
           type="text"
           maxlength="64"
-          :placeholder="`Enter organization name...`"
+          :placeholder="`输入团队名称...`"
           autocomplete="off"
           @input="updateSlug()"
         />
@@ -26,7 +26,7 @@
           </span>
         </label>
         <div class="text-input-wrapper">
-          <div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
+          <div class="text-input-wrapper__before">https://bbsmc.net/organization/</div>
           <input
             id="slug"
             v-model="slug"
@@ -40,30 +40,29 @@
       <div class="flex flex-col gap-2">
         <label for="additional-information" class="flex flex-col gap-1">
           <span class="text-lg font-semibold text-contrast">
-            Summary
+            概况
             <span class="text-brand-red">*</span>
           </span>
-          <span>A sentence or two that describes your organization.</span>
+          <span>简短的团队简介</span>
         </label>
         <div class="textarea-wrapper">
           <textarea id="additional-information" v-model="description" maxlength="256" />
         </div>
       </div>
       <p class="m-0 max-w-[30rem]">
-        You will be the owner of this organization, but you can invite other members and transfer
-        ownership at any time.
+        您将成为该团队的所有者，但您可以随时邀请其他成员并转让所有权。
       </p>
       <div class="flex gap-2">
         <ButtonStyled color="brand">
           <button @click="createOrganization">
             <PlusIcon aria-hidden="true" />
-            Create organization
+            创建团队
           </button>
         </ButtonStyled>
         <ButtonStyled>
           <button @click="modal.hide()">
             <XIcon aria-hidden="true" />
-            Cancel
+            取消
           </button>
         </ButtonStyled>
       </div>
@@ -105,7 +104,7 @@ async function createOrganization() {
     console.error(err);
     addNotification({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });

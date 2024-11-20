@@ -11,7 +11,7 @@
               :key="projectType.id"
               class="main-header-strong"
             >
-              {{ projectType.display }}s <br />
+              {{ projectType.display }} <br />
             </strong>
             <strong class="main-header-strong">servers <br /></strong>
             <strong class="main-header-strong">mods</strong>
@@ -32,7 +32,7 @@
           </nuxt-link>
           <nuxt-link v-else to="/dashboard/projects">
             <DashboardIcon aria-hidden="true" />
-            Go to dashboard
+            查看我的资源
           </nuxt-link>
         </ButtonStyled>
       </div>
@@ -87,7 +87,7 @@
                     v-model="searchQuery"
                     type="search"
                     name="search"
-                    :placeholder="`Search...`"
+                    :placeholder="`搜索...`"
                     autocomplete="off"
                     @input="updateSearchProjects"
                   />
@@ -98,7 +98,7 @@
                     v-model="sortType"
                     placeholder="Select one"
                     class="selector"
-                    :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+                    :custom-label="(value) => formatSearch(value)"
                     :options="['relevance', 'downloads', 'follows', 'updated', 'newest']"
                     :searchable="false"
                     :close-on-select="true"
@@ -363,6 +363,7 @@
   </div>
 </template>
 <script setup>
+import {formatSearch} from "@modrinth/utils";
 import { Multiselect } from "vue-multiselect";
 import { ButtonStyled } from "@modrinth/ui";
 import { CompassIcon, LogInIcon, DashboardIcon, NewspaperIcon } from "@modrinth/assets";
@@ -376,7 +377,7 @@ import ProjectCard from "~/components/ui/ProjectCard.vue";
 
 import { homePageProjects, homePageSearch, homePageNotifs } from "~/generated/state.json";
 
-const searchQuery = ref("leave");
+const searchQuery = ref("");
 const sortType = ref("relevance");
 
 const auth = await useAuth();

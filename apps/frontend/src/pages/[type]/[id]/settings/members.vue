@@ -2,23 +2,22 @@
   <div>
     <ModalConfirm
       ref="modal_remove"
-      title="Are you sure you want to remove this project from the organization?"
-      description="If you proceed, this project will no longer be managed by the organization."
-      proceed-label="Remove"
+      title="您确定要从团队中移除该项目吗？"
+      description="如果继续，该项目将不再由该团队管理。"
+      proceed-label="移除"
       :noblur="!(cosmetics?.advancedRendering ?? true)"
       @proceed="onRemoveFromOrg"
     />
     <Card>
       <div class="label">
         <h3>
-          <span class="label__title size-card-header">Manage members</span>
+          <span class="label__title size-card-header">管理成员</span>
         </h3>
       </div>
       <span class="label">
-        <span class="label__title">Invite a member</span>
+        <span class="label__title">邀请成员</span>
         <span class="label__description">
-          Enter the Modrinth username of the person you'd like to invite to be a member of this
-          project.
+          输入您想要邀请成为该项目成员的人员的 BBSMC 用户名。
         </span>
       </span>
       <div class="input-group">
@@ -26,7 +25,7 @@
           id="username"
           v-model="currentUsername"
           type="text"
-          placeholder="Username"
+          placeholder="用户名"
           :disabled="(props.currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
           @keypress.enter="inviteTeamMember()"
         />
@@ -37,26 +36,26 @@
           @click="inviteTeamMember()"
         >
           <UserPlusIcon />
-          Invite
+          邀请
         </button>
       </div>
       <div class="adjacent-input">
         <span class="label">
-          <span class="label__title">Leave project</span>
-          <span class="label__description"> Remove yourself as a member of this project. </span>
+          <span class="label__title">退出项目</span>
+          <span class="label__description"> 从该项目离开,不再成为该项目的成员 </span>
         </span>
         <button
           class="iconified-button danger-button"
           :disabled="props.currentMember?.is_owner"
           :title="
             props.currentMember?.is_owner
-              ? 'You cannot leave the project if you are the owner!'
+              ? '你无法离开！你是老大！'
               : ''
           "
           @click="leaveProject()"
         >
           <UserRemoveIcon />
-          Leave project
+          退出
         </button>
       </div>
     </Card>
@@ -95,9 +94,9 @@
       <div class="content">
         <div class="adjacent-input">
           <label :for="`member-${allTeamMembers[index].user.username}-role`">
-            <span class="label__title">Role</span>
+            <span class="label__title">角色</span>
             <span class="label__description">
-              The title of the role that this member plays for this project.
+              该成员在此资源中的头衔。
             </span>
           </label>
           <input
@@ -107,21 +106,20 @@
             :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
           />
         </div>
-        <div class="adjacent-input">
-          <label :for="`member-${allTeamMembers[index].user.username}-monetization-weight`">
-            <span class="label__title">Monetization weight</span>
-            <span class="label__description">
-              Relative to all other members' monetization weights, this determines what portion of
-              this project's revenue goes to this member.
-            </span>
-          </label>
-          <input
-            :id="`member-${allTeamMembers[index].user.username}-monetization-weight`"
-            v-model="allTeamMembers[index].payouts_split"
-            type="number"
-            :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
-          />
-        </div>
+<!--        <div class="adjacent-input">-->
+<!--          <label :for="`member-${allTeamMembers[index].user.username}-monetization-weight`">-->
+<!--            <span class="label__title">盈利权重</span>-->
+<!--            <span class="label__description">-->
+<!--              相对于所有其他成员的货币化权重，这决定了该项目的收入中有多少部分归该成员所有。-->
+<!--            </span>-->
+<!--          </label>-->
+<!--          <input-->
+<!--            :id="`member-${allTeamMembers[index].user.username}-monetization-weight`"-->
+<!--            v-model="allTeamMembers[index].payouts_split"-->
+<!--            type="number"-->
+<!--            :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"-->
+<!--          />-->
+<!--        </div>-->
         <template v-if="!member.is_owner">
           <span class="label">
             <span class="label__title">Permissions</span>
@@ -133,7 +131,7 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 (props.currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
               "
-              label="Upload version"
+              label="上传版本"
               @update:model-value="allTeamMembers[index].permissions ^= UPLOAD_VERSION"
             />
             <Checkbox
@@ -142,7 +140,7 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 (props.currentMember?.permissions & DELETE_VERSION) !== DELETE_VERSION
               "
-              label="Delete version"
+              label="删除版本"
               @update:model-value="allTeamMembers[index].permissions ^= DELETE_VERSION"
             />
             <Checkbox
@@ -151,7 +149,7 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 (props.currentMember?.permissions & EDIT_DETAILS) !== EDIT_DETAILS
               "
-              label="Edit details"
+              label="编辑详细信息"
               @update:model-value="allTeamMembers[index].permissions ^= EDIT_DETAILS"
             />
             <Checkbox
@@ -160,7 +158,7 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 (props.currentMember?.permissions & EDIT_BODY) !== EDIT_BODY
               "
-              label="Edit body"
+              label="编辑正文"
               @update:model-value="allTeamMembers[index].permissions ^= EDIT_BODY"
             />
             <Checkbox
@@ -169,7 +167,7 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 (props.currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES
               "
-              label="Manage invites"
+              label="邀请成员"
               @update:model-value="allTeamMembers[index].permissions ^= MANAGE_INVITES"
             />
             <Checkbox
@@ -178,13 +176,13 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 (props.currentMember?.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER
               "
-              label="Remove member"
+              label="移除成员"
               @update:model-value="allTeamMembers[index].permissions ^= REMOVE_MEMBER"
             />
             <Checkbox
               :model-value="(member.permissions & EDIT_MEMBER) === EDIT_MEMBER"
               :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
-              label="Edit member"
+              label="设置成员"
               @update:model-value="allTeamMembers[index].permissions ^= EDIT_MEMBER"
             />
             <Checkbox
@@ -193,7 +191,7 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 (props.currentMember?.permissions & DELETE_PROJECT) !== DELETE_PROJECT
               "
-              label="Delete project"
+              label="删除资源"
               @update:model-value="allTeamMembers[index].permissions ^= DELETE_PROJECT"
             />
             <Checkbox
@@ -202,7 +200,7 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 (props.currentMember?.permissions & VIEW_ANALYTICS) !== VIEW_ANALYTICS
               "
-              label="View analytics"
+              label="查看分析"
               @update:model-value="allTeamMembers[index].permissions ^= VIEW_ANALYTICS"
             />
             <Checkbox
@@ -211,7 +209,7 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 (props.currentMember?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS
               "
-              label="View revenue"
+              label="查看收入"
               @update:model-value="allTeamMembers[index].permissions ^= VIEW_PAYOUTS"
             />
           </div>
@@ -223,7 +221,7 @@
             @click="updateTeamMember(index)"
           >
             <SaveIcon />
-            Save changes
+            保存
           </button>
           <button
             v-if="!member.is_owner"
@@ -232,7 +230,7 @@
             @click="removeTeamMember(index)"
           >
             <UserRemoveIcon />
-            Remove member
+            移除成员
           </button>
           <button
             v-if="!member.is_owner && props.currentMember?.is_owner && member.accepted"
@@ -240,22 +238,21 @@
             @click="transferOwnership(index)"
           >
             <TransferIcon />
-            Transfer ownership
+            转让所有权
           </button>
         </div>
       </div>
     </div>
     <section class="universal-card">
       <div class="label">
-        <span class="label__title size-card-header">Organization</span>
+        <span class="label__title size-card-header">团队</span>
       </div>
       <div v-if="props.organization">
         <p>
-          This project is managed by {{ props.organization.name }}. The defaults for member
-          permissions are set in the
+          {{ props.organization.name }}正在管理该资源. 成员的默认权限设置请前往
           <nuxt-link :to="`/organization/${props.organization.slug}/settings/members`">
-            organization settings</nuxt-link
-          >. You may override them below.
+            团队设置</nuxt-link
+          >. 您可以在下面覆盖成员在该项目的权限
         </p>
         <nuxt-link
           :to="`/organization/${props.organization.slug}`"
@@ -273,9 +270,9 @@
               <div class="stats">
                 <UsersIcon />
                 <span>
-                  {{ acceptedOrgMembers.length }} member<template
+                  {{ acceptedOrgMembers.length }} 位成员<template
                     v-if="acceptedOrgMembers.length !== 1"
-                    >s</template
+                    ></template
                   >
                 </span>
               </div>
@@ -284,14 +281,14 @@
         </nuxt-link>
       </div>
       <p v-else>
-        This project is not managed by an organization. If you are the member of any organizations,
-        you can transfer management to one of them.
+        此项目不受任何团队管理。如果您是任何团队的成员，您可以将管理权转让给其中一个团队。
       </p>
       <div v-if="!props.organization" class="input-group">
         <Multiselect
           id="organization-picker"
           v-model="selectedOrganization"
           class="large-multiselect"
+          placeholder="选择一个团队"
           track-by="id"
           label="name"
           open-direction="top"
@@ -303,12 +300,12 @@
         />
         <button class="btn btn-primary" :disabled="!selectedOrganization" @click="onAddToOrg">
           <CheckIcon />
-          Transfer management
+          转移管理权
         </button>
       </div>
       <button v-if="props.organization" class="btn" @click="$refs.modal_remove.show()">
         <OrganizationIcon />
-        Remove from organization
+        从团队中移除
       </button>
     </section>
     <div
@@ -323,7 +320,7 @@
           <div class="text">
             <nuxt-link :to="'/user/' + member.user.username" class="name">
               <p>{{ member.user.username }}</p>
-              <CrownIcon v-if="member.is_owner" v-tooltip="'Organization owner'" />
+              <CrownIcon v-if="member.is_owner" v-tooltip="'团队创始人'" />
             </nuxt-link>
             <p>{{ member.role }}</p>
           </div>
@@ -346,10 +343,9 @@
       <div class="content">
         <div class="adjacent-input">
           <label :for="`member-${allOrgMembers[index].user.username}-override-perms`">
-            <span class="label__title">Override values</span>
+            <span class="label__title">覆盖</span>
             <span class="label__description">
-              Override organization default values and assign custom permissions, roles, and
-              monetization weights to this user on the project.
+              覆盖团队默认值权限并为资源中的用户分配在该资源中的自定义权限、角色
             </span>
           </label>
           <input
@@ -362,9 +358,9 @@
         </div>
         <div class="adjacent-input">
           <label :for="`member-${allOrgMembers[index].user.username}-role`">
-            <span class="label__title">Role</span>
+            <span class="label__title">角色</span>
             <span class="label__description">
-              The title of the role that this member plays for this project.
+              该成员在此资源中的头衔。
             </span>
           </label>
           <input
@@ -377,27 +373,27 @@
             "
           />
         </div>
-        <div class="adjacent-input">
-          <label :for="`member-${allOrgMembers[index].user.username}-monetization-weight`">
-            <span class="label__title">Monetization weight</span>
-            <span class="label__description">
-              Relative to all other members' monetization weights, this determines what portion of
-              this project's revenue goes to this member.
-            </span>
-          </label>
-          <input
-            :id="`member-${allOrgMembers[index].user.username}-monetization-weight`"
-            v-model="allOrgMembers[index].payouts_split"
-            type="number"
-            :disabled="
-              (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-              !allOrgMembers[index].override
-            "
-          />
-        </div>
+<!--        <div class="adjacent-input">-->
+<!--          <label :for="`member-${allOrgMembers[index].user.username}-monetization-weight`">-->
+<!--            <span class="label__title">Monetization weight</span>-->
+<!--            <span class="label__description">-->
+<!--              Relative to all other members' monetization weights, this determines what portion of-->
+<!--              this project's revenue goes to this member.-->
+<!--            </span>-->
+<!--          </label>-->
+<!--          <input-->
+<!--            :id="`member-${allOrgMembers[index].user.username}-monetization-weight`"-->
+<!--            v-model="allOrgMembers[index].payouts_split"-->
+<!--            type="number"-->
+<!--            :disabled="-->
+<!--              (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||-->
+<!--              !allOrgMembers[index].override-->
+<!--            "-->
+<!--          />-->
+<!--        </div>-->
         <template v-if="!member.is_owner">
           <span class="label">
-            <span class="label__title">Permissions</span>
+            <span class="label__title">权限</span>
           </span>
           <div class="permissions">
             <Checkbox
@@ -407,7 +403,7 @@
                 (props.currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION ||
                 !allOrgMembers[index].override
               "
-              label="Upload version"
+              label="上传新版本"
               @update:model-value="allOrgMembers[index].permissions ^= UPLOAD_VERSION"
             />
             <Checkbox
@@ -417,7 +413,7 @@
                 (props.currentMember?.permissions & DELETE_VERSION) !== DELETE_VERSION ||
                 !allOrgMembers[index].override
               "
-              label="Delete version"
+              label="删除版本"
               @update:model-value="allOrgMembers[index].permissions ^= DELETE_VERSION"
             />
             <Checkbox
@@ -427,7 +423,7 @@
                 (props.currentMember?.permissions & EDIT_DETAILS) !== EDIT_DETAILS ||
                 !allOrgMembers[index].override
               "
-              label="Edit details"
+              label="编辑详情"
               @update:model-value="allOrgMembers[index].permissions ^= EDIT_DETAILS"
             />
             <Checkbox
@@ -437,7 +433,7 @@
                 (props.currentMember?.permissions & EDIT_BODY) !== EDIT_BODY ||
                 !allOrgMembers[index].override
               "
-              label="Edit body"
+              label="编辑正文"
               @update:model-value="allOrgMembers[index].permissions ^= EDIT_BODY"
             />
             <Checkbox
@@ -447,7 +443,7 @@
                 (props.currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES ||
                 !allOrgMembers[index].override
               "
-              label="Manage invites"
+              label="邀请成员"
               @update:model-value="allOrgMembers[index].permissions ^= MANAGE_INVITES"
             />
             <Checkbox
@@ -457,7 +453,7 @@
                 (props.currentMember?.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER ||
                 !allOrgMembers[index].override
               "
-              label="Remove member"
+              label="移除成员"
               @update:model-value="allOrgMembers[index].permissions ^= REMOVE_MEMBER"
             />
             <Checkbox
@@ -466,7 +462,7 @@
                 (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
                 !allOrgMembers[index].override
               "
-              label="Edit member"
+              label="编辑成员"
               @update:model-value="allOrgMembers[index].permissions ^= EDIT_MEMBER"
             />
             <Checkbox
@@ -476,7 +472,7 @@
                 (props.currentMember?.permissions & DELETE_PROJECT) !== DELETE_PROJECT ||
                 !allOrgMembers[index].override
               "
-              label="Delete project"
+              label="删除资源"
               @update:model-value="allOrgMembers[index].permissions ^= DELETE_PROJECT"
             />
             <Checkbox
@@ -486,19 +482,19 @@
                 (props.currentMember?.permissions & VIEW_ANALYTICS) !== VIEW_ANALYTICS ||
                 !allOrgMembers[index].override
               "
-              label="View analytics"
+              label="查看分析"
               @update:model-value="allOrgMembers[index].permissions ^= VIEW_ANALYTICS"
             />
-            <Checkbox
-              :model-value="(member.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"
-              :disabled="
-                (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-                (props.currentMember?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS ||
-                !allOrgMembers[index].override
-              "
-              label="View revenue"
-              @update:model-value="allOrgMembers[index].permissions ^= VIEW_PAYOUTS"
-            />
+<!--            <Checkbox-->
+<!--              :model-value="(member.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"-->
+<!--              :disabled="-->
+<!--                (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||-->
+<!--                (props.currentMember?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS ||-->
+<!--                !allOrgMembers[index].override-->
+<!--              "-->
+<!--              label="View revenue"-->
+<!--              @update:model-value="allOrgMembers[index].permissions ^= VIEW_PAYOUTS"-->
+<!--            />-->
           </div>
         </template>
         <div class="input-group">
@@ -508,7 +504,7 @@
             @click="updateOrgMember(index)"
           >
             <SaveIcon />
-            Save changes
+            保存
           </button>
         </div>
       </div>
@@ -653,8 +649,8 @@ const onAddToOrg = useClientTry(async () => {
 
   addNotification({
     group: "main",
-    title: "Project transferred",
-    text: "Your project has been transferred to the organization.",
+    title: "资源移交",
+    text: "您的资源已转移到该团队。",
     type: "success",
   });
 });
@@ -674,8 +670,8 @@ const onRemoveFromOrg = useClientTry(async () => {
 
   addNotification({
     group: "main",
-    title: "Project removed",
-    text: "Your project has been removed from the organization.",
+    title: "资源已删除",
+    text: "您的资源已从团队中删除.",
     type: "success",
   });
 });
@@ -702,8 +698,8 @@ const inviteTeamMember = async () => {
   } catch (err) {
     addNotification({
       group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
+      title: "发生错误",
+      text: err?.data?.description || err?.message || err || "未知错误",
       type: "error",
     });
   }
@@ -725,8 +721,8 @@ const removeTeamMember = async (index) => {
   } catch (err) {
     addNotification({
       group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
+      title: "发生错误",
+      text: err?.data?.description || err?.message || err || "未知错误",
       type: "error",
     });
   }
@@ -759,15 +755,15 @@ const updateTeamMember = async (index) => {
     await updateMembers();
     addNotification({
       group: "main",
-      title: "Member(s) updated",
-      text: "Your project's member(s) has been updated.",
+      title: "成员更新",
+      text: "您的资源成员已更新。",
       type: "success",
     });
   } catch (err) {
     addNotification({
       group: "main",
-      title: "An error occurred",
-      text: err?.data?.description || err?.message || err || "Unknown error",
+      title: "发生错误",
+      text: err?.data?.description || err?.message || err || "未知错误",
       type: "error",
     });
   }
@@ -789,7 +785,7 @@ const transferOwnership = async (index) => {
   } catch (err) {
     addNotification({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err?.data?.description || err?.message || err || "Unknown error",
       type: "error",
     });
@@ -836,7 +832,7 @@ async function updateOrgMember(index) {
   } catch (err) {
     addNotification({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err?.data?.description || err?.message || err || "Unknown error",
       type: "error",
     });

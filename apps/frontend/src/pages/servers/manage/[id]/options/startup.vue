@@ -160,7 +160,7 @@ const saveStartup = async () => {
     addNotification({
       group: "serverOptions",
       type: "success",
-      title: "Server settings updated",
+      title: "服务器设置已更新",
       text: "Your server settings were successfully changed.",
     });
     await props.server.refresh();
@@ -169,7 +169,7 @@ const saveStartup = async () => {
     addNotification({
       group: "serverOptions",
       type: "error",
-      title: "Failed to update server arguments",
+      title: "无法更新服务器参数",
       text: "Please try again later.",
     });
   } finally {

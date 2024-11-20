@@ -747,7 +747,7 @@ async function addPaymentMethod() {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data ? err.data.description : err,
       type: "error",
     });
@@ -770,7 +770,7 @@ async function submit() {
   if (error && error.type !== "validation_error") {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: error.message,
       type: "error",
     });
@@ -798,7 +798,7 @@ async function editPaymentMethod(index, primary) {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data ? err.data.description : err,
       type: "error",
     });
@@ -817,7 +817,7 @@ async function removePaymentMethod(index) {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data ? err.data.description : err,
       type: "error",
     });
@@ -840,7 +840,7 @@ async function cancelSubscription(id, cancelled) {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data ? err.data.description : err,
       type: "error",
     });

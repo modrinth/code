@@ -1,22 +1,22 @@
 <template>
   <div>
     <section class="universal-card">
-      <h2>External links</h2>
+      <h2>更多链接</h2>
       <div class="adjacent-input">
         <label
           id="project-issue-tracker"
           title="A place for users to report bugs, issues, and concerns about your project."
         >
-          <span class="label__title">Issue tracker</span>
+          <span class="label__title">问题提交</span>
           <span class="label__description">
-            A place for users to report bugs, issues, and concerns about your project.
+            用户报告项目错误、问题和疑虑的地方。
           </span>
         </label>
         <input
           id="project-issue-tracker"
           v-model="issuesUrl"
           type="url"
-          placeholder="Enter a valid URL"
+          placeholder="填入可访问链接"
           maxlength="2048"
           :disabled="!hasPermission"
         />
@@ -26,9 +26,9 @@
           id="project-source-code"
           title="A page/repository containing the source code for your project"
         >
-          <span class="label__title">Source code</span>
+          <span class="label__title">开源地址</span>
           <span class="label__description">
-            A page/repository containing the source code for your project
+           包含项目源代码的页面/存储库
           </span>
         </label>
         <input
@@ -36,7 +36,7 @@
           v-model="sourceUrl"
           type="url"
           maxlength="2048"
-          placeholder="Enter a valid URL"
+          placeholder="填入可访问链接"
           :disabled="!hasPermission"
         />
       </div>
@@ -45,9 +45,9 @@
           id="project-wiki-page"
           title="A page containing information, documentation, and help for the project."
         >
-          <span class="label__title">Wiki page</span>
+          <span class="label__title">Wiki页面</span>
           <span class="label__description">
-            A page containing information, documentation, and help for the project.
+            包含项目信息、文档和帮助的页面。
           </span>
         </label>
         <input
@@ -55,28 +55,28 @@
           v-model="wikiUrl"
           type="url"
           maxlength="2048"
-          placeholder="Enter a valid URL"
+          placeholder="填入可访问链接"
           :disabled="!hasPermission"
         />
       </div>
       <div class="adjacent-input">
         <label id="project-discord-invite" title="An invitation link to your Discord server.">
-          <span class="label__title">Discord invite</span>
-          <span class="label__description"> An invitation link to your Discord server. </span>
+          <span class="label__title">KOOK邀请链接</span>
+          <span class="label__description"> 您的 KOOK 服务器的邀请链接。 </span>
         </label>
         <input
           id="project-discord-invite"
           v-model="discordUrl"
           type="url"
           maxlength="2048"
-          placeholder="Enter a valid URL"
+          placeholder="填入可访问链接"
           :disabled="!hasPermission"
         />
       </div>
       <span class="label">
-        <span class="label__title">Donation links</span>
+        <span class="label__title">爱发电链接</span>
         <span class="label__description">
-          Add donation links for users to support you directly.
+          添加爱发电链接，以便用户直接支持您。
         </span>
       </span>
 
@@ -89,18 +89,18 @@
           v-model="donationLink.url"
           type="url"
           maxlength="2048"
-          placeholder="Enter a valid URL"
+          placeholder="填入可访问链接"
           :disabled="!hasPermission"
           @input="updateDonationLinks"
         />
         <DropdownSelect
           v-model="donationLink.id"
           name="Donation platform selector"
-          :options="tags.donationPlatforms.map((x) => x.short)"
+          :options="['other']"
           :display-name="
             (option) => tags.donationPlatforms.find((platform) => platform.short === option)?.name
           "
-          placeholder="Select platform"
+          placeholder="选择平台"
           render-up
           class="platform-selector"
           @update:model-value="updateDonationLinks"
@@ -114,7 +114,7 @@
           @click="saveChanges()"
         >
           <SaveIcon />
-          Save changes
+          保存
         </button>
       </div>
     </section>
@@ -225,16 +225,8 @@ function updateDonationLinks() {
   links.forEach((link) => {
     if (link.url) {
       const url = link.url.toLowerCase();
-      if (url.includes("patreon.com")) {
-        link.id = "patreon";
-      } else if (url.includes("ko-fi.com")) {
-        link.id = "ko-fi";
-      } else if (url.includes("paypal.com") || url.includes("paypal.me")) {
-        link.id = "paypal";
-      } else if (url.includes("buymeacoffee.com") || url.includes("buymeacoff.ee")) {
-        link.id = "bmac";
-      } else if (url.includes("github.com/sponsors")) {
-        link.id = "github";
+      if (url.includes("afdian.com")) {
+        link.id = "爱发电";
       }
     }
   });

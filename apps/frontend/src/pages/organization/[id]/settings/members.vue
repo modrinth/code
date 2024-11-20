@@ -3,14 +3,13 @@
     <div class="universal-card">
       <div class="label">
         <h3>
-          <span class="label__title size-card-header">Manage members</span>
+          <span class="label__title size-card-header">管理成员</span>
         </h3>
       </div>
       <span class="label">
-        <span class="label__title">Invite a member</span>
+        <span class="label__title">邀请成员</span>
         <span class="label__description">
-          Enter the Modrinth username of the person you'd like to invite to be a member of this
-          organization.
+          输入您想要邀请成为该团队成员的人员的 BBSMC 用户名。
         </span>
       </span>
       <div class="input-group">
@@ -18,7 +17,7 @@
           id="username"
           v-model="currentUsername"
           type="text"
-          placeholder="Username"
+          placeholder="用户名"
           :disabled="
             !isPermission(
               currentMember.organization_permissions,
@@ -27,7 +26,7 @@
           "
           @keypress.enter="() => onInviteTeamMember(organization.team, currentUsername)"
         />
-        <label for="username" class="hidden">Username</label>
+        <label for="username" class="hidden">用户名</label>
         <Button
           color="primary"
           :disabled="
@@ -39,14 +38,14 @@
           @click="() => onInviteTeamMember(organization.team_id, currentUsername)"
         >
           <UserPlusIcon />
-          Invite
+          邀请
         </Button>
       </div>
       <div class="adjacent-input">
         <span class="label">
-          <span class="label__title">Leave organization</span>
+          <span class="label__title">离开团队</span>
           <span class="label__description">
-            Remove yourself as a member of this organization.
+            从该团队退出
           </span>
         </span>
         <Button
@@ -55,7 +54,7 @@
           @click="() => onLeaveProject(organization.team_id, auth.user.id)"
         >
           <UserRemoveIcon />
-          Leave organization
+          离开团队
         </Button>
       </div>
     </div>
@@ -71,7 +70,7 @@
           <div class="text">
             <nuxt-link :to="'/user/' + member.user.username" class="name">
               <p>{{ member.user.username }}</p>
-              <CrownIcon v-if="member.is_owner" v-tooltip="'Organization owner'" />
+              <CrownIcon v-if="member.is_owner" v-tooltip="'团队所有者'" />
             </nuxt-link>
             <p>{{ member.role }}</p>
           </div>
@@ -96,9 +95,9 @@
       <div class="content">
         <div class="adjacent-input">
           <label :for="`member-${member.user.id}-role`">
-            <span class="label__title">Role</span>
+            <span class="label__title">角色</span>
             <span class="label__description">
-              The title of the role that this member plays for this organization.
+              该成员在该团队中的头衔。
             </span>
           </label>
           <input
@@ -113,29 +112,29 @@
             "
           />
         </div>
-        <div class="adjacent-input">
-          <label :for="`member-${member.user.id}-monetization-weight`">
-            <span class="label__title">Monetization weight</span>
-            <span class="label__description">
-              Relative to all other members' monetization weights, this determines what portion of
-              the organization projects' revenue goes to this member.
-            </span>
-          </label>
-          <input
-            :id="`member-${member.user.id}-monetization-weight`"
-            v-model="member.payouts_split"
-            type="number"
-            :disabled="
-              !isPermission(
-                currentMember.organization_permissions,
-                organizationPermissions.EDIT_MEMBER,
-              )
-            "
-          />
-        </div>
+<!--        <div class="adjacent-input">-->
+<!--          <label :for="`member-${member.user.id}-monetization-weight`">-->
+<!--            <span class="label__title">Monetization weight</span>-->
+<!--            <span class="label__description">-->
+<!--              Relative to all other members' monetization weights, this determines what portion of-->
+<!--              the organization projects' revenue goes to this member.-->
+<!--            </span>-->
+<!--          </label>-->
+<!--          <input-->
+<!--            :id="`member-${member.user.id}-monetization-weight`"-->
+<!--            v-model="member.payouts_split"-->
+<!--            type="number"-->
+<!--            :disabled="-->
+<!--              !isPermission(-->
+<!--                currentMember.organization_permissions,-->
+<!--                organizationPermissions.EDIT_MEMBER,-->
+<!--              )-->
+<!--            "-->
+<!--          />-->
+<!--        </div>-->
         <template v-if="!member.is_owner">
           <span class="label">
-            <span class="label__title">Project permissions</span>
+            <span class="label__title">资源权限</span>
           </span>
           <div class="permissions">
             <Checkbox
@@ -155,7 +154,7 @@
         </template>
         <template v-if="!member.is_owner">
           <span class="label">
-            <span class="label__title">Organization permissions</span>
+            <span class="label__title">团队权限</span>
           </span>
           <div class="permissions">
             <Checkbox
@@ -203,14 +202,14 @@
             @click="onRemoveMember(organization.team_id, member)"
           >
             <UserRemoveIcon />
-            Remove member
+            移除成员
           </Button>
           <Button
             v-if="!member.is_owner && currentMember.is_owner && member.accepted"
             @click="() => onTransferOwnership(organization.team_id, member.user.id)"
           >
             <TransferIcon />
-            Transfer ownership
+            转移所有权
           </Button>
         </div>
       </div>
@@ -298,8 +297,8 @@ const onInviteTeamMember = useClientTry(async (teamId, username) => {
   currentUsername.value = "";
   addNotification({
     group: "main",
-    title: "Member invited",
-    text: `${user.username} has been invited to the organization.`,
+    title: "邀请成员",
+    text: `${user.username} 已被邀请加入该团队。`,
     type: "success",
   });
 });
@@ -309,8 +308,8 @@ const onRemoveMember = useClientTry(async (teamId, member) => {
   await refreshOrganization();
   addNotification({
     group: "main",
-    title: "Member removed",
-    text: `${member.user.username} has been removed from the organization.`,
+    title: "成员移除",
+    text: `${member.user.username} 已被从团队中移除`,
     type: "success",
   });
 });
@@ -334,8 +333,8 @@ const onUpdateTeamMember = useClientTry(async (teamId, member) => {
   await refreshOrganization();
   addNotification({
     group: "main",
-    title: "Member updated",
-    text: `${member.user.username} has been updated.`,
+    title: "成员更新",
+    text: `${member.user.username} 已被更新完成.`,
     type: "success",
   });
 });
@@ -351,8 +350,8 @@ const onTransferOwnership = useClientTry(async (teamId, uid) => {
   await refreshOrganization();
   addNotification({
     group: "main",
-    title: "Ownership transferred",
-    text: `The ownership of ${organization.value.name} has been successfully transferred.`,
+    title: "所有权已转让",
+    text: `${organization.value.name} 已成功转让.`,
     type: "success",
   });
 });

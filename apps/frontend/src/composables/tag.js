@@ -11,32 +11,32 @@ export const useTags = () =>
       {
         actual: "mod",
         id: "mod",
-        display: "mod",
+        display: "模组",
       },
       {
         actual: "mod",
         id: "plugin",
-        display: "plugin",
+        display: "插件",
       },
       {
         actual: "mod",
         id: "datapack",
-        display: "data pack",
+        display: "数据包",
       },
       {
         actual: "shader",
         id: "shader",
-        display: "shader",
+        display: "光影包",
       },
       {
         actual: "resourcepack",
         id: "resourcepack",
-        display: "resource pack",
+        display: "资源包",
       },
       {
         actual: "modpack",
         id: "modpack",
-        display: "modpack",
+        display: "模组整合包",
       },
     ],
     loaderData: {

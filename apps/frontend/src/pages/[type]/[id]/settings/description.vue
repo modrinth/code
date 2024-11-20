@@ -2,14 +2,14 @@
   <div>
     <div class="universal-card">
       <div class="markdown-disclaimer">
-        <h2>Description</h2>
+        <h2>简介</h2>
         <span class="label__description">
-          You can type an extended description of your mod here.
+          您可以在此处输入您的资源的详细描述。
           <span class="label__subdescription">
-            The description must clearly and honestly describe the purpose and function of the
-            project. See section 2.1 of the
-            <nuxt-link to="/legal/rules" class="text-link" target="_blank">Content Rules</nuxt-link>
-            for the full requirements.
+            描述必须清楚、诚实地描述目的和功能
+            项目。请参阅
+            <nuxt-link to="/legal/rules" class="text-link" target="_blank">内容规则</nuxt-link>
+            满足全部要求。
           </span>
         </span>
       </div>
@@ -26,7 +26,7 @@
           @click="saveChanges()"
         >
           <SaveIcon />
-          Save changes
+          保存修改
         </button>
       </div>
     </div>
@@ -71,7 +71,7 @@ export default defineNuxtComponent({
         return () => {
           this.$notify({
             group: "main",
-            title: "An error occurred",
+            title: "发生错误",
             text: "Patch project function not found",
             type: "error",
           });

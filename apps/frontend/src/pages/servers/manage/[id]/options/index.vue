@@ -240,7 +240,7 @@ const uploadFile = async (e: Event) => {
       addNotification({
         group: "serverOptions",
         type: "error",
-        title: "No file selected",
+        title: "未选择文件",
         text: "Please select a file to upload.",
       });
       reject(new Error("No file selected"));
@@ -278,7 +278,7 @@ const uploadFile = async (e: Event) => {
   addNotification({
     group: "serverOptions",
     type: "success",
-    title: "Server icon updated",
+    title: "服务器图标已更新",
     text: "Your server icon was successfully changed.",
   });
 };
@@ -292,8 +292,8 @@ const resetIcon = async () => {
     addNotification({
       group: "serverOptions",
       type: "success",
-      title: "Server icon reset",
-      text: "Your server icon was successfully reset.",
+      title: "服务器图标重置",
+      text: "您的服务器图标已成功重置。",
     });
   }
 };

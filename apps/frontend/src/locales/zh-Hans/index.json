@@ -96,7 +96,7 @@
     "message": "用户名"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "创建账户即表示您同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
+    "message": "创建账户即表示您同意 BBSMC 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "密码不正确！"
@@ -108,7 +108,7 @@
     "message": "已有一个账户？"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "订阅有关 Modrinth 的更新"
+    "message": "订阅有关 BBSMC 的更新"
   },
   "auth.sign-up.title": {
     "message": "注册"
@@ -153,16 +153,16 @@
     "message": "电子邮件验证"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "订阅有关 Modrinth 的更新"
+    "message": "订阅有关 BBSMC 的更新"
   },
   "auth.welcome.description": {
-    "message": "感谢您创建账户。您现在可以关注和创建项目，接收有关您喜爱的项目的更新，还有更多！"
+    "message": "感谢您创建账户。您现在可以关注和创建资源，接收有关您喜爱的资源的更新，还有更多！"
   },
   "auth.welcome.label.tos": {
-    "message": "创建账户即代您同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
+    "message": "创建账户即代您同意 BBSMC 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
   },
   "auth.welcome.long-title": {
-    "message": "欢迎来到 Modrinth！"
+    "message": "欢迎来到 BBSMC！"
   },
   "auth.welcome.title": {
     "message": "欢迎"
@@ -174,7 +174,7 @@
     "message": "继续"
   },
   "button.create-a-project": {
-    "message": "创建一个项目"
+    "message": "创建一个资源"
   },
   "button.edit": {
     "message": "编辑"
@@ -201,10 +201,10 @@
     "message": "编辑图标"
   },
   "collection.button.remove-project": {
-    "message": "移除项目"
+    "message": "移除资源"
   },
   "collection.button.unfollow-project": {
-    "message": "取消关注项目"
+    "message": "取消关注资源"
   },
   "collection.button.upload-icon": {
     "message": "上传图标"
@@ -216,10 +216,10 @@
     "message": "你确定要删除该收藏夹吗？"
   },
   "collection.description": {
-    "message": "{description} - 前往 Modrinth 查看 {username} 的收藏夹 {name}"
+    "message": "{description} - 前往 BBSMC 查看 {username} 的收藏夹 {name}"
   },
   "collection.description.following": {
-    "message": "自动生成你关注的所有项目的收藏夹。"
+    "message": "自动生成你关注的所有资源的收藏夹。"
   },
   "collection.error.not-found": {
     "message": "未找到收藏夹"
@@ -234,10 +234,10 @@
     "message": "策划人"
   },
   "collection.label.no-projects": {
-    "message": "该收藏夹没有项目！"
+    "message": "该收藏夹没有资源！"
   },
   "collection.label.no-projects-auth": {
-    "message": "您没有任何项目。\n您想<create-link>添加一个</create-link>吗？"
+    "message": "您没有任何资源。\n您想<create-link>添加一个</create-link>吗？"
   },
   "collection.label.owner": {
     "message": "所有者"
@@ -246,7 +246,7 @@
     "message": "私有"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, other {<stat>{count}</stat> 个项目}}"
+    "message": "{count, plural, other {<stat>{count}</stat> 个资源}}"
   },
   "collection.label.updated-at": {
     "message": "更新于 {ago}"
@@ -258,7 +258,7 @@
     "message": "新建"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, other {{count} 个项目}}"
+    "message": "{count, plural, other {{count} 个资源}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "搜索你的收藏夹"
@@ -312,7 +312,7 @@
     "message": "错误"
   },
   "label.followed-projects": {
-    "message": "已关注的项目"
+    "message": "已关注的资源"
   },
   "label.moderation": {
     "message": "管理"
@@ -351,7 +351,7 @@
     "message": "更改主题"
   },
   "layout.action.get-modrinth-app": {
-    "message": "获取 Modrinth 应用"
+    "message": "获取 BBSMC 应用"
   },
   "layout.avatar.alt": {
     "message": "你的头像"
@@ -360,19 +360,19 @@
     "message": "访问账户设置"
   },
   "layout.banner.add-email.title": {
-    "message": "为了安全起见，请在 Modrinth 上输入你的电子邮箱地址。"
+    "message": "为了安全起见，请在 BBSMC 上输入你的电子邮箱地址。"
   },
   "layout.banner.staging.description": {
-    "message": "暂存环境在生产 Modrinth 数据库的副本上运行。这用于测试和调试目的，并且可能运行比生产实例更新的 Modrinth 后端或前端的开发版本。"
+    "message": "暂存环境在生产 BBSMC 数据库的副本上运行。这用于测试和调试目的，并且可能运行比生产实例更新的 BBSMC 后端或前端的开发版本。"
   },
   "layout.banner.staging.title": {
-    "message": "你正在查看 Modrinth 的暂存环境。"
+    "message": "你正在查看 BBSMC 的暂存环境。"
   },
   "layout.banner.verify-email.action": {
     "message": "重新发送验证邮件"
   },
   "layout.banner.verify-email.title": {
-    "message": "为了安全起见，请在 Modrinth 上验证你的电子邮箱地址。"
+    "message": "为了安全起见，请在 BBSMC 上验证你的电子邮箱地址。"
   },
   "layout.footer.company.careers": {
     "message": "招贤纳士"
@@ -396,7 +396,7 @@
     "message": "非官方 MINECRAFT 服务。未经 MOJANG 或 MICROSOFT 批准或与之关联。"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth 是<github-link>开源项目</github-link>。"
+    "message": "BBSMC 是<github-link>开源资源</github-link>。"
   },
   "layout.footer.resources.blog": {
     "message": "博客"
@@ -417,7 +417,7 @@
     "message": "切换菜单"
   },
   "layout.meta.description": {
-    "message": "在 Modrinth 上下载 Minecraft 模组、插件、数据包、光影、资源包和整合包。通过现代化、易于使用的界面和 API 在 Modrinth 上发现和发布项目。"
+    "message": "在 BBSMC 上下载 Minecraft 模组、插件、数据包、光影、资源包和整合包。通过现代化、易于使用的界面和 API 在 BBSMC 上发现和发布资源。"
   },
   "layout.meta.og-description": {
     "message": "发现并发布 Minecraft 内容！"
@@ -432,7 +432,7 @@
     "message": "出了点错误"
   },
   "profile.button.manage-projects": {
-    "message": "管理项目"
+    "message": "管理资源"
   },
   "profile.button.report": {
     "message": "举报"
@@ -444,25 +444,25 @@
     "message": "加入于 {ago}"
   },
   "profile.label.no-collections": {
-    "message": "该用户没有收藏项目！"
+    "message": "该用户没有收藏资源！"
   },
   "profile.label.no-collections-auth": {
     "message": "你还没有收藏夹。\n是否想要 <create-link>创建一个</create-link>？"
   },
   "profile.label.no-projects": {
-    "message": "该用户没有项目！"
+    "message": "该用户没有资源！"
   },
   "profile.label.no-projects-auth": {
-    "message": "您没有任何项目。\n您想要<create-link>创建一个</create-link>吗？"
+    "message": "您没有任何资源。\n您想要<create-link>创建一个</create-link>吗？"
   },
   "profile.label.organizations": {
-    "message": "组织"
+    "message": "团队"
   },
   "profile.meta.description": {
-    "message": "前往 Modrinth 下载 {username} 的项目"
+    "message": "前往 BBSMC 下载 {username} 的资源"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} - 前往 Modrinth 下载 {username} 的项目"
+    "message": "{bio} - 前往 BBSMC 下载 {username} 的资源"
   },
   "profile.stats.downloads": {
     "message": "{count, plural,other {<stat>{count}</stat> 次下载}}"
@@ -474,7 +474,7 @@
     "message": "用户 ID：{id}"
   },
   "project-type.all": {
-    "message": "所有项目"
+    "message": "所有资源"
   },
   "project-type.collection.plural": {
     "message": "收藏夹"
@@ -507,10 +507,10 @@
     "message": "插件"
   },
   "project-type.project.plural": {
-    "message": "项目"
+    "message": "资源"
   },
   "project-type.project.singular": {
-    "message": "项目"
+    "message": "资源"
   },
   "project-type.resourcepack.plural": {
     "message": "资源包"
@@ -579,28 +579,28 @@
     "message": "写入通知"
   },
   "scopes.organizationCreate.description": {
-    "message": "创建组织"
+    "message": "创建团队"
   },
   "scopes.organizationCreate.label": {
-    "message": "创建组织"
+    "message": "创建团队"
   },
   "scopes.organizationDelete.description": {
-    "message": "删除组织"
+    "message": "删除团队"
   },
   "scopes.organizationDelete.label": {
-    "message": "删除组织"
+    "message": "删除团队"
   },
   "scopes.organizationRead.description": {
-    "message": "读取组织"
+    "message": "读取团队"
   },
   "scopes.organizationRead.label": {
-    "message": "读取组织"
+    "message": "读取团队"
   },
   "scopes.organizationWrite.description": {
-    "message": "写入组织"
+    "message": "写入团队"
   },
   "scopes.organizationWrite.label": {
-    "message": "写入组织"
+    "message": "写入团队"
   },
   "scopes.patCreate.description": {
     "message": "创建个人 API 令牌"
@@ -645,28 +645,28 @@
     "message": "进行分析"
   },
   "scopes.projectCreate.description": {
-    "message": "创建新项目"
+    "message": "创建新资源"
   },
   "scopes.projectCreate.label": {
-    "message": "创建项目"
+    "message": "创建资源"
   },
   "scopes.projectDelete.description": {
-    "message": "删除您的项目"
+    "message": "删除您的资源"
   },
   "scopes.projectDelete.label": {
-    "message": "删除项目"
+    "message": "删除资源"
   },
   "scopes.projectRead.description": {
-    "message": "读取你的所有项目"
+    "message": "读取你的所有资源"
   },
   "scopes.projectRead.label": {
-    "message": "读取项目"
+    "message": "读取资源"
   },
   "scopes.projectWrite.description": {
-    "message": "写入项目数据"
+    "message": "写入资源数据"
   },
   "scopes.projectWrite.label": {
-    "message": "写入项目"
+    "message": "写入资源"
   },
   "scopes.reportCreate.description": {
     "message": "创建举报"
@@ -792,7 +792,7 @@
     "message": "停用开发者模式"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>开发者模式</strong>处于激活状态 。 这将允许你查看 Modrinth 的各种事物的内部 ID，如果你是使用 Modrinth API 的开发者，可能会有所帮助。点击页面底部的 Modrinth 徽标 5 次以切换开发者模式。"
+    "message": "<strong>开发者模式</strong>处于激活状态 。 这将允许你查看 BBSMC 的各种事物的内部 ID，如果你是使用 BBSMC API 的开发者，可能会有所帮助。点击页面底部的 BBSMC 徽标 5 次以切换开发者模式。"
   },
   "settings.display.flags.description": {
     "message": "在此设备上启用或禁用某些功能。"
@@ -804,7 +804,7 @@
     "message": "数据包页面"
   },
   "settings.display.project-list-layouts.description": {
-    "message": "为此设备上显示项目列表的每个页面选择您的首选布局。"
+    "message": "为此设备上显示资源列表的每个页面选择您的首选布局。"
   },
   "settings.display.project-list-layouts.mod": {
     "message": "模组页面"
@@ -822,7 +822,7 @@
     "message": "光影页面"
   },
   "settings.display.project-list-layouts.title": {
-    "message": "项目列表布局"
+    "message": "资源列表布局"
   },
   "settings.display.project-list-layouts.user": {
     "message": "用户个人资料页面"
@@ -834,22 +834,22 @@
     "message": "高级渲染"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "使离开 Modrinth 的链接在新标签页中打开。 无论如何设置，同一域名和 Markdown 描述中的链接将在同一标签页中打开，而广告和编辑页面的链接将在新标签页中打开。"
+    "message": "使离开 BBSMC 的链接在新标签页中打开。 无论如何设置，同一域名和 Markdown 描述中的链接将在同一标签页中打开，而广告和编辑页面的链接将在新标签页中打开。"
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "始终在新标签页打开外部链接"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "隐藏主页中的“获取 Modrinth 应用”按钮。Modrinth 应用页面仍然可以在登录页面或页脚中找到。"
+    "message": "隐藏主页中的“获取 BBSMC 应用”按钮。BBSMC 应用页面仍然可以在登录页面或页脚中找到。"
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "隐藏 Modrinth 应用程序推荐"
+    "message": "隐藏 BBSMC 应用程序推荐"
   },
   "settings.display.sidebar.right-aligned-project-sidebar.description": {
-    "message": "将项目详细信息侧栏与页面内容的右侧对齐。"
+    "message": "将资源详细信息侧栏与页面内容的右侧对齐。"
   },
   "settings.display.sidebar.right-aligned-project-sidebar.title": {
-    "message": "右对齐项目侧边栏"
+    "message": "右对齐资源侧边栏"
   },
   "settings.display.sidebar.right-aligned-search-sidebar.description": {
     "message": "使搜索筛选器侧边栏与搜索结果的右侧对齐。"
@@ -861,7 +861,7 @@
     "message": "深色"
   },
   "settings.display.theme.description": {
-    "message": "在此设备上为 Modrinth 选择您首选的颜色主题。"
+    "message": "在此设备上为 BBSMC 选择您首选的颜色主题。"
   },
   "settings.display.theme.light": {
     "message": "浅色"
@@ -933,7 +933,7 @@
     "message": "创建个人访问令牌"
   },
   "settings.pats.description": {
-    "message": "个人访问令牌可用于访问 Modrinth 的 API。请参阅 <doc-link>Modrinth 的 API 文档</doc-link>，以获取更多有关信息。您可以随时创建和撤销这些令牌。"
+    "message": "个人访问令牌可用于访问 BBSMC 的 API。请参阅 <doc-link>BBSMC 的 API 文档</doc-link>，以获取更多有关信息。您可以随时创建和撤销这些令牌。"
   },
   "settings.pats.modal.create.action": {
     "message": "创建个人访问令牌"
@@ -990,7 +990,7 @@
     "message": "简介"
   },
   "settings.profile.description": {
-    "message": "您的个人资料信息可在 Modrinth 和通过 <docs-link>Modrinth API</docs-link> 公开查看。"
+    "message": "您的个人资料信息可在 BBSMC 和通过 <docs-link>BBSMC API</docs-link> 公开查看。"
   },
   "settings.profile.profile-info": {
     "message": "个人资料信息"
@@ -1020,7 +1020,7 @@
     "message": "当前会话"
   },
   "settings.sessions.description": {
-    "message": "以下是你目前已登录 Modrinth 账号的所有设备。你可以单独登出任意一项。\n\n如果你看到一条无法辨认的记录，请立即登出该设备并更改你的 Modrinth 账号密码。"
+    "message": "以下是你目前已登录 BBSMC 账号的所有设备。你可以单独登出任意一项。\n\n如果你看到一条无法辨认的记录，请立即登出该设备并更改你的 BBSMC 账号密码。"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "上次访问于 {ago}"

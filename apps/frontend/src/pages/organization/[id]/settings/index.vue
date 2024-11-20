@@ -75,8 +75,8 @@ const onSaveChanges = useClientTry(async () => {
 
   addNotification({
     group: "main",
-    title: "Organization updated",
-    text: "Your organization has been updated.",
+    title: "团队更新",
+    text: "您的团队已更新。",
     type: "success",
   });
 });
@@ -89,8 +89,8 @@ const onDeleteOrganization = useClientTry(async () => {
 
   addNotification({
     group: "main",
-    title: "Organization deleted",
-    text: "Your organization has been deleted.",
+    title: "团队删除",
+    text: "您的团队已删除.",
     type: "success",
   });
 
@@ -102,21 +102,21 @@ const onDeleteOrganization = useClientTry(async () => {
   <div class="normal-page__content">
     <ConfirmModal
       ref="modal_deletion"
-      :title="`Are you sure you want to delete ${organization.name}?`"
-      description="This will delete this organization forever (like *forever* ever)."
+      :title="`您确定要删除 ${organization.name} 吗?`"
+      description="删除后无法撤销该操作."
       :has-to-type="true"
-      proceed-label="Delete"
+      proceed-label="删除"
       :confirmation-text="organization.name"
       @proceed="onDeleteOrganization"
     />
     <div class="universal-card">
       <div class="label">
         <h3>
-          <span class="label__title size-card-header">Organization information</span>
+          <span class="label__title size-card-header">团队信息</span>
         </h3>
       </div>
       <label for="project-icon">
-        <span class="label__title">Icon</span>
+        <span class="label__title">图标</span>
       </label>
       <div class="input-group">
         <Avatar
@@ -132,7 +132,7 @@ const onDeleteOrganization = useClientTry(async () => {
             :show-icon="true"
             accept="image/png,image/jpeg,image/gif,image/webp"
             class="btn"
-            prompt="Upload icon"
+            prompt="上传图标"
             :disabled="!hasPermission"
             @change="showPreviewImage"
           >
@@ -144,13 +144,13 @@ const onDeleteOrganization = useClientTry(async () => {
             @click="markIconForDeletion"
           >
             <TrashIcon />
-            Remove icon
+            移除图标
           </Button>
         </div>
       </div>
 
       <label for="project-name">
-        <span class="label__title">Name</span>
+        <span class="label__title">名称</span>
       </label>
       <input
         id="project-name"
@@ -161,10 +161,10 @@ const onDeleteOrganization = useClientTry(async () => {
       />
 
       <label for="project-slug">
-        <span class="label__title">URL</span>
+        <span class="label__title">主页</span>
       </label>
       <div class="text-input-wrapper">
-        <div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
+        <div class="text-input-wrapper__before">https://bbsmc.net/organization/</div>
         <input
           id="project-slug"
           v-model="slug"
@@ -176,7 +176,7 @@ const onDeleteOrganization = useClientTry(async () => {
       </div>
 
       <label for="project-summary">
-        <span class="label__title">Summary</span>
+        <span class="label__title">介绍</span>
       </label>
       <div class="textarea-wrapper summary-input">
         <textarea
@@ -189,23 +189,22 @@ const onDeleteOrganization = useClientTry(async () => {
       <div class="button-group">
         <Button color="primary" :disabled="!hasChanges" @click="onSaveChanges">
           <SaveIcon />
-          Save changes
+          保存修改
         </Button>
       </div>
     </div>
     <div class="universal-card">
       <div class="label">
         <h3>
-          <span class="label__title size-card-header">Delete organization</span>
+          <span class="label__title size-card-header">删除团队</span>
         </h3>
       </div>
       <p>
-        Deleting your organization will transfer all of its projects to the organization owner. This
-        action cannot be undone.
+        删除您的团队会将其所有资源转移给团队所有者。此操作无法撤消。
       </p>
       <Button color="danger" @click="() => $refs.modal_deletion.show()">
         <TrashIcon />
-        Delete organization
+        删除团队
       </Button>
     </div>
   </div>

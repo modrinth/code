@@ -2,29 +2,29 @@
   <div>
     <ModalConfirm
       ref="modal_confirm"
-      title="Are you sure you want to delete your account?"
-      description="This will **immediately delete all of your user data and follows**. This will not delete your projects. Deleting your account cannot be reversed.<br><br>If you need help with your account, get support on the [Modrinth Discord](https://discord.modrinth.com)."
-      proceed-label="Delete this account"
+      title="你确定要注销该账户吗?"
+      description="这将会 **立即删除您的所有用户数据和关注**. 这不会删除您的已发布的资源. 注销后将无法恢复账户."
+      proceed-label="删除此账户"
       :confirmation-text="auth.user.username"
       :has-to-type="true"
       @proceed="deleteAccount"
     />
-    <Modal ref="changeEmailModal" :header="`${auth.user.email ? 'Change' : 'Add'} email`">
+    <Modal ref="changeEmailModal" :header="`${auth.user.email ? '修改' : '新增'} 电子邮箱`">
       <div class="universal-modal">
-        <p>Your account information is not displayed publicly.</p>
-        <label for="email-input"><span class="label__title">Email address</span> </label>
+        <p>您的帐户信息不会公开显示</p>
+        <label for="email-input"><span class="label__title">电子邮箱地址</span> </label>
         <input
           id="email-input"
           v-model="email"
           maxlength="2048"
           type="email"
-          :placeholder="`Enter your email address...`"
+          :placeholder="`输入邮箱地址...`"
           @keyup.enter="saveEmail()"
         />
         <div class="input-group push-right">
           <button class="iconified-button" @click="$refs.changeEmailModal.hide()">
             <XIcon />
-            Cancel
+            取消
           </button>
           <button
             type="button"
@@ -33,7 +33,7 @@
             @click="saveEmail()"
           >
             <SaveIcon />
-            Save email
+            保存
           </button>
         </div>
       </div>
@@ -41,22 +41,22 @@
     <Modal
       ref="managePasswordModal"
       :header="`${
-        removePasswordMode ? 'Remove' : auth.user.has_password ? 'Change' : 'Add'
-      } password`"
+        removePasswordMode ? '删除' : auth.user.has_password ? '修改' : '设置'
+      }密码`"
     >
       <div class="universal-modal">
         <ul
           v-if="newPassword !== confirmNewPassword && confirmNewPassword.length > 0"
           class="known-errors"
         >
-          <li>Input passwords do not match!</li>
+          <li>输入的密码不匹配！</li>
         </ul>
         <label v-if="removePasswordMode" for="old-password">
-          <span class="label__title">Confirm password</span>
-          <span class="label__description">Please enter your password to proceed.</span>
+          <span class="label__title">确认密码</span>
+          <span class="label__description">请输入您的密码以继续。</span>
         </label>
         <label v-else-if="auth.user.has_password" for="old-password">
-          <span class="label__title">Old password</span>
+          <span class="label__title">当前密码</span>
         </label>
         <input
           v-if="auth.user.has_password"
@@ -65,20 +65,20 @@
           maxlength="2048"
           type="password"
           autocomplete="current-password"
-          :placeholder="`${removePasswordMode ? 'Confirm' : 'Old'} password`"
+          :placeholder="`${removePasswordMode ? '确认' : '当前'} 密码`"
         />
         <template v-if="!removePasswordMode">
-          <label for="new-password"><span class="label__title">New password</span></label>
+          <label for="new-password"><span class="label__title">新密码</span></label>
           <input
             id="new-password"
             v-model="newPassword"
             maxlength="2048"
             type="password"
             autocomplete="new-password"
-            placeholder="New password"
+            placeholder="新密码"
           />
           <label for="confirm-new-password"
-            ><span class="label__title">Confirm new password</span></label
+            ><span class="label__title">再次输入密码</span></label
           >
           <input
             id="confirm-new-password"
@@ -86,14 +86,14 @@
             maxlength="2048"
             type="password"
             autocomplete="new-password"
-            placeholder="Confirm new password"
+            placeholder="再次输入一次新密码"
           />
         </template>
         <p></p>
         <div class="input-group push-right">
           <button class="iconified-button" @click="$refs.managePasswordModal.hide()">
             <XIcon />
-            Cancel
+            取消
           </button>
           <template v-if="removePasswordMode">
             <button
@@ -103,7 +103,7 @@
               @click="savePassword"
             >
               <TrashIcon />
-              Remove password
+              删除密码
             </button>
           </template>
           <template v-else>
@@ -114,7 +114,7 @@
               @click="removePasswordMode = true"
             >
               <TrashIcon />
-              Remove password
+              删除密码
             </button>
             <button
               type="button"
@@ -127,7 +127,7 @@
               @click="savePassword"
             >
               <SaveIcon />
-              Save password
+              保存密码
             </button>
           </template>
         </div>
@@ -291,35 +291,34 @@
       </div>
     </Modal>
     <section class="universal-card">
-      <h2 class="text-2xl">Account security</h2>
+      <h2 class="text-2xl">账号安全</h2>
 
       <div class="adjacent-input">
         <label for="theme-selector">
-          <span class="label__title">Email</span>
-          <span class="label__description">Changes the email associated with your account.</span>
+          <span class="label__title">邮箱</span>
+          <span class="label__description">更改与您的帐户关联的电子邮件</span>
         </label>
         <div>
           <button class="iconified-button" @click="$refs.changeEmailModal.show()">
             <template v-if="auth.user.email">
               <EditIcon />
-              Change email
+              更改电子邮箱
             </template>
             <template v-else>
               <PlusIcon />
-              Add email
+              设置邮箱
             </template>
           </button>
         </div>
       </div>
       <div class="adjacent-input">
         <label for="theme-selector">
-          <span class="label__title">Password</span>
+          <span class="label__title">密码</span>
           <span v-if="auth.user.has_password" class="label__description">
-            Change <template v-if="auth.user.auth_providers.length > 0">or remove</template> the
-            password used to login to your account.
+            更改<template v-if="auth.user.auth_providers.length > 0">或删除</template>您账户的登录密码
           </span>
           <span v-else class="label__description">
-            Set a permanent password to login to your account.
+            设置密码来登录您的帐户。
           </span>
         </label>
         <div>
@@ -336,62 +335,61 @@
             "
           >
             <KeyIcon />
-            <template v-if="auth.user.has_password"> Change password </template>
-            <template v-else> Add password </template>
+            <template v-if="auth.user.has_password"> 修改密码 </template>
+            <template v-else> 设置密码 </template>
           </button>
         </div>
       </div>
-      <div class="adjacent-input">
-        <label for="theme-selector">
-          <span class="label__title">Two-factor authentication</span>
-          <span class="label__description">
-            Add an additional layer of security to your account during login.
-          </span>
-        </label>
-        <div>
-          <button class="iconified-button" @click="showTwoFactorModal">
-            <template v-if="auth.user.has_totp"> <TrashIcon /> Remove 2FA </template>
-            <template v-else> <PlusIcon /> Setup 2FA </template>
-          </button>
-        </div>
-      </div>
-      <div class="adjacent-input">
-        <label for="theme-selector">
-          <span class="label__title">Manage authentication providers</span>
-          <span class="label__description">
-            Add or remove sign-on methods from your account, including GitHub, GitLab, Microsoft,
-            Discord, Steam, and Google.
-          </span>
-        </label>
-        <div>
-          <button class="iconified-button" @click="$refs.manageProvidersModal.show()">
-            <SettingsIcon /> Manage providers
-          </button>
-        </div>
-      </div>
+<!--      <div class="adjacent-input">-->
+<!--        <label for="theme-selector">-->
+<!--          <span class="label__title">Two-factor authentication</span>-->
+<!--          <span class="label__description">-->
+<!--            Add an additional layer of security to your account during login.-->
+<!--          </span>-->
+<!--        </label>-->
+<!--        <div>-->
+<!--          <button class="iconified-button" @click="showTwoFactorModal">-->
+<!--            <template v-if="auth.user.has_totp"> <TrashIcon /> Remove 2FA </template>-->
+<!--            <template v-else> <PlusIcon /> Setup 2FA </template>-->
+<!--          </button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <div class="adjacent-input">-->
+<!--        <label for="theme-selector">-->
+<!--          <span class="label__title">Manage authentication providers</span>-->
+<!--          <span class="label__description">-->
+<!--            Add or remove sign-on methods from your account, including GitHub, GitLab, Microsoft,-->
+<!--            Discord, Steam, and Google.-->
+<!--          </span>-->
+<!--        </label>-->
+<!--        <div>-->
+<!--          <button class="iconified-button" @click="$refs.manageProvidersModal.show()">-->
+<!--            <SettingsIcon /> Manage providers-->
+<!--          </button>-->
+<!--        </div>-->
+<!--      </div>-->
     </section>
 
-    <section id="data-export" class="universal-card">
-      <h2>Data export</h2>
-      <p>
-        Request a copy of all your personal data you have uploaded to Modrinth. This may take
-        several minutes to complete.
-      </p>
-      <a v-if="generated" class="iconified-button" :href="generated" download="export.json">
-        <DownloadIcon />
-        Download export
-      </a>
-      <button v-else class="iconified-button" :disabled="generatingExport" @click="exportData">
-        <template v-if="generatingExport"> <UpdatedIcon /> Generating export... </template>
-        <template v-else> <UpdatedIcon /> Generate export </template>
-      </button>
-    </section>
+<!--    <section id="data-export" class="universal-card">-->
+<!--      <h2>Data export</h2>-->
+<!--      <p>-->
+<!--        Request a copy of all your personal data you have uploaded to Modrinth. This may take-->
+<!--        several minutes to complete.-->
+<!--      </p>-->
+<!--      <a v-if="generated" class="iconified-button" :href="generated" download="export.json">-->
+<!--        <DownloadIcon />-->
+<!--        Download export-->
+<!--      </a>-->
+<!--      <button v-else class="iconified-button" :disabled="generatingExport" @click="exportData">-->
+<!--        <template v-if="generatingExport"> <UpdatedIcon /> Generating export... </template>-->
+<!--        <template v-else> <UpdatedIcon /> Generate export </template>-->
+<!--      </button>-->
+<!--    </section>-->
 
     <section id="delete-account" class="universal-card">
-      <h2>Delete account</h2>
+      <h2>注销账户</h2>
       <p>
-        Once you delete your account, there is no going back. Deleting your account will remove all
-        attached data, excluding projects, from our servers.
+        一旦注销帐户，将无法恢复。注销帐户将从我们的服务器中删除所有附加数据（已发布的资源除外）。
       </p>
       <button
         type="button"
@@ -399,7 +397,7 @@
         @click="$refs.modal_confirm.show()"
       >
         <TrashIcon />
-        Delete account
+        注销账户
       </button>
     </section>
   </div>
@@ -462,7 +460,7 @@ async function saveEmail() {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });
@@ -494,7 +492,7 @@ async function savePassword() {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });
@@ -531,7 +529,7 @@ async function showTwoFactorModal() {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });
@@ -621,7 +619,7 @@ async function deleteAccount() {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });
@@ -651,7 +649,7 @@ async function exportData() {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });

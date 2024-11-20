@@ -3,21 +3,21 @@
     <Modal
       v-if="currentMember"
       ref="modal_edit_item"
-      :header="editIndex === -1 ? 'Upload gallery image' : 'Edit gallery item'"
+      :header="editIndex === -1 ? '上传渲染图' : '编辑渲染图'"
     >
       <div class="modal-gallery universal-labels">
         <div class="gallery-file-input">
           <div class="file-header">
             <ImageIcon aria-hidden="true" />
-            <strong>{{ editFile ? editFile.name : "Current image" }}</strong>
+            <strong>{{ editFile ? editFile.name : "当前图片" }}</strong>
             <FileInput
               v-if="editIndex === -1"
               class="iconified-button raised-button"
-              prompt="Replace"
+              prompt="替换图片"
               :accept="acceptFileTypes"
               :max-size="524288000"
               should-always-reset
-              aria-label="Replace image"
+              aria-label="替换图片"
               @change="
                 (x) => {
                   editFile = x[0];
@@ -40,40 +40,39 @@
           />
         </div>
         <label for="gallery-image-title">
-          <span class="label__title">Title</span>
+          <span class="label__title">标题</span>
         </label>
         <input
           id="gallery-image-title"
           v-model="editTitle"
           type="text"
           maxlength="64"
-          placeholder="Enter title..."
+          placeholder="输入标题.."
         />
         <label for="gallery-image-desc">
-          <span class="label__title">Description</span>
+          <span class="label__title">简介</span>
         </label>
         <div class="textarea-wrapper">
           <textarea
             id="gallery-image-desc"
             v-model="editDescription"
             maxlength="255"
-            placeholder="Enter description..."
+            placeholder="输入简介..."
           />
         </div>
         <label for="gallery-image-ordering">
-          <span class="label__title">Order Index</span>
+          <span class="label__title">优先级</span>
         </label>
         <input
           id="gallery-image-ordering"
           v-model="editOrder"
           type="number"
-          placeholder="Enter order index..."
+          placeholder="优先级数字..."
         />
         <label for="gallery-image-featured">
-          <span class="label__title">Featured</span>
+          <span class="label__title">精选</span>
           <span class="label__description">
-            A featured gallery image shows up in search and your project card. Only one gallery
-            image can be featured.
+            精选图库图片会显示在搜索和资源卡中,只能有一张图库图片被精选
           </span>
         </label>
         <button
@@ -83,7 +82,7 @@
           @click="editFeatured = true"
         >
           <StarIcon aria-hidden="true" />
-          Feature image
+          未精选
         </button>
         <button
           v-else
@@ -92,12 +91,12 @@
           @click="editFeatured = false"
         >
           <StarIcon fill="currentColor" aria-hidden="true" />
-          Unfeature image
+          已精选
         </button>
         <div class="button-group">
           <button class="iconified-button" @click="$refs.modal_edit_item.hide()">
             <XIcon aria-hidden="true" />
-            Cancel
+            取消
           </button>
           <button
             v-if="editIndex === -1"
@@ -106,7 +105,7 @@
             @click="createGalleryItem"
           >
             <PlusIcon aria-hidden="true" />
-            Add gallery image
+            上传
           </button>
           <button
             v-else
@@ -115,7 +114,7 @@
             @click="editGalleryItem"
           >
             <SaveIcon aria-hidden="true" />
-            Save changes
+            保存
           </button>
         </div>
       </div>
@@ -123,10 +122,11 @@
     <ConfirmModal
       v-if="currentMember"
       ref="modal_confirm"
-      title="Are you sure you want to delete this gallery image?"
-      description="This will remove this gallery image forever (like really forever)."
+      title="请确认删除"
+      description="这将永久删除此图库图像（真的永久删除）."
       :has-to-type="false"
-      proceed-label="Delete"
+      proceed-label="删除"
+
       @proceed="deleteGalleryImage"
     />
     <div
@@ -199,8 +199,8 @@
       <FileInput
         :max-size="524288000"
         :accept="acceptFileTypes"
-        prompt="Upload an image"
-        aria-label="Upload an image"
+        prompt="上传渲染图"
+        aria-label="上传渲染图"
         class="iconified-button brand-button"
         :disabled="!isPermission(currentMember?.permissions, 1 << 2)"
         @change="handleFiles"
@@ -208,7 +208,7 @@
         <UploadIcon aria-hidden="true" />
       </FileInput>
       <span class="indicator">
-        <InfoIcon aria-hidden="true" /> Click to choose an image or drag one onto this page
+        <InfoIcon aria-hidden="true" /> 单击选择图像或将其拖到此页面上
       </span>
       <DropArea
         :accept="acceptFileTypes"
@@ -255,7 +255,7 @@
               "
             >
               <EditIcon aria-hidden="true" />
-              Edit
+              编辑
             </button>
             <button
               class="iconified-button"
@@ -267,7 +267,7 @@
               "
             >
               <TrashIcon aria-hidden="true" />
-              Remove
+              删除
             </button>
           </div>
         </div>
@@ -299,6 +299,9 @@ import { ConfirmModal } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
 import DropArea from "~/components/ui/DropArea.vue";
 import Modal from "~/components/ui/Modal.vue";
+import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
+dayjs.locale('zh-cn');
 
 import { isPermission } from "~/utils/permissions.ts";
 
@@ -450,7 +453,7 @@ export default defineNuxtComponent({
       } catch (err) {
         this.$notify({
           group: "main",
-          title: "An error occurred",
+          title: "发生错误",
           text: err.data ? err.data.description : err,
           type: "error",
         });
@@ -487,7 +490,7 @@ export default defineNuxtComponent({
       } catch (err) {
         this.$notify({
           group: "main",
-          title: "An error occurred",
+          title: "发生错误",
           text: err.data ? err.data.description : err,
           type: "error",
         });
@@ -513,7 +516,7 @@ export default defineNuxtComponent({
       } catch (err) {
         this.$notify({
           group: "main",
-          title: "An error occurred",
+          title: "发生错误",
           text: err.data ? err.data.description : err,
           type: "error",
         });

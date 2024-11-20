@@ -237,7 +237,7 @@ const saveProperties = async () => {
     addNotification({
       group: "serverOptions",
       type: "success",
-      title: "Server properties updated",
+      title: "服务器属性已更新",
       text: "Your server properties were successfully changed.",
     });
   } catch (error) {
@@ -245,7 +245,7 @@ const saveProperties = async () => {
     addNotification({
       group: "serverOptions",
       type: "error",
-      title: "Failed to update server properties",
+      title: "无法更新服务器属性",
       text: "An error occurred while attempting to update your server properties.",
     });
   } finally {

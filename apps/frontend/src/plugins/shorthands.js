@@ -89,17 +89,17 @@ export default defineNuxtPlugin((nuxtApp) => {
       });
 
       if (isMod && isPlugin && isDataPack) {
-        return "mod, plugin, and data pack";
+        return "模组, 插件, 和 数据包";
       } else if (isMod && isPlugin) {
-        return "mod and plugin";
+        return "模组 和 插件";
       } else if (isMod && isDataPack) {
-        return "mod and data pack";
+        return "模组 和 数据包";
       } else if (isPlugin && isDataPack) {
-        return "plugin and data pack";
+        return "插件 和 数据包";
       } else if (isDataPack) {
-        return "data pack";
+        return "数据包";
       } else if (isPlugin) {
-        return "plugin";
+        return "插件";
       }
     }
 
@@ -183,9 +183,9 @@ export const formatWallet = (name) => {
 
 export const formatProjectType = (name) => {
   if (name === "resourcepack") {
-    return "Resource Pack";
+    return "资源包";
   } else if (name === "datapack") {
-    return "Data Pack";
+    return "数据包";
   }
 
   return capitalizeString(name);
@@ -193,7 +193,7 @@ export const formatProjectType = (name) => {
 
 export const formatCategory = (name) => {
   if (name === "modloader") {
-    return "Risugami's ModLoader";
+    return "ModLoader模组加载器";
   } else if (name === "bungeecord") {
     return "BungeeCord";
   } else if (name === "liteloader") {
@@ -201,35 +201,35 @@ export const formatCategory = (name) => {
   } else if (name === "neoforge") {
     return "NeoForge";
   } else if (name === "game-mechanics") {
-    return "Game Mechanics";
+    return "游戏机制";
   } else if (name === "worldgen") {
-    return "World Generation";
+    return "世界生成";
   } else if (name === "core-shaders") {
-    return "Core Shaders";
+    return "光影核心";
   } else if (name === "gui") {
-    return "GUI";
+    return "界面";
   } else if (name === "8x-") {
-    return "8x or lower";
+    return "8x 或更低";
   } else if (name === "512x+") {
-    return "512x or higher";
+    return "512x 或更高";
   } else if (name === "kitchen-sink") {
-    return "Kitchen Sink";
+    return "百宝箱模组包";
   } else if (name === "path-tracing") {
-    return "Path Tracing";
+    return "路径追踪";
   } else if (name === "pbr") {
-    return "PBR";
+    return "物理渲染";
   } else if (name === "datapack") {
-    return "Data Pack";
+    return "数据包";
   } else if (name === "colored-lighting") {
-    return "Colored Lighting";
+    return "彩色光照";
   } else if (name === "optifine") {
-    return "OptiFine";
+    return "OptiFine高清修复";
   } else if (name === "mrpack") {
-    return "Modpack";
+    return "整合包";
   } else if (name === "minecraft") {
-    return "Resource Pack";
+    return "资源包";
   } else if (name === "vanilla") {
-    return "Vanilla Shader";
+    return "原版光影";
   }
 
   return capitalizeString(name);

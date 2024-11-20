@@ -461,15 +461,15 @@ const handleReinstallError = (error: any) => {
   if (error instanceof PyroFetchError && error.statusCode === 429) {
     addNotification({
       group: "server",
-      title: "Cannot reinstall server",
+      title: "无法重新安装服务器",
       text: "You are being rate limited. Please try again later.",
       type: "error",
     });
   } else {
     addNotification({
       group: "server",
-      title: "Reinstall Failed",
-      text: "An unexpected error occurred while reinstalling. Please try again later.",
+      title: "重新安装失败",
+      text: "重新安装时发生意外错误。请稍后重试。",
       type: "error",
     });
   }
@@ -514,8 +514,8 @@ const handleReinstall = async () => {
     } catch {
       addNotification({
         group: "server",
-        title: "Backup Failed",
-        text: "An unexpected error occurred while backing up. Please try again later.",
+        title: "备份失败",
+        text: "备份时发生意外错误。请稍后重试。",
         type: "error",
       });
       isLoading.value = false;

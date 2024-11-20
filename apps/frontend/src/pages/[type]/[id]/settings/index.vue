@@ -2,21 +2,21 @@
   <div>
     <ModalConfirm
       ref="modal_confirm"
-      title="Are you sure you want to delete this project?"
-      description="If you proceed, all versions and any attached data will be removed from our servers. This may break other projects, so be careful."
+      title="你确定要删除该资源吗?"
+      description="如果删除,所有版本和所有附加数据都将从我们的服务器中删除.这可能会破坏其他资源,所以请慎重."
       :has-to-type="true"
       :confirmation-text="project.title"
-      proceed-label="Delete"
+      proceed-label="确认删除"
       @proceed="deleteProject"
     />
     <section class="universal-card">
       <div class="label">
         <h3>
-          <span class="label__title size-card-header">Project information</span>
+          <span class="label__title size-card-header">资源信息</span>
         </h3>
       </div>
       <label for="project-icon">
-        <span class="label__title">Icon</span>
+        <span class="label__title">图标</span>
       </label>
       <div class="input-group">
         <Avatar
@@ -32,8 +32,8 @@
             :show-icon="true"
             accept="image/png,image/jpeg,image/gif,image/webp"
             class="choose-image iconified-button"
-            prompt="Upload icon"
-            aria-label="Upload icon"
+            prompt="上传"
+            aria-label="上传"
             :disabled="!hasPermission"
             @change="showPreviewImage"
           >
@@ -46,13 +46,13 @@
             @click="markIconForDeletion"
           >
             <TrashIcon aria-hidden="true" />
-            Remove icon
+            移除
           </button>
         </div>
       </div>
 
       <label for="project-name">
-        <span class="label__title">Name</span>
+        <span class="label__title">资源名称</span>
       </label>
       <input
         id="project-name"
@@ -80,7 +80,7 @@
       </div>
 
       <label for="project-summary">
-        <span class="label__title">Summary</span>
+        <span class="label__title">简短介绍</span>
       </label>
       <div class="textarea-wrapper summary-input">
         <textarea
@@ -101,12 +101,9 @@
       >
         <div class="adjacent-input">
           <label for="project-env-client">
-            <span class="label__title">Client-side</span>
+            <span class="label__title">客户端</span>
             <span class="label__description">
-              Select based on if the
-              {{ $formatProjectType(project.project_type).toLowerCase() }} has functionality on the
-              client side. Just because a mod works in Singleplayer doesn't mean it has actual
-              client-side functionality.
+              请选择资源对客户端的支持程度
             </span>
           </label>
           <Multiselect
@@ -115,7 +112,18 @@
             class="small-multiselect"
             placeholder="Select one"
             :options="sideTypes"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :custom-label="(value) => {
+              switch(value){
+                case 'required':
+                  return '必备';
+                case 'optional':
+                  return '可选';
+                case 'unsupported':
+                  return '不支持';
+                default:
+                  return '未知'
+              }
+            }"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -125,12 +133,9 @@
         </div>
         <div class="adjacent-input">
           <label for="project-env-server">
-            <span class="label__title">Server-side</span>
+            <span class="label__title">服务端</span>
             <span class="label__description">
-              Select based on if the
-              {{ $formatProjectType(project.project_type).toLowerCase() }} has functionality on the
-              <strong>logical</strong> server. Remember that Singleplayer contains an integrated
-              server.
+              选择该资源在服务端上是否支持,请注意 单人模式 拥有内置服务端
             </span>
           </label>
           <Multiselect
@@ -139,7 +144,18 @@
             class="small-multiselect"
             placeholder="Select one"
             :options="sideTypes"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :custom-label="(value) => {
+              switch(value){
+                case 'required':
+                  return '必备';
+                case 'optional':
+                  return '可选';
+                case 'unsupported':
+                  return '不支持';
+                default:
+                  return '未知'
+              }
+            }"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -150,13 +166,11 @@
       </template>
       <div class="adjacent-input">
         <label for="project-visibility">
-          <span class="label__title">Visibility</span>
+          <span class="label__title">可见度</span>
           <div class="label__description">
-            Public and archived projects are visible in search. Unlisted projects are published, but
-            not visible in search or on user profiles. Private projects are only accessible by
-            members of the project.
+            公开和私有的资源可在搜索中查看，未公开的资源已发布，但在搜索或用户个人资料中不可见。私人资源仅供资源成员访问。
 
-            <p>If approved by the moderators:</p>
+            <p>已审核项目:</p>
             <ul class="visibility-info">
               <li>
                 <CheckIcon
@@ -164,7 +178,7 @@
                   class="good"
                 />
                 <ExitIcon v-else class="bad" />
-                {{ hasModifiedVisibility() ? "Will be v" : "V" }}isible in search
+                {{ hasModifiedVisibility() ? "未" : "" }}允许被搜索
               </li>
               <li>
                 <ExitIcon
@@ -172,7 +186,7 @@
                   class="bad"
                 />
                 <CheckIcon v-else class="good" />
-                {{ hasModifiedVisibility() ? "Will be v" : "V" }}isible on profile
+                {{ hasModifiedVisibility() ? "未" : "" }}允许显示在个人资料
               </li>
               <li>
                 <CheckIcon v-if="visibility !== 'private'" class="good" />
@@ -181,12 +195,12 @@
                   v-tooltip="{
                     content:
                       visibility === 'private'
-                        ? 'Only members will be able to view the project.'
+                        ? '只有会员才可以查看该项目。'
                         : '',
                   }"
                   class="warn"
                 />
-                {{ hasModifiedVisibility() ? "Will be v" : "V" }}isible via URL
+                {{ hasModifiedVisibility() ? "未" : "" }}被允许使用URL访问
               </li>
             </ul>
           </div>
@@ -195,7 +209,7 @@
           id="project-visibility"
           v-model="visibility"
           class="small-multiselect"
-          placeholder="Select one"
+          placeholder="选择"
           :options="tags.approvedStatuses"
           :custom-label="(value) => formatProjectStatus(value)"
           :searchable="false"
@@ -213,7 +227,7 @@
           @click="saveChanges()"
         >
           <SaveIcon aria-hidden="true" />
-          Save changes
+          保存
         </button>
       </div>
     </section>
@@ -221,12 +235,11 @@
     <section class="universal-card">
       <div class="label">
         <h3>
-          <span class="label__title size-card-header">Delete project</span>
+          <span class="label__title size-card-header">删除资源</span>
         </h3>
       </div>
       <p>
-        Removes your project from Modrinth's servers and search. Clicking on this will delete your
-        project, so be extra careful!
+        从 BBSMC 的服务器和搜索中删除您的资源.单击此按钮将删除您的资源,请慎重点击!
       </p>
       <button
         type="button"
@@ -235,7 +248,7 @@
         @click="$refs.modal_confirm.show()"
       >
         <TrashIcon aria-hidden="true" />
-        Delete project
+        删除
       </button>
     </section>
   </div>
@@ -386,8 +399,8 @@ const deleteProject = async () => {
   await router.push("/dashboard/projects");
   addNotification({
     group: "main",
-    title: "Project deleted",
-    text: "Your project has been deleted.",
+    title: "资源已删除",
+    text: "您的资源已删除.",
     type: "success",
   });
 };
@@ -405,8 +418,8 @@ const deleteIcon = async () => {
   await props.resetProject();
   addNotification({
     group: "main",
-    title: "Project icon removed",
-    text: "Your project's icon has been removed.",
+    title: "图片已移除",
+    text: "您的资源图标已被移除",
     type: "success",
   });
 };

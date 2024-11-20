@@ -3,18 +3,18 @@
     <section class="universal-card">
       <Breadcrumbs
         v-if="history"
-        current-title="History"
-        :link-stack="[{ href: `/dashboard/notifications`, label: 'Notifications' }]"
+        current-title="历史通知"
+        :link-stack="[{ href: `/dashboard/notifications`, label: '通知' }]"
       />
       <div class="header__row">
         <div class="header__title">
-          <h2 v-if="history" class="text-2xl">Notification history</h2>
-          <h2 v-else class="text-2xl">Notifications</h2>
+          <h2 v-if="history" class="text-2xl">历史通知</h2>
+          <h2 v-else class="text-2xl">通知</h2>
         </div>
         <template v-if="!history">
           <Button v-if="hasRead" @click="updateRoute()"> <HistoryIcon /> View history </Button>
           <Button v-if="notifications.length > 0" color="danger" @click="readAll()">
-            <CheckCheckIcon /> Mark all as read
+            <CheckCheckIcon /> 全部标记为已读
           </Button>
         </template>
       </div>
@@ -25,9 +25,9 @@
         :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x).replace('_', ' ') + 's')"
         :capitalize="false"
       />
-      <p v-if="pending">Loading notifications...</p>
+      <p v-if="pending">加载中...</p>
       <template v-else-if="error">
-        <p>Error loading notifications:</p>
+        <p>异常加载通知:</p>
         <pre>
           {{ error }}
         </pre>
@@ -44,7 +44,7 @@
           @update:notifications="() => refresh()"
         />
       </template>
-      <p v-else>You don't have any unread notifications.</p>
+      <p v-else>你没有收到任何消息.</p>
       <Pagination :page="page" :count="pages" @switch-page="changePage" />
     </section>
   </div>

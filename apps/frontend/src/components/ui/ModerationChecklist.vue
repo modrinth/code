@@ -782,7 +782,7 @@ async function initializeModPackData() {
     const app = useNuxtApp();
     app.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data ? err.data.description : err,
       type: "error",
     });
@@ -900,7 +900,7 @@ async function generateMessage() {
         const app = useNuxtApp();
         app.$notify({
           group: "main",
-          title: "An error occurred",
+          title: "发生错误",
           text: err.data ? err.data.description : err,
           type: "error",
         });
@@ -988,7 +988,7 @@ async function sendMessage(status) {
     const app = useNuxtApp();
     app.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data ? err.data.description : err,
       type: "error",
     });

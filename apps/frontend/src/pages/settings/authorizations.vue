@@ -166,7 +166,7 @@ async function revokeApp(id) {
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data ? err.data.description : err,
       type: "error",
     });

@@ -294,7 +294,7 @@ const addNewAllocation = async () => {
     addNotification({
       group: "serverOptions",
       type: "success",
-      title: "Allocation reserved",
+      title: "预留分配",
       text: "Your allocation has been reserved.",
     });
   } catch (error) {
@@ -336,7 +336,7 @@ const confirmDeleteAllocation = async () => {
   addNotification({
     group: "serverOptions",
     type: "success",
-    title: "Allocation removed",
+    title: "已移除分配",
     text: "Your allocation has been removed.",
   });
 
@@ -357,7 +357,7 @@ const editAllocation = async () => {
     addNotification({
       group: "serverOptions",
       type: "success",
-      title: "Allocation updated",
+      title: "分配已更新",
       text: "Your allocation has been updated.",
     });
   } catch (error) {
@@ -375,8 +375,8 @@ const saveNetwork = async () => {
       addNotification({
         group: "serverOptions",
         type: "error",
-        title: "Subdomain not available",
-        text: "The subdomain you entered is already in use.",
+        title: "子域名不可用",
+        text: "您输入的子域名已被使用",
       });
       return;
     }
@@ -394,7 +394,7 @@ const saveNetwork = async () => {
     addNotification({
       group: "serverOptions",
       type: "success",
-      title: "Server settings updated",
+      title: "已更新",
       text: "Your server settings were successfully changed.",
     });
   } catch (error) {
@@ -402,8 +402,8 @@ const saveNetwork = async () => {
     addNotification({
       group: "serverOptions",
       type: "error",
-      title: "Failed to update server settings",
-      text: "An error occurred while attempting to update your server settings.",
+      title: "无法更新服务器设置",
+      text: "尝试更新服务器设置时发生错误。",
     });
   } finally {
     isUpdating.value = false;
@@ -461,8 +461,8 @@ const copyText = (text: string) => {
   addNotification({
     group: "serverOptions",
     type: "success",
-    title: "Text copied",
-    text: `${text} has been copied to your clipboard`,
+    title: "文本已复制",
+    text: `${text} 已复制到您的剪贴板`,
   });
 };
 </script>

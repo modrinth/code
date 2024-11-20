@@ -113,7 +113,23 @@ export const formatBytes = (bytes, decimals = 2) => {
 }
 
 export const capitalizeString = (name) => {
-  return name ? name.charAt(0).toUpperCase() + name.slice(1) : name
+  if (name === 'views'){
+    return "浏览量"
+  }else if (name === 'downloads'){
+    return "下载量"
+  }
+  return name;
+}
+
+export const localString = (name) => {
+  if (name === 'grid'){
+    return "网格"
+  }else if (name === 'gallery'){
+    return "渲染图"
+  }else if (name === 'list'){
+    return "列表"
+  }
+  return name;
 }
 
 export const formatWallet = (name) => {
@@ -172,14 +188,69 @@ export const formatCategory = (name) => {
 }
 
 export const formatCategoryHeader = (name) => {
-  return capitalizeString(name)
+  if (name === 'loaders'){
+    return '模组加载器';
+  }
+  if (name === 'Categories'){
+    return '分类';
+  }
+  if (name === 'environment'){
+    return '运行环境';
+  }
+  if (name === 'license'){
+    return '许可证';
+  }
+  return name;
 }
 
 export const formatProjectStatus = (name) => {
   if (name === 'approved') {
-    return 'Public'
-  } else if (name === 'processing') {
-    return 'Under review'
+    return '公开'
+  }
+  else if (name === 'archived') {
+    return '归档'
+  }
+  else if (name === 'private') {
+    return '私有'
+  }
+  else if (name === 'unlisted') {
+    return '未公开'
+  }
+  else if (name === 'processing') {
+    return '正在审核'
+  }
+
+  return capitalizeString(name)
+}
+
+export const formatProjectRelease = (name) => {
+  if (name === 'release') {
+    return '正式版'
+  }
+  else if (name === 'beta') {
+    return '测试版'
+  }
+  else if (name === 'alpha') {
+    return '预览版'
+  }
+  return capitalizeString(name)
+}
+
+export const formatSearch = (name) => {
+  if (name === 'relevance') {
+    return '相关'
+  }
+  else if (name === 'downloads') {
+    return '下载量'
+  }
+  else if (name === 'follows') {
+    return '关注度'
+  }
+  else if (name === 'updated') {
+    return '已更新'
+  }
+  else if (name === 'newest') {
+    return '最新'
   }
 
   return capitalizeString(name)

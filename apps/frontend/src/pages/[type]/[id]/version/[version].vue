@@ -3,25 +3,24 @@
     <ConfirmModal
       v-if="currentMember"
       ref="modal_confirm"
-      title="Are you sure you want to delete this version?"
-      description="This will remove this version forever (like really forever)."
+      title="您确实要删除该版本吗？"
+      description="这将永远删除该版本"
       :has-to-type="false"
-      proceed-label="Delete"
+      proceed-label="删除"
       @proceed="deleteVersion()"
     />
     <Modal v-if="auth.user && currentMember" ref="modal_package_mod" header="Package data pack">
       <div class="modal-package-mod universal-labels">
         <div class="markdown-body">
           <p>
-            Package your data pack as a mod. This will create a new version with support for the
-            selected mod loaders. You will be redirected to the new version and can edit it to your
-            liking.
+            将您的数据包打包为模组,这将创建一个支持所选MOD运行环境的新版本。
+            您将被重定向到新版本并可以根据自己的喜好对其进行编辑。
           </p>
         </div>
         <label for="package-mod-loaders">
-          <span class="label__title">Mod loaders</span>
+          <span class="label__title">MOD运行环境</span>
           <span class="label__description">
-            The mod loaders you would like to package your data pack for.
+            选择您数据包的MOD运行环境
           </span>
         </label>
         <multiselect
@@ -33,20 +32,20 @@
           :searchable="false"
           :show-no-results="false"
           :show-labels="false"
-          placeholder="Choose loaders..."
+          placeholder="选择运行环境..."
           open-direction="top"
         />
         <div class="button-group">
           <ButtonStyled>
             <button @click="$refs.modal_package_mod.hide()">
               <CrossIcon aria-hidden="true" />
-              Cancel
+              取消
             </button>
           </ButtonStyled>
           <ButtonStyled color="brand">
             <button @click="createDataPackVersion">
               <RightArrowIcon aria-hidden="true" />
-              Begin packaging data pack
+              开始打包数据包
             </button>
           </ButtonStyled>
         </div>
@@ -67,7 +66,7 @@
           <input
             v-model="version.name"
             type="text"
-            placeholder="Enter a version title..."
+            placeholder="输入该版本的标题..."
             maxlength="256"
           />
         </template>
@@ -76,24 +75,24 @@
         </h2>
         <div v-if="version.featured" class="featured">
           <StarIcon aria-hidden="true" />
-          Featured
+          精选
         </div>
         <div v-else-if="featuredVersions.find((x) => x.id === version.id)" class="featured">
           <StarIcon aria-hidden="true" />
-          Auto-featured
+          自动推荐
         </div>
       </div>
       <div v-if="fieldErrors && showKnownErrors" class="known-errors">
         <ul>
-          <li v-if="version.version_number === ''">Your version must have a version number.</li>
+          <li v-if="version.version_number === ''">您必须输入一个版本号</li>
           <li v-if="version.game_versions.length === 0">
-            Your version must have the supported Minecraft versions selected.
+            您必须选择支持的 Minecraft 版本
           </li>
           <li v-if="newFiles.length === 0 && version.files.length === 0 && !replaceFile">
-            Your version must have a file uploaded.
+            您必须要有一个上传的文件
           </li>
           <li v-if="version.loaders.length === 0 && project.project_type !== 'resourcepack'">
-            Your version must have the supported mod loaders selected.
+            您的版本必须选择资源的运行环境
           </li>
         </ul>
       </div>
@@ -197,7 +196,7 @@
       </div>
     </div>
     <div class="version-page__changelog universal-card">
-      <h3>Changelog</h3>
+      <h3>更新日志</h3>
       <template v-if="isEditing">
         <div class="changelog-editor-spacing">
           <MarkdownEditor v-model="version.changelog" :on-image-upload="onImageUpload" />
@@ -215,7 +214,7 @@
       v-if="deps.length > 0 || (isEditing && project.project_type !== 'modpack')"
       class="version-page__dependencies universal-card"
     >
-      <h3>Dependencies</h3>
+      <h3>依赖项目</h3>
       <div
         v-for="(dependency, index) in deps.filter((x) => !x.file_name)"
         :key="index"
@@ -273,13 +272,22 @@
         </div>
       </div>
       <div v-if="isEditing && project.project_type !== 'modpack'" class="add-dependency">
-        <h4>Add dependency</h4>
+        <h4>添加在本网站发布过的资源作为依赖</h4>
         <div class="input-group">
           <Multiselect
             v-model="dependencyAddMode"
             class="input"
             :options="['project', 'version']"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :custom-label="(value) => {
+              switch (value) {
+                case 'project':
+                  return '资源';
+                case 'version':
+                  return '版本';
+                default:
+                  return value.charAt(0).toUpperCase() + value.slice(1);
+              }
+            }"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -288,7 +296,7 @@
           <input
             v-model="newDependencyId"
             type="text"
-            :placeholder="`Enter the ${dependencyAddMode} ID${
+            :placeholder="`请输入 ${dependencyAddMode} ID${
               dependencyAddMode === 'project' ? '/slug' : ''
             }`"
             @keyup.enter="addDependency(dependencyAddMode, newDependencyId, newDependencyType)"
@@ -297,7 +305,20 @@
             v-model="newDependencyType"
             class="input"
             :options="['required', 'optional', 'incompatible', 'embedded']"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :custom-label="(value) => {
+    switch (value) {
+      case 'required':
+        return '必需';
+      case 'optional':
+        return '可选';
+      case 'incompatible':
+        return '不兼容';
+      case 'embedded':
+        return '嵌入';
+      default:
+        return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+  }"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -308,7 +329,7 @@
           <ButtonStyled color="brand">
             <button @click="addDependency(dependencyAddMode, newDependencyId, newDependencyType)">
               <PlusIcon aria-hidden="true" />
-              Add dependency
+              添加依赖
             </button>
           </ButtonStyled>
         </div>
@@ -324,8 +345,8 @@
         </span>
         <FileInput
           class="iconified-button raised-button"
-          prompt="Replace"
-          aria-label="Replace"
+          prompt="替换"
+          aria-label="替换"
           :accept="acceptFileFromProjectType(project.project_type)"
           :max-size="524288000"
           should-always-reset
@@ -347,19 +368,19 @@
           <strong>{{ file.filename }}</strong>
           <span class="file-size">({{ $formatBytes(file.size) }})</span>
           <span v-if="primaryFile.hashes.sha1 === file.hashes.sha1" class="file-type">
-            Primary
+            主要
           </span>
           <span
             v-else-if="file.file_type === 'required-resource-pack' && !isEditing"
             class="file-type"
           >
-            Required resource pack
+            必选资源包
           </span>
           <span
             v-else-if="file.file_type === 'optional-resource-pack' && !isEditing"
             class="file-type"
           >
-            Optional resource pack
+            可选资源包
           </span>
         </span>
         <multiselect
@@ -370,7 +391,7 @@
           "
           v-model="oldFileTypes[index]"
           class="raised-multiselect"
-          placeholder="Select file type"
+          placeholder="选择文件的类型"
           :options="fileTypes"
           track-by="value"
           label="display"
@@ -391,7 +412,7 @@
             "
           >
             <TrashIcon aria-hidden="true" />
-            Remove
+            删除
           </button>
         </ButtonStyled>
         <ButtonStyled v-else>
@@ -402,7 +423,7 @@
             tabindex="0"
           >
             <DownloadIcon aria-hidden="true" />
-            Download
+            下载
           </a>
         </ButtonStyled>
       </div>
@@ -417,7 +438,7 @@
             v-if="version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))"
             v-model="newFileTypes[index]"
             class="raised-multiselect"
-            placeholder="Select file type"
+            placeholder="选择文件类型"
             :options="fileTypes"
             track-by="value"
             label="display"
@@ -437,19 +458,19 @@
               "
             >
               <TrashIcon aria-hidden="true" />
-              Remove
+              删除
             </button>
           </ButtonStyled>
         </div>
         <div class="additional-files">
-          <h4>Upload additional files</h4>
+          <h4>上传更多文件</h4>
           <span v-if="version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))">
-            Used for additional files such as required/optional resource packs
+            可继续上传文档,等其他依赖文件
           </span>
-          <span v-else>Used for files such as sources or Javadocs.</span>
+          <span v-else>用于源文件或 使用文档 等文件。</span>
           <FileInput
-            prompt="Drag and drop to upload or click to select"
-            aria-label="Upload additional file"
+            prompt="拖放即可上传或单击即可选择"
+            aria-label="上传附加文件"
             multiple
             long-style
             :accept="acceptFileFromProjectType(project.project_type)"
@@ -469,16 +490,16 @@
     </div>
     <div class="version-page__metadata">
       <div class="universal-card full-width-inputs">
-        <h3>Metadata</h3>
+        <h3>更多信息</h3>
         <div>
-          <h4>Release channel</h4>
+          <h4>发布版本</h4>
           <Multiselect
             v-if="isEditing"
             v-model="version.version_type"
             class="input"
-            placeholder="Select one"
+            placeholder="选择"
             :options="['release', 'beta', 'alpha']"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :custom-label="(value) => formatProjectRelease()(value)"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -506,7 +527,7 @@
           </template>
         </div>
         <div>
-          <h4>Version number</h4>
+          <h4>版本号</h4>
           <div v-if="isEditing" class="iconified-input">
             <label class="hidden" for="version-number">Version number</label>
             <HashIcon aria-hidden="true" />
@@ -521,7 +542,7 @@
           <span v-else>{{ version.version_number }}</span>
         </div>
         <div v-if="project.project_type !== 'resourcepack'">
-          <h4>Loaders</h4>
+          <h4>运行环境</h4>
           <Multiselect
             v-if="isEditing"
             v-model="version.loaders"
@@ -542,12 +563,12 @@
             :show-labels="false"
             :limit="6"
             :hide-selected="true"
-            placeholder="Choose loaders..."
+            placeholder="请选择一个运行环境..."
           />
           <Categories v-else :categories="version.loaders" :type="project.actualProjectType" />
         </div>
         <div>
-          <h4>Game versions</h4>
+          <h4>游戏版本</h4>
           <template v-if="isEditing">
             <multiselect
               v-model="version.game_versions"
@@ -568,12 +589,12 @@
               :limit="6"
               :hide-selected="true"
               :custom-label="(version) => version"
-              placeholder="Choose versions..."
+              placeholder="选择支持的MC版本"
             />
             <Checkbox
               v-model="showSnapshots"
-              label="Show all versions"
-              description="Show all versions"
+              label="显示全部版本"
+              description="显示全部版本"
               style="margin-top: 0.5rem"
               :border="false"
             />
@@ -581,17 +602,17 @@
           <span v-else>{{ $formatVersion(version.game_versions) }}</span>
         </div>
         <div v-if="!isEditing">
-          <h4>Downloads</h4>
+          <h4>下载量</h4>
           <span>{{ version.downloads }}</span>
         </div>
         <div v-if="!isEditing">
-          <h4>Publication date</h4>
+          <h4>发布时间</h4>
           <span>
             {{ $dayjs(version.date_published).format("MMMM D, YYYY [at] h:mm A") }}
           </span>
         </div>
         <div v-if="!isEditing && version.author">
-          <h4>Publisher</h4>
+          <h4>创作者</h4>
           <div
             class="team-member columns button-transparent"
             @click="$router.push('/user/' + version.author.user.username)"
@@ -617,7 +638,7 @@
           </div>
         </div>
         <div v-if="!isEditing">
-          <h4>Version ID</h4>
+          <h4>版本号</h4>
           <CopyCode :text="version.id" />
         </div>
       </div>
@@ -625,6 +646,7 @@
   </div>
 </template>
 <script>
+import { formatProjectRelease } from "@modrinth/utils";
 import { ButtonStyled, ConfirmModal, MarkdownEditor } from "@modrinth/ui";
 import { Multiselect } from "vue-multiselect";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
@@ -949,6 +971,9 @@ export default defineNuxtComponent({
     },
   },
   methods: {
+    formatProjectRelease() {
+      return formatProjectRelease
+    },
     async onImageUpload(file) {
       const response = await useImageUpload(file, { context: "version" });
 
@@ -970,8 +995,8 @@ export default defineNuxtComponent({
     getPreviousLabel() {
       return this.$router.options.history.state.back &&
         this.$router.options.history.state.back.endsWith("/versions")
-        ? "Back to versions"
-        : "All versions";
+        ? "返回到版本页面"
+        : "全部版本";
     },
     acceptFileFromProjectType,
     renderHighlightedString,
@@ -1130,7 +1155,7 @@ export default defineNuxtComponent({
       } catch (err) {
         this.$notify({
           group: "main",
-          title: "An error occurred",
+          title: "发生错误",
           text: err.data.description,
           type: "error",
         });
@@ -1155,7 +1180,7 @@ export default defineNuxtComponent({
       } catch (err) {
         this.$notify({
           group: "main",
-          title: "An error occurred",
+          title: "发生错误",
           text: err.data ? err.data.description : err,
           type: "error",
         });
@@ -1286,7 +1311,7 @@ export default defineNuxtComponent({
       } catch (err) {
         this.$notify({
           group: "main",
-          title: "An error occurred",
+          title: "发生错误",
           text: err.data ? err.data.description : err,
           type: "error",
         });

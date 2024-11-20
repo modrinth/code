@@ -1,10 +1,10 @@
 <template>
-  <NewModal ref="modal" header="Creating a project">
+  <NewModal ref="modal" header="创建资源">
     <div class="flex flex-col gap-3">
       <div class="flex flex-col gap-2">
         <label for="name">
           <span class="text-lg font-semibold text-contrast">
-            Name
+            标题
             <span class="text-brand-red">*</span>
           </span>
         </label>
@@ -13,7 +13,7 @@
           v-model="name"
           type="text"
           maxlength="64"
-          placeholder="Enter project name..."
+          placeholder="资源标题..."
           autocomplete="off"
           @input="updatedName()"
         />
@@ -26,7 +26,7 @@
           </span>
         </label>
         <div class="text-input-wrapper">
-          <div class="text-input-wrapper__before">https://modrinth.com/project/</div>
+          <div class="text-input-wrapper__before">https://bbsmc.net/project/</div>
           <input
             id="slug"
             v-model="slug"
@@ -40,10 +40,10 @@
       <div class="flex flex-col gap-2">
         <label for="visibility" class="flex flex-col gap-1">
           <span class="text-lg font-semibold text-contrast">
-            Visibility
+            可见度
             <span class="text-brand-red">*</span>
           </span>
-          <span> The visibility of your project after it has been approved. </span>
+          <span> 您的资源审核完成后的可见性。 </span>
         </label>
         <DropdownSelect
           id="visibility"
@@ -56,10 +56,10 @@
       <div class="flex flex-col gap-2">
         <label for="additional-information" class="flex flex-col gap-1">
           <span class="text-lg font-semibold text-contrast">
-            Summary
+            简介
             <span class="text-brand-red">*</span>
           </span>
-          <span> A sentence or two that describes your project. </span>
+          <span> 一个简短的资源简介. </span>
         </label>
         <div class="textarea-wrapper">
           <textarea id="additional-information" v-model="description" maxlength="256" />
@@ -69,13 +69,13 @@
         <ButtonStyled color="brand">
           <button @click="createProject">
             <PlusIcon aria-hidden="true" />
-            Create project
+            创建资源
           </button>
         </ButtonStyled>
         <ButtonStyled>
           <button @click="cancel">
             <XIcon aria-hidden="true" />
-            Cancel
+            取消
           </button>
         </ButtonStyled>
       </div>
@@ -107,20 +107,20 @@ const manualSlug = ref(false);
 const visibilities = ref([
   {
     actual: "approved",
-    display: "Public",
+    display: "公开",
   },
   {
     actual: "unlisted",
-    display: "Unlisted",
+    display: "未公开",
   },
   {
     actual: "private",
-    display: "Private",
+    display: "私有",
   },
 ]);
 const visibility = ref({
   actual: "approved",
-  display: "Public",
+  display: "公开",
 });
 
 const cancel = () => {
@@ -182,7 +182,7 @@ async function createProject() {
   } catch (err) {
     app.$notify({
       group: "main",
-      title: "An error occurred",
+      title: "发生错误",
       text: err.data.description,
       type: "error",
     });
