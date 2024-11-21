@@ -67,47 +67,44 @@
               selectedMCVersion && !isLoading && selectedLoaderVersions.length === 0,
           }"
         >
-          <div class="flex flex-col gap-2 text-sm font-bold text-contrast">
+          <div class="flex flex-col gap-2">
+            <div class="text-sm font-bold text-contrast">{{ selectedLoader }} version</div>
+
             <template v-if="!selectedMCVersion">
-              <div>
-                Select a Minecraft version to see available {{ selectedLoader }} versions...
-              </div>
-              <div class="relative flex h-9 w-full items-center rounded-xl bg-button-bg opacity-50">
+              <div
+                class="relative flex h-9 w-full select-none items-center rounded-xl bg-button-bg px-4 opacity-50"
+              >
+                Select a Minecraft version to see available versions
                 <DropdownIcon class="absolute right-4" />
               </div>
             </template>
             <template v-else-if="isLoading">
-              <div class="flex items-center gap-1">
-                <UiServersIconsLoadingIcon class="animate-spin" />
-                Loading {{ selectedLoader }} versions...
-              </div>
-              <div class="relative flex h-9 w-full items-center rounded-xl bg-button-bg opacity-50">
+              <div
+                class="relative flex h-9 w-full items-center rounded-xl bg-button-bg px-4 opacity-50"
+              >
+                <UiServersIconsLoadingIcon class="mr-2 animate-spin" />
+                Loading versions...
                 <DropdownIcon class="absolute right-4" />
               </div>
             </template>
             <template v-else-if="selectedLoaderVersions.length > 0">
-              {{ selectedLoader }} version
+              <UiServersTeleportDropdownMenu
+                v-model="selectedLoaderVersion"
+                name="loaderVersion"
+                :options="selectedLoaderVersions"
+                class="w-full max-w-[100%]"
+                :placeholder="
+                  selectedLoader.toLowerCase() === 'paper' ||
+                  selectedLoader.toLowerCase() === 'purpur'
+                    ? `Select build number...`
+                    : `Select loader version...`
+                "
+              />
             </template>
             <template v-else>
-              <div>
-                No {{ selectedLoader }} versions are available to install for Minecraft
-                {{ selectedMCVersion }}.
-              </div>
+              <div>No versions available for Minecraft {{ selectedMCVersion }}.</div>
             </template>
           </div>
-
-          <UiServersTeleportDropdownMenu
-            v-if="selectedMCVersion && !isLoading && selectedLoaderVersions.length > 0"
-            v-model="selectedLoaderVersion"
-            name="loaderVersion"
-            :options="selectedLoaderVersions"
-            class="w-full max-w-[100%]"
-            :placeholder="
-              selectedLoader.toLowerCase() === 'paper' || selectedLoader.toLowerCase() === 'purpur'
-                ? `Select build number...`
-                : `Select loader version...`
-            "
-          />
         </div>
 
         <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
