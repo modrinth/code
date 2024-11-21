@@ -1,5 +1,5 @@
 <template>
-  <NewModal ref="modModal" header="Edit mod version">
+  <NewModal ref="modModal" header="Editing mod version">
     <div>
       <div class="mb-4 flex flex-col gap-4">
         <div class="inline-flex flex-wrap items-center">
