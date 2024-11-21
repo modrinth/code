@@ -244,7 +244,7 @@
         </ButtonStyled>
       </div>
       <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
-        <PackageClosedIcon class="size-24" />
+        <UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
         <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
         <p class="m-0">
           Add content to your server by installing a modpack or choosing a different platform that
