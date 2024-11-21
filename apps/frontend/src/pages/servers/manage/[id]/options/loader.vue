@@ -23,7 +23,29 @@
         before proceeding. Are you sure you want to continue?
       </p>
       <div v-if="!isSecondPhase" class="flex flex-col gap-4">
-        <UiServersIconsLoaderIcon :loader="selectedLoader" />
+        <div class="mx-auto flex flex-row items-center gap-4">
+          <div class="grid size-16 place-content-center rounded-full bg-highlight">
+            <UiServersIconsLoaderIcon class="size-10 text-brand" :loader="selectedLoader" />
+          </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="size-10"
+          >
+            <path d="M5 9v6" />
+            <path d="M9 9h3V5l7 7-7 7v-4H9V9z" />
+          </svg>
+          <div class="grid size-16 place-content-center rounded-full bg-table-alternateRow">
+            <ServerIcon class="size-10" />
+          </div>
+        </div>
         <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
           <div class="text-sm font-bold text-contrast">Minecraft version</div>
           <UiServersTeleportDropdownMenu
@@ -36,21 +58,27 @@
         </div>
 
         <div
-          v-if="selectedMCVersion && selectedLoader.toLowerCase() !== 'vanilla'"
+          v-if="selectedLoader.toLowerCase() !== 'vanilla'"
           class="flex w-full flex-col gap-2 rounded-2xl p-4"
           :class="{
-            'bg-table-alternateRow': isLoading || selectedLoaderVersions.length > 0,
-            'bg-highlight-red': !isLoading && selectedLoaderVersions.length === 0,
+            'bg-table-alternateRow':
+              !selectedMCVersion || isLoading || selectedLoaderVersions.length > 0,
+            'bg-highlight-red':
+              selectedMCVersion && !isLoading && selectedLoaderVersions.length === 0,
           }"
         >
           <div class="flex flex-col gap-2 text-sm font-bold text-contrast">
-            <template v-if="isLoading">
+            <template v-if="!selectedMCVersion">
               <div>
-                Loading
-                {{ selectedLoader }}
-                versions...
+                Select a Minecraft version to see available {{ selectedLoader }} versions...
               </div>
-              <div class="relative flex h-9 w-full items-center rounded-2xl bg-button-bg">
+              <div class="relative flex h-9 w-full items-center rounded-xl bg-button-bg">
+                <DropdownIcon class="absolute right-4" />
+              </div>
+            </template>
+            <template v-else-if="isLoading">
+              <div>Loading {{ selectedLoader }} versions...</div>
+              <div class="relative flex h-9 w-full items-center rounded-xl bg-button-bg">
                 <DropdownIcon class="absolute right-4" />
               </div>
             </template>
@@ -66,7 +94,7 @@
           </div>
 
           <UiServersTeleportDropdownMenu
-            v-if="!isLoading && selectedLoaderVersions.length > 0"
+            v-if="selectedMCVersion && !isLoading && selectedLoaderVersions.length > 0"
             v-model="selectedLoaderVersion"
             name="loaderVersion"
             :options="selectedLoaderVersions"
@@ -302,6 +330,7 @@ import {
   XIcon,
   CompassIcon,
   DropdownIcon,
+  ServerIcon,
 } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 import type { Loaders } from "~/types/servers";
