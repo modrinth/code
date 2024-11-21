@@ -224,17 +224,9 @@
 
 <script setup lang="ts">
 import { LoaderIcon } from "@modrinth/assets";
+import type { Loaders } from "~/types/servers";
 
 defineProps<{
-  loader:
-    | "Fabric"
-    | "Quilt"
-    | "Forge"
-    | "NeoForge"
-    | "Paper"
-    | "Spigot"
-    | "Bukkit"
-    | "Vanilla"
-    | "Purpur";
+  loader: Loaders;
 }>();
 </script>
