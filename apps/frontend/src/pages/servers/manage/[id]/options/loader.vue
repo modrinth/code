@@ -24,8 +24,10 @@
       </p>
       <div v-if="!isSecondPhase" class="flex flex-col gap-4">
         <div class="mx-auto flex flex-row items-center gap-4">
-          <div class="grid size-16 place-content-center rounded-full bg-highlight">
-            <UiServersIconsLoaderIcon class="size-10 text-brand" :loader="selectedLoader" />
+          <div
+            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
+          >
+            <UiServersIconsLoaderIcon class="size-10" :loader="selectedLoader" />
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +44,9 @@
             <path d="M5 9v6" />
             <path d="M9 9h3V5l7 7-7 7v-4H9V9z" />
           </svg>
-          <div class="grid size-16 place-content-center rounded-full bg-table-alternateRow">
+          <div
+            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-table-alternateRow shadow-sm"
+          >
             <ServerIcon class="size-10" />
           </div>
         </div>
