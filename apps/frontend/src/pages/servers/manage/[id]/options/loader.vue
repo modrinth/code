@@ -112,9 +112,9 @@
 
         <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
           <div class="flex w-full flex-row items-center justify-between">
-            <label class="w-full text-lg font-bold text-contrast" for="hard-reset"
-              >Erase all data</label
-            >
+            <label class="w-full text-lg font-bold text-contrast" for="hard-reset">
+              Erase all data
+            </label>
             <input
               id="hard-reset"
               :checked="hardReset"
