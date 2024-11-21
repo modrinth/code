@@ -4,7 +4,7 @@
     :header="
       isSecondPhase
         ? 'Confirming reinstallation'
-        : `Installing
+        : `${data?.loader === selectedLoader ? 'Reinstalling' : 'Installing'}
       ${selectedLoader.toLowerCase() === 'vanilla' ? 'Vanilla Minecraft' : selectedLoader}`
     "
     @hide="onHide"
