@@ -240,7 +240,6 @@
           :stats="stats"
           :server-power-state="serverPowerState"
           :power-state-details="powerStateDetails"
-          :console-output="throttledConsoleOutput"
           :socket="socket"
           :server="server"
           @reinstall="onReinstall"
@@ -265,8 +264,8 @@ import {
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
-import { refThrottled } from "@vueuse/core";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
+import { usePyroConsole } from "~/store/console.ts";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
@@ -305,9 +304,8 @@ const serverData = computed(() => server.general);
 const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
-const maxConsoleOutput = 5000;
-const consoleOutput = ref<string[]>([]);
-const throttledConsoleOutput = refThrottled(consoleOutput, 200);
+const pyroConsole = usePyroConsole();
+console.log("||||||||||||||||||||||| console", pyroConsole.output);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
@@ -387,7 +385,7 @@ const connectWebSocket = () => {
         return;
       }
 
-      consoleOutput.value = [];
+      pyroConsole.clear();
       socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
       isConnected.value = true;
       isReconnecting.value = false;
@@ -395,7 +393,7 @@ const connectWebSocket = () => {
 
       if (firstConnect.value) {
         for (let i = 0; i < initialConsoleMessage.length; i++) {
-          consoleOutput.value.push(initialConsoleMessage[i]);
+          pyroConsole.addLine(initialConsoleMessage[i]);
         }
       }
 
@@ -418,9 +416,7 @@ const connectWebSocket = () => {
 
     socket.value.onclose = () => {
       if (isMounted.value) {
-        consoleOutput.value.push(
-          "\nSomething went wrong with the connection, we're reconnecting...",
-        );
+        pyroConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
         isConnected.value = false;
         scheduleReconnect();
       }
@@ -478,10 +474,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
     case "log":
       // eslint-disable-next-line no-case-declarations
       const log = data.message.split("\n").filter((l) => l.trim());
-      if (consoleOutput.value.length > maxConsoleOutput) {
-        consoleOutput.value.shift();
-      }
-      consoleOutput.value.push(...log);
+      pyroConsole.addLines(log);
       break;
     case "stats":
       updateStats(data);
@@ -571,7 +564,7 @@ const onReinstall = (potentialArgs: any) => {
   // serverData.value.loader_version = potentialArgs.lVersion;
   // serverData.value.mc_version = potentialArgs.mVersion;
   // if (potentialArgs?.loader) {
-  //   console.log("setting loader to", potentialArgs.loader);
+  //   console.log("setting loadeconsole
   //   serverData.value.loader = potentialArgs.loader;
   // }
   // if (potentialArgs?.lVersion) {
