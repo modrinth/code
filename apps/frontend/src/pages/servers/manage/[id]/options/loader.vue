@@ -23,6 +23,7 @@
         before proceeding. Are you sure you want to continue?
       </p>
       <div v-if="!isSecondPhase" class="flex flex-col gap-4">
+        <UiServersIconsLoaderIcon :loader="selectedLoader" />
         <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
           <div class="text-sm font-bold text-contrast">Minecraft version</div>
           <UiServersTeleportDropdownMenu
@@ -303,6 +304,7 @@ import {
   DropdownIcon,
 } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
+import type { Loaders } from "~/types/servers";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -456,7 +458,7 @@ const versionIds = computed(() =>
 const version = ref();
 const currentVersion = ref();
 
-const selectedLoader = ref("");
+const selectedLoader = ref<Loaders>("Vanilla");
 const selectedMCVersion = ref("");
 const selectedLoaderVersion = ref("");
 const isSecondPhase = ref(false);
@@ -496,7 +498,7 @@ const fetchPurpurVersions = async (mcVersion: string) => {
 };
 
 const selectLoader = (loader: string) => {
-  selectedLoader.value = loader;
+  selectedLoader.value = loader as Loaders;
   versionSelectModal.value.show();
 };
 
