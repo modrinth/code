@@ -51,7 +51,7 @@
             />
             .modrinth.gg
           </div>
-          <div class="flex flex-col text-sm text-rose-400">
+          <div v-if="!isValidSubdomain" class="flex flex-col text-sm text-rose-400">
             <span v-if="!isValidLengthSubdomain">
               Subdomain must be at least 5 characters long.
             </span>
