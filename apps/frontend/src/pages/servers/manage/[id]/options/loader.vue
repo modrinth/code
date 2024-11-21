@@ -57,7 +57,10 @@
               {{ selectedLoader }} version
             </template>
             <template v-else>
-              <div>No loaders are available to install for this Minecraft version.</div>
+              <div>
+                No {{ selectedLoader }} versions are available to install for Minecraft
+                {{ selectedMCVersion }}.
+              </div>
             </template>
           </div>
 
