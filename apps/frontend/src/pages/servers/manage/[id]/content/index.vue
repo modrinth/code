@@ -247,7 +247,8 @@
         <PackageClosedIcon class="size-24" />
         <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
         <p class="m-0">
-          Add content to your server by installing a modpack or choosing a different platform.
+          Add content to your server by installing a modpack or choosing a different platform that
+          supports mods.
         </p>
         <div class="flex flex-row items-center gap-4">
           <ButtonStyled class="mt-8">
