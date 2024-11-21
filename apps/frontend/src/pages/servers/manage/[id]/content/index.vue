@@ -228,13 +228,42 @@
           </div>
         </div>
       </div>
-      <div v-else class="mt-4 flex h-full flex-col items-center justify-center text-center">
-        <PackageClosedIcon class="size-24 text-neutral-500" />
-        <p class="m-0 pb-2 pt-3 text-neutral-200">No mods found!</p>
-        <p class="m-0 pb-3 text-neutral-400">Add some mods to your server to manage them here.</p>
-        <ButtonStyled color="brand" class="mt-8">
-          <nuxt-link :to="`/mods?sid=${props.server.serverId}`">Add content</nuxt-link>
+      <!-- no mods has platform -->
+      <div
+        v-else-if="!hasMods && props.server.general?.loader.toLocaleLowerCase() !== 'vanilla'"
+        class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
+      >
+        <PackageClosedIcon class="size-24" />
+        <p class="m-0 font-bold text-contrast">No mods found!</p>
+        <p class="m-0">Add some mods to your server to manage them here.</p>
+        <ButtonStyled color="brand">
+          <NuxtLink :to="`/mods?sid=${props.server.serverId}`">
+            <PlusIcon />
+            Add content
+          </NuxtLink>
         </ButtonStyled>
+      </div>
+      <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
+        <PackageClosedIcon class="size-24" />
+        <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
+        <p class="m-0">
+          Add content to your server by installing a modpack or choosing a different platform.
+        </p>
+        <div class="flex flex-row items-center gap-4">
+          <ButtonStyled class="mt-8">
+            <NuxtLink :to="`/modpacks?sid=${props.server.serverId}`">
+              <CompassIcon />
+              Find a modpack
+            </NuxtLink>
+          </ButtonStyled>
+          <div>or</div>
+          <ButtonStyled class="mt-8">
+            <NuxtLink :to="`/mods?sid=${props.server.serverId}`">
+              <WrenchIcon />
+              Change platform
+            </NuxtLink>
+          </ButtonStyled>
+        </div>
       </div>
     </div>
   </div>
@@ -252,6 +281,8 @@ import {
   XIcon,
   PlusIcon,
   MoreVerticalIcon,
+  CompassIcon,
+  WrenchIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
