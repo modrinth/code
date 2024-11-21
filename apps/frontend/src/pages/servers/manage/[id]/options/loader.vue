@@ -513,7 +513,7 @@ const purpurVersions = ref<Record<string, string[]>>({});
 const fetchPaperVersions = async (mcVersion: string) => {
   try {
     const res = await $fetch(`https://api.papermc.io/v2/projects/paper/versions/${mcVersion}`);
-    paperVersions.value[mcVersion] = (res as any).builds;
+    paperVersions.value[mcVersion] = (res as any).builds.sort((a: number, b: number) => b - a);
     return res;
   } catch (e) {
     console.error(e);
@@ -524,7 +524,9 @@ const fetchPaperVersions = async (mcVersion: string) => {
 const fetchPurpurVersions = async (mcVersion: string) => {
   try {
     const res = await $fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`);
-    purpurVersions.value[mcVersion] = (res as any).builds.all;
+    purpurVersions.value[mcVersion] = (res as any).builds.all.sort(
+      (a: string, b: string) => parseInt(b) - parseInt(a),
+    );
     return res;
   } catch (e) {
     console.error(e);
