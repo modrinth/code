@@ -19,7 +19,8 @@
             <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
               Your server was created from a modpack. Changing the mod version may cause unexpected
-              issues.
+              issues. You can update the modpack version in your server's Options > Platform
+              settings.
             </span>
           </div>
         </div>
