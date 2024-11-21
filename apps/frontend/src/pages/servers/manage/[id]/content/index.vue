@@ -439,7 +439,7 @@ const currentVersion = ref();
 
 async function beginChangeModVersion(mod: Mod) {
   currentMod.value = mod;
-  currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false, true);
+  currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false);
   currentVersion.value = currentVersions.value.find(
     (version: any) => version.id === mod.version_id,
   );
