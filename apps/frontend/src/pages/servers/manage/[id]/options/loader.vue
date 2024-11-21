@@ -72,13 +72,16 @@
               <div>
                 Select a Minecraft version to see available {{ selectedLoader }} versions...
               </div>
-              <div class="relative flex h-9 w-full items-center rounded-xl bg-button-bg">
+              <div class="relative flex h-9 w-full items-center rounded-xl bg-button-bg opacity-50">
                 <DropdownIcon class="absolute right-4" />
               </div>
             </template>
             <template v-else-if="isLoading">
-              <div>Loading {{ selectedLoader }} versions...</div>
-              <div class="relative flex h-9 w-full items-center rounded-xl bg-button-bg">
+              <div class="flex items-center gap-1">
+                <UiServersIconsLoadingIcon class="animate-spin" />
+                Loading {{ selectedLoader }} versions...
+              </div>
+              <div class="relative flex h-9 w-full items-center rounded-xl bg-button-bg opacity-50">
                 <DropdownIcon class="absolute right-4" />
               </div>
             </template>
