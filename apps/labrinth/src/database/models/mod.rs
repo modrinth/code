@@ -4,6 +4,7 @@ pub mod categories;
 pub mod charge_item;
 pub mod collection_item;
 pub mod flow_item;
+pub mod friend_item;
 pub mod ids;
 pub mod image_item;
 pub mod legacy_loader_fields;
@@ -22,6 +23,7 @@ pub mod session_item;
 pub mod team_item;
 pub mod thread_item;
 pub mod user_item;
+pub mod user_status_item;
 pub mod user_subscription_item;
 pub mod version_item;
 

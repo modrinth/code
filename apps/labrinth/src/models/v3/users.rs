@@ -52,6 +52,8 @@ pub struct User {
     pub has_totp: Option<bool>,
     pub payout_data: Option<UserPayoutData>,
     pub stripe_customer_id: Option<String>,
+    pub share_activities: Option<bool>,
+    pub allow_friend_requests: Option<bool>,
 
     // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
@@ -85,6 +87,8 @@ impl From<DBUser> for User {
             has_totp: None,
             github_id: None,
             stripe_customer_id: None,
+            share_activities: None,
+            allow_friend_requests: None,
         }
     }
 }
@@ -136,6 +140,8 @@ impl User {
                 balance: Decimal::ZERO,
             }),
             stripe_customer_id: db_user.stripe_customer_id,
+            share_activities: Some(db_user.share_activities),
+            allow_friend_requests: Some(db_user.allow_friend_requests),
         }
     }
 }
@@ -182,6 +188,46 @@ impl Role {
         match self {
             Role::Developer | Role::Moderator => false,
             Role::Admin => true,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UserFriend {
+    pub id: UserId,
+    pub pending: bool,
+    pub created: DateTime<Utc>,
+}
+
+impl UserFriend {
+    pub fn from(
+        data: crate::database::models::friend_item::FriendItem,
+    ) -> Self {
+        Self {
+            id: data.friend_id.into(),
+            pending: data.accepted,
+            created: data.created,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UserStatus {
+    pub user_id: UserId,
+    pub profile_name: Option<String>,
+    pub last_update: DateTime<Utc>,
+}
+
+impl From<crate::database::models::user_status_item::UserStatusItem>
+    for UserStatus
+{
+    fn from(
+        data: crate::database::models::user_status_item::UserStatusItem,
+    ) -> Self {
+        Self {
+            user_id: data.id.into(),
+            profile_name: data.profile_name,
+            last_update: data.last_update,
         }
     }
 }

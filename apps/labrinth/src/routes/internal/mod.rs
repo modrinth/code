@@ -6,6 +6,8 @@ pub mod moderation;
 pub mod pats;
 pub mod session;
 
+pub mod statuses;
+
 use super::v3::oauth_clients;
 pub use super::ApiError;
 use crate::util::cors::default_cors;
