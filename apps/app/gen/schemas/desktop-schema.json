@@ -37,7 +37,7 @@
   ],
   "definitions": {
     "Capability": {
-      "description": "A grouping and boundary mechanism developers can use to isolate access to the IPC layer.\n\nIt controls application windows fine grained access to the Tauri core, application, or plugin commands. If a window is not matching any capability then it has no access to the IPC layer at all.\n\nThis can be done to create groups of windows, based on their required system access, which can reduce impact of frontend vulnerabilities in less privileged windows. Windows can be added to a capability by exact name (e.g. `main-window`) or glob patterns like `*` or `admin-*`. A Window can have none, one, or multiple associated capabilities.\n\n## Example\n\n```json { \"identifier\": \"main-user-files-write\", \"description\": \"This capability allows the `main` window on macOS and Windows access to `filesystem` write related commands and `dialog` commands to enable programatic access to files selected by the user.\", \"windows\": [ \"main\" ], \"permissions\": [ \"core:default\", \"dialog:open\", { \"identifier\": \"fs:allow-write-text-file\", \"allow\": [{ \"path\": \"$HOME/test.txt\" }] }, \"platforms\": [\"macOS\",\"windows\"] } ```",
+      "description": "A grouping and boundary mechanism developers can use to isolate access to the IPC layer.\n\nIt controls application windows fine grained access to the Tauri core, application, or plugin commands. If a window is not matching any capability then it has no access to the IPC layer at all.\n\nThis can be done to create groups of windows, based on their required system access, which can reduce impact of frontend vulnerabilities in less privileged windows. Windows can be added to a capability by exact name (e.g. `main-window`) or glob patterns like `*` or `admin-*`. A Window can have none, one, or multiple associated capabilities.\n\n## Example\n\n```json { \"identifier\": \"main-user-files-write\", \"description\": \"This capability allows the `main` window on macOS and Windows access to `filesystem` write related commands and `dialog` commands to enable programatic access to files selected by the user.\", \"windows\": [ \"main\" ], \"permissions\": [ \"core:default\", \"dialog:open\", { \"identifier\": \"fs:allow-write-text-file\", \"allow\": [{ \"path\": \"$HOME/test.txt\" }] }, ], \"platforms\": [\"macOS\",\"windows\"] } ```",
       "type": "object",
       "required": [
         "identifier",
@@ -84,7 +84,7 @@
           }
         },
         "permissions": {
-          "description": "List of permissions attached to this capability.\n\nMust include the plugin name as prefix in the form of `${plugin-name}:${permission-name}`. For commands directly implemented in the application itself only `${permission-name}` is required.\n\n## Example\n\n```json [ \"core:default\", \"shell:allow-open\", \"dialog:open\", { \"identifier\": \"fs:allow-write-text-file\", \"allow\": [{ \"path\": \"$HOME/test.txt\" }] } ```",
+          "description": "List of permissions attached to this capability.\n\nMust include the plugin name as prefix in the form of `${plugin-name}:${permission-name}`. For commands directly implemented in the application itself only `${permission-name}` is required.\n\n## Example\n\n```json [ \"core:default\", \"shell:allow-open\", \"dialog:open\", { \"identifier\": \"fs:allow-write-text-file\", \"allow\": [{ \"path\": \"$HOME/test.txt\" }] } ] ```",
           "type": "array",
           "items": {
             "$ref": "#/definitions/PermissionEntry"
@@ -202,72 +202,122 @@
                 "properties": {
                   "allow": {
                     "items": {
-                      "title": "Entry",
-                      "description": "A command allowed to be executed by the webview API.",
-                      "type": "object",
-                      "required": [
-                        "args",
-                        "cmd",
-                        "name",
-                        "sidecar"
-                      ],
-                      "properties": {
-                        "args": {
-                          "description": "The allowed arguments for the command execution.",
-                          "allOf": [
-                            {
-                              "$ref": "#/definitions/ShellAllowedArgs"
+                      "title": "ShellScopeEntry",
+                      "description": "Shell scope entry.",
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "cmd",
+                            "name"
+                          ],
+                          "properties": {
+                            "args": {
+                              "description": "The allowed arguments for the command execution.",
+                              "allOf": [
+                                {
+                                  "$ref": "#/definitions/ShellScopeEntryAllowedArgs"
+                                }
+                              ]
+                            },
+                            "cmd": {
+                              "description": "The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
+                              "type": "string"
+                            },
+                            "name": {
+                              "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
+                              "type": "string"
                             }
-                          ]
+                          },
+                          "additionalProperties": false
                         },
-                        "cmd": {
-                          "description": "The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
-                          "type": "string"
-                        },
-                        "name": {
-                          "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
-                          "type": "string"
-                        },
-                        "sidecar": {
-                          "description": "If this command is a sidecar command.",
-                          "type": "boolean"
+                        {
+                          "type": "object",
+                          "required": [
+                            "name",
+                            "sidecar"
+                          ],
+                          "properties": {
+                            "args": {
+                              "description": "The allowed arguments for the command execution.",
+                              "allOf": [
+                                {
+                                  "$ref": "#/definitions/ShellScopeEntryAllowedArgs"
+                                }
+                              ]
+                            },
+                            "name": {
+                              "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
+                              "type": "string"
+                            },
+                            "sidecar": {
+                              "description": "If this command is a sidecar command.",
+                              "type": "boolean"
+                            }
+                          },
+                          "additionalProperties": false
                         }
-                      }
+                      ]
                     }
                   },
                   "deny": {
                     "items": {
-                      "title": "Entry",
-                      "description": "A command allowed to be executed by the webview API.",
-                      "type": "object",
-                      "required": [
-                        "args",
-                        "cmd",
-                        "name",
-                        "sidecar"
-                      ],
-                      "properties": {
-                        "args": {
-                          "description": "The allowed arguments for the command execution.",
-                          "allOf": [
-                            {
-                              "$ref": "#/definitions/ShellAllowedArgs"
+                      "title": "ShellScopeEntry",
+                      "description": "Shell scope entry.",
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "cmd",
+                            "name"
+                          ],
+                          "properties": {
+                            "args": {
+                              "description": "The allowed arguments for the command execution.",
+                              "allOf": [
+                                {
+                                  "$ref": "#/definitions/ShellScopeEntryAllowedArgs"
+                                }
+                              ]
+                            },
+                            "cmd": {
+                              "description": "The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
+                              "type": "string"
+                            },
+                            "name": {
+                              "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
+                              "type": "string"
                             }
-                          ]
+                          },
+                          "additionalProperties": false
                         },
-                        "cmd": {
-                          "description": "The command name. It can start with a variable that resolves to a system base directory. The variables are: `$AUDIO`, `$CACHE`, `$CONFIG`, `$DATA`, `$LOCALDATA`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`, `$EXE`, `$FONT`, `$HOME`, `$PICTURE`, `$PUBLIC`, `$RUNTIME`, `$TEMPLATE`, `$VIDEO`, `$RESOURCE`, `$APP`, `$LOG`, `$TEMP`, `$APPCONFIG`, `$APPDATA`, `$APPLOCALDATA`, `$APPCACHE`, `$APPLOG`.",
-                          "type": "string"
-                        },
-                        "name": {
-                          "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
-                          "type": "string"
-                        },
-                        "sidecar": {
-                          "description": "If this command is a sidecar command.",
-                          "type": "boolean"
+                        {
+                          "type": "object",
+                          "required": [
+                            "name",
+                            "sidecar"
+                          ],
+                          "properties": {
+                            "args": {
+                              "description": "The allowed arguments for the command execution.",
+                              "allOf": [
+                                {
+                                  "$ref": "#/definitions/ShellScopeEntryAllowedArgs"
+                                }
+                              ]
+                            },
+                            "name": {
+                              "description": "The name for this allowed shell command configuration.\n\nThis name will be used inside of the webview API to call this command along with any specified arguments.",
+                              "type": "string"
+                            },
+                            "sidecar": {
+                              "description": "If this command is a sidecar command.",
+                              "type": "boolean"
+                            }
+                          },
+                          "additionalProperties": false
                         }
-                      }
+                      ]
                     }
                   }
                 }
@@ -3266,7 +3316,7 @@
         }
       ]
     },
-    "ShellAllowedArg": {
+    "ShellScopeEntryAllowedArg": {
       "description": "A command argument allowed to be executed by the webview API.",
       "anyOf": [
         {
@@ -3294,18 +3344,18 @@
         }
       ]
     },
-    "ShellAllowedArgs": {
-      "description": "A set of command arguments allowed to be executed by the webview API.\n\nA value of `true` will allow any arguments to be passed to the command. `false` will disable all arguments. A list of [`ShellAllowedArg`] will set those arguments as the only valid arguments to be passed to the attached command configuration.",
+    "ShellScopeEntryAllowedArgs": {
+      "description": "A set of command arguments allowed to be executed by the webview API.\n\nA value of `true` will allow any arguments to be passed to the command. `false` will disable all arguments. A list of [`ShellScopeEntryAllowedArg`] will set those arguments as the only valid arguments to be passed to the attached command configuration.",
       "anyOf": [
         {
           "description": "Use a simple boolean to allow all or disable all arguments to this command configuration.",
           "type": "boolean"
         },
         {
-          "description": "A specific set of [`ShellAllowedArg`] that are valid to call for the command configuration.",
+          "description": "A specific set of [`ShellScopeEntryAllowedArg`] that are valid to call for the command configuration.",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/ShellAllowedArg"
+            "$ref": "#/definitions/ShellScopeEntryAllowedArg"
           }
         }
       ]

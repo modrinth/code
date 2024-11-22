@@ -36,7 +36,7 @@ tracing-error = "0.2.0"
 
 paste = { version = "1.0" }
 
-tauri = { version = "2.0.0-rc", optional = true }
+tauri = { version = "2.1.1", optional = true }
 indicatif = { version = "0.17.3", optional = true }
 
 async-tungstenite = { version = "0.27.0", features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
