@@ -1051,7 +1051,7 @@ pub struct Authorization {
 }
 
 // Init link takes us to GitHub API and calls back to callback endpoint with a code and state
-// http://localhost:8000/auth/init?url=https://modrinth.com
+// http://localhost:8000/auth/init?url=https://bbsmc.net
 #[get("init")]
 pub async fn init(
     req: HttpRequest,
@@ -1213,9 +1213,9 @@ pub async fn auth_callback(
                 } else if let Some(email) = user.and_then(|x| x.email) {
                     send_email(
                         email,
-                        "Authentication method added",
-                        &format!("When logging into Modrinth, you can now log in using the {} authentication provider.", provider.as_str()),
-                        "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+                        "已添加身份验证方法",
+                        &format!("您现在可以使用 {} 身份验证提供程序登录 BBSMC。", provider.as_str()),
+                        "如果不是您进行的更改，请立即发送电子邮件 (support@bbsmc.net) 联系我们。",
                         None,
                     )?;
                 }
@@ -1276,7 +1276,7 @@ pub async fn auth_callback(
                             let _ = ws_conn.close(None).await;
 
                             return Ok(crate::auth::templates::Success {
-                                icon: user.avatar_url.as_deref().unwrap_or("https://cdn-raw.modrinth.com/placeholder.svg"),
+                                icon: user.avatar_url.as_deref().unwrap_or("https://cdn.bbsmc.net/raw/placeholder.svg"),
                                 name: &user.username,
                             }.render());
                         }
@@ -1335,7 +1335,7 @@ pub async fn auth_callback(
                     let _ = ws_conn.close(None).await;
 
                     return Ok(crate::auth::templates::Success {
-                        icon: user.avatar_url.as_deref().unwrap_or("https://cdn-raw.modrinth.com/placeholder.svg"),
+                        icon: user.avatar_url.as_deref().unwrap_or("https://cdn.bbsmc.net/raw/placeholder.svg"),
                         name: &user.username,
                     }.render());
                 }
@@ -1397,7 +1397,7 @@ pub async fn delete_auth_provider(
         && !user.has_password.unwrap_or(false)
     {
         return Err(ApiError::InvalidInput(
-            "You must have another authentication method added to this account!".to_string(),
+            "您必须为该帐户添加另一种身份验证方法！".to_string(),
         ));
     }
 
@@ -1412,9 +1412,9 @@ pub async fn delete_auth_provider(
         if let Some(email) = user.email {
             send_email(
                 email,
-                "Authentication method removed",
-                &format!("When logging into Modrinth, you can no longer log in using the {} authentication provider.", delete_provider.provider.as_str()),
-                "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+                "身份验证方法已移除",
+                &format!("您现在无法使用 {} 身份验证提供程序登录 BBSMC", delete_provider.provider.as_str()),
+                "如果不是您进行的更改，请立即通过我们的 Discord 支持渠道或电子邮件 (support@bbsmc.net) 联系我们。",
                 None,
             )?;
         }
@@ -1491,7 +1491,7 @@ pub async fn create_account_with_password(
     .await?
     .is_some()
     {
-        return Err(ApiError::InvalidInput("Username is taken!".to_string()));
+        return Err(ApiError::InvalidInput("用户名已被使用".to_string()));
     }
 
     let mut transaction = pool.begin().await?;
@@ -1510,9 +1510,9 @@ pub async fn create_account_with_password(
             if let Some(feedback) =
                 score.feedback().clone().and_then(|x| x.warning())
             {
-                format!("Password too weak: {}", feedback)
+                format!("密码太弱 {}", feedback)
             } else {
-                "Specified password is too weak! Please improve its strength."
+                "密码强度太弱！请提高其强度。"
                     .to_string()
             },
         ));
@@ -1529,7 +1529,7 @@ pub async fn create_account_with_password(
         .is_some()
     {
         return Err(ApiError::InvalidInput(
-            "Email is already registered on Modrinth!".to_string(),
+            "该邮箱已被注册过".to_string(),
         ));
     }
 
@@ -1574,7 +1574,7 @@ pub async fn create_account_with_password(
     send_email_verify(
         new_account.email.clone(),
         flow,
-        &format!("Welcome to Modrinth, {}!", new_account.username),
+        &format!("欢迎加入 BBSMC 资源社区, {}!", new_account.username),
     )?;
 
     if new_account.sign_up_newsletter.unwrap_or(false) {
@@ -1639,7 +1639,7 @@ pub async fn login_password(
 
         Ok(HttpResponse::Ok().json(serde_json::json!({
             "error": "2fa_required",
-            "description": "2FA is required to complete this operation.",
+            "description": "需要 2FA 才能完成此操作。",
             "flow": flow,
         })))
     } else {
@@ -1821,7 +1821,7 @@ pub async fn begin_2fa_flow(
         })))
     } else {
         Err(ApiError::InvalidInput(
-            "User already has 2FA enabled on their account!".to_string(),
+            "用户已在其帐户上启用 2FA！".to_string(),
         ))
     }
 }
@@ -1924,9 +1924,9 @@ pub async fn finish_2fa_flow(
         if let Some(email) = user.email {
             send_email(
                 email,
-                "Two-factor authentication enabled",
-                "When logging into Modrinth, you can now enter a code generated by your authenticator app in addition to entering your usual email address and 1d.",
-                "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+                "已启用双因素身份验证",
+                "登录 BBSMC 时，您现在可以在输入常用的电子邮件地址和密码后，输入由身份验证应用生成的代码。",
+                "如果不是您进行的更改，请立即通过我们的电子邮件(support@bbsmc.net)联系我们。",
                 None,
             )?;
         }
@@ -2023,9 +2023,9 @@ pub async fn remove_2fa(
     if let Some(email) = user.email {
         send_email(
             email,
-            "Two-factor authentication removed",
-            "When logging into Modrinth, you no longer need two-factor authentication to gain access.",
-            "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+            "双因素身份验证已移除",
+            "登录 BBSMC 时，您不再需要双因素身份验证即可访问。",
+            "如果不是您进行的更改，请立即通过我们的 Discord 支持渠道或电子邮件 (support@bbsmc.net) 联系我们。",
             None,
         )?;
     }
@@ -2078,10 +2078,10 @@ pub async fn reset_password_begin(
         if let Some(email) = user.email {
             send_email(
                 email,
-                "Reset your password",
-                "Please visit the following link below to reset your password. If the button does not work, you can copy the link and paste it into your browser.",
-                "If you did not request for your password to be reset, you can safely ignore this email.",
-                Some(("Reset password", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?,  dotenvy::var("SITE_RESET_PASSWORD_PATH")?, flow))),
+                "重置您的密码",
+                "请访问以下链接以重置您的密码。如果按钮无法使用，您可以复制链接并将其粘贴到浏览器中。",
+                "如果您没有请求重置密码，您可以放心忽略此邮件。",
+                Some(("重置密码", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?, dotenvy::var("SITE_RESET_PASSWORD_PATH")?, flow))),
             )?;
         }
     }
@@ -2227,11 +2227,12 @@ pub async fn change_password(
 
         send_email(
             email,
-            &format!("Password {}", changed),
-            &format!("Your password has been {} on your account.", changed),
-            "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+            &format!("密码{}", changed),
+            &format!("您的账户密码已{}。", changed),
+            "如果不是您进行的更改，请立即通过我们的电子邮件 (support@bbsmc.net) 联系我们。",
             None,
         )?;
+
     }
 
     transaction.commit().await?;
@@ -2287,9 +2288,9 @@ pub async fn set_email(
     if let Some(user_email) = user.email {
         send_email(
             user_email,
-            "Email changed",
-            &format!("Your email has been updated to {} on your account.", email.email),
-            "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+            "邮箱已更改",
+            &format!("您的账户邮箱已更新为 {}。", email.email),
+            "如果不是您进行的更改，请立即通过我们的电子邮件 (support@bbsmc.net) 联系我们。",
             None,
         )?;
     }
@@ -2320,7 +2321,7 @@ pub async fn set_email(
     send_email_verify(
         email.email.clone(),
         flow,
-        "We need to verify your email address.",
+        "我们需要验证您的邮箱地址。",
     )?;
 
     transaction.commit().await?;
@@ -2367,13 +2368,13 @@ pub async fn resend_verify_email(
         send_email_verify(
             email,
             flow,
-            "We need to verify your email address.",
+            "我们需要验证您的邮箱地址。",
         )?;
 
         Ok(HttpResponse::NoContent().finish())
     } else {
         Err(ApiError::InvalidInput(
-            "User does not have an email.".to_string(),
+            "该账户设置电子邮箱".to_string(),
         ))
     }
 }
@@ -2458,7 +2459,7 @@ pub async fn subscribe_newsletter(
         Ok(HttpResponse::NoContent().finish())
     } else {
         Err(ApiError::InvalidInput(
-            "User does not have an email.".to_string(),
+            "该账户没有设置电子邮箱地址".to_string(),
         ))
     }
 }
@@ -2470,9 +2471,10 @@ fn send_email_verify(
 ) -> Result<(), crate::auth::email::MailError> {
     send_email(
         email,
-        "Verify your email",
+        "验证您的邮箱",
         opener,
-        "Please visit the following link below to verify your email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.",
-        Some(("Verify email", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?,  dotenvy::var("SITE_VERIFY_EMAIL_PATH")?, flow))),
+        "请点击下面的链接以验证您的邮箱。如果按钮无法使用，您可以复制链接并粘贴到浏览器中。该链接将在 24 小时后失效。",
+        Some(("验证邮箱", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?, dotenvy::var("SITE_VERIFY_EMAIL_PATH")?, flow))),
     )
+
 }

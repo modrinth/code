@@ -8,7 +8,7 @@
           <span class="label__subdescription">
             描述必须清楚、诚实地描述目的和功能
             项目。请参阅
-            <nuxt-link to="/legal/rules" class="text-link" target="_blank">内容规则</nuxt-link>
+            <nuxt-link to="/legal2/rules" class="text-link" target="_blank">内容规则</nuxt-link>
             满足全部要求。
           </span>
         </span>

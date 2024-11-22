@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal ref="modalOpen" header="Transfer Projects">
+    <Modal ref="modalOpen" header="转让资源">
       <div class="universal-modal items">
         <div class="table">
           <div class="table-head table-row">
@@ -10,10 +10,10 @@
                 @update:model-value="toggleSelectedProjects()"
               />
             </div>
-            <div class="table-cell">Icon</div>
-            <div class="table-cell">Name</div>
+            <div class="table-cell">图标</div>
+            <div class="table-cell">名称</div>
             <div class="table-cell">ID</div>
-            <div class="table-cell">Type</div>
+            <div class="table-cell">类型</div>
             <div class="table-cell" />
           </div>
           <div v-for="project in props.projects" :key="`project-${project.id}`" class="table-row">
@@ -59,7 +59,7 @@
               <span>{{
                 $formatProjectType(
                   $getProjectTypeForDisplay(
-                    project.project_types?.[0] ?? "project",
+                    project.project_types?.[0] ?? "资源",
                     project.loaders,
                   ),
                 )
@@ -79,22 +79,22 @@
         <div class="push-right input-group">
           <Button @click="$refs.modalOpen?.hide()">
             <XIcon />
-            Cancel
+            取消
           </Button>
           <Button :disabled="!selectedProjects?.length" color="primary" @click="onSubmitHandler()">
             <TransferIcon />
             <span>
-              Transfer
+              转让
               <span>
                 {{
                   selectedProjects.length === props.projects.length
-                    ? "All"
+                    ? "全部"
                     : selectedProjects.length
                 }}
               </span>
               <span>
                 {{ " " }}
-                {{ selectedProjects.length === 1 ? "project" : "projects" }}
+                {{ selectedProjects.length === 1 ? "资源" : "资源" }}
               </span>
             </span>
           </Button>
@@ -103,7 +103,7 @@
     </Modal>
     <Button @click="$refs.modalOpen?.show()">
       <TransferIcon />
-      <span>Transfer projects</span>
+      <span>转让资源到团队</span>
     </Button>
   </div>
 </template>

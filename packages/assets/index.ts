@@ -3,7 +3,6 @@
 // Branding
 import _ModrinthIcon from './branding/logo.svg?component'
 import _FourOhFourNotFound from './branding/404.svg?component'
-import _ModrinthPlusIcon from './branding/modrinth-plus.svg?component'
 
 // External Icons
 import _SSODiscordIcon from './external/sso/discord.svg?component'
@@ -186,15 +185,12 @@ import _Heading3Icon from './icons/heading-3.svg?component'
 import './omorphia.scss'
 
 export const ModrinthIcon = _ModrinthIcon
-export const FourOhFourNotFound = _FourOhFourNotFound
-export const ModrinthPlusIcon = _ModrinthPlusIcon
 export const SSODiscordIcon = _SSODiscordIcon
 export const SSOGitHubIcon = _SSOGitHubIcon
 export const SSOGitLabIcon = _SSOGitLabIcon
 export const SSOGoogleIcon = _SSOGoogleIcon
 export const SSOMicrosoftIcon = _SSOMicrosoftIcon
 export const SSOSteamIcon = _SSOSteamIcon
-export const AppleIcon = _AppleIcon
 export const BuyMeACoffeeIcon = _BuyMeACoffeeIcon
 export const DiscordIcon = _DiscordIcon
 export const KoFiIcon = _KoFiIcon
@@ -204,26 +200,20 @@ export const PatreonIcon = _PatreonIcon
 export const PayPalIcon = _PayPalIcon
 export const RedditIcon = _RedditIcon
 export const TwitterIcon = _TwitterIcon
-export const WindowsIcon = _WindowsIcon
 export const YouTubeIcon = _YouTubeIcon
 export const PyroIcon = _PyroIcon
 export const AlignLeftIcon = _AlignLeftIcon
 export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
-export const AsteriskIcon = _AsteriskIcon
 export const BanIcon = _BanIcon
 export const BellIcon = _BellIcon
-export const BellRingIcon = _BellRingIcon
-export const BookIcon = _BookIcon
 export const BookTextIcon = _BookTextIcon
 export const BookmarkIcon = _BookmarkIcon
 export const BoxIcon = _BoxIcon
-export const BoxImportIcon = _BoxImportIcon
 export const BracesIcon = _BracesIcon
 export const CalendarIcon = _CalendarIcon
 export const ChartIcon = _ChartIcon
 export const CheckIcon = _CheckIcon
-export const CheckCheckIcon = _CheckCheckIcon
 export const CheckCircleIcon = _CheckCircleIcon
 export const ChevronLeftIcon = _ChevronLeftIcon
 export const ChevronRightIcon = _ChevronRightIcon
@@ -256,7 +246,6 @@ export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
 export const GapIcon = _GapIcon
 export const GameIcon = _GameIcon
-export const GitHubIcon = _GitHubIcon
 export const GlassesIcon = _GlassesIcon
 export const GlobeIcon = _GlobeIcon
 export const GridIcon = _GridIcon
@@ -274,15 +263,12 @@ export const KeyIcon = _KeyIcon
 export const LanguagesIcon = _LanguagesIcon
 export const LeftArrowIcon = _LeftArrowIcon
 export const LibraryIcon = _LibraryIcon
-export const LightBulbIcon = _LightBulbIcon
 export const LinkIcon = _LinkIcon
 export const ListIcon = _ListIcon
-export const ListEndIcon = _ListEndIcon
 export const LockIcon = _LockIcon
 export const LogInIcon = _LogInIcon
 export const LogOutIcon = _LogOutIcon
 export const MailIcon = _MailIcon
-export const MessageIcon = _MessageIcon
 export const MicrophoneIcon = _MicrophoneIcon
 export const MonitorSmartphoneIcon = _MonitorSmartphoneIcon
 export const MoonIcon = _MoonIcon

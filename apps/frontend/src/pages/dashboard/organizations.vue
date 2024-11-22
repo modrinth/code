@@ -32,9 +32,9 @@
                 <div class="stats">
                   <UsersIcon aria-hidden="true" />
                   <span>
-                    {{ onlyAcceptedMembers(org.members).length }} member<template
+                    {{ onlyAcceptedMembers(org.members).length }} 成员<template
                       v-if="onlyAcceptedMembers(org.members).length !== 1"
-                      >s</template
+                      ></template
                     >
                   </span>
                 </div>

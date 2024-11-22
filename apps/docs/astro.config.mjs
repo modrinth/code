@@ -7,7 +7,7 @@ export default defineConfig({
   site: 'https://docs.modrinth.com',
   integrations: [
     starlight({
-      title: 'Modrinth Documentation',
+      title: 'BBSMC Documentation',
       favicon: '/favicon.ico',
       editLink: {
         baseUrl: 'https://github.com/modrinth/code/edit/main/apps/docs/',
@@ -34,14 +34,14 @@ export default defineConfig({
         starlightOpenAPI([
           {
             base: 'api',
-            label: 'Modrinth API',
+            label: 'BBSMC API',
             schema: './public/openapi.yaml',
           },
         ]),
       ],
       sidebar: [
         {
-          label: 'Contributing to Modrinth',
+          label: 'Contributing to BBSMC',
           autogenerate: { directory: 'contributing' },
         },
         // Add the generated sidebar group to the sidebar.

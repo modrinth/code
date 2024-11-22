@@ -2,7 +2,7 @@
   <div class="normal-page">
     <div class="normal-page__sidebar">
       <aside class="universal-card">
-        <h1>Moderation</h1>
+        <h1>版主</h1>
         <NavStack>
           <NavStackItem link="/moderation" label="Overview">
             <ModrinthIcon aria-hidden="true" />

@@ -5,7 +5,22 @@
       <Chips
         v-model="projectType"
         :items="projectTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x) + 's')"
+        :format-label="(x) => {
+          switch(x){
+            case 'all': {
+              return '全部'
+            }
+            case 'status_change': {
+              return '状态变更'
+            }
+            case 'moderator_message': {
+              return '版主消息'
+            }
+            default: {
+              return x
+            }
+          }
+        }"
       />
       <button v-if="oldestFirst" class="iconified-button push-right" @click="oldestFirst = false">
         <SortDescIcon />Sorting by oldest

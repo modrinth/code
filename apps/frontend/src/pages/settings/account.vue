@@ -180,7 +180,7 @@
               v-if="twoFactorSecret"
               :value="`otpauth://totp/${encodeURIComponent(
                 auth.user.email,
-              )}?secret=${twoFactorSecret}&issuer=Modrinth`"
+              )}?secret=${twoFactorSecret}&issuer=BBSMC`"
               :size="250"
               :margin="2"
               level="H"

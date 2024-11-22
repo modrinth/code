@@ -130,7 +130,7 @@ definePageMeta({
 });
 
 useHead({
-  title: () => `${formatMessage(messages.collectionsLongTitle)} - Modrinth`,
+  title: () => `${formatMessage(messages.collectionsLongTitle)} - BBSMC`,
 });
 
 const auth = await useAuth();

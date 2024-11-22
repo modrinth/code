@@ -169,13 +169,13 @@ const handleOptionsClick = async (args) => {
         __tauriModule: 'Shell',
         message: {
           cmd: 'open',
-          path: `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+          path: `https://bbsmc.net/${args.item.project_type}/${args.item.slug}`,
         },
       })
       break
     case 'copy_link':
       await navigator.clipboard.writeText(
-        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+        `https://bbsmc.net/${args.item.project_type}/${args.item.slug}`,
       )
       break
   }

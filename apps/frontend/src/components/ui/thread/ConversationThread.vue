@@ -6,21 +6,19 @@
     >
       <div class="modal-submit universal-body">
         <span>
-          You're submitting <span class="project-title">{{ project.title }}</span> to be reviewed
-          again by the moderators.
+         您正在提交资源 <span class="project-title">{{ project.title }}</span> 给版主审核
         </span>
         <span>
-          Make sure you have addressed the comments from the moderation team.
+          请确保您已经解决了版主反馈给你的消息
           <span class="known-errors">
-            Repeated submissions without addressing the moderators' comments may result in an
-            account suspension.
+            重复提交而不解决版主的反馈可能会导致帐户被封禁。
           </span>
         </span>
         <Checkbox
           v-model="submissionConfirmation"
-          description="Confirm I have addressed the messages from the moderators"
+          description="确认我已解决版主的消息"
         >
-          I confirm that I have properly addressed the moderators' comments.
+          我确认我已经正确处理了版主的评论。
         </Checkbox>
         <div class="input-group push-right">
           <button
@@ -28,7 +26,7 @@
             :disabled="!submissionConfirmation"
             @click="resubmit()"
           >
-            <ModerationIcon aria-hidden="true" /> Resubmit for review
+            <ModerationIcon aria-hidden="true" /> 重新提交审核
           </button>
         </div>
       </div>
@@ -50,16 +48,16 @@
       />
     </div>
     <template v-if="report && report.closed">
-      <p>This thread is closed and new messages cannot be sent to it.</p>
+      <p>此消息已关闭，无法发送新消息</p>
       <button v-if="isStaff(auth.user)" class="iconified-button" @click="reopenReport()">
-        <CloseIcon aria-hidden="true" /> Reopen thread
+        <CloseIcon aria-hidden="true" /> 重新打开消息
       </button>
     </template>
     <template v-else-if="!report || !report.closed">
       <div class="markdown-editor-spacing">
         <MarkdownEditor
           v-model="replyBody"
-          :placeholder="sortedMessages.length > 0 ? 'Reply to thread...' : 'Send a message...'"
+          :placeholder="sortedMessages.length > 0 ? '回复会话...' : '发送消息...'"
           :on-image-upload="onUploadImage"
         />
       </div>
@@ -70,10 +68,10 @@
           :disabled="!replyBody"
           @click="sendReply()"
         >
-          <ReplyIcon aria-hidden="true" /> Reply
+          <ReplyIcon aria-hidden="true" /> 回复
         </button>
         <button v-else class="btn btn-primary" :disabled="!replyBody" @click="sendReply()">
-          <SendIcon aria-hidden="true" /> Send
+          <SendIcon aria-hidden="true" /> 发送
         </button>
         <button
           v-if="isStaff(auth.user)"
@@ -81,7 +79,7 @@
           :disabled="!replyBody"
           @click="sendReply(null, true)"
         >
-          <ModerationIcon aria-hidden="true" /> Add private note
+          <ModerationIcon aria-hidden="true" /> 添加私人注释
         </button>
         <template v-if="currentMember && !isStaff(auth.user)">
           <template v-if="isRejected(project)">
@@ -90,14 +88,14 @@
               class="iconified-button moderation-button"
               @click="openResubmitModal(true)"
             >
-              <ModerationIcon aria-hidden="true" /> Resubmit for review with reply
+              <ModerationIcon aria-hidden="true" /> 重新提交审核并回复
             </button>
             <button
               v-else
               class="iconified-button moderation-button"
               @click="openResubmitModal(false)"
             >
-              <ModerationIcon aria-hidden="true" /> Resubmit for review
+              <ModerationIcon aria-hidden="true" /> 重新提交审核
             </button>
           </template>
         </template>
@@ -110,10 +108,10 @@
                 class="iconified-button danger-button"
                 @click="closeReport(true)"
               >
-                <CloseIcon aria-hidden="true" /> Close with reply
+                <CloseIcon aria-hidden="true" /> 回复关闭
               </button>
               <button v-else class="iconified-button danger-button" @click="closeReport()">
-                <CloseIcon aria-hidden="true" /> Close thread
+                <CloseIcon aria-hidden="true" /> 关闭回复
               </button>
             </template>
           </template>
@@ -125,7 +123,7 @@
                 :disabled="isApproved(project)"
                 @click="sendReply(requestedStatus)"
               >
-                <CheckIcon aria-hidden="true" /> Approve with reply
+                <CheckIcon aria-hidden="true" /> 同意并回复
               </button>
               <button
                 v-else
@@ -133,7 +131,7 @@
                 :disabled="isApproved(project)"
                 @click="setStatus(requestedStatus)"
               >
-                <CheckIcon aria-hidden="true" /> Approve
+                <CheckIcon aria-hidden="true" /> 批准
               </button>
               <div class="joined-buttons">
                 <button
@@ -142,7 +140,7 @@
                   :disabled="project.status === 'rejected'"
                   @click="sendReply('rejected')"
                 >
-                  <CrossIcon aria-hidden="true" /> Reject with reply
+                  <CrossIcon aria-hidden="true" /> 拒绝并回复
                 </button>
                 <button
                   v-else
@@ -150,7 +148,7 @@
                   :disabled="project.status === 'rejected'"
                   @click="setStatus('rejected')"
                 >
-                  <CrossIcon aria-hidden="true" /> Reject
+                  <CrossIcon aria-hidden="true" /> 拒绝
                 </button>
                 <OverflowMenu
                   class="btn btn-danger btn-dropdown-animation icon-only"
@@ -182,9 +180,9 @@
                 >
                   <DropdownIcon style="rotate: 180deg" aria-hidden="true" />
                   <template #withhold-reply>
-                    <EyeOffIcon aria-hidden="true" /> Withhold with reply
+                    <EyeOffIcon aria-hidden="true" /> 保留回复
                   </template>
-                  <template #withhold> <EyeOffIcon aria-hidden="true" /> Withhold </template>
+                  <template #withhold> <EyeOffIcon aria-hidden="true" /> 扣押 </template>
                 </OverflowMenu>
               </div>
             </template>

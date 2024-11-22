@@ -4,7 +4,7 @@
       <div class="flex flex-col gap-2">
         <label for="name">
           <span class="text-lg font-semibold text-contrast">
-            标题
+            资源名称
             <span class="text-brand-red">*</span>
           </span>
         </label>
@@ -13,17 +13,18 @@
           v-model="name"
           type="text"
           maxlength="64"
-          placeholder="资源标题..."
+          placeholder="资源名称..."
           autocomplete="off"
           @input="updatedName()"
         />
       </div>
       <div class="flex flex-col gap-2">
-        <label for="slug">
+        <label for="slug" class="flex flex-col gap-1">
           <span class="text-lg font-semibold text-contrast">
-            URL
+            标识ID
             <span class="text-brand-red">*</span>
           </span>
+          <span>请输入英文名,不可使用空格，特殊符号仅可使用 - 例如 ABC-FWAI-AF</span>
         </label>
         <div class="text-input-wrapper">
           <div class="text-input-wrapper__before">https://bbsmc.net/project/</div>
@@ -111,7 +112,7 @@ const visibilities = ref([
   },
   {
     actual: "unlisted",
-    display: "未公开",
+    display: "不公开",
   },
   {
     actual: "private",

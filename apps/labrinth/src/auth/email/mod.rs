@@ -6,13 +6,13 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum MailError {
-    #[error("Environment Error")]
+    #[error("环境错误")]
     Env(#[from] dotenvy::Error),
-    #[error("Mail Error: {0}")]
+    #[error("邮箱错误: {0}")]
     Mail(#[from] lettre::error::Error),
-    #[error("Address Parse Error: {0}")]
+    #[error("地址解析错误: {0}")]
     Address(#[from] lettre::address::AddressError),
-    #[error("SMTP Error: {0}")]
+    #[error("SMTP 错误: {0}")]
     Smtp(#[from] lettre::transport::smtp::Error),
 }
 

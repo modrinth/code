@@ -18,53 +18,54 @@
         </nuxt-link>
       </template>
     </div>
-    <div
-      v-if="
-        user &&
-        user.subscriptions &&
-        user.subscriptions.some((x) => x.status === 'payment-failed') &&
-        route.path !== '/settings/billing'
-      "
-      class="email-nag"
-    >
-      <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
-      <nuxt-link class="btn" to="/settings/billing">
-        <SettingsIcon aria-hidden="true" />
-        {{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}
-      </nuxt-link>
-    </div>
-    <div
-      v-if="
-        config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
-        !cosmetics.hideStagingBanner
-      "
-      class="site-banner site-banner--warning [&>*]:z-[6]"
-    >
-      <div class="site-banner__title">
-        <IssuesIcon aria-hidden="true" />
-        <span>{{ formatMessage(stagingBannerMessages.title) }}</span>
-      </div>
-      <div class="site-banner__description">
-        {{ formatMessage(stagingBannerMessages.description) }}
-      </div>
-      <div class="site-banner__actions">
-        <Button transparent icon-only :action="hideStagingBanner" aria-label="Close banner"
-          ><XIcon aria-hidden="true"
-        /></Button>
-      </div>
-    </div>
+<!--    <div-->
+<!--      v-if="-->
+<!--        user &&-->
+<!--        user.subscriptions &&-->
+<!--        user.subscriptions.some((x) => x.status === 'payment-failed') &&-->
+<!--        route.path !== '/settings/billing'-->
+<!--      "-->
+<!--      class="email-nag"-->
+<!--    >-->
+<!--      <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>-->
+<!--      <nuxt-link class="btn" to="/settings/billing">-->
+<!--        <SettingsIcon aria-hidden="true" />-->
+<!--        {{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}-->
+<!--      </nuxt-link>-->
+<!--    </div>-->
+<!--    <div-->
+<!--      v-if="-->
+<!--        config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&-->
+<!--        !cosmetics.hideStagingBanner-->
+<!--      "-->
+<!--      class="site-banner site-banner&#45;&#45;warning [&>*]:z-[6]"-->
+<!--    >-->
+<!--      <div class="site-banner__title">-->
+<!--        <IssuesIcon aria-hidden="true" />-->
+<!--        <span>{{ formatMessage(stagingBannerMessages.title) }}</span>-->
+<!--      </div>-->
+<!--      <div class="site-banner__description">-->
+<!--        {{ formatMessage(stagingBannerMessages.description) }}-->
+<!--      </div>-->
+<!--      <div class="site-banner__actions">-->
+<!--        <Button transparent icon-only :action="hideStagingBanner" aria-label="Close banner"-->
+<!--          ><XIcon aria-hidden="true"-->
+<!--        /></Button>-->
+<!--      </div>-->
+<!--    </div>-->
     <header
       class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-3 py-4 lg:grid-cols-[auto_1fr_auto]"
     >
       <div>
-        <NuxtLink to="/" aria-label="Modrinth home page">
+        <NuxtLink to="/" aria-label="BBSMC home page">
           <BrandTextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
         </NuxtLink>
       </div>
+
       <div
-        :class="`col-span-2 row-start-2 flex flex-wrap justify-center ${flags.projectTypesPrimaryNav ? 'gap-2' : 'gap-4'} lg:col-span-1 lg:row-start-auto`"
+        :class="`col-span-2 row-start-2 flex flex-wrap justify-center gap-2} lg:col-span-1 lg:row-start-auto`"
       >
-        <template v-if="flags.projectTypesPrimaryNav">
+        <template>
           <ButtonStyled
             type="transparent"
             :highlighted="route.name === 'search-mods' || route.path.startsWith('/mod/')"
@@ -72,7 +73,7 @@
               route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
-            <nuxt-link to="/mods"> <BoxIcon aria-hidden="true" /> Mods </nuxt-link>
+            <nuxt-link to="/mods"> <BoxIcon aria-hidden="true" /> 模组 </nuxt-link>
           </ButtonStyled>
           <ButtonStyled
             type="transparent"
@@ -84,7 +85,7 @@
             "
           >
             <nuxt-link to="/resourcepacks">
-              <PaintBrushIcon aria-hidden="true" /> Resource Packs
+              <PaintBrushIcon aria-hidden="true" /> 资源包
             </nuxt-link>
           </ButtonStyled>
           <ButtonStyled
@@ -94,7 +95,7 @@
               route.name === 'search-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
-            <nuxt-link to="/datapacks"> <BracesIcon aria-hidden="true" /> Data Packs </nuxt-link>
+            <nuxt-link to="/datapacks"> <BracesIcon aria-hidden="true" /> 数据包 </nuxt-link>
           </ButtonStyled>
           <ButtonStyled
             type="transparent"
@@ -103,7 +104,7 @@
               route.name === 'search-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
-            <nuxt-link to="/modpacks"> <PackageOpenIcon aria-hidden="true" /> Modpacks </nuxt-link>
+            <nuxt-link to="/modpacks"> <PackageOpenIcon aria-hidden="true" /> 整合包 </nuxt-link>
           </ButtonStyled>
           <ButtonStyled
             type="transparent"
@@ -112,7 +113,7 @@
               route.name === 'search-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
-            <nuxt-link to="/shaders"> <GlassesIcon aria-hidden="true" /> Shaders </nuxt-link>
+            <nuxt-link to="/shaders"> <GlassesIcon aria-hidden="true" /> 光影 </nuxt-link>
           </ButtonStyled>
           <ButtonStyled
             type="transparent"
@@ -121,107 +122,116 @@
               route.name === 'search-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
             "
           >
-            <nuxt-link to="/plugins"> <PlugIcon aria-hidden="true" /> Plugins </nuxt-link>
+            <nuxt-link to="/plugins"> <PlugIcon aria-hidden="true" /> 插件 </nuxt-link>
           </ButtonStyled>
         </template>
-        <template v-else>
-          <ButtonStyled
-            type="transparent"
-            :highlighted="isDiscovering || isDiscoveringSubpage"
-            :highlighted-style="isDiscoveringSubpage ? 'main-nav-secondary' : 'main-nav-primary'"
-          >
-            <TeleportOverflowMenu
-              :options="[
-                {
-                  id: 'mods',
-                  action: '/mods',
-                },
-                {
-                  id: 'resourcepacks',
-                  action: '/resourcepacks',
-                },
-                {
-                  id: 'datapacks',
-                  action: '/datapacks',
-                },
-                {
-                  id: 'shaders',
-                  action: '/shaders',
-                },
-                {
-                  id: 'modpacks',
-                  action: '/modpacks',
-                },
-                {
-                  id: 'plugins',
-                  action: '/plugins',
-                },
-              ]"
-              hoverable
-            >
-              <BoxIcon
-                v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
-                aria-hidden="true"
-              />
-              <PaintBrushIcon
-                v-else-if="
-                  route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
-                "
-                aria-hidden="true"
-              />
-              <BracesIcon
-                v-else-if="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
-                aria-hidden="true"
-              />
-              <PackageOpenIcon
-                v-else-if="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
-                aria-hidden="true"
-              />
-              <GlassesIcon
-                v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
-                aria-hidden="true"
-              />
-              <PlugIcon
-                v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
-                aria-hidden="true"
-              />
-              <CompassIcon v-else aria-hidden="true" />
-              <span class="hidden md:contents">发现内容</span>
-              <span class="contents md:hidden">Discover</span>
-              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
 
-              <template #mods> <BoxIcon aria-hidden="true" /> 模组 </template>
-              <template #resourcepacks>
-                <PaintBrushIcon aria-hidden="true" /> 资源包
-              </template>
-              <template #datapacks> <BracesIcon aria-hidden="true" /> 数据包 </template>
-              <template #plugins> <PlugIcon aria-hidden="true" /> 插件 </template>
-              <template #shaders> <GlassesIcon aria-hidden="true" /> 光影 </template>
-              <template #modpacks> <PackageOpenIcon aria-hidden="true" /> 整合包 </template>
-            </TeleportOverflowMenu>
-          </ButtonStyled>
 
+
+
+<!--        -->
+<!--        -->
+<!--        <template v-else>-->
 <!--          <ButtonStyled-->
 <!--            type="transparent"-->
-<!--            :highlighted="route.name.startsWith('servers')"-->
-<!--            :highlighted-style="-->
-<!--              route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'-->
-<!--            "-->
+<!--            :highlighted="isDiscovering || isDiscoveringSubpage"-->
+<!--            :highlighted-style="isDiscoveringSubpage ? 'main-nav-secondary' : 'main-nav-primary'"-->
 <!--          >-->
-<!--            <nuxt-link to="/servers">-->
-<!--              <ServerIcon aria-hidden="true" />-->
-<!--              服务器租用-->
-<!--            </nuxt-link>-->
+<!--            <TeleportOverflowMenu-->
+<!--              :options="[-->
+<!--                {-->
+<!--                  id: 'mods',-->
+<!--                  action: '/mods',-->
+<!--                },-->
+<!--                {-->
+<!--                  id: 'resourcepacks',-->
+<!--                  action: '/resourcepacks',-->
+<!--                },-->
+<!--                {-->
+<!--                  id: 'datapacks',-->
+<!--                  action: '/datapacks',-->
+<!--                },-->
+<!--                {-->
+<!--                  id: 'shaders',-->
+<!--                  action: '/shaders',-->
+<!--                },-->
+<!--                {-->
+<!--                  id: 'modpacks',-->
+<!--                  action: '/modpacks',-->
+<!--                },-->
+<!--                {-->
+<!--                  id: 'plugins',-->
+<!--                  action: '/plugins',-->
+<!--                },-->
+<!--              ]"-->
+<!--              hoverable-->
+<!--            >-->
+<!--              <BoxIcon-->
+<!--                v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"-->
+<!--                aria-hidden="true"-->
+<!--              />-->
+<!--              <PaintBrushIcon-->
+<!--                v-else-if="-->
+<!--                  route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')-->
+<!--                "-->
+<!--                aria-hidden="true"-->
+<!--              />-->
+<!--              <BracesIcon-->
+<!--                v-else-if="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"-->
+<!--                aria-hidden="true"-->
+<!--              />-->
+<!--              <PackageOpenIcon-->
+<!--                v-else-if="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"-->
+<!--                aria-hidden="true"-->
+<!--              />-->
+<!--              <GlassesIcon-->
+<!--                v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"-->
+<!--                aria-hidden="true"-->
+<!--              />-->
+<!--              <PlugIcon-->
+<!--                v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"-->
+<!--                aria-hidden="true"-->
+<!--              />-->
+<!--              <CompassIcon v-else aria-hidden="true" />-->
+<!--              <span class="hidden md:contents">发现内容</span>-->
+<!--              <span class="contents md:hidden">Discover</span>-->
+<!--              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />-->
+
+<!--              <template #mods> <BoxIcon aria-hidden="true" /> 模组 </template>-->
+<!--              <template #resourcepacks>-->
+<!--                <PaintBrushIcon aria-hidden="true" /> 资源包-->
+<!--              </template>-->
+<!--              <template #datapacks> <BracesIcon aria-hidden="true" /> 数据包 </template>-->
+<!--              <template #plugins> <PlugIcon aria-hidden="true" /> 插件 </template>-->
+<!--              <template #shaders> <GlassesIcon aria-hidden="true" /> 光影 </template>-->
+<!--              <template #modpacks> <PackageOpenIcon aria-hidden="true" /> 整合包 </template>-->
+<!--            </TeleportOverflowMenu>-->
 <!--          </ButtonStyled>-->
-<!--          <ButtonStyled type="transparent" :highlighted="route.name === 'app'">-->
-<!--            <nuxt-link to="/app">-->
-<!--              <DownloadIcon aria-hidden="true" />-->
-<!--              <span class="hidden md:contents">Get Modrinth App</span>-->
-<!--              <span class="contents md:hidden">Modrinth App</span>-->
-<!--            </nuxt-link>-->
-<!--          </ButtonStyled>-->
-        </template>
+
+<!--&lt;!&ndash;          <ButtonStyled&ndash;&gt;-->
+<!--&lt;!&ndash;            type="transparent"&ndash;&gt;-->
+<!--&lt;!&ndash;            :highlighted="route.name.startsWith('servers')"&ndash;&gt;-->
+<!--&lt;!&ndash;            :highlighted-style="&ndash;&gt;-->
+<!--&lt;!&ndash;              route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'&ndash;&gt;-->
+<!--&lt;!&ndash;            "&ndash;&gt;-->
+<!--&lt;!&ndash;          >&ndash;&gt;-->
+<!--&lt;!&ndash;            <nuxt-link to="/servers">&ndash;&gt;-->
+<!--&lt;!&ndash;              <ServerIcon aria-hidden="true" />&ndash;&gt;-->
+<!--&lt;!&ndash;              服务器租用&ndash;&gt;-->
+<!--&lt;!&ndash;            </nuxt-link>&ndash;&gt;-->
+<!--&lt;!&ndash;          </ButtonStyled>&ndash;&gt;-->
+<!--&lt;!&ndash;          <ButtonStyled type="transparent" :highlighted="route.name === 'app'">&ndash;&gt;-->
+<!--&lt;!&ndash;            <nuxt-link to="/app">&ndash;&gt;-->
+<!--&lt;!&ndash;              <DownloadIcon aria-hidden="true" />&ndash;&gt;-->
+<!--&lt;!&ndash;              <span class="hidden md:contents">Get Modrinth App</span>&ndash;&gt;-->
+<!--&lt;!&ndash;              <span class="contents md:hidden">Modrinth App</span>&ndash;&gt;-->
+<!--&lt;!&ndash;            </nuxt-link>&ndash;&gt;-->
+<!--&lt;!&ndash;          </ButtonStyled>&ndash;&gt;-->
+<!--        </template>-->
+<!--        -->
+<!--        -->
       </div>
+
       <div class="flex items-center gap-2">
         <ButtonStyled type="transparent">
           <OverflowMenu
@@ -542,12 +552,8 @@ import {
   BookmarkIcon,
   ServerIcon,
   LogInIcon,
-  DownloadIcon,
   LibraryIcon,
-  XIcon,
-  IssuesIcon,
   ReportIcon,
-  CompassIcon,
   HamburgerIcon,
   SearchIcon,
   BellIcon,
@@ -570,7 +576,7 @@ import {
   PaintBrushIcon,
   PackageOpenIcon,
 } from "@modrinth/assets";
-import { Button, ButtonStyled, OverflowMenu, Avatar } from "@modrinth/ui";
+import { ButtonStyled, OverflowMenu, Avatar } from "@modrinth/ui";
 
 import CrossIcon from "assets/images/utils/x.svg";
 import NotificationIcon from "assets/images/sidebar/notifications.svg";
@@ -580,13 +586,11 @@ import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import { commonMessages } from "~/utils/common-messages.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
-import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
 
 const { formatMessage } = useVIntl();
 
 const app = useNuxtApp();
 const auth = await useAuth();
-const user = await useUser();
 
 const cosmetics = useCosmetics();
 const flags = useFeatureFlags();
@@ -617,29 +621,7 @@ const addEmailBannerMessages = defineMessages({
   },
 });
 
-const subscriptionPaymentFailedBannerMessages = defineMessages({
-  title: {
-    id: "layout.banner.subscription-payment-failed.title",
-    defaultMessage:
-      "Your subscription failed to renew. Please update your payment method to prevent losing access.",
-  },
-  action: {
-    id: "layout.banner.subscription-payment-failed.button",
-    defaultMessage: "Update billing info",
-  },
-});
 
-const stagingBannerMessages = defineMessages({
-  title: {
-    id: "layout.banner.staging.title",
-    defaultMessage: "You’re viewing Modrinth’s staging environment.",
-  },
-  description: {
-    id: "layout.banner.staging.description",
-    defaultMessage:
-      "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.",
-  },
-});
 
 const navMenuMessages = defineMessages({
   home: {
@@ -736,28 +718,28 @@ useHead({
   ],
 });
 useSeoMeta({
-  title: "Modrinth",
+  title: "BBSMC - 我的世界资源社区论坛",
   description: () =>
     formatMessage({
       id: "layout.meta.description",
       defaultMessage:
-        "Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. " +
-        "Discover and publish projects on Modrinth with a modern, easy to use interface and API.",
+        "在 BBSMC 上下载 Minecraft 模组、插件、数据包、光影、资源包和整合包 " +
+        "使用现代、易于使用的界面和 API 在 BBSMC 上发现和发布项目。",
     }),
-  publisher: "Modrinth",
+  publisher: "BBSMC",
   themeColor: "#1bd96a",
   colorScheme: "dark light",
 
   // OpenGraph
-  ogTitle: "Modrinth",
-  ogSiteName: "Modrinth",
+  ogTitle: "BBSMC - 我的世界资源社区论坛",
+  ogSiteName: "BBSMC - 我的世界资源社区论坛",
   ogDescription: () =>
     formatMessage({
       id: "layout.meta.og-description",
-      defaultMessage: "Discover and publish Minecraft content!",
+      defaultMessage: "以Minecraft我的世界内容为主的中文论坛。面向我的世界玩家、服主、创作者，提供简洁好用的交流讨论和资源分享平台。你可以在这里找到单机游戏、服务器扩展乃至开发辅助种种资源。并且相较于其他论坛，我们外观精致，UI简洁易用，拥有良好的社区氛围，为你带来非同一般的社区体验",
     }),
   ogType: "website",
-  ogImage: "https://cdn.modrinth.com/modrinth-new.png",
+  ogImage: "https://cdn.bbsmc.net/raw/bbsmc-logo.png",
   ogUrl: link,
 
   // Twitter

@@ -193,7 +193,7 @@ export const formatProjectType = (name) => {
 
 export const formatCategory = (name) => {
   if (name === "modloader") {
-    return "ModLoader模组加载器";
+    return "ModLoader";
   } else if (name === "bungeecord") {
     return "BungeeCord";
   } else if (name === "liteloader") {
@@ -207,7 +207,7 @@ export const formatCategory = (name) => {
   } else if (name === "core-shaders") {
     return "光影核心";
   } else if (name === "gui") {
-    return "界面";
+    return "GUI";
   } else if (name === "8x-") {
     return "8x 或更低";
   } else if (name === "512x+") {
@@ -225,7 +225,7 @@ export const formatCategory = (name) => {
   } else if (name === "optifine") {
     return "OptiFine高清修复";
   } else if (name === "mrpack") {
-    return "整合包";
+    return "mrpack";
   } else if (name === "minecraft") {
     return "资源包";
   } else if (name === "vanilla") {

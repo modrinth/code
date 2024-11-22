@@ -12,12 +12,7 @@
       }"
       aria-label="Filters"
     >
-      <AdPlaceholder
-        v-if="
-          (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
-          !server
-        "
-      />
+
       <section v-if="server" class="card">
         <nuxt-link
           :to="`/servers/manage/${server.serverId}/content`"
@@ -324,7 +319,6 @@ import GridIcon from "~/assets/images/utils/grid.svg?component";
 import ListIcon from "~/assets/images/utils/list.svg?component";
 import ImageIcon from "~/assets/images/utils/image.svg?component";
 import Accordion from "~/components/ui/Accordion.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const sidebarMenuOpen = ref(false);
 const showAllLoaders = ref(false);
@@ -862,7 +856,8 @@ const filters = computed(() => {
     }
   }
 
-  filters.license = [{ name: "进筛选开源", type: "license" }];
+  filters.license = [];
+  // filters.license = [{ name: "进筛选开源", type: "license" }];
 
   const filteredObj = {};
 

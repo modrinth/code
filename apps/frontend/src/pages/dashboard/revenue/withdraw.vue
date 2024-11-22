@@ -86,7 +86,7 @@
 
     <h3>Amount</h3>
     <p>
-      You are initiating a transfer of your revenue from Modrinth's Creator Monetization Program.
+      You are initiating a transfer of your revenue from BBSMC Creator Monetization Program.
       How much of your
       <strong>{{ $formatMoney(userBalance.available) }}</strong> balance would you like to transfer
       transfer to {{ selectedMethod.name }}?
@@ -150,7 +150,7 @@
         </Checkbox>
         <Checkbox v-model="agreedTerms" class="rewards-checkbox">
           I agree to the
-          <nuxt-link to="/legal/cmp" class="text-link">Rewards Program Terms</nuxt-link>
+          <nuxt-link to="/legal2/cmp" class="text-link">Rewards Program Terms</nuxt-link>
         </Checkbox>
       </template>
       <template v-else>

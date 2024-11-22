@@ -27,7 +27,7 @@ pub fn validation_errors_to_string(
                 ValidationErrorsKind::Struct(errors) => {
                     validation_errors_to_string(
                         *errors.clone(),
-                        Some(format!("of item {field}")),
+                        Some(format!("项目 {field}")),
                     )
                 }
                 ValidationErrorsKind::List(list) => {
@@ -44,14 +44,14 @@ pub fn validation_errors_to_string(
                     if let Some(error) = errors.first() {
                         if let Some(adder) = adder {
                             output.push_str(&format!(
-                                "Field {} {} failed validation with error: {}",
+                                "字段 {} {} 未通过要求原因: {}",
                                 field, adder, error.code
-                            ));
+                            ).replace("name","名称").replace("slug","标识ID").replace("summary","简介"));
                         } else {
                             output.push_str(&format!(
-                                "Field {} failed validation with error: {}",
+                                "字段 {} 未通过要求原因: {}",
                                 field, error.code
-                            ));
+                            ).replace("name","名称").replace("slug","标识ID").replace("summary","简介"));
                         }
                     }
 

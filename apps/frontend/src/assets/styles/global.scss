@@ -216,8 +216,8 @@ html {
 
   --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
 
-  --landing-maze-bg: url("https://cdn.modrinth.com/landing-new/landing-light.webp");
-  --landing-maze-gradient-bg: url("https://cdn.modrinth.com/landing-new/landing-lower-light.webp");
+  --landing-maze-bg: url("https://cdn.bbsmc.net/raw/landing-new/landing-light.webp");
+  --landing-maze-gradient-bg: url("https://cdn.bbsmc.net/raw/landing-new/landing-lower-light.webp");
   --landing-maze-outer-bg: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
 
   --landing-color-heading: #000;
@@ -346,10 +346,21 @@ html {
 
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
 
-  --landing-maze-bg: url("https://cdn.modrinth.com/landing-new/landing.webp");
+  //--landing-maze-bg: url("https://cdn.modrinth.com/landing-new/landing.webp");
+  //--landing-maze-gradient-bg: linear-gradient(0deg, #31375f 0%, rgba(8, 14, 55, 0) 100%),
+  //url("https://cdn.modrinth.com/landing-new/landing-lower.webp");
+  //--landing-maze-outer-bg: linear-gradient(180deg, #06060d 0%, #000000 100%);
+
+
+  --landing-maze-bg: url("https://cdn.bbsmc.net/raw/landing-new/landing.webp");
   --landing-maze-gradient-bg: linear-gradient(0deg, #31375f 0%, rgba(8, 14, 55, 0) 100%),
-    url("https://cdn.modrinth.com/landing-new/landing-lower.webp");
+    url("https://cdn.bbsmc.net/raw/landing-new/landing-lower.webp");
   --landing-maze-outer-bg: linear-gradient(180deg, #06060d 0%, #000000 100%);
+
+  //--landing-maze-bg: url("https://cdn.bbsmc.net/raw/landing-new/landing.webp");
+  //--landing-maze-gradient-bg: linear-gradient(0deg, #31375f 0%, rgba(8, 14, 55, 0) 100%),
+  //  url("https://cdn.bbsmc.net/raw/landing-new/landing-lower.webp");
+  //--landing-maze-outer-bg: linear-gradient(180deg, #06060d 0%, #000000 100%);
 
   --landing-color-heading: #fff;
   --landing-color-subheading: #afb6be;

@@ -99,7 +99,7 @@ import NotificationItem from "~/components/ui/NotificationItem.vue";
 import { fetchExtraNotificationData, groupNotifications } from "~/helpers/notifications.js";
 
 useHead({
-  title: "Dashboard - Modrinth",
+  title: "仪表板 - BBSMC",
 });
 
 const auth = await useAuth();

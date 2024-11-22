@@ -118,7 +118,7 @@ export const capitalizeString = (name) => {
   }else if (name === 'downloads'){
     return "下载量"
   }
-  return name;
+  return name ? name.charAt(0).toUpperCase() + name.slice(1) : name;
 }
 
 export const localString = (name) => {
@@ -189,7 +189,10 @@ export const formatCategory = (name) => {
 
 export const formatCategoryHeader = (name) => {
   if (name === 'loaders'){
-    return '模组加载器';
+    return '运行平台';
+  }
+  if (name === 'platforms'){
+    return '核心';
   }
   if (name === 'Categories'){
     return '分类';

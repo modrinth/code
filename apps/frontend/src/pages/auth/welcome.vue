@@ -21,12 +21,12 @@
       <p>
         <IntlFormatted :message-id="messages.tosLabel">
           <template #terms-link="{ children }">
-            <NuxtLink to="/legal/terms" class="text-link">
+            <NuxtLink to="/legal2/terms" class="text-link">
               <component :is="() => children" />
             </NuxtLink>
           </template>
           <template #privacy-policy-link="{ children }">
-            <NuxtLink to="/legal/privacy" class="text-link">
+            <NuxtLink to="/legal2/privacy" class="text-link">
               <component :is="() => children" />
             </NuxtLink>
           </template>
@@ -44,12 +44,12 @@ const { formatMessage } = useVIntl();
 const messages = defineMessages({
   subscribeCheckbox: {
     id: "auth.welcome.checkbox.subscribe",
-    defaultMessage: "Subscribe to updates about Modrinth",
+    defaultMessage: "Subscribe to updates about BBSMC",
   },
   tosLabel: {
     id: "auth.welcome.label.tos",
     defaultMessage:
-      "By creating an account, you have agreed to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
+      "By creating an account, you have agreed to BBSMC <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
   },
   welcomeDescription: {
     id: "auth.welcome.description",
@@ -58,7 +58,7 @@ const messages = defineMessages({
   },
   welcomeLongTitle: {
     id: "auth.welcome.long-title",
-    defaultMessage: "Welcome to Modrinth!",
+    defaultMessage: "Welcome to BBSMC!",
   },
   welcomeTitle: {
     id: "auth.welcome.title",
@@ -67,7 +67,7 @@ const messages = defineMessages({
 });
 
 useHead({
-  title: () => `${formatMessage(messages.welcomeTitle)} - Modrinth`,
+  title: () => `${formatMessage(messages.welcomeTitle)} - BBSMC`,
 });
 
 const subscribe = ref(true);

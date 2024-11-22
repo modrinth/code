@@ -7,7 +7,7 @@ export const useFetch = async (url, item, isSilent) => {
     const version = await getVersion()
 
     return await ofetch(url, {
-      headers: { 'User-Agent': `modrinth/theseus/${version} (support@modrinth.com)` },
+      headers: { 'User-Agent': `modrinth/theseus/${version} (support@bbsmc.net)` },
     })
   } catch (err) {
     if (!isSilent) {

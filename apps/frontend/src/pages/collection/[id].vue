@@ -247,9 +247,6 @@
             </div>
           </template>
         </div>
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
       </div>
       <div class="normal-page__content">
         <nav class="navigation-card">
@@ -388,7 +385,6 @@ import { addNotification } from "~/composables/notifs.js";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
@@ -398,7 +394,7 @@ const formatCompactNumber = useCompactNumber();
 const messages = defineMessages({
   collectionDescription: {
     id: "collection.description",
-    defaultMessage: "{description} - View the collection {name} by {username} on Modrinth",
+    defaultMessage: "{description} - View the collection {name} by {username} on BBSMC",
   },
   collectionLabel: {
     id: "collection.label.collection",
@@ -582,7 +578,7 @@ useSeoMeta({
     }),
   ogTitle: title,
   ogDescription: collection.value.description,
-  ogImage: collection.value.icon_url ?? "https://cdn.modrinth.com/placeholder.png",
+  ogImage: collection.value.icon_url ?? "https://cdn.bbsmc.net/raw/placeholder.png",
   robots: collection.value.status === "listed" ? "all" : "noindex",
 });
 

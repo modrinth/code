@@ -339,7 +339,7 @@
     "message": "标题"
   },
   "label.unlisted": {
-    "message": "未列出"
+    "message": "未公开"
   },
   "label.visibility": {
     "message": "公开范围"

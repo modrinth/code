@@ -21,7 +21,7 @@
           <input
             id="search-input"
             v-model="searchQuery"
-            placeholder="Search..."
+            placeholder="搜索..."
             type="text"
             ref="searchInput"
             @keydown.enter="

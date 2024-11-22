@@ -46,6 +46,7 @@ impl S3Host {
                 )
             })?;
         bucket.set_path_style();
+        bucket.set_request_timeout(None);
 
         Ok(S3Host { bucket })
     }
@@ -68,11 +69,13 @@ impl FileHost for S3Host {
                 content_type,
             )
             .await
-            .map_err(|_| {
+            .map_err(|e| {
+                println!("错误上传到S3: {}", e.to_string());
                 FileHostingError::S3Error(
                     "Error while uploading file to S3".to_string(),
                 )
             })?;
+        println!("上传完成");
 
         Ok(UploadFileData {
             file_id: file_name.to_string(),

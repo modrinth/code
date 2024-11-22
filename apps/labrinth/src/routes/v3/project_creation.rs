@@ -720,7 +720,7 @@ async fn project_create_inner(
         )
         .map_err(|err| {
             CreateError::InvalidInput(format!(
-                "Invalid SPDX license identifier: {err}"
+                "填写的URL内SPDX 许可证标识符无效 {err}"
             ))
         })?;
 

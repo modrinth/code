@@ -28,7 +28,7 @@
         :src="
           expandedGalleryItem.raw_url
             ? expandedGalleryItem.raw_url
-            : 'https://cdn.modrinth.com/placeholder-banner.svg'
+            : 'https://cdn.bbsmc.net/raw/placeholder-banner.svg'
         "
         :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
         @click.stop=""
@@ -54,7 +54,7 @@
               :href="
                 expandedGalleryItem.raw_url
                   ? expandedGalleryItem.raw_url
-                  : 'https://cdn.modrinth.com/placeholder-banner.svg'
+                  : 'https://cdn.bbsmc.net/raw/placeholder-banner.svg'
               "
             >
               <ExternalIcon aria-hidden="true" />

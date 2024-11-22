@@ -12,6 +12,6 @@ const route = useNativeRoute();
 const auth = await useAuth();
 
 useHead({
-  title: `Report ${route.params.id} - Modrinth`,
+  title: `Report ${route.params.id} - BBSMC`,
 });
 </script>

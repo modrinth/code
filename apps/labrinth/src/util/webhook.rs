@@ -315,7 +315,7 @@ pub async fn send_slack_webhook(
                 "elements": [
                     {
                         "type": "image",
-                        "image_url": "https://cdn-raw.modrinth.com/modrinth-new.png",
+                        "image_url": "https://cdn.bbsmc.net/raw/bbsmc-logo.png",
                         "alt_text": "Author"
                     },
                     {
@@ -451,9 +451,9 @@ pub async fn send_discord_webhook(
                 .gallery_image
                 .map(|x| DiscordEmbedImage { url: Some(x) }),
             footer: Some(DiscordEmbedFooter {
-                text: format!("{} on Modrinth", project.display_project_type),
+                text: format!("{} on BBSMC", project.display_project_type),
                 icon_url: Some(
-                    "https://cdn-raw.modrinth.com/modrinth-new.png".to_string(),
+                    "https://cdn.bbsmc.net/raw/bbsmc-logo.png".to_string(),
                 ),
             }),
         };

@@ -48,9 +48,9 @@
     </DoubleIcon>
     <div class="notification__title">
       <template v-if="type === 'project_update' && project && version">
-        A project you follow,
+       您关注的项目
         <nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link
-        >, has been updated:
+        >, 已更新
       </template>
       <template v-else-if="type === 'team_invite' && project">
         <nuxt-link
@@ -69,7 +69,7 @@
           <span>{{ invitedBy.username }}</span>
         </nuxt-link>
         <span>
-          has invited you to join
+          邀请您加入资源
           <nuxt-link :to="getProjectLink(project)" class="title-link">
             {{ project.title }} </nuxt-link
           >.
@@ -92,7 +92,7 @@
           <span>{{ invitedBy.username }}</span>
         </nuxt-link>
         <span>
-          has invited you to join
+          邀请您加入团队
           <nuxt-link :to="`/organization/${organization.slug}`" class="title-link">
             {{ organization.name }} </nuxt-link
           >.
@@ -103,32 +103,31 @@
           {{ project.title }}
         </nuxt-link>
         <template v-if="tags.rejectedStatuses.includes(notification.body.new_status)">
-          has been <Badge :type="notification.body.new_status" />
+          版主已将 <Badge :type="notification.body.new_status" />
         </template>
         <template v-else>
-          updated from
+          从
           <Badge :type="notification.body.old_status" />
-          to
+          更新到
           <Badge :type="notification.body.new_status" />
         </template>
-        by the moderators.
       </template>
       <template v-else-if="type === 'moderator_message' && thread && project && !report">
-        Your project,
+        您的资源
         <nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link
-        >, has received
-        <template v-if="notification.grouped_notifs"> messages </template>
-        <template v-else>a message</template>
-        from the moderators.
+        >, 收到版主的
+        <template v-if="notification.grouped_notifs"> 消息 </template>
+        <template v-else>消息</template>
+
       </template>
       <template v-else-if="type === 'moderator_message' && thread && report">
-        A moderator replied to your report of
+        版主已回复您
         <template v-if="version">
-          version
+
           <nuxt-link :to="getVersionLink(project, version)" class="title-link">
             {{ version.name }}
           </nuxt-link>
-          of project
+          版本
         </template>
         <nuxt-link v-if="project" :to="getProjectLink(project)" class="title-link">
           {{ project.title }}
@@ -192,18 +191,18 @@
       </template>
     </div>
     <span class="notification__date">
-      <span v-if="notification.read" class="read-badge inline-flex"> <ReadIcon /> Read </span>
+      <span v-if="notification.read" class="read-badge inline-flex"> <ReadIcon /> 读 </span>
       <span
         v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm A')"
         class="inline-flex"
       >
-        <CalendarIcon class="mr-1" /> Received {{ fromNow(notification.created) }}
+        <CalendarIcon class="mr-1" /> 已收到 {{ fromNow(notification.created) }}
       </span>
     </span>
     <div v-if="compact" class="notification__actions">
       <template v-if="type === 'team_invite' || type === 'organization_invite'">
         <button
-          v-tooltip="`Accept`"
+          v-tooltip="`接受`"
           class="iconified-button square-button brand-button button-transparent"
           @click="
             () => {
@@ -215,7 +214,7 @@
           <CheckIcon />
         </button>
         <button
-          v-tooltip="`Decline`"
+          v-tooltip="`拒绝`"
           class="iconified-button square-button danger-button button-transparent"
           @click="
             () => {
@@ -229,7 +228,7 @@
       </template>
       <button
         v-else-if="!notification.read"
-        v-tooltip="`Mark as read`"
+        v-tooltip="`标记为已读`"
         class="iconified-button square-button button-transparent"
         @click="read()"
       >
@@ -250,7 +249,7 @@
               }
             "
           >
-            <CheckIcon /> Accept
+            <CheckIcon /> 接受
           </button>
           <button
             class="iconified-button danger-button"
@@ -261,7 +260,7 @@
               }
             "
           >
-            <CrossIcon /> Decline
+            <CrossIcon /> 拒绝
           </button>
         </template>
         <button
@@ -270,7 +269,7 @@
           :class="{ 'raised-button': raised }"
           @click="read()"
         >
-          <CheckIcon /> Mark as read
+          <CheckIcon /> 标记为已读
         </button>
         <CopyCode v-if="flags.developerMode" :text="notification.id" />
       </div>
@@ -283,7 +282,7 @@
           target="_blank"
         >
           <ExternalIcon />
-          Open link
+          打开链接
         </nuxt-link>
         <button
           v-for="(action, actionIndex) in notification.actions"
@@ -292,8 +291,8 @@
           :class="{ 'raised-button': raised }"
           @click="performAction(notification, actionIndex)"
         >
-          <CheckIcon v-if="action.title === 'Accept'" />
-          <CrossIcon v-else-if="action.title === 'Deny'" />
+          <CheckIcon v-if="action.title === '接受'" />
+          <CrossIcon v-else-if="action.title === '拒绝'" />
           {{ action.title }}
         </button>
         <button
@@ -302,7 +301,7 @@
           :class="{ 'raised-button': raised }"
           @click="performAction(notification, null)"
         >
-          <CheckIcon /> Mark as read
+          <CheckIcon /> 标记为已读
         </button>
         <CopyCode v-if="flags.developerMode" :text="notification.id" />
       </div>
@@ -399,7 +398,7 @@ async function read() {
   } catch (err) {
     app.$notify({
       group: "main",
-      title: "Error marking notification as read",
+      title: "将通知标记为已读时出错",
       text: err.data ? err.data.description : err,
       type: "error",
     });

@@ -63,7 +63,7 @@
         <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">
           兼容度
         </div>
-        <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">Stats</div>
+        <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">统计</div>
         <div class="w-9 max-sm:hidden"></div>
       </div>
       <template
@@ -190,7 +190,7 @@
                     id: 'copy-link',
                     action: () =>
                       copyToClipboard(
-                        `https://modrinth.com/${project.project_type}/${
+                        `https://bbsmc.net/${project.project_type}/${
                           project.slug ? project.slug : project.id
                         }/version/${encodeURI(version.displayUrlEnding)}`,
                       ),

@@ -19,7 +19,7 @@
         </div>
       </h1>
       <h2>
-        通过我们的社区发布、托管Minecraft资源，提供快速便捷的分发下载资源站点
+        通过我们的社区发布、托管Minecraft资源，提供快速便捷的附属资源分发下载资源站点
       </h2>
       <div class="button-group">
         <ButtonStyled color="brand" size="large">
@@ -368,13 +368,13 @@ import { Multiselect } from "vue-multiselect";
 import { ButtonStyled } from "@modrinth/ui";
 import { CompassIcon, LogInIcon, DashboardIcon, NewspaperIcon } from "@modrinth/assets";
 import SearchIcon from "~/assets/images/utils/search.svg?component";
-import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
 import ModrinthIcon from "~/assets/images/logo.svg?component";
-import PrismLauncherLogo from "~/assets/images/external/prism.svg?component";
-import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
 import Avatar from "~/components/ui/Avatar.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 
+// useHead({
+//   title: () => `我的世界资源社区 | BBSMC`,
+// });
 import { homePageProjects, homePageSearch, homePageNotifs } from "~/generated/state.json";
 
 const searchQuery = ref("");
@@ -401,6 +401,7 @@ async function updateSearchProjects() {
 
   searchProjects.value = res.hits ?? [];
 }
+
 </script>
 
 <style lang="scss" scoped>
@@ -417,7 +418,7 @@ async function updateSearchProjects() {
   flex-direction: column;
 
   .modrinth-icon {
-    width: 13rem;
+    width: 50rem;
     height: 13rem;
     margin-bottom: 2.5rem;
   }

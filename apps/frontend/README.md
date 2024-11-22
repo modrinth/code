@@ -4,7 +4,7 @@
 
 Welcome to the Modrinth Web Interface! This web-based platform is designed for discovering, downloading, and managing Minecraft mods.
 
-If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com).
+If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://bbsmc.net).
 
 ## Development
 

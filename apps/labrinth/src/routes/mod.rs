@@ -84,43 +84,43 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
 
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
-    #[error("Environment Error")]
+    #[error("运行环境错误")]
     Env(#[from] dotenvy::Error),
-    #[error("Error while uploading file: {0}")]
+    #[error("上传文件时出错： {0}")]
     FileHosting(#[from] FileHostingError),
-    #[error("Database Error: {0}")]
+    #[error("数据库错误: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("Database Error: {0}")]
+    #[error("数据库错误: {0}")]
     SqlxDatabase(#[from] sqlx::Error),
-    #[error("Clickhouse Error: {0}")]
+    #[error("Clickhouse数据库错误: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
-    #[error("Internal server error: {0}")]
+    #[error("服务器内部错误: {0}")]
     Xml(String),
-    #[error("Deserialization error: {0}")]
+    #[error("反序列化错误: {0}")]
     Json(#[from] serde_json::Error),
-    #[error("Authentication Error: {0}")]
+    #[error("身份验证错误: {0}")]
     Authentication(#[from] crate::auth::AuthenticationError),
-    #[error("Authentication Error: {0}")]
+    #[error("身份验证错误: {0}")]
     CustomAuthentication(String),
-    #[error("Invalid Input: {0}")]
+    #[error("无效输入: {0}")]
     InvalidInput(String),
-    #[error("Error while validating input: {0}")]
+    #[error("验证输入时出错: {0}")]
     Validation(String),
-    #[error("Search Error: {0}")]
+    #[error("搜索出错: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
-    #[error("Indexing Error: {0}")]
+    #[error("索引错误: {0}")]
     Indexing(#[from] crate::search::indexing::IndexingError),
-    #[error("Payments Error: {0}")]
+    #[error("付款错误: {0}")]
     Payments(String),
-    #[error("Discord Error: {0}")]
+    #[error("Discord 错误: {0}")]
     Discord(String),
-    #[error("Captcha Error. Try resubmitting the form.")]
+    #[error("验证码错误。请尝试重新提交。")]
     Turnstile,
-    #[error("Error while decoding Base62: {0}")]
+    #[error("解码 Base62 时出错: {0}")]
     Decoding(#[from] crate::models::ids::DecodingError),
-    #[error("Image Parsing Error: {0}")]
+    #[error("图片解析错误: {0}")]
     ImageParse(#[from] image::ImageError),
-    #[error("Password Hashing Error: {0}")]
+    #[error("密码哈希错误: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
     #[error("Password strength checking error: {0}")]
     PasswordStrengthCheck(#[from] zxcvbn::ZxcvbnError),

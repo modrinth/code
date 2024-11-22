@@ -3,14 +3,14 @@
     <section class="universal-card">
       <Breadcrumbs
         v-if="breadcrumbsStack"
-        :current-title="`Report ${reportId}`"
+        :current-title="`报告 ${reportId}`"
         :link-stack="breadcrumbsStack"
       />
       <h2>Report details</h2>
       <ReportInfo :report="report" :show-thread="false" :show-message="false" :auth="auth" />
     </section>
     <section class="universal-card">
-      <h2>Messages</h2>
+      <h2>消息</h2>
       <ConversationThread
         :thread="thread"
         :report="report"

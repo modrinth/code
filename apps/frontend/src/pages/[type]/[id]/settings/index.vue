@@ -67,7 +67,7 @@
       </label>
       <div class="text-input-wrapper">
         <div class="text-input-wrapper__before">
-          https://modrinth.com/{{ $getProjectTypeForUrl(project.project_type, project.loaders) }}/
+          https://bbsmc.net/{{ $getProjectTypeForUrl(project.project_type, project.loaders) }}/
         </div>
         <input
           id="project-slug"

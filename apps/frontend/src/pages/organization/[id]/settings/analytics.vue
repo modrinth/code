@@ -1,12 +1,9 @@
 <template>
   <div class="normal-page__content">
     <div class="universal-card">
-      <h2>Analytics</h2>
-
+      <h2>分析</h2>
       <p>
-        This page shows you the analytics for your organization's projects. You can see the number
-        of downloads, page views and revenue earned for all of your projects, as well as the total
-        downloads and page views for each project by country.
+        此页面显示贵团队项目的分析数据。您可以查看所有资源的下载量、页面浏览量
       </p>
     </div>
 

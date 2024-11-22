@@ -4,7 +4,7 @@
 - type: embed
   embeds:
     - title: __Welcome to Modrinth's Discord server!__
-      url: https://modrinth.com
+      url: https://bbsmc.net
       color: 0x1bd96a
       description: "Modrinth is the place for Minecraft mods, plugins, data packs, shaders, resource packs, and
         modpacks. Discover, play, and share Minecraft content through our open-source platform built for the community."
@@ -62,7 +62,7 @@
   color: 0x4f9cff
   title: "**:link: __Links__**"
   links:
-    Website: https://modrinth.com
+    Website: https://bbsmc.net
     Support: https://support.modrinth.com
     Status page: https://status.modrinth.com
     Roadmap: https://roadmap.modrinth.com

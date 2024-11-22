@@ -45,9 +45,9 @@ async fn main() -> std::io::Result<()> {
         dotenvy::var("BIND_ADDR").unwrap()
     );
 
-    database::check_for_migrations()
-        .await
-        .expect("An error occurred while running migrations.");
+    // database::check_for_migrations()
+    //     .await
+    //     .expect("An error occurred while running migrations.");
 
     // Database Connector
     let pool = database::connect()

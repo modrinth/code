@@ -25,7 +25,7 @@
       <span :class="`message__author role-${members[message.author_id].role}`">
         <LockIcon
           v-if="message.body.private"
-          v-tooltip="'Only visible to moderators'"
+          v-tooltip="'仅版主可见'"
           class="private-icon"
         />
         <ConditionalNuxtLink
@@ -37,11 +37,11 @@
         <ScaleIcon v-if="members[message.author_id].role === 'moderator'" v-tooltip="'Moderator'" />
         <ModrinthIcon
           v-else-if="members[message.author_id].role === 'admin'"
-          v-tooltip="'Modrinth Team'"
+          v-tooltip="'BBSMC 团队'"
         />
         <MicrophoneIcon
           v-if="report && message.author_id === report.reporterUser.id"
-          v-tooltip="'Reporter'"
+          v-tooltip="'报告'"
           class="reporter-icon"
         />
       </span>
@@ -51,7 +51,7 @@
         <ScaleIcon />
       </div>
       <span class="message__author moderation-color">
-        Moderator
+        版主
         <ScaleIcon v-tooltip="'Moderator'" />
       </span>
     </template>
@@ -64,15 +64,15 @@
       <span v-if="message.body.type === 'deleted'"> posted a message that has been deleted. </span>
       <template v-else-if="message.body.type === 'status_change'">
         <span v-if="message.body.new_status === 'processing'">
-          submitted the project for review.
+          提交资源审核。
         </span>
         <span v-else>
-          changed the project's status from <Badge :type="message.body.old_status" /> to
+          更改了资源的状态从 <Badge :type="message.body.old_status" /> 到
           <Badge :type="message.body.new_status" />.
         </span>
       </template>
-      <span v-else-if="message.body.type === 'thread_closure'">closed the thread.</span>
-      <span v-else-if="message.body.type === 'thread_reopen'">reopened the thread.</span>
+      <span v-else-if="message.body.type === 'thread_closure'">关闭了该会话</span>
+      <span v-else-if="message.body.type === 'thread_reopen'">重新打开该会话</span>
     </div>
     <span class="message__date">
       <span v-tooltip="$dayjs(message.created).format('MMMM D, YYYY [at] h:mm A')">
@@ -92,7 +92,7 @@
         ]"
       >
         <MoreHorizontalIcon />
-        <template #delete> <TrashIcon /> Delete </template>
+        <template #delete> <TrashIcon /> 删除 </template>
       </OverflowMenu>
     </div>
   </div>

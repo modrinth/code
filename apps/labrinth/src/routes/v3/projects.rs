@@ -94,7 +94,9 @@ pub async fn random_projects_get(
 
     let project_ids = sqlx::query!(
         "
-            SELECT id FROM mods TABLESAMPLE SYSTEM_ROWS($1) WHERE status = ANY($2)
+            SELECT id FROM mods WHERE status = ANY($2) ORDER BY RANDOM() limit $1
+
+
             ",
         count.count as i32,
         &*crate::models::projects::ProjectStatus::iterator()
@@ -685,7 +687,7 @@ pub async fn project_edit(
 
                 spdx::Expression::parse(&license).map_err(|err| {
                     ApiError::InvalidInput(format!(
-                        "Invalid SPDX license identifier: {err}"
+                        "填写的URL内SPDX 许可证标识符无效: {err}"
                     ))
                 })?;
 

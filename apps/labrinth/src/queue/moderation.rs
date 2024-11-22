@@ -180,7 +180,7 @@ impl ModerationMessage {
                         };
 
                         val.push_str(&if let Some(additional_text) = additional_text {
-                            format!("- {project}(consider using [{additional_text}](https://modrinth.com/mod/{}) instead)\n", additional_text.to_lowercase())
+                            format!("- {project}(consider using [{additional_text}](https://bbsmc.net/mod/{}) instead)\n", additional_text.to_lowercase())
                         } else {
                             format!("- {project}\n")
                         })
@@ -198,7 +198,7 @@ impl ModerationMessage {
 
                 str
             },
-            ModerationMessage::MissingGalleryImage => "We ask that resource packs like yours show off their content using images in the Gallery, or optionally in the Description, in order to effectively and clearly inform users of the content in your pack per section 2.1 of [Modrinth's content rules](https://modrinth.com/legal/rules#general-expectations).\n
+            ModerationMessage::MissingGalleryImage => "We ask that resource packs like yours show off their content using images in the Gallery, or optionally in the Description, in order to effectively and clearly inform users of the content in your pack per section 2.1 of [Modrinth's content rules](https://bbsmc.net/legal/rules#general-expectations).\n
 Keep in mind that you should:\n
 - Set a featured image that best represents your pack.
 - Ensure all your images have titles that accurately label the image, and optionally, details on the contents of the image in the images Description.

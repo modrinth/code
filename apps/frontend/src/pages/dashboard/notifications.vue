@@ -12,7 +12,7 @@
           <h2 v-else class="text-2xl">通知</h2>
         </div>
         <template v-if="!history">
-          <Button v-if="hasRead" @click="updateRoute()"> <HistoryIcon /> View history </Button>
+          <Button v-if="hasRead" @click="updateRoute()"> <HistoryIcon /> 查看历史通知 </Button>
           <Button v-if="notifications.length > 0" color="danger" @click="readAll()">
             <CheckCheckIcon /> 全部标记为已读
           </Button>
@@ -22,7 +22,22 @@
         v-if="notifTypes.length > 1"
         v-model="selectedType"
         :items="notifTypes"
-        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x).replace('_', ' ') + 's')"
+        :format-label="(x) => {
+          switch(x){
+            case 'all': {
+              return '全部'
+            }
+            case 'status_change': {
+              return '状态变更'
+            }
+            case 'moderator_message': {
+              return '版主消息'
+            }
+            default: {
+              return x
+            }
+          }
+        }"
         :capitalize="false"
       />
       <p v-if="pending">加载中...</p>
@@ -64,7 +79,7 @@ import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import Pagination from "~/components/ui/Pagination.vue";
 
 useHead({
-  title: "Notifications - Modrinth",
+  title: "通知 - BBSMC",
 });
 
 const auth = await useAuth();

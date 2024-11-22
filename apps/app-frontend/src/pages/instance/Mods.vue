@@ -796,7 +796,7 @@ const shareUrls = async () => {
   await shareModal.value.show(
     functionValues.value
       .filter((x) => x.slug)
-      .map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
+      .map((x) => `https://bbsmc.net/${x.project_type}/${x.slug}`)
       .join('\n'),
   )
 }
@@ -806,7 +806,7 @@ const shareMarkdown = async () => {
     functionValues.value
       .map((x) => {
         if (x.slug) {
-          return `[${x.name}](https://modrinth.com/${x.project_type}/${x.slug})`
+          return `[${x.name}](https://bbsmc.net/${x.project_type}/${x.slug})`
         }
         return x.name
       })
@@ -853,7 +853,7 @@ const handleRightClick = (event, mod) => {
     props.options.showMenu(
       event,
       {
-        link: `https://modrinth.com/${mod.project_type}/${mod.slug}`,
+        link: `https://bbsmc.net/${mod.project_type}/${mod.slug}`,
       },
       [{ name: 'open_link' }, { name: 'copy_link' }],
     )

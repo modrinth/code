@@ -3,29 +3,24 @@
     <Card>
       <div class="content">
         <div>
-          <h1 class="card-title-adjustments">Submit a Report</h1>
+          <h1 class="card-title-adjustments">提交举报</h1>
           <div>
             <p>
-              Modding should be safe for everyone, so we take abuse and malicious intent seriously
-              at Modrinth. If you encounter content that violates our
-              <nuxt-link class="text-link" to="/legal/terms">Terms of Service</nuxt-link> or our
-              <nuxt-link class="text-link" to="/legal/rules">Rules</nuxt-link>, please report it to
-              us here.
+              改装对每个人来说都应该是安全的，因此 BBSMC 严肃对待滥用和恶意行为。如果您发现违反我们
+              <nuxt-link class="text-link" to="/legal2/terms">服务条款</nuxt-link> 或我们的
+              <nuxt-link class="text-link" to="/legal2/rules">规则</nuxt-link>, 请在此处向我们举报。
             </p>
             <p>
-              This form is intended exclusively for reporting abuse or harmful content to Modrinth
-              staff. For bugs related to specific projects, please use the project's designated
-              Issues link or Discord channel.
+              此表单仅用于向 BBSMC 工作人员举报滥用或有害内容。对于与特定项目相关的错误，请使用该项目指定的问题链接或邮件。
             </p>
             <p>
-              Your privacy is important to us; rest assured that your identifying information will
-              be kept confidential.
+              您的隐私对我们很重要；请放心，您的身份信息将被保密。
             </p>
           </div>
         </div>
         <div class="report-info-section">
           <div class="report-info-item">
-            <label for="report-item">Item type to report</label>
+            <label for="report-item">要举报的项目类型</label>
             <DropdownSelect
               id="report-item"
               v-model="reportItem"
@@ -40,18 +35,18 @@
             />
           </div>
           <div class="report-info-item">
-            <label for="report-item-id">Item ID</label>
+            <label for="report-item-id">资源ID</label>
             <input
               id="report-item-id"
               v-model="reportItemID"
               type="text"
-              placeholder="ex. project ID"
+              placeholder="输入资源ID"
               autocomplete="off"
               :disabled="reportItem === ''"
             />
           </div>
           <div class="report-info-item">
-            <label for="report-type">Reason for report</label>
+            <label for="report-type">举报理由</label>
             <DropdownSelect
               id="report-type"
               v-model="reportType"
@@ -62,15 +57,14 @@
               :show-no-results="false"
               :show-labels="false"
               :display-name="capitalizeString"
-              placeholder="Choose report type"
+              placeholder="举报类型"
             />
           </div>
         </div>
         <div class="report-submission-section">
           <div>
             <p>
-              Please provide additional context about your report. Include links and images if
-              possible. <strong>Empty reports will be closed.</strong>
+              请提供有关举报的其他背景信息。如有可以的话,请包含链接和图像 <strong>未填写的举报将被关闭</strong>
             </p>
           </div>
           <MarkdownEditor v-model="reportBody" placeholder="" :on-image-upload="onImageUpload" />
@@ -83,7 +77,7 @@
             @click="submitReport"
           >
             <SaveIcon aria-hidden="true" />
-            Submit
+            提交
           </Button>
         </div>
       </div>
@@ -126,30 +120,48 @@ const canSubmit = computed(() => {
 
 const submissionValidation = () => {
   if (!canSubmit.value) {
-    throw new Error("Please fill out all required fields");
+    throw new Error("请填写所有必填字段");
   }
 
   if (reportItem.value === "") {
-    throw new Error("Please select a report item");
+    throw new Error("请选择要举报的项目");
   }
 
   if (reportItemID.value === "") {
-    throw new Error("Please enter a report item ID");
+    throw new Error("请输入要举报的资源的ID");
   }
 
   if (reportType.value === "") {
-    throw new Error("Please select a report type");
+    throw new Error("请选择举报类型");
   }
 
   if (reportBody.value === "") {
-    throw new Error("Please enter a report body");
+    throw new Error("请输入举报内容");
   }
 
   return true;
 };
 
 const capitalizeString = (value?: string) => {
+
   if (!value) return "";
+  if (value === 'project'){
+    return '资源';
+  }if (value === 'version'){
+    return '版本';
+  }if (value === 'user'){
+    return '用户';
+  }if (value === 'spam'){
+    return '垃圾邮件';
+  }if (value === 'copyright'){
+    return '版权';
+  }if (value === 'inappropriate'){
+    return '违法内容';
+  }if (value === 'malicious'){
+    return '恶意内容';
+  }if (value === 'name-squatting'){
+    return '抢注';
+  }
   return value?.charAt(0).toUpperCase() + value?.slice(1);
 };
 

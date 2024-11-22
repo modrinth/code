@@ -75,7 +75,7 @@ function updateAdPosition(overrideShown = false) {
 
 async function openPlusLink() {
   await record_ads_click()
-  await open_ads_link('https://modrinth.com/plus', 'https://modrinth.com')
+  await open_ads_link('https://bbsmc.net/plus', 'https://bbsmc.net')
 }
 
 const unlisten = await listen('ads-scroll', (event) => {

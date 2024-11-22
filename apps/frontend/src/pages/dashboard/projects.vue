@@ -145,11 +145,11 @@
         <div class="push-right input-group">
           <button class="iconified-button" @click="$refs.editLinksModal.hide()">
             <CrossIcon />
-            Cancel
+            取消
           </button>
           <button class="iconified-button brand-button" @click="bulkEditLinks()">
             <SaveIcon />
-            Save changes
+            保存
           </button>
         </div>
       </div>
@@ -186,7 +186,18 @@
                 v-model="sortBy"
                 :searchable="false"
                 class="small-select"
-                :options="['标题', '状态', '类型']"
+                :options="['Name', 'Status', 'Type']"
+                :custom-label="(value) => {
+                  switch(value){
+                    case 'Name':{
+                      return '名称'
+                    }case 'Status':{
+                      return '状态'
+                    }case 'Type':{
+                      return '类型'
+                    }
+                  }
+                }"
                 :close-on-select="true"
                 :show-labels="false"
                 :allow-empty="false"
@@ -372,7 +383,7 @@ export default defineNuxtComponent({
     };
   },
   head: {
-    title: "Projects - Modrinth",
+    title: "资源 - BBSMC",
   },
   created() {
     this.UPLOAD_VERSION = 1 << 0;

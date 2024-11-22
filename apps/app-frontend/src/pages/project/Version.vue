@@ -35,7 +35,7 @@
           Report
         </Button>
         <a
-          :href="`https://modrinth.com/mod/${route.params.id}/version/${route.params.version}`"
+          :href="`https://bbsmc.net/mod/${route.params.id}/version/${route.params.version}`"
           rel="external"
           class="btn"
         >
@@ -157,7 +157,7 @@
           <div v-if="author" class="metadata-item">
             <span class="metadata-label">Author</span>
             <a
-              :href="`https://modrinth.com/user/${author.user.username}`"
+              :href="`https://bbsmc.net/user/${author.user.username}`"
               rel="external"
               class="metadata-value btn author"
             >

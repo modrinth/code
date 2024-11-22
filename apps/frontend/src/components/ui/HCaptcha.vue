@@ -17,7 +17,7 @@ onMounted(() => {
   useHead({
     script: [
       {
-        src: "https://js.hcaptcha.com/1/api.js?render=explicit&onload=hCaptchaReady",
+        src: "https://js.hcaptcha.com/1/api.js?render=explicit&onload=hCaptchaReady&hl=zh",
         async: true,
         defer: true,
       },

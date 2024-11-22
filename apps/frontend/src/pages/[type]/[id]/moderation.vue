@@ -1,83 +1,66 @@
 <template>
   <div>
     <section class="universal-card">
-      <h2>Project status</h2>
+      <h2>资源状态</h2>
       <Badge :type="project.status" />
       <p v-if="isApproved(project)">
-        Your project has been approved by the moderators and you may freely change project
-        visibility in
+        您发布的资源已通过审核
+        您可以点击
         <router-link :to="`${getProjectLink(project)}/settings`" class="text-link"
-          >your project's settings</router-link
-        >.
+          >资源设置</router-link
+        > 去修改资源是否公开
       </p>
       <div v-else-if="isUnderReview(project)">
         <p>
-          Modrinth's team of content moderators work hard to review all submitted projects.
-          Typically, you can expect a new project to be reviewed within 24 to 48 hours. Please keep
-          in mind that larger projects, especially modpacks, may require more time to review.
-          Certain holidays or events may also lead to delays depending on moderator availability.
-          Modrinth's moderators will leave a message below if they have any questions or concerns
-          for you.
+          BBSMC 内容版主团队会努力审核所有已提交的项目。
+          通常，新项目将在 24 到 48 小时内审核完毕。请记住，较大的项目（尤其是模组包）可能需要更多时间审核。
+          某些节假日或活动也可能导致延迟，具体取决于版主的空闲时间。
+          如果 BBSMC 版主对您有任何问题或疑虑，他们会在下面留言。
         </p>
-        <p>
-          If your review has taken more than 48 hours, check our
-          <a
-            class="text-link"
-            href="https://support.modrinth.com/en/articles/8793355-modrinth-project-review-times"
-            target="_blank"
-          >
-            support article on review times
-          </a>
-          for moderation delays.
-        </p>
+
       </div>
       <template v-else-if="isRejected(project)">
         <p>
-          Your project does not currently meet Modrinth's
-          <nuxt-link to="/legal/rules" class="text-link" target="_blank">content rules</nuxt-link>
-          and the moderators have requested you make changes before it can be approved. Read the
-          messages from the moderators below and address their comments before resubmitting.
+          您的项目目前不符合 BBSMC 要求
+          <nuxt-link to="/legal2/rules" class="text-link" target="_blank">内容规则</nuxt-link>
+          版主已要求您进行更改才能批准。请阅读以下版主的留言，并在重新提交前解决他们的意见。
         </p>
         <p class="warning">
-          <IssuesIcon /> Repeated submissions without addressing the moderators' comments may result
-          in an account suspension.
+          <IssuesIcon /> 重复提交而不回应版主的留言回复可能会导致帐户被封禁。
         </p>
       </template>
-      <h3>Current visibility</h3>
+      <h3>当前可见性</h3>
       <ul class="visibility-info">
         <li v-if="isListed(project)">
           <CheckIcon class="good" />
-          Listed in search results
+          搜索结果中显示
         </li>
         <li v-else>
           <ExitIcon class="bad" />
-          Not listed in search results
+          不可被搜索
         </li>
         <li v-if="isListed(project)">
           <CheckIcon class="good" />
-          Listed on the profiles of members
+          在个人资料中显示
         </li>
         <li v-else>
           <ExitIcon class="bad" />
-          Not listed on the profiles of members
+          不可在个人资料中显示
         </li>
         <li v-if="isPrivate(project)">
           <ExitIcon class="bad" />
-          Not accessible with a direct link
+          无法通过直接链接访问
         </li>
         <li v-else>
           <CheckIcon class="good" />
-          Accessible with a direct link
+          可直接通过链接打开查看
         </li>
       </ul>
     </section>
     <section id="messages" class="universal-card">
-      <h2>Messages</h2>
+      <h2>消息</h2>
       <p>
-        This is a private conversation thread with the Modrinth moderators. They may message you
-        with issues concerning this project. This thread is only checked when you submit your
-        project for review. For additional inquiries, contact
-        <a href="https://support.modrinth.com">Modrinth support</a>.
+        这是与 BBSMC 版主的私人对话页面,他们可能会向您发送有关此项目的问题的消息.仅当您提交资源以供审核时才会显示此对话。
       </p>
       <ConversationThread
         v-if="thread"

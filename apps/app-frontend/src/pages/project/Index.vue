@@ -53,7 +53,7 @@
             {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
           </Button>
           <a
-            :href="`https://modrinth.com/${data.project_type}/${data.slug}`"
+            :href="`https://bbsmc.net/${data.project_type}/${data.slug}`"
             rel="external"
             class="btn"
           >
@@ -350,13 +350,13 @@ const handleOptionsClick = (args) => {
         __tauriModule: 'Shell',
         message: {
           cmd: 'open',
-          path: `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+          path: `https://bbsmc.net/${args.item.project_type}/${args.item.slug}`,
         },
       })
       break
     case 'copy_link':
       navigator.clipboard.writeText(
-        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+        `https://bbsmc.net/${args.item.project_type}/${args.item.slug}`,
       )
       break
   }

@@ -15,7 +15,7 @@ pub struct AdsState {
     pub malicious_origins: HashSet<String>,
 }
 
-const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
+const AD_LINK: &str = "https://bbsmc.net/wrapper/app-ads-cookie";
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::<R>::new("ads")

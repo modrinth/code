@@ -23,7 +23,7 @@ At times, pull requests may be rejected or left unmerged for a variation of reas
 
 ### Code isn't the only way to contribute
 
-You don't need to know how to program to contribute to Modrinth. Quality assurance, supporting the community, coming up with feature ideas, and making sure your voice is heard in public decisions are all great ways to contribute to Modrinth. If you find bugs, reporting them on the appropriate issue tracker is your responsibility; however, remember that potential security breaches and exploits must instead be reported in accordance with our [security policy](https://modrinth.com/legal/security).
+You don't need to know how to program to contribute to Modrinth. Quality assurance, supporting the community, coming up with feature ideas, and making sure your voice is heard in public decisions are all great ways to contribute to Modrinth. If you find bugs, reporting them on the appropriate issue tracker is your responsibility; however, remember that potential security breaches and exploits must instead be reported in accordance with our [security policy](https://bbsmc.net/legal/security).
 
 ## Project-specific details
 

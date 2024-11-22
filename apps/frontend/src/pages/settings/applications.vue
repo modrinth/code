@@ -148,9 +148,9 @@
       </button>
     </div>
     <p>
-      Applications can be used to authenticate Modrinth's users with your products. For more
+      Applications can be used to authenticate BBSMC users with your products. For more
       information, see
-      <a class="text-link" href="https://docs.modrinth.com">Modrinth's API documentation</a>.
+      <a class="text-link" href="https://docs.modrinth.com">BBSMC API documentation</a>.
     </p>
     <div v-for="app in usersApps" :key="app.id" class="universal-card recessed token mt-4">
       <div class="token-info">
@@ -235,7 +235,7 @@ definePageMeta({
 });
 
 useHead({
-  title: "Applications - Modrinth",
+  title: "Applications - BBSMC",
 });
 
 const data = useNuxtApp();

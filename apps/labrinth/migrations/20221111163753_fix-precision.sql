@@ -1,1 +1,0 @@
-ALTER TABLE users ALTER balance TYPE numeric(40, 30);

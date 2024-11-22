@@ -56,7 +56,7 @@ mod tests {
 
     #[test]
     fn validate_for_none_returns_first_valid_uri() {
-        let validate_against = vec!["https://modrinth.com/a"];
+        let validate_against = vec!["https://bbsmc.net/a"];
 
         let validated = ValidatedRedirectUri::validate(
             &None,
@@ -72,11 +72,11 @@ mod tests {
     fn validate_for_valid_uri_returns_first_matching_uri_ignoring_query_params()
     {
         let validate_against = vec![
-            "https://modrinth.com/a?q3=p3&q4=p4",
-            "https://modrinth.com/a/b/c?q1=p1&q2=p2",
+            "https://bbsmc.net/a?q3=p3&q4=p4",
+            "https://bbsmc.net/a/b/c?q1=p1&q2=p2",
         ];
         let to_validate =
-            "https://modrinth.com/a/b/c?query0=param0&query1=param1"
+            "https://bbsmc.net/a/b/c?query0=param0&query1=param1"
                 .to_string();
 
         let validated = ValidatedRedirectUri::validate(
@@ -91,8 +91,8 @@ mod tests {
 
     #[test]
     fn validate_for_invalid_uri_returns_err() {
-        let validate_against = vec!["https://modrinth.com/a"];
-        let to_validate = "https://modrinth.com/a/b".to_string();
+        let validate_against = vec!["https://bbsmc.net/a"];
+        let to_validate = "https://bbsmc.net/a/b".to_string();
 
         let validated = ValidatedRedirectUri::validate(
             &Some(to_validate),

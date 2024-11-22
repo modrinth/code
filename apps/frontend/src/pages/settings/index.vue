@@ -241,7 +241,7 @@ const developerModeBanner = defineMessages({
   description: {
     id: "settings.display.banner.developer-mode.description",
     defaultMessage:
-      "<strong>开发者模式</strong> 已启用. This will allow you to view the internal IDs of various things throughout Modrinth that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode.",
+      "<strong>开发者模式</strong> 已启用. This will allow you to view the internal IDs of various things throughout BBSMC that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode.",
   },
   deactivate: {
     id: "settings.display.banner.developer-mode.button",

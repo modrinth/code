@@ -53,7 +53,6 @@ export { default as SearchDropdown } from './search/SearchDropdown.vue'
 export { default as SearchFilter } from './search/SearchFilter.vue'
 
 // Billing
-export { default as PurchaseModal } from './billing/PurchaseModal.vue'
 
 // Version
 export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'

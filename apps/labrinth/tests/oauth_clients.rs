@@ -24,8 +24,8 @@ async fn can_create_edit_get_oauth_client() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let client_name = "test_client".to_string();
         let redirect_uris = vec![
-            "https://modrinth.com".to_string(),
-            "https://modrinth.com/a".to_string(),
+            "https://bbsmc.net".to_string(),
+            "https://bbsmc.net/a".to_string(),
         ];
         let resp = env
             .api
@@ -41,11 +41,11 @@ async fn can_create_edit_get_oauth_client() {
             test::read_body_json(resp).await;
         let client_id = get_json_val_str(creation_result.client.id);
 
-        let url = Some("https://modrinth.com".to_string());
+        let url = Some("https://bbsmc.net".to_string());
         let description = Some("test description".to_string());
         let edited_redirect_uris = vec![
             redirect_uris[0].clone(),
-            "https://modrinth.com/b".to_string(),
+            "https://bbsmc.net/b".to_string(),
         ];
         let edit = OAuthClientEdit {
             name: None,
@@ -83,7 +83,7 @@ async fn create_oauth_client_with_restricted_scopes_fails() {
             .add_oauth_client(
                 "test_client".to_string(),
                 Scopes::restricted(),
-                vec!["https://modrinth.com".to_string()],
+                vec!["https://bbsmc.net".to_string()],
                 FRIEND_USER_PAT,
             )
             .await;

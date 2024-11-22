@@ -115,7 +115,7 @@ const failedVerificationMessages = defineMessages({
 });
 
 useHead({
-  title: () => `${formatMessage(messages.title)} - Modrinth`,
+  title: () => `${formatMessage(messages.title)} - BBSMC`,
 });
 
 const auth = await useAuth();

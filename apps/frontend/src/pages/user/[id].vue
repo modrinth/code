@@ -236,9 +236,6 @@
             <div v-for="badge in badges" :key="badge">
               <StaffBadge v-if="badge === 'staff'" class="h-14 w-14" />
               <ModBadge v-else-if="badge === 'mod'" class="h-14 w-14" />
-              <nuxt-link v-else-if="badge === 'plus'" to="/plus">
-                <PlusBadge class="h-14 w-14" />
-              </nuxt-link>
               <TenMClubBadge v-else-if="badge === '10m-club'" class="h-14 w-14" />
               <EarlyAdopterBadge v-else-if="badge === 'early-adopter'" class="h-14 w-14" />
               <AlphaTesterBadge v-else-if="badge === 'alpha-tester'" class="h-14 w-14" />
@@ -246,9 +243,7 @@
             </div>
           </div>
         </div>
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
+
       </div>
     </div>
   </div>
@@ -285,7 +280,6 @@ import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
@@ -343,11 +337,11 @@ const messages = defineMessages({
   },
   profileMetaDescription: {
     id: "profile.meta.description",
-    defaultMessage: "Download {username}'s projects on Modrinth",
+    defaultMessage: "Download {username}'s projects on BBSMC",
   },
   profileMetaDescriptionWithBio: {
     id: "profile.meta.description-with-bio",
-    defaultMessage: "{bio} - Download {username}'s projects on Modrinth",
+    defaultMessage: "{bio} - Download {username}'s projects on BBSMC",
   },
   profileNoProjectsLabel: {
     id: "profile.label.no-projects",
@@ -425,7 +419,7 @@ if (user.value.username !== route.params.id) {
   await navigateTo(`/user/${user.value.username}`, { redirectCode: 301 });
 }
 
-const title = computed(() => `${user.value.username} - Modrinth`);
+const title = computed(() => `${user.value.username} - BBSMC资源社区`);
 const description = computed(() =>
   user.value.bio
     ? formatMessage(messages.profileMetaDescriptionWithBio, {
@@ -440,7 +434,7 @@ useSeoMeta({
   description: () => description.value,
   ogTitle: () => title.value,
   ogDescription: () => description.value,
-  ogImage: () => user.value.avatar_url ?? "https://cdn.modrinth.com/placeholder.png",
+  ogImage: () => user.value.avatar_url ?? "https://cdn.bbsmc.net/raw/placeholder.png",
 });
 
 const projectTypes = computed(() => {

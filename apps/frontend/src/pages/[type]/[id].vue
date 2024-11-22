@@ -185,7 +185,7 @@
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
         <div class="truncate text-lg font-extrabold text-contrast">
-          Download {{ project.title }}
+          下载 {{ project.title }}
         </div>
       </template>
       <template #default>
@@ -197,33 +197,33 @@
             "
             class="modrinth-app-section contents"
           >
-            <div class="mx-auto flex w-fit flex-col">
-              <ButtonStyled color="brand">
-                <a
-                  class="w-fit"
-                  :href="`modrinth://mod/${project.slug}`"
-                  @click="() => installWithApp()"
-                >
-                  <ModrinthIcon aria-hidden="true" />
-                  Install with Modrinth App
-                  <ExternalIcon aria-hidden="true" />
-                </a>
-              </ButtonStyled>
-              <Accordion ref="getModrinthAppAccordion">
-                <nuxt-link
-                  class="mt-2 flex justify-center text-brand-blue hover:underline"
-                  to="/app"
-                >
-                  Don't have Modrinth App?
-                </nuxt-link>
-              </Accordion>
-            </div>
+<!--            <div class="mx-auto flex w-fit flex-col">-->
+<!--              <ButtonStyled color="brand">-->
+<!--                <a-->
+<!--                  class="w-fit"-->
+<!--                  :href="`modrinth://mod/${project.slug}`"-->
+<!--                  @click="() => installWithApp()"-->
+<!--                >-->
+<!--                  <ModrinthIcon aria-hidden="true" />-->
+<!--                  Install with BBSMC App-->
+<!--                  <ExternalIcon aria-hidden="true" />-->
+<!--                </a>-->
+<!--              </ButtonStyled>-->
+<!--              <Accordion ref="getModrinthAppAccordion">-->
+<!--                <nuxt-link-->
+<!--                  class="mt-2 flex justify-center text-brand-blue hover:underline"-->
+<!--                  to="/app"-->
+<!--                >-->
+<!--                  Don't have Modrinth App?-->
+<!--                </nuxt-link>-->
+<!--              </Accordion>-->
+<!--            </div>-->
 
-            <div class="flex items-center gap-4 px-4">
-              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-              <span class="flex-shrink-0 text-sm font-semibold text-secondary"> or </span>
-              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-            </div>
+<!--            <div class="flex items-center gap-4 px-4">-->
+<!--              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>-->
+<!--              <span class="flex-shrink-0 text-sm font-semibold text-secondary"> or </span>-->
+<!--              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>-->
+<!--            </div>-->
           </div>
           <div class="mx-auto flex w-fit flex-col gap-2">
             <ButtonStyled v-if="project.game_versions.length === 1">
@@ -231,11 +231,11 @@
                 <GameIcon aria-hidden="true" />
                 {{
                   currentGameVersion
-                    ? `Game version: ${currentGameVersion}`
-                    : "Error: no game versions found"
+                    ? `游戏版本: ${currentGameVersion}`
+                    : "错误: 未找到任何游戏版本"
                 }}
                 <InfoIcon
-                  v-tooltip="`${project.title} is only available for ${currentGameVersion}`"
+                  v-tooltip="`${project.title} 仅可在 ${currentGameVersion} 运行`"
                   class="ml-auto size-5"
                 />
               </div>
@@ -255,11 +255,11 @@
               <template #title>
                 <GameIcon aria-hidden="true" />
                 {{
-                  currentGameVersion ? `Game version: ${currentGameVersion}` : "Select game version"
+                  currentGameVersion ? `游戏版本: ${currentGameVersion}` : "选择游戏版本"
                 }}
               </template>
               <div class="iconified-input mb-2 flex w-full">
-                <label for="game-versions-filtering" hidden>Search game versions...</label>
+                <label for="game-versions-filtering" hidden>搜索版本...</label>
                 <SearchIcon aria-hidden="true" />
                 <input
                   id="game-versions-filtering"
@@ -267,7 +267,7 @@
                   v-model="versionFilter"
                   type="search"
                   autocomplete="off"
-                  placeholder="Search game versions..."
+                  placeholder="搜索版本..."
                 />
               </div>
               <ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
@@ -287,7 +287,7 @@
                   <button
                     v-tooltip="
                       !possibleGameVersions.includes(version)
-                        ? `${project.title} does not support ${version} for ${formatCategory(currentPlatform)}`
+                        ? `${project.title} 该版本 ${version} 不支持在 ${formatCategory(currentPlatform)} 运行`
                         : null
                     "
                     :class="{
@@ -311,7 +311,7 @@
               <Checkbox
                 v-model="showAllVersions"
                 class="mx-1"
-                :label="`Show all versions`"
+                :label="`显示全部版本`"
                 :disabled="!!versionFilter"
               />
             </Accordion>
@@ -322,12 +322,12 @@
                 <WrenchIcon aria-hidden="true" />
                 {{
                   currentPlatform
-                    ? `Platform: ${formatCategory(currentPlatform)}`
-                    : "Error: no platforms found"
+                    ? `平台: ${formatCategory(currentPlatform)}`
+                    : "错误: 未找到任何平台"
                 }}
                 <InfoIcon
                   v-tooltip="
-                    `${project.title} is only available for ${formatCategory(currentPlatform)}`
+                    `${project.title} 仅可在 ${formatCategory(currentPlatform)} 运行`
                   "
                   class="ml-auto size-5"
                 />
@@ -349,8 +349,8 @@
                 <WrenchIcon aria-hidden="true" />
                 {{
                   currentPlatform
-                    ? `Platform: ${formatCategory(currentPlatform)}`
-                    : "Select platform"
+                    ? `平台: ${formatCategory(currentPlatform)}`
+                    : "选择运行平台"
                 }}
               </template>
               <ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
@@ -362,7 +362,7 @@
                   <button
                     v-tooltip="
                       !possiblePlatforms.includes(platform)
-                        ? `${project.title} does not support ${formatCategory(platform)} for ${currentGameVersion}`
+                        ? `${project.title} 不支持${currentGameVersion}的 ${formatCategory(platform)} `
                         : null
                     "
                     :class="{
@@ -415,8 +415,8 @@
                 !filteredAlpha
               "
             >
-              No versions available for {{ currentGameVersion }} and
-              {{ formatCategory(currentPlatform) }}.
+               {{ currentGameVersion }} 和
+              {{ formatCategory(currentPlatform) }} 没有可用版本.
             </p>
           </AutomaticAccordion>
         </div>
@@ -479,7 +479,7 @@
               >
                 <button @click="(event) => downloadModal.show(event)">
                   <DownloadIcon aria-hidden="true" />
-                  Download
+                  下载
                 </button>
               </ButtonStyled>
             </div>
@@ -507,8 +507,8 @@
             >
               <button
                 v-if="auth.user"
-                v-tooltip="following ? `Unfollow` : `Follow`"
-                :aria-label="following ? `Unfollow` : `Follow`"
+                v-tooltip="following ? `取消关注` : `关注`"
+                :aria-label="following ? `取消关注` : `关注`"
                 @click="userFollowProject(project)"
               >
                 <HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
@@ -518,7 +518,7 @@
               </nuxt-link>
             </ButtonStyled>
             <ButtonStyled size="large" circular>
-              <PopoutMenu v-if="auth.user" v-tooltip="'Save'" from="top-right" aria-label="Save">
+              <PopoutMenu v-if="auth.user" v-tooltip="'保存'" from="top-right" aria-label="Save">
                 <BookmarkIcon
                   aria-hidden="true"
                   :fill="
@@ -531,7 +531,7 @@
                   <input
                     v-model="displayCollectionsSearch"
                     type="text"
-                    placeholder="Search collections..."
+                    placeholder="搜索收藏..."
                     class="search-input menu-search"
                   />
                   <div v-if="collections.length > 0" class="collections-list">
@@ -548,18 +548,18 @@
                     </Checkbox>
                   </div>
                   <div v-else class="menu-text">
-                    <p class="popout-text">No collections found.</p>
+                    <p class="popout-text">未找到任何收收藏夹</p>
                   </div>
                   <button
                     class="btn collection-button"
                     @click="(event) => $refs.modal_collection.show(event)"
                   >
                     <PlusIcon aria-hidden="true" />
-                    Create new collection
+                    创建收藏夹
                   </button>
                 </template>
               </PopoutMenu>
-              <nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+              <nuxt-link v-else v-tooltip="'保存'" to="/auth/sign-in" aria-label="Save">
                 <BookmarkIcon aria-hidden="true" />
               </nuxt-link>
             </ButtonStyled>
@@ -731,12 +731,7 @@
             </div>
           </section>
         </div>
-        <AdPlaceholder
-          v-if="
-            (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
-            tags.approvedStatuses.includes(project.status)
-          "
-        />
+
         <div
           v-if="
             project.issues_url ||
@@ -848,7 +843,7 @@
                   <span>
                     {{ organization.name }}
                   </span>
-                  <span class="details-list__item__text--style-secondary">Organization</span>
+                  <span class="details-list__item__text--style-secondary">团队</span>
                 </div>
               </nuxt-link>
               <hr v-if="members.length > 0" />
@@ -1047,7 +1042,6 @@ import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
 import VersionSummary from "~/components/ui/VersionSummary.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 import { getVersionsToDisplay } from "~/helpers/projects.js";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
@@ -1517,7 +1511,7 @@ if (!route.name.startsWith("type-id-settings")) {
     description: () => description.value,
     ogTitle: () => title.value,
     ogDescription: () => project.value.description,
-    ogImage: () => project.value.icon_url ?? "https://cdn.modrinth.com/placeholder.png",
+    ogImage: () => project.value.icon_url ?? "https://cdn.bbsmc.net/raw/placeholder.png",
     robots: () =>
       project.value.status === "approved" || project.value.status === "archived"
         ? "all"

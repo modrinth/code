@@ -194,7 +194,7 @@
                 <div class="country-flag-container">
                   <template v-if="name.toLowerCase() === 'xx' || !name">
                     <img
-                      src="https://cdn.modrinth.com/placeholder-banner.svg"
+                      src="https://cdn.bbsmc.net/raw/placeholder-banner.svg"
                       alt="Placeholder flag"
                       class="country-flag"
                     />
@@ -253,7 +253,7 @@
                 <div class="country-flag-container">
                   <template v-if="name.toLowerCase() === 'xx' || !name">
                     <img
-                      src="https://cdn.modrinth.com/placeholder-banner.svg"
+                      src="https://cdn.bbsmc.net/raw/placeholder-banner.svg"
                       alt="Placeholder flag"
                       class="country-flag"
                     />

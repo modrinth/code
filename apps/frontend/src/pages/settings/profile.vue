@@ -85,7 +85,7 @@ import { Avatar, FileInput, Button } from "@modrinth/ui";
 import { commonMessages } from "~/utils/common-messages.ts";
 
 useHead({
-  title: "Profile settings - Modrinth",
+  title: "个人资料设置 - BBSMC",
 });
 
 definePageMeta({
@@ -102,7 +102,7 @@ const messages = defineMessages({
   description: {
     id: "settings.profile.description",
     defaultMessage:
-      "Your profile information is publicly viewable on Modrinth and through the <docs-link>Modrinth API</docs-link>.",
+      "Your profile information is publicly viewable on BBSMC and through the <docs-link>BBSMC API</docs-link>.",
   },
   profilePicture: {
     id: "settings.profile.profile-picture.title",

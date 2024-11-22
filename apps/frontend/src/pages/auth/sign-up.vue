@@ -1,35 +1,35 @@
 <template>
   <div>
-    <h1>{{ formatMessage(messages.signUpWithTitle) }}</h1>
+<!--    <h1>{{ formatMessage(messages.signUpWithTitle) }}</h1>-->
 
-    <section class="third-party">
-      <a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
-        <SSODiscordIcon />
-        <span>Discord</span>
-      </a>
-      <a class="btn" :href="getAuthUrl('github', redirectTarget)">
-        <SSOGitHubIcon />
-        <span>GitHub</span>
-      </a>
-      <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-        <SSOMicrosoftIcon />
-        <span>Microsoft</span>
-      </a>
-      <a class="btn" :href="getAuthUrl('google', redirectTarget)">
-        <SSOGoogleIcon />
-        <span>Google</span>
-      </a>
-      <a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-        <SSOSteamIcon />
-        <span>Steam</span>
-      </a>
-      <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-        <SSOGitLabIcon />
-        <span>GitLab</span>
-      </a>
-    </section>
+<!--    <section class="third-party">-->
+<!--      <a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">-->
+<!--        <SSODiscordIcon />-->
+<!--        <span>Discord</span>-->
+<!--      </a>-->
+<!--      <a class="btn" :href="getAuthUrl('github', redirectTarget)">-->
+<!--        <SSOGitHubIcon />-->
+<!--        <span>GitHub</span>-->
+<!--      </a>-->
+<!--      <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">-->
+<!--        <SSOMicrosoftIcon />-->
+<!--        <span>Microsoft</span>-->
+<!--      </a>-->
+<!--      <a class="btn" :href="getAuthUrl('google', redirectTarget)">-->
+<!--        <SSOGoogleIcon />-->
+<!--        <span>Google</span>-->
+<!--      </a>-->
+<!--      <a class="btn" :href="getAuthUrl('steam', redirectTarget)">-->
+<!--        <SSOSteamIcon />-->
+<!--        <span>Steam</span>-->
+<!--      </a>-->
+<!--      <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">-->
+<!--        <SSOGitLabIcon />-->
+<!--        <span>GitLab</span>-->
+<!--      </a>-->
+<!--    </section>-->
 
-    <h1>{{ formatMessage(messages.createAccountTitle) }}</h1>
+    <h1>注册</h1>
 
     <section class="auth-form">
       <div class="iconified-input">
@@ -91,20 +91,20 @@
         :description="formatMessage(messages.subscribeLabel)"
       />
 
-      <p>
-        <IntlFormatted :message-id="messages.legalDisclaimer">
-          <template #terms-link="{ children }">
-            <NuxtLink to="/legal/terms" class="text-link">
-              <component :is="() => children" />
-            </NuxtLink>
-          </template>
-          <template #privacy-policy-link="{ children }">
-            <NuxtLink to="/legal/privacy" class="text-link">
-              <component :is="() => children" />
-            </NuxtLink>
-          </template>
-        </IntlFormatted>
-      </p>
+<!--      <p>-->
+<!--        <IntlFormatted :message-id="messages.legalDisclaimer">-->
+<!--          <template #terms-link="{ children }">-->
+<!--            <NuxtLink to="/legal2/terms" class="text-link">-->
+<!--              <component :is="() => children" />-->
+<!--            </NuxtLink>-->
+<!--          </template>-->
+<!--          <template #privacy-policy-link="{ children }">-->
+<!--            <NuxtLink to="/legal2/privacy" class="text-link">-->
+<!--              <component :is="() => children" />-->
+<!--            </NuxtLink>-->
+<!--          </template>-->
+<!--        </IntlFormatted>-->
+<!--      </p>-->
 
       <HCaptcha ref="captcha" v-model="token" />
 
@@ -175,12 +175,12 @@ const messages = defineMessages({
   },
   subscribeLabel: {
     id: "auth.sign-up.subscribe.label",
-    defaultMessage: "Subscribe to updates about Modrinth",
+    defaultMessage: "Subscribe to updates about BBSMC",
   },
   legalDisclaimer: {
     id: "auth.sign-up.legal-dislaimer",
     defaultMessage:
-      "By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
+      "By creating an account, you agree to BBSMC <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
   },
   createAccountButton: {
     id: "auth.sign-up.action.create-account",
@@ -193,7 +193,7 @@ const messages = defineMessages({
 });
 
 useHead({
-  title: () => `${formatMessage(messages.title)} - Modrinth`,
+  title: () => `${formatMessage(messages.title)} - BBSMC`,
 });
 
 const auth = await useAuth();

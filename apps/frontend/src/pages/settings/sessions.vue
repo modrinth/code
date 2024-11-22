@@ -82,7 +82,7 @@ const messages = defineMessages({
   sessionsDescription: {
     id: "settings.sessions.description",
     defaultMessage:
-      "Here are all the devices that are currently logged in with your Modrinth account. You can log out of each one individually.\n\nIf you see an entry you don't recognize, log out of that device and change your Modrinth account password immediately.",
+      "Here are all the devices that are currently logged in with your BBSMC account. You can log out of each one individually.\n\nIf you see an entry you don't recognize, log out of that device and change your Modrinth account password immediately.",
   },
   lastAccessedAgoLabel: {
     id: "settings.sessions.last-accessed-ago",
@@ -99,7 +99,7 @@ const messages = defineMessages({
 });
 
 useHead({
-  title: () => `${formatMessage(commonSettingsMessages.sessions)} - Modrinth`,
+  title: () => `${formatMessage(commonSettingsMessages.sessions)} - BBSMC资源社区`,
 });
 
 const data = useNuxtApp();

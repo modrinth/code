@@ -100,7 +100,7 @@
         <ButtonStyled color="brand">
           <button :disabled="shouldPreventActions" @click="createVersion">
             <PlusIcon aria-hidden="true" />
-            Create
+            创建
           </button>
         </ButtonStyled>
         <ButtonStyled>
@@ -109,7 +109,7 @@
             :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
           >
             <CrossIcon aria-hidden="true" />
-            Cancel
+            取消
           </nuxt-link>
         </ButtonStyled>
       </div>
@@ -117,14 +117,14 @@
         <ButtonStyled color="brand">
           <button :disabled="shouldPreventActions" @click="saveEditedVersion">
             <SaveIcon aria-hidden="true" />
-            Save
+            保存
           </button>
         </ButtonStyled>
         <ButtonStyled>
           <button @click="version.featured = !version.featured">
             <StarIcon aria-hidden="true" />
-            <template v-if="!version.featured"> Feature version</template>
-            <template v-else> Unfeature version</template>
+            <template v-if="!version.featured"> 精选版本</template>
+            <template v-else> 取消精选</template>
           </button>
         </ButtonStyled>
         <ButtonStyled>
@@ -136,7 +136,7 @@
             }/version/${encodeURI(version.displayUrlEnding)}`"
           >
             <CrossIcon aria-hidden="true" />
-            Discard changes
+            放弃修改
           </nuxt-link>
         </ButtonStyled>
       </div>
@@ -148,19 +148,19 @@
             @click="emit('onDownload')"
           >
             <DownloadIcon aria-hidden="true" />
-            Download
+            下载
           </a>
         </ButtonStyled>
         <ButtonStyled v-if="!auth.user">
           <nuxt-link to="/auth/sign-in">
             <ReportIcon aria-hidden="true" />
-            Report
+            报告反馈
           </nuxt-link>
         </ButtonStyled>
         <ButtonStyled v-else-if="!currentMember">
           <button @click="() => reportVersion(version.id)">
             <ReportIcon aria-hidden="true" />
-            Report
+            报告反馈
           </button>
         </ButtonStyled>
         <ButtonStyled>
@@ -172,7 +172,7 @@
             }/version/${encodeURI(version.displayUrlEnding)}/edit`"
           >
             <EditIcon aria-hidden="true" />
-            Edit
+            编辑
           </nuxt-link>
         </ButtonStyled>
         <ButtonStyled>
@@ -184,13 +184,13 @@
             @click="$refs.modal_package_mod.show()"
           >
             <BoxIcon aria-hidden="true" />
-            Package as mod
+            打包成模组
           </button>
         </ButtonStyled>
         <ButtonStyled>
           <button v-if="currentMember" @click="$refs.modal_confirm.show()">
             <TrashIcon aria-hidden="true" />
-            Delete
+            删除
           </button>
         </ButtonStyled>
       </div>
@@ -206,7 +206,7 @@
         v-else
         class="markdown-body"
         v-html="
-          version.changelog ? renderHighlightedString(version.changelog) : 'No changelog specified.'
+          version.changelog ? renderHighlightedString(version.changelog) : '无'
         "
       />
     </div>
@@ -336,7 +336,7 @@
       </div>
     </div>
     <div class="version-page__files universal-card">
-      <h3>Files</h3>
+      <h3>文件</h3>
       <div v-if="isEditing && replaceFile" class="file primary">
         <FileIcon aria-hidden="true" />
         <span class="filename">
@@ -683,7 +683,6 @@ import RightArrowIcon from "~/assets/images/utils/right-arrow.svg?component";
 import Modal from "~/components/ui/Modal.vue";
 import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
 
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 export default defineNuxtComponent({
   components: {
     MarkdownEditor,
@@ -715,7 +714,6 @@ export default defineNuxtComponent({
     RightArrowIcon,
     ConfirmModal,
     ButtonStyled,
-    AdPlaceholder,
   },
   props: {
     project: {

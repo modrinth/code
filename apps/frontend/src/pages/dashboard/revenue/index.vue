@@ -7,7 +7,7 @@
           You have
           <strong>{{ $formatMoney(userBalance.available) }}</strong>
           available to withdraw. <strong>{{ $formatMoney(userBalance.pending) }}</strong> of your
-          balance is <nuxt-link class="text-link" to="/legal/cmp-info#pending">pending</nuxt-link>.
+          balance is <nuxt-link class="text-link" to="/legal2/cmp-info#pending">pending</nuxt-link>.
         </p>
       </div>
       <p v-else>
@@ -15,7 +15,7 @@
         <strong>{{ $formatMoney(userBalance.available) }}</strong
         >, which is under the minimum of ${{ minWithdraw }} to withdraw.
         <strong>{{ $formatMoney(userBalance.pending) }}</strong> of your balance is
-        <nuxt-link class="text-link" to="/legal/cmp-info#pending">pending</nuxt-link>.
+        <nuxt-link class="text-link" to="/legal2/cmp-info#pending">pending</nuxt-link>.
       </p>
       <div class="input-group mt-4">
         <nuxt-link
@@ -31,9 +31,9 @@
       </div>
       <p>
         By uploading projects to Modrinth and withdrawing money from your account, you agree to the
-        <nuxt-link to="/legal/cmp" class="text-link">Rewards Program Terms</nuxt-link>. For more
+        <nuxt-link to="/legal2/cmp" class="text-link">Rewards Program Terms</nuxt-link>. For more
         information on how the rewards system works, see our information page
-        <nuxt-link to="/legal/cmp-info" class="text-link">here</nuxt-link>.
+        <nuxt-link to="/legal2/cmp-info" class="text-link">here</nuxt-link>.
       </p>
     </section>
     <section class="universal-card">

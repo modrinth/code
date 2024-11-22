@@ -105,7 +105,7 @@ VALUES (
         '4dbff86cc2ca1bae1e16468a05cb9881c97f1753bce3619034898faa1aabe429955a1bf8ec483d7421fe3c1646613a59ed5441fb0f321389f77f48a879c7b1f1',
         3
     );
-INSERT INTO oauth_client_redirect_uris (id, client_id, uri) VALUES (1, 1, 'https://modrinth.com/oauth_callback');
+INSERT INTO oauth_client_redirect_uris (id, client_id, uri) VALUES (1, 1, 'https://bbsmc.net/oauth_callback');
 
 -- Create dummy data table to mark that this file has been run
 CREATE TABLE dummy_data ( 

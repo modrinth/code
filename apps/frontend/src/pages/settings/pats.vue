@@ -267,7 +267,7 @@ const messages = defineMessages({
   description: {
     id: "settings.pats.description",
     defaultMessage:
-      "PATs can be used to access Modrinth's API. For more information, see <doc-link>Modrinth's API documentation</doc-link>. They can be created and revoked at any time.",
+      "PATs can be used to access BBSMC API. For more information, see <doc-link>BBSMC API documentation</doc-link>. They can be created and revoked at any time.",
   },
   create: {
     id: "settings.pats.action.create",
@@ -307,7 +307,7 @@ definePageMeta({
 });
 
 useHead({
-  title: `${formatMessage(commonSettingsMessages.pats)} - Modrinth`,
+  title: `${formatMessage(commonSettingsMessages.pats)} - BBSMC资源社区`,
 });
 
 const data = useNuxtApp();

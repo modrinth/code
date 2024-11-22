@@ -3,11 +3,11 @@ openapi: '3.0.0'
 info:
   version: v2.7.0/15cf3fc
   title: Labrinth
-  termsOfService: https://modrinth.com/legal/terms
+  termsOfService: https://bbsmc.net/legal/terms
   contact:
-    name: Modrinth Support
+    name: BBSMC Support
     url: https://support.modrinth.com
-    email: support@modrinth.com
+    email: support@bbsmc.net
   description: |
     This documentation doesn't provide a way to test our API. In order to facilitate testing, we recommend the following tools:
 
@@ -53,11 +53,11 @@ info:
 
     ### OAuth2
     Applications interacting with the authenticated API should create an OAuth2 application.
-    You can do this in [the developer settings](https://modrinth.com/settings/applications).
+    You can do this in [the developer settings](https://bbsmc.net/settings/applications).
 
     Once you have created a client, use the following URL to have a user authorize your client:
     ```
-    https://modrinth.com/auth/authorize?client_id=<CLIENT_ID>&redirect_uri=<CALLBACK_URL>&scope=<SCOPE_ONE>+<SCOPE_TWO>+<SCOPE_THREE>
+    https://bbsmc.net/auth/authorize?client_id=<CLIENT_ID>&redirect_uri=<CALLBACK_URL>&scope=<SCOPE_ONE>+<SCOPE_TWO>+<SCOPE_THREE>
     ```
 
     Then, use the following URL to get the token:
@@ -68,7 +68,7 @@ info:
     This route will be changed in the future to move the `_internal` part to `v3`.
 
     ### Personal access tokens
-    Personal access tokens (PATs) can be generated in from [the user settings](https://modrinth.com/settings/account).
+    Personal access tokens (PATs) can be generated in from [the user settings](https://bbsmc.net/settings/account).
 
     ### GitHub tokens
     For backwards compatibility purposes, some types of GitHub tokens also work for authenticating a user with Modrinth's API, granting all scopes.
@@ -505,7 +505,7 @@ components:
           $ref: '#/components/schemas/VersionFileHashes'
         url:
           type: string
-          example: "https://cdn.modrinth.com/data/AABBCCDD/versions/1.0.0/my_file.jar"
+          example: "https://cdn.bbsmc.net/bbsmc/data/AABBCCDD/versions/1.0.0/my_file.jar"
           description: A direct link to the file
         filename:
           type: string
@@ -645,7 +645,7 @@ components:
               description: The total number of downloads of the project
             icon_url:
               type: string
-              example: https://cdn.modrinth.com/data/AABBCCDD/b46513nd83hb4792a9a0e1fn28fgi6090c1842639.png
+              example: https://cdn.bbsmc.net/bbsmc/data/AABBCCDD/b46513nd83hb4792a9a0e1fn28fgi6090c1842639.png
               description: The URL of the project's icon
               nullable: true
             color:
@@ -711,7 +711,7 @@ components:
             gallery:
               type: array
               description: All gallery images attached to the project
-              example: [https://cdn.modrinth.com/data/AABBCCDD/images/009b7d8d6e8bf04968a29421117c59b3efe2351a.png, https://cdn.modrinth.com/data/AABBCCDD/images/c21776867afb6046fdc3c21dbcf5cc50ae27a236.png]
+              example: [https://cdn.bbsmc.net/bbsmc/data/AABBCCDD/images/009b7d8d6e8bf04968a29421117c59b3efe2351a.png, https://cdn.bbsmc.net/bbsmc/data/AABBCCDD/images/c21776867afb6046fdc3c21dbcf5cc50ae27a236.png]
               items:
                 type: string
             featured_gallery:
@@ -1007,7 +1007,7 @@ components:
         url:
           type: string
           description: The URL of the gallery image
-          example: https://cdn.modrinth.com/data/AABBCCDD/images/009b7d8d6e8bf04968a29421117c59b3efe2351a.png
+          example: https://cdn.bbsmc.net/bbsmc/data/AABBCCDD/images/009b7d8d6e8bf04968a29421117c59b3efe2351a.png
         featured:
           type: boolean
           description: Whether the image is featured in the gallery
@@ -1227,7 +1227,7 @@ components:
         payout_address:
           type: string
           description: The user's payout address
-          example: support@modrinth.com
+          example: support@bbsmc.net
     User:
       allOf:
         - $ref: '#/components/schemas/EditableUser'
@@ -1779,7 +1779,7 @@ components:
         homepage:
           type: string
           description: A link to the mod page
-          example: https://modrinth.com
+          example: https://bbsmc.net
         promos:
           $ref: '#/components/schemas/ForgeUpdateCheckerPromos'
     ForgeUpdateCheckerPromos:
@@ -2219,7 +2219,7 @@ paths:
       - $ref: '#/components/parameters/ProjectIdentifier'
     post:
       summary: Add a gallery image
-      description: Modrinth allows you to upload files of up to 5MiB to a project's gallery.
+      description: BBSMC allows you to upload files of up to 5MiB to a project's gallery.
       operationId: addGalleryImage
       tags:
         - projects

@@ -62,6 +62,7 @@ pub async fn page_view_ingest(
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = Url::parse(&url_input.url).map_err(|_| {
+        println!("Invalid URL: {}", url_input.url);
         ApiError::InvalidInput("invalid page view URL specified!".to_string())
     })?;
 
@@ -71,10 +72,14 @@ pub async fn page_view_ingest(
 
     let allowed_origins =
         parse_strings_from_var("CORS_ALLOWED_ORIGINS").unwrap_or_default();
-    if !(domain.ends_with(".modrinth.com")
-        || domain == "modrinth.com"
+
+
+    if !(domain.ends_with(".bbsmc.net")
+        || domain.ends_with("localhost")
+        || domain == "bbsmc.net"
         || allowed_origins.contains(&"*".to_string()))
     {
+        println!("Invalid URL: {}", domain);
         return Err(ApiError::InvalidInput(
             "invalid page view URL specified!".to_string(),
         ));

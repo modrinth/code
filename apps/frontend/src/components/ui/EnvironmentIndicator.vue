@@ -1,7 +1,7 @@
 <template>
   <span v-if="typeOnly" class="environment">
     <InfoIcon aria-hidden="true" />
-    A {{ type }}
+    {{ type }}
   </span>
   <span
     v-else-if="
@@ -13,11 +13,11 @@
   >
     <template v-if="clientSide === 'optional' && serverSide === 'optional'">
       <GlobeIcon aria-hidden="true" />
-      Client or server
+      服务端/客户端
     </template>
     <template v-else-if="clientSide === 'required' && serverSide === 'required'">
       <GlobeIcon aria-hidden="true" />
-      Client and server
+      服务端+客户端
     </template>
     <template
       v-else-if="
@@ -26,7 +26,7 @@
       "
     >
       <ClientIcon aria-hidden="true" />
-      Client
+      客户端
     </template>
     <template
       v-else-if="
@@ -35,15 +35,15 @@
       "
     >
       <ServerIcon aria-hidden="true" />
-      Server
+      服务端
     </template>
     <template v-else-if="serverSide === 'unsupported' && clientSide === 'unsupported'">
       <GlobeIcon aria-hidden="true" />
-      Unsupported
+      不支持
     </template>
     <template v-else-if="alwaysShow">
       <InfoIcon aria-hidden="true" />
-      A {{ type }}
+      {{ type }}
     </template>
   </span>
 </template>

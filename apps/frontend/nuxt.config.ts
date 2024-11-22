@@ -8,7 +8,7 @@ import { globIterate } from "glob";
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { consola } from "consola";
 
-const STAGING_API_URL = "http://staging-api.modrinth.com/v2/";
+const STAGING_API_URL = "http://staging-api.bbsmc.net/v2/";
 
 const preloadedFonts = [
   "inter/Inter-Regular.woff2",
@@ -52,13 +52,13 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: "en",
       },
-      title: "Modrinth",
+      title: "BBSMC 我的世界资源社区",
       link: [
         // The type is necessary because the linter can't always compare this very nested/complex type on itself
         ...preloadedFonts.map((font): object => {
           return {
             rel: "preload",
-            href: `https://cdn-raw.modrinth.com/fonts/${font}?v=3.19`,
+            href: `https://cdn.bbsmc.net/raw/fonts/${font}?v=3.19`,
             as: "font",
             type: "font/woff2",
             crossorigin: "anonymous",
@@ -74,7 +74,7 @@ export default defineNuxtConfig({
           rel: "search",
           type: "application/opensearchdescription+xml",
           href: "/opensearch.xml",
-          title: "Modrinth mods",
+          title: "BBSMC 模组",
         },
       ],
     },
@@ -153,7 +153,7 @@ export default defineNuxtConfig({
 
       const headers = {
         headers: {
-          "user-agent": "Knossos generator (support@modrinth.com)",
+          "user-agent": "Knossos generator (support@bbsmc.net)",
         },
       };
 
@@ -213,7 +213,7 @@ export default defineNuxtConfig({
     async "vintl:extendOptions"(opts) {
       opts.locales ??= [];
 
-      const isProduction = getDomain() === "https://modrinth.com";
+      const isProduction = getDomain() === "https://bbsmc.net";
 
       const resolveCompactNumberDataImport = await (async () => {
         const compactNumberLocales: string[] = [];
@@ -328,7 +328,7 @@ export default defineNuxtConfig({
       production: isProduction(),
       featureFlagOverrides: getFeatureFlagOverrides(),
 
-      owner: process.env.VERCEL_GIT_REPO_OWNER || "modrinth",
+      owner: process.env.VERCEL_GIT_REPO_OWNER || "bbsmc",
       slug: process.env.VERCEL_GIT_REPO_SLUG || "code",
       branch:
         process.env.VERCEL_GIT_COMMIT_REF ||
@@ -344,9 +344,8 @@ export default defineNuxtConfig({
         "unknown",
 
       stripePublishableKey:
-        process.env.STRIPE_PUBLISHABLE_KEY ||
-        globalThis.STRIPE_PUBLISHABLE_KEY ||
-        "pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b",
+
+        "",
     },
   },
   typescript: {
@@ -456,9 +455,9 @@ function getDomain() {
     } else if (process.env.VERCEL_URL) {
       return `https://${process.env.VERCEL_URL}`;
     } else if (getApiUrl() === STAGING_API_URL) {
-      return "https://staging.modrinth.com";
+      return "https://staging.bbsmc.net";
     } else {
-      return "https://modrinth.com";
+      return "https://bbsmc.net";
     }
   } else {
     const port = process.env.PORT || 3000;

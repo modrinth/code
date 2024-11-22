@@ -1,10 +1,10 @@
 <template>
   <nuxt-link :to="link" class="thread-summary" :class="{ raised: raised }">
     <div class="thread-title-row">
-      <span v-if="report" class="thread-title">Report thread</span>
-      <span v-else class="thread-title">Thread</span>
+      <span v-if="report" class="thread-title">报告会话</span>
+      <span v-else class="thread-title">会话</span>
       <span class="thread-messages"
-        >{{ props.thread.messages.length }} messages <ChevronRightIcon
+        >{{ props.thread.messages.length }} 消息 <ChevronRightIcon
       /></span>
     </div>
     <template v-if="displayMessages.length > 0">
@@ -19,7 +19,7 @@
         no-links
       />
     </template>
-    <span v-else>There are no messages in this thread yet.</span>
+    <span v-else>此会话中尚无任何消息。</span>
   </nuxt-link>
 </template>
 

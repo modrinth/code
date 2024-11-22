@@ -42,7 +42,7 @@ lazy_static::lazy_static! {
     pub static ref REQWEST_CLIENT: reqwest::Client = {
         let mut headers = reqwest::header::HeaderMap::new();
         if let Ok(header) = reqwest::header::HeaderValue::from_str(&format!(
-            "modrinth/daedalus/{} (support@modrinth.com)",
+            "modrinth/daedalus/{} (support@bbsmc.net)",
             env!("CARGO_PKG_VERSION")
         )) {
             headers.insert(reqwest::header::USER_AGENT, header);
