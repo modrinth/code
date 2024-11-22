@@ -791,22 +791,35 @@ onMounted(() => {
     connectWebSocket();
   }
 
-  Intercom({
-    app_id: INTERCOM_APP_ID.value,
-    userId: userId.value,
-    name: username.value,
-    email: email.value,
-    created_at: createdAt.value ?? undefined,
-  });
+  if (username.value && email.value && userId.value && createdAt.value) {
+    const currentUser = auth.value?.user as any;
+    const matches =
+      username.value === currentUser?.username &&
+      email.value === currentUser?.email &&
+      userId.value === currentUser?.id &&
+      createdAt.value === Math.floor(new Date(currentUser?.created).getTime() / 1000);
 
-  // duplication needed because we shutdown intercom in cleanup
-  boot({
-    app_id: INTERCOM_APP_ID.value,
-    user_id: userId.value,
-    name: username.value,
-    email: email.value,
-    created_at: createdAt.value ?? undefined,
-  });
+    if (matches) {
+      Intercom({
+        app_id: INTERCOM_APP_ID.value,
+        userId: userId.value,
+        name: username.value,
+        email: email.value,
+        created_at: createdAt.value,
+      });
+
+      boot({
+        app_id: INTERCOM_APP_ID.value,
+        user_id: userId.value,
+        name: username.value,
+        email: email.value,
+        created_at: createdAt.value,
+        hide_default_launcher: false,
+      });
+    } else {
+      console.warn("[PYROSERVERS][INTERCOM] mismatch");
+    }
+  }
 
   DOMPurify.addHook(
     "afterSanitizeAttributes",
