@@ -266,8 +266,7 @@ import {
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { refThrottled } from "@vueuse/core";
-// eslint-disable-next-line import/no-named-as-default
-import Intercom, { boot, shutdown } from "@intercom/messenger-js-sdk";
+import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 
 const socket = ref<WebSocket | null>(null);
@@ -806,15 +805,6 @@ onMounted(() => {
         name: username.value,
         email: email.value,
         created_at: createdAt.value,
-      });
-
-      boot({
-        app_id: INTERCOM_APP_ID.value,
-        user_id: userId.value,
-        name: username.value,
-        email: email.value,
-        created_at: createdAt.value,
-        hide_default_launcher: false,
       });
     } else {
       console.warn("[PYROSERVERS][INTERCOM] mismatch");
