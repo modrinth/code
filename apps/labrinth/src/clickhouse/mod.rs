@@ -1,3 +1,6 @@
+use hyper::client::HttpConnector;
+use hyper_tls::{native_tls, HttpsConnector};
+
 mod fetch;
 
 pub use fetch::*;
@@ -11,16 +14,15 @@ pub async fn init_client_with_database(
     database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
     let client = {
-        let tls_connector = hyper_rustls::HttpsConnectorBuilder::new()
-            .with_native_roots()
-            .expect("no native root CA certificates found")
-            .https_only()
-            .enable_http1()
-            .build();
-        let hyper_client = hyper_util::client::legacy::Client::builder(
-            hyper_util::rt::TokioExecutor::new(),
-        )
-        .build(tls_connector);
+        let mut http_connector = HttpConnector::new();
+        http_connector.enforce_http(false); // allow https URLs
+
+        let tls_connector =
+            native_tls::TlsConnector::builder().build().unwrap().into();
+        let https_connector =
+            HttpsConnector::from((http_connector, tls_connector));
+        let hyper_client =
+            hyper::client::Client::builder().build(https_connector);
 
         clickhouse::Client::with_http_client(hyper_client)
             .with_url(dotenvy::var("CLICKHOUSE_URL").unwrap())
