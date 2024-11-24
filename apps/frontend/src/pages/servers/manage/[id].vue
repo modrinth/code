@@ -266,6 +266,7 @@ import {
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { refThrottled } from "@vueuse/core";
+import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 
 const socket = ref<WebSocket | null>(null);
@@ -274,6 +275,19 @@ const isLoading = ref(true);
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
 const isFirstMount = ref(true);
 const isMounted = ref(true);
+
+const INTERCOM_APP_ID = ref("ykeritl9");
+const auth = await useAuth();
+// @ts-expect-error - Auth is untyped
+const userId = ref(auth.value?.user?.id ?? null);
+// @ts-expect-error - Auth is untyped
+const username = ref(auth.value?.user?.username ?? null);
+// @ts-expect-error - Auth is untyped
+const email = ref(auth.value?.user?.email ?? null);
+const createdAt = ref(
+  // @ts-expect-error - Auth is untyped
+  auth.value?.user?.created ? Math.floor(new Date(auth.value.user.created).getTime() / 1000) : null,
+);
 
 const route = useNativeRoute();
 const router = useRouter();
@@ -735,6 +749,8 @@ const openInstallLog = () => {
 const cleanup = () => {
   isMounted.value = false;
 
+  shutdown();
+
   stopPolling();
   stopUptimeUpdates();
   if (reconnectInterval.value) {
@@ -772,6 +788,27 @@ onMounted(() => {
     }
   } else {
     connectWebSocket();
+  }
+
+  if (username.value && email.value && userId.value && createdAt.value) {
+    const currentUser = auth.value?.user as any;
+    const matches =
+      username.value === currentUser?.username &&
+      email.value === currentUser?.email &&
+      userId.value === currentUser?.id &&
+      createdAt.value === Math.floor(new Date(currentUser?.created).getTime() / 1000);
+
+    if (matches) {
+      Intercom({
+        app_id: INTERCOM_APP_ID.value,
+        userId: userId.value,
+        name: username.value,
+        email: email.value,
+        created_at: createdAt.value,
+      });
+    } else {
+      console.warn("[PYROSERVERS][INTERCOM] mismatch");
+    }
   }
 
   DOMPurify.addHook(
