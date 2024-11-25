@@ -165,6 +165,10 @@ pub async fn edit_pat(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    info.0.validate().map_err(|err| {
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
+
     let user = get_user_from_headers(
         &req,
         &**pool,
