@@ -94,12 +94,24 @@
         <div class="auth-form__additional-options">
           <IntlFormatted :message-id="messages.additionalOptionsLabel">
             <template #forgot-password-link="{ children }">
-              <NuxtLink class="text-link" to="/auth/reset-password">
+              <NuxtLink
+                class="text-link"
+                :to="{
+                  path: '/auth/reset-password',
+                  query: route.query,
+                }"
+              >
                 <component :is="() => children" />
               </NuxtLink>
             </template>
             <template #create-account-link="{ children }">
-              <NuxtLink class="text-link" :to="signUpLink">
+              <NuxtLink
+                class="text-link"
+                :to="{
+                  path: '/auth/sign-up',
+                  query: route.query,
+                }"
+              >
                 <component :is="() => children" />
               </NuxtLink>
             </template>
@@ -193,10 +205,6 @@ const token = ref("");
 
 const flow = ref(route.query.flow);
 
-const signUpLink = computed(
-  () => `/auth/sign-up${route.query.redirect ? `?redirect=${route.query.redirect}` : ""}`,
-);
-
 async function beginPasswordSignIn() {
   startLoading();
   try {
@@ -252,6 +260,11 @@ async function begin2FASignIn() {
 }
 
 async function finishSignIn(token) {
+  if (route.query.launcher) {
+    await navigateTo(`https://launcher-files.modrinth.com/?code=${token}`, { external: true });
+    return;
+  }
+
   if (token) {
     await useAuth(token);
     await useUser();

@@ -82,6 +82,7 @@ impl FriendItem {
 
     pub async fn get_user_friends<'a, E>(
         user_id: UserId,
+        accepted: Option<bool>,
         exec: E,
     ) -> Result<Vec<FriendItem>, sqlx::Error>
     where
@@ -104,6 +105,7 @@ impl FriendItem {
             created: row.created,
             accepted: row.accepted,
         })
+        .filter(|x| accepted.map(|y| y == x.accepted).unwrap_or(true))
         .collect::<Vec<_>>();
 
         Ok(friends)

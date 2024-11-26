@@ -65,7 +65,7 @@ pub async fn add_friend(
             }
 
             crate::database::models::friend_item::FriendItem::update_friend(
-                user.id.into(),
+                friend.user_id,
                 friend.friend_id,
                 true,
                 &mut transaction,
@@ -98,9 +98,9 @@ pub async fn add_friend(
 
                         if socket
                             .text(serde_json::to_string(
-                                &ServerToClientMessage::StatusUpdate(
-                                    friend_status.into(),
-                                ),
+                                &ServerToClientMessage::StatusUpdate {
+                                    status: friend_status.into(),
+                                },
                             )?)
                             .await
                             .is_err()
@@ -138,6 +138,12 @@ pub async fn add_friend(
             )
             .await?;
         } else {
+            if friend.id == user.id.into() {
+                return Err(ApiError::InvalidInput(
+                    "You cannot add yourself as a friend!".to_string(),
+                ));
+            }
+
             if !friend.allow_friend_requests {
                 return Err(ApiError::InvalidInput(
                     "Friend requests are disabled for this user!".to_string(),
@@ -159,7 +165,7 @@ pub async fn add_friend(
 
                 if socket
                     .text(serde_json::to_string(
-                        &ServerToClientMessage::FriendRequest(user.id),
+                        &ServerToClientMessage::FriendRequest { from: user.id },
                     )?)
                     .await
                     .is_err()
@@ -237,6 +243,7 @@ pub async fn friends(
     let friends =
         crate::database::models::friend_item::FriendItem::get_user_friends(
             user.id.into(),
+            None,
             &**pool,
         )
         .await?

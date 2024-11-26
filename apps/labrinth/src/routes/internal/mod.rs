@@ -23,6 +23,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(pats::config)
             .configure(moderation::config)
             .configure(billing::config)
-            .configure(gdpr::config),
+            .configure(gdpr::config)
+            .configure(statuses::config),
     );
 }
