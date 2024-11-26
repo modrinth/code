@@ -36,7 +36,6 @@ impl Drop for Scheduler {
     }
 }
 
-use log::{info, warn};
 
 pub fn schedule_versions(
     scheduler: &mut Scheduler,
@@ -51,12 +50,12 @@ pub fn schedule_versions(
         let pool_ref = pool.clone();
         let redis = redis.clone();
         async move {
-            info!("Indexing game versions list from Mojang");
+            info!("从 Mojang 索引游戏版本列表");
             let result = update_versions(&pool_ref, &redis).await;
             if let Err(e) = result {
-                warn!("Version update failed: {}", e);
+                warn!("版本更新失败：{}", e);
             }
-            info!("Done indexing game versions");
+            info!("完成游戏版本索引");
         }
     });
 }
@@ -65,9 +64,9 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum VersionIndexingError {
-    #[error("Network error while updating game versions list: {0}")]
+    #[error("更新游戏版本列表时的网络错误：{0}")]
     NetworkError(#[from] reqwest::Error),
-    #[error("Database error while updating game versions list: {0}")]
+    #[error("更新游戏版本列表时的数据库错误：{0}")]
     DatabaseError(#[from] crate::database::models::DatabaseError),
 }
 
@@ -78,6 +77,7 @@ use crate::{
     util::env::parse_var,
 };
 use chrono::{DateTime, Utc};
+use log::{info, warn};
 use serde::Deserialize;
 use tokio_stream::wrappers::IntervalStream;
 
@@ -102,9 +102,9 @@ async fn update_versions(
     let input = reqwest::get(
         "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
     )
-    .await?
-    .json::<InputFormat>()
-    .await?;
+        .await?
+        .json::<InputFormat>()
+        .await?;
 
     let mut skipped_versions_count = 0u32;
 
@@ -207,7 +207,7 @@ async fn update_versions(
         // that accounts for those versions and update it whenever we
         // manually fix another version.
         warn!(
-            "Skipped {} game versions; check for new versions and add them manually",
+            "跳过了 {} 个游戏版本；请检查新版本并手动添加",
             skipped_versions_count
         );
     }

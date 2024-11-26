@@ -66,13 +66,11 @@
             <span
               >共
               {{ downloadsProjectCount }}
-              个资源</span>
-                      <NuxtLink class="goto-link" to="/dashboard/analytics"
-                        >查看详细
-                        <ChevronRightIcon
-                          class="featured-header-chevron"
-                          aria-hidden="true"
-                      /></NuxtLink>
+              个资源</span
+            >
+            <NuxtLink class="goto-link" to="/dashboard/analytics"
+              >查看详细 <ChevronRightIcon class="featured-header-chevron" aria-hidden="true"
+            /></NuxtLink>
           </div>
           <div class="grid-display__item">
             <div class="label">订阅量</div>
@@ -80,10 +78,7 @@
               {{ $formatNumber(projects.reduce((agg, x) => agg + x.followers, 0)) }}
             </div>
             <span>
-              <span
-                >共 {{ followersProjectCount }} 个资源
-                </span
-              ></span
+              <span>共 {{ followersProjectCount }} 个资源 </span></span
             >
           </div>
         </div>

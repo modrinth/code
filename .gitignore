@@ -57,8 +57,11 @@ generated
 app-playground-data/*
 
 # soley because i need the PORT to be 3002 due to WSL stuff
-.env
 apps/frontend/.env
 
 .astro
 apps/labrinth/.env
+apps/frontend/.env.example
+apps/frontend/.env.example
+apps/labrinth/.env
+apps/labrinth/.env.dev

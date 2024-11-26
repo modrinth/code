@@ -59,7 +59,7 @@ async fn user_scopes() {
             .test(req_gen, read_email)
             .await
             .unwrap();
-        assert_eq!(success["email"], json!("user@modrinth.com")); // email should be present
+        assert_eq!(success["email"], json!("user@bbsmc.net")); // email should be present
 
         // Payout reading
         let read_payout = Scopes::USER_READ | Scopes::PAYOUTS_READ;

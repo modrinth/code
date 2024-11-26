@@ -23,13 +23,16 @@ impl super::Validator for NeoForgeValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
+        if archive.by_name("manifest.json").is_ok() {
+            return Ok(ValidationResult::Pass);
+        }
         if archive.by_name("META-INF/mods.toml").is_err()
             && archive.by_name("META-INF/neoforge.mods.toml").is_err()
             && archive.by_name("META-INF/MANIFEST.MF").is_err()
             && !archive.file_names().any(|x| x.ends_with(".class"))
         {
             return Ok(ValidationResult::Warning(
-                "No neoforge.mods.toml, mods.toml, or valid class files present for NeoForge file.",
+                "NeoForge 文件中没有 neoforge.mods.toml、mods.toml 或有效的类文件。",
             ));
         }
 

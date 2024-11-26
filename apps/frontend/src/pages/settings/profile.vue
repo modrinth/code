@@ -2,9 +2,7 @@
   <div>
     <section class="card">
       <h2 class="text-2xl">{{ formatMessage(messages.title) }}</h2>
-      <p class="mb-4">
-        您的个人资料信息可在 BBSMC 公开查看。
-      </p>
+      <p class="mb-4">您的个人资料信息可在 BBSMC 公开查看。</p>
       <label>
         <span class="label__title">{{ formatMessage(messages.profilePicture) }}</span>
       </label>

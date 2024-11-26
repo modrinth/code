@@ -47,11 +47,7 @@
         <button
           class="iconified-button danger-button"
           :disabled="props.currentMember?.is_owner"
-          :title="
-            props.currentMember?.is_owner
-              ? '你无法离开！你是老大！'
-              : ''
-          "
+          :title="props.currentMember?.is_owner ? '你无法离开！你是老大！' : ''"
           @click="leaveProject()"
         >
           <UserRemoveIcon />
@@ -95,9 +91,7 @@
         <div class="adjacent-input">
           <label :for="`member-${allTeamMembers[index].user.username}-role`">
             <span class="label__title">角色</span>
-            <span class="label__description">
-              该成员在此资源中的头衔。
-            </span>
+            <span class="label__description"> 该成员在此资源中的头衔。 </span>
           </label>
           <input
             :id="`member-${allTeamMembers[index].user.username}-role`"
@@ -106,20 +100,20 @@
             :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
           />
         </div>
-<!--        <div class="adjacent-input">-->
-<!--          <label :for="`member-${allTeamMembers[index].user.username}-monetization-weight`">-->
-<!--            <span class="label__title">盈利权重</span>-->
-<!--            <span class="label__description">-->
-<!--              相对于所有其他成员的货币化权重，这决定了该项目的收入中有多少部分归该成员所有。-->
-<!--            </span>-->
-<!--          </label>-->
-<!--          <input-->
-<!--            :id="`member-${allTeamMembers[index].user.username}-monetization-weight`"-->
-<!--            v-model="allTeamMembers[index].payouts_split"-->
-<!--            type="number"-->
-<!--            :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"-->
-<!--          />-->
-<!--        </div>-->
+        <!--        <div class="adjacent-input">-->
+        <!--          <label :for="`member-${allTeamMembers[index].user.username}-monetization-weight`">-->
+        <!--            <span class="label__title">盈利权重</span>-->
+        <!--            <span class="label__description">-->
+        <!--              相对于所有其他成员的货币化权重，这决定了该项目的收入中有多少部分归该成员所有。-->
+        <!--            </span>-->
+        <!--          </label>-->
+        <!--          <input-->
+        <!--            :id="`member-${allTeamMembers[index].user.username}-monetization-weight`"-->
+        <!--            v-model="allTeamMembers[index].payouts_split"-->
+        <!--            type="number"-->
+        <!--            :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"-->
+        <!--          />-->
+        <!--        </div>-->
         <template v-if="!member.is_owner">
           <span class="label">
             <span class="label__title">Permissions</span>
@@ -272,8 +266,7 @@
                 <span>
                   {{ acceptedOrgMembers.length }} 位成员<template
                     v-if="acceptedOrgMembers.length !== 1"
-                    ></template
-                  >
+                  ></template>
                 </span>
               </div>
             </span>
@@ -359,9 +352,7 @@
         <div class="adjacent-input">
           <label :for="`member-${allOrgMembers[index].user.username}-role`">
             <span class="label__title">角色</span>
-            <span class="label__description">
-              该成员在此资源中的头衔。
-            </span>
+            <span class="label__description"> 该成员在此资源中的头衔。 </span>
           </label>
           <input
             :id="`member-${allOrgMembers[index].user.username}-role`"
@@ -373,24 +364,24 @@
             "
           />
         </div>
-<!--        <div class="adjacent-input">-->
-<!--          <label :for="`member-${allOrgMembers[index].user.username}-monetization-weight`">-->
-<!--            <span class="label__title">Monetization weight</span>-->
-<!--            <span class="label__description">-->
-<!--              Relative to all other members' monetization weights, this determines what portion of-->
-<!--              this project's revenue goes to this member.-->
-<!--            </span>-->
-<!--          </label>-->
-<!--          <input-->
-<!--            :id="`member-${allOrgMembers[index].user.username}-monetization-weight`"-->
-<!--            v-model="allOrgMembers[index].payouts_split"-->
-<!--            type="number"-->
-<!--            :disabled="-->
-<!--              (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||-->
-<!--              !allOrgMembers[index].override-->
-<!--            "-->
-<!--          />-->
-<!--        </div>-->
+        <!--        <div class="adjacent-input">-->
+        <!--          <label :for="`member-${allOrgMembers[index].user.username}-monetization-weight`">-->
+        <!--            <span class="label__title">Monetization weight</span>-->
+        <!--            <span class="label__description">-->
+        <!--              Relative to all other members' monetization weights, this determines what portion of-->
+        <!--              this project's revenue goes to this member.-->
+        <!--            </span>-->
+        <!--          </label>-->
+        <!--          <input-->
+        <!--            :id="`member-${allOrgMembers[index].user.username}-monetization-weight`"-->
+        <!--            v-model="allOrgMembers[index].payouts_split"-->
+        <!--            type="number"-->
+        <!--            :disabled="-->
+        <!--              (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||-->
+        <!--              !allOrgMembers[index].override-->
+        <!--            "-->
+        <!--          />-->
+        <!--        </div>-->
         <template v-if="!member.is_owner">
           <span class="label">
             <span class="label__title">权限</span>
@@ -485,16 +476,16 @@
               label="查看分析"
               @update:model-value="allOrgMembers[index].permissions ^= VIEW_ANALYTICS"
             />
-<!--            <Checkbox-->
-<!--              :model-value="(member.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"-->
-<!--              :disabled="-->
-<!--                (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||-->
-<!--                (props.currentMember?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS ||-->
-<!--                !allOrgMembers[index].override-->
-<!--              "-->
-<!--              label="View revenue"-->
-<!--              @update:model-value="allOrgMembers[index].permissions ^= VIEW_PAYOUTS"-->
-<!--            />-->
+            <!--            <Checkbox-->
+            <!--              :model-value="(member.permissions & VIEW_PAYOUTS) === VIEW_PAYOUTS"-->
+            <!--              :disabled="-->
+            <!--                (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||-->
+            <!--                (props.currentMember?.permissions & VIEW_PAYOUTS) !== VIEW_PAYOUTS ||-->
+            <!--                !allOrgMembers[index].override-->
+            <!--              "-->
+            <!--              label="View revenue"-->
+            <!--              @update:model-value="allOrgMembers[index].permissions ^= VIEW_PAYOUTS"-->
+            <!--            />-->
           </div>
         </template>
         <div class="input-group">

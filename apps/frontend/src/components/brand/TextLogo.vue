@@ -12,7 +12,7 @@ const config = useRuntimeConfig();
 
 const api = computed(() => {
   const apiUrl = config.public.apiBaseUrl;
-  if (apiUrl.startsWith("http://127.0.0.1")) {
+  if (apiUrl.startsWith("https://bbsmc.net")) {
     return "prod";
   } else if (apiUrl.startsWith("https://staging-api.bbsmc.net")) {
     return "staging";

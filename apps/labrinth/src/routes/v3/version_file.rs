@@ -87,19 +87,19 @@ pub async fn get_version_from_hash(
 
 #[derive(Serialize, Deserialize)]
 pub struct HashQuery {
-    pub algorithm: Option<String>, // Defaults to calculation based on size of hash
+    pub algorithm: Option<String>, // 默认根据哈希大小计算
     pub version_id: Option<VersionId>,
 }
 
-// Calculates whether or not to use sha1 or sha512 based on the size of the hash
+// 根据哈希的大小计算是否使用 sha1 或 sha512
 pub fn default_algorithm_from_hashes(hashes: &[String]) -> String {
-    // Gets first hash, optionally
+    // 可选地获取第一个哈希
     let empty_string = "".into();
     let hash = hashes.first().unwrap_or(&empty_string);
     let hash_len = hash.len();
-    // Sha1 = 40 characters
-    // Sha512 = 128 characters
-    // Favour sha1 as default, unless the hash is longer or equal to 128 characters
+    // Sha1 = 40 个字符
+    // Sha512 = 128 个字符
+    // 默认使用 sha1，除非哈希长度大于或等于 128 个字符
     if hash_len >= 128 {
         return "sha512".into();
     }
@@ -111,10 +111,10 @@ pub struct UpdateData {
     pub loaders: Option<Vec<String>>,
     pub version_types: Option<Vec<VersionType>>,
     /*
-       Loader fields to filter with:
+       用于过滤的加载器字段：
        "game_versions": ["1.16.5", "1.17"]
 
-       Returns if it matches any of the values
+       如果匹配任何值则返回
     */
     pub loader_fields: Option<HashMap<String, Vec<serde_json::Value>>>,
 }
@@ -211,10 +211,10 @@ pub async fn get_update_from_hash(
     Err(ApiError::NotFound)
 }
 
-// Requests above with multiple versions below
+// 上面的请求与下面的多个版本
 #[derive(Deserialize)]
 pub struct FileHashes {
-    pub algorithm: Option<String>, // Defaults to calculation based on size of hash
+    pub algorithm: Option<String>, // 默认根据哈希大小计算
     pub hashes: Vec<String>,
 }
 
@@ -328,7 +328,7 @@ pub async fn get_projects_from_hashes(
 
 #[derive(Deserialize)]
 pub struct ManyUpdateData {
-    pub algorithm: Option<String>, // Defaults to calculation based on size of hash
+    pub algorithm: Option<String>, // 默认根据哈希大小计算
     pub hashes: Vec<String>,
     pub loaders: Option<Vec<String>>,
     pub game_versions: Option<Vec<String>>,
@@ -351,7 +351,7 @@ pub async fn update_files(
     )
     .await?;
 
-    // TODO: de-hardcode this and actually use version fields system
+    // TODO: 取消硬编码并实际使用版本字段系统
     let update_version_ids = sqlx::query!(
         "
         SELECT v.id version_id, v.mod_id mod_id
@@ -416,7 +416,7 @@ pub struct FileUpdateData {
 
 #[derive(Serialize, Deserialize)]
 pub struct ManyFileUpdateData {
-    pub algorithm: Option<String>, // Defaults to calculation based on size of hash
+    pub algorithm: Option<String>, // 默认根据哈希大小计算
     pub hashes: Vec<FileUpdateData>,
 }
 
@@ -550,7 +550,7 @@ pub async fn update_individual_files(
     Ok(HttpResponse::Ok().json(response))
 }
 
-// under /api/v1/version_file/{hash}
+// 在 /api/v1/version_file/{hash} 下
 pub async fn delete_file(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -581,7 +581,7 @@ pub async fn delete_file(
         &**pool,
         &redis,
     )
-    .await?;
+  .await?;
 
     if let Some(row) = file {
         if !user.role.is_admin() {
@@ -625,8 +625,7 @@ pub async fn delete_file(
 
             if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
                 return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to delete this file!"
-                        .to_string(),
+                    "您没有权限删除此文件！".to_string(),
                 ));
             }
         }
@@ -637,8 +636,7 @@ pub async fn delete_file(
         if let Some(version) = version {
             if version.files.len() < 2 {
                 return Err(ApiError::InvalidInput(
-                    "Versions must have at least one file uploaded to them"
-                        .to_string(),
+                    "版本必须至少有一个文件上传".to_string(),
                 ));
             }
 
@@ -680,7 +678,7 @@ pub struct DownloadRedirect {
     pub url: String,
 }
 
-// under /api/v1/version_file/{hash}/download
+// 在 /api/v1/version_file/{hash}/download 下
 pub async fn download_version(
     req: HttpRequest,
     info: web::Path<(String,)>,

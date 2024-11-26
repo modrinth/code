@@ -1067,7 +1067,7 @@ pub async fn init(
         parse_strings_from_var("ALLOWED_CALLBACK_URLS").unwrap_or_default();
     let domain = url.host_str().ok_or(AuthenticationError::Url)?;
     if !allowed_callback_urls.iter().any(|x| domain.ends_with(x))
-        && domain != "modrinth.com"
+        && domain != "bbsmc.net"
     {
         return Err(AuthenticationError::Url);
     }
@@ -1430,31 +1430,31 @@ pub async fn delete_auth_provider(
     Ok(HttpResponse::NoContent().finish())
 }
 
-pub async fn sign_up_beehiiv(email: &str) -> Result<(), AuthenticationError> {
-    let id = dotenvy::var("BEEHIIV_PUBLICATION_ID")?;
-    let api_key = dotenvy::var("BEEHIIV_API_KEY")?;
-    let site_url = dotenvy::var("SITE_URL")?;
-
-    let client = reqwest::Client::new();
-    client
-        .post(format!(
-            "https://api.beehiiv.com/v2/publications/{id}/subscriptions"
-        ))
-        .header(AUTHORIZATION, format!("Bearer {}", api_key))
-        .json(&serde_json::json!({
-            "email": email,
-            "utm_source": "modrinth",
-            "utm_medium": "account_creation",
-            "referring_site": site_url,
-        }))
-        .send()
-        .await?
-        .error_for_status()?
-        .text()
-        .await?;
-
-    Ok(())
-}
+// pub async fn sign_up_beehiiv(email: &str) -> Result<(), AuthenticationError> {
+//     let id = dotenvy::var("BEEHIIV_PUBLICATION_ID")?;
+//     let api_key = dotenvy::var("BEEHIIV_API_KEY")?;
+//     let site_url = dotenvy::var("SITE_URL")?;
+//
+//     let client = reqwest::Client::new();
+//     client
+//         .post(format!(
+//             "https://api.beehiiv.com/v2/publications/{id}/subscriptions"
+//         ))
+//         .header(AUTHORIZATION, format!("Bearer {}", api_key))
+//         .json(&serde_json::json!({
+//             "email": email,
+//             "utm_source": "modrinth",
+//             "utm_medium": "account_creation",
+//             "referring_site": site_url,
+//         }))
+//         .send()
+//         .await?
+//         .error_for_status()?
+//         .text()
+//         .await?;
+//
+//     Ok(())
+// }
 
 #[derive(Deserialize, Validate)]
 pub struct NewAccount {
@@ -1578,7 +1578,7 @@ pub async fn create_account_with_password(
     )?;
 
     if new_account.sign_up_newsletter.unwrap_or(false) {
-        sign_up_beehiiv(&new_account.email).await?;
+        // sign_up_beehiiv(&new_account.email).await?;
     }
 
     transaction.commit().await?;
@@ -2220,9 +2220,9 @@ pub async fn change_password(
 
     if let Some(email) = user.email {
         let changed = if update_password.is_some() {
-            "changed"
+            "修改完成"
         } else {
-            "removed"
+            "已删除"
         };
 
         send_email(
@@ -2454,8 +2454,8 @@ pub async fn subscribe_newsletter(
     .1;
 
     if let Some(email) = user.email {
-        sign_up_beehiiv(&email).await?;
-
+        // sign_up_beehiiv(&email).await?;
+        println!("Signed up {} for newsletter", email);
         Ok(HttpResponse::NoContent().finish())
     } else {
         Err(ApiError::InvalidInput(

@@ -18,41 +18,41 @@
         </nuxt-link>
       </template>
     </div>
-<!--    <div-->
-<!--      v-if="-->
-<!--        user &&-->
-<!--        user.subscriptions &&-->
-<!--        user.subscriptions.some((x) => x.status === 'payment-failed') &&-->
-<!--        route.path !== '/settings/billing'-->
-<!--      "-->
-<!--      class="email-nag"-->
-<!--    >-->
-<!--      <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>-->
-<!--      <nuxt-link class="btn" to="/settings/billing">-->
-<!--        <SettingsIcon aria-hidden="true" />-->
-<!--        {{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}-->
-<!--      </nuxt-link>-->
-<!--    </div>-->
-<!--    <div-->
-<!--      v-if="-->
-<!--        config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&-->
-<!--        !cosmetics.hideStagingBanner-->
-<!--      "-->
-<!--      class="site-banner site-banner&#45;&#45;warning [&>*]:z-[6]"-->
-<!--    >-->
-<!--      <div class="site-banner__title">-->
-<!--        <IssuesIcon aria-hidden="true" />-->
-<!--        <span>{{ formatMessage(stagingBannerMessages.title) }}</span>-->
-<!--      </div>-->
-<!--      <div class="site-banner__description">-->
-<!--        {{ formatMessage(stagingBannerMessages.description) }}-->
-<!--      </div>-->
-<!--      <div class="site-banner__actions">-->
-<!--        <Button transparent icon-only :action="hideStagingBanner" aria-label="Close banner"-->
-<!--          ><XIcon aria-hidden="true"-->
-<!--        /></Button>-->
-<!--      </div>-->
-<!--    </div>-->
+    <!--    <div-->
+    <!--      v-if="-->
+    <!--        user &&-->
+    <!--        user.subscriptions &&-->
+    <!--        user.subscriptions.some((x) => x.status === 'payment-failed') &&-->
+    <!--        route.path !== '/settings/billing'-->
+    <!--      "-->
+    <!--      class="email-nag"-->
+    <!--    >-->
+    <!--      <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>-->
+    <!--      <nuxt-link class="btn" to="/settings/billing">-->
+    <!--        <SettingsIcon aria-hidden="true" />-->
+    <!--        {{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}-->
+    <!--      </nuxt-link>-->
+    <!--    </div>-->
+    <!--    <div-->
+    <!--      v-if="-->
+    <!--        config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&-->
+    <!--        !cosmetics.hideStagingBanner-->
+    <!--      "-->
+    <!--      class="site-banner site-banner&#45;&#45;warning [&>*]:z-[6]"-->
+    <!--    >-->
+    <!--      <div class="site-banner__title">-->
+    <!--        <IssuesIcon aria-hidden="true" />-->
+    <!--        <span>{{ formatMessage(stagingBannerMessages.title) }}</span>-->
+    <!--      </div>-->
+    <!--      <div class="site-banner__description">-->
+    <!--        {{ formatMessage(stagingBannerMessages.description) }}-->
+    <!--      </div>-->
+    <!--      <div class="site-banner__actions">-->
+    <!--        <Button transparent icon-only :action="hideStagingBanner" aria-label="Close banner"-->
+    <!--          ><XIcon aria-hidden="true"-->
+    <!--        /></Button>-->
+    <!--      </div>-->
+    <!--    </div>-->
     <header
       class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-3 py-4 lg:grid-cols-[auto_1fr_auto]"
     >
@@ -63,7 +63,7 @@
       </div>
 
       <div
-        :class="`col-span-2 row-start-2 flex flex-wrap justify-center gap-2} lg:col-span-1 lg:row-start-auto`"
+        :class="`gap-2} col-span-2 row-start-2 flex flex-wrap justify-center lg:col-span-1 lg:row-start-auto`"
       >
         <template>
           <ButtonStyled
@@ -126,110 +126,107 @@
           </ButtonStyled>
         </template>
 
+        <!--        -->
+        <!--        -->
+        <!--        <template v-else>-->
+        <!--          <ButtonStyled-->
+        <!--            type="transparent"-->
+        <!--            :highlighted="isDiscovering || isDiscoveringSubpage"-->
+        <!--            :highlighted-style="isDiscoveringSubpage ? 'main-nav-secondary' : 'main-nav-primary'"-->
+        <!--          >-->
+        <!--            <TeleportOverflowMenu-->
+        <!--              :options="[-->
+        <!--                {-->
+        <!--                  id: 'mods',-->
+        <!--                  action: '/mods',-->
+        <!--                },-->
+        <!--                {-->
+        <!--                  id: 'resourcepacks',-->
+        <!--                  action: '/resourcepacks',-->
+        <!--                },-->
+        <!--                {-->
+        <!--                  id: 'datapacks',-->
+        <!--                  action: '/datapacks',-->
+        <!--                },-->
+        <!--                {-->
+        <!--                  id: 'shaders',-->
+        <!--                  action: '/shaders',-->
+        <!--                },-->
+        <!--                {-->
+        <!--                  id: 'modpacks',-->
+        <!--                  action: '/modpacks',-->
+        <!--                },-->
+        <!--                {-->
+        <!--                  id: 'plugins',-->
+        <!--                  action: '/plugins',-->
+        <!--                },-->
+        <!--              ]"-->
+        <!--              hoverable-->
+        <!--            >-->
+        <!--              <BoxIcon-->
+        <!--                v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"-->
+        <!--                aria-hidden="true"-->
+        <!--              />-->
+        <!--              <PaintBrushIcon-->
+        <!--                v-else-if="-->
+        <!--                  route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')-->
+        <!--                "-->
+        <!--                aria-hidden="true"-->
+        <!--              />-->
+        <!--              <BracesIcon-->
+        <!--                v-else-if="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"-->
+        <!--                aria-hidden="true"-->
+        <!--              />-->
+        <!--              <PackageOpenIcon-->
+        <!--                v-else-if="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"-->
+        <!--                aria-hidden="true"-->
+        <!--              />-->
+        <!--              <GlassesIcon-->
+        <!--                v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"-->
+        <!--                aria-hidden="true"-->
+        <!--              />-->
+        <!--              <PlugIcon-->
+        <!--                v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"-->
+        <!--                aria-hidden="true"-->
+        <!--              />-->
+        <!--              <CompassIcon v-else aria-hidden="true" />-->
+        <!--              <span class="hidden md:contents">发现内容</span>-->
+        <!--              <span class="contents md:hidden">Discover</span>-->
+        <!--              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />-->
 
+        <!--              <template #mods> <BoxIcon aria-hidden="true" /> 模组 </template>-->
+        <!--              <template #resourcepacks>-->
+        <!--                <PaintBrushIcon aria-hidden="true" /> 资源包-->
+        <!--              </template>-->
+        <!--              <template #datapacks> <BracesIcon aria-hidden="true" /> 数据包 </template>-->
+        <!--              <template #plugins> <PlugIcon aria-hidden="true" /> 插件 </template>-->
+        <!--              <template #shaders> <GlassesIcon aria-hidden="true" /> 光影 </template>-->
+        <!--              <template #modpacks> <PackageOpenIcon aria-hidden="true" /> 整合包 </template>-->
+        <!--            </TeleportOverflowMenu>-->
+        <!--          </ButtonStyled>-->
 
-
-<!--        -->
-<!--        -->
-<!--        <template v-else>-->
-<!--          <ButtonStyled-->
-<!--            type="transparent"-->
-<!--            :highlighted="isDiscovering || isDiscoveringSubpage"-->
-<!--            :highlighted-style="isDiscoveringSubpage ? 'main-nav-secondary' : 'main-nav-primary'"-->
-<!--          >-->
-<!--            <TeleportOverflowMenu-->
-<!--              :options="[-->
-<!--                {-->
-<!--                  id: 'mods',-->
-<!--                  action: '/mods',-->
-<!--                },-->
-<!--                {-->
-<!--                  id: 'resourcepacks',-->
-<!--                  action: '/resourcepacks',-->
-<!--                },-->
-<!--                {-->
-<!--                  id: 'datapacks',-->
-<!--                  action: '/datapacks',-->
-<!--                },-->
-<!--                {-->
-<!--                  id: 'shaders',-->
-<!--                  action: '/shaders',-->
-<!--                },-->
-<!--                {-->
-<!--                  id: 'modpacks',-->
-<!--                  action: '/modpacks',-->
-<!--                },-->
-<!--                {-->
-<!--                  id: 'plugins',-->
-<!--                  action: '/plugins',-->
-<!--                },-->
-<!--              ]"-->
-<!--              hoverable-->
-<!--            >-->
-<!--              <BoxIcon-->
-<!--                v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"-->
-<!--                aria-hidden="true"-->
-<!--              />-->
-<!--              <PaintBrushIcon-->
-<!--                v-else-if="-->
-<!--                  route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')-->
-<!--                "-->
-<!--                aria-hidden="true"-->
-<!--              />-->
-<!--              <BracesIcon-->
-<!--                v-else-if="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"-->
-<!--                aria-hidden="true"-->
-<!--              />-->
-<!--              <PackageOpenIcon-->
-<!--                v-else-if="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"-->
-<!--                aria-hidden="true"-->
-<!--              />-->
-<!--              <GlassesIcon-->
-<!--                v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"-->
-<!--                aria-hidden="true"-->
-<!--              />-->
-<!--              <PlugIcon-->
-<!--                v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"-->
-<!--                aria-hidden="true"-->
-<!--              />-->
-<!--              <CompassIcon v-else aria-hidden="true" />-->
-<!--              <span class="hidden md:contents">发现内容</span>-->
-<!--              <span class="contents md:hidden">Discover</span>-->
-<!--              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />-->
-
-<!--              <template #mods> <BoxIcon aria-hidden="true" /> 模组 </template>-->
-<!--              <template #resourcepacks>-->
-<!--                <PaintBrushIcon aria-hidden="true" /> 资源包-->
-<!--              </template>-->
-<!--              <template #datapacks> <BracesIcon aria-hidden="true" /> 数据包 </template>-->
-<!--              <template #plugins> <PlugIcon aria-hidden="true" /> 插件 </template>-->
-<!--              <template #shaders> <GlassesIcon aria-hidden="true" /> 光影 </template>-->
-<!--              <template #modpacks> <PackageOpenIcon aria-hidden="true" /> 整合包 </template>-->
-<!--            </TeleportOverflowMenu>-->
-<!--          </ButtonStyled>-->
-
-<!--&lt;!&ndash;          <ButtonStyled&ndash;&gt;-->
-<!--&lt;!&ndash;            type="transparent"&ndash;&gt;-->
-<!--&lt;!&ndash;            :highlighted="route.name.startsWith('servers')"&ndash;&gt;-->
-<!--&lt;!&ndash;            :highlighted-style="&ndash;&gt;-->
-<!--&lt;!&ndash;              route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'&ndash;&gt;-->
-<!--&lt;!&ndash;            "&ndash;&gt;-->
-<!--&lt;!&ndash;          >&ndash;&gt;-->
-<!--&lt;!&ndash;            <nuxt-link to="/servers">&ndash;&gt;-->
-<!--&lt;!&ndash;              <ServerIcon aria-hidden="true" />&ndash;&gt;-->
-<!--&lt;!&ndash;              服务器租用&ndash;&gt;-->
-<!--&lt;!&ndash;            </nuxt-link>&ndash;&gt;-->
-<!--&lt;!&ndash;          </ButtonStyled>&ndash;&gt;-->
-<!--&lt;!&ndash;          <ButtonStyled type="transparent" :highlighted="route.name === 'app'">&ndash;&gt;-->
-<!--&lt;!&ndash;            <nuxt-link to="/app">&ndash;&gt;-->
-<!--&lt;!&ndash;              <DownloadIcon aria-hidden="true" />&ndash;&gt;-->
-<!--&lt;!&ndash;              <span class="hidden md:contents">Get Modrinth App</span>&ndash;&gt;-->
-<!--&lt;!&ndash;              <span class="contents md:hidden">Modrinth App</span>&ndash;&gt;-->
-<!--&lt;!&ndash;            </nuxt-link>&ndash;&gt;-->
-<!--&lt;!&ndash;          </ButtonStyled>&ndash;&gt;-->
-<!--        </template>-->
-<!--        -->
-<!--        -->
+        <!--&lt;!&ndash;          <ButtonStyled&ndash;&gt;-->
+        <!--&lt;!&ndash;            type="transparent"&ndash;&gt;-->
+        <!--&lt;!&ndash;            :highlighted="route.name.startsWith('servers')"&ndash;&gt;-->
+        <!--&lt;!&ndash;            :highlighted-style="&ndash;&gt;-->
+        <!--&lt;!&ndash;              route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'&ndash;&gt;-->
+        <!--&lt;!&ndash;            "&ndash;&gt;-->
+        <!--&lt;!&ndash;          >&ndash;&gt;-->
+        <!--&lt;!&ndash;            <nuxt-link to="/servers">&ndash;&gt;-->
+        <!--&lt;!&ndash;              <ServerIcon aria-hidden="true" />&ndash;&gt;-->
+        <!--&lt;!&ndash;              服务器租用&ndash;&gt;-->
+        <!--&lt;!&ndash;            </nuxt-link>&ndash;&gt;-->
+        <!--&lt;!&ndash;          </ButtonStyled>&ndash;&gt;-->
+        <!--&lt;!&ndash;          <ButtonStyled type="transparent" :highlighted="route.name === 'app'">&ndash;&gt;-->
+        <!--&lt;!&ndash;            <nuxt-link to="/app">&ndash;&gt;-->
+        <!--&lt;!&ndash;              <DownloadIcon aria-hidden="true" />&ndash;&gt;-->
+        <!--&lt;!&ndash;              <span class="hidden md:contents">Get Modrinth App</span>&ndash;&gt;-->
+        <!--&lt;!&ndash;              <span class="contents md:hidden">Modrinth App</span>&ndash;&gt;-->
+        <!--&lt;!&ndash;            </nuxt-link>&ndash;&gt;-->
+        <!--&lt;!&ndash;          </ButtonStyled>&ndash;&gt;-->
+        <!--        </template>-->
+        <!--        -->
+        <!--        -->
       </div>
 
       <div class="flex items-center gap-2">
@@ -260,9 +257,7 @@
             <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
             <template #new-project> <BoxIcon aria-hidden="true" /> 创建资源 </template>
             <!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
-            <template #new-collection>
-              <CollectionIcon aria-hidden="true" /> 创建收藏夹
-            </template>
+            <template #new-collection> <CollectionIcon aria-hidden="true" /> 创建收藏夹 </template>
             <template #new-organization>
               <OrganizationIcon aria-hidden="true" /> 创建团队
             </template>
@@ -278,16 +273,14 @@
           <template #profile> <UserIcon aria-hidden="true" /> 个人资料 </template>
           <template #notifications> <BellIcon aria-hidden="true" /> 通知 </template>
           <template #saved> <BookmarkIcon aria-hidden="true" /> 收藏夹 </template>
-<!--          <template #servers> <ServerIcon aria-hidden="true" /> My servers </template>-->
+          <!--          <template #servers> <ServerIcon aria-hidden="true" /> My servers </template>-->
           <template #plus>
             <ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
           </template>
           <template #settings> <SettingsIcon aria-hidden="true" /> 设置 </template>
           <template #flags> <ReportIcon aria-hidden="true" /> 标签 </template>
           <template #projects> <BoxIcon aria-hidden="true" /> 我的资源 </template>
-          <template #organizations>
-            <OrganizationIcon aria-hidden="true" /> 团队
-          </template>
+          <template #organizations> <OrganizationIcon aria-hidden="true" /> 团队 </template>
           <template #revenue> <CurrencyIcon aria-hidden="true" /> 收入 </template>
           <template #analytics> <ChartIcon aria-hidden="true" /> 统计 </template>
           <template #moderation> <ModerationIcon aria-hidden="true" /> 管理 </template>
@@ -472,64 +465,64 @@
       <slot id="main" />
     </main>
     <footer>
-<!--      <div class="logo-info" role="region" aria-label="Modrinth information">-->
-<!--        <BrandTextLogo-->
-<!--          aria-hidden="true"-->
-<!--          class="text-logo button-base mx-auto mb-4 lg:mx-0"-->
-<!--          @click="developerModeIncrement()"-->
-<!--        />-->
-<!--        <p class="mb-4">-->
-<!--          <IntlFormatted :message-id="footerMessages.openSource">-->
-<!--            <template #github-link="{ children }">-->
-<!--              <a-->
-<!--                :target="$external()"-->
-<!--                href="https://github.com/modrinth"-->
-<!--                class="text-link"-->
-<!--                rel="noopener"-->
-<!--              >-->
-<!--                <component :is="() => children" />-->
-<!--              </a>-->
-<!--            </template>-->
-<!--          </IntlFormatted>-->
-<!--        </p>-->
+      <!--      <div class="logo-info" role="region" aria-label="Modrinth information">-->
+      <!--        <BrandTextLogo-->
+      <!--          aria-hidden="true"-->
+      <!--          class="text-logo button-base mx-auto mb-4 lg:mx-0"-->
+      <!--          @click="developerModeIncrement()"-->
+      <!--        />-->
+      <!--        <p class="mb-4">-->
+      <!--          <IntlFormatted :message-id="footerMessages.openSource">-->
+      <!--            <template #github-link="{ children }">-->
+      <!--              <a-->
+      <!--                :target="$external()"-->
+      <!--                href="https://github.com/modrinth"-->
+      <!--                class="text-link"-->
+      <!--                rel="noopener"-->
+      <!--              >-->
+      <!--                <component :is="() => children" />-->
+      <!--              </a>-->
+      <!--            </template>-->
+      <!--          </IntlFormatted>-->
+      <!--        </p>-->
 
-<!--      </div>-->
-<!--      <div class="links links-1" role="region" aria-label="Legal">-->
-<!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.companyTitle) }}</h4>-->
-<!--        <nuxt-link to="/legal/terms"> {{ formatMessage(footerMessages.terms) }}</nuxt-link>-->
-<!--        <nuxt-link to="/legal/privacy"> {{ formatMessage(footerMessages.privacy) }}</nuxt-link>-->
-<!--        <nuxt-link to="/legal/rules"> {{ formatMessage(footerMessages.rules) }}</nuxt-link>-->
+      <!--      </div>-->
+      <!--      <div class="links links-1" role="region" aria-label="Legal">-->
+      <!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.companyTitle) }}</h4>-->
+      <!--        <nuxt-link to="/legal/terms"> {{ formatMessage(footerMessages.terms) }}</nuxt-link>-->
+      <!--        <nuxt-link to="/legal/privacy"> {{ formatMessage(footerMessages.privacy) }}</nuxt-link>-->
+      <!--        <nuxt-link to="/legal/rules"> {{ formatMessage(footerMessages.rules) }}</nuxt-link>-->
 
-<!--      </div>-->
-<!--      <div class="links links-2" role="region" aria-label="Resources">-->
-<!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.resourcesTitle) }}</h4>-->
-<!--        <a :target="$external()" href="https://support.modrinth.com">-->
-<!--          {{ formatMessage(footerMessages.support) }}-->
-<!--        </a>-->
-<!--        <a :target="$external()" href="https://blog.modrinth.com">-->
-<!--          {{ formatMessage(footerMessages.blog) }}-->
-<!--        </a>-->
-<!--        <a :target="$external()" href="https://docs.modrinth.com">-->
-<!--          {{ formatMessage(footerMessages.docs) }}-->
-<!--        </a>-->
-<!--        <a :target="$external()" href="https://status.modrinth.com">-->
-<!--          {{ formatMessage(footerMessages.status) }}-->
-<!--        </a>-->
-<!--      </div>-->
-<!--      <div class="links links-3" role="region" aria-label="Interact">-->
-<!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.interactTitle) }}</h4>-->
-<!--        <a rel="noopener" :target="$external()" href="https://discord.modrinth.com"> Discord </a>-->
-<!--        <a rel="noopener" :target="$external()" href="https://x.com/modrinth"> X (Twitter) </a>-->
-<!--        <a rel="noopener" :target="$external()" href="https://floss.social/@modrinth"> Mastodon </a>-->
-<!--        <a rel="noopener" :target="$external()" href="https://crowdin.com/project/modrinth">-->
-<!--          Crowdin-->
-<!--        </a>-->
-<!--      </div>-->
+      <!--      </div>-->
+      <!--      <div class="links links-2" role="region" aria-label="Resources">-->
+      <!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.resourcesTitle) }}</h4>-->
+      <!--        <a :target="$external()" href="https://support.modrinth.com">-->
+      <!--          {{ formatMessage(footerMessages.support) }}-->
+      <!--        </a>-->
+      <!--        <a :target="$external()" href="https://blog.modrinth.com">-->
+      <!--          {{ formatMessage(footerMessages.blog) }}-->
+      <!--        </a>-->
+      <!--        <a :target="$external()" href="https://docs.modrinth.com">-->
+      <!--          {{ formatMessage(footerMessages.docs) }}-->
+      <!--        </a>-->
+      <!--        <a :target="$external()" href="https://status.modrinth.com">-->
+      <!--          {{ formatMessage(footerMessages.status) }}-->
+      <!--        </a>-->
+      <!--      </div>-->
+      <!--      <div class="links links-3" role="region" aria-label="Interact">-->
+      <!--        <h4 aria-hidden="true">{{ formatMessage(footerMessages.interactTitle) }}</h4>-->
+      <!--        <a rel="noopener" :target="$external()" href="https://discord.modrinth.com"> Discord </a>-->
+      <!--        <a rel="noopener" :target="$external()" href="https://x.com/modrinth"> X (Twitter) </a>-->
+      <!--        <a rel="noopener" :target="$external()" href="https://floss.social/@modrinth"> Mastodon </a>-->
+      <!--        <a rel="noopener" :target="$external()" href="https://crowdin.com/project/modrinth">-->
+      <!--          Crowdin-->
+      <!--        </a>-->
+      <!--      </div>-->
       <div class="buttons">
-<!--        <nuxt-link class="btn btn-outline btn-primary" to="/app">-->
-<!--          <DownloadIcon aria-hidden="true" />-->
-<!--          {{ formatMessage(messages.getModrinthApp) }}-->
-<!--        </nuxt-link>-->
+        <!--        <nuxt-link class="btn btn-outline btn-primary" to="/app">-->
+        <!--          <DownloadIcon aria-hidden="true" />-->
+        <!--          {{ formatMessage(messages.getModrinthApp) }}-->
+        <!--        </nuxt-link>-->
         <button class="iconified-button raised-button" @click="changeTheme">
           <MoonIcon v-if="$theme.active === 'light'" aria-hidden="true" />
           <SunIcon v-else aria-hidden="true" />
@@ -540,8 +533,12 @@
           {{ formatMessage(commonMessages.settingsLabel) }}
         </nuxt-link>
       </div>
+
       <div class="not-affiliated-notice">
         {{ formatMessage(footerMessages.legalDisclaimer) }}
+        <br /><br />
+        版权所有 © 2019-2024 青岛柒兮网络科技有限公司 | ICP经营许可证: 鲁B2-20210590 | ICP备案:
+        鲁ICP备2021009459号-12
       </div>
     </footer>
   </div>
@@ -592,7 +589,6 @@ const { formatMessage } = useVIntl();
 const app = useNuxtApp();
 const auth = await useAuth();
 
-const cosmetics = useCosmetics();
 const flags = useFeatureFlags();
 
 const config = useRuntimeConfig();
@@ -620,8 +616,6 @@ const addEmailBannerMessages = defineMessages({
     defaultMessage: "Visit account settings",
   },
 });
-
-
 
 const navMenuMessages = defineMessages({
   home: {
@@ -704,8 +698,7 @@ const footerMessages = defineMessages({
   },
   legalDisclaimer: {
     id: "layout.footer.legal-disclaimer",
-    defaultMessage:
-      "非官方 MINECRAFT 服务。未获得 MOJANG 或 MICROSOFT 批准或与其相关。",
+    defaultMessage: "非官方 MINECRAFT 服务。未获得 MOJANG 或 MICROSOFT 批准或与其相关。",
   },
 });
 
@@ -736,7 +729,8 @@ useSeoMeta({
   ogDescription: () =>
     formatMessage({
       id: "layout.meta.og-description",
-      defaultMessage: "以Minecraft我的世界内容为主的中文论坛。面向我的世界玩家、服主、创作者，提供简洁好用的交流讨论和资源分享平台。你可以在这里找到单机游戏、服务器扩展乃至开发辅助种种资源。并且相较于其他论坛，我们外观精致，UI简洁易用，拥有良好的社区氛围，为你带来非同一般的社区体验",
+      defaultMessage:
+        "以Minecraft我的世界内容为主的中文论坛。面向我的世界玩家、服主、创作者，提供简洁好用的交流讨论和资源分享平台。你可以在这里找到单机游戏、服务器扩展乃至开发辅助种种资源。并且相较于其他论坛，我们外观精致，UI简洁易用，拥有良好的社区氛围，为你带来非同一般的社区体验",
     }),
   ogType: "website",
   ogImage: "https://cdn.bbsmc.net/raw/bbsmc-logo.png",
@@ -746,8 +740,6 @@ useSeoMeta({
   twitterCard: "summary",
   twitterSite: "@modrinth",
 });
-
-const developerModeCounter = ref(0);
 
 const isMobileMenuOpen = ref(false);
 const isBrowseMenuOpen = ref(false);
@@ -865,10 +857,6 @@ const userMenuOptions = computed(() => {
   return options;
 });
 
-const isDiscovering = computed(() => route.name && route.name.startsWith("search-"));
-
-const isDiscoveringSubpage = computed(() => route.name && route.name.startsWith("type-id"));
-
 onMounted(() => {
   if (window && import.meta.client) {
     window.history.scrollRestoration = "auto";
@@ -893,31 +881,6 @@ watch(
     runAnalytics();
   },
 );
-
-function developerModeIncrement() {
-  if (developerModeCounter.value >= 5) {
-    flags.value.developerMode = !flags.value.developerMode;
-    developerModeCounter.value = 0;
-    saveFeatureFlags();
-    if (flags.value.developerMode) {
-      app.$notify({
-        group: "main",
-        title: "Developer mode activated",
-        text: "Developer mode has been enabled",
-        type: "success",
-      });
-    } else {
-      app.$notify({
-        group: "main",
-        title: "Developer mode deactivated",
-        text: "Developer mode has been disabled",
-        type: "success",
-      });
-    }
-  } else {
-    developerModeCounter.value++;
-  }
-}
 
 async function logoutUser() {
   await logout();
@@ -960,10 +923,6 @@ function toggleBrowseMenu() {
 }
 
 const { cycle: changeTheme } = useTheme();
-
-function hideStagingBanner() {
-  cosmetics.value.hideStagingBanner = true;
-}
 </script>
 
 <style lang="scss">

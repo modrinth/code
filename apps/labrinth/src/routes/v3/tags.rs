@@ -97,12 +97,14 @@ pub async fn loader_list(
 ) -> Result<HttpResponse, ApiError> {
     let loaders = Loader::list(&**pool, &redis).await?;
 
+    println!("1");
     let loader_fields = LoaderField::get_fields_per_loader(
         &loaders.iter().map(|x| x.id).collect_vec(),
         &**pool,
         &redis,
     )
     .await?;
+    println!("2");
 
     let mut results = loaders
         .into_iter()
@@ -143,7 +145,7 @@ pub async fn loader_fields_list(
         .find(|x| x.field == query.loader_field)
         .ok_or_else(|| {
             ApiError::InvalidInput(format!(
-                "'{}' was not a valid loader field.",
+                "'{}' 不是一个有效的加载器字段。",
                 query.loader_field
             ))
         })?;
@@ -153,7 +155,7 @@ pub async fn loader_fields_list(
         | LoaderFieldType::ArrayEnum(enum_id) => enum_id,
         _ => {
             return Err(ApiError::InvalidInput(format!(
-                "'{}' is not an enumerable field, but an '{}' field.",
+                "'{}' 不是一个可枚举字段，而是一个 '{}' 字段。",
                 query.loader_field,
                 loader_field.field_type.to_str()
             )))
@@ -209,8 +211,8 @@ pub async fn license_text(
 
     if license_id == *crate::models::projects::DEFAULT_LICENSE_ID {
         return Ok(HttpResponse::Ok().json(LicenseText {
-            title: "All Rights Reserved".to_string(),
-            body: "All rights reserved unless explicitly stated.".to_string(),
+            title: "版权所有".to_string(),
+            body: "除非明确说明，否则保留所有权利。".to_string(),
         }));
     }
 
@@ -222,7 +224,7 @@ pub async fn license_text(
     }
 
     Err(ApiError::InvalidInput(
-        "Invalid SPDX identifier specified".to_string(),
+        "指定的 SPDX 标识符无效".to_string(),
     ))
 }
 

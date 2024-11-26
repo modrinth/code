@@ -8,9 +8,7 @@
           title="A place for users to report bugs, issues, and concerns about your project."
         >
           <span class="label__title">问题提交</span>
-          <span class="label__description">
-            用户报告项目错误、问题和疑虑的地方。
-          </span>
+          <span class="label__description"> 用户报告项目错误、问题和疑虑的地方。 </span>
         </label>
         <input
           id="project-issue-tracker"
@@ -27,9 +25,7 @@
           title="A page/repository containing the source code for your project"
         >
           <span class="label__title">开源地址</span>
-          <span class="label__description">
-           包含项目源代码的页面/存储库
-          </span>
+          <span class="label__description"> 包含项目源代码的页面/存储库 </span>
         </label>
         <input
           id="project-source-code"
@@ -46,9 +42,7 @@
           title="A page containing information, documentation, and help for the project."
         >
           <span class="label__title">Wiki页面</span>
-          <span class="label__description">
-            包含项目信息、文档和帮助的页面。
-          </span>
+          <span class="label__description"> 包含项目信息、文档和帮助的页面。 </span>
         </label>
         <input
           id="project-wiki-page"
@@ -75,9 +69,7 @@
       </div>
       <span class="label">
         <span class="label__title">爱发电链接</span>
-        <span class="label__description">
-          添加爱发电链接，以便用户直接支持您。
-        </span>
+        <span class="label__description"> 添加爱发电链接，以便用户直接支持您。 </span>
       </span>
 
       <div

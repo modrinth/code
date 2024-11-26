@@ -12,7 +12,6 @@
       }"
       aria-label="Filters"
     >
-
       <section v-if="server" class="card">
         <nuxt-link
           :to="`/servers/manage/${server.serverId}/content`"
@@ -302,7 +301,7 @@
   </div>
 </template>
 <script setup>
-import { formatCategoryHeader,localString } from "@modrinth/utils";
+import { formatCategoryHeader, localString } from "@modrinth/utils";
 
 import { Multiselect } from "vue-multiselect";
 import { Pagination, ScrollablePanel, Checkbox, Avatar } from "@modrinth/ui";
@@ -330,8 +329,6 @@ const route = useNativeRoute();
 
 const cosmetics = useCosmetics();
 const tags = useTags();
-const flags = useFeatureFlags();
-const auth = await useAuth();
 
 const query = ref("");
 const facets = ref([]);
@@ -969,11 +966,11 @@ function toggleFilter(filter, doNotSendRequest) {
       facets.value.push(elementName);
     }
   } else if (filter.type === "env") {
-    let name = ""
-    if (filter.name === '客户端'){
-      name = 'client'
-    }else if (filter.name === '服务端'){
-      name = "server"
+    let name = "";
+    if (filter.name === "客户端") {
+      name = "client";
+    } else if (filter.name === "服务端") {
+      name = "server";
     }
     const index = selectedEnvironments.value.indexOf(name);
     if (index !== -1) {

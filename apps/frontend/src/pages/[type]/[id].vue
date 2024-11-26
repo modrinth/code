@@ -158,9 +158,7 @@
       </template>
       <div
         class="markdown-body"
-        v-html="
-          renderString(licenseText).isEmpty ? '正在加载许可证...' : renderString(licenseText)
-        "
+        v-html="renderString(licenseText).isEmpty ? '正在加载许可证...' : renderString(licenseText)"
       />
     </NewModal>
     <div
@@ -184,9 +182,7 @@
     <NewModal ref="downloadModal">
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-        <div class="truncate text-lg font-extrabold text-contrast">
-          下载 {{ project.title }}
-        </div>
+        <div class="truncate text-lg font-extrabold text-contrast">下载 {{ project.title }}</div>
       </template>
       <template #default>
         <div class="mx-auto flex max-w-[40rem] flex-col gap-4 md:w-[30rem]">
@@ -197,33 +193,33 @@
             "
             class="modrinth-app-section contents"
           >
-<!--            <div class="mx-auto flex w-fit flex-col">-->
-<!--              <ButtonStyled color="brand">-->
-<!--                <a-->
-<!--                  class="w-fit"-->
-<!--                  :href="`modrinth://mod/${project.slug}`"-->
-<!--                  @click="() => installWithApp()"-->
-<!--                >-->
-<!--                  <ModrinthIcon aria-hidden="true" />-->
-<!--                  Install with BBSMC App-->
-<!--                  <ExternalIcon aria-hidden="true" />-->
-<!--                </a>-->
-<!--              </ButtonStyled>-->
-<!--              <Accordion ref="getModrinthAppAccordion">-->
-<!--                <nuxt-link-->
-<!--                  class="mt-2 flex justify-center text-brand-blue hover:underline"-->
-<!--                  to="/app"-->
-<!--                >-->
-<!--                  Don't have Modrinth App?-->
-<!--                </nuxt-link>-->
-<!--              </Accordion>-->
-<!--            </div>-->
+            <!--            <div class="mx-auto flex w-fit flex-col">-->
+            <!--              <ButtonStyled color="brand">-->
+            <!--                <a-->
+            <!--                  class="w-fit"-->
+            <!--                  :href="`modrinth://mod/${project.slug}`"-->
+            <!--                  @click="() => installWithApp()"-->
+            <!--                >-->
+            <!--                  <ModrinthIcon aria-hidden="true" />-->
+            <!--                  Install with BBSMC App-->
+            <!--                  <ExternalIcon aria-hidden="true" />-->
+            <!--                </a>-->
+            <!--              </ButtonStyled>-->
+            <!--              <Accordion ref="getModrinthAppAccordion">-->
+            <!--                <nuxt-link-->
+            <!--                  class="mt-2 flex justify-center text-brand-blue hover:underline"-->
+            <!--                  to="/app"-->
+            <!--                >-->
+            <!--                  Don't have Modrinth App?-->
+            <!--                </nuxt-link>-->
+            <!--              </Accordion>-->
+            <!--            </div>-->
 
-<!--            <div class="flex items-center gap-4 px-4">-->
-<!--              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>-->
-<!--              <span class="flex-shrink-0 text-sm font-semibold text-secondary"> or </span>-->
-<!--              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>-->
-<!--            </div>-->
+            <!--            <div class="flex items-center gap-4 px-4">-->
+            <!--              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>-->
+            <!--              <span class="flex-shrink-0 text-sm font-semibold text-secondary"> or </span>-->
+            <!--              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>-->
+            <!--            </div>-->
           </div>
           <div class="mx-auto flex w-fit flex-col gap-2">
             <ButtonStyled v-if="project.game_versions.length === 1">
@@ -254,9 +250,7 @@
             >
               <template #title>
                 <GameIcon aria-hidden="true" />
-                {{
-                  currentGameVersion ? `游戏版本: ${currentGameVersion}` : "选择游戏版本"
-                }}
+                {{ currentGameVersion ? `游戏版本: ${currentGameVersion}` : "选择游戏版本" }}
               </template>
               <div class="iconified-input mb-2 flex w-full">
                 <label for="game-versions-filtering" hidden>搜索版本...</label>
@@ -326,9 +320,7 @@
                     : "错误: 未找到任何平台"
                 }}
                 <InfoIcon
-                  v-tooltip="
-                    `${project.title} 仅可在 ${formatCategory(currentPlatform)} 运行`
-                  "
+                  v-tooltip="`${project.title} 仅可在 ${formatCategory(currentPlatform)} 运行`"
                   class="ml-auto size-5"
                 />
               </div>
@@ -347,11 +339,7 @@
             >
               <template #title>
                 <WrenchIcon aria-hidden="true" />
-                {{
-                  currentPlatform
-                    ? `平台: ${formatCategory(currentPlatform)}`
-                    : "选择运行平台"
-                }}
+                {{ currentPlatform ? `平台: ${formatCategory(currentPlatform)}` : "选择运行平台" }}
               </template>
               <ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
                 <ButtonStyled
@@ -415,8 +403,7 @@
                 !filteredAlpha
               "
             >
-               {{ currentGameVersion }} 和
-              {{ formatCategory(currentPlatform) }} 没有可用版本.
+              {{ currentGameVersion }} 和 {{ formatCategory(currentPlatform) }} 没有可用版本.
             </p>
           </AutomaticAccordion>
         </div>
@@ -1038,7 +1025,6 @@ import { userCollectProject } from "~/composables/user.js";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
 import Accordion from "~/components/ui/Accordion.vue";
-import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
 import VersionSummary from "~/components/ui/VersionSummary.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 import { getVersionsToDisplay } from "~/helpers/projects.js";
@@ -1050,7 +1036,6 @@ const auth = await useAuth();
 const user = await useUser();
 
 const tags = useTags();
-const flags = useFeatureFlags();
 const cosmetics = useCosmetics();
 
 const { formatMessage } = useVIntl();
@@ -1091,16 +1076,8 @@ const currentPlatform = computed(() => {
     userSelectedPlatform.value || (project.value.loaders.length === 1 && project.value.loaders[0])
   );
 });
-
-function installWithApp() {
-  setTimeout(() => {
-    getModrinthAppAccordion.value.open();
-  }, 1500);
-}
-
 const gameVersionAccordion = ref();
 const platformAccordion = ref();
-const getModrinthAppAccordion = ref();
 
 const formatRelativeTime = useRelativeTime();
 
@@ -1229,7 +1206,7 @@ const licenseIdDisplay = computed(() => {
   const id = project.value.license.id;
 
   if (id === "LicenseRef-All-Rights-Reserved") {
-    return "ARR";
+    return "保留所有权益/无许可证";
   } else if (id.includes("LicenseRef")) {
     return id.replaceAll("LicenseRef-", "").replaceAll("-", " ");
   } else {

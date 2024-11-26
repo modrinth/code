@@ -38,7 +38,7 @@ pub async fn forge_updates(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    const ERROR: &str = "The specified project does not exist!";
+    const ERROR: &str = "指定的项目不存在！";
 
     let (id,) = info.into_inner();
 

@@ -4,7 +4,7 @@ export const fileIsValid = (file, validationOptions) => {
   const { maxSize, alertOnInvalid } = validationOptions;
   if (maxSize !== null && maxSize !== undefined && file.size > maxSize) {
     if (alertOnInvalid) {
-      alert(`File ${file.name} is too big! Must be less than ${formatBytes(maxSize)}`);
+      alert(`文件 ${file.name} 太大了！必须小于 ${formatBytes(maxSize)}`);
     }
     return false;
   }

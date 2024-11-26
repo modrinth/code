@@ -1,8 +1,10 @@
 use flate2::read::GzDecoder;
-use log::warn;
 use maxminddb::geoip2::Country;
 use std::io::{Cursor, Read};
 use std::net::Ipv6Addr;
+use std::time::Duration;
+use log::{info, warn};
+use reqwest::Client;
 use tar::Archive;
 use tokio::sync::RwLock;
 
@@ -33,14 +35,40 @@ impl MaxMindIndexer {
     async fn inner_index(
         should_panic: bool,
     ) -> Result<Option<maxminddb::Reader<Vec<u8>>>, reqwest::Error> {
-        let response = reqwest::get(
-            format!(
-                "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key={}&suffix=tar.gz",
-                dotenvy::var("MAXMIND_LICENSE_KEY").unwrap()
-            )
-        ).await?.bytes().await.unwrap().to_vec();
+        let license_key = dotenvy::var("MAXMIND_LICENSE_KEY").unwrap();
+        let url = format!(
+            "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key={}&suffix=tar.gz",
+            license_key
+        );
+        // 创建一个 reqwest Client 并设置超时时间
+        let client = Client::builder()
+            .timeout(Duration::from_secs(10)) // 设置超时时间为 30 秒
+            .build()?;
 
-        let tarfile = GzDecoder::new(Cursor::new(response));
+        // 使用自定义的 client 发起请求
+        let mut response = client.get(&url).send().await?;
+        if !response.status().is_success() {
+            info!("maxmind官方下载失败 {}", response.status());
+            let url = format!(
+                "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key={}&suffix=tar.gz",
+                license_key
+            );
+
+            response = reqwest::get(&url).await?;
+            if !response.status().is_success() {
+                info!("maxmind备用下载失败 {}", response.status());
+            }else {
+                info!("maxmind已使用备用下载源 {}", response.status());
+
+            }
+        }
+        if !response.status().is_success() {
+            info!("maxmind全部下载失败 {}", response.status());
+
+            return Ok(None);
+        }
+        info!("Downloaded maxmind database.");
+        let tarfile = GzDecoder::new(Cursor::new(response.bytes().await?.as_ref().to_vec()));
         let mut archive = Archive::new(tarfile);
 
         if let Ok(entries) = archive.entries() {

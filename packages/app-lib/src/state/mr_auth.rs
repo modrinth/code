@@ -3,7 +3,7 @@ use crate::state::{CacheBehaviour, CachedEntry};
 use crate::util::fetch::{fetch_advanced, FetchSemaphore};
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use dashmap::DashMap;
-use futures::TryStreamExt;
+
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

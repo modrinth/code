@@ -12,7 +12,7 @@ const defaultOnError: ErrorFunction = (error) => {
   addNotification({
     group: "main",
     title: "发生错误",
-    text: error?.data?.description || error.message || error || "Unknown error",
+    text: error?.data?.description || error.message || error || "未知错误",
     type: "error",
   });
 };

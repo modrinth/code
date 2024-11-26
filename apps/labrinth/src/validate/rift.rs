@@ -23,9 +23,13 @@ impl super::Validator for RiftValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
+        if archive.by_name("manifest.json").is_ok() {
+
+            return Ok(ValidationResult::Pass);
+        }
         if archive.by_name("riftmod.json").is_err() {
             return Ok(ValidationResult::Warning(
-                "No riftmod.json present for Rift file.",
+                "Rift 文件中没有 riftmod.json 文件。",
             ));
         }
 

@@ -16,17 +16,17 @@ pub mod indexing;
 
 #[derive(Error, Debug)]
 pub enum SearchError {
-    #[error("MeiliSearch Error: {0}")]
+    #[error("MeiliSearch 错误: {0}")]
     MeiliSearch(#[from] meilisearch_sdk::errors::Error),
-    #[error("Error while serializing or deserializing JSON: {0}")]
+    #[error("序列化或反序列化 JSON 时出错: {0}")]
     Serde(#[from] serde_json::Error),
-    #[error("Error while parsing an integer: {0}")]
+    #[error("解析整数时出错: {0}")]
     IntParsing(#[from] std::num::ParseIntError),
-    #[error("Error while formatting strings: {0}")]
+    #[error("格式化字符串时出错: {0}")]
     FormatError(#[from] std::fmt::Error),
-    #[error("Environment Error")]
+    #[error("环境错误")]
     Env(#[from] dotenvy::Error),
-    #[error("Invalid index to sort by: {0}")]
+    #[error("无效的排序索引: {0}")]
     InvalidIndex(String),
 }
 
@@ -252,7 +252,7 @@ pub async fn search_for_project(
                                     vec![serde_json::from_value::<String>(
                                         facet,
                                     )
-                                    .unwrap_or_default()]
+                                        .unwrap_or_default()]
                                 }
                             })
                             .collect_vec()

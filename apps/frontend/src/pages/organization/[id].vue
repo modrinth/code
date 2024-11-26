@@ -75,9 +75,7 @@
             {{ organization.name }}
           </template>
           <template #title-suffix>
-            <div class="ml-1 flex items-center gap-2 font-semibold">
-              <OrganizationIcon /> 团队
-            </div>
+            <div class="ml-1 flex items-center gap-2 font-semibold"><OrganizationIcon /> 团队</div>
           </template>
           <template #summary>
             {{ organization.description }}
@@ -140,7 +138,6 @@
         </ContentPageHeader>
       </div>
       <div class="normal-page__sidebar">
-
         <div class="card flex-card">
           <h2>成员</h2>
           <div class="details-list">
@@ -272,7 +269,6 @@ const user = await useUser();
 const cosmetics = useCosmetics();
 const route = useNativeRoute();
 const tags = useTags();
-const flags = useFeatureFlags();
 
 let orgId = useRouteId();
 

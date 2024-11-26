@@ -25,7 +25,7 @@ impl super::Validator for ShaderValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if !archive.file_names().any(|x| x.starts_with("shaders/")) {
             return Ok(ValidationResult::Warning(
-                "No shaders folder present for OptiFine/Iris shader.",
+                "OptiFine/Iris shader 中没有 shaders 文件夹。",
             ));
         }
 
@@ -54,13 +54,13 @@ impl super::Validator for CanvasShaderValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("pack.mcmeta").is_err() {
             return Ok(ValidationResult::Warning(
-                "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!",
+                "pack 文件中没有 pack.mcmeta 文件。提示：确保 pack.mcmeta 位于 pack 的根目录中！",
             ));
         };
 
         if !archive.file_names().any(|x| x.contains("/pipelines/")) {
             return Ok(ValidationResult::Warning(
-                "No pipeline shaders folder present for canvas shaders.",
+                "canvas shaders 中没有 pipeline shaders 文件夹。",
             ));
         }
 
@@ -89,7 +89,7 @@ impl super::Validator for CoreShaderValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("pack.mcmeta").is_err() {
             return Ok(ValidationResult::Warning(
-                "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!",
+                "pack 文件中没有 pack.mcmeta 文件。提示：确保 pack.mcmeta 位于 pack 的根目录中！",
             ));
         };
 
@@ -98,7 +98,7 @@ impl super::Validator for CoreShaderValidator {
             .any(|x| x.starts_with("assets/minecraft/shaders/"))
         {
             return Ok(ValidationResult::Warning(
-                "No shaders folder present for vanilla shaders.",
+                "vanilla shaders 中没有 shaders 文件夹。",
             ));
         }
 

@@ -126,7 +126,6 @@
       description="这将永久删除此图库图像（真的永久删除）."
       :has-to-type="false"
       proceed-label="删除"
-
       @proceed="deleteGalleryImage"
     />
     <div
@@ -299,12 +298,11 @@ import { ConfirmModal } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
 import DropArea from "~/components/ui/DropArea.vue";
 import Modal from "~/components/ui/Modal.vue";
-import dayjs from 'dayjs';
-import 'dayjs/locale/zh-cn';
-dayjs.locale('zh-cn');
 
 import { isPermission } from "~/utils/permissions.ts";
-
+import dayjs from "dayjs";
+import 'dayjs/locale/zh-cn';
+dayjs.locale('zh-cn');
 const props = defineProps({
   project: {
     type: Object,

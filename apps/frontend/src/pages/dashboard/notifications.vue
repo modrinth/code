@@ -22,22 +22,24 @@
         v-if="notifTypes.length > 1"
         v-model="selectedType"
         :items="notifTypes"
-        :format-label="(x) => {
-          switch(x){
-            case 'all': {
-              return '全部'
-            }
-            case 'status_change': {
-              return '状态变更'
-            }
-            case 'moderator_message': {
-              return '版主消息'
-            }
-            default: {
-              return x
+        :format-label="
+          (x) => {
+            switch (x) {
+              case 'all': {
+                return '全部';
+              }
+              case 'status_change': {
+                return '状态变更';
+              }
+              case 'moderator_message': {
+                return '版主消息';
+              }
+              default: {
+                return x;
+              }
             }
           }
-        }"
+        "
         :capitalize="false"
       />
       <p v-if="pending">加载中...</p>

@@ -14,6 +14,11 @@ export const useTags = () =>
         display: "模组",
       },
       {
+        actual: "project",
+        id: "project",
+        display: "资源",
+      },
+      {
         actual: "mod",
         id: "plugin",
         display: "插件",
@@ -21,7 +26,7 @@ export const useTags = () =>
       {
         actual: "mod",
         id: "datapack",
-        display: "数据包",
+        display: "原版数据包",
       },
       {
         actual: "shader",
@@ -36,7 +41,7 @@ export const useTags = () =>
       {
         actual: "modpack",
         id: "modpack",
-        display: "模组整合包",
+        display: "模组包/整合包",
       },
     ],
     loaderData: {

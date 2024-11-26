@@ -1,7 +1,5 @@
 use log::info;
-use sqlx::migrate::MigrateDatabase;
 use sqlx::postgres::{PgPool, PgPoolOptions};
-use sqlx::{Connection, PgConnection, Postgres};
 use std::time::Duration;
 
 pub async fn connect() -> Result<PgPool, sqlx::Error> {
@@ -27,21 +25,21 @@ pub async fn connect() -> Result<PgPool, sqlx::Error> {
 
     Ok(pool)
 }
-pub async fn check_for_migrations() -> Result<(), sqlx::Error> {
-    let uri = dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
-    let uri = uri.as_str();
-    if !Postgres::database_exists(uri).await? {
-        info!("Creating database...");
-        Postgres::create_database(uri).await?;
-    }
-
-    info!("Applying migrations...");
-
-    let mut conn: PgConnection = PgConnection::connect(uri).await?;
-    sqlx::migrate!()
-        .run(&mut conn)
-        .await
-        .expect("Error while running database migrations!");
-
-    Ok(())
-}
+// pub async fn check_for_migrations() -> Result<(), sqlx::Error> {
+//     let uri = dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+//     let uri = uri.as_str();
+//     if !Postgres::database_exists(uri).await? {
+//         info!("Creating database...");
+//         Postgres::create_database(uri).await?;
+//     }
+//
+//     info!("Applying migrations...");
+//
+//     let mut conn: PgConnection = PgConnection::connect(uri).await?;
+//     sqlx::migrate!()
+//         .run(&mut conn)
+//         .await
+//         .expect("Error while running database migrations!");
+//
+//     Ok(())
+// }

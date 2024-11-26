@@ -41,6 +41,7 @@
     "@pinia/nuxt": "^0.5.1",
     "@vintl/vintl": "^4.4.1",
     "@vueuse/core": "^11.1.0",
+    "@vueuse/head": "github:vueuse/head",
     "ace-builds": "^1.36.2",
     "ansi-to-html": "^0.7.2",
     "dayjs": "^1.11.7",
@@ -57,9 +58,10 @@
     "qrcode.vue": "^3.4.0",
     "semver": "^7.5.4",
     "vue-multiselect": "3.0.0-alpha.2",
+    "vue-turnstile": "^1.0.11",
     "vue-typed-virtual-list": "^1.0.10",
     "vue3-ace-editor": "^2.2.4",
     "vue3-apexcharts": "^1.5.2",
-    "xss": "^1.0.14"
+    "xss": "^1.0.15"
   }
 }

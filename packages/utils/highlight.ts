@@ -16,7 +16,7 @@ import properties from 'highlight.js/lib/languages/properties'
 import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import { configuredXss, md } from './parse'
-
+import pkg from 'xss';
 /* REGISTRATION */
 // Scripting
 hljs.registerLanguage('javascript', javascript)

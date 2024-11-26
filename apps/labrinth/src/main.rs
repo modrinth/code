@@ -6,7 +6,7 @@ use labrinth::file_hosting::S3Host;
 use labrinth::search;
 use labrinth::util::ratelimit::RateLimit;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
-use log::{error, info};
+use log::{error, info, warn};
 use std::sync::Arc;
 
 #[cfg(feature = "jemalloc")]
@@ -25,7 +25,7 @@ async fn main() -> std::io::Result<()> {
         .init();
 
     if check_env_vars() {
-        error!("Some environment variables are missing!");
+        error!("某些环境变量丢失！");
     }
 
     // DSN is from SENTRY_DSN env variable.
@@ -36,12 +36,12 @@ async fn main() -> std::io::Result<()> {
         ..Default::default()
     });
     if sentry.is_enabled() {
-        info!("Enabled Sentry integration");
+        info!("启用 Sentry 集成");
         std::env::set_var("RUST_BACKTRACE", "1");
     }
 
     info!(
-        "Starting Labrinth on {}",
+        "启动 Labrinth 于 {}",
         dotenvy::var("BIND_ADDR").unwrap()
     );
 
@@ -52,11 +52,13 @@ async fn main() -> std::io::Result<()> {
     // Database Connector
     let pool = database::connect()
         .await
-        .expect("Database connection failed");
+        .expect("数据库连接失败");
 
     // Redis connector
+    info!("初始化 Redis 连接");
     let redis_pool = RedisPool::new(None);
 
+    info!("Redis 连接已建立");
     let storage_backend =
         dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
 
@@ -68,7 +70,7 @@ async fn main() -> std::io::Result<()> {
                     &dotenvy::var("BACKBLAZE_KEY").unwrap(),
                     &dotenvy::var("BACKBLAZE_BUCKET_ID").unwrap(),
                 )
-                .await,
+                    .await,
             ),
             "s3" => Arc::new(
                 S3Host::new(
@@ -77,25 +79,25 @@ async fn main() -> std::io::Result<()> {
                     &dotenvy::var("S3_ACCESS_TOKEN").unwrap(),
                     &dotenvy::var("S3_SECRET").unwrap(),
                 )
-                .unwrap(),
+                    .unwrap(),
             ),
             "local" => Arc::new(file_hosting::MockHost::new()),
-            _ => panic!("Invalid storage backend specified. Aborting startup!"),
+            _ => panic!("指定了无效的存储后端。启动中止！"),
         };
 
-    info!("Initializing clickhouse connection");
+    info!("初始化 clickhouse 连接");
     let mut clickhouse = clickhouse::init_client().await.unwrap();
-
+    info!("开始连接 maxmind 数据库");
     let maxmind_reader =
         Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
-
+    println!("maxmind_reader: 正常");
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")
         .build()
-        .expect("Failed to create prometheus metrics middleware");
-
+        .expect("创建 prometheus 指标中间件失败");
+    println!("prometheus: 正常");
     let search_config = search::SearchConfig::new(None);
-
+    println!("search_config: 正常");
     let labrinth_config = labrinth::app_setup(
         pool.clone(),
         redis_pool.clone(),
@@ -105,7 +107,7 @@ async fn main() -> std::io::Result<()> {
         maxmind_reader.clone(),
     );
 
-    info!("Starting Actix HTTP server!");
+    info!("启动 Actix HTTP 服务器！");
 
     // Init App
     HttpServer::new(move || {
@@ -116,7 +118,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(sentry_actix::Sentry::new())
             .configure(|cfg| labrinth::app_config(cfg, labrinth_config.clone()))
     })
-    .bind(dotenvy::var("BIND_ADDR").unwrap())?
-    .run()
-    .await
+        .bind(dotenvy::var("BIND_ADDR").unwrap())?
+        .run()
+        .await
 }

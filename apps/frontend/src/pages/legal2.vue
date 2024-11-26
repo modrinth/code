@@ -25,13 +25,13 @@
             <InfoIcon aria-hidden="true" />
           </NavStackItem>
 
-<!--          <h3>奖励计划</h3>-->
-<!--          <NavStackItem link="/legal/cmp" label="Rewards Program Terms">-->
-<!--            <CurrencyIcon aria-hidden="true" />-->
-<!--          </NavStackItem>-->
-<!--          <NavStackItem link="/legal/cmp-info" label="Rewards Program Info">-->
-<!--            <InfoIcon aria-hidden="true" />-->
-<!--          </NavStackItem>-->
+          <!--          <h3>奖励计划</h3>-->
+          <!--          <NavStackItem link="/legal/cmp" label="Rewards Program Terms">-->
+          <!--            <CurrencyIcon aria-hidden="true" />-->
+          <!--          </NavStackItem>-->
+          <!--          <NavStackItem link="/legal/cmp-info" label="Rewards Program Info">-->
+          <!--            <InfoIcon aria-hidden="true" />-->
+          <!--          </NavStackItem>-->
         </NavStack>
       </aside>
     </div>
@@ -42,15 +42,7 @@
 </template>
 
 <script setup>
-import {
-  InfoIcon,
-  HeartHandshakeIcon,
-  LockIcon,
-  ScaleIcon,
-  ShieldIcon,
-  CurrencyIcon,
-  CopyrightIcon,
-} from "@modrinth/assets";
+import {InfoIcon, HeartHandshakeIcon, LockIcon, ScaleIcon, ShieldIcon} from "@modrinth/assets";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 

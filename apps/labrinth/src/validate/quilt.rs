@@ -26,11 +26,14 @@ impl super::Validator for QuiltValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
+        if archive.by_name("manifest.json").is_ok() {
+            return Ok(ValidationResult::Pass);
+        }
         if archive.by_name("quilt.mod.json").is_err()
             && archive.by_name("fabric.mod.json").is_err()
         {
             return Ok(ValidationResult::Warning(
-                "No quilt.mod.json present for Quilt file.",
+                "Quilt 文件中没有 quilt.mod.json 文件。",
             ));
         }
 

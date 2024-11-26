@@ -78,11 +78,8 @@ impl From<DBNotification> for Notification {
                     project_id,
                     version_id,
                 } => (
-                    "A project you follow has been updated!".to_string(),
-                    format!(
-                        "The project {} has released a new version: {}",
-                        project_id, version_id
-                    ),
+                    "您关注的项目已更新！".to_string(),
+                    format!("项目 {} 发布了新版本：{}", project_id, version_id),
                     format!("/project/{}/version/{}", project_id, version_id),
                     vec![],
                 ),
@@ -92,19 +89,25 @@ impl From<DBNotification> for Notification {
                     team_id,
                     ..
                 } => (
-                    "You have been invited to join a team!".to_string(),
-                    format!("An invite has been sent for you to be {} of a team", role),
+                    "您已被邀请加入团队！".to_string(),
+                    format!("已向您发送邀请，成为团队的 {}", role),
                     format!("/project/{}", project_id),
                     vec![
                         NotificationAction {
-                            name: "Accept".to_string(),
-                            action_route: ("POST".to_string(), format!("team/{team_id}/join")),
+                            name: "接受".to_string(),
+                            action_route: (
+                                "POST".to_string(),
+                                format!("team/{team_id}/join"),
+                            ),
                         },
                         NotificationAction {
-                            name: "Deny".to_string(),
+                            name: "拒绝".to_string(),
                             action_route: (
                                 "DELETE".to_string(),
-                                format!("team/{team_id}/members/{}", UserId::from(notif.user_id)),
+                                format!(
+                                    "team/{team_id}/members/{}",
+                                    UserId::from(notif.user_id)
+                                ),
                             ),
                         },
                     ],
@@ -115,19 +118,19 @@ impl From<DBNotification> for Notification {
                     team_id,
                     ..
                 } => (
-                    "You have been invited to join an organization!".to_string(),
-                    format!(
-                        "An invite has been sent for you to be {} of an organization",
-                        role
-                    ),
+                    "您已被邀请加入组织！".to_string(),
+                    format!("已向您发送邀请，成为组织的 {}", role),
                     format!("/organization/{}", organization_id),
                     vec![
                         NotificationAction {
-                            name: "Accept".to_string(),
-                            action_route: ("POST".to_string(), format!("team/{team_id}/join")),
+                            name: "接受".to_string(),
+                            action_route: (
+                                "POST".to_string(),
+                                format!("team/{team_id}/join"),
+                            ),
                         },
                         NotificationAction {
-                            name: "Deny".to_string(),
+                            name: "拒绝".to_string(),
                             action_route: (
                                 "DELETE".to_string(),
                                 format!(
@@ -143,9 +146,9 @@ impl From<DBNotification> for Notification {
                     new_status,
                     project_id,
                 } => (
-                    "Project status has changed".to_string(),
+                    "项目状态已更改".to_string(),
                     format!(
-                        "Status has changed from {} to {}",
+                        "状态已从 {} 更改为 {}",
                         old_status.as_friendly_str(),
                         new_status.as_friendly_str()
                     ),
@@ -157,8 +160,8 @@ impl From<DBNotification> for Notification {
                     report_id,
                     ..
                 } => (
-                    "A moderator has sent you a message!".to_string(),
-                    "Click on the link to read more.".to_string(),
+                    "管理员已向您发送消息！".to_string(),
+                    "点击链接查看更多信息。".to_string(),
                     if let Some(project_id) = project_id {
                         format!("/project/{}", project_id)
                     } else if let Some(report_id) = report_id {

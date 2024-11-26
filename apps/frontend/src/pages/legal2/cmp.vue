@@ -21,10 +21,10 @@
     <p>
       Rinth shall pay to you the percentage set forth
       <nuxt-link to="/legal2/cmp-info">here</nuxt-link> of net revenue collected by Rinth
-      attributable to ad impressions displayed on bbsmc.net and the BBSMC App excluding
-      transaction fees ("Revenue Share"). Rinth shall make Revenue Share payments to you when you
-      withdraw funds from Rinth's dashboard. Rinth shall include with each such payment either
-      access to a dashboard or other reasonable reporting detailing the calculation thereof.
+      attributable to ad impressions displayed on bbsmc.net and the BBSMC App excluding transaction
+      fees ("Revenue Share"). Rinth shall make Revenue Share payments to you when you withdraw funds
+      from Rinth's dashboard. Rinth shall include with each such payment either access to a
+      dashboard or other reasonable reporting detailing the calculation thereof.
     </p>
 
     <h2>Relationship</h2>

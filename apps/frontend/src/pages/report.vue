@@ -11,11 +11,10 @@
               <nuxt-link class="text-link" to="/legal2/rules">规则</nuxt-link>, 请在此处向我们举报。
             </p>
             <p>
-              此表单仅用于向 BBSMC 工作人员举报滥用或有害内容。对于与特定项目相关的错误，请使用该项目指定的问题链接或邮件。
+              此表单仅用于向 BBSMC
+              工作人员举报滥用或有害内容。对于与特定项目相关的错误，请使用该项目指定的问题链接或邮件。
             </p>
-            <p>
-              您的隐私对我们很重要；请放心，您的身份信息将被保密。
-            </p>
+            <p>您的隐私对我们很重要；请放心，您的身份信息将被保密。</p>
           </div>
         </div>
         <div class="report-info-section">
@@ -64,7 +63,8 @@
         <div class="report-submission-section">
           <div>
             <p>
-              请提供有关举报的其他背景信息。如有可以的话,请包含链接和图像 <strong>未填写的举报将被关闭</strong>
+              请提供有关举报的其他背景信息。如有可以的话,请包含链接和图像
+              <strong>未填写的举报将被关闭</strong>
             </p>
           </div>
           <MarkdownEditor v-model="reportBody" placeholder="" :on-image-upload="onImageUpload" />
@@ -143,24 +143,30 @@ const submissionValidation = () => {
 };
 
 const capitalizeString = (value?: string) => {
-
   if (!value) return "";
-  if (value === 'project'){
-    return '资源';
-  }if (value === 'version'){
-    return '版本';
-  }if (value === 'user'){
-    return '用户';
-  }if (value === 'spam'){
-    return '垃圾邮件';
-  }if (value === 'copyright'){
-    return '版权';
-  }if (value === 'inappropriate'){
-    return '违法内容';
-  }if (value === 'malicious'){
-    return '恶意内容';
-  }if (value === 'name-squatting'){
-    return '抢注';
+  if (value === "project") {
+    return "资源";
+  }
+  if (value === "version") {
+    return "版本";
+  }
+  if (value === "user") {
+    return "用户";
+  }
+  if (value === "spam") {
+    return "垃圾邮件";
+  }
+  if (value === "copyright") {
+    return "版权";
+  }
+  if (value === "inappropriate") {
+    return "违法内容";
+  }
+  if (value === "malicious") {
+    return "恶意内容";
+  }
+  if (value === "name-squatting") {
+    return "抢注";
   }
   return value?.charAt(0).toUpperCase() + value?.slice(1);
 };

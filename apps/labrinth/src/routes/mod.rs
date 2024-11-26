@@ -44,11 +44,11 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
 
                         allowed_origins.contains(&"*".to_string())
                             || allowed_origins.contains(
-                                &origin
-                                    .to_str()
-                                    .unwrap_or_default()
-                                    .to_string(),
-                            )
+                            &origin
+                                .to_str()
+                                .unwrap_or_default()
+                                .to_string(),
+                        )
                     })
                     .allowed_methods(vec!["GET", "POST"])
                     .allowed_headers(vec![
@@ -65,14 +65,14 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
         web::scope("api/v1")
             .wrap(default_cors())
             .wrap_fn(|req, _srv| {
-            async {
-                Ok(req.into_response(
-                    HttpResponse::Gone()
-                        .content_type("application/json")
-                        .body(r#"{"error":"api_deprecated","description":"You are using an application that uses an outdated version of Modrinth's API. Please either update it or switch to another application. For developers: https://docs.modrinth.com/api/#versioning"}"#)
-                ))
-            }.boxed_local()
-        })
+                async {
+                    Ok(req.into_response(
+                        HttpResponse::Gone()
+                            .content_type("application/json")
+                            .body(r#"{"error":"api_deprecated","description":"您正在使用一个使用过时版本的 Modrinth API 的应用程序。请更新它或切换到另一个应用程序。对于开发人员：https://docs.modrinth.com/api/#versioning"}"#)
+                    ))
+                }.boxed_local()
+            })
     );
     cfg.service(
         web::scope("")
@@ -100,7 +100,7 @@ pub enum ApiError {
     Json(#[from] serde_json::Error),
     #[error("身份验证错误: {0}")]
     Authentication(#[from] crate::auth::AuthenticationError),
-    #[error("身份验证错误: {0}")]
+    #[error("自定义身份验证错误: {0}")]
     CustomAuthentication(String),
     #[error("无效输入: {0}")]
     InvalidInput(String),
@@ -122,21 +122,21 @@ pub enum ApiError {
     ImageParse(#[from] image::ImageError),
     #[error("密码哈希错误: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
-    #[error("Password strength checking error: {0}")]
+    #[error("密码强度检查错误: {0}")]
     PasswordStrengthCheck(#[from] zxcvbn::ZxcvbnError),
     #[error("{0}")]
     Mail(#[from] crate::auth::email::MailError),
-    #[error("Error while rerouting request: {0}")]
+    #[error("重新路由请求时出错: {0}")]
     Reroute(#[from] reqwest::Error),
-    #[error("Unable to read Zip Archive: {0}")]
+    #[error("无法读取 Zip 存档: {0}")]
     Zip(#[from] zip::result::ZipError),
-    #[error("IO Error: {0}")]
+    #[error("IO 错误: {0}")]
     Io(#[from] std::io::Error),
-    #[error("Resource not found")]
+    #[error("资源未找到")]
     NotFound,
-    #[error("You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining.")]
+    #[error("您已被限速。请等待 {0} 毫秒。0/{1} 剩余。")]
     RateLimitError(u128, u32),
-    #[error("Error while interacting with payment processor: {0}")]
+    #[error("与支付处理器交互时出错: {0}")]
     Stripe(#[from] stripe::StripeError),
 }
 

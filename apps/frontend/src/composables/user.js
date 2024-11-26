@@ -89,7 +89,7 @@ export const userCollectProject = async (collection, projectId) => {
 
   const latestCollection = user.collections.find((x) => x.id === collectionId);
   if (!latestCollection) {
-    throw new Error("This collection was not found. Has it been deleted?");
+    throw new Error("未找到此收藏。它是否已被删除？");
   }
 
   const add = !latestCollection.projects.includes(projectId);
@@ -146,8 +146,8 @@ export const resendVerifyEmail = async () => {
     const auth = await useAuth();
     app.$notify({
       group: "main",
-      title: "Email sent",
-      text: `An email with a link to verify your account has been sent to ${auth.value.user.email}.`,
+      title: "邮件已发送",
+      text: `已向 ${auth.value.user.email} 发送包含验证链接的邮件。`,
       type: "success",
     });
   } catch (err) {

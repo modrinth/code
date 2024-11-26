@@ -4,7 +4,6 @@ use std::time::Duration;
 
 use actix_web::web;
 use database::redis::RedisPool;
-use log::{info, warn};
 use queue::{
     analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
     socket::ActiveSockets,
@@ -16,6 +15,7 @@ extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
 use governor::middleware::StateInformationMiddleware;
 use governor::{Quota, RateLimiter};
+use log::{info, warn};
 use util::cors::default_cors;
 
 use crate::queue::moderation::AutomatedModerationQueue;
@@ -71,7 +71,7 @@ pub fn app_setup(
     maxmind: Arc<queue::maxmind::MaxMindIndexer>,
 ) -> LabrinthConfig {
     info!(
-        "Starting Labrinth on {}",
+        "启动 Labrinth 于 {}",
         dotenvy::var("BIND_ADDR").unwrap()
     );
 
@@ -98,12 +98,12 @@ pub fn app_setup(
     let limiter_clone = Arc::clone(&limiter);
     scheduler.run(Duration::from_secs(60), move || {
         info!(
-            "Clearing ratelimiter, storage size: {}",
+            "清理速率限制器，存储大小：{}",
             limiter_clone.len()
         );
         limiter_clone.retain_recent();
         info!(
-            "Done clearing ratelimiter, storage size: {}",
+            "完成清理速率限制器，存储大小：{}",
             limiter_clone.len()
         );
 
@@ -124,17 +124,17 @@ pub fn app_setup(
         let redis_pool_ref = redis_pool_ref.clone();
         let search_config_ref = search_config_ref.clone();
         async move {
-            info!("Indexing local database");
+            info!("索引本地数据库");
             let result = index_projects(
                 pool_ref,
                 redis_pool_ref.clone(),
                 &search_config_ref,
             )
-            .await;
+                .await;
             if let Err(e) = result {
-                warn!("Local project indexing failed: {:?}", e);
+                warn!("本地项目索引失败：{:?}", e);
             }
-            info!("Done indexing local database");
+            info!("完成索引本地数据库");
         }
     });
 
@@ -143,7 +143,7 @@ pub fn app_setup(
     // TODO: Clear cache when these are run
     scheduler.run(std::time::Duration::from_secs(60 * 5), move || {
         let pool_ref = pool_ref.clone();
-        info!("Releasing scheduled versions/projects!");
+        info!("发布计划的版本/项目！");
 
         async move {
             let projects_results = sqlx::query!(
@@ -154,11 +154,11 @@ pub fn app_setup(
                 ",
                 crate::models::projects::ProjectStatus::Scheduled.as_str(),
             )
-            .execute(&pool_ref)
-            .await;
+                .execute(&pool_ref)
+                .await;
 
             if let Err(e) = projects_results {
-                warn!("Syncing scheduled releases for projects failed: {:?}", e);
+                warn!("同步计划的项目发布失败：{:?}", e);
             }
 
             let versions_results = sqlx::query!(
@@ -169,14 +169,14 @@ pub fn app_setup(
                 ",
                 crate::models::projects::VersionStatus::Scheduled.as_str(),
             )
-            .execute(&pool_ref)
-            .await;
+                .execute(&pool_ref)
+                .await;
 
             if let Err(e) = versions_results {
-                warn!("Syncing scheduled releases for versions failed: {:?}", e);
+                warn!("同步计划的版本发布失败：{:?}", e);
             }
 
-            info!("Finished releasing scheduled versions/projects");
+            info!("完成发布计划的版本/项目");
         }
     });
 
@@ -197,12 +197,12 @@ pub fn app_setup(
         let session_queue_ref = session_queue_ref.clone();
 
         async move {
-            info!("Indexing sessions queue");
+            info!("索引会话队列");
             let result = session_queue_ref.index(&pool_ref, &redis_ref).await;
             if let Err(e) = result {
-                warn!("Indexing sessions queue failed: {:?}", e);
+                warn!("索引会话队列失败： {:?}", e);
             }
-            info!("Done indexing sessions queue");
+            info!("完成索引会话队列");
         }
     });
 
@@ -213,19 +213,19 @@ pub fn app_setup(
             let reader_ref = reader_ref.clone();
 
             async move {
-                info!("Downloading MaxMind GeoLite2 country database");
+                info!("下载 MaxMind GeoLite2 国家数据库");
                 let result = reader_ref.index().await;
                 if let Err(e) = result {
                     warn!(
-                        "Downloading MaxMind GeoLite2 country database failed: {:?}",
+                        "下载 MaxMind GeoLite2 国家数据库失败: {:?}",
                         e
                     );
                 }
-                info!("Done downloading MaxMind GeoLite2 country database");
+                info!("已完成下载 MaxMind GeoLite2 国家数据库");
             }
         });
     }
-    info!("Downloading MaxMind GeoLite2 country database");
+    info!("下载 MaxMind GeoLite2 国家数据库");
 
     let analytics_queue = Arc::new(AnalyticsQueue::new());
     {
@@ -240,35 +240,35 @@ pub fn app_setup(
             let redis_ref = redis_ref.clone();
 
             async move {
-                info!("Indexing analytics queue");
+                info!("开始索引分析服务");
                 let result = analytics_queue_ref
                     .index(client_ref, &redis_ref, &pool_ref)
                     .await;
                 if let Err(e) = result {
-                    warn!("Indexing analytics queue failed: {:?}", e);
+                    warn!("分析服务索引失败: {:?}", e);
                 }
-                info!("Done indexing analytics queue");
+                info!("分析索引完成");
             }
         });
     }
 
-    {
-        let pool_ref = pool.clone();
-        let client_ref = clickhouse.clone();
-        scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
-            let pool_ref = pool_ref.clone();
-            let client_ref = client_ref.clone();
-
-            async move {
-                info!("Started running payouts");
-                let result = process_payout(&pool_ref, &client_ref).await;
-                if let Err(e) = result {
-                    warn!("Payouts run failed: {:?}", e);
-                }
-                info!("Done running payouts");
-            }
-        });
-    }
+    // {
+    //     let pool_ref = pool.clone();
+    //     let client_ref = clickhouse.clone();
+    //     scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
+    //         let pool_ref = pool_ref.clone();
+    //         let client_ref = client_ref.clone();
+    //
+    //         async move {
+    //             info!("Started running payouts");
+    //             let result = process_payout(&pool_ref, &client_ref).await;
+    //             if let Err(e) = result {
+    //                 warn!("Payouts run failed: {:?}", e);
+    //             }
+    //             info!("Done running payouts");
+    //         }
+    //     });
+    // }
 
     let stripe_client =
         stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
@@ -283,7 +283,7 @@ pub fn app_setup(
                 pool_ref,
                 redis_ref,
             )
-            .await;
+                .await;
         });
     }
 
@@ -331,33 +331,33 @@ pub fn app_config(
     cfg.app_data(web::FormConfig::default().error_handler(|err, _req| {
         routes::ApiError::Validation(err.to_string()).into()
     }))
-    .app_data(web::PathConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
-    }))
-    .app_data(web::QueryConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
-    }))
-    .app_data(web::JsonConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
-    }))
-    .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
-    .app_data(web::Data::new(labrinth_config.pool.clone()))
-    .app_data(web::Data::new(labrinth_config.file_host.clone()))
-    .app_data(web::Data::new(labrinth_config.search_config.clone()))
-    .app_data(labrinth_config.session_queue.clone())
-    .app_data(labrinth_config.payouts_queue.clone())
-    .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
-    .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
-    .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
-    .app_data(web::Data::new(labrinth_config.maxmind.clone()))
-    .app_data(labrinth_config.active_sockets.clone())
-    .app_data(labrinth_config.automated_moderation_queue.clone())
-    .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
-    .configure(routes::v2::config)
-    .configure(routes::v3::config)
-    .configure(routes::internal::config)
-    .configure(routes::root_config)
-    .default_service(web::get().wrap(default_cors()).to(routes::not_found));
+        .app_data(web::PathConfig::default().error_handler(|err, _req| {
+            routes::ApiError::Validation(err.to_string()).into()
+        }))
+        .app_data(web::QueryConfig::default().error_handler(|err, _req| {
+            routes::ApiError::Validation(err.to_string()).into()
+        }))
+        .app_data(web::JsonConfig::default().error_handler(|err, _req| {
+            routes::ApiError::Validation(err.to_string()).into()
+        }))
+        .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
+        .app_data(web::Data::new(labrinth_config.pool.clone()))
+        .app_data(web::Data::new(labrinth_config.file_host.clone()))
+        .app_data(web::Data::new(labrinth_config.search_config.clone()))
+        .app_data(labrinth_config.session_queue.clone())
+        .app_data(labrinth_config.payouts_queue.clone())
+        .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
+        .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
+        .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
+        .app_data(web::Data::new(labrinth_config.maxmind.clone()))
+        .app_data(labrinth_config.active_sockets.clone())
+        .app_data(labrinth_config.automated_moderation_queue.clone())
+        .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
+        .configure(routes::v2::config)
+        .configure(routes::v3::config)
+        .configure(routes::internal::config)
+        .configure(routes::root_config)
+        .default_service(web::get().wrap(default_cors()).to(routes::not_found));
 }
 
 // This is so that env vars not used immediately don't panic at runtime
@@ -368,7 +368,7 @@ pub fn check_env_vars() -> bool {
         let check = parse_var::<T>(var).is_none();
         if check {
             warn!(
-                "Variable `{}` missing in dotenv or not of type `{}`",
+                "变量 `{}` 在 dotenv 中缺失或不是类型 `{}`",
                 var,
                 std::any::type_name::<T>()
             );
@@ -407,11 +407,11 @@ pub fn check_env_vars() -> bool {
             failed |= check_var::<String>("MOCK_FILE_PATH");
         }
         Some(backend) => {
-            warn!("Variable `STORAGE_BACKEND` contains an invalid value: {}. Expected \"backblaze\", \"s3\", or \"local\".", backend);
+            warn!("变量 `STORAGE_BACKEND` 包含无效值：{}。预期值为 \"backblaze\"、\"s3\" 或 \"local\"。", backend);
             failed |= true;
         }
         _ => {
-            warn!("Variable `STORAGE_BACKEND` is not set!");
+            warn!("变量 `STORAGE_BACKEND` 未设置！");
             failed |= true;
         }
     }
@@ -420,12 +420,12 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<usize>("VERSION_INDEX_INTERVAL");
 
     if parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").is_none() {
-        warn!("Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings");
+        warn!("变量 `WHITELISTED_MODPACK_DOMAINS` 在 dotenv 中缺失或不是字符串数组");
         failed |= true;
     }
 
     if parse_strings_from_var("ALLOWED_CALLBACK_URLS").is_none() {
-        warn!("Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings");
+        warn!("变量 `ALLOWED_CALLBACK_URLS` 在 dotenv 中缺失或不是字符串数组");
         failed |= true;
     }
 
@@ -465,7 +465,7 @@ pub fn check_env_vars() -> bool {
 
     if parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS").is_none() {
         warn!(
-            "Variable `ANALYTICS_ALLOWED_ORIGINS` missing in dotenv or not a json array of strings"
+            "变量 `ANALYTICS_ALLOWED_ORIGINS` 在 dotenv 中缺失或不是字符串数组"
         );
         failed |= true;
     }

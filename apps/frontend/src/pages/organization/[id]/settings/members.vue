@@ -44,9 +44,7 @@
       <div class="adjacent-input">
         <span class="label">
           <span class="label__title">离开团队</span>
-          <span class="label__description">
-            从该团队退出
-          </span>
+          <span class="label__description"> 从该团队退出 </span>
         </span>
         <Button
           color="danger"
@@ -96,9 +94,7 @@
         <div class="adjacent-input">
           <label :for="`member-${member.user.id}-role`">
             <span class="label__title">角色</span>
-            <span class="label__description">
-              该成员在该团队中的头衔。
-            </span>
+            <span class="label__description"> 该成员在该团队中的头衔。 </span>
           </label>
           <input
             :id="`member-${member.user.id}-role`"
@@ -112,26 +108,26 @@
             "
           />
         </div>
-<!--        <div class="adjacent-input">-->
-<!--          <label :for="`member-${member.user.id}-monetization-weight`">-->
-<!--            <span class="label__title">Monetization weight</span>-->
-<!--            <span class="label__description">-->
-<!--              Relative to all other members' monetization weights, this determines what portion of-->
-<!--              the organization projects' revenue goes to this member.-->
-<!--            </span>-->
-<!--          </label>-->
-<!--          <input-->
-<!--            :id="`member-${member.user.id}-monetization-weight`"-->
-<!--            v-model="member.payouts_split"-->
-<!--            type="number"-->
-<!--            :disabled="-->
-<!--              !isPermission(-->
-<!--                currentMember.organization_permissions,-->
-<!--                organizationPermissions.EDIT_MEMBER,-->
-<!--              )-->
-<!--            "-->
-<!--          />-->
-<!--        </div>-->
+        <!--        <div class="adjacent-input">-->
+        <!--          <label :for="`member-${member.user.id}-monetization-weight`">-->
+        <!--            <span class="label__title">Monetization weight</span>-->
+        <!--            <span class="label__description">-->
+        <!--              Relative to all other members' monetization weights, this determines what portion of-->
+        <!--              the organization projects' revenue goes to this member.-->
+        <!--            </span>-->
+        <!--          </label>-->
+        <!--          <input-->
+        <!--            :id="`member-${member.user.id}-monetization-weight`"-->
+        <!--            v-model="member.payouts_split"-->
+        <!--            type="number"-->
+        <!--            :disabled="-->
+        <!--              !isPermission(-->
+        <!--                currentMember.organization_permissions,-->
+        <!--                organizationPermissions.EDIT_MEMBER,-->
+        <!--              )-->
+        <!--            "-->
+        <!--          />-->
+        <!--        </div>-->
         <template v-if="!member.is_owner">
           <span class="label">
             <span class="label__title">资源权限</span>

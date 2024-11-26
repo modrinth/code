@@ -3,14 +3,14 @@
     <h1>Rewards Program Information</h1>
     <p><em>Last modified: Sep 12, 2024</em></p>
     <p>
-      This page was created for transparency for how the rewards program works on BBSMC. Feel
-      free to join our Discord or email
+      This page was created for transparency for how the rewards program works on BBSMC. Feel free
+      to join our Discord or email
       <a href="mailto:support@bbsmc.net">support@bbsmc.net</a> if you have any questions!
     </p>
     <p>
       This document is provided for informational purposes only and does not constitute a legal
-      agreement. BBSMC makes no representations or warranties as to the accuracy, completeness,
-      or reliability of the information contained herein.
+      agreement. BBSMC makes no representations or warranties as to the accuracy, completeness, or
+      reliability of the information contained herein.
     </p>
     <h2>Rewards Distribution</h2>
     <p>
@@ -52,9 +52,9 @@
     <p>
       Page views are counted when a legitimate browser views a project page. In-app downloads when a
       user logged into the launcher downloads a project. Project downloads alongside modpack
-      downloads are counted equally. In each category, BBSMC actively removes botted downloads
-      and page views at our own discretion. If users are caught botting, they will be permanently
-      banned from using BBSMC services.
+      downloads are counted equally. In each category, BBSMC actively removes botted downloads and
+      page views at our own discretion. If users are caught botting, they will be permanently banned
+      from using BBSMC services.
     </p>
     <p>
       You can view your page views and project downloads in your
@@ -75,8 +75,8 @@
     <p>
       Right now, you can use PayPal or Venmo to withdraw money from your BBSMC account. Gift card
       withdrawal is also available. We are working on more methods to withdraw money from your
-      account. There are fees to withdraw money from your BBSMC account—see the revenue page in
-      your dashboard for more information.
+      account. There are fees to withdraw money from your BBSMC account—see the revenue page in your
+      dashboard for more information.
     </p>
     <h3 id="pending">What does "pending" revenue mean in my dashboard?</h3>
     <p>
@@ -126,8 +126,8 @@
       <a href="https://github.com/modrinth/labrinth/blob/master/src/queue/payouts.rs#L561">
         revenue distribution system </a
       >. We also have an
-      <a href="https://api.bbsmc.net/v3/payout/platform_revenue">API route</a> that allows users
-      to query exact daily revenue for the site.
+      <a href="https://api.bbsmc.net/v3/payout/platform_revenue">API route</a> that allows users to
+      query exact daily revenue for the site.
     </p>
   </div>
 </template>

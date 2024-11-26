@@ -1,8 +1,8 @@
 // usePyroServer is a composable that interfaces with the REDACTED API to get data and control the users server
-import { $fetch, FetchError } from "ofetch";
+import { $fetch, FetchError } from 'ofetch'
 
 interface PyroFetchOptions {
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   contentType?: string;
   body?: Record<string, any>;
   version?: number;
@@ -14,88 +14,88 @@ interface PyroFetchOptions {
 }
 
 async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promise<T> {
-  const config = useRuntimeConfig();
-  const auth = await useAuth();
-  const authToken = auth.value?.token;
+  const config = useRuntimeConfig()
+  const auth = await useAuth()
+  const authToken = auth.value?.token
 
   if (!authToken) {
-    throw new PyroFetchError("Cannot pyrofetch without auth", 10000);
+    throw new PyroFetchError('未经授权无法进行 pyrofetch', 10000)
   }
 
-  const { method = "GET", contentType = "application/json", body, version = 0, override } = options;
+  const { method = 'GET', contentType = 'application/json', body, version = 0, override } = options
 
   const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
     /\/$/,
-    "",
-  );
+    ''
+  )
 
   if (!base) {
     throw new PyroFetchError(
-      "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
-      10001,
-    );
+      '无法进行 pyrofetch 操作，因为缺少基础 URL。请确保在环境变量中设置 PYRO_BASE_URL',
+      10001
+    )
   }
 
   const fullUrl = override?.url
-    ? `https://${override.url}/${path.replace(/^\//, "")}`
-    : `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`;
+    ? `https://${override.url}/${path.replace(/^\//, '')}`
+    : `${base}/modrinth/v${version}/${path.replace(/^\//, '')}`
 
   type HeadersRecord = Record<string, string>;
 
   const headers: HeadersRecord = {
     Authorization: `Bearer ${override?.token ?? authToken}`,
-    "Access-Control-Allow-Headers": "Authorization",
-    "User-Agent": "Pyro/1.0 (https://pyro.host)",
-    Vary: "Accept, Origin",
-  };
-
-  if (contentType !== "none") {
-    headers["Content-Type"] = contentType;
+    'Access-Control-Allow-Headers': 'Authorization',
+    'User-Agent': 'Pyro/1.0 (https://pyro.host)',
+    Vary: 'Accept, Origin'
   }
 
-  if (import.meta.client && typeof window !== "undefined") {
-    headers.Origin = window.location.origin;
+  if (contentType !== 'none') {
+    headers['Content-Type'] = contentType
+  }
+
+  if (import.meta.client && typeof window !== 'undefined') {
+    headers.Origin = window.location.origin
   }
 
   try {
     const response = await $fetch<T>(fullUrl, {
       method,
       headers,
-      body: body && contentType === "application/json" ? JSON.stringify(body) : body ?? undefined,
+      body: body && contentType === 'application/json' ? JSON.stringify(body) : body ?? undefined,
       timeout: 10000,
-      retry: options.retry !== false ? (method === "GET" ? 3 : 0) : 0,
-    });
-    return response;
+      retry: options.retry !== false ? (method === 'GET' ? 3 : 0) : 0
+    })
+    return response
   } catch (error) {
-    console.error("[PYROSERVERS]:", error);
+    console.error('[PYROSERVERS]:', error)
     if (error instanceof FetchError) {
-      const statusCode = error.response?.status;
-      const statusText = error.response?.statusText || "Unknown error";
+      const statusCode = error.response?.status
+      const statusText = error.response?.statusText || 'Unknown error'
       const errorMessages: { [key: number]: string } = {
-        400: "Bad Request",
-        401: "Unauthorized",
-        403: "Forbidden",
-        404: "Not Found",
-        405: "Method Not Allowed",
-        429: "Too Many Requests",
-        500: "Internal Server Error",
-        502: "Bad Gateway",
-      };
+        400: '错误请求',
+        401: '未经授权',
+        403: '禁止',
+        404: '未找到',
+        405: '方法不允许',
+        429: '请求过多',
+        500: '内部服务器错误',
+        502: '错误网关'
+      }
       const message =
         statusCode && statusCode in errorMessages
           ? errorMessages[statusCode]
-          : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
-      throw new PyroFetchError(`[PYROSERVERS][PYRO] ${message}`, statusCode, error);
+          : `HTTP Error: ${statusCode || 'unknown'} ${statusText}`
+      throw new PyroFetchError(`[PYROSERVERS][PYRO] ${message}`, statusCode, error)
     }
     throw new PyroFetchError(
-      "[PYROSERVERS][PYRO] An unexpected error occurred during the fetch operation.",
+      '[PYROSERVERS][PYRO] 在获取操作期间发生了意外错误。',
       undefined,
-      error as Error,
-    );
+      error as Error
+    )
   }
 }
 
-const internalServerRefrence = ref<any>(null);
+const internalServerRefrence = ref<any>(null)
 
 interface License {
   id: string;
@@ -123,23 +123,23 @@ export interface Project {
   title: string;
   description: string;
   categories: string[];
-  client_side: "required" | "optional";
-  server_side: "required" | "optional";
+  client_side: 'required' | 'optional';
+  server_side: 'required' | 'optional';
   body: string;
-  status: "approved" | "pending" | "rejected";
-  requested_status: "approved" | "pending" | "rejected";
+  status: 'approved' | 'pending' | 'rejected';
+  requested_status: 'approved' | 'pending' | 'rejected';
   additional_categories: string[];
   issues_url: string;
   source_url: string;
   wiki_url: string;
   discord_url: string;
   donation_urls: DonationUrl[];
-  project_type: "mod" | "resourcepack" | "map" | "plugin";
+  project_type: 'mod' | 'resourcepack' | 'map' | 'plugin';
   downloads: number;
   icon_url: string;
   color: number;
   thread_id: string;
-  monetization_status: "monetized" | "non-monetized";
+  monetization_status: 'monetized' | 'non-monetized';
   id: string;
   team: string;
   body_url: string | null;
@@ -173,7 +173,7 @@ interface General {
   loader_version: string;
   mc_version: string;
   upstream: {
-    kind: "modpack" | "mod" | "resourcepack";
+    kind: 'modpack' | 'mod' | 'resourcepack';
     version_id: string;
     project_id: string;
   } | null;
@@ -194,8 +194,8 @@ interface Allocation {
 interface Startup {
   invocation: string;
   original_invocation: string;
-  jdk_version: "lts8" | "lts11" | "lts17" | "lts21";
-  jdk_build: "corretto" | "temurin" | "graal";
+  jdk_version: 'lts8' | 'lts11' | 'lts17' | 'lts21';
+  jdk_build: 'corretto' | 'temurin' | 'graal';
 }
 
 interface Mod {
@@ -226,141 +226,141 @@ interface JWTAuth {
 }
 
 const constructServerProperties = (properties: any): string => {
-  let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`;
+  let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`
 
   for (const [key, value] of Object.entries(properties)) {
-    if (typeof value === "object") {
-      fileContent += `${key}=${JSON.stringify(value)}\n`;
-    } else if (typeof value === "boolean") {
-      fileContent += `${key}=${value ? "true" : "false"}\n`;
+    if (typeof value === 'object') {
+      fileContent += `${key}=${JSON.stringify(value)}\n`
+    } else if (typeof value === 'boolean') {
+      fileContent += `${key}=${value ? 'true' : 'false'}\n`
     } else {
-      fileContent += `${key}=${value}\n`;
+      fileContent += `${key}=${value}\n`
     }
   }
 
-  return fileContent;
-};
+  return fileContent
+}
 
 const processImage = async (iconUrl: string | undefined) => {
-  const image = ref<string | null>(null);
-  const auth = await PyroFetch<JWTAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
+  const image = ref<string | null>(null)
+  const auth = await PyroFetch<JWTAuth>(`servers/${internalServerRefrence.value.serverId}/fs`)
   try {
     const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
       override: auth,
-      retry: false,
-    });
+      retry: false
+    })
 
     if (fileData instanceof Blob) {
       if (import.meta.client) {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const img = new Image();
-        img.src = URL.createObjectURL(fileData);
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        const img = new Image()
+        img.src = URL.createObjectURL(fileData)
         await new Promise<void>((resolve) => {
           img.onload = () => {
-            canvas.width = 512;
-            canvas.height = 512;
-            ctx?.drawImage(img, 0, 0, 512, 512);
-            const dataURL = canvas.toDataURL("image/png");
-            internalServerRefrence.value.general.image = dataURL;
-            image.value = dataURL;
-            resolve();
-          };
-        });
+            canvas.width = 512
+            canvas.height = 512
+            ctx?.drawImage(img, 0, 0, 512, 512)
+            const dataURL = canvas.toDataURL('image/png')
+            internalServerRefrence.value.general.image = dataURL
+            image.value = dataURL
+            resolve()
+          }
+        })
       }
     }
   } catch (error) {
     if (error instanceof PyroFetchError && error.statusCode === 404) {
-      console.log("[PYROSERVERS] No server icon found");
+      console.log('[PYROSERVERS] 未找到服务器图标')
     } else {
-      console.error(error);
+      console.error(error)
     }
   }
 
   if (image.value === null && iconUrl) {
-    console.log("iconUrl", iconUrl);
+    console.log('iconUrl', iconUrl)
     try {
-      const response = await fetch(iconUrl);
-      const file = await response.blob();
-      const originalfile = new File([file], "server-icon-original.png", {
-        type: "image/png",
-      });
+      const response = await fetch(iconUrl)
+      const file = await response.blob()
+      const originalfile = new File([file], 'server-icon-original.png', {
+        type: 'image/png'
+      })
       if (import.meta.client) {
         const scaledFile = await new Promise<File>((resolve, reject) => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          const img = new Image();
-          img.src = URL.createObjectURL(file);
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')
+          const img = new Image()
+          img.src = URL.createObjectURL(file)
           img.onload = () => {
-            canvas.width = 64;
-            canvas.height = 64;
-            ctx?.drawImage(img, 0, 0, 64, 64);
+            canvas.width = 64
+            canvas.height = 64
+            ctx?.drawImage(img, 0, 0, 64, 64)
             canvas.toBlob((blob) => {
               if (blob) {
-                const data = new File([blob], "server-icon.png", { type: "image/png" });
-                resolve(data);
+                const data = new File([blob], 'server-icon.png', { type: 'image/png' })
+                resolve(data)
               } else {
-                reject(new Error("Canvas toBlob failed"));
+                reject(new Error('Canvas toBlob failed'))
               }
-            }, "image/png");
-          };
-          img.onerror = reject;
-        });
+            }, 'image/png')
+          }
+          img.onerror = reject
+        })
         if (scaledFile) {
           await PyroFetch(`/create?path=/server-icon.png&type=file`, {
-            method: "POST",
-            contentType: "application/octet-stream",
+            method: 'POST',
+            contentType: 'application/octet-stream',
             body: scaledFile,
-            override: auth,
-          });
+            override: auth
+          })
 
           await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
-            method: "POST",
-            contentType: "application/octet-stream",
+            method: 'POST',
+            contentType: 'application/octet-stream',
             body: originalfile,
-            override: auth,
-          });
+            override: auth
+          })
         }
       }
     } catch (error) {
       if (error instanceof PyroFetchError && error.statusCode === 404) {
-        console.log("[PYROSERVERS] No server icon found");
+        console.log('[PYROSERVERS] No server icon found')
       } else {
-        console.error(error);
+        console.error(error)
       }
     }
   }
-  return image.value;
-};
+  return image.value
+}
 
 // ------------------ GENERAL ------------------ //
 
 const sendPowerAction = async (action: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/power`, {
-      method: "POST",
-      body: { action },
-    });
+      method: 'POST',
+      body: { action }
+    })
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    await internalServerRefrence.value.refresh();
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await internalServerRefrence.value.refresh()
   } catch (error) {
-    console.error("Error changing power state:", error);
-    throw error;
+    console.error('更改电源状态时出错', error)
+    throw error
   }
-};
+}
 
 const updateName = async (newName: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/name`, {
-      method: "POST",
-      body: { name: newName },
-    });
+      method: 'POST',
+      body: { name: newName }
+    })
   } catch (error) {
-    console.error("Error updating server name:", error);
-    throw error;
+    console.error('Error updating server name:', error)
+    throw error
   }
-};
+}
 
 const reinstallServer = async (
   serverId: string,
@@ -368,241 +368,241 @@ const reinstallServer = async (
   projectId: string,
   versionId?: string,
   loaderVersionId?: string,
-  hardReset: boolean = false,
+  hardReset: boolean = false
 ) => {
   try {
-    const hardResetParam = hardReset ? "true" : "false";
+    const hardResetParam = hardReset ? 'true' : 'false'
     if (loader) {
-      if (projectId.toLowerCase() === "neoforge") {
-        projectId = "NeoForge";
+      if (projectId.toLowerCase() === 'neoforge') {
+        projectId = 'NeoForge'
       }
       await PyroFetch(`servers/${serverId}/reinstall?hard=${hardResetParam}`, {
-        method: "POST",
-        body: { loader: projectId, loader_version: loaderVersionId, game_version: versionId },
-      });
+        method: 'POST',
+        body: { loader: projectId, loader_version: loaderVersionId, game_version: versionId }
+      })
     } else {
       await PyroFetch(`servers/${serverId}/reinstall?hard=${hardResetParam}`, {
-        method: "POST",
-        body: { project_id: projectId, version_id: versionId },
-      });
+        method: 'POST',
+        body: { project_id: projectId, version_id: versionId }
+      })
     }
   } catch (error) {
-    console.error("Error reinstalling server:", error);
-    throw error;
+    console.error('Error reinstalling server:', error)
+    throw error
   }
-};
+}
 
 const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => {
-  const hardResetParam = hardReset ? "true" : "false";
+  const hardResetParam = hardReset ? 'true' : 'false'
   try {
     const auth = await PyroFetch<JWTAuth>(
-      `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`,
-    );
+      `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`
+    )
 
-    const formData = new FormData();
-    formData.append("file", mrpack);
+    const formData = new FormData()
+    formData.append('file', mrpack)
 
     const response = await fetch(
       `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`,
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          Authorization: `Bearer ${auth.token}`,
+          Authorization: `Bearer ${auth.token}`
         },
         body: formData,
-        signal: AbortSignal.timeout(30 * 60 * 1000),
-      },
-    );
+        signal: AbortSignal.timeout(30 * 60 * 1000)
+      }
+    )
 
     if (!response.ok) {
-      throw new Error(`[pyroservers] native fetch err status: ${response.status}`);
+      throw new Error(`[pyroservers] native fetch err status: ${response.status}`)
     }
   } catch (error) {
-    console.error("Error reinstalling from mrpack:", error);
-    throw error;
+    console.error('Error reinstalling from mrpack:', error)
+    throw error
   }
-};
+}
 
 const suspendServer = async (status: boolean) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/suspend`, {
-      method: "POST",
-      body: { suspended: status },
-    });
+      method: 'POST',
+      body: { suspended: status }
+    })
   } catch (error) {
-    console.error("Error suspending server:", error);
-    throw error;
+    console.error('Error suspending server:', error)
+    throw error
   }
-};
+}
 
 const fetchConfigFile = async (fileName: string) => {
   try {
-    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/config/${fileName}`);
+    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/config/${fileName}`)
   } catch (error) {
-    console.error("Error fetching config file:", error);
-    throw error;
+    console.error('Error fetching config file:', error)
+    throw error
   }
-};
+}
 
 const getMotd = async () => {
   try {
-    const props = await downloadFile("/server.properties");
+    const props = await downloadFile('/server.properties')
     if (props) {
-      const lines = props.split("\n");
+      const lines = props.split('\n')
       for (const line of lines) {
-        if (line.startsWith("motd=")) {
-          return line.slice(5);
+        if (line.startsWith('motd=')) {
+          return line.slice(5)
         }
       }
     }
   } catch {
-    return null;
+    return null
   }
-};
+}
 
 const setMotd = async (motd: string) => {
   try {
-    const props = (await fetchConfigFile("ServerProperties")) as any;
+    const props = (await fetchConfigFile('ServerProperties')) as any
     if (props) {
-      props.motd = motd;
-      const newProps = constructServerProperties(props);
-      const octetStream = new Blob([newProps], { type: "application/octet-stream" });
+      props.motd = motd
+      const newProps = constructServerProperties(props)
+      const octetStream = new Blob([newProps], { type: 'application/octet-stream' })
       const auth = await await PyroFetch<JWTAuth>(
-        `servers/${internalServerRefrence.value.serverId}/fs`,
-      );
+        `servers/${internalServerRefrence.value.serverId}/fs`
+      )
 
       return await PyroFetch(`/update?path=/server.properties`, {
-        method: "PUT",
-        contentType: "application/octet-stream",
+        method: 'PUT',
+        contentType: 'application/octet-stream',
         body: octetStream,
-        override: auth,
-      });
+        override: auth
+      })
     }
   } catch (error) {
-    console.error("Error setting motd:", error);
+    console.error('Error setting motd:', error)
   }
-};
+}
 
 // ------------------ MODS ------------------ //
 
 const installMod = async (projectId: string, versionId: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods`, {
-      method: "POST",
-      body: { rinth_ids: { project_id: projectId, version_id: versionId } },
-    });
+      method: 'POST',
+      body: { rinth_ids: { project_id: projectId, version_id: versionId } }
+    })
   } catch (error) {
-    console.error("Error installing mod:", error);
-    throw error;
+    console.error('Error installing mod:', error)
+    throw error
   }
-};
+}
 
 const removeMod = async (modId: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/deleteMod`, {
-      method: "POST",
+      method: 'POST',
       body: {
-        path: modId,
-      },
-    });
+        path: modId
+      }
+    })
   } catch (error) {
-    console.error("Error removing mod:", error);
-    throw error;
+    console.error('Error removing mod:', error)
+    throw error
   }
-};
+}
 
 const reinstallMod = async (modId: string, versionId: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods/${modId}`, {
-      method: "PUT",
-      body: { version_id: versionId },
-    });
+      method: 'PUT',
+      body: { version_id: versionId }
+    })
   } catch (error) {
-    console.error("Error reinstalling mod:", error);
-    throw error;
+    console.error('Error reinstalling mod:', error)
+    throw error
   }
-};
+}
 
 // ------------------ BACKUPS ------------------ //
 
 const createBackup = async (backupName: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
-      method: "POST",
-      body: { name: backupName },
-    });
+      method: 'POST',
+      body: { name: backupName }
+    })
   } catch (error) {
-    console.error("Error creating backup:", error);
-    throw error;
+    console.error('Error creating backup:', error)
+    throw error
   }
-};
+}
 
 const renameBackup = async (backupId: string, newName: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}/rename`, {
-      method: "POST",
-      body: { name: newName },
-    });
+      method: 'POST',
+      body: { name: newName }
+    })
   } catch (error) {
-    console.error("Error renaming backup:", error);
-    throw error;
+    console.error('Error renaming backup:', error)
+    throw error
   }
-};
+}
 
 const deleteBackup = async (backupId: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}`, {
-      method: "DELETE",
-    });
+      method: 'DELETE'
+    })
   } catch (error) {
-    console.error("Error deleting backup:", error);
-    throw error;
+    console.error('Error deleting backup:', error)
+    throw error
   }
-};
+}
 
 const restoreBackup = async (backupId: string) => {
   try {
     await PyroFetch(
       `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/restore`,
       {
-        method: "POST",
-      },
-    );
+        method: 'POST'
+      }
+    )
   } catch (error) {
-    console.error("Error restoring backup:", error);
-    throw error;
+    console.error('Error restoring backup:', error)
+    throw error
   }
-};
+}
 
 const downloadBackup = async (backupId: string) => {
   try {
-    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}`);
+    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}`)
   } catch (error) {
-    console.error("Error downloading backup:", error);
-    throw error;
+    console.error('Error downloading backup:', error)
+    throw error
   }
-};
+}
 
-const updateAutoBackup = async (autoBackup: "enable" | "disable", interval: number) => {
+const updateAutoBackup = async (autoBackup: 'enable' | 'disable', interval: number) => {
   try {
     return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`, {
-      method: "POST",
-      body: { set: autoBackup, interval },
-    });
+      method: 'POST',
+      body: { set: autoBackup, interval }
+    })
   } catch (error) {
-    console.error("Error updating auto backup:", error);
-    throw error;
+    console.error('Error updating auto backup:', error)
+    throw error
   }
-};
+}
 
 const getAutoBackup = async () => {
   try {
-    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`);
+    return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`)
   } catch (error) {
-    console.error("Error getting auto backup settings:", error);
-    throw error;
+    console.error('Error getting auto backup settings:', error)
+    throw error
   }
-};
+}
 
 // ------------------ NETWORK ------------------ //
 
@@ -611,242 +611,243 @@ const reserveAllocation = async (name: string): Promise<Allocation> => {
     return await PyroFetch<Allocation>(
       `servers/${internalServerRefrence.value.serverId}/allocations?name=${name}`,
       {
-        method: "POST",
-      },
-    );
+        method: 'POST'
+      }
+    )
   } catch (error) {
-    console.error("Error reserving new allocation:", error);
-    throw error;
+    console.error('Error reserving new allocation:', error)
+    throw error
   }
-};
+}
 
 const updateAllocation = async (port: number, name: string) => {
   try {
     await PyroFetch(
       `servers/${internalServerRefrence.value.serverId}/allocations/${port}?name=${name}`,
       {
-        method: "PUT",
-      },
-    );
+        method: 'PUT'
+      }
+    )
   } catch (error) {
-    console.error("Error updating allocations:", error);
-    throw error;
+    console.error('Error updating allocations:', error)
+    throw error
   }
-};
+}
 
 const deleteAllocation = async (port: number) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/allocations/${port}`, {
-      method: "DELETE",
-    });
+      method: 'DELETE'
+    })
   } catch (error) {
-    console.error("Error deleting allocation:", error);
-    throw error;
+    console.error('Error deleting allocation:', error)
+    throw error
   }
-};
+}
 
 const checkSubdomainAvailability = async (subdomain: string): Promise<{ available: boolean }> => {
   try {
-    return (await PyroFetch(`subdomains/${subdomain}/isavailable`)) as { available: boolean };
+    return (await PyroFetch(`subdomains/${subdomain}/isavailable`)) as { available: boolean }
   } catch (error) {
-    console.error("Error checking subdomain availability:", error);
-    throw error;
+    console.error('Error checking subdomain availability:', error)
+    throw error
   }
-};
+}
 
 const changeSubdomain = async (subdomain: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/subdomain`, {
-      method: "POST",
-      body: { subdomain },
-    });
+      method: 'POST',
+      body: { subdomain }
+    })
   } catch (error) {
-    console.error("Error changing subdomain:", error);
-    throw error;
+    console.error('Error changing subdomain:', error)
+    throw error
   }
-};
+}
 
 // ------------------ STARTUP ------------------ //
 
 const updateStartupSettings = async (
   invocation: string,
-  jdkVersion: "lts8" | "lts11" | "lts17" | "lts21",
-  jdkBuild: "corretto" | "temurin" | "graal",
+  jdkVersion: 'lts8' | 'lts11' | 'lts17' | 'lts21',
+  jdkBuild: 'corretto' | 'temurin' | 'graal'
 ) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/startup`, {
-      method: "POST",
+      method: 'POST',
       body: {
         invocation: invocation || null,
         jdk_version: jdkVersion || null,
-        jdk_build: jdkBuild || null,
-      },
-    });
+        jdk_build: jdkBuild || null
+      }
+    })
   } catch (error) {
-    console.error("Error updating startup settings:", error);
-    throw error;
+    console.error('Error updating startup settings:', error)
+    throw error
   }
-};
+}
 
 // ------------------ FS ------------------ //
 
 const retryWithAuth = async (requestFn: () => Promise<any>) => {
   try {
-    return await requestFn();
+    return await requestFn()
   } catch (error) {
     if (error instanceof PyroFetchError && error.statusCode === 401) {
-      await internalServerRefrence.value.refresh(["fs"]);
-      return await requestFn();
+      await internalServerRefrence.value.refresh(['fs'])
+      return await requestFn()
     }
   }
-};
+}
 
 const listDirContents = (path: string, page: number, pageSize: number) => {
   return retryWithAuth(async () => {
-    const encodedPath = encodeURIComponent(path);
+    const encodedPath = encodeURIComponent(path)
     return await PyroFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
       override: internalServerRefrence.value.fs.auth,
-      retry: false,
-    });
-  });
-};
+      retry: false
+    })
+  })
+}
 
-const createFileOrFolder = (path: string, type: "file" | "directory") => {
+const createFileOrFolder = (path: string, type: 'file' | 'directory') => {
   return retryWithAuth(async () => {
-    const encodedPath = encodeURIComponent(path);
+    const encodedPath = encodeURIComponent(path)
     return await PyroFetch(`/create?path=${encodedPath}&type=${type}`, {
-      method: "POST",
-      contentType: "application/octet-stream",
-      override: internalServerRefrence.value.fs.auth,
-    });
-  });
-};
+      method: 'POST',
+      contentType: 'application/octet-stream',
+      override: internalServerRefrence.value.fs.auth
+    })
+  })
+}
 
 const uploadFile = (path: string, file: File) => {
   return retryWithAuth(async () => {
-    const encodedPath = encodeURIComponent(path);
+    const encodedPath = encodeURIComponent(path)
     return await PyroFetch(`/create?path=${encodedPath}&type=file`, {
-      method: "POST",
-      contentType: "application/octet-stream",
+      method: 'POST',
+      contentType: 'application/octet-stream',
       body: file,
-      override: internalServerRefrence.value.fs.auth,
-    });
-  });
-};
+      override: internalServerRefrence.value.fs.auth
+    })
+  })
+}
 
 const renameFileOrFolder = (path: string, name: string) => {
-  const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
+  const pathName = path.split('/').slice(0, -1).join('/') + '/' + name
   return retryWithAuth(async () => {
     return await PyroFetch(`/move`, {
-      method: "POST",
+      method: 'POST',
       override: internalServerRefrence.value.fs.auth,
       body: {
         source: path,
-        destination: pathName,
-      },
-    });
-  });
-};
+        destination: pathName
+      }
+    })
+  })
+}
 
 const updateFile = (path: string, content: string) => {
-  const octetStream = new Blob([content], { type: "application/octet-stream" });
+  const octetStream = new Blob([content], { type: 'application/octet-stream' })
   return retryWithAuth(async () => {
     return await PyroFetch(`/update?path=${path}`, {
-      method: "PUT",
-      contentType: "application/octet-stream",
+      method: 'PUT',
+      contentType: 'application/octet-stream',
       body: octetStream,
-      override: internalServerRefrence.value.fs.auth,
-    });
-  });
-};
+      override: internalServerRefrence.value.fs.auth
+    })
+  })
+}
 
 const createMissingFolders = async (path: string) => {
-  if (path.startsWith("/")) {
-    path = path.substring(1);
+  if (path.startsWith('/')) {
+    path = path.substring(1)
   }
-  const folders = path.split("/");
-  console.log(folders);
-  let currentPath = "";
+  const folders = path.split('/')
+  console.log(folders)
+  let currentPath = ''
 
   for (const folder of folders) {
-    currentPath += "/" + folder;
+    currentPath += '/' + folder
     try {
-      await createFileOrFolder(currentPath, "directory");
-    } catch {}
+      await createFileOrFolder(currentPath, 'directory')
+    } catch {
+    }
   }
-};
+}
 
 const moveFileOrFolder = (path: string, newPath: string) => {
   return retryWithAuth(async () => {
-    console.log(path);
-    console.log(newPath);
-    console.log(newPath.substring(0, newPath.lastIndexOf("/")));
-    await createMissingFolders(newPath.substring(0, newPath.lastIndexOf("/")));
+    console.log(path)
+    console.log(newPath)
+    console.log(newPath.substring(0, newPath.lastIndexOf('/')))
+    await createMissingFolders(newPath.substring(0, newPath.lastIndexOf('/')))
 
     return await PyroFetch(`/move`, {
-      method: "POST",
+      method: 'POST',
       override: internalServerRefrence.value.fs.auth,
       body: {
         source: path,
-        destination: newPath,
-      },
-    });
-  });
-};
+        destination: newPath
+      }
+    })
+  })
+}
 
 const deleteFileOrFolder = (path: string, recursive: boolean) => {
-  const encodedPath = encodeURIComponent(path);
+  const encodedPath = encodeURIComponent(path)
   return retryWithAuth(async () => {
     return await PyroFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
-      method: "DELETE",
-      override: internalServerRefrence.value.fs.auth,
-    });
-  });
-};
+      method: 'DELETE',
+      override: internalServerRefrence.value.fs.auth
+    })
+  })
+}
 
 const downloadFile = (path: string, raw?: boolean) => {
   return retryWithAuth(async () => {
-    const encodedPath = encodeURIComponent(path);
+    const encodedPath = encodeURIComponent(path)
     const fileData = await PyroFetch(`/download?path=${encodedPath}`, {
-      override: internalServerRefrence.value.fs.auth,
-    });
+      override: internalServerRefrence.value.fs.auth
+    })
 
     if (fileData instanceof Blob) {
       if (raw) {
-        return fileData;
+        return fileData
       } else {
-        return await fileData.text();
+        return await fileData.text()
       }
     }
-  });
-};
+  })
+}
 
 const modules: any = {
   general: {
     get: async (serverId: string) => {
       try {
-        const data = await PyroFetch<General>(`servers/${serverId}`);
+        const data = await PyroFetch<General>(`servers/${serverId}`)
         // TODO: temp hack to fix hydration error
         if (data.upstream?.project_id) {
           const res = await $fetch(
-            `https://api.modrinth.com/v2/project/${data.upstream.project_id}`,
-          );
-          data.project = res as Project;
+            `https://api.bbsmc.net/v2/project/${data.upstream.project_id}`
+          )
+          data.project = res as Project
         }
         if (import.meta.client) {
-          data.image = (await processImage(data.project?.icon_url)) ?? undefined;
+          data.image = (await processImage(data.project?.icon_url)) ?? undefined
         }
-        const motd = await getMotd();
-        if (motd === "A Minecraft Server") {
+        const motd = await getMotd()
+        if (motd === 'A Minecraft Server') {
           await setMotd(
-            `§b${data.project?.title || data.loader + " " + data.mc_version} §f♦ §aModrinth Servers`,
-          );
+            `§b${data.project?.title || data.loader + ' ' + data.mc_version} §f♦ §aBBSMC Servers`
+          )
         }
-        data.motd = motd;
-        return data;
+        data.motd = motd
+        return data
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        internalServerRefrence.value.setError(error)
+        return undefined
       }
     },
     updateName,
@@ -856,34 +857,34 @@ const modules: any = {
     suspend: suspendServer,
     getMotd,
     setMotd,
-    fetchConfigFile,
+    fetchConfigFile
   },
   mods: {
     get: async (serverId: string) => {
       try {
-        const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`);
+        const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`)
         return {
           data:
             internalServerRefrence.value.error === undefined
-              ? mods.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? ""))
-              : [],
-        };
+              ? mods.sort((a, b) => (a?.name ?? '').localeCompare(b?.name ?? ''))
+              : []
+        }
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        internalServerRefrence.value.setError(error)
+        return undefined
       }
     },
     install: installMod,
     remove: removeMod,
-    reinstall: reinstallMod,
+    reinstall: reinstallMod
   },
   backups: {
     get: async (serverId: string) => {
       try {
-        return { data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`) };
+        return { data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`) }
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        internalServerRefrence.value.setError(error)
+        return undefined
       }
     },
     create: createBackup,
@@ -892,51 +893,51 @@ const modules: any = {
     restore: restoreBackup,
     download: downloadBackup,
     updateAutoBackup,
-    getAutoBackup,
+    getAutoBackup
   },
   network: {
     get: async (serverId: string) => {
       try {
-        return { allocations: await PyroFetch<Allocation[]>(`servers/${serverId}/allocations`) };
+        return { allocations: await PyroFetch<Allocation[]>(`servers/${serverId}/allocations`) }
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        internalServerRefrence.value.setError(error)
+        return undefined
       }
     },
     reserveAllocation,
     updateAllocation,
     deleteAllocation,
     checkSubdomainAvailability,
-    changeSubdomain,
+    changeSubdomain
   },
   startup: {
     get: async (serverId: string) => {
       try {
-        return await PyroFetch<Startup>(`servers/${serverId}/startup`);
+        return await PyroFetch<Startup>(`servers/${serverId}/startup`)
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        internalServerRefrence.value.setError(error)
+        return undefined
       }
     },
-    update: updateStartupSettings,
+    update: updateStartupSettings
   },
   ws: {
     get: async (serverId: string) => {
       try {
-        return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`);
+        return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`)
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        internalServerRefrence.value.setError(error)
+        return undefined
       }
-    },
+    }
   },
   fs: {
     get: async (serverId: string) => {
       try {
-        return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`) };
+        return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`) }
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        internalServerRefrence.value.setError(error)
+        return undefined
       }
     },
     listDirContents,
@@ -946,9 +947,9 @@ const modules: any = {
     updateFile,
     moveFileOrFolder,
     deleteFileOrFolder,
-    downloadFile,
-  },
-};
+    downloadFile
+  }
+}
 
 type GeneralFunctions = {
   /**
@@ -984,7 +985,7 @@ type GeneralFunctions = {
     projectId: string,
     versionId?: string,
     loaderVersionId?: string,
-    hardReset?: boolean,
+    hardReset?: boolean
   ) => Promise<void>;
 
   /**
@@ -1092,7 +1093,7 @@ type BackupFunctions = {
    * @param autoBackup - Whether to enable auto backup.
    * @param interval - The interval to backup at (in Hours).
    */
-  updateAutoBackup: (autoBackup: "enable" | "disable", interval: number) => Promise<void>;
+  updateAutoBackup: (autoBackup: 'enable' | 'disable', interval: number) => Promise<void>;
 
   /**
    * Gets the auto backup settings of the server.
@@ -1158,8 +1159,8 @@ type StartupFunctions = {
    */
   update: (
     invocation: string,
-    jdkVersion: "lts8" | "lts11" | "lts17" | "lts21",
-    jdkBuild: "corretto" | "temurin" | "graal",
+    jdkVersion: 'lts8' | 'lts11' | 'lts17' | 'lts21',
+    jdkBuild: 'corretto' | 'temurin' | 'graal'
   ) => Promise<void>;
 };
 
@@ -1184,7 +1185,7 @@ type FSFunctions = {
    * @param type - The type of file or folder to create.
    * @returns
    */
-  createFileOrFolder: (path: string, type: "file" | "directory") => Promise<any>;
+  createFileOrFolder: (path: string, type: 'file' | 'directory') => Promise<any>;
 
   /**
    * @param path - The path to upload the file to.
@@ -1247,7 +1248,7 @@ type ModulesMap = {
   fs: FSModule;
 };
 
-type avaliableModules = ("general" | "mods" | "backups" | "network" | "startup" | "ws" | "fs")[];
+type avaliableModules = ('general' | 'mods' | 'backups' | 'network' | 'startup' | 'ws' | 'fs')[];
 
 export type Server<T extends avaliableModules> = {
   [K in T[number]]?: ModulesMap[K];
@@ -1265,48 +1266,48 @@ export type Server<T extends avaliableModules> = {
 export const usePyroServer = async (serverId: string, includedModules: avaliableModules) => {
   const server: Server<typeof includedModules> = reactive({
     refresh: async (refreshModules?: avaliableModules) => {
-      const promises: Promise<void>[] = [];
+      const promises: Promise<void>[] = []
       if (refreshModules) {
         for (const module of refreshModules) {
           promises.push(
             (async () => {
-              const mods = modules[module];
+              const mods = modules[module]
               if (mods.get) {
-                const data = await mods.get(serverId);
-                server[module] = { ...server[module], ...data };
+                const data = await mods.get(serverId)
+                server[module] = { ...server[module], ...data }
               }
-            })(),
-          );
+            })()
+          )
         }
       } else {
         for (const module of includedModules) {
           promises.push(
             (async () => {
-              const mods = modules[module];
+              const mods = modules[module]
               if (mods.get) {
-                const data = await mods.get(serverId);
-                server[module] = { ...server[module], ...data };
+                const data = await mods.get(serverId)
+                server[module] = { ...server[module], ...data }
               }
-            })(),
-          );
+            })()
+          )
         }
       }
-      await Promise.all(promises);
+      await Promise.all(promises)
     },
     setError: (error: Error) => {
-      server.error = error;
+      server.error = error
     },
-    serverId,
-  });
+    serverId
+  })
 
   for (const module of includedModules) {
-    const mods = modules[module];
-    server[module] = mods;
+    const mods = modules[module]
+    server[module] = mods
   }
 
-  internalServerRefrence.value = server;
+  internalServerRefrence.value = server
 
-  await server.refresh();
+  await server.refresh()
 
-  return server as Server<typeof includedModules>;
-};
+  return server as Server<typeof includedModules>
+}

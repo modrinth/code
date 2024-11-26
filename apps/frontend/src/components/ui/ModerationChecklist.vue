@@ -1,50 +1,49 @@
 <template>
   <div class="card moderation-checklist">
-    <h1>Moderation checklist</h1>
+    <h1>审核清单</h1>
     <div v-if="done">
-      <p>You are done moderating this project! There are {{ futureProjects.length }} left.</p>
+      <p>您已完成此项目的审核！还有 {{ futureProjects.length }} 个项目。</p>
     </div>
     <div v-else-if="generatedMessage">
       <p>
-        Enter your moderation message here. Remember to check the Moderation tab to answer any
-        questions an author might have!
+        在此输入您的审核消息。请记得检查审核标签，以回答作者可能提出的任何问题！
       </p>
       <div class="markdown-editor-spacing">
-        <MarkdownEditor v-model="message" :placeholder="'Enter moderation message'" />
+        <MarkdownEditor v-model="message" :placeholder="'输入审核消息'"/>
       </div>
     </div>
     <div v-else-if="steps[currentStepIndex].id === 'modpack-permissions'">
       <h2 v-if="modPackData">
-        Modpack permissions
+        模组包权限
         <template v-if="modPackIndex + 1 <= modPackData.length">
           ({{ modPackIndex + 1 }} / {{ modPackData.length }})
         </template>
       </h2>
-      <div v-if="!modPackData">Loading data...</div>
+      <div v-if="!modPackData">加载数据中...</div>
       <div v-else-if="modPackData.length === 0">
-        <p>All permissions obtained. You may skip this step!</p>
+        <p>所有权限已获得。您可以跳过此步骤！</p>
       </div>
       <div v-else-if="!modPackData[modPackIndex]">
-        <p>All permission checks complete!</p>
+        <p>所有权限检查已完成！</p>
         <div class="input-group modpack-buttons">
           <button class="btn" @click="modPackIndex -= 1">
-            <LeftArrowIcon aria-hidden="true" />
-            Previous
+            <LeftArrowIcon aria-hidden="true"/>
+            上一步
           </button>
         </div>
       </div>
       <div v-else>
         <div v-if="modPackData[modPackIndex].type === 'unknown'">
-          <p>What is the approval type of {{ modPackData[modPackIndex].file_name }}?</p>
+          <p>{{ modPackData[modPackIndex].file_name }} 的批准类型是什么？</p>
           <div class="input-group">
             <button
-              v-for="(option, index) in fileApprovalTypes"
-              :key="index"
-              class="btn"
-              :class="{
+                v-for="(option, index) in fileApprovalTypes"
+                :key="index"
+                class="btn"
+                :class="{
                 'option-selected': modPackData[modPackIndex].status === option.id,
               }"
-              @click="modPackData[modPackIndex].status = option.id"
+                @click="modPackData[modPackIndex].status = option.id"
             >
               {{ option.name }}
             </button>
@@ -52,89 +51,83 @@
           <template v-if="modPackData[modPackIndex].status !== 'unidentified'">
             <div class="universal-labels"></div>
             <label for="proof">
-              <span class="label__title">Proof</span>
+              <span class="label__title">证明</span>
             </label>
             <input
-              id="proof"
-              v-model="modPackData[modPackIndex].proof"
-              type="text"
-              autocomplete="off"
-              placeholder="Enter proof of status..."
+                id="proof"
+                v-model="modPackData[modPackIndex].proof"
+                type="text"
+                autocomplete="off"
+                placeholder="输入状态证明..."
             />
             <label for="link">
-              <span class="label__title">Link</span>
+              <span class="label__title">链接</span>
             </label>
             <input
-              id="link"
-              v-model="modPackData[modPackIndex].url"
-              type="text"
-              autocomplete="off"
-              placeholder="Enter link of project..."
+                id="link"
+                v-model="modPackData[modPackIndex].url"
+                type="text"
+                autocomplete="off"
+                placeholder="输入项目链接..."
             />
             <label for="title">
-              <span class="label__title">Title</span>
+              <span class="label__title">标题</span>
             </label>
             <input
-              id="title"
-              v-model="modPackData[modPackIndex].title"
-              type="text"
-              autocomplete="off"
-              placeholder="Enter title of project..."
+                id="title"
+                v-model="modPackData[modPackIndex].title"
+                type="text"
+                autocomplete="off"
+                placeholder="输入项目标题..."
             />
           </template>
         </div>
         <div v-else-if="modPackData[modPackIndex].type === 'flame'">
           <p>
-            What is the approval type of {{ modPackData[modPackIndex].title }} (<a
+            {{ modPackData[modPackIndex].title }} 的批准类型是什么 (<a
               :href="modPackData[modPackIndex].url"
               target="_blank"
               class="text-link"
-              >{{ modPackData[modPackIndex].url }}</a
-            >?
+          >{{ modPackData[modPackIndex].url }}</a
+          >?
           </p>
           <div class="input-group">
             <button
-              v-for="(option, index) in fileApprovalTypes"
-              :key="index"
-              class="btn"
-              :class="{
+                v-for="(option, index) in fileApprovalTypes"
+                :key="index"
+                class="btn"
+                :class="{
                 'option-selected': modPackData[modPackIndex].status === option.id,
               }"
-              @click="modPackData[modPackIndex].status = option.id"
+                @click="modPackData[modPackIndex].status = option.id"
             >
               {{ option.name }}
             </button>
           </div>
         </div>
         <div
-          v-if="
+            v-if="
             ['unidentified', 'no', 'with-attribution'].includes(modPackData[modPackIndex].status)
           "
         >
           <p v-if="modPackData[modPackIndex].status === 'unidentified'">
-            Does this project provide identification and permission for
-            <strong>{{ modPackData[modPackIndex].file_name }}</strong
-            >?
+            该项目是否提供了 <strong>{{ modPackData[modPackIndex].file_name }}</strong> 的识别和权限？
           </p>
           <p v-else-if="modPackData[modPackIndex].status === 'with-attribution'">
-            Does this project provide attribution for
-            <strong>{{ modPackData[modPackIndex].file_name }}</strong
-            >?
+            该项目是否为 <strong>{{ modPackData[modPackIndex].file_name }}</strong> 提供了归属？
           </p>
           <p v-else>
-            Does this project provide proof of permission for
-            <strong>{{ modPackData[modPackIndex].file_name }}</strong
-            >?
+            该项目是否提供了 <strong>{{ modPackData[modPackIndex].file_name }}</strong> 的权限证明？
           </p>
           <div class="input-group">
             <button
-              v-for="(option, index) in filePermissionTypes"
-              :key="index"
-              class="btn"
-              :class="{
+                v-for="(option, index) in filePermissionTypes"
+                :key="index"
+                class="btn"
+                :class="{
                 'option-selected': modPackData[modPackIndex].approved === option.id,
               }"
-              @click="modPackData[modPackIndex].approved = option.id"
+                @click="modPackData[modPackIndex].approved = option.id"
             >
               {{ option.name }}
             </button>
@@ -142,16 +135,16 @@
         </div>
         <div class="input-group modpack-buttons">
           <button class="btn" :disabled="modPackIndex <= 0" @click="modPackIndex -= 1">
-            <LeftArrowIcon aria-hidden="true" />
-            Previous
+            <LeftArrowIcon aria-hidden="true"/>
+            上一步
           </button>
           <button
-            class="btn btn-blue"
-            :disabled="!modPackData[modPackIndex].status"
-            @click="modPackIndex += 1"
+              class="btn btn-blue"
+              :disabled="!modPackData[modPackIndex].status"
+              @click="modPackIndex += 1"
           >
-            <RightArrowIcon aria-hidden="true" />
-            Next project
+            <RightArrowIcon aria-hidden="true"/>
+            下一个项目
           </button>
         </div>
       </div>
@@ -159,7 +152,7 @@
     <div v-else>
       <h2>{{ steps[currentStepIndex].question }}</h2>
       <template v-if="steps[currentStepIndex].rules && steps[currentStepIndex].rules.length > 0">
-        <strong>Rules guidance:</strong>
+        <strong>规则指导：</strong>
         <ul>
           <li v-for="(rule, index) in steps[currentStepIndex].rules" :key="index">
             {{ rule }}
@@ -167,9 +160,9 @@
         </ul>
       </template>
       <template
-        v-if="steps[currentStepIndex].examples && steps[currentStepIndex].examples.length > 0"
+          v-if="steps[currentStepIndex].examples && steps[currentStepIndex].examples.length > 0"
       >
-        <strong>Examples of what to reject:</strong>
+        <strong>拒绝示例：</strong>
         <ul>
           <li v-for="(example, index) in steps[currentStepIndex].examples" :key="index">
             {{ example }}
@@ -177,9 +170,9 @@
         </ul>
       </template>
       <template
-        v-if="steps[currentStepIndex].exceptions && steps[currentStepIndex].exceptions.length > 0"
+          v-if="steps[currentStepIndex].exceptions && steps[currentStepIndex].exceptions.length > 0"
       >
-        <strong>Exceptions:</strong>
+        <strong>例外情况：</strong>
         <ul>
           <li v-for="(exception, index) in steps[currentStepIndex].exceptions" :key="index">
             {{ exception }}
@@ -187,75 +180,75 @@
         </ul>
       </template>
       <p v-if="steps[currentStepIndex].id === 'title'">
-        <strong>Title:</strong> {{ project.title }}
+        <strong>标题：</strong> {{ project.title }}
       </p>
-      <p v-if="steps[currentStepIndex].id === 'slug'"><strong>Slug:</strong> {{ project.slug }}</p>
+      <p v-if="steps[currentStepIndex].id === 'slug'"><strong>Slug：</strong> {{ project.slug }}</p>
       <p v-if="steps[currentStepIndex].id === 'summary'">
-        <strong>Summary:</strong> {{ project.description }}
+        <strong>摘要：</strong> {{ project.description }}
       </p>
       <p v-if="steps[currentStepIndex].id === 'links'">
         <template v-if="project.issues_url">
-          <strong>Issues: </strong>
-          <a class="text-link" :href="project.issues_url">{{ project.issues_url }}</a> <br />
+          <strong>问题： </strong>
+          <a class="text-link" :href="project.issues_url">{{ project.issues_url }}</a> <br/>
         </template>
         <template v-if="project.source_url">
-          <strong>Source: </strong>
-          <a class="text-link" :href="project.source_url">{{ project.source_url }}</a> <br />
+          <strong>源代码： </strong>
+          <a class="text-link" :href="project.source_url">{{ project.source_url }}</a> <br/>
         </template>
         <template v-if="project.wiki_url">
-          <strong>Wiki: </strong>
-          <a class="text-link" :href="project.wiki_url">{{ project.wiki_url }}</a> <br />
+          <strong>Wiki： </strong>
+          <a class="text-link" :href="project.wiki_url">{{ project.wiki_url }}</a> <br/>
         </template>
         <template v-if="project.discord_url">
-          <strong>Discord: </strong>
+          <strong>Discord： </strong>
           <a class="text-link" :href="project.discord_url">{{ project.discord_url }}</a>
-          <br />
+          <br/>
         </template>
         <template v-for="(donation, index) in project.donation_urls" :key="index">
-          <strong>{{ donation.platform }}: </strong>
+          <strong>{{ donation.platform }}： </strong>
           <a class="text-link" :href="donation.url">{{ donation.url }}</a>
-          <br />
+          <br/>
         </template>
       </p>
       <p v-if="steps[currentStepIndex].id === 'categories'">
-        <strong>Categories:</strong>
+        <strong>类别：</strong>
         <Categories
-          :categories="project.categories.concat(project.additional_categories)"
-          :type="project.actualProjectType"
-          class="categories"
+            :categories="project.categories.concat(project.additional_categories)"
+            :type="project.actualProjectType"
+            class="categories"
         />
       </p>
       <p v-if="steps[currentStepIndex].id === 'side-types'">
-        <strong>Client side:</strong> {{ project.client_side }} <br />
-        <strong>Server side:</strong> {{ project.server_side }}
+        <strong>客户端：</strong> {{ project.client_side }} <br/>
+        <strong>服务器端：</strong> {{ project.server_side }}
       </p>
       <div class="options input-group">
         <button
-          v-for="(option, index) in steps[currentStepIndex].options"
-          :key="index"
-          class="btn"
-          :class="{
+            v-for="(option, index) in steps[currentStepIndex].options"
+            :key="index"
+            class="btn"
+            :class="{
             'option-selected':
               selectedOptions[steps[currentStepIndex].id] &&
               selectedOptions[steps[currentStepIndex].id].find((x) => x.name === option.name),
           }"
-          @click="toggleOption(steps[currentStepIndex].id, option)"
+            @click="toggleOption(steps[currentStepIndex].id, option)"
         >
           {{ option.name }}
         </button>
       </div>
       <div
-        v-if="
+          v-if="
           selectedOptions[steps[currentStepIndex].id] &&
           selectedOptions[steps[currentStepIndex].id].length > 0
         "
-        class="inputs universal-labels"
+          class="inputs universal-labels"
       >
         <div
-          v-for="(option, index) in selectedOptions[steps[currentStepIndex].id].filter(
+            v-for="(option, index) in selectedOptions[steps[currentStepIndex].id].filter(
             (x) => x.fillers && x.fillers.length > 0,
           )"
-          :key="index"
+            :key="index"
         >
           <div v-for="(filler, idx) in option.fillers" :key="idx">
             <label :for="filler.id">
@@ -265,48 +258,53 @@
               </span>
             </label>
             <div v-if="filler.large" class="markdown-editor-spacing">
-              <MarkdownEditor v-model="filler.value" :placeholder="'Enter moderation message'" />
+              <MarkdownEditor v-model="filler.value" :placeholder="'输入审核消息'"/>
             </div>
-            <input v-else :id="filler.id" v-model="filler.value" type="text" autocomplete="off" />
+            <input v-else :id="filler.id" v-model="filler.value" type="text" autocomplete="off"/>
           </div>
         </div>
       </div>
     </div>
     <div class="input-group modpack-buttons">
-      <button v-if="!done" class="btn skip-btn" aria-label="Skip" @click="goToNextProject">
-        <ExitIcon aria-hidden="true" />
-        <template v-if="futureProjects.length > 0">Skip</template>
-        <template v-else>Exit</template>
+      <button v-if="!done" class="btn skip-btn" aria-label="跳过" @click="goToNextProject">
+        <ExitIcon aria-hidden="true"/>
+        <template v-if="futureProjects.length > 0">跳过</template>
+        <template v-else>退出</template>
       </button>
       <button v-if="currentStepIndex > 0" class="btn" @click="previousPage() && !done">
-        <LeftArrowIcon aria-hidden="true" /> Previous
+        <LeftArrowIcon aria-hidden="true"/>
+        上一步
       </button>
       <button
-        v-if="currentStepIndex < steps.length - 1 && !done"
-        class="btn btn-primary"
-        @click="nextPage()"
+          v-if="currentStepIndex < steps.length - 1 && !done"
+          class="btn btn-primary"
+          @click="nextPage()"
       >
-        <RightArrowIcon aria-hidden="true" /> Next
+        <RightArrowIcon aria-hidden="true"/>
+        下一步
       </button>
       <button
-        v-else-if="!generatedMessage"
-        class="btn btn-primary"
-        :disabled="loadingMessage"
-        @click="generateMessage"
+          v-else-if="!generatedMessage"
+          class="btn btn-primary"
+          :disabled="loadingMessage"
+          @click="generateMessage"
       >
-        <UpdatedIcon aria-hidden="true" /> Generate message
+        <UpdatedIcon aria-hidden="true"/>
+        生成消息
       </button>
       <template v-if="generatedMessage && !done">
         <button class="btn btn-green" @click="sendMessage(project.requested_status ?? 'approved')">
-          <CheckIcon aria-hidden="true" /> Approve
+          <CheckIcon aria-hidden="true"/>
+          批准
         </button>
         <div class="joined-buttons">
           <button class="btn btn-danger" @click="sendMessage('rejected')">
-            <CrossIcon aria-hidden="true" /> Reject
+            <CrossIcon aria-hidden="true"/>
+            拒绝
           </button>
           <OverflowMenu
-            class="btn btn-danger btn-dropdown-animation icon-only"
-            :options="[
+              class="btn btn-danger btn-dropdown-animation icon-only"
+              :options="[
               {
                 id: 'withhold',
                 color: 'danger',
@@ -315,18 +313,20 @@
               },
             ]"
           >
-            <DropdownIcon style="rotate: 180deg" />
-            <template #withhold> <EyeOffIcon aria-hidden="true" /> Withhold </template>
+            <DropdownIcon style="rotate: 180deg"/>
+            <template #withhold>
+              <EyeOffIcon aria-hidden="true"/>
+              保留
+            </template>
           </OverflowMenu>
         </div>
       </template>
       <button v-if="done" class="btn btn-primary next-project" @click="goToNextProject">
-        Next project
+        下一个项目
       </button>
     </div>
   </div>
 </template>
-
 <script setup>
 import {
   LeftArrowIcon,
@@ -338,7 +338,7 @@ import {
   EyeOffIcon,
   ExitIcon,
 } from "@modrinth/assets";
-import { MarkdownEditor, OverflowMenu } from "@modrinth/ui";
+import {MarkdownEditor, OverflowMenu} from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
 
 const props = defineProps({
@@ -353,347 +353,348 @@ const props = defineProps({
   resetProject: {
     type: Function,
     required: true,
-    default: () => {},
+    default: () => {
+    },
   },
 });
 
 const steps = computed(() =>
-  [
-    {
-      id: "title",
-      question: "Is this title free of useless information?",
-      shown: true,
-      rules: [
-        "No unnecessary data (mod loaders, game versions, etc)",
-        "No emojis / useless text decorators",
-      ],
-      examples: [
-        "✅ NoobMod [1.8+] • Kill all noobs in your world!",
-        "[FABRIC] My Optimization Pack",
-        "[1.17-1.20.4] LagFixer ⚡️ Best Performance Solution! ⭕ Well optimized ✅ Folia supported! (BETA)",
-      ],
-      exceptions: [
-        "Loaders and/or game versions allowed if this project is a port of another mod. (ex: Gravestones for 1.20)",
-        "Loaders allowed if they choose to separate their project into Forge and Fabric variants (discouraged)",
-      ],
-      options: [
-        {
-          name: "Contains useless info",
-          resultingMessage: `## Misuse of Title
-Per section 5.2 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) we ask that you limit the title to just the name of your project. Additional information, such as themes, tags, supported versions or loaders, etc. should be saved for the Summary or Description. When changing your project title, remember to also ensure that your project slug (URL) matches and accurately represents your project.`,
-        },
-      ],
-    },
-    {
-      id: "slug",
-      question: "Is the slug accurate and appropriate?",
-      shown: true,
-      rules: ["Matches title / not misleading (acronyms are OK)"],
-      options: [
-        {
-          name: "Misused",
-          resultingMessage: `## Misuse of Slug
-Per section 5.2 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) your project slug (URL) must accurately represent your project. `,
-        },
-      ],
-    },
-    {
-      id: "summary",
-      question: `Is the project's summary sufficient?`,
-      shown: true,
-      rules: [
-        "The summary should provide a brief overview of your project that informs and entices users.",
-        `Should not be the exact same as the project's title`,
-        "Should not include any markdown formatting.",
-      ],
-      options: [
-        {
-          name: "Insufficient",
-          resultingMessage: `## Insufficient Summary
-Per section 5.3 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) Your project summary should provide a brief overview of your project that informs and entices users.
-This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
-        },
-        {
-          name: "Repeat of title",
-          resultingMessage: `## Insufficient Summary
-Per section 5.3 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) your Summary can not be the same as your project's Title. Your project summary should provide a brief overview of your project that informs and entices users.
-This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
-        },
-        {
-          name: "Formatting",
-          resultingMessage: `## Insufficient Summary
-Per section 5.3 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) your Summary can not include any extra formatting such as lists, or links. Your project summary should provide a brief overview of your project that informs and entices users.
-This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
-        },
-      ],
-    },
-    {
-      id: "description",
-      question: `Is the project's description sufficient?`,
-      navigate: `/${props.project.project_type}/${props.project.slug}`,
-      shown: true,
-      rules: [
-        "Should answer what the project specifically does or adds ",
-        "Should answer why someone should want to download the project ",
-        "Should indicate any other critical information the user must know before downloading",
-        "Should be accessible (no fancy characters / non-standard text, no image-only descriptions, must have English component, etc)",
-      ],
-      options: [
-        {
-          name: "Insufficient",
-          resultingMessage: `## Insufficient Description
-Per section 2.1 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#general-expectations) your project's Description should clearly inform the reader of the content, purpose, and appeal of your project.
-Currently, it looks like there are some missing details.
+    [
+      {
+        id: "title",
+        question: "标题是否没有无用信息？",
+        shown: true,
+        rules: [
+          "没有不必要的数据（模组加载器、游戏版本等）",
+          "没有表情符号/无用的文本装饰",
+        ],
+        examples: [
+          "✅ NoobMod [1.8+] • 在你的世界中杀死所有菜鸟！",
+          "[FABRIC] 我的优化包",
+          "[1.17-1.20.4] LagFixer ⚡️ 最佳性能解决方案！ ⭕ 优化良好 ✅ 支持 Folia！(BETA)",
+        ],
+        exceptions: [
+          "如果此项目是另一个模组的移植版本，则允许加载器和/或游戏版本。（例如：Gravestones for 1.20）",
+          "如果他们选择将项目分为 Forge 和 Fabric 变体（不推荐），则允许加载器。",
+        ],
+        options: [
+          {
+            name: "包含无用信息",
+            resultingMessage: `## 标题误用
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.2 节，我们要求您将标题限制为项目名称。其他信息，如主题、标签、支持的版本或加载器等，应保存在摘要或描述中。更改项目标题时，请记住还要确保项目 slug（URL）匹配并准确代表您的项目。`,
+          },
+        ],
+      },
+      {
+        id: "slug",
+        question: "slug 是否准确且合适？",
+        shown: true,
+        rules: ["与标题匹配/不误导（首字母缩略词可以）"],
+        options: [
+          {
+            name: "误用",
+            resultingMessage: `## Slug 误用
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.2 节，您的项目 slug（URL）必须准确代表您的项目。`,
+          },
+        ],
+      },
+      {
+        id: "summary",
+        question: `项目的摘要是否足够？`,
+        shown: true,
+        rules: [
+          "摘要应提供项目的简要概述，以告知和吸引用户。",
+          `不应与项目标题完全相同`,
+          "不应包含任何 markdown 格式。",
+        ],
+        options: [
+          {
+            name: "不足",
+            resultingMessage: `## 摘要不足
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.3 节，您的项目摘要应提供项目的简要概述，以告知和吸引用户。
+这是大多数人除了 Logo 之外看到的关于您的模组的第一件事，因此它必须准确、合理详细且令人兴奋。`,
+          },
+          {
+            name: "重复标题",
+            resultingMessage: `## 摘要不足
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.3 节，您的摘要不能与项目标题相同。您的项目摘要应提供项目的简要概述，以告知和吸引用户。
+这是大多数人除了 Logo 之外看到的关于您的模组的第一件事，因此它必须准确、合理详细且令人兴奋。`,
+          },
+          {
+            name: "格式化",
+            resultingMessage: `## 摘要不足
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.3 节，您的摘要不能包含任何额外的格式，如列表或链接。您的项目摘要应提供项目的简要概述，以告知和吸引用户。
+这是大多数人除了 Logo 之外看到的关于您的模组的第一件事，因此它必须准确、合理详细且令人兴奋。`,
+          },
+        ],
+      },
+      {
+        id: "description",
+        question: `项目的描述是否足够？`,
+        navigate: `/${props.project.project_type}/${props.project.slug}`,
+        shown: true,
+        rules: [
+          "应回答项目具体做了什么或添加了什么",
+          "应回答为什么有人会想下载这个项目",
+          "应指出用户在下载前必须知道的任何其他关键信息",
+          "应易于访问（没有花哨的字符/非标准文本，没有仅图像描述，必须有英文部分等）",
+        ],
+        options: [
+          {
+            name: "不足",
+            resultingMessage: `## 描述不足
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#general-expectations) 第 2.1 节，您的项目描述应清楚地告知读者项目的内容、目的和吸引力。
+目前，看起来有一些缺失的细节。
 %EXPLAINER%`,
-          fillers: [
-            {
-              id: "EXPLAINER",
-              question: "Please elaborate on how the author can improve their description.",
-              large: true,
-            },
-          ],
-        },
-        {
-          name: "Insufficient (default packs)",
-          resultingMessage: `## Insufficient Description
-Per section 2.1 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#general-expectations) your project's Description should clearly inform the reader of the content, purpose, and appeal of your project.
-Currently, it looks like there are some missing details.
-What does your modpack add? What features does it have? Why would a user want to download it? Be specific!
-See descriptions like [Simply Optimized](https://bbsmc.net/modpack/sop) or [Aged](https://bbsmc.net/modpack/aged) for examples of what a good description looks like.
+            fillers: [
+              {
+                id: "EXPLAINER",
+                question: "请详细说明作者如何改进他们的描述。",
+                large: true,
+              },
+            ],
+          },
+          {
+            name: "不足（默认包）",
+            resultingMessage: `## 描述不足
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#general-expectations) 第 2.1 节，您的项目描述应清楚地告知读者项目的内容、目的和吸引力。
+目前，看起来有一些缺失的细节。
+您的模组包添加了什么？它有哪些功能？为什么用户会想下载它？请具体说明！
+请参阅 [Simply Optimized](https://bbsmc.net/modpack/sop) 或 [Aged](https://bbsmc.net/modpack/aged) 的描述示例，了解良好描述的样子。
 `,
-        },
-        {
-          name: "Insufficient (default projects)",
-          resultingMessage: `## Insufficient Description
-Per section 2.1 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#general-expectations) your project's Description should clearly inform the reader of the content, purpose, and appeal of your project.
-Currently, it looks like there are some missing details.
-What does your project add? What features does it have? Why would a user want to download it? Be specific!
-See descriptions like [Sodium](https://bbsmc.net/mod/sodium) or [LambDynamicLights](https://bbsmc.net/mod/lambdynamiclights) for examples of what a good description looks like.
+          },
+          {
+            name: "不足（默认项目）",
+            resultingMessage: `## 描述不足
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#general-expectations) 第 2.1 节，您的项目描述应清楚地告知读者项目的内容、目的和吸引力。
+目前，看起来有一些缺失的细节。
+您的项目添加了什么？它有哪些功能？为什么用户会想下载它？请具体说明！
+请参阅 [Sodium](https://bbsmc.net/mod/sodium) 或 [LambDynamicLights](https://bbsmc.net/mod/lambdynamiclights) 的描述示例，了解良好描述的样子。
 `,
-        },
-        {
-          name: "Non-english",
-          resultingMessage: `## No English Description
-Per section 2.2 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#accessibility) a project's Summary and Description must be in English, unless meant exclusively for non-English use, such as translations.  You may include your non-English Description if you would like but we ask that you also add an English translation of the Description to your Description page, if you would like to use an online translator to do this, we recommend [DeepL](https://www.deepl.com/translator).`,
-        },
-        {
-          name: "Unfinished",
-          resultingMessage: `## Unfinished Description
-It looks like your project Description is still a WIP seeing as %REASON%. Please remember to submit only when ready, as it is important your project meets the requirements of Section 2.1 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#general-expectations), if you have any questions on this feel free to reach out!`,
-        },
-        {
-          name: "Headers as body text",
-          resultingMessage: `## Description Accessibility
-In accordance with section 2.2 of [BBSMC Content Rules](https://bbsmc.net/legal/rules) we request that \`# header\`s not be used as body text. Headers are interpreted differently by screen-readers and thus should generally only be used for things like separating sections of your Description. If you would like to emphasize a particular sentence or paragraph, instead consider using \`**bold**\` text using the **B** button above the text editor.`,
-        },
-        {
-          name: "Image-only",
-          resultingMessage: `## Image Descriptions
-In accordance with section 2.2 of [BBSMC Content Rules](https://bbsmc.net/legal/rules) we ask that you provide a text alternative to your current Description. It is important that your Description contains enough detail about your project that a user can have a full understanding of it from text alone. A text-based transcription allows for those using screen readers, and users with slow internet connections unable to load images to be able to access the contents of your Description. This also acts as a backup in case the image in your Description ever goes offline for some reason.
-We appreciate how much effort you put into your Description, but accessibility is important to us at Modrinth, if you would like you could put the transcription of your Description entirely in a \`details\` tag, so as to not spoil the visuals of your Description.`,
-        },
-        {
-          name: "Non-standard text",
-          resultingMessage: `## Description Accessibility
-Per section 2 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#clear-and-honest-function) your description must be plainly readable and accessible. Using non-standard text characters like Zalgo or "fancy text" in place of text anywhere in your project, including the Description, Summary, or Title can make your project pages inaccessible. This is important for users who rely on Screen Readers and for search engines in order to provide relevant results to users. Please remove any instances of this type of text.`,
-        },
-      ],
-    },
-    {
-      id: "links",
-      question: `Are the project's links accessible and not misleading?`,
-      shown:
-        props.project.issues_url ||
-        props.project.source_url ||
-        props.project.wiki_url ||
-        props.project.discord_url ||
-        props.project.donation_urls.length > 0,
-      rules: [
-        `All links must be accessible.`,
-        `All links must correspond correctly with a label (ex: Discord link should not go to a YouTube channel)`,
-      ],
-      options: [
-        {
-          name: "Links are misused",
-          resultingMessage: `## Misuse of External Resources
-Per section 5.4 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) all links must lead to correctly labeled publicly available resources that are directly related to your project.`,
-        },
-        {
-          name: "Not accessible (source)",
-          resultingMessage: `## Unreachable Links
-Per section 5.4 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) all links must lead to correctly labeled publicly available resources that are directly related to your project.
-Currently, your Source link directs to a Page Not Found error, likely because your repository is private, make sure to make your repository public before resubmitting your project!`,
-        },
-        {
-          name: "Not accessible (other)",
-          resultingMessage: `## Unreachable Links
-Per section 5.4 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) all links must lead to correctly labeled publicly available resources that are directly related to your project.
-Currently, your %LINK% link is inaccessible!`,
-          fillers: [
-            {
-              id: "LINK",
-              question: "Please specify the link type that is inaccessible.",
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "categories",
-      question: `Are the project's tags/categories accurate?`,
-      shown: props.project.categories.length > 0 || props.project.additional_categories.length > 0,
-      options: [
-        {
-          name: "Inaccurate",
-          resultingMessage: `## Misuse of Tags
-Per section 5.1 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous), it is important that the metadata of your projects is accurate. Including that selected tags honestly represent your project.`,
-        },
-      ],
-    },
-    {
-      id: "side-types",
-      question: `Is the project's environment information accurate?`,
-      shown: ["mod", "modpack"].includes(props.project.project_type),
-      options: [
-        {
-          name: "Inaccurate (modpack)",
-          resultingMessage: `## Incorrect Environment Information
-Per section 5.1 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous), it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
-For a brief rundown of how this works:
-Some modpacks can be client-side, usually aimed at providing utility and optimization while allowing the player to join an unmodded server, for instance, [Fabulously Optimized](https://bbsmc.net/modpack/fabulously-optimized).
-Most other modpacks that change how the game is played are going to be required on both the client and server, like the modpack [Dying Light](https://bbsmc.net/modpack/dying-light).
-When in doubt, test for yourself or check the requirements of the mods in your pack.`,
-        },
-        {
-          name: "Inaccurate (mod)",
-          resultingMessage: `## Environment Information
-Per section 5.1 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous), it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
-For a brief rundown of how this works:
-**Client side** refers to a mod that is only required by the client, like [Sodium](https://bbsmc.net/mod/sodium).
-**Server side** mods change the behavior of the server without the client needing the mod, like Datapacks, recipes, or server-side behaviors, like [Falling Tree](https://bbsmc.net/mod/fallingtree).
-A mod that adds features, entities, or new blocks and items, generally will be required on **both** the server and the client, for example [Cobblemon](https://bbsmc.net/mod/cobblemon).`,
-        },
-      ],
-    },
-    {
-      id: "gallery",
-      navigate: `/${props.project.project_type}/${props.project.slug}/gallery`,
-      question: `Are the project's gallery images relevant?`,
-      shown: props.project.gallery.length > 0,
-      options: [
-        {
-          name: "Not relevant",
-          resultingMessage: `## Unrelated Gallery Images
-Per section 5.5 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) any images in your project's Gallery must be relevant to the project and also include a Title.`,
-        },
-      ],
-    },
-    {
-      id: "versions",
-      navigate: `/${props.project.project_type}/${props.project.slug}/versions`,
-      question: `Are these project's files correct?`,
-      shown: !["modpack"].includes(props.project.project_type),
-      rules: [
-        "A multi-loader project should not use additional files for more loaders",
-        "Modpacks must be uploaded as MRPACK files. Be sure to check the project type is modpack (if not their file is malformed)",
-      ],
-      options: [
-        {
-          name: "Incorrect additional files",
-          resultingMessage: `## Incorrect Use of Additional Files
-It looks like you've uploaded multiple \`mod.jar\` files to one Version as Additional Files. Per section 5.7 of [BBSMC Content Rules](https://bbsmc.net/legal/rules#miscellaneous) each Version of your project must include only one \`mod.jar\` that corresponds to its respective Minecraft and loader versions. This allows users to easily find and download the file they need for the version they're on with ease. The Additional Files feature can be used for things like a \`Sources.jar\`.
-Please upload each version of your mod separately, thank you.`,
-        },
-        {
-          name: "Invalid file type (modpacks)",
-          resultingMessage: `## Modpacks on Modrinth
-It looks like you've uploaded your Modpack as a \`.zip\`, unfortunately, this is invalid and is why your project type is "Mod". I recommend taking a look at our support page about [Modrinth Modpacks](https://support.modrinth.com/en/articles/8802250-modpacks-on-modrinth), and once you're ready feel free to resubmit your project as a \`.mrpack\`. Don't forget to delete the old files from your Versions!`,
-        },
-        {
-          name: "Invalid file type (resourcepacks)",
-          resultingMessage: `## Resource Packs on Modrinth
-It looks like you've selected loaders for your Resource Pack that are causing it to be marked as a different project type. Resource Packs must only be uploaded with the "Resource Pack" loader selected. Please re-upload all versions of your resource pack and make sure to only select "Resource Pack" as the loader.`,
-        },
-      ],
-    },
-    {
-      id: "copyright",
-      question: `Does the author have proper permissions to post this project?`,
-      shown: true,
-      rules: [
-        `Perform a quick search to make sure someone is not reuploading content.`,
-        `If the authors don't align or it seems like a re-post, reject and ask the user for proof they have permission.`,
-      ],
-      options: [
-        {
-          name: "Re-upload",
-          resultingMessage: `## Reuploads are forbidden
-This project appears to contain content from %ORIGINAL_PROJECT% by %ORIGINAL_AUTHOR%.
-Per section 4 of [BBSMC Content Rules](https://bbsmc.net/legal/rules) this is strictly forbidden.
-If you believe this is an error, or you can verify you are the creator and rightful owner of this content please let us know. Otherwise, we ask that you **do not resubmit this project**.`,
-          fillers: [
-            {
-              id: "ORIGINAL_PROJECT",
-              question: "What is the title of the original project?",
-              required: true,
-            },
-            {
-              id: "ORIGINAL_AUTHOR",
-              question: "What is the author of the original project?",
-              required: true,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "rule-following",
-      question: `Does this project follow our content rules?`,
-      navigate: `/${props.project.project_type}/${props.project.slug}`,
-      shown: true,
-      rules: [
-        "Should not be a cheat/hack (without a server-side opt-out)",
-        "Should not contain sexually explicit / inappropriate content",
-        "Should not be excessively profane",
-        "Should not promote any illegal activity (including illicit drugs + substances)",
-        "Anything else infringing of our content rules (see 1.1-12, 3.1-3)",
-      ],
-      options: [
-        {
-          name: "No",
-          resultingMessage: `%MESSAGE%`,
-          fillers: [
-            {
-              id: "MESSAGE",
-              question: "Please explain to the user how it infringes on our content rules.",
-              large: true,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "modpack-permissions",
-      question: "Modpack permissions",
-      shown: ["modpack"].includes(props.project.project_type),
-      options: [],
-    },
-    {
-      id: "private-server",
-      question: `Is this pack for a private server?`,
-      shown: ["modpack"].includes(props.project.project_type),
-      rules: [
-        "Select this if you are withholding this pack since it is for a private server (for circumstances you would normally reject for).",
-      ],
-      options: [
-        {
-          name: "Private server (withhold)",
-          resultingMessage: `## Private Server
-Under normal circumstances, your project would be rejected due to the issues listed above. However, since your project is intended for a specific server and not for general use, these requirements will be waived and your project will be withheld. This means it will be unlisted and accessible only through a direct link, without appearing in public search results. If you're fine with this, no further action is needed. Otherwise, feel free to resubmit once all issues have been addressed. `,
-        },
-      ],
-    },
-  ].filter((x) => x.shown),
+          },
+          {
+            name: "非英文",
+            resultingMessage: `## 没有英文描述
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#accessibility) 第 2.2 节，项目的摘要和描述必须是英文的，除非专门用于非英文使用，如翻译。您可以包含非英文描述，但我们要求您也在描述页面添加英文翻译，如果您想使用在线翻译器，我们推荐 [DeepL](https://www.deepl.com/translator)。`,
+          },
+          {
+            name: "未完成",
+            resultingMessage: `## 描述未完成
+看起来您的项目描述仍在进行中，因为 %REASON%。请记住只有在准备好时提交，因为您的项目必须符合 [BBSMC 内容规则](https://bbsmc.net/legal/rules#general-expectations) 第 2.1 节的要求，如果您对此有任何疑问，请随时联系我们！`,
+          },
+          {
+            name: "标题作为正文",
+            resultingMessage: `## 描述可访问性
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules) 第 2.2 节，我们要求不要将 \`# 标题\` 用作正文。标题在屏幕阅读器中的解释不同，因此通常只应用于分隔描述的部分。如果您想强调特定的句子或段落，请考虑使用 \`**粗体**\` 文本，使用文本编辑器上方的 **B** 按钮。`,
+          },
+          {
+            name: "仅图像",
+            resultingMessage: `## 图像描述
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules) 第 2.2 节，我们要求您为当前描述提供文本替代。您的描述应包含足够的项目详细信息，以便用户仅通过文本即可全面了解它。文本转录允许使用屏幕阅读器的用户和无法加载图像的慢速互联网用户访问描述内容。这也作为备份，以防描述中的图像因某种原因离线。
+我们感谢您在描述中付出的努力，但可访问性对我们来说很重要，如果您愿意，您可以将描述的转录完全放在 \`details\` 标签中，以免破坏描述的视觉效果。`,
+          },
+          {
+            name: "非标准文本",
+            resultingMessage: `## 描述可访问性
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#clear-and-honest-function) 第 2 节，您的描述必须清晰可读且易于访问。使用非标准文本字符，如 Zalgo 或“花哨文本”代替文本，可能会使您的项目页面无法访问。这对依赖屏幕阅读器的用户和搜索引擎提供相关结果非常重要。请删除此类文本的任何实例。`,
+          },
+        ],
+      },
+      {
+        id: "links",
+        question: `项目的链接是否可访问且不误导？`,
+        shown:
+            props.project.issues_url ||
+            props.project.source_url ||
+            props.project.wiki_url ||
+            props.project.discord_url ||
+            props.project.donation_urls.length > 0,
+        rules: [
+          `所有链接必须可访问。`,
+          `所有链接必须正确对应标签（例如：Discord 链接不应指向 YouTube 频道）`,
+        ],
+        options: [
+          {
+            name: "链接被误用",
+            resultingMessage: `## 外部资源误用
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.4 节，所有链接必须指向正确标记的公开可用资源，并且与您的项目直接相关。`,
+          },
+          {
+            name: "不可访问（源）",
+            resultingMessage: `## 链接不可访问
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.4 节，所有链接必须指向正确标记的公开可用资源，并且与您的项目直接相关。
+目前，您的源链接指向“页面未找到”错误，可能是因为您的存储库是私有的，请确保在重新提交项目之前将存储库设为公开！`,
+          },
+          {
+            name: "不可访问（其他）",
+            resultingMessage: `## 链接不可访问
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.4 节，所有链接必须指向正确标记的公开可用资源，并且与您的项目直接相关。
+目前，您的 %LINK% 链接不可访问！`,
+            fillers: [
+              {
+                id: "LINK",
+                question: "请指定不可访问的链接类型。",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "categories",
+        question: `项目的标签/类别是否准确？`,
+        shown: props.project.categories.length > 0 || props.project.additional_categories.length > 0,
+        options: [
+          {
+            name: "不准确",
+            resultingMessage: `## 标签误用
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.1 节，项目的元数据必须准确。包括所选标签诚实地代表您的项目。`,
+          },
+        ],
+      },
+      {
+        id: "side-types",
+        question: `项目的环境信息是否准确？`,
+        shown: ["mod", "modpack"].includes(props.project.project_type),
+        options: [
+          {
+            name: "不准确（模组包）",
+            resultingMessage: `## 环境信息不正确
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.1 节，项目的元数据必须准确，包括项目在客户端或服务器端运行。
+简要介绍如下：
+一些模组包可以是客户端的，通常旨在提供实用程序和优化，同时允许玩家加入未修改的服务器，例如 [Fabulously Optimized](https://bbsmc.net/modpack/fabulously-optimized)。
+大多数其他改变游戏玩法的模组包将在客户端和服务器上都需要，例如模组包 [Dying Light](https://bbsmc.net/modpack/dying-light)。
+如有疑问，请自行测试或检查包中模组的要求。`,
+          },
+          {
+            name: "不准确（模组）",
+            resultingMessage: `## 环境信息
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.1 节，项目的元数据必须准确，包括项目在客户端或服务器端运行。
+简要介绍如下：
+**客户端** 指仅客户端需要的模组，例如 [Sodium](https://bbsmc.net/mod/sodium)。
+**服务器端** 模组更改服务器的行为，而无需客户端需要模组，例如数据包、配方或服务器端行为，例如 [Falling Tree](https://bbsmc.net/mod/fallingtree)。
+添加功能、实体或新方块和物品的模组，通常在 **客户端和服务器** 上都需要，例如 [Cobblemon](https://bbsmc.net/mod/cobblemon)。`,
+          },
+        ],
+      },
+      {
+        id: "gallery",
+        navigate: `/${props.project.project_type}/${props.project.slug}/gallery`,
+        question: `项目的画廊图片是否相关？`,
+        shown: props.project.gallery.length > 0,
+        options: [
+          {
+            name: "不相关",
+            resultingMessage: `## 无关的画廊图片
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.5 节，项目画廊中的任何图片必须与项目相关，并且包含标题。`,
+          },
+        ],
+      },
+      {
+        id: "versions",
+        navigate: `/${props.project.project_type}/${props.project.slug}/versions`,
+        question: `这些项目的文件是否正确？`,
+        shown: !["modpack"].includes(props.project.project_type),
+        rules: [
+          "多加载器项目不应使用额外文件来加载更多加载器",
+          "模组包必须作为 MRPACK 文件上传。请确保项目类型为模组包（如果不是，则文件格式错误）",
+        ],
+        options: [
+          {
+            name: "额外文件不正确",
+            resultingMessage: `## 额外文件使用不正确
+看起来您已将多个 \`mod.jar\` 文件作为额外文件上传到一个版本。根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules#miscellaneous) 第 5.7 节，每个版本的项目必须仅包含一个 \`mod.jar\`，对应其各自的 Minecraft 和加载器版本。这使用户可以轻松找到并下载他们所需版本的文件。额外文件功能可用于诸如 \`Sources.jar\` 之类的内容。
+请分别上传每个版本的模组，谢谢。`,
+          },
+          {
+            name: "文件类型无效（模组包）",
+            resultingMessage: `## Modrinth 上的模组包
+看起来您已将模组包上传为 \`.zip\`，不幸的是，这是无效的，这就是为什么您的项目类型是“模组”。我建议查看我们的支持页面 [Modrinth Modpacks](https://support.modrinth.com/en/articles/8802250-modpacks-on-modrinth)，一旦准备好，请随时重新提交项目为 \`.mrpack\`。不要忘记从版本中删除旧文件！`,
+          },
+          {
+            name: "文件类型无效（资源包）",
+            resultingMessage: `## Modrinth 上的资源包
+看起来您为资源包选择的加载器导致其被标记为不同的项目类型。资源包必须仅使用“资源包”加载器上传。请重新上传所有版本的资源包，并确保仅选择“资源包”作为加载器。`,
+          },
+        ],
+      },
+      {
+        id: "copyright",
+        question: `作者是否有适当的权限发布此项目？`,
+        shown: true,
+        rules: [
+          `快速搜索以确保没有人重新上传内容。`,
+          `如果作者不一致或看起来像是重新发布，请拒绝并要求用户提供他们有权限的证明。`,
+        ],
+        options: [
+          {
+            name: "重新上传",
+            resultingMessage: `## 禁止重新上传
+该项目似乎包含 %ORIGINAL_PROJECT% 的内容，由 %ORIGINAL_AUTHOR% 创建。
+根据 [BBSMC 内容规则](https://bbsmc.net/legal/rules) 第 4 节，这是严格禁止的。
+如果您认为这是一个错误，或者您可以验证您是此内容的创建者和合法所有者，请告知我们。否则，我们要求您 **不要重新提交此项目**。`,
+            fillers: [
+              {
+                id: "ORIGINAL_PROJECT",
+                question: "原始项目的标题是什么？",
+                required: true,
+              },
+              {
+                id: "ORIGINAL_AUTHOR",
+                question: "原始项目的作者是谁？",
+                required: true,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "rule-following",
+        question: `此项目是否遵循我们的内容规则？`,
+        navigate: `/${props.project.project_type}/${props.project.slug}`,
+        shown: true,
+        rules: [
+          "不应是作弊/黑客（没有服务器端选择退出）",
+          "不应包含性暗示/不适当的内容",
+          "不应过度使用粗话",
+          "不应宣传任何非法活动（包括非法药物和物质）",
+          "任何其他违反我们内容规则的内容（见 1.1-12，3.1-3）",
+        ],
+        options: [
+          {
+            name: "否",
+            resultingMessage: `%MESSAGE%`,
+            fillers: [
+              {
+                id: "MESSAGE",
+                question: "请向用户解释它如何违反我们的内容规则。",
+                large: true,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "modpack-permissions",
+        question: "模组包权限",
+        shown: ["modpack"].includes(props.project.project_type),
+        options: [],
+      },
+      {
+        id: "private-server",
+        question: `这个包是为私人服务器准备的吗？`,
+        shown: ["modpack"].includes(props.project.project_type),
+        rules: [
+          "如果您因为这是为私人服务器准备的包而保留它（在通常情况下您会拒绝的情况），请选择此选项。",
+        ],
+        options: [
+          {
+            name: "私人服务器（保留）",
+            resultingMessage: `## 私人服务器
+在正常情况下，由于上述问题，您的项目将被拒绝。然而，由于您的项目是为特定服务器准备的，而不是用于一般用途，这些要求将被免除，您的项目将被保留。这意味着它将被取消列出，并且只能通过直接链接访问，而不会出现在公共搜索结果中。如果您对此没有意见，则无需采取进一步行动。否则，请在解决所有问题后随时重新提交。`,
+          },
+        ],
+      },
+    ].filter((x) => x.shown),
 );
 
 const currentStepIndex = ref(0);
@@ -739,7 +740,7 @@ async function nextPage() {
 async function initializeModPackData() {
   startLoading();
   try {
-    const raw = await useBaseFetch(`moderation/project/${props.project.id}`, { internal: true });
+    const raw = await useBaseFetch(`moderation/project/${props.project.id}`, {internal: true});
     const projects = [];
 
     for (const [hash, fileName] of Object.entries(raw.unknown_files)) {
@@ -833,9 +834,11 @@ const filePermissionTypes = ref([
 const message = ref("");
 const generatedMessage = ref(false);
 const loadingMessage = ref(false);
+
 async function generateMessage() {
   message.value = "";
   loadingMessage.value = true;
+
   function printMods(mods, msg) {
     if (mods.length === 0) {
       return;
@@ -908,30 +911,29 @@ async function generateMessage() {
     }
 
     if (
-      attributeMods.length > 0 ||
-      noMods.length > 0 ||
-      permanentNoMods.length > 0 ||
-      unidentifiedMods.length > 0
+        attributeMods.length > 0 ||
+        noMods.length > 0 ||
+        permanentNoMods.length > 0 ||
+        unidentifiedMods.length > 0
     ) {
-      message.value += "## Copyrighted Content \n";
+      message.value += "## 版权内容\n";
 
       printMods(
-        attributeMods,
-        "The following content has attribution requirements, meaning that you must link back to the page where you originally found this content in your modpack description or version changelog (e.g. linking a mod's CurseForge page if you got it from CurseForge):",
+          attributeMods,
+          "以下内容有归属要求，这意味着您必须在模组包描述或版本更新日志中链接回您最初找到此内容的页面（例如，如果您从 CurseForge 获取模组，请链接模组的 CurseForge 页面）：",
       );
       printMods(
-        noMods,
-        "The following content is not allowed in Modrinth modpacks due to licensing restrictions. Please contact the author(s) directly for permission or remove the content from your modpack:",
+          noMods,
+          "由于许可限制，以下内容不允许在 Modrinth 模组包中使用。请直接联系作者获取许可或从模组包中删除内容：",
       );
       printMods(
-        permanentNoMods,
-        "The following content is not allowed in Modrinth modpacks, regardless of permission obtained. This may be because it breaks BBSMC content rules or because the authors, upon being contacted for permission, have declined. Please remove the content from your modpack:",
+          permanentNoMods,
+          "无论是否获得许可，以下内容都不允许在 Modrinth 模组包中使用。这可能是因为它违反了 BBSMC 内容规则，或者因为在联系作者获取许可时被拒绝。请从模组包中删除内容：",
       );
       printMods(
-        unidentifiedMods,
-        "The following content could not be identified. Please provide proof of its origin along with proof that you have permission to include it:",
+          unidentifiedMods,
+          "以下内容无法识别。请提供其来源的证明以及您有权包含它的证明：",
       );
-
       message.value += "\n\n";
     }
   }
@@ -943,8 +945,8 @@ async function generateMessage() {
       if (option.fillers && option.fillers.length > 0) {
         for (const filler of option.fillers) {
           addonMessage = addonMessage.replace(
-            new RegExp(`%${filler.id}%`, "g"),
-            filler.value ?? "",
+              new RegExp(`%${filler.id}%`, "g"),
+              filler.value ?? "",
           );
         }
       }
@@ -960,6 +962,7 @@ async function generateMessage() {
 }
 
 const done = ref(false);
+
 async function sendMessage(status) {
   startLoading();
   try {
@@ -1043,9 +1046,8 @@ async function goToNextProject() {
   .option-selected {
     color: var(--color-contrast);
     background-color: var(--color-brand-highlight);
-    box-shadow:
-      inset 0 0 0 transparent,
-      0 0 0 2px var(--color-brand);
+    box-shadow: inset 0 0 0 transparent,
+    0 0 0 2px var(--color-brand);
   }
 }
 </style>

@@ -329,10 +329,9 @@ pub async fn version_edit_helper(
 
         if let Some(perms) = permissions {
             if !perms.contains(ProjectPermissions::UPLOAD_VERSION) {
-                return Err(ApiError::CustomAuthentication(
-                    "You do not have the permissions to edit this version!"
-                        .to_string(),
-                ));
+               return Err(ApiError::CustomAuthentication(
+    "您没有权限编辑此版本！".to_string(),
+));
             }
 
             let mut transaction = pool.begin().await?;
@@ -468,9 +467,9 @@ pub async fn version_edit_helper(
                         .iter()
                         .find(|lf| lf.field == vf_name)
                         .ok_or_else(|| {
-                            ApiError::InvalidInput(format!(
-                                "Loader field '{vf_name}' does not exist for any loaders supplied."
-                            ))
+                           ApiError::InvalidInput(format!(
+    "加载器字段 '{vf_name}' 不存在于提供的任何加载器中。"
+))
                         })?;
                     let enum_variants = loader_field_enum_values
                         .remove(&loader_field.id)
@@ -508,10 +507,9 @@ pub async fn version_edit_helper(
                         )
                         .await?
                         .ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "No database entry for loader provided."
-                                    .to_string(),
-                            )
+                          ApiError::InvalidInput(
+    "没有提供的加载器的数据库条目。".to_string(),
+)
                         })?;
                     loader_versions.push(LoaderVersion::new(loader_id, id));
                 }
@@ -558,8 +556,8 @@ pub async fn version_edit_helper(
             if let Some(downloads) = &new_version.downloads {
                 if !user.role.is_mod() {
                     return Err(ApiError::CustomAuthentication(
-                        "You don't have permission to set the downloads of this mod".to_string(),
-                    ));
+    "您没有权限设置此模组的下载次数！".to_string(),
+));
                 }
 
                 sqlx::query!(
@@ -688,7 +686,7 @@ pub async fn version_edit_helper(
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this version!".to_string(),
+                "您没有权限编辑此版本！".to_string(),
             ))
         }
     } else {
@@ -886,9 +884,7 @@ pub async fn version_delete(
     let version = database::models::Version::get(id.into(), &**pool, &redis)
         .await?
         .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified version does not exist!".to_string(),
-            )
+            ApiError::InvalidInput("指定的版本不存在！".to_string())
         })?;
 
     if !user.role.is_admin() {
@@ -929,8 +925,7 @@ pub async fn version_delete(
 
         if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
             return Err(ApiError::CustomAuthentication(
-                "You do not have permission to delete versions in this team"
-                    .to_string(),
+                "您没有权限删除此团队中的版本".to_string(),
             ));
         }
     }

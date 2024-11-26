@@ -40,9 +40,7 @@
     </Modal>
     <Modal
       ref="managePasswordModal"
-      :header="`${
-        removePasswordMode ? '删除' : auth.user.has_password ? '修改' : '设置'
-      }密码`"
+      :header="`${removePasswordMode ? '删除' : auth.user.has_password ? '修改' : '设置'}密码`"
     >
       <div class="universal-modal">
         <ul
@@ -77,9 +75,7 @@
             autocomplete="new-password"
             placeholder="新密码"
           />
-          <label for="confirm-new-password"
-            ><span class="label__title">再次输入密码</span></label
-          >
+          <label for="confirm-new-password"><span class="label__title">再次输入密码</span></label>
           <input
             id="confirm-new-password"
             v-model="confirmNewPassword"
@@ -315,11 +311,10 @@
         <label for="theme-selector">
           <span class="label__title">密码</span>
           <span v-if="auth.user.has_password" class="label__description">
-            更改<template v-if="auth.user.auth_providers.length > 0">或删除</template>您账户的登录密码
+            更改<template v-if="auth.user.auth_providers.length > 0">或删除</template
+            >您账户的登录密码
           </span>
-          <span v-else class="label__description">
-            设置密码来登录您的帐户。
-          </span>
+          <span v-else class="label__description"> 设置密码来登录您的帐户。 </span>
         </label>
         <div>
           <button
@@ -340,51 +335,51 @@
           </button>
         </div>
       </div>
-<!--      <div class="adjacent-input">-->
-<!--        <label for="theme-selector">-->
-<!--          <span class="label__title">Two-factor authentication</span>-->
-<!--          <span class="label__description">-->
-<!--            Add an additional layer of security to your account during login.-->
-<!--          </span>-->
-<!--        </label>-->
-<!--        <div>-->
-<!--          <button class="iconified-button" @click="showTwoFactorModal">-->
-<!--            <template v-if="auth.user.has_totp"> <TrashIcon /> Remove 2FA </template>-->
-<!--            <template v-else> <PlusIcon /> Setup 2FA </template>-->
-<!--          </button>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="adjacent-input">-->
-<!--        <label for="theme-selector">-->
-<!--          <span class="label__title">Manage authentication providers</span>-->
-<!--          <span class="label__description">-->
-<!--            Add or remove sign-on methods from your account, including GitHub, GitLab, Microsoft,-->
-<!--            Discord, Steam, and Google.-->
-<!--          </span>-->
-<!--        </label>-->
-<!--        <div>-->
-<!--          <button class="iconified-button" @click="$refs.manageProvidersModal.show()">-->
-<!--            <SettingsIcon /> Manage providers-->
-<!--          </button>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!--      <div class="adjacent-input">-->
+      <!--        <label for="theme-selector">-->
+      <!--          <span class="label__title">Two-factor authentication</span>-->
+      <!--          <span class="label__description">-->
+      <!--            Add an additional layer of security to your account during login.-->
+      <!--          </span>-->
+      <!--        </label>-->
+      <!--        <div>-->
+      <!--          <button class="iconified-button" @click="showTwoFactorModal">-->
+      <!--            <template v-if="auth.user.has_totp"> <TrashIcon /> Remove 2FA </template>-->
+      <!--            <template v-else> <PlusIcon /> Setup 2FA </template>-->
+      <!--          </button>-->
+      <!--        </div>-->
+      <!--      </div>-->
+      <!--      <div class="adjacent-input">-->
+      <!--        <label for="theme-selector">-->
+      <!--          <span class="label__title">Manage authentication providers</span>-->
+      <!--          <span class="label__description">-->
+      <!--            Add or remove sign-on methods from your account, including GitHub, GitLab, Microsoft,-->
+      <!--            Discord, Steam, and Google.-->
+      <!--          </span>-->
+      <!--        </label>-->
+      <!--        <div>-->
+      <!--          <button class="iconified-button" @click="$refs.manageProvidersModal.show()">-->
+      <!--            <SettingsIcon /> Manage providers-->
+      <!--          </button>-->
+      <!--        </div>-->
+      <!--      </div>-->
     </section>
 
-<!--    <section id="data-export" class="universal-card">-->
-<!--      <h2>Data export</h2>-->
-<!--      <p>-->
-<!--        Request a copy of all your personal data you have uploaded to Modrinth. This may take-->
-<!--        several minutes to complete.-->
-<!--      </p>-->
-<!--      <a v-if="generated" class="iconified-button" :href="generated" download="export.json">-->
-<!--        <DownloadIcon />-->
-<!--        Download export-->
-<!--      </a>-->
-<!--      <button v-else class="iconified-button" :disabled="generatingExport" @click="exportData">-->
-<!--        <template v-if="generatingExport"> <UpdatedIcon /> Generating export... </template>-->
-<!--        <template v-else> <UpdatedIcon /> Generate export </template>-->
-<!--      </button>-->
-<!--    </section>-->
+    <!--    <section id="data-export" class="universal-card">-->
+    <!--      <h2>Data export</h2>-->
+    <!--      <p>-->
+    <!--        Request a copy of all your personal data you have uploaded to Modrinth. This may take-->
+    <!--        several minutes to complete.-->
+    <!--      </p>-->
+    <!--      <a v-if="generated" class="iconified-button" :href="generated" download="export.json">-->
+    <!--        <DownloadIcon />-->
+    <!--        Download export-->
+    <!--      </a>-->
+    <!--      <button v-else class="iconified-button" :disabled="generatingExport" @click="exportData">-->
+    <!--        <template v-if="generatingExport"> <UpdatedIcon /> Generating export... </template>-->
+    <!--        <template v-else> <UpdatedIcon /> Generate export </template>-->
+    <!--      </button>-->
+    <!--    </section>-->
 
     <section id="delete-account" class="universal-card">
       <h2>注销账户</h2>
@@ -412,11 +407,8 @@ import {
   PlusIcon,
   RightArrowIcon,
   SaveIcon,
-  SettingsIcon,
   TrashIcon,
-  UpdatedIcon,
   XIcon,
-  DownloadIcon,
 } from "@modrinth/assets";
 import QrcodeVue from "qrcode.vue";
 import GitHubIcon from "assets/icons/auth/sso-github.svg";
@@ -504,39 +496,6 @@ const manageTwoFactorModal = ref();
 const twoFactorSecret = ref(null);
 const twoFactorFlow = ref(null);
 const twoFactorStep = ref(0);
-async function showTwoFactorModal() {
-  twoFactorStep.value = 0;
-  twoFactorCode.value = null;
-  twoFactorIncorrect.value = false;
-  if (auth.value.user.has_totp) {
-    manageTwoFactorModal.value.show();
-    return;
-  }
-
-  twoFactorSecret.value = null;
-  twoFactorFlow.value = null;
-  backupCodes.value = [];
-  manageTwoFactorModal.value.show();
-
-  startLoading();
-  try {
-    const res = await useBaseFetch("auth/2fa/get_secret", {
-      method: "POST",
-    });
-
-    twoFactorSecret.value = res.secret;
-    twoFactorFlow.value = res.flow;
-  } catch (err) {
-    data.$notify({
-      group: "main",
-      title: "发生错误",
-      text: err.data.description,
-      type: "error",
-    });
-  }
-  stopLoading();
-}
-
 const twoFactorIncorrect = ref(false);
 const twoFactorCode = ref(null);
 const backupCodes = ref([]);
@@ -628,34 +587,6 @@ async function deleteAccount() {
   useCookie("auth-token").value = null;
   window.location.href = "/";
 
-  stopLoading();
-}
-
-const generatingExport = ref(false);
-const generated = ref();
-async function exportData() {
-  startLoading();
-  generatingExport.value = true;
-  try {
-    const res = await useBaseFetch("gdpr/export", {
-      method: "POST",
-      internal: true,
-    });
-
-    const jsonString = JSON.stringify(res, null, 2);
-
-    const blob = new Blob([jsonString], { type: "application/json" });
-    generated.value = URL.createObjectURL(blob);
-  } catch (err) {
-    data.$notify({
-      group: "main",
-      title: "发生错误",
-      text: err.data.description,
-      type: "error",
-    });
-  }
-
-  generatingExport.value = false;
   stopLoading();
 }
 </script>

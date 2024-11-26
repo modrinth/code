@@ -6,12 +6,8 @@
           <span class="label__title size-card-header">标签</span>
         </h3>
       </div>
-      <p>
-        准确的标记对于帮助人们找到您的项目非常重要。请确保选择所有适用的标签。
-      </p>
-      <p v-if="project.versions.length === 0" class="known-errors">
-        请先上传一个版本以后再选择
-      </p>
+      <p>准确的标记对于帮助人们找到您的项目非常重要。请确保选择所有适用的标签。</p>
+      <p v-if="project.versions.length === 0" class="known-errors">请先上传一个版本以后再选择</p>
       <template v-else>
         <template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
           <div class="label">
@@ -23,12 +19,8 @@
                 选择所有能反映您主题或功能的分类
                 {{ $formatProjectType(project.project_type).toLowerCase() }}.
               </template>
-              <template v-else-if="header === 'features'">
-                选择您资源所具有的的功能
-              </template>
-              <template v-else-if="header === 'resolutions'">
-                请选择您资源的纹理分辨率
-              </template>
+              <template v-else-if="header === 'features'"> 选择您资源所具有的的功能 </template>
+              <template v-else-if="header === 'resolutions'"> 请选择您资源的纹理分辨率 </template>
               <template v-else-if="header === 'performance impact'">
                 选择您资源对性能的影响, 可以选择多个
               </template>
@@ -63,9 +55,7 @@
             您最多可以推荐 3 个最相关的标签。如果您没有选择全部 3 个,其他标签可能会被提升为精选.
           </span>
         </div>
-        <p v-if="selectedTags.length < 1">
-          选择至少一个分类以便突出显示该分类
-        </p>
+        <p v-if="selectedTags.length < 1">选择至少一个分类以便突出显示该分类</p>
         <div class="category-list input-div">
           <Checkbox
             v-for="category in selectedTags"

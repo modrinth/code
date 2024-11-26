@@ -176,8 +176,7 @@
 </template>
 
 <script setup>
-const description =
-  "专注于 Minecraft 的开源修改平台 BBSMC 的内容规则。";
+const description = "专注于 Minecraft 的开源修改平台 BBSMC 的内容规则。";
 
 useSeoMeta({
   title: "内容规则 - BBSMC",

@@ -4,7 +4,8 @@
       <h2>分析</h2>
 
       <p>
-        该页面显示您<strong>{{ project.title }}</strong>的分析数据 . 您可以查看该资源的到下载次数, 浏览量等
+        该页面显示您<strong>{{ project.title }}</strong
+        >的分析数据 . 您可以查看该资源的到下载次数, 浏览量等
       </p>
     </div>
 

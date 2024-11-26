@@ -21,33 +21,33 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum AuthenticationError {
-    #[error("Environment Error")]
+    #[error("环境错误")]
     Env(#[from] dotenvy::Error),
-    #[error("An unknown database error occurred: {0}")]
+    #[error("发生未知的数据库错误: {0}")]
     Sqlx(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
+    #[error("数据库错误: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("Error while parsing JSON: {0}")]
+    #[error("解析 JSON 时出错: {0}")]
     SerDe(#[from] serde_json::Error),
-    #[error("Error while communicating to external provider")]
+    #[error("与外部提供商通信时出错: {0}")]
     Reqwest(#[from] reqwest::Error),
-    #[error("Error uploading user profile picture")]
+    #[error("上传用户头像时出错")]
     FileHosting(#[from] FileHostingError),
-    #[error("Error while decoding PAT: {0}")]
+    #[error("解码 PAT 时出错: {0}")]
     Decoding(#[from] crate::models::ids::DecodingError),
     #[error("{0}")]
     Mail(#[from] email::MailError),
-    #[error("Invalid Authentication Credentials")]
+    #[error("无效的认证凭据")]
     InvalidCredentials,
-    #[error("Authentication method was not valid")]
+    #[error("认证方法无效")]
     InvalidAuthMethod,
-    #[error("GitHub Token from incorrect Client ID")]
+    #[error("GitHub 令牌来自错误的客户端 ID")]
     InvalidClientId,
-    #[error("User email/account is already registered on Modrinth")]
+    #[error("用户邮箱/账户已在 BBSMC 注册")]
     DuplicateUser,
-    #[error("Invalid state sent, you probably need to get a new websocket")]
+    #[error("发送的状态无效，可能需要获取新的 websocket")]
     SocketError,
-    #[error("Invalid callback URL specified")]
+    #[error("指定的回调 URL 无效")]
     Url,
 }
 

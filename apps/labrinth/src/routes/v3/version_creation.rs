@@ -818,7 +818,7 @@ pub async fn upload_file(
 
     if file_name.contains('/') {
         return Err(CreateError::InvalidInput(
-            "File names must not contain slashes!".to_string(),
+            "文件名不能包含斜杠！".to_string(),
         ));
     }
 
@@ -829,7 +829,7 @@ pub async fn upload_file(
 
     let data = read_from_field(
         field, 500 * (1 << 20),
-        "Project file exceeds the maximum of 500MiB. Contact a moderator or admin to request permission to upload larger files."
+        "项目文件超出了 500MB 的上限。请联系版主或管理员以请求上传更大文件的权限。"
     ).await?;
 
     let hash = sha1::Sha1::from(&data).hexdigest();

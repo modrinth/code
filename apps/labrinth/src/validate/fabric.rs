@@ -23,9 +23,15 @@ impl super::Validator for FabricValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
+        if archive.by_name("manifest.json").is_ok() {
+            return Ok(ValidationResult::Pass);
+        }
+        if archive.by_name("mod.json").is_ok() {
+            return Ok(ValidationResult::Pass);
+        }
         if archive.by_name("fabric.mod.json").is_err() {
             return Ok(ValidationResult::Warning(
-                "No fabric.mod.json present for Fabric file.",
+                "未找到 fabric.mod.json 文件。提示：确保 fabric.mod.json 位于 Fabric 文件的根目录中！",
             ));
         }
 

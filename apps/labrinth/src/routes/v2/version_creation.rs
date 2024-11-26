@@ -17,6 +17,7 @@ use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
 use actix_web::web::Data;
 use actix_web::{post, web, HttpRequest, HttpResponse};
+use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::postgres::PgPool;
@@ -25,62 +26,60 @@ use std::sync::Arc;
 use validator::Validate;
 
 pub fn default_requested_status() -> VersionStatus {
-    VersionStatus::Listed
+    VersionStatus::Listed // 默认请求状态为“已列出”
 }
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
 pub struct InitialVersionData {
     #[serde(alias = "mod_id")]
-    pub project_id: Option<ProjectId>,
+    pub project_id: Option<ProjectId>, // 项目ID
     #[validate(length(min = 1, max = 256))]
-    pub file_parts: Vec<String>,
+    pub file_parts: Vec<String>, // 文件部分
     #[validate(
         length(min = 1, max = 32),
         regex = "crate::util::validate::RE_URL_SAFE"
     )]
-    pub version_number: String,
+    pub version_number: String, // 版本号
     #[validate(
         length(min = 1, max = 64),
         custom(function = "crate::util::validate::validate_name")
     )]
     #[serde(alias = "name")]
-    pub version_title: String,
+    pub version_title: String, // 版本标题
     #[validate(length(max = 65536))]
     #[serde(alias = "changelog")]
-    pub version_body: Option<String>,
+    pub version_body: Option<String>, // 版本日志
     #[validate(
         length(min = 0, max = 4096),
         custom(function = "crate::util::validate::validate_deps")
     )]
-    pub dependencies: Vec<Dependency>,
+    pub dependencies: Vec<Dependency>, // 依赖项
     #[validate(length(min = 1))]
-    pub game_versions: Vec<String>,
+    pub game_versions: Vec<String>, // 游戏版本
     #[serde(alias = "version_type")]
-    pub release_channel: VersionType,
+    pub release_channel: VersionType, // 发布渠道
     #[validate(length(min = 1))]
-    pub loaders: Vec<Loader>,
-    pub featured: bool,
-    pub primary_file: Option<String>,
+    pub loaders: Vec<Loader>, // 加载器
+    pub featured: bool,               // 是否推荐
+    pub primary_file: Option<String>, // 主文件
     #[serde(default = "default_requested_status")]
-    pub status: VersionStatus,
+    pub status: VersionStatus, // 状态
     #[serde(default = "HashMap::new")]
-    pub file_types: HashMap<String, Option<FileType>>,
-    // Associations to uploaded images in changelog
+    pub file_types: HashMap<String, Option<FileType>>, // 文件类型
     #[validate(length(max = 10))]
     #[serde(default)]
-    pub uploaded_images: Vec<ImageId>,
-
-    // The ordering relative to other versions
-    pub ordering: Option<i32>,
+    pub uploaded_images: Vec<ImageId>, // 上传的图片
+    pub ordering: Option<i32>,        // 排序
+    pub curse: bool
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 struct InitialFileData {
     #[serde(default = "HashMap::new")]
-    pub file_types: HashMap<String, Option<FileType>>,
+    pub file_types: HashMap<String, Option<FileType>>, // 文件类型
 }
 
-// under `/api/v1/version`
+// 在 `/api/v1/version` 下
 #[post("version")]
 pub async fn version_create(
     req: HttpRequest,
@@ -99,14 +98,15 @@ pub async fn version_create(
             let client = client.clone();
             let redis = redis.clone();
             async move {
-                // Convert input data to V3 format
+                // 将输入数据转换为 V3 格式
+
                 let mut fields = HashMap::new();
                 fields.insert(
                     "game_versions".to_string(),
                     json!(legacy_create.game_versions),
                 );
 
-                // Get all possible side-types for loaders given- we will use these to check if we need to convert/apply singleplayer, etc.
+                // 获取给定加载器的所有可能的侧类型字段 - 我们将使用这些字段来检查是否需要转换/应用单人游戏等。
                 let loaders =
                     match v3::tags::loader_list(client.clone(), redis.clone())
                         .await
@@ -136,24 +136,24 @@ pub async fn version_create(
                     .flatten()
                     .collect::<Vec<_>>();
 
-                // Copies side types of another version of the project.
-                // If no version exists, defaults to all false.
-                // This is inherently lossy, but not much can be done about it, as side types are no longer associated with projects,
-                // so the 'missing' ones can't be easily accessed, and versions do need to have these fields explicitly set.
+                // 复制项目的示例版本的侧类型。
+                // 如果没有版本存在，则默认为所有 false。
+                // 这本质上是有损的，但对此无能为力，因为侧类型不再与项目关联，
+                // 因此无法轻松访问“缺失”的那些，并且版本确实需要显式设置这些字段。
                 let side_type_loader_field_names = [
-                    "singleplayer",
-                    "client_and_server",
-                    "client_only",
-                    "server_only",
+                    "singleplayer",      // 单人游戏
+                    "client_and_server", // 客户端和服务器
+                    "client_only",       // 仅客户端
+                    "server_only",       // 仅服务器
                 ];
 
-                // Check if loader_fields_aggregate contains any of these side types
-                // We assume these four fields are linked together.
+                // 检查 loader_fields_aggregate 是否包含这些侧类型中的任何一个
+                // 我们假设这四个字段是关联在一起的。
                 if loader_fields_aggregate
                     .iter()
                     .any(|f| side_type_loader_field_names.contains(&f.as_str()))
                 {
-                    // If so, we get the fields of the example version of the project, and set the side types to match.
+                    // 如果是这样，我们获取项目的示例版本的字段，并设置侧类型以匹配。
                     fields.extend(
                         side_type_loader_field_names
                             .iter()
@@ -185,7 +185,7 @@ pub async fn version_create(
                         );
                     }
                 }
-                // Handle project type via file extension prediction
+                // 通过文件扩展名预测处理项目类型
                 let mut project_type = None;
                 for file_part in &legacy_create.file_parts {
                     if let Some(ext) = file_part.split('.').last() {
@@ -194,16 +194,16 @@ pub async fn version_create(
                                 project_type = Some("modpack");
                                 break;
                             }
-                            // No other type matters
+                            // 其他类型不重要
                             _ => {}
                         }
                         break;
                     }
                 }
 
-                // Similarly, check actual content disposition for mrpacks, in case file_parts is wrong
+                // 类似地，检查实际内容处置的 mrpacks，以防 file_parts 错误
                 for content_disposition in content_dispositions {
-                    // Uses version_create functions to get the file name and extension
+                    // 使用 version_create 函数获取文件名和扩展名
                     let (_, file_extension) =
                         version_creation::get_name_ext(&content_disposition)?;
                     crate::util::ext::project_file_type(file_extension)
@@ -218,9 +218,13 @@ pub async fn version_create(
                         break;
                     }
                 }
+                
+                if legacy_create.curse == true {
+                    project_type = Some("modpack");
+                }
 
-                // Modpacks now use the "mrpack" loader, and loaders are converted to loader fields.
-                // Setting of 'project_type' directly is removed, it's loader-based now.
+                // Modpacks 现在使用“mrpack”加载器，并且加载器被转换为加载器字段。
+                // 直接设置“project_type”已被删除，现在是基于加载器的。
                 if project_type == Some("modpack") {
                     fields.insert(
                         "mrpack_loaders".to_string(),
@@ -256,7 +260,56 @@ pub async fn version_create(
     )
     .await?;
 
-    // Call V3 project creation
+
+    // let mut error = None;
+    //
+    // while let Some(item) = payload.next().await {
+    //     let mut field: Field = item?;
+    //     let result = async {
+    //         let content_disposition = field.content_disposition().clone();
+    //         let name = content_disposition.get_name().ok_or_else(|| {
+    //             CreateError::MissingValueError("Missing content name".to_string())
+    //         })?;
+    //         println!("{}", name);
+    //
+    //         if name == "data" {
+    //             let mut data = Vec::new();
+    //             while let Some(chunk) = field.next().await {
+    //                 data.extend_from_slice(&chunk?);
+    //             }
+    //             let file_data: InitialFileData = serde_json::from_slice(&data)?;
+    //             // 将解析后的数据转换为 JSON 字符串
+    //             let json_output = serde_json::to_string(&file_data)?;
+    //             // 如果需要更具可读性的格式，可以使用 serde_json::to_string_pretty
+    //             // let json_output = serde_json::to_string_pretty(&file_data)?;
+    //
+    //             println!("{}", json_output);  // 输出 JSON 字符串到控制台
+    //
+    //             return Ok(());
+    //         }
+    //         // let data = read_from_field(
+    //         //     &mut field, 500 * (1 << 20),
+    //         //     "项目文件超出了 500MB 的上限。请联系版主或管理员以请求上传更大文件的权限。"
+    //         // ).await?;
+    //         //
+    //         // info!("Reading field 4");
+    //
+    //
+    //
+    //
+    //         Ok(())
+    //     }
+    //         .await;
+    //     if result.is_err() {
+    //         error = result.err();
+    //     }
+    // }
+    //
+    // if let Some(error) = error {
+    //     return Err(error);
+    // }
+
+    // 调用 V3 项目创建
     let response = v3::version_creation::version_create(
         req,
         payload,
@@ -268,7 +321,7 @@ pub async fn version_create(
     )
     .await?;
 
-    // Convert response to V2 format
+    // 将响应转换为 V2 格式
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
             let v2_version = LegacyVersion::from(version);
@@ -278,7 +331,7 @@ pub async fn version_create(
     }
 }
 
-// Gets version fields of an example version of a project, if one exists.
+// 获取项目的示例版本的版本字段（如果存在）。
 async fn get_example_version_fields(
     project_id: Option<ProjectId>,
     pool: Data<PgPool>,
@@ -306,7 +359,7 @@ async fn get_example_version_fields(
     Ok(Some(example_version.version_fields))
 }
 
-// under /api/v1/version/{version_id}
+// 在 /api/v1/version/{version_id} 下
 #[post("{version_id}/file")]
 pub async fn upload_file_to_version(
     req: HttpRequest,
@@ -317,7 +370,7 @@ pub async fn upload_file_to_version(
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
-    // Returns NoContent, so no need to convert to V2
+    // 返回 NoContent，因此无需转换为 V2
     let response = v3::version_creation::upload_file_to_version(
         req,
         url_data,

@@ -5,15 +5,14 @@
 
     <h2>Introduction</h2>
     <p>
-      <a href="https://bbsmc.net">BBSMC</a> is part of Rinth, Inc. ("Company", "us", "we",
-      "our"). This privacy policy explains how we collect data, process it, and your rights relative
-      to your data.
+      <a href="https://bbsmc.net">BBSMC</a> is part of Rinth, Inc. ("Company", "us", "we", "our").
+      This privacy policy explains how we collect data, process it, and your rights relative to your
+      data.
     </p>
     <p>
       This policy describes the types of information we may collect from you or that you may provide
-      when you use www.bbsmc.net, api.bbsmc.net, or the BBSMC App ("Service" or "Website"),
-      and our practices for collecting, using, maintaining, protecting, and disclosing that
-      information.
+      when you use www.bbsmc.net, api.bbsmc.net, or the BBSMC App ("Service" or "Website"), and our
+      practices for collecting, using, maintaining, protecting, and disclosing that information.
     </p>
     <p>This policy applies to information we collect:</p>
     <ul>
@@ -122,9 +121,7 @@
     <h3>Creator Monetization Program data</h3>
     <p>
       When you sign up for our
-      <a href="https://blog.bbsmc.net/p/creator-monetization-beta">
-        Creator Monetization Program</a
-      >
+      <a href="https://blog.bbsmc.net/p/creator-monetization-beta"> Creator Monetization Program</a>
       (the "CMP"), we collect:
     </p>
     <ul>
@@ -219,9 +216,9 @@
     </ul>
     <p>
       If you would like to exercise those rights, contact us at
-      <a href="mailto:gdpr@bbsmc.net">gdpr@bbsmc.net</a>. We may ask you to verify your
-      identity before proceeding and will respond to your request within 30 days as required by law,
-      or notify you of an extended reply time.
+      <a href="mailto:gdpr@bbsmc.net">gdpr@bbsmc.net</a>. We may ask you to verify your identity
+      before proceeding and will respond to your request within 30 days as required by law, or
+      notify you of an extended reply time.
     </p>
 
     <h2>Children's Information</h2>
@@ -231,17 +228,17 @@
       online activity.
     </p>
     <p>
-      BBSMC does not knowingly collect any Personal Identifiable Information from children under
-      the age of 13. If you think that your child provided this kind of information on our website,
-      we strongly encourage you to contact us immediately and we will do our best efforts to
-      promptly remove such information from our records.
+      BBSMC does not knowingly collect any Personal Identifiable Information from children under the
+      age of 13. If you think that your child provided this kind of information on our website, we
+      strongly encourage you to contact us immediately and we will do our best efforts to promptly
+      remove such information from our records.
     </p>
 
     <h2>Online Privacy Policy Only</h2>
     <p>
       This Privacy Policy applies only to our online activities and is valid for visitors to our
-      website with regards to the information that they shared and/or collect in BBSMC. This
-      policy is not applicable to any information collected offline or via channels other than this
+      website with regards to the information that they shared and/or collect in BBSMC. This policy
+      is not applicable to any information collected offline or via channels other than this
       website.
     </p>
 

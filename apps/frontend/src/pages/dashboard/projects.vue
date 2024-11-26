@@ -6,10 +6,7 @@
           在资源管理页面中，您可以为每个选定的项目指定URL。任何您在下方指定的URL将覆盖选定项目中的现有URL。任何空白的URL将被忽略。您可以使用垃圾桶按钮从所有选定项目中清除某个URL。
         </p>
         <section class="links">
-          <label
-            for="issue-tracker-input"
-            title="反馈BUG"
-          >
+          <label for="issue-tracker-input" title="反馈BUG">
             <span class="label__title">反馈BUG</span>
           </label>
           <div class="input-group shrink-first">
@@ -18,9 +15,7 @@
               v-model="editLinks.issues.val"
               :disabled="editLinks.issues.clear"
               type="url"
-              :placeholder="
-                editLinks.issues.clear ? '现有 URL 将被清除' : '输入可用访问URL'
-              "
+              :placeholder="editLinks.issues.clear ? '现有 URL 将被清除' : '输入可用访问URL'"
               maxlength="2048"
             />
             <button
@@ -46,9 +41,7 @@
               :disabled="editLinks.source.clear"
               type="url"
               maxlength="2048"
-              :placeholder="
-                editLinks.source.clear ? '现有 URL 将被清除' : '输入可用访问URL'
-              "
+              :placeholder="editLinks.source.clear ? '现有 URL 将被清除' : '输入可用访问URL'"
             />
             <button
               v-tooltip="'Clear link'"
@@ -73,9 +66,7 @@
               :disabled="editLinks.wiki.clear"
               type="url"
               maxlength="2048"
-              :placeholder="
-                editLinks.wiki.clear ? '现有 URL 将被清除' : '输入可用访问URL'
-              "
+              :placeholder="editLinks.wiki.clear ? '现有 URL 将被清除' : '输入可用访问URL'"
             />
             <button
               v-tooltip="'Clear link'"
@@ -87,32 +78,32 @@
               <TrashIcon />
             </button>
           </div>
-<!--          <label for="discord-invite-input" title="An invitation link to your Discord server.">-->
-<!--            <span class="label__title">Discord invite</span>-->
-<!--          </label>-->
-<!--          <div class="input-group shrink-first">-->
-<!--            <input-->
-<!--              id="discord-invite-input"-->
-<!--              v-model="editLinks.discord.val"-->
-<!--              :disabled="editLinks.discord.clear"-->
-<!--              type="url"-->
-<!--              maxlength="2048"-->
-<!--              :placeholder="-->
-<!--                editLinks.discord.clear-->
-<!--                  ? '现有 URL 将被清除'-->
-<!--                  : 'Enter a valid Discord invite URL'-->
-<!--              "-->
-<!--            />-->
-<!--            <button-->
-<!--              v-tooltip="'Clear link'"-->
-<!--              aria-label="Clear link"-->
-<!--              class="square-button label-button"-->
-<!--              :data-active="editLinks.discord.clear"-->
-<!--              @click="editLinks.discord.clear = !editLinks.discord.clear"-->
-<!--            >-->
-<!--              <TrashIcon />-->
-<!--            </button>-->
-<!--          </div>-->
+          <!--          <label for="discord-invite-input" title="An invitation link to your Discord server.">-->
+          <!--            <span class="label__title">Discord invite</span>-->
+          <!--          </label>-->
+          <!--          <div class="input-group shrink-first">-->
+          <!--            <input-->
+          <!--              id="discord-invite-input"-->
+          <!--              v-model="editLinks.discord.val"-->
+          <!--              :disabled="editLinks.discord.clear"-->
+          <!--              type="url"-->
+          <!--              maxlength="2048"-->
+          <!--              :placeholder="-->
+          <!--                editLinks.discord.clear-->
+          <!--                  ? '现有 URL 将被清除'-->
+          <!--                  : 'Enter a valid Discord invite URL'-->
+          <!--              "-->
+          <!--            />-->
+          <!--            <button-->
+          <!--              v-tooltip="'Clear link'"-->
+          <!--              aria-label="Clear link"-->
+          <!--              class="square-button label-button"-->
+          <!--              :data-active="editLinks.discord.clear"-->
+          <!--              @click="editLinks.discord.clear = !editLinks.discord.clear"-->
+          <!--            >-->
+          <!--              <TrashIcon />-->
+          <!--            </button>-->
+          <!--          </div>-->
         </section>
         <p>
           变更将应用于
@@ -165,9 +156,7 @@
           </button>
         </div>
       </div>
-      <p v-if="projects.length < 1">
-        您还没有任何资源。点击上方的绿色按钮即可开始创建。
-      </p>
+      <p v-if="projects.length < 1">您还没有任何资源。点击上方的绿色按钮即可开始创建。</p>
       <template v-else>
         <p>您可以通过选择下面多个资源来同时编辑它们。</p>
         <div class="input-group">
@@ -187,17 +176,21 @@
                 :searchable="false"
                 class="small-select"
                 :options="['Name', 'Status', 'Type']"
-                :custom-label="(value) => {
-                  switch(value){
-                    case 'Name':{
-                      return '名称'
-                    }case 'Status':{
-                      return '状态'
-                    }case 'Type':{
-                      return '类型'
+                :custom-label="
+                  (value) => {
+                    switch (value) {
+                      case 'Name': {
+                        return '名称';
+                      }
+                      case 'Status': {
+                        return '状态';
+                      }
+                      case 'Type': {
+                        return '类型';
+                      }
                     }
                   }
-                }"
+                "
                 :close-on-select="true"
                 :show-labels="false"
                 :allow-empty="false"

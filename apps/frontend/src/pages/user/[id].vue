@@ -12,13 +12,7 @@
             {{ user.username }}
           </template>
           <template #summary>
-            {{
-              user.bio
-                ? user.bio
-                : projects.length === 0
-                  ? "BBSMC 用户"
-                  : "BBSMC 创作者"
-            }}
+            {{ user.bio ? user.bio : projects.length === 0 ? "BBSMC 用户" : "BBSMC 创作者" }}
           </template>
           <template #stats>
             <div
@@ -243,7 +237,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -267,7 +260,6 @@ import { reportUser } from "~/utils/report-helpers.ts";
 
 import StaffBadge from "~/assets/images/badges/staff.svg?component";
 import ModBadge from "~/assets/images/badges/mod.svg?component";
-import PlusBadge from "~/assets/images/badges/plus.svg?component";
 import TenMClubBadge from "~/assets/images/badges/10m-club.svg?component";
 import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?component";
 import AlphaTesterBadge from "~/assets/images/badges/alpha-tester.svg?component";
@@ -286,7 +278,6 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
-const flags = useFeatureFlags();
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;

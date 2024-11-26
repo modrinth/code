@@ -86,8 +86,8 @@
 
     <h3>Amount</h3>
     <p>
-      You are initiating a transfer of your revenue from BBSMC Creator Monetization Program.
-      How much of your
+      You are initiating a transfer of your revenue from BBSMC Creator Monetization Program. How
+      much of your
       <strong>{{ $formatMoney(userBalance.available) }}</strong> balance would you like to transfer
       transfer to {{ selectedMethod.name }}?
     </p>

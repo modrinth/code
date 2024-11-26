@@ -199,9 +199,7 @@ const onDeleteOrganization = useClientTry(async () => {
           <span class="label__title size-card-header">删除团队</span>
         </h3>
       </div>
-      <p>
-        删除您的团队会将其所有资源转移给团队所有者。此操作无法撤消。
-      </p>
+      <p>删除您的团队会将其所有资源转移给团队所有者。此操作无法撤消。</p>
       <Button color="danger" @click="() => $refs.modal_deletion.show()">
         <TrashIcon />
         删除团队

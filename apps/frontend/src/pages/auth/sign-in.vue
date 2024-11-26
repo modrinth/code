@@ -23,35 +23,34 @@
       </button>
     </template>
     <template v-else>
+      <!--      <h1>第三方登录</h1>-->
 
-<!--      <h1>第三方登录</h1>-->
-
-<!--      <section class="third-party">-->
-<!--        <a class="btn" :href="getAuthUrl('discord', redirectTarget)">-->
-<!--          <SSODiscordIcon />-->
-<!--          <span>Discord</span>-->
-<!--        </a>-->
-<!--        <a class="btn" :href="getAuthUrl('github', redirectTarget)">-->
-<!--          <SSOGitHubIcon />-->
-<!--          <span>GitHub</span>-->
-<!--        </a>-->
-<!--        <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">-->
-<!--          <SSOMicrosoftIcon />-->
-<!--          <span>Microsoft</span>-->
-<!--        </a>-->
-<!--        <a class="btn" :href="getAuthUrl('google', redirectTarget)">-->
-<!--          <SSOGoogleIcon />-->
-<!--          <span>Google</span>-->
-<!--        </a>-->
-<!--        <a class="btn" :href="getAuthUrl('steam', redirectTarget)">-->
-<!--          <SSOSteamIcon />-->
-<!--          <span>Steam</span>-->
-<!--        </a>-->
-<!--        <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">-->
-<!--          <SSOGitLabIcon />-->
-<!--          <span>GitLab</span>-->
-<!--        </a>-->
-<!--      </section>-->
+      <!--      <section class="third-party">-->
+      <!--        <a class="btn" :href="getAuthUrl('discord', redirectTarget)">-->
+      <!--          <SSODiscordIcon />-->
+      <!--          <span>Discord</span>-->
+      <!--        </a>-->
+      <!--        <a class="btn" :href="getAuthUrl('github', redirectTarget)">-->
+      <!--          <SSOGitHubIcon />-->
+      <!--          <span>GitHub</span>-->
+      <!--        </a>-->
+      <!--        <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">-->
+      <!--          <SSOMicrosoftIcon />-->
+      <!--          <span>Microsoft</span>-->
+      <!--        </a>-->
+      <!--        <a class="btn" :href="getAuthUrl('google', redirectTarget)">-->
+      <!--          <SSOGoogleIcon />-->
+      <!--          <span>Google</span>-->
+      <!--        </a>-->
+      <!--        <a class="btn" :href="getAuthUrl('steam', redirectTarget)">-->
+      <!--          <SSOSteamIcon />-->
+      <!--          <span>Steam</span>-->
+      <!--        </a>-->
+      <!--        <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">-->
+      <!--          <SSOGitLabIcon />-->
+      <!--          <span>GitLab</span>-->
+      <!--        </a>-->
+      <!--      </section>-->
 
       <h1>登 录</h1>
 
@@ -112,18 +111,13 @@
 </template>
 
 <script setup>
-import {
-  RightArrowIcon,
-  SSOGitHubIcon,
-  SSOMicrosoftIcon,
-  SSOSteamIcon,
-  SSOGoogleIcon,
-  SSODiscordIcon,
-  SSOGitLabIcon,
-  KeyIcon,
-  MailIcon,
-} from "@modrinth/assets";
+
+import {RightArrowIcon, KeyIcon, MailIcon} from "@modrinth/assets";
 import HCaptcha from "@/components/ui/HCaptcha.vue";
+
+const captcha = ref();
+const token = ref("");
+
 
 const { formatMessage } = useVIntl();
 
@@ -176,7 +170,6 @@ useHead({
 const auth = await useAuth();
 const route = useNativeRoute();
 
-const redirectTarget = route.query.redirect || "";
 
 if (route.query.code && !route.fullPath.includes("new_account=true")) {
   await finishSignIn();
@@ -186,11 +179,10 @@ if (auth.value.user) {
   await finishSignIn();
 }
 
-const captcha = ref();
 
 const email = ref("");
 const password = ref("");
-const token = ref("");
+
 
 const flow = ref(route.query.flow);
 

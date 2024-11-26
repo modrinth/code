@@ -28,7 +28,7 @@ impl super::Validator for PluginYmlValidator {
             .any(|name| name == "plugin.yml" || name == "paper-plugin.yml")
         {
             return Ok(ValidationResult::Warning(
-                "No plugin.yml or paper-plugin.yml present for plugin file.",
+                "插件文件中没有 plugin.yml 或 paper-plugin.yml 文件。",
             ));
         };
 
@@ -60,7 +60,7 @@ impl super::Validator for BungeeCordValidator {
             .any(|name| name == "plugin.yml" || name == "bungee.yml")
         {
             return Ok(ValidationResult::Warning(
-                "No plugin.yml or bungee.yml present for plugin file.",
+                "插件文件中没有 plugin.yml 或 bungee.yml 文件。",
             ));
         };
 
@@ -89,7 +89,7 @@ impl super::Validator for VelocityValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("velocity-plugin.json").is_err() {
             return Ok(ValidationResult::Warning(
-                "No velocity-plugin.json present for plugin file.",
+                "插件文件中没有 velocity-plugin.json 文件。",
             ));
         }
 
@@ -122,7 +122,7 @@ impl super::Validator for SpongeValidator {
                 || name == "META-INF/sponge_plugins.json"
         }) {
             return Ok(ValidationResult::Warning(
-                "No sponge_plugins.json or mcmod.info present for Sponge plugin.",
+                "Sponge 插件中没有 sponge_plugins.json 或 mcmod.info 文件。",
             ));
         };
 

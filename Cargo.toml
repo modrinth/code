@@ -2,11 +2,10 @@
 resolver = '2'
 members = [
   './packages/app-lib',
-	'./apps/app-playground',
-  './apps/app',
+  './apps/app-playground',
   './apps/labrinth',
-    './apps/daedalus_client',
-    './packages/daedalus',
+  './apps/daedalus_client',
+  './packages/daedalus',
 ]
 
 # Optimize for speed and reduce size on release builds
@@ -20,5 +19,10 @@ strip = true # Remove debug symbols
 [profile.dev.package.sqlx-macros]
 opt-level = 3
 
-[patch.crates-io]
-wry = { git = "https://github.com/modrinth/wry", rev = "27fb16b" }
+[source.crates-io]
+replace-with = "ustc"
+
+[source.ustc]
+registry = "https://mirrors.ustc.edu.cn/crates.io-index"
+[registries]
+ustc = { index = "https://mirrors.ustc.edu.cn/crates.io-index" }

@@ -1,5 +1,8 @@
 import MarkdownIt from 'markdown-it'
-import { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } from 'xss'
+
+import pkg from 'xss'
+const { FilterXSS, whiteList, escapeAttrValue, safeAttrValue } = pkg as any;
+// import { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } from 'xss'
 
 export const configuredXss = new FilterXSS({
   whiteList: {
@@ -92,10 +95,11 @@ export const configuredXss = new FilterXSS({
         const allowedHostnames = [
           'imgur.com',
           'i.imgur.com',
-          'cdn.bbsmc.net',
-          'api.bbsmc.net',
-          'bbsmc.net',
+          'cdn-raw.modrinth.com',
           'cdn.modrinth.com',
+          'cdn.bbsmc.net',
+          'staging-cdn-raw.modrinth.com',
+          'staging-cdn.modrinth.com',
           'github.com',
           'raw.githubusercontent.com',
           'img.shields.io',
@@ -148,7 +152,7 @@ export const md = (options = {}) => {
 
       try {
         const url = new URL(href)
-        const allowedHostnames = ['modrinth.com']
+        const allowedHostnames = ["bbsmc.net"]
 
         if (allowedHostnames.includes(url.hostname)) {
           return defaultLinkOpenRenderer(tokens, idx, options, env, self)

@@ -71,7 +71,7 @@ pub async fn organization_projects_get(
 
     let possible_organization_id: Option<u64> = parse_base62(&info).ok();
 
-    let project_ids = sqlx::query!(
+    let project_ids:Vec<database::models::ProjectId> = sqlx::query!(
         "
         SELECT m.id FROM organizations o
         INNER JOIN mods m ON m.organization_id = o.id

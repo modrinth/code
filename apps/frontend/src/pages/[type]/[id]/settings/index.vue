@@ -102,9 +102,7 @@
         <div class="adjacent-input">
           <label for="project-env-client">
             <span class="label__title">客户端</span>
-            <span class="label__description">
-              请选择资源对客户端的支持程度
-            </span>
+            <span class="label__description"> 请选择资源对客户端的支持程度 </span>
           </label>
           <Multiselect
             id="project-env-client"
@@ -112,18 +110,20 @@
             class="small-multiselect"
             placeholder="Select one"
             :options="sideTypes"
-            :custom-label="(value) => {
-              switch(value){
-                case 'required':
-                  return '必备';
-                case 'optional':
-                  return '可选';
-                case 'unsupported':
-                  return '不支持';
-                default:
-                  return '未知'
+            :custom-label="
+              (value) => {
+                switch (value) {
+                  case 'required':
+                    return '必备';
+                  case 'optional':
+                    return '可选';
+                  case 'unsupported':
+                    return '不支持';
+                  default:
+                    return '未知';
+                }
               }
-            }"
+            "
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -144,18 +144,20 @@
             class="small-multiselect"
             placeholder="Select one"
             :options="sideTypes"
-            :custom-label="(value) => {
-              switch(value){
-                case 'required':
-                  return '必备';
-                case 'optional':
-                  return '可选';
-                case 'unsupported':
-                  return '不支持';
-                default:
-                  return '未知'
+            :custom-label="
+              (value) => {
+                switch (value) {
+                  case 'required':
+                    return '必备';
+                  case 'optional':
+                    return '可选';
+                  case 'unsupported':
+                    return '不支持';
+                  default:
+                    return '未知';
+                }
               }
-            }"
+            "
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -193,10 +195,7 @@
                 <IssuesIcon
                   v-else
                   v-tooltip="{
-                    content:
-                      visibility === 'private'
-                        ? '只有会员才可以查看该项目。'
-                        : '',
+                    content: visibility === 'private' ? '只有会员才可以查看该项目。' : '',
                   }"
                   class="warn"
                 />
@@ -238,9 +237,7 @@
           <span class="label__title size-card-header">删除资源</span>
         </h3>
       </div>
-      <p>
-        从 BBSMC 的服务器和搜索中删除您的资源.单击此按钮将删除您的资源,请慎重点击!
-      </p>
+      <p>从 BBSMC 的服务器和搜索中删除您的资源.单击此按钮将删除您的资源,请慎重点击!</p>
       <button
         type="button"
         class="iconified-button danger-button"

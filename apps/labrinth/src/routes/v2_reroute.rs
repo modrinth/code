@@ -14,21 +14,22 @@ use actix_web::HttpResponse;
 use futures::{stream, Future, StreamExt};
 use serde_json::{json, Value};
 
+// 提取 OK 状态的 JSON 响应
 pub async fn extract_ok_json<T>(
     response: HttpResponse,
 ) -> Result<T, HttpResponse>
 where
     T: serde::de::DeserializeOwned,
 {
-    // If the response is StatusCode::OK, parse the json and return it
+    // 如果响应状态是 StatusCode::OK，解析 JSON 并返回
     if response.status() == actix_web::http::StatusCode::OK {
         let failure_http_response = || {
             HttpResponse::InternalServerError().json(json!({
                 "error": "reroute_error",
-                "description": "Could not parse response from V2 redirection of route."
+                "description": "无法解析 V2 路由重定向的响应。"
             }))
         };
-        // Takes json out of HttpResponse, mutates it, then regenerates the HttpResponse
+        // 从 HttpResponse 中提取 JSON，进行修改，然后重新生成 HttpResponse
         let body = response.into_body();
         let bytes = actix_web::body::to_bytes(body)
             .await
@@ -41,8 +42,8 @@ where
     }
 }
 
-// This only removes the body of 404 responses
-// This should not be used on the fallback no-route-found handler
+// 仅移除 404 响应的主体
+// 不应在回退无路由找到的处理程序中使用
 pub fn flatten_404_error(res: ApiError) -> Result<HttpResponse, ApiError> {
     match res {
         ApiError::NotFound => Ok(HttpResponse::NotFound().body("")),
@@ -50,11 +51,11 @@ pub fn flatten_404_error(res: ApiError) -> Result<HttpResponse, ApiError> {
     }
 }
 
-// Allows internal modification of an actix multipart file
-// Expected:
-// 1. A json segment
-// 2. Any number of other binary segments
-// 'closure' is called with the json value, and the content disposition of the other segments
+// 允许内部修改 actix multipart 文件
+// 预期：
+// 1. 一个 JSON 段
+// 2. 任意数量的其他二进制段
+// 'closure' 使用 JSON 值和其他段的内容处置进行调用
 pub async fn alter_actix_multipart<T, U, Fut>(
     mut multipart: Multipart,
     mut headers: HeaderMap,
@@ -94,7 +95,7 @@ where
             name: field_name.to_string(),
             filename: field_filename.map(|s| s.to_string()),
             content_type: field_content_type,
-            data: MultipartSegmentData::Binary(vec![]), // Initialize to empty, will be finished after
+            data: MultipartSegmentData::Binary(vec![]), // 初始化为空，将在之后完成
         });
     }
 
@@ -121,22 +122,22 @@ where
         })
     }
 
-    // Finishes the json segment, with aggregated content dispositions
+    // 完成 JSON 段，带有聚合的内容处置
     {
         let json_value = json.ok_or(CreateError::InvalidInput(
-            "No json segment found in multipart.".to_string(),
+            "在 multipart 中未找到 JSON 段。".to_string(),
         ))?;
         let mut json_segment =
             json_segment.ok_or(CreateError::InvalidInput(
-                "No json segment found in multipart.".to_string(),
+                "在 multipart 中未找到 JSON 段。".to_string(),
             ))?;
 
-        // Call closure, with the json value and names of the other segments
+        // 使用 JSON 值和其他段的名称调用 closure
         let json_value: U = closure(json_value, content_dispositions).await?;
         let buffer = serde_json::to_vec(&json_value)?;
         json_segment.data = MultipartSegmentData::Binary(buffer);
 
-        // Insert the json segment at the beginning
+        // 将 JSON 段插入到开头
         segments.insert(0, json_segment);
     }
 
@@ -153,7 +154,7 @@ where
         }
         Err(err) => {
             CreateError::InvalidInput(format!(
-                "Error inserting test header: {:?}.",
+                "插入测试头时出错： {:?}。",
                 err
             ));
         }
@@ -165,7 +166,7 @@ where
     Ok(new_multipart)
 }
 
-// Converts a "client_side" and "server_side" pair into the new v3 corresponding fields
+// 将 "client_side" 和 "server_side" 对转换为新的 v3 对应字段
 pub fn convert_side_types_v3(
     client_side: LegacySideType,
     server_side: LegacySideType,
@@ -190,9 +191,9 @@ pub fn convert_side_types_v3(
     fields
 }
 
-// Converts plugin loaders from v2 to v3, for search facets
-// Within every 1st and 2nd level (the ones allowed in v2), we convert every instance of:
-// "project_type:mod" to "project_type:plugin" OR "project_type:mod"
+// 将插件加载器从 v2 转换为 v3，用于搜索 facets
+// 在每个一级和二级（v2 中允许的）中，我们将每个实例转换为：
+// "project_type:mod" 到 "project_type:plugin" 或 "project_type:mod"
 pub fn convert_plugin_loader_facets_v3(
     facets: Vec<Vec<String>>,
 ) -> Vec<Vec<String>> {
@@ -212,8 +213,8 @@ pub fn convert_plugin_loader_facets_v3(
         .collect::<Vec<_>>()
 }
 
-// Convert search facets from V3 back to v2
-// this is not lossless. (See tests)
+// 将搜索 facets 从 V3 转换回 v2
+// 这不是无损的。（见测试）
 pub fn convert_side_types_v2(
     side_types: &HashMap<String, Value>,
     project_type: Option<&str>,
@@ -244,7 +245,7 @@ pub fn convert_side_types_v2(
     )
 }
 
-// Client side, server side
+// 客户端，服务器端
 pub fn convert_side_types_v2_bools(
     singleplayer: Option<bool>,
     client_only: bool,
@@ -264,28 +265,29 @@ pub fn convert_side_types_v2_bools(
                 singleplayer.or(client_and_server).unwrap_or(false);
 
             match (singleplayer, client_only, server_only) {
-                // Only singleplayer
+                // 仅单人游戏
                 (true, false, false) => (Required, Required),
 
-                // Client only and not server only
+                // 仅客户端且不为服务器端
                 (false, true, false) => (Required, Unsupported),
                 (true, true, false) => (Required, Unsupported),
 
-                // Server only and not client only
+                // 仅服务器端且不为客户端
                 (false, false, true) => (Unsupported, Required),
                 (true, false, true) => (Unsupported, Required),
 
-                // Both server only and client only
+                // 同时为服务器端和客户端
                 (true, true, true) => (Optional, Optional),
                 (false, true, true) => (Optional, Optional),
 
-                // Bad type
+                // 错误类型
                 (false, false, false) => (Unknown, Unknown),
             }
         }
     }
 }
 
+// 首字母大写
 pub fn capitalize_first(input: &str) -> String {
     let mut result = input.to_owned();
     if let Some(first_char) = result.get_mut(0..1) {
@@ -303,7 +305,7 @@ mod tests {
 
     #[test]
     fn convert_types() {
-        // Converting types from V2 to V3 and back should be idempotent- for certain pairs
+        // 从 V2 到 V3 再转换回来应该是幂等的 - 对于某些对
         let lossy_pairs = [
             (Optional, Unsupported),
             (Unsupported, Optional),

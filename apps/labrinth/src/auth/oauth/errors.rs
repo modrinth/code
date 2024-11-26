@@ -25,11 +25,10 @@ where
 }
 
 impl OAuthError {
-    /// The OAuth request failed either because of an invalid redirection URI
-    /// or before we could validate the one we were given, so return an error
-    /// directly to the caller
+    /// OAuth 请求失败，可能是因为无效的重定向 URI
+    /// 或者在我们验证给定的 URI 之前失败，因此直接向调用者返回错误
     ///
-    /// See: IETF RFC 6749 4.1.2.1 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1)
+    /// 参见：IETF RFC 6749 4.1.2.1 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1)
     pub fn error(error_type: impl Into<OAuthErrorType>) -> Self {
         Self {
             error_type: error_type.into(),
@@ -38,10 +37,10 @@ impl OAuthError {
         }
     }
 
-    /// The OAuth request failed for a reason other than an invalid redirection URI
-    /// So send the error in url-encoded form to the redirect URI
+    /// OAuth 请求因无效的重定向 URI 以外的原因失败
+    /// 因此将错误以 URL 编码的形式发送到重定向 URI
     ///
-    /// See: IETF RFC 6749 4.1.2.1 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1)
+    /// 参见：IETF RFC 6749 4.1.2.1 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1)
     pub fn redirect(
         err: impl Into<OAuthErrorType>,
         state: &Option<String>,
@@ -114,37 +113,33 @@ impl actix_web::ResponseError for OAuthError {
 pub enum OAuthErrorType {
     #[error(transparent)]
     AuthenticationError(#[from] AuthenticationError),
-    #[error("Client {} has no redirect URIs specified", .client_id.0)]
+    #[error("客户端 {} 没有指定重定向 URI", .client_id.0)]
     ClientMissingRedirectURI {
         client_id: crate::database::models::OAuthClientId,
     },
-    #[error(
-        "The provided redirect URI did not match any configured in the client"
-    )]
+    #[error("提供的重定向 URI 与客户端中配置的不匹配")]
     RedirectUriNotConfigured(String),
-    #[error("The provided scope was malformed or did not correspond to known scopes ({0})")]
+    #[error("提供的 scope 格式错误或不对应已知的 scope ({0})")]
     FailedScopeParse(bitflags::parser::ParseError),
-    #[error(
-        "The provided scope requested scopes broader than the developer app is configured with"
-    )]
+    #[error("提供的 scope 请求的范围比开发者应用程序配置的范围更广")]
     ScopesTooBroad,
-    #[error("The provided flow id was invalid")]
+    #[error("提供的 flow id 无效")]
     InvalidAcceptFlowId,
-    #[error("The provided client id was invalid")]
+    #[error("提供的客户端 id 无效")]
     InvalidClientId(crate::database::models::OAuthClientId),
-    #[error("The provided ID could not be decoded: {0}")]
+    #[error("提供的 ID 无法解码：{0}")]
     MalformedId(#[from] DecodingError),
-    #[error("Failed to authenticate client")]
+    #[error("客户端身份验证失败")]
     ClientAuthenticationFailed,
-    #[error("The provided authorization grant code was invalid")]
+    #[error("提供的授权码无效")]
     InvalidAuthCode,
-    #[error("The provided client id did not match the id this authorization code was granted to")]
+    #[error("提供的客户端 id 与此授权码授予的 id 不匹配")]
     UnauthorizedClient,
-    #[error("The provided redirect URI did not exactly match the uri originally provided when this flow began")]
+    #[error("提供的重定向 URI 与此流程开始时提供的 URI 不完全匹配")]
     RedirectUriChanged(Option<String>),
-    #[error("The provided grant type ({0}) must be \"authorization_code\"")]
+    #[error("提供的授权类型 ({0}) 必须是 \"authorization_code\"")]
     OnlySupportsAuthorizationCodeGrant(String),
-    #[error("The resource owner denied the request")]
+    #[error("资源所有者拒绝了请求")]
     AccessDenied,
 }
 
@@ -163,7 +158,7 @@ impl From<sqlx::Error> for OAuthErrorType {
 impl OAuthErrorType {
     pub fn error_name(&self) -> String {
         // IETF RFC 6749 4.1.2.1 (https://datatracker.ietf.org/doc/html/rfc6749#autoid-38)
-        // And 5.2 (https://datatracker.ietf.org/doc/html/rfc6749#section-5.2)
+        // 以及 5.2 (https://datatracker.ietf.org/doc/html/rfc6749#section-5.2)
         match self {
             Self::RedirectUriNotConfigured(_)
             | Self::ClientMissingRedirectURI { client_id: _ } => "invalid_uri",

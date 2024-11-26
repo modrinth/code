@@ -94,6 +94,7 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
     .filter((it) => it.version_type === "release")
     .map((it) => it.version);
 
+  // @ts-ignore
   const inferFunctions = {
     // NeoForge
     "META-INF/neoforge.mods.toml": (file) => {
@@ -305,6 +306,34 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
           .map((x) => x.version),
       };
     },
+    "manifest.json": (file) => {
+      const metadata = JSON.parse(file);
+      const loaders = [];
+      metadata.minecraft.modLoaders.forEach((modLoader) => {
+        if (modLoader.id.includes("neoforge")) {
+          loaders.push("neoforge");
+        }
+        if (modLoader.id.includes("fabric")) {
+          loaders.push("fabric");
+        }
+        if (modLoader.id.includes("forge-")) {
+          loaders.push("forge");
+        }
+        if (modLoader.id.includes("quilt")) {
+          loaders.push("quilt");
+        }
+      });
+      return {
+        name: `${metadata.name} ${metadata.version}`,
+        version_number: metadata.version,
+        version_type: versionType(metadata.version),
+        loaders,
+        game_versions: gameVersions
+          .filter((x) => x.version === metadata.minecraft.version)
+          .map((x) => x.version),
+      };
+    },
+
     // Resource Packs + Data Packs
     "pack.mcmeta": (file) => {
       const metadata = JSON.parse(file);

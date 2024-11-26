@@ -4,20 +4,19 @@
       <h2>资源状态</h2>
       <Badge :type="project.status" />
       <p v-if="isApproved(project)">
-        您发布的资源已通过审核
-        您可以点击
+        您发布的资源已通过审核 您可以点击
         <router-link :to="`${getProjectLink(project)}/settings`" class="text-link"
           >资源设置</router-link
-        > 去修改资源是否公开
+        >
+        去修改资源是否公开
       </p>
       <div v-else-if="isUnderReview(project)">
         <p>
-          BBSMC 内容版主团队会努力审核所有已提交的项目。
-          通常，新项目将在 24 到 48 小时内审核完毕。请记住，较大的项目（尤其是模组包）可能需要更多时间审核。
-          某些节假日或活动也可能导致延迟，具体取决于版主的空闲时间。
-          如果 BBSMC 版主对您有任何问题或疑虑，他们会在下面留言。
+          BBSMC 内容版主团队会努力审核所有已提交的项目。 通常，新项目将在 24 到 48
+          小时内审核完毕。请记住，较大的项目（尤其是模组包）可能需要更多时间审核。
+          某些节假日或活动也可能导致延迟，具体取决于版主的空闲时间。 如果 BBSMC
+          版主对您有任何问题或疑虑，他们会在下面留言。
         </p>
-
       </div>
       <template v-else-if="isRejected(project)">
         <p>
@@ -25,9 +24,7 @@
           <nuxt-link to="/legal2/rules" class="text-link" target="_blank">内容规则</nuxt-link>
           版主已要求您进行更改才能批准。请阅读以下版主的留言，并在重新提交前解决他们的意见。
         </p>
-        <p class="warning">
-          <IssuesIcon /> 重复提交而不回应版主的留言回复可能会导致帐户被封禁。
-        </p>
+        <p class="warning"><IssuesIcon /> 重复提交而不回应版主的留言回复可能会导致帐户被封禁。</p>
       </template>
       <h3>当前可见性</h3>
       <ul class="visibility-info">
@@ -60,7 +57,8 @@
     <section id="messages" class="universal-card">
       <h2>消息</h2>
       <p>
-        这是与 BBSMC 版主的私人对话页面,他们可能会向您发送有关此项目的问题的消息.仅当您提交资源以供审核时才会显示此对话。
+        这是与 BBSMC
+        版主的私人对话页面,他们可能会向您发送有关此项目的问题的消息.仅当您提交资源以供审核时才会显示此对话。
       </p>
       <ConversationThread
         v-if="thread"

@@ -25,7 +25,7 @@ impl super::Validator for DataPackValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("pack.mcmeta").is_err() {
             return Ok(ValidationResult::Warning(
-                "No pack.mcmeta present for datapack file. Tip: Make sure pack.mcmeta is in the root directory of your datapack!",
+                "未找到 pack.mcmeta 文件。提示：确保 pack.mcmeta 位于数据包的根目录中！",
             ));
         }
 

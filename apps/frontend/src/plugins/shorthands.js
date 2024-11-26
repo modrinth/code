@@ -225,7 +225,7 @@ export const formatCategory = (name) => {
   } else if (name === "optifine") {
     return "OptiFine高清修复";
   } else if (name === "mrpack") {
-    return "mrpack";
+    return "整合包";
   } else if (name === "minecraft") {
     return "资源包";
   } else if (name === "vanilla") {

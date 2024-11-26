@@ -3,7 +3,7 @@ use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
-use redis::{cmd, Cmd, ExistenceCheck, SetExpiry, SetOptions};
+use redis::{cmd, Cmd, ConnectionInfo, ExistenceCheck, IntoConnectionInfo, SetExpiry, SetOptions};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -31,9 +31,16 @@ impl RedisPool {
     // initiate a new redis pool
     // testing pool uses a hashmap to mimic redis behaviour for very small data sizes (ie: tests)
     // PANICS: production pool will panic if redis url is not set
+
+
     pub fn new(meta_namespace: Option<String>) -> Self {
-        let redis_pool = Config::from_url(
-            dotenvy::var("REDIS_URL").expect("Redis URL not set"),
+
+        let redis_url = dotenvy::var("REDIS_URL").expect("Redis URL not set");
+        let connection_info: ConnectionInfo = redis_url.into_connection_info().expect("Invalid Redis URL");
+
+
+        let redis_pool = Config::from_connection_info(
+            connection_info
         )
         .builder()
         .expect("Error building Redis pool")

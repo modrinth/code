@@ -18,9 +18,7 @@
               v-model="editLinks.issues.val"
               :disabled="editLinks.issues.clear"
               type="url"
-              :placeholder="
-                editLinks.issues.clear ? '现有链接将被清除' : '输入有效URL'
-              "
+              :placeholder="editLinks.issues.clear ? '现有链接将被清除' : '输入有效URL'"
               maxlength="2048"
             />
             <Button
@@ -47,9 +45,7 @@
               :disabled="editLinks.source.clear"
               type="url"
               maxlength="2048"
-              :placeholder="
-                editLinks.source.clear ? '现有链接将被清除' : '输入有效URL'
-              "
+              :placeholder="editLinks.source.clear ? '现有链接将被清除' : '输入有效URL'"
             />
             <Button
               v-tooltip="'Clear link'"
@@ -74,9 +70,7 @@
               :disabled="editLinks.wiki.clear"
               type="url"
               maxlength="2048"
-              :placeholder="
-                editLinks.wiki.clear ? '现有链接将被清除' : '输入有效URL'
-              "
+              :placeholder="editLinks.wiki.clear ? '现有链接将被清除' : '输入有效URL'"
             />
             <Button
               v-tooltip="'Clear link'"
@@ -98,11 +92,7 @@
               :disabled="editLinks.discord.clear"
               type="url"
               maxlength="2048"
-              :placeholder="
-                editLinks.discord.clear
-                  ? '现有链接将被清除'
-                  : '请输入KOOK邀请链接'
-              "
+              :placeholder="editLinks.discord.clear ? '现有链接将被清除' : '请输入KOOK邀请链接'"
             />
             <Button
               v-tooltip="'删除'"
@@ -168,9 +158,7 @@
           @submit="onProjectTransferSubmit"
         />
       </div>
-      <p v-if="sortedProjects.length < 1">
-        您还没有任何资源,点击上方的绿色按钮即可开始
-      </p>
+      <p v-if="sortedProjects.length < 1">您还没有任何资源,点击上方的绿色按钮即可开始</p>
       <template v-else>
         <p>您可以通过选择下面来同时编辑多个项目.</p>
         <div class="input-group">
@@ -186,17 +174,21 @@
                 :searchable="false"
                 class="small-select"
                 :options="['Name', 'Status', 'Type']"
-                :custom-label="(value) => {
-                  switch(value){
-                    case 'Name':{
-                      return '名称'
-                    }case 'Status':{
-                      return '状态'
-                    }case 'Type':{
-                      return '类型'
+                :custom-label="
+                  (value) => {
+                    switch (value) {
+                      case 'Name': {
+                        return '名称';
+                      }
+                      case 'Status': {
+                        return '状态';
+                      }
+                      case 'Type': {
+                        return '类型';
+                      }
                     }
                   }
-                }"
+                "
                 :close-on-select="true"
                 :show-labels="false"
                 :allow-empty="false"

@@ -143,22 +143,22 @@ export default defineNuxtComponent({
   },
   async setup(props) {
     const defaultLicenses = shallowRef([
-      { friendly: "自定义", short: "" },
+      { friendly: "Custom", short: "" },
       {
-        friendly: "保留所有权利/无许可",
+        friendly: "All Rights Reserved/No License",
         short: "All-Rights-Reserved",
       },
-      { friendly: "Apache 许可证 2.0", short: "Apache-2.0" },
+      { friendly: "Apache License 2.0", short: "Apache-2.0" },
       {
-        friendly: 'BSD 2-Clause "简化" 许可证',
+        friendly: 'BSD 2-Clause "Simplified" License',
         short: "BSD-2-Clause",
       },
       {
-        friendly: 'BSD 3-Clause "新" 或 "修订" 许可证',
+        friendly: 'BSD 3-Clause "New" or "Revised" License',
         short: "BSD-3-Clause",
       },
       {
-        friendly: "CC Zero （相当于公共领域）",
+        friendly: "CC Zero (Public Domain equivalent)",
         short: "CC0-1.0",
       },
       { friendly: "CC-BY 4.0", short: "CC-BY-4.0" },
@@ -183,34 +183,34 @@ export default defineNuxtComponent({
         short: "CC-BY-NC-ND-4.0",
       },
       {
-        friendly: "GNU Affero 通用公共许可证 v3",
+        friendly: "GNU Affero General Public License v3",
         short: "AGPL-3.0",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: "GNU 较宽松通用公共许可证 v2.1",
+        friendly: "GNU Lesser General Public License v2.1",
         short: "LGPL-2.1",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: "GNU 较宽松通用公共许可证 v3",
+        friendly: "GNU Lesser General Public License v3",
         short: "LGPL-3.0",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: "GNU 通用公共许可证 v2",
+        friendly: "GNU General Public License v2",
         short: "GPL-2.0",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: "GNU 通用公共许可证 v3",
+        friendly: "GNU General Public License v3",
         short: "GPL-3.0",
         requiresOnlyOrLater: true,
       },
-      { friendly: "ISC 许可证", short: "ISC" },
-      { friendly: "MIT 许可证", short: "MIT" },
-      { friendly: "Mozilla 公共许可证 2.0", short: "MPL-2.0" },
-      { friendly: "Zlib许可证", short: "Zlib" },
+      { friendly: "ISC License", short: "ISC" },
+      { friendly: "MIT License", short: "MIT" },
+      { friendly: "Mozilla Public License 2.0", short: "MPL-2.0" },
+      { friendly: "zlib License", short: "Zlib" },
     ]);
 
     const licenseUrl = ref(props.project.license.url);

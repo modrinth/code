@@ -19,9 +19,7 @@
         </div>
         <label for="package-mod-loaders">
           <span class="label__title">MOD运行环境</span>
-          <span class="label__description">
-            选择您数据包的MOD运行环境
-          </span>
+          <span class="label__description"> 选择您数据包的MOD运行环境 </span>
         </label>
         <multiselect
           id="package-mod-loaders"
@@ -85,9 +83,7 @@
       <div v-if="fieldErrors && showKnownErrors" class="known-errors">
         <ul>
           <li v-if="version.version_number === ''">您必须输入一个版本号</li>
-          <li v-if="version.game_versions.length === 0">
-            您必须选择支持的 Minecraft 版本
-          </li>
+          <li v-if="version.game_versions.length === 0">您必须选择支持的 Minecraft 版本</li>
           <li v-if="newFiles.length === 0 && version.files.length === 0 && !replaceFile">
             您必须要有一个上传的文件
           </li>
@@ -205,9 +201,7 @@
       <div
         v-else
         class="markdown-body"
-        v-html="
-          version.changelog ? renderHighlightedString(version.changelog) : '无'
-        "
+        v-html="version.changelog ? renderHighlightedString(version.changelog) : '无'"
       />
     </div>
     <div
@@ -278,16 +272,18 @@
             v-model="dependencyAddMode"
             class="input"
             :options="['project', 'version']"
-            :custom-label="(value) => {
-              switch (value) {
-                case 'project':
-                  return '资源';
-                case 'version':
-                  return '版本';
-                default:
-                  return value.charAt(0).toUpperCase() + value.slice(1);
+            :custom-label="
+              (value) => {
+                switch (value) {
+                  case 'project':
+                    return '资源';
+                  case 'version':
+                    return '版本';
+                  default:
+                    return value.charAt(0).toUpperCase() + value.slice(1);
+                }
               }
-            }"
+            "
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -305,20 +301,22 @@
             v-model="newDependencyType"
             class="input"
             :options="['required', 'optional', 'incompatible', 'embedded']"
-            :custom-label="(value) => {
-    switch (value) {
-      case 'required':
-        return '必需';
-      case 'optional':
-        return '可选';
-      case 'incompatible':
-        return '不兼容';
-      case 'embedded':
-        return '嵌入';
-      default:
-        return value.charAt(0).toUpperCase() + value.slice(1);
-    }
-  }"
+            :custom-label="
+              (value) => {
+                switch (value) {
+                  case 'required':
+                    return '必需';
+                  case 'optional':
+                    return '可选';
+                  case 'incompatible':
+                    return '不兼容';
+                  case 'embedded':
+                    return '嵌入';
+                  default:
+                    return value.charAt(0).toUpperCase() + value.slice(1);
+                }
+              }
+            "
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -367,9 +365,7 @@
         <span class="filename">
           <strong>{{ file.filename }}</strong>
           <span class="file-size">({{ $formatBytes(file.size) }})</span>
-          <span v-if="primaryFile.hashes.sha1 === file.hashes.sha1" class="file-type">
-            主要
-          </span>
+          <span v-if="primaryFile.hashes.sha1 === file.hashes.sha1" class="file-type"> 主要 </span>
           <span
             v-else-if="file.file_type === 'required-resource-pack' && !isEditing"
             class="file-type"
@@ -649,6 +645,7 @@
 import { formatProjectRelease } from "@modrinth/utils";
 import { ButtonStyled, ConfirmModal, MarkdownEditor } from "@modrinth/ui";
 import { Multiselect } from "vue-multiselect";
+import JSZip from "jszip";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 import { inferVersionInfo } from "~/helpers/infer.js";
 import { createDataPackVersion } from "~/helpers/package.js";
@@ -813,8 +810,10 @@ export default defineNuxtComponent({
         game_versions: [],
         loaders: [],
         featured: false,
+        curseforge: "",
       };
-      // For navigation from versions page / upload file prompt
+      // 用于从版本页面导航/上传文件提示
+
       if (import.meta.client && history.state && history.state.newPrimaryFile) {
         replaceFile = history.state.newPrimaryFile;
 
@@ -830,7 +829,7 @@ export default defineNuxtComponent({
             ...inferredData,
           };
         } catch (err) {
-          console.error("Error parsing version file data", err);
+          console.error("解析版本文件数据时出错", err);
         }
       }
     } else if (route.params.version === "latest") {
@@ -970,7 +969,7 @@ export default defineNuxtComponent({
   },
   methods: {
     formatProjectRelease() {
-      return formatProjectRelease
+      return formatProjectRelease;
     },
     async onImageUpload(file) {
       const response = await useImageUpload(file, { context: "version" });
@@ -1006,8 +1005,8 @@ export default defineNuxtComponent({
           if (this.version.dependencies.some((dep) => project.id === dep.project_id)) {
             this.$notify({
               group: "main",
-              title: "Dependency already added",
-              text: "You cannot add the same dependency twice.",
+              title: "依赖项已添加",
+              text: "您不能两次添加相同的依赖项。",
               type: "error",
             });
           } else {
@@ -1031,8 +1030,8 @@ export default defineNuxtComponent({
           if (this.version.dependencies.some((dep) => version.id === dep.version_id)) {
             this.$notify({
               group: "main",
-              title: "Dependency already added",
-              text: "You cannot add the same dependency twice.",
+              title: "依赖项已添加",
+              text: "您不能两次添加相同的依赖项。",
               type: "error",
             });
           } else {
@@ -1059,8 +1058,8 @@ export default defineNuxtComponent({
         if (!hideErrors) {
           this.$notify({
             group: "main",
-            title: "Invalid Dependency",
-            text: "The specified dependency could not be found",
+            title: "无效的依赖项",
+            text: "找不到指定的依赖项",
             type: "error",
           });
         }
@@ -1199,9 +1198,28 @@ export default defineNuxtComponent({
       if (this.project.project_type === "resourcepack") {
         version.loaders = ["minecraft"];
       }
+      let curse = false;
+      for (let i = 0; i < this.newFiles.length; i++) {
+        const part = new Blob([this.newFiles[i]]);
+        const zipReader = new JSZip();
+        const zip = await zipReader.loadAsync(part);
+        if (zip.file("manifest.json")) {
+          curse = true;
+        }
+      }
+
+      if (this.replaceFile) {
+        const part = new Blob([this.replaceFile]);
+        const zipReader = new JSZip();
+        const zip = await zipReader.loadAsync(part);
+        if (zip.file("manifest.json")) {
+          curse = true;
+        }
+      }
 
       const newVersion = {
         project_id: version.project_id,
+        curse,
         file_parts: fileParts,
         version_number: version.version_number,
         version_title: version.name || version.version_number,
@@ -1236,6 +1254,13 @@ export default defineNuxtComponent({
           new Blob([this.newFiles[i]]),
           this.newFiles[i].name,
         );
+        const part = new Blob([this.newFiles[i]]);
+        const zipReader = new JSZip();
+        const zip = await zipReader.loadAsync(part);
+        if (zip.file("manifest.json")) {
+          const manifest = await zip.file("manifest.json").async("string");
+          console.log(manifest);
+        }
       }
 
       const data = await useBaseFetch("version", {
@@ -1302,8 +1327,8 @@ export default defineNuxtComponent({
 
         this.$notify({
           group: "main",
-          title: "Packaging Success",
-          text: "Your data pack was successfully packaged as a mod! Make sure to playtest to check for errors.",
+          title: "打包成功",
+          text: "您的数据包已成功打包为模组！请务必进行游戏测试以检查是否有错误。",
           type: "success",
         });
       } catch (err) {

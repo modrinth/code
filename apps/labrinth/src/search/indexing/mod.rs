@@ -5,26 +5,27 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::base62_impl::to_base62;
 use crate::search::{SearchConfig, UploadSearchProject};
 use local_import::index_local;
-use log::info;
+use log::{info, warn};
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use meilisearch_sdk::SwapIndexes;
 use sqlx::postgres::PgPool;
 use thiserror::Error;
+
 #[derive(Error, Debug)]
 pub enum IndexingError {
-    #[error("Error while connecting to the MeiliSearch database")]
+    #[error("连接 MeiliSearch 数据库时出错")]
     Indexing(#[from] meilisearch_sdk::errors::Error),
-    #[error("Error while serializing or deserializing JSON: {0}")]
+    #[error("序列化或反序列化 JSON 时出错: {0}")]
     Serde(#[from] serde_json::Error),
-    #[error("Database Error: {0}")]
+    #[error("数据库错误: {0}")]
     Sqlx(#[from] sqlx::error::Error),
-    #[error("Database Error: {0}")]
+    #[error("数据库错误: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("Environment Error")]
+    #[error("环境错误")]
     Env(#[from] dotenvy::Error),
-    #[error("Error while awaiting index creation task")]
+    #[error("等待索引创建任务时出错")]
     Task,
 }
 
@@ -58,7 +59,7 @@ pub async fn index_projects(
     redis: RedisPool,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
-    info!("Indexing projects.");
+    info!("索引项目。");
 
     // First, ensure current index exists (so no error happens- current index should be worst-case empty, not missing)
     get_indexes_for_indexing(config, false).await?;
@@ -75,10 +76,10 @@ pub async fn index_projects(
         crate::database::models::loader_fields::LoaderField::get_fields_all(
             &pool, &redis,
         )
-        .await?
-        .into_iter()
-        .map(|x| x.field)
-        .collect::<Vec<_>>();
+            .await?
+            .into_iter()
+            .map(|x| x.field)
+            .collect::<Vec<_>>();
 
     let uploads = index_local(&pool).await?;
     add_projects(&indices, uploads, all_loader_fields.clone(), config).await?;
@@ -92,7 +93,7 @@ pub async fn index_projects(
         index.delete().await?;
     }
 
-    info!("Done adding projects.");
+    info!("完成添加项目。");
     Ok(())
 }
 
@@ -135,7 +136,7 @@ pub async fn get_indexes_for_indexing(
             "sort",
         ]),
     )
-    .await?;
+        .await?;
     let projects_filtered_index = create_or_update_index(
         &client,
         &project_filtered_name,
@@ -148,7 +149,7 @@ pub async fn get_indexes_for_indexing(
             "exactness",
         ]),
     )
-    .await?;
+        .await?;
 
     Ok(vec![projects_index, projects_filtered_index])
 }
@@ -158,11 +159,11 @@ async fn create_or_update_index(
     name: &str,
     custom_rules: Option<&'static [&'static str]>,
 ) -> Result<Index, meilisearch_sdk::errors::Error> {
-    info!("Updating/creating index {}", name);
+    info!("更新/创建索引 {}", name);
 
     match client.get_index(name).await {
         Ok(index) => {
-            info!("Updating index settings.");
+            info!("更新索引设置。");
 
             let mut settings = default_settings();
 
@@ -170,18 +171,18 @@ async fn create_or_update_index(
                 settings = settings.with_ranking_rules(custom_rules);
             }
 
-            info!("Performing index settings set.");
+            info!("执行索引设置。");
             index
                 .set_settings(&settings)
                 .await?
                 .wait_for_completion(client, None, Some(TIMEOUT))
                 .await?;
-            info!("Done performing index settings set.");
+            info!("完成索引设置。");
 
             Ok(index)
         }
         _ => {
-            info!("Creating index.");
+            info!("创建索引。");
 
             // Only create index and set settings if the index doesn't already exist
             let task = client.create_index(name, Some("version_id")).await?;
@@ -216,7 +217,7 @@ async fn add_to_index(
 ) -> Result<(), IndexingError> {
     for chunk in mods.chunks(MEILISEARCH_CHUNK_SIZE) {
         info!(
-            "Adding chunk starting with version id {}",
+            "添加以版本 ID {} 开头的块",
             chunk[0].version_id
         );
         index
@@ -228,7 +229,7 @@ async fn add_to_index(
                 Some(std::time::Duration::from_secs(3600)),
             )
             .await?;
-        info!("Added chunk of {} projects to index", chunk.len());
+        info!("将 {} 个项目的块添加到索引中", chunk.len());
     }
 
     Ok(())
@@ -272,7 +273,7 @@ async fn update_and_add_to_index(
     //         .await?;
     // }
 
-    info!("Adding to index.");
+    info!("添加到索引。");
 
     add_to_index(client, index, projects).await?;
 

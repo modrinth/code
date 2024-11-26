@@ -1,8 +1,12 @@
 # Windows has stack overflows when calling from Tauri, so we increase compiler size
-[target.'cfg(windows)']
-rustflags = ["-C", "link-args=/STACK:16777220"]
+#[target.'cfg(windows)']
+#rustflags = ["-C", "link-args=/STACK:16777220"]
 [source.crates-io]
 replace-with = 'ustc'
 
 [source.ustc]
 registry = 'https://mirrors.ustc.edu.cn/crates.io-index'
+
+[source.tuna]
+registry = 'https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/'
+

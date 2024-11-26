@@ -36,30 +36,30 @@ mod shader;
 
 #[derive(Error, Debug)]
 pub enum ValidationError {
-    #[error("Unable to read Zip Archive: {0}")]
+    #[error("无法读取 Zip 压缩包: {0}")]
     Zip(#[from] zip::result::ZipError),
-    #[error("IO Error: {0}")]
+    #[error("IO 错误: {0}")]
     Io(#[from] std::io::Error),
-    #[error("Error while validating JSON for uploaded file: {0}")]
+    #[error("验证上传文件的 JSON 时出错: {0}")]
     SerDe(#[from] serde_json::Error),
-    #[error("Invalid Input: {0}")]
+    #[error("无效输入: {0}")]
     InvalidInput(std::borrow::Cow<'static, str>),
-    #[error("Error while managing threads")]
+    #[error("管理线程时出错")]
     Blocking(#[from] actix_web::error::BlockingError),
-    #[error("Error while querying database")]
+    #[error("查询数据库时出错")]
     Database(#[from] DatabaseError),
 }
 
 #[derive(Eq, PartialEq, Debug)]
 pub enum ValidationResult {
-    /// File should be marked as primary with pack file data
+    /// 文件应标记为主要文件，并包含包文件数据
     PassWithPackDataAndFiles {
         format: PackFormat,
         files: Vec<String>,
     },
-    /// File should be marked as primary
+    /// 文件应标记为主要文件
     Pass,
-    /// File should not be marked primary, the reason for which is inside the String
+    /// 文件不应标记为主要文件，原因在字符串中
     Warning(&'static str),
 }
 
@@ -114,7 +114,37 @@ static VALIDATORS: &[&dyn Validator] = &[
     &NeoForgeValidator,
 ];
 
-/// The return value is whether this file should be marked as primary or not, based on the analysis of the file
+/// 返回值是此文件是否应标记为主要文件，基于文件的分析
+#[allow(clippy::too_many_arguments)]
+pub async fn validate_file_for_pack(
+    data: bytes::Bytes,
+    file_extension: String,
+    loaders: Vec<Loader>,
+    file_type: Option<FileType>,
+    version_fields: Vec<VersionField>,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    redis: &RedisPool,
+) -> Result<ValidationResult, ValidationError> {
+    let game_versions = version_fields
+        .into_iter()
+        .find_map(|v| MinecraftGameVersion::try_from_version_field(&v).ok())
+        .unwrap_or_default();
+    let all_game_versions =
+        MinecraftGameVersion::list(None, None, &mut *transaction, redis)
+            .await?;
+
+    validate_minecraft_file(
+        data,
+        file_extension,
+        loaders,
+        game_versions,
+        all_game_versions,
+        file_type,
+    )
+    .await
+}
+
+/// 返回值是此文件是否应标记为主要文件，基于文件的分析
 #[allow(clippy::too_many_arguments)]
 pub async fn validate_file(
     data: bytes::Bytes,
@@ -142,6 +172,16 @@ pub async fn validate_file(
         file_type,
     )
     .await
+}
+
+async fn validate_curseforge(data: bytes::Bytes) -> Result<ValidationResult, ValidationError> {
+    let reader = Cursor::new(data);
+    let mut zip = ZipArchive::new(reader)?;
+    if zip.by_name("manifest.json").is_ok() {
+        return Ok(ValidationResult::Pass);
+    }
+    Ok(ValidationResult::Pass)
+
 }
 
 async fn validate_minecraft_file(
@@ -205,11 +245,11 @@ async fn validate_minecraft_file(
         if visited {
             if ALWAYS_ALLOWED_EXT.contains(&&*file_extension) {
                 Ok(ValidationResult::Warning(
-                    "File extension is invalid for input file",
+                    "文件扩展名对输入文件无效",
                 ))
             } else {
                 Err(ValidationError::InvalidInput(
-                    format!("File extension {file_extension} is invalid for input file").into(),
+                    format!("文件扩展名 {file_extension} 对输入文件无效").into(),
                 ))
             }
         } else {
@@ -219,7 +259,7 @@ async fn validate_minecraft_file(
     .await?
 }
 
-// Write tests for this
+// 为此编写测试
 fn game_version_supported(
     game_versions: &[MinecraftGameVersion],
     all_game_versions: &[MinecraftGameVersion],
@@ -258,6 +298,9 @@ fn game_version_supported(
 pub fn filter_out_packs(
     archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
 ) -> Result<ValidationResult, ValidationError> {
+
+
+
     if (archive.by_name("modlist.html").is_ok()
         && archive.by_name("manifest.json").is_ok())
         || archive
@@ -267,9 +310,11 @@ pub fn filter_out_packs(
             .file_names()
             .any(|x| x.starts_with("override/mods/") && x.ends_with(".jar"))
     {
-        return Ok(ValidationResult::Warning(
-            "Invalid modpack file. You must upload a valid .MRPACK file.",
-        ));
+        return Ok(ValidationResult::Pass);
+
+        // return Ok(ValidationResult::Warning(
+        //     "无效的模组包文件。您必须上传有效的 .MRPACK 文件。",
+        // ));
     }
 
     Ok(ValidationResult::Pass)

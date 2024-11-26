@@ -36,6 +36,6 @@
     "vue-multiselect": "3.0.0",
     "vue-select": "4.0.0-beta.6",
     "vue3-apexcharts": "^1.4.4",
-    "xss": "^1.0.14"
+    "xss": "^1.0.15"
   }
 }

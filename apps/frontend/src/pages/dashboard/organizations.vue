@@ -34,8 +34,7 @@
                   <span>
                     {{ onlyAcceptedMembers(org.members).length }} 成员<template
                       v-if="onlyAcceptedMembers(org.members).length !== 1"
-                      ></template
-                    >
+                    ></template>
                   </span>
                 </div>
               </span>

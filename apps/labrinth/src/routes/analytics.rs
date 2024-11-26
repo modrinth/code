@@ -21,13 +21,13 @@ pub const FILTERED_HEADERS: &[&str] = &[
     "authorization",
     "cookie",
     "modrinth-admin",
-    // we already retrieve/use these elsewhere- so they are unneeded
+    // 我们已经在其他地方检索/使用这些-所以它们是不需要的
     "user-agent",
     "cf-connecting-ip",
     "cf-ipcountry",
     "x-forwarded-for",
     "x-real-ip",
-    // We don't need the information vercel provides from its headers
+    // 我们不需要 vercel 提供的头信息
     "x-vercel-ip-city",
     "x-vercel-ip-timezone",
     "x-vercel-ip-longitude",
@@ -44,7 +44,7 @@ pub struct UrlInput {
     url: String,
 }
 
-//this route should be behind the cloudflare WAF to prevent non-browsers from calling it
+// 这个路由应该在 cloudflare WAF 后面，以防止非浏览器调用它
 #[post("view")]
 pub async fn page_view_ingest(
     req: HttpRequest,
@@ -62,12 +62,12 @@ pub async fn page_view_ingest(
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = Url::parse(&url_input.url).map_err(|_| {
-        println!("Invalid URL: {}", url_input.url);
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
+        println!("无效的 URL: {}", url_input.url);
+        ApiError::InvalidInput("指定的页面视图 URL 无效！".to_string())
     })?;
 
     let domain = url.host_str().ok_or_else(|| {
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
+        ApiError::InvalidInput("指定的页面视图 URL 无效！".to_string())
     })?;
 
     let allowed_origins =
@@ -79,9 +79,9 @@ pub async fn page_view_ingest(
         || domain == "bbsmc.net"
         || allowed_origins.contains(&"*".to_string()))
     {
-        println!("Invalid URL: {}", domain);
+        println!("无效的 URL: {}", domain);
         return Err(ApiError::InvalidInput(
-            "invalid page view URL specified!".to_string(),
+            "指定的页面视图 URL 无效！".to_string(),
         ));
     }
 
@@ -103,7 +103,7 @@ pub async fn page_view_ingest(
             conn_info.as_deref().unwrap_or_default()
         },
     )
-    .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
+        .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
 
     let mut view = PageView {
         recorded: get_current_tenths_of_ms(),
@@ -140,7 +140,7 @@ pub async fn page_view_ingest(
                     &**pool,
                     &redis,
                 )
-                .await?;
+                    .await?;
 
                 if let Some(project) = project {
                     view.project_id = project.inner.id.0 as u64;
@@ -184,13 +184,13 @@ pub async fn playtime_ingest(
         &session_queue,
         Some(&[Scopes::PERFORM_ANALYTICS]),
     )
-    .await?;
+        .await?;
 
     let playtimes = playtime_input.0;
 
     if playtimes.len() > 2000 {
         return Err(ApiError::InvalidInput(
-            "Too much playtime entered for version!".to_string(),
+            "输入的版本游戏时间过多！".to_string(),
         ));
     }
 
@@ -199,7 +199,7 @@ pub async fn playtime_ingest(
         &**pool,
         &redis,
     )
-    .await?;
+        .await?;
 
     for (id, playtime) in playtimes {
         if playtime.seconds > 300 {

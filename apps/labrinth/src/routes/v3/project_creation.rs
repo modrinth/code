@@ -46,47 +46,47 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 #[derive(Error, Debug)]
 pub enum CreateError {
-    #[error("Environment Error")]
+    #[error("环境错误")]
     EnvError(#[from] dotenvy::Error),
-    #[error("An unknown database error occurred")]
+    #[error("发生未知的数据库错误")]
     SqlxDatabaseError(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
+    #[error("数据库错误: {0}")]
     DatabaseError(#[from] models::DatabaseError),
-    #[error("Indexing Error: {0}")]
+    #[error("索引错误: {0}")]
     IndexingError(#[from] IndexingError),
-    #[error("Error while parsing multipart payload: {0}")]
+    #[error("解析多部分负载时出错: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
-    #[error("Error while parsing JSON: {0}")]
+    #[error("解析 JSON 时出错: {0}")]
     SerDeError(#[from] serde_json::Error),
-    #[error("Error while validating input: {0}")]
+    #[error("验证输入时出错: {0}")]
     ValidationError(String),
-    #[error("Error while uploading file: {0}")]
+    #[error("上传文件时出错: {0}")]
     FileHostingError(#[from] FileHostingError),
-    #[error("Error while validating uploaded file: {0}")]
+    #[error("验证上传文件时出错: {0}")]
     FileValidationError(#[from] crate::validate::ValidationError),
-    #[error("{}", .0)]
+    #[error("{0}")]
     MissingValueError(String),
-    #[error("Invalid format for image: {0}")]
+    #[error("图像格式无效: {0}")]
     InvalidIconFormat(String),
-    #[error("Error with multipart data: {0}")]
+    #[error("多部分数据错误: {0}")]
     InvalidInput(String),
-    #[error("Invalid game version: {0}")]
+    #[error("游戏版本无效: {0}")]
     InvalidGameVersion(String),
-    #[error("Invalid loader: {0}")]
+    #[error("加载器无效: {0}")]
     InvalidLoader(String),
-    #[error("Invalid category: {0}")]
+    #[error("类别无效: {0}")]
     InvalidCategory(String),
-    #[error("Invalid file type for version file: {0}")]
+    #[error("版本文件类型无效: {0}")]
     InvalidFileType(String),
-    #[error("Slug is already taken!")]
+    #[error("Slug 已被占用!")]
     SlugCollision,
-    #[error("Authentication Error: {0}")]
+    #[error("认证错误: {0}")]
     Unauthorized(#[from] AuthenticationError),
-    #[error("Authentication Error: {0}")]
+    #[error("认证错误: {0}")]
     CustomAuthenticationError(String),
-    #[error("Image Parsing Error: {0}")]
+    #[error("图像解析错误: {0}")]
     ImageError(#[from] ImageError),
-    #[error("Reroute Error: {0}")]
+    #[error("重定向错误: {0}")]
     RerouteError(#[from] reqwest::Error),
 }
 
@@ -126,27 +126,27 @@ impl actix_web::ResponseError for CreateError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
-                CreateError::EnvError(..) => "environment_error",
-                CreateError::SqlxDatabaseError(..) => "database_error",
-                CreateError::DatabaseError(..) => "database_error",
-                CreateError::IndexingError(..) => "indexing_error",
-                CreateError::FileHostingError(..) => "file_hosting_error",
-                CreateError::SerDeError(..) => "invalid_input",
-                CreateError::MultipartError(..) => "invalid_input",
-                CreateError::MissingValueError(..) => "invalid_input",
-                CreateError::InvalidIconFormat(..) => "invalid_input",
-                CreateError::InvalidInput(..) => "invalid_input",
-                CreateError::InvalidGameVersion(..) => "invalid_input",
-                CreateError::InvalidLoader(..) => "invalid_input",
-                CreateError::InvalidCategory(..) => "invalid_input",
-                CreateError::InvalidFileType(..) => "invalid_input",
-                CreateError::Unauthorized(..) => "unauthorized",
-                CreateError::CustomAuthenticationError(..) => "unauthorized",
-                CreateError::SlugCollision => "invalid_input",
-                CreateError::ValidationError(..) => "invalid_input",
-                CreateError::FileValidationError(..) => "invalid_input",
-                CreateError::ImageError(..) => "invalid_image",
-                CreateError::RerouteError(..) => "reroute_error",
+                CreateError::EnvError(..) => "环境错误",
+                CreateError::SqlxDatabaseError(..) => "数据库错误",
+                CreateError::DatabaseError(..) => "数据库错误",
+                CreateError::IndexingError(..) => "索引错误",
+                CreateError::FileHostingError(..) => "文件托管错误",
+                CreateError::SerDeError(..) => "无效输入",
+                CreateError::MultipartError(..) => "无效输入",
+                CreateError::MissingValueError(..) => "无效输入",
+                CreateError::InvalidIconFormat(..) => "无效输入",
+                CreateError::InvalidInput(..) => "无效输入",
+                CreateError::InvalidGameVersion(..) => "无效输入",
+                CreateError::InvalidLoader(..) => "无效输入",
+                CreateError::InvalidCategory(..) => "无效输入",
+                CreateError::InvalidFileType(..) => "无效输入",
+                CreateError::Unauthorized(..) => "未授权",
+                CreateError::CustomAuthenticationError(..) => "未授权",
+                CreateError::SlugCollision => "无效输入",
+                CreateError::ValidationError(..) => "无效输入",
+                CreateError::FileValidationError(..) => "无效输入",
+                CreateError::ImageError(..) => "无效图像",
+                CreateError::RerouteError(..) => "重定向错误",
             },
             description: self.to_string(),
         })
@@ -283,7 +283,7 @@ pub async fn project_create(
         &redis,
         &session_queue,
     )
-    .await;
+        .await;
 
     if result.is_err() {
         let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
@@ -351,8 +351,8 @@ async fn project_create_inner(
         session_queue,
         Some(&[Scopes::PROJECT_CREATE]),
     )
-    .await?
-    .1;
+        .await?
+        .1;
 
     let project_id: ProjectId =
         models::generate_project_id(transaction).await?.into();
@@ -373,7 +373,7 @@ async fn project_create_inner(
             .map(|m| m.map_err(CreateError::MultipartError))
             .unwrap_or_else(|| {
                 Err(CreateError::MissingValueError(String::from(
-                    "No `data` field in multipart upload",
+                    "分段上传中没有“data”字段",
                 )))
             })?;
 
@@ -384,7 +384,7 @@ async fn project_create_inner(
 
         if name != "data" {
             return Err(CreateError::InvalidInput(String::from(
-                "`data` field must come before file fields",
+                "`data` 字段必须位于文件字段之前",
             )));
         }
 
@@ -412,9 +412,9 @@ async fn project_create_inner(
                 ",
                 slug_project_id as models::ids::ProjectId
             )
-            .fetch_one(&mut **transaction)
-            .await
-            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+                .fetch_one(&mut **transaction)
+                .await
+                .map_err(|e| CreateError::DatabaseError(e.into()))?;
 
             if results.exists.unwrap_or(false) {
                 return Err(CreateError::SlugCollision);
@@ -428,9 +428,9 @@ async fn project_create_inner(
                 ",
                 create_data.slug
             )
-            .fetch_one(&mut **transaction)
-            .await
-            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+                .fetch_one(&mut **transaction)
+                .await
+                .map_err(|e| CreateError::DatabaseError(e.into()))?;
 
             if results.exists.unwrap_or(false) {
                 return Err(CreateError::SlugCollision);
@@ -458,7 +458,7 @@ async fn project_create_inner(
                     transaction,
                     redis,
                 )
-                .await?,
+                    .await?,
             );
         }
 
@@ -488,7 +488,7 @@ async fn project_create_inner(
             if name == "icon" {
                 if icon_data.is_some() {
                     return Err(CreateError::InvalidInput(String::from(
-                        "Projects can only have one icon",
+                        "只能设置一个资源",
                     )));
                 }
                 // Upload the icon to the cdn
@@ -500,23 +500,23 @@ async fn project_create_inner(
                         file_host,
                         field,
                     )
-                    .await?,
+                        .await?,
                 );
                 return Ok(());
             }
             if let Some(gallery_items) = &project_create_data.gallery_items {
                 if gallery_items.iter().filter(|a| a.featured).count() > 1 {
                     return Err(CreateError::InvalidInput(String::from(
-                        "Only one gallery image can be featured.",
+                        "只能设置一个渲染图为主要渲染图.",
                     )));
                 }
                 if let Some(item) = gallery_items.iter().find(|x| x.item == name) {
                     let data = read_from_field(
                         &mut field,
                         2 * (1 << 20),
-                        "Gallery image exceeds the maximum of 2MiB.",
+                        "渲染图文件请不要超过2MB",
                     )
-                    .await?;
+                        .await?;
 
                     let (_, file_extension) =
                         super::version_creation::get_name_ext(&content_disposition)?;
@@ -530,8 +530,8 @@ async fn project_create_inner(
                         Some(1.0),
                         file_host,
                     )
-                    .await
-                    .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
+                        .await
+                        .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
 
                     uploaded_files.push(UploadedFile {
                         file_id: upload_result.raw_url_path.clone(),
@@ -554,7 +554,7 @@ async fn project_create_inner(
                 *i
             } else {
                 return Err(CreateError::InvalidInput(format!(
-                    "File `{file_name}` (field {name}) isn't specified in the versions data"
+                    "文件 `{file_name}` (字段 {name}) 未在版本数据中指定"
                 )));
             };
             // `index` is always valid for these lists
@@ -588,11 +588,11 @@ async fn project_create_inner(
                 transaction,
                 redis,
             )
-            .await?;
+                .await?;
 
             Ok(())
         }
-        .await;
+            .await;
 
         if result.is_err() {
             error = result.err();
@@ -612,7 +612,7 @@ async fn project_create_inner(
         {
             if version_data.file_parts.len() != builder.files.len() {
                 return Err(CreateError::InvalidInput(String::from(
-                    "Some files were specified in initial_versions but not uploaded",
+                    "文件上传异常，请重新刷新页面选择文件进行上传",
                 )));
             }
         }
@@ -625,7 +625,7 @@ async fn project_create_inner(
                 category,
                 &mut **transaction,
             )
-            .await?;
+                .await?;
             if ids.is_empty() {
                 return Err(CreateError::InvalidCategory(category.clone()));
             }
@@ -642,7 +642,7 @@ async fn project_create_inner(
                 category,
                 &mut **transaction,
             )
-            .await?;
+                .await?;
             if ids.is_empty() {
                 return Err(CreateError::InvalidCategory(category.clone()));
             }
@@ -659,19 +659,19 @@ async fn project_create_inner(
                 pool,
                 redis,
             )
-            .await?
-            .ok_or_else(|| {
-                CreateError::InvalidInput(
-                    "Invalid organization ID specified!".to_string(),
-                )
-            })?;
+                .await?
+                .ok_or_else(|| {
+                    CreateError::InvalidInput(
+                        "团队ID无效".to_string(),
+                    )
+                })?;
 
             let team_member = models::TeamMember::get_from_user_id(
                 org.team_id,
                 current_user.id.into(),
                 pool,
             )
-            .await?;
+                .await?;
 
             let perms = OrganizationPermissions::get_permissions_by_role(
                 &current_user.role,
@@ -683,7 +683,7 @@ async fn project_create_inner(
                 .unwrap_or(false)
             {
                 return Err(CreateError::CustomAuthenticationError(
-                    "You do not have the permissions to create projects in this organization!"
+                    "您没有权限在此团队中创建项目！"
                         .to_string(),
                 ));
             }
@@ -710,7 +710,7 @@ async fn project_create_inner(
             status = ProjectStatus::Processing;
             if project_create_data.initial_versions.is_empty() {
                 return Err(CreateError::InvalidInput(String::from(
-                    "Project submitted for review with no initial versions",
+                    "请先上传一个版本文件",
                 )));
             }
         }
@@ -718,11 +718,11 @@ async fn project_create_inner(
         let license_id = spdx::Expression::parse(
             &project_create_data.license_id,
         )
-        .map_err(|err| {
-            CreateError::InvalidInput(format!(
-                "填写的URL内SPDX 许可证标识符无效 {err}"
-            ))
-        })?;
+            .map_err(|err| {
+                CreateError::InvalidInput(format!(
+                    "填写的URL内SPDX 许可证标识符无效 {err}"
+                ))
+            })?;
 
         let mut link_urls = vec![];
 
@@ -734,19 +734,19 @@ async fn project_create_inner(
                 platform,
                 &mut **transaction,
             )
-            .await?
-            .ok_or_else(|| {
-                CreateError::InvalidInput(format!(
-                    "Link platform {} does not exist.",
-                    platform.clone()
-                ))
-            })?;
+                .await?
+                .ok_or_else(|| {
+                    CreateError::InvalidInput(format!(
+                        "链接平台{}不存在.",
+                        platform.clone()
+                    ))
+                })?;
             let link_platform = link_platforms
                 .iter()
                 .find(|x| x.id == platform_id)
                 .ok_or_else(|| {
                     CreateError::InvalidInput(format!(
-                        "Link platform {} does not exist.",
+                        "链接平台{}不存在.",
                         platform.clone()
                     ))
                 })?;
@@ -802,19 +802,15 @@ async fn project_create_inner(
         User::clear_project_cache(&[current_user.id.into()], redis).await?;
 
         for image_id in project_create_data.uploaded_images {
-            if let Some(db_image) = image_item::Image::get(
-                image_id.into(),
-                &mut **transaction,
-                redis,
-            )
-            .await?
+            if let Some(db_image) =
+                image_item::Image::get(image_id.into(), &mut **transaction, redis).await?
             {
                 let image: Image = db_image.into();
                 if !matches!(image.context, ImageContext::Project { .. })
                     || image.context.inner_id().is_some()
                 {
                     return Err(CreateError::InvalidInput(format!(
-                        "Image {} is not unused and in the 'project' context",
+                        "图片 {} 没有在资源正文中使用过",
                         image_id
                     )));
                 }
@@ -828,13 +824,13 @@ async fn project_create_inner(
                     id as models::ids::ProjectId,
                     image_id.0 as i64
                 )
-                .execute(&mut **transaction)
-                .await?;
+                    .execute(&mut **transaction)
+                    .await?;
 
                 image_item::Image::clear_cache(image.id.into(), redis).await?;
             } else {
                 return Err(CreateError::InvalidInput(format!(
-                    "Image {} does not exist",
+                    "图片 {} 不存在",
                     image_id
                 )));
             }
@@ -846,8 +842,8 @@ async fn project_create_inner(
             project_id: Some(id),
             report_id: None,
         }
-        .insert(&mut *transaction)
-        .await?;
+            .insert(&mut *transaction)
+            .await?;
 
         let loaders = project_builder
             .initial_versions
@@ -929,7 +925,7 @@ async fn create_initial_version(
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
     if version_data.project_id.is_some() {
         return Err(CreateError::InvalidInput(String::from(
-            "Found project id in initial version for new project",
+            "该版本已经存在",
         )));
     }
 
@@ -961,7 +957,7 @@ async fn create_initial_version(
             &mut **transaction,
             redis,
         )
-        .await?;
+            .await?;
 
     let version_fields = try_create_version_fields(
         version_id,
@@ -1012,9 +1008,9 @@ async fn process_icon_upload(
     let data = read_from_field(
         &mut field,
         262144,
-        "Icons must be smaller than 256KiB",
+        "图标必须小于 256KB",
     )
-    .await?;
+        .await?;
     let upload_result = crate::util::img::upload_image_optimized(
         &format!("data/{}", to_base62(id)),
         data.freeze(),
@@ -1023,8 +1019,8 @@ async fn process_icon_upload(
         Some(1.0),
         file_host,
     )
-    .await
-    .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
+        .await
+        .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
 
     uploaded_files.push(UploadedFile {
         file_id: upload_result.raw_url_path.clone(),
