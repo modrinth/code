@@ -53,9 +53,9 @@ import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import { get_user } from '@/helpers/cache.js'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
-import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
+import { login } from '@/helpers/auth.js'
 
 const themeStore = useTheming()
 
@@ -234,7 +234,8 @@ async function fetchCredentials() {
   credentials.value = creds
 }
 
-async function signInAfter() {
+async function signIn() {
+  await login().catch(handleError)
   await fetchCredentials()
 }
 
@@ -377,7 +378,7 @@ async function checkUpdates() {
           <template #sign-out> <LogOutIcon /> Sign out </template>
         </OverflowMenu>
       </ButtonStyled>
-      <NavButton v-else :to="() => $refs.loginScreenModal.show()">
+      <NavButton v-else :to="() => signIn()">
         <LogInIcon />
         <template #label>Sign in</template>
       </NavButton>
@@ -506,7 +507,6 @@ async function checkUpdates() {
   <ModInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
   <InstallConfirmModal ref="installConfirmModal" />
-  <ModrinthLoginScreen ref="loginScreenModal" :callback="signInAfter" />
 </template>
 
 <style lang="scss" scoped>
