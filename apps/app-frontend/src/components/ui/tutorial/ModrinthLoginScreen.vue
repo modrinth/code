@@ -9,7 +9,7 @@ import {
   SteamIcon,
   GitLabIcon,
 } from '@/assets/external'
-import { login, login_2fa, create_account, login_pass } from '@/helpers/mr_auth.js'
+import { login } from '@/helpers/mr_auth.js'
 import { handleError, useNotifications } from '@/store/state.js'
 import { ref } from 'vue'
 import { handleSevereError } from '@/store/error.js'
@@ -72,7 +72,7 @@ const confirmPassword = ref('')
 const subscribe = ref(true)
 
 async function signInOauth(provider) {
-  const creds = await login(provider).catch(handleSevereError)
+  const creds = await login().catch(handleSevereError)
 
   if (creds && creds.type === 'two_factor_required') {
     twoFactorFlow.value = creds.flow

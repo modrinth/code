@@ -2411,6 +2411,11 @@
           "const": "mr-auth:allow-logout"
         },
         {
+          "description": "Enables the modrinth_login command without any pre-configured scope.",
+          "type": "string",
+          "const": "mr-auth:allow-modrinth-login"
+        },
+        {
           "description": "Denies the create_account command without any pre-configured scope.",
           "type": "string",
           "const": "mr-auth:deny-create-account"
@@ -2434,6 +2439,11 @@
           "description": "Denies the logout command without any pre-configured scope.",
           "type": "string",
           "const": "mr-auth:deny-logout"
+        },
+        {
+          "description": "Denies the modrinth_login command without any pre-configured scope.",
+          "type": "string",
+          "const": "mr-auth:deny-modrinth-login"
         },
         {
           "description": "This permission set configures which\noperating system information are available\nto gather from the frontend.\n\n#### Granted Permissions\n\nAll information except the host name are available.\n\n",
