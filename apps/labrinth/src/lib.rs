@@ -10,7 +10,6 @@ use queue::{
     socket::ActiveSockets,
 };
 use sqlx::Postgres;
-use tokio::sync::RwLock;
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
@@ -56,7 +55,7 @@ pub struct LabrinthConfig {
     pub session_queue: web::Data<AuthQueue>,
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
-    pub active_sockets: web::Data<RwLock<ActiveSockets>>,
+    pub active_sockets: web::Data<ActiveSockets>,
     pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
     pub rate_limiter: KeyedRateLimiter,
     pub stripe_client: stripe::Client,
@@ -303,7 +302,7 @@ pub fn app_setup(
     };
 
     let payouts_queue = web::Data::new(PayoutsQueue::new());
-    let active_sockets = web::Data::new(RwLock::new(ActiveSockets::default()));
+    let active_sockets = web::Data::new(ActiveSockets::default());
 
     LabrinthConfig {
         pool,
