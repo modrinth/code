@@ -8,5 +8,4 @@ CREATE TABLE friends (
 );
 
 ALTER TABLE users
-    ADD COLUMN share_activities BOOLEAN NOT NULL DEFAULT TRUE,
     ADD COLUMN allow_friend_requests BOOLEAN NOT NULL DEFAULT TRUE;

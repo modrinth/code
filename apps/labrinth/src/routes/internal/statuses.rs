@@ -1,7 +1,6 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::AuthenticationError;
 use crate::database::models::friend_item::FriendItem;
-use crate::database::models::user_status_item::UserStatusItem;
 use crate::database::redis::RedisPool;
 use crate::models::ids::UserId;
 use crate::models::pats::Scopes;
@@ -71,7 +70,7 @@ pub async fn ws_init(
 
     let user = User::from_full(db_user);
 
-    if let Some((_, session)) = db.auth_sockets.remove(&user.id) {
+    if let Some((_, (_, session))) = db.auth_sockets.remove(&user.id) {
         let _ = session.close(None).await;
     }
 
@@ -80,32 +79,31 @@ pub async fn ws_init(
         Err(e) => return Ok(e.error_response()),
     };
 
-    let status = UserStatusItem {
-        id: user.id.into(),
+    let status = UserStatus {
+        user_id: user.id,
         profile_name: None,
         last_update: Utc::now(),
     };
-    status.set(&redis).await?;
 
     let friends =
         FriendItem::get_user_friends(user.id.into(), Some(true), &**pool)
             .await?;
 
     let friend_statuses = if !friends.is_empty() {
-        UserStatusItem::get_many(
-            &friends
-                .iter()
-                .map(|x| {
-                    if x.user_id == user.id.into() {
+        friends
+            .iter()
+            .filter_map(|x| {
+                db.auth_sockets.get(
+                    &if x.user_id == user.id.into() {
                         x.friend_id
                     } else {
                         x.user_id
                     }
-                })
-                .collect::<Vec<_>>(),
-            &redis,
-        )
-        .await?
+                    .into(),
+                )
+            })
+            .map(|x| x.value().0.clone())
+            .collect::<Vec<_>>()
     } else {
         Vec::new()
     };
@@ -113,21 +111,16 @@ pub async fn ws_init(
     let _ = session
         .text(serde_json::to_string(
             &ServerToClientMessage::FriendStatuses {
-                statuses: friend_statuses
-                    .into_iter()
-                    .map(|x| x.into())
-                    .collect(),
+                statuses: friend_statuses,
             },
         )?)
         .await;
 
-    db.auth_sockets.insert(user.id, session);
+    db.auth_sockets.insert(user.id, (status.clone(), session));
 
     broadcast_friends(
         user.id,
-        ServerToClientMessage::StatusUpdate {
-            status: status.into(),
-        },
+        ServerToClientMessage::StatusUpdate { status },
         &pool,
         &redis,
         &db,
@@ -152,25 +145,30 @@ pub async fn ws_init(
                             ClientToServerMessage::StatusUpdate {
                                 profile_name,
                             } => {
-                                let status_item: UserStatusItem =
-                                    UserStatusItem {
-                                        id: user.id.into(),
-                                        profile_name,
-                                        last_update: Utc::now(),
-                                    };
-                                let _ = status_item.set(&redis).await;
+                                if let Some(mut pair) =
+                                    db.auth_sockets.get_mut(&user.id)
+                                {
+                                    let (status, _) = pair.value_mut();
 
-                                let _ = broadcast_friends(
-                                    user.id,
-                                    ServerToClientMessage::StatusUpdate {
-                                        status: status_item.into(),
-                                    },
-                                    &pool,
-                                    &redis,
-                                    &db,
-                                    None,
-                                )
-                                .await;
+                                    if status.profile_name.as_ref().map(|x| x.len() > 64).unwrap_or(false) {
+                                        continue;
+                                    }
+
+                                    status.profile_name = profile_name;
+                                    status.last_update = Utc::now();
+
+                                    let _ = broadcast_friends(
+                                        user.id,
+                                        ServerToClientMessage::StatusUpdate {
+                                            status: status.clone(),
+                                        },
+                                        &pool,
+                                        &redis,
+                                        &db,
+                                        None,
+                                    )
+                                    .await;
+                                }
                             }
                         }
                     }
@@ -213,7 +211,7 @@ pub async fn broadcast_friends(
             if let Some(mut socket) =
                 sockets.auth_sockets.get_mut(&friend_id.into())
             {
-                let socket = socket.value_mut();
+                let (_, socket) = socket.value_mut();
 
                 // TODO: bulk close sockets for better perf
                 if socket.text(serde_json::to_string(&message)?).await.is_err()
@@ -239,11 +237,10 @@ pub async fn close_socket(
     redis: &RedisPool,
     sockets: &ActiveSockets,
 ) -> Result<(), crate::database::models::DatabaseError> {
-    if let Some((_, socket)) = sockets.auth_sockets.remove(&id) {
+    if let Some((_, (_, socket))) = sockets.auth_sockets.remove(&id) {
         let _ = socket.close(None).await;
     }
 
-    UserStatusItem::remove(id.into(), redis).await?;
     broadcast_friends(
         id,
         ServerToClientMessage::UserOffline { id },

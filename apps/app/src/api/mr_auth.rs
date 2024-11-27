@@ -61,7 +61,7 @@ pub async fn modrinth_login<R: Runtime>(
             window.close()?;
 
             return if let Some((_, code)) = code {
-                let val = mr_auth::authenticate_finish_flow(&*code).await?;
+                let val = mr_auth::authenticate_finish_flow(&code).await?;
 
                 Ok(Some(val))
             } else {

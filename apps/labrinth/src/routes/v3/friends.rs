@@ -1,5 +1,4 @@
 use crate::auth::get_user_from_headers;
-use crate::database::models::user_status_item::UserStatusItem;
 use crate::database::models::UserId;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
@@ -72,34 +71,24 @@ pub async fn add_friend(
             )
             .await?;
 
-            let mut friend_status = UserStatusItem::get_many(
-                &[friend.user_id, friend.friend_id],
-                &redis,
-            )
-            .await?;
-
             async fn send_friend_status(
-                friend_status: &mut Vec<UserStatusItem>,
                 user_id: UserId,
                 friend_id: UserId,
                 pool: &PgPool,
                 redis: &RedisPool,
                 sockets: &ActiveSockets,
             ) -> Result<(), ApiError> {
-                if let Some(idx) =
-                    friend_status.iter().position(|x| x.id == user_id)
-                {
-                    let friend_status = friend_status.remove(idx);
-
+                if let Some(pair) = sockets.auth_sockets.get(&user_id.into()) {
+                    let (friend_status, _) = pair.value();
                     if let Some(mut socket) =
                         sockets.auth_sockets.get_mut(&friend_id.into())
                     {
-                        let socket = socket.value_mut();
+                        let (_, socket) = socket.value_mut();
 
                         if socket
                             .text(serde_json::to_string(
                                 &ServerToClientMessage::StatusUpdate {
-                                    status: friend_status.into(),
+                                    status: friend_status.clone(),
                                 },
                             )?)
                             .await
@@ -120,7 +109,6 @@ pub async fn add_friend(
             }
 
             send_friend_status(
-                &mut friend_status,
                 friend.user_id,
                 friend.friend_id,
                 &pool,
@@ -129,7 +117,6 @@ pub async fn add_friend(
             )
             .await?;
             send_friend_status(
-                &mut friend_status,
                 friend.friend_id,
                 friend.user_id,
                 &pool,
@@ -161,7 +148,7 @@ pub async fn add_friend(
 
             if let Some(mut socket) = db.auth_sockets.get_mut(&friend.id.into())
             {
-                let socket = socket.value_mut();
+                let (_, socket) = socket.value_mut();
 
                 if socket
                     .text(serde_json::to_string(

@@ -23,7 +23,6 @@ pub mod session_item;
 pub mod team_item;
 pub mod thread_item;
 pub mod user_item;
-pub mod user_status_item;
 pub mod user_subscription_item;
 pub mod version_item;
 

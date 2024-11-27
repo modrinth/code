@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, share_activities, allow_friend_requests\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
   "describe": {
     "columns": [
       {
@@ -120,11 +120,6 @@
       },
       {
         "ordinal": 23,
-        "name": "share_activities",
-        "type_info": "Bool"
-      },
-      {
-        "ordinal": 24,
         "name": "allow_friend_requests",
         "type_info": "Bool"
       }
@@ -159,9 +154,8 @@
       true,
       true,
       true,
-      false,
       false
     ]
   },
-  "hash": "5ae328b165995be4d578cf09001d4242fd7463e6aa3bc892861a7e131ad93d3f"
+  "hash": "b5857aafa522ca62294bc296fb6cddd862eca2889203e43b4962df07ba1221a0"
 }

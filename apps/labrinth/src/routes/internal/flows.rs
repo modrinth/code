@@ -229,7 +229,6 @@ impl TempUser {
                 created: Utc::now(),
                 role: Role::Developer.to_string(),
                 badges: Badges::default(),
-                share_activities: true,
                 allow_friend_requests: true,
             }
             .insert(transaction)
@@ -1415,7 +1414,6 @@ pub async fn create_account_with_password(
         created: Utc::now(),
         role: Role::Developer.to_string(),
         badges: Badges::default(),
-        share_activities: true,
         allow_friend_requests: true,
     }
     .insert(&mut transaction)

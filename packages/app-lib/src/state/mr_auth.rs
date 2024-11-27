@@ -191,7 +191,7 @@ impl ModrinthCredentials {
 }
 
 pub fn get_login_url() -> &'static str {
-    "http:/localhost:3000/auth/sign-in?launcher=true"
+    "https:/modrinth.com/auth/sign-in?launcher=true"
 }
 
 pub async fn finish_login_flow(
