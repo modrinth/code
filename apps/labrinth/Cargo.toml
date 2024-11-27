@@ -15,7 +15,7 @@ actix-web = "4.4.1"
 actix-rt = "2.9.0"
 actix-multipart = "0.6.1"
 actix-cors = "0.7.0"
-actix-ws = "0.2.5"
+actix-ws = "0.3.0"
 actix-files = "0.6.5"
 actix-web-prom = { version = "0.8.0", features = ["process"] }
 governor = "0.6.3"

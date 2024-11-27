@@ -1,27 +1,20 @@
 use crate::api::Result;
 use chrono::{Duration, Utc};
 use tauri::plugin::TauriPlugin;
-use tauri::{Manager, UserAttentionType};
+use tauri::{Manager, Runtime, UserAttentionType};
 use theseus::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::new("mr-auth")
-        .invoke_handler(tauri::generate_handler![
-            login_pass,
-            login_2fa,
-            create_account,
-            logout,
-            get,
-        ])
+        .invoke_handler(tauri::generate_handler![modrinth_login, logout, get,])
         .build()
 }
 
 #[tauri::command]
-pub async fn modrinth_auth_login(
-    app: tauri::AppHandle,
-    provider: &str,
-) -> Result<Option<ModrinthCredentialsResult>> {
-    let redirect_uri = mr_auth::authenticate_begin_flow(provider);
+pub async fn modrinth_login<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<Option<ModrinthCredentials>> {
+    let redirect_uri = mr_auth::authenticate_begin_flow();
 
     let start = Utc::now();
 
@@ -39,6 +32,10 @@ pub async fn modrinth_auth_login(
             .as_error()
         })?),
     )
+    .min_inner_size(420.0, 632.0)
+    .inner_size(420.0, 632.0)
+    .max_inner_size(420.0, 632.0)
+    .zoom_hotkeys_enabled(false)
     .title("Sign into Modrinth")
     .always_on_top(true)
     .center()
@@ -55,23 +52,21 @@ pub async fn modrinth_auth_login(
         if window
             .url()?
             .as_str()
-            .starts_with("https://launcher-files.modrinth.com/detect.txt")
+            .starts_with("https://launcher-files.modrinth.com")
         {
-            let query = window
-                .url()?
-                .query_pairs()
-                .map(|(key, val)| {
-                    (
-                        key.to_string(),
-                        serde_json::Value::String(val.to_string()),
-                    )
-                })
-                .collect();
+            let url = window.url()?;
+
+            let code = url.query_pairs().find(|(key, _)| key == "code");
+
             window.close()?;
 
-            let val = mr_auth::authenticate_finish_flow(query).await?;
+            return if let Some((_, code)) = code {
+                let val = mr_auth::authenticate_finish_flow(&code).await?;
 
-            return Ok(Some(val));
+                Ok(Some(val))
+            } else {
+                Ok(None)
+            };
         }
 
         tokio::time::sleep(std::time::Duration::from_millis(50)).await;
@@ -79,38 +74,6 @@ pub async fn modrinth_auth_login(
 
     window.close()?;
     Ok(None)
-}
-
-#[tauri::command]
-pub async fn login_pass(
-    username: &str,
-    password: &str,
-    challenge: &str,
-) -> Result<ModrinthCredentialsResult> {
-    Ok(theseus::mr_auth::login_password(username, password, challenge).await?)
-}
-
-#[tauri::command]
-pub async fn login_2fa(code: &str, flow: &str) -> Result<ModrinthCredentials> {
-    Ok(theseus::mr_auth::login_2fa(code, flow).await?)
-}
-
-#[tauri::command]
-pub async fn create_account(
-    username: &str,
-    email: &str,
-    password: &str,
-    challenge: &str,
-    sign_up_newsletter: bool,
-) -> Result<ModrinthCredentials> {
-    Ok(theseus::mr_auth::create_account(
-        username,
-        email,
-        password,
-        challenge,
-        sign_up_newsletter,
-    )
-    .await?)
 }
 
 #[tauri::command]

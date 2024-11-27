@@ -6,7 +6,7 @@
 import { invoke } from '@tauri-apps/api/core'
 
 export async function login() {
-  return await invoke('modrinth_auth_login')
+  return await invoke('plugin:mr-auth|modrinth_login')
 }
 
 export async function logout() {
