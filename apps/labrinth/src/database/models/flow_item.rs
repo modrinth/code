@@ -18,7 +18,7 @@ const FLOWS_NAMESPACE: &str = "flows";
 pub enum Flow {
     OAuth {
         user_id: Option<UserId>,
-        url: Option<String>,
+        url: String,
         provider: AuthProvider,
     },
     Login2FA {
