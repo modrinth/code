@@ -22,13 +22,7 @@
           />
         </div>
 
-        <NuxtTurnstile
-          ref="turnstile"
-          v-model="token"
-          class="turnstile"
-          :options="{ theme: $theme.active === 'light' ? 'light' : 'dark' }"
-          data-size="flexible"
-        />
+        <HCaptcha ref="captcha" v-model="token" />
 
         <button class="btn btn-primary centered-btn" :disabled="!token" @click="recovery">
           <SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
@@ -75,6 +69,7 @@
 <script setup>
 import { SendIcon, MailIcon, KeyIcon } from "@modrinth/assets";
 import { commonMessages } from "@modrinth/ui";
+import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -167,7 +162,7 @@ if (route.query.flow) {
   step.value = "passed_challenge";
 }
 
-const turnstile = ref();
+const captcha = ref();
 
 const email = ref("");
 const token = ref("");
@@ -196,7 +191,7 @@ async function recovery() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }
@@ -229,7 +224,7 @@ async function changePassword() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }

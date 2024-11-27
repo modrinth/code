@@ -4,9 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Modrinth App Ad</title>
-    <script src="/inmobi.js"></script>
-    <script src="https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js"></script>
-    <link rel="preload" href="https://www.googletagservices.com/tag/js/gpt.js" as="script" />
+    <script type="module" src="//js.rev.iq" data-domain="modrinth.com"></script>
     <style>
       * {
         margin: 0;
@@ -43,31 +41,9 @@
   <body>
     <div class="ads-container">
       <div id="plus-link"></div>
-      <div id="modrinth-rail-1"></div>
+      <div id="modrinth-rail-1" data-ad="app-rail" />
     </div>
     <script>
-      window.tude = window.tude || { cmd: [] };
-
-      window.Raven = window.Raven || { cmd: [] };
-
-      window.Raven.cmd.push(({ config }) => {
-        config.setCustom({
-          param1: "app",
-        });
-      });
-
-      tude.cmd.push(function () {
-        tude.refreshAdsViaDivMappings([
-          {
-            divId: "modrinth-rail-1",
-            baseDivId: "pb-slot-square-2",
-            targeting: {
-              location: "app",
-            },
-          },
-        ]);
-      });
-
       // window.addEventListener(
       //   "message",
       //   (event) => {

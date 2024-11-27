@@ -12,7 +12,7 @@ use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
 use crate::routes::internal::session::issue_session;
 use crate::routes::ApiError;
-use crate::util::captcha::check_turnstile_captcha;
+use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
@@ -1430,23 +1430,23 @@ pub async fn delete_auth_provider(
     Ok(HttpResponse::NoContent().finish())
 }
 
-pub async fn sign_up_beehiiv(email: &str) -> Result<(), AuthenticationError> {
-    let id = dotenvy::var("BEEHIIV_PUBLICATION_ID")?;
-    let api_key = dotenvy::var("BEEHIIV_API_KEY")?;
+pub async fn sign_up_sendy(email: &str) -> Result<(), AuthenticationError> {
+    let url = dotenvy::var("SENDY_URL")?;
+    let id = dotenvy::var("SENDY_LIST_ID")?;
+    let api_key = dotenvy::var("SENDY_API_KEY")?;
     let site_url = dotenvy::var("SITE_URL")?;
+
+    let mut form = HashMap::new();
+
+    form.insert("api_key", &*api_key);
+    form.insert("email", email);
+    form.insert("list", &*id);
+    form.insert("referrer", &*site_url);
 
     let client = reqwest::Client::new();
     client
-        .post(format!(
-            "https://api.beehiiv.com/v2/publications/{id}/subscriptions"
-        ))
-        .header(AUTHORIZATION, format!("Bearer {}", api_key))
-        .json(&serde_json::json!({
-            "email": email,
-            "utm_source": "modrinth",
-            "utm_medium": "account_creation",
-            "referring_site": site_url,
-        }))
+        .post(format!("{url}/subscribe"))
+        .form(&form)
         .send()
         .await?
         .error_for_status()?
@@ -1468,8 +1468,6 @@ pub struct NewAccount {
     pub sign_up_newsletter: Option<bool>,
 }
 
-const NEW_ACCOUNT_LIMITER_NAMESPACE: &str = "new_account_ips";
-
 #[post("create")]
 pub async fn create_account_with_password(
     req: HttpRequest,
@@ -1481,7 +1479,7 @@ pub async fn create_account_with_password(
         ApiError::InvalidInput(validation_errors_to_string(err, None))
     })?;
 
-    if !check_turnstile_captcha(&req, &new_account.challenge).await? {
+    if !check_hcaptcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -1566,36 +1564,6 @@ pub async fn create_account_with_password(
     let session = issue_session(req, user_id, &mut transaction, &redis).await?;
     let res = crate::models::sessions::Session::from(session, true, None);
 
-    // We limit each ip to creating 5 accounts in a six hour period
-    let ip = crate::util::ip::convert_to_ip_v6(&res.ip).map_err(|_| {
-        ApiError::InvalidInput("unable to parse user ip!".to_string())
-    })?;
-    let stripped_ip = crate::util::ip::strip_ip(ip).to_string();
-
-    let mut conn = redis.connect().await?;
-    let uses = if let Some(res) = conn
-        .get(NEW_ACCOUNT_LIMITER_NAMESPACE, &stripped_ip)
-        .await?
-    {
-        res.parse::<u64>().unwrap_or(0)
-    } else {
-        0
-    };
-
-    if uses >= 5 {
-        return Err(ApiError::InvalidInput(
-            "IP has been rate-limited.".to_string(),
-        ));
-    }
-
-    conn.set(
-        NEW_ACCOUNT_LIMITER_NAMESPACE,
-        &stripped_ip,
-        &(uses + 1).to_string(),
-        Some(60 * 60 * 6),
-    )
-    .await?;
-
     let flow = Flow::ConfirmEmail {
         user_id,
         confirm_email: new_account.email.clone(),
@@ -1610,7 +1578,7 @@ pub async fn create_account_with_password(
     )?;
 
     if new_account.sign_up_newsletter.unwrap_or(false) {
-        sign_up_beehiiv(&new_account.email).await?;
+        sign_up_sendy(&new_account.email).await?;
     }
 
     transaction.commit().await?;
@@ -1632,7 +1600,7 @@ pub async fn login_password(
     redis: Data<RedisPool>,
     login: web::Json<Login>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_turnstile_captcha(&req, &login.challenge).await? {
+    if !check_hcaptcha(&req, &login.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -1710,26 +1678,26 @@ async fn validate_2fa_code(
             .map_err(|_| AuthenticationError::InvalidCredentials)?,
     )
     .map_err(|_| AuthenticationError::InvalidCredentials)?;
-    let token = totp
-        .generate_current()
-        .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
     const TOTP_NAMESPACE: &str = "used_totp";
     let mut conn = redis.connect().await?;
 
     // Check if TOTP has already been used
     if conn
-        .get(TOTP_NAMESPACE, &format!("{}-{}", token, user_id.0))
+        .get(TOTP_NAMESPACE, &format!("{}-{}", input, user_id.0))
         .await?
         .is_some()
     {
         return Err(AuthenticationError::InvalidCredentials);
     }
 
-    if input == token {
+    if totp
+        .check_current(input.as_str())
+        .map_err(|_| AuthenticationError::InvalidCredentials)?
+    {
         conn.set(
             TOTP_NAMESPACE,
-            &format!("{}-{}", token, user_id.0),
+            &format!("{}-{}", input, user_id.0),
             "",
             Some(60),
         )
@@ -2082,7 +2050,7 @@ pub async fn reset_password_begin(
     redis: Data<RedisPool>,
     reset_password: web::Json<ResetPassword>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_turnstile_captcha(&req, &reset_password.challenge).await? {
+    if !check_hcaptcha(&req, &reset_password.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -2485,7 +2453,7 @@ pub async fn subscribe_newsletter(
     .1;
 
     if let Some(email) = user.email {
-        sign_up_beehiiv(&email).await?;
+        sign_up_sendy(&email).await?;
 
         Ok(HttpResponse::NoContent().finish())
     } else {

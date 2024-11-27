@@ -450,7 +450,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("PAYPAL_CLIENT_ID");
     failed |= check_var::<String>("PAYPAL_CLIENT_SECRET");
 
-    failed |= check_var::<String>("TURNSTILE_SECRET");
+    failed |= check_var::<String>("HCAPTCHA_SECRET");
 
     failed |= check_var::<String>("SMTP_USERNAME");
     failed |= check_var::<String>("SMTP_PASSWORD");
@@ -460,8 +460,9 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");
     failed |= check_var::<String>("SITE_BILLING_PATH");
 
-    failed |= check_var::<String>("BEEHIIV_PUBLICATION_ID");
-    failed |= check_var::<String>("BEEHIIV_API_KEY");
+    failed |= check_var::<String>("SENDY_URL");
+    failed |= check_var::<String>("SENDY_LIST_ID");
+    failed |= check_var::<String>("SENDY_API_KEY");
 
     if parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS").is_none() {
         warn!(

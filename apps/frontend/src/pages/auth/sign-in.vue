@@ -1,5 +1,5 @@
 <template>
-  <div class="experimental-styles-within">
+  <div>
     <template v-if="flow">
       <label for="two-factor-code">
         <span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
@@ -23,30 +23,106 @@
       </button>
     </template>
     <template v-else>
-      <SignInUi
-        :completed-turnstile="!!turnstile"
-        forgot-password-link="/auth/reset-password"
-        :create-account-link="signUpLink"
-        third-party-button-handler-type="href"
-        :third-party-button-handler="(service) => getAuthUrl(service, redirectTarget)"
-        :on-submit="signIn"
-      >
-        <template #turnstile>
-          <NuxtTurnstile
-            ref="turnstile"
-            v-model="token"
-            :options="{ theme: $theme.active === 'light' ? 'light' : 'dark' }"
-            data-size="flexible"
+      <h1>{{ formatMessage(messages.signInWithLabel) }}</h1>
+
+      <section class="third-party">
+        <a class="btn" :href="getAuthUrl('discord', redirectTarget)">
+          <SSODiscordIcon />
+          <span>Discord</span>
+        </a>
+        <a class="btn" :href="getAuthUrl('github', redirectTarget)">
+          <SSOGitHubIcon />
+          <span>GitHub</span>
+        </a>
+        <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
+          <SSOMicrosoftIcon />
+          <span>Microsoft</span>
+        </a>
+        <a class="btn" :href="getAuthUrl('google', redirectTarget)">
+          <SSOGoogleIcon />
+          <span>Google</span>
+        </a>
+        <a class="btn" :href="getAuthUrl('steam', redirectTarget)">
+          <SSOSteamIcon />
+          <span>Steam</span>
+        </a>
+        <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
+          <SSOGitLabIcon />
+          <span>GitLab</span>
+        </a>
+      </section>
+
+      <h1>{{ formatMessage(messages.usePasswordLabel) }}</h1>
+
+      <section class="auth-form">
+        <div class="iconified-input">
+          <label for="email" hidden>{{ formatMessage(messages.emailUsernameLabel) }}</label>
+          <MailIcon />
+          <input
+            id="email"
+            v-model="email"
+            type="text"
+            autocomplete="username"
+            class="auth-form__input"
+            :placeholder="formatMessage(messages.emailUsernameLabel)"
           />
-        </template>
-      </SignInUi>
+        </div>
+
+        <div class="iconified-input">
+          <label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
+          <KeyIcon />
+          <input
+            id="password"
+            v-model="password"
+            type="password"
+            autocomplete="current-password"
+            class="auth-form__input"
+            :placeholder="formatMessage(messages.passwordLabel)"
+          />
+        </div>
+
+        <HCaptcha ref="captcha" v-model="token" />
+
+        <button
+          class="btn btn-primary continue-btn centered-btn"
+          :disabled="!token"
+          @click="beginPasswordSignIn()"
+        >
+          {{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
+        </button>
+
+        <div class="auth-form__additional-options">
+          <IntlFormatted :message-id="messages.additionalOptionsLabel">
+            <template #forgot-password-link="{ children }">
+              <NuxtLink class="text-link" to="/auth/reset-password">
+                <component :is="() => children" />
+              </NuxtLink>
+            </template>
+            <template #create-account-link="{ children }">
+              <NuxtLink class="text-link" :to="signUpLink">
+                <component :is="() => children" />
+              </NuxtLink>
+            </template>
+          </IntlFormatted>
+        </div>
+      </section>
     </template>
   </div>
 </template>
 
 <script setup>
-import { RightArrowIcon } from "@modrinth/assets";
-import { commonMessages, SignInUi } from "@modrinth/ui";
+import {
+  RightArrowIcon,
+  SSOGitHubIcon,
+  SSOMicrosoftIcon,
+  SSOSteamIcon,
+  SSOGoogleIcon,
+  SSODiscordIcon,
+  SSOGitLabIcon,
+  KeyIcon,
+  MailIcon,
+} from "@modrinth/assets";
+import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -109,8 +185,10 @@ if (auth.value.user) {
   await finishSignIn();
 }
 
-const turnstile = ref();
+const captcha = ref();
 
+const email = ref("");
+const password = ref("");
 const token = ref("");
 
 const flow = ref(route.query.flow);
@@ -119,15 +197,15 @@ const signUpLink = computed(
   () => `/auth/sign-up${route.query.redirect ? `?redirect=${route.query.redirect}` : ""}`,
 );
 
-async function signIn(email, password, token) {
+async function beginPasswordSignIn() {
   startLoading();
   try {
     const res = await useBaseFetch("auth/login", {
       method: "POST",
       body: {
-        username: email,
-        password,
-        challenge: token,
+        username: email.value,
+        password: password.value,
+        challenge: token.value,
       },
     });
 
@@ -143,7 +221,7 @@ async function signIn(email, password, token) {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }
@@ -168,7 +246,7 @@ async function begin2FASignIn() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }
