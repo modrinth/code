@@ -6,9 +6,79 @@
     <Head>
       <Title>Search {{ projectType.display }}s - Modrinth</Title>
     </Head>
-    <section v-if="server" class="normal-page__header mb-4 flex flex-col gap-4">
+    <aside
+      :class="{
+        'normal-page__sidebar': true,
+      }"
+      aria-label="Filters"
+    >
+      <AdPlaceholder
+        v-if="
+          (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
+          !server
+        "
+      />
+      <div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
       <div
-        class="flex items-center justify-between border-0 border-b border-solid border-button-bg pb-4"
+        class="flex flex-col gap-3"
+        :class="{
+          'fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl bg-bg-raised': filtersMenuOpen,
+        }"
+      >
+        <div
+          v-if="filtersMenuOpen"
+          class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-button-bg bg-bg-raised px-6 py-4"
+        >
+          <h3 class="m-0 text-lg text-contrast">Filters</h3>
+          <ButtonStyled circular>
+            <button
+              @click="
+                () => {
+                  filtersMenuOpen = false;
+                  scrollToTop('instant');
+                }
+              "
+            >
+              <XIcon />
+            </button>
+          </ButtonStyled>
+        </div>
+        <div v-if="server" class="rounded-2xl bg-bg-raised p-4">
+          <Checkbox
+            v-model="serverHideInstalled"
+            label="Hide installed content"
+            class="filter-checkbox"
+            @update:model-value="updateSearchResults()"
+          />
+        </div>
+        <SearchSidebarFilter
+          v-for="filter in filters.filter((f) => f.display !== 'none')"
+          :key="`filter-${filter.id}`"
+          v-model:selected-filters="currentFilters"
+          v-model:toggled-groups="toggledGroups"
+          v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
+          :provided-filters="serverFilters"
+          :filter-type="filter"
+          :class="
+            filtersMenuOpen
+              ? 'border-0 border-b-[1px] border-solid border-button-bg last:border-b-0'
+              : 'rounded-2xl bg-bg-raised'
+          "
+          button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
+          content-class="mb-4 mx-3"
+          inner-panel-class="p-1"
+          :open-by-default="true"
+        >
+          <template #header>
+            <h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
+          </template>
+        </SearchSidebarFilter>
+      </div>
+    </aside>
+    <section class="normal-page__content">
+      <div
+        v-if="server"
+        class="mb-4 flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-button-bg pb-4"
       >
         <nuxt-link
           :to="`/servers/manage/${server.serverId}/content`"
@@ -34,44 +104,10 @@
           </nuxt-link>
         </ButtonStyled>
       </div>
-    </section>
-    <aside
-      :class="{
-        'normal-page__sidebar': true,
-      }"
-      aria-label="Filters"
-    >
-      <AdPlaceholder
-        v-if="
-          (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
-          !server
-        "
-      />
+
       <div class="flex flex-col gap-3">
-        <SearchSidebarFilter
-          v-for="filter in filters.filter((f) => f.display !== 'none')"
-          :key="`filter-${filter.id}`"
-          v-model:selected-filters="currentFilters"
-          v-model:toggled-groups="toggledGroups"
-          v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-          :provided-filters="serverFilters"
-          :filter-type="filter"
-          class="rounded-2xl bg-bg-raised"
-          button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
-          content-class="mb-4 mx-3"
-          inner-panel-class="p-1"
-          :open-by-default="true"
-        >
-          <template #header>
-            <h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
-          </template>
-        </SearchSidebarFilter>
-      </div>
-    </aside>
-    <section class="normal-page__content">
-      <div class="flex flex-col gap-3">
-        <NavTabs :links="selectableProjectTypes" />
-        <div class="iconified-input">
+        <NavTabs v-if="!server" :links="selectableProjectTypes" class="hidden md:flex" />
+        <div class="iconified-input w-full">
           <SearchIcon aria-hidden="true" class="text-lg" />
           <input
             v-model="query"
@@ -86,11 +122,11 @@
             <XIcon />
           </Button>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <DropdownSelect
             v-slot="{ selected }"
             v-model="currentSortType"
-            class="max-w-[16rem]"
+            class="!w-auto flex-grow md:flex-grow-0"
             name="Sort by"
             :options="sortTypes"
             :display-name="(option) => option?.display"
@@ -106,12 +142,17 @@
             :options="currentMaxResultsOptions"
             :default-value="maxResults"
             :model-value="maxResults"
-            class="max-w-[9rem]"
+            class="!w-auto flex-grow md:flex-grow-0"
             @change="updateSearchResults(1)"
           >
             <span class="font-semibold text-primary">View: </span>
             <span class="font-semibold text-secondary">{{ selected }}</span>
           </DropdownSelect>
+          <div class="lg:hidden">
+            <ButtonStyled>
+              <button @click="filtersMenuOpen = true"><FilterIcon /> Filter results...</button>
+            </ButtonStyled>
+          </div>
           <ButtonStyled circular>
             <button
               v-tooltip="$capitalizeString(cosmetics.searchDisplayMode[projectType.id]) + ' view'"
@@ -126,7 +167,7 @@
           <Pagination
             :page="currentPage"
             :count="pageCount"
-            class="ml-auto"
+            class="mx-auto sm:ml-auto sm:mr-0"
             @switch-page="setPage"
           />
         </div>
@@ -194,12 +235,11 @@
                   </button>
                 </template>
               </ProjectCard>
-              <NuxtLink :to="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`">
-                <NewProjectCard
-                  v-if="flags.newProjectCards"
-                  :project="result"
-                  :categories="result.display_categories"
-                >
+              <NuxtLink
+                v-if="flags.newProjectCards"
+                :to="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`"
+              >
+                <NewProjectCard :project="result" :categories="result.display_categories">
                   <template v-if="false" #actions> </template>
                 </NewProjectCard>
               </NuxtLink>
@@ -244,7 +284,7 @@ import ImageIcon from "~/assets/images/utils/image.svg?component";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 
-const sidebarMenuOpen = ref(false);
+const filtersMenuOpen = ref(false);
 
 const data = useNuxtApp();
 const route = useNativeRoute();
@@ -263,19 +303,32 @@ const serverHideInstalled = ref(false);
 
 const PERSISTENT_QUERY_PARAMS = ["sid", "shi"];
 
-if (route.query.sid) {
-  if (!auth.value.user) {
-    router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
-  } else {
-    const serverId = typeof route.query.sid === "string" ? route.query.sid : route.query.sid[0];
-    if (serverId !== null) {
-      server.value = await usePyroServer(serverId, ["general", "mods"]);
+await updateServerContext();
+
+watch(route, () => {
+  updateServerContext();
+});
+
+async function updateServerContext() {
+  if (route.query.sid && (!server.value || server.value.serverId !== route.query.sid)) {
+    if (!auth.value.user) {
+      router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
+    } else if (route.query.sid !== null) {
+      server.value = await usePyroServer(route.query.sid, ["general", "mods"]);
     }
   }
-}
 
-if (route.query.shi && projectType.value.id !== "modpack") {
-  serverHideInstalled.value = route.query.shi === "true";
+  if (
+    server.value &&
+    server.value.serverId !== route.query.sid &&
+    route.name.startsWith("search")
+  ) {
+    server.value = undefined;
+  }
+
+  if (route.query.shi && projectType.value.id !== "modpack" && server.value) {
+    serverHideInstalled.value = route.query.shi === "true";
+  }
 }
 
 const serverFilters = computed(() => {
@@ -410,6 +463,10 @@ function setPage(newPageNumber) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 
   updateSearchResults();
+}
+
+function scrollToTop(behavior = "smooth") {
+  window.scrollTo({ top: 0, behavior });
 }
 
 function updateSearchResults() {
