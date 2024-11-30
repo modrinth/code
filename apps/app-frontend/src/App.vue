@@ -424,6 +424,9 @@ async function checkUpdates() {
       >
         <ModrinthLoadingIndicator />
       </div>
+      <div class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50">
+        {{ route.fullPath }}
+      </div>
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">

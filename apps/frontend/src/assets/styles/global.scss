@@ -37,6 +37,8 @@ html {
   --icon-20: 1.25rem; // used for icons in normal sized buttons
   --icon-24: 1.5rem; // used for icons that are used as a primary label or in large buttons
   --icon-32: 2rem;
+
+  interpolate-size: allow-keywords;
 }
 
 .light-mode {

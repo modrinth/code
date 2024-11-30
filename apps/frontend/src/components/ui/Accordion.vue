@@ -62,6 +62,9 @@ defineOptions({
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.3s ease-in-out;
+  animation: height-animate 500ms ease-in-out both;
+  content-visibility: auto;
+  animation-composition: replace;
 }
 
 @media (prefers-reduced-motion) {
@@ -76,5 +79,14 @@ defineOptions({
 
 .accordion-content > div {
   overflow: hidden;
+}
+
+@keyframes height-animate {
+  from {
+    block-size: initial;
+  }
+  to {
+    block-size: auto;
+  }
 }
 </style>

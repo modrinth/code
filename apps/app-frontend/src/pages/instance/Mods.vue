@@ -53,27 +53,40 @@
       v-model="selectedFiles"
       :locked="isPackLocked"
       :items="
-        search.map((x) => ({
-          disabled: x.disabled,
-          filename: x.file_name,
-          icon: x.icon,
-          title: x.name,
-          creator: {
-            name: x.author,
-            type: 'user',
-            id: x.author,
-            link: 'https://modrinth.com/user/' + x.author,
-            linkProps: { target: '_blank' },
-          },
-          project: {
-            id: x.id,
-            link: { path: `/project/${x.id}`, query: { i: props.instance.path } },
-            linkProps: {},
-          },
-          version: x.version,
-          versionId: x.version,
-          data: x,
-        }))
+        search.map((x) => {
+          const item: ContentItem<any> = {
+            disabled: x.disabled,
+            filename: x.file_name,
+            icon: x.icon,
+            title: x.name,
+            data: x,
+          }
+
+          if (x.version) {
+            item.version = x.version
+            item.versionId = x.version
+          }
+
+          if (x.id) {
+            item.project = {
+              id: x.id,
+              link: { path: `/project/${x.id}`, query: { i: props.instance.path } },
+              linkProps: {},
+            }
+          }
+
+          if (x.author) {
+            item.creator = {
+              name: x.author,
+              type: 'user',
+              id: x.author,
+              link: 'https://modrinth.com/user/' + x.author,
+              linkProps: { target: '_blank' },
+            }
+          }
+
+          return item
+        })
       "
     >
       <template v-if="selectedProjects.length > 0" #headers>
@@ -540,6 +553,7 @@ import { profile_listener } from '@/helpers/events.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
+import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 
 const props = defineProps({
   instance: {

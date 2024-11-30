@@ -54,6 +54,7 @@ export { default as NavRow } from './nav/NavRow.vue'
 export { default as NavStack } from './nav/NavStack.vue'
 
 // Project
+export { default as NewProjectCard } from './project/NewProjectCard.vue'
 export { default as ProjectHeader } from './project/ProjectHeader.vue'
 export { default as ProjectSidebarCompatibility } from './project/ProjectSidebarCompatibility.vue'
 export { default as ProjectSidebarCreators } from './project/ProjectSidebarCreators.vue'
@@ -65,6 +66,8 @@ export { default as BrowseFiltersPanel } from './search/BrowseFiltersPanel.vue'
 export { default as Categories } from './search/Categories.vue'
 export { default as SearchDropdown } from './search/SearchDropdown.vue'
 export { default as SearchFilter } from './search/SearchFilter.vue'
+export { default as SearchSidebarFilter } from './search/SearchSidebarFilter.vue'
+export { default as SearchFilterOption } from './search/SearchFilterOption.vue'
 
 // Billing
 export { default as PurchaseModal } from './billing/PurchaseModal.vue'

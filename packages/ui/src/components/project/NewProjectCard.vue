@@ -1,16 +1,5 @@
 <template>
-  <div
-    class="button-base p-4 bg-bg-raised rounded-xl flex gap-3 group"
-    @click="
-      () => {
-        emit('open')
-        $router.push({
-          path: `/project/${project.project_id ?? project.id}`,
-          query: { i: props.instance ? props.instance.path : undefined },
-        })
-      }
-    "
-  >
+  <div class="button-base p-4 bg-bg-raised rounded-xl flex gap-3 group">
     <div class="icon">
       <Avatar :src="project.icon_url" size="96px" class="search-icon" />
     </div>
@@ -31,7 +20,7 @@
           :key="tag"
           class="text-sm font-semibold text-secondary flex gap-1 px-[0.375rem] py-0.5 bg-button-bg rounded-full"
         >
-          {{ formatCategory(tag.name) }}
+          {{ formatCategory(tag) }}
         </div>
       </div>
     </div>
@@ -52,7 +41,11 @@
       </div>
       <div class="mt-auto relative">
         <div
-          class="flex items-center gap-2 group-hover:-translate-y-3 group-hover:opacity-0 group-focus-within:opacity-0 group-hover:scale-95 group-focus-within:scale-95 transition-all"
+          :class="{
+            'group-hover:-translate-y-3 group-hover:opacity-0 group-focus-within:opacity-0 group-hover:scale-95 group-focus-within:scale-95 transition-all':
+              $slots.actions,
+          }"
+          class="flex items-center gap-2"
         >
           <HistoryIcon class="shrink-0" />
           <span>
@@ -63,28 +56,7 @@
         <div
           class="opacity-0 scale-95 translate-y-3 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:opacity-100 group-focus-within:scale-100 absolute bottom-0 right-0 transition-all w-fit"
         >
-          <ButtonStyled color="brand">
-            <button
-              :disabled="installed || installing"
-              class="shrink-0 no-wrap"
-              @click.stop="install()"
-            >
-              <template v-if="!installed">
-                <DownloadIcon v-if="modpack || instance" />
-                <PlusIcon v-else />
-              </template>
-              <CheckIcon v-else />
-              {{
-                installing
-                  ? 'Installing'
-                  : installed
-                    ? 'Installed'
-                    : modpack || instance
-                      ? 'Install'
-                      : 'Add to an instance'
-              }}
-            </button>
-          </ButtonStyled>
+          <slot name="actions" />
         </div>
       </div>
     </div>
@@ -92,27 +64,15 @@
 </template>
 
 <script setup>
-import {
-  TagsIcon,
-  DownloadIcon,
-  HeartIcon,
-  PlusIcon,
-  CheckIcon,
-  HistoryIcon,
-} from '@modrinth/assets'
-import { ButtonStyled, Avatar } from '@modrinth/ui'
+import { TagsIcon, DownloadIcon, HeartIcon, HistoryIcon } from '@modrinth/assets'
+import Avatar from '../base/Avatar.vue'
 import { formatNumber, formatCategory } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ref, computed } from 'vue'
-import { install as installVersion } from '@/store/install.js'
+
 dayjs.extend(relativeTime)
 
-const props = defineProps({
-  backgroundImage: {
-    type: String,
-    default: null,
-  },
+defineProps({
   project: {
     type: Object,
     required: true,
@@ -121,37 +81,5 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  instance: {
-    type: Object,
-    default: null,
-  },
-  featured: {
-    type: Boolean,
-    default: false,
-  },
-  installed: {
-    type: Boolean,
-    default: false,
-  },
 })
-
-const emit = defineEmits(['open', 'install'])
-
-const installing = ref(false)
-
-async function install() {
-  installing.value = true
-  await installVersion(
-    props.project.project_id,
-    null,
-    props.instance ? props.instance.path : null,
-    'SearchCard',
-    () => {
-      installing.value = false
-      emit('install', props.project.project_id)
-    },
-  )
-}
-
-const modpack = computed(() => props.project.project_type === 'modpack')
 </script>

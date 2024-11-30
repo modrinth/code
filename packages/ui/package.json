@@ -16,7 +16,8 @@
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
-    "vue": "^3.4.31"
+    "vue": "^3.4.31",
+    "vue-router": "4.3.0"
   },
   "dependencies": {
     "@codemirror/commands": "^6.3.2",

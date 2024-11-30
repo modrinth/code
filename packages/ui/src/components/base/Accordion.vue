@@ -3,15 +3,18 @@
     <button
       v-if="!!slots.title"
       @click="() => (isOpen ? close() : open())"
-      :class="buttonClass ? buttonClass : ''"
+      :class="buttonClass ?? 'flex flex-col gap-2'"
     >
       <slot name="button" :open="isOpen">
-        <slot name="title" />
-        <DropdownIcon
-          class="ml-auto size-5 transition-transform duration-300"
-          :class="{ 'rotate-180': isOpen }"
-        />
+        <div class="flex items-center w-full">
+          <slot name="title" />
+          <DropdownIcon
+            class="ml-auto size-5 transition-transform duration-300 shrink-0"
+            :class="{ 'rotate-180': isOpen }"
+          />
+        </div>
       </slot>
+      <slot name="summary" />
     </button>
     <div class="accordion-content" :class="{ open: isOpen }">
       <div>
@@ -33,6 +36,7 @@ const props = withDefaults(
     type?: 'standard' | 'outlined' | 'transparent'
     buttonClass?: string
     contentClass?: string
+    titleWrapperClass?: string
   }>(),
   {
     type: 'standard',

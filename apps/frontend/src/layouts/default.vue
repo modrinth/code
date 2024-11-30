@@ -203,7 +203,10 @@
 
           <ButtonStyled
             type="transparent"
-            :highlighted="route.name.startsWith('servers')"
+            :highlighted="
+              route.name.startsWith('servers') ||
+              (route.name.startsWith('search-') && route.query.sid)
+            "
             :highlighted-style="
               route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
             "
@@ -911,9 +914,13 @@ const userMenuOptions = computed(() => {
   return options;
 });
 
-const isDiscovering = computed(() => route.name && route.name.startsWith("search-"));
+const isDiscovering = computed(
+  () => route.name && route.name.startsWith("search-") && !route.query.sid,
+);
 
-const isDiscoveringSubpage = computed(() => route.name && route.name.startsWith("type-id"));
+const isDiscoveringSubpage = computed(
+  () => route.name && route.name.startsWith("type-id") && !route.query.sid,
+);
 
 onMounted(() => {
   if (window && import.meta.client) {
