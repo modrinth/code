@@ -1,26 +1,4 @@
 <template>
-  <div
-    v-if="isPackLocked"
-    class="border-2 border-solid rounded-2xl border-bg-raised p-4 flex flex-col mb-4 gap-2"
-  >
-    <div class="flex items-center text-lg font-semibold text-contrast">
-      <LockIcon class="mr-2" />
-      Content locked
-    </div>
-    <p class="m-0">
-      This instance is linked to the modpack
-      <router-link
-        :to="{
-          path: `/project/${instance.linked_data.project_id}/`,
-          query: { i: props.instance.path },
-        }"
-        >{{ instance.name }}</router-link
-      >. Adding or removing content may break the modpack or cause unexpected behavior.
-    </p>
-    <p class="m-0 text-sm text-secondary">
-      You can unlock content in this instance's settings if you know what you're doing.
-    </p>
-  </div>
   <template v-if="projects.length > 0">
     <div class="flex items-center gap-2 mb-4">
       <div class="iconified-input flex-grow">
@@ -36,7 +14,7 @@
           <XIcon />
         </Button>
       </div>
-      <AddContentButton v-if="!isPackLocked" :instance="instance" />
+      <AddContentButton :instance="instance" />
     </div>
     <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
       <FilterIcon class="text-secondary h-5 w-5 mr-1" />
@@ -55,6 +33,7 @@
       :items="
         search.map((x) => {
           const item: ContentItem<any> = {
+            path: x.path,
             disabled: x.disabled,
             filename: x.file_name,
             icon: x.icon,
@@ -88,11 +67,14 @@
           return item
         })
       "
+      :sort-column="sortColumn"
+      :sort-ascending="ascending"
+      :update-sort="sortProjects"
     >
       <template v-if="selectedProjects.length > 0" #headers>
         <div class="flex gap-2">
           <ButtonStyled
-            v-if="selectedProjects.some((m) => m.outdated)"
+            v-if="!isPackLocked && selectedProjects.some((m) => m.outdated)"
             color="brand"
             color-fill="text"
             hover-color-fill="text"
@@ -139,14 +121,32 @@
         </div>
       </template>
       <template #header-actions>
+        <ButtonStyled type="transparent" color-fill="text" hover-color-fill="text">
+          <button @click="refreshProjects" :disabled="refreshingProjects" class="w-max">
+            <UpdatedIcon />
+            Refresh
+          </button>
+        </ButtonStyled>
         <ButtonStyled
           v-if="!isPackLocked && projects.some((m) => (m as any).outdated)"
           type="transparent"
           color="brand"
           color-fill="text"
           hover-color-fill="text"
+          @click="updateAll"
         >
-          <button><DownloadIcon /> Update all</button>
+          <button class="w-max"><DownloadIcon /> Update all</button>
+        </ButtonStyled>
+        <ButtonStyled
+          v-if="canUpdatePack"
+          type="transparent"
+          color="brand"
+          color-fill="text"
+          hover-color-fill="text"
+        >
+          <button class="w-max" :disabled="installing" @click="modpackVersionModal.show()">
+            <DownloadIcon /> Update pack
+          </button>
         </ButtonStyled>
       </template>
       <template #actions="{ item }">
@@ -156,12 +156,16 @@
           color="brand"
           circular
         >
-          <button v-tooltip="`Update`" @click="updateProject(item.data)">
+          <button
+            v-tooltip="`Update`"
+            @click="updateProject(item.data)"
+            :disabled="(item.data as any).updating"
+          >
             <DownloadIcon />
           </button>
         </ButtonStyled>
         <div v-else class="w-[36px]"></div>
-        <ButtonStyled v-if="!isPackLocked" type="transparent" circular>
+        <ButtonStyled type="transparent" circular>
           <button
             v-tooltip="item.disabled ? `Enable` : `Disable`"
             @click="toggleDisableMod(item.data)"
@@ -175,7 +179,7 @@
             :options="[
               {
                 id: 'show-file',
-                action: () => highlightModInProfile(instance.path, item.filename),
+                action: () => highlightModInProfile(instance.path, item.path),
               },
               {
                 id: 'copy-link',
@@ -184,12 +188,10 @@
               },
               {
                 divider: true,
-                shown: !isPackLocked,
               },
               {
                 id: 'remove',
                 color: 'red',
-                shown: !isPackLocked,
                 action: () => removeMod(item),
               },
             ]"
@@ -217,265 +219,9 @@
     </div>
     <div class="top-box-divider"></div>
     <div class="flex items-center gap-6 py-4">
-      <AddContentButton v-if="!isPackLocked" :instance="instance" />
+      <AddContentButton :instance="instance" />
     </div>
   </div>
-  <div v-if="false && projects.length > 0" class="table bg-bg-raised">
-    <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
-      <div class="table-cell table-text">
-        <Checkbox v-model="selectAll" class="select-checkbox" />
-      </div>
-      <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
-        <Button class="transparent" @click="sortProjects('Name')">
-          Name
-          <DropdownIcon v-if="sortColumn === 'Name'" :class="{ down: ascending }" />
-        </Button>
-      </div>
-      <div v-if="selected.length === 0" class="table-cell table-text version">
-        <Button class="transparent" @click="sortProjects('Version')">
-          Version
-          <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
-        </Button>
-      </div>
-      <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
-        <Button class="transparent" @click="sortProjects('Enabled')">
-          Actions
-          <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
-        </Button>
-      </div>
-      <div v-else class="options table-cell name-cell">
-        <div>
-          <Button
-            class="transparent share"
-            @click="() => (showingOptions = !showingOptions)"
-            @mouseover="selectedOption = 'Share'"
-          >
-            <MenuIcon :class="{ open: showingOptions }" />
-          </Button>
-        </div>
-        <Button
-          class="transparent share"
-          @click="shareNames()"
-          @mouseover="selectedOption = 'Share'"
-        >
-          <ShareIcon />
-          Share
-        </Button>
-        <div v-tooltip="isPackLocked ? 'Unlock this instance to remove mods' : ''">
-          <Button
-            :disabled="isPackLocked"
-            class="transparent trash"
-            @click="deleteWarning.show()"
-            @mouseover="selectedOption = 'Delete'"
-          >
-            <TrashIcon />
-            Delete
-          </Button>
-        </div>
-        <div v-tooltip="isPackLocked ? 'Unlock this instance to update mods' : ''">
-          <Button
-            :disabled="isPackLocked || offline"
-            class="transparent update"
-            @click="updateSelected()"
-            @mouseover="selectedOption = 'Update'"
-          >
-            <UpdatedIcon />
-            Update
-          </Button>
-        </div>
-        <div v-tooltip="isPackLocked ? 'Unlock this instance to toggle mods' : ''">
-          <Button
-            :disabled="isPackLocked"
-            class="transparent"
-            @click="toggleSelected()"
-            @mouseover="selectedOption = 'Toggle'"
-          >
-            <ToggleIcon />
-            Toggle
-          </Button>
-        </div>
-      </div>
-    </div>
-    <div v-if="showingOptions && selected.length > 0" class="more-box">
-      <section v-if="selectedOption === 'Share'" class="options">
-        <Button class="transparent" @click="shareNames()">
-          <TextInputIcon />
-          Share names
-        </Button>
-        <Button class="transparent" @click="shareUrls()">
-          <GlobeIcon />
-          Share URLs
-        </Button>
-        <Button class="transparent" @click="shareFileNames()">
-          <FileIcon />
-          Share file names
-        </Button>
-        <Button class="transparent" @click="shareMarkdown()">
-          <CodeIcon />
-          Share as markdown
-        </Button>
-      </section>
-      <section v-if="selectedOption === 'Delete'" class="options">
-        <Button class="transparent" @click="deleteWarning.show()">
-          <TrashIcon />
-          Delete selected
-        </Button>
-        <Button class="transparent" @click="deleteDisabledWarning.show()">
-          <ToggleIcon />
-          Delete disabled
-        </Button>
-      </section>
-      <section v-if="selectedOption === 'Update'" class="options">
-        <Button class="transparent" :disabled="offline" @click="updateAll()">
-          <UpdatedIcon />
-          Update all
-        </Button>
-        <Button class="transparent" @click="selectUpdatable()">
-          <CheckIcon />
-          Select updatable
-        </Button>
-      </section>
-      <section v-if="selectedOption === 'Toggle'" class="options">
-        <Button class="transparent" @click="enableAll()">
-          <CheckIcon />
-          Toggle on
-        </Button>
-        <Button class="transparent" @click="disableAll()">
-          <XIcon />
-          Toggle off
-        </Button>
-        <Button class="transparent" @click="hideShowAll()">
-          <EyeIcon v-if="hideNonSelected" />
-          <EyeOffIcon v-else />
-          {{ hideNonSelected ? 'Show' : 'Hide' }} untoggled
-        </Button>
-      </section>
-    </div>
-    <div
-      v-for="mod in search"
-      :key="mod.file_name"
-      class="table-row"
-      @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
-    >
-      <div class="table-cell table-text checkbox">
-        <Checkbox
-          :model-value="selectionMap.get(mod.path)"
-          class="select-checkbox"
-          @update:model-value="(newValue) => selectionMap.set(mod.path, newValue)"
-        />
-      </div>
-      <div class="table-cell table-text name-cell">
-        <router-link
-          v-if="mod.slug"
-          :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
-          :disabled="offline"
-          class="mod-content"
-        >
-          <Avatar :src="mod.icon" />
-          <div class="mod-text">
-            <div class="title">{{ mod.name }}</div>
-            <span v-if="mod.author" class="no-wrap">by {{ mod.author }}</span>
-          </div>
-        </router-link>
-        <div v-else class="mod-content">
-          <Avatar :src="mod.icon" />
-          <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
-        </div>
-      </div>
-      <div class="table-cell table-text version">
-        <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
-      </div>
-      <div class="table-cell table-text manage">
-        <div v-tooltip="isPackLocked ? 'Unlock this instance to remove mods.' : 'Remove project'">
-          <Button :disabled="isPackLocked" icon-only @click="removeMod(mod)">
-            <TrashIcon />
-          </Button>
-        </div>
-        <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator" />
-        <div
-          v-else
-          v-tooltip="isPackLocked ? 'Unlock this instance to update mods.' : 'Update project'"
-        >
-          <Button
-            :disabled="!mod.outdated || offline || isPackLocked"
-            icon-only
-            @click="updateProject(mod)"
-          >
-            <UpdatedIcon v-if="mod.outdated" />
-            <CheckIcon v-else />
-          </Button>
-        </div>
-        <div v-tooltip="isPackLocked ? 'Unlock this instance to toggle mods.' : ''">
-          <input
-            id="switch-1"
-            :disabled="isPackLocked"
-            autocomplete="off"
-            type="checkbox"
-            class="switch stylized-toggle"
-            :checked="!mod.disabled"
-            @change="toggleDisableMod(mod)"
-          />
-        </div>
-        <Button
-          v-tooltip="`Show ${mod.file_name}`"
-          icon-only
-          @click="highlightModInProfile(instance.path, mod)"
-        >
-          <FolderOpenIcon />
-        </Button>
-      </div>
-    </div>
-  </div>
-  <div v-else-if="false" class="empty-prompt">
-    <div class="empty-icon">
-      <AddProjectImage />
-    </div>
-    <h3>No projects found</h3>
-    <p class="empty-subtitle">Add a project to get started</p>
-    <AddContentButton :instance="instance" />
-  </div>
-  <ModalWrapper ref="deleteWarning" header="Are you sure?">
-    <div class="modal-body">
-      <div class="markdown-body">
-        <p>
-          Are you sure you want to remove
-          <strong>{{ functionValues.length }} project(s)</strong> from {{ instance.name }}?
-          <br />
-          This action <strong>cannot</strong> be undone.
-        </p>
-      </div>
-      <div class="button-group push-right">
-        <Button @click="deleteWarning.hide()"> Cancel </Button>
-        <Button color="danger" @click="deleteSelected">
-          <TrashIcon />
-          Remove
-        </Button>
-      </div>
-    </div>
-  </ModalWrapper>
-  <ModalWrapper ref="deleteDisabledWarning" header="Are you sure?">
-    <div class="modal-body">
-      <div class="markdown-body">
-        <p>
-          Are you sure you want to remove
-          <strong
-            >{{ Array.from(projects.values()).filter((x) => x.disabled).length }} disabled
-            project(s)</strong
-          >
-          from {{ instance.name }}?
-          <br />
-          This action <strong>cannot</strong> be undone.
-        </p>
-      </div>
-      <div class="button-group push-right">
-        <Button @click="deleteDisabledWarning.hide()"> Cancel </Button>
-        <Button color="danger" @click="deleteDisabled">
-          <TrashIcon />
-          Remove
-        </Button>
-      </div>
-    </div>
-  </ModalWrapper>
   <ShareModalWrapper
     ref="shareModal"
     share-title="Sharing modpack content"
@@ -494,20 +240,14 @@
 import {
   ExternalIcon,
   LinkIcon,
-  LockIcon,
   ClipboardCopyIcon,
   TrashIcon,
-  CheckIcon,
   SearchIcon,
   UpdatedIcon,
-  FolderOpenIcon,
   XIcon,
   ShareIcon,
   DropdownIcon,
-  GlobeIcon,
   FileIcon,
-  EyeIcon,
-  EyeOffIcon,
   CodeIcon,
   DownloadIcon,
   FilterIcon,
@@ -515,15 +255,7 @@ import {
   CheckCircleIcon,
   SlashIcon,
 } from '@modrinth/assets'
-import {
-  Checkbox,
-  AnimatedLogo,
-  Avatar,
-  Button,
-  ButtonStyled,
-  ContentListPanel,
-  OverflowMenu,
-} from '@modrinth/ui'
+import { Button, ButtonStyled, ContentListPanel, OverflowMenu } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -539,7 +271,7 @@ import {
 import { handleError } from '@/store/notifications.js'
 import { trackEvent } from '@/helpers/analytics'
 import { highlightModInProfile } from '@/helpers/utils.js'
-import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
+import { TextInputIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import AddContentButton from '@/components/ui/AddContentButton.vue'
@@ -550,10 +282,10 @@ import {
   get_version_many,
 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
+import dayjs from 'dayjs'
 
 const props = defineProps({
   instance: {
@@ -594,7 +326,6 @@ onUnmounted(() => {
   unlistenProfiles()
 })
 
-const showingOptions = ref(false)
 const isPackLocked = computed(() => {
   return props.instance.linked_data && props.instance.linked_data.locked
 })
@@ -612,7 +343,7 @@ const selectedProjects = computed(() =>
 
 const selectionMap = ref(new Map())
 
-const initProjects = async (cacheBehaviour) => {
+const initProjects = async (cacheBehaviour?) => {
   const newProjects = []
 
   const profileProjects = await get_projects(props.instance.path, cacheBehaviour)
@@ -670,6 +401,7 @@ const initProjects = async (cacheBehaviour) => {
           icon: project.icon_url,
           disabled: file.file_name.endsWith('.disabled'),
           updateVersion: file.update_version_id,
+          updated: dayjs(version.date_published),
           outdated: !!file.update_version_id,
           project_type: project.project_type,
           id: project.id,
@@ -778,10 +510,7 @@ function toggleArray(array, value) {
 const searchFilter = ref('')
 const selectAll = ref(false)
 const selectedProjectType = ref('All')
-const deleteWarning = ref(null)
-const deleteDisabledWarning = ref(null)
 const hideNonSelected = ref(false)
-const selectedOption = ref('Share')
 const shareModal = ref(null)
 const ascending = ref(true)
 const sortColumn = ref('Name')
@@ -827,43 +556,19 @@ const search = computed(() => {
       return true
     })
 
-  return updateSort(filtered)
-})
-
-const updateSort = (projects) => {
   switch (sortColumn.value) {
-    case 'Version':
-      return projects.slice().sort((a, b) => {
-        if (a.version < b.version) {
-          return ascending.value ? -1 : 1
-        }
-        if (a.version > b.version) {
+    case 'Updated':
+      return filtered.slice().sort((a, b) => {
+        if (a.updated < b.updated) {
           return ascending.value ? 1 : -1
         }
-        return 0
-      })
-    case 'Author':
-      return projects.slice().sort((a, b) => {
-        if (a.author < b.author) {
-          return ascending.value ? -1 : 1
-        }
-        if (a.author > b.author) {
-          return ascending.value ? 1 : -1
-        }
-        return 0
-      })
-    case 'Enabled':
-      return projects.slice().sort((a, b) => {
-        if (a.disabled && !b.disabled) {
-          return ascending.value ? 1 : -1
-        }
-        if (!a.disabled && b.disabled) {
+        if (a.updated > b.updated) {
           return ascending.value ? -1 : 1
         }
         return 0
       })
     default:
-      return projects.slice().sort((a, b) => {
+      return filtered.slice().sort((a, b) => {
         if (a.name < b.name) {
           return ascending.value ? -1 : 1
         }
@@ -873,7 +578,7 @@ const updateSort = (projects) => {
         return 0
       })
   }
-}
+})
 
 const sortProjects = (filter) => {
   if (sortColumn.value === filter) {
@@ -915,14 +620,6 @@ const updateAll = async () => {
     count: setProjects.length,
     selected: selected.value.length > 1,
   })
-}
-
-const selectUpdatable = () => {
-  for (const project of projects.value) {
-    if (project.outdated) {
-      selectionMap.value.set(project.path, true)
-    }
-  }
 }
 
 const updateProject = async (mod) => {
@@ -980,6 +677,7 @@ const toggleDisableMod = async (mod) => {
 }
 
 const removeMod = async (mod) => {
+  console.log(mod)
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
@@ -998,20 +696,9 @@ const deleteSelected = async () => {
   }
 
   projects.value = projects.value.filter((x) => !x.selected)
-  deleteWarning.value.hide()
-}
-
-const deleteDisabled = async () => {
-  for (const project of Array.of(projects.value.values().filter((x) => x.disabled))) {
-    await remove_project(props.instance.path, project.path).catch(handleError)
-  }
-
-  projects.value = projects.value.filter((x) => !x.selected)
-  deleteDisabledWarning.value.hide()
 }
 
 const shareNames = async () => {
-  console.log(functionValues.value)
   await shareModal.value.show(functionValues.value.map((x) => x.name).join('\n'))
 }
 
@@ -1041,12 +728,6 @@ const shareMarkdown = async () => {
   )
 }
 
-const toggleSelected = async () => {
-  for (const project of functionValues.value) {
-    await toggleDisableMod(project, !project.disabled)
-  }
-}
-
 const updateSelected = async () => {
   const promises = []
   for (const project of functionValues.value) {
@@ -1056,35 +737,23 @@ const updateSelected = async () => {
 }
 
 const enableAll = async () => {
+  const promises = []
   for (const project of functionValues.value) {
     if (project.disabled) {
-      await toggleDisableMod(project, false)
+      promises.push(toggleDisableMod(project))
     }
   }
+  await Promise.all(promises).catch(handleError)
 }
 
 const disableAll = async () => {
+  const promises = []
   for (const project of functionValues.value) {
     if (!project.disabled) {
-      await toggleDisableMod(project, false)
+      promises.push(toggleDisableMod(project))
     }
   }
-}
-
-const hideShowAll = async () => {
-  hideNonSelected.value = !hideNonSelected.value
-}
-
-const handleRightClick = (event, mod) => {
-  if (mod.slug && mod.project_type) {
-    props.options.showMenu(
-      event,
-      {
-        link: `https://modrinth.com/${mod.project_type}/${mod.slug}`,
-      },
-      [{ name: 'open_link' }, { name: 'copy_link' }],
-    )
-  }
+  await Promise.all(promises).catch(handleError)
 }
 
 watch(selectAll, () => {
@@ -1396,31 +1065,11 @@ onUnmounted(() => {
 </style>
 
 <style lang="scss">
-.updating-indicator {
-  height: 2.25rem !important;
-  width: 2.25rem !important;
-
-  svg {
-    height: 1.25rem !important;
-    width: 1.25rem !important;
-  }
-}
-
 .select-checkbox {
   button.checkbox {
     border: none;
     margin: 0;
   }
-}
-
-.dropdown-input {
-  .selected {
-    height: 2.5rem;
-  }
-}
-
-.pagination-after {
-  margin-bottom: 5rem;
 }
 
 .search-input {

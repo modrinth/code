@@ -74,3 +74,6 @@ export { default as PurchaseModal } from './billing/PurchaseModal.vue'
 
 // Version
 export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'
+
+// Settings
+export { default as ThemeSelector } from './settings/ThemeSelector.vue'

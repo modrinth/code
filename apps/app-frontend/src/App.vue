@@ -251,13 +251,17 @@ const hasPlus = computed(
     (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
 )
 
-watch(hasPlus, () => {
-  if (hasPlus.value) {
-    hide_ads_window()
-  } else {
-    show_ads_window()
-  }
-})
+watch(
+  hasPlus,
+  () => {
+    if (hasPlus.value) {
+      hide_ads_window()
+    } else {
+      show_ads_window()
+    }
+  },
+  { immediate: true },
+)
 
 onMounted(() => {
   invoke('show_window')
@@ -453,8 +457,11 @@ async function checkUpdates() {
           </div>
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
             <h3 class="text-lg m-0">Friends</h3>
-            <p class="m-0">you have no friends :c</p>
-            <p class="m-0">what's up with that?</p>
+            <p class="m-0">
+              You have no friends :c. <br />
+              <br />
+              <span>Sign in</span> to add friends!
+            </p>
           </div>
           <div class="pt-4 flex flex-col">
             <h3 class="px-4 text-lg m-0">News</h3>
@@ -491,8 +498,10 @@ async function checkUpdates() {
         <a
           href="https://modrinth.plus?app"
           class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
-          ><ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+</a
+          target="_blank"
         >
+          <ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+
+        </a>
         <PromotionWrapper />
       </template>
     </div>
@@ -504,7 +513,7 @@ async function checkUpdates() {
     </div>
   </div>
   <URLConfirmModal ref="urlModal" />
-  <Notifications ref="notificationsWrapper" />
+  <Notifications ref="notificationsWrapper" sidebar />
   <ErrorModal ref="errorModal" />
   <ModInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarningModal" />

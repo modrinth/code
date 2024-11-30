@@ -29,8 +29,6 @@ export async function showProfileInFolder(path) {
 }
 
 export async function highlightModInProfile(profilePath, projectPath) {
-  console.log(projectPath)
-  console.log(profilePath, projectPath)
   const fullPath = await get_mod_full_path(profilePath, projectPath)
   return await highlightInFolder(fullPath)
 }

@@ -67,7 +67,7 @@
         "resizable": true,
         "title": "Modrinth App",
         "width": 1280,
-        "minHeight": 750,
+        "minHeight": 700,
         "minWidth": 1100,
         "visible": false,
         "zoomHotkeysEnabled": false,

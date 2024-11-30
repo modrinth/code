@@ -11,11 +11,11 @@ import { RecycleScroller } from 'vue-virtual-scroller'
 const props = withDefaults(
   defineProps<{
     items: ContentItem<T>[]
-    locked?: boolean
+    sortColumn: string
+    sortAscending: boolean
+    updateSort: (column: string) => void
   }>(),
-  {
-    locked: false,
-  },
+  {},
 )
 
 const selectionStates: Ref<Record<string, boolean>> = ref({})
@@ -49,18 +49,28 @@ function setSelected(value: boolean) {
       :class="`${$slots.headers ? 'flex' : 'grid'} grid-cols-[min-content,4fr,3fr,2fr] gap-3 items-center px-2 pt-1 h-10 mb-3 text-contrast font-bold`"
     >
       <Checkbox
-        v-if="!locked"
         v-model="allSelected"
         class="select-checkbox"
         @update:model-value="setSelected"
         :indeterminate="selected.length > 0 && selected.length < items.length"
       />
       <slot name="headers">
-        <div class="flex items-center gap-2" :class="{ 'col-span-2': locked }">
-          <!--        <div class="w-[48px]"></div>-->
-          Name <DropdownIcon />
+        <div class="flex items-center gap-2 cursor-pointer" @click="updateSort('Name')">
+          Name
+          <DropdownIcon
+            v-if="sortColumn === 'Name'"
+            class="transition-all transform"
+            :class="{ 'rotate-180': sortAscending }"
+          />
         </div>
-        <div class="flex items-center gap-1 max-w-60">Updated <DropdownIcon v-if="false" /></div>
+        <div class="flex items-center gap-1 max-w-60 cursor-pointer" @click="updateSort('Updated')">
+          Updated
+          <DropdownIcon
+            v-if="sortColumn === 'Updated'"
+            class="transition-all transform"
+            :class="{ 'rotate-180': sortAscending }"
+          />
+        </div>
         <div class="flex justify-end gap-2">
           <slot name="header-actions" />
         </div>
@@ -68,7 +78,7 @@ function setSelected(value: boolean) {
     </div>
     <div class="bg-bg-raised rounded-xl">
       <RecycleScroller
-        :items="items.slice().sort((a, b) => a.filename.localeCompare(b.filename))"
+        :items="items"
         :item-size="64"
         disable-transform
         key-field="filename"
@@ -77,7 +87,6 @@ function setSelected(value: boolean) {
       >
         <ContentListItem
           :item="item"
-          :locked="locked"
           v-model="selectionStates[item.filename]"
           @update:model-value="updateSelection"
           :last="props.items.length - 1 === index"

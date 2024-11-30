@@ -28,7 +28,7 @@
       </Button>
       <Button :disabled="props.disabled" @click="autoDetect">
         <SearchIcon />
-        Auto detect
+        Detect
       </Button>
       <Button :disabled="props.disabled" @click="handleJavaFileInput()">
         <FolderSearchIcon />

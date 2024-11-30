@@ -77,7 +77,6 @@ import { handleError } from '@/store/state.js'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
-import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
 
 defineProps({
   mode: {
@@ -155,13 +154,8 @@ const handleClickOutside = (event) => {
 
 function toggleMenu(override = true) {
   if (showCard.value || !override) {
-    if (showCard.value) {
-      show_ads_window()
-    }
-
     showCard.value = false
   } else {
-    hide_ads_window()
     showCard.value = true
   }
 }

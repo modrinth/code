@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DropdownSelect, PreviewSelectButton, Toggle } from '@modrinth/ui'
+import { DropdownSelect, PreviewSelectButton, Toggle, ThemeSelector } from '@modrinth/ui'
 import { useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { watch, ref } from 'vue'
@@ -18,21 +18,12 @@ watch(settings, async () => {
   <h2 class="m-0 text-2xl">Color theme</h2>
   <p class="m-0 mt-1">Select your preferred color theme for Modrinth App.</p>
 
-  <PreviewSelectButton
-    v-for="(option, index) in themeStore.themeOptions"
-    :key="`theme-${index}`"
-    :checked="themeStore.selectedTheme === option"
-    class="mt-4"
-    @click="
-      (e) => {
-        themeStore.setThemeState(e.option.toLowerCase())
-        settings.theme = themeStore.selectedTheme
-      }
-    "
-  >
-    <template #preview> PREVIEW </template>
-    {{ option }}
-  </PreviewSelectButton>
+  <ThemeSelector
+    :update-color-theme="themeStore.setThemeState"
+    :current-theme="themeStore.selectedTheme"
+    :theme-options="themeStore.themeOptions"
+    system-theme-color="system"
+  />
 
   <div class="mt-4 flex items-center justify-between">
     <div>

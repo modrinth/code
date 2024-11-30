@@ -463,6 +463,9 @@ importers:
       vue:
         specifier: ^3.4.31
         version: 3.4.31(typescript@5.5.4)
+      vue-router:
+        specifier: 4.3.0
+        version: 4.3.0(vue@3.4.31(typescript@5.5.4))
 
   packages/utils:
     dependencies:

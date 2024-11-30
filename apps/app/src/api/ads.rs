@@ -1,4 +1,3 @@
-use serde::Serialize;
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;

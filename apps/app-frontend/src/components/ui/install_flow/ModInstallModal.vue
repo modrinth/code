@@ -308,7 +308,6 @@ const createInstance = async () => {
   flex-direction: column;
   gap: 1rem;
   margin: 0;
-  padding: 1rem;
   background-color: var(--color-bg);
 }
 
