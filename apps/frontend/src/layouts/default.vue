@@ -533,6 +533,7 @@
         <a rel="noopener" :target="$external()" href="https://crowdin.com/project/modrinth">
           Crowdin
         </a>
+        <a rel="noopener" :target="$external()" href="https://bsky.app/profile/modrinth.com"> Bluesky </a>
       </div>
       <div class="buttons">
         <nuxt-link class="btn btn-outline btn-primary" to="/app">
