@@ -161,7 +161,7 @@ pub struct Charge {
     pub id: ChargeId,
     pub user_id: UserId,
     pub price_id: ProductPriceId,
-    pub amount: i64,
+    pub amount: u64,
     pub currency_code: String,
     pub status: ChargeStatus,
     pub due: DateTime<Utc>,
@@ -170,6 +170,7 @@ pub struct Charge {
     pub type_: ChargeType,
     pub subscription_id: Option<UserSubscriptionId>,
     pub subscription_interval: Option<PriceDuration>,
+    pub platform: PaymentPlatform,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -208,6 +209,8 @@ pub enum ChargeStatus {
     Succeeded,
     Failed,
     Cancelled,
+    Refunded,
+    RefundProcessing,
 }
 
 impl ChargeStatus {
@@ -229,6 +232,28 @@ impl ChargeStatus {
             ChargeStatus::Failed => "failed",
             ChargeStatus::Open => "open",
             ChargeStatus::Cancelled => "cancelled",
+            ChargeStatus::RefundProcessing => "refund_processing",
+            ChargeStatus::Refunded => "refunded",
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PaymentPlatform {
+    Stripe,
+}
+
+impl PaymentPlatform {
+    pub fn from_string(string: &str) -> PaymentPlatform {
+        match string {
+            "stripe" => PaymentPlatform::Stripe,
+            _ => PaymentPlatform::Stripe,
+        }
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            PaymentPlatform::Stripe => "stripe",
         }
     }
 }

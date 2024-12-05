@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval\n            FROM charges\n            WHERE subscription_id = $1 AND (status = 'open' OR status = 'cancelled')",
+  "query": "\n            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval, payment_platform, payment_platform_id, net, refunded\n            FROM charges\n            WHERE (status = 'cancelled' AND due < $1) OR (status = 'failed' AND last_attempt < $1 - INTERVAL '2 days')",
   "describe": {
     "columns": [
       {
@@ -57,11 +57,31 @@
         "ordinal": 10,
         "name": "subscription_interval",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "payment_platform",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "payment_platform_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "net",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 14,
+        "name": "refunded",
+        "type_info": "Int8"
       }
     ],
     "parameters": {
       "Left": [
-        "Int8"
+        "Timestamptz"
       ]
     },
     "nullable": [
@@ -75,8 +95,12 @@
       true,
       false,
       true,
-      true
+      true,
+      false,
+      true,
+      false,
+      false
     ]
   },
-  "hash": "e68e27fcb3e85233be06e7435aaeb6b27d8dbe2ddaf211ba37a026eab3bb6926"
+  "hash": "758550f2d8f968ea6b1f9197756dab77a095212557fd8410ee4fdfab670c007c"
 }

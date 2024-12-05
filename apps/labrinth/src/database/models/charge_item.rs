@@ -1,7 +1,9 @@
 use crate::database::models::{
     ChargeId, DatabaseError, ProductPriceId, UserId, UserSubscriptionId,
 };
-use crate::models::billing::{ChargeStatus, ChargeType, PriceDuration};
+use crate::models::billing::{
+    ChargeStatus, ChargeType, PaymentPlatform, PriceDuration,
+};
 use chrono::{DateTime, Utc};
 use std::convert::{TryFrom, TryInto};
 
@@ -9,7 +11,7 @@ pub struct ChargeItem {
     pub id: ChargeId,
     pub user_id: UserId,
     pub price_id: ProductPriceId,
-    pub amount: i64,
+    pub amount: u64,
     pub currency_code: String,
     pub status: ChargeStatus,
     pub due: DateTime<Utc>,
@@ -18,6 +20,13 @@ pub struct ChargeItem {
     pub type_: ChargeType,
     pub subscription_id: Option<UserSubscriptionId>,
     pub subscription_interval: Option<PriceDuration>,
+
+    pub payment_platform: PaymentPlatform,
+    pub payment_platform_id: Option<String>,
+
+    // Net is always in USD
+    pub net: u64,
+    pub refunded: u64,
 }
 
 struct ChargeResult {
@@ -32,6 +41,10 @@ struct ChargeResult {
     charge_type: String,
     subscription_id: Option<i64>,
     subscription_interval: Option<String>,
+    payment_platform: String,
+    payment_platform_id: Option<String>,
+    net: i64,
+    refunded: i64,
 }
 
 impl TryFrom<ChargeResult> for ChargeItem {
@@ -42,7 +55,7 @@ impl TryFrom<ChargeResult> for ChargeItem {
             id: ChargeId(r.id),
             user_id: UserId(r.user_id),
             price_id: ProductPriceId(r.price_id),
-            amount: r.amount,
+            amount: r.amount as u64,
             currency_code: r.currency_code,
             status: ChargeStatus::from_string(&r.status),
             due: r.due,
@@ -52,6 +65,10 @@ impl TryFrom<ChargeResult> for ChargeItem {
             subscription_interval: r
                 .subscription_interval
                 .map(|x| PriceDuration::from_string(&x)),
+            payment_platform: PaymentPlatform::from_string(&r.payment_platform),
+            payment_platform_id: r.payment_platform_id,
+            net: r.net as u64,
+            refunded: r.refunded as u64,
         })
     }
 }
@@ -61,7 +78,7 @@ macro_rules! select_charges_with_predicate {
         sqlx::query_as!(
             ChargeResult,
             r#"
-            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval
+            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval, payment_platform, payment_platform_id, net, refunded
             FROM charges
             "#
                 + $predicate,
@@ -77,20 +94,24 @@ impl ChargeItem {
     ) -> Result<ChargeId, DatabaseError> {
         sqlx::query!(
             r#"
-            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, net, refunded)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
             ON CONFLICT (id)
             DO UPDATE
                 SET status = EXCLUDED.status,
                     last_attempt = EXCLUDED.last_attempt,
                     due = EXCLUDED.due,
                     subscription_id = EXCLUDED.subscription_id,
-                    subscription_interval = EXCLUDED.subscription_interval
+                    subscription_interval = EXCLUDED.subscription_interval,
+                    payment_platform = EXCLUDED.payment_platform,
+                    payment_platform_id = EXCLUDED.payment_platform_id,
+                    net = EXCLUDED.net,
+                    refunded = EXCLUDED.refunded
             "#,
             self.id.0,
             self.user_id.0,
             self.price_id.0,
-            self.amount,
+            self.amount as i64,
             self.currency_code,
             self.type_.as_str(),
             self.status.as_str(),
@@ -98,6 +119,10 @@ impl ChargeItem {
             self.last_attempt,
             self.subscription_id.map(|x| x.0),
             self.subscription_interval.map(|x| x.as_str()),
+            self.payment_platform.as_str(),
+            self.payment_platform_id.as_deref(),
+            self.net as i64,
+            self.refunded as i64,
         )
             .execute(&mut **transaction)
         .await?;
