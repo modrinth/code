@@ -47,6 +47,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(edit_payment_method)
             .service(remove_payment_method)
             .service(charges)
+            .service(active_servers)
             .service(initiate_payment)
             .service(stripe_webhook),
     );
@@ -795,6 +796,49 @@ pub async fn payment_methods(
     } else {
         Ok(HttpResponse::NoContent().finish())
     }
+}
+
+#[derive(Deserialize)]
+pub struct ActiveServersQuery {
+    pub subscription_status: Option<SubscriptionStatus>,
+}
+
+#[get("active_servers")]
+pub async fn active_servers(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    query: web::Query<ActiveServersQuery>,
+) -> Result<HttpResponse, ApiError> {
+    let master_key = dotenvy::var("PYRO_API_KEY")?;
+
+    if !req
+        .head()
+        .headers()
+        .get("X-Master-Key")
+        .map_or(false, |it| it.as_bytes() == master_key.as_bytes())
+    {
+        return Err(ApiError::CustomAuthentication(
+            "Invalid master key".to_string(),
+        ));
+    }
+
+    let servers =
+        user_subscription_item::UserSubscriptionItem::get_all_servers(
+            query.subscription_status,
+            &**pool,
+        )
+        .await?;
+
+    let server_ids = servers
+        .into_iter()
+        .filter_map(|x| {
+            x.metadata.and_then(|x| match x {
+                SubscriptionMetadata::Pyro { id } => Some(id),
+            })
+        })
+        .collect::<Vec<_>>();
+
+    Ok(HttpResponse::Ok().json(server_ids))
 }
 
 #[derive(Deserialize)]
