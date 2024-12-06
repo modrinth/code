@@ -2386,24 +2386,9 @@
           "const": "mr-auth:default"
         },
         {
-          "description": "Enables the create_account command without any pre-configured scope.",
-          "type": "string",
-          "const": "mr-auth:allow-create-account"
-        },
-        {
           "description": "Enables the get command without any pre-configured scope.",
           "type": "string",
           "const": "mr-auth:allow-get"
-        },
-        {
-          "description": "Enables the login_2fa command without any pre-configured scope.",
-          "type": "string",
-          "const": "mr-auth:allow-login-2fa"
-        },
-        {
-          "description": "Enables the login_pass command without any pre-configured scope.",
-          "type": "string",
-          "const": "mr-auth:allow-login-pass"
         },
         {
           "description": "Enables the logout command without any pre-configured scope.",
@@ -2416,24 +2401,9 @@
           "const": "mr-auth:allow-modrinth-login"
         },
         {
-          "description": "Denies the create_account command without any pre-configured scope.",
-          "type": "string",
-          "const": "mr-auth:deny-create-account"
-        },
-        {
           "description": "Denies the get command without any pre-configured scope.",
           "type": "string",
           "const": "mr-auth:deny-get"
-        },
-        {
-          "description": "Denies the login_2fa command without any pre-configured scope.",
-          "type": "string",
-          "const": "mr-auth:deny-login-2fa"
-        },
-        {
-          "description": "Denies the login_pass command without any pre-configured scope.",
-          "type": "string",
-          "const": "mr-auth:deny-login-pass"
         },
         {
           "description": "Denies the logout command without any pre-configured scope.",

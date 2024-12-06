@@ -11,7 +11,7 @@ pub struct ChargeItem {
     pub id: ChargeId,
     pub user_id: UserId,
     pub price_id: ProductPriceId,
-    pub amount: u64,
+    pub amount: i64,
     pub currency_code: String,
     pub status: ChargeStatus,
     pub due: DateTime<Utc>,
@@ -24,9 +24,10 @@ pub struct ChargeItem {
     pub payment_platform: PaymentPlatform,
     pub payment_platform_id: Option<String>,
 
+    pub parent_charge_id: Option<ChargeId>,
+
     // Net is always in USD
-    pub net: u64,
-    pub refunded: u64,
+    pub net: Option<i64>,
 }
 
 struct ChargeResult {
@@ -43,8 +44,8 @@ struct ChargeResult {
     subscription_interval: Option<String>,
     payment_platform: String,
     payment_platform_id: Option<String>,
-    net: i64,
-    refunded: i64,
+    parent_charge_id: Option<i64>,
+    net: Option<i64>,
 }
 
 impl TryFrom<ChargeResult> for ChargeItem {
@@ -55,7 +56,7 @@ impl TryFrom<ChargeResult> for ChargeItem {
             id: ChargeId(r.id),
             user_id: UserId(r.user_id),
             price_id: ProductPriceId(r.price_id),
-            amount: r.amount as u64,
+            amount: r.amount,
             currency_code: r.currency_code,
             status: ChargeStatus::from_string(&r.status),
             due: r.due,
@@ -67,8 +68,8 @@ impl TryFrom<ChargeResult> for ChargeItem {
                 .map(|x| PriceDuration::from_string(&x)),
             payment_platform: PaymentPlatform::from_string(&r.payment_platform),
             payment_platform_id: r.payment_platform_id,
-            net: r.net as u64,
-            refunded: r.refunded as u64,
+            parent_charge_id: r.parent_charge_id.map(ChargeId),
+            net: r.net,
         })
     }
 }
@@ -78,7 +79,7 @@ macro_rules! select_charges_with_predicate {
         sqlx::query_as!(
             ChargeResult,
             r#"
-            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval, payment_platform, payment_platform_id, net, refunded
+            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net
             FROM charges
             "#
                 + $predicate,
@@ -94,7 +95,7 @@ impl ChargeItem {
     ) -> Result<ChargeId, DatabaseError> {
         sqlx::query!(
             r#"
-            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, net, refunded)
+            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
             ON CONFLICT (id)
             DO UPDATE
@@ -105,13 +106,13 @@ impl ChargeItem {
                     subscription_interval = EXCLUDED.subscription_interval,
                     payment_platform = EXCLUDED.payment_platform,
                     payment_platform_id = EXCLUDED.payment_platform_id,
-                    net = EXCLUDED.net,
-                    refunded = EXCLUDED.refunded
+                    parent_charge_id = EXCLUDED.parent_charge_id,
+                    net = EXCLUDED.net
             "#,
             self.id.0,
             self.user_id.0,
             self.price_id.0,
-            self.amount as i64,
+            self.amount,
             self.currency_code,
             self.type_.as_str(),
             self.status.as_str(),
@@ -121,8 +122,8 @@ impl ChargeItem {
             self.subscription_interval.map(|x| x.as_str()),
             self.payment_platform.as_str(),
             self.payment_platform_id.as_deref(),
-            self.net as i64,
-            self.refunded as i64,
+            self.parent_charge_id.map(|x| x.0),
+            self.net,
         )
             .execute(&mut **transaction)
         .await?;
@@ -160,6 +161,24 @@ impl ChargeItem {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
+    pub async fn get_children(
+        charge_id: ChargeId,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<ChargeItem>, DatabaseError> {
+        let charge_id = charge_id.0;
+        let res = select_charges_with_predicate!(
+            "WHERE parent_charge_id = $1",
+            charge_id
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(res
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
+
     pub async fn get_open_subscription(
         user_subscription_id: UserSubscriptionId,
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
@@ -178,9 +197,18 @@ impl ChargeItem {
     pub async fn get_chargeable(
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<ChargeItem>, DatabaseError> {
-        let now = Utc::now();
-
-        let res = select_charges_with_predicate!("WHERE (status = 'open' AND due < $1) OR (status = 'failed' AND last_attempt < $1 - INTERVAL '2 days')", now)
+        let charge_type = ChargeType::Subscription.as_str();
+        let res = select_charges_with_predicate!(
+            r#"
+            WHERE
+                charge_type = $1 AND
+                (
+                    (status = 'open' AND due < NOW()) OR
+                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')
+                )
+            "#,
+            charge_type
+        )
             .fetch_all(exec)
             .await?;
 
@@ -193,10 +221,18 @@ impl ChargeItem {
     pub async fn get_unprovision(
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<ChargeItem>, DatabaseError> {
-        let now = Utc::now();
-
-        let res =
-            select_charges_with_predicate!("WHERE (status = 'cancelled' AND due < $1) OR (status = 'failed' AND last_attempt < $1 - INTERVAL '2 days')", now)
+        let charge_type = ChargeType::Subscription.as_str();
+        let res = select_charges_with_predicate!(
+            r#"
+            WHERE
+                charge_type = $1 AND
+                (
+                    (status = 'cancelled' AND due < NOW()) OR
+                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')
+                )
+            "#,
+            charge_type
+        )
             .fetch_all(exec)
             .await?;
 

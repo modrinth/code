@@ -179,6 +179,7 @@ pub enum ChargeType {
     OneTime,
     Subscription,
     Proration,
+    Refund,
 }
 
 impl ChargeType {
@@ -187,6 +188,7 @@ impl ChargeType {
             ChargeType::OneTime => "one-time",
             ChargeType::Subscription { .. } => "subscription",
             ChargeType::Proration { .. } => "proration",
+            ChargeType::Refund => "refund",
         }
     }
 
@@ -195,6 +197,7 @@ impl ChargeType {
             "one-time" => ChargeType::OneTime,
             "subscription" => ChargeType::Subscription,
             "proration" => ChargeType::Proration,
+            "refund" => ChargeType::Refund,
             _ => ChargeType::OneTime,
         }
     }
@@ -209,8 +212,6 @@ pub enum ChargeStatus {
     Succeeded,
     Failed,
     Cancelled,
-    Refunded,
-    RefundProcessing,
 }
 
 impl ChargeStatus {
@@ -232,8 +233,6 @@ impl ChargeStatus {
             ChargeStatus::Failed => "failed",
             ChargeStatus::Open => "open",
             ChargeStatus::Cancelled => "cancelled",
-            ChargeStatus::RefundProcessing => "refund_processing",
-            ChargeStatus::Refunded => "refunded",
         }
     }
 }

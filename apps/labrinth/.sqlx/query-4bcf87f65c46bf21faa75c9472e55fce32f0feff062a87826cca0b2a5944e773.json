@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval, payment_platform, payment_platform_id, net, refunded\n            FROM charges\n            WHERE id = $1",
+  "query": "\n            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net\n            FROM charges\n            \n            WHERE\n                charge_type = $1 AND\n                (\n                    (status = 'cancelled' AND due < NOW()) OR\n                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')\n                )\n            ",
   "describe": {
     "columns": [
       {
@@ -70,18 +70,18 @@
       },
       {
         "ordinal": 13,
-        "name": "net",
+        "name": "parent_charge_id",
         "type_info": "Int8"
       },
       {
         "ordinal": 14,
-        "name": "refunded",
+        "name": "net",
         "type_info": "Int8"
       }
     ],
     "parameters": {
       "Left": [
-        "Int8"
+        "Text"
       ]
     },
     "nullable": [
@@ -98,9 +98,9 @@
       true,
       false,
       true,
-      false,
+      true,
       false
     ]
   },
-  "hash": "5bf5e5ab876b33044facf21cd3da909b4517dac5d48e27a5ecd43d272ff20c85"
+  "hash": "4bcf87f65c46bf21faa75c9472e55fce32f0feff062a87826cca0b2a5944e773"
 }

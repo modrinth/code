@@ -1,0 +1,106 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net\n            FROM charges\n            WHERE parent_charge_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "price_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "amount",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "currency_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "due",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "last_attempt",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "charge_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "subscription_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "subscription_interval",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "payment_platform",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "payment_platform_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "parent_charge_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 14,
+        "name": "net",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "4e6978d9dd65fddb1f35b02736e1ff5cb2236e68cbec7c379d0cd7dbd521b783"
+}
