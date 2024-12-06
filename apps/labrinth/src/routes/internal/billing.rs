@@ -447,7 +447,7 @@ pub async fn edit_subscription(
                 }
 
                 let charge_id = generate_charge_id(&mut transaction).await?;
-                let charge = ChargeItem {
+                let mut charge = ChargeItem {
                     id: charge_id,
                     user_id: user.id.into(),
                     price_id: product_price.id,
@@ -511,14 +511,14 @@ pub async fn edit_subscription(
                     intent.payment_method = Some(payment_method_id);
                 }
 
+                let intent =
+                    stripe::PaymentIntent::create(&stripe_client, intent)
+                        .await?;
+
+                charge.payment_platform_id = Some(intent.id.to_string());
                 charge.upsert(&mut transaction).await?;
 
-                Some((
-                    proration,
-                    0,
-                    stripe::PaymentIntent::create(&stripe_client, intent)
-                        .await?,
-                ))
+                Some((proration, 0, intent))
             }
         } else {
             None
@@ -1432,6 +1432,8 @@ pub async fn stripe_webhook(
 
                     charge.status = charge_status;
                     charge.last_attempt = Some(Utc::now());
+                    charge.payment_platform_id =
+                        Some(payment_intent_id.to_string());
                     charge.upsert(transaction).await?;
 
                     if let Some(subscription_id) = charge.subscription_id {
@@ -1571,7 +1573,6 @@ pub async fn stripe_webhook(
                             payment_intent_id.to_string(),
                         ),
                         parent_charge_id: None,
-                        // TODO: fill these in (application fee)
                         net: None,
                     };
 
