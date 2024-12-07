@@ -108,7 +108,7 @@ pub async fn count_download(
         ApiError::InvalidInput("invalid download URL specified!".to_string())
     })?;
 
-    let ip = crate::routes::analytics::convert_to_ip_v6(&download_body.ip)
+    let ip = crate::util::ip::convert_to_ip_v6(&download_body.ip)
         .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
 
     analytics_queue.add_download(Download {

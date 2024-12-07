@@ -69,11 +69,11 @@ pub enum PackFileHash {
 
 impl From<String> for PackFileHash {
     fn from(s: String) -> Self {
-        return match s.as_str() {
+        match s.as_str() {
             "sha1" => PackFileHash::Sha1,
             "sha512" => PackFileHash::Sha512,
             _ => PackFileHash::Unknown(s),
-        };
+        }
     }
 }
 

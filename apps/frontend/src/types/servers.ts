@@ -167,6 +167,9 @@ export interface WSAuthExpiringEvent {
 export interface WSPowerStateEvent {
   event: "power-state";
   state: ServerState;
+  // if state "crashed"
+  oom_killed?: boolean;
+  exit_code?: number;
 }
 
 export interface WSAuthIncorrectEvent {

@@ -205,6 +205,7 @@
                     color: 'red',
                     hoverFilled: true,
                     action: () => reportVersion(version.id),
+                    shown: !currentMember,
                   },
                   { divider: true, shown: currentMember },
                   {

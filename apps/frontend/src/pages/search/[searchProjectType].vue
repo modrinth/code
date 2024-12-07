@@ -473,7 +473,7 @@ async function serverInstall(project) {
 }
 
 projectType.value = tags.value.projectTypes.find(
-  (x) => x.id === route.path.substring(1, route.path.length - 1),
+  (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
 );
 
 const noLoad = ref(false);

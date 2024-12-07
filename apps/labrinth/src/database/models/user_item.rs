@@ -44,6 +44,8 @@ pub struct User {
     pub created: DateTime<Utc>,
     pub role: String,
     pub badges: Badges,
+
+    pub allow_friend_requests: bool,
 }
 
 impl User {
@@ -58,13 +60,13 @@ impl User {
                 avatar_url, raw_avatar_url, bio, created,
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
-                venmo_handle, stripe_customer_id
+                venmo_handle, stripe_customer_id, allow_friend_requests
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9, $10, $11, $12, $13,
-                $14, $15, $16, $17, $18, $19, $20
+                $14, $15, $16, $17, $18, $19, $20, $21
             )
             ",
             self.id as UserId,
@@ -86,7 +88,8 @@ impl User {
             self.paypal_country,
             self.paypal_email,
             self.venmo_handle,
-            self.stripe_customer_id
+            self.stripe_customer_id,
+            self.allow_friend_requests,
         )
         .execute(&mut **transaction)
         .await?;
@@ -172,7 +175,7 @@ impl User {
                         created, role, badges,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
-                        venmo_handle, stripe_customer_id
+                        venmo_handle, stripe_customer_id, allow_friend_requests
                     FROM users
                     WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                     ",
@@ -205,6 +208,7 @@ impl User {
                             venmo_handle: u.venmo_handle,
                             stripe_customer_id: u.stripe_customer_id,
                             totp_secret: u.totp_secret,
+                            allow_friend_requests: u.allow_friend_requests,
                         };
 
                         acc.insert(u.id, (Some(u.username), user));
@@ -637,6 +641,16 @@ impl User {
                 "
                 DELETE FROM pats
                 WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM friends
+                WHERE user_id = $1 OR friend_id = $1
                 ",
                 id as UserId,
             )
