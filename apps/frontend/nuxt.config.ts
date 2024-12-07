@@ -343,8 +343,6 @@ export default defineNuxtConfig({
         globalThis.CF_PAGES_COMMIT_SHA ||
         "unknown",
 
-      turnstile: { siteKey: "0x4AAAAAAAW3guHM6Eunbgwu" },
-
       stripePublishableKey:
         process.env.STRIPE_PUBLISHABLE_KEY ||
         globalThis.STRIPE_PUBLISHABLE_KEY ||
@@ -362,7 +360,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@vintl/nuxt", "@nuxtjs/turnstile", "@pinia/nuxt"],
+  modules: ["@vintl/nuxt", "@pinia/nuxt"],
   vintl: {
     defaultLocale: "en-US",
     locales: [

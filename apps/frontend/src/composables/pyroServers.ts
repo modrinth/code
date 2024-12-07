@@ -47,8 +47,11 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
     "Access-Control-Allow-Headers": "Authorization",
     "User-Agent": "Pyro/1.0 (https://pyro.host)",
     Vary: "Accept, Origin",
-    "Content-Type": contentType,
   };
+
+  if (contentType !== "none") {
+    headers["Content-Type"] = contentType;
+  }
 
   if (import.meta.client && typeof window !== "undefined") {
     headers.Origin = window.location.origin;
@@ -396,12 +399,24 @@ const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => 
       `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`,
     );
 
-    return await PyroFetch(`/reinstallMrpack?hard=${hardResetParam}`, {
-      method: "POST",
-      contentType: "application/octet-stream",
-      body: mrpack,
-      override: auth,
-    });
+    const formData = new FormData();
+    formData.append("file", mrpack);
+
+    const response = await fetch(
+      `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+        body: formData,
+        signal: AbortSignal.timeout(30 * 60 * 1000),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`[pyroservers] native fetch err status: ${response.status}`);
+    }
   } catch (error) {
     console.error("Error reinstalling from mrpack:", error);
     throw error;
@@ -688,7 +703,8 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
 
 const listDirContents = (path: string, page: number, pageSize: number) => {
   return retryWithAuth(async () => {
-    return await PyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
+    const encodedPath = encodeURIComponent(path);
+    return await PyroFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
       override: internalServerRefrence.value.fs.auth,
       retry: false,
     });
@@ -697,7 +713,8 @@ const listDirContents = (path: string, page: number, pageSize: number) => {
 
 const createFileOrFolder = (path: string, type: "file" | "directory") => {
   return retryWithAuth(async () => {
-    return await PyroFetch(`/create?path=${path}&type=${type}`, {
+    const encodedPath = encodeURIComponent(path);
+    return await PyroFetch(`/create?path=${encodedPath}&type=${type}`, {
       method: "POST",
       contentType: "application/octet-stream",
       override: internalServerRefrence.value.fs.auth,
@@ -707,7 +724,8 @@ const createFileOrFolder = (path: string, type: "file" | "directory") => {
 
 const uploadFile = (path: string, file: File) => {
   return retryWithAuth(async () => {
-    return await PyroFetch(`/create?path=${path}&type=file`, {
+    const encodedPath = encodeURIComponent(path);
+    return await PyroFetch(`/create?path=${encodedPath}&type=file`, {
       method: "POST",
       contentType: "application/octet-stream",
       body: file,
@@ -788,7 +806,8 @@ const deleteFileOrFolder = (path: string, recursive: boolean) => {
 
 const downloadFile = (path: string, raw?: boolean) => {
   return retryWithAuth(async () => {
-    const fileData = await PyroFetch(`/download?path=${path}`, {
+    const encodedPath = encodeURIComponent(path);
+    const fileData = await PyroFetch(`/download?path=${encodedPath}`, {
       override: internalServerRefrence.value.fs.auth,
     });
 

@@ -2,7 +2,8 @@ name: docker-build
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - '**'
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'

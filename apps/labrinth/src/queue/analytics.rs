@@ -6,7 +6,6 @@ use dashmap::{DashMap, DashSet};
 use redis::cmd;
 use sqlx::PgPool;
 use std::collections::HashMap;
-use std::net::Ipv6Addr;
 
 const DOWNLOADS_NAMESPACE: &str = "downloads";
 const VIEWS_NAMESPACE: &str = "views";
@@ -33,23 +32,8 @@ impl AnalyticsQueue {
         }
     }
 
-    fn strip_ip(ip: Ipv6Addr) -> u64 {
-        if let Some(ip) = ip.to_ipv4_mapped() {
-            let octets = ip.octets();
-            u64::from_be_bytes([
-                octets[0], octets[1], octets[2], octets[3], 0, 0, 0, 0,
-            ])
-        } else {
-            let octets = ip.octets();
-            u64::from_be_bytes([
-                octets[0], octets[1], octets[2], octets[3], octets[4],
-                octets[5], octets[6], octets[7],
-            ])
-        }
-    }
-
     pub fn add_view(&self, page_view: PageView) {
-        let ip_stripped = Self::strip_ip(page_view.ip);
+        let ip_stripped = crate::util::ip::strip_ip(page_view.ip);
 
         self.views_queue
             .entry((ip_stripped, page_view.project_id))
@@ -57,7 +41,7 @@ impl AnalyticsQueue {
             .push(page_view);
     }
     pub fn add_download(&self, download: Download) {
-        let ip_stripped = Self::strip_ip(download.ip);
+        let ip_stripped = crate::util::ip::strip_ip(download.ip);
         self.downloads_queue
             .insert((ip_stripped, download.project_id), download);
     }
