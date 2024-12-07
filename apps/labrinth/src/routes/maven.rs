@@ -21,10 +21,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(version_file);
 }
 
-// TODO: These were modified in v3 and should be tested
-
 #[derive(Default, Debug, Clone, YaSerialize)]
-#[yaserde(root = "metadata", rename = "metadata")]
+#[yaserde(rename = "metadata")]
 pub struct Metadata {
     #[yaserde(rename = "groupId")]
     group_id: String,
@@ -51,11 +49,11 @@ pub struct Versions {
 }
 
 #[derive(Default, Debug, Clone, YaSerialize)]
-#[yaserde(rename = "project", namespace = "http://maven.apache.org/POM/4.0.0")]
+#[yaserde(rename = "project", namespaces = { "" = "http://maven.apache.org/POM/4.0.0" })]
 pub struct MavenPom {
-    #[yaserde(rename = "xsi:schemaLocation", attribute)]
+    #[yaserde(rename = "xsi:schemaLocation", attribute = true)]
     schema_location: String,
-    #[yaserde(rename = "xmlns:xsi", attribute)]
+    #[yaserde(rename = "xmlns:xsi", attribute = true)]
     xsi: String,
     #[yaserde(rename = "modelVersion")]
     model_version: String,
