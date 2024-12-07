@@ -338,6 +338,9 @@
   "label.scopes": {
     "message": "Scopes"
   },
+  "label.servers": {
+    "message": "Servers"
+  },
   "label.settings": {
     "message": "Settings"
   },
@@ -386,44 +389,80 @@
   "layout.banner.verify-email.title": {
     "message": "For security purposes, please verify your email address on Modrinth."
   },
-  "layout.footer.company.careers": {
-    "message": "Careers"
+  "layout.footer.about": {
+    "message": "About"
   },
-  "layout.footer.company.privacy": {
-    "message": "Privacy"
+  "layout.footer.about.blog": {
+    "message": "Blog"
   },
-  "layout.footer.company.rules": {
-    "message": "Rules"
+  "layout.footer.about.rewards-program": {
+    "message": "Rewards Program"
   },
-  "layout.footer.company.terms": {
-    "message": "Terms"
+  "layout.footer.about.status": {
+    "message": "Status"
   },
-  "layout.footer.company.title": {
-    "message": "Company"
-  },
-  "layout.footer.interact.title": {
-    "message": "Interact"
+  "layout.footer.legal": {
+    "message": "Legal"
   },
   "layout.footer.legal-disclaimer": {
     "message": "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT."
   },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Privacy Policy"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Content Rules"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Terms of Use"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth is <github-link>open source</github-link>."
   },
-  "layout.footer.resources.blog": {
-    "message": "Blog"
+  "layout.footer.products": {
+    "message": "Products"
   },
-  "layout.footer.resources.docs": {
-    "message": "Docs"
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
   },
-  "layout.footer.resources.status": {
-    "message": "Status"
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
   },
-  "layout.footer.resources.support": {
-    "message": "Support"
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
   },
-  "layout.footer.resources.title": {
+  "layout.footer.resources": {
     "message": "Resources"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "API documentation"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Help Center"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Report issues"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Translate"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.tumblr": {
+    "message": "Tumblr"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
   },
   "layout.menu-toggle.action": {
     "message": "Toggle menu"
@@ -976,6 +1015,12 @@
   },
   "settings.billing.payment_method_type.visa": {
     "message": "Visa"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Manage your Modrinth Server subscriptions."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Modrinth Server Subscriptions"
   },
   "settings.billing.subscription.description": {
     "message": "Manage your Modrinth subscriptions."

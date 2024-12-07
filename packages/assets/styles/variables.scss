@@ -69,6 +69,18 @@ html {
     hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, hsla(0, 0%, 0%, 0.1) 0px 2px 4px -1px;
 
   --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
+
+  --brand-gradient-strong-bg: linear-gradient(
+      270deg,
+      rgba(68, 182, 138, 0.175) 0%,
+      rgba(36, 225, 91, 0.12) 100%
+  );
+  --brand-gradient-bg: linear-gradient(
+      0deg,
+      rgba(68, 182, 138, 0.175) 0%,
+      rgba(58, 250, 112, 0.125) 100%
+  );
+  --brand-gradient-border: rgba(32, 64, 32, 0.15);
 }
 
 .dark-mode,
@@ -113,6 +125,10 @@ html {
     hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
+
+  --brand-gradient-strong-bg: linear-gradient(270deg, #09110D 10%, #131F17 100%);
+  --brand-gradient-bg: linear-gradient(0deg, rgba(14, 35, 19, 0.2) 0%, rgba(55, 137, 73, 0.1) 100%);
+  --brand-gradient-border: rgba(155, 255, 160, 0.08);
 }
 
 .oled-mode {
@@ -122,4 +138,10 @@ html {
   --color-button-bg: #222329;
 
   --color-ad: #0d1828;
+
+  --brand-gradient-strong-bg: linear-gradient(270deg, rgba(9, 18, 14, 0.6) 10%, rgba(19, 31, 23, 0.5) 100%);
+}
+
+.retro-mode {
+  --brand-gradient-strong-bg: #3A3B38
 }
