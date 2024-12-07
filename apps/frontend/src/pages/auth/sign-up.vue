@@ -91,7 +91,7 @@
         :description="formatMessage(messages.subscribeLabel)"
       />
 
-      <p>
+      <p v-if="!route.query.launcher">
         <IntlFormatted :message-id="messages.legalDisclaimer">
           <template #terms-link="{ children }">
             <NuxtLink to="/legal/terms" class="text-link">
@@ -118,7 +118,13 @@
 
       <div class="auth-form__additional-options">
         {{ formatMessage(messages.alreadyHaveAccountLabel) }}
-        <NuxtLink class="text-link" :to="signInLink">
+        <NuxtLink
+          class="text-link"
+          :to="{
+            path: '/auth/sign-in',
+            query: route.query,
+          }"
+        >
           {{ formatMessage(commonMessages.signInButton) }}
         </NuxtLink>
       </div>
@@ -214,10 +220,6 @@ const confirmPassword = ref("");
 const token = ref("");
 const subscribe = ref(true);
 
-const signInLink = computed(
-  () => `/auth/sign-in${route.query.redirect ? `?redirect=${route.query.redirect}` : ""}`,
-);
-
 async function createAccount() {
   startLoading();
   try {
@@ -244,6 +246,13 @@ async function createAccount() {
         sign_up_newsletter: subscribe.value,
       },
     });
+
+    if (route.query.launcher) {
+      await navigateTo(`https://launcher-files.modrinth.com/?code=${res.session}`, {
+        external: true,
+      });
+      return;
+    }
 
     await useAuth(res.session);
     await useUser();

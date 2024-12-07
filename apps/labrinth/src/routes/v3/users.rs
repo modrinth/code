@@ -300,6 +300,7 @@ pub struct EditUser {
     pub badges: Option<Badges>,
     #[validate(length(max = 160))]
     pub venmo_handle: Option<String>,
+    pub allow_friend_requests: Option<bool>,
 }
 
 pub async fn user_edit(
@@ -432,6 +433,20 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     venmo_handle,
+                    id as crate::database::models::ids::UserId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
+            if let Some(allow_friend_requests) = &user.allow_friend_requests {
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET allow_friend_requests = $1
+                    WHERE (id = $2)
+                    ",
+                    allow_friend_requests,
                     id as crate::database::models::ids::UserId,
                 )
                 .execute(&mut *transaction)

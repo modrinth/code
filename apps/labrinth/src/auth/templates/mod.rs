@@ -8,7 +8,7 @@ pub struct Success<'a> {
     pub name: &'a str,
 }
 
-impl<'a> Success<'a> {
+impl Success<'_> {
     pub fn render(self) -> HttpResponse {
         let html = include_str!("success.html");
 

@@ -818,11 +818,13 @@ pub async fn process_payout(
 
     // Modrinth's share of ad revenue
     let modrinth_cut = Decimal::from(1) / Decimal::from(4);
-    // Clean.io fee (ad antimalware). Per 1000 impressions.
+    // Clean.io fee (ad antimalware). Per 1000 impressions. 0.008 CPM
     let clean_io_fee = Decimal::from(8) / Decimal::from(1000);
+    // Google Ad Manager fee. Per 1000 impressions. 0.015400 CPM
+    let gam_fee = Decimal::from(154) / Decimal::from(10000);
 
     let net_revenue = aditude_amount
-        - (clean_io_fee * Decimal::from(aditude_impressions)
+        - ((clean_io_fee + gam_fee) * Decimal::from(aditude_impressions)
             / Decimal::from(1000));
 
     let payout = net_revenue * (Decimal::from(1) - modrinth_cut);
