@@ -157,7 +157,7 @@ pub async fn refund_charge(
 
     if let Some(charge) = ChargeItem::get(id.into(), &**pool).await? {
         let refunds = ChargeItem::get_children(id.into(), &**pool).await?;
-        let refunds = refunds
+        let refunds = -refunds
             .into_iter()
             .filter_map(|x| match x.status {
                 ChargeStatus::Open
@@ -180,7 +180,7 @@ pub async fn refund_charge(
             ));
         }
 
-        if (refundable - refund_amount) < 0 {
+        if (refundable - refund_amount) < 0 || refund_amount == 0 {
             return Err(ApiError::InvalidInput(
                 "You cannot refund more than the amount of the charge!"
                     .to_string(),
@@ -208,10 +208,6 @@ pub async fn refund_charge(
                         &stripe_client,
                         CreateRefund {
                             amount: Some(refund_amount),
-                            currency: Some(
-                                Currency::from_str(&charge.currency_code)
-                                    .unwrap_or(Currency::USD),
-                            ),
                             metadata: Some(metadata),
                             payment_intent: Some(payment_platform_id),
 

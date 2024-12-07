@@ -79,7 +79,15 @@ macro_rules! select_charges_with_predicate {
         sqlx::query_as!(
             ChargeResult,
             r#"
-            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net
+            SELECT
+                id, user_id, price_id, amount, currency_code, status, due, last_attempt,
+                charge_type, subscription_id,
+                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336
+                subscription_interval AS "subscription_interval?",
+                payment_platform,
+                payment_platform_id AS "payment_platform_id?",
+                parent_charge_id AS "parent_charge_id?",
+                net AS "net?"
             FROM charges
             "#
                 + $predicate,

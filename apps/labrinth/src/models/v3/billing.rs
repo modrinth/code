@@ -173,7 +173,7 @@ pub struct Charge {
     pub platform: PaymentPlatform,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ChargeType {
     OneTime,
@@ -203,7 +203,7 @@ impl ChargeType {
     }
 }
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub enum ChargeStatus {
     // Open charges are for the next billing interval

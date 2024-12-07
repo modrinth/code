@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, user_id, price_id, amount, currency_code, status, due, last_attempt, charge_type, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net\n            FROM charges\n            WHERE subscription_id = $1 AND (status = 'open' OR status = 'cancelled')",
+  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            \n            WHERE\n                charge_type = $1 AND\n                (\n                    (status = 'cancelled' AND due < NOW()) OR\n                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')\n                )\n            ",
   "describe": {
     "columns": [
       {
@@ -55,7 +55,7 @@
       },
       {
         "ordinal": 10,
-        "name": "subscription_interval",
+        "name": "subscription_interval?",
         "type_info": "Text"
       },
       {
@@ -65,23 +65,23 @@
       },
       {
         "ordinal": 12,
-        "name": "payment_platform_id",
+        "name": "payment_platform_id?",
         "type_info": "Text"
       },
       {
         "ordinal": 13,
-        "name": "parent_charge_id",
+        "name": "parent_charge_id?",
         "type_info": "Int8"
       },
       {
         "ordinal": 14,
-        "name": "net",
+        "name": "net?",
         "type_info": "Int8"
       }
     ],
     "parameters": {
       "Left": [
-        "Int8"
+        "Text"
       ]
     },
     "nullable": [
@@ -102,5 +102,5 @@
       false
     ]
   },
-  "hash": "68567e03cdf5c8815501e0d283c1ce4ff61c6b24af0c744abbe3f0c9b43a0fbe"
+  "hash": "bfcbcadda1e323d56b6a21fc060c56bff2f38a54cf65dd1cc21f209240c7091b"
 }
