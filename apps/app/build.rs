@@ -102,13 +102,7 @@ fn main() {
             .plugin(
                 "mr-auth",
                 InlinedPlugin::new()
-                    .commands(&[
-                        "login_pass",
-                        "login_2fa",
-                        "create_account",
-                        "logout",
-                        "get",
-                    ])
+                    .commands(&["modrinth_login", "logout", "get"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),

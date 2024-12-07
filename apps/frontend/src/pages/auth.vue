@@ -1,3 +1,8 @@
+<script setup lang="ts">
+definePageMeta({
+  middleware: ["launcher-auth"],
+});
+</script>
 <template>
   <NuxtPage class="auth-container universal-card" />
 </template>
@@ -57,20 +62,6 @@
 @media screen and (max-width: 25.5rem) {
   .third-party .btn {
     grid-column: 1 / 3;
-  }
-}
-
-.turnstile {
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--color-button-bg);
-  height: 66px;
-
-  iframe {
-    margin: -1px;
-    min-width: calc(100% + 2px);
   }
 }
 
