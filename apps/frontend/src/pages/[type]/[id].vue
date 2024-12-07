@@ -606,6 +606,7 @@
                       auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
                     color: 'red',
                     hoverOnly: true,
+                    shown: !currentMember,
                   },
                   { id: 'copy-id', action: () => copyId() },
                 ]"

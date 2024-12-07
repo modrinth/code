@@ -161,7 +161,7 @@ pub struct Charge {
     pub id: ChargeId,
     pub user_id: UserId,
     pub price_id: ProductPriceId,
-    pub amount: i64,
+    pub amount: u64,
     pub currency_code: String,
     pub status: ChargeStatus,
     pub due: DateTime<Utc>,
@@ -170,14 +170,16 @@ pub struct Charge {
     pub type_: ChargeType,
     pub subscription_id: Option<UserSubscriptionId>,
     pub subscription_interval: Option<PriceDuration>,
+    pub platform: PaymentPlatform,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ChargeType {
     OneTime,
     Subscription,
     Proration,
+    Refund,
 }
 
 impl ChargeType {
@@ -186,6 +188,7 @@ impl ChargeType {
             ChargeType::OneTime => "one-time",
             ChargeType::Subscription { .. } => "subscription",
             ChargeType::Proration { .. } => "proration",
+            ChargeType::Refund => "refund",
         }
     }
 
@@ -194,12 +197,13 @@ impl ChargeType {
             "one-time" => ChargeType::OneTime,
             "subscription" => ChargeType::Subscription,
             "proration" => ChargeType::Proration,
+            "refund" => ChargeType::Refund,
             _ => ChargeType::OneTime,
         }
     }
 }
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub enum ChargeStatus {
     // Open charges are for the next billing interval
@@ -229,6 +233,26 @@ impl ChargeStatus {
             ChargeStatus::Failed => "failed",
             ChargeStatus::Open => "open",
             ChargeStatus::Cancelled => "cancelled",
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PaymentPlatform {
+    Stripe,
+}
+
+impl PaymentPlatform {
+    pub fn from_string(string: &str) -> PaymentPlatform {
+        match string {
+            "stripe" => PaymentPlatform::Stripe,
+            _ => PaymentPlatform::Stripe,
+        }
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            PaymentPlatform::Stripe => "stripe",
         }
     }
 }

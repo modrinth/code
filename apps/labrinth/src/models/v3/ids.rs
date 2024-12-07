@@ -158,7 +158,7 @@ pub mod base62_impl {
         {
             struct Base62Visitor;
 
-            impl<'de> Visitor<'de> for Base62Visitor {
+            impl Visitor<'_> for Base62Visitor {
                 type Value = Base62Id;
 
                 fn expecting(

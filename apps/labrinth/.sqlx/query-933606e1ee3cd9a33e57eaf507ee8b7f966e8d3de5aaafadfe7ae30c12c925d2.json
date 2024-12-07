@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)\n            ON CONFLICT (id)\n            DO UPDATE\n                SET status = EXCLUDED.status,\n                    last_attempt = EXCLUDED.last_attempt,\n                    due = EXCLUDED.due,\n                    subscription_id = EXCLUDED.subscription_id,\n                    subscription_interval = EXCLUDED.subscription_interval,\n                    payment_platform = EXCLUDED.payment_platform,\n                    payment_platform_id = EXCLUDED.payment_platform_id,\n                    parent_charge_id = EXCLUDED.parent_charge_id,\n                    net = EXCLUDED.net\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Text",
+        "Text",
+        "Varchar",
+        "Timestamptz",
+        "Timestamptz",
+        "Int8",
+        "Text",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "933606e1ee3cd9a33e57eaf507ee8b7f966e8d3de5aaafadfe7ae30c12c925d2"
+}

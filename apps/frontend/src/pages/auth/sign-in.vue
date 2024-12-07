@@ -81,12 +81,7 @@
           />
         </div>
 
-        <NuxtTurnstile
-          ref="turnstile"
-          v-model="token"
-          class="turnstile"
-          :options="{ theme: $theme.active === 'light' ? 'light' : 'dark' }"
-        />
+        <HCaptcha ref="captcha" v-model="token" />
 
         <button
           class="btn btn-primary continue-btn centered-btn"
@@ -99,12 +94,24 @@
         <div class="auth-form__additional-options">
           <IntlFormatted :message-id="messages.additionalOptionsLabel">
             <template #forgot-password-link="{ children }">
-              <NuxtLink class="text-link" to="/auth/reset-password">
+              <NuxtLink
+                class="text-link"
+                :to="{
+                  path: '/auth/reset-password',
+                  query: route.query,
+                }"
+              >
                 <component :is="() => children" />
               </NuxtLink>
             </template>
             <template #create-account-link="{ children }">
-              <NuxtLink class="text-link" :to="signUpLink">
+              <NuxtLink
+                class="text-link"
+                :to="{
+                  path: '/auth/sign-up',
+                  query: route.query,
+                }"
+              >
                 <component :is="() => children" />
               </NuxtLink>
             </template>
@@ -127,6 +134,7 @@ import {
   KeyIcon,
   MailIcon,
 } from "@modrinth/assets";
+import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -189,17 +197,13 @@ if (auth.value.user) {
   await finishSignIn();
 }
 
-const turnstile = ref();
+const captcha = ref();
 
 const email = ref("");
 const password = ref("");
 const token = ref("");
 
 const flow = ref(route.query.flow);
-
-const signUpLink = computed(
-  () => `/auth/sign-up${route.query.redirect ? `?redirect=${route.query.redirect}` : ""}`,
-);
 
 async function beginPasswordSignIn() {
   startLoading();
@@ -225,7 +229,7 @@ async function beginPasswordSignIn() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }
@@ -250,12 +254,17 @@ async function begin2FASignIn() {
       text: err.data ? err.data.description : err,
       type: "error",
     });
-    turnstile.value?.reset();
+    captcha.value?.reset();
   }
   stopLoading();
 }
 
 async function finishSignIn(token) {
+  if (route.query.launcher) {
+    await navigateTo(`https://launcher-files.modrinth.com/?code=${token}`, { external: true });
+    return;
+  }
+
   if (token) {
     await useAuth(token);
     await useUser();

@@ -52,6 +52,7 @@ pub struct User {
     pub has_totp: Option<bool>,
     pub payout_data: Option<UserPayoutData>,
     pub stripe_customer_id: Option<String>,
+    pub allow_friend_requests: Option<bool>,
 
     // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
@@ -85,6 +86,7 @@ impl From<DBUser> for User {
             has_totp: None,
             github_id: None,
             stripe_customer_id: None,
+            allow_friend_requests: None,
         }
     }
 }
@@ -136,6 +138,7 @@ impl User {
                 balance: Decimal::ZERO,
             }),
             stripe_customer_id: db_user.stripe_customer_id,
+            allow_friend_requests: Some(db_user.allow_friend_requests),
         }
     }
 }
@@ -184,4 +187,30 @@ impl Role {
             Role::Admin => true,
         }
     }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UserFriend {
+    pub id: UserId,
+    pub pending: bool,
+    pub created: DateTime<Utc>,
+}
+
+impl UserFriend {
+    pub fn from(
+        data: crate::database::models::friend_item::FriendItem,
+    ) -> Self {
+        Self {
+            id: data.friend_id.into(),
+            pending: data.accepted,
+            created: data.created,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct UserStatus {
+    pub user_id: UserId,
+    pub profile_name: Option<String>,
+    pub last_update: DateTime<Utc>,
 }

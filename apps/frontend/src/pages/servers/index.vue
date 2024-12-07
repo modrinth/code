@@ -22,6 +22,8 @@
       :payment-methods="paymentMethods"
       :return-url="`${config.public.siteUrl}/servers/manage`"
       :server-name="`${auth?.user?.username}'s server`"
+      :fetch-capacity-statuses="fetchCapacityStatuses"
+      :out-of-stock-url="outOfStockUrl"
       @hidden="handleModalHidden"
     />
 
@@ -165,7 +167,7 @@
             class="hidden w-full rounded-2xl sm:block"
           />
         </div>
-        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
+        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-3">
           <div class="flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -214,6 +216,22 @@
               Modrinth Servers are hosted on
               <span class="text-contrast">2023 Ryzen 7/9 CPUs with DDR5 RAM</span>, running on
               custom-built software to ensure your server performs smoothly.
+            </h3>
+          </div>
+
+          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
+            <ServerIcon class="size-8 text-brand" />
+            <h2 class="m-0 text-lg font-bold">Consistently fast</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Under Pyro, infrastructure is never overloaded, meaning each Modrinth server always
+              runs at its full performance.
+              <a
+                class="mt-2 flex items-center gap-2 font-medium text-contrast transition-all hover:gap-3"
+                href="https://status.pyro.host/"
+                target="_blank"
+              >
+                See the infrastructure <RightArrowIcon class="flex-none" />
+              </a>
             </h3>
           </div>
         </div>
@@ -404,7 +422,7 @@
           <h1 class="m-0 text-lg font-bold">Frequently Asked Questions</h1>
           <div class="details-hide flex flex-col gap-1">
             <details pyro-hash="cpus" class="group" :open="$route.hash === '#cpus'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -417,7 +435,7 @@
             </details>
 
             <details pyro-hash="ddos" class="group" :open="$route.hash === '#ddos'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -431,21 +449,21 @@
             </details>
 
             <details pyro-hash="region" class="group" :open="$route.hash === '#region'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
               <p class="m-0 !leading-[190%]">
-                Currently, Modrinth Servers are located in New York and Los Angeles. More regions
-                are coming soon! Your server's location is currently chosen algorithmically, but you
-                will be able to choose a region in the future.
+                Currently, Modrinth Servers are located in New York, Los Angeles, and Miami. More
+                regions are coming soon! Your server's location is currently chosen algorithmically,
+                but you will be able to choose a region in the future.
               </p>
             </details>
 
             <details pyro-hash="storage" class="group" :open="$route.hash === '#storage'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -458,7 +476,7 @@
             </details>
 
             <details pyro-hash="players" class="group" :open="$route.hash === '#players'">
-              <summary class="flex cursor-pointer items-center py-3 font-bold text-contrast">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
@@ -494,7 +512,7 @@
               : "There's a plan for everyone! Choose the one that fits your needs."
           }}
           <span class="font-bold">
-            Servers are currently US only, in New York and Los Angeles. More regions coming
+            Servers are currently US only, in New York, Los Angeles, and Miami. More regions coming
             soon!</span
           >
         </h2>
@@ -523,29 +541,23 @@
               $12<span class="text-sm font-normal text-secondary">/month</span>
             </h2>
             <ButtonStyled color="blue" size="large">
-              <button
-                v-if="!isSmallAtCapacity"
+              <NuxtLink
+                v-if="!loggedOut && isSmallAtCapacity"
+                :to="outOfStockUrl"
+                target="_blank"
                 class="!bg-highlight-blue !font-medium !text-blue"
-                @click="selectProduct(pyroPlanProducts[0])"
+              >
+                Out of Stock
+                <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
+              </NuxtLink>
+              <button
+                v-else
+                class="!bg-highlight-blue !font-medium !text-blue"
+                @click="selectProduct('small')"
               >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
               </button>
-              <NuxtLink
-                v-else
-                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
-                :target="loggedOut ? '_self' : '_blank'"
-                class="!bg-highlight-blue !font-medium !text-blue"
-              >
-                <template v-if="loggedOut">
-                  Login
-                  <UserIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </template>
-                <template v-else>
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </template>
-              </NuxtLink>
             </ButtonStyled>
           </li>
 
@@ -581,29 +593,23 @@
               $18<span class="text-sm font-normal text-secondary">/month</span>
             </h2>
             <ButtonStyled color="brand" size="large">
-              <button
-                v-if="!isMediumAtCapacity"
-                class="shadow-xl"
-                @click="selectProduct(pyroPlanProducts[1])"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4" />
-              </button>
               <NuxtLink
-                v-else
-                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
-                :target="loggedOut ? '_self' : '_blank'"
+                v-if="!loggedOut && isMediumAtCapacity"
+                :to="outOfStockUrl"
+                target="_blank"
                 class="!bg-highlight-green !font-medium !text-green"
               >
-                <template v-if="loggedOut">
-                  Login
-                  <UserIcon class="!min-h-4 !min-w-4 !text-green" />
-                </template>
-                <template v-else>
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
-                </template>
+                Out of Stock
+                <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
               </NuxtLink>
+              <button
+                v-else
+                class="!bg-highlight-green !font-medium !text-green"
+                @click="selectProduct('medium')"
+              >
+                Get Started
+                <RightArrowIcon class="!min-h-4 !min-w-4 !text-green" />
+              </button>
             </ButtonStyled>
           </li>
 
@@ -627,30 +633,24 @@
             <h2 class="m-0 text-3xl text-contrast">
               $24<span class="text-sm font-normal text-secondary">/month</span>
             </h2>
-            <ButtonStyled color="purple" size="large">
-              <button
-                v-if="!isLargeAtCapacity"
+            <ButtonStyled color="brand" size="large">
+              <NuxtLink
+                v-if="!loggedOut && isLargeAtCapacity"
+                :to="outOfStockUrl"
+                target="_blank"
                 class="!bg-highlight-purple !font-medium !text-purple"
-                @click="selectProduct(pyroPlanProducts[2])"
+              >
+                Out of Stock
+                <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
+              </NuxtLink>
+              <button
+                v-else
+                class="!bg-highlight-purple !font-medium !text-purple"
+                @click="selectProduct('large')"
               >
                 Get Started
                 <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
               </button>
-              <NuxtLink
-                v-else
-                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
-                :target="loggedOut ? '_self' : '_blank'"
-                class="!bg-highlight-purple !font-medium !text-purple"
-              >
-                <template v-if="loggedOut">
-                  Login
-                  <UserIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </template>
-                <template v-else>
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </template>
-              </NuxtLink>
             </ButtonStyled>
           </li>
         </ul>
@@ -668,29 +668,10 @@
 
           <div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
             <ButtonStyled color="standard" size="large">
-              <button
-                v-if="!isLargeAtCapacity"
-                class="w-full md:w-fit"
-                @click="selectProduct(pyroProducts, true)"
-              >
+              <button class="w-full md:w-fit" @click="selectProduct('custom')">
                 Build your own
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
-              <NuxtLink
-                v-else
-                :to="loggedOut ? redirectUrl : 'https://support.modrinth.com'"
-                :target="loggedOut ? '_self' : '_blank'"
-                class="w-full md:w-fit"
-              >
-                <template v-if="loggedOut">
-                  Login
-                  <UserIcon class="!min-h-4 !min-w-4" />
-                </template>
-                <template v-else>
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4" />
-                </template>
-              </NuxtLink>
             </ButtonStyled>
             <p class="m-0 text-sm">Starting at $3/GB RAM</p>
           </div>
@@ -710,9 +691,9 @@ import {
   SortAscendingIcon,
   ExternalIcon,
   TerminalSquareIcon,
-  UserIcon,
   TransferIcon,
   VersionIcon,
+  ServerIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
@@ -722,11 +703,6 @@ const pyroPlanProducts = pyroProducts.filter(
   (p) => p.metadata.ram === 4096 || p.metadata.ram === 6144 || p.metadata.ram === 8192,
 );
 pyroPlanProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
-// yep. this is a thing.
-if (!pyroProducts.metadata) {
-  pyroProducts.metadata = {};
-}
-pyroProducts.metadata.type = "pyro";
 
 const title = "Modrinth Servers";
 const description =
@@ -770,7 +746,7 @@ const deletingSpeed = 25;
 const pauseTime = 2000;
 
 const loggedOut = computed(() => !auth.value.user);
-const redirectUrl = `/auth/sign-in?redirect=${encodeURIComponent("/servers#plan")}`;
+const outOfStockUrl = "https://support.modrinth.com";
 
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
   try {
@@ -782,37 +758,47 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
   }
 });
 
-const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
-  "ServerCapacityAll",
-  async () => {
-    try {
-      const capacityChecks = pyroPlanProducts.map((product) =>
-        usePyroFetch("capacity", {
-          method: "POST",
-          body: {
-            cpu: product.metadata.cpu,
-            memory_mb: product.metadata.ram,
-            swap_mb: product.metadata.swap,
-            storage_mb: product.metadata.storage,
-          },
-        }),
-      );
+async function fetchCapacityStatuses(customProduct = null) {
+  try {
+    const productsToCheck = customProduct?.metadata ? [customProduct] : pyroPlanProducts;
+    const capacityChecks = productsToCheck.map((product) =>
+      usePyroFetch("capacity", {
+        method: "POST",
+        body: {
+          cpu: product.metadata.cpu,
+          memory_mb: product.metadata.ram,
+          swap_mb: product.metadata.swap,
+          storage_mb: product.metadata.storage,
+        },
+      }),
+    );
 
-      const results = await Promise.all(capacityChecks);
+    const results = await Promise.all(capacityChecks);
+    if (customProduct?.metadata) {
+      return {
+        custom: results[0],
+      };
+    } else {
       return {
         small: results[0],
         medium: results[1],
         large: results[2],
       };
-    } catch (error) {
-      console.error("Error checking server capacities:", error);
-      return {
-        small: { available: 0 },
-        medium: { available: 0 },
-        large: { available: 0 },
-      };
     }
-  },
+  } catch (error) {
+    console.error("Error checking server capacities:", error);
+    return {
+      custom: { available: 0 },
+      small: { available: 0 },
+      medium: { available: 0 },
+      large: { available: 0 },
+    };
+  }
+}
+
+const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
+  "ServerCapacityAll",
+  fetchCapacityStatuses,
 );
 
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
@@ -907,19 +893,20 @@ onMounted(scrollToFaq);
 
 watch(() => route.hash, scrollToFaq);
 
-const selectProduct = async (product, custom) => {
-  if (isAtCapacity.value) {
-    addNotification({
-      group: "main",
-      title: "Server Capacity Full",
-      type: "error",
-      text: "We are currently at capacity. Please try again later.",
-    });
+const plans = {
+  small: pyroPlanProducts?.[0],
+  medium: pyroPlanProducts?.[1],
+  large: pyroPlanProducts?.[2],
+  custom: pyroProducts || [],
+};
+
+const selectProduct = async (product) => {
+  if (loggedOut.value) {
+    data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent("/servers?plan=" + product)}`);
     return;
   }
 
   await refreshCapacity();
-
   if (isAtCapacity.value) {
     addNotification({
       group: "main",
@@ -930,68 +917,53 @@ const selectProduct = async (product, custom) => {
     return;
   }
 
-  if (!auth.value.user) {
-    data.$router.push(redirectUrl);
+  const selectedPlan = plans[product];
+  if (!selectedPlan) return;
+
+  if (
+    (product === "custom" && !selectedPlan.length) ||
+    (product !== "custom" && !selectedPlan.metadata)
+  ) {
+    addNotification({
+      group: "main",
+      title: "Invalid product",
+      type: "error",
+      text: "The selected product was found but lacks necessary data. Please contact support.",
+    });
     return;
   }
 
-  customServer.value = !!custom;
-  selectedProduct.value = product;
+  // required for the purchase modal
+  if (!pyroProducts.metadata) {
+    pyroProducts.metadata = {};
+  }
+  pyroProducts.metadata.type = "pyro";
+
+  customServer.value = product === "custom";
+  selectedProduct.value = selectedPlan;
   showModal.value = true;
   modalKey.value++;
   await nextTick();
+
   if (purchaseModal.value && purchaseModal.value.show) {
     purchaseModal.value.show();
   }
 };
 
-const openPurchaseModal = () => {
-  if (isAtCapacity.value) {
-    addNotification({
-      group: "main",
-      title: "Server Capacity Full",
-      type: "error",
-      text: "We are currently at capacity. Please try again later.",
-    });
-    return;
+const planQuery = () => {
+  if (route.query.plan) {
+    document.getElementById("plan").scrollIntoView();
+    selectProduct(route.query.plan);
   }
-
-  refreshCapacity();
-
-  if (isAtCapacity.value) {
-    addNotification({
-      group: "main",
-      title: "Server Capacity Full",
-      type: "error",
-      text: "We are currently at capacity. Please try again later.",
-    });
-    return;
-  }
-
-  customServer.value = false;
-  selectedProduct.value = pyroPlanProducts[0];
-  showModal.value = true;
-  modalKey.value++;
-  nextTick(() => {
-    if (purchaseModal.value && purchaseModal.value.show) {
-      purchaseModal.value.show();
-    }
-  });
 };
 
 onMounted(() => {
   startTyping();
-  if (route.query.showModal) {
-    openPurchaseModal();
-  }
+  planQuery();
 });
 
 watch(customer, (newCustomer) => {
-  if (newCustomer) {
-    if (route.query.showModal) {
-      openPurchaseModal();
-    }
-  }
+  if (newCustomer) planQuery();
 });
 
 onMounted(() => {
