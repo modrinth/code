@@ -150,7 +150,12 @@ pub async fn ws_init(
                                 {
                                     let (status, _) = pair.value_mut();
 
-                                    if status.profile_name.as_ref().map(|x| x.len() > 64).unwrap_or(false) {
+                                    if status
+                                        .profile_name
+                                        .as_ref()
+                                        .map(|x| x.len() > 64)
+                                        .unwrap_or(false)
+                                    {
                                         continue;
                                     }
 
