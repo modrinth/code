@@ -49,7 +49,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(charges)
             .service(active_servers)
             .service(initiate_payment)
-            .service(stripe_webhook),
+            .service(stripe_webhook)
+            .service(refund_charge),
     );
 }
 
