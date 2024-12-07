@@ -173,7 +173,6 @@ const switchVersion = async (versionId) => {
 }
 
 .modal-body {
-  padding: var(--gap-xl);
   display: flex;
   flex-direction: column;
   gap: var(--gap-md);

@@ -28,7 +28,7 @@
       </Button>
       <Button :disabled="props.disabled" @click="autoDetect">
         <SearchIcon />
-        Auto detect
+        Detect
       </Button>
       <Button :disabled="props.disabled" @click="handleJavaFileInput()">
         <FolderSearchIcon />
@@ -187,6 +187,7 @@ async function reinstallJava() {
 
 .toggle-setting {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;

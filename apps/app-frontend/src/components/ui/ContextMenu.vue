@@ -25,7 +25,6 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
 
 const emit = defineEmits(['menu-closed', 'option-clicked'])
 
@@ -38,7 +37,6 @@ const shown = ref(false)
 
 defineExpose({
   showMenu: (event, passedItem, passedOptions) => {
-    hide_ads_window()
     item.value = passedItem
     options.value = passedOptions
 
@@ -71,9 +69,6 @@ const isLinkedData = (item) => {
 }
 
 const hideContextMenu = () => {
-  if (shown.value) {
-    show_ads_window()
-  }
   shown.value = false
   emit('menu-closed')
 }

@@ -399,22 +399,6 @@
   }
 }
 
-.v-popper--theme-tooltip {
-  .v-popper__inner {
-    background: var(--color-tooltip-bg) !important;
-    color: var(--color-tooltip-text) !important;
-    padding: 5px 10px 4px !important;
-    border-radius: var(--size-rounded-tooltip) !important;
-    box-shadow: var(--shadow-floating) !important;
-    font-size: 0.9rem !important;
-  }
-
-  .v-popper__arrow-outer,
-  .v-popper__arrow-inner {
-    border-color: var(--color-tooltip-bg) !important;
-  }
-}
-
 .button-base {
   @extend .button-animation;
   font-weight: 500;
@@ -1232,6 +1216,7 @@ svg.inline-svg {
       font-size: var(--text-18);
       font-weight: var(--weight-extrabold);
       color: var(--color-contrast);
+      line-height: initial;
       margin: 0;
     }
 

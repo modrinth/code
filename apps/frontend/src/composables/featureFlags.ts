@@ -25,6 +25,8 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
   // Feature toggles
   projectTypesPrimaryNav: false,
   hidePlusPromoInUserMenu: false,
+  oldProjectCards: true,
+  newProjectCards: false,
   // advancedRendering: true,
   // externalLinksNewTab: true,
   // notUsingBlockers: false,

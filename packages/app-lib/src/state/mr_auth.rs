@@ -1,4 +1,4 @@
-use crate::config::MODRINTH_API_URL;
+use crate::config::{MODRINTH_API_URL, MODRINTH_URL};
 use crate::state::{CacheBehaviour, CachedEntry};
 use crate::util::fetch::{fetch_advanced, FetchSemaphore};
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -190,8 +190,8 @@ impl ModrinthCredentials {
     }
 }
 
-pub fn get_login_url() -> &'static str {
-    "https:/modrinth.com/auth/sign-in?launcher=true"
+pub fn get_login_url() -> String {
+    format!("{MODRINTH_URL}auth/sign-in?launcher=true")
 }
 
 pub async fn finish_login_flow(

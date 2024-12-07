@@ -260,7 +260,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 1rem;
   gap: 1rem;
 
   -ms-overflow-style: none;
@@ -294,16 +293,16 @@ onUnmounted(() => {
 
     a {
       margin: 0;
-      font-size: var(--font-size-lg);
+      font-size: var(--font-size-md);
       font-weight: bolder;
       white-space: nowrap;
-      color: var(--color-contrast);
+      color: var(--color-base);
     }
 
     svg {
-      height: 1.5rem;
-      width: 1.5rem;
-      color: var(--color-contrast);
+      height: 1.25rem;
+      width: 1.25rem;
+      color: var(--color-base);
     }
   }
 

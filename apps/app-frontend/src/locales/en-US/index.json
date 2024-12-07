@@ -1,0 +1,20 @@
+{
+  "app.settings.tabs.appearance": {
+    "message": "Appearance"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Default instance options"
+  },
+  "app.settings.tabs.java-versions": {
+    "message": "Java versions"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privacy"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Resource management"
+  },
+  "instance.filter.updates-available": {
+    "message": "Updates available"
+  }
+}
