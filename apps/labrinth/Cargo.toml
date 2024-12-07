@@ -40,8 +40,8 @@ serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_with = "3.0.0"
 chrono = { version = "0.4.26", features = ["serde"] }
-yaserde = "0.8.0"
-yaserde_derive = "0.8.0"
+yaserde = "0.12.0"
+yaserde_derive = "0.12.0"
 xml-rs = "0.8.15"
 
 rand = "0.8.5"
@@ -120,7 +120,7 @@ rust_iso3166 = "0.1.11"
 
 jemallocator = { version = "0.5.4", optional = true }
 
-async-stripe = { version = "0.37.3", features = ["runtime-tokio-hyper-rustls"] }
+async-stripe = { version = "0.39.1", features = ["runtime-tokio-hyper-rustls"] }
 rusty-money = "0.4.1"
 json-patch = "*"
 

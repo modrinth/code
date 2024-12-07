@@ -1788,7 +1788,6 @@ pub struct GalleryEditQuery {
 pub async fn edit_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
-    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -1802,19 +1801,38 @@ pub async fn edit_gallery_item(
     )
     .await?
     .1;
-    let string = info.into_inner().0;
 
     item.validate().map_err(|err| {
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let project_item = db_models::Project::get(&string, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified project does not exist!".to_string(),
-            )
-        })?;
+    let result = sqlx::query!(
+        "
+        SELECT id, mod_id FROM mods_gallery
+        WHERE image_url = $1
+        ",
+        item.url
+    )
+    .fetch_optional(&**pool)
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(format!(
+            "Gallery item at URL {} is not part of the project's gallery.",
+            item.url
+        ))
+    })?;
+
+    let project_item = db_models::Project::get_id(
+        database::models::ProjectId(result.mod_id),
+        &**pool,
+        &redis,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "The specified project does not exist!".to_string(),
+        )
+    })?;
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
@@ -1845,24 +1863,6 @@ pub async fn edit_gallery_item(
             ));
         }
     }
-    let mut transaction = pool.begin().await?;
-
-    let id = sqlx::query!(
-        "
-        SELECT id FROM mods_gallery
-        WHERE image_url = $1
-        ",
-        item.url
-    )
-    .fetch_optional(&mut *transaction)
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(format!(
-            "Gallery item at URL {} is not part of the project's gallery.",
-            item.url
-        ))
-    })?
-    .id;
 
     let mut transaction = pool.begin().await?;
 
@@ -1887,7 +1887,7 @@ pub async fn edit_gallery_item(
             SET featured = $2
             WHERE id = $1
             ",
-            id,
+            result.id,
             featured
         )
         .execute(&mut *transaction)
@@ -1900,7 +1900,7 @@ pub async fn edit_gallery_item(
             SET name = $2
             WHERE id = $1
             ",
-            id,
+            result.id,
             name
         )
         .execute(&mut *transaction)
@@ -1913,7 +1913,7 @@ pub async fn edit_gallery_item(
             SET description = $2
             WHERE id = $1
             ",
-            id,
+            result.id,
             description
         )
         .execute(&mut *transaction)
@@ -1926,7 +1926,7 @@ pub async fn edit_gallery_item(
             SET ordering = $2
             WHERE id = $1
             ",
-            id,
+            result.id,
             ordering
         )
         .execute(&mut *transaction)
@@ -1954,7 +1954,6 @@ pub struct GalleryDeleteQuery {
 pub async fn delete_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
-    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
@@ -1969,15 +1968,34 @@ pub async fn delete_gallery_item(
     )
     .await?
     .1;
-    let string = info.into_inner().0;
 
-    let project_item = db_models::Project::get(&string, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified project does not exist!".to_string(),
-            )
-        })?;
+    let item = sqlx::query!(
+        "
+        SELECT id, image_url, raw_image_url, mod_id FROM mods_gallery
+        WHERE image_url = $1
+        ",
+        item.url
+    )
+    .fetch_optional(&**pool)
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(format!(
+            "Gallery item at URL {} is not part of the project's gallery.",
+            item.url
+        ))
+    })?;
+
+    let project_item = db_models::Project::get_id(
+        database::models::ProjectId(item.mod_id),
+        &**pool,
+        &redis,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "The specified project does not exist!".to_string(),
+        )
+    })?;
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
@@ -2009,23 +2027,6 @@ pub async fn delete_gallery_item(
             ));
         }
     }
-    let mut transaction = pool.begin().await?;
-
-    let item = sqlx::query!(
-        "
-        SELECT id, image_url, raw_image_url FROM mods_gallery
-        WHERE image_url = $1
-        ",
-        item.url
-    )
-    .fetch_optional(&mut *transaction)
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(format!(
-            "Gallery item at URL {} is not part of the project's gallery.",
-            item.url
-        ))
-    })?;
 
     delete_old_images(
         Some(item.image_url),
