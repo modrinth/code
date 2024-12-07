@@ -71,7 +71,7 @@ const password = ref('')
 const confirmPassword = ref('')
 const subscribe = ref(true)
 
-async function signInOauth(provider) {
+async function signInOauth() {
   const creds = await login().catch(handleSevereError)
 
   if (creds && creds.type === 'two_factor_required') {
