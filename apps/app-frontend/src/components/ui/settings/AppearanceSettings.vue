@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DropdownSelect, PreviewSelectButton, Toggle, ThemeSelector } from '@modrinth/ui'
+import { DropdownSelect, Toggle, ThemeSelector } from '@modrinth/ui'
 import { useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { watch, ref } from 'vue'

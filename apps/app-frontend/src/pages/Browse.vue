@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, shallowRef, Teleport, watch } from 'vue'
+import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { Ref } from 'vue'
-import {
-  GameIcon,
-  LeftArrowIcon,
-  SearchIcon,
-  XIcon,
-} from '@modrinth/assets'
+import { GameIcon, LeftArrowIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import type { Category, GameVersion, Platform, ProjectType, Tags } from '@modrinth/ui'
 import {
   SearchSidebarFilter,
@@ -19,7 +14,7 @@ import {
   Pagination,
   useSearch,
 } from '@modrinth/ui'
-import { formatCategory, formatCategoryHeader } from '@modrinth/utils'
+import { formatCategory } from '@modrinth/utils'
 import { handleError } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
@@ -55,45 +50,45 @@ const instanceProjects = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref([])
 
-const PERSISTENT_QUERY_PARAMS = ["i", "ai"];
+const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
 if (route.query.i) {
-  [instance.value, instanceProjects.value] = await Promise.all([
+  ;[instance.value, instanceProjects.value] = await Promise.all([
     getInstance(route.query.i).catch(handleError),
     getInstanceProjects(route.query.i).catch(handleError),
   ])
   newlyInstalled.value = []
 }
 
-if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === "modpack")) {
-  instanceHideInstalled.value = route.query.ai === "true";
+if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === 'modpack')) {
+  instanceHideInstalled.value = route.query.ai === 'true'
 }
 
 const instanceFilters = computed(() => {
-  const filters = [];
+  const filters = []
 
   if (instance.value) {
-    const gameVersion = instance.value.game_version;
+    const gameVersion = instance.value.game_version
     if (gameVersion) {
       filters.push({
-        type: "game_version",
+        type: 'game_version',
         option: gameVersion,
-      });
+      })
     }
 
-    const platform = instance.value.loader;
+    const platform = instance.value.loader
 
-    const supportedModLoaders = ["fabric", "forge", "quilt", "neoforge"];
+    const supportedModLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 
-    if (platform && projectTypes.value.includes("mod") && supportedModLoaders.includes(platform)) {
+    if (platform && projectTypes.value.includes('mod') && supportedModLoaders.includes(platform)) {
       filters.push({
-        type: "mod_loader",
+        type: 'mod_loader',
         option: platform,
-      });
+      })
     }
 
     if (instanceHideInstalled.value) {
-      const installedMods =  Object.values(instanceProjects.value)
+      const installedMods = Object.values(instanceProjects.value)
         .filter((x) => x.metadata)
         .map((x) => x.metadata.project_id)
 
@@ -101,16 +96,16 @@ const instanceFilters = computed(() => {
 
       installedMods
         ?.map((x) => ({
-          type: "project_id",
+          type: 'project_id',
           option: `project_id:${x}`,
           negative: true,
         }))
-        .forEach((x) => filters.push(x));
+        .forEach((x) => filters.push(x))
     }
   }
 
-  return filters;
-});
+  return filters
+})
 
 const {
   // Selections
@@ -131,7 +126,7 @@ const {
 
   // Functions
   createPageParams,
-} = useSearch(projectTypes, tags, instanceFilters);
+} = useSearch(projectTypes, tags, instanceFilters)
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -170,43 +165,44 @@ async function refreshSearch() {
   }
   if (instance.value) {
     for (const val of rawResults.result.hits) {
-      val.installed = newlyInstalled.value.includes(val.project_id) || Object.values(instanceProjects.value).some(
-        (x) => x.metadata && x.metadata.project_id === val.project_id,
-      )
+      val.installed =
+        newlyInstalled.value.includes(val.project_id) ||
+        Object.values(instanceProjects.value).some(
+          (x) => x.metadata && x.metadata.project_id === val.project_id,
+        )
     }
   }
   results.value = rawResults.result
 }
 
 async function updateSearchResults() {
-
   if (query.value === null) {
-    return;
+    return
   }
 
-  await refreshSearch();
+  await refreshSearch()
 
   if (import.meta.client) {
-    const persistentParams = {};
+    const persistentParams = {}
 
     for (const [key, value] of Object.entries(route.query)) {
       if (PERSISTENT_QUERY_PARAMS.includes(key)) {
-        persistentParams[key] = value;
+        persistentParams[key] = value
       }
     }
 
     if (serverHideInstalled.value) {
-      persistentParams.ai = "true";
+      persistentParams.ai = 'true'
     } else {
-      delete persistentParams.ai;
+      delete persistentParams.ai
     }
 
     const params = {
       ...persistentParams,
       ...createPageParams(),
-    };
+    }
 
-    router.replace({ path: route.path, query: params });
+    router.replace({ path: route.path, query: params })
     breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: params })
   }
 }
@@ -246,9 +242,7 @@ function getSearchUrl(offset, useObj) {
   return useObj ? obj : url
 }
 
-async function clearFilters() {
-
-}
+async function clearFilters() {}
 
 watch(
   () => route.params.projectType,
@@ -275,9 +269,8 @@ const selectableProjectTypes = computed(() => {
 
   if (instance.value) {
     if (
-      availableGameVersions.value.findIndex(
-        (x) => x.version === instance.value.game_version,
-      ) <= availableGameVersions.value.findIndex((x) => x.version === '1.13')
+      availableGameVersions.value.findIndex((x) => x.version === instance.value.game_version) <=
+      availableGameVersions.value.findIndex((x) => x.version === '1.13')
     ) {
       dataPacks = true
     }
@@ -300,7 +293,7 @@ const selectableProjectTypes = computed(() => {
   ]
 })
 
-await refreshSearch();
+await refreshSearch()
 </script>
 
 <template>
@@ -447,10 +440,12 @@ await refreshSearch();
             ),
           ]"
           :installed="result.installed"
-          @install="(id) => {
-            newlyInstalled.push(id)
-            refreshSearch()
-          }"
+          @install="
+            (id) => {
+              newlyInstalled.push(id)
+              refreshSearch()
+            }
+          "
         />
       </section>
       <div class="flex justify-end">

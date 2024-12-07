@@ -272,7 +272,6 @@ import {
 } from "@modrinth/ui";
 import { CheckIcon, DownloadIcon, GameIcon, LeftArrowIcon, XIcon } from "@modrinth/assets";
 import { computed } from "vue";
-import { formatCategory } from "@modrinth/utils";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 
@@ -513,8 +512,6 @@ function cycleSearchDisplayMode() {
   );
   setClosestMaxResults();
 }
-
-const previousMaxResults = ref(20);
 
 function setClosestMaxResults() {
   const view = cosmetics.value.searchDisplayMode[projectType.value.id];

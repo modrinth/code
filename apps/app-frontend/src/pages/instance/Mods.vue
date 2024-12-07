@@ -122,7 +122,7 @@
       </template>
       <template #header-actions>
         <ButtonStyled type="transparent" color-fill="text" hover-color-fill="text">
-          <button @click="refreshProjects" :disabled="refreshingProjects" class="w-max">
+          <button :disabled="refreshingProjects" class="w-max" @click="refreshProjects">
             <UpdatedIcon />
             Refresh
           </button>
@@ -158,8 +158,8 @@
         >
           <button
             v-tooltip="`Update`"
-            @click="updateProject(item.data)"
             :disabled="(item.data as any).updating"
+            @click="updateProject(item.data)"
           >
             <DownloadIcon />
           </button>

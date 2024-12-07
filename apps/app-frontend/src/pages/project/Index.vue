@@ -251,15 +251,6 @@ async function install(version) {
   )
 }
 
-const handleRightClick = (e) => {
-  options.value.showMenu(e, data.value, [
-    { name: 'install' },
-    { type: 'divider' },
-    { name: 'open_link' },
-    { name: 'copy_link' },
-  ])
-}
-
 const handleOptionsClick = (args) => {
   switch (args.option) {
     case 'install':

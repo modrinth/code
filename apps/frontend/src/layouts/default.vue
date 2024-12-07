@@ -204,8 +204,8 @@
           <ButtonStyled
             type="transparent"
             :highlighted="
-              route.name.startsWith('servers') ||
-              (route.name.startsWith('search-') && route.query.sid)
+              route.name?.startsWith('servers') ||
+              (route.name?.startsWith('search-') && route.query.sid)
             "
             :highlighted-style="
               route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
