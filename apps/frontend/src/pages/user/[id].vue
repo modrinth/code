@@ -96,7 +96,7 @@
         </ContentPageHeader>
       </div>
       <div class="normal-page__content">
-        <div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
+        <div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
           <NavTabs :links="navLinks" />
         </div>
         <div v-if="projects.length > 0">
