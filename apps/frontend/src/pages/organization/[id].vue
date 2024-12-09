@@ -84,14 +84,14 @@
           </template>
           <template #stats>
             <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <UsersIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(acceptedMembers?.length || 0) }}
               members
             </div>
             <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <BoxIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(projects?.length || 0) }}

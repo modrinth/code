@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { Ref } from 'vue'
 import { GameIcon, LeftArrowIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import type { Category, GameVersion, Platform, ProjectType, Tags } from '@modrinth/ui'
+import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
   SearchSidebarFilter,
   Avatar,
@@ -18,6 +18,7 @@ import { formatCategory } from '@modrinth/utils'
 import { handleError } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
+import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
@@ -25,6 +26,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { get_search_results } from '@/helpers/cache.js'
 import { debounce } from '@/helpers/utils.js'
 import NavTabs from '@/components/ui/NavTabs.vue'
+import type Instance from '@/components/ui/Instance.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -45,8 +47,23 @@ const tags: Ref<Tags> = computed(() => ({
   categories: categories.value as Category[],
 }))
 
-const instance = ref(null)
-const instanceProjects = ref(null)
+type Instance = {
+  game_version: string
+  loader: string
+  path: string
+  install_stage: string
+  icon_path?: string
+  name: string
+}
+
+type InstanceProject = {
+  metadata: {
+    project_id: string
+  }
+}
+
+const instance: Ref<Instance | null> = ref(null)
+const instanceProjects: Ref<InstanceProject[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref([])
 
@@ -87,7 +104,7 @@ const instanceFilters = computed(() => {
       })
     }
 
-    if (instanceHideInstalled.value) {
+    if (instanceHideInstalled.value && instanceProjects.value) {
       const installedMods = Object.values(instanceProjects.value)
         .filter((x) => x.metadata)
         .map((x) => x.metadata.project_id)
@@ -143,7 +160,17 @@ const loading = ref(false)
 
 const projectType = ref(route.params.projectType)
 
-const results = shallowRef([])
+type SearchResult = {
+  project_id: string
+}
+
+type SearchResults = {
+  total_hits: number
+  limit: number
+  hits: SearchResult[]
+}
+
+const results: Ref<SearchResults | null> = shallowRef(null)
 const pageCount = computed(() =>
   results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
 )
@@ -175,15 +202,18 @@ async function refreshSearch() {
   results.value = rawResults.result
 }
 
-async function updateSearchResults() {
-  if (query.value === null) {
-    return
-  }
+function setPage(newPageNumber: number) {
+  currentPage.value = newPageNumber
 
+  updateSearchResults()
+  onSearchChangeToTop()
+}
+
+async function updateSearchResults() {
   await refreshSearch()
 
   if (import.meta.client) {
-    const persistentParams = {}
+    const persistentParams: LocationQuery = {}
 
     for (const [key, value] of Object.entries(route.query)) {
       if (PERSISTENT_QUERY_PARAMS.includes(key)) {
@@ -191,7 +221,7 @@ async function updateSearchResults() {
       }
     }
 
-    if (serverHideInstalled.value) {
+    if (instanceHideInstalled.value) {
       persistentParams.ai = 'true'
     } else {
       delete persistentParams.ai
@@ -202,44 +232,24 @@ async function updateSearchResults() {
       ...createPageParams(),
     }
 
-    router.replace({ path: route.path, query: params })
+    await router.replace({ path: route.path, query: params })
     breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: params })
   }
 }
 
 const debouncedSearchChange = debounce(() => updateSearchResults(1), 200)
 
-const searchWrapper = ref(null)
-async function onSearchChangeToTop(newPageNumber) {
-  await updateSearchResults(newPageNumber)
+const searchWrapper: Ref<HTMLElement | null> = ref(null)
+
+async function onSearchChangeToTop() {
   await nextTick()
-  searchWrapper.value.scrollTo({ top: 0, behavior: 'smooth' })
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function clearSearch() {
   query.value = ''
-  await updateSearchResults(1)
-}
-
-function getSearchUrl(offset, useObj) {
-  const queryItems = []
-  const obj = {}
-
-  if (offset > 0) {
-    queryItems.push(`o=${offset}`)
-  }
-
-  let url = `${route.path}`
-
-  if (queryItems.length > 0) {
-    url += `?${queryItems[0]}`
-
-    for (let i = 1; i < queryItems.length; i++) {
-      url += `&${queryItems[i]}`
-    }
-  }
-
-  return useObj ? obj : url
+  await updateSearchResults()
 }
 
 async function clearFilters() {}
@@ -284,13 +294,36 @@ const selectableProjectTypes = computed(() => {
     modpacks = true
   }
 
-  return [
+  const params: LocationQuery = {}
+
+  if (route.query.i) {
+    params.i = route.query.i
+  }
+  if (route.query.ai) {
+    params.ai = route.query.ai
+  }
+
+  const links = [
     { label: 'Modpacks', href: `/browse/modpack`, shown: modpacks },
     { label: 'Mods', href: `/browse/mod`, shown: mods },
     { label: 'Resource Packs', href: `/browse/resourcepack` },
     { label: 'Data Packs', href: `/browse/datapack`, shown: dataPacks },
     { label: 'Shaders', href: `/browse/shader` },
   ]
+
+  if (params) {
+    return links.map((link) => {
+      return {
+        ...link,
+        href: {
+          path: link.href,
+          query: params,
+        },
+      }
+    })
+  }
+
+  return links
 })
 
 await refreshSearch()
@@ -306,7 +339,7 @@ await refreshSearch()
         v-model="instanceHideInstalled"
         label="Hide installed content"
         class="filter-checkbox"
-        @update:model-value="onSearchChangeToTop(1)"
+        @update:model-value="onSearchChangeToTop()"
         @click.prevent.stop
       />
     </div>
@@ -332,7 +365,7 @@ await refreshSearch()
   <div ref="searchWrapper" class="flex flex-col gap-3 p-6">
     <template v-if="instance">
       <div
-        class="flex justify-between items-center border-0 border-b border-solid border-button-bg pb-4"
+        class="flex justify-between items-center border-0 border-b border-solid border-divider pb-4"
       >
         <router-link
           :to="`/instance/${encodeURIComponent(instance.path)}`"
@@ -341,7 +374,7 @@ await refreshSearch()
         >
           <span class="flex items-center gap-2">
             <Avatar
-              :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+              :src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
               :alt="instance.name"
               size="48px"
             />
@@ -387,9 +420,9 @@ await refreshSearch()
         v-model="currentSortType"
         class="max-w-[16rem]"
         name="Sort by"
-        :options="sortTypes"
-        :display-name="(option) => option?.display"
-        @change="updateSearchResults(1)"
+        :options="sortTypes as any"
+        :display-name="(option: SortType | undefined) => option?.display"
+        @change="updateSearchResults()"
       >
         <span class="font-semibold text-primary">Sort by: </span>
         <span class="font-semibold text-secondary">{{ selected }}</span>
@@ -399,21 +432,13 @@ await refreshSearch()
         v-model="maxResults"
         name="Max results"
         :options="[5, 10, 15, 20, 50, 100]"
-        :default-value="maxResults"
-        :model-value="maxResults"
         class="max-w-[9rem]"
-        @change="updateSearchResults(1)"
+        @change="updateSearchResults()"
       >
         <span class="font-semibold text-primary">View: </span>
         <span class="font-semibold text-secondary">{{ selected }}</span>
       </DropdownSelect>
-      <Pagination
-        :page="currentPage"
-        :count="pageCount"
-        :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
-        class="ml-auto"
-        @switch-page="updateSearchResults"
-      />
+      <Pagination :page="currentPage" :count="pageCount" class="ml-auto" @switch-page="setPage" />
     </div>
     <div class="search">
       <section v-if="loading" class="offline">
@@ -452,9 +477,8 @@ await refreshSearch()
         <pagination
           :page="currentPage"
           :count="pageCount"
-          :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
           class="pagination-after"
-          @switch-page="onSearchChangeToTop"
+          @switch-page="setPage"
         />
       </div>
     </div>

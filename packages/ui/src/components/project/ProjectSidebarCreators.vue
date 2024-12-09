@@ -6,6 +6,7 @@
         <AutoLink
           class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
           :to="orgLink(organization.slug)"
+          :target="linkTarget ?? null"
         >
           <Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
           <div class="flex flex-col flex-nowrap justify-center">
@@ -24,6 +25,7 @@
         :key="`member-${member.id}`"
         class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
         :to="userLink(member.user.username)"
+        :target="linkTarget ?? null"
       >
         <Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
         <div class="flex flex-col">
@@ -34,6 +36,7 @@
               v-tooltip="formatMessage(messages.owner)"
               class="text-brand-orange"
             />
+            <ExternalIcon v-if="linkTarget === '_blank'" />
           </span>
           <span class="text-secondary text-sm font-medium">{{ member.role }}</span>
         </div>
@@ -42,7 +45,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { CrownIcon, OrganizationIcon } from '@modrinth/assets'
+import { CrownIcon, ExternalIcon, OrganizationIcon } from '@modrinth/assets'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import Avatar from '../base/Avatar.vue'
 import AutoLink from '../base/AutoLink.vue'
@@ -74,6 +77,7 @@ const props = defineProps<{
   members: TeamMember[]
   orgLink: (slug: string) => string
   userLink: (username: string) => string
+  linkTarget?: string
 }>()
 
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start

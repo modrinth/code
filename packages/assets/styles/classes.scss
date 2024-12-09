@@ -844,7 +844,8 @@ a,
 
 .markdown-body {
   h1:first-child {
-    margin-top: 0;
+    margin-block-start: 0;
+    padding-block-start: 0;
   }
 
   blockquote,
@@ -871,9 +872,15 @@ a,
   }
 
   h1,
+  h2,
+  h3 {
+    color: var(--color-contrast);
+  }
+
+  h1,
   h2 {
     padding: 10px 0 5px;
-    border-bottom: 1px solid var(--color-gray);
+    border-bottom: 1px solid var(--color-divider);
   }
 
   h1,
@@ -892,6 +899,7 @@ a,
     padding: 0 1em;
     color: var(--color-base);
     border-left: 0.25em solid var(--color-button-bg);
+    margin-inline: 0;
   }
 
   a {
@@ -908,6 +916,10 @@ a,
       filter: brightness(1.1);
       text-decoration: none;
     }
+  }
+
+  a:active > img {
+    scale: 0.98;
   }
 
   img {

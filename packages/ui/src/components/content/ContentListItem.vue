@@ -2,7 +2,7 @@
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import Checkbox from '../base/Checkbox.vue'
-import { type RouteLocationRaw } from 'vue-router'
+import type { RouteLocationRaw } from 'vue-router'
 import { SlashIcon } from '@modrinth/assets'
 
 import { ref } from 'vue'

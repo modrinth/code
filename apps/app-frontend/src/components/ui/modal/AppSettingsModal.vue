@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { NewModal } from '@modrinth/ui'
 import {
+  ReportIcon,
+  ModrinthIcon,
   ShieldIcon,
   SettingsIcon,
   GaugeIcon,
@@ -17,6 +19,10 @@ import PrivacySettings from '@/components/ui/settings/PrivacySettings.vue'
 import DefaultInstanceSettings from '@/components/ui/settings/DefaultInstanceSettings.vue'
 import { getVersion } from '@tauri-apps/api/app'
 import { version as getOsVersion, platform as getOsPlatform } from '@tauri-apps/plugin-os'
+import { useTheming } from '@/store/state'
+import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
+
+const themeStore = useTheming()
 
 const modal = ref()
 
@@ -27,6 +33,12 @@ function show() {
 const { formatMessage } = useVIntl()
 
 const selectedTab = ref(0)
+const devModeCounter = ref(0)
+
+const developerModeEnabled = defineMessage({
+  id: 'app.settings.developer-mode-enabled',
+  defaultMessage: 'Developer mode enabled.',
+})
 
 const tabs = [
   {
@@ -69,6 +81,15 @@ const tabs = [
     icon: GaugeIcon,
     content: ResourceManagementSettings,
   },
+  {
+    name: defineMessage({
+      id: 'app.settings.tabs.feature-flags',
+      defaultMessage: 'Feature flags',
+    }),
+    icon: ReportIcon,
+    content: FeatureFlagSettings,
+    developerOnly: true,
+  },
 ]
 
 defineExpose({ show })
@@ -86,9 +107,9 @@ const osVersion = getOsVersion()
       </span>
     </template>
     <div class="grid grid-cols-[auto_1fr] gap-4">
-      <div class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-button-bg">
+      <div class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-divider">
         <button
-          v-for="(tab, index) in tabs"
+          v-for="(tab, index) in tabs.filter((t) => !t.developerOnly || themeStore.devMode)"
           :key="index"
           :class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-transform ${selectedTab === index ? 'bg-highlight text-brand' : 'bg-transparent text-button-text'}`"
           @click="() => (selectedTab = index)"
@@ -98,12 +119,31 @@ const osVersion = getOsVersion()
         </button>
 
         <div class="mt-auto text-secondary text-sm">
-          <p class="m-0">Modrinth App {{ version }}</p>
-          <p class="m-0">
-            <span v-if="osPlatform === 'macos'">MacOS</span>
-            <span v-else class="capitalize">{{ osPlatform }}</span>
-            {{ osVersion }}
-          </p>
+          <p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">{{ formatMessage(developerModeEnabled) }}</p>
+          <div class="flex items-center gap-3">
+            <button
+              class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation" :class="{ 'text-brand': themeStore.devMode, 'text-secondary': !themeStore.devMode }" @click="() => {
+            devModeCounter++
+            if (devModeCounter > 5) {
+              themeStore.devMode = !themeStore.devMode
+              devModeCounter = 0
+
+              if (!themeStore.devMode && tabs[selectedTab].developerOnly === true) {
+                selectedTab = 0
+              }
+            }
+          }">
+              <ModrinthIcon class="w-6 h-6" />
+            </button>
+            <div>
+              <p class="m-0">Modrinth App {{ version }}</p>
+              <p class="m-0">
+                <span v-if="osPlatform === 'macos'">MacOS</span>
+                <span v-else class="capitalize">{{ osPlatform }}</span>
+                {{ osVersion }}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       <div class="w-[600px] h-[500px] overflow-y-auto">

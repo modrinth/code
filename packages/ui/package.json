@@ -16,8 +16,9 @@
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
-    "vue": "^3.4.31",
-    "vue-router": "4.3.0"
+    "vue": "^3.5.13",
+    "vue-router": "4.3.0",
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "@codemirror/commands": "^6.3.2",
@@ -39,5 +40,6 @@
     "vue-virtual-scroller": "v2.0.0-beta.8",
     "vue3-apexcharts": "^1.4.4",
     "xss": "^1.0.14"
-  }
+  },
+  "web-types": "../../web-types.json"
 }

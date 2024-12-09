@@ -1,74 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
 
-export const getProjectTypeForDisplay = (type, categories, tags) => {
-  if (type === 'mod') {
-    const isPlugin = categories.some((category) => {
-      return tags.loaderData.allPluginLoaders.includes(category)
-    })
-    const isMod = categories.some((category) => {
-      return tags.loaderData.modLoaders.includes(category)
-    })
-    const isDataPack = categories.some((category) => {
-      return tags.loaderData.dataPackLoaders.includes(category)
-    })
-
-    if (isMod && isPlugin && isDataPack) {
-      return 'mod, plugin, and data pack'
-    } else if (isMod && isPlugin) {
-      return 'mod and plugin'
-    } else if (isMod && isDataPack) {
-      return 'mod and data pack'
-    } else if (isPlugin && isDataPack) {
-      return 'plugin and data pack'
-    } else if (isDataPack) {
-      return 'data pack'
-    } else if (isPlugin) {
-      return 'plugin'
-    }
-  }
-
-  return type
-}
-
-export const getProjectTypeForUrl = (type, loaders, tags) => {
-  if (type === 'mod') {
-    const isMod = loaders.some((category) => {
-      return tags.loaderData.modLoaders.includes(category)
-    })
-
-    const isPlugin = loaders.some((category) => {
-      return tags.loaderData.allPluginLoaders.includes(category)
-    })
-
-    const isDataPack = loaders.some((category) => {
-      return tags.loaderData.dataPackLoaders.includes(category)
-    })
-
-    if (isDataPack) {
-      return 'datapack'
-    } else if (isPlugin) {
-      return 'plugin'
-    } else if (isMod) {
-      return 'mod'
-    }
-    return 'mod'
-  }
-  return type
-}
-
-export const getProjectLink = (project) => {
-  return `/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
-    project.slug ? project.slug : project.id
-  }`
-}
-
-export const getVersionLink = (project, version) => {
-  if (version) {
-    return `${getProjectLink(project)}/version/${version.id}`
-  }
-  return getProjectLink(project)
-}
-
 export const isApproved = (project) => {
   return project && APPROVED_PROJECT_STATUSES.includes(project.status)
 }
@@ -130,7 +61,10 @@ export function getVersionsToDisplay(project, allGameVersions: GameVersionTag[])
   return formatVersionsForDisplay(project.game_versions.slice(), allGameVersions)
 }
 
-export function formatVersionsForDisplay(gameVersions: string, allGameVersions: GameVersionTag[]) {
+export function formatVersionsForDisplay(
+  gameVersions: string[],
+  allGameVersions: GameVersionTag[],
+) {
   const inputVersions = gameVersions.slice()
   const allVersions = allGameVersions.slice()
 
@@ -152,9 +86,9 @@ export function formatVersionsForDisplay(gameVersions: string, allGameVersions: 
     allReleases.some((gameVer) => gameVer.version === projVer),
   )
 
-  const latestReleaseVersionDate = Date.parse(
-    allReleases.find((version) => version.version === releaseVersions[0])?.date,
-  )
+  const dateString = allReleases.find((version) => version.version === releaseVersions[0])?.date
+
+  const latestReleaseVersionDate = dateString ? Date.parse(dateString) : 0
   const latestSnapshot = inputVersions.find((projVer) =>
     allSnapshots.some(
       (gameVer) =>
@@ -171,18 +105,16 @@ export function formatVersionsForDisplay(gameVersions: string, allGameVersions: 
 
   const releaseVersionsAsRanges = projectVersionsGrouped.map(({ major, minor }) => {
     if (minor.length === 1) {
-      return formatVersion(major, minor[0])
+      return formatMinecraftMinorVersion(major, minor[0])
     }
 
-    if (
-      allReleasesGrouped
-        .find((x) => x.major === major)
-        .minor.every((value, index) => value === minor[index])
-    ) {
+    const range = allReleasesGrouped.find((x) => x.major === major)
+
+    if (range?.minor.every((value, index) => value === minor[index])) {
       return `${major}.x`
     }
 
-    return `${formatVersion(major, minor[0])}–${formatVersion(major, minor[minor.length - 1])}`
+    return `${formatMinecraftMinorVersion(major, minor[0])}–${formatMinecraftMinorVersion(major, minor[minor.length - 1])}`
   })
 
   const legacyVersionsAsRanges = groupConsecutiveIndices(
@@ -213,11 +145,16 @@ export function formatVersionsForDisplay(gameVersions: string, allGameVersions: 
 
 const mcVersionRegex = /^([0-9]+.[0-9]+)(.[0-9]+)?$/
 
-function groupVersions(versions, consecutive = false) {
+type VersionRange = {
+  major: string
+  minor: number[]
+}
+
+function groupVersions(versions: string[], consecutive = false) {
   return versions
     .slice()
     .reverse()
-    .reduce((ranges, version) => {
+    .reduce((ranges: VersionRange[], version: string) => {
       const matchesVersion = version.match(mcVersionRegex)
 
       if (matchesVersion) {
@@ -225,13 +162,10 @@ function groupVersions(versions, consecutive = false) {
         const minorVersion = matchesVersion[2]
         const minorNumeric = minorVersion ? parseInt(minorVersion.replace('.', '')) : 0
 
-        let prevInRange
-        if (
-          (prevInRange = ranges.find(
-            (x) =>
-              x.major === majorVersion && (!consecutive || x.minor.at(-1) === minorNumeric - 1),
-          ))
-        ) {
+        const prevInRange = ranges.find(
+          (x) => x.major === majorVersion && (!consecutive || x.minor.at(-1) === minorNumeric - 1),
+        )
+        if (prevInRange) {
           prevInRange.minor.push(minorNumeric)
           return ranges
         }
@@ -244,7 +178,7 @@ function groupVersions(versions, consecutive = false) {
     .reverse()
 }
 
-function groupConsecutiveIndices(versions, referenceList) {
+function groupConsecutiveIndices(versions: string[], referenceList: GameVersionTag[]) {
   if (!versions || versions.length === 0) {
     return []
   }
@@ -254,9 +188,11 @@ function groupConsecutiveIndices(versions, referenceList) {
     referenceMap.set(item.version, index)
   })
 
-  const sortedList = versions.slice().sort((a, b) => referenceMap.get(a) - referenceMap.get(b))
+  const sortedList: string[] = versions
+    .slice()
+    .sort((a, b) => referenceMap.get(a) - referenceMap.get(b))
 
-  const ranges = []
+  const ranges: string[] = []
   let start = sortedList[0]
   let previous = sortedList[0]
 
@@ -274,7 +210,7 @@ function groupConsecutiveIndices(versions, referenceList) {
   return ranges
 }
 
-function validateRange(range) {
+function validateRange(range: string): string {
   switch (range) {
     case 'rd-132211–b1.8.1':
       return 'All legacy versions'
@@ -294,6 +230,6 @@ function validateRange(range) {
   return range
 }
 
-function formatVersion(major, minor) {
+function formatMinecraftMinorVersion(major: string, minor: number): string {
   return minor === 0 ? major : `${major}.${minor}`
 }

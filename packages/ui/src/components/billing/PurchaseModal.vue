@@ -934,7 +934,7 @@ async function submitPayment() {
 
 defineExpose({
   show: () => {
-    // eslint-disable-next-line no-undef
+     
     stripe = Stripe(props.publishableKey)
 
     selectedPlan.value = 'yearly'

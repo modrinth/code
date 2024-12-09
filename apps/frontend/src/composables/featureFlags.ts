@@ -27,6 +27,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
   hidePlusPromoInUserMenu: false,
   oldProjectCards: true,
   newProjectCards: false,
+  projectBackground: false,
   // advancedRendering: true,
   // externalLinksNewTab: true,
   // notUsingBlockers: false,

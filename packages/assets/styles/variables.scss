@@ -5,6 +5,9 @@
   --color-button-bg: hsl(220, 13%, 91%);
   --color-scrollbar: #96a2b0;
 
+  --color-divider: #babfc5;
+  --color-divider-dark: #c8cdd3;
+
   --color-base: hsl(221, 39%, 11%);
   --color-secondary: #6b7280;
   --color-contrast: #1a202c;
@@ -23,6 +26,12 @@
   --color-blue-highlight: rgba(31, 104, 192, 0.25);
   --color-purple-highlight: rgba(142, 50, 243, 0.25);
   --color-gray-highlight: rgba(89, 91, 97, 0.25);
+
+  --color-red-bg: rgba(203, 34, 69, 0.1);
+  --color-orange-bg: rgba(224, 131, 37, 0.1);
+  --color-green-bg: rgba(0, 175, 92, 0.1);
+  --color-blue-bg: rgba(31, 104, 192, 0.1);
+  --color-purple-bg: rgba(142, 50, 243, 0.1);
 
   --color-brand: var(--color-green);
   --color-brand-highlight: var(--color-green-highlight);
@@ -46,16 +55,12 @@
     rgba(68, 182, 138, 0.175) 0%,
     rgba(58, 250, 112, 0.125) 100%
   );
-  //--brand-gradient-bg: linear-gradient(
-  //    0deg,
-  //    rgba(166, 99, 221, 0.2) 0%,
-  //    rgba(176, 101, 213, 0.15) 100%
-  //);
+  --brand-gradient-button: rgba(255, 255, 255, 0.5);
   --brand-gradient-border: rgba(32, 64, 32, 0.15);
   --brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(213, 235, 224, 0), #d0ece0 70%);
 
-  --selected-button-bg: var(--color-brand);
-  --selected-button-text: var(--color-accent-contrast);
+  --color-button-bg-selected: var(--color-brand);
+  --color-button-text-selected: var(--color-accent-contrast);
 
   --loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #00af5c 100%);
 }
@@ -101,6 +106,9 @@ html {
   --color-button-bg: hsl(222, 13%, 30%);
   --color-scrollbar: var(--color-button-bg);
 
+  --color-divider: var(--color-button-bg);
+  --color-divider-dark: #646c75;
+
   --color-base: var(--dark-color-base);
   --color-secondary: #96a2b0;
   --color-contrast: var(--dark-color-contrast);
@@ -120,6 +128,12 @@ html {
   --color-purple-highlight: rgba(199, 138, 255, 0.25);
   --color-gray-highlight: rgba(159, 164, 179, 0.25);
 
+  --color-red-bg: rgba(255, 73, 110, 0.2);
+  --color-orange-bg: rgba(255, 163, 71, 0.2);
+  --color-green-bg: rgba(27, 217, 106, 0.2);
+  --color-blue-bg: rgba(79, 156, 255, 0.2);
+  --color-purple-bg: rgba(199, 138, 255, 0.2);
+
   --color-brand: var(--color-green);
   --color-brand-highlight: rgba(27, 217, 106, 0.25);
   --color-brand-shadow: rgba(27, 217, 106, 0.7);
@@ -136,11 +150,12 @@ html {
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
 
   --brand-gradient-bg: linear-gradient(0deg, rgba(14, 35, 19, 0.2) 0%, rgba(55, 137, 73, 0.1) 100%);
+  --brand-gradient-button: rgba(255, 255, 255, 0.08);
   --brand-gradient-border: rgba(155, 255, 160, 0.08);
   --brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(24, 30, 31, 0), #171d1e 80%);
 
-  --selected-button-bg: var(--color-brand-highlight);
-  --selected-button-text: var(--color-brand);
+  --color-button-bg-selected: var(--color-brand-highlight);
+  --color-button-text-selected: var(--color-brand);
 
   --loading-bar-gradient: linear-gradient(to right, var(--color-brand) 0%, #1ffa9a 100%);
 }
@@ -167,8 +182,6 @@ html {
   --color-text-inactive: initial !important;
   --color-text-dark: initial !important;
   --color-heading: initial !important;
-  --color-divider: initial !important;
-  --color-divider-dark: initial !important;
   --color-text-inverted: initial !important;
   --color-bg-inverted: initial !important;
 

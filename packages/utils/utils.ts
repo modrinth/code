@@ -322,3 +322,11 @@ export const sortByNameOrNumber = (sortable, identifiers) => {
   })
   return sortable
 }
+
+export const getArrayOrString = (x: string[] | string): string[] => {
+  if (typeof x === 'string') {
+    return [x]
+  } else {
+    return x
+  }
+}

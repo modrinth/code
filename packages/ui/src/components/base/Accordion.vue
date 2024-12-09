@@ -2,14 +2,14 @@
   <div v-bind="$attrs">
     <button
       v-if="!!slots.title"
-      @click="() => (isOpen ? close() : open())"
       :class="buttonClass ?? 'flex flex-col gap-2'"
+      @click="() => (isOpen ? close() : open())"
     >
       <slot name="button" :open="isOpen">
         <div class="flex items-center w-full">
           <slot name="title" />
           <DropdownIcon
-            class="ml-auto size-5 transition-transform duration-300 shrink-0"
+            class="ml-auto size-5 transition-transform duration-300 shrink-0 text-contrast"
             :class="{ 'rotate-180': isOpen }"
           />
         </div>

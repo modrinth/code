@@ -26,6 +26,7 @@ export { default as PopoutMenu } from './base/PopoutMenu.vue'
 export { default as PreviewSelectButton } from './base/PreviewSelectButton.vue'
 export { default as ProjectCard } from './base/ProjectCard.vue'
 export { default as ScrollablePanel } from './base/ScrollablePanel.vue'
+export { default as SimpleBadge } from './base/SimpleBadge.vue'
 export { default as Slider } from './base/Slider.vue'
 export { default as StatItem } from './base/StatItem.vue'
 export { default as Toggle } from './base/Toggle.vue'
@@ -55,11 +56,16 @@ export { default as NavStack } from './nav/NavStack.vue'
 
 // Project
 export { default as NewProjectCard } from './project/NewProjectCard.vue'
+export { default as ProjectBackgroundGradient } from './project/ProjectBackgroundGradient.vue'
 export { default as ProjectHeader } from './project/ProjectHeader.vue'
+export { default as ProjectPageDescription } from './project/ProjectPageDescription.vue'
+export { default as ProjectPageGallery } from './project/ProjectPageGallery.vue'
+export { default as ProjectPageVersions } from './project/ProjectPageVersions.vue'
 export { default as ProjectSidebarCompatibility } from './project/ProjectSidebarCompatibility.vue'
 export { default as ProjectSidebarCreators } from './project/ProjectSidebarCreators.vue'
 export { default as ProjectSidebarDetails } from './project/ProjectSidebarDetails.vue'
 export { default as ProjectSidebarLinks } from './project/ProjectSidebarLinks.vue'
+export { default as ProjectStatusBadge } from './project/ProjectStatusBadge.vue'
 
 // Search
 export { default as BrowseFiltersPanel } from './search/BrowseFiltersPanel.vue'
@@ -74,6 +80,8 @@ export { default as PurchaseModal } from './billing/PurchaseModal.vue'
 
 // Version
 export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'
+export { default as VersionFilterControl } from './version/VersionFilterControl.vue'
+export { default as VersionSummary } from './version/VersionSummary.vue'
 
 // Settings
 export { default as ThemeSelector } from './settings/ThemeSelector.vue'

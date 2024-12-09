@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import type { Ref } from 'vue'
 import Checkbox from '../base/Checkbox.vue'
 import ContentListItem from './ContentListItem.vue'
-import { type ContentItem } from './ContentListItem.vue'
+import type { ContentItem } from './ContentListItem.vue'
 import { DropdownIcon } from '@modrinth/assets'
 // @ts-ignore
 import { RecycleScroller } from 'vue-virtual-scroller'
@@ -51,8 +51,8 @@ function setSelected(value: boolean) {
       <Checkbox
         v-model="allSelected"
         class="select-checkbox"
-        @update:model-value="setSelected"
         :indeterminate="selected.length > 0 && selected.length < items.length"
+        @update:model-value="setSelected"
       />
       <slot name="headers">
         <div class="flex items-center gap-2 cursor-pointer" @click="updateSort('Name')">
@@ -78,19 +78,19 @@ function setSelected(value: boolean) {
     </div>
     <div class="bg-bg-raised rounded-xl">
       <RecycleScroller
+        v-slot="{ item, index }"
         :items="items"
         :item-size="64"
         disable-transform
         key-field="filename"
         style="height: 100%"
-        v-slot="{ item, index }"
       >
         <ContentListItem
-          :item="item"
           v-model="selectionStates[item.filename]"
-          @update:model-value="updateSelection"
+          :item="item"
           :last="props.items.length - 1 === index"
           class="mb-2"
+          @update:model-value="updateSelection"
         >
           <template #actions="{ item }">
             <slot name="actions" :item="item" />

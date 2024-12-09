@@ -12,6 +12,7 @@
         :members="members"
         :org-link="(slug) => `https://modrinth.com/organization/${slug}`"
         :user-link="(username) => `https://modrinth.com/user/${username}`"
+        link-target="_blank"
         class="project-sidebar-section"
       />
       <ProjectSidebarDetails
@@ -40,23 +41,27 @@
           </div>
         </router-link>
       </Card>
-      <ProjectHeader :project="data">
-        <template #actions>
-          <ButtonStyled size="large" color="brand">
-            <button
-              v-tooltip="installed ? `This project is already installed` : null"
-              :disabled="installed || installing"
-              @click="install(null)"
-            >
-              <DownloadIcon v-if="!installed && !installing" />
-              <CheckIcon v-else-if="installed" />
-              {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
-            </button>
-          </ButtonStyled>
-          <ButtonStyled size="large" circular type="transparent">
-            <OverflowMenu
-              :tooltip="`More options`"
-              :options="[
+      <template v-if="data">
+        <Teleport v-if="themeStore.featureFlag_projectBackground" to="#background-teleport-target">
+          <ProjectBackgroundGradient :project="data" />
+        </Teleport>
+        <ProjectHeader :project="data">
+          <template #actions>
+            <ButtonStyled size="large" color="brand">
+              <button
+                v-tooltip="installed ? `This project is already installed` : null"
+                :disabled="installed || installing"
+                @click="install(null)"
+              >
+                <DownloadIcon v-if="!installed && !installing" />
+                <CheckIcon v-else-if="installed" />
+                {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
+              </button>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular type="transparent">
+              <OverflowMenu
+                :tooltip="`More options`"
+                :options="[
                 {
                   id: 'follow',
                   disabled: true,
@@ -72,6 +77,7 @@
                 {
                   id: 'open-in-browser',
                   link: `https://modrinth.com/${data.project_type}/${data.slug}`,
+                  external: true,
                 },
                 {
                   divider: true,
@@ -83,18 +89,17 @@
                   link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
                 },
               ]"
-              aria-label="More options"
-            >
-              <MoreVerticalIcon aria-hidden="true" />
-              <template #open-in-browser> <ExternalIcon /> Open in browser </template>
-              <template #follow> <HeartIcon /> Follow </template>
-              <template #save> <BookmarkIcon /> Save </template>
-              <template #report> <ReportIcon /> Report </template>
-            </OverflowMenu>
-          </ButtonStyled>
-        </template>
-      </ProjectHeader>
-      <template v-if="data">
+                aria-label="More options"
+              >
+                <MoreVerticalIcon aria-hidden="true" />
+                <template #open-in-browser> <ExternalIcon /> Open in browser </template>
+                <template #follow> <HeartIcon /> Follow </template>
+                <template #save> <BookmarkIcon /> Save </template>
+                <template #report> <ReportIcon /> Report </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </template>
+        </ProjectHeader>
         <NavTabs
           :links="[
             {
@@ -104,6 +109,7 @@
             {
               label: 'Versions',
               href: `/project/${$route.params.id}/versions`,
+              subpages: [ 'version' ]
             },
             {
               label: 'Gallery',
@@ -154,7 +160,7 @@ import {
   OverflowMenu,
   ProjectSidebarLinks,
   ProjectSidebarCreators,
-  ProjectSidebarDetails,
+  ProjectSidebarDetails, ProjectBackgroundGradient
 } from '@modrinth/ui'
 
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
@@ -170,11 +176,13 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { install as installVersion } from '@/store/install.js'
 import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
 import NavTabs from '@/components/ui/NavTabs.vue'
+import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
+const themeStore = useTheming()
 
 const options = ref(null)
 const installing = ref(false)

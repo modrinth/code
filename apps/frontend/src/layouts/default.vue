@@ -54,7 +54,7 @@
       </div>
     </div>
     <header
-      class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-3 py-4 lg:grid-cols-[auto_1fr_auto]"
+      class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
     >
       <div>
         <NuxtLink to="/" aria-label="Modrinth home page">
@@ -1441,7 +1441,7 @@ function hideStagingBanner() {
   }
 
   main {
-    padding-top: 0.75rem;
+    padding-top: 1.5rem;
   }
 }
 </style>

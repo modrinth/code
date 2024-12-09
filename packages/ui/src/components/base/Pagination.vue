@@ -68,7 +68,7 @@ const props = withDefaults(
 )
 
 const pages = computed(() => {
-  let pages: ('-' | number)[] = []
+  const pages: ('-' | number)[] = []
 
   const first = 1
   const last = props.count

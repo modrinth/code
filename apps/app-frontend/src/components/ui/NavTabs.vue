@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="experimental-styles-within relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold"
+    class="card-shadow experimental-styles-within relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold"
   >
     <RouterLink
       v-for="(link, index) in filteredLinks"
@@ -8,13 +8,13 @@
       :key="index"
       ref="tabLinkElements"
       :to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
-      :class="`button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full ${activeIndex === index && !subpageSelected ? 'text-brand' : activeIndex === index && subpageSelected ? 'text-contrast' : 'text-primary'}`"
+      :class="`button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full ${activeIndex === index && !subpageSelected ? 'text-button-textSelected' : activeIndex === index && subpageSelected ? 'text-contrast' : 'text-primary'}`"
     >
       <component :is="link.icon" v-if="link.icon" class="size-5" />
       <span class="text-nowrap">{{ link.label }}</span>
     </RouterLink>
     <div
-      :class="`navtabs-transition pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1 ${subpageSelected ? 'bg-button-bg' : 'bg-brand-highlight'}`"
+      :class="`navtabs-transition pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1 ${subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected'}`"
       :style="{
         left: sliderLeftPx,
         top: sliderTopPx,
@@ -29,13 +29,14 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import type { RouteLocationRaw } from 'vue-router';
 import { useRoute, RouterLink } from 'vue-router'
 
 const route = useRoute()
 
 interface Tab {
   label: string
-  href: string
+  href: string | RouteLocationRaw
   shown?: boolean
   icon?: unknown
   subpages?: string[]
@@ -68,11 +69,11 @@ function pickLink() {
   for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
     const link = filteredLinks.value[i]
 
-    if (route.path === link.href) {
+
+    if (route.path === (typeof link.href === 'string' ? link.href : link.href.path)) {
       index = i
       break
     } else if (
-      route.path === link.href ||
       (link.subpages && link.subpages.some((subpage) => route.path.includes(subpage)))
     ) {
       index = i
@@ -158,5 +159,9 @@ watch(route, () => {
   transition:
     all 150ms cubic-bezier(0.4, 0, 0.2, 1) 0s,
     opacity 250ms cubic-bezier(0.5, 0, 0.2, 1) 50ms;
+}
+
+.card-shadow {
+  box-shadow: var(--shadow-card);
 }
 </style>

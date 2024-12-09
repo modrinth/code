@@ -428,9 +428,13 @@ async function checkUpdates() {
       >
         <ModrinthLoadingIndicator />
       </div>
-      <div class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50">
+      <div v-if="themeStore.featureFlag_pagePath" class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50">
         {{ route.fullPath }}
       </div>
+      <div
+        id="background-teleport-target" class="absolute h-full -z-10 rounded-tl-[--radius-xl] overflow-hidden" :style="{
+        width: 'calc(100% - var(--right-bar-width))',
+      }"></div>
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
@@ -786,8 +790,10 @@ async function checkUpdates() {
   height: calc(100vh - 3.75rem);
   background: var(--brand-gradient-bg);
 
-  --color-button-bg: rgba(255, 255, 255, 0.08);
+  --color-button-bg: var(--brand-gradient-button);
   --color-button-bg-hover: var(--brand-gradient-border);
+  --color-divider: var(--brand-gradient-border);
+  --color-divider-dark: var(--brand-gradient-border);
 }
 
 .app-sidebar::after {

@@ -284,7 +284,6 @@ import {
 import { profile_listener } from '@/helpers/events.js'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
-import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 import dayjs from 'dayjs'
 
 const props = defineProps({

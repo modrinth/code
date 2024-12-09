@@ -17,6 +17,7 @@
         <Button
           v-else
           :key="`option-${option.id}`"
+          v-tooltip="option.tooltip"
           :color="option.color ? option.color : 'default'"
           :hover-filled="option.hoverFilled"
           :hover-filled-only="option.hoverFilledOnly"
@@ -34,7 +35,6 @@
           "
           :link="option.link ? option.link : null"
           :external="option.external ? option.external : false"
-          v-tooltip="option.tooltip"
           :disabled="option.disabled"
           @click="
             () => {

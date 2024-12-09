@@ -3,7 +3,7 @@
     <ButtonStyled v-if="!!slots.title" :type="type">
       <button class="!w-full" @click="() => (isOpen ? close() : open())">
         <slot name="title" /><DropdownIcon
-          class="ml-auto size-5 transition-transform duration-300"
+          class="ml-auto size-5 text-contrast transition-transform duration-300"
           :class="{ 'rotate-180': isOpen }"
         />
       </button>

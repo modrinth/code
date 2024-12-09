@@ -1,31 +1,4 @@
 {
-  "auth.sign-in.2fa.description": {
-    "defaultMessage": "Please enter a two-factor code to proceed."
-  },
-  "auth.sign-in.2fa.label": {
-    "defaultMessage": "Enter two-factor code"
-  },
-  "auth.sign-in.2fa.placeholder": {
-    "defaultMessage": "Enter code..."
-  },
-  "auth.sign-in.additional-options": {
-    "defaultMessage": "<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>"
-  },
-  "auth.sign-in.email-username.label": {
-    "defaultMessage": "Email or username"
-  },
-  "auth.sign-in.password.label": {
-    "defaultMessage": "Password"
-  },
-  "auth.sign-in.sign-in-with": {
-    "defaultMessage": "Sign in with"
-  },
-  "auth.sign-in.title": {
-    "defaultMessage": "Sign In"
-  },
-  "auth.sign-in.use-password": {
-    "defaultMessage": "Or use a password"
-  },
   "button.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -344,6 +317,9 @@
   "project.visibility.public": {
     "defaultMessage": "Public"
   },
+  "project.visibility.rejected": {
+    "defaultMessage": "Rejected"
+  },
   "project.visibility.scheduled": {
     "defaultMessage": "Scheduled"
   },
@@ -359,6 +335,45 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Unlisted by staff"
   },
+  "search.filter_type.environment": {
+    "defaultMessage": "Environment"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Client"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Server"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Game version"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Show all versions"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "License"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Open source"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Loader"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Loader"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Loader"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platform"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "Project ID"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Loader"
+  },
   "settings.account.title": {
     "defaultMessage": "Account and security"
   },
@@ -373,6 +388,33 @@
   },
   "settings.billing.title": {
     "defaultMessage": "Billing and subscriptions"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Dark"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Select your preferred color theme for Modrinth on this device."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Light"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Preferred dark theme"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Preferred light theme"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Sync with system"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Color theme"
   },
   "settings.language.title": {
     "defaultMessage": "Language"

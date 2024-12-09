@@ -283,7 +283,7 @@ a:active + .message__author a,
 }
 
 .moderation-color,
-role-moderator {
+.role-moderator {
   color: var(--color-orange);
 }
 

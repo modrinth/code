@@ -39,11 +39,12 @@
       </div>
     </template>
     <template v-if="locked" #default>
-      <div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-button-bg">
+      <div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider mx-2">
         <p class="m-0 font-bold items-center">{{ filterType.formatted_name }} is provided by the server.</p>
         <p class="m-0 text-secondary text-sm">Unlocking this filter may allow you to install incompatible content.</p>
         <ButtonStyled>
-          <button class="w-fit" @click="() => {
+          <button
+class="w-fit" @click="() => {
             overriddenProvidedFilterTypes.push(filterType.id);
           }">
             <LockOpenIcon /> Unlock filter
@@ -52,12 +53,12 @@
       </div>
     </template>
     <template v-else #default>
-      <div class="iconified-input mx-2 my-1 !flex" v-if="filterType.searchable">
+      <div v-if="filterType.searchable" class="iconified-input mx-2 my-1 !flex">
         <SearchIcon aria-hidden="true" />
         <input
-          class="!min-h-9 text-sm"
           :id="`search-${filterType.id}`"
           v-model="query"
+          class="!min-h-9 text-sm"
           type="text"
           :placeholder="`Search...`"
           autocomplete="off"
@@ -76,15 +77,15 @@
             :included="isIncluded(option)"
             :excluded="isExcluded(option)"
             :supports-negative-filter="filterType.supports_negative_filter"
-            @toggle="toggleFilter"
-            @toggle-exclude="toggleNegativeFilter"
             :class="{
               'mr-3': scrollable,
             }"
+            @toggle="toggleFilter"
+            @toggle-exclude="toggleNegativeFilter"
           >
             <slot name="option" :filter="filterType" :option="option">
               <div v-if="typeof option.icon === 'string'" class="h-4 w-4" v-html="option.icon" />
-              <component v-else-if="option.icon" class="h-4 w-4" :is="option.icon" />
+              <component :is="option.icon" v-else-if="option.icon" class="h-4 w-4" />
               <span class="truncate text-sm">{{ option.formatted_name ?? option.id }}</span>
             </slot>
           </SearchFilterOption>
@@ -100,12 +101,13 @@
           :key="`toggle-group-${group.id}`"
           class="mx-2"
           :model-value="groupEnabled(group.id)"
-          @update:model-value="toggleGroup(group.id)"
           :label="`${group.formatted_name}`"
+          @update:model-value="toggleGroup(group.id)"
         />
         <div v-if="hasProvidedFilter" class="mt-2 mx-1">
           <ButtonStyled>
-            <button class="w-fit" @click="() => {
+            <button
+class="w-fit" @click="() => {
             overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter((id) => id !== filterType.id);
             accordion?.close()
             clearFilters();
@@ -121,10 +123,10 @@
 
 <script setup lang="ts">
 import Accordion from '../base/Accordion.vue'
-import {
-  type FilterOption,
-  type FilterType,
-  type FilterValue,
+import type {
+  FilterOption,
+  FilterType,
+  FilterValue,
 } from '../../utils/search'
 import { BanIcon, SearchIcon, XIcon, UpdatedIcon, LockOpenIcon, DropdownIcon } from '@modrinth/assets'
 import { Button, Checkbox, ScrollablePanel } from '../index'
@@ -154,8 +156,8 @@ const showMore = ref(false)
 
 const accordion = ref<InstanceType<typeof Accordion> | null>()
 
-const selectedFilterOptions = computed(() => props.filterType.options.filter((option) => locked ? isProvided(option, false) : isIncluded(option)))
-const selectedNegativeFilterOptions = computed(() => props.filterType.options.filter((option) => locked ? isProvided(option, true) : isExcluded(option)))
+const selectedFilterOptions = computed(() => props.filterType.options.filter((option) => locked.value ? isProvided(option, false) : isIncluded(option)))
+const selectedNegativeFilterOptions = computed(() => props.filterType.options.filter((option) => locked.value ? isProvided(option, true) : isExcluded(option)))
 const visibleOptions = computed(() => props.filterType.options
   .filter((option) => isVisible(option) || isIncluded(option) || isExcluded(option))
   .slice()

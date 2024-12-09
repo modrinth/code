@@ -54,7 +54,7 @@ defineOptions({
 }
 
 .router-link-active {
-  @apply text-[--selected-button-text] bg-[--selected-button-bg];
+  @apply text-[--color-button-text-selected] bg-[--color-button-bg-selected];
 }
 
 .subpage-active {

@@ -1,4 +1,7 @@
 <template>
+  <div v-if="flags.projectBackground" class="-z-1 pointer-events-none fixed inset-0">
+    <ProjectBackgroundGradient :project="project" />
+  </div>
   <div v-if="route.name.startsWith('type-id-settings')" class="normal-page">
     <div class="normal-page__sidebar">
       <aside class="universal-card">
@@ -486,7 +489,7 @@
                   "
                   from="top-right"
                   aria-label="Save"
-                  :dropdown-id="savePopoutId"
+                  :dropdown-id="`${baseId}-save`"
                 >
                   <BookmarkIcon
                     aria-hidden="true"
@@ -603,7 +606,7 @@
                   { id: 'copy-id', action: () => copyId() },
                 ]"
                 aria-label="More options"
-                :dropdown-id="moreOptionsPopoutId"
+                :dropdown-id="`${baseId}-more-options`"
               >
                 <MoreVerticalIcon aria-hidden="true" />
                 <template #analytics>
@@ -821,9 +824,11 @@ import {
   ProjectSidebarCreators,
   ProjectSidebarLinks,
   ProjectSidebarDetails,
+  ProjectBackgroundGradient,
 } from "@modrinth/ui";
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
 import dayjs from "dayjs";
+import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import Badge from "~/components/ui/Badge.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import NavStack from "~/components/ui/NavStack.vue";
@@ -837,7 +842,6 @@ import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
 import Accordion from "~/components/ui/Accordion.vue";
 import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
-import VersionSummary from "~/components/ui/VersionSummary.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
@@ -865,8 +869,7 @@ const gameVersionFilterInput = ref();
 
 const versionFilter = ref("");
 
-const savePopoutId = useId();
-const moreOptionsPopoutId = useId();
+const baseId = useId();
 
 const currentGameVersion = computed(() => {
   return (

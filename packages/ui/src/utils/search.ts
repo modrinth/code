@@ -1,6 +1,5 @@
-import { type Component, computed, watch, readonly, ref } from 'vue'
-import type { Ref } from 'vue'
-import { type LocationQueryRaw, type LocationQueryValue, useRoute, useRouter } from 'vue-router'
+import { type Ref , type Component, computed, readonly, ref  } from 'vue';
+import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 import { defineMessage, useVIntl } from '@vintl/vintl'
 import { formatCategory, formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
 import { ClientIcon, ServerIcon } from '@modrinth/assets'

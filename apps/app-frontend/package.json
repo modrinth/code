@@ -29,7 +29,7 @@
     "pinia": "^2.1.7",
     "posthog-js": "^1.158.2",
     "vite-svg-loader": "^5.1.0",
-    "vue": "^3.4.21",
+    "vue": "^3.5.13",
     "vue-multiselect": "3.0.0",
     "vue-router": "4.3.0",
     "vue-virtual-scroller": "v2.0.0-beta.8"
@@ -49,8 +49,9 @@
     "tailwindcss": "^3.4.4",
     "tsconfig": "workspace:*",
     "typescript": "^5.5.4",
-    "vite": "^5.2.8",
+    "vite": "^5.4.6",
     "vue-tsc": "^2.1.6"
   },
-  "packageManager": "pnpm@9.4.0"
+  "packageManager": "pnpm@9.4.0",
+  "web-types": "../../web-types.json"
 }

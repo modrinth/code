@@ -21,7 +21,7 @@
     <div class="modal-container experimental-styles-within" :class="{ shown: visible }">
       <div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
         <div
-          class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-button-bg max-w-full"
+          class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
         >
           <div class="flex text-wrap break-words items-center gap-3 min-w-0">
             <slot name="title">
@@ -31,7 +31,7 @@
             </slot>
           </div>
           <ButtonStyled v-if="closable" circular>
-            <button @click="hide" aria-label="Close">
+            <button aria-label="Close" @click="hide">
               <XIcon aria-hidden="true" />
             </button>
           </ButtonStyled>

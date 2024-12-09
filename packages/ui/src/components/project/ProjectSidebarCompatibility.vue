@@ -44,34 +44,28 @@
           <ClientIcon aria-hidden="true" />
           Client-side
         </TagItem>
-        <div
+        <TagItem
           v-if="
             (project.server_side === 'required' && project.client_side !== 'required') ||
             (project.client_side === 'optional' && project.server_side === 'optional')
           "
-          class="tag-list__item"
         >
           <ServerIcon aria-hidden="true" />
           Server-side
-        </div>
-        <div v-if="false" class="tag-list__item">
+        </TagItem>
+        <TagItem v-if="false">
           <UserIcon aria-hidden="true" />
           Singleplayer
-        </div>
-        <div
+        </TagItem>
+        <TagItem
           v-if="
             project.project_type !== 'datapack' &&
-            ((project.client_side === 'required' && project.server_side === 'required') ||
-              project.client_side === 'optional' ||
-              (project.client_side === 'required' && project.server_side === 'optional') ||
-              project.server_side === 'optional' ||
-              (project.server_side === 'required' && project.client_side === 'optional'))
+            project.client_side !== 'unsupported' && project.server_side !== 'unsupported' && project.client_side !== 'unknown' && project.server_side !== 'unknown'
           "
-          class="tag-list__item"
         >
           <MonitorSmartphoneIcon aria-hidden="true" />
           Client and server
-        </div>
+        </TagItem>
       </div>
     </section>
   </div>
@@ -89,6 +83,7 @@ type EnvironmentValue = 'optional' | 'required' | 'unsupported' | 'unknown'
 
 defineProps<{
   project: {
+    actualProjectType: string
     project_type: string
     loaders: string[]
     client_side: EnvironmentValue

@@ -1,9 +1,15 @@
 {
+  "app.settings.developer-mode-enabled": {
+    "message": "Developer mode enabled."
+  },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Default instance options"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Feature flags"
   },
   "app.settings.tabs.java-versions": {
     "message": "Java versions"

@@ -27,7 +27,7 @@
       >
         <div
           v-if="filtersMenuOpen"
-          class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-button-bg bg-bg-raised px-6 py-4"
+          class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
         >
           <h3 class="m-0 text-lg text-contrast">Filters</h3>
           <ButtonStyled circular>
@@ -61,7 +61,7 @@
           :filter-type="filter"
           :class="
             filtersMenuOpen
-              ? 'border-0 border-b-[1px] border-solid border-button-bg last:border-b-0'
+              ? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
               : 'rounded-2xl bg-bg-raised'
           "
           button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
@@ -78,7 +78,7 @@
     <section class="normal-page__content">
       <div
         v-if="server"
-        class="mb-4 flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-button-bg pb-4"
+        class="mb-4 flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-divider pb-4"
       >
         <nuxt-link
           :to="`/servers/manage/${server.serverId}/content`"

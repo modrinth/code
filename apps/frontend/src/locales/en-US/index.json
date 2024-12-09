@@ -890,29 +890,8 @@
   "settings.display.sidebar.right-aligned-filters-sidebar.title": {
     "message": "Right-aligned filters sidebar on search pages"
   },
-  "settings.display.theme.dark": {
-    "message": "Dark"
-  },
   "settings.display.theme.description": {
     "message": "Select your preferred color theme for Modrinth on this device."
-  },
-  "settings.display.theme.light": {
-    "message": "Light"
-  },
-  "settings.display.theme.oled": {
-    "message": "OLED"
-  },
-  "settings.display.theme.preferred-dark-theme": {
-    "message": "Preferred dark theme"
-  },
-  "settings.display.theme.preferred-light-theme": {
-    "message": "Preferred light theme"
-  },
-  "settings.display.theme.retro": {
-    "message": "Retro"
-  },
-  "settings.display.theme.system": {
-    "message": "Sync with system"
   },
   "settings.display.theme.title": {
     "message": "Color theme"
