@@ -100,7 +100,7 @@ onUnmounted(() => {
 
 <template>
   <div class="p-6 flex flex-col gap-2">
-    <h1 class="m-0 text-2xl">Welcome back, Prospector!</h1>
+    <h1 class="m-0 text-2xl">Welcome back!</h1>
     <RowDisplay
       v-if="total > 0"
       :instances="[

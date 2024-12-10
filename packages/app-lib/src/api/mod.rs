@@ -1,5 +1,6 @@
 //! API for interacting with Theseus
 pub mod cache;
+mod friends;
 pub mod handler;
 pub mod jre;
 pub mod logs;
