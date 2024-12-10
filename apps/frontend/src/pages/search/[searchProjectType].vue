@@ -274,7 +274,7 @@
               <button
                 v-if="
                   result.installed ||
-                  server.mods.data.find((x) => x.project_id === result.project_id) ||
+                  server.content.data.find((x) => x.project_id === result.project_id) ||
                   server.general?.project?.id === result.project_id
                 "
                 disabled
@@ -430,7 +430,7 @@ const serverOverrideGameVersions = ref(false);
 const serverOverrideLoaders = ref(false);
 
 if (route.query.sid) {
-  server.value = await usePyroServer(route.query.sid, ["general", "mods"]);
+  server.value = await usePyroServer(route.query.sid, ["general", "content"]);
 }
 
 if (route.query.shi && projectType.value.id !== "modpack") {
@@ -462,8 +462,12 @@ async function serverInstall(project) {
       project.installed = true;
       navigateTo(`/servers/manage/${route.query.sid}/options/loader`);
     } else if (projectType.value.id === "mod") {
-      await server.value.mods.install(version.project_id, version.id);
-      await server.value.refresh(["mods"]);
+      await server.value.content.install("Mod", version.project_id, version.id);
+      await server.value.refresh(["content"]);
+      project.installed = true;
+    } else if (projectType.value.id === "plugin") {
+      await server.value.content.install("Plugin", version.project_id, version.id);
+      await server.value.refresh(["content"]);
       project.installed = true;
     }
   } catch (e) {

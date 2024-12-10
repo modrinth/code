@@ -99,6 +99,7 @@ import _LinkIcon from './icons/link.svg?component'
 import _ListIcon from './icons/list.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
 import _LockIcon from './icons/lock.svg?component'
+import _OpenLockIcon from './icons/lock-open.svg?component'
 import _LogInIcon from './icons/log-in.svg?component'
 import _LogOutIcon from './icons/log-out.svg?component'
 import _MailIcon from './icons/mail.svg?component'
@@ -279,6 +280,7 @@ export const LinkIcon = _LinkIcon
 export const ListIcon = _ListIcon
 export const ListEndIcon = _ListEndIcon
 export const LockIcon = _LockIcon
+export const OpenLockIcon = _OpenLockIcon
 export const LogInIcon = _LogInIcon
 export const LogOutIcon = _LogOutIcon
 export const MailIcon = _MailIcon

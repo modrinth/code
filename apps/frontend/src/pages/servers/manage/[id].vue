@@ -302,7 +302,7 @@ const router = useRouter();
 const serverId = route.params.id as string;
 const server = await usePyroServer(serverId, [
   "general",
-  "mods",
+  "content",
   "backups",
   "network",
   "startup",
