@@ -88,7 +88,7 @@
     <p>
       You are initiating a transfer of your revenue from Modrinth's Creator Monetization Program.
       How much of your
-      <strong>{{ $formatMoney(auth.user.payout_data.balance) }}</strong> balance would you like to
+      <strong>{{ $formatMoney(userBalance.available) }}</strong> balance would you like to transfer
       transfer to {{ selectedMethod.name }}?
     </p>
     <div class="confirmation-input">
@@ -212,10 +212,13 @@ const country = ref(
   countries.value.find((x) => x.id === (auth.value.user.payout_data.paypal_region ?? "US")),
 );
 
-const { data: payoutMethods, refresh: refreshPayoutMethods } = await useAsyncData(
-  `payout/methods?country=${country.value.id}`,
-  () => useBaseFetch(`payout/methods?country=${country.value.id}`, { apiVersion: 3 }),
-);
+const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMethods }] =
+  await Promise.all([
+    useAsyncData(`payout/balance`, () => useBaseFetch(`payout/balance`, { apiVersion: 3 })),
+    useAsyncData(`payout/methods?country=${country.value.id}`, () =>
+      useBaseFetch(`payout/methods?country=${country.value.id}`, { apiVersion: 3 }),
+    ),
+  ]);
 
 const selectedMethodId = ref(payoutMethods.value[0].id);
 const selectedMethod = computed(() =>
@@ -295,10 +298,10 @@ const knownErrors = computed(() => {
   if (!parsedAmount.value && amount.value.length > 0) {
     errors.push(`${amount.value} is not a valid amount`);
   } else if (
-    parsedAmount.value > auth.value.user.payout_data.balance ||
+    parsedAmount.value > userBalance.value.available ||
     parsedAmount.value > maxWithdrawAmount.value
   ) {
-    const maxAmount = Math.min(auth.value.user.payout_data.balance, maxWithdrawAmount.value);
+    const maxAmount = Math.min(userBalance.value.available, maxWithdrawAmount.value);
     errors.push(`The amount must be no more than ${data.$formatMoney(maxAmount)}`);
   } else if (parsedAmount.value <= fees.value || parsedAmount.value < minWithdrawAmount.value) {
     const minAmount = Math.max(fees.value + 0.01, minWithdrawAmount.value);

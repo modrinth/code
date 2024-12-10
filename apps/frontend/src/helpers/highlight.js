@@ -1,21 +1,21 @@
 import hljs from "highlight.js/lib/core";
 // Scripting
 import javascript from "highlight.js/lib/languages/javascript";
-import python from "highlight.js/lib/languages/python";
 import lua from "highlight.js/lib/languages/lua";
+import python from "highlight.js/lib/languages/python";
 // Coding
+import groovy from "highlight.js/lib/languages/groovy";
 import java from "highlight.js/lib/languages/java";
 import kotlin from "highlight.js/lib/languages/kotlin";
 import scala from "highlight.js/lib/languages/scala";
-import groovy from "highlight.js/lib/languages/groovy";
 // Configs
+import { configuredXss, md } from "@modrinth/utils";
 import gradle from "highlight.js/lib/languages/gradle";
-import json from "highlight.js/lib/languages/json";
 import ini from "highlight.js/lib/languages/ini";
-import yaml from "highlight.js/lib/languages/yaml";
-import xml from "highlight.js/lib/languages/xml";
+import json from "highlight.js/lib/languages/json";
 import properties from "highlight.js/lib/languages/properties";
-import { md, configuredXss } from "@modrinth/utils";
+import xml from "highlight.js/lib/languages/xml";
+import yaml from "highlight.js/lib/languages/yaml";
 
 /* REGISTRATION */
 // Scripting
@@ -54,7 +54,7 @@ export const renderHighlightedString = (string) =>
         if (lang && hljs.getLanguage(lang)) {
           try {
             return hljs.highlight(str, { language: lang }).value;
-          } catch (__) {
+          } catch {
             /* empty */
           }
         }

@@ -606,6 +606,7 @@
                       auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
                     color: 'red',
                     hoverOnly: true,
+                    shown: !currentMember,
                   },
                   { id: 'copy-id', action: () => copyId() },
                 ]"
@@ -1383,7 +1384,7 @@ try {
       },
     ),
     useAsyncData(`project/${route.params.id}/dependencies`, () =>
-      useBaseFetch(`project/${route.params.id}/dependencies`),
+      useBaseFetch(`project/${route.params.id}/dependencies`, {}),
     ),
     useAsyncData(`project/${route.params.id}/version?featured=true`, () =>
       useBaseFetch(`project/${route.params.id}/version?featured=true`),
@@ -1398,7 +1399,7 @@ try {
 
   versions = shallowRef(toRaw(versions));
   featuredVersions = shallowRef(toRaw(featuredVersions));
-} catch (error) {
+} catch {
   throw createError({
     fatal: true,
     statusCode: 404,

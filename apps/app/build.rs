@@ -62,7 +62,7 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "get_java_versions",
-                        "set_java_versions",
+                        "set_java_version",
                         "jre_find_filtered_jres",
                         "jre_get_jre",
                         "jre_test_jre",
@@ -102,13 +102,7 @@ fn main() {
             .plugin(
                 "mr-auth",
                 InlinedPlugin::new()
-                    .commands(&[
-                        "login_pass",
-                        "login_2fa",
-                        "create_account",
-                        "logout",
-                        "get",
-                    ])
+                    .commands(&["modrinth_login", "logout", "get"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
@@ -213,6 +207,22 @@ fn main() {
                         "show_launcher_logs_folder",
                         "progress_bars_list",
                         "get_opening_command",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
+                "ads",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "init_ads_window",
+                        "hide_ads_window",
+                        "scroll_ads_window",
+                        "show_ads_window",
+                        "record_ads_click",
+                        "open_link",
+                        "get_ads_personalization",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

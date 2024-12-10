@@ -12,7 +12,7 @@ import {
   EyeIcon,
   ChevronRightIcon,
 } from '@modrinth/assets'
-import { ConfirmModal } from '@modrinth/ui'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -22,7 +22,6 @@ import { handleError } from '@/store/notifications.js'
 import { duplicate, kill, remove, run } from '@/helpers/profile.js'
 import { useRouter } from 'vue-router'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { useTheming } from '@/store/state.js'
 import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { install as installVersion } from '@/store/install.js'
@@ -53,7 +52,6 @@ const instanceComponents = ref(null)
 const rows = ref(null)
 const deleteConfirmModal = ref(null)
 
-const themeStore = useTheming()
 const currentDeleteInstance = ref(null)
 
 async function deleteProfile() {
@@ -207,13 +205,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <ConfirmModal
+  <ConfirmModalWrapper
     ref="deleteConfirmModal"
     title="Are you sure you want to delete this instance?"
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"
     proceed-label="Delete"
-    :noblur="!themeStore.advancedRendering"
     @proceed="deleteProfile"
   />
   <div class="content">

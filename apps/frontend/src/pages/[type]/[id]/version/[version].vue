@@ -158,7 +158,7 @@
             Report
           </nuxt-link>
         </ButtonStyled>
-        <ButtonStyled v-else>
+        <ButtonStyled v-else-if="!currentMember">
           <button @click="() => reportVersion(version.id)">
             <ReportIcon aria-hidden="true" />
             Report
@@ -567,6 +567,7 @@
               :show-labels="false"
               :limit="6"
               :hide-selected="true"
+              :custom-label="(version) => version"
               placeholder="Choose versions..."
             />
             <Checkbox

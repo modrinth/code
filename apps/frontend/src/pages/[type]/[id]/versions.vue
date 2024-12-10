@@ -204,7 +204,9 @@
                     id: 'report',
                     color: 'red',
                     hoverFilled: true,
-                    action: () => reportVersion(version.id),
+                    action: () =>
+                      auth.user ? reportVersion(version.id) : navigateTo('/auth/sign-in'),
+                    shown: !currentMember,
                   },
                   { divider: true, shown: currentMember },
                   {
@@ -338,6 +340,7 @@ const props = defineProps({
 const tags = useTags();
 const flags = useFeatureFlags();
 const formatRelativeTime = useRelativeTime();
+const auth = await useAuth();
 
 const emits = defineEmits(["onDownload"]);
 

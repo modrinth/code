@@ -20,14 +20,14 @@
       </span>
     </Card>
   </div>
-  <div v-if="expandedGalleryItem" class="expanded-image-modal" @click="expandedGalleryItem = null">
+  <div v-if="expandedGalleryItem" class="expanded-image-modal" @click="hideImage">
     <div class="content">
       <img
         class="image"
         :class="{ 'zoomed-in': zoomedIn }"
         :src="
-          expandedGalleryItem.url
-            ? expandedGalleryItem.url
+          expandedGalleryItem.raw_url
+            ? expandedGalleryItem.raw_url
             : 'https://cdn.modrinth.com/placeholder-banner.svg'
         "
         :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
@@ -45,15 +45,15 @@
         </div>
         <div class="controls">
           <div class="buttons">
-            <Button class="close" icon-only @click="expandedGalleryItem = null">
+            <Button class="close" icon-only @click="hideImage">
               <XIcon aria-hidden="true" />
             </Button>
             <a
               class="open btn icon-only"
               target="_blank"
               :href="
-                expandedGalleryItem.url
-                  ? expandedGalleryItem.url
+                expandedGalleryItem.raw_url
+                  ? expandedGalleryItem.raw_url
                   : 'https://cdn.modrinth.com/placeholder-banner.svg'
               "
             >
@@ -94,6 +94,7 @@ import {
 import { Button, Card } from '@modrinth/ui'
 import { ref } from 'vue'
 import { trackEvent } from '@/helpers/analytics'
+import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
 
 const props = defineProps({
   project: {
@@ -102,9 +103,14 @@ const props = defineProps({
   },
 })
 
-let expandedGalleryItem = ref(null)
-let expandedGalleryIndex = ref(0)
-let zoomedIn = ref(false)
+const expandedGalleryItem = ref(null)
+const expandedGalleryIndex = ref(0)
+const zoomedIn = ref(false)
+
+const hideImage = () => {
+  expandedGalleryItem.value = null
+  show_ads_window()
+}
 
 const nextImage = () => {
   expandedGalleryIndex.value++
@@ -131,6 +137,7 @@ const previousImage = () => {
 }
 
 const expandImage = (item, index) => {
+  hide_ads_window()
   expandedGalleryItem.value = item
   expandedGalleryIndex.value = index
   zoomedIn.value = false
@@ -140,6 +147,20 @@ const expandImage = (item, index) => {
     url: item.url,
   })
 }
+
+function keyListener(e) {
+  if (expandedGalleryItem.value) {
+    e.preventDefault()
+    if (e.key === 'Escape') {
+      hideImage()
+    } else if (e.key === 'ArrowLeft') {
+      previousImage()
+    } else if (e.key === 'ArrowRight') {
+      nextImage()
+    }
+  }
+}
+document.addEventListener('keypress', keyListener)
 </script>
 
 <style scoped lang="scss">

@@ -12,13 +12,13 @@ import {
   SearchIcon,
   XIcon,
 } from '@modrinth/assets'
-import { ConfirmModal, Button, Card, DropdownSelect } from '@modrinth/ui'
+import { Button, Card, DropdownSelect } from '@modrinth/ui'
 import { formatCategoryHeader } from '@modrinth/utils'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import dayjs from 'dayjs'
-import { useTheming } from '@/store/theme.js'
 import { duplicate, remove } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 
 const props = defineProps({
   instances: {
@@ -35,7 +35,6 @@ const props = defineProps({
 const instanceOptions = ref(null)
 const instanceComponents = ref(null)
 
-const themeStore = useTheming()
 const currentDeleteInstance = ref(null)
 const confirmModal = ref(null)
 
@@ -230,13 +229,12 @@ const filteredResults = computed(() => {
 })
 </script>
 <template>
-  <ConfirmModal
+  <ConfirmModalWrapper
     ref="confirmModal"
     title="Are you sure you want to delete this instance?"
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"
     proceed-label="Delete"
-    :noblur="!themeStore.advancedRendering"
     @proceed="deleteProfile"
   />
   <Card class="header">

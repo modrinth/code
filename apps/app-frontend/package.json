@@ -1,11 +1,12 @@
 {
   "name": "@modrinth/app-frontend",
   "private": true,
-  "version": "0.8.3-1",
+  "version": "0.8.9",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vue-tsc --noEmit && vite build",
+    "tsc:check": "vue-tsc --noEmit",
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write ."
   },
@@ -13,36 +14,41 @@
     "@modrinth/assets": "workspace:*",
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
+    "@sentry/vue": "^8.27.0",
     "@tauri-apps/api": "^2.0.0-rc.3",
     "@tauri-apps/plugin-dialog": "^2.0.0-rc.0",
     "@tauri-apps/plugin-os": "^2.0.0-rc.0",
-    "@tauri-apps/plugin-window-state": "^2.0.0-rc.0",
     "@tauri-apps/plugin-shell": "^2.0.0-rc.0",
+    "@tauri-apps/plugin-updater": "^2.0.0-rc.0",
+    "@tauri-apps/plugin-window-state": "^2.0.0-rc.0",
     "@vintl/vintl": "^4.4.1",
     "dayjs": "^1.11.10",
     "floating-vue": "^5.2.2",
     "ofetch": "^1.3.4",
     "pinia": "^2.1.7",
+    "posthog-js": "^1.158.2",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.4.21",
     "vue-multiselect": "3.0.0",
     "vue-router": "4.3.0",
-    "vue-virtual-scroller": "v2.0.0-beta.8",
-    "posthog-js": "^1.158.2",
-    "@sentry/vue": "^8.27.0"
+    "vue-virtual-scroller": "v2.0.0-beta.8"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.0.0-rc",
+    "@eslint/compat": "^1.1.1",
+    "@nuxt/eslint-config": "^0.5.6",
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.19",
-    "eslint": "^8.57.0",
+    "eslint": "^9.9.1",
     "eslint-config-custom": "workspace:*",
+    "eslint-plugin-turbo": "^2.1.1",
     "postcss": "^8.4.39",
     "prettier": "^3.2.5",
     "sass": "^1.74.1",
     "tailwindcss": "^3.4.4",
     "tsconfig": "workspace:*",
-    "vite": "^5.2.8"
+    "typescript": "^5.5.4",
+    "vite": "^5.2.8",
+    "vue-tsc": "^2.1.6"
   },
   "packageManager": "pnpm@9.4.0"
 }

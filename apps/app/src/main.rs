@@ -26,11 +26,73 @@ extern crate objc;
 #[tauri::command]
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app.clone()).await?;
-    State::init().await?;
+
+    #[cfg(feature = "updater")]
+    {
+        use tauri_plugin_updater::UpdaterExt;
+
+        let updater = app.updater_builder().build()?;
+
+        let update_fut = updater.check();
+
+        State::init().await?;
+
+        let check_bar = theseus::init_loading(
+            theseus::LoadingBarType::CheckingForUpdates,
+            1.0,
+            "Checking for updates...",
+        )
+        .await?;
+
+        let update = update_fut.await;
+
+        drop(check_bar);
+
+        if let Some(update) = update.ok().flatten() {
+            tracing::info!("Update found: {:?}", update.download_url);
+            let loader_bar_id = theseus::init_loading(
+                theseus::LoadingBarType::LauncherUpdate {
+                    version: update.version.clone(),
+                    current_version: update.current_version.clone(),
+                },
+                1.0,
+                "Updating Modrinth App...",
+            )
+            .await?;
+
+            // 100 MiB
+            const DEFAULT_CONTENT_LENGTH: u64 = 1024 * 1024 * 100;
+
+            update
+                .download_and_install(
+                    |chunk_length, content_length| {
+                        let _ = theseus::emit_loading(
+                            &loader_bar_id,
+                            (chunk_length as f64)
+                                / (content_length
+                                    .unwrap_or(DEFAULT_CONTENT_LENGTH)
+                                    as f64),
+                            None,
+                        );
+                    },
+                    || {},
+                )
+                .await?;
+
+            app.restart();
+        }
+    }
+
+    #[cfg(not(feature = "updater"))]
+    {
+        State::init().await?;
+    }
 
     let state = State::get().await?;
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir(), true)?;
+    app.asset_protocol_scope()
+        .allow_directory(state.directories.caches_dir().join("icons"), true)?;
 
     Ok(())
 }
@@ -39,7 +101,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 #[tracing::instrument(skip_all)]
 #[tauri::command]
 fn show_window(app: tauri::AppHandle) {
-    let win = app.get_webview_window("main").unwrap();
+    let win = app.get_window("main").unwrap();
     if let Err(e) = win.show() {
         MessageDialog::new()
             .set_type(MessageType::Error)
@@ -73,6 +135,11 @@ async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
     Ok(())
 }
 
+#[tauri::command]
+fn restart_app(app: tauri::AppHandle) {
+    app.restart();
+}
+
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
@@ -102,6 +169,19 @@ fn main() {
     }
 
     builder = builder
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+            if let Some(payload) = args.get(1) {
+                tracing::info!("Handling deep link from arg {payload}");
+                let payload = payload.clone();
+                tauri::async_runtime::spawn(api::utils::handle_command(
+                    payload,
+                ));
+            }
+
+            if let Some(win) = app.get_window("main") {
+                let _ = win.set_focus();
+            }
+        }))
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
@@ -179,12 +259,13 @@ fn main() {
         .plugin(api::tags::init())
         .plugin(api::utils::init())
         .plugin(api::cache::init())
+        .plugin(api::ads::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
             toggle_decorations,
-            api::mr_auth::modrinth_auth_login,
             show_window,
+            restart_app,
         ]);
 
     #[cfg(target_os = "macos")]
@@ -235,7 +316,7 @@ fn main() {
                     MessageDialog::new()
                         .set_type(MessageType::Error)
                         .set_title("Initialization error")
-                        .set_text("Your Microsoft Edge WebView2 installation is corrupt.\n\nMicrosoft Edge WebView2 is required to run Modrinth App.\n\nLearn how to repair it at https://docs.modrinth.com/faq/app/webview2")
+                        .set_text("Your Microsoft Edge WebView2 installation is corrupt.\n\nMicrosoft Edge WebView2 is required to run Modrinth App.\n\nLearn how to repair it at https://support.modrinth.com/en/articles/8797765-corrupted-microsoft-edge-webview2-installation")
                         .show_alert()
                         .unwrap();
 

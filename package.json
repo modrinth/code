@@ -6,6 +6,7 @@
     "web:dev": "turbo run dev --filter=@modrinth/frontend",
     "web:build": "turbo run build --filter=@modrinth/frontend",
     "app:dev": "turbo run dev --filter=@modrinth/app",
+    "docs:dev": "turbo run dev --filter=@modrinth/docs",
     "app:build": "turbo run build --filter=@modrinth/app",
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "build": "turbo run build --continue",
@@ -15,10 +16,10 @@
   },
   "devDependencies": {
     "prettier": "^3.3.2",
-    "turbo": "^2.0.6",
+    "turbo": "^2.2.3",
     "vue": "^3.4.31"
   },
-  "packageManager": "pnpm@9.4.0",
+  "packageManager": "pnpm@9.15.0",
   "pnpm": {
     "patchedDependencies": {
       "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
