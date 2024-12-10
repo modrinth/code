@@ -466,7 +466,7 @@ async function serverInstall(project) {
       await server.value.refresh(["content"]);
       project.installed = true;
     } else if (projectType.value.id === "plugin") {
-      await server.value.content.install("Plugin", version.project_id, version.id);
+      await server.value.content.install("plugin", version.project_id, version.id);
       await server.value.refresh(["content"]);
       project.installed = true;
     }
