@@ -48,12 +48,12 @@
       <section class="card gap-1" :class="{ 'max-lg:!hidden': !sidebarMenuOpen }">
         <div class="flex items-center gap-2">
           <div class="iconified-input w-full">
-            <label class="hidden" for="search">Search</label>
+            <label class="hidden" for="filter-search">Search</label>
             <SearchIcon aria-hidden="true" />
             <input
-              id="search"
+              id="filter-search"
               v-model="queryFilter"
-              name="search"
+              name="filter-search"
               type="search"
               placeholder="Search filters..."
               autocomplete="off"
@@ -174,13 +174,13 @@
             Filters...
           </button>
           <div class="iconified-input">
-            <label class="hidden" for="search">Search</label>
+            <label class="hidden" for="project-search">Search</label>
             <SearchIcon aria-hidden="true" />
             <input
-              id="search"
+              id="project-search"
               v-model="query"
               type="search"
-              name="search"
+              name="project-search"
               :placeholder="`Search ${projectType.display}s...`"
               autocomplete="off"
               @input="onSearchChange(1)"

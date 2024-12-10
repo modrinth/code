@@ -272,6 +272,7 @@ const backupServer = ref(false);
 
 const isError = computed(() => props.server.general?.status === "error");
 const isDangerous = computed(() => hardReset.value);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isBackupLimited = computed(() => (props.server.backups?.data?.length || 0) >= 15);
 
 const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
@@ -318,7 +319,6 @@ const mrpackModal = ref();
 const canInstall = computed(() => {
   const conds =
     !selectedMCVersion.value ||
-    isBackupLimited.value ||
     isLoading.value ||
     loadingServerCheck.value ||
     serverCheckError.value.trim().length > 0;

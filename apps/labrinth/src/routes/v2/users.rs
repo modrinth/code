@@ -156,6 +156,7 @@ pub struct EditUser {
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
     pub badges: Option<Badges>,
+    pub allow_friend_requests: Option<bool>,
 }
 
 #[patch("{id}")]
@@ -178,6 +179,7 @@ pub async fn user_edit(
             role: new_user.role,
             badges: new_user.badges,
             venmo_handle: None,
+            allow_friend_requests: new_user.allow_friend_requests,
         }),
         pool,
         redis,
