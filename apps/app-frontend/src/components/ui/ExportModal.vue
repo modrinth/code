@@ -211,7 +211,6 @@ const exportPack = async () => {
 
 <style scoped lang="scss">
 .modal-body {
-  padding: var(--gap-xl);
   display: flex;
   flex-direction: column;
   gap: var(--gap-md);
@@ -286,6 +285,7 @@ const exportPack = async () => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .textarea-wrapper {

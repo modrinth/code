@@ -2,10 +2,6 @@
   "identifier": "updater",
   "description": "",
   "local": true,
-  "windows": [
-    "main"
-  ],
-  "permissions": [
-    "updater:default"
-  ]
+  "windows": ["main"],
+  "permissions": ["updater:default"]
 }

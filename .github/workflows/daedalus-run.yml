@@ -21,7 +21,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-
       - name: Pull Docker image from GHCR
         run: docker pull ghcr.io/modrinth/daedalus:main
 

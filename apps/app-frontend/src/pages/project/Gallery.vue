@@ -198,7 +198,7 @@ document.addEventListener('keypress', keyListener)
 
 .expanded-image-modal {
   position: fixed;
-  z-index: 10;
+  z-index: 11;
   overflow: auto;
   top: 0;
   left: 0;

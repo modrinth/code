@@ -39,7 +39,7 @@
 
 .normal-page {
   display: grid;
-  padding: 0 0.75rem;
+  padding: 0 1.5rem;
 
   grid-template:
     "sidebar"
@@ -115,7 +115,7 @@
   }
 
   .normal-page__content {
-    max-width: calc(80rem - 18.75rem - 0.75rem);
+    max-width: calc(80rem - 18.75rem - 1.5rem);
     //overflow-x: hidden;
   }
 }
@@ -125,7 +125,7 @@
   margin: 0 auto;
   max-width: 80rem;
   column-gap: 0.75rem;
-  padding: 0 0.75rem;
+  padding: 0 1.5rem;
 
   grid-template:
     "header"
@@ -162,7 +162,7 @@
 
   .normal-page__content {
     grid-area: content;
-    max-width: calc(80rem - 18.75rem - 0.75rem);
+    max-width: calc(80rem - 18.75rem - 1.5rem);
     //overflow-x: hidden;
   }
 

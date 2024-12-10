@@ -1,7 +1,11 @@
 <template>
   <div class="content">
     <div class="mb-3 flex">
-      <VersionFilterControl :versions="props.versions" @switch-page="switchPage" />
+      <VersionFilterControl
+        :versions="props.versions"
+        :game-versions="tags.gameVersions"
+        @update:query="updateQuery"
+      />
       <Pagination
         :page="currentPage"
         :count="Math.ceil(filteredVersions.length / 20)"
@@ -72,8 +76,8 @@
 import { Pagination } from "@modrinth/ui";
 import { DownloadIcon } from "@modrinth/assets";
 
+import VersionFilterControl from "@modrinth/ui/src/components/version/VersionFilterControl.vue";
 import { renderHighlightedString } from "~/helpers/highlight.js";
-import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
 
 const props = defineProps({
   project: {
@@ -108,6 +112,7 @@ useSeoMeta({
 
 const router = useNativeRouter();
 const route = useNativeRoute();
+const tags = useTags();
 
 const currentPage = ref(Number(route.query.page ?? 1));
 const filteredVersions = computed(() => {
@@ -135,6 +140,21 @@ function switchPage(page) {
     query: {
       ...route.query,
       page: currentPage.value !== 1 ? currentPage.value : undefined,
+    },
+  });
+}
+
+function updateQuery(newQueries) {
+  if (newQueries.page) {
+    currentPage.value = Number(newQueries.page);
+  } else if (newQueries.page === undefined) {
+    currentPage.value = 1;
+  }
+
+  router.replace({
+    query: {
+      ...route.query,
+      ...newQueries,
     },
   });
 }

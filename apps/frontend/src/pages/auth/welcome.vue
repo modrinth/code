@@ -36,7 +36,7 @@
   </div>
 </template>
 <script setup>
-import { Checkbox } from "@modrinth/ui";
+import { Checkbox, commonMessages } from "@modrinth/ui";
 import { RightArrowIcon } from "@modrinth/assets";
 
 const { formatMessage } = useVIntl();

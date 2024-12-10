@@ -25,7 +25,7 @@
           v-if="isOpen"
           ref="menuRef"
           data-pyro-telepopover-root
-          class="experimental-styles-within fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-2 shadow-lg"
+          class="experimental-styles-within fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-2 shadow-lg"
           :style="menuStyle"
           role="menu"
           tabindex="-1"
@@ -272,7 +272,7 @@ const handleItemClick = (option: Option, index: number) => {
 
 const handleMouseOver = (index: number) => {
   selectedIndex.value = index;
-  menuItemsRef.value[selectedIndex.value].focus();
+  menuItemsRef.value[selectedIndex.value].focus?.();
 };
 
 // Scrolling is disabled for keyboard navigation
@@ -295,7 +295,7 @@ const enableBodyScroll = () => {
 
 const focusFirstMenuItem = () => {
   if (menuItemsRef.value.length > 0) {
-    menuItemsRef.value[0].focus();
+    menuItemsRef.value[0].focus?.();
   }
 };
 
@@ -312,26 +312,26 @@ const handleKeydown = (event: KeyboardEvent) => {
     case "ArrowDown":
       event.preventDefault();
       selectedIndex.value = (selectedIndex.value + 1) % filteredOptions.value.length;
-      menuItemsRef.value[selectedIndex.value].focus();
+      menuItemsRef.value[selectedIndex.value].focus?.();
       break;
     case "ArrowUp":
       event.preventDefault();
       selectedIndex.value =
         (selectedIndex.value - 1 + filteredOptions.value.length) % filteredOptions.value.length;
-      menuItemsRef.value[selectedIndex.value].focus();
+      menuItemsRef.value[selectedIndex.value].focus?.();
       break;
     case "Home":
       event.preventDefault();
       if (menuItemsRef.value.length > 0) {
         selectedIndex.value = 0;
-        menuItemsRef.value[selectedIndex.value].focus();
+        menuItemsRef.value[selectedIndex.value].focus?.();
       }
       break;
     case "End":
       event.preventDefault();
       if (menuItemsRef.value.length > 0) {
         selectedIndex.value = filteredOptions.value.length - 1;
-        menuItemsRef.value[selectedIndex.value].focus();
+        menuItemsRef.value[selectedIndex.value].focus?.();
       }
       break;
     case "Enter":
@@ -344,7 +344,7 @@ const handleKeydown = (event: KeyboardEvent) => {
     case "Escape":
       event.preventDefault();
       closeMenu();
-      triggerRef.value?.focus();
+      triggerRef.value?.focus?.();
       break;
     case "Tab":
       event.preventDefault();
@@ -355,7 +355,7 @@ const handleKeydown = (event: KeyboardEvent) => {
         } else {
           selectedIndex.value = (selectedIndex.value + 1) % filteredOptions.value.length;
         }
-        menuItemsRef.value[selectedIndex.value].focus();
+        menuItemsRef.value[selectedIndex.value].focus?.();
       }
       break;
     default:
@@ -366,7 +366,7 @@ const handleKeydown = (event: KeyboardEvent) => {
         );
         if (matchIndex !== -1) {
           selectedIndex.value = matchIndex;
-          menuItemsRef.value[selectedIndex.value].focus();
+          menuItemsRef.value[selectedIndex.value].focus?.();
         }
         if (typeAheadTimeout.value) {
           clearTimeout(typeAheadTimeout.value);

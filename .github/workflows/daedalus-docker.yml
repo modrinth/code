@@ -8,12 +8,12 @@ on:
       - .github/workflows/daedalus-docker.yml
       - 'apps/daedalus_client/**'
   pull_request:
-    types: [ opened, synchronize ]
+    types: [opened, synchronize]
     paths:
       - .github/workflows/daedalus-docker.yml
       - 'apps/daedalus_client/**'
   merge_group:
-    types: [ checks_requested ]
+    types: [checks_requested]
 
 jobs:
   docker:
@@ -26,15 +26,13 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: ghcr.io/modrinth/daedalus
-      -
-        name: Login to GitHub Images
+      - name: Login to GitHub Images
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Build and push
+      - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:

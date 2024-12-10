@@ -301,6 +301,18 @@
 
 <script>
 import { Multiselect } from "vue-multiselect";
+import {
+  SettingsIcon,
+  TrashIcon,
+  PlusIcon,
+  XIcon as CrossIcon,
+  IssuesIcon,
+  EditIcon,
+  SaveIcon,
+  SortAscendingIcon as AscendingIcon,
+  SortDescendingIcon as DescendingIcon,
+} from "@modrinth/assets";
+import { commonMessages } from "@modrinth/ui";
 
 import Badge from "~/components/ui/Badge.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
@@ -308,16 +320,6 @@ import Modal from "~/components/ui/Modal.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
-
-import SettingsIcon from "~/assets/images/utils/settings.svg?component";
-import TrashIcon from "~/assets/images/utils/trash.svg?component";
-import IssuesIcon from "~/assets/images/utils/issues.svg?component";
-import PlusIcon from "~/assets/images/utils/plus.svg?component";
-import CrossIcon from "~/assets/images/utils/x.svg?component";
-import EditIcon from "~/assets/images/utils/edit.svg?component";
-import SaveIcon from "~/assets/images/utils/save.svg?component";
-import AscendingIcon from "~/assets/images/utils/sort-asc.svg?component";
-import DescendingIcon from "~/assets/images/utils/sort-desc.svg?component";
 
 export default defineNuxtComponent({
   components: {
@@ -337,6 +339,7 @@ export default defineNuxtComponent({
     CopyCode,
     AscendingIcon,
     DescendingIcon,
+    commonMessages,
   },
   async setup() {
     const { formatMessage } = useVIntl();

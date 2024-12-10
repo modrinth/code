@@ -42,16 +42,19 @@
   </div>
 </template>
 <script setup>
-import { LibraryIcon, ChartIcon } from "@modrinth/assets";
+import {
+  DashboardIcon,
+  CurrencyIcon,
+  ListIcon,
+  ReportIcon,
+  BellIcon as NotificationsIcon,
+  OrganizationIcon,
+  LibraryIcon,
+  ChartIcon,
+} from "@modrinth/assets";
+import { commonMessages } from "@modrinth/ui";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
-
-import DashboardIcon from "~/assets/images/utils/dashboard.svg?component";
-import CurrencyIcon from "~/assets/images/utils/currency.svg?component";
-import ListIcon from "~/assets/images/utils/list.svg?component";
-import ReportIcon from "~/assets/images/utils/report.svg?component";
-import NotificationsIcon from "~/assets/images/utils/bell.svg?component";
-import OrganizationIcon from "~/assets/images/utils/organization.svg?component";
 
 const { formatMessage } = useVIntl();
 

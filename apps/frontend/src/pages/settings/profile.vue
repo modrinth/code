@@ -87,8 +87,7 @@
 
 <script setup>
 import { UserIcon, SaveIcon, UploadIcon, UndoIcon, XIcon } from "@modrinth/assets";
-import { Avatar, FileInput, Button } from "@modrinth/ui";
-import { commonMessages } from "~/utils/common-messages.ts";
+import { Avatar, FileInput, Button, commonMessages } from "@modrinth/ui";
 
 useHead({
   title: "Profile settings - Modrinth",

@@ -42,7 +42,7 @@ fn position_traffic_lights(
         let title_bar_container_view = close.superview().superview();
 
         let close_rect: NSRect = msg_send![close, frame];
-        let button_height = close_rect.size.height;
+        let button_height = close_rect.size.height + 12.0;
 
         let title_bar_frame_height = button_height + y;
         let mut title_bar_rect = NSView::frame(title_bar_container_view);
@@ -58,7 +58,7 @@ fn position_traffic_lights(
 
         for (i, button) in window_buttons.into_iter().enumerate() {
             let mut rect: NSRect = NSView::frame(button);
-            rect.origin.x = x + (i as f64 * space_between);
+            rect.origin.x = x + (i as f64 * space_between) + 6.0;
             button.setFrameOrigin(rect.origin);
         }
     }

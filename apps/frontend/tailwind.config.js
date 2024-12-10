@@ -68,6 +68,8 @@ module.exports = {
           bgActive: "var(--color-button-bg-active)",
           textActive: "var(--color-button-text-active)",
           border: "var(--color-button-border)",
+          bgSelected: "var(--color-button-bg-selected)",
+          textSelected: "var(--color-button-text-selected)",
         },
         toggleHandle: "var(--color-toggle-handle)",
         dropdown: {

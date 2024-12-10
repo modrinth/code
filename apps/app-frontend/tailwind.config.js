@@ -5,7 +5,7 @@ export default {
     './src/layouts/**/*.vue',
     './src/pages/**/*.vue',
     './src/plugins/**/*.{js,ts}',
-    './src/app.vue',
+    './src/App.vue',
     './src/error.vue',
     // monorepo - TODO: migrate this to its own package
     '../../packages/**/*.{js,vue,ts}',
@@ -65,6 +65,9 @@ export default {
           textHover: 'var(--color-button-text-hover)',
           bgActive: 'var(--color-button-bg-active)',
           textActive: 'var(--color-button-text-active)',
+          border: 'var(--color-button-border)',
+          bgSelected: 'var(--color-button-bg-selected)',
+          textSelected: 'var(--color-button-text-selected)',
         },
         toggleHandle: 'var(--color-toggle-handle)',
         dropdown: {

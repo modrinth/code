@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-[min-content_auto_min-content_min-content] items-center gap-2 rounded-2xl border-[1px] border-button-bg bg-bg p-2"
+    class="grid grid-cols-[min-content_auto_min-content_min-content] items-center gap-2 rounded-2xl border-[1px] border-divider bg-bg p-2"
   >
     <VersionChannelIndicator :channel="version.version_type" />
     <div class="flex min-w-0 flex-col gap-1">
@@ -30,8 +30,9 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, VersionChannelIndicator } from "@modrinth/ui";
+import { ButtonStyled, VersionChannelIndicator } from "../index";
 import { DownloadIcon, ExternalIcon } from "@modrinth/assets";
+import { computed } from "vue";
 
 const props = defineProps<{
   version: Version;

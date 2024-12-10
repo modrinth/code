@@ -108,7 +108,7 @@
               type="search"
               name="search"
               autocomplete="off"
-              class="h-8 min-h-[unset] w-full border-[1px] border-solid border-button-bg bg-transparent py-2 pl-9"
+              class="h-8 min-h-[unset] w-full border-[1px] border-solid border-divider bg-transparent py-2 pl-9"
               placeholder="Search..."
               @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
             />

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
+    class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-divider pb-6 lg:grid-cols-[1fr_auto]"
   >
     <div class="flex gap-4">
       <slot name="icon" />

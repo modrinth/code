@@ -4,6 +4,7 @@
       <ManySelect
         v-model="selectedPlatforms"
         :options="filterOptions.platform"
+        :dropdown-id="`${baseId}-platform`"
         @change="updateFilters"
       >
         <FilterIcon class="h-5 w-5 text-secondary" />
@@ -15,6 +16,7 @@
       <ManySelect
         v-model="selectedGameVersions"
         :options="filterOptions.gameVersion"
+        :dropdown-id="`${baseId}-game-version`"
         search
         @change="updateFilters"
       >
@@ -27,73 +29,74 @@
       <ManySelect
         v-model="selectedChannels"
         :options="filterOptions.channel"
+        :dropdown-id="`${baseId}-channel`"
         @change="updateFilters"
       >
         <FilterIcon class="h-5 w-5 text-secondary" />
         Channels
         <template #option="{ option }">
-          {{ option === "release" ? "Release" : option === "beta" ? "Beta" : "Alpha" }}
+          {{ option === 'release' ? 'Release' : option === 'beta' ? 'Beta' : 'Alpha' }}
         </template>
       </ManySelect>
     </div>
     <div class="flex flex-wrap items-center gap-1 empty:hidden">
-      <button
+      <TagItem
         v-if="selectedChannels.length + selectedGameVersions.length + selectedPlatforms.length > 1"
-        class="tag-list__item text-contrast transition-transform active:scale-[0.95]"
-        @click="clearFilters"
+        class="text-primary transition-transform active:scale-[0.95]"
+        :action="clearFilters"
       >
         <XCircleIcon />
         Clear all filters
-      </button>
-      <button
+      </TagItem>
+      <TagItem
         v-for="channel in selectedChannels"
         :key="`remove-filter-${channel}`"
-        class="tag-list__item transition-transform active:scale-[0.95]"
         :style="`--_color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'});--_bg-color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'}-highlight)`"
-        @click="toggleFilter('channel', channel)"
+        :action="() =>toggleFilter('channel', channel)"
       >
         <XIcon />
         {{ channel.slice(0, 1).toUpperCase() + channel.slice(1) }}
-      </button>
-      <button
+      </TagItem>
+      <TagItem
         v-for="version in selectedGameVersions"
         :key="`remove-filter-${version}`"
-        class="tag-list__item transition-transform active:scale-[0.95]"
-        @click="toggleFilter('gameVersion', version)"
+        :action="() =>toggleFilter('gameVersion', version)"
       >
         <XIcon />
         {{ version }}
-      </button>
-      <button
+      </TagItem>
+      <TagItem
         v-for="platform in selectedPlatforms"
         :key="`remove-filter-${platform}`"
-        class="tag-list__item transition-transform active:scale-[0.95]"
         :style="`--_color: var(--color-platform-${platform})`"
-        @click="toggleFilter('platform', platform)"
+        :action="() => toggleFilter('platform', platform)"
       >
         <XIcon />
         {{ formatCategory(platform) }}
-      </button>
+      </TagItem>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { FilterIcon, XCircleIcon, XIcon } from "@modrinth/assets";
-import { ManySelect, Checkbox } from "@modrinth/ui";
-import { formatCategory } from "@modrinth/utils";
-import type { ModrinthVersion } from "@modrinth/utils";
+import { ManySelect, Checkbox } from "../index";
+import { type Version , formatCategory, type GameVersionTag  } from '@modrinth/utils';
+import { ref, computed } from "vue";
+import { useRoute } from "vue-router";
+import TagItem from '../base/TagItem.vue'
 
-const props = defineProps<{ versions: ModrinthVersion[] }>();
+const props = defineProps<{
+  versions: Version[]
+  gameVersions: GameVersionTag[]
+  baseId?: string
+}>();
 
-const emit = defineEmits(["switch-page"]);
+const emit = defineEmits(["update:query"]);
 
 const allChannels = ref(["release", "beta", "alpha"]);
 
-const route = useNativeRoute();
-const router = useNativeRouter();
-
-const tags = useTags();
+const route = useRoute();
 
 const showSnapshots = ref(false);
 
@@ -126,7 +129,7 @@ const filterOptions = computed(() => {
     filters.channel.sort((a, b) => allChannels.value.indexOf(a) - allChannels.value.indexOf(b));
   }
   if (gameVersionSet.size > 0) {
-    const gameVersions = tags.value.gameVersions.filter((x) => gameVersionSet.has(x.version));
+    const gameVersions = props.gameVersions.filter((x) => gameVersionSet.has(x.version));
 
     filters.gameVersion = gameVersions
       .filter((x) => (showSnapshots.value ? true : x.version_type === "release"))
@@ -149,22 +152,13 @@ selectedPlatforms.value = route.query.l ? getArrayOrString(route.query.l) : [];
 
 async function toggleFilters(type: FilterType, filters: Filter[]) {
   for (const filter of filters) {
-    await toggleFilter(type, filter);
+    await toggleFilter(type, filter, true);
   }
 
-  await router.replace({
-    query: {
-      ...route.query,
-      c: selectedChannels.value,
-      g: selectedGameVersions.value,
-      l: selectedPlatforms.value,
-    },
-  });
-
-  emit("switch-page", 1);
+  updateFilters();
 }
 
-async function toggleFilter(type: FilterType, filter: Filter, skipRouter = false) {
+async function toggleFilter(type: FilterType, filter: Filter, bulk = false) {
   if (type === "channel") {
     selectedChannels.value = selectedChannels.value.includes(filter)
       ? selectedChannels.value.filter((x) => x !== filter)
@@ -178,22 +172,9 @@ async function toggleFilter(type: FilterType, filter: Filter, skipRouter = false
       ? selectedPlatforms.value.filter((x) => x !== filter)
       : [...selectedPlatforms.value, filter];
   }
-  if (!skipRouter) {
-    await updateFilters();
+  if (!bulk) {
+    updateFilters();
   }
-}
-
-async function updateFilters() {
-  await router.replace({
-    query: {
-      ...route.query,
-      c: selectedChannels.value,
-      g: selectedGameVersions.value,
-      l: selectedPlatforms.value,
-    },
-  });
-
-  emit("switch-page", 1);
 }
 
 async function clearFilters() {
@@ -201,20 +182,31 @@ async function clearFilters() {
   selectedGameVersions.value = [];
   selectedPlatforms.value = [];
 
-  await router.replace({
-    query: {
-      ...route.query,
-      c: undefined,
-      g: undefined,
-      l: undefined,
-    },
-  });
+  updateFilters();
+}
 
-  emit("switch-page", 1);
+function updateFilters() {
+  emit("update:query", {
+    c: selectedChannels.value,
+    g: selectedGameVersions.value,
+    l: selectedPlatforms.value,
+    page: undefined,
+  });
 }
 
 defineExpose({
   toggleFilter,
   toggleFilters,
+  selectedChannels,
+  selectedGameVersions,
+  selectedPlatforms,
 });
+
+function getArrayOrString(x: string | string[]): string[] {
+  if (typeof x === "string") {
+    return [x];
+  } else {
+    return x;
+  }
+}
 </script>

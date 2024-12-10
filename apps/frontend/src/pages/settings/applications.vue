@@ -216,7 +216,15 @@
 </template>
 <script setup>
 import { UploadIcon, PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from "@modrinth/assets";
-import { CopyCode, ConfirmModal, Button, Checkbox, Avatar, FileInput } from "@modrinth/ui";
+import {
+  CopyCode,
+  ConfirmModal,
+  Button,
+  Checkbox,
+  Avatar,
+  FileInput,
+  commonSettingsMessages,
+} from "@modrinth/ui";
 import Modal from "~/components/ui/Modal.vue";
 
 import {
@@ -226,7 +234,6 @@ import {
   useScopes,
   getScopeValue,
 } from "~/composables/auth/scopes.ts";
-import { commonSettingsMessages } from "~/utils/common-messages.ts";
 
 const { formatMessage } = useVIntl();
 

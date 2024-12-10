@@ -37,92 +37,8 @@ html {
   --icon-20: 1.25rem; // used for icons in normal sized buttons
   --icon-24: 1.5rem; // used for icons that are used as a primary label or in large buttons
   --icon-32: 2rem;
-}
 
-.experimental-styles-within {
-  // Reset deprecated properties
-  --color-icon: initial !important;
-  --color-text: initial !important;
-  --color-text-inactive: initial !important;
-  --color-text-dark: initial !important;
-  --color-heading: initial !important;
-  --color-divider: initial !important;
-  --color-divider-dark: initial !important;
-  --color-text-inverted: initial !important;
-  --color-bg-inverted: initial !important;
-
-  --color-brand: var(--color-green) !important;
-  --color-brand-inverted: initial !important;
-
-  --tab-underline-hovered: initial !important;
-
-  --color-button-text: initial !important;
-  --color-button-bg-hover: initial !important;
-  --color-button-text-hover: initial !important;
-  --color-button-bg-active: initial !important;
-  --color-button-text-active: initial !important;
-
-  --color-grey-link: inherit !important;
-  --color-grey-link-hover: inherit !important; // DEPRECATED, use filters in future
-  --color-grey-link-active: inherit !important; // DEPRECATED, use filters in future
-  --color-link: var(--color-blue) !important;
-  --color-link-hover: var(--color-blue) !important; // DEPRECATED, use filters in future
-  --color-link-active: var(--color-blue) !important; // DEPRECATED, use filters in future
-}
-
-.light-mode,
-.light {
-  .experimental-styles-within,
-  &.experimental-styles-within {
-    --color-bg: #ebebeb;
-    --color-raised-bg: #ffffff;
-    --color-button-bg: #f5f5f5;
-    --color-base: #2c2e31;
-    --color-secondary: #484d54;
-    --color-accent-contrast: #ffffff;
-
-    --color-platform-fabric: #8a7b71;
-    --color-platform-quilt: #8b61b4;
-    --color-platform-forge: #5b6197;
-    --color-platform-neoforge: #dc895c;
-    --color-platform-liteloader: #4c90de;
-    --color-platform-bukkit: #e78362;
-    --color-platform-bungeecord: #c69e39;
-    --color-platform-folia: #6aa54f;
-    --color-platform-paper: #e67e7e;
-    --color-platform-purpur: #7763a3;
-    --color-platform-spigot: #cd7a21;
-    --color-platform-velocity: #4b98b0;
-    --color-platform-waterfall: #5f83cb;
-    --color-platform-sponge: #c49528;
-
-    --color-button-border: rgba(161, 161, 161, 0.35);
-  }
-}
-
-.dark-mode,
-.dark {
-  .experimental-styles-within,
-  &.experimental-styles-within {
-    --color-button-bg: #33363d;
-
-    --color-platform-fabric: #dbb69b;
-    --color-platform-quilt: #c796f9;
-    --color-platform-forge: #959eef;
-    --color-platform-neoforge: #f99e6b;
-    --color-platform-liteloader: #7ab0ee;
-    --color-platform-bukkit: #f6af7b;
-    --color-platform-bungeecord: #d2c080;
-    --color-platform-folia: #a5e388;
-    --color-platform-paper: #eeaaaa;
-    --color-platform-purpur: #c3abf7;
-    --color-platform-spigot: #f1cc84;
-    --color-platform-velocity: #83d5ef;
-    --color-platform-waterfall: #78a4fb;
-    --color-platform-sponge: #f9e580;
-
-    --color-button-border: rgba(193, 190, 209, 0.12);
-  }
+  interpolate-size: allow-keywords;
 }
 
 .light-mode {
@@ -159,9 +75,6 @@ html {
   --color-dropdown-bg: var(--color-button-bg);
   --color-dropdown-text: var(--color-button-text);
 
-  --color-tooltip-bg: var(--color-text);
-  --color-tooltip-text: var(--color-bg);
-
   --color-code-bg: var(--color-bg);
   --color-code-text: var(--color-text-dark);
 
@@ -178,12 +91,6 @@ html {
   --color-link: #0d60bb;
   --color-link-hover: #1a76e7;
   --color-link-active: #146fd7;
-
-  --color-red-bg: rgba(203, 34, 69, 0.1);
-  --color-orange-bg: rgba(224, 131, 37, 0.1);
-  --color-green-bg: rgba(0, 175, 92, 0.1);
-  --color-blue-bg: rgba(31, 104, 192, 0.1);
-  --color-purple-bg: rgba(142, 50, 243, 0.1);
 
   --color-warning-bg: hsl(355, 70%, 88%);
   --color-warning-text: hsl(342, 70%, 35%);
@@ -275,12 +182,6 @@ html {
   --color-text-inverted: var(--color-bg);
   --color-bg-inverted: var(--color-text);
 
-  --color-red-bg: rgba(255, 73, 110, 0.2);
-  --color-orange-bg: rgba(255, 163, 71, 0.2);
-  --color-green-bg: rgba(27, 217, 106, 0.2);
-  --color-blue-bg: rgba(79, 156, 255, 0.2);
-  --color-purple-bg: rgba(199, 138, 255, 0.2);
-
   --color-brand: var(--color-green);
   --color-brand-highlight: rgba(27, 217, 106, 0.25);
   --color-brand-shadow: rgba(27, 217, 106, 0.7);
@@ -299,9 +200,6 @@ html {
 
   --color-dropdown-bg: var(--color-button-bg);
   --color-dropdown-text: var(--color-button-text);
-
-  --color-tooltip-bg: var(--color-button-bg);
-  --color-tooltip-text: var(--color-text);
 
   --color-code-bg: var(--color-button-bg);
   --color-code-text: var(--color-text-dark);

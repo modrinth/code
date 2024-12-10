@@ -88,9 +88,8 @@
   </div>
 </template>
 <script setup>
-import { Button, ConfirmModal, Avatar } from "@modrinth/ui";
+import { Button, ConfirmModal, Avatar, commonSettingsMessages } from "@modrinth/ui";
 import { TrashIcon, CheckIcon } from "@modrinth/assets";
-import { commonSettingsMessages } from "~/utils/common-messages.ts";
 import { useScopes } from "~/composables/auth/scopes.ts";
 
 const { formatMessage } = useVIntl();
