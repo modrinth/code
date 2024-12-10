@@ -2,8 +2,17 @@
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { Ref } from 'vue'
 import { GameIcon, LeftArrowIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
+import type {
+  Category,
+  GameVersion,
+  Platform,
+  ProjectType,
+  SortType,
+  Tags
+} from '@modrinth/ui';
 import {
+  SearchFilterControl
+,
   SearchSidebarFilter,
   Avatar,
   Button,
@@ -27,6 +36,9 @@ import { get_search_results } from '@/helpers/cache.js'
 import { debounce } from '@/helpers/utils.js'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import type Instance from '@/components/ui/Instance.vue'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+
+const { formatMessage } = useVIntl()
 
 const router = useRouter()
 const route = useRoute()
@@ -326,6 +338,25 @@ const selectableProjectTypes = computed(() => {
   return links
 })
 
+const messages = defineMessages({
+  gameVersionProvidedByInstance: {
+    id: "search.filter.locked.instance-game-version.title",
+    defaultMessage: "Game version is provided by the instance",
+  },
+  modLoaderProvidedByInstance: {
+    id: "search.filter.locked.instance-loader.title",
+    defaultMessage: "Loader is provided by the instance",
+  },
+  providedByInstance: {
+    id: "search.filter.locked.instance",
+    defaultMessage: "Provided by the instance",
+  },
+  syncFilterButton: {
+    id: "search.filter.locked.instance.sync",
+    defaultMessage: "Sync with instance",
+  },
+});
+
 await refreshSearch()
 </script>
 
@@ -360,6 +391,13 @@ await refreshSearch()
       <template #header>
         <h3 class="text-lg m-0">{{ filter.formatted_name }}</h3>
       </template>
+      <template #locked-game_version>
+        {{ formatMessage(messages.gameVersionProvidedByInstance) }}
+      </template>
+      <template #locked-mod_loader>
+        {{ formatMessage(messages.modLoaderProvidedByInstance) }}
+      </template>
+      <template #sync-button> {{ formatMessage(messages.syncFilterButton) }} </template>
     </SearchSidebarFilter>
   </Teleport>
   <div ref="searchWrapper" class="flex flex-col gap-3 p-6">
@@ -440,6 +478,13 @@ await refreshSearch()
       </DropdownSelect>
       <Pagination :page="currentPage" :count="pageCount" class="ml-auto" @switch-page="setPage" />
     </div>
+    <SearchFilterControl
+      v-model:selected-filters="currentFilters"
+      :filters="filters.filter((f) => f.display !== 'none')"
+      :provided-filters="instanceFilters"
+      :overridden-provided-filter-types="overriddenProvidedFilterTypes"
+      :provided-message="messages.providedByInstance"
+    />
     <div class="search">
       <section v-if="loading" class="offline">
         <LoadingIndicator />

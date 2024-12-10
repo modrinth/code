@@ -14,10 +14,10 @@
     </template>
     <template
       v-if="
-      locked || (
-        !!accordion &&
-        !accordion.isOpen &&
-        (selectedFilterOptions.length > 0 || selectedNegativeFilterOptions.length > 0))
+        locked ||
+        (!!accordion &&
+          !accordion.isOpen &&
+          (selectedFilterOptions.length > 0 || selectedNegativeFilterOptions.length > 0))
       "
       #summary
     >
@@ -40,14 +40,25 @@
     </template>
     <template v-if="locked" #default>
       <div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider mx-2">
-        <p class="m-0 font-bold items-center">{{ filterType.formatted_name }} is provided by the server.</p>
-        <p class="m-0 text-secondary text-sm">Unlocking this filter may allow you to install incompatible content.</p>
+        <p class="m-0 font-bold items-center">
+          <slot :name="`locked-${filterType.id}`" >
+            {{ formatMessage(messages.lockedTitle, { type: filterType.formatted_name }) }}
+          </slot>
+        </p>
+        <p class="m-0 text-secondary text-sm">
+          {{ formatMessage(messages.lockedDescription) }}
+        </p>
         <ButtonStyled>
           <button
-class="w-fit" @click="() => {
-            overriddenProvidedFilterTypes.push(filterType.id);
-          }">
-            <LockOpenIcon /> Unlock filter
+            class="w-fit"
+            @click="
+              () => {
+                overriddenProvidedFilterTypes.push(filterType.id)
+              }
+            "
+          >
+            <LockOpenIcon />
+            {{ formatMessage(messages.unlockFilterButton) }}
           </button>
         </ButtonStyled>
       </div>
@@ -89,8 +100,15 @@ class="w-fit" @click="() => {
               <span class="truncate text-sm">{{ option.formatted_name ?? option.id }}</span>
             </slot>
           </SearchFilterOption>
-          <button v-if="filterType.display === 'expandable'" class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]" @click="showMore = !showMore">
-            <DropdownIcon class="h-4 w-4 transition-transform" :class="{ 'rotate-180': showMore }" />
+          <button
+            v-if="filterType.display === 'expandable'"
+            class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
+            @click="showMore = !showMore"
+          >
+            <DropdownIcon
+              class="h-4 w-4 transition-transform"
+              :class="{ 'rotate-180': showMore }"
+            />
             <span class="truncate text-sm">{{ showMore ? 'Show fewer' : 'Show more' }}</span>
           </button>
         </div>
@@ -107,12 +125,21 @@ class="w-fit" @click="() => {
         <div v-if="hasProvidedFilter" class="mt-2 mx-1">
           <ButtonStyled>
             <button
-class="w-fit" @click="() => {
-            overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter((id) => id !== filterType.id);
-            accordion?.close()
-            clearFilters();
-          }">
-              <UpdatedIcon /> Sync with server
+              class="w-fit"
+              @click="
+                () => {
+                  overriddenProvidedFilterTypes = overriddenProvidedFilterTypes.filter(
+                    (id) => id !== filterType.id,
+                  )
+                  accordion?.close()
+                  clearFilters()
+                }
+              "
+            >
+              <UpdatedIcon />
+              <slot name="sync-button">
+                {{ formatMessage(messages.syncFilterButton) }}
+              </slot>
             </button>
           </ButtonStyled>
         </div>
@@ -123,20 +150,29 @@ class="w-fit" @click="() => {
 
 <script setup lang="ts">
 import Accordion from '../base/Accordion.vue'
-import type {
-  FilterOption,
-  FilterType,
-  FilterValue,
-} from '../../utils/search'
-import { BanIcon, SearchIcon, XIcon, UpdatedIcon, LockOpenIcon, DropdownIcon } from '@modrinth/assets'
+import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
+import {
+  BanIcon,
+  SearchIcon,
+  XIcon,
+  UpdatedIcon,
+  LockOpenIcon,
+  DropdownIcon,
+} from '@modrinth/assets'
 import { Button, Checkbox, ScrollablePanel } from '../index'
 import { computed, ref } from 'vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import SearchFilterOption from './SearchFilterOption.vue'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+
+const { formatMessage } = useVIntl()
 
 const selectedFilters = defineModel<FilterValue[]>('selectedFilters', { required: true })
 const toggledGroups = defineModel<string[]>('toggledGroups', { required: true })
-const overriddenProvidedFilterTypes = defineModel<string[]>('overriddenProvidedFilterTypes', { required: false, default: [] })
+const overriddenProvidedFilterTypes = defineModel<string[]>('overriddenProvidedFilterTypes', {
+  required: false,
+  default: [],
+})
 
 const props = defineProps<{
   filterType: FilterType
@@ -156,27 +192,42 @@ const showMore = ref(false)
 
 const accordion = ref<InstanceType<typeof Accordion> | null>()
 
-const selectedFilterOptions = computed(() => props.filterType.options.filter((option) => locked.value ? isProvided(option, false) : isIncluded(option)))
-const selectedNegativeFilterOptions = computed(() => props.filterType.options.filter((option) => locked.value ? isProvided(option, true) : isExcluded(option)))
-const visibleOptions = computed(() => props.filterType.options
-  .filter((option) => isVisible(option) || isIncluded(option) || isExcluded(option))
-  .slice()
-  .sort((a, b) => {
-    if (props.filterType.display === 'expandable') {
-      const aDefault = props.filterType.default_values.includes(a.id);
-      const bDefault = props.filterType.default_values.includes(b.id);
+const selectedFilterOptions = computed(() =>
+  props.filterType.options.filter((option) =>
+    locked.value ? isProvided(option, false) : isIncluded(option),
+  ),
+)
+const selectedNegativeFilterOptions = computed(() =>
+  props.filterType.options.filter((option) =>
+    locked.value ? isProvided(option, true) : isExcluded(option),
+  ),
+)
+const visibleOptions = computed(() =>
+  props.filterType.options
+    .filter((option) => isVisible(option) || isIncluded(option) || isExcluded(option))
+    .slice()
+    .sort((a, b) => {
+      if (props.filterType.display === 'expandable') {
+        const aDefault = props.filterType.default_values.includes(a.id)
+        const bDefault = props.filterType.default_values.includes(b.id)
 
-      if (aDefault && !bDefault) {
-        return -1;
-      } else if (!aDefault && bDefault) {
-        return 1;
+        if (aDefault && !bDefault) {
+          return -1
+        } else if (!aDefault && bDefault) {
+          return 1
+        }
       }
-    }
-    return 0;
-  }))
+      return 0
+    }),
+)
 
-const hasProvidedFilter = computed(() => props.providedFilters.some((filter) => filter.type === props.filterType.id))
-const locked = computed(() => hasProvidedFilter.value && !overriddenProvidedFilterTypes.value.includes(props.filterType.id))
+const hasProvidedFilter = computed(() =>
+  props.providedFilters.some((filter) => filter.type === props.filterType.id),
+)
+const locked = computed(
+  () =>
+    hasProvidedFilter.value && !overriddenProvidedFilterTypes.value.includes(props.filterType.id),
+)
 
 const scrollable = computed(
   () => visibleOptions.value.length >= 10 && props.filterType.display === 'scrollable',
@@ -218,7 +269,9 @@ function isVisible(filter: FilterOption) {
 }
 
 function isProvided(filter: FilterOption, negative: boolean) {
-  return props.providedFilters.some((x) => x.type === props.filterType.id && x.option === filter.id && !x.negative === !negative)
+  return props.providedFilters.some(
+    (x) => x.type === props.filterType.id && x.option === filter.id && !x.negative === !negative,
+  )
 }
 
 type FilterState = 'include' | 'exclude' | 'ignore'
@@ -255,6 +308,27 @@ function setFilter(filter: FilterOption, state: FilterState) {
 }
 
 function clearFilters() {
-  selectedFilters.value = selectedFilters.value.filter((filter) => filter.type !== props.filterType.id);
+  selectedFilters.value = selectedFilters.value.filter(
+    (filter) => filter.type !== props.filterType.id,
+  )
 }
+
+const messages = defineMessages({
+  unlockFilterButton: {
+    id: 'search.filter.locked.default.unlock',
+    defaultMessage: 'Unlock filter',
+  },
+  syncFilterButton: {
+    id: 'search.filter.locked.default.sync',
+    defaultMessage: 'Sync filter',
+  },
+  lockedTitle: {
+    id: 'search.filter.locked.default.title',
+    defaultMessage: '{type} is locked',
+  },
+  lockedDescription: {
+    id: 'search.filter.locked.default.description',
+    defaultMessage: 'Unlocking this filter may allow you to install incompatible content.',
+  },
+})
 </script>

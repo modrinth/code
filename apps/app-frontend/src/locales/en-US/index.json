@@ -22,5 +22,17 @@
   },
   "instance.filter.updates-available": {
     "message": "Updates available"
+  },
+  "search.filter.locked.instance": {
+    "message": "Provided by the instance"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Game version is provided by the instance"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Loader is provided by the instance"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Sync with instance"
   }
 }

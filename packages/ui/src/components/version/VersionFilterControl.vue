@@ -42,7 +42,7 @@
     <div class="flex flex-wrap items-center gap-1 empty:hidden">
       <TagItem
         v-if="selectedChannels.length + selectedGameVersions.length + selectedPlatforms.length > 1"
-        class="text-primary transition-transform active:scale-[0.95]"
+        class="transition-transform active:scale-[0.95]"
         :action="clearFilters"
       >
         <XCircleIcon />
