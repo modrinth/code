@@ -102,7 +102,7 @@
           <ButtonStyled v-if="hasMods" color="brand" type="outlined">
             <nuxt-link
               class="w-full text-nowrap sm:w-fit"
-              :to="`/mods?sid=${props.server.serverId}`"
+              :to="`/${type}s?sid=${props.server.serverId}`"
             >
               <PlusIcon />
               Add {{ type }}
@@ -263,7 +263,7 @@
           </ButtonStyled>
           <div>or</div>
           <ButtonStyled class="mt-8">
-            <NuxtLink :to="`/mods?sid=${props.server.serverId}`">
+            <NuxtLink :to="`/${type}s?sid=${props.server.serverId}`">
               <WrenchIcon />
               Change platform
             </NuxtLink>
@@ -460,7 +460,7 @@ async function removeMod(mod: Mod) {
   mod.changing = true;
 
   try {
-    await props.server.content?.remove(`/mods/${mod.filename}`);
+    await props.server.content?.remove(type.value, `/${type.value}s/${mod.filename}`);
     await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error removing mod:", error);
@@ -482,6 +482,11 @@ const currentVersion = ref();
 async function beginChangeModVersion(mod: Mod) {
   currentMod.value = mod;
   currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false);
+
+  currentVersions.value = currentVersions.value.filter((version: any) =>
+    version.loaders.includes(props.server.general?.loader?.toLowerCase()),
+  );
+
   currentVersion.value = currentVersions.value.find(
     (version: any) => version.id === mod.version_id,
   );
@@ -492,8 +497,11 @@ async function changeModVersion() {
   currentMod.value.changing = true;
   try {
     modModal.value.hide();
-    await props.server.content?.remove(`/mods/${currentMod.value.filename}`);
-    await props.server.content?.install(currentMod.value.project_id, currentVersion.value.id);
+    await props.server.content?.reinstall(
+      type.value,
+      currentMod.value.version_id,
+      currentVersion.value.id,
+    );
     await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error changing mod version:", error);
