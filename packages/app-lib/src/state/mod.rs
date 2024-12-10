@@ -31,6 +31,9 @@ pub use self::minecraft_auth::*;
 mod cache;
 pub use self::cache::*;
 
+mod friends;
+pub use self::friends::*;
+
 pub mod db;
 pub mod fs_watcher;
 mod mr_auth;
@@ -59,6 +62,9 @@ pub struct State {
 
     /// Process manager
     pub process_manager: ProcessManager,
+
+    /// Friends socket
+    pub friends_socket: FriendsSocket,
 
     pub(crate) pool: SqlitePool,
 
@@ -129,6 +135,9 @@ impl State {
         let file_watcher = fs_watcher::init_watcher().await?;
         fs_watcher::watch_profiles_init(&file_watcher, &directories).await?;
 
+        let friends_socket = FriendsSocket::new();
+        friends_socket.connect(&pool, &fetch_semaphore).await?;
+
         Ok(Arc::new(Self {
             directories,
             fetch_semaphore,
@@ -136,6 +145,7 @@ impl State {
             api_semaphore,
             discord_rpc,
             process_manager: ProcessManager::new(),
+            friends_socket,
             pool,
             file_watcher,
         }))

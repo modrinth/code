@@ -206,6 +206,8 @@ impl Process {
 
         let _ = state.discord_rpc.clear_to_default(true).await;
 
+        let _ = state.friends_socket.update_status(None).await;
+
         // If in tauri, window should show itself again after process exists if it was hidden
         #[cfg(feature = "tauri")]
         {

@@ -38,6 +38,5 @@
     "fix": {
       "cache": false
     }
-  },
-  "ui": "tui"
+  }
 }
