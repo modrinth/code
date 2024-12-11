@@ -48,12 +48,12 @@
       <section class="card gap-1" :class="{ 'max-lg:!hidden': !sidebarMenuOpen }">
         <div class="flex items-center gap-2">
           <div class="iconified-input w-full">
-            <label class="hidden" for="search">Search</label>
+            <label class="hidden" for="filter-search">Search</label>
             <SearchIcon aria-hidden="true" />
             <input
-              id="search"
+              id="filter-search"
               v-model="queryFilter"
-              name="search"
+              name="filter-search"
               type="search"
               placeholder="Search filters..."
               autocomplete="off"
@@ -174,13 +174,13 @@
             Filters...
           </button>
           <div class="iconified-input">
-            <label class="hidden" for="search">Search</label>
+            <label class="hidden" for="project-search">Search</label>
             <SearchIcon aria-hidden="true" />
             <input
-              id="search"
+              id="project-search"
               v-model="query"
               type="search"
-              name="search"
+              name="project-search"
               :placeholder="`Search ${projectType.display}s...`"
               autocomplete="off"
               @input="onSearchChange(1)"
@@ -274,7 +274,7 @@
               <button
                 v-if="
                   result.installed ||
-                  server.mods.data.find((x) => x.project_id === result.project_id) ||
+                  server.content.data.find((x) => x.project_id === result.project_id) ||
                   server.general?.project?.id === result.project_id
                 "
                 disabled
@@ -430,7 +430,7 @@ const serverOverrideGameVersions = ref(false);
 const serverOverrideLoaders = ref(false);
 
 if (route.query.sid) {
-  server.value = await usePyroServer(route.query.sid, ["general", "mods"]);
+  server.value = await usePyroServer(route.query.sid, ["general", "content"]);
 }
 
 if (route.query.shi && projectType.value.id !== "modpack") {
@@ -462,8 +462,12 @@ async function serverInstall(project) {
       project.installed = true;
       navigateTo(`/servers/manage/${route.query.sid}/options/loader`);
     } else if (projectType.value.id === "mod") {
-      await server.value.mods.install(version.project_id, version.id);
-      await server.value.refresh(["mods"]);
+      await server.value.content.install("mod", version.project_id, version.id);
+      await server.value.refresh(["content"]);
+      project.installed = true;
+    } else if (projectType.value.id === "plugin") {
+      await server.value.content.install("plugin", version.project_id, version.id);
+      await server.value.refresh(["content"]);
       project.installed = true;
     }
   } catch (e) {
@@ -509,7 +513,7 @@ const {
       }
 
       if (server.value && serverHideInstalled.value) {
-        const installedMods = server.value.mods.data
+        const installedMods = server.value.content.data
           .filter((x) => x.project_id)
           .map((x) => x.project_id);
 

@@ -1,11 +1,26 @@
 <template>
-  <NuxtLink class="contents" :to="`/servers/manage/${props.server_id}`">
+  <NuxtLink
+    class="contents"
+    :to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
+  >
     <div
-      class="flex cursor-pointer flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100 active:scale-95"
+      v-tooltip="
+        status === 'suspended'
+          ? `This server is suspended visit the billing page to learn more`
+          : ''
+      "
+      class="flex cursor-pointer flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100"
+      :class="status === 'suspended' ? 'opacity-50' : 'active:scale-95'"
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
     >
-      <UiServersServerIcon :image="image" />
+      <UiServersServerIcon v-if="status !== 'suspended'" :image="image" />
+      <div
+        v-else
+        class="bg-bg-secondary flex size-24 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+      >
+        <LockIcon class="size-20 text-secondary" />
+      </div>
       <div class="ml-8 flex flex-col gap-2.5">
         <div class="flex flex-row items-center gap-2">
           <h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
@@ -40,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon } from "@modrinth/assets";
+import { ChevronRightIcon, LockIcon } from "@modrinth/assets";
 import type { Project, Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();

@@ -547,6 +547,23 @@ impl RedisConnection {
         Ok(res)
     }
 
+    pub async fn get_many(
+        &mut self,
+        namespace: &str,
+        ids: &[String],
+    ) -> Result<Vec<Option<String>>, DatabaseError> {
+        let mut cmd = cmd("MGET");
+        redis_args(
+            &mut cmd,
+            ids.iter()
+                .map(|x| format!("{}_{}:{}", self.meta_namespace, namespace, x))
+                .collect::<Vec<_>>()
+                .as_slice(),
+        );
+        let res = redis_execute(&mut cmd, &mut self.connection).await?;
+        Ok(res)
+    }
+
     pub async fn get_deserialized_from_json<R>(
         &mut self,
         namespace: &str,
@@ -559,6 +576,22 @@ impl RedisConnection {
             .get(namespace, id)
             .await?
             .and_then(|x| serde_json::from_str(&x).ok()))
+    }
+
+    pub async fn get_many_deserialized_from_json<R>(
+        &mut self,
+        namespace: &str,
+        ids: &[String],
+    ) -> Result<Vec<Option<R>>, DatabaseError>
+    where
+        R: for<'a> serde::Deserialize<'a>,
+    {
+        Ok(self
+            .get_many(namespace, ids)
+            .await?
+            .into_iter()
+            .map(|x| x.and_then(|val| serde_json::from_str::<R>(&val).ok()))
+            .collect::<Vec<_>>())
     }
 
     pub async fn delete<T1>(

@@ -203,7 +203,7 @@
 
           <ButtonStyled
             type="transparent"
-            :highlighted="route.name.startsWith('servers')"
+            :highlighted="route.name?.startsWith('servers')"
             :highlighted-style="
               route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
             "

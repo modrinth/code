@@ -253,6 +253,7 @@ const inspectError = async () => {
 
   mcError.value = response;
 
+  // @ts-ignore
   const analysis = (await $fetch(`https://api.mclo.gs/1/insights/${response.id}`, {
     method: "POST",
     headers: {

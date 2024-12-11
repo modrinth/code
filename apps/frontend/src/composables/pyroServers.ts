@@ -213,6 +213,7 @@ interface Backup {
   name: string;
   created_at: string;
   ongoing: boolean;
+  locked: boolean;
 }
 
 interface AutoBackupSettings {
@@ -224,6 +225,8 @@ interface JWTAuth {
   url: string;
   token: string;
 }
+
+type ContentType = "Mod" | "Plugin";
 
 const constructServerProperties = (properties: any): string => {
   let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`;
@@ -483,13 +486,16 @@ const setMotd = async (motd: string) => {
   }
 };
 
-// ------------------ MODS ------------------ //
+// ------------------ CONTENT ------------------ //
 
-const installMod = async (projectId: string, versionId: string) => {
+const installContent = async (contentType: ContentType, projectId: string, versionId: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods`, {
       method: "POST",
-      body: { rinth_ids: { project_id: projectId, version_id: versionId } },
+      body: {
+        install_as: contentType,
+        rinth_ids: { project_id: projectId, version_id: versionId },
+      },
     });
   } catch (error) {
     console.error("Error installing mod:", error);
@@ -497,12 +503,13 @@ const installMod = async (projectId: string, versionId: string) => {
   }
 };
 
-const removeMod = async (modId: string) => {
+const removeContent = async (contentType: ContentType, contentId: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/deleteMod`, {
       method: "POST",
       body: {
-        path: modId,
+        install_as: contentType,
+        path: contentId,
       },
     });
   } catch (error) {
@@ -511,11 +518,15 @@ const removeMod = async (modId: string) => {
   }
 };
 
-const reinstallMod = async (modId: string, versionId: string) => {
+const reinstallContent = async (
+  contentType: ContentType,
+  contentId: string,
+  newContentId: string,
+) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods/${modId}`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods/${contentId}`, {
       method: "PUT",
-      body: { version_id: versionId },
+      body: { install_as: contentType, version_id: newContentId },
     });
   } catch (error) {
     console.error("Error reinstalling mod:", error);
@@ -527,10 +538,11 @@ const reinstallMod = async (modId: string, versionId: string) => {
 
 const createBackup = async (backupName: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
+    const response = (await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
       method: "POST",
       body: { name: backupName },
-    });
+    })) as { id: string };
+    return response.id;
   } catch (error) {
     console.error("Error creating backup:", error);
     throw error;
@@ -600,6 +612,34 @@ const getAutoBackup = async () => {
     return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`);
   } catch (error) {
     console.error("Error getting auto backup settings:", error);
+    throw error;
+  }
+};
+
+const lockBackup = async (backupId: string) => {
+  try {
+    return await PyroFetch(
+      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/lock`,
+      {
+        method: "POST",
+      },
+    );
+  } catch (error) {
+    console.error("Error locking backup:", error);
+    throw error;
+  }
+};
+
+const unlockBackup = async (backupId: string) => {
+  try {
+    return await PyroFetch(
+      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/unlock`,
+      {
+        method: "POST",
+      },
+    );
+  } catch (error) {
+    console.error("Error locking backup:", error);
     throw error;
   }
 };
@@ -858,7 +898,7 @@ const modules: any = {
     setMotd,
     fetchConfigFile,
   },
-  mods: {
+  content: {
     get: async (serverId: string) => {
       try {
         const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`);
@@ -873,9 +913,9 @@ const modules: any = {
         return undefined;
       }
     },
-    install: installMod,
-    remove: removeMod,
-    reinstall: reinstallMod,
+    install: installContent,
+    remove: removeContent,
+    reinstall: reinstallContent,
   },
   backups: {
     get: async (serverId: string) => {
@@ -893,6 +933,8 @@ const modules: any = {
     download: downloadBackup,
     updateAutoBackup,
     getAutoBackup,
+    lock: lockBackup,
+    unlock: unlockBackup,
   },
   network: {
     get: async (serverId: string) => {
@@ -1018,9 +1060,9 @@ type GeneralFunctions = {
   fetchConfigFile: (fileName: string) => Promise<any>;
 };
 
-type ModFunctions = {
+type ContentFunctions = {
   /**
-   * INTERNAL: Gets the mods of a server.
+   * INTERNAL: Gets the list content of a server.
    * @param serverId - The ID of the server.
    * @returns
    */
@@ -1028,23 +1070,26 @@ type ModFunctions = {
 
   /**
    * Installs a mod to a server.
+   * @param contentType - The type of content to install.
    * @param projectId - The ID of the project.
    * @param versionId - The ID of the version.
    */
-  install: (projectId: string, versionId: string) => Promise<void>;
+  install: (contentType: ContentType, projectId: string, versionId: string) => Promise<void>;
 
   /**
    * Removes a mod from a server.
-   * @param modId - The ID of the mod.
+   * @param contentType - The type of content to remove.
+   * @param contentId - The ID of the content.
    */
-  remove: (modId: string) => Promise<void>;
+  remove: (contentType: ContentType, contentId: string) => Promise<void>;
 
   /**
    * Reinstalls a mod to a server.
-   * @param modId - The ID of the mod.
-   * @param versionId - The ID of the version.
+   * @param contentType - The type of content to reinstall.
+   * @param contentId - The ID of the content.
+   * @param newContentId - The ID of the new version.
    */
-  reinstall: (modId: string, versionId: string) => Promise<void>;
+  reinstall: (contentType: ContentType, contentId: string, newContentId: string) => Promise<void>;
 };
 
 type BackupFunctions = {
@@ -1058,6 +1103,7 @@ type BackupFunctions = {
   /**
    * Creates a new backup for the server.
    * @param backupName - The name of the backup.
+   * @returns The ID of the backup.
    */
   create: (backupName: string) => Promise<void>;
 
@@ -1098,6 +1144,18 @@ type BackupFunctions = {
    * Gets the auto backup settings of the server.
    */
   getAutoBackup: () => Promise<AutoBackupSettings>;
+
+  /**
+   * Locks a backup for the server.
+   * @param backupId - The ID of the backup.
+   */
+  lock: (backupId: string) => Promise<void>;
+
+  /**
+   * Unlocks a backup for the server.
+   * @param backupId - The ID of the backup.
+   */
+  unlock: (backupId: string) => Promise<void>;
 };
 
 type NetworkFunctions = {
@@ -1231,7 +1289,7 @@ type FSFunctions = {
 };
 
 type GeneralModule = General & GeneralFunctions;
-type ModsModule = { data: Mod[] } & ModFunctions;
+type ContentModule = { data: Mod[] } & ContentFunctions;
 type BackupsModule = { data: Backup[] } & BackupFunctions;
 type NetworkModule = { allocations: Allocation[] } & NetworkFunctions;
 type StartupModule = Startup & StartupFunctions;
@@ -1239,7 +1297,7 @@ type FSModule = { auth: JWTAuth } & FSFunctions;
 
 type ModulesMap = {
   general: GeneralModule;
-  mods: ModsModule;
+  content: ContentModule;
   backups: BackupsModule;
   network: NetworkModule;
   startup: StartupModule;
@@ -1247,7 +1305,7 @@ type ModulesMap = {
   fs: FSModule;
 };
 
-type avaliableModules = ("general" | "mods" | "backups" | "network" | "startup" | "ws" | "fs")[];
+type avaliableModules = ("general" | "content" | "backups" | "network" | "startup" | "ws" | "fs")[];
 
 export type Server<T extends avaliableModules> = {
   [K in T[number]]?: ModulesMap[K];

@@ -68,7 +68,7 @@
                   { divider: true, shown: auth.user && auth.user.id === user.id },
                   {
                     id: 'report',
-                    action: () => reportUser(user.id),
+                    action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
                     color: 'red',
                     hoverOnly: true,
                     shown: auth.user?.id !== user.id,
