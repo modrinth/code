@@ -135,8 +135,12 @@ impl State {
         let file_watcher = fs_watcher::init_watcher().await?;
         fs_watcher::watch_profiles_init(&file_watcher, &directories).await?;
 
+        let process_manager = ProcessManager::new();
+
         let friends_socket = FriendsSocket::new();
-        friends_socket.connect(&pool, &fetch_semaphore).await?;
+        friends_socket
+            .connect(&pool, &fetch_semaphore, &process_manager)
+            .await?;
 
         Ok(Arc::new(Self {
             directories,
@@ -144,7 +148,7 @@ impl State {
             io_semaphore,
             api_semaphore,
             discord_rpc,
-            process_manager: ProcessManager::new(),
+            process_manager,
             friends_socket,
             pool,
             file_watcher,

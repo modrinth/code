@@ -21,7 +21,7 @@ pub async fn authenticate_finish_flow(
     creds.upsert(&state.pool).await?;
     state
         .friends_socket
-        .connect(&state.pool, &state.api_semaphore)
+        .connect(&state.pool, &state.api_semaphore, &state.process_manager)
         .await?;
 
     Ok(creds)

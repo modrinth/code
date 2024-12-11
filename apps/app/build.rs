@@ -227,6 +227,19 @@ fn main() {
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
+            )
+            .plugin(
+                "friends",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "friends",
+                        "friend_statuses",
+                        "add_friend",
+                        "remove_friend",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
             ),
     )
     .expect("Failed to run tauri-build");
