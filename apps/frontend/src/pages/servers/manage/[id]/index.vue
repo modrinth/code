@@ -88,7 +88,7 @@
             <UiServersPanelServerStatus :state="serverPowerState" />
           </div>
         </div>
-        <UiServersPanelTerminal :console-output="consoleOutput" :full-screen="fullScreen">
+        <UiServersPanelTerminal :full-screen="fullScreen">
           <div class="relative w-full px-4 pt-4">
             <ul
               v-if="suggestions.length"
@@ -192,7 +192,6 @@ type ServerProps = {
   isConnected: boolean;
   isWsAuthIncorrect: boolean;
   stats: Stats;
-  consoleOutput: string[];
   serverPowerState: ServerState;
   powerStateDetails?: {
     oom_killed?: boolean;
