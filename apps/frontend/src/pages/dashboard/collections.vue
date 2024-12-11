@@ -94,7 +94,7 @@
   </div>
 </template>
 <script setup>
-import { BoxIcon, LinkIcon, LockIcon, PlusIcon, SearchIcon, XIcon } from "@modrinth/assets";
+import { BoxIcon, SearchIcon, XIcon, PlusIcon, LinkIcon, LockIcon } from "@modrinth/assets";
 import { Avatar, Button } from "@modrinth/ui";
 import WorldIcon from "~/assets/images/utils/world.svg?component";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
