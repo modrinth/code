@@ -770,7 +770,7 @@ const handleReinstall = async () => {
       });
       const backupName = `Reinstallation - ${format}`;
       isLoading.value = true;
-      const backupId = await props.server.backups?.create(backupName);
+      const backupId = (await props.server.backups?.create(backupName)) as unknown as string;
 
       isBackingUp.value = true;
 
@@ -870,7 +870,7 @@ const handleReinstallUpload = async () => {
       });
       const backupName = `Reinstallation - ${format}`;
       isLoading.value = true;
-      const backupId = await props.server.backups?.create(backupName);
+      const backupId = (await props.server.backups?.create(backupName)) as unknown as string;
 
       isBackingUp.value = true;
 
