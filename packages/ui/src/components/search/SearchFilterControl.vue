@@ -24,7 +24,7 @@
       :style="{ '--_bg-color': `var(--color-raised-bg)` }"
     >
       <LockIcon />
-      {{ providedItem.option }}
+      {{ providedItem.formatted_name ?? providedItem.option }}
     </TagItem>
   </div>
 </template>
