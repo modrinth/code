@@ -81,16 +81,33 @@ const newlyInstalled = ref([])
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
-if (route.query.i) {
-  ;[instance.value, instanceProjects.value] = await Promise.all([
-    getInstance(route.query.i).catch(handleError),
-    getInstanceProjects(route.query.i).catch(handleError),
-  ])
-  newlyInstalled.value = []
-}
+await updateInstanceContext();
 
-if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === 'modpack')) {
-  instanceHideInstalled.value = route.query.ai === 'true'
+watch(route, () => {
+  updateInstanceContext();
+});
+
+async function updateInstanceContext() {
+  if (route.query.i) {
+    ;[instance.value, instanceProjects.value] = await Promise.all([
+      getInstance(route.query.i).catch(handleError),
+      getInstanceProjects(route.query.i).catch(handleError),
+    ])
+    newlyInstalled.value = []
+  }
+
+  if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === 'modpack')) {
+    instanceHideInstalled.value = route.query.ai === 'true'
+  }
+
+  if (
+    instance.value &&
+    instance.value.path !== route.query.i &&
+    route.path.startsWith("/browse")
+  ) {
+    instance.value = null;
+    instanceHideInstalled.value = false;
+  }
 }
 
 const instanceFilters = computed(() => {
