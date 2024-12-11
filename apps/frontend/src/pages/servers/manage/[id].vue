@@ -1,7 +1,35 @@
 <template>
   <div class="contents">
     <div
-      v-if="server.error && server.error.message.includes('Forbidden')"
+      v-if="serverData?.status === 'suspended'"
+      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    >
+      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+              <LockIcon class="size-12 text-orange" />
+            </div>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server Suspended</h1>
+          </div>
+          <p class="text-lg text-secondary">
+            {{
+              serverData.suspension_reason
+                ? `Your server has been suspended: ${serverData.suspension_reason}`
+                : "Your server has been suspended."
+            }}
+            <br />
+            This is most likely due to a billing issue. Please check your billing information and
+            contact Modrinth support if you believe this is an error.
+          </p>
+        </div>
+        <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
+          <button class="mt-6 !w-full">Go to billing</button>
+        </ButtonStyled>
+      </div>
+    </div>
+    <div
+      v-else-if="server.error && server.error.message.includes('Forbidden')"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -270,6 +298,7 @@ import {
   CheckIcon,
   FileIcon,
   TransferIcon,
+  LockIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
@@ -313,6 +342,7 @@ const server = await usePyroServer(serverId, [
 watch(
   () => server.error,
   (newError) => {
+    if (server.general?.status === "suspended") return;
     if (newError && !newError.message.includes("Forbidden")) {
       startPolling();
     }
@@ -526,7 +556,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
       handleInstallationResult(data);
       break;
     case "new-mod":
-      server.refresh(["mods"]);
+      server.refresh(["content"]);
       console.log("New mod:", data);
       break;
     case "auth-ok":
