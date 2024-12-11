@@ -231,7 +231,7 @@
           <input
             type="file"
             accept=".mrpack"
-            class="mt-4"
+            class=""
             :disabled="isLoading"
             @change="uploadMrpack"
           />
@@ -269,10 +269,7 @@
               @change="backupServer = ($event.target as HTMLInputElement).checked"
             />
           </div>
-          <div>
-            Creates a backup of your server before proceeding with the installation or
-            reinstallation.
-          </div>
+          <div>Creates a backup of your server before proceeding.</div>
         </div>
       </div>
       <div class="mt-4 flex justify-start gap-4">
