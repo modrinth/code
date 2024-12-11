@@ -448,7 +448,7 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
 const emit = defineEmits<{
@@ -794,8 +794,9 @@ const handleReinstall = async () => {
         }
 
         await props.server.refresh(["backups"]);
-        const backups = await props.server.backups.data;
-        if (!backups?.find((x) => x.id === backupId).ongoing) {
+        const backups = await props.server.backups?.data;
+        const backup = backupId ? backups?.find((x) => x.id === backupId) : undefined;
+        if (backup && !backup.ongoing) {
           console.log("Backup Finished");
           isBackingUp.value = false;
           break;
@@ -893,8 +894,9 @@ const handleReinstallUpload = async () => {
         }
 
         await props.server.refresh(["backups"]);
-        const backups = await props.server.backups.data;
-        if (!backups?.find((x) => x.id === backupId).ongoing) {
+        const backups = await props.server.backups?.data;
+        const backup = backupId ? backups?.find((x) => x.id === backupId) : undefined;
+        if (backup && !backup.ongoing) {
           console.log("Backup Finished");
           isBackingUp.value = false;
           break;
@@ -916,6 +918,9 @@ const handleReinstallUpload = async () => {
   isLoading.value = true;
 
   try {
+    if (!mrpackFile.value) {
+      throw new Error("No mrpack file selected");
+    }
     const mrpack = new File([mrpackFile.value], mrpackFile.value.name, {
       type: mrpackFile.value.type,
     });
