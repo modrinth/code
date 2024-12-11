@@ -204,6 +204,7 @@
                 </div>
 
                 <div class="flex w-full flex-row items-center gap-2 sm:w-auto">
+                  <UiCopyCode :text="`${serverIP}:${allocation.port}`" />
                   <ButtonStyled icon-only>
                     <button
                       class="!w-full sm:!w-auto"
@@ -252,7 +253,7 @@ import { ref, computed, nextTick } from "vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
 const isUpdating = ref(false);
