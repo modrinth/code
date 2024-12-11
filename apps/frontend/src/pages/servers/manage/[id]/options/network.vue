@@ -204,6 +204,7 @@
                 </div>
 
                 <div class="flex w-full flex-row items-center gap-2 sm:w-auto">
+                  <UiCopyCode :text="`${serverIP}:${allocation.port}`" />
                   <ButtonStyled icon-only>
                     <button
                       class="!w-full sm:!w-auto"
