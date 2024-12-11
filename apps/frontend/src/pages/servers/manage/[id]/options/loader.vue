@@ -129,19 +129,40 @@
             then reinstalls it with the selected version.
           </div>
         </div>
+
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <label class="w-full text-lg font-bold text-contrast" for="backup-server">
+              Backup server
+            </label>
+            <input
+              id="backup-server"
+              :checked="backupServer"
+              class="switch stylized-toggle shrink-0"
+              type="checkbox"
+              @change="backupServer = ($event.target as HTMLInputElement).checked"
+            />
+          </div>
+          <div>
+            Creates a backup of your server before proceeding with the installation or
+            reinstallation.
+          </div>
+        </div>
       </div>
       <div class="mt-4 flex justify-start gap-4">
         <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
           <button :disabled="canInstall" @click="handleReinstall">
             <RightArrowIcon />
             {{
-              isSecondPhase
-                ? "Erase and install"
-                : loadingServerCheck
-                  ? "Loading..."
-                  : isDangerous
-                    ? "Erase and install"
-                    : "Install"
+              isBackingUp
+                ? "Backing up..."
+                : isSecondPhase
+                  ? "Erase and install"
+                  : loadingServerCheck
+                    ? "Loading..."
+                    : isDangerous
+                      ? "Erase and install"
+                      : "Install"
             }}
           </button>
         </ButtonStyled>
@@ -165,43 +186,125 @@
   </NewModal>
 
   <NewModal ref="mrpackModal" header="Uploading mrpack" @hide="onHide" @show="onShow">
-    <div>
-      <div class="mt-2 flex items-center gap-2">
-        <input
-          id="hard-reset"
-          :checked="hardReset"
-          class="switch stylized-toggle"
-          type="checkbox"
-          @change="hardReset = ($event.target as HTMLInputElement).checked"
-        />
-        <label for="hard-reset">Erase all data</label>
+    <div class="flex flex-col gap-4 md:w-[600px]">
+      <p
+        v-if="isSecondPhase"
+        :style="{
+          lineHeight: isSecondPhase ? '1.5' : undefined,
+          marginBottom: isSecondPhase ? '-12px' : '0',
+          marginTop: isSecondPhase ? '-4px' : '-2px',
+        }"
+      >
+        This will reinstall your server and erase all data. You may want to back up your server
+        before proceeding. Are you sure you want to continue?
+      </p>
+      <div v-if="!isSecondPhase" class="flex flex-col gap-4">
+        <div class="mx-auto flex flex-row items-center gap-4">
+          <div
+            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
+          >
+            <UploadIcon class="size-10" />
+          </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="size-10"
+          >
+            <path d="M5 9v6" />
+            <path d="M9 9h3V5l7 7-7 7v-4H9V9z" />
+          </svg>
+          <div
+            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-table-alternateRow shadow-sm"
+          >
+            <ServerIcon class="size-10" />
+          </div>
+        </div>
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="text-sm font-bold text-contrast">Upload mrpack</div>
+          <input
+            type="file"
+            accept=".mrpack"
+            class="mt-4"
+            :disabled="isLoading"
+            @change="uploadMrpack"
+          />
+        </div>
+
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <label class="w-full text-lg font-bold text-contrast" for="hard-reset">
+              Erase all data
+            </label>
+            <input
+              id="hard-reset"
+              :checked="hardReset"
+              class="switch stylized-toggle shrink-0"
+              type="checkbox"
+              @change="hardReset = ($event.target as HTMLInputElement).checked"
+            />
+          </div>
+          <div>
+            Removes all data on your server, including your worlds, mods, and configuration files,
+            then reinstalls it with the selected version.
+          </div>
+        </div>
+
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <label class="w-full text-lg font-bold text-contrast" for="backup-server-mrpack">
+              Backup server
+            </label>
+            <input
+              id="backup-server-mrpack"
+              :checked="backupServer"
+              class="switch stylized-toggle shrink-0"
+              type="checkbox"
+              @change="backupServer = ($event.target as HTMLInputElement).checked"
+            />
+          </div>
+          <div>
+            Creates a backup of your server before proceeding with the installation or
+            reinstallation.
+          </div>
+        </div>
       </div>
-      <input
-        type="file"
-        accept=".mrpack"
-        class="mt-4"
-        :disabled="isLoading"
-        @change="uploadMrpack"
-      />
       <div class="mt-4 flex justify-start gap-4">
         <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="!mrpackFile || isLoading" @click="reinstallMrpack">
+          <button :disabled="canInstallUpload" @click="handleReinstallUpload">
             <RightArrowIcon />
             {{
-              isSecondPhase
-                ? "Erase and install"
-                : loadingServerCheck
-                  ? "Loading..."
-                  : isDangerous
-                    ? "Erase and install"
-                    : "Install"
+              isBackingUp
+                ? "Backing up..."
+                : isSecondPhase
+                  ? "Erase and install"
+                  : loadingServerCheck
+                    ? "Loading..."
+                    : isDangerous
+                      ? "Erase and install"
+                      : "Install"
             }}
           </button>
         </ButtonStyled>
         <ButtonStyled>
-          <button :disabled="isLoading" @click="mrpackModal?.hide">
+          <button
+            :disabled="isLoading"
+            @click="
+              if (isSecondPhase) {
+                isSecondPhase = false;
+              } else {
+                mrpackModal?.hide();
+              }
+            "
+          >
             <XIcon />
-            Cancel
+            {{ isSecondPhase ? "Go back" : "Cancel" }}
           </button>
         </ButtonStyled>
       </div>
@@ -363,6 +466,7 @@ const isError = computed(() => props.server.general?.status === "error");
 const isDangerous = computed(() => hardReset.value);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isBackupLimited = computed(() => (props.server.backups?.data?.length || 0) >= 15);
+const isBackingUp = ref(false);
 
 const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
 
@@ -416,6 +520,16 @@ const canInstall = computed(() => {
   }
 
   return conds || !selectedLoaderVersion.value;
+});
+
+const canInstallUpload = computed(() => {
+  const conds =
+    !mrpackFile.value ||
+    isLoading.value ||
+    loadingServerCheck.value ||
+    serverCheckError.value.trim().length > 0;
+
+  return conds;
 });
 
 const mcVersions = tags.value.gameVersions
@@ -659,7 +773,35 @@ const handleReinstall = async () => {
       });
       const backupName = `Reinstallation - ${format}`;
       isLoading.value = true;
-      await props.server.backups?.create(backupName);
+      const backupId = await props.server.backups?.create(backupName);
+
+      isBackingUp.value = true;
+
+      let attempts = 0;
+
+      while (true) {
+        attempts += 1;
+
+        if (attempts > 100) {
+          addNotification({
+            group: "server",
+            title: "Backup Failed",
+            text: "An unexpected error occurred while backing up. Please try again later.",
+            type: "error",
+          });
+          isLoading.value = false;
+          return;
+        }
+
+        await props.server.refresh(["backups"]);
+        const backups = await props.server.backups.data;
+        if (!backups?.find((x) => x.id === backupId).ongoing) {
+          console.log("Backup Finished");
+          isBackingUp.value = false;
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
     } catch {
       addNotification({
         group: "server",
@@ -710,19 +852,82 @@ const uploadMrpack = (event: Event) => {
   mrpackFile.value = target.files[0];
 };
 
-const reinstallMrpack = async () => {
-  if (!mrpackFile.value) {
+const handleReinstallUpload = async () => {
+  if (hardReset.value && !backupServer.value && !isSecondPhase.value) {
+    isSecondPhase.value = true;
     return;
   }
 
-  const mrpack = new File([mrpackFile.value], mrpackFile.value.name, {
-    type: mrpackFile.value.type,
-  });
+  if (backupServer.value) {
+    try {
+      const date = new Date();
+      const format = date.toLocaleString(navigator.language || "en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        timeZoneName: "short",
+      });
+      const backupName = `Reinstallation - ${format}`;
+      isLoading.value = true;
+      const backupId = await props.server.backups?.create(backupName);
+
+      isBackingUp.value = true;
+
+      let attempts = 0;
+
+      while (true) {
+        attempts += 1;
+
+        if (attempts > 100) {
+          addNotification({
+            group: "server",
+            title: "Backup Failed",
+            text: "An unexpected error occurred while backing up. Please try again later.",
+            type: "error",
+          });
+          isLoading.value = false;
+          return;
+        }
+
+        await props.server.refresh(["backups"]);
+        const backups = await props.server.backups.data;
+        if (!backups?.find((x) => x.id === backupId).ongoing) {
+          console.log("Backup Finished");
+          isBackingUp.value = false;
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+    } catch {
+      addNotification({
+        group: "server",
+        title: "Backup Failed",
+        text: "An unexpected error occurred while backing up. Please try again later.",
+        type: "error",
+      });
+      isLoading.value = false;
+      return;
+    }
+  }
+
+  isLoading.value = true;
 
   try {
-    isLoading.value = true;
+    const mrpack = new File([mrpackFile.value], mrpackFile.value.name, {
+      type: mrpackFile.value.type,
+    });
+
     await props.server.general?.reinstallFromMrpack(mrpack, hardReset.value);
-    emit("reinstall");
+
+    emit("reinstall", {
+      loader: "mrpack",
+      lVersion: "",
+      mVersion: "",
+    });
+
     await nextTick();
     window.scrollTo(0, 0);
   } catch (error) {

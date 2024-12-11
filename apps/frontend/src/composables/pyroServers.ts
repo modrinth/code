@@ -538,10 +538,11 @@ const reinstallContent = async (
 
 const createBackup = async (backupName: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
+    const response = (await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
       method: "POST",
       body: { name: backupName },
-    });
+    })) as { id: string };
+    return response.id;
   } catch (error) {
     console.error("Error creating backup:", error);
     throw error;
@@ -1102,6 +1103,7 @@ type BackupFunctions = {
   /**
    * Creates a new backup for the server.
    * @param backupName - The name of the backup.
+   * @returns The ID of the backup.
    */
   create: (backupName: string) => Promise<void>;
 
