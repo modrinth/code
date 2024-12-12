@@ -243,7 +243,7 @@ const createInstance = async () => {
             "
           >
             <Button
-              :disabled="profile.installedMod || profile.installing || profile.linked_data?.locked"
+              :disabled="profile.installedMod || profile.installing"
               @click="install(profile)"
             >
               <DownloadIcon v-if="!profile.installedMod && !profile.installing" />
@@ -253,9 +253,7 @@ const createInstance = async () => {
                   ? 'Installing...'
                   : profile.installedMod
                     ? 'Installed'
-                    : profile.linked_data && profile.linked_data.locked
-                      ? 'Paired'
-                      : 'Install'
+                    : 'Install'
               }}
             </Button>
           </div>

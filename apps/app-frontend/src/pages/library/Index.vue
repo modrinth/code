@@ -37,11 +37,17 @@ onUnmounted(() => {
 <template>
   <div class="p-6 flex flex-col gap-3">
     <h1 class="m-0 text-2xl">Library</h1>
-    <NavTabs :links="[ { label: 'All instances', href: `/library` }, { label: 'Downloaded', href: `/library/downloaded` }, { label: 'Custom', href: `/library/custom` }, { label: 'Shared with me', href: `/library/shared`, shown: false }, { label: 'Saved', href: `/library/saved`, shown: false } ]" />
+    <NavTabs
+      :links="[
+        { label: 'All instances', href: `/library` },
+        { label: 'Downloaded', href: `/library/downloaded` },
+        { label: 'Custom', href: `/library/custom` },
+        { label: 'Shared with me', href: `/library/shared`, shown: false },
+        { label: 'Saved', href: `/library/saved`, shown: false },
+      ]"
+    />
     <template v-if="instances.length > 0">
-      <RouterView
-        :instances="instances"
-      />
+      <RouterView :instances="instances" />
     </template>
     <div v-else class="no-instance">
       <div class="icon">

@@ -29,6 +29,8 @@ pub struct FriendsSocket {
 #[derive(Deserialize, Serialize)]
 pub struct UserFriend {
     pub id: String,
+    // TODO: Remove this optional and serde alias on release
+    pub friend_id: Option<String>,
     #[serde(alias = "pending")]
     pub accepted: bool,
     pub created: DateTime<Utc>,

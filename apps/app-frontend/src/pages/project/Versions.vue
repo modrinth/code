@@ -1,13 +1,20 @@
 <template>
   <div>
-    <ProjectPageVersions :loaders="loaders" :game-versions="gameVersions" :versions="versions" :project="project" :version-link="(version) => `/project/${project.id}/version/${version.id}`">
+    <ProjectPageVersions
+      :loaders="loaders"
+      :game-versions="gameVersions"
+      :versions="versions"
+      :project="project"
+      :version-link="(version) => `/project/${project.id}/version/${version.id}`"
+    >
       <template #actions="{ version }">
         <ButtonStyled circular type="transparent">
           <button
             v-tooltip="`Install`"
             :class="{
-            'group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted': !installed || version.id !== installedVersion
-          }"
+              'group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted':
+                !installed || version.id !== installedVersion,
+            }"
             :disabled="installing || (installed && version.id === installedVersion)"
             @click.stop="() => install(version.id)"
           >
@@ -45,30 +52,21 @@
           <a
             v-else
             v-tooltip="`Open in browser`"
-            class="group-hover:!bg-button-bg" :href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`" target="_blank"
+            class="group-hover:!bg-button-bg"
+            :href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
+            target="_blank"
           >
             <ExternalIcon />
           </a>
         </ButtonStyled>
-
       </template>
     </ProjectPageVersions>
   </div>
 </template>
 
 <script setup>
-import {
-  ProjectPageVersions,
-  ButtonStyled,
-  OverflowMenu
-} from '@modrinth/ui'
-import {
-  CheckIcon,
-  DownloadIcon,
-  EditIcon,
-  ExternalIcon,
-  LinkIcon, MoreVerticalIcon, ReportIcon, ShareIcon, TrashIcon
-} from '@modrinth/assets'
+import { ProjectPageVersions, ButtonStyled, OverflowMenu } from '@modrinth/ui'
+import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
 import { ref, watch } from 'vue'
 import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
@@ -104,7 +102,6 @@ const props = defineProps({
     default: null,
   },
 })
-
 
 const [loaders, gameVersions] = await Promise.all([
   get_loaders().catch(handleError).then(ref),

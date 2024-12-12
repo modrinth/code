@@ -1,20 +1,17 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { Ref } from 'vue'
-import { GameIcon, LeftArrowIcon, SearchIcon, XIcon } from '@modrinth/assets'
+import { SearchIcon, XIcon } from '@modrinth/assets'
 import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
   SearchSidebarFilter,
-  Avatar,
   Button,
-  ButtonStyled,
   Checkbox,
   DropdownSelect,
   LoadingIndicator,
   Pagination,
   useSearch,
 } from '@modrinth/ui'
-import { formatCategory } from '@modrinth/utils'
 import { handleError } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
@@ -22,11 +19,11 @@ import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { get_search_results } from '@/helpers/cache.js'
 import { debounce } from '@/helpers/utils.js'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import type Instance from '@/components/ui/Instance.vue'
+import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -244,7 +241,7 @@ const searchWrapper: Ref<HTMLElement | null> = ref(null)
 async function onSearchChangeToTop() {
   await nextTick()
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 async function clearSearch() {
@@ -364,37 +361,7 @@ await refreshSearch()
   </Teleport>
   <div ref="searchWrapper" class="flex flex-col gap-3 p-6">
     <template v-if="instance">
-      <div
-        class="flex justify-between items-center border-0 border-b border-solid border-divider pb-4"
-      >
-        <router-link
-          :to="`/instance/${encodeURIComponent(instance.path)}`"
-          tabindex="-1"
-          class="flex flex-col gap-4 text-primary"
-        >
-          <span class="flex items-center gap-2">
-            <Avatar
-              :src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
-              :alt="instance.name"
-              size="48px"
-            />
-            <span class="flex flex-col gap-2">
-              <span class="font-extrabold bold text-contrast">
-                {{ instance.name }}
-              </span>
-              <span class="text-secondary flex items-center gap-2 font-semibold">
-                <GameIcon class="h-5 w-5 text-secondary" />
-                {{ formatCategory(instance.loader) }} {{ instance.game_version }}
-              </span>
-            </span>
-          </span>
-        </router-link>
-        <ButtonStyled>
-          <router-link :to="`/instance/${encodeURIComponent(instance.path)}`">
-            <LeftArrowIcon /> Back to instance
-          </router-link>
-        </ButtonStyled>
-      </div>
+      <InstanceIndicator :instance="instance" />
       <h1 class="m-0 mb-1 text-xl">Install content to instance</h1>
     </template>
     <h1 v-else class="m-0 mb-1 text-2xl">Discover content</h1>

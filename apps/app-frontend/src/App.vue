@@ -256,7 +256,7 @@ watch(
   hasPlus,
   () => {
     if (hasPlus.value) {
-      hide_ads_window()
+      hide_ads_window(true)
     } else {
       show_ads_window()
     }
