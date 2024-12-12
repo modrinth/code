@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useVIntl, defineMessages } from '@vintl/vintl'
-import { computed } from 'vue'
+import type { VersionChannel } from '@modrinth/utils'
 
 const { formatMessage } = useVIntl()
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
-    channel: 'release' | 'beta' | 'alpha'
+    channel: VersionChannel
     large?: boolean
   }>(),
   {

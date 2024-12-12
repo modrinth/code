@@ -145,7 +145,7 @@ import {
   MailIcon,
   SSOGitLabIcon,
 } from "@modrinth/assets";
-import { Checkbox } from "@modrinth/ui";
+import { Checkbox, commonMessages } from "@modrinth/ui";
 import HCaptcha from "@/components/ui/HCaptcha.vue";
 
 const { formatMessage } = useVIntl();

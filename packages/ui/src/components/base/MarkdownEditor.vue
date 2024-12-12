@@ -368,7 +368,6 @@ onMounted(() => {
       if (clipboardData.files && clipboardData.files.length > 0 && props.onImageUpload) {
         // If the user is pasting a file, upload it if there's an included handler and insert the link.
         uploadImagesFromList(clipboardData.files)
-          // eslint-disable-next-line func-names -- who the fuck did this?
           .then(function (url) {
             const selection = markdownCommands.yankSelection(view)
             const altText = selection || 'Replace this with a description'
@@ -654,7 +653,7 @@ function cleanUrl(input: string): string {
   // Attempt to validate and parse the URL
   try {
     url = new URL(input)
-  } catch (e) {
+  } catch {
     throw new Error('Invalid URL. Make sure the URL is well-formed.')
   }
 

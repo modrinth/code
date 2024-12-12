@@ -12,7 +12,7 @@ import {
   SearchIcon,
   XIcon,
 } from '@modrinth/assets'
-import { Button, Card, DropdownSelect } from '@modrinth/ui'
+import { Button, DropdownSelect } from '@modrinth/ui'
 import { formatCategoryHeader } from '@modrinth/utils'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import dayjs from 'dayjs'
@@ -121,11 +121,10 @@ const handleOptionsClick = async (args) => {
 
 const search = ref('')
 const group = ref('Category')
-const filters = ref('All profiles')
 const sortBy = ref('Name')
 
 const filteredResults = computed(() => {
-  let instances = props.instances.filter((instance) => {
+  const instances = props.instances.filter((instance) => {
     return instance.name.toLowerCase().includes(search.value.toLowerCase())
   })
 
@@ -156,16 +155,6 @@ const filteredResults = computed(() => {
   if (sortBy.value === 'Date modified') {
     instances.sort((a, b) => {
       return dayjs(b.date_modified).diff(dayjs(a.date_modified))
-    })
-  }
-
-  if (filters.value === 'Custom instances') {
-    instances = instances.filter((instance) => {
-      return !instance.linked_data
-    })
-  } else if (filters.value === 'Downloaded modpacks') {
-    instances = instances.filter((instance) => {
-      return instance.linked_data
     })
   }
 
@@ -229,53 +218,37 @@ const filteredResults = computed(() => {
 })
 </script>
 <template>
-  <ConfirmModalWrapper
-    ref="confirmModal"
-    title="Are you sure you want to delete this instance?"
-    description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
-    :has-to-type="false"
-    proceed-label="Delete"
-    @proceed="deleteProfile"
-  />
-  <Card class="header">
-    <div class="iconified-input">
-      <SearchIcon />
-      <input v-model="search" type="text" placeholder="Search" class="search-input" />
-      <Button class="r-btn" @click="() => (search = '')">
-        <XIcon />
-      </Button>
-    </div>
-    <div class="labeled_button">
-      <span>Sort by</span>
-      <DropdownSelect
-        v-model="sortBy"
-        class="sort-dropdown"
-        name="Sort Dropdown"
-        :options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
-        placeholder="Select..."
-      />
-    </div>
-    <div class="labeled_button">
-      <span>Filter by</span>
-      <DropdownSelect
-        v-model="filters"
-        class="filter-dropdown"
-        name="Filter Dropdown"
-        :options="['All profiles', 'Custom instances', 'Downloaded modpacks']"
-        placeholder="Select..."
-      />
-    </div>
-    <div class="labeled_button">
-      <span>Group by</span>
-      <DropdownSelect
-        v-model="group"
-        class="group-dropdown"
-        name="Group Dropdown"
-        :options="['Category', 'Loader', 'Game version', 'None']"
-        placeholder="Select..."
-      />
-    </div>
-  </Card>
+  <div class="iconified-input">
+    <SearchIcon />
+    <input v-model="search" type="text" class="h-12" placeholder="Search" />
+    <Button class="r-btn" @click="() => (search = '')">
+      <XIcon />
+    </Button>
+  </div>
+  <div class="flex gap-2">
+    <DropdownSelect
+      v-slot="{ selected }"
+      v-model="sortBy"
+      name="Sort Dropdown"
+      class="max-w-[16rem]"
+      :options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
+      placeholder="Select..."
+    >
+      <span class="font-semibold text-primary">Sort by: </span>
+      <span class="font-semibold text-secondary">{{ selected }}</span>
+    </DropdownSelect>
+    <DropdownSelect
+      v-slot="{ selected }"
+      v-model="group"
+      class="max-w-[16rem]"
+      name="Group Dropdown"
+      :options="['Category', 'Loader', 'Game version', 'None']"
+      placeholder="Select..."
+    >
+      <span class="font-semibold text-primary">Group by: </span>
+      <span class="font-semibold text-secondary">{{ selected }}</span>
+    </DropdownSelect>
+  </div>
   <div
     v-for="instanceSection in Array.from(filteredResults, ([key, value]) => ({
       key,
@@ -298,6 +271,14 @@ const filteredResults = computed(() => {
       />
     </section>
   </div>
+  <ConfirmModalWrapper
+    ref="confirmModal"
+    title="Are you sure you want to delete this instance?"
+    description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
+    :has-to-type="false"
+    proceed-label="Delete"
+    @proceed="deleteProfile"
+  />
   <ContextMenu ref="instanceOptions" @option-clicked="handleOptionsClick">
     <template #play> <PlayIcon /> Play </template>
     <template #stop> <StopCircleIcon /> Stop </template>
@@ -315,7 +296,6 @@ const filteredResults = computed(() => {
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  padding: 1rem;
 
   .divider {
     display: flex;

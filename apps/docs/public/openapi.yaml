@@ -354,7 +354,7 @@ components:
           items:
             type: string
           description: The mod loaders that this version supports. In case of resource packs, use "minecraft"
-          example: ["fabric", "forge", "minecraft"]
+          example: ['fabric', 'forge', 'minecraft']
         featured:
           type: boolean
           description: Whether the version is featured or not

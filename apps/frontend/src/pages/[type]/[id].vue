@@ -1,4 +1,7 @@
 <template>
+  <Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
+    <ProjectBackgroundGradient :project="project" />
+  </Teleport>
   <div v-if="route.name.startsWith('type-id-settings')" class="normal-page">
     <div class="normal-page__sidebar">
       <aside class="universal-card">
@@ -430,47 +433,7 @@
       }"
     >
       <div class="normal-page__header relative my-4">
-        <ContentPageHeader>
-          <template #icon>
-            <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
-          </template>
-          <template #title>
-            {{ project.title }}
-          </template>
-          <template #title-suffix>
-            <Badge v-if="auth.user && currentMember" :type="project.status" class="status-badge" />
-          </template>
-          <template #summary>
-            {{ project.description }}
-          </template>
-          <template #stats>
-            <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
-            >
-              <DownloadIcon class="h-6 w-6 text-secondary" />
-              {{ $formatNumber(project.downloads) }}
-            </div>
-            <div
-              class="flex items-center gap-2 border-0 border-solid border-button-bg pr-4 md:border-r"
-            >
-              <HeartIcon class="h-6 w-6 text-secondary" />
-              <span class="font-semibold">
-                {{ $formatNumber(project.followers) }}
-              </span>
-            </div>
-            <div class="hidden items-center gap-2 md:flex">
-              <TagsIcon class="h-6 w-6 text-secondary" />
-              <div class="flex flex-wrap gap-2">
-                <div
-                  v-for="(category, index) in project.categories"
-                  :key="index"
-                  class="tag-list__item"
-                >
-                  {{ formatCategory(category) }}
-                </div>
-              </div>
-            </div>
-          </template>
+        <ProjectHeader :project="project" :member="!!currentMember">
           <template #actions>
             <div class="hidden sm:contents">
               <ButtonStyled
@@ -498,73 +461,104 @@
                 </button>
               </ButtonStyled>
             </div>
-            <ButtonStyled
-              size="large"
-              circular
-              :color="following ? 'red' : 'standard'"
-              color-fill="none"
-              hover-color-fill="background"
-            >
-              <button
-                v-if="auth.user"
-                v-tooltip="following ? `Unfollow` : `Follow`"
-                :aria-label="following ? `Unfollow` : `Follow`"
-                @click="userFollowProject(project)"
+            <ClientOnly>
+              <ButtonStyled
+                size="large"
+                circular
+                :color="following ? 'red' : 'standard'"
+                color-fill="none"
+                hover-color-fill="background"
               >
-                <HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
-              </button>
-              <nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in" aria-label="Follow">
-                <HeartIcon aria-hidden="true" />
-              </nuxt-link>
-            </ButtonStyled>
-            <ButtonStyled size="large" circular>
-              <PopoutMenu v-if="auth.user" v-tooltip="'Save'" from="top-right" aria-label="Save">
-                <BookmarkIcon
-                  aria-hidden="true"
-                  :fill="
-                    collections.some((x) => x.projects.includes(project.id))
-                      ? 'currentColor'
-                      : 'none'
+                <button
+                  v-if="auth.user"
+                  v-tooltip="following ? `Unfollow` : `Follow`"
+                  :aria-label="following ? `Unfollow` : `Follow`"
+                  @click="userFollowProject(project)"
+                >
+                  <HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
+                </button>
+                <nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in" aria-label="Follow">
+                  <HeartIcon aria-hidden="true" />
+                </nuxt-link>
+              </ButtonStyled>
+              <ButtonStyled size="large" circular>
+                <PopoutMenu
+                  v-if="auth.user"
+                  :tooltip="
+                    collections.some((x) => x.projects.includes(project.id)) ? 'Saved' : 'Save'
                   "
-                />
-                <template #menu>
-                  <input
-                    v-model="displayCollectionsSearch"
-                    type="text"
-                    placeholder="Search collections..."
-                    class="search-input menu-search"
+                  from="top-right"
+                  aria-label="Save"
+                  :dropdown-id="`${baseId}-save`"
+                >
+                  <BookmarkIcon
+                    aria-hidden="true"
+                    :fill="
+                      collections.some((x) => x.projects.includes(project.id))
+                        ? 'currentColor'
+                        : 'none'
+                    "
                   />
-                  <div v-if="collections.length > 0" class="collections-list">
-                    <Checkbox
-                      v-for="option in collections
-                        .slice()
-                        .sort((a, b) => a.name.localeCompare(b.name))"
-                      :key="option.id"
-                      :model-value="option.projects.includes(project.id)"
-                      class="popout-checkbox"
-                      @update:model-value="() => onUserCollectProject(option, project.id)"
+                  <template #menu>
+                    <input
+                      v-model="displayCollectionsSearch"
+                      type="text"
+                      placeholder="Search collections..."
+                      class="search-input menu-search"
+                    />
+                    <div v-if="collections.length > 0" class="collections-list">
+                      <Checkbox
+                        v-for="option in collections
+                          .slice()
+                          .sort((a, b) => a.name.localeCompare(b.name))"
+                        :key="option.id"
+                        :model-value="option.projects.includes(project.id)"
+                        class="popout-checkbox"
+                        @update:model-value="() => onUserCollectProject(option, project.id)"
+                      >
+                        {{ option.name }}
+                      </Checkbox>
+                    </div>
+                    <div v-else class="menu-text">
+                      <p class="popout-text">No collections found.</p>
+                    </div>
+                    <button
+                      class="btn collection-button"
+                      @click="(event) => $refs.modal_collection.show(event)"
                     >
-                      {{ option.name }}
-                    </Checkbox>
-                  </div>
-                  <div v-else class="menu-text">
-                    <p class="popout-text">No collections found.</p>
-                  </div>
+                      <PlusIcon aria-hidden="true" />
+                      Create new collection
+                    </button>
+                  </template>
+                </PopoutMenu>
+                <nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+                  <BookmarkIcon aria-hidden="true" />
+                </nuxt-link>
+              </ButtonStyled>
+              <template #fallback>
+                <ButtonStyled size="large" circular>
                   <button
-                    class="btn collection-button"
-                    @click="(event) => $refs.modal_collection.show(event)"
+                    v-if="auth.user"
+                    v-tooltip="`Follow`"
+                    :aria-label="`Follow`"
+                    @click="userFollowProject(project)"
                   >
-                    <PlusIcon aria-hidden="true" />
-                    Create new collection
+                    <HeartIcon aria-hidden="true" />
                   </button>
-                </template>
-              </PopoutMenu>
-              <nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
-                <BookmarkIcon aria-hidden="true" />
-              </nuxt-link>
-            </ButtonStyled>
+                  <nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in" aria-label="Follow">
+                    <HeartIcon aria-hidden="true" />
+                  </nuxt-link>
+                </ButtonStyled>
+                <ButtonStyled size="large" circular>
+                  <nuxt-link v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+                    <BookmarkIcon aria-hidden="true" />
+                  </nuxt-link>
+                </ButtonStyled>
+              </template>
+            </ClientOnly>
             <ButtonStyled v-if="auth.user && currentMember" size="large" circular>
               <nuxt-link
+                v-tooltip="'Settings'"
                 :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
               >
                 <SettingsIcon aria-hidden="true" />
@@ -572,6 +566,7 @@
             </ButtonStyled>
             <ButtonStyled size="large" circular type="transparent">
               <OverflowMenu
+                :tooltip="'More options'"
                 :options="[
                   {
                     id: 'analytics',
@@ -611,6 +606,7 @@
                   { id: 'copy-id', action: () => copyId() },
                 ]"
                 aria-label="More options"
+                :dropdown-id="`${baseId}-more-options`"
               >
                 <MoreVerticalIcon aria-hidden="true" />
                 <template #analytics>
@@ -632,7 +628,7 @@
               </OverflowMenu>
             </ButtonStyled>
           </template>
-        </ContentPageHeader>
+        </ProjectHeader>
         <ProjectMemberHeader
           v-if="currentMember"
           :project="project"
@@ -654,227 +650,37 @@
         </MessageBanner>
       </div>
       <div class="normal-page__sidebar">
-        <div v-if="versions.length > 0" class="card flex-card experimental-styles-within">
-          <h2>{{ formatMessage(compatibilityMessages.title) }}</h2>
-          <section>
-            <h3>{{ formatMessage(compatibilityMessages.minecraftJava) }}</h3>
-            <div class="tag-list">
-              <div
-                v-for="version in getVersionsToDisplay(project)"
-                :key="`version-tag-${version}`"
-                class="tag-list__item"
-              >
-                {{ version }}
-              </div>
-            </div>
-          </section>
-          <section v-if="project.project_type !== 'resourcepack'">
-            <h3>{{ formatMessage(compatibilityMessages.platforms) }}</h3>
-            <div class="tag-list">
-              <div
-                v-for="platform in project.loaders"
-                :key="`platform-tag-${platform}`"
-                :class="`tag-list__item`"
-                :style="`--_color: var(--color-platform-${platform})`"
-              >
-                <svg v-html="tags.loaders.find((x) => x.name === platform).icon"></svg>
-                {{ formatCategory(platform) }}
-              </div>
-            </div>
-          </section>
-          <section
-            v-if="
-              (project.actualProjectType === 'mod' || project.project_type === 'modpack') &&
-              !(project.client_side === 'unsupported' && project.server_side === 'unsupported') &&
-              !(project.client_side === 'unknown' && project.server_side === 'unknown')
-            "
-          >
-            <h3>{{ formatMessage(compatibilityMessages.environments) }}</h3>
-            <div class="tag-list">
-              <div
-                v-if="
-                  (project.client_side === 'required' && project.server_side !== 'required') ||
-                  (project.client_side === 'optional' && project.server_side === 'optional')
-                "
-                class="tag-list__item"
-              >
-                <ClientIcon aria-hidden="true" />
-                Client-side
-              </div>
-              <div
-                v-if="
-                  (project.server_side === 'required' && project.client_side !== 'required') ||
-                  (project.client_side === 'optional' && project.server_side === 'optional')
-                "
-                class="tag-list__item"
-              >
-                <ServerIcon aria-hidden="true" />
-                Server-side
-              </div>
-              <div v-if="false" class="tag-list__item">
-                <UserIcon aria-hidden="true" />
-                Singleplayer
-              </div>
-              <div
-                v-if="
-                  project.project_type !== 'datapack' &&
-                  ((project.client_side === 'required' && project.server_side === 'required') ||
-                    project.client_side === 'optional' ||
-                    (project.client_side === 'required' && project.server_side === 'optional') ||
-                    project.server_side === 'optional' ||
-                    (project.server_side === 'required' && project.client_side === 'optional'))
-                "
-                class="tag-list__item"
-              >
-                <MonitorSmartphoneIcon aria-hidden="true" />
-                Client and server
-              </div>
-            </div>
-          </section>
-        </div>
+        <ProjectSidebarCompatibility
+          :project="project"
+          :tags="tags"
+          class="card flex-card experimental-styles-within"
+        />
         <AdPlaceholder
           v-if="
             (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
             tags.approvedStatuses.includes(project.status)
           "
         />
-        <div
-          v-if="
-            project.issues_url ||
-            project.source_url ||
-            project.wiki_url ||
-            project.discord_url ||
-            project.donation_urls.length > 0
-          "
+        <ProjectSidebarLinks
+          :project="project"
+          :link-target="$external()"
           class="card flex-card experimental-styles-within"
-        >
-          <h2>{{ formatMessage(linksMessages.title) }}</h2>
-          <div class="links-list">
-            <a
-              v-if="project.issues_url"
-              :href="project.issues_url"
-              :target="$external()"
-              rel="noopener nofollow ugc"
-            >
-              <IssuesIcon aria-hidden="true" />
-              {{ formatMessage(linksMessages.issues) }}
-              <ExternalIcon aria-hidden="true" class="external-icon" />
-            </a>
-            <a
-              v-if="project.source_url"
-              :href="project.source_url"
-              :target="$external()"
-              rel="noopener nofollow ugc"
-            >
-              <CodeIcon aria-hidden="true" />
-              {{ formatMessage(linksMessages.source) }}
-              <ExternalIcon aria-hidden="true" class="external-icon" />
-            </a>
-            <a
-              v-if="project.wiki_url"
-              :href="project.wiki_url"
-              :target="$external()"
-              rel="noopener nofollow ugc"
-            >
-              <WikiIcon aria-hidden="true" />
-              {{ formatMessage(linksMessages.wiki) }}
-              <ExternalIcon aria-hidden="true" class="external-icon" />
-            </a>
-            <a
-              v-if="project.discord_url"
-              :href="project.discord_url"
-              :target="$external()"
-              rel="noopener nofollow ugc"
-            >
-              <DiscordIcon class="shrink" aria-hidden="true" />
-              {{ formatMessage(linksMessages.discord) }}
-              <ExternalIcon aria-hidden="true" class="external-icon" />
-            </a>
-            <hr
-              v-if="
-                (project.issues_url ||
-                  project.source_url ||
-                  project.wiki_url ||
-                  project.discord_url) &&
-                project.donation_urls.length > 0
-              "
-            />
-            <a
-              v-for="(donation, index) in project.donation_urls"
-              :key="index"
-              :href="donation.url"
-              :target="$external()"
-              rel="noopener nofollow ugc"
-            >
-              <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true" />
-              <PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden="true" />
-              <KoFiIcon v-else-if="donation.id === 'ko-fi'" aria-hidden="true" />
-              <PayPalIcon v-else-if="donation.id === 'paypal'" aria-hidden="true" />
-              <OpenCollectiveIcon
-                v-else-if="donation.id === 'open-collective'"
-                aria-hidden="true"
-              />
-              <HeartIcon v-else-if="donation.id === 'github'" />
-              <CurrencyIcon v-else />
-              <span v-if="donation.id === 'bmac'">{{
-                formatMessage(linksMessages.donateBmac)
-              }}</span>
-              <span v-else-if="donation.id === 'patreon'">{{
-                formatMessage(linksMessages.donatePatreon)
-              }}</span>
-              <span v-else-if="donation.id === 'paypal'">{{
-                formatMessage(linksMessages.donatePayPal)
-              }}</span>
-              <span v-else-if="donation.id === 'ko-fi'">{{
-                formatMessage(linksMessages.donateKoFi)
-              }}</span>
-              <span v-else-if="donation.id === 'github'">{{
-                formatMessage(linksMessages.donateGithub)
-              }}</span>
-              <span v-else>{{ formatMessage(linksMessages.donateGeneric) }}</span>
-              <ExternalIcon aria-hidden="true" class="external-icon" />
-            </a>
-          </div>
-        </div>
-        <div class="card flex-card experimental-styles-within">
-          <h2>{{ formatMessage(creatorsMessages.title) }}</h2>
-          <div class="details-list">
-            <template v-if="organization">
-              <nuxt-link
-                class="details-list__item details-list__item--type-large"
-                :to="`/organization/${organization.slug}`"
-              >
-                <Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
-                <div class="rows">
-                  <span>
-                    {{ organization.name }}
-                  </span>
-                  <span class="details-list__item__text--style-secondary">Organization</span>
-                </div>
-              </nuxt-link>
-              <hr v-if="members.length > 0" />
-            </template>
-            <nuxt-link
-              v-for="member in members"
-              :key="`member-${member.id}`"
-              class="details-list__item details-list__item--type-large"
-              :to="'/user/' + member.user.username"
-            >
-              <Avatar :src="member.avatar_url" :alt="member.name" size="32px" circle />
-              <div class="rows">
-                <span class="flex items-center gap-1">
-                  {{ member.name }}
-                  <CrownIcon
-                    v-if="member.is_owner"
-                    v-tooltip="formatMessage(creatorsMessages.owner)"
-                    class="text-brand-orange"
-                  />
-                </span>
-                <span class="details-list__item__text--style-secondary">{{ member.role }}</span>
-              </div>
-            </nuxt-link>
-          </div>
-        </div>
+        />
+        <ProjectSidebarCreators
+          :organization="organization"
+          :members="members"
+          :org-link="(slug) => `/organization/${slug}`"
+          :user-link="(username) => `/user/${username}`"
+          class="card flex-card experimental-styles-within"
+        />
+        <!-- TODO: Finish license modal and enable -->
+        <ProjectSidebarDetails
+          v-if="false"
+          :project="project"
+          :has-versions="versions.length > 0"
+          :link-target="$external()"
+          class="card flex-card experimental-styles-within"
+        />
         <div class="card flex-card experimental-styles-within">
           <h2>{{ formatMessage(detailsMessages.title) }}</h2>
           <div class="details-list">
@@ -1002,23 +808,8 @@ import {
   UsersIcon,
   VersionIcon,
   WrenchIcon,
-  ClientIcon,
   BookTextIcon,
-  MonitorSmartphoneIcon,
-  WikiIcon,
-  DiscordIcon,
   CalendarIcon,
-  KoFiIcon,
-  BuyMeACoffeeIcon,
-  IssuesIcon,
-  UserIcon,
-  PayPalIcon,
-  ServerIcon,
-  PatreonIcon,
-  CrownIcon,
-  OpenCollectiveIcon,
-  CodeIcon,
-  CurrencyIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -1028,10 +819,16 @@ import {
   OverflowMenu,
   PopoutMenu,
   ScrollablePanel,
-  ContentPageHeader,
+  ProjectHeader,
+  ProjectSidebarCompatibility,
+  ProjectSidebarCreators,
+  ProjectSidebarLinks,
+  ProjectSidebarDetails,
+  ProjectBackgroundGradient,
 } from "@modrinth/ui";
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
 import dayjs from "dayjs";
+import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import Badge from "~/components/ui/Badge.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import NavStack from "~/components/ui/NavStack.vue";
@@ -1045,9 +842,7 @@ import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
 import Accordion from "~/components/ui/Accordion.vue";
 import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
-import VersionSummary from "~/components/ui/VersionSummary.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
-import { getVersionsToDisplay } from "~/helpers/projects.js";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const data = useNuxtApp();
@@ -1073,6 +868,8 @@ const showAllVersions = ref(false);
 const gameVersionFilterInput = ref();
 
 const versionFilter = ref("");
+
+const baseId = useId();
 
 const currentGameVersion = computed(() => {
   return (
@@ -1111,84 +908,6 @@ const getModrinthAppAccordion = ref();
 
 const formatRelativeTime = useRelativeTime();
 
-const compatibilityMessages = defineMessages({
-  title: {
-    id: "project.about.compatibility.title",
-    defaultMessage: "Compatibility",
-  },
-  minecraftJava: {
-    id: "project.about.compatibility.game.minecraftJava",
-    defaultMessage: "Minecraft: Java Edition",
-  },
-  platforms: {
-    id: "project.about.compatibility.platforms",
-    defaultMessage: "Platforms",
-  },
-  environments: {
-    id: "project.about.compatibility.environments",
-    defaultMessage: "Supported environments",
-  },
-});
-const linksMessages = defineMessages({
-  title: {
-    id: "project.about.links.title",
-    defaultMessage: "Links",
-  },
-  issues: {
-    id: "project.about.links.issues",
-    defaultMessage: "Report issues",
-  },
-  source: {
-    id: "project.about.links.source",
-    defaultMessage: "View source",
-  },
-  wiki: {
-    id: "project.about.links.wiki",
-    defaultMessage: "Visit wiki",
-  },
-  discord: {
-    id: "project.about.links.discord",
-    defaultMessage: "Join Discord server",
-  },
-  donateGeneric: {
-    id: "project.about.links.donate.generic",
-    defaultMessage: "Donate",
-  },
-  donateGitHub: {
-    id: "project.about.links.donate.github",
-    defaultMessage: "Sponsor on GitHub",
-  },
-  donateBmac: {
-    id: "project.about.links.donate.bmac",
-    defaultMessage: "Buy Me a Coffee",
-  },
-  donatePatreon: {
-    id: "project.about.links.donate.patreon",
-    defaultMessage: "Donate on Patreon",
-  },
-  donatePayPal: {
-    id: "project.about.links.donate.paypal",
-    defaultMessage: "Donate on PayPal",
-  },
-  donateKoFi: {
-    id: "project.about.links.donate.kofi",
-    defaultMessage: "Donate on Ko-fi",
-  },
-  donateGithub: {
-    id: "project.about.links.donate.github",
-    defaultMessage: "Sponsor on GitHub",
-  },
-});
-const creatorsMessages = defineMessages({
-  title: {
-    id: "project.about.creators.title",
-    defaultMessage: "Creators",
-  },
-  owner: {
-    id: "project.about.creators.owner",
-    defaultMessage: "Project owner",
-  },
-});
 const detailsMessages = defineMessages({
   title: {
     id: "project.about.details.title",

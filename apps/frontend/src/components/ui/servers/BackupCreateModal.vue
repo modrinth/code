@@ -44,7 +44,7 @@ import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { PlusIcon, XIcon, InfoIcon } from "@modrinth/assets";
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
 const emit = defineEmits(["backupCreated"]);

@@ -72,7 +72,7 @@
           </g>
         </g>
       </svg>
-      <ProgressBar class="loading-bar" :progress="loadingProgress" />
+      <ProgressBar class="loading-bar" :progress="Math.min(loadingProgress, 100)" />
       <span v-if="message">{{ message }}</span>
     </div>
     <div class="gradient-bg" data-tauri-drag-region></div>
@@ -86,8 +86,7 @@ import { ref, watch } from 'vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { loading_listener } from '@/helpers/events.js'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { XIcon } from '@modrinth/assets'
-import { MaximizeIcon, MinimizeIcon } from '@/assets/icons/index.js'
+import { XIcon, MaximizeIcon, MinimizeIcon } from '@modrinth/assets'
 import { getOS } from '@/helpers/utils.js'
 import { useLoading } from '@/store/loading.js'
 

@@ -1,0 +1,38 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Developer mode enabled."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Appearance"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Default instance options"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Feature flags"
+  },
+  "app.settings.tabs.java-versions": {
+    "message": "Java versions"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privacy"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Resource management"
+  },
+  "instance.filter.updates-available": {
+    "message": "Updates available"
+  },
+  "search.filter.locked.instance": {
+    "message": "Provided by the instance"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Game version is provided by the instance"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Loader is provided by the instance"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Sync with instance"
+  }
+}

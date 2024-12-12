@@ -25,7 +25,7 @@
     </div>
     <div
       class="border-0 border-b border-solid"
-      :class="danger ? 'border-[#cb2245] dark:border-[#612d38]' : 'border-button-bg'"
+      :class="danger ? 'border-[#cb2245] dark:border-[#612d38]' : 'border-divider'"
     ></div>
     <div class="mt-2 h-full w-full overflow-auto px-6">
       <slot />
