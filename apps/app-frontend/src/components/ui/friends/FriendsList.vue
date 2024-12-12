@@ -19,7 +19,7 @@ import dayjs from 'dayjs'
 
 const props = defineProps<{
   credentials: unknown | null
-  signIn: () => void
+  signIn: () => void2
 }>()
 
 const userCredentials = computed(() => props.credentials)

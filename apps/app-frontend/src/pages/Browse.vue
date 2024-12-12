@@ -2,14 +2,7 @@
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { Ref } from 'vue'
 import { SearchIcon, XIcon } from '@modrinth/assets'
-import type {
-  Category,
-  GameVersion,
-  Platform,
-  ProjectType,
-  SortType,
-  Tags
-} from '@modrinth/ui';
+import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
   SearchFilterControl,
   SearchSidebarFilter,
@@ -77,11 +70,11 @@ const newlyInstalled = ref([])
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
-await updateInstanceContext();
+await updateInstanceContext()
 
 watch(route, () => {
-  updateInstanceContext();
-});
+  updateInstanceContext()
+})
 
 async function updateInstanceContext() {
   if (route.query.i) {
@@ -96,13 +89,9 @@ async function updateInstanceContext() {
     instanceHideInstalled.value = route.query.ai === 'true'
   }
 
-  if (
-    instance.value &&
-    instance.value.path !== route.query.i &&
-    route.path.startsWith("/browse")
-  ) {
-    instance.value = null;
-    instanceHideInstalled.value = false;
+  if (instance.value && instance.value.path !== route.query.i && route.path.startsWith('/browse')) {
+    instance.value = null
+    instanceHideInstalled.value = false
   }
 }
 
@@ -353,22 +342,22 @@ const selectableProjectTypes = computed(() => {
 
 const messages = defineMessages({
   gameVersionProvidedByInstance: {
-    id: "search.filter.locked.instance-game-version.title",
-    defaultMessage: "Game version is provided by the instance",
+    id: 'search.filter.locked.instance-game-version.title',
+    defaultMessage: 'Game version is provided by the instance',
   },
   modLoaderProvidedByInstance: {
-    id: "search.filter.locked.instance-loader.title",
-    defaultMessage: "Loader is provided by the instance",
+    id: 'search.filter.locked.instance-loader.title',
+    defaultMessage: 'Loader is provided by the instance',
   },
   providedByInstance: {
-    id: "search.filter.locked.instance",
-    defaultMessage: "Provided by the instance",
+    id: 'search.filter.locked.instance',
+    defaultMessage: 'Provided by the instance',
   },
   syncFilterButton: {
-    id: "search.filter.locked.instance.sync",
-    defaultMessage: "Sync with instance",
+    id: 'search.filter.locked.instance.sync',
+    defaultMessage: 'Sync with instance',
   },
-});
+})
 
 await refreshSearch()
 </script>
