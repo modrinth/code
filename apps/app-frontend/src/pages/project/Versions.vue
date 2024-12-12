@@ -101,6 +101,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  project: {
+    type: Object,
+    required: true,
+  }
 })
 
 const [loaders, gameVersions] = await Promise.all([
@@ -109,7 +113,7 @@ const [loaders, gameVersions] = await Promise.all([
 ])
 
 const filterVersions = ref([])
-const filterLoader = ref(props.instance ? [props.instance?.loader] : [])
+const filterLoader = ref(props.project.project_type === 'mod' ? props.instance ? [props.instance?.loader] : [] : [])
 const filterGameVersions = ref(props.instance ? [props.instance?.game_version] : [])
 
 const currentPage = ref(1)
