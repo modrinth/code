@@ -1,4 +1,10 @@
 <template>
+  <div class="pointer-events-none fixed inset-0 z-[-1]">
+    <div id="fixed-background-teleport" class="relative"></div>
+  </div>
+  <div class="pointer-events-none absolute inset-0 z-[-1]">
+    <div id="absolute-background-teleport" class="relative"></div>
+  </div>
   <div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
     <div
       v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
@@ -1025,7 +1031,6 @@ function hideStagingBanner() {
 
 .layout {
   min-height: 100vh;
-  background-color: var(--color-bg);
   display: block;
 
   @media screen and (min-width: 1024px) {

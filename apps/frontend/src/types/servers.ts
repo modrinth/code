@@ -149,6 +149,17 @@ export type ServerState = "running" | "stopped" | "crashed";
 //   state: ServerState;
 // }
 
+export type Loaders =
+  | "Fabric"
+  | "Quilt"
+  | "Forge"
+  | "NeoForge"
+  | "Paper"
+  | "Spigot"
+  | "Bukkit"
+  | "Vanilla"
+  | "Purpur";
+
 export interface WSLogEvent {
   event: "log";
   message: string;

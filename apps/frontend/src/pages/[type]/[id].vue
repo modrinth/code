@@ -1,7 +1,7 @@
 <template>
-  <div v-if="flags.projectBackground" class="-z-1 pointer-events-none fixed inset-0">
+  <Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
     <ProjectBackgroundGradient :project="project" />
-  </div>
+  </Teleport>
   <div v-if="route.name.startsWith('type-id-settings')" class="normal-page">
     <div class="normal-page__sidebar">
       <aside class="universal-card">

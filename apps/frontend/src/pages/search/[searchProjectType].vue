@@ -6,6 +6,47 @@
     <Head>
       <Title>Search {{ projectType.display }}s - Modrinth</Title>
     </Head>
+    <Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
+      <div class="search-background"></div>
+    </Teleport>
+    <section class="normal-page__header mb-4 flex flex-col gap-4">
+      <template v-if="server">
+        <div
+          class="flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-divider pb-4"
+        >
+          <nuxt-link
+            :to="`/servers/manage/${server.serverId}/content`"
+            tabindex="-1"
+            class="flex flex-col gap-4 text-primary"
+          >
+            <span class="flex items-center gap-2">
+              <Avatar :src="server.general.image" size="48px" />
+              <span class="flex flex-col gap-2">
+                <span class="bold font-extrabold text-contrast">
+                  {{ server.general.name }}
+                </span>
+                <span class="flex items-center gap-2 font-semibold text-secondary">
+                  <GameIcon class="h-5 w-5 text-secondary" />
+                  {{ server.general.loader }} {{ server.general.mc_version }}
+                </span>
+              </span>
+            </span>
+          </nuxt-link>
+          <ButtonStyled>
+            <nuxt-link :to="`/servers/manage/${server.serverId}/content`">
+              <LeftArrowIcon /> Back to server
+            </nuxt-link>
+          </ButtonStyled>
+        </div>
+        <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
+          Install content to server
+        </h1>
+      </template>
+      <ContentPageHeader v-else>
+        <template #title> Discover content </template>
+      </ContentPageHeader>
+      <NavTabs v-if="!server" :links="selectableProjectTypes" class="hidden md:flex" />
+    </section>
     <aside
       :class="{
         'normal-page__sidebar': true,
@@ -83,37 +124,7 @@
       </div>
     </aside>
     <section class="normal-page__content">
-      <div
-        v-if="server"
-        class="mb-4 flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-divider pb-4"
-      >
-        <nuxt-link
-          :to="`/servers/manage/${server.serverId}/content`"
-          tabindex="-1"
-          class="flex flex-col gap-4 text-primary"
-        >
-          <span class="flex items-center gap-2">
-            <Avatar :src="server.general.image" size="48px" />
-            <span class="flex flex-col gap-2">
-              <span class="bold font-extrabold text-contrast">
-                {{ server.general.name }}
-              </span>
-              <span class="flex items-center gap-2 font-semibold text-secondary">
-                <GameIcon class="h-5 w-5 text-secondary" />
-                {{ server.general.loader }} {{ server.general.mc_version }}
-              </span>
-            </span>
-          </span>
-        </nuxt-link>
-        <ButtonStyled>
-          <nuxt-link :to="`/servers/manage/${server.serverId}/content`">
-            <LeftArrowIcon /> Back to server
-          </nuxt-link>
-        </ButtonStyled>
-      </div>
-
       <div class="flex flex-col gap-3">
-        <NavTabs v-if="!server" :links="selectableProjectTypes" class="hidden md:flex" />
         <div class="iconified-input w-full">
           <SearchIcon aria-hidden="true" class="text-lg" />
           <input
@@ -284,6 +295,7 @@ import {
   ButtonStyled,
   NewProjectCard,
   SearchFilterControl,
+  ContentPageHeader,
 } from "@modrinth/ui";
 import { CheckIcon, DownloadIcon, GameIcon, LeftArrowIcon, XIcon } from "@modrinth/assets";
 import { computed } from "vue";
@@ -453,8 +465,12 @@ async function serverInstall(project) {
       project.installed = true;
       navigateTo(`/servers/manage/${route.query.sid}/options/loader`);
     } else if (projectType.value.id === "mod") {
-      await server.value.mods.install(version.project_id, version.id);
-      await server.value.refresh(["mods"]);
+      await server.value.content.install("mod", version.project_id, version.id);
+      await server.value.refresh(["content"]);
+      project.installed = true;
+    } else if (projectType.value.id === "plugin") {
+      await server.value.content.install("plugin", version.project_id, version.id);
+      await server.value.refresh(["content"]);
       project.installed = true;
     }
   } catch (e) {
@@ -789,5 +805,16 @@ useSeoMeta({
     flex-wrap: nowrap !important;
     flex-direction: row !important;
   }
+}
+
+.search-background {
+  width: 100%;
+  height: 20rem;
+  background-image: url("https://minecraft.wiki/images/The_Garden_Awakens_Key_Art_No_Creaking.jpg?9968c");
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, black, transparent);
+  opacity: 0.25;
 }
 </style>

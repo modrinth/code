@@ -41,7 +41,6 @@ div {
   width: 100%;
   height: 60rem;
   background: linear-gradient(to bottom, var(--_color), transparent);
-  z-index: -1;
   opacity: 0.075;
 }
 </style>
