@@ -453,8 +453,12 @@ async function serverInstall(project) {
       project.installed = true;
       navigateTo(`/servers/manage/${route.query.sid}/options/loader`);
     } else if (projectType.value.id === "mod") {
-      await server.value.mods.install(version.project_id, version.id);
-      await server.value.refresh(["mods"]);
+      await server.value.content.install("mod", version.project_id, version.id);
+      await server.value.refresh(["content"]);
+      project.installed = true;
+    } else if (projectType.value.id === "plugin") {
+      await server.value.content.install("plugin", version.project_id, version.id);
+      await server.value.refresh(["content"]);
       project.installed = true;
     }
   } catch (e) {

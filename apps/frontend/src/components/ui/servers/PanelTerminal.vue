@@ -136,14 +136,17 @@
 <script setup lang="ts">
 import { RightArrowIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { usePyroConsole } from "~/store/console.ts";
 
 const { $cosmetics } = useNuxtApp();
 const cosmetics = $cosmetics;
 
 const props = defineProps<{
-  consoleOutput: string[];
   fullScreen: boolean;
 }>();
+
+const pyroConsole = usePyroConsole();
+const consoleOutput = pyroConsole.output;
 
 const scrollContainer = ref<HTMLElement | null>(null);
 const itemHeights = ref<number[]>([]);
@@ -170,7 +173,7 @@ const handleScrollEvent = () => {
 const totalHeight = computed(
   () =>
     itemHeights.value.reduce((sum, height) => sum + height, 0) ||
-    props.consoleOutput.length * averageItemHeight.value,
+    consoleOutput.value.length * averageItemHeight.value,
 );
 
 watch(totalHeight, () => {
@@ -223,7 +226,7 @@ const visibleStartIndex = computed(() => {
   let index = 0;
   let offset = 0;
   while (
-    index < props.consoleOutput.length &&
+    index < consoleOutput.value.length &&
     offset < scrollTop.value - bufferSize * averageItemHeight.value
   ) {
     offset += itemHeights.value[index] || averageItemHeight.value;
@@ -236,17 +239,17 @@ const visibleEndIndex = computed(() => {
   let index = visibleStartIndex.value;
   let offset = getItemOffset(index);
   while (
-    index < props.consoleOutput.length &&
+    index < consoleOutput.value.length &&
     offset < scrollTop.value + clientHeight.value + bufferSize * averageItemHeight.value
   ) {
     offset += itemHeights.value[index] || averageItemHeight.value;
     index++;
   }
-  return Math.min(props.consoleOutput.length - 1, index);
+  return Math.min(consoleOutput.value.length - 1, index);
 });
 
 const visibleItems = computed(() =>
-  props.consoleOutput.slice(visibleStartIndex.value, visibleEndIndex.value + 1),
+  consoleOutput.value.slice(visibleStartIndex.value, visibleEndIndex.value + 1),
 );
 
 const offsetY = computed(() => getItemOffset(visibleStartIndex.value));
@@ -280,7 +283,7 @@ const updateItemHeights = async () => {
     const index = visibleStartIndex.value + idx;
     const height = el.getBoundingClientRect().height;
     itemHeights.value[index] = height;
-    const content = props.consoleOutput[index];
+    const content = consoleOutput.value[index];
     if (content) {
       cachedHeights.value.set(content, height);
     }
@@ -457,7 +460,7 @@ const initializeTerminal = async () => {
 
   updateClientHeight();
 
-  const initialHeights = props.consoleOutput.map(
+  const initialHeights = consoleOutput.value.map(
     (content) => cachedHeights.value.get(content) || averageItemHeight.value,
   );
   itemHeights.value = initialHeights;
@@ -487,7 +490,7 @@ onUnmounted(() => {
 });
 
 watch(
-  () => props.consoleOutput,
+  () => consoleOutput.value,
   async (newOutput) => {
     const newItemsCount = newOutput.length - itemHeights.value.length;
 

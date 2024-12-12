@@ -104,7 +104,7 @@ const modal = ref<InstanceType<typeof NewModal>>();
 
 const initialSettings = ref<{ interval: number; enabled: boolean } | null>(null);
 const autoBackupEnabled = ref(false);
-const autoBackupInterval = ref(1);
+const autoBackupInterval = ref(6);
 const isLoadingSettings = ref(true);
 const isSaving = ref(false);
 
@@ -134,7 +134,7 @@ const fetchSettings = async () => {
     const settings = await props.server.backups?.getAutoBackup();
     initialSettings.value = settings as { interval: number; enabled: boolean };
     autoBackupEnabled.value = settings?.enabled ?? false;
-    autoBackupInterval.value = settings?.interval || 1;
+    autoBackupInterval.value = settings?.interval || 6;
   } catch (error) {
     console.error("Error fetching backup settings:", error);
     addNotification({

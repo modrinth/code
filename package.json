@@ -23,7 +23,7 @@
     "turbo": "^2.2.3",
     "vue": "^3.5.13"
   },
-  "packageManager": "pnpm@9.4.0",
+  "packageManager": "pnpm@9.15.0",
   "pnpm": {
     "patchedDependencies": {
       "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"

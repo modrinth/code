@@ -38,10 +38,7 @@ Follow the project-specific instructions below to get started:
 - [Minotaur (Gradle plugin)](/contributing/minotaur)
 - [Labrinth (API/backend)](/contributing/labrinth)
 - [Daedalus (Metadata service)](/contributing/daedalus)
-
-### Documentation
-
-The [documentation](https://github.com/modrinth/docs) (which you are reading right now!) is the place to find any and all general information about Modrinth and its API. The instructions are largely the same as [knossos](#knossos-frontend), except that the docs have no lint.
+- [Docs (Developer/Contributor Documentation)](/contributing/docs)
 
 [Discord]: https://discord.modrinth.com
 [GitHub]: https://github.com/modrinth
@@ -49,5 +46,6 @@ The [documentation](https://github.com/modrinth/docs) (which you are reading rig
 [labrinth]: https://github.com/modrinth/labrinth
 [theseus]: https://github.com/modrinth/theseus
 [minotaur]: https://github.com/modrinth/minotaur
+[docs]: https://github.com/modrinth/code/tree/main/apps/docs
 [Rust]: https://www.rust-lang.org/tools/install
 [pnpm]: https://pnpm.io

@@ -1,7 +1,35 @@
 <template>
   <div class="contents">
     <div
-      v-if="server.error && server.error.message.includes('Forbidden')"
+      v-if="serverData?.status === 'suspended'"
+      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    >
+      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+              <LockIcon class="size-12 text-orange" />
+            </div>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server Suspended</h1>
+          </div>
+          <p class="text-lg text-secondary">
+            {{
+              serverData.suspension_reason
+                ? `Your server has been suspended: ${serverData.suspension_reason}`
+                : "Your server has been suspended."
+            }}
+            <br />
+            This is most likely due to a billing issue. Please check your billing information and
+            contact Modrinth support if you believe this is an error.
+          </p>
+        </div>
+        <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
+          <button class="mt-6 !w-full">Go to billing</button>
+        </ButtonStyled>
+      </div>
+    </div>
+    <div
+      v-else-if="server.error && server.error.message.includes('Forbidden')"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -128,11 +156,11 @@
           class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
         >
           <div class="flex flex-row gap-4">
-            <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
+            <IssuesIcon class="hidden h-8 w-8 shrink-0 text-red sm:block" />
             <div class="flex flex-col gap-2 leading-[150%]">
               <div class="flex items-center gap-3">
-                <IssuesIcon class="block h-8 w-8 text-red sm:hidden" />
-                <div class="flex gap-2 text-xl font-bold">{{ errorTitle }}</div>
+                <IssuesIcon class="flex h-8 w-8 shrink-0 text-red sm:hidden" />
+                <div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
               </div>
 
               <div
@@ -174,6 +202,14 @@
                   An internal error occurred while installing your server. Don't fret — try
                   reinstalling your server, and if the problem persists, please contact Modrinth
                   support with your server's debug information.
+                </div>
+                <div
+                  v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
+                >
+                  An error occurred while installing your server because Modrinth Servers does not
+                  support the version of Minecraft or the loader you specified. Try reinstalling
+                  your server with a different version or loader, and if the problem persists,
+                  please contact Modrinth support with your server's debug information.
                 </div>
 
                 <div
@@ -240,7 +276,6 @@
           :stats="stats"
           :server-power-state="serverPowerState"
           :power-state-details="powerStateDetails"
-          :console-output="throttledConsoleOutput"
           :socket="socket"
           :server="server"
           @reinstall="onReinstall"
@@ -262,12 +297,13 @@ import {
   CheckIcon,
   FileIcon,
   TransferIcon,
+  LockIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
-import { refThrottled } from "@vueuse/core";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
+import { usePyroConsole } from "~/store/console.ts";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
@@ -294,7 +330,7 @@ const router = useRouter();
 const serverId = route.params.id as string;
 const server = await usePyroServer(serverId, [
   "general",
-  "mods",
+  "content",
   "backups",
   "network",
   "startup",
@@ -305,6 +341,7 @@ const server = await usePyroServer(serverId, [
 watch(
   () => server.error,
   (newError) => {
+    if (server.general?.status === "suspended") return;
     if (newError && !newError.message.includes("Forbidden")) {
       startPolling();
     }
@@ -319,9 +356,8 @@ const serverData = computed(() => server.general);
 const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
-const maxConsoleOutput = 5000;
-const consoleOutput = ref<string[]>([]);
-const throttledConsoleOutput = refThrottled(consoleOutput, 200);
+const pyroConsole = usePyroConsole();
+console.log("||||||||||||||||||||||| console", pyroConsole.output);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
@@ -401,7 +437,7 @@ const connectWebSocket = () => {
         return;
       }
 
-      consoleOutput.value = [];
+      pyroConsole.clear();
       socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
       isConnected.value = true;
       isReconnecting.value = false;
@@ -409,7 +445,7 @@ const connectWebSocket = () => {
 
       if (firstConnect.value) {
         for (let i = 0; i < initialConsoleMessage.length; i++) {
-          consoleOutput.value.push(initialConsoleMessage[i]);
+          pyroConsole.addLine(initialConsoleMessage[i]);
         }
       }
 
@@ -432,9 +468,7 @@ const connectWebSocket = () => {
 
     socket.value.onclose = () => {
       if (isMounted.value) {
-        consoleOutput.value.push(
-          "\nSomething went wrong with the connection, we're reconnecting...",
-        );
+        pyroConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
         isConnected.value = false;
         scheduleReconnect();
       }
@@ -492,10 +526,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
     case "log":
       // eslint-disable-next-line no-case-declarations
       const log = data.message.split("\n").filter((l) => l.trim());
-      if (consoleOutput.value.length > maxConsoleOutput) {
-        consoleOutput.value.shift();
-      }
-      consoleOutput.value.push(...log);
+      pyroConsole.addLines(log);
       break;
     case "stats":
       updateStats(data);
@@ -518,7 +549,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
       handleInstallationResult(data);
       break;
     case "new-mod":
-      server.refresh(["mods"]);
+      server.refresh(["content"]);
       console.log("New mod:", data);
       break;
     case "auth-ok":
@@ -585,7 +616,7 @@ const onReinstall = (potentialArgs: any) => {
   // serverData.value.loader_version = potentialArgs.lVersion;
   // serverData.value.mc_version = potentialArgs.mVersion;
   // if (potentialArgs?.loader) {
-  //   console.log("setting loader to", potentialArgs.loader);
+  //   console.log("setting loadeconsole
   //   serverData.value.loader = potentialArgs.loader;
   // }
   // if (potentialArgs?.lVersion) {
