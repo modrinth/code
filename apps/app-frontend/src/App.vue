@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref, onMounted, watch, onUnmounted } from 'vue'
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
@@ -56,6 +56,7 @@ import dayjs from 'dayjs'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import { open as openURL } from '@tauri-apps/plugin-shell'
 
 const themeStore = useTheming()
 
@@ -110,6 +111,14 @@ const isMaximized = ref(false)
 
 onMounted(async () => {
   await useCheckDisableMouseover()
+
+  document.querySelector('body').addEventListener('click', handleClick)
+  document.querySelector('body').addEventListener('auxclick', handleAuxClick)
+})
+
+onUnmounted(() => {
+  document.querySelector('body').removeEventListener('click', handleClick)
+  document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 })
 
 async function setupApp() {
@@ -309,6 +318,42 @@ async function checkUpdates() {
     },
     5 * 1000 * 60,
   )
+}
+
+function handleClick(e) {
+  let target = e.target
+  while (target != null) {
+    if (target.matches('a')) {
+      if (
+        target.href &&
+        ['http://', 'https://', 'mailto:', 'tel:'].some((v) => target.href.startsWith(v)) &&
+        !target.classList.contains('router-link-active') &&
+        !target.href.startsWith('http://localhost') &&
+        !target.href.startsWith('https://tauri.localhost') &&
+        !target.href.startsWith('http://tauri.localhost') &&
+        target.target !== '_blank'
+      ) {
+        openURL(target.href)
+      }
+      e.preventDefault()
+      break
+    }
+    target = target.parentElement
+  }
+}
+
+function handleAuxClick(e) {
+  // disables middle click -> new tab
+  if (e.button === 1) {
+    e.preventDefault()
+    // instead do a left click
+    const event = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    })
+    e.target.dispatchEvent(event)
+  }
 }
 </script>
 
