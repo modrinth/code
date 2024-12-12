@@ -76,11 +76,19 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   }
 
   &.bottom-fade {
-    mask-image: linear-gradient(rgb(0 0 0 / 100%) calc(100% - var(--_fade-height)), transparent 100%);
+    mask-image: linear-gradient(
+      rgb(0 0 0 / 100%) calc(100% - var(--_fade-height)),
+      transparent 100%
+    );
   }
 
   &.top-fade.bottom-fade {
-    mask-image: linear-gradient(transparent, rgb(0 0 0 / 100%) var(--_fade-height), rgb(0 0 0 / 100%) calc(100% - var(--_fade-height)), transparent 100%);
+    mask-image: linear-gradient(
+      transparent,
+      rgb(0 0 0 / 100%) var(--_fade-height),
+      rgb(0 0 0 / 100%) calc(100% - var(--_fade-height)),
+      transparent 100%
+    );
   }
 }
 .scrollable-pane {

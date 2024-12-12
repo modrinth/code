@@ -60,7 +60,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { GapIcon, ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
-import Button from './Button.vue'
 import ButtonStyled from './ButtonStyled.vue'
 
 const emit = defineEmits<{

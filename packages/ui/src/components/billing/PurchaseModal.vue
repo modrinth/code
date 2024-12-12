@@ -942,7 +942,6 @@ async function submitPayment() {
 
 defineExpose({
   show: () => {
-     
     stripe = Stripe(props.publishableKey)
 
     selectedPlan.value = 'yearly'

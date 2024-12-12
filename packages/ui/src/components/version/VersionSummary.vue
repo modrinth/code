@@ -30,18 +30,18 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, VersionChannelIndicator } from "../index";
-import { DownloadIcon, ExternalIcon } from "@modrinth/assets";
-import { computed } from "vue";
+import { ButtonStyled, VersionChannelIndicator } from '../index'
+import { DownloadIcon, ExternalIcon } from '@modrinth/assets'
+import { computed } from 'vue'
 
 const props = defineProps<{
-  version: Version;
-}>();
+  version: Version
+}>()
 
 const downloadUrl = computed(() => {
-  const primary: VersionFile = props.version.files.find((x) => x.primary) || props.version.files[0];
-  return primary.url;
-});
+  const primary: VersionFile = props.version.files.find((x) => x.primary) || props.version.files[0]
+  return primary.url
+})
 
-const emit = defineEmits(["onDownload", "onNavigate"]);
+const emit = defineEmits(['onDownload', 'onNavigate'])
 </script>
