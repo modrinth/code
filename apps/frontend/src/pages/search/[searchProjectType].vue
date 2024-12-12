@@ -84,6 +84,13 @@
             </button>
           </ButtonStyled>
         </div>
+        <div v-if="server && projectType.id === 'modpack'" class="rounded-2xl bg-bg-raised p-4">
+          <Checkbox
+            v-model="eraseDataOnInstall"
+            label="Erase all data when installing"
+            class="filter-checkbox"
+          />
+        </div>
         <div v-if="server" class="rounded-2xl bg-bg-raised p-4">
           <Checkbox
             v-model="serverHideInstalled"
@@ -328,6 +335,7 @@ const projectTypes = computed(() => [projectType.value.id]);
 
 const server = ref();
 const serverHideInstalled = ref(false);
+const eraseDataOnInstall = ref(false);
 
 const PERSISTENT_QUERY_PARAMS = ["sid", "shi"];
 
@@ -461,7 +469,14 @@ async function serverInstall(project) {
       ) ?? versions[0];
 
     if (projectType.value.id === "modpack") {
-      await server.value.general?.reinstall(route.query.sid, false, project.project_id, version.id);
+      await server.value.general?.reinstall(
+        route.query.sid,
+        false,
+        project.project_id,
+        version.id,
+        undefined,
+        eraseDataOnInstall.value,
+      );
       project.installed = true;
       navigateTo(`/servers/manage/${route.query.sid}/options/loader`);
     } else if (projectType.value.id === "mod") {
