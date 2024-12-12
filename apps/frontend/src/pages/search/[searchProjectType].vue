@@ -87,7 +87,7 @@
         <div v-if="server && projectType.id === 'modpack'" class="rounded-2xl bg-bg-raised p-4">
           <Checkbox
             v-model="eraseDataOnInstall"
-            label="Erase all data when installing"
+            label="Erase all data on install"
             class="filter-checkbox"
           />
         </div>
