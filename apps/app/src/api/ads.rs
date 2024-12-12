@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, Runtime};
+use tauri::{LogicalPosition, LogicalSize, Manager, Runtime};
 use tauri_plugin_shell::ShellExt;
 use theseus::settings;
 use tokio::sync::RwLock;

@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import type { RouteLocationRaw } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router'
 import { useRoute, RouterLink } from 'vue-router'
 
 const route = useRoute()
@@ -69,13 +69,10 @@ function pickLink() {
   for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
     const link = filteredLinks.value[i]
 
-
     if (route.path === (typeof link.href === 'string' ? link.href : link.href.path)) {
       index = i
       break
-    } else if (
-      (link.subpages && link.subpages.some((subpage) => route.path.includes(subpage)))
-    ) {
+    } else if (link.subpages && link.subpages.some((subpage) => route.path.includes(subpage))) {
       index = i
       subpageSelected.value = true
       break

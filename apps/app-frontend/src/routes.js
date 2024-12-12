@@ -49,7 +49,7 @@ export default new createRouter({
           name: 'Custom',
           component: Library.Custom,
         },
-      ]
+      ],
     },
     {
       path: '/project/:id',

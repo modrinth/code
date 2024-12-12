@@ -23,24 +23,7 @@
       />
     </Teleport>
     <div class="flex flex-col gap-4 p-6">
-      <Card v-if="instance" class="small-instance">
-        <router-link class="instance" :to="`/instance/${encodeURIComponent(instance.path)}`">
-          <Avatar
-            :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-            :alt="instance.name"
-            size="sm"
-          />
-          <div class="small-instance_info">
-            <span class="title">{{
-              instance.name.length > 20 ? instance.name.substring(0, 20) + '...' : instance.name
-            }}</span>
-            <span>
-              {{ instance.loader.charAt(0).toUpperCase() + instance.loader.slice(1) }}
-              {{ instance.game_version }}
-            </span>
-          </div>
-        </router-link>
-      </Card>
+      <InstanceIndicator v-if="instance" :instance="instance" />
       <template v-if="data">
         <Teleport v-if="themeStore.featureFlag_projectBackground" to="#background-teleport-target">
           <ProjectBackgroundGradient :project="data" />
@@ -62,33 +45,33 @@
               <OverflowMenu
                 :tooltip="`More options`"
                 :options="[
-                {
-                  id: 'follow',
-                  disabled: true,
-                  tooltip: 'Coming soon',
-                  action: () => {},
-                },
-                {
-                  id: 'save',
-                  disabled: true,
-                  tooltip: 'Coming soon',
-                  action: () => {},
-                },
-                {
-                  id: 'open-in-browser',
-                  link: `https://modrinth.com/${data.project_type}/${data.slug}`,
-                  external: true,
-                },
-                {
-                  divider: true,
-                },
-                {
-                  id: 'report',
-                  color: 'red',
-                  hoverFilled: true,
-                  link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
-                },
-              ]"
+                  {
+                    id: 'follow',
+                    disabled: true,
+                    tooltip: 'Coming soon',
+                    action: () => {},
+                  },
+                  {
+                    id: 'save',
+                    disabled: true,
+                    tooltip: 'Coming soon',
+                    action: () => {},
+                  },
+                  {
+                    id: 'open-in-browser',
+                    link: `https://modrinth.com/${data.project_type}/${data.slug}`,
+                    external: true,
+                  },
+                  {
+                    divider: true,
+                  },
+                  {
+                    id: 'report',
+                    color: 'red',
+                    hoverFilled: true,
+                    link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
+                  },
+                ]"
                 aria-label="More options"
               >
                 <MoreVerticalIcon aria-hidden="true" />
@@ -109,7 +92,7 @@
             {
               label: 'Versions',
               href: `/project/${$route.params.id}/versions`,
-              subpages: [ 'version' ]
+              subpages: ['version'],
             },
             {
               label: 'Gallery',
@@ -152,15 +135,14 @@ import {
   ClipboardCopyIcon,
 } from '@modrinth/assets'
 import {
-  Card,
-  Avatar,
   ProjectHeader,
   ProjectSidebarCompatibility,
   ButtonStyled,
   OverflowMenu,
   ProjectSidebarLinks,
   ProjectSidebarCreators,
-  ProjectSidebarDetails, ProjectBackgroundGradient
+  ProjectSidebarDetails,
+  ProjectBackgroundGradient,
 } from '@modrinth/ui'
 
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
@@ -171,12 +153,12 @@ import { useRoute } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { install as installVersion } from '@/store/install.js'
 import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { useTheming } from '@/store/state.js'
+import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 
 dayjs.extend(relativeTime)
 
@@ -436,30 +418,6 @@ const handleOptionsClick = (args) => {
 
   :deep(svg) {
     color: var(--color-contrast);
-  }
-}
-
-.small-instance {
-  padding: var(--gap-lg);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--gap-md);
-
-  .instance {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0;
-
-    .title {
-      font-weight: 600;
-      color: var(--color-contrast);
-    }
-  }
-
-  .small-instance_info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 0.25rem 0;
   }
 }
 

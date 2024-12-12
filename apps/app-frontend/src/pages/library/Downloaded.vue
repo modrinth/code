@@ -9,5 +9,9 @@ defineProps({
 })
 </script>
 <template>
-  <GridDisplay v-if="instances.length > 0" label="Instances" :instances="instances.filter(i => i.linked_data)" />
+  <GridDisplay
+    v-if="instances.length > 0"
+    label="Instances"
+    :instances="instances.filter((i) => i.linked_data)"
+  />
 </template>

@@ -260,6 +260,7 @@ fn main() {
         .plugin(api::utils::init())
         .plugin(api::cache::init())
         .plugin(api::ads::init())
+        .plugin(api::friends::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,

@@ -119,20 +119,27 @@ const osVersion = getOsVersion()
         </button>
 
         <div class="mt-auto text-secondary text-sm">
-          <p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">{{ formatMessage(developerModeEnabled) }}</p>
+          <p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">
+            {{ formatMessage(developerModeEnabled) }}
+          </p>
           <div class="flex items-center gap-3">
             <button
-              class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation" :class="{ 'text-brand': themeStore.devMode, 'text-secondary': !themeStore.devMode }" @click="() => {
-            devModeCounter++
-            if (devModeCounter > 5) {
-              themeStore.devMode = !themeStore.devMode
-              devModeCounter = 0
+              class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation"
+              :class="{ 'text-brand': themeStore.devMode, 'text-secondary': !themeStore.devMode }"
+              @click="
+                () => {
+                  devModeCounter++
+                  if (devModeCounter > 5) {
+                    themeStore.devMode = !themeStore.devMode
+                    devModeCounter = 0
 
-              if (!themeStore.devMode && tabs[selectedTab].developerOnly === true) {
-                selectedTab = 0
-              }
-            }
-          }">
+                    if (!themeStore.devMode && tabs[selectedTab].developerOnly === true) {
+                      selectedTab = 0
+                    }
+                  }
+                }
+              "
+            >
               <ModrinthIcon class="w-6 h-6" />
             </button>
             <div>

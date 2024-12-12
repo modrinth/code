@@ -55,6 +55,7 @@ import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
+import FriendsList from '@/components/ui/friends/FriendsList.vue'
 
 const themeStore = useTheming()
 
@@ -255,7 +256,7 @@ watch(
   hasPlus,
   () => {
     if (hasPlus.value) {
-      hide_ads_window()
+      hide_ads_window(true)
     } else {
       show_ads_window()
     }
@@ -428,13 +429,19 @@ async function checkUpdates() {
       >
         <ModrinthLoadingIndicator />
       </div>
-      <div v-if="themeStore.featureFlag_pagePath" class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50">
+      <div
+        v-if="themeStore.featureFlag_pagePath"
+        class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50"
+      >
         {{ route.fullPath }}
       </div>
       <div
-        id="background-teleport-target" class="absolute h-full -z-10 rounded-tl-[--radius-xl] overflow-hidden" :style="{
-        width: 'calc(100% - var(--right-bar-width))',
-      }"></div>
+        id="background-teleport-target"
+        class="absolute h-full -z-10 rounded-tl-[--radius-xl] overflow-hidden"
+        :style="{
+          width: 'calc(100% - var(--right-bar-width))',
+        }"
+      ></div>
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
@@ -460,12 +467,9 @@ async function checkUpdates() {
             </suspense>
           </div>
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-            <h3 class="text-lg m-0">Friends</h3>
-            <p class="m-0">
-              You have no friends :c. <br />
-              <br />
-              <span>Sign in</span> to add friends!
-            </p>
+            <suspense>
+              <FriendsList :credentials="credentials" :sign-in="() => signIn()" />
+            </suspense>
           </div>
           <div class="pt-4 flex flex-col">
             <h3 class="px-4 text-lg m-0">News</h3>

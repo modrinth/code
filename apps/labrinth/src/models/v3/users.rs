@@ -191,8 +191,11 @@ impl Role {
 
 #[derive(Serialize, Deserialize)]
 pub struct UserFriend {
+    // The user who accepted the friend request
     pub id: UserId,
-    pub pending: bool,
+    /// THe user who sent the friend request
+    pub friend_id: UserId,
+    pub accepted: bool,
     pub created: DateTime<Utc>,
 }
 
@@ -202,7 +205,8 @@ impl UserFriend {
     ) -> Self {
         Self {
             id: data.friend_id.into(),
-            pending: data.accepted,
+            friend_id: data.user_id.into(),
+            accepted: data.accepted,
             created: data.created,
         }
     }
