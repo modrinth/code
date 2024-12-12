@@ -62,12 +62,12 @@ const themeStore = useTheming()
 
 const news = ref([
   {
-    title: 'Modrinth App 0.9.0',
-    summary: 'An all-new UI, Modrinth Servers, and support for collections.',
+    title: 'Introducing Modrinth Servers',
+    summary: 'Host your next Minecraft server with Modrinth.',
     thumbnail:
-      'https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/publication/thumbnail/a49f8e1b-3835-4ea1-a85b-118c6425ebc3/landscape_1667087426098458.png',
-    date: '2024-10-11T00:00:00Z',
-    link: 'https://blog.modrinth.com/p/creator-revenue-update',
+      'https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/asset/file/eefddc59-b4c4-4e7d-92e8-c26bdef42984/Modrinth-Servers-Thumb.png',
+    date: '2024-11-02T00:00:00Z',
+    link: 'https://blog.modrinth.com/p/modrinth-servers-beta',
   },
   {
     title: 'Becoming Sustainable',
