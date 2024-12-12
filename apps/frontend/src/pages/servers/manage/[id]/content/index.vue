@@ -102,7 +102,7 @@
           <ButtonStyled v-if="hasMods" color="brand" type="outlined">
             <nuxt-link
               class="w-full text-nowrap sm:w-fit"
-              :to="`/${type}s?sid=${props.server.serverId}`"
+              :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
             >
               <PlusIcon />
               Add {{ type }}
@@ -241,7 +241,7 @@
         <p class="m-0 font-bold text-contrast">No {{ type }}s found!</p>
         <p class="m-0">Add some {{ type }}s to your server to manage them here.</p>
         <ButtonStyled color="brand">
-          <NuxtLink :to="`/${type}s?sid=${props.server.serverId}`">
+          <NuxtLink :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`">
             <PlusIcon />
             Add {{ type }}
           </NuxtLink>

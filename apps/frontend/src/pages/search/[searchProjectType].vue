@@ -238,7 +238,7 @@
                   <button
                     v-if="
                       result.installed ||
-                      server.mods.data.find((x) => x.project_id === result.project_id) ||
+                      server.content.data.find((x) => x.project_id === result.project_id) ||
                       server.general?.project?.id === result.project_id
                     "
                     disabled
@@ -342,7 +342,7 @@ async function updateServerContext() {
     if (!auth.value.user) {
       router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
     } else if (route.query.sid !== null) {
-      server.value = await usePyroServer(route.query.sid, ["general", "mods"]);
+      server.value = await usePyroServer(route.query.sid, ["general", "content"]);
     }
   }
 
@@ -382,7 +382,7 @@ const serverFilters = computed(() => {
     }
 
     if (serverHideInstalled.value) {
-      const installedMods = server.value.mods?.data
+      const installedMods = server.value.content?.data
         .filter((x) => x.project_id)
         .map((x) => x.project_id);
 
