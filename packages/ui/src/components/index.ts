@@ -71,8 +71,9 @@ export { default as BrowseFiltersPanel } from './search/BrowseFiltersPanel.vue'
 export { default as Categories } from './search/Categories.vue'
 export { default as SearchDropdown } from './search/SearchDropdown.vue'
 export { default as SearchFilter } from './search/SearchFilter.vue'
-export { default as SearchSidebarFilter } from './search/SearchSidebarFilter.vue'
+export { default as SearchFilterControl } from './search/SearchFilterControl.vue'
 export { default as SearchFilterOption } from './search/SearchFilterOption.vue'
+export { default as SearchSidebarFilter } from './search/SearchSidebarFilter.vue'
 
 // Billing
 export { default as PurchaseModal } from './billing/PurchaseModal.vue'

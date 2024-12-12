@@ -335,6 +335,21 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Unlisted by staff"
   },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filter locked"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Unlocking this filter may allow you to install incompatible content."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Sync filter"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} is locked"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Unlock filter"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"
   },

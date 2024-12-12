@@ -72,6 +72,13 @@
           <template #header>
             <h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
           </template>
+          <template #locked-game_version>
+            {{ formatMessage(messages.gameVersionProvidedByServer) }}
+          </template>
+          <template #locked-mod_loader>
+            {{ formatMessage(messages.modLoaderProvidedByServer) }}
+          </template>
+          <template #sync-button> {{ formatMessage(messages.syncFilterButton) }} </template>
         </SearchSidebarFilter>
       </div>
     </aside>
@@ -171,6 +178,13 @@
             @switch-page="setPage"
           />
         </div>
+        <SearchFilterControl
+          v-model:selected-filters="currentFilters"
+          :filters="filters.filter((f) => f.display !== 'none')"
+          :provided-filters="serverFilters"
+          :overridden-provided-filter-types="overriddenProvidedFilterTypes"
+          :provided-message="messages.providedByServer"
+        />
         <LogoAnimated v-if="searchLoading && !noLoad" />
         <div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
           <p>No results found for your query!</p>
@@ -269,6 +283,7 @@ import {
   Button,
   ButtonStyled,
   NewProjectCard,
+  SearchFilterControl,
 } from "@modrinth/ui";
 import { CheckIcon, DownloadIcon, GameIcon, LeftArrowIcon, XIcon } from "@modrinth/assets";
 import { computed } from "vue";
@@ -282,6 +297,8 @@ import ListIcon from "~/assets/images/utils/list.svg?component";
 import ImageIcon from "~/assets/images/utils/image.svg?component";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
+
+const { formatMessage } = useVIntl();
 
 const filtersMenuOpen = ref(false);
 
@@ -399,6 +416,25 @@ const {
   // Functions
   createPageParams,
 } = useSearch(projectTypes, tags, serverFilters);
+
+const messages = defineMessages({
+  gameVersionProvidedByServer: {
+    id: "search.filter.locked.server-game-version.title",
+    defaultMessage: "Game version is provided by the server",
+  },
+  modLoaderProvidedByServer: {
+    id: "search.filter.locked.server-loader.title",
+    defaultMessage: "Loader is provided by the server",
+  },
+  providedByServer: {
+    id: "search.filter.locked.server",
+    defaultMessage: "Provided by the server",
+  },
+  syncFilterButton: {
+    id: "search.filter.locked.server.sync",
+    defaultMessage: "Sync with server",
+  },
+});
 
 async function serverInstall(project) {
   project.installing = true;
