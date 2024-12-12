@@ -180,8 +180,7 @@ pub async fn ws_init(
                 }
 
                 Ok(AggregatedMessage::Ping(msg)) => {
-                    if let Some(mut socket) =
-                        db.auth_sockets.get_mut(&user.id.into())
+                    if let Some(mut socket) = db.auth_sockets.get_mut(&user.id)
                     {
                         let (_, socket) = socket.value_mut();
                         let _ = socket.pong(&msg).await;
