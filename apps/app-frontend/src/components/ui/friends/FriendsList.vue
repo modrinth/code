@@ -157,20 +157,19 @@ const unlisten = await friend_listener(() => loadFriends())
 onUnmounted(() => {
   unlisten()
 })
-// TODO: Remove friends menu
 </script>
 
 <template>
   <NewModal ref="manageFriendsModal" header="Manage friends">
     <p v-if="acceptedFriends.length === 0">You have no friends :C</p>
-    <div v-else class="flex flex-col gap-4">
-      <input type="text" placeholder="Search friends..." class="w-full" />
+    <div v-else class="flex flex-col gap-4 min-w-[20rem]">
+      <input v-model="search" type="text" placeholder="Search friends..." class="w-full" />
       <div
-        v-for="friend in acceptedFriends.filter((x) =>
-          x.username.toLowerCase().includes(search.value),
+        v-for="friend in acceptedFriends.filter(
+          (x) => !search || x.username.toLowerCase().includes(search),
         )"
         :key="friend.username"
-        class="flex gap-2 items-center min-w-[20rem]"
+        class="flex gap-2 items-center"
       >
         <div class="relative">
           <Avatar :src="friend.avatar" class="w-12 h-12 rounded-full" size="2.25rem" circle />

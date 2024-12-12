@@ -206,6 +206,13 @@ impl FriendsSocket {
         tokio::task::spawn(async move {
             let res = async {
                 let state = crate::State::get().await?;
+
+                {
+                    if state.friends_socket.write.lock().await.is_some() {
+                        return Ok(());
+                    }
+                }
+
                 state
                     .friends_socket
                     .connect(
