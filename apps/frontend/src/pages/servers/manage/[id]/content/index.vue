@@ -105,7 +105,7 @@
               :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
             >
               <PlusIcon />
-              Add {{ type }}
+              Add {{ type.toLocaleLowerCase() }}
             </nuxt-link>
           </ButtonStyled>
         </div>
@@ -243,7 +243,7 @@
         <ButtonStyled color="brand">
           <NuxtLink :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`">
             <PlusIcon />
-            Add {{ type }}
+            Add {{ type.toLocaleLowerCase() }}
           </NuxtLink>
         </ButtonStyled>
       </div>
