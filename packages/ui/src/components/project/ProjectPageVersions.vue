@@ -87,11 +87,16 @@
               <div class="flex items-center">
                 <div class="flex flex-wrap gap-1">
                   <TagItem
-                    v-for="gameVersion in formatVersionsForDisplay(version.game_versions, gameVersions)"
+                    v-for="gameVersion in formatVersionsForDisplay(
+                      version.game_versions,
+                      gameVersions,
+                    )"
                     :key="`version-tag-${gameVersion}`"
                     v-tooltip="`Toggle filter for ${gameVersion}`"
                     class="z-[1]"
-                    :action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
+                    :action="
+                      () => versionFilters?.toggleFilters('gameVersion', version.game_versions)
+                    "
                   >
                     {{ gameVersion }}
                   </TagItem>
@@ -119,11 +124,11 @@
             >
               <div
                 v-tooltip="
-                    formatMessage(commonMessages.dateAtTimeTooltip, {
-                      date: new Date(version.date_published),
-                      time: new Date(version.date_published),
-                    })
-                  "
+                  formatMessage(commonMessages.dateAtTimeTooltip, {
+                    date: new Date(version.date_published),
+                    time: new Date(version.date_published),
+                  })
+                "
                 class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
               >
                 <CalendarIcon class="xl:hidden" />
@@ -141,10 +146,7 @@
         <div class="flex items-start justify-end gap-1 sm:items-center z-[1]">
           <slot name="actions" :version="version"></slot>
         </div>
-        <div
-          v-if="showFiles"
-          class="tag-list pointer-events-none relative z-[1] col-span-full"
-        >
+        <div v-if="showFiles" class="tag-list pointer-events-none relative z-[1] col-span-full">
           <div
             v-for="(file, fileIdx) in version.files"
             :key="`platform-tag-${fileIdx}`"
@@ -169,17 +171,16 @@
 <script setup lang="ts">
 import {
   formatBytes,
-  formatCategory, formatNumber,
+  formatCategory,
+  formatNumber,
   formatVersionsForDisplay,
-  type GameVersionTag, type PlatformTag, type Version
+  type GameVersionTag,
+  type PlatformTag,
+  type Version,
 } from '@modrinth/utils'
 
 import { commonMessages } from '../../utils/common-messages'
-import {
-  CalendarIcon,
-  DownloadIcon,
-  StarIcon,
-} from '@modrinth/assets'
+import { CalendarIcon, DownloadIcon, StarIcon } from '@modrinth/assets'
 import { Pagination, VersionChannelIndicator, VersionFilterControl } from '../index'
 import { useVIntl } from '@vintl/vintl'
 import { type Ref, ref, computed } from 'vue'
@@ -190,24 +191,24 @@ import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()
 
-type VersionWithDisplayUrlEnding =  Version & {
+type VersionWithDisplayUrlEnding = Version & {
   displayUrlEnding: string
 }
 
 const props = withDefaults(
   defineProps<{
-    baseId?: string,
+    baseId?: string
     project: {
       project_type: string
       slug?: string
       id: string
-    },
-    versions: VersionWithDisplayUrlEnding[],
-    showFiles?: boolean,
-    currentMember?: boolean,
-    loaders: PlatformTag[],
-    gameVersions: GameVersionTag[],
-    versionLink?: (version: Version) => string,
+    }
+    versions: VersionWithDisplayUrlEnding[]
+    showFiles?: boolean
+    currentMember?: boolean
+    loaders: PlatformTag[]
+    gameVersions: GameVersionTag[]
+    versionLink?: (version: Version) => string
   }>(),
   {
     baseId: undefined,
@@ -217,23 +218,26 @@ const props = withDefaults(
   },
 )
 
-const currentPage: Ref<number> = ref(1);
-const pageSize: Ref<number> = ref(20);
+const currentPage: Ref<number> = ref(1)
+const pageSize: Ref<number> = ref(20)
 const versionFilters: Ref<InstanceType<typeof VersionFilterControl> | null> = ref(null)
 
-const selectedGameVersions: Ref<string[]> = computed(() => versionFilters.value?.selectedGameVersions ?? []);
-const selectedPlatforms: Ref<string[]> = computed(() => versionFilters.value?.selectedPlatforms ?? []);
-const selectedChannels: Ref<string[]> = computed(() => versionFilters.value?.selectedChannels ?? []);
+const selectedGameVersions: Ref<string[]> = computed(
+  () => versionFilters.value?.selectedGameVersions ?? [],
+)
+const selectedPlatforms: Ref<string[]> = computed(
+  () => versionFilters.value?.selectedPlatforms ?? [],
+)
+const selectedChannels: Ref<string[]> = computed(() => versionFilters.value?.selectedChannels ?? [])
 
 const filteredVersions = computed(() => {
   return props.versions.filter(
     (version) =>
       hasAnySelected(version.game_versions, selectedGameVersions.value) &&
       hasAnySelected(version.loaders, selectedPlatforms.value) &&
-      isAnySelected(version.version_type, selectedChannels.value)
-  );
-});
-
+      isAnySelected(version.version_type, selectedChannels.value),
+  )
+})
 
 function hasAnySelected(values: string[], selected: string[]) {
   return selected.length === 0 || selected.some((value) => values.includes(value))
@@ -244,33 +248,37 @@ function isAnySelected(value: string, selected: string[]) {
 }
 
 const currentVersions = computed(() =>
-  filteredVersions.value.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value));
+  filteredVersions.value.slice(
+    (currentPage.value - 1) * pageSize.value,
+    currentPage.value * pageSize.value,
+  ),
+)
 
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const router = useRouter()
 
 if (route.query.page) {
-  currentPage.value = Number(route.query.page) || 1;
+  currentPage.value = Number(route.query.page) || 1
 }
 
 function switchPage(page: number) {
-  currentPage.value = page;
+  currentPage.value = page
 
   router.replace({
     query: {
       ...route.query,
       page: currentPage.value !== 1 ? currentPage.value : undefined,
     },
-  });
+  })
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 function updateQuery(newQueries: Record<string, string | string[] | undefined | null>) {
   if (newQueries.page) {
-    currentPage.value = Number(newQueries.page);
+    currentPage.value = Number(newQueries.page)
   } else if (newQueries.page === undefined) {
-    currentPage.value = 1;
+    currentPage.value = 1
   }
 
   router.replace({
@@ -278,9 +286,8 @@ function updateQuery(newQueries: Record<string, string | string[] | undefined | 
       ...route.query,
       ...newQueries,
     },
-  });
+  })
 }
-
 </script>
 <style scoped>
 .versions-grid-row {

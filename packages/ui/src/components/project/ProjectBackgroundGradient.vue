@@ -7,30 +7,28 @@ import { computed } from 'vue'
 const props = withDefaults(
   defineProps<{
     project: {
-      body: string,
-      color: number,
+      body: string
+      color: number
     }
   }>(),
-  {
-  },
+  {},
 )
 
-function clamp (value: number) {
-  return Math.max(0, Math.min(255, value));
+function clamp(value: number) {
+  return Math.max(0, Math.min(255, value))
 }
 
-function toHex (value: number) {
-  return clamp(value).toString(16).padStart(2, '0');
+function toHex(value: number) {
+  return clamp(value).toString(16).padStart(2, '0')
 }
 
 function decimalToHexColor(decimal: number) {
-  const r = (decimal >> 16) & 255;
-  const g = (decimal >> 8) & 255;
-  const b = decimal & 255;
+  const r = (decimal >> 16) & 255
+  const g = (decimal >> 8) & 255
+  const b = decimal & 255
 
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }
-
 
 const color = computed(() => {
   return decimalToHexColor(props.project.color)

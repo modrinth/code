@@ -11,7 +11,8 @@ import {
   CalendarIcon,
   GlobeIcon,
   LinkIcon,
-  UnknownIcon, XIcon
+  UnknownIcon,
+  XIcon,
 } from '@modrinth/assets'
 import { useVIntl, defineMessage, type MessageDescriptor } from '@vintl/vintl'
 import type { Component } from 'vue'
@@ -30,7 +31,7 @@ const metadata = computed(() => ({
   formattedName: formatMessage(statusMetadata[props.status]?.message ?? props.status),
 }))
 
-const statusMetadata: Record<ProjectStatus, { icon?: Component, message: MessageDescriptor }> = {
+const statusMetadata: Record<ProjectStatus, { icon?: Component; message: MessageDescriptor }> = {
   approved: {
     icon: GlobeIcon,
     message: defineMessage({

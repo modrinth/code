@@ -16,10 +16,10 @@ use reqwest::header::HeaderValue;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::RwLock;
 
 type WriteSocket =
-    Arc<Mutex<Option<SplitSink<WebSocketStream<ConnectStream>, Message>>>>;
+    Arc<RwLock<Option<SplitSink<WebSocketStream<ConnectStream>, Message>>>>;
 
 pub struct FriendsSocket {
     write: WriteSocket,
@@ -67,7 +67,7 @@ impl Default for FriendsSocket {
 impl FriendsSocket {
     pub fn new() -> Self {
         Self {
-            write: Arc::new(Mutex::new(None)),
+            write: Arc::new(RwLock::new(None)),
             user_statuses: Arc::new(DashMap::new()),
         }
     }
@@ -83,7 +83,7 @@ impl FriendsSocket {
 
         if let Some(credentials) = credentials {
             let mut request = format!(
-                "{MODRINTH_SOCKET_URL}_internal/launcher_heartbeat?code={}",
+                "{MODRINTH_SOCKET_URL}_internal/launcher_socket?code={}",
                 credentials.session
             )
             .into_client_request()?;
@@ -105,7 +105,7 @@ impl FriendsSocket {
                     let (write, read) = socket.split();
 
                     {
-                        let mut write_lock = self.write.lock().await;
+                        let mut write_lock = self.write.write().await;
                         *write_lock = Some(write);
                     }
 
@@ -181,18 +181,14 @@ impl FriendsSocket {
                             }
                         }
 
-                        let mut w = write_handle.lock().await;
+                        let mut w = write_handle.write().await;
                         *w = None;
-
-                        Self::reconnect_task();
                     });
                 }
                 Err(e) => {
                     tracing::error!(
                         "Error connecting to friends socket: {e:?}"
                     );
-
-                    Self::reconnect_task();
 
                     return Err(crate::Error::from(e));
                 }
@@ -202,40 +198,39 @@ impl FriendsSocket {
         Ok(())
     }
 
-    fn reconnect_task() {
+    pub fn reconnect_task() {
         tokio::task::spawn(async move {
-            let res = async {
-                let state = crate::State::get().await?;
+            let state = crate::State::get().await?;
+            let mut last_connection = Utc::now();
 
+            loop {
+                let connected = {
+                    let read = state.friends_socket.write.read().await;
+                    read.is_some()
+                };
+
+                if !connected
+                    && Utc::now().signed_duration_since(last_connection)
+                        > chrono::Duration::seconds(30)
                 {
-                    if state.friends_socket.write.lock().await.is_some() {
-                        return Ok(());
-                    }
+                    last_connection = Utc::now();
+                    let _ = state
+                        .friends_socket
+                        .connect(
+                            &state.pool,
+                            &state.api_semaphore,
+                            &state.process_manager,
+                        )
+                        .await;
                 }
 
-                state
-                    .friends_socket
-                    .connect(
-                        &state.pool,
-                        &state.api_semaphore,
-                        &state.process_manager,
-                    )
-                    .await?;
-
-                Ok::<(), crate::Error>(())
-            };
-
-            if let Err(e) = res.await {
-                tracing::info!("Error reconnecting to friends socket: {e:?}");
-
-                tokio::time::sleep(std::time::Duration::from_secs(30)).await;
-                FriendsSocket::reconnect_task();
+                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
             }
         });
     }
 
     pub async fn disconnect(&self) -> crate::Result<()> {
-        let mut write_lock = self.write.lock().await;
+        let mut write_lock = self.write.write().await;
         if let Some(ref mut write_half) = *write_lock {
             write_half.close().await?;
             *write_lock = None;
@@ -247,7 +242,7 @@ impl FriendsSocket {
         &self,
         profile_name: Option<String>,
     ) -> crate::Result<()> {
-        let mut write_lock = self.write.lock().await;
+        let mut write_lock = self.write.write().await;
         if let Some(ref mut write_half) = *write_lock {
             write_half
                 .send(Message::Text(serde_json::to_string(

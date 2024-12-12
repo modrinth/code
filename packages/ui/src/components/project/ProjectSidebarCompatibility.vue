@@ -60,7 +60,10 @@
         <TagItem
           v-if="
             project.project_type !== 'datapack' &&
-            project.client_side !== 'unsupported' && project.server_side !== 'unsupported' && project.client_side !== 'unknown' && project.server_side !== 'unknown'
+            project.client_side !== 'unsupported' &&
+            project.server_side !== 'unsupported' &&
+            project.client_side !== 'unknown' &&
+            project.server_side !== 'unknown'
           "
         >
           <MonitorSmartphoneIcon aria-hidden="true" />
@@ -88,6 +91,7 @@ defineProps<{
     loaders: string[]
     client_side: EnvironmentValue
     server_side: EnvironmentValue
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     versions: any[]
   }
   tags: {

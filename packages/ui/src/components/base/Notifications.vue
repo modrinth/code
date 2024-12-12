@@ -20,7 +20,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const props = defineProps({
+defineProps({
   sidebar: {
     type: Boolean,
     default: false,

@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import { BookTextIcon, CalendarIcon, ScaleIcon, VersionIcon, ExternalIcon } from '@modrinth/assets'
 import { useVIntl, defineMessages } from '@vintl/vintl'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import dayjs from 'dayjs'
 
 const { formatMessage } = useVIntl()

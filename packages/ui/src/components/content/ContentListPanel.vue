@@ -5,7 +5,6 @@ import Checkbox from '../base/Checkbox.vue'
 import ContentListItem from './ContentListItem.vue'
 import type { ContentItem } from './ContentListItem.vue'
 import { DropdownIcon } from '@modrinth/assets'
-// @ts-ignore
 import { RecycleScroller } from 'vue-virtual-scroller'
 
 const props = withDefaults(

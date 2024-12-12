@@ -41,7 +41,7 @@
     <template v-if="locked" #default>
       <div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider mx-2">
         <p class="m-0 font-bold items-center">
-          <slot :name="`locked-${filterType.id}`" >
+          <slot :name="`locked-${filterType.id}`">
             {{ formatMessage(messages.lockedTitle, { type: filterType.formatted_name }) }}
           </slot>
         </p>

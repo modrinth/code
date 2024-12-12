@@ -1,7 +1,5 @@
 <template>
-  <span
-    class="inline-flex items-center gap-1 font-semibold text-secondary"
-  >
+  <span class="inline-flex items-center gap-1 font-semibold text-secondary">
     <component :is="icon" v-if="icon" :aria-hidden="true" class="shrink-0" />
     {{ formattedName }}
   </span>

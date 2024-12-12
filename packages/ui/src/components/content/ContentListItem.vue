@@ -3,21 +3,20 @@ import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
 import Checkbox from '../base/Checkbox.vue'
 import type { RouteLocationRaw } from 'vue-router'
-import { SlashIcon } from '@modrinth/assets'
-
-import { ref } from 'vue'
 
 export interface ContentCreator {
   name: string
   type: 'user' | 'organization'
   id: string
   link?: string | RouteLocationRaw
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   linkProps?: any
 }
 
 export interface ContentProject {
   id: string
   link?: string | RouteLocationRaw
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   linkProps?: any
 }
 
@@ -46,7 +45,7 @@ withDefaults(
   },
 )
 
-const model = defineModel()
+const model = defineModel<boolean>()
 </script>
 <template>
   <div

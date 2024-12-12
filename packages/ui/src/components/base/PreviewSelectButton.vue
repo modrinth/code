@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RadioButtonIcon, RadioButtonChecked } from '@modrinth/assets'
-import { ref } from 'vue'
 
 withDefaults(
   defineProps<{
