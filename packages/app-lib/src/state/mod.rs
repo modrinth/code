@@ -96,7 +96,7 @@ impl State {
                     &state.process_manager,
                 )
                 .await;
-            FriendsSocket::reconnect_task();
+            let _ = FriendsSocket::reconnect_task().await;
         });
 
         Ok(())

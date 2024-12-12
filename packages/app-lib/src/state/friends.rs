@@ -198,9 +198,10 @@ impl FriendsSocket {
         Ok(())
     }
 
-    pub fn reconnect_task() {
+    pub async fn reconnect_task() -> crate::Result<()> {
+        let state = crate::State::get().await?;
+
         tokio::task::spawn(async move {
-            let state = crate::State::get().await?;
             let mut last_connection = Utc::now();
 
             loop {
@@ -227,6 +228,8 @@ impl FriendsSocket {
                 tokio::time::sleep(std::time::Duration::from_secs(1)).await;
             }
         });
+
+        Ok(())
     }
 
     pub async fn disconnect(&self) -> crate::Result<()> {
