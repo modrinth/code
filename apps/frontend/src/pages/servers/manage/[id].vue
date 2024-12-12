@@ -86,10 +86,12 @@
         </ButtonStyled>
       </div>
     </div>
+
+    <!-- SERVER START -->
     <div
       v-else-if="serverData"
       data-pyro-server-manager-root
-      class="experimental-styles-within mobile-blurred-servericon relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-3 transition-all duration-300"
+      class="experimental-styles-within mobile-blurred-servericon relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
       :style="{
         '--server-bg-image': serverData.image
           ? `url(${serverData.image})`
