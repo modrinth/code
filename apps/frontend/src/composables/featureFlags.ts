@@ -28,6 +28,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
   oldProjectCards: true,
   newProjectCards: false,
   projectBackground: false,
+  searchBackground: false,
   // advancedRendering: true,
   // externalLinksNewTab: true,
   // notUsingBlockers: false,
