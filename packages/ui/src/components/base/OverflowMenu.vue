@@ -89,7 +89,7 @@ interface Item extends BaseOption {
 
 type Option = Divider | Item
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     options: Option[]
     disabled?: boolean

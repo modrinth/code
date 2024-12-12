@@ -87,6 +87,16 @@ impl State {
             if let Err(e) = res {
                 tracing::error!("Error running discord RPC: {e}");
             }
+
+            let _ = state
+                .friends_socket
+                .connect(
+                    &state.pool,
+                    &state.api_semaphore,
+                    &state.process_manager,
+                )
+                .await;
+            let _ = FriendsSocket::reconnect_task().await;
         });
 
         Ok(())
@@ -138,9 +148,6 @@ impl State {
         let process_manager = ProcessManager::new();
 
         let friends_socket = FriendsSocket::new();
-        friends_socket
-            .connect(&pool, &fetch_semaphore, &process_manager)
-            .await?;
 
         Ok(Arc::new(Self {
             directories,

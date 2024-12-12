@@ -52,7 +52,7 @@
         v-for="channel in selectedChannels"
         :key="`remove-filter-${channel}`"
         :style="`--_color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'});--_bg-color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'}-highlight)`"
-        :action="() =>toggleFilter('channel', channel)"
+        :action="() => toggleFilter('channel', channel)"
       >
         <XIcon />
         {{ channel.slice(0, 1).toUpperCase() + channel.slice(1) }}
@@ -60,7 +60,7 @@
       <TagItem
         v-for="version in selectedGameVersions"
         :key="`remove-filter-${version}`"
-        :action="() =>toggleFilter('gameVersion', version)"
+        :action="() => toggleFilter('gameVersion', version)"
       >
         <XIcon />
         {{ version }}
@@ -79,119 +79,119 @@
 </template>
 
 <script setup lang="ts">
-import { FilterIcon, XCircleIcon, XIcon } from "@modrinth/assets";
-import { ManySelect, Checkbox } from "../index";
-import { type Version , formatCategory, type GameVersionTag  } from '@modrinth/utils';
-import { ref, computed } from "vue";
-import { useRoute } from "vue-router";
+import { FilterIcon, XCircleIcon, XIcon } from '@modrinth/assets'
+import { ManySelect, Checkbox } from '../index'
+import { type Version, formatCategory, type GameVersionTag } from '@modrinth/utils'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import TagItem from '../base/TagItem.vue'
 
 const props = defineProps<{
   versions: Version[]
   gameVersions: GameVersionTag[]
   baseId?: string
-}>();
+}>()
 
-const emit = defineEmits(["update:query"]);
+const emit = defineEmits(['update:query'])
 
-const allChannels = ref(["release", "beta", "alpha"]);
+const allChannels = ref(['release', 'beta', 'alpha'])
 
-const route = useRoute();
+const route = useRoute()
 
-const showSnapshots = ref(false);
+const showSnapshots = ref(false)
 
-type FilterType = "channel" | "gameVersion" | "platform";
-type Filter = string;
+type FilterType = 'channel' | 'gameVersion' | 'platform'
+type Filter = string
 
 const filterOptions = computed(() => {
   const filters: Record<FilterType, Filter[]> = {
     channel: [],
     gameVersion: [],
     platform: [],
-  };
+  }
 
-  const platformSet = new Set();
-  const gameVersionSet = new Set();
-  const channelSet = new Set();
+  const platformSet = new Set()
+  const gameVersionSet = new Set()
+  const channelSet = new Set()
 
   for (const version of props.versions) {
     for (const loader of version.loaders) {
-      platformSet.add(loader);
+      platformSet.add(loader)
     }
     for (const gameVersion of version.game_versions) {
-      gameVersionSet.add(gameVersion);
+      gameVersionSet.add(gameVersion)
     }
-    channelSet.add(version.version_type);
+    channelSet.add(version.version_type)
   }
 
   if (channelSet.size > 0) {
-    filters.channel = Array.from(channelSet) as Filter[];
-    filters.channel.sort((a, b) => allChannels.value.indexOf(a) - allChannels.value.indexOf(b));
+    filters.channel = Array.from(channelSet) as Filter[]
+    filters.channel.sort((a, b) => allChannels.value.indexOf(a) - allChannels.value.indexOf(b))
   }
   if (gameVersionSet.size > 0) {
-    const gameVersions = props.gameVersions.filter((x) => gameVersionSet.has(x.version));
+    const gameVersions = props.gameVersions.filter((x) => gameVersionSet.has(x.version))
 
     filters.gameVersion = gameVersions
-      .filter((x) => (showSnapshots.value ? true : x.version_type === "release"))
-      .map((x) => x.version);
+      .filter((x) => (showSnapshots.value ? true : x.version_type === 'release'))
+      .map((x) => x.version)
   }
   if (platformSet.size > 0) {
-    filters.platform = Array.from(platformSet) as Filter[];
+    filters.platform = Array.from(platformSet) as Filter[]
   }
 
-  return filters;
-});
+  return filters
+})
 
-const selectedChannels = ref<string[]>([]);
-const selectedGameVersions = ref<string[]>([]);
-const selectedPlatforms = ref<string[]>([]);
+const selectedChannels = ref<string[]>([])
+const selectedGameVersions = ref<string[]>([])
+const selectedPlatforms = ref<string[]>([])
 
-selectedChannels.value = route.query.c ? getArrayOrString(route.query.c) : [];
-selectedGameVersions.value = route.query.g ? getArrayOrString(route.query.g) : [];
-selectedPlatforms.value = route.query.l ? getArrayOrString(route.query.l) : [];
+selectedChannels.value = route.query.c ? getArrayOrString(route.query.c) : []
+selectedGameVersions.value = route.query.g ? getArrayOrString(route.query.g) : []
+selectedPlatforms.value = route.query.l ? getArrayOrString(route.query.l) : []
 
 async function toggleFilters(type: FilterType, filters: Filter[]) {
   for (const filter of filters) {
-    await toggleFilter(type, filter, true);
+    await toggleFilter(type, filter, true)
   }
 
-  updateFilters();
+  updateFilters()
 }
 
 async function toggleFilter(type: FilterType, filter: Filter, bulk = false) {
-  if (type === "channel") {
+  if (type === 'channel') {
     selectedChannels.value = selectedChannels.value.includes(filter)
       ? selectedChannels.value.filter((x) => x !== filter)
-      : [...selectedChannels.value, filter];
-  } else if (type === "gameVersion") {
+      : [...selectedChannels.value, filter]
+  } else if (type === 'gameVersion') {
     selectedGameVersions.value = selectedGameVersions.value.includes(filter)
       ? selectedGameVersions.value.filter((x) => x !== filter)
-      : [...selectedGameVersions.value, filter];
-  } else if (type === "platform") {
+      : [...selectedGameVersions.value, filter]
+  } else if (type === 'platform') {
     selectedPlatforms.value = selectedPlatforms.value.includes(filter)
       ? selectedPlatforms.value.filter((x) => x !== filter)
-      : [...selectedPlatforms.value, filter];
+      : [...selectedPlatforms.value, filter]
   }
   if (!bulk) {
-    updateFilters();
+    updateFilters()
   }
 }
 
 async function clearFilters() {
-  selectedChannels.value = [];
-  selectedGameVersions.value = [];
-  selectedPlatforms.value = [];
+  selectedChannels.value = []
+  selectedGameVersions.value = []
+  selectedPlatforms.value = []
 
-  updateFilters();
+  updateFilters()
 }
 
 function updateFilters() {
-  emit("update:query", {
+  emit('update:query', {
     c: selectedChannels.value,
     g: selectedGameVersions.value,
     l: selectedPlatforms.value,
     page: undefined,
-  });
+  })
 }
 
 defineExpose({
@@ -200,13 +200,13 @@ defineExpose({
   selectedChannels,
   selectedGameVersions,
   selectedPlatforms,
-});
+})
 
 function getArrayOrString(x: string | string[]): string[] {
-  if (typeof x === "string") {
-    return [x];
+  if (typeof x === 'string') {
+    return [x]
   } else {
-    return x;
+    return x
   }
 }
 </script>

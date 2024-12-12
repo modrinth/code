@@ -69,6 +69,7 @@ const props = defineProps<{
 }>()
 
 const filters = computed(() => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filters: FilterType<any>[] = [
     {
       id: 'platform',

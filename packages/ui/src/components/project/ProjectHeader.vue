@@ -7,10 +7,7 @@
       {{ project.title }}
     </template>
     <template #title-suffix>
-      <ProjectStatusBadge
-        v-if="member || project.status !== 'approved'"
-        :status="project.status"
-      />
+      <ProjectStatusBadge v-if="member || project.status !== 'approved'" :status="project.status" />
     </template>
     <template #summary>
       {{ project.description }}
@@ -39,10 +36,7 @@
       <div class="hidden items-center gap-2 md:flex">
         <TagsIcon class="h-6 w-6 text-secondary" />
         <div class="flex flex-wrap gap-2">
-          <TagItem
-            v-for="(category, index) in project.categories"
-            :key="index"
-          >
+          <TagItem v-for="(category, index) in project.categories" :key="index">
             {{ formatCategory(category) }}
           </TagItem>
         </div>
@@ -55,7 +49,6 @@
 </template>
 <script setup lang="ts">
 import { DownloadIcon, HeartIcon, TagsIcon } from '@modrinth/assets'
-import Badge from '../base/SimpleBadge.vue'
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
 import { formatCategory, formatNumber, type Project } from '@modrinth/utils'

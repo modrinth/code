@@ -33,6 +33,7 @@ pub enum ServerToClientMessage {
     UserOffline { id: UserId },
     FriendStatuses { statuses: Vec<UserStatus> },
     FriendRequest { from: UserId },
+    FriendRequestRejected { from: UserId },
 }
 
 #[derive(Deserialize)]
@@ -40,7 +41,7 @@ struct LauncherHeartbeatInit {
     code: String,
 }
 
-#[get("launcher_heartbeat")]
+#[get("launcher_socket")]
 pub async fn ws_init(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -122,16 +123,12 @@ pub async fn ws_init(
         user.id,
         ServerToClientMessage::StatusUpdate { status },
         &pool,
-        &redis,
         &db,
         Some(friends),
     )
     .await?;
 
-    let mut stream = msg_stream
-        .aggregate_continuations()
-        // aggregate continuation frames up to 1MiB
-        .max_continuation_size(2_usize.pow(20));
+    let mut stream = msg_stream.aggregate_continuations();
 
     actix_web::rt::spawn(async move {
         // receive messages from websocket
@@ -168,7 +165,6 @@ pub async fn ws_init(
                                             status: status.clone(),
                                         },
                                         &pool,
-                                        &redis,
                                         &db,
                                         None,
                                     )
@@ -180,12 +176,23 @@ pub async fn ws_init(
                 }
 
                 Ok(AggregatedMessage::Close(_)) => {
-                    let _ = close_socket(user.id, &pool, &redis, &db).await;
+                    let _ = close_socket(user.id, &pool, &db).await;
+                }
+
+                Ok(AggregatedMessage::Ping(msg)) => {
+                    if let Some(mut socket) =
+                        db.auth_sockets.get_mut(&user.id.into())
+                    {
+                        let (_, socket) = socket.value_mut();
+                        let _ = socket.pong(&msg).await;
+                    }
                 }
 
                 _ => {}
             }
         }
+
+        let _ = close_socket(user.id, &pool, &db).await;
     });
 
     Ok(res)
@@ -195,7 +202,6 @@ pub async fn broadcast_friends(
     user_id: UserId,
     message: ServerToClientMessage,
     pool: &PgPool,
-    redis: &RedisPool,
     sockets: &ActiveSockets,
     friends: Option<Vec<FriendItem>>,
 ) -> Result<(), crate::database::models::DatabaseError> {
@@ -218,17 +224,7 @@ pub async fn broadcast_friends(
             {
                 let (_, socket) = socket.value_mut();
 
-                // TODO: bulk close sockets for better perf
-                if socket.text(serde_json::to_string(&message)?).await.is_err()
-                {
-                    Box::pin(close_socket(
-                        friend_id.into(),
-                        pool,
-                        redis,
-                        sockets,
-                    ))
-                    .await?;
-                }
+                let _ = socket.text(serde_json::to_string(&message)?).await;
             }
         }
     }
@@ -239,22 +235,20 @@ pub async fn broadcast_friends(
 pub async fn close_socket(
     id: UserId,
     pool: &PgPool,
-    redis: &RedisPool,
     sockets: &ActiveSockets,
 ) -> Result<(), crate::database::models::DatabaseError> {
     if let Some((_, (_, socket))) = sockets.auth_sockets.remove(&id) {
         let _ = socket.close(None).await;
-    }
 
-    broadcast_friends(
-        id,
-        ServerToClientMessage::UserOffline { id },
-        pool,
-        redis,
-        sockets,
-        None,
-    )
-    .await?;
+        broadcast_friends(
+            id,
+            ServerToClientMessage::UserOffline { id },
+            pool,
+            sockets,
+            None,
+        )
+        .await?;
+    }
 
     Ok(())
 }
