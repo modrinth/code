@@ -91,7 +91,7 @@
             class="filter-checkbox"
           />
         </div>
-        <div v-if="server" class="rounded-2xl bg-bg-raised p-4">
+        <div v-if="server && projectType.id !== 'modpack'" class="rounded-2xl bg-bg-raised p-4">
           <Checkbox
             v-model="serverHideInstalled"
             label="Hide installed content"
