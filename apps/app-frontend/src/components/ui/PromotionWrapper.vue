@@ -1,75 +1,23 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { get as getCreds } from '@/helpers/mr_auth.js'
-import { handleError } from '@/store/notifications.js'
-import { get_user } from '@/helpers/cache.js'
+import { ref, onMounted } from 'vue'
 import { ChevronRightIcon } from '@modrinth/assets'
 import { init_ads_window, open_ads_link, record_ads_click } from '@/helpers/ads.js'
-import { listen } from '@tauri-apps/api/event'
-
-const showAd = ref(true)
-
-defineExpose({
-  scroll() {
-    updateAdPosition()
-  },
-})
-
-const creds = await getCreds().catch(handleError)
-if (creds && creds.user_id) {
-  const user = await get_user(creds.user_id).catch(handleError)
-
-  const MIDAS_BITFLAG = 1 << 0
-  if (user && (user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG) {
-    showAd.value = false
-  }
-}
 
 const adsWrapper = ref(null)
-let resizeObserver
-let scrollHandler
-let intersectionObserver
-let mutationObserver
 onMounted(() => {
-  if (showAd.value) {
-    updateAdPosition(true)
+  updateAdPosition()
 
-    resizeObserver = new ResizeObserver(() => updateAdPosition())
-    resizeObserver.observe(adsWrapper.value)
-
-    intersectionObserver = new IntersectionObserver(() => updateAdPosition())
-    intersectionObserver.observe(adsWrapper.value)
-
-    mutationObserver = new MutationObserver(() => updateAdPosition())
-    mutationObserver.observe(adsWrapper.value, { attributes: true, childList: true, subtree: true })
-
-    // Add scroll event listener
-    scrollHandler = () => {
-      requestAnimationFrame(() => updateAdPosition())
-    }
-    window.addEventListener('scroll', scrollHandler, { passive: true })
-  }
+  window.addEventListener('resize', updateAdPosition)
 })
 
-function updateAdPosition(overrideShown = false) {
+function updateAdPosition() {
   if (adsWrapper.value) {
     const rect = adsWrapper.value.getBoundingClientRect()
 
-    let y = rect.top + window.scrollY
-    let height = rect.bottom - rect.top
+    const x = rect.left + window.scrollX
+    const y = rect.top + window.scrollY
 
-    // Prevent ad from overlaying the app bar
-    if (y <= 52) {
-      y = 52
-      height = rect.bottom - 52
-
-      if (height < 0) {
-        height = 0
-        y = -1000
-      }
-    }
-
-    init_ads_window(rect.left + window.scrollX, y, rect.right - rect.left, height, overrideShown)
+    init_ads_window(x, y, 300, 250, true)
   }
 }
 
@@ -77,38 +25,10 @@ async function openPlusLink() {
   await record_ads_click()
   await open_ads_link('https://modrinth.com/plus', 'https://modrinth.com')
 }
-
-const unlisten = await listen('ads-scroll', (event) => {
-  if (adsWrapper.value) {
-    adsWrapper.value.parentNode.scrollTop += event.payload.scroll
-    updateAdPosition()
-  }
-})
-
-onUnmounted(() => {
-  if (resizeObserver) {
-    resizeObserver.disconnect()
-  }
-  if (intersectionObserver) {
-    intersectionObserver.disconnect()
-  }
-  if (mutationObserver) {
-    mutationObserver.disconnect()
-  }
-  if (scrollHandler) {
-    window.removeEventListener('scroll', scrollHandler)
-  }
-
-  unlisten()
-})
 </script>
 
 <template>
-  <div
-    v-if="showAd"
-    ref="adsWrapper"
-    class="ad-parent relative mb-3 flex w-full justify-center rounded-2xl bg-bg-raised cursor-pointer"
-  >
+  <div ref="adsWrapper" class="ad-parent relative flex w-full justify-center cursor-pointer bg-bg">
     <div class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 p-6">
       <p class="m-0 text-2xl font-bold text-contrast">75% of ad revenue goes to creators</p>
       <button

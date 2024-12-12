@@ -73,8 +73,6 @@ function setJavaInstall(javaInstall) {
 </script>
 <style lang="scss" scoped>
 .auto-detect-modal {
-  padding: 1rem;
-
   .table {
     .table-row {
       grid-template-columns: 1fr 4fr min-content;

@@ -323,7 +323,6 @@ async function repairInstance() {
   display: flex;
   flex-direction: column;
   gap: var(--gap-md);
-  padding: var(--gap-lg);
 }
 
 .markdown-body {

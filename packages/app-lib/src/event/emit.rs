@@ -1,4 +1,4 @@
-use super::LoadingBarId;
+use super::{FriendPayload, LoadingBarId};
 use crate::event::{
     CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
     ProfilePayloadType,
@@ -293,6 +293,20 @@ pub async fn emit_profile(
             )
             .map_err(EventError::from)?;
     }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_friend(payload: FriendPayload) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get()?;
+        event_state
+            .app
+            .emit("friend", payload)
+            .map_err(EventError::from)?;
+    }
+
     Ok(())
 }
 

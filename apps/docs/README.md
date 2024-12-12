@@ -1,6 +1,6 @@
 # Modrinth Documentation
 
-Welcome to the Modrinth documentation! 
+Welcome to the Modrinth documentation!
 
 ## Development
 

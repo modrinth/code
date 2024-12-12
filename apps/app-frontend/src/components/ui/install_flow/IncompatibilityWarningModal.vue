@@ -151,7 +151,6 @@ td:first-child {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem;
 
   :deep(.animated-dropdown .options) {
     max-height: 13.375rem;

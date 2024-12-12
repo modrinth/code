@@ -183,7 +183,7 @@
                   <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
                   <template #rename> <EditIcon /> Rename </template>
                   <template #restore> <ClipboardCopyIcon /> Restore </template>
-                  <template v-if="backup.locked" #lock> <OpenLockIcon /> Unlock </template>
+                  <template v-if="backup.locked" #lock> <LockOpenIcon /> Unlock </template>
                   <template v-else #lock> <LockIcon /> Lock </template>
                   <template #download> <DownloadIcon /> Download </template>
                   <template #delete> <TrashIcon /> Delete </template>
@@ -231,7 +231,7 @@ import {
   SettingsIcon,
   BoxIcon,
   LockIcon,
-  OpenLockIcon,
+  LockOpenIcon,
 } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
