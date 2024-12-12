@@ -198,7 +198,7 @@ type ServerProps = {
     exit_code?: number;
   };
   isServerRunning: boolean;
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 };
 
 const props = defineProps<ServerProps>();

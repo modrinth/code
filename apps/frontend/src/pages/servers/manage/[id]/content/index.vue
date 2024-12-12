@@ -299,7 +299,7 @@ const props = defineProps<{
 
 const type = computed(() => {
   const loader = props.server.general?.loader?.toLowerCase();
-  return loader === "paper" || loader === "purpur" ? "plugin" : "mod";
+  return loader === "paper" || loader === "purpur" ? "Plugin" : "Mod";
 });
 
 interface Mod {
@@ -460,7 +460,10 @@ async function removeMod(mod: Mod) {
   mod.changing = true;
 
   try {
-    await props.server.content?.remove(type.value, `/${type.value}s/${mod.filename}`);
+    await props.server.content?.remove(
+      type.value as "Mod" | "Plugin",
+      `/${type.value.toLowerCase()}s/${mod.filename}`,
+    );
     await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error removing mod:", error);
