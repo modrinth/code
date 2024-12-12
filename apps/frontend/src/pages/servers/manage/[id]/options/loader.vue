@@ -703,7 +703,7 @@ watch(selectedMCVersion, async () => {
 });
 
 const onShow = () => {
-  selectedMCVersion.value = "";
+  selectedMCVersion.value = props.server.general?.mc_version || "";
   selectedLoaderVersion.value = "";
 };
 

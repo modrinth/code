@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+const config = {
   content: [
     "./src/components/**/*.{js,vue,ts}",
     "./src/layouts/**/*.vue",
@@ -152,3 +152,5 @@ module.exports = {
     preflight: false,
   },
 };
+
+export default config;

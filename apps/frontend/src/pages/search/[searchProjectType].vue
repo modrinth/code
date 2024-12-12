@@ -84,7 +84,26 @@
             </button>
           </ButtonStyled>
         </div>
-        <div v-if="server" class="rounded-2xl bg-bg-raised p-4">
+        <div v-if="server && projectType.id === 'modpack'" class="rounded-2xl bg-bg-raised">
+          <div class="flex flex-row items-center gap-2 px-6 py-4 text-contrast">
+            <h3 class="m-0 text-lg">Options</h3>
+          </div>
+          <div class="flex flex-row items-center justify-between gap-2 px-6">
+            <label for="erase-data-on-install"> Erase all data on install </label>
+            <input
+              id="erase-data-on-install"
+              v-model="eraseDataOnInstall"
+              label="Erase all data on install"
+              class="switch stylized-toggle flex-none"
+              type="checkbox"
+            />
+          </div>
+          <div class="px-6 py-4 text-sm">
+            If enabled, existing mods, worlds, and configurations, will be deleted before installing
+            the selected modpack.
+          </div>
+        </div>
+        <div v-if="server && projectType.id !== 'modpack'" class="rounded-2xl bg-bg-raised p-4">
           <Checkbox
             v-model="serverHideInstalled"
             label="Hide installed content"
@@ -238,7 +257,7 @@
                   <button
                     v-if="
                       result.installed ||
-                      server.mods.data.find((x) => x.project_id === result.project_id) ||
+                      server.content.data.find((x) => x.project_id === result.project_id) ||
                       server.general?.project?.id === result.project_id
                     "
                     disabled
@@ -328,6 +347,7 @@ const projectTypes = computed(() => [projectType.value.id]);
 
 const server = ref();
 const serverHideInstalled = ref(false);
+const eraseDataOnInstall = ref(false);
 
 const PERSISTENT_QUERY_PARAMS = ["sid", "shi"];
 
@@ -342,7 +362,7 @@ async function updateServerContext() {
     if (!auth.value.user) {
       router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
     } else if (route.query.sid !== null) {
-      server.value = await usePyroServer(route.query.sid, ["general", "mods"]);
+      server.value = await usePyroServer(route.query.sid, ["general", "content"]);
     }
   }
 
@@ -382,7 +402,7 @@ const serverFilters = computed(() => {
     }
 
     if (serverHideInstalled.value) {
-      const installedMods = server.value.mods?.data
+      const installedMods = server.value.content?.data
         .filter((x) => x.project_id)
         .map((x) => x.project_id);
 
@@ -461,7 +481,14 @@ async function serverInstall(project) {
       ) ?? versions[0];
 
     if (projectType.value.id === "modpack") {
-      await server.value.general?.reinstall(route.query.sid, false, project.project_id, version.id);
+      await server.value.general?.reinstall(
+        route.query.sid,
+        false,
+        project.project_id,
+        version.id,
+        undefined,
+        eraseDataOnInstall.value,
+      );
       project.installed = true;
       navigateTo(`/servers/manage/${route.query.sid}/options/loader`);
     } else if (projectType.value.id === "mod") {
@@ -816,5 +843,9 @@ useSeoMeta({
   pointer-events: none;
   mask-image: linear-gradient(to bottom, black, transparent);
   opacity: 0.25;
+}
+
+.stylized-toggle:checked::after {
+  background: var(--color-accent-contrast) !important;
 }
 </style>

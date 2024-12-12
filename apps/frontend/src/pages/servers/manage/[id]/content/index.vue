@@ -102,10 +102,10 @@
           <ButtonStyled v-if="hasMods" color="brand" type="outlined">
             <nuxt-link
               class="w-full text-nowrap sm:w-fit"
-              :to="`/${type}s?sid=${props.server.serverId}`"
+              :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
             >
               <PlusIcon />
-              Add {{ type }}
+              Add {{ type.toLocaleLowerCase() }}
             </nuxt-link>
           </ButtonStyled>
         </div>
@@ -241,9 +241,9 @@
         <p class="m-0 font-bold text-contrast">No {{ type }}s found!</p>
         <p class="m-0">Add some {{ type }}s to your server to manage them here.</p>
         <ButtonStyled color="brand">
-          <NuxtLink :to="`/${type}s?sid=${props.server.serverId}`">
+          <NuxtLink :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`">
             <PlusIcon />
-            Add {{ type }}
+            Add {{ type.toLocaleLowerCase() }}
           </NuxtLink>
         </ButtonStyled>
       </div>
@@ -299,7 +299,7 @@ const props = defineProps<{
 
 const type = computed(() => {
   const loader = props.server.general?.loader?.toLowerCase();
-  return loader === "paper" || loader === "purpur" ? "plugin" : "mod";
+  return loader === "paper" || loader === "purpur" ? "Plugin" : "Mod";
 });
 
 interface Mod {
@@ -460,7 +460,10 @@ async function removeMod(mod: Mod) {
   mod.changing = true;
 
   try {
-    await props.server.content?.remove(type.value, `/${type.value}s/${mod.filename}`);
+    await props.server.content?.remove(
+      type.value as "Mod" | "Plugin",
+      `/${type.value.toLowerCase()}s/${mod.filename}`,
+    );
     await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error removing mod:", error);
