@@ -2,7 +2,7 @@
   <div class="flex h-[calc(100vh-12rem)] w-full flex-col items-center bg-bg-raised">
     <div
       ref="container"
-      class="relative w-full flex-grow overflow-hidden bg-bg-raised"
+      class="relative w-full flex-grow cursor-grab overflow-hidden bg-bg-raised active:cursor-grabbing"
       @mousedown="startPan"
       @mousemove="pan"
       @mouseup="endPan"
