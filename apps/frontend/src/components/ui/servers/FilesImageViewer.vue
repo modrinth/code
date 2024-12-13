@@ -46,17 +46,21 @@
     </div>
     <div
       v-if="!error"
-      class="absolute bottom-0 mb-2 flex w-fit justify-center space-x-4 rounded-xl bg-bg p-2"
+      class="absolute bottom-0 mb-2 flex w-fit justify-center gap-2 space-x-4 rounded-2xl bg-bg p-2"
     >
-      <Button icon-only transparent @click="zoomIn">
-        <ZoomInIcon />
-      </Button>
-      <Button icon-only transparent @click="resetZoom">
-        <HomeIcon />
-      </Button>
-      <Button icon-only transparent @click="zoomOut">
-        <ZoomOutIcon />
-      </Button>
+      <ButtonStyled type="transparent" @click="zoomIn">
+        <button>
+          <ZoomInIcon />
+        </button>
+      </ButtonStyled>
+      <ButtonStyled type="transparent" @click="zoomOut">
+        <button>
+          <ZoomOutIcon />
+        </button>
+      </ButtonStyled>
+      <ButtonStyled type="transparent" @click="resetZoom">
+        <button>Reset Zoom</button>
+      </ButtonStyled>
     </div>
   </div>
 </template>
@@ -64,7 +68,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { HomeIcon, ZoomInIcon, ZoomOutIcon } from "@modrinth/assets";
-import { Button } from "@modrinth/ui";
+import { Button, ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps({
   imageBlob: {
