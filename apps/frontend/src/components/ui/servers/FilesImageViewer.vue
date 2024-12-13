@@ -2,7 +2,7 @@
   <div class="flex h-[calc(100vh-12rem)] w-full flex-col items-center bg-bg-raised">
     <div
       ref="container"
-      class="relative w-full flex-grow cursor-grab overflow-hidden bg-bg-raised active:cursor-grabbing"
+      class="relative w-full flex-grow cursor-grab overflow-hidden active:cursor-grabbing"
       @mousedown="startPan"
       @mousemove="pan"
       @mouseup="endPan"
@@ -49,12 +49,12 @@
       class="absolute bottom-0 mb-2 flex w-fit justify-center gap-2 space-x-4 rounded-2xl bg-bg p-2"
     >
       <ButtonStyled type="transparent" @click="zoomIn">
-        <button>
+        <button v-tooltip="'Zoom in'">
           <ZoomInIcon />
         </button>
       </ButtonStyled>
       <ButtonStyled type="transparent" @click="zoomOut">
-        <button>
+        <button v-tooltip="'Zoom out'">
           <ZoomOutIcon />
         </button>
       </ButtonStyled>
