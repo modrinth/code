@@ -141,7 +141,7 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
 import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
-import type { Server } from "~/composables/pyroServers";
+import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
@@ -190,7 +190,7 @@ useHead({
   title: computed(() => `Files - ${data.value?.name ?? "Server"} - Modrinth`),
 });
 
-const fetchDirectoryContents = async (): Promise<{ items: any[]; total: number }> => {
+const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
   const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
   try {
     const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
@@ -384,7 +384,7 @@ const handleRenameError = (error: any) => {
   }
 };
 
-const applyDefaultSort = (items: any[]) => {
+const applyDefaultSort = (items: DirectoryItem[]) => {
   return items.sort((a: any, b: any) => {
     if (a.type === "directory" && b.type !== "directory") return -1;
     if (a.type !== "directory" && b.type === "directory") return 1;

@@ -226,6 +226,21 @@ interface JWTAuth {
   token: string;
 }
 
+export interface DirectoryItem {
+  name: string;
+  type: "directory" | "file";
+  count?: number;
+  modified: number;
+  created: number;
+  path: string;
+}
+
+export interface DirectoryResponse {
+  items: DirectoryItem[];
+  total: number;
+  current?: number;
+}
+
 type ContentType = "Mod" | "Plugin";
 
 const constructServerProperties = (properties: any): string => {
@@ -1235,7 +1250,7 @@ type FSFunctions = {
    * @param pageSize - The page size to list.
    * @returns
    */
-  listDirContents: (path: string, page: number, pageSize: number) => Promise<any>;
+  listDirContents: (path: string, page: number, pageSize: number) => Promise<DirectoryResponse>;
 
   /**
    * @param path - The path to create the file or folder at.
