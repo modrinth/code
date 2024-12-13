@@ -18,7 +18,7 @@
         <ButtonStyled color="brand">
           <button :disabled="!!error" type="submit">
             <PlusIcon class="h-5 w-5" />
-            Create
+            Create {{ displayType }}
           </button>
         </ButtonStyled>
         <ButtonStyled>
