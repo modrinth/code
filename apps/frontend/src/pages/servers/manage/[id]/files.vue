@@ -406,6 +406,9 @@ const filteredItems = computed(() => {
     case "modified":
       result.sort((a, b) => new Date(b.modified).getTime() - new Date(a.modified).getTime());
       break;
+    case "created":
+      result.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+      break;
     case "filesOnly":
       result = result.filter((item) => item.type !== "directory");
       break;

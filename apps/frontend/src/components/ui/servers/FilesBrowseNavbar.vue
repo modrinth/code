@@ -80,6 +80,7 @@
             :options="[
               { id: 'normal', action: () => $emit('sort', 'default') },
               { id: 'modified', action: () => $emit('sort', 'modified') },
+              { id: 'created', action: () => $emit('sort', 'created') },
               { id: 'filesOnly', action: () => $emit('sort', 'filesOnly') },
               { id: 'foldersOnly', action: () => $emit('sort', 'foldersOnly') },
             ]"
@@ -91,6 +92,7 @@
             <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
             <template #normal> Alphabetical </template>
             <template #modified> Date modified </template>
+            <template #created> Date created </template>
             <template #filesOnly> Files only </template>
             <template #foldersOnly> Folders only </template>
           </UiServersTeleportOverflowMenu>
@@ -183,6 +185,8 @@ const sortMethodLabel = computed(() => {
   switch (props.sortMethod) {
     case "modified":
       return "Date modified";
+    case "created":
+      return "Date created";
     case "filesOnly":
       return "Files only";
     case "foldersOnly":
