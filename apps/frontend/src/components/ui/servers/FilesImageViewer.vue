@@ -1,8 +1,8 @@
 <template>
-  <div class="flex h-[calc(100vh-12rem)] w-full flex-col items-center bg-bg-raised">
+  <div class="flex h-[calc(100vh-12rem)] w-full flex-col items-center">
     <div
       ref="container"
-      class="relative w-full flex-grow cursor-grab overflow-hidden active:cursor-grabbing"
+      class="relative w-full flex-grow cursor-grab overflow-hidden rounded-b-2xl bg-black active:cursor-grabbing"
       @mousedown="startPan"
       @mousemove="pan"
       @mouseup="endPan"
