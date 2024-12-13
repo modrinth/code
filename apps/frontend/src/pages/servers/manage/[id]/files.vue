@@ -75,7 +75,8 @@
         </div>
         <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
           <div
-            class="flex w-full flex-row items-center border-0 border-b border-solid border-bg-raised px-3 py-2 text-xs font-bold uppercase"
+            aria-hidden="true"
+            class="flex w-full select-none flex-row items-center border-0 border-b border-solid border-bg-raised px-3 py-2 text-xs font-bold uppercase"
           >
             <div class="min-w-[48px]"></div>
             <span class="flex w-full">Name</span>
