@@ -67,8 +67,8 @@
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import { HomeIcon, ZoomInIcon, ZoomOutIcon } from "@modrinth/assets";
-import { Button, ButtonStyled } from "@modrinth/ui";
+import { ZoomInIcon, ZoomOutIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
 
 const props = defineProps({
   imageBlob: {
