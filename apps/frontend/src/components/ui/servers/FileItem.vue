@@ -26,9 +26,12 @@
     </div>
 
     <div data-pyro-file-actions class="flex w-fit flex-shrink-0 items-center gap-4 md:gap-12">
-      <span class="w-[160px] text-nowrap text-right font-mono text-sm text-secondary">{{
-        formattedDate
-      }}</span>
+      <span class="hidden w-[160px] text-nowrap font-mono text-sm text-secondary md:flex">
+        {{ formattedCreationDate }}
+      </span>
+      <span class="w-[160px] text-nowrap font-mono text-sm text-secondary">
+        {{ formattedModifiedDate }}
+      </span>
       <ButtonStyled circular type="transparent">
         <UiServersTeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
           <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
@@ -70,6 +73,7 @@ interface FileItemProps {
   size?: number;
   count?: number;
   modified: number;
+  created: number;
   path: string;
 }
 
@@ -161,8 +165,21 @@ const subText = computed(() => {
   return formattedSize.value;
 });
 
-const formattedDate = computed(() => {
+const formattedModifiedDate = computed(() => {
   const date = new Date(props.modified * 1000);
+  return `${date.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "2-digit",
+  })}, ${date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  })}`;
+});
+
+const formattedCreationDate = computed(() => {
+  const date = new Date(props.created * 1000);
   return `${date.toLocaleDateString("en-US", {
     month: "2-digit",
     day: "2-digit",
