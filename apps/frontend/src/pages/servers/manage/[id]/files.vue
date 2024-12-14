@@ -65,17 +65,18 @@
             v-if="!isEditingImage"
             v-model:value="fileContent"
             :lang="
-              editingFile?.name.split('.').pop()?.toLowerCase() === 'json'
-                ? 'json'
-                : editingFile?.name.split('.').pop()?.toLowerCase() === 'toml'
-                  ? 'toml'
-                  : editingFile?.name.split('.').pop()?.toLowerCase() === 'sh'
-                    ? 'sh'
-                    : ['yml', 'yaml'].includes(
-                          editingFile?.name.split('.').pop()?.toLowerCase() ?? '',
-                        )
-                      ? 'yaml'
-                      : 'text'
+              (() => {
+                const ext = editingFile?.name?.split('.')?.pop()?.toLowerCase() ?? '';
+                return ext === 'json'
+                  ? 'json'
+                  : ext === 'toml'
+                    ? 'toml'
+                    : ext === 'sh'
+                      ? 'sh'
+                      : ['yml', 'yaml'].includes(ext)
+                        ? 'yaml'
+                        : 'text';
+              })()
             "
             theme="one_dark"
             :print-margin="false"
