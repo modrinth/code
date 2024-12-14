@@ -8,7 +8,7 @@
       isDragging ? 'opacity-50' : '',
     ]"
     tabindex="0"
-    :draggable="type === 'file'"
+    draggable="true"
     @click="selectItem"
     @contextmenu="openContextMenu"
     @keydown="(e) => e.key === 'Enter' && selectItem()"
@@ -277,7 +277,8 @@ const selectItem = () => {
 };
 
 const handleDragStart = (event: DragEvent) => {
-  if (!event.dataTransfer || props.type !== "file") return;
+  if (!event.dataTransfer) return;
+
   isDragging.value = true;
   event.dataTransfer.setData(
     "application/pyro-file-move",
@@ -288,6 +289,10 @@ const handleDragStart = (event: DragEvent) => {
     }),
   );
   event.dataTransfer.effectAllowed = "move";
+};
+
+const isChildPath = (parentPath: string, childPath: string) => {
+  return childPath.startsWith(parentPath + "/");
 };
 
 const handleDragEnd = () => {
@@ -314,7 +319,13 @@ const handleDrop = (event: DragEvent) => {
 
   try {
     const dragData = JSON.parse(event.dataTransfer.getData("application/pyro-file-move"));
+
     if (dragData.path === props.path) return;
+
+    if (dragData.type === "directory" && isChildPath(dragData.path, props.path)) {
+      console.error("Cannot move a folder into its own subfolder");
+      return;
+    }
 
     emit("moveDirectTo", {
       name: dragData.name,
