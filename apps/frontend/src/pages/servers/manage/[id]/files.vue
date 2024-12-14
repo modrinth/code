@@ -115,6 +115,7 @@
           @home="navigateToSegment(-1)"
         />
       </div>
+
       <div
         v-if="isDragging"
         class="absolute inset-0 flex items-center justify-center rounded-xl bg-black bg-opacity-50 text-white"
@@ -713,6 +714,13 @@ const saveFileContent = async (exit: boolean = true) => {
 const saveFileContentRestart = async () => {
   await saveFileContent();
   await props.server.general?.power("Restart");
+
+  addNotification({
+    group: "files",
+    title: "Server restarted",
+    text: "Your server has been restarted.",
+    type: "success",
+  });
 };
 
 const saveFileContentAs = async () => {
