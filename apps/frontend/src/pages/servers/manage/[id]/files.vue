@@ -131,6 +131,8 @@
       @download="downloadFile"
       @delete="showDeleteModal"
     />
+
+    <UiServersFileUploadIndicator :show="isUploading" :current-file="currentUploadFile" />
   </div>
 </template>
 
@@ -179,6 +181,10 @@ const imagePreview = ref();
 
 const isDragging = ref(false);
 const dragCounter = ref(0);
+
+const isUploading = ref(false);
+const currentUploadFile = ref("");
+const uploadTimeout = ref<NodeJS.Timeout>();
 
 const data = computed(() => props.server.general);
 
@@ -544,6 +550,12 @@ onUnmounted(() => {
   window.removeEventListener("scroll", onScroll);
 });
 
+onUnmounted(() => {
+  if (uploadTimeout.value) {
+    clearTimeout(uploadTimeout.value);
+  }
+});
+
 watch(
   () => route.query,
   async (newQuery) => {
@@ -663,9 +675,16 @@ const handleDrop = async (event: DragEvent) => {
 
 const uploadFile = async (file: File) => {
   try {
+    isUploading.value = true;
+    currentUploadFile.value = file.name;
+
     const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
     await props.server.fs?.uploadFile(filePath, file);
     refreshList();
+
+    await new Promise((resolve) => {
+      uploadTimeout.value = setTimeout(resolve, 2000);
+    });
 
     addNotification({
       group: "files",
@@ -675,6 +694,9 @@ const uploadFile = async (file: File) => {
     });
   } catch (error) {
     console.error("Error uploading file:", error);
+  } finally {
+    isUploading.value = false;
+    currentUploadFile.value = "";
   }
 };
 
