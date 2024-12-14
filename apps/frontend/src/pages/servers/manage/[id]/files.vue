@@ -248,10 +248,11 @@ const handleCreateNewItem = async (name: string) => {
     await props.server.fs?.createFileOrFolder(path, newItemType.value);
 
     refreshList();
+
     addNotification({
       group: "files",
-      title: "File created",
-      text: "Your file has been created.",
+      title: `${newItemType.value === "directory" ? "Folder" : "File"} created`,
+      text: `New ${newItemType.value === "directory" ? "folder" : "file"} ${name} has been created.`,
       type: "success",
     });
   } catch (error) {
