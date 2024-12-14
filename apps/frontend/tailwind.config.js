@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+const config = {
   content: [
     "./src/components/**/*.{js,vue,ts}",
     "./src/layouts/**/*.vue",
@@ -68,6 +68,8 @@ module.exports = {
           bgActive: "var(--color-button-bg-active)",
           textActive: "var(--color-button-text-active)",
           border: "var(--color-button-border)",
+          bgSelected: "var(--color-button-bg-selected)",
+          textSelected: "var(--color-button-text-selected)",
         },
         toggleHandle: "var(--color-toggle-handle)",
         dropdown: {
@@ -150,3 +152,5 @@ module.exports = {
     preflight: false,
   },
 };
+
+export default config;

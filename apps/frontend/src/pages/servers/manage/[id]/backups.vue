@@ -107,6 +107,7 @@
                     v-tooltip="'Backup in progress'"
                     class="size-6 animate-spin"
                   />
+                  <LockIcon v-else-if="backup.locked" class="size-8" />
                   <BoxIcon v-else class="size-8" />
                 </div>
                 <div class="flex min-w-0 flex-col gap-2">
@@ -160,6 +161,16 @@
                     },
                     { id: 'download', action: () => initiateDownload(backup.id) },
                     {
+                      id: 'lock',
+                      action: () => {
+                        if (backup.locked) {
+                          unlockBackup(backup.id);
+                        } else {
+                          lockBackup(backup.id);
+                        }
+                      },
+                    },
+                    {
                       id: 'delete',
                       action: () => {
                         currentBackup = backup.id;
@@ -172,6 +183,8 @@
                   <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
                   <template #rename> <EditIcon /> Rename </template>
                   <template #restore> <ClipboardCopyIcon /> Restore </template>
+                  <template v-if="backup.locked" #lock> <LockOpenIcon /> Unlock </template>
+                  <template v-else #lock> <LockIcon /> Lock </template>
                   <template #download> <DownloadIcon /> Download </template>
                   <template #delete> <TrashIcon /> Delete </template>
                 </UiServersTeleportOverflowMenu>
@@ -217,12 +230,14 @@ import {
   TrashIcon,
   SettingsIcon,
   BoxIcon,
+  LockIcon,
+  LockOpenIcon,
 } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
   isServerRunning: boolean;
 }>();
 
@@ -332,6 +347,24 @@ const initiateDownload = async (backupId: string) => {
     a.remove();
   } catch (error) {
     console.error("Download failed:", error);
+  }
+};
+
+const lockBackup = async (backupId: string) => {
+  try {
+    await props.server.backups?.lock(backupId);
+    await props.server.refresh(["backups"]);
+  } catch (error) {
+    console.error("Failed to toggle lock:", error);
+  }
+};
+
+const unlockBackup = async (backupId: string) => {
+  try {
+    await props.server.backups?.unlock(backupId);
+    await props.server.refresh(["backups"]);
+  } catch (error) {
+    console.error("Failed to toggle lock:", error);
   }
 };
 

@@ -193,7 +193,7 @@ impl ProjectType {
             ProjectType::Mod => "mod",
             ProjectType::DataPack => "datapack",
             ProjectType::ResourcePack => "resourcepack",
-            ProjectType::ShaderPack => "shaderpack",
+            ProjectType::ShaderPack => "shader",
         }
     }
 

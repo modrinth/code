@@ -169,19 +169,19 @@ fn main() {
     }
 
     builder = builder
-        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
-            if let Some(payload) = args.get(1) {
-                tracing::info!("Handling deep link from arg {payload}");
-                let payload = payload.clone();
-                tauri::async_runtime::spawn(api::utils::handle_command(
-                    payload,
-                ));
-            }
-
-            if let Some(win) = app.get_window("main") {
-                let _ = win.set_focus();
-            }
-        }))
+        //         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+        //             if let Some(payload) = args.get(1) {
+        //                 tracing::info!("Handling deep link from arg {payload}");
+        //                 let payload = payload.clone();
+        //                 tauri::async_runtime::spawn(api::utils::handle_command(
+        //                     payload,
+        //                 ));
+        //             }
+        //
+        //             if let Some(win) = app.get_window("main") {
+        //                 let _ = win.set_focus();
+        //             }
+        //         }))
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
@@ -260,6 +260,7 @@ fn main() {
         .plugin(api::utils::init())
         .plugin(api::cache::init())
         .plugin(api::ads::init())
+        .plugin(api::friends::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,

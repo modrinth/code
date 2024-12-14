@@ -677,6 +677,11 @@ pub async fn launch_minecraft(
         .set_activity(&format!("Playing {}", profile.name), true)
         .await;
 
+    let _ = state
+        .friends_socket
+        .update_status(Some(profile.name.clone()))
+        .await;
+
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
     state

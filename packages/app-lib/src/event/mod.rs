@@ -1,4 +1,5 @@
 //! Theseus state management system
+use crate::state::UserStatus;
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
@@ -255,4 +256,14 @@ pub enum EventError {
     #[cfg(feature = "tauri")]
     #[error("Tauri error: {0}")]
     TauriError(#[from] tauri::Error),
+}
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "event")]
+pub enum FriendPayload {
+    FriendRequest { from: String },
+    UserOffline { id: String },
+    StatusUpdate { user_status: UserStatus },
+    StatusSync,
 }

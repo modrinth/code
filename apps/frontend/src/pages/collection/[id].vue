@@ -380,7 +380,14 @@ import {
   LibraryIcon,
   BoxIcon,
 } from "@modrinth/assets";
-import { PopoutMenu, FileInput, DropdownSelect, Avatar, Button } from "@modrinth/ui";
+import {
+  PopoutMenu,
+  FileInput,
+  DropdownSelect,
+  Avatar,
+  Button,
+  commonMessages,
+} from "@modrinth/ui";
 
 import WorldIcon from "assets/images/utils/world.svg";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";

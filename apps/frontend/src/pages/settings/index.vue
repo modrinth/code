@@ -16,38 +16,12 @@
     <section class="universal-card">
       <h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
       <p>{{ formatMessage(colorTheme.description) }}</p>
-      <div class="theme-options mt-4">
-        <button
-          v-for="option in themeOptions"
-          :key="option"
-          class="preview-radio button-base"
-          :class="{ selected: theme.preferred === option }"
-          @click="() => updateColorTheme(option)"
-        >
-          <div class="preview" :class="`${option === 'system' ? systemTheme : option}-mode`">
-            <div class="example-card card card">
-              <div class="example-icon"></div>
-              <div class="example-text-1"></div>
-              <div class="example-text-2"></div>
-            </div>
-          </div>
-          <div class="label">
-            <RadioButtonChecked v-if="theme.preferred === option" class="radio" />
-            <RadioButtonIcon v-else class="radio" />
-            {{ colorTheme[option] ? formatMessage(colorTheme[option]) : option }}
-            <SunIcon
-              v-if="theme.preferences.light === option"
-              v-tooltip="formatMessage(colorTheme.preferredLight)"
-              class="theme-icon"
-            />
-            <MoonIcon
-              v-else-if="theme.preferences.dark === option"
-              v-tooltip="formatMessage(colorTheme.preferredDark)"
-              class="theme-icon"
-            />
-          </div>
-        </button>
-      </div>
+      <ThemeSelector
+        :update-color-theme="updateColorTheme"
+        :current-theme="theme.preferred"
+        :theme-options="themeOptions"
+        :system-theme-color="systemTheme"
+      />
     </section>
     <section class="universal-card">
       <h2 class="text-2xl">{{ formatMessage(projectListLayouts.title) }}</h2>
@@ -224,8 +198,8 @@
 </template>
 
 <script setup lang="ts">
-import { CodeIcon, MoonIcon, RadioButtonChecked, RadioButtonIcon, SunIcon } from "@modrinth/assets";
-import { Button } from "@modrinth/ui";
+import { CodeIcon, RadioButtonChecked, RadioButtonIcon } from "@modrinth/assets";
+import { Button, ThemeSelector } from "@modrinth/ui";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
 import type { DisplayLocation } from "~/plugins/cosmetics";
 import { formatProjectType } from "~/plugins/shorthands.js";
@@ -257,34 +231,6 @@ const colorTheme = defineMessages({
   description: {
     id: "settings.display.theme.description",
     defaultMessage: "Select your preferred color theme for Modrinth on this device.",
-  },
-  system: {
-    id: "settings.display.theme.system",
-    defaultMessage: "Sync with system",
-  },
-  light: {
-    id: "settings.display.theme.light",
-    defaultMessage: "Light",
-  },
-  dark: {
-    id: "settings.display.theme.dark",
-    defaultMessage: "Dark",
-  },
-  oled: {
-    id: "settings.display.theme.oled",
-    defaultMessage: "OLED",
-  },
-  retro: {
-    id: "settings.display.theme.retro",
-    defaultMessage: "Retro",
-  },
-  preferredLight: {
-    id: "settings.display.theme.preferred-light-theme",
-    defaultMessage: "Preferred light theme",
-  },
-  preferredDark: {
-    id: "settings.display.theme.preferred-dark-theme",
-    defaultMessage: "Preferred dark theme",
   },
 });
 
@@ -457,107 +403,6 @@ const listTypes = computed(() => {
 });
 </script>
 <style scoped lang="scss">
-.preview-radio {
-  width: 100%;
-  border-radius: var(--radius-md);
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--color-divider);
-  background-color: var(--color-button-bg);
-  color: var(--color-base);
-  display: flex;
-  flex-direction: column;
-  outline: 2px solid transparent;
-
-  &.selected {
-    color: var(--color-contrast);
-
-    .label {
-      .radio {
-        color: var(--color-brand);
-      }
-
-      .theme-icon {
-        color: var(--color-text);
-      }
-    }
-  }
-
-  .preview {
-    background-color: var(--color-bg);
-    padding: 1.5rem;
-    outline: 2px solid transparent;
-    width: 100%;
-
-    .example-card {
-      margin: 0;
-      padding: 1rem;
-      outline: 2px solid transparent;
-      min-height: 0;
-    }
-  }
-
-  .label {
-    display: flex;
-    align-items: center;
-    text-align: left;
-    flex-grow: 1;
-    padding: var(--gap-md) var(--gap-lg);
-
-    .radio {
-      margin-right: 0.5rem;
-    }
-
-    .theme-icon {
-      color: var(--color-secondary);
-      margin-left: 0.25rem;
-    }
-  }
-}
-.theme-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
-  gap: var(--gap-lg);
-
-  .preview .example-card {
-    margin: 0;
-    padding: 1rem;
-    display: grid;
-    grid-template: "icon text1" "icon text2";
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem;
-    outline: 2px solid transparent;
-
-    .example-icon {
-      grid-area: icon;
-      width: 2rem;
-      height: 2rem;
-      background-color: var(--color-button-bg);
-      border-radius: var(--radius-sm);
-      outline: 2px solid transparent;
-    }
-
-    .example-text-1,
-    .example-text-2 {
-      height: 0.5rem;
-      border-radius: var(--radius-sm);
-      outline: 2px solid transparent;
-    }
-
-    .example-text-1 {
-      grid-area: text1;
-      width: 100%;
-      background-color: var(--color-base);
-    }
-
-    .example-text-2 {
-      grid-area: text2;
-      width: 60%;
-      background-color: var(--color-secondary);
-    }
-  }
-}
-
 .project-lists {
   display: flex;
   flex-direction: column;

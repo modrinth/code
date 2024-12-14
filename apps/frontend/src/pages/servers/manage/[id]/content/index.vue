@@ -1,5 +1,5 @@
 <template>
-  <NewModal ref="modModal" header="Edit mod version">
+  <NewModal ref="modModal" header="Editing mod version">
     <div>
       <div class="mb-4 flex flex-col gap-4">
         <div class="inline-flex flex-wrap items-center">
@@ -19,7 +19,8 @@
             <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
               Your server was created from a modpack. Changing the mod version may cause unexpected
-              issues.
+              issues. You can update the modpack version in your server's Options > Platform
+              settings.
             </span>
           </div>
         </div>
@@ -72,7 +73,7 @@
                 type="search"
                 name="search"
                 autocomplete="off"
-                placeholder="Search mods..."
+                :placeholder="`Search ${type}s...`"
                 @input="debouncedSearch"
               />
             </div>
@@ -80,7 +81,7 @@
               <UiServersTeleportOverflowMenu
                 position="bottom"
                 direction="left"
-                aria-label="Filter mods"
+                :aria-label="`Filter ${type}s`"
                 :options="[
                   { id: 'all', action: () => (filterMethod = 'all') },
                   { id: 'enabled', action: () => (filterMethod = 'enabled') },
@@ -92,7 +93,7 @@
                 </span>
                 <FilterIcon aria-hidden="true" />
                 <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-                <template #all> All mods </template>
+                <template #all> All {{ type }}s </template>
                 <template #enabled> Only enabled </template>
                 <template #disabled> Only disabled </template>
               </UiServersTeleportOverflowMenu>
@@ -101,10 +102,10 @@
           <ButtonStyled v-if="hasMods" color="brand" type="outlined">
             <nuxt-link
               class="w-full text-nowrap sm:w-fit"
-              :to="`/mods?sid=${props.server.serverId}`"
+              :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
             >
               <PlusIcon />
-              Add content
+              Add {{ type.toLocaleLowerCase() }}
             </nuxt-link>
           </ButtonStyled>
         </div>
@@ -227,13 +228,47 @@
           </div>
         </div>
       </div>
-      <div v-else class="mt-4 flex h-full flex-col items-center justify-center text-center">
-        <PackageClosedIcon class="size-24 text-neutral-500" />
-        <p class="m-0 pb-2 pt-3 text-neutral-200">No mods found!</p>
-        <p class="m-0 pb-3 text-neutral-400">Add some mods to your server to manage them here.</p>
-        <ButtonStyled color="brand" class="mt-8">
-          <nuxt-link :to="`/mods?sid=${props.server.serverId}`">Add content</nuxt-link>
+      <!-- no mods has platform -->
+      <div
+        v-else-if="
+          !hasMods &&
+          props.server.general?.loader &&
+          props.server.general?.loader.toLocaleLowerCase() !== 'vanilla'
+        "
+        class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
+      >
+        <PackageClosedIcon class="size-24" />
+        <p class="m-0 font-bold text-contrast">No {{ type }}s found!</p>
+        <p class="m-0">Add some {{ type }}s to your server to manage them here.</p>
+        <ButtonStyled color="brand">
+          <NuxtLink :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`">
+            <PlusIcon />
+            Add {{ type.toLocaleLowerCase() }}
+          </NuxtLink>
         </ButtonStyled>
+      </div>
+      <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
+        <UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
+        <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
+        <p class="m-0">
+          Add content to your server by installing a modpack or choosing a different platform that
+          supports {{ type }}s.
+        </p>
+        <div class="flex flex-row items-center gap-4">
+          <ButtonStyled class="mt-8">
+            <NuxtLink :to="`/modpacks?sid=${props.server.serverId}`">
+              <CompassIcon />
+              Find a modpack
+            </NuxtLink>
+          </ButtonStyled>
+          <div>or</div>
+          <ButtonStyled class="mt-8">
+            <NuxtLink :to="`/${type}s?sid=${props.server.serverId}`">
+              <WrenchIcon />
+              Change platform
+            </NuxtLink>
+          </ButtonStyled>
+        </div>
       </div>
     </div>
   </div>
@@ -251,14 +286,21 @@ import {
   XIcon,
   PlusIcon,
   MoreVerticalIcon,
+  CompassIcon,
+  WrenchIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
+
+const type = computed(() => {
+  const loader = props.server.general?.loader?.toLowerCase();
+  return loader === "paper" || loader === "purpur" ? "Plugin" : "Mod";
+});
 
 interface Mod {
   name?: string;
@@ -291,7 +333,7 @@ const filterMethodLabel = computed(() => {
     case "enabled":
       return "Only enabled";
     default:
-      return "All mods";
+      return `All ${type.value}s`;
   }
 });
 
@@ -350,7 +392,7 @@ onUnmounted(() => {
 });
 
 watch(
-  () => props.server.mods?.data,
+  () => props.server.content?.data,
   (newMods) => {
     if (newMods) {
       localMods.value = [...newMods];
@@ -399,7 +441,7 @@ async function toggleMod(mod: Mod) {
 
     await props.server.fs?.moveFileOrFolder(sourcePath, destinationPath);
 
-    await props.server.refresh(["general", "mods"]);
+    await props.server.refresh(["general", "content"]);
   } catch (error) {
     mod.filename = originalFilename;
     mod.disabled = originalFilename.endsWith(".disabled");
@@ -418,8 +460,11 @@ async function removeMod(mod: Mod) {
   mod.changing = true;
 
   try {
-    await props.server.mods?.remove(`/mods/${mod.filename}`);
-    await props.server.refresh(["general", "mods"]);
+    await props.server.content?.remove(
+      type.value as "Mod" | "Plugin",
+      `/${type.value.toLowerCase()}s/${mod.filename}`,
+    );
+    await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error removing mod:", error);
 
@@ -439,7 +484,12 @@ const currentVersion = ref();
 
 async function beginChangeModVersion(mod: Mod) {
   currentMod.value = mod;
-  currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false, true);
+  currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false);
+
+  currentVersions.value = currentVersions.value.filter((version: any) =>
+    version.loaders.includes(props.server.general?.loader?.toLowerCase()),
+  );
+
   currentVersion.value = currentVersions.value.find(
     (version: any) => version.id === mod.version_id,
   );
@@ -450,9 +500,12 @@ async function changeModVersion() {
   currentMod.value.changing = true;
   try {
     modModal.value.hide();
-    await props.server.mods?.remove(`/mods/${currentMod.value.filename}`);
-    await props.server.mods?.install(currentMod.value.project_id, currentVersion.value.id);
-    await props.server.refresh(["general", "mods"]);
+    await props.server.content?.reinstall(
+      type.value,
+      currentMod.value.version_id,
+      currentVersion.value.id,
+    );
+    await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error changing mod version:", error);
   }

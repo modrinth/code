@@ -34,6 +34,7 @@
     "settings:default",
     "tags:default",
     "utils:default",
-    "ads:default"
+    "ads:default",
+    "friends:default"
   ]
 }

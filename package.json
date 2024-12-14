@@ -3,23 +3,27 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "ui:intl:extract": "pnpm run --filter=@modrinth/ui intl:extract",
     "web:dev": "turbo run dev --filter=@modrinth/frontend",
     "web:build": "turbo run build --filter=@modrinth/frontend",
+    "web:intl:extract": "pnpm run --filter=@modrinth/frontend intl:extract",
     "app:dev": "turbo run dev --filter=@modrinth/app",
     "docs:dev": "turbo run dev --filter=@modrinth/docs",
     "app:build": "turbo run build --filter=@modrinth/app",
+    "app:intl:extract": "pnpm run --filter=@modrinth/app-frontend intl:extract",
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "build": "turbo run build --continue",
     "lint": "turbo run lint --continue",
     "test": "turbo run test --continue",
-    "fix": "turbo run fix --continue"
+    "fix": "turbo run fix --continue",
+    "intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract"
   },
   "devDependencies": {
     "prettier": "^3.3.2",
     "turbo": "^2.2.3",
-    "vue": "^3.4.31"
+    "vue": "^3.5.13"
   },
-  "packageManager": "pnpm@9.4.0",
+  "packageManager": "pnpm@9.15.0",
   "pnpm": {
     "patchedDependencies": {
       "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"

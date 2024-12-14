@@ -146,6 +146,7 @@ where
         }
         _ => return Err(AuthenticationError::InvalidAuthMethod),
     };
+
     Ok(possible_user)
 }
 

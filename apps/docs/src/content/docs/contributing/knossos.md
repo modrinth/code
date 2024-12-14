@@ -3,7 +3,7 @@ title: Knossos (Frontend)
 description: Guide for contributing to Modrinth's frontend
 ---
 
-This project is our [monorepo](https://github.com/modrinth/code). You can find the frontend in the `apps/frontend` directory.
+This project is part of our [monorepo](https://github.com/modrinth/code). You can find it in the `apps/frontend` directory.
 
 [knossos] is the Nuxt.js frontend. You will need to install [pnpm] and run the standard commands:
 

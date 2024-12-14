@@ -52,18 +52,32 @@ info:
     For example, deleting a user account can only be done through Modrinth's frontend.
 
     ### OAuth2
-    Applications interacting with the authenticated API should create an OAuth2 application.
+    Applications interacting with an authenticated API should create an OAuth2 application.
     You can do this in [the developer settings](https://modrinth.com/settings/applications).
+
+    Make sure to save your application secret, as you will not be able to access it after you leave the page.
 
     Once you have created a client, use the following URL to have a user authorize your client:
     ```
     https://modrinth.com/auth/authorize?client_id=<CLIENT_ID>&redirect_uri=<CALLBACK_URL>&scope=<SCOPE_ONE>+<SCOPE_TWO>+<SCOPE_THREE>
     ```
+    > You can get a list of all scope names [here](https://github.com/modrinth/code/tree/main/apps/labrinth/src/models/v3/pats.rs).
 
-    Then, use the following URL to get the token:
+    Then, send a `POST` request to the following URL to get the token:
+
     ```
     https://api.modrinth.com/_internal/oauth/token
     ```
+
+    > Note that you will need to provide your application's secret under the Authorization header.
+
+    In the body of your request, make sure to include the following:
+    - `code`: The code generated when authorizing your client
+    - `client_id`: Your client ID (found in developer settings)
+    - `redirect_uri`: A valid redirect URI provided in your application's settings
+    - `grant_type`: This will need to be `authorization_code`.
+
+    If your token request fails for any reason, you will need to get another code from the authorization process.
 
     This route will be changed in the future to move the `_internal` part to `v3`.
 
@@ -190,7 +204,7 @@ components:
       description: The IDs and/or slugs of the projects
       schema:
         type: string
-        example: "[\"AABBCCDD\", \"EEFFGGHH\"]"
+        example: '["AABBCCDD", "EEFFGGHH"]'
       required: true
     UserIdentifier:
       name: id|username
@@ -309,27 +323,27 @@ components:
         name:
           type: string
           description: The name of this version
-          example: "Version 1.0.0"
+          example: 'Version 1.0.0'
         version_number:
           type: string
-          description: "The version number. Ideally will follow semantic versioning"
-          example: "1.0.0"
+          description: 'The version number. Ideally will follow semantic versioning'
+          example: '1.0.0'
         changelog:
           type: string
-          description: "The changelog for this version"
-          example: "List of changes in this version: ..."
+          description: 'The changelog for this version'
+          example: 'List of changes in this version: ...'
           nullable: true
         dependencies:
           type: array
           items:
-            $ref: "#/components/schemas/VersionDependency"
+            $ref: '#/components/schemas/VersionDependency'
           description: A list of specific versions of projects that this version depends on
         game_versions:
           type: array
           items:
             type: string
           description: A list of versions of Minecraft that this version supports
-          example: ["1.16.5", "1.17.1"]
+          example: ['1.16.5', '1.17.1']
         version_type:
           type: string
           description: The release channel for this version
@@ -340,7 +354,7 @@ components:
           items:
             type: string
           description: The mod loaders that this version supports. In case of resource packs, use "minecraft"
-          example: ["fabric", "forge", "minecraft"]
+          example: ['fabric', 'forge', 'minecraft']
         featured:
           type: boolean
           description: Whether the version is featured or not
@@ -373,7 +387,7 @@ components:
           nullable: true
         dependency_type:
           type: string
-          enum: [ required, optional, incompatible, embedded ]
+          enum: [required, optional, incompatible, embedded]
           description: The type of dependency that this version has
           example: required
       required:
@@ -409,7 +423,7 @@ components:
           example: aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj
         file_type:
           type: string
-          enum: [ required-resource-pack, optional-resource-pack ]
+          enum: [required-resource-pack, optional-resource-pack]
           description: The hash algorithm of the file you're editing
           example: required-resource-pack
           nullable: true
@@ -450,7 +464,7 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/CreatableVersion'
-      required: [ data ]
+      required: [data]
     Version:
       allOf:
         - $ref: '#/components/schemas/BaseVersion'
@@ -505,11 +519,11 @@ components:
           $ref: '#/components/schemas/VersionFileHashes'
         url:
           type: string
-          example: "https://cdn.modrinth.com/data/AABBCCDD/versions/1.0.0/my_file.jar"
+          example: 'https://cdn.modrinth.com/data/AABBCCDD/versions/1.0.0/my_file.jar'
           description: A direct link to the file
         filename:
           type: string
-          example: "my_file.jar"
+          example: 'my_file.jar'
           description: The name of the file
         primary:
           type: boolean
@@ -521,7 +535,7 @@ components:
           description: The size of the file in bytes
         file_type:
           type: string
-          enum: [ required-resource-pack, optional-resource-pack ]
+          enum: [required-resource-pack, optional-resource-pack]
           description: The type of the additional file, used mainly for adding resource packs to datapacks
           example: required-resource-pack
           nullable: true
@@ -548,32 +562,36 @@ components:
           type: array
           items:
             type: string
-            example: [ fabric ]
+            example: [fabric]
         game_versions:
           type: array
           items:
             type: string
-          example: [ "1.18", 1.18.1 ]
+          example: ['1.18', 1.18.1]
       required:
         - loaders
         - game_versions
     HashVersionMap:
-      description: "A map from hashes to versions"
+      description: 'A map from hashes to versions'
       type: object
       additionalProperties:
         $ref: '#/components/schemas/Version'
     HashList:
-      description: "A list of hashes and the algorithm used to create them"
+      description: 'A list of hashes and the algorithm used to create them'
       type: object
       properties:
         hashes:
           type: array
           items:
             type: string
-          example: [ ea0f38408102e4d2efd53c2cc11b88b711996b48d8922f76ea6abf731219c5bd1efe39ddf9cce77c54d49a62ff10fb685c00d2e4c524ab99d20f6296677ab2c4, 925a5c4899affa4098d997dfa4a4cb52c636d539e94bc489d1fa034218cb96819a70eb8b01647a39316a59fcfe223c1a8c05ed2e2ae5f4c1e75fa48f6af1c960 ]
+          example:
+            [
+              ea0f38408102e4d2efd53c2cc11b88b711996b48d8922f76ea6abf731219c5bd1efe39ddf9cce77c54d49a62ff10fb685c00d2e4c524ab99d20f6296677ab2c4,
+              925a5c4899affa4098d997dfa4a4cb52c636d539e94bc489d1fa034218cb96819a70eb8b01647a39316a59fcfe223c1a8c05ed2e2ae5f4c1e75fa48f6af1c960,
+            ]
         algorithm:
           type: string
-          enum: [ sha1, sha512 ]
+          enum: [sha1, sha512]
           example: sha512
       required:
         - hashes
@@ -587,12 +605,12 @@ components:
               type: array
               items:
                 type: string
-              example: [ fabric ]
+              example: [fabric]
             game_versions:
               type: array
               items:
                 type: string
-              example: [ "1.18", 1.18.1 ]
+              example: ['1.18', 1.18.1]
           required:
             - loaders
             - game_versions
@@ -682,13 +700,13 @@ components:
               items:
                 type: string
               description: A list of the categories that the project has which are not secondary
-              example: ["technology", "fabric"]
+              example: ['technology', 'fabric']
             versions:
               type: array
               items:
                 type: string
               description: A list of the minecraft versions supported by the project
-              example: ["1.8", "1.8.9"]
+              example: ['1.8', '1.8.9']
             follows:
               type: integer
               description: The total number of users following the project
@@ -711,7 +729,11 @@ components:
             gallery:
               type: array
               description: All gallery images attached to the project
-              example: [https://cdn.modrinth.com/data/AABBCCDD/images/009b7d8d6e8bf04968a29421117c59b3efe2351a.png, https://cdn.modrinth.com/data/AABBCCDD/images/c21776867afb6046fdc3c21dbcf5cc50ae27a236.png]
+              example:
+                [
+                  https://cdn.modrinth.com/data/AABBCCDD/images/009b7d8d6e8bf04968a29421117c59b3efe2351a.png,
+                  https://cdn.modrinth.com/data/AABBCCDD/images/c21776867afb6046fdc3c21dbcf5cc50ae27a236.png,
+                ]
               items:
                 type: string
             featured_gallery:
@@ -743,7 +765,19 @@ components:
               example: A long body describing my project in detail
             status:
               type: string
-              enum: [approved, archived, rejected, draft, unlisted, processing, withheld, scheduled, private, unknown]
+              enum:
+                [
+                  approved,
+                  archived,
+                  rejected,
+                  draft,
+                  unlisted,
+                  processing,
+                  withheld,
+                  scheduled,
+                  private,
+                  unknown,
+                ]
               description: The status of the project
               example: approved
             requested_status:
@@ -943,13 +977,13 @@ components:
               type: array
               items:
                 type: string
-              example: ["1.19", "1.19.1", "1.19.2", "1.19.3"]
+              example: ['1.19', '1.19.1', '1.19.2', '1.19.3']
               description: A list of all of the game versions supported by the project
             loaders:
               type: array
               items:
                 type: string
-              example: ["forge", "fabric", "quilt"]
+              example: ['forge', 'fabric', 'quilt']
               description: A list of all of the loaders supported by the project
             gallery:
               type: array
@@ -1123,9 +1157,9 @@ components:
         icon:
           type: string
           format: binary
-          enum: [ "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif", "*.webp", "*.svg", "*.svgz", "*.rgb" ]
+          enum: ['*.png', '*.jpg', '*.jpeg', '*.bmp', '*.gif', '*.webp', '*.svg', '*.svgz', '*.rgb']
           description: Project icon file
-      required: [ data ]
+      required: [data]
     ProjectIdentifier:
       type: object
       properties:
@@ -1138,10 +1172,10 @@ components:
         time:
           type: string
           format: ISO-8601
-          example: "2023-02-05T19:39:55.551839Z"
+          example: '2023-02-05T19:39:55.551839Z'
         requested_status:
           type: string
-          enum: [ approved, archived, unlisted, private, draft ]
+          enum: [approved, archived, unlisted, private, draft]
           description: The requested status when scheduling the project for release
       required:
         - time
@@ -1216,12 +1250,12 @@ components:
           example: 10.11223344556677889900
         payout_wallet:
           type: string
-          enum: [ paypal, venmo ]
+          enum: [paypal, venmo]
           description: The wallet that the user has selected
           example: paypal
         payout_wallet_type:
           type: string
-          enum: [ email, phone, user_handle ]
+          enum: [email, phone, user_handle]
           description: The type of the user's wallet
           example: email
         payout_address:
@@ -1347,11 +1381,11 @@ components:
         title:
           type: string
           description: The title of the notification
-          example: "**My Project** has been updated!"
+          example: '**My Project** has been updated!'
         text:
           type: string
           description: The body text of the notification
-          example: "The project, My Project, has released a new version: 1.0.0"
+          example: 'The project, My Project, has released a new version: 1.0.0'
         link:
           type: string
           description: A link to the related project or version
@@ -1508,7 +1542,7 @@ components:
       properties:
         type:
           type: string
-          enum: [ status_change, text, thread_closure, deleted ]
+          enum: [status_change, text, thread_closure, deleted]
           description: The type of message
           example: status_change
         body:
@@ -1526,12 +1560,36 @@ components:
           example: SSTTUUVV
         old_status:
           type: string
-          enum: [ approved, archived, rejected, draft, unlisted, processing, withheld, scheduled, private, unknown ]
+          enum:
+            [
+              approved,
+              archived,
+              rejected,
+              draft,
+              unlisted,
+              processing,
+              withheld,
+              scheduled,
+              private,
+              unknown,
+            ]
           description: The old status of the project. **Only present for `status_change` message type**
           example: processing
         new_status:
           type: string
-          enum: [ approved, archived, rejected, draft, unlisted, processing, withheld, scheduled, private, unknown ]
+          enum:
+            [
+              approved,
+              archived,
+              rejected,
+              draft,
+              unlisted,
+              processing,
+              withheld,
+              scheduled,
+              private,
+              unknown,
+            ]
           description: The new status of the project. **Only present for `status_change` message type**
           example: approved
       required:
@@ -1596,7 +1654,7 @@ components:
         name:
           type: string
           description: The name of the category
-          example: "adventure"
+          example: 'adventure'
         project_type:
           type: string
           description: The project type this category is applicable to
@@ -1604,7 +1662,7 @@ components:
         header:
           type: string
           description: The header under which the category should go
-          example: "resolutions"
+          example: 'resolutions'
       required:
         - icon
         - name
@@ -1734,11 +1792,11 @@ components:
         error:
           type: string
           description: The name of the error
-          example: "invalid_input"
+          example: 'invalid_input'
         description:
           type: string
           description: The contents of the error
-          example: "Error while parsing multipart payload"
+          example: 'Error while parsing multipart payload'
       required:
         - error
         - description
@@ -1748,11 +1806,11 @@ components:
         error:
           type: string
           description: The name of the error
-          example: "unauthorized"
+          example: 'unauthorized'
         description:
           type: string
           description: The contents of the error
-          example: "Authentication Error: Invalid Authentication Credentials"
+          example: 'Authentication Error: Invalid Authentication Credentials'
       required:
         - error
         - description
@@ -1786,10 +1844,10 @@ components:
       type: object
       description: A list of the recommended and latest versions for each Minecraft release
       properties:
-        "{version}-recommended":
+        '{version}-recommended':
           type: string
           description: The mod version that is recommended for `{version}`. Excludes versions with the `alpha` and `beta` version types.
-        "{version}-latest":
+        '{version}-latest':
           type: string
           description: The latest mod version for `{version}`. Shows versions with the `alpha` and `beta` version types.
   securitySchemes:
@@ -1883,7 +1941,7 @@ paths:
           name: facets
           schema:
             type: string
-          example: "[[\"categories:forge\"],[\"versions:1.17.1\"],[\"project_type:mod\"],[\"license:mit\"]]"
+          example: '[["categories:forge"],["versions:1.17.1"],["project_type:mod"],["license:mit"]]'
           description: |
             Facets are an essential concept for understanding how to filter out results.
 
@@ -1961,13 +2019,13 @@ paths:
       tags:
         - projects
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SearchResults'
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
@@ -1982,13 +2040,13 @@ paths:
       tags:
         - projects
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Project'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     patch:
       summary: Modify a project
@@ -1998,21 +2056,21 @@ paths:
       security:
         - TokenAuth: ['PROJECT_WRITE']
       requestBody:
-        description: "Modified project fields"
+        description: 'Modified project fields'
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EditableProject'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     delete:
       summary: Delete a project
@@ -2022,15 +2080,15 @@ paths:
       security:
         - TokenAuth: ['PROJECT_DELETE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2045,7 +2103,7 @@ paths:
       tags:
         - projects
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -2067,15 +2125,15 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchProjectsBody'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2098,7 +2156,7 @@ paths:
       tags:
         - projects
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -2106,7 +2164,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Project'
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
@@ -2121,25 +2179,25 @@ paths:
       security:
         - TokenAuth: ['PROJECT_CREATE']
       requestBody:
-        description: "New project"
+        description: 'New project'
         content:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/CreateProjectBody'
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Project'
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2167,9 +2225,9 @@ paths:
       security:
         - TokenAuth: ['PROJECT_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
@@ -2183,15 +2241,15 @@ paths:
       security:
         - TokenAuth: ['PROJECT_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2206,13 +2264,13 @@ paths:
       tags:
         - projects
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectIdentifier'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /project/{id|slug}/gallery:
     parameters:
@@ -2257,21 +2315,21 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/Image'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     patch:
       summary: Modify a gallery image
@@ -2309,15 +2367,15 @@ paths:
           schema:
             type: integer
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     delete:
       summary: Delete a gallery image
@@ -2335,15 +2393,15 @@ paths:
             type: string
             format: uri
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2358,13 +2416,13 @@ paths:
       tags:
         - projects
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectDependencyList'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /project/{id|slug}/follow:
     parameters:
@@ -2377,15 +2435,15 @@ paths:
       security:
         - TokenAuth: ['USER_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2399,15 +2457,15 @@ paths:
       security:
         - TokenAuth: ['USER_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2430,15 +2488,15 @@ paths:
             schema:
               $ref: '#/components/schemas/Schedule'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2457,25 +2515,25 @@ paths:
         - in: query
           name: loaders
           required: false
-          description: "The types of loaders to filter for"
+          description: 'The types of loaders to filter for'
           schema:
             type: string
-            example: "[\"fabric\"]"
+            example: '["fabric"]'
         - in: query
           name: game_versions
           required: false
-          description: "The game versions to filter for"
+          description: 'The game versions to filter for'
           schema:
             type: string
-            example: "[\"1.18.1\"]"
+            example: '["1.18.1"]'
         - in: query
           name: featured
           required: false
-          description: "Allows to filter for featured or non-featured versions only"
+          description: 'Allows to filter for featured or non-featured versions only'
           schema:
             type: boolean
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -2483,7 +2541,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Version'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /version/{id}:
     parameters:
@@ -2494,13 +2552,13 @@ paths:
       tags:
         - versions
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Version'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     patch:
       summary: Modify a version
@@ -2510,21 +2568,21 @@ paths:
       security:
         - TokenAuth: ['VERSION_WRITE']
       requestBody:
-        description: "Modified version fields"
+        description: 'Modified version fields'
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EditableVersion'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     delete:
       summary: Delete a version
@@ -2534,15 +2592,15 @@ paths:
       security:
         - TokenAuth: ['VERSION_DELETE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /project/{id|slug}/version/{id|number}:
     parameters:
@@ -2561,13 +2619,13 @@ paths:
       tags:
         - versions
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Version'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /version:
     post:
@@ -2584,25 +2642,25 @@ paths:
       security:
         - TokenAuth: ['VERSION_CREATE']
       requestBody:
-        description: "New version"
+        description: 'New version'
         content:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/CreateVersionBody'
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Version'
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2625,15 +2683,15 @@ paths:
             schema:
               $ref: '#/components/schemas/Schedule'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2646,7 +2704,7 @@ paths:
         description: The IDs of the versions
         schema:
           type: string
-          example: "[\"AABBCCDD\", \"EEFFGGHH\"]"
+          example: '["AABBCCDD", "EEFFGGHH"]'
         required: true
     get:
       summary: Get multiple versions
@@ -2654,7 +2712,7 @@ paths:
       tags:
         - versions
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -2674,7 +2732,7 @@ paths:
       security:
         - TokenAuth: ['VERSION_WRITE']
       requestBody:
-        description: "New version files"
+        description: 'New version files'
         content:
           multipart/form-data:
             schema:
@@ -2683,17 +2741,17 @@ paths:
                 data:
                   type: object
                   enum:
-                    - { }
+                    - {}
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   # Version file
   /version_file/{hash}:
@@ -2708,13 +2766,13 @@ paths:
       parameters:
         - $ref: '#/components/parameters/MultipleHashQueryIdentifier'
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Version'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     delete:
       summary: Delete a file from its hash
@@ -2732,15 +2790,15 @@ paths:
             type: string
             example: [IIJJKKLL]
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /version_file/{hash}/update:
     parameters:
@@ -2758,15 +2816,15 @@ paths:
             schema:
               $ref: '#/components/schemas/GetLatestVersionFromHashBody'
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Version'
-        "400":
+        '400':
           description: Request was invalid, see given error
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /version_files:
     post:
@@ -2776,13 +2834,13 @@ paths:
       tags:
         - version-files
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HashVersionMap'
-        "400":
+        '400':
           description: Request was invalid, see given error
       requestBody:
         description: Hashes and algorithm of the versions requested
@@ -2804,13 +2862,13 @@ paths:
             schema:
               $ref: '#/components/schemas/GetLatestVersionsFromHashesBody'
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HashVersionMap'
-        "400":
+        '400':
           description: Request was invalid, see given error
   # TODO check this out? https://github.com/modrinth/labrinth/blob/ec80c2b9dbf0bae98eb41714d3455b98095563b7/src/routes/v2/version_file.rs#L381
   #/version_files/project:
@@ -2860,13 +2918,13 @@ paths:
       tags:
         - users
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     patch:
       summary: Modify a user
@@ -2876,21 +2934,21 @@ paths:
       security:
         - TokenAuth: ['USER_WRITE']
       requestBody:
-        description: "Modified user fields"
+        description: 'Modified user fields'
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EditableUser'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /user:
     get:
@@ -2901,13 +2959,13 @@ paths:
       security:
         - TokenAuth: ['USER_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -2920,7 +2978,7 @@ paths:
         description: The IDs of the users
         schema:
           type: string
-          example: "[\"AABBCCDD\", \"EEFFGGHH\"]"
+          example: '["AABBCCDD", "EEFFGGHH"]'
         required: true
     get:
       summary: Get multiple users
@@ -2928,7 +2986,7 @@ paths:
       tags:
         - users
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -2950,15 +3008,15 @@ paths:
       security:
         - TokenAuth: ['USER_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /user/{id|username}/projects:
     parameters:
@@ -2969,7 +3027,7 @@ paths:
       tags:
         - users
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -2977,7 +3035,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Project'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /user/{id|username}/follows:
     parameters:
@@ -2990,7 +3048,7 @@ paths:
       security:
         - TokenAuth: ['USER_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -2998,13 +3056,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Project'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /user/{id|username}/payouts:
     parameters:
@@ -3017,24 +3075,24 @@ paths:
       security:
         - TokenAuth: ['PAYOUTS_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserPayoutHistory'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     post:
       summary: Withdraw payout balance to PayPal or Venmo
       operationId: withdrawPayout
-      description: "Warning: certain amounts get withheld for fees. Please do not call this API endpoint without first acknowledging the warnings on the corresponding frontend page."
+      description: 'Warning: certain amounts get withheld for fees. Please do not call this API endpoint without first acknowledging the warnings on the corresponding frontend page.'
       tags:
         - users
       security:
@@ -3047,15 +3105,15 @@ paths:
             type: integer
           required: true
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   # Notifications
   /user/{id|username}/notifications:
@@ -3069,7 +3127,7 @@ paths:
       security:
         - TokenAuth: ['NOTIFICATION_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3077,13 +3135,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Notification'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /notification/{id}:
     parameters:
@@ -3096,19 +3154,19 @@ paths:
       security:
         - TokenAuth: ['NOTIFICATION_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Notification'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     patch:
       summary: Mark notification as read
@@ -3118,15 +3176,15 @@ paths:
       security:
         - TokenAuth: ['NOTIFICATION_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     delete:
       summary: Delete notification
@@ -3136,15 +3194,15 @@ paths:
       security:
         - TokenAuth: ['NOTIFICATION_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /notifications:
     parameters:
@@ -3153,7 +3211,7 @@ paths:
         description: The IDs of the notifications
         schema:
           type: string
-          example: "[\"AABBCCDD\", \"EEFFGGHH\"]"
+          example: '["AABBCCDD", "EEFFGGHH"]'
         required: true
     get:
       summary: Get multiple notifications
@@ -3163,7 +3221,7 @@ paths:
       security:
         - TokenAuth: ['NOTIFICATION_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3171,13 +3229,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Notification'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     patch:
       summary: Mark multiple notifications as read
@@ -3187,15 +3245,15 @@ paths:
       security:
         - TokenAuth: ['NOTIFICATION_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     delete:
       summary: Delete multiple notifications
@@ -3205,15 +3263,15 @@ paths:
       security:
         - TokenAuth: ['NOTIFICATION_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   # Threads
   /report:
@@ -3232,19 +3290,19 @@ paths:
             schema:
               $ref: '#/components/schemas/CreatableReport'
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Report'
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
@@ -3264,7 +3322,7 @@ paths:
             type: integer
             example: 100
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3272,13 +3330,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Report'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /report/{id}:
     parameters:
@@ -3291,19 +3349,19 @@ paths:
       security:
         - TokenAuth: ['REPORT_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Report'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     patch:
       summary: Modify a report
@@ -3327,21 +3385,21 @@ paths:
                   type: boolean
                   description: Whether the thread should be closed
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /reports:
     parameters:
@@ -3350,7 +3408,7 @@ paths:
         description: The IDs of the reports
         schema:
           type: string
-          example: "[\"AABBCCDD\", \"EEFFGGHH\"]"
+          example: '["AABBCCDD", "EEFFGGHH"]'
         required: true
     get:
       summary: Get multiple reports
@@ -3360,7 +3418,7 @@ paths:
       security:
         - TokenAuth: ['REPORT_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3368,13 +3426,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Report'
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /thread/{id}:
     parameters:
@@ -3387,13 +3445,13 @@ paths:
       security:
         - TokenAuth: ['THREAD_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Thread'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     post:
       summary: Send a text message to a thread
@@ -3409,19 +3467,19 @@ paths:
             schema:
               $ref: '#/components/schemas/ThreadMessageBody'
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Thread'
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidInputError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /threads:
     parameters:
@@ -3430,7 +3488,7 @@ paths:
         description: The IDs of the threads
         schema:
           type: string
-          example: "[\"AABBCCDD\", \"EEFFGGHH\"]"
+          example: '["AABBCCDD", "EEFFGGHH"]'
         required: true
     get:
       summary: Get multiple threads
@@ -3440,7 +3498,7 @@ paths:
       security:
         - TokenAuth: ['THREAD_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3448,7 +3506,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Thread'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /message/{id}:
     parameters:
@@ -3467,15 +3525,15 @@ paths:
       security:
         - TokenAuth: ['THREAD_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   # Teams
   /project/{id|slug}/members:
@@ -3487,7 +3545,7 @@ paths:
       tags:
         - teams
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3496,7 +3554,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TeamMember'
                 description: An array of team members
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /team/{id}/members:
     parameters:
@@ -3509,7 +3567,7 @@ paths:
       security:
         - TokenAuth: ['PROJECT_READ']
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3532,15 +3590,15 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdentifier'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /teams:
     parameters:
@@ -3549,7 +3607,7 @@ paths:
         description: The IDs of the teams
         schema:
           type: string
-          example: "[\"AABBCCDD\", \"EEFFGGHH\"]"
+          example: '["AABBCCDD", "EEFFGGHH"]'
         required: true
     get:
       summary: Get the members of multiple teams
@@ -3557,7 +3615,7 @@ paths:
       tags:
         - teams
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3578,15 +3636,15 @@ paths:
       security:
         - TokenAuth: ['PROJECT_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /team/{id}/members/{id|username}:
     parameters:
@@ -3606,15 +3664,15 @@ paths:
             schema:
               $ref: '#/components/schemas/ModifyTeamMemberBody'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
     delete:
       summary: Remove a member from a team
@@ -3624,15 +3682,15 @@ paths:
       security:
         - TokenAuth: ['PROJECT_WRITE']
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   /team/{id}/owner:
     parameters:
@@ -3651,15 +3709,15 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdentifier'
       responses:
-        "204":
+        '204':
           description: Expected response to a valid request
-        "401":
+        '401':
           description: Incorrect token scopes or no authorization to access the requested item(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthError'
-        "404":
+        '404':
           description: The requested item(s) were not found or no authorization to access the requested item(s)
   # Tags
   /tag/category:
@@ -3670,7 +3728,7 @@ paths:
       tags:
         - tags
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3686,7 +3744,7 @@ paths:
       tags:
         - tags
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3702,7 +3760,7 @@ paths:
       tags:
         - tags
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3719,7 +3777,7 @@ paths:
       tags:
         - tags
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3742,13 +3800,13 @@ paths:
       tags:
         - tags
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/License'
-        "400":
+        '400':
           description: Request was invalid, see given error
           content:
             application/json:
@@ -3762,7 +3820,7 @@ paths:
       tags:
         - tags
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3778,7 +3836,7 @@ paths:
       tags:
         - tags
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3786,7 +3844,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: [ spam, copyright, inappropriate, malicious, name-squatting, other ]
+                example: [spam, copyright, inappropriate, malicious, name-squatting, other]
   /tag/project_type:
     get:
       summary: Get a list of project types
@@ -3795,7 +3853,7 @@ paths:
       tags:
         - tags
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3803,7 +3861,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: [ mod, modpack, resourcepack, shader ]
+                example: [mod, modpack, resourcepack, shader]
   /tag/side_type:
     get:
       summary: Get a list of side types
@@ -3812,7 +3870,7 @@ paths:
       tags:
         - tags
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
@@ -3820,7 +3878,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: [ required, optional, unsupported, unknown ]
+                example: [required, optional, unsupported, unknown]
   # Miscellaneous
   /updates/{id|slug}/forge_updates.json:
     parameters:
@@ -3855,13 +3913,13 @@ paths:
       tags:
         - misc
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForgeUpdates'
-        "400":
+        '400':
           description: Invalid request
           content:
             application/json:
@@ -3874,7 +3932,7 @@ paths:
       tags:
         - misc
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:

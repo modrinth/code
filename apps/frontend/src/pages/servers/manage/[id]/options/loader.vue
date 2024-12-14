@@ -1,51 +1,152 @@
 <template>
-  <NewModal ref="editModal" header="Select modpack">
-    <UiServersProjectSelect type="modpack" @select="reinstallNew" />
-  </NewModal>
-
   <NewModal
     ref="versionSelectModal"
-    :header="isSecondPhase ? 'Confirm reinstallation' : 'Select version'"
+    :header="
+      isSecondPhase
+        ? 'Confirming reinstallation'
+        : `${data?.loader === selectedLoader ? 'Reinstalling' : 'Installing'}
+      ${selectedLoader.toLowerCase() === 'vanilla' ? 'Vanilla Minecraft' : selectedLoader}`
+    "
     @hide="onHide"
     @show="onShow"
   >
     <div class="flex flex-col gap-4 md:w-[600px]">
       <p
+        v-if="isSecondPhase"
         :style="{
           lineHeight: isSecondPhase ? '1.5' : undefined,
           marginBottom: isSecondPhase ? '-12px' : '0',
           marginTop: isSecondPhase ? '-4px' : '-2px',
         }"
       >
-        {{
-          isSecondPhase
-            ? "This will reinstall your server and erase all data. You may want to back up your server before proceeding. Are you sure you want to continue?"
-            : "Choose the version of Minecraft you want to use for this server."
-        }}
+        This will reinstall your server and erase all data. You may want to back up your server
+        before proceeding. Are you sure you want to continue?
       </p>
-      <div v-if="!isSecondPhase" class="flex flex-col gap-2">
-        <UiServersTeleportDropdownMenu
-          v-model="selectedMCVersion"
-          name="mcVersion"
-          :options="mcVersions"
-          placeholder="Select Minecraft version..."
-        />
-        <UiServersTeleportDropdownMenu
-          v-if="selectedMCVersion && selectedLoader.toLowerCase() !== 'vanilla'"
-          v-model="selectedLoaderVersion"
-          name="loaderVersion"
-          :options="selectedLoaderVersions"
-          placeholder="Select loader version..."
-        />
-        <div class="mt-2 flex items-center gap-2">
-          <input
-            id="hard-reset"
-            :checked="hardReset"
-            class="switch stylized-toggle"
-            type="checkbox"
-            @change="hardReset = ($event.target as HTMLInputElement).checked"
+      <div v-if="!isSecondPhase" class="flex flex-col gap-4">
+        <div class="mx-auto flex flex-row items-center gap-4">
+          <div
+            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
+          >
+            <UiServersIconsLoaderIcon class="size-10" :loader="selectedLoader" />
+          </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="size-10"
+          >
+            <path d="M5 9v6" />
+            <path d="M9 9h3V5l7 7-7 7v-4H9V9z" />
+          </svg>
+          <div
+            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-table-alternateRow shadow-sm"
+          >
+            <ServerIcon class="size-10" />
+          </div>
+        </div>
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="text-sm font-bold text-contrast">Minecraft version</div>
+          <UiServersTeleportDropdownMenu
+            v-model="selectedMCVersion"
+            name="mcVersion"
+            :options="mcVersions"
+            class="w-full max-w-[100%]"
+            placeholder="Select Minecraft version..."
           />
-          <label for="hard-reset">Clean reinstall</label>
+        </div>
+
+        <div
+          v-if="selectedLoader.toLowerCase() !== 'vanilla'"
+          class="flex w-full flex-col gap-2 rounded-2xl p-4"
+          :class="{
+            'bg-table-alternateRow':
+              !selectedMCVersion || isLoading || selectedLoaderVersions.length > 0,
+            'bg-highlight-red':
+              selectedMCVersion && !isLoading && selectedLoaderVersions.length === 0,
+          }"
+        >
+          <div class="flex flex-col gap-2">
+            <div class="text-sm font-bold text-contrast">{{ selectedLoader }} version</div>
+
+            <template v-if="!selectedMCVersion">
+              <div
+                class="relative flex h-9 w-full select-none items-center rounded-xl bg-button-bg px-4 opacity-50"
+              >
+                Select a Minecraft version to see available versions
+                <DropdownIcon class="absolute right-4" />
+              </div>
+            </template>
+            <template v-else-if="isLoading">
+              <div
+                class="relative flex h-9 w-full items-center rounded-xl bg-button-bg px-4 opacity-50"
+              >
+                <UiServersIconsLoadingIcon class="mr-2 animate-spin" />
+                Loading versions...
+                <DropdownIcon class="absolute right-4" />
+              </div>
+            </template>
+            <template v-else-if="selectedLoaderVersions.length > 0">
+              <UiServersTeleportDropdownMenu
+                v-model="selectedLoaderVersion"
+                name="loaderVersion"
+                :options="selectedLoaderVersions"
+                class="w-full max-w-[100%]"
+                :placeholder="
+                  selectedLoader.toLowerCase() === 'paper' ||
+                  selectedLoader.toLowerCase() === 'purpur'
+                    ? `Select build number...`
+                    : `Select loader version...`
+                "
+              />
+            </template>
+            <template v-else>
+              <div>No versions available for Minecraft {{ selectedMCVersion }}.</div>
+            </template>
+          </div>
+        </div>
+
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <label class="w-full text-lg font-bold text-contrast" for="hard-reset">
+              Erase all data
+            </label>
+            <input
+              id="hard-reset"
+              :checked="hardReset"
+              class="switch stylized-toggle shrink-0"
+              type="checkbox"
+              @change="hardReset = ($event.target as HTMLInputElement).checked"
+            />
+          </div>
+          <div>
+            Removes all data on your server, including your worlds, mods, and configuration files,
+            then reinstalls it with the selected version.
+          </div>
+        </div>
+
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <label class="w-full text-lg font-bold text-contrast" for="backup-server">
+              Backup server
+            </label>
+            <input
+              id="backup-server"
+              :checked="backupServer"
+              class="switch stylized-toggle shrink-0"
+              type="checkbox"
+              @change="backupServer = ($event.target as HTMLInputElement).checked"
+            />
+          </div>
+          <div>
+            Creates a backup of your server before proceeding with the installation or
+            reinstallation.
+          </div>
         </div>
       </div>
       <div class="mt-4 flex justify-start gap-4">
@@ -53,13 +154,15 @@
           <button :disabled="canInstall" @click="handleReinstall">
             <RightArrowIcon />
             {{
-              isSecondPhase
-                ? "Erase and install"
-                : loadingServerCheck
-                  ? "Loading..."
-                  : isDangerous
-                    ? "Erase and install"
-                    : "Install"
+              isBackingUp
+                ? "Backing up..."
+                : isSecondPhase
+                  ? "Erase and install"
+                  : loadingServerCheck
+                    ? "Loading..."
+                    : isDangerous
+                      ? "Erase and install"
+                      : "Install"
             }}
           </button>
         </ButtonStyled>
@@ -75,51 +178,130 @@
             "
           >
             <XIcon />
-            {{ isSecondPhase ? "No" : "Cancel" }}
+            {{ isSecondPhase ? "Go back" : "Cancel" }}
           </button>
         </ButtonStyled>
       </div>
     </div>
   </NewModal>
 
-  <NewModal ref="mrpackModal" header="Upload mrpack" @hide="onHide" @show="onShow">
-    <div>
-      <div class="mt-2 flex items-center gap-2">
-        <input
-          id="hard-reset"
-          :checked="hardReset"
-          class="switch stylized-toggle"
-          type="checkbox"
-          @change="hardReset = ($event.target as HTMLInputElement).checked"
-        />
-        <label for="hard-reset">Clean reinstall</label>
+  <NewModal ref="mrpackModal" header="Uploading mrpack" @hide="onHide" @show="onShow">
+    <div class="flex flex-col gap-4 md:w-[600px]">
+      <p
+        v-if="isSecondPhase"
+        :style="{
+          lineHeight: isSecondPhase ? '1.5' : undefined,
+          marginBottom: isSecondPhase ? '-12px' : '0',
+          marginTop: isSecondPhase ? '-4px' : '-2px',
+        }"
+      >
+        This will reinstall your server and erase all data. You may want to back up your server
+        before proceeding. Are you sure you want to continue?
+      </p>
+      <div v-if="!isSecondPhase" class="flex flex-col gap-4">
+        <div class="mx-auto flex flex-row items-center gap-4">
+          <div
+            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
+          >
+            <UploadIcon class="size-10" />
+          </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="size-10"
+          >
+            <path d="M5 9v6" />
+            <path d="M9 9h3V5l7 7-7 7v-4H9V9z" />
+          </svg>
+          <div
+            class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-table-alternateRow shadow-sm"
+          >
+            <ServerIcon class="size-10" />
+          </div>
+        </div>
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="text-sm font-bold text-contrast">Upload mrpack</div>
+          <input
+            type="file"
+            accept=".mrpack"
+            class=""
+            :disabled="isLoading"
+            @change="uploadMrpack"
+          />
+        </div>
+
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <label class="w-full text-lg font-bold text-contrast" for="hard-reset">
+              Erase all data
+            </label>
+            <input
+              id="hard-reset"
+              :checked="hardReset"
+              class="switch stylized-toggle shrink-0"
+              type="checkbox"
+              @change="hardReset = ($event.target as HTMLInputElement).checked"
+            />
+          </div>
+          <div>
+            Removes all data on your server, including your worlds, mods, and configuration files,
+            then reinstalls it with the selected version.
+          </div>
+        </div>
+
+        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+          <div class="flex w-full flex-row items-center justify-between">
+            <label class="w-full text-lg font-bold text-contrast" for="backup-server-mrpack">
+              Backup server
+            </label>
+            <input
+              id="backup-server-mrpack"
+              :checked="backupServer"
+              class="switch stylized-toggle shrink-0"
+              type="checkbox"
+              @change="backupServer = ($event.target as HTMLInputElement).checked"
+            />
+          </div>
+          <div>Creates a backup of your server before proceeding.</div>
+        </div>
       </div>
-      <input
-        type="file"
-        accept=".mrpack"
-        class="mt-4"
-        :disabled="isLoading"
-        @change="uploadMrpack"
-      />
       <div class="mt-4 flex justify-start gap-4">
         <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="!mrpackFile || isLoading" @click="reinstallMrpack">
+          <button :disabled="canInstallUpload" @click="handleReinstallUpload">
             <RightArrowIcon />
             {{
-              isSecondPhase
-                ? "Erase and install"
-                : loadingServerCheck
-                  ? "Loading..."
-                  : isDangerous
-                    ? "Erase and install"
-                    : "Install"
+              isBackingUp
+                ? "Backing up..."
+                : isSecondPhase
+                  ? "Erase and install"
+                  : loadingServerCheck
+                    ? "Loading..."
+                    : isDangerous
+                      ? "Erase and install"
+                      : "Install"
             }}
           </button>
         </ButtonStyled>
         <ButtonStyled>
-          <button :disabled="isLoading" @click="mrpackModal?.hide">
+          <button
+            :disabled="isLoading"
+            @click="
+              if (isSecondPhase) {
+                isSecondPhase = false;
+              } else {
+                mrpackModal?.hide();
+              }
+            "
+          >
             <XIcon />
-            Cancel
+            {{ isSecondPhase ? "Go back" : "Cancel" }}
           </button>
         </ButtonStyled>
       </div>
@@ -199,7 +381,7 @@
         <div v-else class="flex w-full flex-col items-center gap-2 sm:w-fit sm:flex-row">
           <ButtonStyled>
             <nuxt-link class="!w-full sm:!w-auto" :to="`/modpacks?sid=${props.server.serverId}`">
-              <DownloadIcon class="size-4" /> Install a modpack
+              <CompassIcon class="size-4" /> Find a modpack
             </nuxt-link>
           </ButtonStyled>
           <span class="hidden sm:block">or</span>
@@ -213,18 +395,21 @@
 
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <h2 class="m-0 text-lg font-bold text-contrast">Mod loader</h2>
-          <p class="m-0">Mod loaders allow you to run mods on your server.</p>
+          <h2 class="m-0 text-lg font-bold text-contrast">Platform</h2>
+          <p class="m-0">
+            Your server's platform is the software that runs your server. Different platforms
+            support different mods and plugins.
+          </p>
           <div v-if="data.upstream" class="mt-2 flex items-center gap-2">
             <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
               Your server was installed from a modpack, which automatically chooses the appropriate
-              mod loader.
+              platform.
             </span>
           </div>
         </div>
         <div
-          class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2"
+          class="flex w-full flex-col gap-1 rounded-2xl"
           :class="{
             'pointer-events-none cursor-not-allowed select-none opacity-50':
               props.server.general?.status === 'installing' && isError,
@@ -236,7 +421,7 @@
       </div>
     </div>
 
-    <UiServersPyroLoading v-else />
+    <div v-else />
   </div>
 </template>
 
@@ -249,14 +434,18 @@ import {
   InfoIcon,
   RightArrowIcon,
   XIcon,
+  CompassIcon,
+  DropdownIcon,
+  ServerIcon,
 } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
+import type { Loaders } from "~/types/servers";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
 const emit = defineEmits<{
@@ -272,7 +461,9 @@ const backupServer = ref(false);
 
 const isError = computed(() => props.server.general?.status === "error");
 const isDangerous = computed(() => hardReset.value);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isBackupLimited = computed(() => (props.server.backups?.data?.length || 0) >= 15);
+const isBackingUp = ref(false);
 
 const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
 
@@ -311,14 +502,12 @@ const loaderVersions = (await Promise.all(
   }[]
 >;
 
-const editModal = ref();
 const versionSelectModal = ref();
 const mrpackModal = ref();
 
 const canInstall = computed(() => {
   const conds =
     !selectedMCVersion.value ||
-    isBackupLimited.value ||
     isLoading.value ||
     loadingServerCheck.value ||
     serverCheckError.value.trim().length > 0;
@@ -328,6 +517,16 @@ const canInstall = computed(() => {
   }
 
   return conds || !selectedLoaderVersion.value;
+});
+
+const canInstallUpload = computed(() => {
+  const conds =
+    !mrpackFile.value ||
+    isLoading.value ||
+    loadingServerCheck.value ||
+    serverCheckError.value.trim().length > 0;
+
+  return conds;
 });
 
 const mcVersions = tags.value.gameVersions
@@ -343,27 +542,37 @@ const mcVersions = tags.value.gameVersions
   });
 
 const selectedLoaderVersions = computed(() => {
-  /*
-      loaderVersions[
-      selectedLoader.value.toLowerCase() === "neoforge" ? "neo" : selectedLoader.toLowerCase()
-    ]
-      .find((x) => x.id === selectedMCVersion)
-      ?.loaders.map((x) => x.id) || []
-      */
-  let loader = selectedLoader.value.toLowerCase();
-  if (loader === "neoforge") {
-    loader = "neo";
+  const loader = selectedLoader.value.toLowerCase();
+
+  if (loader === "paper") {
+    return paperVersions.value[selectedMCVersion.value] || [];
   }
-  const backwardsCompatibleVersion = loaderVersions[loader].find(
+
+  if (loader === "purpur") {
+    return purpurVersions.value[selectedMCVersion.value] || [];
+  }
+
+  if (loader === "vanilla") {
+    return [];
+  }
+
+  let apiLoader = loader;
+  if (loader === "neoforge") {
+    apiLoader = "neo";
+  }
+
+  const backwardsCompatibleVersion = loaderVersions[apiLoader]?.find(
     // eslint-disable-next-line no-template-curly-in-string
     (x) => x.id === "${modrinth.gameVersion}",
   );
+
   if (backwardsCompatibleVersion) {
     return backwardsCompatibleVersion.loaders.map((x) => x.id);
   }
+
   return (
-    loaderVersions[loader]
-      .find((x) => x.id === selectedMCVersion.value)
+    loaderVersions[apiLoader]
+      ?.find((x) => x.id === selectedMCVersion.value)
       ?.loaders.map((x) => x.id) || []
   );
 });
@@ -395,7 +604,7 @@ const versionIds = computed(() =>
 const version = ref();
 const currentVersion = ref();
 
-const selectedLoader = ref("");
+const selectedLoader = ref<Loaders>("Vanilla");
 const selectedMCVersion = ref("");
 const selectedLoaderVersion = ref("");
 const isSecondPhase = ref(false);
@@ -409,8 +618,35 @@ const updateData = async () => {
 };
 updateData();
 
+const paperVersions = ref<Record<string, number[]>>({});
+const purpurVersions = ref<Record<string, string[]>>({});
+
+const fetchPaperVersions = async (mcVersion: string) => {
+  try {
+    const res = await $fetch(`https://api.papermc.io/v2/projects/paper/versions/${mcVersion}`);
+    paperVersions.value[mcVersion] = (res as any).builds.sort((a: number, b: number) => b - a);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+const fetchPurpurVersions = async (mcVersion: string) => {
+  try {
+    const res = await $fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`);
+    purpurVersions.value[mcVersion] = (res as any).builds.all.sort(
+      (a: string, b: string) => parseInt(b) - parseInt(a),
+    );
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 const selectLoader = (loader: string) => {
-  selectedLoader.value = loader;
+  selectedLoader.value = loader as Loaders;
   versionSelectModal.value.show();
 };
 
@@ -421,29 +657,53 @@ const cachedVersions: Record<string, any> = {};
 
 watch(selectedMCVersion, async () => {
   if (selectedMCVersion.value.trim().length < 3) return;
-  // const res = await fetch(
-  //   `/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`,
-  // ).then((r) => r.json());
 
+  isLoading.value = true;
   loadingServerCheck.value = true;
-  const res =
-    cachedVersions[selectedMCVersion.value] ||
-    (await $fetch(`/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`));
 
-  cachedVersions[selectedMCVersion.value] = res;
+  try {
+    // Check if Minecraft version exists
+    const mcRes =
+      cachedVersions[selectedMCVersion.value] ||
+      (await $fetch(`/loader-versions?loader=minecraft&version=${selectedMCVersion.value}`));
 
-  loadingServerCheck.value = false;
+    cachedVersions[selectedMCVersion.value] = mcRes;
 
-  if (res.downloads.server) {
+    if (!mcRes.downloads?.server) {
+      serverCheckError.value =
+        "We couldn't find a server.jar for this version. Please pick another one.";
+      return;
+    }
+
+    // Fetch Paper/Purpur versions if needed
+    if (selectedLoader.value.toLowerCase() === "paper") {
+      const paperRes = await fetchPaperVersions(selectedMCVersion.value);
+      if (!paperRes) {
+        serverCheckError.value = "This Minecraft version is not supported by Paper.";
+        return;
+      }
+    }
+
+    if (selectedLoader.value.toLowerCase() === "purpur") {
+      const purpurRes = await fetchPurpurVersions(selectedMCVersion.value);
+      if (!purpurRes) {
+        serverCheckError.value = "This Minecraft version is not supported by Purpur.";
+        return;
+      }
+    }
+
     serverCheckError.value = "";
-  } else {
-    serverCheckError.value =
-      "We couldn't find a server.jar for this version. Please pick another one.";
+  } catch (error) {
+    console.error(error);
+    serverCheckError.value = "Failed to fetch versions. Please try again.";
+  } finally {
+    loadingServerCheck.value = false;
+    isLoading.value = false;
   }
 });
 
 const onShow = () => {
-  selectedMCVersion.value = "";
+  selectedMCVersion.value = props.server.general?.mc_version || "";
   selectedLoaderVersion.value = "";
 };
 
@@ -510,7 +770,36 @@ const handleReinstall = async () => {
       });
       const backupName = `Reinstallation - ${format}`;
       isLoading.value = true;
-      await props.server.backups?.create(backupName);
+      const backupId = (await props.server.backups?.create(backupName)) as unknown as string;
+
+      isBackingUp.value = true;
+
+      let attempts = 0;
+
+      while (true) {
+        attempts += 1;
+
+        if (attempts > 100) {
+          addNotification({
+            group: "server",
+            title: "Backup Failed",
+            text: "An unexpected error occurred while backing up. Please try again later.",
+            type: "error",
+          });
+          isLoading.value = false;
+          return;
+        }
+
+        await props.server.refresh(["backups"]);
+        const backups = await props.server.backups?.data;
+        const backup = backupId ? backups?.find((x) => x.id === backupId) : undefined;
+        if (backup && !backup.ongoing) {
+          console.log("Backup Finished");
+          isBackingUp.value = false;
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
     } catch {
       addNotification({
         group: "server",
@@ -551,24 +840,6 @@ const handleReinstall = async () => {
   }
 };
 
-const reinstallNew = async (project: any, versionNumber: string) => {
-  editModal.value.hide();
-  try {
-    const versions = (await useBaseFetch(`project/${project.project_id}/version`)) as any;
-    const version = versions.find((x: any) => x.version_number === versionNumber);
-
-    if (!version?.id) {
-      throw new Error("Version not found");
-    }
-    await props.server.general?.reinstall(serverId, false, project.project_id, version.id);
-    emit("reinstall");
-    await nextTick();
-    window.scrollTo(0, 0);
-  } catch (error) {
-    handleReinstallError(error);
-  }
-};
-
 const mrpackFile = ref<File | null>(null);
 
 const uploadMrpack = (event: Event) => {
@@ -579,19 +850,86 @@ const uploadMrpack = (event: Event) => {
   mrpackFile.value = target.files[0];
 };
 
-const reinstallMrpack = async () => {
-  if (!mrpackFile.value) {
+const handleReinstallUpload = async () => {
+  if (hardReset.value && !backupServer.value && !isSecondPhase.value) {
+    isSecondPhase.value = true;
     return;
   }
 
-  const mrpack = new File([mrpackFile.value], mrpackFile.value.name, {
-    type: mrpackFile.value.type,
-  });
+  if (backupServer.value) {
+    try {
+      const date = new Date();
+      const format = date.toLocaleString(navigator.language || "en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        timeZoneName: "short",
+      });
+      const backupName = `Reinstallation - ${format}`;
+      isLoading.value = true;
+      const backupId = (await props.server.backups?.create(backupName)) as unknown as string;
+
+      isBackingUp.value = true;
+
+      let attempts = 0;
+
+      while (true) {
+        attempts += 1;
+
+        if (attempts > 100) {
+          addNotification({
+            group: "server",
+            title: "Backup Failed",
+            text: "An unexpected error occurred while backing up. Please try again later.",
+            type: "error",
+          });
+          isLoading.value = false;
+          return;
+        }
+
+        await props.server.refresh(["backups"]);
+        const backups = await props.server.backups?.data;
+        const backup = backupId ? backups?.find((x) => x.id === backupId) : undefined;
+        if (backup && !backup.ongoing) {
+          console.log("Backup Finished");
+          isBackingUp.value = false;
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+    } catch {
+      addNotification({
+        group: "server",
+        title: "Backup Failed",
+        text: "An unexpected error occurred while backing up. Please try again later.",
+        type: "error",
+      });
+      isLoading.value = false;
+      return;
+    }
+  }
+
+  isLoading.value = true;
 
   try {
-    isLoading.value = true;
+    if (!mrpackFile.value) {
+      throw new Error("No mrpack file selected");
+    }
+    const mrpack = new File([mrpackFile.value], mrpackFile.value.name, {
+      type: mrpackFile.value.type,
+    });
+
     await props.server.general?.reinstallFromMrpack(mrpack, hardReset.value);
-    emit("reinstall");
+
+    emit("reinstall", {
+      loader: "mrpack",
+      lVersion: "",
+      mVersion: "",
+    });
+
     await nextTick();
     window.scrollTo(0, 0);
   } catch (error) {

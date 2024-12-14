@@ -1,8 +1,7 @@
-use serde::Serialize;
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, Runtime};
+use tauri::{LogicalPosition, LogicalSize, Manager, Runtime};
 use tauri_plugin_shell::ShellExt;
 use theseus::settings;
 use tokio::sync::RwLock;
@@ -47,7 +46,6 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             init_ads_window,
             hide_ads_window,
-            scroll_ads_window,
             show_ads_window,
             record_ads_click,
             open_link,
@@ -150,21 +148,6 @@ pub async fn hide_ads_window<R: Runtime>(
 
         let _ = webview.set_position(LogicalPosition::new(-1000, -1000));
     }
-
-    Ok(())
-}
-
-#[derive(Serialize, Clone)]
-struct ScrollEvent {
-    scroll: f32,
-}
-
-#[tauri::command]
-pub async fn scroll_ads_window<R: Runtime>(
-    app: tauri::AppHandle<R>,
-    scroll: f32,
-) -> crate::api::Result<()> {
-    let _ = app.emit("ads-scroll", ScrollEvent { scroll });
 
     Ok(())
 }

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
@@ -8,11 +8,6 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
 import { get_search_results } from '@/helpers/cache.js'
-import { hide_ads_window } from '@/helpers/ads.js'
-
-onMounted(() => {
-  hide_ads_window(true)
-})
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -104,7 +99,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="p-6 flex flex-col gap-2">
+    <h1 class="m-0 text-2xl">Welcome back!</h1>
     <RowDisplay
       v-if="total > 0"
       :instances="[
@@ -132,13 +128,3 @@ onUnmounted(() => {
     />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.page-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-</style>
