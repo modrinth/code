@@ -2,30 +2,47 @@
   <li
     role="button"
     data-pyro-file
-    :class="containerClasses"
+    :class="[
+      containerClasses,
+      isDragOver && type === 'directory' ? 'bg-brand-highlight' : '',
+      isDragging ? 'opacity-50' : '',
+    ]"
     tabindex="0"
+    :draggable="type === 'file'"
     @click="selectItem"
     @contextmenu="openContextMenu"
     @keydown="(e) => e.key === 'Enter' && selectItem()"
+    @dragstart="handleDragStart"
+    @dragend="handleDragEnd"
+    @dragenter.prevent="handleDragEnter"
+    @dragover.prevent="handleDragOver"
+    @dragleave.prevent="handleDragLeave"
+    @drop.prevent="handleDrop"
   >
-    <div data-pyro-file-metadata class="flex w-full items-center gap-4 truncate">
+    <div
+      data-pyro-file-metadata
+      class="pointer-events-none flex w-full items-center gap-4 truncate"
+    >
       <div
-        class="flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand group-focus:bg-brand-highlight group-focus:text-brand group-active:scale-[0.8]"
+        class="pointer-events-none flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand group-focus:bg-brand-highlight group-focus:text-brand group-active:scale-[0.8]"
       >
         <component :is="iconComponent" class="size-6" />
       </div>
-      <div class="flex w-full flex-col truncate">
+      <div class="pointer-events-none flex w-full flex-col truncate">
         <span
-          class="w-[98%] truncate font-bold group-hover:text-contrast group-focus:text-contrast"
-          >{{ name }}</span
+          class="pointer-events-none w-[98%] truncate font-bold group-hover:text-contrast group-focus:text-contrast"
         >
-        <span class="text-xs text-secondary group-hover:text-primary">
+          {{ name }}
+        </span>
+        <span class="pointer-events-none text-xs text-secondary group-hover:text-primary">
           {{ subText }}
         </span>
       </div>
     </div>
-
-    <div data-pyro-file-actions class="flex w-fit flex-shrink-0 items-center gap-4 md:gap-12">
+    <div
+      data-pyro-file-actions
+      class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 md:gap-12"
+    >
       <span class="hidden w-[160px] text-nowrap font-mono text-sm text-secondary md:flex">
         {{ formattedCreationDate }}
       </span>
@@ -35,10 +52,10 @@
       <ButtonStyled circular type="transparent">
         <UiServersTeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
           <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-          <template #rename> <EditIcon /> Rename </template>
-          <template #move> <RightArrowIcon /> Move </template>
-          <template #download> <DownloadIcon /> Download </template>
-          <template #delete> <TrashIcon /> Delete </template>
+          <template #rename><EditIcon /> Rename</template>
+          <template #move><RightArrowIcon /> Move</template>
+          <template #download><DownloadIcon /> Download</template>
+          <template #delete><TrashIcon /> Delete</template>
         </UiServersTeleportOverflowMenu>
       </ButtonStyled>
     </div>
@@ -79,7 +96,21 @@ interface FileItemProps {
 
 const props = defineProps<FileItemProps>();
 
-const emit = defineEmits(["rename", "download", "delete", "move", "edit", "contextmenu"]);
+const emit = defineEmits<{
+  (e: "rename", item: { name: string; type: string; path: string }): void;
+  (e: "move", item: { name: string; type: string; path: string }): void;
+  (
+    e: "moveDirectTo",
+    item: { name: string; type: string; path: string; destination: string },
+  ): void;
+  (e: "download", item: { name: string; type: string; path: string }): void;
+  (e: "delete", item: { name: string; type: string; path: string }): void;
+  (e: "edit", item: { name: string; type: string; path: string }): void;
+  (e: "contextmenu", x: number, y: number): void;
+}>();
+
+const isDragOver = ref(false);
+const isDragging = ref(false);
 
 const codeExtensions = Object.freeze([
   "json",
@@ -118,6 +149,7 @@ const router = useRouter();
 const containerClasses = computed(() => [
   "group m-0 p-0 focus:!outline-none flex w-full select-none items-center justify-between overflow-hidden border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised focus:bg-bg-raised",
   isEditableFile.value ? "cursor-pointer" : props.type === "directory" ? "cursor-pointer" : "",
+  isDragOver.value ? "bg-brand-highlight" : "",
 ]);
 
 const fileExtension = computed(() => props.name.split(".").pop()?.toLowerCase() || "");
@@ -242,5 +274,56 @@ const selectItem = () => {
   setTimeout(() => {
     isNavigating.value = false;
   }, 500);
+};
+
+const handleDragStart = (event: DragEvent) => {
+  if (!event.dataTransfer || props.type !== "file") return;
+  isDragging.value = true;
+  event.dataTransfer.setData(
+    "application/pyro-file-move",
+    JSON.stringify({
+      name: props.name,
+      type: props.type,
+      path: props.path,
+    }),
+  );
+  event.dataTransfer.effectAllowed = "move";
+};
+
+const handleDragEnd = () => {
+  isDragging.value = false;
+};
+
+const handleDragEnter = () => {
+  if (props.type !== "directory") return;
+  isDragOver.value = true;
+};
+
+const handleDragOver = (event: DragEvent) => {
+  if (props.type !== "directory" || !event.dataTransfer) return;
+  event.dataTransfer.dropEffect = "move";
+};
+
+const handleDragLeave = () => {
+  isDragOver.value = false;
+};
+
+const handleDrop = (event: DragEvent) => {
+  isDragOver.value = false;
+  if (props.type !== "directory" || !event.dataTransfer) return;
+
+  try {
+    const dragData = JSON.parse(event.dataTransfer.getData("application/pyro-file-move"));
+    if (dragData.path === props.path) return;
+
+    emit("moveDirectTo", {
+      name: dragData.name,
+      type: dragData.type,
+      path: dragData.path,
+      destination: props.path,
+    });
+  } catch (error) {
+    console.error("Error handling file drop:", error);
+  }
 };
 </script>

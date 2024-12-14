@@ -82,6 +82,7 @@
             @rename="showRenameModal"
             @download="downloadFile"
             @move="showMoveModal"
+            @move-direct-to="handleDirectMove"
             @edit="editFile"
             @contextmenu="showContextMenu"
             @load-more="handleLoadMore"
@@ -454,6 +455,30 @@ const handleLoadMore = async () => {
   }
 };
 
+const handleDirectMove = async (moveData: {
+  name: string;
+  type: string;
+  path: string;
+  destination: string;
+}) => {
+  try {
+    await props.server.fs?.moveFileOrFolder(
+      moveData.path,
+      `${moveData.destination}/${moveData.name}`.replace("//", "/"),
+    );
+
+    refreshList();
+    addNotification({
+      group: "files",
+      title: "File moved",
+      text: "Your file has been moved.",
+      type: "success",
+    });
+  } catch (error) {
+    console.error("Error moving item:", error);
+  }
+};
+
 const onInit = (editor: any) => {
   editor.commands.addCommand({
     name: "saveFile",
@@ -598,8 +623,10 @@ const requestShareLink = async () => {
 const handleDragEnter = (event: DragEvent) => {
   if (isEditing.value) return;
   event.preventDefault();
-  dragCounter.value++;
-  isDragging.value = true;
+  if (!event.dataTransfer?.types.includes("application/pyro-file-move")) {
+    dragCounter.value++;
+    isDragging.value = true;
+  }
 };
 
 const handleDragOver = (event: DragEvent) => {
@@ -621,6 +648,10 @@ const handleDrop = async (event: DragEvent) => {
   event.preventDefault();
   isDragging.value = false;
   dragCounter.value = 0;
+
+  const isInternalMove = event.dataTransfer?.types.includes("application/pyro-file-move");
+  if (isInternalMove) return;
+
   const files = event.dataTransfer?.files;
   if (files) {
     for (let i = 0; i < files.length; i++) {
