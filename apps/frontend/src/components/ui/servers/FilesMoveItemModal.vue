@@ -8,7 +8,7 @@
           autofocus
           type="text"
           class="bg-bg-input w-full rounded-lg p-4"
-          placeholder="e.g. mods/modname"
+          placeholder="e.g. /mods/modname"
           required
         />
       </div>
