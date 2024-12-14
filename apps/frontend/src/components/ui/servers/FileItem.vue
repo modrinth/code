@@ -74,6 +74,7 @@ import {
   RightArrowIcon,
 } from "@modrinth/assets";
 import { computed, shallowRef, ref } from "vue";
+import { renderToString } from "@vue/server-renderer";
 import { useRouter, useRoute } from "vue-router";
 import {
   UiServersIconsCogFolderIcon,
@@ -276,10 +277,65 @@ const selectItem = () => {
   }, 500);
 };
 
-const handleDragStart = (event: DragEvent) => {
-  if (!event.dataTransfer) return;
+const getDragIcon = async () => {
+  let iconToUse;
 
+  if (props.type === "directory") {
+    if (props.name === "config") {
+      iconToUse = UiServersIconsCogFolderIcon;
+    } else if (props.name === "world") {
+      iconToUse = UiServersIconsEarthIcon;
+    } else if (props.name === "resourcepacks") {
+      iconToUse = PaletteIcon;
+    } else {
+      iconToUse = FolderOpenIcon;
+    }
+  } else {
+    const ext = fileExtension.value;
+    if (codeExtensions.includes(ext)) {
+      iconToUse = UiServersIconsCodeFileIcon;
+    } else if (textExtensions.includes(ext)) {
+      iconToUse = UiServersIconsTextFileIcon;
+    } else if (imageExtensions.includes(ext)) {
+      iconToUse = UiServersIconsImageFileIcon;
+    } else {
+      iconToUse = FileIcon;
+    }
+  }
+
+  return await renderToString(h(iconToUse));
+};
+
+const handleDragStart = async (event: DragEvent) => {
+  if (!event.dataTransfer) return;
   isDragging.value = true;
+
+  const dragGhost = document.createElement("div");
+  dragGhost.className =
+    "fixed left-0 top-0 flex items-center flex-row gap-3 rounded-lg bg-bg-raised p-3 shadow-lg pointer-events-none";
+
+  const iconContainer = document.createElement("div");
+  iconContainer.className = "flex size-6 items-center justify-center";
+
+  const icon = document.createElement("div");
+  icon.className = "size-4";
+  icon.innerHTML = await getDragIcon();
+  iconContainer.appendChild(icon);
+
+  const nameSpan = document.createElement("span");
+  nameSpan.className = "font-bold text-contrast";
+  nameSpan.textContent = props.name;
+
+  dragGhost.appendChild(iconContainer);
+  dragGhost.appendChild(nameSpan);
+  document.body.appendChild(dragGhost);
+
+  event.dataTransfer.setDragImage(dragGhost, 0, 0);
+
+  requestAnimationFrame(() => {
+    document.body.removeChild(dragGhost);
+  });
+
   event.dataTransfer.setData(
     "application/pyro-file-move",
     JSON.stringify({
