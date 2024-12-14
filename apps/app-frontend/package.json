@@ -35,8 +35,8 @@
     "vue-virtual-scroller": "v2.0.0-beta.8"
   },
   "devDependencies": {
-    "@formatjs/cli": "^6.2.12",
     "@eslint/compat": "^1.1.1",
+    "@formatjs/cli": "^6.2.12",
     "@nuxt/eslint-config": "^0.5.6",
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.19",
