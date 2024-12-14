@@ -7,37 +7,41 @@
         installed.
       </p>
       <table>
-        <tr class="header">
-          <th>{{ instance?.name }}</th>
-          <th>{{ project.title }}</th>
-        </tr>
-        <tr class="content">
-          <td class="data">{{ instance?.loader }} {{ instance?.game_version }}</td>
-          <td>
-            <DropdownSelect
-              v-if="versions?.length > 1"
-              v-model="selectedVersion"
-              :options="versions"
-              placeholder="Select version"
-              name="Version select"
-              :display-name="
-                (version) =>
-                  `${version?.name} (${version?.loaders
-                    .map((name) => formatCategory(name))
-                    .join(', ')} - ${version?.game_versions.join(', ')})`
-              "
-              render-up
-            />
-            <span v-else>
-              <span>
-                {{ selectedVersion?.name }} ({{
-                  selectedVersion?.loaders.map((name) => formatCategory(name)).join(', ')
-                }}
-                - {{ selectedVersion?.game_versions.join(', ') }})
+        <thead>
+          <tr class="header">
+            <th>{{ instance?.name }}</th>
+            <th>{{ project.title }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="content">
+            <td class="data">{{ instance?.loader }} {{ instance?.game_version }}</td>
+            <td>
+              <DropdownSelect
+                v-if="versions?.length > 1"
+                v-model="selectedVersion"
+                :options="versions"
+                placeholder="Select version"
+                name="Version select"
+                :display-name="
+                  (version) =>
+                    `${version?.name} (${version?.loaders
+                      .map((name) => formatCategory(name))
+                      .join(', ')} - ${version?.game_versions.join(', ')})`
+                "
+                render-up
+              />
+              <span v-else>
+                <span>
+                  {{ selectedVersion?.name }} ({{
+                    selectedVersion?.loaders.map((name) => formatCategory(name)).join(', ')
+                  }}
+                  - {{ selectedVersion?.game_versions.join(', ') }})
+                </span>
               </span>
-            </span>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        </tbody>
       </table>
       <div class="button-group">
         <Button @click="() => incompatibleModal.hide()"><XIcon />Cancel</Button>
