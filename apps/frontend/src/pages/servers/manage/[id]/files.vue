@@ -674,6 +674,7 @@ onMounted(async () => {
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/theme-one_dark");
+  await import("ace-builds/src-noconflict/ext-searchbox");
   VAceEditor.value = markRaw((await import("vue3-ace-editor")).VAceEditor);
   document.addEventListener("click", onAnywhereClicked);
   window.addEventListener("scroll", onScroll);
