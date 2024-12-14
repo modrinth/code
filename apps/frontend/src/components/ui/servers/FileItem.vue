@@ -312,7 +312,7 @@ const handleDragStart = async (event: DragEvent) => {
 
   const dragGhost = document.createElement("div");
   dragGhost.className =
-    "fixed left-0 top-0 flex items-center flex-row gap-3 rounded-lg bg-bg-raised p-3 shadow-lg pointer-events-none";
+    "fixed left-0 top-0 flex items-center max-w-[500px] flex-row gap-3 rounded-lg bg-bg-raised p-3 shadow-lg pointer-events-none";
 
   const iconContainer = document.createElement("div");
   iconContainer.className = "flex size-6 items-center justify-center";
@@ -323,7 +323,7 @@ const handleDragStart = async (event: DragEvent) => {
   iconContainer.appendChild(icon);
 
   const nameSpan = document.createElement("span");
-  nameSpan.className = "font-bold text-contrast";
+  nameSpan.className = "font-bold truncate text-contrast";
   nameSpan.textContent = props.name;
 
   dragGhost.appendChild(iconContainer);
