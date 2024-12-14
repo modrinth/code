@@ -64,7 +64,19 @@
             :is="VAceEditor"
             v-if="!isEditingImage"
             v-model:value="fileContent"
-            :lang="editingFile?.name.split('.').pop() === 'json' ? 'json' : 'yaml'"
+            :lang="
+              editingFile?.name.split('.').pop()?.toLowerCase() === 'json'
+                ? 'json'
+                : editingFile?.name.split('.').pop()?.toLowerCase() === 'toml'
+                  ? 'toml'
+                  : editingFile?.name.split('.').pop()?.toLowerCase() === 'sh'
+                    ? 'sh'
+                    : ['yml', 'yaml'].includes(
+                          editingFile?.name.split('.').pop()?.toLowerCase() ?? '',
+                        )
+                      ? 'yaml'
+                      : 'text'
+            "
             theme="one_dark"
             :print-margin="false"
             style="height: 750px; font-size: 1rem"
@@ -674,6 +686,8 @@ onMounted(async () => {
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/mode-yaml");
+  await import("ace-builds/src-noconflict/mode-toml");
+  await import("ace-builds/src-noconflict/mode-sh");
   await import("ace-builds/src-noconflict/theme-one_dark");
   await import("ace-builds/src-noconflict/ext-searchbox");
   VAceEditor.value = markRaw((await import("vue3-ace-editor")).VAceEditor);
