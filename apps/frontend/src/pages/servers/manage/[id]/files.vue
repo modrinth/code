@@ -64,7 +64,7 @@
             :is="VAceEditor"
             v-if="!isEditingImage"
             v-model:value="fileContent"
-            lang="json"
+            :lang="editingFile?.name.split('.').pop() === 'json' ? 'json' : 'yaml'"
             theme="one_dark"
             :print-margin="false"
             style="height: 750px; font-size: 1rem"
@@ -673,6 +673,7 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
 onMounted(async () => {
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
+  await import("ace-builds/src-noconflict/mode-yaml");
   await import("ace-builds/src-noconflict/theme-one_dark");
   await import("ace-builds/src-noconflict/ext-searchbox");
   VAceEditor.value = markRaw((await import("vue3-ace-editor")).VAceEditor);
