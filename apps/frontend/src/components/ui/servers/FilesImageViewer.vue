@@ -45,7 +45,7 @@
       <ButtonStyled type="transparent" @click="reset">
         <button>
           <span class="font-mono">{{ Math.round(state.scale * 100) }}%</span>
-          <span class="ml-2 text-sm text-blue">Reset</span>
+          <span class="ml-4 text-sm text-blue">Reset</span>
         </button>
       </ButtonStyled>
     </div>
