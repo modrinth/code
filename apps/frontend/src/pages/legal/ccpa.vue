@@ -21,108 +21,110 @@
       within the last twelve (12) months:
     </p>
     <table>
-      <tr>
-        <th>Category</th>
-        <th>Examples</th>
-        <th>Collected</th>
-      </tr>
-      <tr>
-        <td>A. Identifiers.</td>
-        <td>
-          A real name, alias, postal address, unique personal identifier, online identifier,
-          Internet Protocol address, email address, account name, Social Security number, driver's
-          license number, passport number, or other similar identifiers.
-        </td>
-        <td>YES</td>
-      </tr>
-      <tr>
-        <td>
-          B. Personal information categories listed in the California Customer Records statute (Cal.
-          Civ. Code § 1798.80(e)).
-        </td>
-        <td>
-          A name, signature, Social Security number, physical characteristics or description,
-          address, telephone number, passport number, driver's license or state identification card
-          number, insurance policy number, education, employment, employment history, bank account
-          number, credit card number, debit card number, or any other financial information, medical
-          information, or health insurance information. <br /><br />
-          Some personal information included in this category may overlap with other categories.
-        </td>
-        <td>NO</td>
-      </tr>
-      <tr>
-        <td>C. Protected classification characteristics.</td>
-        <td>
-          Age (40 years or older), race, color, ancestry, national origin, citizenship, religion or
-          creed, marital status, medical condition, physical or mental disability, sex (including
-          gender, gender identity, gender expression, pregnancy or childbirth and related medical
-          conditions), sexual orientation, veteran or military status, genetic information
-          (including familial genetic information).
-        </td>
-        <td>NO</td>
-      </tr>
-      <tr>
-        <td>D. Commercial information.</td>
-        <td>
-          Records of personal property, products or services purchased, obtained, or considered, or
-          other purchasing or consuming histories or tendencies.
-        </td>
-        <td>NO</td>
-      </tr>
-      <tr>
-        <td>E. Biometric information.</td>
-        <td>
-          Genetic, physiological, behavioral, and biological characteristics, or activity patterns
-          used to extract a template or other identifier or identifying information, such as,
-          fingerprints, faceprints, and voiceprints, iris or retina scans, keystroke, gait, or other
-          physical patterns, and sleep, health, or exercise data.
-        </td>
-        <td>NO</td>
-      </tr>
-      <tr>
-        <td>F. Internet or other similar network activity.</td>
-        <td>
-          Browsing history, search history, information on a consumer's interaction with a website,
-          application, or advertisement.
-        </td>
-        <td>YES</td>
-      </tr>
-      <tr>
-        <td>G. Geolocation data.</td>
-        <td>Physical location or movements.</td>
-        <td>YES</td>
-      </tr>
-      <tr>
-        <td>H. Sensory data.</td>
-        <td>Audio, electronic, visual, thermal, olfactory, or similar information.</td>
-        <td>NO</td>
-      </tr>
-      <tr>
-        <td>I. Professional or employment-related information.</td>
-        <td>Current or past job history or performance evaluations.</td>
-        <td>NO</td>
-      </tr>
-      <tr>
-        <td>
-          J. Non-public education information (per the Family Educational Rights and Privacy Act (20
-          U.S.C. Section 1232g, 34 C.F.R. Part 99)).
-        </td>
-        <td>
-          Education records directly related to a student maintained by an educational institution
-          or party acting on its behalf, such as grades, transcripts, class lists, student
-          schedules, student identification codes, student financial information, or student
-          disciplinary records.
-        </td>
-        <td>NO</td>
-      </tr>
-      <tr>
-        <td>K. Inferences drawn from other personal information.</td>
-        <td>
-          Profile reflecting a person's preferences, characteristics, psychological trends,
-          predispositions, behavior, attitudes, intelligence, abilities, and aptitudes.
-        </td>
-        <td>NO</td>
-      </tr>
+      <tbody>
+        <tr>
+          <th>Category</th>
+          <th>Examples</th>
+          <th>Collected</th>
+        </tr>
+        <tr>
+          <td>A. Identifiers.</td>
+          <td>
+            A real name, alias, postal address, unique personal identifier, online identifier,
+            Internet Protocol address, email address, account name, Social Security number, driver's
+            license number, passport number, or other similar identifiers.
+          </td>
+          <td>YES</td>
+        </tr>
+        <tr>
+          <td>
+            B. Personal information categories listed in the California Customer Records statute
+            (Cal. Civ. Code § 1798.80(e)).
+          </td>
+          <td>
+            A name, signature, Social Security number, physical characteristics or description,
+            address, telephone number, passport number, driver's license or state identification
+            card number, insurance policy number, education, employment, employment history, bank
+            account number, credit card number, debit card number, or any other financial
+            information, medical information, or health insurance information. <br /><br />
+            Some personal information included in this category may overlap with other categories.
+          </td>
+          <td>NO</td>
+        </tr>
+        <tr>
+          <td>C. Protected classification characteristics.</td>
+          <td>
+            Age (40 years or older), race, color, ancestry, national origin, citizenship, religion
+            or creed, marital status, medical condition, physical or mental disability, sex
+            (including gender, gender identity, gender expression, pregnancy or childbirth and
+            related medical conditions), sexual orientation, veteran or military status, genetic
+            information (including familial genetic information).
+          </td>
+          <td>NO</td>
+        </tr>
+        <tr>
+          <td>D. Commercial information.</td>
+          <td>
+            Records of personal property, products or services purchased, obtained, or considered,
+            or other purchasing or consuming histories or tendencies.
+          </td>
+          <td>NO</td>
+        </tr>
+        <tr>
+          <td>E. Biometric information.</td>
+          <td>
+            Genetic, physiological, behavioral, and biological characteristics, or activity patterns
+            used to extract a template or other identifier or identifying information, such as,
+            fingerprints, faceprints, and voiceprints, iris or retina scans, keystroke, gait, or
+            other physical patterns, and sleep, health, or exercise data.
+          </td>
+          <td>NO</td>
+        </tr>
+        <tr>
+          <td>F. Internet or other similar network activity.</td>
+          <td>
+            Browsing history, search history, information on a consumer's interaction with a
+            website, application, or advertisement.
+          </td>
+          <td>YES</td>
+        </tr>
+        <tr>
+          <td>G. Geolocation data.</td>
+          <td>Physical location or movements.</td>
+          <td>YES</td>
+        </tr>
+        <tr>
+          <td>H. Sensory data.</td>
+          <td>Audio, electronic, visual, thermal, olfactory, or similar information.</td>
+          <td>NO</td>
+        </tr>
+        <tr>
+          <td>I. Professional or employment-related information.</td>
+          <td>Current or past job history or performance evaluations.</td>
+          <td>NO</td>
+        </tr>
+        <tr>
+          <td>
+            J. Non-public education information (per the Family Educational Rights and Privacy Act
+            (20 U.S.C. Section 1232g, 34 C.F.R. Part 99)).
+          </td>
+          <td>
+            Education records directly related to a student maintained by an educational institution
+            or party acting on its behalf, such as grades, transcripts, class lists, student
+            schedules, student identification codes, student financial information, or student
+            disciplinary records.
+          </td>
+          <td>NO</td>
+        </tr>
+        <tr>
+          <td>K. Inferences drawn from other personal information.</td>
+          <td>
+            Profile reflecting a person's preferences, characteristics, psychological trends,
+            predispositions, behavior, attitudes, intelligence, abilities, and aptitudes.
+          </td>
+          <td>NO</td>
+        </tr>
+      </tbody>
     </table>
     <p>Personal information does not include:</p>
     <ul>
