@@ -13,8 +13,8 @@
         id="item-context-menu"
         ref="ctxRef"
         :style="{
-          border: '1px solid var(--color-button-bg)',
-          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--color-divider)',
+          borderRadius: 'var(--radius-lg)',
           backgroundColor: 'var(--color-raised-bg)',
           padding: 'var(--gap-sm)',
           boxShadow: 'var(--shadow-floating)',
