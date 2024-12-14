@@ -1,6 +1,6 @@
 [package]
 name = "theseus_gui"
-version = "0.8.9"
+version = "0.9.0"
 description = "The Modrinth App is a desktop application for managing your Minecraft mods"
 license = "GPL-3.0-only"
 repository = "https://github.com/modrinth/code/apps/app/"
@@ -20,7 +20,7 @@ tauri = { version = "2.1.1", features = ["devtools", "macos-private-api", "proto
 tauri-plugin-window-state = "2.2.0"
 tauri-plugin-deep-link = "2.2.0"
 tauri-plugin-os = "2.2.0"
-tauri-plugin-shell = "2.2.0"
+tauri-plugin-opener = "2.2.1"
 tauri-plugin-dialog = "2.2.0"
 tauri-plugin-updater = { version = "2.3.0" }
 tauri-plugin-single-instance = { version = "2.2.0" }

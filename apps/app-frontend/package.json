@@ -1,7 +1,7 @@
 {
   "name": "@modrinth/app-frontend",
   "private": true,
-  "version": "0.8.9",
+  "version": "0.9.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -19,7 +19,7 @@
     "@tauri-apps/api": "^2.1.1",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-os": "^2.2.0",
-    "@tauri-apps/plugin-shell": "^2.2.0",
+    "@tauri-apps/plugin-opener": "^2.2.1",
     "@tauri-apps/plugin-updater": "^2.3.0",
     "@tauri-apps/plugin-window-state": "^2.2.0",
     "@vintl/vintl": "^4.4.1",

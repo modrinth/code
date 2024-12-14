@@ -1,10 +1,8 @@
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{
-    Manager, PhysicalPosition, PhysicalSize, Runtime,
-};
-use tauri_plugin_shell::ShellExt;
+use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
+use tauri_plugin_opener::OpenerExt;
 use theseus::settings;
 use tokio::sync::RwLock;
 
@@ -191,7 +189,7 @@ pub async fn open_link<R: Runtime>(
     {
         if let Some(last_click) = state.last_click {
             if last_click.elapsed() < Duration::from_millis(100) {
-                let _ = app.shell().open(&path, None);
+                let _ = app.opener().open_url(&path, None::<String>);
                 state.last_click = None;
 
                 return Ok(());

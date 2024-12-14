@@ -56,7 +56,7 @@ import dayjs from 'dayjs'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
-import { open as openURL } from '@tauri-apps/plugin-shell'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 const themeStore = useTheming()
 
@@ -329,10 +329,9 @@ function handleClick(e) {
         !target.classList.contains('router-link-active') &&
         !target.href.startsWith('http://localhost') &&
         !target.href.startsWith('https://tauri.localhost') &&
-        !target.href.startsWith('http://tauri.localhost') &&
-        target.target !== '_blank'
+        !target.href.startsWith('http://tauri.localhost')
       ) {
-        openURL(target.href)
+        openUrl(target.href)
       }
       e.preventDefault()
       break
