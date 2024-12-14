@@ -97,7 +97,7 @@
             <template #foldersOnly> Folders only </template>
           </UiServersTeleportOverflowMenu>
         </ButtonStyled>
-        <div class="mx-1 w-full text-sm sm:w-40">
+        <div class="mx-1 w-full text-sm sm:w-48">
           <label for="search-folder" class="sr-only">Search folder</label>
           <div class="relative">
             <SearchIcon

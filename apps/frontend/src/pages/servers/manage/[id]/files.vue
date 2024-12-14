@@ -351,7 +351,7 @@ const handleCreateError = (error: any) => {
       addNotification({
         group: "files",
         title: "Error creating item",
-        text: "File already exists",
+        text: "Something went wrong. The file may already exist.",
         type: "error",
       });
     }
