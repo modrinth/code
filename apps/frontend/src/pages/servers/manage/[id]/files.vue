@@ -276,8 +276,8 @@ const handleRenameItem = async (newName: string) => {
 
     addNotification({
       group: "files",
-      title: "File renamed",
-      text: "Your file has been renamed.",
+      title: `${selectedItem.value.type === "directory" ? "Folder" : "File"} renamed`,
+      text: `${selectedItem.value.name} has been renamed to ${newName}`,
       type: "success",
     });
   } catch (error) {
