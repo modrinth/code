@@ -89,7 +89,7 @@
         </div>
 
         <div
-          v-else-if="!isLoading && items.length === 0"
+          v-else-if="!isLoading && items.length === 0 && !loadError"
           class="flex h-full w-full items-center justify-center p-20"
         >
           <div class="flex flex-col items-center gap-4 text-center">
@@ -100,17 +100,9 @@
         </div>
 
         <LazyUiServersFileManagerError
-          v-else-if="!isLoading"
-          title="Unable to list files"
-          message="Unfortunately, we were unable to list items in this folder. If this issue persists, contact Modrinth support."
-          @refetch="refreshList"
-          @home="navigateToSegment(-1)"
-        />
-
-        <LazyUiServersFileManagerError
           v-else-if="loadError"
-          title="Unable to fetch files"
-          message="This path is invalid or the server is not responding."
+          title="Unable to load files"
+          message="The folder may not exist."
           @refetch="refreshList"
           @home="navigateToSegment(-1)"
         />
