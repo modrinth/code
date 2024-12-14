@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 
-export async function init_ads_window(x, y, width, height, overrideShown = false) {
-  return await invoke('plugin:ads|init_ads_window', { x, y, width, height, overrideShown })
+export async function init_ads_window(overrideShown = false) {
+  return await invoke('plugin:ads|init_ads_window', { overrideShown })
 }
 
 export async function show_ads_window() {

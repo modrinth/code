@@ -1,15 +1,15 @@
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{LogicalPosition, LogicalSize, Manager, Runtime};
+use tauri::{
+    Manager, PhysicalPosition, PhysicalSize, Runtime,
+};
 use tauri_plugin_shell::ShellExt;
 use theseus::settings;
 use tokio::sync::RwLock;
 
 pub struct AdsState {
     pub shown: bool,
-    pub size: Option<LogicalSize<f32>>,
-    pub position: Option<LogicalPosition<f32>>,
     pub last_click: Option<Instant>,
     pub malicious_origins: HashSet<String>,
 }
@@ -21,8 +21,6 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .setup(|app, _api| {
             app.manage(RwLock::new(AdsState {
                 shown: true,
-                size: None,
-                position: None,
                 last_click: None,
                 malicious_origins: HashSet::new(),
             }));
@@ -54,14 +52,29 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .build()
 }
 
+fn get_webview_position<R: Runtime>(
+    app: &tauri::AppHandle<R>,
+) -> crate::api::Result<(PhysicalPosition<f32>, PhysicalSize<f32>)> {
+    let main_window = app.get_window("main").unwrap();
+    let scale_factor = main_window.scale_factor()? as f32;
+
+    let width = 300.0 * scale_factor;
+    let height = 250.0 * scale_factor;
+
+    let main_window_size = main_window.inner_size()?;
+    let x = (main_window_size.width as f32) - width;
+    let y = (main_window_size.height as f32) - height;
+
+    Ok((
+        PhysicalPosition::new(x, y),
+        PhysicalSize::new(width, height),
+    ))
+}
+
 #[tauri::command]
 #[cfg(not(target_os = "linux"))]
 pub async fn init_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32,
     override_shown: bool,
 ) -> crate::api::Result<()> {
     use tauri::WebviewUrl;
@@ -69,37 +82,40 @@ pub async fn init_ads_window<R: Runtime>(
 
     let state = app.state::<RwLock<AdsState>>();
     let mut state = state.write().await;
-    state.size = Some(LogicalSize::new(width, height));
-    state.position = Some(LogicalPosition::new(x, y));
 
     if override_shown {
         state.shown = true;
     }
 
-    if let Some(webview) = app.webviews().get("ads-window") {
-        if state.shown {
-            let _ = webview.set_position(LogicalPosition::new(x, y));
-            let _ = webview.set_size(LogicalSize::new(width, height));
-        }
-    } else if let Some(window) = app.get_window("main") {
-        let _ = window.add_child(
-            tauri::webview::WebviewBuilder::new(
-                "ads-window",
-                WebviewUrl::External(
-                   AD_LINK.parse().unwrap(),
-                ),
-            )
-            .initialization_script(LINK_SCRIPT)
-            .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
-            .zoom_hotkeys_enabled(false)
-            .transparent(true),
+    if let Ok((position, size)) = get_webview_position(&app) {
+        if let Some(webview) = app.webviews().get("ads-window") {
             if state.shown {
-                LogicalPosition::new(x, y)
+                let _ = webview.set_position(position);
+                let _ = webview.set_size(size);
             } else {
-                LogicalPosition::new(-1000.0, -1000.0)
-            },
-            LogicalSize::new(width, height),
-        );
+                let _ =
+                    webview.set_position(PhysicalPosition::new(-1000, -1000));
+            }
+        } else if let Some(window) = app.get_window("main") {
+            let _ = window.add_child(
+                tauri::webview::WebviewBuilder::new(
+                    "ads-window",
+                    WebviewUrl::External(
+                        AD_LINK.parse().unwrap(),
+                    ),
+                )
+                    .initialization_script(LINK_SCRIPT)
+                    .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
+                    .zoom_hotkeys_enabled(false)
+                    .transparent(true),
+                if state.shown {
+                    position
+                } else {
+                    PhysicalPosition::new(-1000.0, -1000.0)
+                },
+                size,
+            );
+        }
     }
 
     Ok(())
@@ -116,14 +132,11 @@ pub async fn show_ads_window<R: Runtime>(
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
-        let mut state = state.write().await;
+        let state = state.read().await;
 
-        state.shown = true;
-        if let Some(size) = state.size {
+        if state.shown {
+            let (position, size) = get_webview_position(&app)?;
             let _ = webview.set_size(size);
-        }
-
-        if let Some(position) = state.position {
             let _ = webview.set_position(position);
         }
     }
@@ -137,16 +150,14 @@ pub async fn hide_ads_window<R: Runtime>(
     reset: Option<bool>,
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
-        let state = app.state::<RwLock<AdsState>>();
-        let mut state = state.write().await;
-        state.shown = false;
-
         if reset.unwrap_or(false) {
-            state.size = None;
-            state.position = None;
+            let state = app.state::<RwLock<AdsState>>();
+            let mut state = state.write().await;
+
+            state.shown = false;
         }
 
-        let _ = webview.set_position(LogicalPosition::new(-1000, -1000));
+        let _ = webview.set_position(PhysicalPosition::new(-1000, -1000));
     }
 
     Ok(())
