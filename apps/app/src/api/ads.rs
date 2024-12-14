@@ -54,12 +54,12 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
 fn get_webview_position<R: Runtime>(
     app: &tauri::AppHandle<R>,
+    dpr: f32,
 ) -> crate::api::Result<(PhysicalPosition<f32>, PhysicalSize<f32>)> {
     let main_window = app.get_window("main").unwrap();
-    let scale_factor = main_window.scale_factor()? as f32;
 
-    let width = 300.0 * scale_factor;
-    let height = 250.0 * scale_factor;
+    let width = 300.0 * dpr;
+    let height = 250.0 * dpr;
 
     let main_window_size = main_window.inner_size()?;
     let x = (main_window_size.width as f32) - width;
@@ -75,6 +75,7 @@ fn get_webview_position<R: Runtime>(
 #[cfg(not(target_os = "linux"))]
 pub async fn init_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
+    dpr: f32,
     override_shown: bool,
 ) -> crate::api::Result<()> {
     use tauri::WebviewUrl;
@@ -87,7 +88,7 @@ pub async fn init_ads_window<R: Runtime>(
         state.shown = true;
     }
 
-    if let Ok((position, size)) = get_webview_position(&app) {
+    if let Ok((position, size)) = get_webview_position(&app, dpr) {
         if let Some(webview) = app.webviews().get("ads-window") {
             if state.shown {
                 let _ = webview.set_position(position);
@@ -129,13 +130,14 @@ pub async fn init_ads_window() {}
 #[tauri::command]
 pub async fn show_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
+    dpr: f32,
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
         let state = state.read().await;
 
         if state.shown {
-            let (position, size) = get_webview_position(&app)?;
+            let (position, size) = get_webview_position(&app, dpr)?;
             let _ = webview.set_size(size);
             let _ = webview.set_position(position);
         }
