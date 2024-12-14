@@ -281,16 +281,19 @@ const handleRenameItem = async (newName: string) => {
 
 const handleMoveItem = async (destination: string) => {
   try {
+    const itemType = selectedItem.value.type;
+    const newPath = `${destination}/${selectedItem.value.name}`.replace("//", "/");
+
     await props.server.fs?.moveFileOrFolder(
       `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/"),
-      `${destination}/${selectedItem.value.name}`.replace("//", "/"),
+      newPath,
     );
 
     refreshList();
     addNotification({
       group: "files",
-      title: "File moved",
-      text: "Your file has been moved.",
+      title: `${itemType === "directory" ? "Folder" : "File"} moved`,
+      text: `${selectedItem.value.name} has been moved to ${newPath}`,
       type: "success",
     });
   } catch (error) {
@@ -462,16 +465,14 @@ const handleDirectMove = async (moveData: {
   destination: string;
 }) => {
   try {
-    await props.server.fs?.moveFileOrFolder(
-      moveData.path,
-      `${moveData.destination}/${moveData.name}`.replace("//", "/"),
-    );
+    const newPath = `${moveData.destination}/${moveData.name}`.replace("//", "/");
+    await props.server.fs?.moveFileOrFolder(moveData.path, newPath);
 
     refreshList();
     addNotification({
       group: "files",
-      title: "File moved",
-      text: "Your file has been moved.",
+      title: `${moveData.type === "directory" ? "Folder" : "File"} moved`,
+      text: `${moveData.name} has been moved to ${newPath}`,
       type: "success",
     });
   } catch (error) {
