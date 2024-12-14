@@ -141,6 +141,27 @@ import { useInfiniteScroll } from "@vueuse/core";
 import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
 
+interface BaseOperation {
+  type: "move" | "rename";
+  itemType: string;
+  fileName: string;
+}
+
+interface MoveOperation extends BaseOperation {
+  type: "move";
+  sourcePath: string;
+  destinationPath: string;
+}
+
+interface RenameOperation extends BaseOperation {
+  type: "rename";
+  path: string;
+  oldName: string;
+  newName: string;
+}
+
+type Operation = MoveOperation | RenameOperation;
+
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
@@ -152,6 +173,8 @@ const VAceEditor = ref();
 const mainContent = ref<HTMLElement | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
 const contextMenu = ref();
+const operationHistory = ref<Operation[]>([]);
+const redoStack = ref<Operation[]>([]);
 
 const searchQuery = ref("");
 const sortMethod = ref("default");
@@ -242,6 +265,86 @@ const refreshList = () => {
   reset();
 };
 
+const undoLastOperation = async () => {
+  const lastOperation = operationHistory.value.pop();
+  if (!lastOperation) return;
+
+  try {
+    switch (lastOperation.type) {
+      case "move":
+        await props.server.fs?.moveFileOrFolder(
+          `${lastOperation.destinationPath}/${lastOperation.fileName}`.replace("//", "/"),
+          `${lastOperation.sourcePath}/${lastOperation.fileName}`.replace("//", "/"),
+        );
+        break;
+      case "rename":
+        await props.server.fs?.renameFileOrFolder(
+          `${lastOperation.path}/${lastOperation.newName}`.replace("//", "/"),
+          lastOperation.oldName,
+        );
+        break;
+    }
+
+    redoStack.value.push(lastOperation);
+
+    refreshList();
+    addNotification({
+      group: "files",
+      title: `${lastOperation.type === "move" ? "Move" : "Rename"} undone`,
+      text: `${lastOperation.fileName} has been restored to its original ${lastOperation.type === "move" ? "location" : "name"}`,
+      type: "success",
+    });
+  } catch (error) {
+    console.error(`Error undoing ${lastOperation.type}:`, error);
+    addNotification({
+      group: "files",
+      title: "Undo failed",
+      text: `Failed to undo the last ${lastOperation.type} operation`,
+      type: "error",
+    });
+  }
+};
+
+const redoLastOperation = async () => {
+  const lastOperation = redoStack.value.pop();
+  if (!lastOperation) return;
+
+  try {
+    switch (lastOperation.type) {
+      case "move":
+        await props.server.fs?.moveFileOrFolder(
+          `${lastOperation.sourcePath}/${lastOperation.fileName}`.replace("//", "/"),
+          `${lastOperation.destinationPath}/${lastOperation.fileName}`.replace("//", "/"),
+        );
+        break;
+      case "rename":
+        await props.server.fs?.renameFileOrFolder(
+          `${lastOperation.path}/${lastOperation.oldName}`.replace("//", "/"),
+          lastOperation.newName,
+        );
+        break;
+    }
+
+    operationHistory.value.push(lastOperation);
+
+    refreshList();
+    addNotification({
+      group: "files",
+      title: `${lastOperation.type === "move" ? "Move" : "Rename"} redone`,
+      text: `${lastOperation.fileName} has been ${lastOperation.type === "move" ? "moved" : "renamed"} again`,
+      type: "success",
+    });
+  } catch (error) {
+    console.error(`Error redoing ${lastOperation.type}:`, error);
+    addNotification({
+      group: "files",
+      title: "Redo failed",
+      text: `Failed to redo the last ${lastOperation.type} operation`,
+      type: "error",
+    });
+  }
+};
+
 const handleCreateNewItem = async (name: string) => {
   try {
     const path = `${currentPath.value}/${name}`.replace("//", "/");
@@ -264,6 +367,16 @@ const handleRenameItem = async (newName: string) => {
   try {
     const path = `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/");
     await props.server.fs?.renameFileOrFolder(path, newName);
+
+    redoStack.value = [];
+    operationHistory.value.push({
+      type: "rename",
+      itemType: selectedItem.value.type,
+      fileName: selectedItem.value.name,
+      path: currentPath.value,
+      oldName: selectedItem.value.name,
+      newName,
+    });
 
     refreshList();
 
@@ -289,18 +402,61 @@ const handleRenameItem = async (newName: string) => {
 const handleMoveItem = async (destination: string) => {
   try {
     const itemType = selectedItem.value.type;
+    const sourcePath = currentPath.value;
     const newPath = `${destination}/${selectedItem.value.name}`.replace("//", "/");
 
     await props.server.fs?.moveFileOrFolder(
-      `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/"),
+      `${sourcePath}/${selectedItem.value.name}`.replace("//", "/"),
       newPath,
     );
+
+    redoStack.value = [];
+    operationHistory.value.push({
+      type: "move",
+      sourcePath,
+      destinationPath: destination,
+      fileName: selectedItem.value.name,
+      itemType,
+    });
 
     refreshList();
     addNotification({
       group: "files",
       title: `${itemType === "directory" ? "Folder" : "File"} moved`,
       text: `${selectedItem.value.name} has been moved to ${newPath}`,
+      type: "success",
+    });
+  } catch (error) {
+    console.error("Error moving item:", error);
+  }
+};
+
+const handleDirectMove = async (moveData: {
+  name: string;
+  type: string;
+  path: string;
+  destination: string;
+}) => {
+  try {
+    const newPath = `${moveData.destination}/${moveData.name}`.replace("//", "/");
+    const sourcePath = moveData.path.substring(0, moveData.path.lastIndexOf("/"));
+
+    await props.server.fs?.moveFileOrFolder(moveData.path, newPath);
+
+    redoStack.value = [];
+    operationHistory.value.push({
+      type: "move",
+      sourcePath,
+      destinationPath: moveData.destination,
+      fileName: moveData.name,
+      itemType: moveData.type,
+    });
+
+    refreshList();
+    addNotification({
+      group: "files",
+      title: `${moveData.type === "directory" ? "Folder" : "File"} moved`,
+      text: `${moveData.name} has been moved to ${newPath}`,
       type: "success",
     });
   } catch (error) {
@@ -465,28 +621,6 @@ const handleLoadMore = async () => {
   }
 };
 
-const handleDirectMove = async (moveData: {
-  name: string;
-  type: string;
-  path: string;
-  destination: string;
-}) => {
-  try {
-    const newPath = `${moveData.destination}/${moveData.name}`.replace("//", "/");
-    await props.server.fs?.moveFileOrFolder(moveData.path, newPath);
-
-    refreshList();
-    addNotification({
-      group: "files",
-      title: `${moveData.type === "directory" ? "Folder" : "File"} moved`,
-      text: `${moveData.name} has been moved to ${newPath}`,
-      type: "success",
-    });
-  } catch (error) {
-    console.error("Error moving item:", error);
-  }
-};
-
 const onInit = (editor: any) => {
   editor.commands.addCommand({
     name: "saveFile",
@@ -544,11 +678,23 @@ onMounted(async () => {
   VAceEditor.value = markRaw((await import("vue3-ace-editor")).VAceEditor);
   document.addEventListener("click", onAnywhereClicked);
   window.addEventListener("scroll", onScroll);
+
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === "z") {
+      e.preventDefault();
+      undoLastOperation();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "z") {
+      e.preventDefault();
+      redoLastOperation();
+    }
+  });
 });
 
 onUnmounted(() => {
   document.removeEventListener("click", onAnywhereClicked);
   window.removeEventListener("scroll", onScroll);
+  document.removeEventListener("keydown", () => {});
 });
 
 onUnmounted(() => {
