@@ -550,8 +550,7 @@ const applyDefaultSort = (items: DirectoryItem[]) => {
   return items.sort((a: any, b: any) => {
     if (a.type === "directory" && b.type !== "directory") return -1;
     if (a.type !== "directory" && b.type === "directory") return 1;
-    if (a.count > b.count) return -1;
-    if (a.count < b.count) return 1;
+
     return a.name.localeCompare(b.name);
   });
 };
