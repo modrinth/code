@@ -191,6 +191,7 @@ async function setupApp() {
 
   get_opening_command().then(handleCommand)
   checkUpdates()
+  fetchCredentials()
 }
 
 const stateFailed = ref(false)
@@ -283,8 +284,6 @@ onMounted(() => {
   install.setIncompatibilityWarningModal(incompatibilityWarningModal)
   install.setInstallConfirmModal(installConfirmModal)
   install.setModInstallModal(modInstallModal)
-
-  fetchCredentials()
 })
 
 const accounts = ref(null)
@@ -359,13 +358,13 @@ function handleAuxClick(e) {
 
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
-  <Suspense>
-    <AppSettingsModal ref="settingsModal" />
-  </Suspense>
-  <Suspense>
-    <InstanceCreationModal ref="installationModal" />
-  </Suspense>
   <div v-if="stateInitialized" class="app-grid-layout relative">
+    <Suspense>
+      <AppSettingsModal ref="settingsModal" />
+    </Suspense>
+    <Suspense>
+      <InstanceCreationModal ref="installationModal" />
+    </Suspense>
     <div
       class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10 w-[--left-bar-width]"
     >
