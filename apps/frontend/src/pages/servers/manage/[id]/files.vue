@@ -73,19 +73,9 @@
           />
           <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
         </div>
+
         <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
-          <div
-            aria-hidden="true"
-            class="flex w-full select-none flex-row items-center border-0 border-b border-solid border-bg-raised px-3 py-2 text-xs font-bold uppercase"
-          >
-            <div class="min-w-[48px]"></div>
-            <span class="flex w-full">Name</span>
-            <div class="flex shrink-0 gap-4 text-right md:gap-12">
-              <span class="hidden min-w-[160px] md:block">Created</span>
-              <span class="mr-4 min-w-[160px]">Modified</span>
-              <div class="min-w-[36px]"></div>
-            </div>
-          </div>
+          <UiServersFilesLabelBar />
           <UiServersFileVirtualList
             :items="filteredItems"
             @delete="showDeleteModal"
@@ -104,7 +94,7 @@
         >
           <div class="flex flex-col items-center gap-4 text-center">
             <FolderOpenIcon class="h-16 w-16 text-secondary" />
-            <h3 class="text-2xl font-bold text-contrast">This folder is empty</h3>
+            <h3 class="m-0 text-2xl font-bold text-contrast">This folder is empty</h3>
             <p class="m-0 text-sm text-secondary">There are no files or folders.</p>
           </div>
         </div>
@@ -112,7 +102,7 @@
         <LazyUiServersFileManagerError
           v-else-if="!isLoading"
           title="Unable to list files"
-          message="Unfortunately, we were unable to list the files in this folder. If this issue persists, contact support."
+          message="Unfortunately, we were unable to list items in this folder. If this issue persists, contact Modrinth support."
           @refetch="refreshList"
           @home="navigateToSegment(-1)"
         />
