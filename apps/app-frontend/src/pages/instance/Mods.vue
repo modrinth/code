@@ -311,20 +311,6 @@ const props = defineProps({
   },
 })
 
-const unlistenProfiles = await profile_listener(async (event) => {
-  if (
-    event.profile_path_id === props.instance.path &&
-    event.event === 'synced' &&
-    props.instance.install_stage !== 'pack_installing'
-  ) {
-    await initProjects()
-  }
-})
-
-onUnmounted(() => {
-  unlistenProfiles()
-})
-
 const isPackLocked = computed(() => {
   return props.instance.linked_data && props.instance.linked_data.locked
 })
@@ -676,7 +662,6 @@ const toggleDisableMod = async (mod) => {
 }
 
 const removeMod = async (mod) => {
-  console.log(mod)
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
@@ -780,8 +765,19 @@ const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
   await initProjects()
 })
 
+const unlistenProfiles = await profile_listener(async (event) => {
+  if (
+    event.profile_path_id === props.instance.path &&
+    event.event === 'synced' &&
+    props.instance.install_stage !== 'pack_installing'
+  ) {
+    await initProjects()
+  }
+})
+
 onUnmounted(() => {
   unlisten()
+  unlistenProfiles()
 })
 </script>
 
