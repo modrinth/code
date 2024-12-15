@@ -10122,18 +10122,8 @@ snapshots:
     dependencies:
       '@types/web-bluetooth': 0.0.16
       '@vueuse/metadata': 9.13.0
-      '@vueuse/shared': 9.13.0(vue@3.5.13(typescript@5.5.3))
-      vue-demi: 0.14.8(vue@3.5.13(typescript@5.5.3))
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - vue
-
-  '@vueuse/core@9.13.0(vue@3.5.13(typescript@5.5.4))':
-    dependencies:
-      '@types/web-bluetooth': 0.0.16
-      '@vueuse/metadata': 9.13.0
       '@vueuse/shared': 9.13.0(vue@3.5.13(typescript@5.5.4))
-      vue-demi: 0.14.8(vue@3.5.13(typescript@5.5.4))
+      vue-demi: 0.14.10(vue@3.5.13(typescript@5.5.4))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -10151,14 +10141,7 @@ snapshots:
 
   '@vueuse/shared@9.13.0(vue@3.5.13(typescript@5.5.4))':
     dependencies:
-      vue-demi: 0.14.8(vue@3.5.13(typescript@5.5.3))
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - vue
-
-  '@vueuse/shared@9.13.0(vue@3.5.13(typescript@5.5.4))':
-    dependencies:
-      vue-demi: 0.14.8(vue@3.5.13(typescript@5.5.4))
+      vue-demi: 0.14.10(vue@3.5.13(typescript@5.5.4))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -15896,14 +15879,6 @@ snapshots:
       '@vue/language-core': 2.1.6(typescript@5.5.4)
       semver: 7.6.3
       typescript: 5.5.4
-
-  vue-typed-virtual-list@1.0.10(vue@3.5.13(typescript@5.5.4)):
-    dependencies:
-      '@vueuse/core': 9.13.0(vue@3.5.13(typescript@5.5.4))
-      debounce: 1.2.1
-      vue: 3.5.13(typescript@5.5.3)
-    transitivePeerDependencies:
-      - '@vue/composition-api'
 
   vue-typed-virtual-list@1.0.10(vue@3.5.13(typescript@5.5.4)):
     dependencies:
