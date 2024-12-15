@@ -4,6 +4,7 @@
     @contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
   >
     <ExportModal ref="exportModal" :instance="instance" />
+    <InstanceSettingsModal ref="settingsModal" />
     <ContentPageHeader>
       <template #icon>
         <Avatar :src="icon" :alt="instance.name" size="96px" />
@@ -48,12 +49,9 @@
               <button disabled>Loading...</button>
             </ButtonStyled>
             <ButtonStyled size="large" circular>
-              <RouterLink
-                v-tooltip="'Instance settings'"
-                :to="`/instance/${encodeURIComponent(route.params.id)}/options`"
-              >
+              <button v-tooltip="'Instance settings'" @click="settingsModal.show()">
                 <SettingsIcon />
-              </RouterLink>
+              </button>
             </ButtonStyled>
             <ButtonStyled size="large" type="transparent" circular>
               <OverflowMenu
@@ -169,6 +167,7 @@ import { handleSevereError } from '@/store/error.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import dayjs from 'dayjs'
 import ExportModal from '@/components/ui/ExportModal.vue'
+import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 
 const route = useRoute()
 
@@ -346,6 +345,8 @@ const unlistenProcesses = await process_listener((e) => {
 const icon = computed(() =>
   instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 )
+
+const settingsModal = ref()
 
 onUnmounted(() => {
   unlistenProcesses()
