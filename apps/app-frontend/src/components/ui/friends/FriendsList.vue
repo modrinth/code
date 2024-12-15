@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Avatar, ButtonStyled, NewModal, OverflowMenu } from '@modrinth/ui'
+import { Avatar, ButtonStyled, OverflowMenu } from '@modrinth/ui'
 import {
   UserPlusIcon,
   MoreVerticalIcon,
@@ -16,6 +16,7 @@ import { handleError } from '@/store/notifications.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const props = defineProps<{
   credentials: unknown | null
@@ -140,7 +141,6 @@ async function loadFriends(timeout = false) {
 watch(
   userCredentials,
   () => {
-    console.log('watch', userCredentials.value)
     if (userCredentials.value === undefined) {
       userFriends.value = []
     } else if (userCredentials.value === null) {
@@ -160,7 +160,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <NewModal ref="manageFriendsModal" header="Manage friends">
+  <ModalWrapper ref="manageFriendsModal" header="Manage friends">
     <p v-if="acceptedFriends.length === 0">You have no friends :C</p>
     <div v-else class="flex flex-col gap-4 min-w-[20rem]">
       <input v-model="search" type="text" placeholder="Search friends..." class="w-full" />
@@ -189,8 +189,8 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-  </NewModal>
-  <NewModal ref="friendInvitesModal" header="View friend requests">
+  </ModalWrapper>
+  <ModalWrapper ref="friendInvitesModal" header="View friend requests">
     <p v-if="pendingFriends.length === 0">You have no pending friend requests :C</p>
     <div v-else class="flex flex-col gap-4">
       <div v-for="friend in pendingFriends" :key="friend.username" class="flex gap-2">
@@ -234,8 +234,8 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-  </NewModal>
-  <NewModal ref="addFriendModal" header="Add a friend">
+  </ModalWrapper>
+  <ModalWrapper ref="addFriendModal" header="Add a friend">
     <div class="mb-4">
       <h2 class="m-0 text-xl">Username</h2>
       <p class="m-0 mt-1 leading-tight">You can add friends with their Modrinth username.</p>
@@ -247,7 +247,7 @@ onUnmounted(() => {
         Add friend
       </button>
     </ButtonStyled>
-  </NewModal>
+  </ModalWrapper>
   <div class="flex justify-between items-center">
     <h3 class="text-lg m-0">Friends</h3>
     <ButtonStyled type="transparent" circular>

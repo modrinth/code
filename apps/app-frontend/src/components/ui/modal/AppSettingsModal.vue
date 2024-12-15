@@ -21,6 +21,7 @@ import { getVersion } from '@tauri-apps/api/app'
 import { version as getOsVersion, platform as getOsPlatform } from '@tauri-apps/plugin-os'
 import { useTheming } from '@/store/state'
 import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const themeStore = useTheming()
 
@@ -98,22 +99,24 @@ const osPlatform = getOsPlatform()
 const osVersion = getOsVersion()
 </script>
 <template>
-  <TabbedModal ref="modal" :tabs="tabs.filter((t) => !t.developerOnly || themeStore.devMode)">
+  <ModalWrapper ref="modal">
     <template #title>
       <span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
         <SettingsIcon /> Settings
       </span>
     </template>
-    <template #footer>
-      <div class="mt-auto text-secondary text-sm">
-        <p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">
-          {{ formatMessage(developerModeEnabled) }}
-        </p>
-        <div class="flex items-center gap-3">
-          <button
-            class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation"
-            :class="{ 'text-brand': themeStore.devMode, 'text-secondary': !themeStore.devMode }"
-            @click="
+
+    <TabbedModal :tabs="tabs.filter((t) => !t.developerOnly || themeStore.devMode)">
+      <template #footer>
+        <div class="mt-auto text-secondary text-sm">
+          <p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">
+            {{ formatMessage(developerModeEnabled) }}
+          </p>
+          <div class="flex items-center gap-3">
+            <button
+              class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation"
+              :class="{ 'text-brand': themeStore.devMode, 'text-secondary': !themeStore.devMode }"
+              @click="
                 () => {
                   devModeCounter++
                   if (devModeCounter > 5) {
@@ -126,19 +129,20 @@ const osVersion = getOsVersion()
                   }
                 }
               "
-          >
-            <ModrinthIcon class="w-6 h-6" />
-          </button>
-          <div>
-            <p class="m-0">Modrinth App {{ version }}</p>
-            <p class="m-0">
-              <span v-if="osPlatform === 'macos'">MacOS</span>
-              <span v-else class="capitalize">{{ osPlatform }}</span>
-              {{ osVersion }}
-            </p>
+            >
+              <ModrinthIcon class="w-6 h-6" />
+            </button>
+            <div>
+              <p class="m-0">Modrinth App {{ version }}</p>
+              <p class="m-0">
+                <span v-if="osPlatform === 'macos'">MacOS</span>
+                <span v-else class="capitalize">{{ osPlatform }}</span>
+                {{ osVersion }}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </template>
-  </TabbedModal>
+      </template>
+    </TabbedModal>
+  </ModalWrapper>
 </template>

@@ -1,12 +1,12 @@
 <template>
-  <template v-if="projects.length > 0">
+  <template v-if="projects?.length > 0">
     <div class="flex items-center gap-2 mb-4">
       <div class="iconified-input flex-grow">
         <SearchIcon />
         <input
           v-model="searchFilter"
           type="text"
-          :placeholder="`Search content...`"
+          :placeholder="`Search ${filteredProjects.length} project${filteredProjects.length === 1 ? '' : 's'}...`"
           class="text-input search-input"
           autocomplete="off"
         />
@@ -309,20 +309,6 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-})
-
-const unlistenProfiles = await profile_listener(async (event) => {
-  if (
-    event.profile_path_id === props.instance.path &&
-    event.event === 'synced' &&
-    props.instance.install_stage !== 'pack_installing'
-  ) {
-    await initProjects()
-  }
-})
-
-onUnmounted(() => {
-  unlistenProfiles()
 })
 
 const isPackLocked = computed(() => {
@@ -676,7 +662,6 @@ const toggleDisableMod = async (mod) => {
 }
 
 const removeMod = async (mod) => {
-  console.log(mod)
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
@@ -780,8 +765,19 @@ const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
   await initProjects()
 })
 
+const unlistenProfiles = await profile_listener(async (event) => {
+  if (
+    event.profile_path_id === props.instance.path &&
+    event.event === 'synced' &&
+    props.instance.install_stage !== 'pack_installing'
+  ) {
+    await initProjects()
+  }
+})
+
 onUnmounted(() => {
   unlisten()
+  unlistenProfiles()
 })
 </script>
 
