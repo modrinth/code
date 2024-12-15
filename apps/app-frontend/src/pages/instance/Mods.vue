@@ -1,5 +1,5 @@
 <template>
-  <template v-if="projects.length > 0">
+  <template v-if="projects?.length > 0">
     <div class="flex items-center gap-2 mb-4">
       <div class="iconified-input flex-grow">
         <SearchIcon />
