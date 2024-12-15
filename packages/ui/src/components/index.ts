@@ -47,6 +47,7 @@ export { default as NewModal } from './modal/NewModal.vue'
 export { default as Modal } from './modal/Modal.vue'
 export { default as ConfirmModal } from './modal/ConfirmModal.vue'
 export { default as ShareModal } from './modal/ShareModal.vue'
+export { default as TabbedModal } from './modal/TabbedModal.vue'
 
 // Navigation
 export { default as Breadcrumbs } from './nav/Breadcrumbs.vue'
