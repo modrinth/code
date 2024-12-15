@@ -8,7 +8,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         placement: "bottom-end",
         instantMove: true,
         distance: 8,
-        triggers: ["click"],
       },
     },
   });
