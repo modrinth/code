@@ -38,6 +38,8 @@ import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { save_filters } from '@/helpers/skin_manager.js'
+import { SkinManagerIcon } from '@/assets/icons/index.js'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
@@ -210,6 +212,7 @@ initialize_state()
   })
 
 const handleClose = async () => {
+  await save_filters()
   await saveWindowState(StateFlags.ALL)
   await getCurrentWindow().close()
 }
@@ -390,6 +393,10 @@ function handleAuxClick(e) {
       >
         <LibraryIcon />
         <template #label>Library</template>
+      </NavButton>
+      <NavButton v-if="!offline" to="/SkinManager">
+        <SkinManagerIcon />
+        <template #label>Skin Manager</template>
       </NavButton>
       <div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
       <NavButton :to="() => $refs.installationModal.show()" :disabled="offline">

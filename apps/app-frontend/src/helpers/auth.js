@@ -56,3 +56,8 @@ export async function remove_user(user) {
 export async function users() {
   return await invoke('plugin:auth|get_users')
 }
+
+// Refreshes a credential by UUID
+export async function refresh(user) {
+  return await invoke('plugin:auth|auth_refresh', { user })
+}

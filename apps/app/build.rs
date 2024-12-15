@@ -240,6 +240,33 @@ fn main() {
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
+            )
+            .plugin(
+                "skin-manager",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "get_user_skin_data",
+                        "get_heads",
+                        "set_skin",
+                        "delete_skin",
+                        "import_skin",
+                        "check_image",
+                        "check_skin",
+                        "get_cape_data",
+                        "cache_users_skins",
+                        "cache_new_user_skin",
+                        "get_launcher_names",
+                        "save_skin",
+                        "get_skins",
+                        "set_cape",
+                        "get_order",
+                        "save_order",
+                        "get_filters",
+                        "save_filters",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
             ),
     )
     .expect("Failed to run tauri-build");
