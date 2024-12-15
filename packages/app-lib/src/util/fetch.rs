@@ -112,6 +112,19 @@ pub async fn fetch_advanced(
         let result = req.send().await;
         match result {
             Ok(x) => {
+                if x.status().is_server_error() {
+                    if attempt <= FETCH_ATTEMPTS {
+                        continue;
+                    } else {
+                        return Err(crate::Error::from(
+                            crate::ErrorKind::OtherError(
+                                "Server error when fetching content"
+                                    .to_string(),
+                            ),
+                        ));
+                    }
+                }
+
                 let bytes = if let Some((bar, total)) = &loading_bar {
                     let length = x.content_length();
                     if let Some(total_size) = length {
@@ -145,7 +158,7 @@ pub async fn fetch_advanced(
                     if let Some(sha1) = sha1 {
                         let hash = sha1_async(bytes.clone()).await?;
                         if &*hash != sha1 {
-                            if attempt <= 3 {
+                            if attempt <= FETCH_ATTEMPTS {
                                 continue;
                             } else {
                                 return Err(crate::ErrorKind::HashError(
@@ -159,13 +172,13 @@ pub async fn fetch_advanced(
 
                     tracing::trace!("Done downloading URL {url}");
                     return Ok(bytes);
-                } else if attempt <= 3 {
+                } else if attempt <= FETCH_ATTEMPTS {
                     continue;
                 } else if let Err(err) = bytes {
                     return Err(err.into());
                 }
             }
-            Err(_) if attempt <= 3 => continue,
+            Err(_) if attempt <= FETCH_ATTEMPTS => continue,
             Err(err) => {
                 return Err(err.into());
             }
