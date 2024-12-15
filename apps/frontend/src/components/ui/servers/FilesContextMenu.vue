@@ -31,7 +31,7 @@
           Rename
         </button>
         <button class="btn btn-transparent flex !w-full items-center" @click="$emit('move', item)">
-          <ArrowBigUpDashIcon class="h-5 w-5" />
+          <RightArrowIcon />
           Move
         </button>
         <button
@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, ArrowBigUpDashIcon, DownloadIcon, TrashIcon } from "@modrinth/assets";
+import { EditIcon, DownloadIcon, TrashIcon, RightArrowIcon } from "@modrinth/assets";
 
 interface FileItem {
   type: string;
