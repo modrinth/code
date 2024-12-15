@@ -50,48 +50,45 @@
             class="upload-status m-2 rounded-xl bg-table-alternateRow text-contrast"
           >
             <div class="flex flex-col gap-2 p-4 text-sm">
-              <div
-                class="flex cursor-pointer items-center justify-between"
-                @click="isUploadPanelExpanded = !isUploadPanelExpanded"
-              >
+              <div class="flex cursor-pointer items-center justify-between">
                 <div class="flex items-center gap-2 font-bold">
-                  <UiServersPanelSpinner v-if="activeUploads.length" class="size-4" />
+                  <UiServersPanelSpinner v-if="activeUploads.length" class="!size-4" />
                   <CheckCircleIcon v-else class="size-4" />
                   <span>
                     Uploading {{ uploadQueue.length }} file{{ uploadQueue.length !== 1 ? "s" : "" }}
                   </span>
                 </div>
-                <ChevronDownIcon
-                  class="size-4 transform transition-transform duration-200"
-                  :class="{ 'rotate-180': !isUploadPanelExpanded }"
-                />
               </div>
 
-              <div v-show="isUploadPanelExpanded" class="mt-2 space-y-2">
+              <div class="mt-2 space-y-2">
                 <div
                   v-for="item in uploadQueue"
                   :key="item.file.name"
                   class="flex items-center justify-between gap-2 text-xs"
                 >
                   <div class="flex flex-1 items-center gap-2 truncate">
-                    <CheckCircleIcon
-                      v-if="item.status === 'completed'"
-                      class="text-green-500 size-3"
-                    />
+                    <UiServersPanelSpinner v-if="item.status === 'uploading'" class="!size-4" />
+                    <CheckCircleIcon v-if="item.status === 'completed'" class="size-4" />
+                    <XCircleIcon v-else-if="item.status === 'error'" class="size-4 text-red" />
                     <span class="truncate">{{ item.file.name }}</span>
                     <span class="text-secondary">({{ item.size }})</span>
                   </div>
                   <div class="flex min-w-[80px] items-center justify-end gap-2">
-                    <template v-if="item.status !== 'completed'">
+                    <template v-if="item.status === 'completed'">
+                      <span>Done</span>
+                    </template>
+                    <template v-else-if="item.status === 'error'">
+                      <span class="text-red">Failed - File already exists</span>
+                    </template>
+                    <template v-else>
                       <span>{{ item.progress }}%</span>
-                      <div class="h-1 w-20 overflow-hidden rounded-full bg-white/20">
+                      <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
                         <div
-                          class="h-full bg-white transition-all duration-200"
+                          class="h-full bg-contrast transition-all duration-200"
                           :style="{ width: item.progress + '%' }"
                         />
                       </div>
                     </template>
-                    <span v-else class="text-green-500">Done</span>
                   </div>
                 </div>
               </div>
@@ -203,7 +200,7 @@
 
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
-import { UploadIcon, FolderOpenIcon, CheckCircleIcon } from "@modrinth/assets";
+import { UploadIcon, FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
 
 interface BaseOperation {
@@ -971,9 +968,9 @@ const uploadFile = async (file: File) => {
 
   setTimeout(() => {
     uploadQueue.value = uploadQueue.value.filter(
-      (item) => item.status !== "completed" && item.status !== "error",
+      (item) => item.status === "pending" || item.status === "uploading",
     );
-  }, 3000);
+  }, 5000);
 };
 
 const initiateFileUpload = () => {
