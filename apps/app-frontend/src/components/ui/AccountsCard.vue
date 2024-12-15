@@ -174,6 +174,7 @@ function toggleMenu(override = true) {
   } else {
     showCard.value = true
   }
+  console.log(account_heads.value)
 }
 
 const unlisten = await process_listener(async (e) => {

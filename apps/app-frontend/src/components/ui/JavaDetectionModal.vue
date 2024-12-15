@@ -1,5 +1,5 @@
 <template>
-  <ModalWrapper ref="detectJavaModal" header="Select java version">
+  <ModalWrapper ref="detectJavaModal" header="Select java version" :show-ad-on-close="false">
     <div class="auto-detect-modal">
       <div class="table">
         <div class="table-row table-head">

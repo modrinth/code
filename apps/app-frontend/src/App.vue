@@ -58,7 +58,7 @@ import dayjs from 'dayjs'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
-import { open as openURL } from '@tauri-apps/plugin-shell'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 const themeStore = useTheming()
 
@@ -135,8 +135,8 @@ async function setupApp() {
     default_page,
   } = await get()
 
-  if (default_page && default_page !== 'Home') {
-    await router.push({ name: default_page })
+  if (default_page === 'Library') {
+    await router.push('/library')
   }
 
   os.value = await getOS()
@@ -193,6 +193,7 @@ async function setupApp() {
 
   get_opening_command().then(handleCommand)
   checkUpdates()
+  fetchCredentials()
 }
 
 const stateFailed = ref(false)
@@ -286,8 +287,6 @@ onMounted(() => {
   install.setIncompatibilityWarningModal(incompatibilityWarningModal)
   install.setInstallConfirmModal(installConfirmModal)
   install.setModInstallModal(modInstallModal)
-
-  fetchCredentials()
 })
 
 const accounts = ref(null)
@@ -333,10 +332,9 @@ function handleClick(e) {
         !target.classList.contains('router-link-active') &&
         !target.href.startsWith('http://localhost') &&
         !target.href.startsWith('https://tauri.localhost') &&
-        !target.href.startsWith('http://tauri.localhost') &&
-        target.target !== '_blank'
+        !target.href.startsWith('http://tauri.localhost')
       ) {
-        openURL(target.href)
+        openUrl(target.href)
       }
       e.preventDefault()
       break
@@ -362,21 +360,13 @@ function handleAuxClick(e) {
 
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
-  <Suspense>
-    <AppSettingsModal ref="settingsModal" />
-  </Suspense>
-  <RouterLink
-    v-if="!offline"
-    v-tooltip="'Skin Manager'"
-    to="/SkinManager"
-    class="btn icon-only collapsed-button"
-  >
-    <SkinManagerIcon />
-  </RouterLink>
-  <Suspense>
-    <InstanceCreationModal ref="installationModal" />
-  </Suspense>
   <div v-if="stateInitialized" class="app-grid-layout relative">
+    <Suspense>
+      <AppSettingsModal ref="settingsModal" />
+    </Suspense>
+    <Suspense>
+      <InstanceCreationModal ref="installationModal" />
+    </Suspense>
     <div
       class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10 w-[--left-bar-width]"
     >
@@ -403,6 +393,10 @@ function handleAuxClick(e) {
       >
         <LibraryIcon />
         <template #label>Library</template>
+      </NavButton>
+      <NavButton v-if="!offline" to="/SkinManager">
+        <SkinManagerIcon />
+        <template #label>Skin Manager</template>
       </NavButton>
       <div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
       <NavButton :to="() => $refs.installationModal.show()" :disabled="offline">
@@ -948,3 +942,4 @@ function handleAuxClick(e) {
   }
 }
 </style>
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>

@@ -456,9 +456,18 @@ async fn parse_skin_data(response: Value, id: Uuid) -> crate::Result<Parsed> {
     let encoded_img = STANDARD.encode(&img);
     let img = image::load_from_memory(&img)?;
 
+    // Cutout the head and overlay the hat
     let mut head = image::imageops::crop_imm(&img, 8, 8, 8, 8).to_image();
     let hat = image::imageops::crop_imm(&img, 40, 8, 8, 8).to_image();
     image::imageops::overlay(&mut head, &hat, 0, 0);
+
+    // Displayed image is blurred without scaling it up first
+    let head = image::imageops::resize(
+        &head,
+        40,
+        40,
+        image::imageops::FilterType::Nearest,
+    );
 
     let mut buf: Vec<u8> = vec![];
     // img is stored as jpg to convert transparency into black pixels

@@ -10,9 +10,13 @@ const themeStore = useTheming()
 const os = ref(await getOS())
 const settings = ref(await get())
 
-watch(settings, async () => {
-  await set(settings.value)
-})
+watch(
+  settings,
+  async () => {
+    await set(settings.value)
+  },
+  { deep: true },
+)
 </script>
 <template>
   <h2 class="m-0 text-2xl">Color theme</h2>
@@ -88,16 +92,11 @@ watch(settings, async () => {
     </div>
     <DropdownSelect
       id="opening-page"
+      v-model="settings.default_page"
       name="Opening page dropdown"
       :options="['Home', 'Library']"
-      :default-value="settings.default_page"
-      :model-value="settings.default_page"
       class="opening-page"
-      @change="
-        (e) => {
-          settings.default_page = e.option
-        }
-      "
+      @change="updateDefaultPage"
     />
   </div>
 </template>

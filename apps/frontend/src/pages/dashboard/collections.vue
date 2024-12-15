@@ -22,7 +22,7 @@
     </div>
     <div class="collections-grid">
       <nuxt-link
-        v-if="'followed projects'.includes(filterQuery)"
+        v-if="'followed projects'.includes(filterQuery.toLowerCase())"
         :to="`/collection/following`"
         class="universal-card recessed collection"
       >

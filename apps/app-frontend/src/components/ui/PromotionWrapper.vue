@@ -4,20 +4,29 @@ import { ChevronRightIcon } from '@modrinth/assets'
 import { init_ads_window, open_ads_link, record_ads_click } from '@/helpers/ads.js'
 
 const adsWrapper = ref(null)
+
+let devicePixelRatioWatcher = null
+
+function initDevicePixelRatioWatcher() {
+  if (devicePixelRatioWatcher) {
+    devicePixelRatioWatcher.removeEventListener('change', updateAdPosition)
+  }
+
+  devicePixelRatioWatcher = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`)
+  devicePixelRatioWatcher.addEventListener('change', updateAdPosition)
+}
+
 onMounted(() => {
   updateAdPosition()
 
   window.addEventListener('resize', updateAdPosition)
+  initDevicePixelRatioWatcher()
 })
 
 function updateAdPosition() {
   if (adsWrapper.value) {
-    const rect = adsWrapper.value.getBoundingClientRect()
-
-    const x = rect.left + window.scrollX
-    const y = rect.top + window.scrollY
-
-    init_ads_window(x, y, 300, 250, true)
+    init_ads_window(true)
+    initDevicePixelRatioWatcher()
   }
 }
 

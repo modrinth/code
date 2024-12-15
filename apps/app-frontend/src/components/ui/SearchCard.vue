@@ -11,14 +11,28 @@
       }
     "
   >
-    <div class="icon">
-      <Avatar :src="project.icon_url" size="96px" class="search-icon" />
+    <div class="icon w-[96px] h-[96px] relative">
+      <Avatar
+        :src="project.icon_url"
+        size="96px"
+        class="search-icon origin-top transition-all"
+        :class="{ 'scale-[0.85]': installed, 'brightness-50': installing }"
+      />
+      <div v-if="installing" class="rounded-2xl absolute inset-0 flex items-center justify-center">
+        <SpinnerIcon class="h-8 w-8 animate-spin" />
+      </div>
+      <div
+        v-if="installed"
+        class="absolute shadow-sm font-semibold bottom-0 w-full p-1 bg-button-bg rounded-full text-xs justify-center items-center flex gap-1 text-brand border-[1px] border-solid border-[--color-button-border]"
+      >
+        <CheckIcon class="shrink-0 stroke-[3px]" /> Installed
+      </div>
     </div>
     <div class="flex flex-col gap-2 overflow-hidden">
       <div class="gap-2 overflow-hidden no-wrap text-ellipsis">
-        <span class="text-lg font-extrabold text-contrast m-0 leading-none">{{
-          project.title
-        }}</span>
+        <span class="text-lg font-extrabold text-contrast m-0 leading-none">
+          {{ project.title }}
+        </span>
         <span v-if="project.author" class="text-secondary"> by {{ project.author }}</span>
       </div>
       <div class="m-0 line-clamp-2">
@@ -93,6 +107,7 @@
 
 <script setup>
 import {
+  SpinnerIcon,
   TagsIcon,
   DownloadIcon,
   HeartIcon,

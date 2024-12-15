@@ -1,77 +1,84 @@
 <template>
-  <Card class="header">
+  <div class="p-6 flex flex-col gap-3">
+    <h1 class="m-0 text-2xl">Skin Manager</h1>
     <div class="iconified-input">
       <SearchIcon />
-      <input v-model="search" type="text" placeholder="Search" class="search-input" />
+      <input v-model="search" type="text" placeholder="Search" class="h-12" />
       <Button class="r-btn" @click="() => (search = '')">
         <XIcon />
       </Button>
     </div>
-    <div class="labeled_button">
-      <span>Sort by</span>
+    <div class="flex gap-2">
       <DropdownSelect
+        v-slot="{ selected }"
         v-model="Filters.sort"
-        class="sort-dropdown"
         name="Sort Dropdown"
+        class="max-w-[16rem]"
         :options="['Name', 'Custom', 'Date created', 'Date modified']"
         placeholder="Select..."
-      />
-    </div>
-    <div class="labeled_button">
-      <span>Filter by</span>
+      >
+        <span class="font-semibold text-primary">Sort by: </span>
+        <span class="font-semibold text-secondary">{{ selected }}</span>
+      </DropdownSelect>
       <DropdownSelect
+        v-slot="{ selected }"
         v-model="Filters.filter"
-        class="filter-dropdown"
+        class="max-w-[16rem]"
         name="Filter Dropdown"
         :options="['Current user', 'All users']"
         placeholder="Select..."
-      />
+      >
+        <span class="font-semibold text-primary">Filter by: </span>
+        <span class="font-semibold text-secondary">{{ selected }}</span>
+      </DropdownSelect>
     </div>
-  </Card>
-  <div class="content">
-    <div class="instance">
-      <Card class="instance-card-item">
-        <div class="overlap">
-          <canvas id="skin_container" class="render" />
-          <AnimatedLogo v-if="!loaded_skins" />
-        </div>
-        <div class="card-row">
-          <div class="project-info">
-            <p class="title">Current Skin</p>
-            <p class="description">{{ skinData.arms }}, {{ skinData.cape }}</p>
-          </div>
-          <Button v-if="!InLibrary" color="primary" @click="handleAdd"> Add to Library </Button>
-        </div>
-      </Card>
-    </div>
-
-    <div class="row">
+    <div class="content">
       <div class="instance">
-        <Card class="instance-card-item button-base" @click="handleModal">
-          <PlusIcon size="lg" alt="Mod card" class="mod-image" />
-          <div class="project-info">
-            <p class="title">Add new skin</p>
-            <p class="description">&nbsp;</p>
+        <Card class="instance-card-item">
+          <div class="overlap">
+            <canvas id="skin_container" class="render" />
+            <AnimatedLogo v-if="!loaded_skins" />
+          </div>
+          <div class="card-row">
+            <div class="project-info">
+              <p class="title">Current Skin</p>
+              <p class="description">{{ skinData.arms }}, {{ skinData.cape }}</p>
+            </div>
+            <Button v-if="!InLibrary" color="primary" @click="handleAdd"> Add to Library </Button>
           </div>
         </Card>
       </div>
-      <SkinSave
-        v-for="skin in filteredResults"
-        :key="skin"
-        :data="skin"
-        @contextmenu.prevent.stop="(event) => handleRightClick(event, skin)"
-        @set-skin="(data) => clickCard(data)"
-      />
-      <ContextMenu ref="skinOptions" @option-clicked="handleOptionsClick">
-        <template #use> <PlayIcon /> Use </template>
-        <template v-if="Filters.sort === 'Custom'" #left> <ChevronLeftIcon /> Move Left </template>
-        <template v-if="Filters.sort === 'Custom'" #right>
-          <ChevronRightIcon /> Move Right
-        </template>
-        <template #edit> <EyeIcon /> Edit </template>
-        <template #duplicate> <ClipboardCopyIcon /> Duplicate </template>
-        <template #delete> <TrashIcon /> Delete </template>
-      </ContextMenu>
+
+      <div class="row">
+        <div class="instance">
+          <Card class="instance-card-item button-base" @click="handleModal">
+            <PlusIcon size="lg" alt="Mod card" class="mod-image" />
+            <div class="project-info">
+              <p class="title">Add new skin</p>
+              <p class="description">&nbsp;</p>
+            </div>
+          </Card>
+        </div>
+        <SkinSave
+          v-for="skin in filteredResults"
+          :key="skin"
+          :data="skin"
+          @contextmenu.prevent.stop="(event) => handleRightClick(event, skin)"
+          @set-skin="(data) => clickCard(data)"
+        />
+        <ContextMenu ref="skinOptions" @option-clicked="handleOptionsClick">
+          <template #use> <PlayIcon /> Use </template>
+          <template v-if="Filters.sort === 'Custom'" #left>
+            <ChevronLeftIcon /> Move Left
+          </template>
+          <template v-if="Filters.sort === 'Custom'" #right>
+            <ChevronRightIcon /> Move Right
+          </template>
+          <template #edit> <EyeIcon /> Edit </template>
+          <template #duplicate> <ClipboardCopyIcon /> Duplicate </template>
+          <template #delete> <TrashIcon /> Delete </template>
+        </ContextMenu>
+      </div>
     </div>
   </div>
 
@@ -277,8 +284,8 @@ import { ref, onMounted, watch, computed, onBeforeUnmount } from 'vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError, useTheming } from '@/store/state.js'
 import { useNotifications } from '@/store/notifications.js'
-import { open } from '@tauri-apps/api/dialog'
-import { tauri } from '@tauri-apps/api'
+import { open } from '@tauri-apps/plugin-dialog'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import SkinSave from '@/components/ui/SkinSave.vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -312,7 +319,6 @@ const notificationsWrapper = ref(null)
 const skinModal = ref(null)
 const deleteConfirmModal = ref(null)
 const skinOptions = ref(null)
-// Possibly dont need skinComponents?
 const changeSkinType = ref('from file')
 
 const skinData = ref({})
@@ -607,7 +613,7 @@ const handleSkin = async (state) => {
 
     if (uploadedSkin) {
       if (!selectedSkin.value.skin.startsWith('data:image/png;base64,')) {
-        skinData.value.skin = tauri.convertFileSrc(selectedSkin.value.skin)
+        skinData.value.skin = convertFileSrc(selectedSkin.value.skin)
       } else {
         skinData.value.skin = selectedSkin.value.skin
       }
@@ -716,7 +722,7 @@ const openskin = async () => {
     skinClear()
     return
   }
-  displaySkin.value = tauri.convertFileSrc(selectedSkin.value.skin)
+  displaySkin.value = convertFileSrc(selectedSkin.value.skin)
   create_modal_render()
 }
 
@@ -821,6 +827,8 @@ onBeforeUnmount(async () => {
   flex-direction: row;
   width: 100%;
   padding: 1rem;
+  padding-left: 0rem;
+  padding-top: 0rem;
   gap: 1rem;
 
   -ms-overflow-style: none;
