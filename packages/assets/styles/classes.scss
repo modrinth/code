@@ -1205,7 +1205,8 @@ select {
   border-top-right-radius: var(--radius-md) !important;
 }
 
-.v-popper--theme-dropdown {
+.v-popper--theme-dropdown,
+.v-popper--theme-dropdown.v-popper--theme-ribbit-popout {
   .v-popper__inner {
     border: 1px solid var(--color-button-bg)!important;
     padding: var(--gap-sm)!important;

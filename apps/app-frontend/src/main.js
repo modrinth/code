@@ -39,7 +39,8 @@ app.use(router)
 app.use(pinia)
 app.use(FloatingVue, {
   themes: {
-    dropdown: {
+    "ribbit-popout": {
+      $extend: "dropdown",
       placement: "bottom-end",
       instantMove: true,
       distance: 8,
