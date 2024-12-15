@@ -778,14 +778,59 @@ const createFileOrFolder = (path: string, type: "file" | "directory") => {
 };
 
 const uploadFile = (path: string, file: File) => {
+  // eslint-disable-next-line require-await
   return retryWithAuth(async () => {
     const encodedPath = encodeURIComponent(path);
-    return await PyroFetch(`/create?path=${encodedPath}&type=file`, {
-      method: "POST",
-      contentType: "application/octet-stream",
-      body: file,
-      override: internalServerRefrence.value.fs.auth,
+
+    const progressSubject = new EventTarget();
+
+    const uploadPromise = new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          const progress = (e.loaded / e.total) * 100;
+          progressSubject.dispatchEvent(
+            new CustomEvent("progress", {
+              detail: {
+                loaded: e.loaded,
+                total: e.total,
+                progress,
+              },
+            }),
+          );
+        }
+      });
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.response);
+        } else {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error("Upload failed"));
+
+      xhr.open(
+        "POST",
+        `https://${internalServerRefrence.value.fs.auth.url}/create?path=${encodedPath}&type=file`,
+      );
+      xhr.setRequestHeader("Authorization", `Bearer ${internalServerRefrence.value.fs.auth.token}`);
+      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+      xhr.send(file);
     });
+
+    return {
+      promise: uploadPromise,
+      onProgress: (
+        callback: (progress: { loaded: number; total: number; progress: number }) => void,
+      ) => {
+        progressSubject.addEventListener("progress", ((e: CustomEvent) => {
+          callback(e.detail);
+        }) as EventListener);
+      },
+    }; // Remove .promise from here
   });
 };
 

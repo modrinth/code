@@ -33,17 +33,42 @@
       @drop.prevent="handleDrop"
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
-        <UiServersFilesBrowseNavbar
-          v-if="!isEditing"
-          :breadcrumb-segments="breadcrumbSegments"
-          :search-query="searchQuery"
-          :sort-method="sortMethod"
-          @navigate="navigateToSegment"
-          @sort="sortFiles"
-          @create="showCreateModal"
-          @upload="initiateFileUpload"
-          @update:search-query="searchQuery = $event"
-        />
+        <div v-if="!isEditing" class="contents">
+          <UiServersFilesBrowseNavbar
+            :breadcrumb-segments="breadcrumbSegments"
+            :search-query="searchQuery"
+            :sort-method="sortMethod"
+            @navigate="navigateToSegment"
+            @sort="sortFiles"
+            @create="showCreateModal"
+            @upload="initiateFileUpload"
+            @update:search-query="searchQuery = $event"
+          />
+          <Transition name="expand">
+            <div
+              v-if="isUploading"
+              class="upload-status transition-colors duration-200"
+              :class="{
+                'bg-brand-highlight text-contrast': !showDoneMessage,
+                'bg-brand text-[var(--color-accent-contrast)]': showDoneMessage,
+              }"
+            >
+              <div
+                class="flex flex-row items-center justify-between gap-4 px-5 py-2 text-sm font-medium"
+              >
+                <div class="flex flex-row items-center gap-4">
+                  <UiServersPanelSpinner v-if="!showDoneMessage" class="size-5" />
+                  <CheckCircleIcon v-else class="size-5" />
+                  <span v-if="!showDoneMessage"> Uploading {{ currentUploadFile }} </span>
+                  <span v-else> Done uploading! </span>
+                </div>
+                <div class="flex flex-row items-center gap-4">
+                  <span v-if="!showDoneMessage"> {{ uploadProgress }}% </span>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </div>
 
         <UiServersFilesEditingNavbar
           v-else
@@ -144,14 +169,12 @@
       @download="downloadFile"
       @delete="showDeleteModal"
     />
-
-    <UiServersFileUploadIndicator :show="isUploading" :current-file="currentUploadFile" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
-import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
+import { UploadIcon, FolderOpenIcon, CheckCircleIcon } from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
 
 interface BaseOperation {
@@ -220,6 +243,8 @@ const dragCounter = ref(0);
 
 const isUploading = ref(false);
 const currentUploadFile = ref("");
+const uploadProgress = ref(0);
+const showDoneMessage = ref(false);
 const uploadTimeout = ref<NodeJS.Timeout>();
 
 const data = computed(() => props.server.general);
@@ -840,26 +865,45 @@ const uploadFile = async (file: File) => {
   try {
     isUploading.value = true;
     currentUploadFile.value = file.name;
+    uploadProgress.value = 0;
+    showDoneMessage.value = false;
 
     const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
-    await props.server.fs?.uploadFile(filePath, file);
-    refreshList();
+    const uploader = await props.server.fs?.uploadFile(filePath, file);
+
+    if (uploader?.onProgress) {
+      uploader.onProgress(({ progress }: { progress: number }) => {
+        uploadProgress.value = Math.round(progress);
+      });
+    }
+
+    await uploader?.promise;
+    await refreshList();
+
+    showDoneMessage.value = true;
+    // addNotification({
+    //   group: "files",
+    //   title: "File uploaded",
+    //   text: "Your file has been uploaded.",
+    //   type: "success",
+    // });
 
     await new Promise((resolve) => {
       uploadTimeout.value = setTimeout(resolve, 2000);
     });
-
-    addNotification({
-      group: "files",
-      title: "File uploaded",
-      text: "Your file has been uploaded.",
-      type: "success",
-    });
   } catch (error) {
     console.error("Error uploading file:", error);
+    addNotification({
+      group: "files",
+      title: "Upload failed",
+      text: "Failed to upload file.",
+      type: "error",
+    });
   } finally {
     isUploading.value = false;
     currentUploadFile.value = "";
+    uploadProgress.value = 0;
+    showDoneMessage.value = false;
   }
 };
 
@@ -956,3 +1000,21 @@ const onScroll = () => {
   }
 };
 </script>
+
+<style scoped>
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease-out;
+  max-height: 36px;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.upload-status {
+  overflow: hidden;
+}
+</style>
