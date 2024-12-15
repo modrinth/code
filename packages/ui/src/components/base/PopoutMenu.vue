@@ -1,6 +1,7 @@
 <template>
   <Dropdown
     ref="dropdown"
+    theme="ribbit-popout"
     no-auto-focus
     :aria-id="dropdownId || null"
     @hide="focusTrigger"
