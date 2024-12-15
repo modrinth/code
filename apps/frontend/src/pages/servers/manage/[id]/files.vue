@@ -280,9 +280,6 @@ const activeUploads = computed(() =>
   uploadQueue.value.filter((item) => item.status === "pending" || item.status === "uploading"),
 );
 
-const uploadPanelRef = ref<HTMLElement | null>(null);
-const isUploadPanelExpanded = ref(true);
-
 const data = computed(() => props.server.general);
 
 useHead({
@@ -744,12 +741,6 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
   }
 };
 
-const updateUploadPanelHeight = () => {
-  if (!uploadPanelRef.value) return;
-  const height = uploadPanelRef.value.scrollHeight;
-  uploadPanelRef.value.style.height = `${height}px`;
-};
-
 onMounted(async () => {
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
@@ -807,22 +798,6 @@ watch(
   },
   { immediate: true, deep: true },
 );
-
-watch(
-  uploadQueue,
-  () => {
-    nextTick(updateUploadPanelHeight);
-  },
-  { deep: true },
-);
-
-watch(isUploadPanelExpanded, () => {
-  nextTick(updateUploadPanelHeight);
-});
-
-onMounted(() => {
-  nextTick(updateUploadPanelHeight);
-});
 
 const breadcrumbSegments = computed(() => {
   if (typeof currentPath.value === "string") {
@@ -969,7 +944,6 @@ const uploadFile = async (file: File) => {
     uploadQueue.value = uploadQueue.value.filter(
       (item) => item.status === "pending" || item.status === "uploading",
     );
-    nextTick(updateUploadPanelHeight);
   }, 5000);
 };
 
