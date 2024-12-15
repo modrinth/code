@@ -114,6 +114,9 @@ pub enum ErrorKind {
 
     #[error("Error while applying migrations: {0}")]
     SqlxMigrate(#[from] sqlx::migrate::MigrateError),
+
+    #[error("Move directory error: {0}")]
+    DirectoryMoveError(String),
 }
 
 #[derive(Debug)]

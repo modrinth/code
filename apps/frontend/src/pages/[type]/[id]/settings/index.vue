@@ -33,10 +33,11 @@
             accept="image/png,image/jpeg,image/gif,image/webp"
             class="choose-image iconified-button"
             prompt="Upload icon"
+            aria-label="Upload icon"
             :disabled="!hasPermission"
             @change="showPreviewImage"
           >
-            <UploadIcon />
+            <UploadIcon aria-hidden="true" />
           </FileInput>
           <button
             v-if="!deletedIcon && (previewImage || project.icon_url)"
@@ -44,7 +45,7 @@
             :disabled="!hasPermission"
             @click="markIconForDeletion"
           >
-            <TrashIcon />
+            <TrashIcon aria-hidden="true" />
             Remove icon
           </button>
         </div>
@@ -151,7 +152,7 @@
         <label for="project-visibility">
           <span class="label__title">Visibility</span>
           <div class="label__description">
-            Listed and archived projects are visible in search. Unlisted projects are published, but
+            Public and archived projects are visible in search. Unlisted projects are published, but
             not visible in search or on user profiles. Private projects are only accessible by
             members of the project.
 
@@ -196,7 +197,7 @@
           class="small-multiselect"
           placeholder="Select one"
           :options="tags.approvedStatuses"
-          :custom-label="(value) => $formatProjectStatus(value)"
+          :custom-label="(value) => formatProjectStatus(value)"
           :searchable="false"
           :close-on-select="true"
           :show-labels="false"
@@ -211,7 +212,7 @@
           :disabled="!hasChanges"
           @click="saveChanges()"
         >
-          <SaveIcon />
+          <SaveIcon aria-hidden="true" />
           Save changes
         </button>
       </div>
@@ -233,7 +234,7 @@
         :disabled="!hasDeletePermission"
         @click="$refs.modal_confirm.show()"
       >
-        <TrashIcon />
+        <TrashIcon aria-hidden="true" />
         Delete project
       </button>
     </section>
@@ -243,6 +244,7 @@
 <script setup>
 import { Multiselect } from "vue-multiselect";
 
+import { formatProjectStatus } from "@modrinth/utils";
 import Avatar from "~/components/ui/Avatar.vue";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import FileInput from "~/components/ui/FileInput.vue";
@@ -423,7 +425,7 @@ const deleteIcon = async () => {
 
 svg {
   &.good {
-    color: var(--color-brand-green);
+    color: var(--color-green);
   }
 
   &.bad {
@@ -442,5 +444,9 @@ svg {
 
 .small-multiselect {
   max-width: 15rem;
+}
+
+.button-group {
+  justify-content: flex-start;
 }
 </style>

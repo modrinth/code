@@ -1,16 +1,15 @@
-use super::LoadingBarId;
+use super::{FriendPayload, LoadingBarId};
 use crate::event::{
     CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
     ProfilePayloadType,
 };
-use futures::prelude::*;
-
 #[cfg(feature = "tauri")]
 use crate::event::{
     LoadingPayload, ProcessPayload, ProfilePayload, WarningPayload,
 };
+use futures::prelude::*;
 #[cfg(feature = "tauri")]
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
@@ -34,7 +33,7 @@ const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
    pub async fn loading_function() -> crate::Result<()> {
        let loading_bar = init_loading(LoadingBarType::StateInit, 100.0, "Loading something long...").await;
        for i in 0..100 {
-           emit_loading(&loading_bar, 1.0, None).await?;
+           emit_loading(&loading_bar, 1.0, None)?;
            tokio::time::sleep(Duration::from_millis(100)).await;
        }
    }
@@ -45,7 +44,6 @@ const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
 /// total is the total amount of work to be done- all emissions will be considered a fraction of this value (should be 1 or 100 for simplicity)
 /// title is the title of the loading bar
 /// The app will wait for this loading bar to finish before exiting, as it is considered safe.
-
 pub async fn init_loading(
     bar_type: LoadingBarType,
     total: f64,
@@ -57,16 +55,15 @@ pub async fn init_loading(
 
 /// An unsafe loading bar can be created without adding it to the SafeProcesses list,
 /// meaning that the app won't ask to wait for it to finish before exiting.
-
 pub async fn init_loading_unsafe(
     bar_type: LoadingBarType,
     total: f64,
     title: &str,
 ) -> crate::Result<LoadingBarId> {
-    let event_state = crate::EventState::get().await?;
+    let event_state = crate::EventState::get()?;
     let key = LoadingBarId(Uuid::new_v4());
 
-    event_state.loading_bars.write().await.insert(
+    event_state.loading_bars.insert(
         key.0,
         LoadingBar {
             loading_bar_uuid: key.0,
@@ -92,7 +89,7 @@ pub async fn init_loading_unsafe(
         },
     );
     // attempt an initial loading_emit event to the frontend
-    emit_loading(&key, 0.0, None).await?;
+    emit_loading(&key, 0.0, None)?;
     Ok(key)
 }
 
@@ -119,9 +116,9 @@ pub async fn edit_loading(
     total: f64,
     title: &str,
 ) -> crate::Result<()> {
-    let event_state = crate::EventState::get().await?;
+    let event_state = crate::EventState::get()?;
 
-    if let Some(bar) = event_state.loading_bars.write().await.get_mut(&id.0) {
+    if let Some(mut bar) = event_state.loading_bars.get_mut(&id.0) {
         bar.bar_type = bar_type;
         bar.total = total;
         bar.message = title.to_string();
@@ -133,7 +130,7 @@ pub async fn edit_loading(
         }
     };
 
-    emit_loading(id, 0.0, None).await?;
+    emit_loading(id, 0.0, None)?;
     Ok(())
 }
 
@@ -145,15 +142,14 @@ pub async fn edit_loading(
 #[allow(unused_variables)]
 #[tracing::instrument(level = "debug")]
 
-pub async fn emit_loading(
+pub fn emit_loading(
     key: &LoadingBarId,
     increment_frac: f64,
     message: Option<&str>,
 ) -> crate::Result<()> {
-    let event_state = crate::EventState::get().await?;
+    let event_state = crate::EventState::get()?;
 
-    let mut loading_bar = event_state.loading_bars.write().await;
-    let loading_bar = match loading_bar.get_mut(&key.0) {
+    let mut loading_bar = match event_state.loading_bars.get_mut(&key.0) {
         Some(f) => f,
         None => {
             return Err(EventError::NoLoadingBar(key.0).into());
@@ -188,7 +184,7 @@ pub async fn emit_loading(
         #[cfg(feature = "tauri")]
         event_state
             .app
-            .emit_all(
+            .emit(
                 "loading",
                 LoadingPayload {
                     fraction: opt_display_frac,
@@ -213,10 +209,10 @@ pub async fn emit_loading(
 pub async fn emit_warning(message: &str) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get().await?;
+        let event_state = crate::EventState::get()?;
         event_state
             .app
-            .emit_all(
+            .emit(
                 "warning",
                 WarningPayload {
                     message: message.to_string(),
@@ -230,18 +226,22 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
 
 // emit_command(CommandPayload::Something { something })
 // ie: installing a pack, opening an .mrpack, etc
-// Generally used for url deep links and file opens that we we want to handle in the frontend
+// Generally used for url deep links and file opens that we want to handle in the frontend
 #[allow(dead_code)]
 #[allow(unused_variables)]
 pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
     tracing::debug!("Command: {}", serde_json::to_string(&command)?);
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get().await?;
+        let event_state = crate::EventState::get()?;
         event_state
             .app
-            .emit_all("command", command)
+            .emit("command", command)
             .map_err(EventError::from)?;
+
+        if let Some(window) = event_state.app.get_window("main") {
+            let _ = window.set_focus();
+        }
     }
     Ok(())
 }
@@ -250,20 +250,20 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
 #[allow(unused_variables)]
 pub async fn emit_process(
     profile_path: &str,
-    pid: u32,
+    uuid: Uuid,
     event: ProcessPayloadType,
     message: &str,
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get().await?;
+        let event_state = crate::EventState::get()?;
         event_state
             .app
-            .emit_all(
+            .emit(
                 "process",
                 ProcessPayload {
                     profile_path_id: profile_path.to_string(),
-                    pid,
+                    uuid,
                     event,
                     message: message.to_string(),
                 },
@@ -281,10 +281,10 @@ pub async fn emit_profile(
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let event_state = crate::EventState::get().await?;
+        let event_state = crate::EventState::get()?;
         event_state
             .app
-            .emit_all(
+            .emit(
                 "profile",
                 ProfilePayload {
                     profile_path_id: profile_path_id.to_string(),
@@ -293,6 +293,20 @@ pub async fn emit_profile(
             )
             .map_err(EventError::from)?;
     }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_friend(payload: FriendPayload) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get()?;
+        event_state
+            .app
+            .emit("friend", payload)
+            .map_err(EventError::from)?;
+    }
+
     Ok(())
 }
 
@@ -331,7 +345,7 @@ macro_rules! loading_join {
                         async move {
                             let res = $task.await;
                             if let Some(key) = key {
-                                $crate::event::emit::emit_loading(key, increment, message).await?;
+                                $crate::event::emit::emit_loading(key, increment, message)?;
                             }
                             res
                         }
@@ -378,8 +392,7 @@ where
             async move {
                 f.await?;
                 if let Some(key) = key {
-                    emit_loading(key, total / (num_futs as f64), message)
-                        .await?;
+                    emit_loading(key, total / (num_futs as f64), message)?;
                 }
                 Ok(())
             }

@@ -42,7 +42,7 @@ const getInstances = async () => {
     return dateB - dateA
   })
 
-  let filters = []
+  const filters = []
   for (const instance of recentInstances.value) {
     if (instance.linked_data && instance.linked_data.project_id) {
       filters.push(`NOT"project_id"="${instance.linked_data.project_id}"`)
@@ -99,7 +99,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="p-6 flex flex-col gap-2">
+    <h1 class="m-0 text-2xl">Welcome back!</h1>
     <RowDisplay
       v-if="total > 0"
       :instances="[
@@ -127,13 +128,3 @@ onUnmounted(() => {
     />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.page-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-</style>

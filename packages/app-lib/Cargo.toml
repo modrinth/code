@@ -1,10 +1,8 @@
 [package]
 name = "theseus"
-version = "0.0.0"
+version = "0.8.9"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2021"
 
 [dependencies]
 bytes = "1"
@@ -17,14 +15,14 @@ sha2 = "0.10.8"
 url = "2.2"
 uuid = { version = "1.1", features = ["serde", "v4"] }
 zip = "0.6.5"
-async_zip = { version = "0.0.17", features = ["full"] }
+async_zip = { version = "0.0.17", features = ["chrono", "tokio-fs", "deflate", "bzip2", "zstd", "deflate64"] }
 flate2 = "1.0.28"
 tempfile = "3.5.0"
 urlencoding = "2.1.3"
 dashmap = { version = "6.0.1", features = ["serde"] }
 
 chrono = { version = "0.4.19", features = ["serde"] }
-daedalus = { version = "0.2.2" }
+daedalus = { path = "../../packages/daedalus" }
 dirs = "5.0.1"
 
 regex = "1.5"
@@ -35,20 +33,18 @@ thiserror = "1.0"
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.18", features = ["chrono", "env-filter"] }
 tracing-error = "0.2.0"
-tracing-appender = "0.2.3"
 
 paste = { version = "1.0" }
 
-tauri = { version = "1.7.1", optional = true }
+tauri = { version = "2.0.0-rc", optional = true }
 indicatif = { version = "0.17.3", optional = true }
 
 image = "0.24.7"
 
 async-tungstenite = { version = "0.25.1", features = ["tokio-runtime", "tokio-native-tls"] }
 futures = "0.3"
-reqwest = { version = "0.12.3", features = ["json", "stream", "deflate", "gzip", "brotli", "multipart"] }
+reqwest = { version = "0.12.3", features = ["json", "stream", "deflate", "gzip", "brotli", "multipart", "rustls-tls", "charset", "http2", "macos-system-configuration"], default-features = false }
 tokio = { version = "1", features = ["full"] }
-tokio-stream = { version = "0.1", features = ["fs"] }
 async-recursion = "1.0.4"
 
 notify = { version = "6.1.1", default-features = false }
@@ -66,10 +62,7 @@ rand = "0.8"
 byteorder = "1.5.0"
 base64 = "0.22.0"
 
-# TODO: Remove when new SQLX version is released
-# We force-upgrade SQLite so JSONB support is added (theseus)
-# https://github.com/launchbadge/sqlx/commit/352b02de6af70f1ff1bfbd15329120589a0f7337
-sqlx = { git = "https://github.com/launchbadge/sqlx.git", rev = "352b02de6af70f1ff1bfbd15329120589a0f7337", features = [ "runtime-tokio", "sqlite", "macros"] }
+sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52.0"

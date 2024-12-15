@@ -39,6 +39,16 @@ export const initAuth = async (oldToken = null) => {
     authCookie.value = route.query.code;
   }
 
+  if (route.fullPath.includes("new_account=true") && route.path !== "/auth/welcome") {
+    const redirect = route.path.startsWith("/auth/") ? null : route.fullPath;
+
+    await navigateTo(
+      `/auth/welcome?authToken=${route.query.code}${
+        redirect ? `&redirect=${encodeURIComponent(redirect)}` : ""
+      }`,
+    );
+  }
+
   if (authCookie.value) {
     auth.token = authCookie.value;
 
@@ -101,9 +111,15 @@ export const getAuthUrl = (provider, redirect = "") => {
   if (redirect === "") {
     redirect = route.path;
   }
-  const fullURL = `${config.public.siteUrl}${redirect}`;
 
-  return `${config.public.apiBaseUrl}auth/init?url=${fullURL}&provider=${provider}`;
+  let fullURL;
+  if (route.query.launcher) {
+    fullURL = `https://launcher-files.modrinth.com`;
+  } else {
+    fullURL = `${config.public.siteUrl}${redirect}`;
+  }
+
+  return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${fullURL}`;
 };
 
 export const removeAuthProvider = async (provider) => {

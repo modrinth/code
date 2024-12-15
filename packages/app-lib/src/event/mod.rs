@@ -1,8 +1,11 @@
 //! Theseus state management system
+use crate::state::UserStatus;
+use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, path::PathBuf, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
+#[cfg(feature = "tauri")]
+use tauri::Emitter;
 use tokio::sync::OnceCell;
-use tokio::sync::RwLock;
 use uuid::Uuid;
 
 pub mod emit;
@@ -14,7 +17,7 @@ pub struct EventState {
     /// Tauri app
     #[cfg(feature = "tauri")]
     pub app: tauri::AppHandle,
-    pub loading_bars: RwLock<HashMap<Uuid, LoadingBar>>,
+    pub loading_bars: DashMap<Uuid, LoadingBar>,
 }
 
 impl EventState {
@@ -24,7 +27,7 @@ impl EventState {
             .get_or_try_init(|| async {
                 Ok(Arc::new(Self {
                     app,
-                    loading_bars: RwLock::new(HashMap::new()),
+                    loading_bars: DashMap::new(),
                 }))
             })
             .await
@@ -36,43 +39,30 @@ impl EventState {
         EVENT_STATE
             .get_or_try_init(|| async {
                 Ok(Arc::new(Self {
-                    loading_bars: RwLock::new(HashMap::new()),
+                    loading_bars: DashMap::new(),
                 }))
             })
             .await
             .cloned()
     }
 
-    #[cfg(feature = "tauri")]
-    pub async fn get() -> crate::Result<Arc<Self>> {
+    pub fn get() -> crate::Result<Arc<Self>> {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
     }
 
-    // Initialization requires no app handle in non-tauri mode, so we can just use the same function
-    #[cfg(not(feature = "tauri"))]
-    pub async fn get() -> crate::Result<Arc<Self>> {
-        Self::init().await
-    }
-
     // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
-    pub async fn list_progress_bars() -> crate::Result<HashMap<Uuid, LoadingBar>>
+    pub async fn list_progress_bars() -> crate::Result<DashMap<Uuid, LoadingBar>>
     {
-        let value = Self::get().await?;
-        let read = value.loading_bars.read().await;
-
-        let mut display_list: HashMap<Uuid, LoadingBar> = HashMap::new();
-        for (uuid, loading_bar) in read.iter() {
-            display_list.insert(*uuid, loading_bar.clone());
-        }
-
-        Ok(display_list)
+        let value = Self::get()?;
+        Ok(value.loading_bars.clone())
     }
 
     #[cfg(feature = "tauri")]
-    pub async fn get_main_window() -> crate::Result<Option<tauri::Window>> {
+    pub async fn get_main_window() -> crate::Result<Option<tauri::WebviewWindow>>
+    {
         use tauri::Manager;
-        let value = Self::get().await?;
-        Ok(value.app.get_window("main"))
+        let value = Self::get()?;
+        Ok(value.app.get_webview_window("main"))
     }
 }
 
@@ -99,19 +89,18 @@ impl Drop for LoadingBarId {
     fn drop(&mut self) {
         let loader_uuid = self.0;
         tokio::spawn(async move {
-            if let Ok(event_state) = EventState::get().await {
-                let mut bars = event_state.loading_bars.write().await;
-
+            if let Ok(event_state) = EventState::get() {
                 #[cfg(any(feature = "tauri", feature = "cli"))]
-                if let Some(bar) = bars.remove(&loader_uuid) {
+                if let Some((_, bar)) =
+                    event_state.loading_bars.remove(&loader_uuid)
+                {
                     #[cfg(feature = "tauri")]
                     {
                         let loader_uuid = bar.loading_bar_uuid;
                         let event = bar.bar_type.clone();
                         let fraction = bar.current / bar.total;
 
-                        use tauri::Manager;
-                        let _ = event_state.app.emit_all(
+                        let _ = event_state.app.emit(
                             "loading",
                             LoadingPayload {
                                 fraction: None,
@@ -135,7 +124,7 @@ impl Drop for LoadingBarId {
                 }
 
                 #[cfg(not(any(feature = "tauri", feature = "cli")))]
-                bars.remove(&loader_uuid);
+                event_state.loading_bars.remove(&loader_uuid);
             }
         });
     }
@@ -145,7 +134,11 @@ impl Drop for LoadingBarId {
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
 pub enum LoadingBarType {
-    StateInit,
+    LegacyDataMigration,
+    DirectoryMove {
+        old: PathBuf,
+        new: PathBuf,
+    },
     JavaDownload {
         version: u32,
     },
@@ -180,6 +173,11 @@ pub enum LoadingBarType {
     CopyProfile {
         import_location: PathBuf,
         profile_name: String,
+    },
+    CheckingForUpdates,
+    LauncherUpdate {
+        version: String,
+        current_version: String,
     },
 }
 
@@ -222,7 +220,7 @@ pub enum CommandPayload {
 #[derive(Serialize, Clone)]
 pub struct ProcessPayload {
     pub profile_path_id: String,
-    pub pid: u32,
+    pub uuid: Uuid,
     pub event: ProcessPayloadType,
     pub message: String,
 }
@@ -258,4 +256,14 @@ pub enum EventError {
     #[cfg(feature = "tauri")]
     #[error("Tauri error: {0}")]
     TauriError(#[from] tauri::Error),
+}
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "event")]
+pub enum FriendPayload {
+    FriendRequest { from: String },
+    UserOffline { id: String },
+    StatusUpdate { user_status: UserStatus },
+    StatusSync,
 }

@@ -1,8 +1,4 @@
 //! Theseus state management system
-use crate::event::emit::{emit_loading, init_loading_unsafe};
-
-use crate::event::LoadingBarType;
-
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use std::sync::Arc;
 use tokio::sync::{OnceCell, Semaphore};
@@ -35,7 +31,10 @@ pub use self::minecraft_auth::*;
 mod cache;
 pub use self::cache::*;
 
-mod db;
+mod friends;
+pub use self::friends::*;
+
+pub mod db;
 pub mod fs_watcher;
 mod mr_auth;
 
@@ -61,6 +60,12 @@ pub struct State {
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
 
+    /// Process manager
+    pub process_manager: ProcessManager,
+
+    /// Friends socket
+    pub friends_socket: FriendsSocket,
+
     pub(crate) pool: SqlitePool,
 
     pub(crate) file_watcher: FileWatcher,
@@ -72,7 +77,27 @@ impl State {
             .get_or_try_init(Self::initialize_state)
             .await?;
 
-        Process::garbage_collect(&state.pool).await?;
+        tokio::task::spawn(async move {
+            let res = tokio::try_join!(
+                state.discord_rpc.clear_to_default(true),
+                Profile::refresh_all(),
+                ModrinthCredentials::refresh_all(),
+            );
+
+            if let Err(e) = res {
+                tracing::error!("Error running discord RPC: {e}");
+            }
+
+            let _ = state
+                .friends_socket
+                .connect(
+                    &state.pool,
+                    &state.api_semaphore,
+                    &state.process_manager,
+                )
+                .await;
+            let _ = FriendsSocket::socket_loop().await;
+        });
 
         Ok(())
     }
@@ -94,13 +119,6 @@ impl State {
 
     #[tracing::instrument]
     async fn initialize_state() -> crate::Result<Arc<Self>> {
-        let loading_bar = init_loading_unsafe(
-            LoadingBarType::StateInit,
-            100.0,
-            "Initializing launcher",
-        )
-        .await?;
-
         let pool = db::connect().await?;
 
         legacy_converter::migrate_legacy_data(&pool).await?;
@@ -120,22 +138,16 @@ impl State {
             &io_semaphore,
         )
         .await?;
-
         let directories = DirectoryInfo::init(settings.custom_dir).await?;
 
-        emit_loading(&loading_bar, 10.0, None).await?;
-
-        let discord_rpc = DiscordGuard::init().await?;
-        if settings.discord_rpc {
-            // Add default Idling to discord rich presence
-            // Force add to avoid recursion
-            let _ = discord_rpc.force_set_activity("Idling...", true).await;
-        }
+        let discord_rpc = DiscordGuard::init()?;
 
         let file_watcher = fs_watcher::init_watcher().await?;
         fs_watcher::watch_profiles_init(&file_watcher, &directories).await?;
 
-        emit_loading(&loading_bar, 10.0, None).await?;
+        let process_manager = ProcessManager::new();
+
+        let friends_socket = FriendsSocket::new();
 
         Ok(Arc::new(Self {
             directories,
@@ -143,6 +155,8 @@ impl State {
             io_semaphore,
             api_semaphore,
             discord_rpc,
+            process_manager,
+            friends_socket,
             pool,
             file_watcher,
         }))

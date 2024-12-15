@@ -11,7 +11,7 @@
       {
         "name": "active",
         "ordinal": 1,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "username",
@@ -31,20 +31,13 @@
       {
         "name": "expires",
         "ordinal": 5,
-        "type_info": "Int64"
+        "type_info": "Integer"
       }
     ],
     "parameters": {
       "Right": 0
     },
-    "nullable": [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
-    ]
+    "nullable": [false, false, false, false, false, false]
   },
   "hash": "727e3e1bc8625bbcb833920059bb8cea926ac6c65d613904eff1d740df30acda"
 }

@@ -3,7 +3,9 @@ use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::launcher::io::IOError;
-use crate::state::{Credentials, JavaVersion, Process, ProfileInstallStage};
+use crate::state::{
+    Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
+};
 use crate::util::io;
 use crate::{
     process,
@@ -48,7 +50,7 @@ pub fn parse_rules(
 
 // if anything is disallowed, it should NOT be included
 // if anything is not disallowed, it shouldn't factor in final result
-// if anything is not allowed, it shouldn't factor in final result
+// if anything is not allowed, it should NOT be included
 // if anything is allowed, it should be included
 #[tracing::instrument]
 pub fn parse_rule(
@@ -83,7 +85,7 @@ pub fn parse_rule(
             if res {
                 Some(true)
             } else {
-                None
+                Some(false)
             }
         }
         RuleAction::Disallow => {
@@ -225,12 +227,31 @@ pub async fn install_minecraft(
             .position(|x| x.id == "22w16a")
             .unwrap_or(0);
 
-    let loader_version = get_loader_version_from_profile(
+    let mut loader_version = get_loader_version_from_profile(
         &profile.game_version,
         profile.loader,
         profile.loader_version.as_deref(),
     )
     .await?;
+
+    // If no loader version is selected, try to select the stable version!
+    if profile.loader != ModLoader::Vanilla && loader_version.is_none() {
+        loader_version = get_loader_version_from_profile(
+            &profile.game_version,
+            profile.loader,
+            Some("stable"),
+        )
+        .await?;
+
+        let loader_version_id = loader_version.clone();
+        crate::api::profile::edit(&profile.path, |prof| {
+            prof.loader_version =
+                loader_version_id.clone().map(|x| x.id.clone());
+
+            async { Ok(()) }
+        })
+        .await?;
+    }
 
     let version_jar =
         loader_version.as_ref().map_or(version.id.clone(), |it| {
@@ -315,8 +336,7 @@ pub async fn install_minecraft(
                     server => "";
             }
 
-            emit_loading(&loading_bar, 0.0, Some("Running forge processors"))
-                .await?;
+            emit_loading(&loading_bar, 0.0, Some("Running forge processors"))?;
             let total_length = processors.len();
 
             // Forge processors (90-100)
@@ -381,8 +401,7 @@ pub async fn install_minecraft(
                         "Running forge processor {}/{}",
                         index, total_length
                     )),
-                )
-                .await?;
+                )?;
             }
         }
     }
@@ -393,7 +412,7 @@ pub async fn install_minecraft(
         async { Ok(()) }
     })
     .await?;
-    emit_loading(&loading_bar, 1.0, Some("Finished installing")).await?;
+    emit_loading(&loading_bar, 1.0, Some("Finished installing"))?;
 
     Ok(())
 }
@@ -410,7 +429,7 @@ pub async fn launch_minecraft(
     credentials: &Credentials,
     post_exit_hook: Option<String>,
     profile: &Profile,
-) -> crate::Result<Process> {
+) -> crate::Result<ProcessMetadata> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
         || profile.install_stage == ProfileInstallStage::Installing
     {
@@ -452,6 +471,14 @@ pub async fn launch_minecraft(
         profile.loader_version.as_deref(),
     )
     .await?;
+
+    if profile.loader != ModLoader::Vanilla && loader_version.is_none() {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "No loader version selected for {}",
+            profile.loader.as_str()
+        ))
+        .into());
+    }
 
     let version_jar =
         loader_version.as_ref().map_or(version.id.clone(), |it| {
@@ -508,16 +535,22 @@ pub async fn launch_minecraft(
     if let Some(process) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Profile {} is already running at path: {}",
-            profile.path, process.pid
+            profile.path, process.uuid
         ))
         .as_error());
     }
+
+    let natives_dir = state.directories.version_natives_dir(&version_jar);
+    if !natives_dir.exists() {
+        io::create_dir_all(&natives_dir).await?;
+    }
+
     command
         .args(
             args::get_jvm_arguments(
                 args.get(&d::minecraft::ArgumentType::Jvm)
                     .map(|x| x.as_slice()),
-                &state.directories.version_natives_dir(&version_jar),
+                &natives_dir,
                 &state.directories.libraries_dir(),
                 &args::get_class_paths(
                     &state.directories.libraries_dir(),
@@ -644,13 +677,15 @@ pub async fn launch_minecraft(
         .set_activity(&format!("Playing {}", profile.name), true)
         .await;
 
+    let _ = state
+        .friends_socket
+        .update_status(Some(profile.name.clone()))
+        .await;
+
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
-    Process::insert_new_process(
-        &profile.path,
-        command,
-        post_exit_hook,
-        &state.pool,
-    )
-    .await
+    state
+        .process_manager
+        .insert_new_process(&profile.path, command, post_exit_hook)
+        .await
 }

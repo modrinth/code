@@ -56,32 +56,32 @@
       {
         "name": "locked",
         "ordinal": 10,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "created",
         "ordinal": 11,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "modified",
         "ordinal": 12,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "last_played",
         "ordinal": 13,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "submitted_time_played",
         "ordinal": 14,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "recent_time_played",
         "ordinal": 15,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "override_java_path",
@@ -101,22 +101,22 @@
       {
         "name": "override_mc_memory_max",
         "ordinal": 19,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "override_mc_force_fullscreen",
         "ordinal": 20,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "override_mc_game_resolution_x",
         "ordinal": 21,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "override_mc_game_resolution_y",
         "ordinal": 22,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "override_hook_pre_launch",

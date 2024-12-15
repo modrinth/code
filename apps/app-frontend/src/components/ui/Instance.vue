@@ -3,14 +3,14 @@ import { onUnmounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { StopCircleIcon, PlayIcon } from '@modrinth/assets'
 import { Card, Avatar, AnimatedLogo } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
 import { handleError } from '@/store/state.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
 import { handleSevereError } from '@/store/error.js'
+import { trackEvent } from '@/helpers/analytics'
 
 const props = defineProps({
   instance: {
@@ -28,7 +28,7 @@ const modLoading = computed(() => props.instance.install_stage !== 'installed')
 const router = useRouter()
 
 const seeInstance = async () => {
-  await router.push(`/instance/${encodeURIComponent(props.instance.path)}/`)
+  await router.push(`/instance/${encodeURIComponent(props.instance.path)}`)
 }
 
 const checkProcess = async () => {
@@ -40,10 +40,12 @@ const checkProcess = async () => {
 const play = async (e, context) => {
   e?.stopPropagation()
   modLoading.value = true
-  await run(props.instance.path).catch(handleSevereError)
+  await run(props.instance.path).catch((err) =>
+    handleSevereError(err, { profilePath: props.instance.path }),
+  )
   modLoading.value = false
 
-  mixpanel_track('InstancePlay', {
+  trackEvent('InstancePlay', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     source: context,
@@ -56,7 +58,7 @@ const stop = async (e, context) => {
 
   await kill(props.instance.path).catch(handleError)
 
-  mixpanel_track('InstanceStop', {
+  trackEvent('InstanceStop', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     source: context,
@@ -101,7 +103,17 @@ onUnmounted(() => unlisten())
       />
       <div class="project-info">
         <p class="title">{{ props.instance.name }}</p>
-        <p class="description">
+        <p
+          v-if="
+            props.instance.install_stage === 'installing' ||
+            props.instance.install_stage === 'not_installed' ||
+            props.instance.install_stage === 'pack_installing'
+          "
+          class="description"
+        >
+          Installing...
+        </p>
+        <p v-else class="description">
           {{ props.instance.loader }}
           {{ props.instance.game_version }}
         </p>

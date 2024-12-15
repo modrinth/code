@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="landing-hero">
-      <ModrinthIcon />
+      <ModrinthIcon class="modrinth-icon" />
       <h1 class="main-header">
         The place for Minecraft
         <div class="animate-strong">
@@ -13,6 +13,7 @@
             >
               {{ projectType.display }}s <br />
             </strong>
+            <strong class="main-header-strong">servers <br /></strong>
             <strong class="main-header-strong">mods</strong>
           </span>
         </div>
@@ -22,18 +23,19 @@
         community.
       </h2>
       <div class="button-group">
-        <nuxt-link to="/mods" class="iconified-button brand-button"> Discover mods </nuxt-link>
-        <nuxt-link
-          v-if="!auth.user"
-          to="/auth/sign-up"
-          class="iconified-button outline-button"
-          rel="noopener nofollow"
-        >
-          Sign up
-        </nuxt-link>
-        <nuxt-link v-else to="/dashboard/projects" class="iconified-button outline-button">
-          Go to dashboard
-        </nuxt-link>
+        <ButtonStyled color="brand" size="large">
+          <nuxt-link to="/mods"> <CompassIcon aria-hidden="true" /> Discover mods </nuxt-link>
+        </ButtonStyled>
+        <ButtonStyled size="large" type="outlined">
+          <nuxt-link v-if="!auth.user" to="/auth/sign-up" rel="noopener nofollow">
+            <LogInIcon aria-hidden="true" />
+            Sign up
+          </nuxt-link>
+          <nuxt-link v-else to="/dashboard/projects">
+            <DashboardIcon aria-hidden="true" />
+            Go to dashboard
+          </nuxt-link>
+        </ButtonStyled>
       </div>
     </div>
     <div class="users-section-outer">
@@ -174,7 +176,7 @@
                       {{ notification.versions[notification.versions.length - 1] }}
                     </p>
                     <div class="date">
-                      <CalendarIcon />
+                      <CalendarIcon aria-hidden="true" />
                       <span>
                         Received
                         {{ fromNow(notification.date_modified) }}
@@ -216,19 +218,21 @@
                   href="https://prismlauncher.org/"
                   class="graphic gradient-border"
                   title="Prism Launcher"
+                  aria-label="Prism Launcher"
                 >
-                  <PrismLauncherLogo />
+                  <PrismLauncherLogo aria-hidden="true" />
                 </a>
-                <nuxt-link to="/app" class="graphic gradient-border">
-                  <ModrinthIcon />
+                <nuxt-link to="/app" class="graphic gradient-border" aria-label="Modrinth App">
+                  <ModrinthIcon aria-hidden="true" />
                 </nuxt-link>
                 <a
                   rel="noopener"
                   href="https://atlauncher.com/"
                   class="graphic gradient-border"
                   title="ATLauncher"
+                  aria-label="ATLauncher"
                 >
-                  <ATLauncherLogo />
+                  <ATLauncherLogo aria-hidden="true" />
                 </a>
               </div>
             </div>
@@ -411,7 +415,7 @@
         viewBox="0 0 865 512"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        class="light-height"
+        class="light-height modrinth-icon"
       >
         <g clip-path="url(#clip0_419_237)">
           <rect x="176" width="512" height="512" fill="url(#paint0_linear_419_237)" />
@@ -455,7 +459,13 @@
           </clipPath>
         </defs>
       </svg>
-      <svg v-else viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg
+        v-else
+        viewBox="0 0 512 512"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        class="modrinth-icon"
+      >
         <g clip-path="url(#clip0_127_331)">
           <rect width="512" height="512" fill="url(#paint0_linear_127_331)" />
           <g style="mix-blend-mode: overlay">
@@ -493,18 +503,22 @@
           Read more about <br />
           <strong class="main-header-strong">Modrinth</strong>
         </h2>
-        <a
-          href="https://blog.modrinth.com/?utm_source=website&utm_source=homepage&utm_campaign=newsletter"
-          class="iconified-button brand-button"
-        >
-          Visit the blog
-        </a>
+        <ButtonStyled color="brand">
+          <a
+            href="https://blog.modrinth.com/?utm_source=website&utm_source=homepage&utm_campaign=newsletter"
+          >
+            <NewspaperIcon />
+            Visit the blog
+          </a>
+        </ButtonStyled>
       </div>
     </div>
   </div>
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
+import { ButtonStyled } from "@modrinth/ui";
+import { CompassIcon, LogInIcon, DashboardIcon, NewspaperIcon } from "@modrinth/assets";
 import SearchIcon from "~/assets/images/utils/search.svg?component";
 import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
 import ModrinthIcon from "~/assets/images/logo.svg?component";
@@ -554,7 +568,7 @@ async function updateSearchProjects() {
   text-align: center;
   flex-direction: column;
 
-  svg {
+  .modrinth-icon {
     width: 13rem;
     height: 13rem;
     margin-bottom: 2.5rem;
@@ -575,12 +589,6 @@ async function updateSearchProjects() {
     gap: 1.25rem;
     margin: 0 auto 5rem;
     justify-content: center;
-
-    .outline-button {
-      color: var(--landing-color-heading);
-      background: none;
-      border: 1px var(--landing-color-heading) solid;
-    }
   }
 }
 
@@ -717,6 +725,7 @@ async function updateSearchProjects() {
 
           display: -webkit-box;
           -webkit-line-clamp: 2;
+          line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
 
@@ -1044,7 +1053,7 @@ async function updateSearchProjects() {
   padding: 1rem 1rem 2rem 1rem;
   overflow: hidden;
 
-  svg {
+  .modrinth-icon {
     z-index: 2;
     width: auto;
     height: 32rem;
@@ -1159,7 +1168,7 @@ async function updateSearchProjects() {
   > span {
     position: absolute;
     top: 0;
-    animation: slide 10s infinite;
+    animation: slide 12s infinite;
 
     @media (prefers-reduced-motion) {
       animation-play-state: paused !important;
@@ -1168,42 +1177,41 @@ async function updateSearchProjects() {
 
   @keyframes slide {
     0%,
-    13% {
+    10% {
       top: 0;
     }
-    17%,
-    30% {
+    13%,
+    23% {
       top: -1.2em;
     }
-    33%,
-    46% {
+    26%,
+    36% {
       top: -2.4em;
     }
-    50%,
-    63% {
+    39%,
+    49% {
       top: -3.6em;
     }
-    66%,
-    79% {
+    52%,
+    62% {
       top: -4.8em;
     }
-    83%,
-    96% {
+    65%,
+    75% {
       top: -6em;
+    }
+    78%,
+    88% {
+      top: -7.2em;
     }
     99.99997%,
     99.99998% {
-      top: -7.2em;
+      top: -8.4em;
     }
     99.99999% {
       top: 0;
     }
   }
-}
-
-.iconified-button {
-  font-weight: 600;
-  min-height: 3rem;
 }
 
 @media screen and (min-width: 560px) {
@@ -1276,7 +1284,7 @@ async function updateSearchProjects() {
       font-size: 1.625rem;
     }
 
-    margin-top: -4rem;
+    margin-top: -5rem;
     padding: 11.25rem 1rem 12rem;
   }
 

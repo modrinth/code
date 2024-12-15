@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import * as Pages from '@/pages'
 import * as Project from '@/pages/project'
 import * as Instance from '@/pages/instance'
+import * as Library from '@/pages/library'
 
 /**
  * Configures application routing. Add page to pages/index and then add to route table here.
@@ -19,19 +20,36 @@ export default new createRouter({
     },
     {
       path: '/browse/:projectType',
-      name: 'Browse',
+      name: 'Discover content',
       component: Pages.Browse,
       meta: {
-        breadcrumb: [{ name: 'Browse' }],
+        breadcrumb: [{ name: 'Discover content' }],
       },
     },
     {
       path: '/library',
       name: 'Library',
-      component: Pages.Library,
+      component: Library.Index,
       meta: {
         breadcrumb: [{ name: 'Library' }],
       },
+      children: [
+        {
+          path: '',
+          name: 'Overview',
+          component: Library.Overview,
+        },
+        {
+          path: 'downloaded',
+          name: 'Downloaded',
+          component: Library.Downloaded,
+        },
+        {
+          path: 'custom',
+          name: 'Custom',
+          component: Library.Custom,
+        },
+      ],
     },
     {
       path: '/SkinManager',
@@ -39,14 +57,6 @@ export default new createRouter({
       component: Pages.SkinManager,
       meta: {
         breadcrumb: [{ name: 'Skin Manager' }],
-      },
-    },
-    {
-      path: '/settings',
-      name: 'Settings',
-      component: Pages.Settings,
-      meta: {
-        breadcrumb: [{ name: 'Settings' }],
       },
     },
     {
@@ -147,7 +157,7 @@ export default new createRouter({
   linkExactActiveClass: 'router-link-exact-active',
   scrollBehavior() {
     // Sometimes Vue's scroll behavior is not working as expected, so we need to manually scroll to top (especially on Linux)
-    document.querySelector('.router-view').scrollTop = 0
+    document.querySelector('.router-view')?.scrollTo(0, 0)
     return {
       el: '.router-view',
       top: 0,

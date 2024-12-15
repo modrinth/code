@@ -2,15 +2,14 @@
   <div
     v-if="mode !== 'isolated'"
     ref="button"
-    v-tooltip.right="'Minecraft accounts'"
-    class="button-base avatar-button"
+    class="button-base mt-2 px-3 py-2 bg-button-bg rounded-xl flex items-center gap-2"
     :class="{ expanded: mode === 'expanded' }"
-    @click="showCard = !showCard"
+    @click="toggleMenu"
   >
     <div class="overlap">
       <AnimatedLogo v-if="!loaded_skins" class="loading" />
       <Avatar
-        :size="mode === 'expanded' ? 'xs' : 'sm'"
+        size="36px"
         :src="
           selectedAccount
             ? account_heads[selectedAccount.id]
@@ -18,6 +17,11 @@
         "
       />
     </div>
+    <div class="flex flex-col w-full">
+      <span>{{ selectedAccount ? selectedAccount.username : 'Select account' }}</span>
+      <span class="text-secondary text-xs">Minecraft account</span>
+    </div>
+    <DropdownIcon class="w-5 h-5 shrink-0" />
   </div>
   <transition name="fade">
     <Card
@@ -62,7 +66,7 @@
 </template>
 
 <script setup>
-import { PlusIcon, TrashIcon, LogInIcon } from '@modrinth/assets'
+import { DropdownIcon, PlusIcon, TrashIcon, LogInIcon } from '@modrinth/assets'
 import { Avatar, Button, Card, AnimatedLogo } from '@modrinth/ui'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import {
@@ -73,7 +77,7 @@ import {
   get_default_user,
 } from '@/helpers/auth'
 import { handleError } from '@/store/state.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
 import {
@@ -134,7 +138,7 @@ async function login() {
     await refreshValues()
   }
 
-  mixpanel_track('AccountLogIn')
+  trackEvent('AccountLogIn')
 }
 
 const logout = async (id) => {
@@ -146,12 +150,12 @@ const logout = async (id) => {
   } else {
     emit('change')
   }
-  mixpanel_track('AccountLogOut')
+  trackEvent('AccountLogOut')
 }
 
-let showCard = ref(false)
-let card = ref(null)
-let button = ref(null)
+const showCard = ref(false)
+const card = ref(null)
+const button = ref(null)
 const handleClickOutside = (event) => {
   const elements = document.elementsFromPoint(event.clientX, event.clientY)
   if (
@@ -160,7 +164,15 @@ const handleClickOutside = (event) => {
     !elements.includes(card.value.$el) &&
     !button.value.contains(event.target)
   ) {
+    toggleMenu(false)
+  }
+}
+
+function toggleMenu(override = true) {
+  if (showCard.value || !override) {
     showCard.value = false
+  } else {
+    showCard.value = true
   }
 }
 
@@ -219,11 +231,11 @@ onUnmounted(() => {
 }
 
 .account-card {
-  position: absolute;
+  position: fixed;
   display: flex;
   flex-direction: column;
-  top: 0.5rem;
-  left: 5.5rem;
+  margin-top: 0.5rem;
+  right: 2rem;
   z-index: 11;
   gap: 0.5rem;
   padding: 1rem;
@@ -298,12 +310,17 @@ onUnmounted(() => {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition:
+    opacity 0.25s ease,
+    translate 0.25s ease,
+    scale 0.25s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  translate: 0 -2rem;
+  scale: 0.9;
 }
 
 .avatar-button {
@@ -311,9 +328,10 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   color: var(--color-base);
-  background-color: var(--color-raised-bg);
+  background-color: var(--color-button-bg);
   border-radius: var(--radius-md);
   width: 100%;
+  padding: 0.5rem 0.75rem;
   text-align: left;
 
   &.expanded {

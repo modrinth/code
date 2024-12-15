@@ -1,6 +1,6 @@
 use crate::state::{
-    CachedEntry, Organization, Project, SearchResults, TeamMember, User,
-    Version,
+    CacheBehaviour, CacheValueType, CachedEntry, Organization, Project,
+    SearchResults, TeamMember, User, Version,
 };
 
 macro_rules! impl_cache_methods {
@@ -10,15 +10,17 @@ macro_rules! impl_cache_methods {
                 #[tracing::instrument]
                 pub async fn [<get_ $variant:snake>](
                     id: &str,
+                    cache_behaviour: Option<CacheBehaviour>,
                 ) -> crate::Result<Option<$type>>
                 {
                     let state = crate::State::get().await?;
-                    Ok(CachedEntry::[<get_ $variant:snake _many>](&[id], None, &state.pool, &state.api_semaphore).await?.into_iter().next())
+                    Ok(CachedEntry::[<get_ $variant:snake _many>](&[id], cache_behaviour, &state.pool, &state.api_semaphore).await?.into_iter().next())
                 }
 
                 #[tracing::instrument]
                 pub async fn [<get_ $variant:snake _many>](
                     ids: &[&str],
+                    cache_behaviour: Option<CacheBehaviour>,
                 ) -> crate::Result<Vec<$type>>
                 {
                     let state = crate::State::get().await?;
@@ -40,3 +42,12 @@ impl_cache_methods!(
     (Organization, Organization),
     (SearchResults, SearchResults)
 );
+
+pub async fn purge_cache_types(
+    cache_types: &[CacheValueType],
+) -> crate::Result<()> {
+    let state = crate::State::get().await?;
+    CachedEntry::purge_cache_types(cache_types, &state.pool).await?;
+
+    Ok(())
+}

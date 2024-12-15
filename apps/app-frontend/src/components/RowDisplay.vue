@@ -12,7 +12,7 @@ import {
   EyeIcon,
   ChevronRightIcon,
 } from '@modrinth/assets'
-import { ConfirmModal } from '@modrinth/ui'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -22,8 +22,7 @@ import { handleError } from '@/store/notifications.js'
 import { duplicate, kill, remove, run } from '@/helpers/profile.js'
 import { useRouter } from 'vue-router'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { useTheming } from '@/store/state.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { install as installVersion } from '@/store/install.js'
 
@@ -53,7 +52,6 @@ const instanceComponents = ref(null)
 const rows = ref(null)
 const deleteConfirmModal = ref(null)
 
-const themeStore = useTheming()
 const currentDeleteInstance = ref(null)
 
 async function deleteProfile() {
@@ -122,15 +120,17 @@ const handleProjectClick = (event, passedInstance) => {
 const handleOptionsClick = async (args) => {
   switch (args.option) {
     case 'play':
-      await run(args.item.path).catch(handleSevereError)
-      mixpanel_track('InstanceStart', {
+      await run(args.item.path).catch((err) =>
+        handleSevereError(err, { profilePath: args.item.path }),
+      )
+      trackEvent('InstanceStart', {
         loader: args.item.loader,
         game_version: args.item.game_version,
       })
       break
     case 'stop':
       await kill(args.item.path).catch(handleError)
-      mixpanel_track('InstanceStop', {
+      trackEvent('InstanceStop', {
         loader: args.item.loader,
         game_version: args.item.game_version,
       })
@@ -205,13 +205,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <ConfirmModal
+  <ConfirmModalWrapper
     ref="deleteConfirmModal"
     title="Are you sure you want to delete this instance?"
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"
     proceed-label="Delete"
-    :noblur="!themeStore.advancedRendering"
     @proceed="deleteProfile"
   />
   <div class="content">
@@ -261,7 +260,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 1rem;
   gap: 1rem;
 
   -ms-overflow-style: none;
@@ -295,16 +293,16 @@ onUnmounted(() => {
 
     a {
       margin: 0;
-      font-size: var(--font-size-lg);
+      font-size: var(--font-size-md);
       font-weight: bolder;
       white-space: nowrap;
-      color: var(--color-contrast);
+      color: var(--color-base);
     }
 
     svg {
-      height: 1.5rem;
-      width: 1.5rem;
-      color: var(--color-contrast);
+      height: 1.25rem;
+      width: 1.25rem;
+      color: var(--color-base);
     }
   }
 

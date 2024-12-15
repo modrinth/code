@@ -19,7 +19,7 @@
       nags.filter((x) => x.condition).length > 0 &&
       (project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
     "
-    class="author-actions universal-card"
+    class="author-actions universal-card mb-4"
   >
     <div class="header__row">
       <div class="header__title">
@@ -93,7 +93,7 @@
         </NuxtLink>
         <button
           v-else-if="nag.action"
-          class="iconified-button moderation-button"
+          class="btn btn-orange"
           :disabled="nag.action.disabled()"
           @click="nag.action.onClick"
         >
@@ -384,6 +384,8 @@ const submitForReview = async () => {
 }
 
 .author-actions {
+  margin-top: var(--spacing-card-md);
+
   &:empty {
     display: none;
   }

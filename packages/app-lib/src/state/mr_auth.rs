@@ -1,12 +1,11 @@
-use crate::config::MODRINTH_API_URL;
+use crate::config::{MODRINTH_API_URL, MODRINTH_URL};
+use crate::state::{CacheBehaviour, CachedEntry};
 use crate::util::fetch::{fetch_advanced, FetchSemaphore};
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ModrinthCredentials {
@@ -172,178 +171,42 @@ impl ModrinthCredentials {
 
         Ok(())
     }
-}
 
-#[derive(Serialize, Debug)]
-#[serde(tag = "type")]
-#[serde(rename_all = "snake_case")]
-pub enum ModrinthCredentialsResult {
-    TwoFactorRequired { flow: String },
-    Credentials(ModrinthCredentials),
-}
+    pub(crate) async fn refresh_all() -> crate::Result<()> {
+        let state = crate::State::get().await?;
+        let all = Self::get_all(&state.pool).await?;
 
-async fn get_result_from_res(
-    code_key: &str,
-    response: HashMap<String, Value>,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-) -> crate::Result<ModrinthCredentialsResult> {
-    if let Some(flow) = response.get("flow").and_then(|x| x.as_str()) {
-        Ok(ModrinthCredentialsResult::TwoFactorRequired {
-            flow: flow.to_string(),
-        })
-    } else if let Some(code) = response.get(code_key).and_then(|x| x.as_str()) {
-        let info = fetch_info(code, semaphore, exec).await?;
+        let user_ids = all.into_iter().map(|x| x.0).collect::<Vec<_>>();
 
-        Ok(ModrinthCredentialsResult::Credentials(
-            ModrinthCredentials {
-                session: code.to_string(),
-                expires: Utc::now() + Duration::weeks(2),
-                user_id: info.id,
-                active: true,
-            },
-        ))
-    } else if let Some(error) =
-        response.get("description").and_then(|x| x.as_str())
-    {
-        Err(crate::ErrorKind::OtherError(format!(
-            "Failed to login with error {error}"
-        ))
-        .as_error())
-    } else {
-        Err(crate::ErrorKind::OtherError(String::from(
-            "Flow/code/error not found in response!",
-        ))
-        .as_error())
+        CachedEntry::get_user_many(
+            &user_ids.iter().map(|x| &**x).collect::<Vec<_>>(),
+            Some(CacheBehaviour::Bypass),
+            &state.pool,
+            &state.fetch_semaphore,
+        )
+        .await?;
+
+        Ok(())
     }
 }
 
-async fn get_creds_from_res(
-    response: HashMap<String, Value>,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-) -> crate::Result<ModrinthCredentials> {
-    if let Some(code) = response.get("session").and_then(|x| x.as_str()) {
-        let info = fetch_info(code, semaphore, exec).await?;
-
-        Ok(ModrinthCredentials {
-            session: code.to_string(),
-            expires: Utc::now() + Duration::weeks(2),
-            user_id: info.id,
-            active: true,
-        })
-    } else if let Some(error) =
-        response.get("description").and_then(|x| x.as_str())
-    {
-        Err(crate::ErrorKind::OtherError(format!(
-            "Failed to login with error {error}"
-        ))
-        .as_error())
-    } else {
-        Err(crate::ErrorKind::OtherError(String::from(
-            "Flow/code/error not found in response!",
-        ))
-        .as_error())
-    }
-}
-
-pub fn get_login_url(provider: &str) -> String {
-    format!(
-        "{MODRINTH_API_URL}auth/init?url={}&provider={provider}",
-        urlencoding::encode("https://launcher-files.modrinth.com/detect.txt")
-    )
+pub fn get_login_url() -> String {
+    format!("{MODRINTH_URL}auth/sign-in?launcher=true")
 }
 
 pub async fn finish_login_flow(
-    response: HashMap<String, Value>,
+    code: &str,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-) -> crate::Result<ModrinthCredentialsResult> {
-    get_result_from_res("code", response, semaphore, exec).await
-}
-
-pub async fn login_password(
-    username: &str,
-    password: &str,
-    challenge: &str,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-) -> crate::Result<ModrinthCredentialsResult> {
-    let resp = fetch_advanced(
-        Method::POST,
-        &format!("{MODRINTH_API_URL}auth/login"),
-        None,
-        Some(serde_json::json!({
-            "username": username,
-            "password": password,
-            "challenge": challenge,
-        })),
-        None,
-        None,
-        semaphore,
-        exec,
-    )
-    .await?;
-    let value = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
-
-    get_result_from_res("session", value, semaphore, exec).await
-}
-
-pub async fn login_2fa(
-    code: &str,
-    flow: &str,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<ModrinthCredentials> {
-    let resp = fetch_advanced(
-        Method::POST,
-        &format!("{MODRINTH_API_URL}auth/login/2fa"),
-        None,
-        Some(serde_json::json!({
-            "code": code,
-            "flow": flow,
-        })),
-        None,
-        None,
-        semaphore,
-        exec,
-    )
-    .await?;
+    let info = fetch_info(code, semaphore, exec).await?;
 
-    let response = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
-
-    get_creds_from_res(response, semaphore, exec).await
-}
-
-pub async fn create_account(
-    username: &str,
-    email: &str,
-    password: &str,
-    challenge: &str,
-    sign_up_newsletter: bool,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-) -> crate::Result<ModrinthCredentials> {
-    let resp = fetch_advanced(
-        Method::POST,
-        &format!("{MODRINTH_API_URL}auth/create"),
-        None,
-        Some(serde_json::json!({
-            "username": username,
-            "email": email,
-            "password": password,
-            "challenge": challenge,
-            "sign_up_newsletter": sign_up_newsletter,
-        })),
-        None,
-        None,
-        semaphore,
-        exec,
-    )
-    .await?;
-    let response = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
-
-    get_creds_from_res(response, semaphore, exec).await
+    Ok(ModrinthCredentials {
+        session: code.to_string(),
+        expires: Utc::now() + Duration::weeks(2),
+        user_id: info.id,
+        active: true,
+    })
 }
 
 async fn fetch_info(

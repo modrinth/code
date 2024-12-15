@@ -8,10 +8,10 @@ use theseus::pack::import;
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("import")
         .invoke_handler(tauri::generate_handler![
-            import_get_importable_instances,
-            import_import_instance,
-            import_is_valid_importable_instance,
-            import_get_default_launcher_path,
+            get_importable_instances,
+            import_instance,
+            is_valid_importable_instance,
+            get_default_launcher_path,
         ])
         .build()
 }
@@ -20,7 +20,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 /// eg: get_importable_instances(ImportLauncherType::MultiMC, PathBuf::from("C:/MultiMC"))
 /// returns ["Instance 1", "Instance 2"]
 #[tauri::command]
-pub async fn import_get_importable_instances(
+pub async fn get_importable_instances(
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
 ) -> Result<Vec<String>> {
@@ -31,7 +31,7 @@ pub async fn import_get_importable_instances(
 /// profile_path should be a blank profile for this purpose- if the function fails, it will be deleted
 /// eg: import_instance(ImportLauncherType::MultiMC, PathBuf::from("C:/MultiMC"), "Instance 1")
 #[tauri::command]
-pub async fn import_import_instance(
+pub async fn import_instance(
     profile_path: &str,
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
@@ -50,7 +50,7 @@ pub async fn import_import_instance(
 /// Checks if this instance is valid for importing, given a certain launcher type
 /// eg: is_valid_importable_instance(PathBuf::from("C:/MultiMC/Instance 1"), ImportLauncherType::MultiMC)
 #[tauri::command]
-pub async fn import_is_valid_importable_instance(
+pub async fn is_valid_importable_instance(
     instance_folder: PathBuf,
     launcher_type: ImportLauncherType,
 ) -> Result<bool> {
@@ -63,7 +63,7 @@ pub async fn import_is_valid_importable_instance(
 /// Returns the default path for the given launcher type
 /// None if it can't be found or doesn't exist
 #[tauri::command]
-pub async fn import_get_default_launcher_path(
+pub async fn get_default_launcher_path(
     launcher_type: ImportLauncherType,
 ) -> Result<Option<PathBuf>> {
     Ok(import::get_default_launcher_path(launcher_type))

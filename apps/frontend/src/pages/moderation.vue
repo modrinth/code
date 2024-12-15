@@ -5,13 +5,13 @@
         <h1>Moderation</h1>
         <NavStack>
           <NavStackItem link="/moderation" label="Overview">
-            <ModrinthIcon />
+            <ModrinthIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/moderation/review" label="Review projects">
-            <ModerationIcon />
+            <ModerationIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/moderation/reports" label="Reports">
-            <ReportIcon />
+            <ReportIcon aria-hidden="true" />
           </NavStackItem>
         </NavStack>
       </aside>

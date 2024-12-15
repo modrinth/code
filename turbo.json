@@ -14,17 +14,29 @@
         "RATE_LIMIT_IGNORE_KEY",
         "VERCEL_*",
         "CF_PAGES_*",
-        "HEROKU_APP_NAME"
+        "HEROKU_APP_NAME",
+        "STRIPE_PUBLISHABLE_KEY",
+        "PYRO_BASE_URL",
+        "PROD_OVERRIDE",
+        "PYRO_MASTER_KEY",
+        "PORT",
+        "SQLX_OFFLINE"
       ]
     },
-    "lint": {},
+    "lint": {
+      "env": ["SQLX_OFFLINE"]
+    },
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": [
-        "*"
-      ]
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "env": ["DISPLAY", "WEBKIT_DISABLE_DMABUF_RENDERER"]
     },
-    "test": {}
+    "test": {
+      "env": ["SQLX_OFFLINE", "DATABASE_URL"]
+    },
+    "fix": {
+      "cache": false
+    }
   }
 }

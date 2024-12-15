@@ -80,6 +80,13 @@ const classes = computed(() => {
     :class="classes"
     :to="link"
     :target="external ? '_blank' : '_self'"
+    @click="
+      (event) => {
+        if (action) {
+          action(event)
+        }
+      }
+    "
   >
     <slot />
     <ExternalIcon v-if="external && !iconOnly" class="external-icon" />
@@ -91,6 +98,13 @@ const classes = computed(() => {
     :class="classes"
     :href="link"
     :target="external ? '_blank' : '_self'"
+    @click="
+      (event) => {
+        if (action) {
+          action(event)
+        }
+      }
+    "
   >
     <slot />
     <ExternalIcon v-if="external && !iconOnly" class="external-icon" />

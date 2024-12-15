@@ -5,14 +5,19 @@
     <div class="search-row">
       <div class="iconified-input">
         <label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
-        <SearchIcon />
+        <SearchIcon aria-hidden="true" />
         <input id="search-input" v-model="filterQuery" type="text" />
-        <Button v-if="filterQuery" class="r-btn" @click="() => (filterQuery = '')">
-          <XIcon />
+        <Button
+          v-if="filterQuery"
+          class="r-btn"
+          aria-label="Clear search"
+          @click="() => (filterQuery = '')"
+        >
+          <XIcon aria-hidden="true" />
         </Button>
       </div>
-      <Button color="primary" @click="$refs.modal_creation.show()">
-        <PlusIcon /> {{ formatMessage(messages.createNewButton) }}
+      <Button color="primary" @click="(event) => $refs.modal_creation.show(event)">
+        <PlusIcon aria-hidden="true" /> {{ formatMessage(messages.createNewButton) }}
       </Button>
     </div>
     <div class="collections-grid">
@@ -29,15 +34,16 @@
           </span>
           <div class="stat-bar">
             <div class="stats">
-              <BoxIcon />
+              <BoxIcon aria-hidden="true" />
               {{
                 formatMessage(messages.projectsCountLabel, {
-                  count: formatCompactNumber(user.follows.length),
+                  count: formatCompactNumber(user ? user.follows.length : 0),
                 })
               }}
             </div>
             <div class="stats">
-              <LockIcon /> <span> {{ formatMessage(commonMessages.privateLabel) }} </span>
+              <LockIcon aria-hidden="true" />
+              <span> {{ formatMessage(commonMessages.privateLabel) }} </span>
             </div>
           </div>
         </div>
@@ -56,7 +62,7 @@
           </span>
           <div class="stat-bar">
             <div class="stats">
-              <BoxIcon />
+              <BoxIcon aria-hidden="true" />
               {{
                 formatMessage(messages.projectsCountLabel, {
                   count: formatCompactNumber(collection.projects?.length || 0),
@@ -65,19 +71,19 @@
             </div>
             <div class="stats">
               <template v-if="collection.status === 'listed'">
-                <WorldIcon />
+                <WorldIcon aria-hidden="true" />
                 <span> {{ formatMessage(commonMessages.publicLabel) }} </span>
               </template>
               <template v-else-if="collection.status === 'unlisted'">
-                <LinkIcon />
+                <LinkIcon aria-hidden="true" />
                 <span> {{ formatMessage(commonMessages.unlistedLabel) }} </span>
               </template>
               <template v-else-if="collection.status === 'private'">
-                <LockIcon />
+                <LockIcon aria-hidden="true" />
                 <span> {{ formatMessage(commonMessages.privateLabel) }} </span>
               </template>
               <template v-else-if="collection.status === 'rejected'">
-                <XIcon />
+                <XIcon aria-hidden="true" />
                 <span> {{ formatMessage(commonMessages.rejectedLabel) }} </span>
               </template>
             </div>
@@ -89,7 +95,7 @@
 </template>
 <script setup>
 import { BoxIcon, SearchIcon, XIcon, PlusIcon, LinkIcon, LockIcon } from "@modrinth/assets";
-import { Avatar, Button } from "@modrinth/ui";
+import { Avatar, Button, commonMessages } from "@modrinth/ui";
 import WorldIcon from "~/assets/images/utils/world.svg?component";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 
@@ -127,8 +133,8 @@ useHead({
   title: () => `${formatMessage(messages.collectionsLongTitle)} - Modrinth`,
 });
 
-const user = await useUser();
 const auth = await useAuth();
+const user = await useUser();
 
 if (import.meta.client) {
   await initUserFollows();

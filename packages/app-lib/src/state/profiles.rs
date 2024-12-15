@@ -193,7 +193,7 @@ impl ProjectType {
             ProjectType::Mod => "mod",
             ProjectType::DataPack => "datapack",
             ProjectType::ResourcePack => "resourcepack",
-            ProjectType::ShaderPack => "shaderpack",
+            ProjectType::ShaderPack => "shader",
         }
     }
 
@@ -501,13 +501,8 @@ impl Profile {
 
     pub async fn remove(
         profile_path: &str,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
-        if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
-        {
-            io::remove_dir_all(&path).await?;
-        }
-
         sqlx::query!(
             "
             DELETE FROM profiles
@@ -515,8 +510,13 @@ impl Profile {
             ",
             profile_path
         )
-        .execute(&mut **transaction)
+        .execute(pool)
         .await?;
+
+        if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
+        {
+            io::remove_dir_all(&path).await?;
+        }
 
         Ok(())
     }
@@ -533,6 +533,93 @@ impl Profile {
             write_cached_icon(file_name, cache_dir, icon, semaphore).await?;
         self.icon_path = Some(file.to_string_lossy().to_string());
         self.modified = Utc::now();
+        Ok(())
+    }
+
+    pub(crate) async fn refresh_all() -> crate::Result<()> {
+        let state = crate::State::get().await?;
+        let all = Self::get_all(&state.pool).await?;
+
+        let mut keys = vec![];
+
+        for profile in &all {
+            let path =
+                crate::api::profile::get_full_path(&profile.path).await?;
+
+            for project_type in ProjectType::iterator() {
+                let folder = project_type.get_folder();
+                let path = path.join(folder);
+
+                if path.exists() {
+                    for subdirectory in std::fs::read_dir(&path)
+                        .map_err(|e| io::IOError::with_path(e, &path))?
+                    {
+                        let subdirectory =
+                            subdirectory.map_err(io::IOError::from)?.path();
+                        if subdirectory.is_file() {
+                            if let Some(file_name) = subdirectory
+                                .file_name()
+                                .and_then(|x| x.to_str())
+                            {
+                                let file_size = subdirectory
+                                    .metadata()
+                                    .map_err(io::IOError::from)?
+                                    .len();
+
+                                keys.push(format!(
+                                    "{file_size}-{}/{folder}/{file_name}",
+                                    profile.path
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        let file_hashes = CachedEntry::get_file_hash_many(
+            &keys.iter().map(|s| &**s).collect::<Vec<_>>(),
+            None,
+            &state.pool,
+            &state.fetch_semaphore,
+        )
+        .await?;
+
+        let file_updates = file_hashes
+            .iter()
+            .filter_map(|x| {
+                all.iter().find(|prof| x.path.contains(&prof.path)).map(
+                    |profile| {
+                        format!(
+                            "{}-{}-{}",
+                            x.hash,
+                            profile.loader.as_str(),
+                            profile.game_version
+                        )
+                    },
+                )
+            })
+            .collect::<Vec<_>>();
+
+        let file_hashes_ref =
+            file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
+        let file_updates_ref =
+            file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
+        tokio::try_join!(
+            CachedEntry::get_file_many(
+                &file_hashes_ref,
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.fetch_semaphore,
+            ),
+            CachedEntry::get_file_update_many(
+                &file_updates_ref,
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.fetch_semaphore,
+            )
+        )?;
+
         Ok(())
     }
 

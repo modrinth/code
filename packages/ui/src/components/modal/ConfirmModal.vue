@@ -1,6 +1,11 @@
 <template>
-  <Modal ref="modal" :header="title" :noblur="noblur">
-    <div class="modal-delete">
+  <NewModal ref="modal" :noblur="noblur" danger :on-hide="onHide">
+    <template #title>
+      <slot name="title">
+        <span class="font-extrabold text-contrast text-lg">{{ title }}</span>
+      </slot>
+    </template>
+    <div>
       <div class="markdown-body" v-html="renderString(description)" />
       <label v-if="hasToType" for="confirmation" class="confirmation-label">
         <span>
@@ -19,25 +24,30 @@
           @input="type"
         />
       </div>
-      <div class="input-group push-right">
-        <button class="btn" @click="modal.hide()">
-          <XIcon />
-          Cancel
-        </button>
-        <button class="btn btn-danger" :disabled="action_disabled" @click="proceed">
-          <TrashIcon />
-          {{ proceedLabel }}
-        </button>
+      <div class="flex gap-2 mt-6">
+        <ButtonStyled color="red">
+          <button :disabled="action_disabled" @click="proceed">
+            <TrashIcon />
+            {{ proceedLabel }}
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="modal.hide()">
+            <XIcon />
+            Cancel
+          </button>
+        </ButtonStyled>
       </div>
     </div>
-  </Modal>
+  </NewModal>
 </template>
 
 <script setup>
 import { renderString } from '@modrinth/utils'
 import { ref } from 'vue'
 import { TrashIcon, XIcon } from '@modrinth/assets'
-import Modal from './Modal.vue'
+import NewModal from './NewModal.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 
 const props = defineProps({
   confirmationText: {
@@ -66,6 +76,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  onHide: {
+    type: Function,
+    default() {
+      return () => {}
+    },
+  },
 })
 
 const emit = defineEmits(['proceed'])
@@ -92,36 +108,3 @@ function show() {
 
 defineExpose({ show })
 </script>
-
-<style scoped lang="scss">
-.modal-delete {
-  padding: var(--gap-lg);
-  display: flex;
-  flex-direction: column;
-
-  .markdown-body {
-    margin-bottom: 1rem;
-  }
-
-  .confirmation-label {
-    margin-bottom: 0.5rem;
-  }
-
-  .confirmation-text {
-    padding-right: 0.25ch;
-    margin: 0 0.25rem;
-  }
-
-  .confirmation-input {
-    input {
-      width: 20rem;
-      max-width: 100%;
-    }
-  }
-
-  .button-group {
-    margin-left: auto;
-    margin-top: 1.5rem;
-  }
-}
-</style>

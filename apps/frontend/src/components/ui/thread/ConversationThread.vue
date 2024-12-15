@@ -28,7 +28,7 @@
             :disabled="!submissionConfirmation"
             @click="resubmit()"
           >
-            <ModerationIcon /> Resubmit for review
+            <ModerationIcon aria-hidden="true" /> Resubmit for review
           </button>
         </div>
       </div>
@@ -52,7 +52,7 @@
     <template v-if="report && report.closed">
       <p>This thread is closed and new messages cannot be sent to it.</p>
       <button v-if="isStaff(auth.user)" class="iconified-button" @click="reopenReport()">
-        <CloseIcon /> Reopen thread
+        <CloseIcon aria-hidden="true" /> Reopen thread
       </button>
     </template>
     <template v-else-if="!report || !report.closed">
@@ -70,10 +70,10 @@
           :disabled="!replyBody"
           @click="sendReply()"
         >
-          <ReplyIcon /> Reply
+          <ReplyIcon aria-hidden="true" /> Reply
         </button>
         <button v-else class="btn btn-primary" :disabled="!replyBody" @click="sendReply()">
-          <SendIcon /> Send
+          <SendIcon aria-hidden="true" /> Send
         </button>
         <button
           v-if="isStaff(auth.user)"
@@ -81,7 +81,7 @@
           :disabled="!replyBody"
           @click="sendReply(null, true)"
         >
-          <ModerationIcon /> Add private note
+          <ModerationIcon aria-hidden="true" /> Add private note
         </button>
         <template v-if="currentMember && !isStaff(auth.user)">
           <template v-if="isRejected(project)">
@@ -90,14 +90,14 @@
               class="iconified-button moderation-button"
               @click="openResubmitModal(true)"
             >
-              <ModerationIcon /> Resubmit for review with reply
+              <ModerationIcon aria-hidden="true" /> Resubmit for review with reply
             </button>
             <button
               v-else
               class="iconified-button moderation-button"
               @click="openResubmitModal(false)"
             >
-              <ModerationIcon /> Resubmit for review
+              <ModerationIcon aria-hidden="true" /> Resubmit for review
             </button>
           </template>
         </template>
@@ -110,10 +110,10 @@
                 class="iconified-button danger-button"
                 @click="closeReport(true)"
               >
-                <CloseIcon /> Close with reply
+                <CloseIcon aria-hidden="true" /> Close with reply
               </button>
               <button v-else class="iconified-button danger-button" @click="closeReport()">
-                <CloseIcon /> Close thread
+                <CloseIcon aria-hidden="true" /> Close thread
               </button>
             </template>
           </template>
@@ -125,7 +125,7 @@
                 :disabled="isApproved(project)"
                 @click="sendReply(requestedStatus)"
               >
-                <CheckIcon /> Approve with reply
+                <CheckIcon aria-hidden="true" /> Approve with reply
               </button>
               <button
                 v-else
@@ -133,7 +133,7 @@
                 :disabled="isApproved(project)"
                 @click="setStatus(requestedStatus)"
               >
-                <CheckIcon /> Approve
+                <CheckIcon aria-hidden="true" /> Approve
               </button>
               <div class="joined-buttons">
                 <button
@@ -142,7 +142,7 @@
                   :disabled="project.status === 'rejected'"
                   @click="sendReply('rejected')"
                 >
-                  <CrossIcon /> Reject with reply
+                  <CrossIcon aria-hidden="true" /> Reject with reply
                 </button>
                 <button
                   v-else
@@ -150,12 +150,10 @@
                   :disabled="project.status === 'rejected'"
                   @click="setStatus('rejected')"
                 >
-                  <CrossIcon /> Reject
+                  <CrossIcon aria-hidden="true" /> Reject
                 </button>
                 <OverflowMenu
                   class="btn btn-danger btn-dropdown-animation icon-only"
-                  position="top"
-                  direction="left"
                   :options="
                     replyBody
                       ? [
@@ -182,9 +180,11 @@
                         ]
                   "
                 >
-                  <DropdownIcon style="rotate: 180deg" />
-                  <template #withhold-reply> <EyeOffIcon /> Withhold with reply </template>
-                  <template #withhold> <EyeOffIcon /> Withhold </template>
+                  <DropdownIcon style="rotate: 180deg" aria-hidden="true" />
+                  <template #withhold-reply>
+                    <EyeOffIcon aria-hidden="true" /> Withhold with reply
+                  </template>
+                  <template #withhold> <EyeOffIcon aria-hidden="true" /> Withhold </template>
                 </OverflowMenu>
               </div>
             </template>

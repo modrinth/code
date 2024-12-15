@@ -1,136 +1,134 @@
-use chrono::{DateTime, Utc};
-use serde::Deserialize;
-use serde::Serialize;
-use tokio::process::Command;
-
 use crate::event::emit::emit_process;
 use crate::event::ProcessPayloadType;
+use crate::profile;
 use crate::util::io::IOError;
-use crate::{profile, ErrorKind};
+use chrono::{DateTime, Utc};
+use dashmap::DashMap;
+use serde::Deserialize;
+use serde::Serialize;
+use std::process::ExitStatus;
+use tokio::process::{Child, Command};
+use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Process {
-    pub pid: i64,
-    pub start_time: i64,
-    pub name: String,
-    pub executable: String,
-    pub profile_path: String,
-    pub post_exit_command: Option<String>,
+pub struct ProcessManager {
+    processes: DashMap<Uuid, Process>,
 }
 
-macro_rules! select_process_with_predicate {
-    ($predicate:tt, $param:ident) => {
-        sqlx::query_as!(
-            Process,
-            r#"
-            SELECT
-                pid, start_time, name, executable, profile_path, post_exit_command
-            FROM processes
-            "#
-                + $predicate,
-            $param
-        )
-    };
+impl Default for ProcessManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-impl Process {
-    /// Runs on launcher startup. Queries all the cached processes and removes processes that no
-    /// longer exist. If a PID is found, they are "rescued" and passed to our process manager
-    pub async fn garbage_collect(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-    ) -> crate::Result<()> {
-        let processes = Self::get_all(exec).await?;
-
-        let mut system = sysinfo::System::new();
-        system.refresh_processes();
-        for cached_process in processes {
-            let process = system
-                .process(sysinfo::Pid::from_u32(cached_process.pid as u32));
-
-            if let Some(process) = process {
-                if cached_process.start_time as u64 == process.start_time()
-                    && cached_process.name == process.name()
-                    && cached_process.executable
-                        == process
-                            .exe()
-                            .map(|x| x.to_string_lossy())
-                            .unwrap_or_default()
-                {
-                    tokio::spawn(cached_process.sequential_process_manager());
-
-                    break;
-                }
-            }
-
-            Self::remove(cached_process.pid as u32, exec).await?;
+impl ProcessManager {
+    pub fn new() -> Self {
+        Self {
+            processes: DashMap::new(),
         }
-
-        Ok(())
     }
 
     pub async fn insert_new_process(
+        &self,
         profile_path: &str,
         mut mc_command: Command,
-        post_exit_command: Option<String>, // Command to run after minecraft.
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<Self> {
+        post_exit_command: Option<String>,
+    ) -> crate::Result<ProcessMetadata> {
         let mc_proc = mc_command.spawn().map_err(IOError::from)?;
 
-        let pid = mc_proc.id().ok_or_else(|| {
-            crate::ErrorKind::LauncherError(
-                "Process immediately failed, could not get PID".to_string(),
-            )
-        })?;
-
-        let mut system = sysinfo::System::new();
-        system.refresh_processes();
-        let process =
-            system.process(sysinfo::Pid::from_u32(pid)).ok_or_else(|| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Could not find process {}",
-                    pid
-                ))
-            })?;
-        let start_time = process.start_time();
-        let name = process.name().to_string();
-
-        let Some(path) = process.exe() else {
-            return Err(ErrorKind::LauncherError(format!(
-                "Cached process {} has no accessible path",
-                pid
-            ))
-            .into());
+        let process = Process {
+            metadata: ProcessMetadata {
+                uuid: Uuid::new_v4(),
+                start_time: Utc::now(),
+                profile_path: profile_path.to_string(),
+            },
+            child: mc_proc,
         };
 
-        let executable = path.to_string_lossy().to_string();
+        let metadata = process.metadata.clone();
 
-        let process = Self {
-            pid: pid as i64,
-            start_time: start_time as i64,
-            name,
-            executable,
-            profile_path: profile_path.to_string(),
+        tokio::spawn(Process::sequential_process_manager(
+            profile_path.to_string(),
             post_exit_command,
-        };
-        process.upsert(exec).await?;
+            metadata.uuid,
+        ));
 
-        tokio::spawn(process.clone().sequential_process_manager());
+        self.processes.insert(process.metadata.uuid, process);
 
         emit_process(
             profile_path,
-            pid,
+            metadata.uuid,
             ProcessPayloadType::Launched,
             "Launched Minecraft",
         )
         .await?;
 
-        Ok(process)
+        Ok(metadata)
     }
 
+    pub fn get(&self, id: Uuid) -> Option<ProcessMetadata> {
+        self.processes.get(&id).map(|x| x.metadata.clone())
+    }
+
+    pub fn get_all(&self) -> Vec<ProcessMetadata> {
+        self.processes
+            .iter()
+            .map(|x| x.value().metadata.clone())
+            .collect()
+    }
+
+    pub fn try_wait(
+        &self,
+        id: Uuid,
+    ) -> crate::Result<Option<Option<ExitStatus>>> {
+        if let Some(mut process) = self.processes.get_mut(&id) {
+            Ok(Some(process.child.try_wait()?))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub async fn wait_for(&self, id: Uuid) -> crate::Result<()> {
+        if let Some(mut process) = self.processes.get_mut(&id) {
+            process.child.wait().await?;
+        }
+        Ok(())
+    }
+
+    pub async fn kill(&self, id: Uuid) -> crate::Result<()> {
+        if let Some(mut process) = self.processes.get_mut(&id) {
+            process.child.kill().await?;
+        }
+
+        Ok(())
+    }
+
+    fn remove(&self, id: Uuid) {
+        self.processes.remove(&id);
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct ProcessMetadata {
+    pub uuid: Uuid,
+    pub profile_path: String,
+    pub start_time: DateTime<Utc>,
+}
+
+#[derive(Debug)]
+struct Process {
+    metadata: ProcessMetadata,
+    child: Child,
+}
+
+impl Process {
     // Spawns a new child process and inserts it into the hashmap
     // Also, as the process ends, it spawns the follow-up process if it exists
     // By convention, ExitStatus is last command's exit status, and we exit on the first non-zero exit status
-    async fn sequential_process_manager(self) -> crate::Result<i32> {
+    async fn sequential_process_manager(
+        profile_path: String,
+        post_exit_command: Option<String>,
+        uuid: Uuid,
+    ) -> crate::Result<()> {
         async fn update_playtime(
             last_updated_playtime: &mut DateTime<Utc>,
             profile_path: &str,
@@ -160,47 +158,55 @@ impl Process {
         let mc_exit_status;
         let mut last_updated_playtime = Utc::now();
 
+        let state = crate::State::get().await?;
         loop {
-            if let Some(t) = self.try_wait().await? {
-                mc_exit_status = t;
+            if let Some(process) = state.process_manager.try_wait(uuid)? {
+                if let Some(t) = process {
+                    mc_exit_status = t;
+                    break;
+                }
+            } else {
+                mc_exit_status = ExitStatus::default();
                 break;
             }
+
             // sleep for 10ms
             tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
 
             // Auto-update playtime every minute
-            update_playtime(
-                &mut last_updated_playtime,
-                &self.profile_path,
-                false,
-            )
-            .await;
+            update_playtime(&mut last_updated_playtime, &profile_path, false)
+                .await;
         }
 
+        state.process_manager.remove(uuid);
+        emit_process(
+            &profile_path,
+            uuid,
+            ProcessPayloadType::Finished,
+            "Exited process",
+        )
+        .await?;
+
         // Now fully complete- update playtime one last time
-        update_playtime(&mut last_updated_playtime, &self.profile_path, true)
-            .await;
+        update_playtime(&mut last_updated_playtime, &profile_path, true).await;
 
         // Publish play time update
         // Allow failure, it will be stored locally and sent next time
         // Sent in another thread as first call may take a couple seconds and hold up process ending
-        let profile_path = self.profile_path.clone();
+        let profile = profile_path.clone();
         tokio::spawn(async move {
-            if let Err(e) =
-                profile::try_update_playtime(&profile_path.clone()).await
-            {
+            if let Err(e) = profile::try_update_playtime(&profile).await {
                 tracing::warn!(
                     "Failed to update playtime for profile {}: {}",
-                    &profile_path,
+                    profile,
                     e
                 );
             }
         });
 
-        let state = crate::State::get().await?;
         let _ = state.discord_rpc.clear_to_default(true).await;
 
-        Self::remove(self.pid as u32, &state.pool).await?;
+        let _ = state.friends_socket.update_status(None).await;
 
         // If in tauri, window should show itself again after process exists if it was hidden
         #[cfg(feature = "tauri")]
@@ -208,158 +214,24 @@ impl Process {
             let window = crate::EventState::get_main_window().await?;
             if let Some(window) = window {
                 window.unminimize()?;
+                window.set_focus()?;
             }
         }
 
-        if mc_exit_status == 0 {
+        if mc_exit_status.success() {
             // We do not wait on the post exist command to finish running! We let it spawn + run on its own.
             // This behaviour may be changed in the future
-            if let Some(hook) = self.post_exit_command {
+            if let Some(hook) = post_exit_command {
                 let mut cmd = hook.split(' ');
                 if let Some(command) = cmd.next() {
                     let mut command = Command::new(command);
-                    command.args(&cmd.collect::<Vec<&str>>()).current_dir(
-                        crate::api::profile::get_full_path(&self.profile_path)
-                            .await?,
+                    command.args(cmd.collect::<Vec<&str>>()).current_dir(
+                        profile::get_full_path(&profile_path).await?,
                     );
                     command.spawn().map_err(IOError::from)?;
                 }
             }
         }
-
-        emit_process(
-            &self.profile_path,
-            self.pid as u32,
-            ProcessPayloadType::Finished,
-            "Exited process",
-        )
-        .await?;
-
-        Ok(mc_exit_status)
-    }
-
-    async fn try_wait(&self) -> crate::Result<Option<i32>> {
-        let mut system = sysinfo::System::new();
-        if !system.refresh_process(sysinfo::Pid::from_u32(self.pid as u32)) {
-            return Ok(Some(0));
-        }
-
-        let process = system.process(sysinfo::Pid::from_u32(self.pid as u32));
-
-        if let Some(process) = process {
-            if process.status() == sysinfo::ProcessStatus::Run {
-                Ok(None)
-            } else {
-                Ok(Some(0))
-            }
-        } else {
-            Ok(Some(0))
-        }
-    }
-
-    pub async fn wait_for(&self) -> crate::Result<()> {
-        loop {
-            if self.try_wait().await?.is_some() {
-                break;
-            }
-            // sleep for 10ms
-            tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
-        }
-
-        Ok(())
-    }
-
-    pub async fn kill(&self) -> crate::Result<()> {
-        let mut system = sysinfo::System::new();
-        if system.refresh_process(sysinfo::Pid::from_u32(self.pid as u32)) {
-            let process =
-                system.process(sysinfo::Pid::from_u32(self.pid as u32));
-            if let Some(process) = process {
-                process.kill();
-            }
-        }
-
-        Ok(())
-    }
-
-    pub async fn get(
-        pid: i32,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<Option<Self>> {
-        let res = select_process_with_predicate!("WHERE pid = $1", pid)
-            .fetch_optional(exec)
-            .await?;
-
-        Ok(res)
-    }
-
-    pub async fn get_from_profile(
-        profile_path: &str,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<Vec<Self>> {
-        let results = select_process_with_predicate!(
-            "WHERE profile_path = $1",
-            profile_path
-        )
-        .fetch_all(exec)
-        .await?;
-
-        Ok(results)
-    }
-
-    pub async fn get_all(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<Vec<Self>> {
-        let true_val = 1;
-        let results = select_process_with_predicate!("WHERE 1=$1", true_val)
-            .fetch_all(exec)
-            .await?;
-
-        Ok(results)
-    }
-
-    pub async fn upsert(
-        &self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<()> {
-        sqlx::query!(
-            "
-            INSERT INTO processes (pid, start_time, name, executable, profile_path, post_exit_command)
-            VALUES ($1, $2, $3, $4, $5, $6)
-            ON CONFLICT (pid) DO UPDATE SET
-                start_time = $2,
-                name = $3,
-                executable = $4,
-                profile_path = $5,
-                post_exit_command = $6
-            ",
-            self.pid,
-            self.start_time,
-            self.name,
-            self.executable,
-            self.profile_path,
-            self.post_exit_command
-        )
-            .execute(exec)
-            .await?;
-
-        Ok(())
-    }
-
-    pub async fn remove(
-        pid: u32,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<()> {
-        let pid = pid as i32;
-
-        sqlx::query!(
-            "
-            DELETE FROM processes WHERE pid = $1
-            ",
-            pid,
-        )
-        .execute(exec)
-        .await?;
 
         Ok(())
     }

@@ -284,6 +284,10 @@
     align-items: center;
   }
 
+  .markdown-body h1 {
+    display: block;
+  }
+
   > :first-child {
     :first-child {
       margin-block-start: 0;
@@ -367,35 +371,6 @@
   Other
  */
 
-// Here lies 𝖄𝖊 𝕸𝖆𝖗𝖌𝖎𝖓 𝕸𝖆𝖌𝖎𝖈
-// which allows to have just one wrapper div
-.iconified-input {
-  align-items: center;
-  display: inline-flex;
-  position: relative;
-
-  input {
-    padding-left: 2.25rem;
-    width: 100%;
-  }
-
-  &:focus-within svg {
-    color: var(--color-button-text-active);
-    opacity: 1;
-  }
-
-  svg {
-    position: absolute;
-    left: 0.75rem;
-    height: 1.25rem;
-    width: 1.25rem;
-    z-index: 1;
-
-    color: var(--color-button-text);
-    opacity: 0.6;
-  }
-}
-
 .text-link {
   color: var(--color-link);
 
@@ -421,22 +396,6 @@
 
   &:active {
     color: var(--color-text-dark);
-  }
-}
-
-.v-popper--theme-tooltip {
-  .v-popper__inner {
-    background: var(--color-tooltip-bg) !important;
-    color: var(--color-tooltip-text) !important;
-    padding: 5px 10px 4px !important;
-    border-radius: var(--size-rounded-tooltip) !important;
-    box-shadow: var(--shadow-floating) !important;
-    font-size: 0.9rem !important;
-  }
-
-  .v-popper__arrow-outer,
-  .v-popper__arrow-inner {
-    border-color: var(--color-tooltip-bg) !important;
   }
 }
 
@@ -620,7 +579,6 @@ tr.button-transparent {
     max-width: 1.25rem;
     min-height: 1.25rem;
     max-height: 1.25rem;
-    margin: auto;
   }
 
   flex-shrink: 0;
@@ -689,122 +647,6 @@ tr.button-transparent {
 
   &::placeholder {
     color: var(--color-warning-text);
-  }
-}
-
-.multiselect {
-  &.raised-multiselect {
-    .multiselect__tags,
-    .multiselect__content-wrapper,
-    .multiselect__spinner {
-      background-color: var(--color-raised-bg);
-      box-shadow: none;
-    }
-  }
-
-  color: var(--color-text) !important;
-  outline: none !important;
-
-  input {
-    background: transparent;
-    box-shadow: none;
-  }
-
-  input::placeholder {
-    color: var(--color-text);
-  }
-
-  .multiselect__tags {
-    border-radius: var(--size-rounded-sm);
-    background: var(--color-dropdown-bg);
-    box-shadow: var(--shadow-inset-sm);
-    border: none;
-    cursor: pointer;
-    padding-left: 7px;
-    padding-top: 10px;
-    outline: 2px solid transparent;
-
-    transition: background-color 0.1s ease-in-out;
-
-    &:active {
-      background: var(--color-button-bg-hover);
-
-      .multiselect__spinner {
-        background: var(--color-button-bg-hover);
-      }
-    }
-
-    .multiselect__single {
-      background: transparent;
-    }
-
-    .multiselect__tag {
-      border-radius: var(--size-rounded-sm);
-      color: var(--color-text-dark);
-      background: transparent;
-      border: 2px solid var(--color-brand);
-    }
-
-    .multiselect__tag-icon {
-      background: transparent;
-
-      &:after {
-        color: var(--color-text-dark);
-      }
-    }
-
-    .multiselect__placeholder {
-      color: var(--color-button-text);
-      margin-left: 8px;
-      margin-bottom: 8px;
-      opacity: 0.6;
-      font-size: 16px;
-      line-height: 16px;
-    }
-  }
-
-  .multiselect__content-wrapper {
-    background: var(--color-dropdown-bg);
-    border: none;
-    overflow-x: hidden;
-    border-bottom-left-radius: var(--size-rounded-sm);
-    border-bottom-right-radius: var(--size-rounded-sm);
-    box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-    outline: 2px solid transparent;
-
-    .multiselect__element {
-      .multiselect__option {
-        outline: 1px solid transparent;
-      }
-
-      .multiselect__option--highlight {
-        background: var(--color-button-bg-active);
-        color: var(--color-text-dark);
-      }
-
-      .multiselect__option--selected {
-        background: var(--color-brand);
-        font-weight: bold;
-        color: var(--color-brand-inverted);
-      }
-    }
-  }
-
-  .multiselect__spinner {
-    background: var(--color-dropdown-bg);
-
-    &:active {
-      background: var(--color-button-bg-hover);
-    }
-  }
-
-  &.multiselect--disabled {
-    background: none;
-
-    .multiselect__current,
-    .multiselect__select {
-      background: none;
-    }
   }
 }
 
@@ -917,9 +759,9 @@ tr.button-transparent {
 }
 
 .card-divider {
-  background-color: var(--color-divider);
+  background-color: var(--color-button-bg);
   border: none;
-  color: var(--color-divider);
+  color: var(--color-button-bg);
   height: 1px;
   margin: var(--spacing-card-bg) 0;
 }
@@ -1289,7 +1131,6 @@ svg.inline-svg {
 }
 
 // START STUFF FOR OMORPHIA
-
 .experimental-styles-within {
   .tag-list {
     display: flex;
@@ -1298,8 +1139,8 @@ svg.inline-svg {
   }
 
   .tag-list__item {
-    background-color: var(--color-button-bg);
-    padding: var(--gap-2) var(--gap-6);
+    background-color: var(--_bg-color, var(--color-button-bg));
+    padding: var(--gap-4) var(--gap-8);
     border-radius: var(--radius-max);
     font-weight: var(--weight-bold);
     font-size: var(--text-14);
@@ -1375,6 +1216,7 @@ svg.inline-svg {
       font-size: var(--text-18);
       font-weight: var(--weight-extrabold);
       color: var(--color-contrast);
+      line-height: initial;
       margin: 0;
     }
 
@@ -1416,6 +1258,10 @@ svg.inline-svg {
       width: var(--icon-16);
       height: var(--icon-16);
     }
+
+    > svg:first-child {
+      flex-shrink: 0;
+    }
   }
 
   .links-list {
@@ -1441,25 +1287,6 @@ svg.inline-svg {
       color: var(--color-secondary);
       font-weight: var(--weight-normal);
       font-size: var(--text-14);
-    }
-  }
-
-  .icon {
-    --_size: 1rem;
-    width: var(--_size, var(--icon-16)) !important;
-    height: var(--_size, var(--icon-16)) !important;
-    border: 1px solid var(--color-button-border);
-
-    &[data-size="32"] {
-      --_size: var(--icon-32);
-    }
-
-    &[data-shape="circle"] {
-      border-radius: var(--radius-max) !important;
-    }
-
-    &[data-shape="square"] {
-      border-radius: calc(2.25 * (var(--_size) / 16)) !important;
     }
   }
 }

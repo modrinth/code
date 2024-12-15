@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+const config = {
   content: [
     "./src/components/**/*.{js,vue,ts}",
     "./src/layouts/**/*.vue",
@@ -16,15 +16,33 @@ module.exports = {
         icon: "var(--color-icon)",
         // Text
         primary: "var(--color-text)",
+        contrast: "var(--color-contrast)",
         secondary: "var(--color-secondary)",
         inactive: "var(--color-text-inactive)",
         dark: "var(--color-text-dark)",
         inverted: "var(--color-text-inverted)",
         heading: "var(--color-heading)",
+        red: "var(--color-red)",
+        orange: "var(--color-orange)",
+        green: "var(--color-green)",
+        blue: "var(--color-blue)",
+        purple: "var(--color-purple)",
         bg: {
           DEFAULT: "var(--color-bg)",
           red: "var(--color-red-bg)",
+          orange: "var(--color-orange-bg)",
+          green: "var(--color-green-bg)",
+          blue: "var(--color-blue-bg)",
+          purple: "var(--color-purple-bg)",
           raised: "var(--color-raised-bg)",
+        },
+        highlight: {
+          DEFAULT: "var(--color-brand-highlight)",
+          red: "var(--color-red-highlight)",
+          orange: "var(--color-orange-highlight)",
+          green: "var(--color-green-highlight)",
+          blue: "var(--color-blue-highlight)",
+          purple: "var(--color-purple-highlight)",
         },
         divider: {
           DEFAULT: "var(--color-divider)",
@@ -32,10 +50,14 @@ module.exports = {
         },
         brand: {
           DEFAULT: "var(--color-brand)",
-          green: "var(--color-brand-green)",
+          red: "var(--color-red)",
+          orange: "var(--color-orange)",
+          green: "var(--color-green)",
+          blue: "var(--color-blue)",
+          purple: "var(--color-purple)",
           highlight: "var(--color-brand-highlight)",
           shadow: "var(--color-brand-shadow)",
-          inverted: "var(--color-brand-inverted)",
+          inverted: "var(--color-accent-contrast)",
         },
         tabUnderlineHovered: "var(--tab-underline-hovered)",
         button: {
@@ -45,6 +67,9 @@ module.exports = {
           textHover: "var(--color-button-text-hover)",
           bgActive: "var(--color-button-bg-active)",
           textActive: "var(--color-button-text-active)",
+          border: "var(--color-button-border)",
+          bgSelected: "var(--color-button-bg-selected)",
+          textSelected: "var(--color-button-text-selected)",
         },
         toggleHandle: "var(--color-toggle-handle)",
         dropdown: {
@@ -127,3 +152,5 @@ module.exports = {
     preflight: false,
   },
 };
+
+export default config;

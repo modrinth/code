@@ -22,7 +22,13 @@
       }"
       @click="toggleDropdown"
     >
-      <span>{{ selectedOption }}</span>
+      <div>
+        <slot :selected="selectedOption">
+          <span>
+            {{ selectedOption }}
+          </span>
+        </slot>
+      </div>
       <DropdownIcon class="arrow" :class="{ rotate: dropdownVisible }" />
     </div>
     <div class="options-wrapper" :class="{ down: !renderUp, up: renderUp }">
@@ -191,7 +197,7 @@ const isChildOfDropdown = (element) => {
 <style lang="scss" scoped>
 .animated-dropdown {
   width: 20rem;
-  min-height: 40px;
+  height: 40px;
   position: relative;
   display: inline-block;
 
@@ -266,6 +272,10 @@ const isChildOfDropdown = (element) => {
       padding: var(--gap-md);
       cursor: pointer;
       user-select: none;
+
+      > label {
+        cursor: pointer;
+      }
 
       &:hover {
         filter: brightness(0.85);

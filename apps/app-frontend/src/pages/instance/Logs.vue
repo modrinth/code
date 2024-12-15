@@ -16,14 +16,14 @@
           {{ copied ? 'Copied' : 'Copy' }}
         </Button>
         <Button color="primary" :disabled="offline || !logs[selectedLogIndex]" @click="share">
-          <ShareIcon />
+          <ShareIcon aria-hidden="true" />
           Share
         </Button>
         <Button
           v-if="logs[selectedLogIndex] && logs[selectedLogIndex].live === true"
           @click="clearLiveLog()"
         >
-          <TrashIcon />
+          <TrashIcon aria-hidden="true" />
           Clear
         </Button>
 
@@ -33,7 +33,7 @@
           color="danger"
           @click="deleteLog()"
         >
-          <TrashIcon />
+          <TrashIcon aria-hidden="true" />
           Delete
         </Button>
       </div>
@@ -59,23 +59,24 @@
       </div>
     </div>
     <div class="log-text">
-      <VirtualScroller
+      <RecycleScroller
+        v-slot="{ item }"
         ref="logContainer"
         class="scroller"
-        :default-size="20"
         :items="displayProcessedLogs"
+        direction="vertical"
+        :item-size="20"
+        key-field="id"
       >
-        <template #item="{ ref }">
-          <div class="user no-wrap">
-            <span :style="{ color: ref.prefixColor, 'font-weight': ref.weight }">{{
-              ref.prefix
-            }}</span>
-            <span :style="{ color: ref.textColor }">{{ ref.text }}</span>
-          </div>
-        </template>
-      </VirtualScroller>
+        <div class="user no-wrap">
+          <span :style="{ color: item.prefixColor, 'font-weight': item.weight }">{{
+            item.prefix
+          }}</span>
+          <span :style="{ color: item.textColor }">{{ item.text }}</span>
+        </div>
+      </RecycleScroller>
     </div>
-    <ShareModal
+    <ShareModalWrapper
       ref="shareModal"
       header="Share Log"
       share-title="Instance Log"
@@ -88,7 +89,7 @@
 
 <script setup>
 import { CheckIcon, ClipboardCopyIcon, ShareIcon, TrashIcon } from '@modrinth/assets'
-import { Button, Card, ShareModal, Checkbox, DropdownSelect } from '@modrinth/ui'
+import { Button, Card, Checkbox, DropdownSelect } from '@modrinth/ui'
 import {
   delete_logs_by_filename,
   get_logs,
@@ -104,12 +105,12 @@ import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
-import { createVirtualScroller } from 'vue-typed-virtual-list'
+import { RecycleScroller } from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 
 dayjs.extend(isToday)
 dayjs.extend(isYesterday)
-
-const VirtualScroller = createVirtualScroller()
 
 const route = useRoute()
 
@@ -295,7 +296,7 @@ if (logs.value.length > 1 && !props.playing) {
 
 const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
-    let deleteIndex = selectedLogIndex.value
+    const deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
     await delete_logs_by_filename(
       props.instance.path,
@@ -412,20 +413,15 @@ function handleUserScroll() {
 interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
     logs.value[0] = await getLiveStdLog()
-    const logContainerElement = logContainer.value.$el
-    const scroll =
-      logContainerElement.scrollHeight -
-      logContainerElement.scrollTop -
-      logContainerElement.clientHeight
-    // const scroll = logContainer.value.$el.scrollHeight - logContainer.value.$el.scrollTop - logContainer.value.$el.clientHeight
+    const scroll = logContainer.value.getScroll()
 
     // Allow resetting of userScrolled if the user scrolls to the bottom
     if (selectedLogIndex.value === 0) {
-      if (scroll <= 10) userScrolled.value = false
+      if (scroll.end >= logContainer.value.$el.scrollHeight - 10) userScrolled.value = false
       if (!userScrolled.value) {
         await nextTick()
         isAutoScrolling.value = true
-        logContainer.value.scrollTo(displayProcessedLogs.value.length - 1)
+        logContainer.value.scrollToItem(displayProcessedLogs.value.length - 1)
         setTimeout(() => (isAutoScrolling.value = false), 50)
       }
     }

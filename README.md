@@ -22,7 +22,7 @@ This repository contains two primary packages. For detailed development informat
 
 ## Contributing
 
-We welcome contributions! Before submitting any contributions, please read our [contributing guidelines](https://support.modrinth.com/en/articles/8802215-contributing-to-modrinth).
+We welcome contributions! Before submitting any contributions, please read our [contributing guidelines](https://docs.modrinth.com/contributing/getting-started/).
 
 If you plan to fork this repository for your own purposes, please review our [copying guidelines](COPYING.md).
 
@@ -32,7 +32,7 @@ If you discover a security vulnerability within our codebase, please follow our 
 
 ## Support
 
-If you need help with the Modrinth web interface or app, please visit our [support page](https://support.modrinth.com). For general inquiries, you can also join our [Discord server](https://discord.gg/modrinth).
+If you need help with the Modrinth web interface or app, please visit our [support page](https://support.modrinth.com). For general inquiries, you can also join our [Discord server](https://discord.modrinth.com).
 
 ## License
 

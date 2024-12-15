@@ -19,7 +19,7 @@ pub async fn get_minecraft_versions() -> crate::Result<VersionManifest> {
     Ok(minecraft_versions)
 }
 
-#[tracing::instrument]
+// #[tracing::instrument]
 pub async fn get_loader_versions(loader: &str) -> crate::Result<Manifest> {
     let state = State::get().await?;
     let loaders = CachedEntry::get_loader_manifest(

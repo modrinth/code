@@ -1,11 +1,12 @@
 <script setup>
-import { Modal, Button } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { ref } from 'vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_categories } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { get_version, get_project } from '@/helpers/cache.js'
 import { install as installVersion } from '@/store/install.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const confirmModal = ref(null)
 const project = ref(null)
@@ -16,11 +17,16 @@ const installing = ref(false)
 defineExpose({
   async show(event) {
     if (event.event === 'InstallVersion') {
-      version.value = await get_version(event.id).catch(handleError)
-      project.value = await get_project(version.value.project_id).catch(handleError)
+      version.value = await get_version(event.id, 'must_revalidate').catch(handleError)
+      project.value = await get_project(version.value.project_id, 'must_revalidate').catch(
+        handleError,
+      )
     } else {
-      project.value = await get_project(event.id).catch(handleError)
-      version.value = await get_version(project.value.versions[0]).catch(handleError)
+      project.value = await get_project(event.id, 'must_revalidate').catch(handleError)
+      version.value = await get_version(
+        project.value.versions[project.value.versions.length - 1],
+        'must_revalidate',
+      ).catch(handleError)
     }
     categories.value = (await get_categories().catch(handleError)).filter(
       (cat) => project.value.categories.includes(cat.name) && cat.project_type === 'mod',
@@ -36,7 +42,7 @@ async function install() {
 </script>
 
 <template>
-  <Modal ref="confirmModal" :header="`Install ${project?.title}`">
+  <ModalWrapper ref="confirmModal" :header="`Install ${project?.title}`">
     <div class="modal-body">
       <SearchCard
         :project="project"
@@ -55,7 +61,7 @@ async function install() {
         </div>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">
@@ -65,7 +71,6 @@ async function install() {
   align-items: center;
   justify-content: center;
   gap: var(--gap-md);
-  padding: var(--gap-lg);
 }
 
 .button-row {

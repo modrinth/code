@@ -19,7 +19,7 @@ export default defineComponent({
     color: {
       type: [String, Boolean],
       default:
-        "repeating-linear-gradient(to right, var(--color-brand-green) 0%, var(--landing-green-label) 100%)",
+        "repeating-linear-gradient(to right, var(--color-green) 0%, var(--landing-green-label) 100%)",
     },
   },
   setup(props, { slots }) {

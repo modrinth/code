@@ -167,33 +167,6 @@
   "auth.welcome.title": {
     "message": "Welcome"
   },
-  "button.cancel": {
-    "message": "Cancel"
-  },
-  "button.continue": {
-    "message": "Continue"
-  },
-  "button.create-a-project": {
-    "message": "Create a project"
-  },
-  "button.edit": {
-    "message": "Edit"
-  },
-  "button.save": {
-    "message": "Save"
-  },
-  "button.save-changes": {
-    "message": "Save changes"
-  },
-  "button.sign-in": {
-    "message": "Sign in"
-  },
-  "button.sign-out": {
-    "message": "Sign out"
-  },
-  "button.upload-image": {
-    "message": "Upload image"
-  },
   "collection.button.delete-icon": {
     "message": "Delete icon"
   },
@@ -242,9 +215,6 @@
   "collection.label.owner": {
     "message": "Owner"
   },
-  "collection.label.private": {
-    "message": "Private"
-  },
   "collection.label.projects-count": {
     "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
   },
@@ -281,72 +251,6 @@
   "frog.title": {
     "message": "Frog"
   },
-  "input.view.gallery": {
-    "message": "Gallery view"
-  },
-  "input.view.grid": {
-    "message": "Grid view"
-  },
-  "input.view.list": {
-    "message": "Rows view"
-  },
-  "label.changes-saved": {
-    "message": "Changes saved"
-  },
-  "label.collections": {
-    "message": "Collections"
-  },
-  "label.created-ago": {
-    "message": "Created {ago}"
-  },
-  "label.dashboard": {
-    "message": "Dashboard"
-  },
-  "label.delete": {
-    "message": "Delete"
-  },
-  "label.description": {
-    "message": "Description"
-  },
-  "label.error": {
-    "message": "Error"
-  },
-  "label.followed-projects": {
-    "message": "Followed projects"
-  },
-  "label.moderation": {
-    "message": "Moderation"
-  },
-  "label.notifications": {
-    "message": "Notifications"
-  },
-  "label.password": {
-    "message": "Password"
-  },
-  "label.public": {
-    "message": "Public"
-  },
-  "label.rejected": {
-    "message": "Rejected"
-  },
-  "label.scopes": {
-    "message": "Scopes"
-  },
-  "label.settings": {
-    "message": "Settings"
-  },
-  "label.title": {
-    "message": "Title"
-  },
-  "label.unlisted": {
-    "message": "Unlisted"
-  },
-  "label.visibility": {
-    "message": "Visibility"
-  },
-  "label.visit-your-profile": {
-    "message": "Visit your profile"
-  },
   "layout.action.change-theme": {
     "message": "Change theme"
   },
@@ -363,10 +267,16 @@
     "message": "For security purposes, please enter your email on Modrinth."
   },
   "layout.banner.staging.description": {
-    "message": "The staging environment is running on a copy of the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
+    "message": "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
   },
   "layout.banner.staging.title": {
     "message": "You’re viewing Modrinth’s staging environment."
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Update billing info"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Your subscription failed to renew. Please update your payment method to prevent losing access."
   },
   "layout.banner.verify-email.action": {
     "message": "Re-send verification email"
@@ -428,20 +338,20 @@
   "layout.nav.search": {
     "message": "Search"
   },
-  "notification.error.title": {
-    "message": "An error occurred"
-  },
   "profile.button.manage-projects": {
     "message": "Manage projects"
-  },
-  "profile.button.report": {
-    "message": "Report"
   },
   "profile.error.not-found": {
     "message": "User not found"
   },
   "profile.joined-at": {
-    "message": "Joined {ago}"
+    "message": "Joined <date>{ago}</date>"
+  },
+  "profile.label.badges": {
+    "message": "Badges"
+  },
+  "profile.label.details": {
+    "message": "Details"
   },
   "profile.label.no-collections": {
     "message": "This user has no collections!"
@@ -465,16 +375,16 @@
     "message": "{bio} - Download {username}'s projects on Modrinth"
   },
   "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> download} other {<stat>{count}</stat> downloads}}"
+    "message": "{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}"
+  },
+  "profile.stats.projects": {
+    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> follower} other {<stat>{count}</stat> followers}} of projects"
+    "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
   },
   "profile.user-id": {
     "message": "User ID: {id}"
-  },
-  "project-type.all": {
-    "message": "All"
   },
   "project-type.collection.plural": {
     "message": "Collections"
@@ -523,6 +433,48 @@
   },
   "project-type.shader.singular": {
     "message": "Shader"
+  },
+  "project.about.details.created": {
+    "message": "Created {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Licensed {license}"
+  },
+  "project.about.details.published": {
+    "message": "Published {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Submitted {date}"
+  },
+  "project.about.details.title": {
+    "message": "Details"
+  },
+  "project.about.details.updated": {
+    "message": "Updated {date}"
+  },
+  "project.description.title": {
+    "message": "Description"
+  },
+  "project.gallery.title": {
+    "message": "Gallery"
+  },
+  "project.moderation.title": {
+    "message": "Moderation"
+  },
+  "project.stats.downloads-label": {
+    "message": "download{count, plural, one {} other {s}}"
+  },
+  "project.stats.followers-label": {
+    "message": "follower{count, plural, one {} other {s}}"
+  },
+  "project.version.all-versions": {
+    "message": "All versions"
+  },
+  "project.version.back-to-versions": {
+    "message": "Back to versions"
+  },
+  "project.versions.title": {
+    "message": "Versions"
   },
   "revenue.transfers.total": {
     "message": "You have withdrawn {amount} in total."
@@ -776,17 +728,107 @@
   "scopes.versionWrite.label": {
     "message": "Write versions"
   },
-  "settings.account.title": {
-    "message": "Account and security"
+  "search.filter.locked.server": {
+    "message": "Provided by the server"
   },
-  "settings.appearance.title": {
-    "message": "Appearance"
+  "search.filter.locked.server-game-version.title": {
+    "message": "Game version is provided by the server"
   },
-  "settings.applications.title": {
-    "message": "Your applications"
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader is provided by the server"
   },
-  "settings.authorized-apps.title": {
-    "message": "Authorized apps"
+  "search.filter.locked.server.sync": {
+    "message": "Sync with server"
+  },
+  "settings.billing.modal.cancel.action": {
+    "message": "Cancel subscription"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "This will cancel your subscription. You will retain your perks until the end of the current billing cycle."
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "Are you sure you want to cancel your subscription?"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Remove this payment method"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "This will remove this payment method forever (like really forever)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Are you sure you want to remove this payment method?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Add payment method"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "View past charges"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Make primary"
+  },
+  "settings.billing.payment_method.card_display": {
+    "message": "{card_brand} ending in {last_four}"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Expires {month}/{year}"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "You have not added any payment methods."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Primary"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Payment methods"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Unknown payment method"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Manage your Modrinth Server subscriptions."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Modrinth Server Subscriptions"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Manage your Modrinth subscriptions."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Subscriptions"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Deactivate developer mode"
@@ -827,6 +869,9 @@
   "settings.display.project-list-layouts.user": {
     "message": "User profile pages"
   },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Collection"
+  },
   "settings.display.sidebar.advanced-rendering.description": {
     "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
   },
@@ -845,41 +890,20 @@
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Hide Modrinth App promotions"
   },
-  "settings.display.sidebar.right-aligned-project-sidebar.description": {
-    "message": "Aligns the project details sidebar to the right of the page's content."
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Left-aligned sidebar on content pages"
   },
-  "settings.display.sidebar.right-aligned-project-sidebar.title": {
-    "message": "Right-aligned project sidebar"
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Aligns the sidebar to the left of the page's content."
   },
-  "settings.display.sidebar.right-aligned-search-sidebar.description": {
-    "message": "Aligns the search filters sidebar to the right of the search results."
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Aligns the filters sidebar to the right of the search results."
   },
-  "settings.display.sidebar.right-aligned-search-sidebar.title": {
-    "message": "Right-aligned search sidebar"
-  },
-  "settings.display.theme.dark": {
-    "message": "Dark"
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Right-aligned filters sidebar on search pages"
   },
   "settings.display.theme.description": {
     "message": "Select your preferred color theme for Modrinth on this device."
-  },
-  "settings.display.theme.light": {
-    "message": "Light"
-  },
-  "settings.display.theme.oled": {
-    "message": "OLED"
-  },
-  "settings.display.theme.preferred-dark-theme": {
-    "message": "Preferred dark theme"
-  },
-  "settings.display.theme.preferred-light-theme": {
-    "message": "Preferred light theme"
-  },
-  "settings.display.theme.retro": {
-    "message": "Retro"
-  },
-  "settings.display.theme.system": {
-    "message": "Sync with system"
   },
   "settings.display.theme.title": {
     "message": "Color theme"
@@ -926,9 +950,6 @@
   "settings.language.languages.search.no-results": {
     "message": "No languages match your search."
   },
-  "settings.language.title": {
-    "message": "Language"
-  },
   "settings.pats.action.create": {
     "message": "Create a PAT"
   },
@@ -961,9 +982,6 @@
   },
   "settings.pats.modal.edit.title": {
     "message": "Edit personal access token"
-  },
-  "settings.pats.title": {
-    "message": "Personal access tokens"
   },
   "settings.pats.token.action.edit": {
     "message": "Edit token"
@@ -1001,9 +1019,6 @@
   "settings.profile.profile-picture.title": {
     "message": "Profile picture"
   },
-  "settings.profile.title": {
-    "message": "Public profile"
-  },
   "settings.profile.username.description": {
     "message": "A unique case-insensitive name to identify your profile."
   },
@@ -1025,16 +1040,10 @@
   "settings.sessions.last-accessed-ago": {
     "message": "Last accessed {ago}"
   },
-  "settings.sessions.title": {
-    "message": "Sessions"
-  },
   "settings.sessions.unknown-os": {
     "message": "Unknown OS"
   },
   "settings.sessions.unknown-platform": {
     "message": "Unknown platform"
-  },
-  "tooltip.date-at-time": {
-    "message": "{date, date, long} at {time, time, short}"
   }
 }

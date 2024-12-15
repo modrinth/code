@@ -3,24 +3,30 @@
     ref="dropdown"
     v-bind="$attrs"
     :disabled="disabled"
-    :position="position"
-    :direction="direction"
+    :dropdown-id="dropdownId"
+    :tooltip="tooltip"
   >
     <slot></slot>
     <template #menu>
-      <template v-for="(option, index) in options">
-        <div v-if="option.divider" :key="`divider-${index}`" class="card-divider"></div>
+      <template v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)">
+        <div
+          v-if="option.divider"
+          :key="`divider-${index}`"
+          class="h-px mx-3 my-2 bg-button-bg"
+        ></div>
         <Button
           v-else
           :key="`option-${option.id}`"
+          v-tooltip="option.tooltip"
           :color="option.color ? option.color : 'default'"
           :hover-filled="option.hoverFilled"
           :hover-filled-only="option.hoverFilledOnly"
           transparent
+          :v-close-popper="!option.remainOnClick"
           :action="
             option.action
-              ? () => {
-                  option.action()
+              ? (event) => {
+                  option.action(event)
                   if (!option.remainOnClick) {
                     close()
                   }
@@ -29,6 +35,7 @@
           "
           :link="option.link ? option.link : null"
           :external="option.external ? option.external : false"
+          :disabled="option.disabled"
           @click="
             () => {
               if (option.link && !option.remainOnClick) {
@@ -45,29 +52,58 @@
   </PopoutMenu>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import Button from './Button.vue'
 import PopoutMenu from './PopoutMenu.vue'
 
-defineProps({
-  options: {
-    type: Array,
-    required: true,
+interface BaseOption {
+  shown?: boolean
+}
+
+interface Divider extends BaseOption {
+  divider?: boolean
+}
+
+interface Item extends BaseOption {
+  id: string
+  action?: () => void
+  link?: string
+  external?: boolean
+  color?:
+    | 'primary'
+    | 'danger'
+    | 'secondary'
+    | 'highlight'
+    | 'red'
+    | 'orange'
+    | 'green'
+    | 'blue'
+    | 'purple'
+  hoverFilled?: boolean
+  hoverFilledOnly?: boolean
+  remainOnClick?: boolean
+  disabled?: boolean
+  tooltip?: string
+}
+
+type Option = Divider | Item
+
+withDefaults(
+  defineProps<{
+    options: Option[]
+    disabled?: boolean
+    dropdownId?: string
+    tooltip?: string
+  }>(),
+  {
+    options: () => [],
+    disabled: false,
+    dropdownId: null,
+    tooltip: null,
   },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  position: {
-    type: String,
-    default: 'bottom',
-  },
-  direction: {
-    type: String,
-    default: 'left',
-  },
-})
+)
+
 defineOptions({
   inheritAttrs: false,
 })
@@ -75,7 +111,6 @@ defineOptions({
 const dropdown = ref(null)
 
 const close = () => {
-  console.log('closing!')
   dropdown.value.hide()
 }
 </script>

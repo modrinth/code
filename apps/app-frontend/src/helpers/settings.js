@@ -3,7 +3,7 @@
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/core'
 
 // Settings object
 /*
@@ -38,12 +38,6 @@ export async function set(settings) {
   return await invoke('plugin:settings|settings_set', { settings })
 }
 
-// Changes the config dir
-// Seizes the entire application state until its done
-export async function change_config_dir(newConfigDir) {
-  return await invoke('plugin:settings|settings_change_config_dir', { newConfigDir })
-}
-
-export async function is_dir_writeable(newConfigDir) {
-  return await invoke('plugin:settings|settings_is_dir_writeable', { newConfigDir })
+export async function cancel_directory_change() {
+  return await invoke('plugin:settings|cancel_directory_change')
 }

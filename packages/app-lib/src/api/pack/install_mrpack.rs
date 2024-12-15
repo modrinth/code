@@ -25,7 +25,6 @@ use super::install_from::{
 /// Wrapper around install_pack_files that generates a pack creation description, and
 /// attempts to install the pack files. If it fails, it will remove the profile (fail safely)
 /// Install a modpack from a mrpack file (a modrinth .zip format)
-
 pub async fn install_zipped_mrpack(
     location: CreatePackLocation,
     profile_path: String,
@@ -68,7 +67,6 @@ pub async fn install_zipped_mrpack(
 
 /// Install all pack files from a description
 /// Does not remove the profile if it fails
-
 pub async fn install_zipped_mrpack_files(
     create_pack: CreatePack,
     ignore_lock: bool,
@@ -177,31 +175,25 @@ pub async fn install_zipped_mrpack_files(
 
                     let path =
                         std::path::Path::new(&project_path).components().next();
-                    if let Some(path) = path {
-                        match path {
-                            Component::CurDir | Component::Normal(_) => {
-                                let path =
-                                    profile::get_full_path(&profile_path)
-                                        .await?
-                                        .join(&project_path);
+                    if let Some(Component::CurDir | Component::Normal(_)) = path
+                    {
+                        let path = profile::get_full_path(&profile_path)
+                            .await?
+                            .join(&project_path);
 
-                                cache_file_hash(
-                                    file.clone(),
-                                    &profile_path,
-                                    &project_path,
-                                    project
-                                        .hashes
-                                        .get(&PackFileHash::Sha1)
-                                        .map(|x| &**x),
-                                    &state.pool,
-                                )
-                                .await?;
+                        cache_file_hash(
+                            file.clone(),
+                            &profile_path,
+                            &project_path,
+                            project
+                                .hashes
+                                .get(&PackFileHash::Sha1)
+                                .map(|x| &**x),
+                            &state.pool,
+                        )
+                        .await?;
 
-                                write(&path, &file, &state.io_semaphore)
-                                    .await?;
-                            }
-                            _ => {}
-                        };
+                        write(&path, &file, &state.io_semaphore).await?;
                     }
                     Ok(())
                 }
@@ -209,7 +201,7 @@ pub async fn install_zipped_mrpack_files(
         )
         .await?;
 
-        emit_loading(&loading_bar, 0.0, Some("Extracting overrides")).await?;
+        emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))?;
 
         let mut total_len = 0;
 
@@ -276,8 +268,7 @@ pub async fn install_zipped_mrpack_files(
                         "Extracting override {}/{}",
                         index, total_len
                     )),
-                )
-                .await?;
+                )?;
             }
         }
 
