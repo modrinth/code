@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { NewModal } from '@modrinth/ui'
 import {
   ReportIcon,
   ModrinthIcon,
@@ -21,6 +20,7 @@ import { getVersion } from '@tauri-apps/api/app'
 import { version as getOsVersion, platform as getOsPlatform } from '@tauri-apps/plugin-os'
 import { useTheming } from '@/store/state'
 import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const themeStore = useTheming()
 
@@ -100,7 +100,7 @@ const osVersion = getOsVersion()
 </script>
 /
 <template>
-  <NewModal ref="modal">
+  <ModalWrapper ref="modal">
     <template #title>
       <span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
         <SettingsIcon /> Settings
@@ -157,5 +157,5 @@ const osVersion = getOsVersion()
         <component :is="tabs[selectedTab].content" />
       </div>
     </div>
-  </NewModal>
+  </ModalWrapper>
 </template>

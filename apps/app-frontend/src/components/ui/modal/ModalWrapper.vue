@@ -21,8 +21,11 @@ const props = defineProps({
       return () => {}
     },
   },
+  showAdOnClose: {
+    type: Boolean,
+    default: true,
+  },
 })
-
 const modal = ref(null)
 
 defineExpose({
@@ -37,7 +40,9 @@ defineExpose({
 })
 
 function onModalHide() {
-  show_ads_window()
+  if (props.showAdOnClose) {
+    show_ads_window()
+  }
   props.onHide()
 }
 </script>
