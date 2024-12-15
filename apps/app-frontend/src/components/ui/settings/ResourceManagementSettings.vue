@@ -10,15 +10,19 @@ import { open } from '@tauri-apps/plugin-dialog'
 
 const settings = ref(await get())
 
-watch(settings, async () => {
-  const setSettings = JSON.parse(JSON.stringify(settings.value))
+watch(
+  settings,
+  async () => {
+    const setSettings = JSON.parse(JSON.stringify(settings.value))
 
-  if (!setSettings.custom_dir) {
-    setSettings.custom_dir = null
-  }
+    if (!setSettings.custom_dir) {
+      setSettings.custom_dir = null
+    }
 
-  await set(setSettings)
-})
+    await set(setSettings)
+  },
+  { deep: true },
+)
 
 async function purgeCache() {
   await purge_cache_types([

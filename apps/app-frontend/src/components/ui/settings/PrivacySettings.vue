@@ -6,15 +6,19 @@ import { optInAnalytics, optOutAnalytics } from '@/helpers/analytics'
 
 const settings = ref(await get())
 
-watch(settings, async () => {
-  if (settings.value.telemetry) {
-    optInAnalytics()
-  } else {
-    optOutAnalytics()
-  }
+watch(
+  settings,
+  async () => {
+    if (settings.value.telemetry) {
+      optInAnalytics()
+    } else {
+      optOutAnalytics()
+    }
 
-  await set(settings.value)
-})
+    await set(settings.value)
+  },
+  { deep: true },
+)
 </script>
 
 <template>

@@ -1,7 +1,6 @@
 <template>
   <Dropdown
     ref="dropdown"
-    theme="ribbit-popout"
     no-auto-focus
     :aria-id="dropdownId || null"
     @hide="focusTrigger"
@@ -10,19 +9,19 @@
     <button ref="trigger" v-bind="$attrs" v-tooltip="tooltip">
       <slot></slot>
     </button>
-    <template #popper="{ hide }">
-      <button class="dummy-button" @focusin="hideAndFocusTrigger(hide)"></button>
+    <template #popper="{ hide: hideFunction }">
+      <button class="dummy-button" @focusin="hideAndFocusTrigger(hideFunction)"></button>
       <div ref="menu" class="contents">
         <slot name="menu"> </slot>
       </div>
-      <button class="dummy-button" @focusin="hideAndFocusTrigger(hide)"></button>
+      <button class="dummy-button" @focusin="hideAndFocusTrigger(hideFunction)"></button>
     </template>
   </Dropdown>
 </template>
 
 <script setup>
 import { Dropdown } from 'floating-vue'
-import { ref, defineOptions } from 'vue'
+import { ref } from 'vue'
 
 const trigger = ref()
 const menu = ref()

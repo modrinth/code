@@ -44,7 +44,6 @@ app.use(FloatingVue, {
       placement: 'bottom-end',
       instantMove: true,
       distance: 8,
-      triggers: ['click'],
     },
   },
 })
