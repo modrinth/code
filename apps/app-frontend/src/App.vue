@@ -133,8 +133,8 @@ async function setupApp() {
     default_page,
   } = await get()
 
-  if (default_page && default_page !== 'Home') {
-    await router.push({ name: default_page })
+  if (default_page === 'Library') {
+    await router.push('/library')
   }
 
   os.value = await getOS()
