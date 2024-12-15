@@ -46,8 +46,7 @@
           />
           <div
             v-if="isUploading"
-            ref="uploadPanelRef"
-            class="upload-status m-2 rounded-xl bg-table-alternateRow text-contrast"
+            class="upload-status mb-2 rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow text-contrast"
           >
             <div class="flex flex-col gap-2 p-4 text-sm">
               <div class="flex cursor-pointer items-center justify-between">
@@ -71,7 +70,7 @@
                     <CheckCircleIcon v-if="item.status === 'completed'" class="size-4" />
                     <XCircleIcon v-else-if="item.status === 'error'" class="size-4 text-red" />
                     <span class="truncate">{{ item.file.name }}</span>
-                    <span class="text-secondary">({{ item.size }})</span>
+                    <span class="text-secondary">{{ item.size }}</span>
                   </div>
                   <div class="flex min-w-[80px] items-center justify-end gap-2">
                     <template v-if="item.status === 'completed'">
@@ -970,6 +969,7 @@ const uploadFile = async (file: File) => {
     uploadQueue.value = uploadQueue.value.filter(
       (item) => item.status === "pending" || item.status === "uploading",
     );
+    nextTick(updateUploadPanelHeight);
   }, 5000);
 };
 
