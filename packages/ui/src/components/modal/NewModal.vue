@@ -31,7 +31,7 @@
             </slot>
           </div>
           <ButtonStyled v-if="closable" circular>
-            <button aria-label="Close" @click="hide">
+            <button v-tooltip="'Close'" aria-label="Close" @click="hide">
               <XIcon aria-hidden="true" />
             </button>
           </ButtonStyled>
@@ -214,14 +214,14 @@ function handleKeyDown(event: KeyboardEvent) {
     visibility: visible;
     transform: translate(0, 0);
 
-    .modal-body {
+    > .modal-body {
       opacity: 1;
       visibility: visible;
       scale: 1;
     }
   }
 
-  .modal-body {
+  > .modal-body {
     position: fixed;
     box-shadow: 4px 4px 26px 10px rgba(0, 0, 0, 0.08);
     max-height: calc(100% - 2 * var(--gap-lg));
