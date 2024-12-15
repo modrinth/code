@@ -6,7 +6,7 @@
   "permissions": [
     "dialog:allow-open",
     "dialog:allow-confirm",
-    "shell:allow-open",
+    "opener:default",
     "os:allow-platform",
     "os:allow-version",
     "os:allow-os-type",
