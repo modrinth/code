@@ -44,30 +44,59 @@
             @upload="initiateFileUpload"
             @update:search-query="searchQuery = $event"
           />
-          <Transition name="expand">
-            <div
-              v-if="isUploading"
-              class="upload-status transition-colors duration-200"
-              :class="{
-                'bg-brand-highlight text-contrast': !showDoneMessage,
-                'bg-brand text-[var(--color-accent-contrast)]': showDoneMessage,
-              }"
-            >
+          <div
+            v-if="isUploading"
+            ref="uploadPanelRef"
+            class="upload-status m-2 rounded-xl bg-table-alternateRow text-contrast"
+          >
+            <div class="flex flex-col gap-2 p-4 text-sm">
               <div
-                class="flex flex-row items-center justify-between gap-4 px-5 py-2 text-sm font-medium"
+                class="flex cursor-pointer items-center justify-between"
+                @click="isUploadPanelExpanded = !isUploadPanelExpanded"
               >
-                <div class="flex flex-row items-center gap-4">
-                  <UiServersPanelSpinner v-if="!showDoneMessage" class="size-5" />
-                  <CheckCircleIcon v-else class="size-5" />
-                  <span v-if="!showDoneMessage"> Uploading {{ currentUploadFile }} </span>
-                  <span v-else> Done uploading! </span>
+                <div class="flex items-center gap-2 font-bold">
+                  <UiServersPanelSpinner v-if="activeUploads.length" class="size-4" />
+                  <CheckCircleIcon v-else class="size-4" />
+                  <span>
+                    Uploading {{ uploadQueue.length }} file{{ uploadQueue.length !== 1 ? "s" : "" }}
+                  </span>
                 </div>
-                <div class="flex flex-row items-center gap-4">
-                  <span v-if="!showDoneMessage"> {{ uploadProgress }}% </span>
+                <ChevronDownIcon
+                  class="size-4 transform transition-transform duration-200"
+                  :class="{ 'rotate-180': !isUploadPanelExpanded }"
+                />
+              </div>
+
+              <div v-show="isUploadPanelExpanded" class="mt-2 space-y-2">
+                <div
+                  v-for="item in uploadQueue"
+                  :key="item.file.name"
+                  class="flex items-center justify-between gap-2 text-xs"
+                >
+                  <div class="flex flex-1 items-center gap-2 truncate">
+                    <CheckCircleIcon
+                      v-if="item.status === 'completed'"
+                      class="text-green-500 size-3"
+                    />
+                    <span class="truncate">{{ item.file.name }}</span>
+                    <span class="text-secondary">({{ item.size }})</span>
+                  </div>
+                  <div class="flex min-w-[80px] items-center justify-end gap-2">
+                    <template v-if="item.status !== 'completed'">
+                      <span>{{ item.progress }}%</span>
+                      <div class="h-1 w-20 overflow-hidden rounded-full bg-white/20">
+                        <div
+                          class="h-full bg-white transition-all duration-200"
+                          :style="{ width: item.progress + '%' }"
+                        />
+                      </div>
+                    </template>
+                    <span v-else class="text-green-500">Done</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </Transition>
+          </div>
         </div>
 
         <UiServersFilesEditingNavbar
@@ -198,6 +227,13 @@ interface RenameOperation extends BaseOperation {
 
 type Operation = MoveOperation | RenameOperation;
 
+interface UploadItem {
+  file: File;
+  progress: number;
+  status: "pending" | "uploading" | "completed" | "error";
+  size: string;
+}
+
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
@@ -241,11 +277,15 @@ const imagePreview = ref();
 const isDragging = ref(false);
 const dragCounter = ref(0);
 
-const isUploading = ref(false);
-const currentUploadFile = ref("");
-const uploadProgress = ref(0);
-const showDoneMessage = ref(false);
-const uploadTimeout = ref<NodeJS.Timeout>();
+const isUploading = computed(() => uploadQueue.value.length > 0);
+const uploadQueue = ref<UploadItem[]>([]);
+
+const activeUploads = computed(() =>
+  uploadQueue.value.filter((item) => item.status === "pending" || item.status === "uploading"),
+);
+
+const uploadPanelRef = ref<HTMLElement | null>(null);
+const isUploadPanelExpanded = ref(true);
 
 const data = computed(() => props.server.general);
 
@@ -708,6 +748,12 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
   }
 };
 
+const updateUploadPanelHeight = () => {
+  if (!uploadPanelRef.value) return;
+  const height = uploadPanelRef.value.scrollHeight;
+  uploadPanelRef.value.style.height = `${height}px`;
+};
+
 onMounted(async () => {
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
@@ -738,12 +784,6 @@ onUnmounted(() => {
   document.removeEventListener("keydown", () => {});
 });
 
-onUnmounted(() => {
-  if (uploadTimeout.value) {
-    clearTimeout(uploadTimeout.value);
-  }
-});
-
 watch(
   () => route.query,
   async (newQuery) => {
@@ -771,6 +811,22 @@ watch(
   },
   { immediate: true, deep: true },
 );
+
+watch(
+  uploadQueue,
+  () => {
+    nextTick(updateUploadPanelHeight);
+  },
+  { deep: true },
+);
+
+watch(isUploadPanelExpanded, () => {
+  nextTick(updateUploadPanelHeight);
+});
+
+onMounted(() => {
+  nextTick(updateUploadPanelHeight);
+});
 
 const breadcrumbSegments = computed(() => {
   if (typeof currentPath.value === "string") {
@@ -844,6 +900,7 @@ const handleDragLeave = (event: DragEvent) => {
   }
 };
 
+// eslint-disable-next-line require-await
 const handleDrop = async (event: DragEvent) => {
   if (isEditing.value) return;
   event.preventDefault();
@@ -855,65 +912,79 @@ const handleDrop = async (event: DragEvent) => {
 
   const files = event.dataTransfer?.files;
   if (files) {
-    for (let i = 0; i < files.length; i++) {
-      await uploadFile(files[i]);
-    }
+    Array.from(files).forEach((file) => {
+      uploadFile(file);
+    });
   }
 };
 
-const uploadFile = async (file: File) => {
-  try {
-    isUploading.value = true;
-    currentUploadFile.value = file.name;
-    uploadProgress.value = 0;
-    showDoneMessage.value = false;
+const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+};
 
+const uploadFile = async (file: File) => {
+  const uploadItem: UploadItem = {
+    file,
+    progress: 0,
+    status: "pending",
+    size: formatFileSize(file.size),
+  };
+
+  uploadQueue.value.push(uploadItem);
+
+  try {
+    uploadItem.status = "uploading";
     const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
     const uploader = await props.server.fs?.uploadFile(filePath, file);
 
     if (uploader?.onProgress) {
       uploader.onProgress(({ progress }: { progress: number }) => {
-        uploadProgress.value = Math.round(progress);
+        const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+        if (index !== -1) {
+          uploadQueue.value[index].progress = Math.round(progress);
+        }
       });
     }
 
     await uploader?.promise;
+    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+    if (index !== -1) {
+      uploadQueue.value[index].status = "completed";
+      uploadQueue.value[index].progress = 100;
+    }
     await refreshList();
-
-    showDoneMessage.value = true;
-    // addNotification({
-    //   group: "files",
-    //   title: "File uploaded",
-    //   text: "Your file has been uploaded.",
-    //   type: "success",
-    // });
-
-    await new Promise((resolve) => {
-      uploadTimeout.value = setTimeout(resolve, 2000);
-    });
   } catch (error) {
     console.error("Error uploading file:", error);
+    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+    if (index !== -1) {
+      uploadQueue.value[index].status = "error";
+    }
     addNotification({
       group: "files",
       title: "Upload failed",
-      text: "Failed to upload file.",
+      text: `Failed to upload ${file.name}`,
       type: "error",
     });
-  } finally {
-    isUploading.value = false;
-    currentUploadFile.value = "";
-    uploadProgress.value = 0;
-    showDoneMessage.value = false;
   }
+
+  setTimeout(() => {
+    uploadQueue.value = uploadQueue.value.filter(
+      (item) => item.status !== "completed" && item.status !== "error",
+    );
+  }, 3000);
 };
 
 const initiateFileUpload = () => {
   const input = document.createElement("input");
   input.type = "file";
-  input.onchange = async () => {
-    const file = input.files?.[0];
-    if (file) {
-      await uploadFile(file);
+  input.multiple = true;
+  input.onchange = () => {
+    if (input.files) {
+      Array.from(input.files).forEach((file) => {
+        uploadFile(file);
+      });
     }
   };
   input.click();
@@ -1002,19 +1073,8 @@ const onScroll = () => {
 </script>
 
 <style scoped>
-.expand-enter-active,
-.expand-leave-active {
-  transition: all 0.3s ease-out;
-  max-height: 36px;
-}
-
-.expand-enter-from,
-.expand-leave-to {
-  max-height: 0;
-  opacity: 0;
-}
-
 .upload-status {
   overflow: hidden;
+  transition: height 0.2s ease-out;
 }
 </style>
