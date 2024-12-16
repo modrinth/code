@@ -960,17 +960,14 @@ const uploadFile = async (file: File) => {
     }
 
     await uploader?.promise;
-    // Update status first to show completion
     const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
     if (index !== -1) {
       uploadQueue.value[index].status = "completed";
       uploadQueue.value[index].progress = 100;
     }
 
-    // Wait for the completion animation
     await nextTick();
 
-    // Remove after delay using splice to trigger reactivity properly
     setTimeout(async () => {
       const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
       if (removeIndex !== -1) {
@@ -986,7 +983,6 @@ const uploadFile = async (file: File) => {
     if (index !== -1) {
       uploadQueue.value[index].status = "error";
 
-      // Remove failed item after delay using splice
       setTimeout(async () => {
         const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
         if (removeIndex !== -1) {

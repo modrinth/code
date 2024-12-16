@@ -24,7 +24,8 @@
       class="pointer-events-none flex w-full items-center gap-4 truncate"
     >
       <div
-        class="pointer-events-none flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand group-focus:bg-brand-highlight group-focus:text-brand group-active:scale-[0.8]"
+        class="pointer-events-none flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand group-focus:bg-brand-highlight group-focus:text-brand"
+        :class="isEditableFile ? 'group-active:scale-[0.8]' : ''"
       >
         <component :is="iconComponent" class="size-6" />
       </div>
