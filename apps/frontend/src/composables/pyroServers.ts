@@ -753,6 +753,8 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
       await internalServerRefrence.value.refresh(["fs"]);
       return await requestFn();
     }
+
+    throw error;
   }
 };
 
@@ -837,7 +839,7 @@ const uploadFile = (path: string, file: File) => {
 const renameFileOrFolder = (path: string, name: string) => {
   const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
   return retryWithAuth(async () => {
-    return await PyroFetch(`/move`, {
+    await PyroFetch(`/move`, {
       method: "POST",
       override: internalServerRefrence.value.fs.auth,
       body: {
@@ -845,6 +847,7 @@ const renameFileOrFolder = (path: string, name: string) => {
         destination: pathName,
       },
     });
+    return true;
   });
 };
 

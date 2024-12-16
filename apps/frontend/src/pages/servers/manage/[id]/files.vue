@@ -479,6 +479,7 @@ const handleRenameItem = async (newName: string) => {
     const path = `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/");
     await props.server.fs?.renameFileOrFolder(path, newName);
 
+    // Only add to history and show success notification if the operation succeeded
     redoStack.value = [];
     operationHistory.value.push({
       type: "rename",
@@ -506,7 +507,24 @@ const handleRenameItem = async (newName: string) => {
       type: "success",
     });
   } catch (error) {
-    handleRenameError(error);
+    console.error("Error renaming item:", error);
+    if (error instanceof PyroFetchError) {
+      if (error.statusCode === 400) {
+        addNotification({
+          group: "files",
+          title: "Could not rename",
+          text: `An item named "${newName}" already exists in this location`,
+          type: "error",
+        });
+        return;
+      }
+      addNotification({
+        group: "files",
+        title: "Could not rename item",
+        text: "An unexpected error occurred",
+        type: "error",
+      });
+    }
   }
 };
 
@@ -630,27 +648,6 @@ const handleCreateError = (error: any) => {
         group: "files",
         title: "Error creating item",
         text: "Something went wrong. The file may already exist.",
-        type: "error",
-      });
-    }
-  }
-};
-
-const handleRenameError = (error: any) => {
-  console.error("Error renaming item:", error);
-  if (error instanceof PyroFetchError) {
-    if (error.statusCode === 400) {
-      addNotification({
-        group: "files",
-        title: "Could not rename item",
-        text: "This item already exists or is invalid.",
-        type: "error",
-      });
-    } else if (error.statusCode === 500) {
-      addNotification({
-        group: "files",
-        title: "Could not rename item",
-        text: "Invalid file",
         type: "error",
       });
     }
