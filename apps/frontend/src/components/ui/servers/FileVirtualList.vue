@@ -32,6 +32,7 @@
           @rename="$emit('rename', item)"
           @download="$emit('download', item)"
           @move="$emit('move', item)"
+          @move-direct-to="$emit('moveDirectTo', $event)"
           @edit="$emit('edit', item)"
           @contextmenu="(x, y) => $emit('contextmenu', item, x, y)"
         />
@@ -55,6 +56,7 @@ const emit = defineEmits<{
   (e: "edit", item: any): void;
   (e: "contextmenu", item: any, x: number, y: number): void;
   (e: "loadMore"): void;
+  (e: "moveDirectTo", item: any): void;
 }>();
 
 const ITEM_HEIGHT = 61;

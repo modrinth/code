@@ -596,17 +596,22 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
       errorMessage.value = data.reason ?? "Unknown error";
       error.value = new Error(data.reason ?? "Unknown error");
       let files = await server.fs?.listDirContents("/", 1, 100);
-      if (files.total > 1) {
-        for (let i = 1; i < files.total; i++) {
-          files = await server.fs?.listDirContents("/", i, 100);
-          if (files.items?.length === 0) break;
+      if (files) {
+        if (files.total > 1) {
+          for (let i = 1; i < files.total; i++) {
+            const nextFiles = await server.fs?.listDirContents("/", i, 100);
+            if (nextFiles?.items?.length === 0) break;
+            if (nextFiles) files = nextFiles;
+          }
         }
       }
-      const fileName = await files.items?.find((file: { name: string }) =>
+      const fileName = files?.items?.find((file: { name: string }) =>
         file.name.startsWith("modrinth-installation"),
       )?.name;
-      errorLogFile.value = fileName;
-      errorLog.value = await server.fs?.downloadFile(fileName);
+      errorLogFile.value = fileName ?? "";
+      if (fileName) {
+        errorLog.value = await server.fs?.downloadFile(fileName);
+      }
       break;
     }
   }

@@ -73,7 +73,7 @@
                 type="search"
                 name="search"
                 autocomplete="off"
-                :placeholder="`Search ${type}s...`"
+                :placeholder="`Search ${type.toLocaleLowerCase()}s...`"
                 @input="debouncedSearch"
               />
             </div>
@@ -93,7 +93,7 @@
                 </span>
                 <FilterIcon aria-hidden="true" />
                 <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-                <template #all> All {{ type }}s </template>
+                <template #all> All {{ type.toLocaleLowerCase() }}s </template>
                 <template #enabled> Only enabled </template>
                 <template #disabled> Only disabled </template>
               </UiServersTeleportOverflowMenu>
@@ -238,8 +238,10 @@
         class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
       >
         <PackageClosedIcon class="size-24" />
-        <p class="m-0 font-bold text-contrast">No {{ type }}s found!</p>
-        <p class="m-0">Add some {{ type }}s to your server to manage them here.</p>
+        <p class="m-0 font-bold text-contrast">No {{ type.toLocaleLowerCase() }}s found!</p>
+        <p class="m-0">
+          Add some {{ type.toLocaleLowerCase() }}s to your server to manage them here.
+        </p>
         <ButtonStyled color="brand">
           <NuxtLink :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`">
             <PlusIcon />
@@ -333,7 +335,7 @@ const filterMethodLabel = computed(() => {
     case "enabled":
       return "Only enabled";
     default:
-      return `All ${type.value}s`;
+      return `All ${type.value.toLocaleLowerCase()}s`;
   }
 });
 

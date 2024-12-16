@@ -1,5 +1,5 @@
 <template>
-  <NewModal ref="modal" :header="`Creating a ${type}`">
+  <NewModal ref="modal" :header="`Creating a ${displayType}`">
     <form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-2">
         <div class="font-semibold text-contrast">Name</div>
@@ -18,7 +18,7 @@
         <ButtonStyled color="brand">
           <button :disabled="!!error" type="submit">
             <PlusIcon class="h-5 w-5" />
-            Create
+            Create {{ displayType }}
           </button>
         </ButtonStyled>
         <ButtonStyled>
@@ -46,6 +46,7 @@ const emit = defineEmits<{
 }>();
 
 const modal = ref<typeof NewModal>();
+const displayType = computed(() => (props.type === "directory" ? "folder" : props.type));
 const createInput = ref<HTMLInputElement | null>(null);
 const itemName = ref("");
 const submitted = ref(false);
