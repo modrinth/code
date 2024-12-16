@@ -52,9 +52,9 @@
             <div
               v-if="isUploading"
               ref="uploadStatusRef"
-              class="upload-status mb-2 rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow text-contrast"
+              class="upload-status rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow text-contrast"
             >
-              <div class="flex flex-col gap-2 p-4 text-sm">
+              <div class="flex flex-col p-4 text-sm">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2 font-bold">
                     <FolderOpenIcon class="size-4" />
@@ -66,17 +66,31 @@
                   </div>
                 </div>
 
-                <div class="mt-2 h-4 space-y-2">
+                <div class="mt-2 space-y-2">
                   <div
                     v-for="item in uploadQueue"
                     :key="item.file.name"
-                    class="flex items-center justify-between gap-2 text-xs"
+                    class="flex h-6 items-center justify-between gap-2 text-xs"
                   >
                     <div class="flex flex-1 items-center gap-2 truncate">
-                      <UiServersPanelSpinner v-if="item.status === 'uploading'" class="!size-4" />
-                      <CheckCircleIcon v-if="item.status === 'completed'" class="size-4" />
-                      <XCircleIcon v-else-if="item.status === 'error'" class="size-4 text-red" />
-                      <span class="truncate">{{ item.file.name }}</span>
+                      <transition-group name="status-icon" mode="out-in">
+                        <UiServersPanelSpinner
+                          v-show="item.status === 'uploading'"
+                          key="spinner"
+                          class="absolute !size-4"
+                        />
+                        <CheckCircleIcon
+                          v-show="item.status === 'completed'"
+                          key="check"
+                          class="absolute size-4 text-green"
+                        />
+                        <XCircleIcon
+                          v-show="item.status === 'error' || item.status === 'cancelled'"
+                          key="error"
+                          class="absolute size-4 text-red"
+                        />
+                      </transition-group>
+                      <span class="ml-6 truncate">{{ item.file.name }}</span>
                       <span class="text-secondary">{{ item.size }}</span>
                     </div>
                     <div class="flex min-w-[80px] items-center justify-end gap-2">
@@ -87,13 +101,30 @@
                         <span class="text-red">Failed - File already exists</span>
                       </template>
                       <template v-else>
-                        <span>{{ item.progress }}%</span>
-                        <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
-                          <div
-                            class="h-full bg-contrast transition-all duration-200"
-                            :style="{ width: item.progress + '%' }"
-                          />
-                        </div>
+                        <template v-if="item.status === 'uploading'">
+                          <span>{{ item.progress }}%</span>
+                          <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
+                            <div
+                              class="h-full bg-contrast transition-all duration-200"
+                              :style="{ width: item.progress + '%' }"
+                            />
+                          </div>
+                          <ButtonStyled color="red" type="transparent" @click="cancelUpload(item)">
+                            <button>Cancel</button>
+                          </ButtonStyled>
+                        </template>
+                        <template v-else-if="item.status === 'cancelled'">
+                          <span class="text-red">Cancelled</span>
+                        </template>
+                        <template v-else>
+                          <span>{{ item.progress }}%</span>
+                          <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
+                            <div
+                              class="h-full bg-contrast transition-all duration-200"
+                              :style="{ width: item.progress + '%' }"
+                            />
+                          </div>
+                        </template>
                       </template>
                     </div>
                   </div>
@@ -208,6 +239,7 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
 import { UploadIcon, FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
+import { ButtonStyled } from "@modrinth/ui";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
 
 interface BaseOperation {
@@ -234,8 +266,9 @@ type Operation = MoveOperation | RenameOperation;
 interface UploadItem {
   file: File;
   progress: number;
-  status: "pending" | "uploading" | "completed" | "error";
+  status: "pending" | "uploading" | "completed" | "error" | "cancelled";
   size: string;
+  uploader?: any;
 }
 
 const props = defineProps<{
@@ -310,8 +343,8 @@ watch(
   () => {
     if (!uploadStatusRef.value) return;
     const el = uploadStatusRef.value;
-    const itemsHeight = uploadQueue.value.length * 24;
-    const headerHeight = 20;
+    const itemsHeight = uploadQueue.value.length * 32;
+    const headerHeight = 12;
     const gap = 8;
     const padding = 32;
     const totalHeight = padding + headerHeight + gap + itemsHeight;
@@ -479,7 +512,6 @@ const handleRenameItem = async (newName: string) => {
     const path = `${currentPath.value}/${selectedItem.value.name}`.replace("//", "/");
     await props.server.fs?.renameFileOrFolder(path, newName);
 
-    // Only add to history and show success notification if the operation succeeded
     redoStack.value = [];
     operationHistory.value.push({
       type: "rename",
@@ -932,6 +964,21 @@ const formatFileSize = (bytes: number): string => {
   return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 };
 
+const cancelUpload = (item: UploadItem) => {
+  if (item.uploader && item.status === "uploading") {
+    item.uploader.cancel();
+    item.status = "cancelled";
+
+    setTimeout(async () => {
+      const index = uploadQueue.value.findIndex((qItem) => qItem.file.name === item.file.name);
+      if (index !== -1) {
+        uploadQueue.value.splice(index, 1);
+        await nextTick();
+      }
+    }, 5000);
+  }
+};
+
 const uploadFile = async (file: File) => {
   const uploadItem: UploadItem = {
     file,
@@ -946,6 +993,7 @@ const uploadFile = async (file: File) => {
     uploadItem.status = "uploading";
     const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
     const uploader = await props.server.fs?.uploadFile(filePath, file);
+    uploadItem.uploader = uploader;
 
     if (uploader?.onProgress) {
       uploader.onProgress(({ progress }: { progress: number }) => {
@@ -958,7 +1006,7 @@ const uploadFile = async (file: File) => {
 
     await uploader?.promise;
     const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1) {
+    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
       uploadQueue.value[index].status = "completed";
       uploadQueue.value[index].progress = 100;
     }
@@ -977,23 +1025,26 @@ const uploadFile = async (file: File) => {
   } catch (error) {
     console.error("Error uploading file:", error);
     const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1) {
+    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
       uploadQueue.value[index].status = "error";
-
-      setTimeout(async () => {
-        const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-        if (removeIndex !== -1) {
-          uploadQueue.value.splice(removeIndex, 1);
-          await nextTick();
-        }
-      }, 5000);
     }
-    addNotification({
-      group: "files",
-      title: "Upload failed",
-      text: `Failed to upload ${file.name}`,
-      type: "error",
-    });
+
+    setTimeout(async () => {
+      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+      if (removeIndex !== -1) {
+        uploadQueue.value.splice(removeIndex, 1);
+        await nextTick();
+      }
+    }, 5000);
+
+    if (error instanceof Error && error.message !== "Upload cancelled") {
+      addNotification({
+        group: "files",
+        title: "Upload failed",
+        text: `Failed to upload ${file.name}`,
+        type: "error",
+      });
+    }
   }
 };
 
@@ -1108,5 +1159,22 @@ const onScroll = () => {
 .upload-status-enter-from,
 .upload-status-leave-to {
   height: 0 !important;
+}
+
+.status-icon-enter-active,
+.status-icon-leave-active {
+  transition: all 0.25s ease;
+}
+
+.status-icon-enter-from,
+.status-icon-leave-to {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.status-icon-enter-to,
+.status-icon-leave-from {
+  transform: scale(1);
+  opacity: 1;
 }
 </style>

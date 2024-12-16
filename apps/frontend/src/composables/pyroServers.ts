@@ -783,8 +783,8 @@ const uploadFile = (path: string, file: File) => {
   // eslint-disable-next-line require-await
   return retryWithAuth(async () => {
     const encodedPath = encodeURIComponent(path);
-
     const progressSubject = new EventTarget();
+    const abortController = new AbortController();
 
     const uploadPromise = new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -813,6 +813,7 @@ const uploadFile = (path: string, file: File) => {
       };
 
       xhr.onerror = () => reject(new Error("Upload failed"));
+      xhr.onabort = () => reject(new Error("Upload cancelled"));
 
       xhr.open(
         "POST",
@@ -821,6 +822,10 @@ const uploadFile = (path: string, file: File) => {
       xhr.setRequestHeader("Authorization", `Bearer ${internalServerRefrence.value.fs.auth.token}`);
       xhr.setRequestHeader("Content-Type", "application/octet-stream");
       xhr.send(file);
+
+      abortController.signal.addEventListener("abort", () => {
+        xhr.abort();
+      });
     });
 
     return {
@@ -832,7 +837,10 @@ const uploadFile = (path: string, file: File) => {
           callback(e.detail);
         }) as EventListener);
       },
-    }; // Remove .promise from here
+      cancel: () => {
+        abortController.abort();
+      },
+    };
   });
 };
 
