@@ -44,55 +44,63 @@
             @upload="initiateFileUpload"
             @update:search-query="searchQuery = $event"
           />
-          <div
-            v-if="isUploading"
-            class="upload-status mb-2 rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow text-contrast"
+          <Transition
+            name="upload-status"
+            @enter="onUploadStatusEnter"
+            @leave="onUploadStatusLeave"
           >
-            <div class="flex flex-col gap-2 p-4 text-sm">
-              <div class="flex cursor-pointer items-center justify-between">
-                <div class="flex items-center gap-2 font-bold">
-                  <UiServersPanelSpinner v-if="activeUploads.length" class="!size-4" />
-                  <CheckCircleIcon v-else class="size-4" />
-                  <span>
-                    Uploading {{ uploadQueue.length }} file{{ uploadQueue.length !== 1 ? "s" : "" }}
-                  </span>
-                </div>
-              </div>
-
-              <div class="mt-2 space-y-2">
-                <div
-                  v-for="item in uploadQueue"
-                  :key="item.file.name"
-                  class="flex items-center justify-between gap-2 text-xs"
-                >
-                  <div class="flex flex-1 items-center gap-2 truncate">
-                    <UiServersPanelSpinner v-if="item.status === 'uploading'" class="!size-4" />
-                    <CheckCircleIcon v-if="item.status === 'completed'" class="size-4" />
-                    <XCircleIcon v-else-if="item.status === 'error'" class="size-4 text-red" />
-                    <span class="truncate">{{ item.file.name }}</span>
-                    <span class="text-secondary">{{ item.size }}</span>
+            <div
+              v-if="isUploading"
+              ref="uploadStatusRef"
+              class="upload-status mb-2 rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow text-contrast"
+            >
+              <div class="flex flex-col gap-2 p-4 text-sm">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 font-bold">
+                    <FolderOpenIcon class="size-4" />
+                    <span>
+                      File Uploads{{
+                        activeUploads.length > 0 ? ` - ${activeUploads.length} left` : ""
+                      }}
+                    </span>
                   </div>
-                  <div class="flex min-w-[80px] items-center justify-end gap-2">
-                    <template v-if="item.status === 'completed'">
-                      <span>Done</span>
-                    </template>
-                    <template v-else-if="item.status === 'error'">
-                      <span class="text-red">Failed - File already exists</span>
-                    </template>
-                    <template v-else>
-                      <span>{{ item.progress }}%</span>
-                      <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
-                        <div
-                          class="h-full bg-contrast transition-all duration-200"
-                          :style="{ width: item.progress + '%' }"
-                        />
-                      </div>
-                    </template>
+                </div>
+
+                <div class="mt-2 h-4 space-y-2">
+                  <div
+                    v-for="item in uploadQueue"
+                    :key="item.file.name"
+                    class="flex items-center justify-between gap-2 text-xs"
+                  >
+                    <div class="flex flex-1 items-center gap-2 truncate">
+                      <UiServersPanelSpinner v-if="item.status === 'uploading'" class="!size-4" />
+                      <CheckCircleIcon v-if="item.status === 'completed'" class="size-4" />
+                      <XCircleIcon v-else-if="item.status === 'error'" class="size-4 text-red" />
+                      <span class="truncate">{{ item.file.name }}</span>
+                      <span class="text-secondary">{{ item.size }}</span>
+                    </div>
+                    <div class="flex min-w-[80px] items-center justify-end gap-2">
+                      <template v-if="item.status === 'completed'">
+                        <span>Done</span>
+                      </template>
+                      <template v-else-if="item.status === 'error'">
+                        <span class="text-red">Failed - File already exists</span>
+                      </template>
+                      <template v-else>
+                        <span>{{ item.progress }}%</span>
+                        <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
+                          <div
+                            class="h-full bg-contrast transition-all duration-200"
+                            :style="{ width: item.progress + '%' }"
+                          />
+                        </div>
+                      </template>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Transition>
         </div>
 
         <UiServersFilesEditingNavbar
@@ -174,7 +182,7 @@
 
       <div
         v-if="isDragging"
-        class="absolute inset-0 flex items-center justify-center rounded-xl bg-black bg-opacity-50 text-white"
+        class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black bg-opacity-50 text-white"
       >
         <div class="text-center">
           <UploadIcon class="mx-auto h-16 w-16" />
@@ -273,11 +281,43 @@ const imagePreview = ref();
 const isDragging = ref(false);
 const dragCounter = ref(0);
 
+const uploadStatusRef = ref<HTMLElement | null>(null);
 const isUploading = computed(() => uploadQueue.value.length > 0);
 const uploadQueue = ref<UploadItem[]>([]);
 
 const activeUploads = computed(() =>
   uploadQueue.value.filter((item) => item.status === "pending" || item.status === "uploading"),
+);
+
+const onUploadStatusEnter = (el: Element) => {
+  const height = (el as HTMLElement).scrollHeight;
+  (el as HTMLElement).style.height = "0";
+  // eslint-disable-next-line no-void
+  void (el as HTMLElement).offsetHeight;
+  (el as HTMLElement).style.height = `${height}px`;
+};
+
+const onUploadStatusLeave = (el: Element) => {
+  const height = (el as HTMLElement).scrollHeight;
+  (el as HTMLElement).style.height = `${height}px`;
+  // eslint-disable-next-line no-void
+  void (el as HTMLElement).offsetHeight;
+  (el as HTMLElement).style.height = "0";
+};
+
+watch(
+  uploadQueue,
+  () => {
+    if (!uploadStatusRef.value) return;
+    const el = uploadStatusRef.value;
+    const itemsHeight = uploadQueue.value.length * 24;
+    const headerHeight = 20;
+    const gap = 8;
+    const padding = 32;
+    const totalHeight = padding + headerHeight + gap + itemsHeight;
+    el.style.height = `${totalHeight}px`;
+  },
+  { deep: true },
 );
 
 const data = computed(() => props.server.general);
@@ -920,17 +960,40 @@ const uploadFile = async (file: File) => {
     }
 
     await uploader?.promise;
+    // Update status first to show completion
     const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
     if (index !== -1) {
       uploadQueue.value[index].status = "completed";
       uploadQueue.value[index].progress = 100;
     }
+
+    // Wait for the completion animation
+    await nextTick();
+
+    // Remove after delay using splice to trigger reactivity properly
+    setTimeout(async () => {
+      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+      if (removeIndex !== -1) {
+        uploadQueue.value.splice(removeIndex, 1);
+        await nextTick();
+      }
+    }, 5000);
+
     await refreshList();
   } catch (error) {
     console.error("Error uploading file:", error);
     const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
     if (index !== -1) {
       uploadQueue.value[index].status = "error";
+
+      // Remove failed item after delay using splice
+      setTimeout(async () => {
+        const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
+        if (removeIndex !== -1) {
+          uploadQueue.value.splice(removeIndex, 1);
+          await nextTick();
+        }
+      }, 5000);
     }
     addNotification({
       group: "files",
@@ -939,12 +1002,6 @@ const uploadFile = async (file: File) => {
       type: "error",
     });
   }
-
-  setTimeout(() => {
-    uploadQueue.value = uploadQueue.value.filter(
-      (item) => item.status === "pending" || item.status === "uploading",
-    );
-  }, 5000);
 };
 
 const initiateFileUpload = () => {
@@ -1046,6 +1103,17 @@ const onScroll = () => {
 <style scoped>
 .upload-status {
   overflow: hidden;
-  transition: height 0.2s ease-out;
+  transition: height 0.2s ease;
+}
+
+.upload-status-enter-active,
+.upload-status-leave-active {
+  transition: height 0.2s ease;
+  overflow: hidden;
+}
+
+.upload-status-enter-from,
+.upload-status-leave-to {
+  height: 0 !important;
 }
 </style>
