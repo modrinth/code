@@ -54,7 +54,7 @@ export default defineComponent({
     },
   },
   created() {
-    if (this.items.length > 0 && this.neverEmpty) {
+    if (this.items.length > 0 && this.neverEmpty && !this.modelValue) {
       this.selected = this.items[0]
     }
   },

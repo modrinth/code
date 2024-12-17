@@ -15,7 +15,9 @@ const props = defineProps<{
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
 const overrideHooks = ref(
-  !!props.instance.hooks.pre_launch || !!props.instance.hooks.wrapper || !!props.instance.hooks.post_exit,
+  !!props.instance.hooks.pre_launch ||
+    !!props.instance.hooks.wrapper ||
+    !!props.instance.hooks.post_exit,
 )
 const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 
@@ -23,7 +25,6 @@ const editProfileObject = computed(() => {
   const editProfile: {
     hooks?: Hooks
   } = {}
-
 
   if (overrideHooks.value) {
     editProfile.hooks = hooks.value
@@ -33,10 +34,7 @@ const editProfileObject = computed(() => {
 })
 
 watch(
-  [
-    overrideHooks,
-    hooks,
-  ],
+  [overrideHooks, hooks],
   async () => {
     await edit(props.instance.path, editProfileObject.value)
   },
@@ -49,7 +47,8 @@ const messages = defineMessages({
   },
   hooksDescription: {
     id: 'instance.settings.tabs.hooks.description',
-    defaultMessage: 'Hooks allow advanced users to run certain system commands before and after launching the game.',
+    defaultMessage:
+      'Hooks allow advanced users to run certain system commands before and after launching the game.',
   },
   customHooks: {
     id: 'instance.settings.tabs.hooks.custom-hooks',
@@ -96,7 +95,7 @@ const messages = defineMessages({
 
 <template>
   <div>
-    <h2 class="m-0 text-lg font-extrabold text-contrast">
+    <h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
       {{ formatMessage(messages.hooks) }}
     </h2>
     <p class="m-0">
@@ -104,7 +103,7 @@ const messages = defineMessages({
     </p>
     <Checkbox v-model="overrideHooks" :label="formatMessage(messages.customHooks)" class="mt-2" />
 
-    <h2 class="mt-2 m-0 text-lg font-extrabold text-contrast">
+    <h2 class="mt-2 mb-1 text-lg font-extrabold text-contrast">
       {{ formatMessage(messages.preLaunch) }}
     </h2>
     <p class="m-0">
@@ -120,7 +119,7 @@ const messages = defineMessages({
       class="w-full mt-2"
     />
 
-    <h2 class="mt-4 m-0 text-lg font-extrabold text-contrast">
+    <h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast">
       {{ formatMessage(messages.wrapper) }}
     </h2>
     <p class="m-0">
@@ -136,7 +135,7 @@ const messages = defineMessages({
       class="w-full mt-2"
     />
 
-    <h2 class="mt-4 m-0 text-lg font-extrabold text-contrast">
+    <h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast">
       {{ formatMessage(messages.postExit) }}
     </h2>
     <p class="m-0">

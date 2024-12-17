@@ -26,6 +26,18 @@
   "instance.settings.tabs.general": {
     "message": "General"
   },
+  "instance.settings.tabs.general.delete": {
+    "message": "Delete instance"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Delete instance"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Permanently deletes an instance from your device, including your worlds, configs, and all installed content. Be careful, as once you delete a instance there is no way to recover it."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Deleting..."
+  },
   "instance.settings.tabs.general.duplicate-button": {
     "message": "Duplicate"
   },
@@ -125,6 +137,9 @@
   "instance.settings.tabs.installation.minecraft-version": {
     "message": "Minecraft {version}"
   },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} is not available for Minecraft {version}. Try another mod loader."
+  },
   "instance.settings.tabs.installation.platform": {
     "message": "Platform"
   },
@@ -150,7 +165,7 @@
     "message": "Repairing"
   },
   "instance.settings.tabs.installation.reset-selections": {
-    "message": "Reset selections"
+    "message": "Reset to current"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Show all versions"
@@ -175,9 +190,6 @@
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Memory allocated"
-  },
-  "instance.settings.tabs.modpack": {
-    "message": "Modpack"
   },
   "instance.settings.tabs.window": {
     "message": "Window"

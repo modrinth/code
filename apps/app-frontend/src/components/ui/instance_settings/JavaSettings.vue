@@ -15,7 +15,7 @@ const props = defineProps<{
   instance: GameInstance
 }>()
 
-const globalSettings = await get().catch(handleError) as AppSettings
+const globalSettings = (await get().catch(handleError)) as AppSettings
 
 const overrideJavaInstall = ref(!!props.instance.java_path)
 const optimalJava = readonly(await get_optimal_jre_key(props.instance.path).catch(handleError))
@@ -113,34 +113,43 @@ const messages = defineMessages({
 
 <template>
   <div>
-    <h2 id="project-name" class="m-0 text-lg font-extrabold text-contrast block">
+    <h2 id="project-name" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
       {{ formatMessage(messages.javaInstallation) }}
     </h2>
-    <Checkbox v-model="overrideJavaInstall" label="Custom Java installation" class="my-2" />
+    <Checkbox v-model="overrideJavaInstall" label="Custom Java installation" class="mb-2" />
     <template v-if="!overrideJavaInstall">
       <div class="flex my-2 items-center gap-2 font-semibold">
         <template v-if="javaInstall">
-          <CheckCircleIcon class="text-brand-green h-4 w-4"/>
+          <CheckCircleIcon class="text-brand-green h-4 w-4" />
           <span>Using default Java {{ optimalJava.major_version }} installation:</span>
         </template>
         <template v-else-if="optimalJava">
-          <XCircleIcon class="text-brand-red h-5 w-5"/>
-          <span>Could not find a default Java {{ optimalJava.major_version }} installation. Please set one below:</span>
+          <XCircleIcon class="text-brand-red h-5 w-5" />
+          <span
+            >Could not find a default Java {{ optimalJava.major_version }} installation. Please set
+            one below:</span
+          >
         </template>
         <template v-else>
-          <XCircleIcon class="text-brand-red h-5 w-5"/>
-          <span>Could not automatically determine a Java installation to use. Please set one below:</span>
+          <XCircleIcon class="text-brand-red h-5 w-5" />
+          <span
+            >Could not automatically determine a Java installation to use. Please set one
+            below:</span
+          >
         </template>
       </div>
-      <div v-if="javaInstall && !overrideJavaInstall" class="p-4 bg-bg rounded-xl text-xs text-secondary leading-none font-mono">
+      <div
+        v-if="javaInstall && !overrideJavaInstall"
+        class="p-4 bg-bg rounded-xl text-xs text-secondary leading-none font-mono"
+      >
         {{ javaInstall.path }}
       </div>
     </template>
     <JavaSelector v-if="overrideJavaInstall || !javaInstall" v-model="javaInstall" />
-    <h2 id="project-name" class="m-0 mt-4 text-lg font-extrabold text-contrast block">
+    <h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
       {{ formatMessage(messages.javaMemory) }}
     </h2>
-    <Checkbox v-model="overrideMemorySettings" label="Custom memory allocation" class="my-2" />
+    <Checkbox v-model="overrideMemorySettings" label="Custom memory allocation" class="mb-2" />
     <Slider
       id="max-memory"
       v-model="memory.maximum"
@@ -150,7 +159,7 @@ const messages = defineMessages({
       :step="64"
       unit="MB"
     />
-    <h2 id="project-name" class="m-0 mt-4 text-lg font-extrabold text-contrast block">
+    <h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
       {{ formatMessage(messages.javaArguments) }}
     </h2>
     <Checkbox v-model="overrideJavaArgs" label="Custom java arguments" class="my-2" />
@@ -163,10 +172,10 @@ const messages = defineMessages({
       class="w-full"
       placeholder="Enter java arguments..."
     />
-    <h2 id="project-name" class="m-0 mt-4 text-lg font-extrabold text-contrast block">
+    <h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
       {{ formatMessage(messages.javaEnvironmentVariables) }}
     </h2>
-    <Checkbox v-model="overrideEnvVars" label="Custom environment variables" class="my-2" />
+    <Checkbox v-model="overrideEnvVars" label="Custom environment variables" class="mb-2" />
     <input
       id="env-vars"
       v-model="envVars"

@@ -105,10 +105,10 @@ const messages = defineMessages({
     />
     <div class="mt-2 flex items-center gap-4 justify-between">
       <div>
-        <h2 class="m-0 text-lg font-extrabold text-contrast">
+        <h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
           {{ formatMessage(messages.fullscreen) }}
         </h2>
-        <p class="m-0 mt-1">
+        <p class="m-0">
           {{ formatMessage(messages.fullscreenDescription) }}
         </p>
       </div>
@@ -127,10 +127,10 @@ const messages = defineMessages({
 
     <div class="mt-4 flex items-center gap-4 justify-between">
       <div>
-        <h2 class="m-0 text-lg font-extrabold text-contrast">
+        <h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
           {{ formatMessage(messages.width) }}
         </h2>
-        <p class="m-0 mt-1">
+        <p class="m-0">
           {{ formatMessage(messages.widthDescription) }}
         </p>
       </div>
@@ -146,10 +146,10 @@ const messages = defineMessages({
 
     <div class="mt-4 flex items-center gap-4 justify-between">
       <div>
-        <h2 class="m-0 text-lg font-extrabold text-contrast">
+        <h2 class="m-0 mb-1 text-lg font-extrabold text-contrast">
           {{ formatMessage(messages.height) }}
         </h2>
-        <p class="m-0 mt-1">
+        <p class="m-0">
           {{ formatMessage(messages.heightDescription) }}
         </p>
       </div>

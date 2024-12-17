@@ -4,9 +4,8 @@ import {
   CoffeeIcon,
   InfoIcon,
   WrenchIcon,
-  BoxIcon,
-  ArchiveIcon,
-  MonitorIcon, CodeIcon
+  MonitorIcon,
+  CodeIcon,
 } from '@modrinth/assets'
 import { Avatar, TabbedModal } from '@modrinth/ui'
 import { ref } from 'vue'
@@ -38,15 +37,6 @@ const tabs = [
     }),
     icon: InfoIcon,
     content: GeneralSettings,
-  },
-  {
-    name: defineMessage({
-      id: 'instance.settings.tabs.modpack',
-      defaultMessage: 'Modpack',
-    }),
-    icon: BoxIcon,
-    content: GeneralSettings,
-    modpackOnly: true,
   },
   {
     name: defineMessage({

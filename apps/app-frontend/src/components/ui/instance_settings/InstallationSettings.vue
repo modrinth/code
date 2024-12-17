@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { HammerIcon, DownloadIcon, WrenchIcon, UndoIcon, SpinnerIcon } from '@modrinth/assets'
+import {
+  IssuesIcon,
+  HammerIcon,
+  DownloadIcon,
+  WrenchIcon,
+  UndoIcon,
+  SpinnerIcon,
+} from '@modrinth/assets'
 import { Checkbox, Chips, ButtonStyled, TeleportDropdownMenu } from '@modrinth/ui'
 import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vue'
 import { edit, install } from '@/helpers/profile'
@@ -112,7 +119,7 @@ resetLoaderVersionIndex()
 
 function resetLoaderVersionIndex() {
   loaderVersionIndex.value =
-    selectableLoaderVersions.value?.findIndex((x) => x.id === props.instance.loader_version) || -1
+    selectableLoaderVersions.value?.findIndex((x) => x.id === props.instance.loader_version) ?? -1
 }
 
 const isValid = computed(() => {
@@ -135,9 +142,12 @@ const isChanged = computed(() => {
   )
 })
 
-watch(loader, () => (loaderVersionIndex.value = 0))
+watch(loader, () => {
+  loaderVersionIndex.value = 0
+})
 
 const editing = ref(false)
+
 async function saveGvLoaderEdits() {
   editing.value = true
 
@@ -150,6 +160,9 @@ async function saveGvLoaderEdits() {
   } else {
     loaderVersionIndex.value = -1
   }
+  console.log('Editing:')
+  console.log(loader.value)
+
   await edit(props.instance.path, editProfile).catch(handleError)
   await repairProfile(false)
 
@@ -160,9 +173,13 @@ const installing = computed(() => props.instance.install_stage !== 'installed')
 const repairing = ref(false)
 
 async function repairProfile(force: boolean) {
-  repairing.value = true
+  if (force) {
+    repairing.value = true
+  }
   await install(props.instance.path, force).catch(handleError)
-  repairing.value = false
+  if (force) {
+    repairing.value = false
+  }
 
   trackEvent('InstanceRepair', {
     loader: props.instance.loader,
@@ -201,7 +218,7 @@ const messages = defineMessages({
   },
   resetSelections: {
     id: 'instance.settings.tabs.installation.reset-selections',
-    defaultMessage: 'Reset selections',
+    defaultMessage: 'Reset to current',
   },
   unknownVersion: {
     id: 'instance.settings.tabs.installation.unknown-version',
@@ -240,6 +257,10 @@ const messages = defineMessages({
     id: 'instance.settings.tabs.installation.minecraft-version',
     defaultMessage: 'Minecraft {version}',
   },
+  noLoaderVersions: {
+    id: 'instance.settings.tabs.installation.no-loader-versions',
+    defaultMessage: '{loader} is not available for Minecraft {version}. Try another mod loader.',
+  },
 })
 </script>
 
@@ -257,6 +278,7 @@ const messages = defineMessages({
     <h2 id="project-name" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
       {{ formatMessage(messages.currentlyInstalled) }}
     </h2>
+    {{ instance.linked_data }}
     <div class="flex gap-4 items-center justify-between p-4 bg-bg rounded-2xl">
       <div class="flex gap-2 items-center">
         <div
@@ -280,15 +302,25 @@ const messages = defineMessages({
       <div>
         <ButtonStyled color="orange" type="transparent" hover-color-fill="background">
           <button
-            v-tooltip="repairing ? formatMessage(messages.repairInProgress) :
-            installing ? formatMessage(messages.repairCannotWhileInstalling) :
-              offline ? formatMessage(messages.repairCannotWhileOffline) : null"
+            v-tooltip="
+              repairing
+                ? formatMessage(messages.repairInProgress)
+                : installing
+                  ? formatMessage(messages.repairCannotWhileInstalling)
+                  : offline
+                    ? formatMessage(messages.repairCannotWhileOffline)
+                    : null
+            "
             :disabled="installing || repairing || offline"
             @click="repairConfirmModal.show()"
           >
             <SpinnerIcon v-if="repairing" class="animate-spin" />
             <HammerIcon v-else />
-            {{ repairing ? formatMessage(messages.repairingButton) : formatMessage(messages.repairButton) }}
+            {{
+              repairing
+                ? formatMessage(messages.repairingButton)
+                : formatMessage(messages.repairButton)
+            }}
           </button>
         </ButtonStyled>
       </div>
@@ -326,6 +358,10 @@ const messages = defineMessages({
         class="mt-2"
         @change="(value) => (loaderVersionIndex = value.index)"
       />
+      <div v-else class="mt-2 text-brand-red flex gap-2 items-center">
+        <IssuesIcon />
+        {{ formatMessage(messages.noLoaderVersions, { loader: loader, version: gameVersion }) }}
+      </div>
     </template>
     <div class="mt-4 flex flex-wrap gap-2">
       <ButtonStyled color="brand">
