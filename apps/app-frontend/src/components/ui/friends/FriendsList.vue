@@ -161,7 +161,7 @@ onUnmounted(() => {
 
 <template>
   <ModalWrapper ref="manageFriendsModal" header="Manage friends">
-    <p v-if="acceptedFriends.length === 0">You have no friends :C</p>
+    <p v-if="acceptedFriends.length > 0">Add friends to share what you're playing!</p>
     <div v-else class="flex flex-col gap-4 min-w-[20rem]">
       <input v-model="search" type="text" placeholder="Search friends..." class="w-full" />
       <div
@@ -237,12 +237,12 @@ onUnmounted(() => {
   </ModalWrapper>
   <ModalWrapper ref="addFriendModal" header="Add a friend">
     <div class="mb-4">
-      <h2 class="m-0 text-xl">Username</h2>
+      <h2 class="m-0 text-lg font-extrabold text-contrast">Username</h2>
       <p class="m-0 mt-1 leading-tight">You can add friends with their Modrinth username.</p>
-      <input v-model="username" class="mt-2" type="text" placeholder="Enter username..." />
+      <input v-model="username" class="mt-2 w-full" type="text" placeholder="Enter username..." />
     </div>
     <ButtonStyled color="brand">
-      <button class="ml-auto" :disabled="username.length === 0" @click="addFriendFromModal">
+      <button :disabled="username.length === 0" @click="addFriendFromModal">
         <UserPlusIcon />
         Add friend
       </button>
@@ -308,15 +308,13 @@ onUnmounted(() => {
         </div>
       </div>
     </template>
-    <template v-else-if="acceptedFriends.length === 0">
+    <template v-else-if="acceptedFriends.length > 0">
       <div class="text-sm">
-        <div class="mb-2">You have no friends :C</div>
         <div v-if="!userCredentials">
           <span class="text-link cursor-pointer" @click="signIn">Sign in</span> to add friends!
         </div>
         <div v-else>
-          Why don't you
-          <span class="text-link cursor-pointer" @click="addFriendModal.show()">add one</span>?
+          <span class="text-link cursor-pointer" @click="addFriendModal.show()">Add friends</span> to share what you're playing!
         </div>
       </div>
     </template>
