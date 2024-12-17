@@ -24,6 +24,8 @@ defineExpose({
   },
 })
 
+const emit = defineEmits(['finish-install'])
+
 const filteredVersions = computed(() => {
   return props.versions
 })
@@ -34,9 +36,11 @@ const installing = computed(() => props.instance.install_stage !== 'installed')
 const inProgress = ref(false)
 
 const switchVersion = async (versionId) => {
+  modpackVersionModal.value.hide()
   inProgress.value = true
   await update_managed_modrinth_version(props.instance.path, versionId)
   inProgress.value = false
+  emit('finish-install')
 }
 </script>
 

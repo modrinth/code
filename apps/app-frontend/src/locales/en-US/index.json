@@ -119,8 +119,29 @@
   "instance.settings.tabs.installation": {
     "message": "Installation"
   },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Change version"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Install"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Installing"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Fetching modpack versions"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Installing new version"
+  },
   "instance.settings.tabs.installation.currently-installed": {
     "message": "Currently installed"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Debug information:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Fetching modpack details"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Game version"
@@ -128,41 +149,56 @@
   "instance.settings.tabs.installation.install": {
     "message": "Install"
   },
-  "instance.settings.tabs.installation.installing": {
-    "message": "Installing..."
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
   },
   "instance.settings.tabs.installation.minecraft-version": {
     "message": "Minecraft {version}"
   },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Cannot fetch linked modpack details. Please check your internet connection."
+  },
   "instance.settings.tabs.installation.no-loader-versions": {
     "message": "{loader} is not available for Minecraft {version}. Try another mod loader."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "This instance is linked to a modpack, but the modpack could not be found on Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Platform"
   },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Reinstall modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Reinstalling modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Reinstalling will reset content provided by the modpack to their original state."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Are you sure you want to reinstall this instance?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Resets all content provided by the modpack to their original state. This may fix unexpected behavior if changes have been made to the instance."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Reinstall modpack"
+  },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Repair"
   },
-  "instance.settings.tabs.installation.repair.cannot-while-installing": {
-    "message": "Cannot repair while installing"
-  },
-  "instance.settings.tabs.installation.repair.cannot-while-offline": {
-    "message": "Cannot repair while offline"
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Repairing"
   },
   "instance.settings.tabs.installation.repair.confirm-title": {
     "message": "Repair instance?"
   },
   "instance.settings.tabs.installation.repair.description": {
-    "message": "Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors."
+    "message": "Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors, but will not resolve issues or crashes related to installed mods."
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "Repair in progress"
-  },
-  "instance.settings.tabs.installation.repairing.button": {
-    "message": "Repairing"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Reset to current"
@@ -170,8 +206,35 @@
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Show all versions"
   },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "change version"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "reinstall"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "repair"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Cannot {action} while installing"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Cannot {action} while offline"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Cannot {action} while repairing"
+  },
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(unknown version)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Unlink instance"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Are you sure you want to unlink this instance?"
   },
   "instance.settings.tabs.java": {
     "message": "Java and memory"

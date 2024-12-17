@@ -1,3 +1,5 @@
+import type { ModrinthId } from '@modrinth/utils'
+
 type GameInstance = {
   path: string
   install_stage: InstallStage
@@ -33,8 +35,8 @@ type GameInstance = {
 type InstallStage = 'installed' | 'installing' | 'pack_installing' | 'not_installed'
 
 type LinkedData = {
-  projectId: string
-  versionId: string
+  project_id: ModrinthId
+  version_id: ModrinthId
 
   locked: boolean
 }

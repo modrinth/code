@@ -113,7 +113,7 @@ watch(
     <Slider
       id="max-memory"
       v-model="settings.memory.maximum"
-      :min="8"
+      :min="512"
       :max="maxMemory"
       :step="64"
       unit="MB"
