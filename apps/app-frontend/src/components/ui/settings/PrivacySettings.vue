@@ -71,8 +71,8 @@ watch(
         longer show up as a game or app you are using on your Discord profile.
       </p>
       <p class="m-0 mt-2 text-sm">
-        Note: This will not prevent any instance-specific Discord Rich Presence integrations, such as those added by mods. (app
-        restart required to take effect)
+        Note: This will not prevent any instance-specific Discord Rich Presence integrations, such
+        as those added by mods. (app restart required to take effect)
       </p>
     </div>
     <Toggle

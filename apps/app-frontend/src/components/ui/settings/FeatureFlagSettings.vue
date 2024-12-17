@@ -27,7 +27,9 @@ function formatFlagName(name: string) {
 <template>
   <div v-for="option in options" :key="option" class="mt-4 flex items-center justify-between">
     <div>
-      <h2 class="m-0 text-lg font-extrabold text-contrast capitalize">{{ formatFlagName(option) }}</h2>
+      <h2 class="m-0 text-lg font-extrabold text-contrast capitalize">
+        {{ formatFlagName(option) }}
+      </h2>
     </div>
 
     <Toggle

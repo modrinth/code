@@ -62,17 +62,19 @@ watch(
         :model-value="settings.force_fullscreen"
         :checked="settings.force_fullscreen"
         @update:model-value="
-        (e) => {
-          settings.force_fullscreen = e
-        }
-      "
+          (e) => {
+            settings.force_fullscreen = e
+          }
+        "
       />
     </div>
 
     <div class="flex items-center justify-between gap-4">
       <div>
         <h3 class="mt-2 m-0 text-base font-extrabold text-primary">Width</h3>
-        <p class="m-0 mt-1 mb-2 leading-tight text-secondary">The width of the game window when launched.</p>
+        <p class="m-0 mt-1 mb-2 leading-tight text-secondary">
+          The width of the game window when launched.
+        </p>
       </div>
 
       <input
@@ -88,7 +90,9 @@ watch(
     <div class="flex items-center justify-between gap-4">
       <div>
         <h3 class="mt-2 m-0 text-base font-extrabold text-primary">Height</h3>
-        <p class="m-0 mt-1 mb-2 leading-tight text-secondary">The height of the game window when launched.</p>
+        <p class="m-0 mt-1 mb-2 leading-tight text-secondary">
+          The height of the game window when launched.
+        </p>
       </div>
 
       <input
@@ -151,7 +155,9 @@ watch(
     />
 
     <h3 class="mt-2 m-0 text-base font-extrabold text-primary">Wrapper</h3>
-    <p class="m-0 mt-1 mb-2 leading-tight text-secondary">Wrapper command for launching Minecraft.</p>
+    <p class="m-0 mt-1 mb-2 leading-tight text-secondary">
+      Wrapper command for launching Minecraft.
+    </p>
     <input
       id="wrapper"
       v-model="settings.hooks.wrapper"

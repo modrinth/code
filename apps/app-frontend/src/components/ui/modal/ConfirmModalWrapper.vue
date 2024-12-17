@@ -36,7 +36,7 @@ defineProps({
   danger: {
     type: Boolean,
     default: true,
-  }
+  },
 })
 
 const emit = defineEmits(['proceed'])
