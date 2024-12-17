@@ -19,64 +19,62 @@
         </div>
       </template>
       <template #actions>
-        <ButtonStyled v-if="instance.install_stage !== 'installed'" color="brand" size="large">
-          <button disabled>Installing...</button>
-        </ButtonStyled>
-        <template v-else>
-          <div class="flex gap-2">
-            <ButtonStyled v-if="playing === true" color="red" size="large">
-              <button @click="stopInstance('InstancePage')">
-                <StopCircleIcon />
-                Stop
-              </button>
-            </ButtonStyled>
-            <ButtonStyled
-              v-else-if="playing === false && loading === false"
-              color="brand"
-              size="large"
+        <div class="flex gap-2">
+          <ButtonStyled v-if="instance.install_stage !== 'installed'" color="brand" size="large">
+            <button disabled>Installing...</button>
+          </ButtonStyled>
+          <ButtonStyled v-else-if="playing === true" color="red" size="large">
+            <button @click="stopInstance('InstancePage')">
+              <StopCircleIcon />
+              Stop
+            </button>
+          </ButtonStyled>
+          <ButtonStyled
+            v-else-if="playing === false && loading === false"
+            color="brand"
+            size="large"
+          >
+            <button @click="startInstance('InstancePage')">
+              <PlayIcon />
+              Play
+            </button>
+          </ButtonStyled>
+          <ButtonStyled
+            v-else-if="loading === true && playing === false"
+            color="brand"
+            size="large"
+          >
+            <button disabled>Loading...</button>
+          </ButtonStyled>
+          <ButtonStyled size="large" circular>
+            <RouterLink
+              v-tooltip="'Instance settings'"
+              :to="`/instance/${encodeURIComponent(route.params.id)}/options`"
             >
-              <button @click="startInstance('InstancePage')">
-                <PlayIcon />
-                Play
-              </button>
-            </ButtonStyled>
-            <ButtonStyled
-              v-else-if="loading === true && playing === false"
-              color="brand"
-              size="large"
+              <SettingsIcon />
+            </RouterLink>
+          </ButtonStyled>
+          <ButtonStyled size="large" type="transparent" circular>
+            <OverflowMenu
+              :options="[
+                {
+                  id: 'open-folder',
+                  action: () => showProfileInFolder(instance.path),
+                },
+                {
+                  id: 'export-mrpack',
+                  action: () => $refs.exportModal.show(),
+                },
+              ]"
             >
-              <button disabled>Loading...</button>
-            </ButtonStyled>
-            <ButtonStyled size="large" circular>
-              <RouterLink
-                v-tooltip="'Instance settings'"
-                :to="`/instance/${encodeURIComponent(route.params.id)}/options`"
-              >
-                <SettingsIcon />
-              </RouterLink>
-            </ButtonStyled>
-            <ButtonStyled size="large" type="transparent" circular>
-              <OverflowMenu
-                :options="[
-                  {
-                    id: 'open-folder',
-                    action: () => showProfileInFolder(instance.path),
-                  },
-                  {
-                    id: 'export-mrpack',
-                    action: () => $refs.exportModal.show(),
-                  },
-                ]"
-              >
-                <MoreVerticalIcon />
-                <template #share-instance> <UserPlusIcon /> Share instance </template>
-                <template #host-a-server> <ServerIcon /> Create a server </template>
-                <template #open-folder> <FolderOpenIcon /> Open folder </template>
-                <template #export-mrpack> <PackageIcon /> Export modpack </template>
-              </OverflowMenu>
-            </ButtonStyled>
-          </div>
-        </template>
+              <MoreVerticalIcon />
+              <template #share-instance> <UserPlusIcon /> Share instance </template>
+              <template #host-a-server> <ServerIcon /> Create a server </template>
+              <template #open-folder> <FolderOpenIcon /> Open folder </template>
+              <template #export-mrpack> <PackageIcon /> Export modpack </template>
+            </OverflowMenu>
+          </ButtonStyled>
+        </div>
       </template>
     </ContentPageHeader>
   </div>
@@ -106,15 +104,15 @@
   <ContextMenu ref="options" @option-clicked="handleOptionsClick">
     <template #play> <PlayIcon /> Play </template>
     <template #stop> <StopCircleIcon /> Stop </template>
-    <template #add_content> <PlusIcon /> Add Content </template>
+    <template #add_content> <PlusIcon /> Add content </template>
     <template #edit> <EditIcon /> Edit </template>
-    <template #copy_path> <ClipboardCopyIcon /> Copy Path </template>
-    <template #open_folder> <ClipboardCopyIcon /> Open Folder </template>
-    <template #copy_link> <ClipboardCopyIcon /> Copy Link </template>
-    <template #open_link> <ClipboardCopyIcon /> Open In Modrinth <ExternalIcon /> </template>
+    <template #copy_path> <ClipboardCopyIcon /> Copy path </template>
+    <template #open_folder> <ClipboardCopyIcon /> Open folder </template>
+    <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+    <template #open_link> <ClipboardCopyIcon /> Open in Modrinth <ExternalIcon /> </template>
     <template #copy_names><EditIcon />Copy names</template>
     <template #copy_slugs><HashIcon />Copy slugs</template>
-    <template #copy_links><GlobeIcon />Copy Links</template>
+    <template #copy_links><GlobeIcon />Copy links</template>
     <template #toggle><EditIcon />Toggle selected</template>
     <template #disable><XIcon />Disable selected</template>
     <template #enable><CheckCircleIcon />Enable selected</template>
@@ -154,7 +152,7 @@ import {
   MoreVerticalIcon,
   GameIcon,
 } from '@modrinth/assets'
-import { get, kill, run } from '@/helpers/profile'
+import { get, get_full_path, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
@@ -321,9 +319,11 @@ const handleOptionsClick = async (args) => {
     case 'open_folder':
       await showProfileInFolder(instance.value.path)
       break
-    case 'copy_path':
-      await navigator.clipboard.writeText(instance.value.path)
+    case 'copy_path': {
+      const fullPath = await get_full_path(instance.value.path)
+      await navigator.clipboard.writeText(fullPath)
       break
+    }
   }
 }
 

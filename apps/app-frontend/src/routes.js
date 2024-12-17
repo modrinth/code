@@ -148,11 +148,6 @@ export default new createRouter({
   linkActiveClass: 'router-link-active',
   linkExactActiveClass: 'router-link-exact-active',
   scrollBehavior() {
-    // Sometimes Vue's scroll behavior is not working as expected, so we need to manually scroll to top (especially on Linux)
-    document.querySelector('.router-view')?.scrollTo(0, 0)
-    return {
-      el: '.router-view',
-      top: 0,
-    }
+    return { top: 0 }
   },
 })
