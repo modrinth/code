@@ -185,10 +185,6 @@ const tabs = computed(() => [
     label: 'Logs',
     href: `/instance/${encodeURIComponent(route.params.id)}/logs`,
   },
-  {
-    label: 'Options (legacy)',
-    href: `/instance/${encodeURIComponent(route.params.id)}/options`,
-  },
 ])
 
 breadcrumbs.setName(
