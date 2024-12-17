@@ -11,8 +11,8 @@
   "app.settings.tabs.feature-flags": {
     "message": "Feature flags"
   },
-  "app.settings.tabs.java-versions": {
-    "message": "Java versions"
+  "app.settings.tabs.java-installations": {
+    "message": "Java installations"
   },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
@@ -22,6 +22,195 @@
   },
   "instance.filter.updates-available": {
     "message": "Updates available"
+  },
+  "instance.settings.tabs.general": {
+    "message": "General"
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Duplicate"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Cannot duplicate while installing."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Duplicate instance"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Creates a copy of this instance, including worlds, configs, mods, etc."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Edit icon"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Remove icon"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Replace icon"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Select icon"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Library groups"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Create new group"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Library groups allow you to organize your instances into different sections in your library."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Enter group name"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Name"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Launch hooks"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Custom launch hooks"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Hooks allow advanced users to run certain system commands before and after launching the game."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Post-exit"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Ran after the game closes."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Enter post-exit command..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Pre-launch"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Ran before the instance is launched."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Enter pre-launch command..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Game launch hooks"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrapper"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Wrapper command for launching Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Enter wrapper command..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Installation"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Currently installed"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Game version"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Install"
+  },
+  "instance.settings.tabs.installation.installing": {
+    "message": "Installing..."
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} version"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Platform"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Repair"
+  },
+  "instance.settings.tabs.installation.repair.cannot-while-installing": {
+    "message": "Cannot repair while installing"
+  },
+  "instance.settings.tabs.installation.repair.cannot-while-offline": {
+    "message": "Cannot repair while offline"
+  },
+  "instance.settings.tabs.installation.repair.confirm-title": {
+    "message": "Repair instance?"
+  },
+  "instance.settings.tabs.installation.repair.description": {
+    "message": "Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors."
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Repair in progress"
+  },
+  "instance.settings.tabs.installation.repairing.button": {
+    "message": "Repairing"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Reset selections"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Show all versions"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(unknown version)"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java and memory"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Environment variables"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Hooks"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java arguments"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java installation"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Memory allocated"
+  },
+  "instance.settings.tabs.modpack": {
+    "message": "Modpack"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Window"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Custom window settings"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Fullscreen"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Make the game start in full screen when launched (using options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Height"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "The height of the game window when launched."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Enter height..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Width"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "The width of the game window when launched."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Enter width..."
+  },
+  "instance.settings.title": {
+    "message": "Settings"
   },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"
