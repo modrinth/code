@@ -206,10 +206,6 @@ const colorVariables = computed(() => {
     transition: color 0.25s ease-in-out;
   }
 
-  &:hover svg:first-child {
-    color: var(--_hover-text);
-  }
-
   &[disabled],
   &[disabled='true'],
   &.disabled,
@@ -225,6 +221,10 @@ const colorVariables = computed(() => {
 
   &:not([disabled]):not([disabled='true']):not(.disabled) {
     @apply active:scale-95 hover:brightness-125 focus-visible:brightness-125 hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text];
+
+    &:hover svg:first-child {
+      color: var(--_hover-icon, var(--_hover-text));
+    }
   }
 }
 

@@ -13,9 +13,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        icon: 'var(--color-icon)',
+        icon: 'var(--color-base)',
         // Text
-        primary: 'var(--color-text)',
+        primary: 'var(--color-base)',
         contrast: 'var(--color-contrast)',
         secondary: 'var(--color-secondary)',
         inactive: 'var(--color-text-inactive)',

@@ -4,7 +4,7 @@
     @contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
   >
     <ExportModal ref="exportModal" :instance="instance" />
-    <InstanceSettingsModal ref="settingsModal" />
+    <InstanceSettingsModal ref="settingsModal" :instance="instance" />
     <ContentPageHeader>
       <template #icon>
         <Avatar :src="icon" :alt="instance.name" size="96px" />
@@ -184,6 +184,10 @@ const tabs = computed(() => [
   {
     label: 'Logs',
     href: `/instance/${encodeURIComponent(route.params.id)}/logs`,
+  },
+  {
+    label: 'Options (legacy)',
+    href: `/instance/${encodeURIComponent(route.params.id)}/options`,
   },
 ])
 

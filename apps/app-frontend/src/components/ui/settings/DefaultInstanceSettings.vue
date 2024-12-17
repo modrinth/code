@@ -46,121 +46,130 @@ watch(
 </script>
 
 <template>
-  <h2 class="m-0 text-2xl">Java arguments</h2>
-  <input
-    id="java-args"
-    v-model="settings.launchArgs"
-    autocomplete="off"
-    type="text"
-    class="installation-input"
-    placeholder="Enter java arguments..."
-  />
+  <div>
+    <h2 class="m-0 text-lg font-extrabold text-contrast">Window size</h2>
 
-  <h2 class="mt-4 m-0 text-2xl">Environmental variables</h2>
-  <input
-    id="env-vars"
-    v-model="settings.envVars"
-    autocomplete="off"
-    type="text"
-    class="installation-input"
-    placeholder="Enter environmental variables..."
-  />
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h3 class="mt-2 m-0 text-base font-extrabold text-primary">Fullscreen</h3>
+        <p class="m-0 mt-1 mb-2 leading-tight text-secondary">
+          Overwrites the options.txt file to start in full screen when launched.
+        </p>
+      </div>
 
-  <h2 class="mt-4 m-0 text-2xl">Java memory</h2>
-  <p class="m-0 mt-1 leading-tight">The memory allocated to each instance when it is ran.</p>
-  <Slider
-    id="max-memory"
-    v-model="settings.memory.maximum"
-    :min="8"
-    :max="maxMemory"
-    :step="64"
-    unit="MB"
-  />
-
-  <h2 class="mt-4 m-0 text-2xl">Hooks</h2>
-
-  <h3 class="mt-2 m-0 text-lg">Pre launch</h3>
-  <p class="m-0 mt-1 leading-tight">Ran before the instance is launched.</p>
-  <input
-    id="pre-launch"
-    v-model="settings.hooks.pre_launch"
-    autocomplete="off"
-    type="text"
-    placeholder="Enter pre-launch command..."
-  />
-
-  <h3 class="mt-2 m-0 text-lg">Wrapper</h3>
-  <p class="m-0 mt-1 leading-tight">Wrapper command for launching Minecraft.</p>
-  <input
-    id="wrapper"
-    v-model="settings.hooks.wrapper"
-    autocomplete="off"
-    type="text"
-    placeholder="Enter wrapper command..."
-  />
-
-  <h3 class="mt-2 m-0 text-lg">Post exit</h3>
-  <p class="m-0 mt-1 leading-tight">Ran after the game closes.</p>
-  <input
-    id="post-exit"
-    v-model="settings.hooks.post_exit"
-    autocomplete="off"
-    type="text"
-    placeholder="Enter post-exit command..."
-  />
-
-  <h2 class="mt-4 m-0 text-2xl">Window size</h2>
-
-  <div class="flex items-center justify-between gap-4">
-    <div>
-      <h3 class="mt-2 m-0 text-lg">Fullscreen</h3>
-      <p class="m-0 mt-1 leading-tight">
-        Overwrites the options.txt file to start in full screen when launched.
-      </p>
-    </div>
-
-    <Toggle
-      id="fullscreen"
-      :model-value="settings.force_fullscreen"
-      :checked="settings.force_fullscreen"
-      @update:model-value="
+      <Toggle
+        id="fullscreen"
+        :model-value="settings.force_fullscreen"
+        :checked="settings.force_fullscreen"
+        @update:model-value="
         (e) => {
           settings.force_fullscreen = e
         }
       "
-    />
-  </div>
-
-  <div class="flex items-center justify-between gap-4">
-    <div>
-      <h3 class="mt-2 m-0 text-lg">Width</h3>
-      <p class="m-0 mt-1 leading-tight">The width of the game window when launched.</p>
+      />
     </div>
 
-    <input
-      id="width"
-      v-model="settings.game_resolution[0]"
-      :disabled="settings.force_fullscreen"
-      autocomplete="off"
-      type="number"
-      placeholder="Enter width..."
-    />
-  </div>
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h3 class="mt-2 m-0 text-base font-extrabold text-primary">Width</h3>
+        <p class="m-0 mt-1 mb-2 leading-tight text-secondary">The width of the game window when launched.</p>
+      </div>
 
-  <div class="flex items-center justify-between gap-4">
-    <div>
-      <h3 class="mt-2 m-0 text-lg">Height</h3>
-      <p class="m-0 mt-1 leading-tight">The height of the game window when launched.</p>
+      <input
+        id="width"
+        v-model="settings.game_resolution[0]"
+        :disabled="settings.force_fullscreen"
+        autocomplete="off"
+        type="number"
+        placeholder="Enter width..."
+      />
     </div>
 
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h3 class="mt-2 m-0 text-base font-extrabold text-primary">Height</h3>
+        <p class="m-0 mt-1 mb-2 leading-tight text-secondary">The height of the game window when launched.</p>
+      </div>
+
+      <input
+        id="height"
+        v-model="settings.game_resolution[1]"
+        :disabled="settings.force_fullscreen"
+        autocomplete="off"
+        type="number"
+        class="input"
+        placeholder="Enter height..."
+      />
+    </div>
+
+    <hr class="mt-4 bg-button-border border-none h-[1px]" />
+
+    <h2 class="mt-4 m-0 text-lg font-extrabold text-contrast">Memory allocated</h2>
+    <p class="m-0 mt-1 leading-tight">The memory allocated to each instance when it is ran.</p>
+    <Slider
+      id="max-memory"
+      v-model="settings.memory.maximum"
+      :min="8"
+      :max="maxMemory"
+      :step="64"
+      unit="MB"
+    />
+
+    <h2 class="mt-4 mb-2 text-lg font-extrabold text-contrast">Java arguments</h2>
     <input
-      id="height"
-      v-model="settings.game_resolution[1]"
-      :disabled="settings.force_fullscreen"
+      id="java-args"
+      v-model="settings.launchArgs"
       autocomplete="off"
-      type="number"
-      class="input"
-      placeholder="Enter height..."
+      type="text"
+      placeholder="Enter java arguments..."
+      class="w-full"
+    />
+
+    <h2 class="mt-4 mb-2 text-lg font-extrabold text-contrast">Environmental variables</h2>
+    <input
+      id="env-vars"
+      v-model="settings.envVars"
+      autocomplete="off"
+      type="text"
+      placeholder="Enter environmental variables..."
+      class="w-full"
+    />
+
+    <hr class="mt-4 bg-button-border border-none h-[1px]" />
+
+    <h2 class="mt-4 m-0 text-lg font-extrabold text-contrast">Hooks</h2>
+
+    <h3 class="mt-2 m-0 text-base font-extrabold text-primary">Pre launch</h3>
+    <p class="m-0 mt-1 mb-2 leading-tight text-secondary">Ran before the instance is launched.</p>
+    <input
+      id="pre-launch"
+      v-model="settings.hooks.pre_launch"
+      autocomplete="off"
+      type="text"
+      placeholder="Enter pre-launch command..."
+      class="w-full"
+    />
+
+    <h3 class="mt-2 m-0 text-base font-extrabold text-primary">Wrapper</h3>
+    <p class="m-0 mt-1 mb-2 leading-tight text-secondary">Wrapper command for launching Minecraft.</p>
+    <input
+      id="wrapper"
+      v-model="settings.hooks.wrapper"
+      autocomplete="off"
+      type="text"
+      placeholder="Enter wrapper command..."
+      class="w-full"
+    />
+
+    <h3 class="mt-2 m-0 text-base font-extrabold text-primary">Post exit</h3>
+    <p class="m-0 mt-1 mb-2 leading-tight text-secondary">Ran after the game closes.</p>
+    <input
+      id="post-exit"
+      v-model="settings.hooks.post_exit"
+      autocomplete="off"
+      type="text"
+      placeholder="Enter post-exit command..."
+      class="w-full"
     />
   </div>
 </template>

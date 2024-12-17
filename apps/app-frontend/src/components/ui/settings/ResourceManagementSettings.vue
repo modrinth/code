@@ -57,7 +57,7 @@ async function findLauncherDir() {
 </script>
 
 <template>
-  <h2 class="m-0 text-2xl">App directory</h2>
+  <h2 class="m-0 text-lg font-extrabold text-contrast">App directory</h2>
   <p class="m-0 mt-1">
     The directory where the launcher stores all of its files. Changes will be applied after
     restarting the launcher.
@@ -96,7 +96,7 @@ async function findLauncherDir() {
     </button>
   </div>
 
-  <h2 class="m-0 text-2xl mt-4">Maximum concurrent downloads</h2>
+  <h2 class="m-0 text-lg font-extrabold text-contrast mt-4">Maximum concurrent downloads</h2>
   <p class="m-0 mt-1">
     The maximum amount of files the launcher can download at the same time. Set this to a lower
     value if you have a poor internet connection. (app restart required to take effect)
@@ -109,7 +109,7 @@ async function findLauncherDir() {
     :step="1"
   />
 
-  <h2 class="m-0 mt-4 text-2xl">Maximum concurrent writes</h2>
+  <h2 class="mt-4 m-0 text-lg font-extrabold text-contrast">Maximum concurrent writes</h2>
   <p class="m-0 mt-1">
     The maximum amount of files the launcher can write to the disk at once. Set this to a lower
     value if you are frequently getting I/O errors. (app restart required to take effect)

@@ -53,8 +53,8 @@ const tabs = [
   },
   {
     name: defineMessage({
-      id: 'app.settings.tabs.java-versions',
-      defaultMessage: 'Java versions',
+      id: 'app.settings.tabs.java-installations',
+      defaultMessage: 'Java installations',
     }),
     icon: CoffeeIcon,
     content: JavaSettings,
