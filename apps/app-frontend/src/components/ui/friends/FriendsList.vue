@@ -161,7 +161,7 @@ onUnmounted(() => {
 
 <template>
   <ModalWrapper ref="manageFriendsModal" header="Manage friends">
-    <p v-if="acceptedFriends.length > 0">Add friends to share what you're playing!</p>
+    <p v-if="acceptedFriends.length === 0">Add friends to share what you're playing!</p>
     <div v-else class="flex flex-col gap-4 min-w-[20rem]">
       <input v-model="search" type="text" placeholder="Search friends..." class="w-full" />
       <div
@@ -308,7 +308,7 @@ onUnmounted(() => {
         </div>
       </div>
     </template>
-    <template v-else-if="acceptedFriends.length > 0">
+    <template v-else-if="acceptedFriends.length === 0">
       <div class="text-sm">
         <div v-if="!userCredentials">
           <span class="text-link cursor-pointer" @click="signIn">Sign in</span> to add friends!
