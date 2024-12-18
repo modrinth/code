@@ -534,6 +534,10 @@ export function useSearch(
       currentPage.value = Number(page)
       readParams.add('page')
     })
+    loadQueryParam(['q'], (queryVal) => {
+      query.value = String(queryVal)
+      readParams.add('q')
+    })
 
     for (const key of Object.keys(route.query).filter((key) => !readParams.has(key))) {
       const type = filters.value.find((type) => type.query_param === key)

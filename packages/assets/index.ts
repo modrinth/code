@@ -180,6 +180,7 @@ import _CPUIcon from './icons/cpu.svg?component'
 import _DBIcon from './icons/db.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _ImportIcon from './icons/import.svg?component'
+import _TimerIcon from './icons/timer.svg?component'
 
 // Editor Icons
 import _BoldIcon from './icons/bold.svg?component'
@@ -381,3 +382,4 @@ export const DBIcon = _DBIcon
 export const LoaderIcon = _LoaderIcon
 export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
+export const TimerIcon = _TimerIcon
