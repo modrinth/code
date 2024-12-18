@@ -8,12 +8,11 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import { get_max_memory } from '@/helpers/jre'
 import { get } from '@/helpers/settings'
+import type { InstanceSettingsTabProps, AppSettings, MemorySettings } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 
-const props = defineProps<{
-  instance: GameInstance
-}>()
+const props = defineProps<InstanceSettingsTabProps>()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 

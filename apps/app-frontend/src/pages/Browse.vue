@@ -394,13 +394,13 @@ await refreshSearch()
       <InstanceIndicator :instance="instance" />
       <h1 class="m-0 mb-1 text-xl">Install content to instance</h1>
     </template>
-    <h1 v-else class="m-0 mb-1 text-2xl">Discover content</h1>
+    <h1 v-else class="m-0 text-2xl">Discover content</h1>
     <NavTabs :links="selectableProjectTypes" />
     <div class="iconified-input">
       <SearchIcon aria-hidden="true" class="text-lg" />
       <input
         v-model="query"
-        class="h-12"
+        class="h-12 card-shadow"
         autocomplete="off"
         spellcheck="false"
         type="text"

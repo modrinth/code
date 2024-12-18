@@ -10,15 +10,14 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useRouter } from 'vue-router'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import type { InstanceSettingsTabProps, GameInstance } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 const router = useRouter()
 
 const deleteConfirmModal = ref()
 
-const props = defineProps<{
-  instance: GameInstance
-}>()
+const props = defineProps<InstanceSettingsTabProps>()
 
 const title = ref(props.instance.name)
 const icon: Ref<string | undefined> = ref(props.instance.icon_path)
@@ -215,6 +214,7 @@ const messages = defineMessages({
           :src="icon ? convertFileSrc(icon) : icon"
           size="108px"
           class="!border-4 group-hover:brightness-75"
+          :tint-by="props.instance.path"
           no-shadow
         />
         <div class="absolute top-0 right-0 m-2">

@@ -4,7 +4,7 @@ import { useVIntl, type MessageDescriptor } from '@vintl/vintl'
 
 const { formatMessage } = useVIntl()
 
-type Tab<Props> = {
+export type Tab<Props> = {
   name: MessageDescriptor
   icon: Component
   content: Component<Props>
@@ -12,7 +12,8 @@ type Tab<Props> = {
 }
 
 defineProps<{
-  tabs: Tab<unknown>[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tabs: Tab<any>[]
 }>()
 
 const selectedTab = ref(0)

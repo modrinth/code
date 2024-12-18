@@ -119,6 +119,12 @@
   "instance.settings.tabs.installation": {
     "message": "Installation"
   },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} for Minecraft {game_version} already installed"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} already installed"
+  },
   "instance.settings.tabs.installation.change-version.button": {
     "message": "Change version"
   },
@@ -149,6 +155,9 @@
   "instance.settings.tabs.installation.install": {
     "message": "Install"
   },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Installation in progress"
+  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
   },
@@ -174,13 +183,13 @@
     "message": "Reinstalling modpack"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Reinstalling will reset content provided by the modpack to their original state."
+    "message": "Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation. This may fix unexpected behavior if changes have been made to the instance, but if your worlds now depend on additional installed content, it may break existing worlds."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Are you sure you want to reinstall this instance?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Resets all content provided by the modpack to their original state. This may fix unexpected behavior if changes have been made to the instance."
+    "message": "Resets the instance's content to its original state, removing any mods or content you have added on top of the original modpack."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Reinstall modpack"
@@ -191,11 +200,11 @@
   "instance.settings.tabs.installation.repair.button.repairing": {
     "message": "Repairing"
   },
-  "instance.settings.tabs.installation.repair.confirm-title": {
-    "message": "Repair instance?"
-  },
-  "instance.settings.tabs.installation.repair.description": {
+  "instance.settings.tabs.installation.repair.confirm.description": {
     "message": "Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors, but will not resolve issues or crashes related to installed mods."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Repair instance?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "Repair in progress"
@@ -208,6 +217,9 @@
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
     "message": "change version"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "install"
   },
   "instance.settings.tabs.installation.tooltip.action.reinstall": {
     "message": "reinstall"
@@ -230,11 +242,17 @@
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Unlink instance"
   },
-  "instance.settings.tabs.installation.unlink.description": {
+  "instance.settings.tabs.installation.unlink.confirm.description": {
     "message": "If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal."
   },
-  "instance.settings.tabs.installation.unlink.title": {
+  "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "Are you sure you want to unlink this instance?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "This instance is linked to a modpack, which means mods can't be updated and you can't change the mod loader or Minecraft version. Unlinking will permanently disconnect this instance from the modpack."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Unlink from modpack"
   },
   "instance.settings.tabs.java": {
     "message": "Java and memory"

@@ -29,7 +29,11 @@ import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { get_project, get_version_many } from '@/helpers/cache'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import dayjs from 'dayjs'
-import type { GameInstance, ManifestLoaderVersion, Manifest } from '@/helpers/types.d.ts'
+import type {
+  InstanceSettingsTabProps,
+  ManifestLoaderVersion,
+  Manifest,
+} from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 
@@ -38,10 +42,7 @@ const modpackVersionModal = ref()
 const modalConfirmUnpair = ref()
 const modalConfirmReinstall = ref()
 
-const props = defineProps<{
-  instance: GameInstance
-  offline?: boolean
-}>()
+const props = defineProps<InstanceSettingsTabProps>()
 
 const loader = ref(props.instance.loader)
 const gameVersion = ref(props.instance.game_version)
@@ -307,11 +308,11 @@ const messages = defineMessages({
     defaultMessage: '(unknown version)',
   },
   repairConfirmTitle: {
-    id: 'instance.settings.tabs.installation.repair.confirm-title',
+    id: 'instance.settings.tabs.installation.repair.confirm.title',
     defaultMessage: 'Repair instance?',
   },
   repairConfirmDescription: {
-    id: 'instance.settings.tabs.installation.repair.description',
+    id: 'instance.settings.tabs.installation.repair.confirm.description',
     defaultMessage:
       'Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors, but will not resolve issues or crashes related to installed mods.',
   },
@@ -347,9 +348,25 @@ const messages = defineMessages({
     id: 'instance.settings.tabs.installation.change-version.button.installing',
     defaultMessage: 'Installing',
   },
+  installInProgress: {
+    id: 'instance.settings.tabs.installation.install.in-progress',
+    defaultMessage: 'Installation in progress',
+  },
   installButton: {
     id: 'instance.settings.tabs.installation.change-version.button.install',
     defaultMessage: 'Install',
+  },
+  alreadyInstalledVanilla: {
+    id: 'instance.settings.tabs.installation.change-version.already-installed.vanilla',
+    defaultMessage: 'Vanilla {game_version} already installed',
+  },
+  alreadyInstalledModded: {
+    id: 'instance.settings.tabs.installation.change-version.already-installed.modded',
+    defaultMessage: '{platform} {version} for Minecraft {game_version} already installed',
+  },
+  installAction: {
+    id: 'instance.settings.tabs.installation.tooltip.action.install',
+    defaultMessage: 'install',
   },
   installingNewVersion: {
     id: 'instance.settings.tabs.installation.change-version.in-progress',
@@ -393,11 +410,11 @@ const messages = defineMessages({
     defaultMessage: 'Unlink instance',
   },
   unlinkInstanceConfirmTitle: {
-    id: 'instance.settings.tabs.installation.unlink.title',
+    id: 'instance.settings.tabs.installation.unlink.confirm.title',
     defaultMessage: 'Are you sure you want to unlink this instance?',
   },
   unlinkInstanceConfirmDescription: {
-    id: 'instance.settings.tabs.installation.unlink.description',
+    id: 'instance.settings.tabs.installation.unlink.confirm.description',
     defaultMessage:
       'If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal.',
   },
@@ -407,7 +424,7 @@ const messages = defineMessages({
   },
   reinstallModpackConfirmDescription: {
     id: 'instance.settings.tabs.installation.reinstall.confirm.description',
-    defaultMessage: `Reinstalling will reset content provided by the modpack to their original state.`,
+    defaultMessage: `Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation. This may fix unexpected behavior if changes have been made to the instance, but if your worlds now depend on additional installed content, it may break existing worlds.`,
   },
   reinstallModpackTitle: {
     id: 'instance.settings.tabs.installation.reinstall.title',
@@ -415,7 +432,7 @@ const messages = defineMessages({
   },
   reinstallModpackDescription: {
     id: 'instance.settings.tabs.installation.reinstall.description',
-    defaultMessage: `Resets all content provided by the modpack to their original state. This may fix unexpected behavior if changes have been made to the instance.`,
+    defaultMessage: `Resets the instance's content to its original state, removing any mods or content you have added on top of the original modpack.`,
   },
   reinstallModpackButton: {
     id: 'instance.settings.tabs.installation.reinstall.button',
@@ -647,7 +664,34 @@ const messages = defineMessages({
       </template>
       <div class="mt-4 flex flex-wrap gap-2">
         <ButtonStyled color="brand">
-          <button :disabled="!isValid || !isChanged || editing" @click="saveGvLoaderEdits()">
+          <button
+            v-tooltip="
+              installing || reinstalling
+                ? formatMessage(messages.installInProgress)
+                : !isChanged
+                  ? formatMessage(
+                      loader === 'vanilla'
+                        ? messages.alreadyInstalledVanilla
+                        : messages.alreadyInstalledModded,
+                      {
+                        platform: formatCategory(loader),
+                        version: instance.loader_version,
+                        game_version: gameVersion,
+                      },
+                    )
+                  : repairing
+                    ? formatMessage(messages.cannotWhileRepairing, {
+                        action: formatMessage(messages.installAction),
+                      })
+                    : offline
+                      ? formatMessage(messages.cannotWhileOffline, {
+                          action: formatMessage(messages.installAction),
+                        })
+                      : null
+            "
+            :disabled="!isValid || !isChanged || editing || offline || repairing"
+            @click="saveGvLoaderEdits()"
+          >
             <SpinnerIcon v-if="editing" class="animate-spin" />
             <DownloadIcon v-else />
             {{

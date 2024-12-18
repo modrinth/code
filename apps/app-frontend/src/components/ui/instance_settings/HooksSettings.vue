@@ -5,12 +5,11 @@ import { handleError } from '@/store/notifications'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { get } from '@/helpers/settings'
 import { edit } from '@/helpers/profile'
+import type { InstanceSettingsTabProps, AppSettings, Hooks } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 
-const props = defineProps<{
-  instance: GameInstance
-}>()
+const props = defineProps<InstanceSettingsTabProps>()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 

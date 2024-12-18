@@ -103,3 +103,8 @@ type AppSettings = {
   prev_custom_dir?: string
   migrated: boolean
 }
+
+export type InstanceSettingsTabProps = {
+  instance: GameInstance
+  offline?: boolean
+}

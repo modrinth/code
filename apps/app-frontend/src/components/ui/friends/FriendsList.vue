@@ -250,7 +250,7 @@ onUnmounted(() => {
   </ModalWrapper>
   <div class="flex justify-between items-center">
     <h3 class="text-lg m-0">Friends</h3>
-    <ButtonStyled type="transparent" circular>
+    <ButtonStyled v-if="userCredentials" type="transparent" circular>
       <OverflowMenu
         :options="[
           {

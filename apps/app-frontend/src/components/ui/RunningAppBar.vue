@@ -14,7 +14,7 @@
       <DownloadIcon />
     </Button>
     <div v-if="offline" class="status">
-      <span class="circle stopped" />
+      <UnplugIcon />
       <div class="running-text">
         <span> Offline </span>
       </div>
@@ -108,7 +108,13 @@
 </template>
 
 <script setup>
-import { DownloadIcon, StopCircleIcon, TerminalSquareIcon, DropdownIcon } from '@modrinth/assets'
+import {
+  DownloadIcon,
+  StopCircleIcon,
+  TerminalSquareIcon,
+  DropdownIcon,
+  UnplugIcon,
+} from '@modrinth/assets'
 import { Button, Card } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'

@@ -363,9 +363,9 @@ const filteredResults = computed(() => {
 
 .instances {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   width: 100%;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-right: auto;
   scroll-behavior: smooth;
   overflow-y: auto;
