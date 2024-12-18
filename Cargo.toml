@@ -20,5 +20,5 @@ strip = true # Remove debug symbols
 [profile.dev.package.sqlx-macros]
 opt-level = 3
 
-[patch.crates-io]
-tauri = { git = "https://github.com/modrinth/tauri", rev = "67911d5" }
+# [patch.crates-io]
+# tauri = { git = "https://github.com/modrinth/tauri", rev = "67911d5" }
