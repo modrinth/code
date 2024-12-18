@@ -21,4 +21,6 @@ strip = true # Remove debug symbols
 opt-level = 3
 
 [patch.crates-io]
-tauri = { git = "https://github.com/modrinth/tauri", rev = "9c36dd3" }
+tauri-runtime = { git = "https://github.com/modrinth/tauri", rev ="70a252b" }
+tauri-runtime-wry = { git = "https://github.com/modrinth/tauri", rev ="70a252b" }
+tauri-utils = { git = "https://github.com/modrinth/tauri", rev ="70a252b" }
