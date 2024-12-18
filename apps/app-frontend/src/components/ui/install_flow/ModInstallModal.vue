@@ -357,7 +357,7 @@ const createInstance = async () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem;
+  min-width: 350px;
 }
 
 .profiles {
@@ -378,7 +378,6 @@ const createInstance = async () => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 0.5rem;
   gap: 0.5rem;
 
   img {

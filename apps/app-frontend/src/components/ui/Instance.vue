@@ -12,7 +12,12 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { trackEvent } from '@/helpers/analytics'
 import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { formatCategory } from '@modrinth/utils'
+
+dayjs.extend(duration)
+dayjs.extend(relativeTime)
 
 const props = defineProps({
   instance: {
@@ -23,17 +28,20 @@ const props = defineProps({
   },
   compact: {
     type: Boolean,
-    default: false
+    default: false,
   },
   first: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const playing = ref(false)
 
-const modLoading = computed(() => currentEvent.value === 'installing' || (currentEvent.value === 'launched' && !playing.value))
+const modLoading = computed(
+  () =>
+    currentEvent.value === 'installing' || (currentEvent.value === 'launched' && !playing.value),
+)
 const installing = computed(() => props.instance.install_stage !== 'installed')
 
 const router = useRouter()
@@ -50,16 +58,15 @@ const checkProcess = async () => {
 
 const play = async (e, context) => {
   e?.stopPropagation()
-  await run(props.instance.path).catch((err) =>
-    handleSevereError(err, { profilePath: props.instance.path }),
-  ).finally(() => {
-
-    trackEvent('InstancePlay', {
-      loader: props.instance.loader,
-      game_version: props.instance.game_version,
-      source: context,
+  await run(props.instance.path)
+    .catch((err) => handleSevereError(err, { profilePath: props.instance.path }))
+    .finally(() => {
+      trackEvent('InstancePlay', {
+        loader: props.instance.loader,
+        game_version: props.instance.game_version,
+        source: context,
+      })
     })
-  })
 }
 
 const stop = async (e, context) => {
@@ -95,7 +102,7 @@ defineExpose({
   instance: props.instance,
 })
 
-const currentEvent = ref(null);
+const currentEvent = ref(null)
 
 const unlisten = await process_listener((e) => {
   if (e.profile_path_id === props.instance.path) {
@@ -112,7 +119,11 @@ onUnmounted(() => unlisten())
 
 <template>
   <template v-if="compact">
-    <div class="card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer active:scale-[0.98] transition-transform" @click="seeInstance" @mouseenter="checkProcess">
+    <div
+      class="button-base card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer active:scale-[0.98] transition-transform"
+      @click="seeInstance"
+      @mouseenter="checkProcess"
+    >
       <Avatar
         size="48px"
         :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
@@ -134,7 +145,11 @@ onUnmounted(() => unlisten())
           </button>
         </ButtonStyled>
         <ButtonStyled v-else :color="first ? 'brand' : 'standard'" circular>
-          <button v-tooltip="'Play'" @click="(e) => play(e, 'InstanceCard')" @mousehover="checkProcess">
+          <button
+            v-tooltip="'Play'"
+            @click="(e) => play(e, 'InstanceCard')"
+            @mousehover="checkProcess"
+          >
             <!-- Translate for optical centering -->
             <PlayIcon class="translate-x-[1px]" />
           </button>
@@ -142,14 +157,16 @@ onUnmounted(() => unlisten())
       </div>
       <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
         <TimerIcon />
-        <span class="text-sm">
-          Played {{ dayjs(instance.last_played).fromNow() }}
-        </span>
+        <span class="text-sm"> Played {{ dayjs(instance.last_played).fromNow() }} </span>
       </div>
     </div>
   </template>
   <div v-else>
-    <div class="button-base bg-bg-raised p-4 rounded-xl flex gap-3 group" @click="seeInstance" @mouseenter="checkProcess">
+    <div
+      class="button-base bg-bg-raised p-4 rounded-xl flex gap-3 group"
+      @click="seeInstance"
+      @mouseenter="checkProcess"
+    >
       <div class="relative flex items-center justify-center">
         <Avatar
           size="96px"
@@ -160,22 +177,39 @@ onUnmounted(() => unlisten())
         />
         <div class="absolute inset-0 flex items-center justify-center">
           <ButtonStyled v-if="playing" size="large" color="red" circular>
-            <button v-tooltip="'Stop'" :class="{ 'scale-100 opacity-100' : playing}" class="transition-all scale-75 origin-bottom opacity-0 card-shadow" @click="(e) => stop(e, 'InstanceCard')" @mousehover="checkProcess">
+            <button
+              v-tooltip="'Stop'"
+              :class="{ 'scale-100 opacity-100': playing }"
+              class="transition-all scale-75 origin-bottom opacity-0 card-shadow"
+              @click="(e) => stop(e, 'InstanceCard')"
+              @mousehover="checkProcess"
+            >
               <StopCircleIcon />
             </button>
           </ButtonStyled>
-          <SpinnerIcon v-else-if="modLoading || installing" v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'" class="animate-spin w-8 h-8" />
+          <SpinnerIcon
+            v-else-if="modLoading || installing"
+            v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
+            class="animate-spin w-8 h-8"
+          />
           <ButtonStyled v-else size="large" color="brand" circular>
-            <button v-tooltip="'Play'" class="transition-all scale-75 group-hover:scale-100 origin-bottom opacity-0 group-hover:opacity-100 card-shadow" @click="(e) => play(e, 'InstanceCard')" @mousehover="checkProcess">
+            <button
+              v-tooltip="'Play'"
+              class="transition-all scale-75 group-hover:scale-100 origin-bottom opacity-0 group-hover:opacity-100 card-shadow"
+              @click="(e) => play(e, 'InstanceCard')"
+              @mousehover="checkProcess"
+            >
               <PlayIcon class="translate-x-[2px]" />
             </button>
           </ButtonStyled>
         </div>
       </div>
       <div class="flex flex-col gap-1">
-        <p class="m-0 text-lg font-bold text-contrast leading-tight line-clamp-2">{{ instance.name }}</p>
+        <p class="m-0 text-lg font-bold text-contrast leading-tight line-clamp-2">
+          {{ instance.name }}
+        </p>
         <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold mt-auto">
-          <GameIcon class="shrink-0"/>
+          <GameIcon class="shrink-0" />
           <span class="text-sm">
             {{ formatCategory(instance.loader) }} {{ instance.game_version }}
           </span>
@@ -183,7 +217,12 @@ onUnmounted(() => unlisten())
         <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
           <TimerIcon class="shrink-0" />
           <span class="text-sm line-clamp-1">
-            Played {{ dayjs.duration(instance.recent_time_played + instance.submitted_time_played, 'seconds').humanize() }}
+            Played
+            {{
+              dayjs
+                .duration(instance.recent_time_played + instance.submitted_time_played, 'seconds')
+                .humanize()
+            }}
           </span>
         </div>
       </div>

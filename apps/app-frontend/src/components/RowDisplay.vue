@@ -197,13 +197,13 @@ const calculateCardsPerRow = () => {
   maxProjectsPerRow.value = Math.floor((containerWidthInRem + 0.75) / 18.75)
 
   if (maxInstancesPerRow.value < 5) {
-    maxInstancesPerRow.value *= 2;
+    maxInstancesPerRow.value *= 2
   }
   if (maxInstancesPerCompactRow.value < 5) {
-    maxInstancesPerCompactRow.value *= 2;
+    maxInstancesPerCompactRow.value *= 2
   }
   if (maxProjectsPerRow.value < 3) {
-    maxProjectsPerRow.value *= 2;
+    maxProjectsPerRow.value *= 2
   }
 }
 
@@ -228,13 +228,27 @@ onUnmounted(() => {
   />
   <div class="flex flex-col gap-4">
     <div v-for="(row, rowIndex) in actualInstances" ref="rows" :key="row.label" class="row">
-      <router-link class="flex mb-3 leading-none items-center gap-1 text-primary text-lg font-bold hover:underline group" :class="{ 'mt-1': rowIndex > 0 }" :to="row.route">
+      <router-link
+        class="flex mb-3 leading-none items-center gap-1 text-primary text-lg font-bold hover:underline group"
+        :class="{ 'mt-1': rowIndex > 0 }"
+        :to="row.route"
+      >
         {{ row.label }}
-        <ChevronRightIcon class="h-5 w-5 stroke-[3px] group-hover:translate-x-1 transition-transform group-hover:text-brand" />
+        <ChevronRightIcon
+          class="h-5 w-5 stroke-[3px] group-hover:translate-x-1 transition-transform group-hover:text-brand"
+        />
       </router-link>
-      <section v-if="row.instance" ref="modsRow" class="instances" :class="{ compact: row.compact }">
+      <section
+        v-if="row.instance"
+        ref="modsRow"
+        class="instances"
+        :class="{ compact: row.compact }"
+      >
         <Instance
-          v-for="(instance, instanceIndex) in row.instances.slice(0, row.compact ? maxInstancesPerCompactRow : maxInstancesPerRow)"
+          v-for="(instance, instanceIndex) in row.instances.slice(
+            0,
+            row.compact ? maxInstancesPerCompactRow : maxInstancesPerRow,
+          )"
           :key="row.label + instance.path"
           :instance="instance"
           :compact="row.compact"

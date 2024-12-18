@@ -71,6 +71,7 @@ import { ref, watch } from 'vue'
 import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
+import { useRouter, useRoute } from 'vue-router'
 
 const props = defineProps({
   project: {
@@ -111,6 +112,18 @@ const [loaders, gameVersions] = await Promise.all([
 const filterVersions = ref([])
 const filterLoader = ref(props.instance ? [props.instance?.loader] : [])
 const filterGameVersions = ref(props.instance ? [props.instance?.game_version] : [])
+
+const router = useRouter()
+const route = useRoute()
+if (filterLoader.value.length > 0 || filterGameVersions.value.length > 0) {
+  await router.replace({
+    query: {
+      ...route.query,
+      l: filterLoader.value,
+      g: filterGameVersions.value,
+    },
+  })
+}
 
 const currentPage = ref(1)
 

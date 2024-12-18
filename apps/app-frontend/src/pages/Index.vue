@@ -8,7 +8,6 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
 import { get_search_results } from '@/helpers/cache.js'
-import { Avatar } from '@modrinth/ui'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
