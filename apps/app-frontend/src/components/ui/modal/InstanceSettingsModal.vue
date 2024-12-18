@@ -86,6 +86,7 @@ const titleMessage = defineMessage({
         <Avatar
           :src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
           size="24px"
+          :tint-by="props.instance.path"
         />
         {{ instance.name }} <ChevronRightIcon />
         <span class="font-extrabold text-contrast">{{ formatMessage(titleMessage) }}</span>

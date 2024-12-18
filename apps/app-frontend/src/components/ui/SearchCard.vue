@@ -1,6 +1,6 @@
 <template>
   <div
-    class="button-base p-4 bg-bg-raised rounded-xl flex gap-3 group"
+    class="card-shadow button-base p-4 bg-bg-raised rounded-xl flex gap-3 group"
     @click="
       () => {
         emit('open')
@@ -121,7 +121,10 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ref, computed } from 'vue'
 import { install as installVersion } from '@/store/install.js'
+import { useRouter } from 'vue-router'
 dayjs.extend(relativeTime)
+
+const router = useRouter()
 
 const props = defineProps({
   backgroundImage: {

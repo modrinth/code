@@ -8,6 +8,7 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
 import { get_search_results } from '@/helpers/cache.js'
+import { Avatar } from '@modrinth/ui'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -100,25 +101,27 @@ onUnmounted(() => {
 
 <template>
   <div class="p-6 flex flex-col gap-2">
-    <h1 class="m-0 text-2xl">Welcome back!</h1>
+    <h1 v-if="recentInstances" class="m-0 text-2xl">Welcome back!</h1>
+    <h1 v-else class="m-0 text-2xl">Welcome to Modrinth App!</h1>
     <RowDisplay
       v-if="total > 0"
       :instances="[
         {
-          label: 'Jump back in',
+          label: 'Recently played',
           route: '/library',
           instances: recentInstances,
           instance: true,
           downloaded: true,
+          compact: true,
         },
         {
-          label: 'Popular packs',
+          label: 'Discover a modpack',
           route: '/browse/modpack',
           instances: featuredModpacks,
           downloaded: false,
         },
         {
-          label: 'Popular mods',
+          label: 'Discover mods',
           route: '/browse/mod',
           instances: featuredMods,
           downloaded: false,

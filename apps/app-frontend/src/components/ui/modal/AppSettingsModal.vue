@@ -10,7 +10,7 @@ import {
   CoffeeIcon,
 } from '@modrinth/assets'
 import { TabbedModal } from '@modrinth/ui'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useVIntl, defineMessage } from '@vintl/vintl'
 import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
 import JavaSettings from '@/components/ui/settings/JavaSettings.vue'
@@ -92,7 +92,9 @@ function show() {
   modal.value.show()
 }
 
-defineExpose({ show })
+const isOpen = computed(() => modal.value?.isOpen)
+
+defineExpose({ show, isOpen })
 
 const version = await getVersion()
 const osPlatform = getOsPlatform()

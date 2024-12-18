@@ -7,7 +7,7 @@
     <InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
     <ContentPageHeader>
       <template #icon>
-        <Avatar :src="icon" :alt="instance.name" size="96px" />
+        <Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />
       </template>
       <template #title>
         {{ instance.name }}
@@ -354,7 +354,9 @@ const unlistenProfiles = await profile_listener(async (event) => {
 })
 
 const unlistenProcesses = await process_listener((e) => {
-  if (e.event === 'finished' && e.profile_path_id === route.params.id) playing.value = false
+  if (e.event === 'finished' && e.profile_path_id === route.params.id) {
+    playing.value = false
+  }
 })
 
 const icon = computed(() =>

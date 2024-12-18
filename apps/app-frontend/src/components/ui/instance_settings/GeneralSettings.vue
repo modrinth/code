@@ -214,6 +214,7 @@ const messages = defineMessages({
           :src="icon ? convertFileSrc(icon) : icon"
           size="108px"
           class="!border-4 group-hover:brightness-75"
+          :tint-by="props.instance.path"
           no-shadow
         />
         <div class="absolute top-0 right-0 m-2">
