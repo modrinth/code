@@ -89,9 +89,13 @@
     <NavTabs :links="tabs" />
   </div>
   <div class="p-6 pt-4">
-    <RouterView v-slot="{ Component }">
+    <RouterView v-slot="{ Component }" :key="instance.path">
       <template v-if="Component">
-        <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
+        <Suspense
+          :key="instance.path"
+          @pending="loadingBar.startLoading()"
+          @resolve="loadingBar.stopLoading()"
+        >
           <component
             :is="Component"
             :instance="instance"
@@ -164,7 +168,7 @@ import { get, get_full_path, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, onUnmounted, computed } from 'vue'
+import { ref, onUnmounted, computed, watch } from 'vue'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -187,7 +191,52 @@ const route = useRoute()
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 
-const instance = ref(await get(route.params.id).catch(handleError))
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
+})
+
+const instance = ref()
+const modrinthVersions = ref([])
+const playing = ref(false)
+const loading = ref(false)
+
+async function fetchInstance() {
+  instance.value = await get(route.params.id).catch(handleError)
+
+  if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
+    get_project(instance.value.linked_data.project_id, 'must_revalidate')
+      .catch(handleError)
+      .then((project) => {
+        if (project && project.versions) {
+          get_version_many(project.versions, 'must_revalidate')
+            .catch(handleError)
+            .then((versions) => {
+              modrinthVersions.value = versions.sort(
+                (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
+              )
+            })
+        }
+      })
+  }
+
+  const runningProcesses = await get_by_profile_path(route.params.id).catch(handleError)
+
+  playing.value = runningProcesses.length > 0
+}
+
+await fetchInstance()
+watch(
+  () => route.params.id,
+  async () => {
+    if (route.params.id && route.path.startsWith('/instance')) {
+      await fetchInstance()
+    }
+  },
+)
 
 const tabs = computed(() => [
   {
@@ -213,18 +262,8 @@ breadcrumbs.setContext({
   query: route.query,
 })
 
-const offline = ref(!navigator.onLine)
-window.addEventListener('offline', () => {
-  offline.value = true
-})
-window.addEventListener('online', () => {
-  offline.value = false
-})
-
 const loadingBar = useLoading()
 
-const playing = ref(false)
-const loading = ref(false)
 const options = ref(null)
 
 const startInstance = async (context) => {
@@ -243,32 +282,6 @@ const startInstance = async (context) => {
     source: context,
   })
 }
-
-const checkProcess = async () => {
-  const runningProcesses = await get_by_profile_path(route.params.id).catch(handleError)
-
-  playing.value = runningProcesses.length > 0
-}
-
-// Get information on associated modrinth versions, if any
-const modrinthVersions = ref([])
-if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
-  get_project(instance.value.linked_data.project_id, 'must_revalidate')
-    .catch(handleError)
-    .then((project) => {
-      if (project && project.versions) {
-        get_version_many(project.versions, 'must_revalidate')
-          .catch(handleError)
-          .then((versions) => {
-            modrinthVersions.value = versions.sort(
-              (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
-            )
-          })
-      }
-    })
-}
-
-await checkProcess()
 
 const stopInstance = async (context) => {
   playing.value = false

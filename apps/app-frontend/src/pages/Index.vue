@@ -31,19 +31,21 @@ window.addEventListener('online', () => {
 const getInstances = async () => {
   const profiles = await list().catch(handleError)
 
-  recentInstances.value = profiles.sort((a, b) => {
-    const dateA = dayjs(a.last_played ?? 0)
-    const dateB = dayjs(b.last_played ?? 0)
+  recentInstances.value = profiles
+    .filter((x) => x.last_played)
+    .sort((a, b) => {
+      const dateA = dayjs(a.last_played)
+      const dateB = dayjs(b.last_played)
 
-    if (dateA.isSame(dateB)) {
-      return a.name.localeCompare(b.name)
-    }
+      if (dateA.isSame(dateB)) {
+        return a.name.localeCompare(b.name)
+      }
 
-    return dateB - dateA
-  })
+      return dateB - dateA
+    })
 
   const filters = []
-  for (const instance of recentInstances.value) {
+  for (const instance of profiles) {
     if (instance.linked_data && instance.linked_data.project_id) {
       filters.push(`NOT"project_id"="${instance.linked_data.project_id}"`)
     }

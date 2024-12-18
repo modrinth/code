@@ -217,7 +217,7 @@ onUnmounted(() => unlisten())
         <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
           <TimerIcon class="shrink-0" />
           <span class="text-sm line-clamp-1">
-            Played
+            Played for
             {{
               dayjs
                 .duration(instance.recent_time_played + instance.submitted_time_played, 'seconds')

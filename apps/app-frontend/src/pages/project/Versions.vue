@@ -67,13 +67,12 @@
 <script setup>
 import { ProjectPageVersions, ButtonStyled, OverflowMenu } from '@modrinth/ui'
 import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
-import { useRouter, useRoute } from 'vue-router'
 
-const props = defineProps({
+defineProps({
   project: {
     type: Object,
     default: () => {},
@@ -108,29 +107,6 @@ const [loaders, gameVersions] = await Promise.all([
   get_loaders().catch(handleError).then(ref),
   get_game_versions().catch(handleError).then(ref),
 ])
-
-const filterVersions = ref([])
-const filterLoader = ref(props.instance ? [props.instance?.loader] : [])
-const filterGameVersions = ref(props.instance ? [props.instance?.game_version] : [])
-
-const router = useRouter()
-const route = useRoute()
-if (filterLoader.value.length > 0 || filterGameVersions.value.length > 0) {
-  await router.replace({
-    query: {
-      ...route.query,
-      l: filterLoader.value,
-      g: filterGameVersions.value,
-    },
-  })
-}
-
-const currentPage = ref(1)
-
-//watch all the filters and if a value changes, reset to page 1
-watch([filterVersions, filterLoader, filterGameVersions], () => {
-  currentPage.value = 1
-})
 </script>
 
 <style scoped lang="scss">
