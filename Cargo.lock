@@ -8453,9 +8453,9 @@ dependencies = [
 
 [[package]]
 name = "tao"
-version = "0.31.0"
+version = "0.30.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc6b53216f32e60efc27dfa111268481e4dfba53e553e4cdebcaed9db36c11bb"
+checksum = "6682a07cf5bab0b8a2bd20d0a542917ab928b5edb75ebd4eda6b05cbaab872da"
 dependencies = [
  "bitflags 2.6.0",
  "cocoa 0.26.0",
@@ -8468,6 +8468,7 @@ dependencies = [
  "gdkwayland-sys",
  "gdkx11-sys",
  "gtk",
+ "instant",
  "jni",
  "lazy_static",
  "libc",
@@ -8526,7 +8527,7 @@ checksum = "61c41af27dd6d1e27b1b16b489db798443478cef1f06a660c96db617ba5de3b1"
 [[package]]
 name = "tauri"
 version = "2.1.1"
-source = "git+https://github.com/modrinth/tauri?rev=9c36dd3#9c36dd30ad6d19832a5dbd7ac9af0a152bb9323a"
+source = "git+https://github.com/modrinth/tauri?rev=67911d5#67911d59155a6952499739506beef2d9bf698207"
 dependencies = [
  "anyhow",
  "bytes 1.7.2",
@@ -8557,11 +8558,11 @@ dependencies = [
  "serde_repr",
  "serialize-to-javascript",
  "swift-rs",
- "tauri-build 2.0.3 (git+https://github.com/modrinth/tauri?rev=9c36dd3)",
+ "tauri-build 2.0.3 (git+https://github.com/modrinth/tauri?rev=67911d5)",
  "tauri-macros",
  "tauri-runtime",
  "tauri-runtime-wry",
- "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=9c36dd3)",
+ "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=67911d5)",
  "thiserror 2.0.7",
  "tokio 1.42.0",
  "tray-icon",
@@ -8600,7 +8601,7 @@ dependencies = [
 [[package]]
 name = "tauri-build"
 version = "2.0.3"
-source = "git+https://github.com/modrinth/tauri?rev=9c36dd3#9c36dd30ad6d19832a5dbd7ac9af0a152bb9323a"
+source = "git+https://github.com/modrinth/tauri?rev=67911d5#67911d59155a6952499739506beef2d9bf698207"
 dependencies = [
  "anyhow",
  "cargo_toml",
@@ -8612,7 +8613,7 @@ dependencies = [
  "semver 1.0.23",
  "serde",
  "serde_json",
- "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=9c36dd3)",
+ "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=67911d5)",
  "tauri-winres",
  "toml 0.8.19",
  "walkdir",
@@ -8647,7 +8648,7 @@ dependencies = [
 [[package]]
 name = "tauri-codegen"
 version = "2.0.3"
-source = "git+https://github.com/modrinth/tauri?rev=9c36dd3#9c36dd30ad6d19832a5dbd7ac9af0a152bb9323a"
+source = "git+https://github.com/modrinth/tauri?rev=67911d5#67911d59155a6952499739506beef2d9bf698207"
 dependencies = [
  "base64 0.22.1",
  "brotli 7.0.0",
@@ -8662,7 +8663,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.8",
  "syn 2.0.90",
- "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=9c36dd3)",
+ "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=67911d5)",
  "thiserror 2.0.7",
  "time",
  "url",
@@ -8673,14 +8674,14 @@ dependencies = [
 [[package]]
 name = "tauri-macros"
 version = "2.0.3"
-source = "git+https://github.com/modrinth/tauri?rev=9c36dd3#9c36dd30ad6d19832a5dbd7ac9af0a152bb9323a"
+source = "git+https://github.com/modrinth/tauri?rev=67911d5#67911d59155a6952499739506beef2d9bf698207"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
  "quote",
  "syn 2.0.90",
- "tauri-codegen 2.0.3 (git+https://github.com/modrinth/tauri?rev=9c36dd3)",
- "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=9c36dd3)",
+ "tauri-codegen 2.0.3 (git+https://github.com/modrinth/tauri?rev=67911d5)",
+ "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=67911d5)",
 ]
 
 [[package]]
@@ -8864,7 +8865,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime"
 version = "2.2.0"
-source = "git+https://github.com/modrinth/tauri?rev=9c36dd3#9c36dd30ad6d19832a5dbd7ac9af0a152bb9323a"
+source = "git+https://github.com/modrinth/tauri?rev=67911d5#67911d59155a6952499739506beef2d9bf698207"
 dependencies = [
  "dpi",
  "gtk",
@@ -8873,7 +8874,7 @@ dependencies = [
  "raw-window-handle 0.6.2",
  "serde",
  "serde_json",
- "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=9c36dd3)",
+ "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=67911d5)",
  "thiserror 2.0.7",
  "url",
  "windows 0.58.0",
@@ -8882,7 +8883,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime-wry"
 version = "2.2.0"
-source = "git+https://github.com/modrinth/tauri?rev=9c36dd3#9c36dd30ad6d19832a5dbd7ac9af0a152bb9323a"
+source = "git+https://github.com/modrinth/tauri?rev=67911d5#67911d59155a6952499739506beef2d9bf698207"
 dependencies = [
  "gtk",
  "http 1.1.0",
@@ -8896,7 +8897,7 @@ dependencies = [
  "softbuffer",
  "tao",
  "tauri-runtime",
- "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=9c36dd3)",
+ "tauri-utils 2.1.0 (git+https://github.com/modrinth/tauri?rev=67911d5)",
  "url",
  "webkit2gtk",
  "webview2-com",
@@ -8943,7 +8944,7 @@ dependencies = [
 [[package]]
 name = "tauri-utils"
 version = "2.1.0"
-source = "git+https://github.com/modrinth/tauri?rev=9c36dd3#9c36dd30ad6d19832a5dbd7ac9af0a152bb9323a"
+source = "git+https://github.com/modrinth/tauri?rev=67911d5#67911d59155a6952499739506beef2d9bf698207"
 dependencies = [
  "brotli 7.0.0",
  "cargo_metadata",
@@ -9032,7 +9033,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.9.0"
+version = "0.9.0-1"
 dependencies = [
  "async-recursion",
  "async-tungstenite",
@@ -9083,7 +9084,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_gui"
-version = "0.9.0"
+version = "0.9.0-1"
 dependencies = [
  "chrono",
  "cocoa 0.25.0",
