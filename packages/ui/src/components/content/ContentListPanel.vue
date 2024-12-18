@@ -83,7 +83,7 @@ function setSelected(value: boolean) {
           <ContentListItem
             v-model="selectionStates[ref.filename]"
             :item="ref"
-            :last="false"
+            :last="ref === items.length - 1"
             class="mb-2"
             @update:model-value="updateSelection"
           >

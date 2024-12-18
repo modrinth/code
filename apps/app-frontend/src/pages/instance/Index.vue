@@ -14,67 +14,74 @@
       </template>
       <template #summary> </template>
       <template #stats>
-        <div class="flex items-center gap-2 font-semibold transform capitalize">
+        <div
+          class="flex items-center gap-2 font-semibold transform capitalize border-0 border-solid border-divider pr-4 md:border-r"
+        >
           <GameIcon class="h-6 w-6 text-secondary" />
           {{ instance.loader }} {{ instance.game_version }}
         </div>
+        <div class="flex items-center gap-2 font-semibold">
+          <TimerIcon class="h-6 w-6 text-secondary" />
+          <template v-if="timePlayed > 0">
+            {{ timePlayedHumanized }}
+          </template>
+          <template v-else> Never played </template>
+        </div>
       </template>
       <template #actions>
-        <ButtonStyled v-if="instance.install_stage !== 'installed'" color="brand" size="large">
-          <button disabled>Installing...</button>
-        </ButtonStyled>
-        <template v-else>
-          <div class="flex gap-2">
-            <ButtonStyled v-if="playing === true" color="red" size="large">
-              <button @click="stopInstance('InstancePage')">
-                <StopCircleIcon />
-                Stop
-              </button>
-            </ButtonStyled>
-            <ButtonStyled
-              v-else-if="playing === false && loading === false"
-              color="brand"
-              size="large"
+        <div class="flex gap-2">
+          <ButtonStyled v-if="instance.install_stage !== 'installed'" color="brand" size="large">
+            <button disabled>Installing...</button>
+          </ButtonStyled>
+          <ButtonStyled v-else-if="playing === true" color="red" size="large">
+            <button @click="stopInstance('InstancePage')">
+              <StopCircleIcon />
+              Stop
+            </button>
+          </ButtonStyled>
+          <ButtonStyled
+            v-else-if="playing === false && loading === false"
+            color="brand"
+            size="large"
+          >
+            <button @click="startInstance('InstancePage')">
+              <PlayIcon />
+              Play
+            </button>
+          </ButtonStyled>
+          <ButtonStyled
+            v-else-if="loading === true && playing === false"
+            color="brand"
+            size="large"
+          >
+            <button disabled>Loading...</button>
+          </ButtonStyled>
+          <ButtonStyled size="large" circular>
+            <button v-tooltip="'Instance settings'" @click="settingsModal.show()">
+              <SettingsIcon />
+            </button>
+          </ButtonStyled>
+          <ButtonStyled size="large" type="transparent" circular>
+            <OverflowMenu
+              :options="[
+                {
+                  id: 'open-folder',
+                  action: () => showProfileInFolder(instance.path),
+                },
+                {
+                  id: 'export-mrpack',
+                  action: () => $refs.exportModal.show(),
+                },
+              ]"
             >
-              <button @click="startInstance('InstancePage')">
-                <PlayIcon />
-                Play
-              </button>
-            </ButtonStyled>
-            <ButtonStyled
-              v-else-if="loading === true && playing === false"
-              color="brand"
-              size="large"
-            >
-              <button disabled>Loading...</button>
-            </ButtonStyled>
-            <ButtonStyled size="large" circular>
-              <button v-tooltip="'Instance settings'" @click="settingsModal.show()">
-                <SettingsIcon />
-              </button>
-            </ButtonStyled>
-            <ButtonStyled size="large" type="transparent" circular>
-              <OverflowMenu
-                :options="[
-                  {
-                    id: 'open-folder',
-                    action: () => showProfileInFolder(instance.path),
-                  },
-                  {
-                    id: 'export-mrpack',
-                    action: () => $refs.exportModal.show(),
-                  },
-                ]"
-              >
-                <MoreVerticalIcon />
-                <template #share-instance> <UserPlusIcon /> Share instance </template>
-                <template #host-a-server> <ServerIcon /> Create a server </template>
-                <template #open-folder> <FolderOpenIcon /> Open folder </template>
-                <template #export-mrpack> <PackageIcon /> Export modpack </template>
-              </OverflowMenu>
-            </ButtonStyled>
-          </div>
-        </template>
+              <MoreVerticalIcon />
+              <template #share-instance> <UserPlusIcon /> Share instance </template>
+              <template #host-a-server> <ServerIcon /> Create a server </template>
+              <template #open-folder> <FolderOpenIcon /> Open folder </template>
+              <template #export-mrpack> <PackageIcon /> Export modpack </template>
+            </OverflowMenu>
+          </ButtonStyled>
+        </div>
       </template>
     </ContentPageHeader>
   </div>
@@ -104,15 +111,15 @@
   <ContextMenu ref="options" @option-clicked="handleOptionsClick">
     <template #play> <PlayIcon /> Play </template>
     <template #stop> <StopCircleIcon /> Stop </template>
-    <template #add_content> <PlusIcon /> Add Content </template>
+    <template #add_content> <PlusIcon /> Add content </template>
     <template #edit> <EditIcon /> Edit </template>
-    <template #copy_path> <ClipboardCopyIcon /> Copy Path </template>
-    <template #open_folder> <ClipboardCopyIcon /> Open Folder </template>
-    <template #copy_link> <ClipboardCopyIcon /> Copy Link </template>
-    <template #open_link> <ClipboardCopyIcon /> Open In Modrinth <ExternalIcon /> </template>
+    <template #copy_path> <ClipboardCopyIcon /> Copy path </template>
+    <template #open_folder> <ClipboardCopyIcon /> Open folder </template>
+    <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+    <template #open_link> <ClipboardCopyIcon /> Open in Modrinth <ExternalIcon /> </template>
     <template #copy_names><EditIcon />Copy names</template>
     <template #copy_slugs><HashIcon />Copy slugs</template>
-    <template #copy_links><GlobeIcon />Copy Links</template>
+    <template #copy_links><GlobeIcon />Copy links</template>
     <template #toggle><EditIcon />Toggle selected</template>
     <template #disable><XIcon />Disable selected</template>
     <template #enable><CheckCircleIcon />Enable selected</template>
@@ -151,8 +158,9 @@ import {
   UpdatedIcon,
   MoreVerticalIcon,
   GameIcon,
+  TimerIcon,
 } from '@modrinth/assets'
-import { get, kill, run } from '@/helpers/profile'
+import { get, get_full_path, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
@@ -166,8 +174,13 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { handleSevereError } from '@/store/error.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
+
+dayjs.extend(duration)
+dayjs.extend(relativeTime)
 
 const route = useRoute()
 
@@ -320,9 +333,11 @@ const handleOptionsClick = async (args) => {
     case 'open_folder':
       await showProfileInFolder(instance.value.path)
       break
-    case 'copy_path':
-      await navigator.clipboard.writeText(instance.value.path)
+    case 'copy_path': {
+      const fullPath = await get_full_path(instance.value.path)
+      await navigator.clipboard.writeText(fullPath)
       break
+    }
   }
 }
 
@@ -347,6 +362,26 @@ const icon = computed(() =>
 )
 
 const settingsModal = ref()
+
+const timePlayed = computed(() => {
+  return instance.value.recent_time_played + instance.value.submitted_time_played
+})
+
+const timePlayedHumanized = computed(() => {
+  const duration = dayjs.duration(timePlayed.value, 'seconds')
+  const hours = Math.floor(duration.asHours())
+  if (hours >= 1) {
+    return hours + ' hour' + (hours > 1 ? 's' : '')
+  }
+
+  const minutes = Math.floor(duration.asMinutes())
+  if (minutes >= 1) {
+    return minutes + ' minute' + (minutes > 1 ? 's' : '')
+  }
+
+  const seconds = Math.floor(duration.asSeconds())
+  return seconds + ' second' + (seconds > 1 ? 's' : '')
+})
 
 onUnmounted(() => {
   unlistenProcesses()

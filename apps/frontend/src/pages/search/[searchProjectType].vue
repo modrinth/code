@@ -42,9 +42,7 @@
           Install content to server
         </h1>
       </template>
-      <ContentPageHeader v-else>
-        <template #title> Discover content </template>
-      </ContentPageHeader>
+      <ContentPageHeader v-else></ContentPageHeader>
       <NavTabs v-if="!server" :links="selectableProjectTypes" class="hidden md:flex" />
     </section>
     <aside
@@ -342,7 +340,11 @@ const tags = useTags();
 const flags = useFeatureFlags();
 const auth = await useAuth();
 
-const projectType = ref({ id: "mod", display: "mod", actual: "mod" });
+const projectType = computed(() =>
+  tags.value.projectTypes.find(
+    (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
+  ),
+);
 const projectTypes = computed(() => [projectType.value.id]);
 
 const server = ref();
@@ -505,10 +507,6 @@ async function serverInstall(project) {
   }
   project.installing = false;
 }
-
-projectType.value = tags.value.projectTypes.find(
-  (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
-);
 
 const noLoad = ref(false);
 const {

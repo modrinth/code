@@ -146,7 +146,7 @@ impl State {
         let discord_rpc = DiscordGuard::init()?;
 
         let file_watcher = fs_watcher::init_watcher().await?;
-        fs_watcher::watch_profiles_init(&file_watcher, &directories).await?;
+        fs_watcher::watch_profiles_init(&file_watcher, &directories).await;
 
         let process_manager = ProcessManager::new();
 

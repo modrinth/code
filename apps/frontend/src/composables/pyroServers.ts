@@ -226,6 +226,21 @@ interface JWTAuth {
   token: string;
 }
 
+export interface DirectoryItem {
+  name: string;
+  type: "directory" | "file";
+  count?: number;
+  modified: number;
+  created: number;
+  path: string;
+}
+
+export interface DirectoryResponse {
+  items: DirectoryItem[];
+  total: number;
+  current?: number;
+}
+
 type ContentType = "Mod" | "Plugin";
 
 const constructServerProperties = (properties: any): string => {
@@ -738,6 +753,8 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
       await internalServerRefrence.value.refresh(["fs"]);
       return await requestFn();
     }
+
+    throw error;
   }
 };
 
@@ -763,21 +780,74 @@ const createFileOrFolder = (path: string, type: "file" | "directory") => {
 };
 
 const uploadFile = (path: string, file: File) => {
+  // eslint-disable-next-line require-await
   return retryWithAuth(async () => {
     const encodedPath = encodeURIComponent(path);
-    return await PyroFetch(`/create?path=${encodedPath}&type=file`, {
-      method: "POST",
-      contentType: "application/octet-stream",
-      body: file,
-      override: internalServerRefrence.value.fs.auth,
+    const progressSubject = new EventTarget();
+    const abortController = new AbortController();
+
+    const uploadPromise = new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          const progress = (e.loaded / e.total) * 100;
+          progressSubject.dispatchEvent(
+            new CustomEvent("progress", {
+              detail: {
+                loaded: e.loaded,
+                total: e.total,
+                progress,
+              },
+            }),
+          );
+        }
+      });
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.response);
+        } else {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error("Upload failed"));
+      xhr.onabort = () => reject(new Error("Upload cancelled"));
+
+      xhr.open(
+        "POST",
+        `https://${internalServerRefrence.value.fs.auth.url}/create?path=${encodedPath}&type=file`,
+      );
+      xhr.setRequestHeader("Authorization", `Bearer ${internalServerRefrence.value.fs.auth.token}`);
+      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+      xhr.send(file);
+
+      abortController.signal.addEventListener("abort", () => {
+        xhr.abort();
+      });
     });
+
+    return {
+      promise: uploadPromise,
+      onProgress: (
+        callback: (progress: { loaded: number; total: number; progress: number }) => void,
+      ) => {
+        progressSubject.addEventListener("progress", ((e: CustomEvent) => {
+          callback(e.detail);
+        }) as EventListener);
+      },
+      cancel: () => {
+        abortController.abort();
+      },
+    };
   });
 };
 
 const renameFileOrFolder = (path: string, name: string) => {
   const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
   return retryWithAuth(async () => {
-    return await PyroFetch(`/move`, {
+    await PyroFetch(`/move`, {
       method: "POST",
       override: internalServerRefrence.value.fs.auth,
       body: {
@@ -785,6 +855,7 @@ const renameFileOrFolder = (path: string, name: string) => {
         destination: pathName,
       },
     });
+    return true;
   });
 };
 
@@ -1235,7 +1306,7 @@ type FSFunctions = {
    * @param pageSize - The page size to list.
    * @returns
    */
-  listDirContents: (path: string, page: number, pageSize: number) => Promise<any>;
+  listDirContents: (path: string, page: number, pageSize: number) => Promise<DirectoryResponse>;
 
   /**
    * @param path - The path to create the file or folder at.

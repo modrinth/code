@@ -13,8 +13,8 @@
         id="item-context-menu"
         ref="ctxRef"
         :style="{
-          border: '1px solid var(--color-button-bg)',
-          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--color-divider)',
+          borderRadius: 'var(--radius-lg)',
           backgroundColor: 'var(--color-raised-bg)',
           padding: 'var(--gap-sm)',
           boxShadow: 'var(--shadow-floating)',
@@ -31,7 +31,7 @@
           Rename
         </button>
         <button class="btn btn-transparent flex !w-full items-center" @click="$emit('move', item)">
-          <ArrowBigUpDashIcon class="h-5 w-5" />
+          <RightArrowIcon />
           Move
         </button>
         <button
@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, ArrowBigUpDashIcon, DownloadIcon, TrashIcon } from "@modrinth/assets";
+import { EditIcon, DownloadIcon, TrashIcon, RightArrowIcon } from "@modrinth/assets";
 
 interface FileItem {
   type: string;

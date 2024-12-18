@@ -183,8 +183,8 @@
               },
               {
                 id: 'copy-link',
-                shown: item.project !== undefined,
-                action: () => toggleDisableMod(item.data),
+                shown: item.data !== undefined && item.data.slug !== undefined,
+                action: () => copyModLink(item),
               },
               {
                 divider: true,
@@ -672,6 +672,12 @@ const removeMod = async (mod) => {
     name: mod.name,
     project_type: mod.project_type,
   })
+}
+
+const copyModLink = async (mod) => {
+  await navigator.clipboard.writeText(
+    `https://modrinth.com/${mod.data.project_type}/${mod.data.slug}`,
+  )
 }
 
 const deleteSelected = async () => {
