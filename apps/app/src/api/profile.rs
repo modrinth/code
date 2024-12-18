@@ -364,13 +364,13 @@ pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
         if let Some(java_path) = edit_profile.java_path.clone() {
             prof.java_path = java_path;
         }
-        if let Some(memory) = edit_profile.memory.clone() {
+        if let Some(memory) = edit_profile.memory {
             prof.memory = memory;
         }
-        if let Some(game_resolution) = edit_profile.game_resolution.clone() {
+        if let Some(game_resolution) = edit_profile.game_resolution {
             prof.game_resolution = game_resolution;
         }
-        if let Some(force_fullscreen) = edit_profile.force_fullscreen.clone() {
+        if let Some(force_fullscreen) = edit_profile.force_fullscreen {
             prof.force_fullscreen = force_fullscreen;
         }
         if let Some(hooks) = edit_profile.hooks.clone() {
