@@ -111,6 +111,7 @@ import _MessageIcon from './icons/message.svg?component'
 import _MicrophoneIcon from './icons/microphone.svg?component'
 import _MinimizeIcon from './icons/minimize.svg?component'
 import _MinusIcon from './icons/minus.svg?component'
+import _MonitorIcon from './icons/monitor.svg?component'
 import _MonitorSmartphoneIcon from './icons/monitor-smartphone.svg?component'
 import _MoonIcon from './icons/moon.svg?component'
 import _MoreHorizontalIcon from './icons/more-horizontal.svg?component'
@@ -160,6 +161,8 @@ import _RedoIcon from './icons/redo.svg?component'
 import _UnknownIcon from './icons/unknown.svg?component'
 import _UnknownDonationIcon from './icons/unknown-donation.svg?component'
 import _UpdatedIcon from './icons/updated.svg?component'
+import _UnlinkIcon from './icons/unlink.svg?component'
+import _UnplugIcon from './icons/unplug.svg?component'
 import _UploadIcon from './icons/upload.svg?component'
 import _UserIcon from './icons/user.svg?component'
 import _UserPlusIcon from './icons/user-plus.svg?component'
@@ -302,6 +305,7 @@ export const MessageIcon = _MessageIcon
 export const MicrophoneIcon = _MicrophoneIcon
 export const MinimizeIcon = _MinimizeIcon
 export const MinusIcon = _MinusIcon
+export const MonitorIcon = _MonitorIcon
 export const MonitorSmartphoneIcon = _MonitorSmartphoneIcon
 export const MoonIcon = _MoonIcon
 export const MoreHorizontalIcon = _MoreHorizontalIcon
@@ -351,6 +355,8 @@ export const RedoIcon = _RedoIcon
 export const UnknownIcon = _UnknownIcon
 export const UnknownDonationIcon = _UnknownDonationIcon
 export const UpdatedIcon = _UpdatedIcon
+export const UnlinkIcon = _UnlinkIcon
+export const UnplugIcon = _UnplugIcon
 export const UploadIcon = _UploadIcon
 export const UserIcon = _UserIcon
 export const UserPlusIcon = _UserPlusIcon

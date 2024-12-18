@@ -25,9 +25,17 @@ defineProps({
     default: 'No description defined',
     required: true,
   },
+  proceedIcon: {
+    type: Object,
+    default: undefined,
+  },
   proceedLabel: {
     type: String,
     default: 'Proceed',
+  },
+  danger: {
+    type: Boolean,
+    default: true,
   },
 })
 
@@ -61,9 +69,11 @@ function proceed() {
     :has-to-type="hasToType"
     :title="title"
     :description="description"
+    :proceed-icon="proceedIcon"
     :proceed-label="proceedLabel"
     :on-hide="onModalHide"
     :noblur="!themeStore.advancedRendering"
+    :danger="danger"
     @proceed="proceed"
   />
 </template>

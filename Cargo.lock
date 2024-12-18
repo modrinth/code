@@ -9101,6 +9101,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "serde_with",
  "tauri",
  "tauri-build 2.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "tauri-plugin-deep-link",

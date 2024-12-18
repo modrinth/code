@@ -9,6 +9,7 @@ import {
   GameIcon,
   CoffeeIcon,
 } from '@modrinth/assets'
+import { TabbedModal } from '@modrinth/ui'
 import { ref } from 'vue'
 import { useVIntl, defineMessage } from '@vintl/vintl'
 import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
@@ -24,15 +25,8 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const themeStore = useTheming()
 
-const modal = ref()
-
-function show() {
-  modal.value.show()
-}
-
 const { formatMessage } = useVIntl()
 
-const selectedTab = ref(0)
 const devModeCounter = ref(0)
 
 const developerModeEnabled = defineMessage({
@@ -59,8 +53,8 @@ const tabs = [
   },
   {
     name: defineMessage({
-      id: 'app.settings.tabs.java-versions',
-      defaultMessage: 'Java versions',
+      id: 'app.settings.tabs.java-installations',
+      defaultMessage: 'Java installations',
     }),
     icon: CoffeeIcon,
     content: JavaSettings,
@@ -92,13 +86,18 @@ const tabs = [
   },
 ]
 
+const modal = ref()
+
+function show() {
+  modal.value.show()
+}
+
 defineExpose({ show })
 
 const version = await getVersion()
 const osPlatform = getOsPlatform()
 const osVersion = getOsVersion()
 </script>
-/
 <template>
   <ModalWrapper ref="modal">
     <template #title>
@@ -106,18 +105,9 @@ const osVersion = getOsVersion()
         <SettingsIcon /> Settings
       </span>
     </template>
-    <div class="grid grid-cols-[auto_1fr] gap-4">
-      <div class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-divider">
-        <button
-          v-for="(tab, index) in tabs.filter((t) => !t.developerOnly || themeStore.devMode)"
-          :key="index"
-          :class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-transform ${selectedTab === index ? 'bg-highlight text-brand' : 'bg-transparent text-button-text'}`"
-          @click="() => (selectedTab = index)"
-        >
-          <component :is="tab.icon" class="w-4 h-4" />
-          <span>{{ formatMessage(tab.name) }}</span>
-        </button>
 
+    <TabbedModal :tabs="tabs.filter((t) => !t.developerOnly || themeStore.devMode)">
+      <template #footer>
         <div class="mt-auto text-secondary text-sm">
           <p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">
             {{ formatMessage(developerModeEnabled) }}
@@ -133,8 +123,8 @@ const osVersion = getOsVersion()
                     themeStore.devMode = !themeStore.devMode
                     devModeCounter = 0
 
-                    if (!themeStore.devMode && tabs[selectedTab].developerOnly === true) {
-                      selectedTab = 0
+                    if (!themeStore.devMode && tabs[modal.selectedTab].developerOnly) {
+                      modal.setTab(0)
                     }
                   }
                 }
@@ -152,10 +142,7 @@ const osVersion = getOsVersion()
             </div>
           </div>
         </div>
-      </div>
-      <div class="w-[600px] h-[500px] overflow-y-auto">
-        <component :is="tabs[selectedTab].content" />
-      </div>
-    </div>
+      </template>
+    </TabbedModal>
   </ModalWrapper>
 </template>

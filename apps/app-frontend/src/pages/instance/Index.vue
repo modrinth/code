@@ -4,6 +4,7 @@
     @contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
   >
     <ExportModal ref="exportModal" :instance="instance" />
+    <InstanceSettingsModal ref="settingsModal" :instance="instance" />
     <ContentPageHeader>
       <template #icon>
         <Avatar :src="icon" :alt="instance.name" size="96px" />
@@ -56,12 +57,9 @@
             <button disabled>Loading...</button>
           </ButtonStyled>
           <ButtonStyled size="large" circular>
-            <RouterLink
-              v-tooltip="'Instance settings'"
-              :to="`/instance/${encodeURIComponent(route.params.id)}/options`"
-            >
+            <button v-tooltip="'Instance settings'" @click="settingsModal.show()">
               <SettingsIcon />
-            </RouterLink>
+            </button>
           </ButtonStyled>
           <ButtonStyled size="large" type="transparent" circular>
             <OverflowMenu
@@ -179,6 +177,7 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ExportModal from '@/components/ui/ExportModal.vue'
+import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -361,6 +360,8 @@ const unlistenProcesses = await process_listener((e) => {
 const icon = computed(() =>
   instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 )
+
+const settingsModal = ref()
 
 const timePlayed = computed(() => {
   return instance.value.recent_time_played + instance.value.submitted_time_played

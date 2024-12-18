@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { type Ref, ref } from 'vue'
 import Button from './Button.vue'
 import PopoutMenu from './PopoutMenu.vue'
 
@@ -108,11 +108,17 @@ defineOptions({
   inheritAttrs: false,
 })
 
-const dropdown = ref(null)
+const dropdown: Ref<InstanceType<typeof PopoutMenu> | null> = ref(null)
 
 const close = () => {
-  dropdown.value.hide()
+  dropdown.value?.hide()
 }
+
+const open = () => {
+  dropdown.value?.show()
+}
+
+defineExpose({ open, close })
 </script>
 
 <style lang="scss" scoped>
