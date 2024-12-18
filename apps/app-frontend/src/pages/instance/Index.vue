@@ -13,9 +13,18 @@
       </template>
       <template #summary> </template>
       <template #stats>
-        <div class="flex items-center gap-2 font-semibold transform capitalize">
+        <div
+          class="flex items-center gap-2 font-semibold transform capitalize border-0 border-solid border-divider pr-4 md:border-r"
+        >
           <GameIcon class="h-6 w-6 text-secondary" />
           {{ instance.loader }} {{ instance.game_version }}
+        </div>
+        <div class="flex items-center gap-2 font-semibold">
+          <TimerIcon class="h-6 w-6 text-secondary" />
+          <template v-if="timePlayed > 0">
+            {{ timePlayedHumanized }}
+          </template>
+          <template v-else> Never played </template>
         </div>
       </template>
       <template #actions>
@@ -151,6 +160,7 @@ import {
   UpdatedIcon,
   MoreVerticalIcon,
   GameIcon,
+  TimerIcon,
 } from '@modrinth/assets'
 import { get, get_full_path, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
@@ -166,7 +176,12 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { handleSevereError } from '@/store/error.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import ExportModal from '@/components/ui/ExportModal.vue'
+
+dayjs.extend(duration)
+dayjs.extend(relativeTime)
 
 const route = useRoute()
 
@@ -346,6 +361,26 @@ const unlistenProcesses = await process_listener((e) => {
 const icon = computed(() =>
   instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 )
+
+const timePlayed = computed(() => {
+  return instance.value.recent_time_played + instance.value.submitted_time_played
+})
+
+const timePlayedHumanized = computed(() => {
+  const duration = dayjs.duration(timePlayed.value, 'seconds')
+  const hours = Math.floor(duration.asHours())
+  if (hours >= 1) {
+    return hours + ' hour' + (hours > 1 ? 's' : '')
+  }
+
+  const minutes = Math.floor(duration.asMinutes())
+  if (minutes >= 1) {
+    return minutes + ' minute' + (minutes > 1 ? 's' : '')
+  }
+
+  const seconds = Math.floor(duration.asSeconds())
+  return seconds + ' second' + (seconds > 1 ? 's' : '')
+})
 
 onUnmounted(() => {
   unlistenProcesses()

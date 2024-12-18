@@ -127,7 +127,6 @@ const os = ref('')
 getOS().then((x) => (os.value = x))
 
 loading_listener(async (e) => {
-  console.log(e)
   if (e.event.type === 'directory_move') {
     loadingProgress.value = 100 * (e.fraction ?? 1)
     message.value = 'Updating app directory...'
