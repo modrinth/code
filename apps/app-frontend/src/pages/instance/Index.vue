@@ -4,7 +4,7 @@
     @contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
   >
     <ExportModal ref="exportModal" :instance="instance" />
-    <InstanceSettingsModal ref="settingsModal" :instance="instance" />
+    <InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
     <ContentPageHeader>
       <template #icon>
         <Avatar :src="icon" :alt="instance.name" size="96px" />

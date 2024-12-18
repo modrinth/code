@@ -7,7 +7,7 @@ import {
   MonitorIcon,
   CodeIcon,
 } from '@modrinth/assets'
-import { Avatar, TabbedModal } from '@modrinth/ui'
+import { Avatar, TabbedModal, type TabbedModalTab } from '@modrinth/ui'
 import { ref } from 'vue'
 import { defineMessage, useVIntl } from '@vintl/vintl'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
@@ -17,19 +17,13 @@ import InstallationSettings from '@/components/ui/instance_settings/Installation
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
+import type { InstanceSettingsTabProps } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 
-defineProps({
-  instance: {
-    type: Object,
-    default() {
-      return {}
-    },
-  },
-})
+const props = defineProps<InstanceSettingsTabProps>()
 
-const tabs = [
+const tabs: TabbedModalTab<InstanceSettingsTabProps>[] = [
   {
     name: defineMessage({
       id: 'instance.settings.tabs.general',
@@ -98,6 +92,6 @@ const titleMessage = defineMessage({
       </span>
     </template>
 
-    <TabbedModal :tabs="tabs.map((tab) => ({ ...tab, props: { instance } }))" />
+    <TabbedModal :tabs="tabs.map((tab) => ({ ...tab, props }))" />
   </ModalWrapper>
 </template>
