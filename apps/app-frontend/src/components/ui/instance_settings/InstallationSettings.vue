@@ -97,7 +97,7 @@ if (props.instance.linked_data && props.instance.linked_data.project_id && !prop
         get_version_many(project.versions, 'must_revalidate')
           .then((versions: Version[]) => {
             modpackVersions.value = versions.sort((a, b) =>
-              dayjs(a.date_published).diff(dayjs(b.date_published)),
+              dayjs(b.date_published).diff(dayjs(a.date_published)),
             )
             modpackVersion.value =
               versions.find(

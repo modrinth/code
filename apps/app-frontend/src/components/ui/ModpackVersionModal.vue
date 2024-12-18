@@ -42,6 +42,12 @@ const switchVersion = async (versionId) => {
   inProgress.value = false
   emit('finish-install')
 }
+
+const onHide = () => {
+  if (!inProgress.value) {
+    emit('finish-install')
+  }
+}
 </script>
 
 <template>
@@ -49,9 +55,10 @@ const switchVersion = async (versionId) => {
     ref="modpackVersionModal"
     class="modpack-version-modal"
     header="Change modpack version"
+    :on-hide="onHide"
   >
     <div class="modal-body">
-      <Card v-if="instance.linked_data" class="mod-card">
+      <div v-if="instance.linked_data" class="mod-card">
         <div class="table">
           <div class="table-row with-columns table-head">
             <div class="table-cell table-text download-cell" />
@@ -110,7 +117,7 @@ const switchVersion = async (versionId) => {
             </div>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   </ModalWrapper>
 </template>

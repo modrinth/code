@@ -314,7 +314,8 @@ onUnmounted(() => {
           <span class="text-link cursor-pointer" @click="signIn">Sign in</span> to add friends!
         </div>
         <div v-else>
-          <span class="text-link cursor-pointer" @click="addFriendModal.show()">Add friends</span> to share what you're playing!
+          <span class="text-link cursor-pointer" @click="addFriendModal.show()">Add friends</span>
+          to share what you're playing!
         </div>
       </div>
     </template>

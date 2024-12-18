@@ -25,7 +25,9 @@ defineExpose({ selectedTab, setTab })
 </script>
 <template>
   <div class="grid grid-cols-[auto_1fr]">
-    <div class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-divider min-w-[200px]">
+    <div
+      class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-divider min-w-[200px]"
+    >
       <button
         v-for="(tab, index) in tabs"
         :key="index"

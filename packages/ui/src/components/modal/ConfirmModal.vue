@@ -45,7 +45,7 @@
 <script setup>
 import { renderString } from '@modrinth/utils'
 import { ref } from 'vue'
-import { TrashIcon, XIcon, RightArrowIcon } from '@modrinth/assets'
+import { TrashIcon, XIcon } from '@modrinth/assets'
 import NewModal from './NewModal.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 
