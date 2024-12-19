@@ -8821,7 +8821,8 @@ dependencies = [
 [[package]]
 name = "tauri-runtime"
 version = "2.2.0"
-source = "git+https://github.com/modrinth/tauri?rev=70a252b#70a252bb08494e515d5bd50c424ba56f75eec701"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cce18d43f80d4aba3aa8a0c953bbe835f3d0f2370aca75e8dbb14bd4bab27958"
 dependencies = [
  "dpi",
  "gtk",
@@ -8839,7 +8840,8 @@ dependencies = [
 [[package]]
 name = "tauri-runtime-wry"
 version = "2.2.0"
-source = "git+https://github.com/modrinth/tauri?rev=70a252b#70a252bb08494e515d5bd50c424ba56f75eec701"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f442a38863e10129ffe2cec7bd09c2dcf8a098a3a27801a476a304d5bb991d2"
 dependencies = [
  "gtk",
  "http 1.1.0",
@@ -8864,7 +8866,8 @@ dependencies = [
 [[package]]
 name = "tauri-utils"
 version = "2.1.0"
-source = "git+https://github.com/modrinth/tauri?rev=70a252b#70a252bb08494e515d5bd50c424ba56f75eec701"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9271a88f99b4adea0dc71d0baca4505475a0bbd139fb135f62958721aaa8fe54"
 dependencies = [
  "brotli 7.0.0",
  "cargo_metadata",
@@ -10862,8 +10865,7 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 [[package]]
 name = "wry"
 version = "0.47.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61ce51277d65170f6379d8cda935c80e3c2d1f0ff712a123c8bddb11b31a4b73"
+source = "git+https://github.com/modrinth/wry?rev=e88d4a1#e88d4a10286f58902f50d5dc6c11363220a8be10"
 dependencies = [
  "base64 0.22.1",
  "block2",
