@@ -6,7 +6,9 @@
     <div
       v-tooltip="
         status === 'suspended'
-          ? `This server is suspended visit the billing page to learn more`
+          ? suspension_reason === 'upgrading'
+            ? 'This server is being transferred to a new node. It will be unavailable until this process finishes.'
+            : 'This server has been suspended. Please visit your billing settings or contact Modrinth Support for more information.'
           : ''
       "
       class="flex cursor-pointer flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100"
