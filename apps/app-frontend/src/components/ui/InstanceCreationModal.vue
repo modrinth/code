@@ -237,7 +237,7 @@ const display_icon = ref(null)
 const showAdvanced = ref(false)
 const creating = ref(false)
 const showSnapshots = ref(false)
-const creationType = ref('from file')
+const creationType = ref('custom')
 const isShowing = ref(false)
 
 defineExpose({

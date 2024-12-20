@@ -91,7 +91,10 @@
             },
             {
               label: 'Versions',
-              href: `/project/${$route.params.id}/versions`,
+              href: {
+                path: `/project/${$route.params.id}/versions`,
+                query: { l: instance?.loader, g: instance?.game_version },
+              },
               subpages: ['version'],
             },
             {
@@ -212,13 +215,11 @@ async function fetchProjectData() {
 
 await fetchProjectData()
 
-const promo = ref(null)
 watch(
   () => route.params.id,
   async () => {
     if (route.params.id && route.path.startsWith('/project')) {
       await fetchProjectData()
-      promo.value.scroll()
     }
   },
 )

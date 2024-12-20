@@ -8999,7 +8999,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.9.0"
+version = "0.9.0-1"
 dependencies = [
  "async-recursion",
  "async-tungstenite",
@@ -9050,7 +9050,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_gui"
-version = "0.9.0"
+version = "0.9.0-1"
 dependencies = [
  "chrono",
  "cocoa 0.25.0",
@@ -9068,6 +9068,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "serde_with",
  "tauri",
  "tauri-build",
  "tauri-plugin-deep-link",
@@ -10932,8 +10933,7 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 [[package]]
 name = "wry"
 version = "0.47.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61ce51277d65170f6379d8cda935c80e3c2d1f0ff712a123c8bddb11b31a4b73"
+source = "git+https://github.com/modrinth/wry?rev=e88d4a1#e88d4a10286f58902f50d5dc6c11363220a8be10"
 dependencies = [
  "base64 0.22.1",
  "block2",

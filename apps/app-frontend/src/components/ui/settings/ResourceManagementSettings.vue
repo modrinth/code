@@ -57,13 +57,13 @@ async function findLauncherDir() {
 </script>
 
 <template>
-  <h2 class="m-0 text-2xl">App directory</h2>
-  <p class="m-0 mt-1">
+  <h2 class="m-0 text-lg font-extrabold text-contrast">App directory</h2>
+  <p class="m-0 mt-1 mb-2 leading-tight text-secondary">
     The directory where the launcher stores all of its files. Changes will be applied after
     restarting the launcher.
   </p>
 
-  <div class="m-1 mt-2">
+  <div class="m-1 my-2">
     <div class="iconified-input w-full">
       <BoxIcon />
       <input id="appDir" v-model="settings.custom_dir" type="text" class="input" />
@@ -73,31 +73,29 @@ async function findLauncherDir() {
     </div>
   </div>
 
-  <div class="flex items-center justify-between gap-4 mt-4">
-    <div>
-      <ConfirmModalWrapper
-        ref="purgeCacheConfirmModal"
-        title="Are you sure you want to purge the cache?"
-        description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
-        :has-to-type="false"
-        proceed-label="Purge cache"
-        @proceed="purgeCache"
-      />
+  <div>
+    <ConfirmModalWrapper
+      ref="purgeCacheConfirmModal"
+      title="Are you sure you want to purge the cache?"
+      description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
+      :has-to-type="false"
+      proceed-label="Purge cache"
+      @proceed="purgeCache"
+    />
 
-      <h2 class="m-0 text-2xl">App cache</h2>
-      <p class="m-0 mt-1 leading-tight">
-        The Modrinth app stores a cache of data to speed up loading. This can be purged to force the
-        app to reload data. This may slow down the app temporarily.
-      </p>
-    </div>
-    <button id="purge-cache" class="btn min-w-max" @click="$refs.purgeCacheConfirmModal.show()">
-      <TrashIcon />
-      Purge cache
-    </button>
+    <h2 class="m-0 text-lg font-extrabold text-contrast">App cache</h2>
+    <p class="m-0 mt-1 mb-2 leading-tight text-secondary">
+      The Modrinth app stores a cache of data to speed up loading. This can be purged to force the
+      app to reload data. This may slow down the app temporarily.
+    </p>
   </div>
+  <button id="purge-cache" class="btn min-w-max" @click="$refs.purgeCacheConfirmModal.show()">
+    <TrashIcon />
+    Purge cache
+  </button>
 
-  <h2 class="m-0 text-2xl mt-4">Maximum concurrent downloads</h2>
-  <p class="m-0 mt-1">
+  <h2 class="m-0 text-lg font-extrabold text-contrast mt-4">Maximum concurrent downloads</h2>
+  <p class="m-0 mt-1 mb-2 leading-tight text-secondary">
     The maximum amount of files the launcher can download at the same time. Set this to a lower
     value if you have a poor internet connection. (app restart required to take effect)
   </p>
@@ -109,8 +107,8 @@ async function findLauncherDir() {
     :step="1"
   />
 
-  <h2 class="m-0 mt-4 text-2xl">Maximum concurrent writes</h2>
-  <p class="m-0 mt-1">
+  <h2 class="mt-4 m-0 text-lg font-extrabold text-contrast">Maximum concurrent writes</h2>
+  <p class="m-0 mt-1 mb-2 leading-tight text-secondary">
     The maximum amount of files the launcher can write to the disk at once. Set this to a lower
     value if you are frequently getting I/O errors. (app restart required to take effect)
   </p>

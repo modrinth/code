@@ -57,6 +57,7 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 
 const themeStore = useTheming()
 
@@ -357,6 +358,7 @@ function handleAuxClick(e) {
 
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
+  <div id="teleports"></div>
   <div v-if="stateInitialized" class="app-grid-layout relative">
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
@@ -392,6 +394,9 @@ function handleAuxClick(e) {
         <template #label>Library</template>
       </NavButton>
       <div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
+      <suspense>
+        <QuickInstanceSwitcher />
+      </suspense>
       <NavButton :to="() => $refs.installationModal.show()" :disabled="offline">
         <PlusIcon />
         <template #label>Create new instance</template>

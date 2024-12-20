@@ -79,11 +79,11 @@ function setSelected(value: boolean) {
     </div>
     <div class="bg-bg-raised rounded-xl">
       <VirtualScroller :items="items" :default-size="64" style="height: 100%">
-        <template #item="{ ref }">
+        <template #item="{ ref, index }">
           <ContentListItem
             v-model="selectionStates[ref.filename]"
             :item="ref"
-            :last="false"
+            :last="index === items.length - 1"
             class="mb-2"
             @update:model-value="updateSelection"
           >

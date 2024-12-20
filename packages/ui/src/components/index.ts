@@ -29,6 +29,8 @@ export { default as ScrollablePanel } from './base/ScrollablePanel.vue'
 export { default as SimpleBadge } from './base/SimpleBadge.vue'
 export { default as Slider } from './base/Slider.vue'
 export { default as StatItem } from './base/StatItem.vue'
+export { default as TagItem } from './base/TagItem.vue'
+export { default as TeleportDropdownMenu } from './base/TeleportDropdownMenu.vue'
 export { default as Toggle } from './base/Toggle.vue'
 
 // Branding
@@ -47,6 +49,8 @@ export { default as NewModal } from './modal/NewModal.vue'
 export { default as Modal } from './modal/Modal.vue'
 export { default as ConfirmModal } from './modal/ConfirmModal.vue'
 export { default as ShareModal } from './modal/ShareModal.vue'
+export { default as TabbedModal } from './modal/TabbedModal.vue'
+export type { Tab as TabbedModalTab } from './modal/TabbedModal.vue'
 
 // Navigation
 export { default as Breadcrumbs } from './nav/Breadcrumbs.vue'

@@ -87,7 +87,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
 pub(crate) async fn watch_profiles_init(
     watcher: &FileWatcher,
     dirs: &DirectoryInfo,
-) -> crate::Result<()> {
+) {
     if let Ok(profiles_dir) = std::fs::read_dir(dirs.profiles_dir()) {
         for profile_dir in profiles_dir {
             if let Ok(file_name) = profile_dir.map(|x| x.file_name()) {
@@ -96,20 +96,18 @@ pub(crate) async fn watch_profiles_init(
                         continue;
                     };
 
-                    watch_profile(file_name, watcher, dirs).await?;
+                    watch_profile(file_name, watcher, dirs).await;
                 }
             }
         }
     }
-
-    Ok(())
 }
 
 pub(crate) async fn watch_profile(
     profile_path: &str,
     watcher: &FileWatcher,
     dirs: &DirectoryInfo,
-) -> crate::Result<()> {
+) {
     let profile_path = dirs.profiles_dir().join(profile_path);
 
     if profile_path.exists() && profile_path.is_dir() {
@@ -120,15 +118,25 @@ pub(crate) async fn watch_profile(
             let path = profile_path.join(folder);
 
             if !path.exists() && !path.is_symlink() {
-                crate::util::io::create_dir_all(&path).await?;
+                if let Err(e) = crate::util::io::create_dir_all(&path).await {
+                    tracing::error!(
+                        "Failed to create directory for watcher {path:?}: {e}"
+                    );
+                    return;
+                }
             }
 
             let mut watcher = watcher.write().await;
-            watcher.watcher().watch(&path, RecursiveMode::Recursive)?;
+            if let Err(e) =
+                watcher.watcher().watch(&path, RecursiveMode::Recursive)
+            {
+                tracing::error!(
+                    "Failed to watch directory for watcher {path:?}: {e}"
+                );
+                return;
+            }
         }
     }
-
-    Ok(())
 }
 
 fn crash_task(path: String) {

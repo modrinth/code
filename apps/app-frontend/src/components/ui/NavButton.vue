@@ -38,6 +38,7 @@ defineProps<{
   to: (() => void) | string
   isPrimary?: RouteFunction
   isSubpage?: RouteFunction
+  highlightOverride?: boolean
 }>()
 
 defineOptions({
