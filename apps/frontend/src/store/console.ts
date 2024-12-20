@@ -62,6 +62,9 @@ export const usePyroConsole = createGlobalState(() => {
   };
 
   const addListener = (listener: (line: string) => void): string => {
+    for (const line of output.value) {
+      listener(line);
+    }
     const id = Math.random().toString(36).substring(7);
     listeners.value[id] = listener;
     return id;

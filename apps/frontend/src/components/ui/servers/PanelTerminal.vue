@@ -1,6 +1,6 @@
 <template>
   <div data-pyro-terminal :class="[
-    'terminal-font !bg-white console relative z-[1] flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-xl rounded-r-none px-1 text-sm transition-transform duration-300',
+    'terminal-font !bg-white console relative z-[1] flex h-full w-full flex-col items-center justify-between px-1 text-sm transition-transform duration-300',
   ]" tabindex="-1">
     <div aria-hidden="true" class="pointer-events-none absolute left-0 top-0 z-[60] h-full w-full" :style="{
     }">
@@ -15,7 +15,7 @@
       height: `${height}px`,
       filter: `blur(${resizing ? 8 : 0}px)`,
       transition: `filter 0.2s`
-    }" @wheel="wheel" @mousedown="mouseDown" data-pyro-terminal-scroll-root class="relative overflow-hidden w-full">
+    }" @wheel="wheel" @mousedown="mouseDown" data-pyro-terminal-scroll-root class="relative w-full">
       <canvas ref="terminalCanvas" :style="{
         objectPosition: 'top left',
         height: `${height}px`,
@@ -31,9 +31,8 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon } from "@modrinth/assets";
-import { usePyroConsole } from "~/store/console";
-import TerminalWorker from "~/workers/console?worker";
+import { usePyroConsole } from "@/store/console";
+import TerminalWorker from "@/workers/console?worker";
 
 const pyroConsole = usePyroConsole();
 const terminalCanvas = ref<HTMLCanvasElement | null>(null);

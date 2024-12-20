@@ -359,6 +359,7 @@ export default defineNuxtConfig({
       compilerOptions: {
         moduleResolution: "bundler",
         allowImportingTsExtensions: true,
+        types: ["vite/client"],
       },
     },
   },
