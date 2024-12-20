@@ -50,6 +50,9 @@ importers:
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      '@pyro/tartaros':
+        specifier: workspace:*
+        version: link:../../packages/tartaros
       '@sentry/vue':
         specifier: ^8.27.0
         version: 8.27.0(vue@3.5.13(typescript@5.5.4))
@@ -79,7 +82,7 @@ importers:
         version: 1.11.11
       floating-vue:
         specifier: ^5.2.2
-        version: 5.2.2(@nuxt/kit@3.14.1592(magicast@0.3.5))(vue@3.5.13(typescript@5.5.4))
+        version: 5.2.2(@nuxt/kit@3.14.1592(magicast@0.3.5)(rollup@4.28.1))(vue@3.5.13(typescript@5.5.4))
       ofetch:
         specifier: ^1.3.4
         version: 1.4.1
@@ -324,6 +327,9 @@ importers:
       typescript:
         specifier: ^5.4.5
         version: 5.5.4
+      vite-plugin-wasm:
+        specifier: 3.3.0
+        version: 3.3.0(vite@5.4.11(@types/node@20.14.11)(sass@1.77.6)(terser@5.31.6))
       vite-svg-loader:
         specifier: ^5.1.0
         version: 5.1.0(vue@3.5.13(typescript@5.5.4))
@@ -375,6 +381,8 @@ importers:
       typescript:
         specifier: ^5.5.3
         version: 5.5.4
+
+  packages/tartaros: {}
 
   packages/tsconfig:
     devDependencies:
@@ -7001,6 +7009,11 @@ packages:
     peerDependencies:
       vite: ^3.0.0-0 || ^4.0.0-0 || ^5.0.0-0
 
+  vite-plugin-wasm@3.3.0:
+    resolution: {integrity: sha512-tVhz6w+W9MVsOCHzxo6SSMSswCeIw4HTrXEi6qL3IRzATl83jl09JVO1djBqPSwfjgnpVHNLYcaMbaDX5WB/pg==}
+    peerDependencies:
+      vite: ^2 || ^3 || ^4 || ^5
+
   vite-svg-loader@5.1.0:
     resolution: {integrity: sha512-M/wqwtOEjgb956/+m5ZrYT/Iq6Hax0OakWbokj8+9PXOnB7b/4AxESHieEtnNEy7ZpjsjYW1/5nK8fATQMmRxw==}
     peerDependencies:
@@ -8682,34 +8695,6 @@ snapshots:
       - supports-color
       - typescript
 
-  '@nuxt/kit@3.14.1592(magicast@0.3.5)':
-    dependencies:
-      '@nuxt/schema': 3.14.1592(magicast@0.3.5)
-      c12: 2.0.1(magicast@0.3.5)
-      consola: 3.2.3
-      defu: 6.1.4
-      destr: 2.0.3
-      globby: 14.0.2
-      hash-sum: 2.0.0
-      ignore: 6.0.2
-      jiti: 2.4.1
-      klona: 2.0.6
-      knitwork: 1.1.0
-      mlly: 1.7.3
-      pathe: 1.1.2
-      pkg-types: 1.2.1
-      scule: 1.3.0
-      semver: 7.6.3
-      ufo: 1.5.4
-      unctx: 2.3.1
-      unimport: 3.14.4
-      untyped: 1.5.1
-    transitivePeerDependencies:
-      - magicast
-      - rollup
-      - supports-color
-    optional: true
-
   '@nuxt/kit@3.14.1592(magicast@0.3.5)(rollup@3.29.4)':
     dependencies:
       '@nuxt/schema': 3.14.1592(magicast@0.3.5)(rollup@3.29.4)
@@ -8764,27 +8749,6 @@ snapshots:
       - magicast
       - rollup
       - supports-color
-
-  '@nuxt/schema@3.14.1592(magicast@0.3.5)':
-    dependencies:
-      c12: 2.0.1(magicast@0.3.5)
-      compatx: 0.1.8
-      consola: 3.2.3
-      defu: 6.1.4
-      hookable: 5.5.3
-      pathe: 1.1.2
-      pkg-types: 1.2.1
-      scule: 1.3.0
-      std-env: 3.8.0
-      ufo: 1.5.4
-      uncrypto: 0.1.3
-      unimport: 3.14.4
-      untyped: 1.5.1
-    transitivePeerDependencies:
-      - magicast
-      - rollup
-      - supports-color
-    optional: true
 
   '@nuxt/schema@3.14.1592(magicast@0.3.5)(rollup@3.29.4)':
     dependencies:
@@ -11993,14 +11957,6 @@ snapshots:
       vue-resize: 2.0.0-alpha.1(vue@3.5.13(typescript@5.5.4))
     optionalDependencies:
       '@nuxt/kit': 3.14.1592(magicast@0.3.5)(rollup@4.28.1)
-
-  floating-vue@5.2.2(@nuxt/kit@3.14.1592(magicast@0.3.5))(vue@3.5.13(typescript@5.5.4)):
-    dependencies:
-      '@floating-ui/dom': 1.1.1
-      vue: 3.5.13(typescript@5.5.4)
-      vue-resize: 2.0.0-alpha.1(vue@3.5.13(typescript@5.5.4))
-    optionalDependencies:
-      '@nuxt/kit': 3.14.1592(magicast@0.3.5)
 
   for-each@0.3.3:
     dependencies:
@@ -15411,26 +15367,6 @@ snapshots:
       trough: 2.2.0
       vfile: 6.0.3
 
-  unimport@3.14.4:
-    dependencies:
-      '@rollup/pluginutils': 5.1.3(rollup@3.29.4)
-      acorn: 8.14.0
-      escape-string-regexp: 5.0.0
-      estree-walker: 3.0.3
-      local-pkg: 0.5.1
-      magic-string: 0.30.14
-      mlly: 1.7.3
-      pathe: 1.1.2
-      picomatch: 4.0.2
-      pkg-types: 1.2.1
-      scule: 1.3.0
-      strip-literal: 2.1.1
-      tinyglobby: 0.2.10
-      unplugin: 1.16.0
-    transitivePeerDependencies:
-      - rollup
-    optional: true
-
   unimport@3.14.4(rollup@3.29.4):
     dependencies:
       '@rollup/pluginutils': 5.1.3(rollup@3.29.4)
@@ -15707,6 +15643,10 @@ snapshots:
       vite: 5.4.11(@types/node@20.14.11)(sass@1.77.6)(terser@5.31.6)
     transitivePeerDependencies:
       - supports-color
+
+  vite-plugin-wasm@3.3.0(vite@5.4.11(@types/node@20.14.11)(sass@1.77.6)(terser@5.31.6)):
+    dependencies:
+      vite: 5.4.11(@types/node@20.14.11)(sass@1.77.6)(terser@5.31.6)
 
   vite-svg-loader@5.1.0(vue@3.5.13(typescript@5.5.4)):
     dependencies:

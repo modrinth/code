@@ -27,6 +27,7 @@
       "env": ["SQLX_OFFLINE"]
     },
     "dev": {
+      "dependsOn": ["@pyro/tartaros#build"],
       "cache": false,
       "persistent": true,
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
@@ -37,6 +38,10 @@
     },
     "fix": {
       "cache": false
+    },
+    "@pyro/tartaros#build": {
+      "inputs": ["packages/tartaros/**"],
+      "outputs": ["packages/tartaros/pkg/**"]
     }
   }
 }

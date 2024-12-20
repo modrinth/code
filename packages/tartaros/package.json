@@ -1,0 +1,10 @@
+{
+  "name": "@pyro/tartaros",
+  "private": true,
+  "main": "./pkg/index.js",
+  "types": "./pkg/index.d.ts",
+  "packageManager": "pnpm@9.4.0",
+  "scripts": {
+    "build": "wasm-pack build --out-name index"
+  }
+}

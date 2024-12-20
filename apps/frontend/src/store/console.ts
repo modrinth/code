@@ -23,6 +23,8 @@ export const usePyroConsole = createGlobalState(() => {
    */
   const output: Ref<string[]> = ref<string[]>([]);
 
+  const listeners = ref<Record<string, (line: string) => void>>({});
+
   /**
    * Adds a new output line to the console output
    * Automatically removes the oldest line if max output is exceeded
@@ -50,6 +52,23 @@ export const usePyroConsole = createGlobalState(() => {
     if (output.value.length > maxLines) {
       output.value.splice(0, output.value.length - maxLines);
     }
+
+    for (const line of lines) {
+      console.log(line);
+      for (const listener of Object.values(listeners.value)) {
+        listener(line);
+      }
+    }
+  };
+
+  const addListener = (listener: (line: string) => void): string => {
+    const id = Math.random().toString(36).substring(7);
+    listeners.value[id] = listener;
+    return id;
+  };
+
+  const removeListener = (id: string): void => {
+    delete listeners.value[id];
   };
 
   /**
@@ -64,5 +83,7 @@ export const usePyroConsole = createGlobalState(() => {
     addLine,
     addLines,
     clear,
+    addListener,
+    removeListener,
   };
 });

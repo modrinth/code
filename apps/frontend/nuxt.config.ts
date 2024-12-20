@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import { pathToFileURL } from "node:url";
 import svgLoader from "vite-svg-loader";
+import wasm from "vite-plugin-wasm";
 import { resolve, basename, relative } from "pathe";
 import { defineNuxtConfig } from "nuxt/config";
 import { $fetch } from "ofetch";
@@ -93,6 +94,7 @@ export default defineNuxtConfig({
       dedupe: ["vue"],
     },
     plugins: [
+      wasm(),
       svgLoader({
         svgoConfig: {
           plugins: [
