@@ -6,5 +6,8 @@
   "packageManager": "pnpm@9.4.0",
   "scripts": {
     "build": "wasm-pack build --out-name index"
+  },
+  "devDependencies": {
+    "wasm-pack": "*"
   }
 }

@@ -41,6 +41,7 @@
     "@modrinth/assets": "workspace:*",
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
+    "@pyro/tartaros": "workspace:*",
     "@pinia/nuxt": "^0.5.1",
     "@vintl/vintl": "^4.4.1",
     "@vueuse/core": "^11.1.0",

@@ -99,7 +99,8 @@ const mouseMove = (e: MouseEvent) => {
   });
 };
 
-const mouseUp = () => {
+const mouseUp = (e: MouseEvent) => {
+  e.preventDefault();
   if (!worker.value) return;
   isMouseDown.value = false;
   worker.value.postMessage({
