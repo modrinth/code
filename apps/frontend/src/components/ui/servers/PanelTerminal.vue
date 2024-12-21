@@ -1,37 +1,61 @@
 <template>
-  <div data-pyro-terminal :class="[
-    'terminal-font !bg-white console relative z-[1] flex h-full w-full flex-col items-center justify-between px-1 text-sm transition-transform duration-300',
-  ]" tabindex="-1">
-    <div aria-hidden="true" class="pointer-events-none absolute left-0 top-0 z-[60] h-full w-full" :style="{
-    }">
-      <div aria-hidden="true" class="absolute -bottom-2 -right-2 h-7 w-7" :style="{
-        background: `radial-gradient(circle at 0% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
-      }"></div>
-      <div aria-hidden="true" class="absolute -bottom-2 -left-2 h-7 w-7" :style="{
-        background: `radial-gradient(circle at 100% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
-      }"></div>
+  <div
+    data-pyro-terminal
+    :class="[
+      'terminal-font console relative z-[1] flex h-full w-full flex-col items-center justify-between !bg-white px-1 text-sm transition-transform duration-300',
+    ]"
+    tabindex="-1"
+  >
+    <div aria-hidden="true" class="pointer-events-none absolute left-0 top-0 z-[60] h-full w-full">
+      <div
+        aria-hidden="true"
+        class="absolute -bottom-2 -right-2 h-7 w-7"
+        :style="{
+          background: `radial-gradient(circle at 0% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
+        }"
+      ></div>
+      <div
+        aria-hidden="true"
+        class="absolute -bottom-2 -left-2 h-7 w-7"
+        :style="{
+          background: `radial-gradient(circle at 100% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
+        }"
+      ></div>
     </div>
-    <div :style="{
-      height: `${height}px`,
-      filter: `blur(${resizing ? 8 : 0}px)`,
-      transition: `filter 0.2s`
-    }" @wheel="wheel" @mousedown="mouseDown" data-pyro-terminal-scroll-root class="relative w-full">
-      <canvas ref="terminalCanvas" :style="{
-        objectPosition: 'top left',
+    <div
+      :style="{
         height: `${height}px`,
-      }" class="absolute -top-0.5 left-0 w-full object-none" />
+        filter: `blur(${resizing ? 8 : 0}px)`,
+        transition: `filter 0.2s`,
+      }"
+      data-pyro-terminal-scroll-root
+      class="relative w-full"
+      @wheel="wheel"
+      @mousedown="mouseDown"
+    >
+      <canvas
+        ref="terminalCanvas"
+        :style="{
+          objectPosition: 'top left',
+          height: `${height}px`,
+        }"
+        class="absolute -top-0.5 left-0 w-full object-none"
+      />
     </div>
 
-    <div class="absolute bottom-4 z-[3] w-full" :style="{
-      filter: `drop-shadow(0 8px 12px rgba(0, 0, 0, 0.1))`,
-    }">
+    <div
+      class="absolute bottom-4 z-[3] w-full"
+      :style="{
+        filter: `drop-shadow(0 8px 12px rgba(0, 0, 0, 0.1))`,
+      }"
+    >
       <slot />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { usePyroConsole } from "@/store/console";
+import { usePyroConsole } from "@/store/console.ts";
 import TerminalWorker from "@/workers/console?worker";
 
 const pyroConsole = usePyroConsole();
@@ -52,11 +76,11 @@ const mouseDown = (e: MouseEvent) => {
   const clientWidth = rect.width;
   const clientHeight = rect.height;
   worker.value.postMessage({
-    type: 'mousedown',
+    type: "mousedown",
     x,
     y,
     clientWidth,
-    clientHeight
+    clientHeight,
   });
   isMouseDown.value = true;
 };
@@ -67,17 +91,18 @@ const mouseMove = (e: MouseEvent) => {
   const y = e.clientY - rect.top;
   const clientHeight = rect.height;
   worker.value.postMessage({
-    type: 'mousemove',
+    type: "mousemove",
     y,
-    clientHeight
+    clientHeight,
   });
 };
 
 const mouseUp = (e: MouseEvent) => {
+  e.preventDefault();
   if (!worker.value) return;
   isMouseDown.value = false;
   worker.value.postMessage({
-    type: 'mouseup'
+    type: "mouseup",
   });
 };
 
@@ -85,28 +110,28 @@ const wheel = (e: WheelEvent) => {
   e.preventDefault();
   if (!worker.value) return;
   worker.value.postMessage({
-    type: 'wheel',
-    deltaY: e.deltaY
+    type: "wheel",
+    deltaY: e.deltaY,
   });
 };
 
 onMounted(() => {
   if (!terminalCanvas.value) return;
-  window.addEventListener('mousemove', mouseMove);
-  window.addEventListener('mouseup', mouseUp);
+  window.addEventListener("mousemove", mouseMove);
+  window.addEventListener("mouseup", mouseUp);
   worker.value = new TerminalWorker();
   const offscreenCanvas = terminalCanvas.value.transferControlToOffscreen();
   worker.value.onmessage = (e) => {
     const { type } = e.data;
     switch (type) {
-      case 'init': {
+      case "init": {
         if (!worker.value) return;
         const { height: h } = e.data;
         height.value = h;
         break;
       }
 
-      case 'resize': {
+      case "resize": {
         if (!terminalCanvas.value) return;
         const { width } = e.data;
         if (width === terminalCanvas.value.clientWidth) resizing.value = false;
@@ -115,12 +140,12 @@ onMounted(() => {
     }
   };
 
-  worker.value.postMessage({ type: 'init', canvas: offscreenCanvas }, [offscreenCanvas]);
+  worker.value.postMessage({ type: "init", canvas: offscreenCanvas }, [offscreenCanvas]);
   terminalListenerId.value = pyroConsole.addListener((l) => {
     if (!terminalCanvas.value || !worker.value) return;
     worker.value.postMessage({
-      type: 'line',
-      text: l
+      type: "line",
+      text: l,
     });
   });
   height.value = terminalCanvas.value.height;
@@ -131,7 +156,7 @@ onMounted(() => {
     height.value = terminalCanvas.value.height;
     resizing.value = true;
     resizeTimeout.value = setTimeout(() => {
-      worker.value?.postMessage({ type: 'resize', width: terminalCanvas.value!.clientWidth });
+      worker.value?.postMessage({ type: "resize", width: terminalCanvas.value!.clientWidth });
       if (resizeTimeout.value) clearTimeout(resizeTimeout.value);
     }, 100);
   });
@@ -152,8 +177,8 @@ onUnmounted(() => {
   if (terminalListenerId.value) {
     pyroConsole.removeListener(terminalListenerId.value);
   }
-  window.removeEventListener('mousemove', mouseMove);
-  window.removeEventListener('mouseup', mouseUp);
+  window.removeEventListener("mousemove", mouseMove);
+  window.removeEventListener("mouseup", mouseUp);
 });
 </script>
 
@@ -227,15 +252,19 @@ html.oled-mode .console {
 }
 
 .progressive-gradient {
-  background: linear-gradient(to top,
-      color-mix(in srgb, var(--color-bg), transparent var(--transparency)) 0%,
-      rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-bg), transparent var(--transparency)) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
 }
 
 html.dark-mode .progressive-gradient {
-  background: linear-gradient(to top,
-      color-mix(in srgb, black, transparent var(--transparency)) 0%,
-      rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, black, transparent var(--transparency)) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
 }
 
 .scroll-to-bottom-enter-active,

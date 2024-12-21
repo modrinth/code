@@ -1,6 +1,6 @@
 let pyroConsole: typeof import("@pyro/tartaros").PyroConsole.prototype | null = null;
 let ctx: OffscreenCanvasRenderingContext2D | null = null;
-let mod = import("@pyro/tartaros");
+const mod = import("@pyro/tartaros");
 
 onmessage = async (e) => {
   try {
@@ -27,6 +27,7 @@ onmessage = async (e) => {
       case "destroy": {
         pyroConsole?.destroy();
         pyroConsole?.free();
+        break;
       }
 
       case "resize": {
@@ -34,7 +35,7 @@ onmessage = async (e) => {
           throw new Error("Canvas not initialized");
         }
 
-        const { width, height } = e.data;
+        const { width } = e.data;
         ctx.canvas.width = width;
         pyroConsole?.redraw();
         postMessage({ type: "resize", width });
