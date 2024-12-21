@@ -360,7 +360,6 @@ const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const pyroConsole = usePyroConsole();
-console.log("||||||||||||||||||||||| console", pyroConsole.output);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
@@ -673,7 +672,6 @@ const updatePowerState = (
   state: ServerState,
   details?: { oom_killed?: boolean; exit_code?: number },
 ) => {
-  console.log("Power state:", state, details);
   serverPowerState.value = state;
 
   if (state === "crashed") {
@@ -896,6 +894,7 @@ definePageMeta({
     opacity: 0;
     transform: translateX(1rem);
   }
+
   100% {
     opacity: 1;
     transform: none;

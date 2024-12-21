@@ -29,6 +29,8 @@
     "sass": "^1.58.0",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.4.5",
+    "vite": "^5.4.6",
+    "vite-plugin-wasm": "3.3.0",
     "vite-svg-loader": "^5.1.0",
     "vue-tsc": "^2.0.24"
   },
@@ -39,6 +41,7 @@
     "@modrinth/assets": "workspace:*",
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
+    "@pyro/tartaros": "workspace:*",
     "@pinia/nuxt": "^0.5.1",
     "@vintl/vintl": "^4.4.1",
     "@vueuse/core": "^11.1.0",

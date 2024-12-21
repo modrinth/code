@@ -80,7 +80,7 @@
     <div class="flex flex-col-reverse gap-6 md:flex-col">
       <UiServersServerStats :data="stats" />
       <div
-        class="relative flex h-[600px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
+        class="relative flex h-[616px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
@@ -88,7 +88,7 @@
             <UiServersPanelServerStatus :state="serverPowerState" />
           </div>
         </div>
-        <UiServersPanelTerminal :full-screen="fullScreen">
+        <UiServersPanelTerminal :search="searchQuery">
           <div class="relative w-full px-4 pt-4">
             <ul
               v-if="suggestions.length"
@@ -136,21 +136,26 @@
               >
                 <TerminalSquareIcon class="ml-3 h-5 w-5" />
               </div>
-              <input
-                v-if="isServerRunning"
-                v-model="commandInput"
-                type="text"
-                placeholder="Send a command"
-                class="w-full rounded-md !pl-10 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
-                aria-autocomplete="list"
-                aria-controls="command-suggestions"
-                spellcheck="false"
-                :aria-activedescendant="'suggestion-' + selectedSuggestionIndex"
-                @keydown.tab.prevent="acceptSuggestion"
-                @keydown.down.prevent="selectNextSuggestion"
-                @keydown.up.prevent="selectPrevSuggestion"
-                @keydown.enter.prevent="sendCommand"
-              />
+              <div v-if="isServerRunning" class="flex h-11 w-full gap-4 pr-4">
+                <input
+                  v-if="isServerRunning"
+                  v-model="commandInput"
+                  type="text"
+                  placeholder="Send a command"
+                  class="w-full flex-grow rounded-md !pl-10 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+                  aria-autocomplete="list"
+                  aria-controls="command-suggestions"
+                  spellcheck="false"
+                  :aria-activedescendant="'suggestion-' + selectedSuggestionIndex"
+                  @keydown.tab.prevent="acceptSuggestion"
+                  @keydown.down.prevent="selectNextSuggestion"
+                  @keydown.up.prevent="selectPrevSuggestion"
+                  @keydown.enter.prevent="sendCommand"
+                />
+                <div class="flex-shrink-0">
+                  <UiServersPanelTerminalSearch @search="onSearch" />
+                </div>
+              </div>
               <input
                 v-else
                 disabled
@@ -238,6 +243,11 @@ interface ErrorData {
 
 const inspectingError = ref<ErrorData | null>(null);
 const mcError = ref<any>(null);
+const searchQuery = ref("");
+
+const onSearch = (val: string) => {
+  searchQuery.value = val;
+};
 
 const inspectError = async () => {
   const log = await props.server.fs?.downloadFile("logs/latest.log");
@@ -578,7 +588,6 @@ const commandTree: any = {
   xp: null,
 };
 
-const fullScreen = ref(false);
 const commandInput = ref("");
 const suggestions = ref<string[]>([]);
 const selectedSuggestionIndex = ref(0);

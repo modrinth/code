@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@modrinth/assets": "workspace:*",
+    "@pyro/tartaros": "workspace:*",
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
     "@sentry/vue": "^8.27.0",

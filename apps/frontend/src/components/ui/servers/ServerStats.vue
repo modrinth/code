@@ -159,7 +159,6 @@ const metrics = ref([
 ]);
 
 const updateMetrics = () => {
-  console.log(props.data.current.ram_usage_bytes);
   metrics.value = metrics.value.map((metric, index) => {
     if (userPreferences.value.ramAsNumber && index === 1) {
       return {
@@ -317,6 +316,7 @@ onUnmounted(() => {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
