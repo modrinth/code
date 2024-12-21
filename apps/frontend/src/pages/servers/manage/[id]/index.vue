@@ -1,8 +1,14 @@
 <template>
-  <div v-if="isConnected && !isWsAuthIncorrect" class="relative flex select-none flex-col gap-6"
-    data-pyro-server-manager-root>
-    <div v-if="inspectingError" data-pyro-servers-inspecting-error
-      class="flex justify-between rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast">
+  <div
+    v-if="isConnected && !isWsAuthIncorrect"
+    class="relative flex select-none flex-col gap-6"
+    data-pyro-server-manager-root
+  >
+    <div
+      v-if="inspectingError"
+      data-pyro-servers-inspecting-error
+      class="flex justify-between rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+    >
       <div class="flex w-full justify-between gap-2">
         <div v-if="inspectingError.analysis.problems.length" class="flex flex-row gap-4">
           <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
@@ -13,7 +19,11 @@
               and found the following problems:
             </div>
 
-            <li v-for="problem in inspectingError.analysis.problems" :key="problem.message" class="list-none">
+            <li
+              v-for="problem in inspectingError.analysis.problems"
+              :key="problem.message"
+              class="list-none"
+            >
               <h4 class="m-0 text-sm font-normal sm:text-lg sm:font-semibold">
                 {{ problem.message }}
               </h4>
@@ -70,50 +80,89 @@
     <div class="flex flex-col-reverse gap-6 md:flex-col">
       <UiServersServerStats :data="stats" />
       <div
-        class="relative flex h-[616px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8">
+        class="relative flex h-[616px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
+      >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
             <UiServersPanelServerStatus :state="serverPowerState" />
           </div>
         </div>
-        <UiServersPanelTerminal :full-screen="fullScreen">
+        <UiServersPanelTerminal :search="searchQuery">
           <div class="relative w-full px-4 pt-4">
-            <ul v-if="suggestions.length" id="command-suggestions" ref="suggestionsList"
+            <ul
+              v-if="suggestions.length"
+              id="command-suggestions"
+              ref="suggestionsList"
               class="mt-1 max-h-60 w-full list-none overflow-auto rounded-md border border-divider bg-bg-raised p-0 shadow-lg"
-              role="listbox">
-              <li v-for="(suggestion, index) in suggestions" :id="'suggestion-' + index" :key="index" role="option"
-                :aria-selected="index === selectedSuggestionIndex" :class="[
+              role="listbox"
+            >
+              <li
+                v-for="(suggestion, index) in suggestions"
+                :id="'suggestion-' + index"
+                :key="index"
+                role="option"
+                :aria-selected="index === selectedSuggestionIndex"
+                :class="[
                   'cursor-pointer px-4 py-2',
                   index === selectedSuggestionIndex ? 'bg-bg-raised' : 'bg-bg',
-                ]" @click="selectSuggestion(index)" @mousemove="() => (selectedSuggestionIndex = index)">
+                ]"
+                @click="selectSuggestion(index)"
+                @mousemove="() => (selectedSuggestionIndex = index)"
+              >
                 {{ suggestion }}
               </li>
             </ul>
             <div class="relative flex items-center">
-              <span v-if="bestSuggestion"
-                class="pointer-events-none absolute left-[26px] transform select-none text-gray-400">
+              <span
+                v-if="bestSuggestion"
+                class="pointer-events-none absolute left-[26px] transform select-none text-gray-400"
+              >
                 <span class="ml-[23.5px] whitespace-pre">{{
                   " ".repeat(commandInput.length - 1)
                 }}</span>
                 <span> {{ bestSuggestion }} </span>
                 <button
                   class="text pointer-events-auto ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-none dark:bg-highlight"
-                  aria-label="Accept suggestion" style="transform: translateY(-1px)" @click="acceptSuggestion">
+                  aria-label="Accept suggestion"
+                  style="transform: translateY(-1px)"
+                  @click="acceptSuggestion"
+                >
                   TAB
                 </button>
               </span>
-              <div class="pointer-events-none absolute left-0 top-0 flex h-full w-full items-center">
+              <div
+                class="pointer-events-none absolute left-0 top-0 flex h-full w-full items-center"
+              >
                 <TerminalSquareIcon class="ml-3 h-5 w-5" />
               </div>
-              <input v-if="isServerRunning" v-model="commandInput" type="text" placeholder="Send a command"
-                class="w-full rounded-md !pl-10 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
-                aria-autocomplete="list" aria-controls="command-suggestions" spellcheck="false"
-                :aria-activedescendant="'suggestion-' + selectedSuggestionIndex" @keydown.tab.prevent="acceptSuggestion"
-                @keydown.down.prevent="selectNextSuggestion" @keydown.up.prevent="selectPrevSuggestion"
-                @keydown.enter.prevent="sendCommand" />
-              <input v-else disabled type="text" placeholder="Send a command"
-                class="w-full rounded-md !pl-10 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg" />
+              <div v-if="isServerRunning" class="flex h-11 w-full gap-4 pr-4">
+                <input
+                  v-if="isServerRunning"
+                  v-model="commandInput"
+                  type="text"
+                  placeholder="Send a command"
+                  class="w-full flex-grow rounded-md !pl-10 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+                  aria-autocomplete="list"
+                  aria-controls="command-suggestions"
+                  spellcheck="false"
+                  :aria-activedescendant="'suggestion-' + selectedSuggestionIndex"
+                  @keydown.tab.prevent="acceptSuggestion"
+                  @keydown.down.prevent="selectNextSuggestion"
+                  @keydown.up.prevent="selectPrevSuggestion"
+                  @keydown.enter.prevent="sendCommand"
+                />
+                <div class="flex-shrink-0">
+                  <UiServersPanelTerminalSearch @search="onSearch" />
+                </div>
+              </div>
+              <input
+                v-else
+                disabled
+                type="text"
+                placeholder="Send a command"
+                class="w-full rounded-md !pl-10 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
+              />
             </div>
           </div>
         </UiServersPanelTerminal>
@@ -194,6 +243,11 @@ interface ErrorData {
 
 const inspectingError = ref<ErrorData | null>(null);
 const mcError = ref<any>(null);
+const searchQuery = ref("");
+
+const onSearch = (val: string) => {
+  searchQuery.value = val;
+};
 
 const inspectError = async () => {
   const log = await props.server.fs?.downloadFile("logs/latest.log");
@@ -534,7 +588,6 @@ const commandTree: any = {
   xp: null,
 };
 
-const fullScreen = ref(false);
 const commandInput = ref("");
 const suggestions = ref<string[]>([]);
 const selectedSuggestionIndex = ref(0);

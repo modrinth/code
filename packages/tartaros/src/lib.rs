@@ -13,9 +13,14 @@ use std::{cell::RefCell, cmp, rc::Rc};
 use ansi::{AnsiCommand, AnsiParser};
 use log::{info, Level};
 use measure::TextMeasureCache;
-use utils::{cancel_animation_frame, request_animation_frame, set_panic_hook, worker};
+use utils::{
+    cancel_animation_frame, request_animation_frame, set_panic_hook, worker,
+};
 use wasm_bindgen::prelude::*;
-use web_sys::{DedicatedWorkerGlobalScope, OffscreenCanvas, OffscreenCanvasRenderingContext2d};
+use web_sys::{
+    DedicatedWorkerGlobalScope, OffscreenCanvas,
+    OffscreenCanvasRenderingContext2d,
+};
 
 const FONT_SIZE: usize = 18;
 const LINE_HEIGHT: usize = FONT_SIZE + (FONT_SIZE / 2);
@@ -93,132 +98,12 @@ impl PyroConsole {
     pub fn init(&mut self) {
         let mut _state = &self.state;
 
-        // let closure = {
-        //     let state = _state.clone();
-        //     Closure::<dyn FnMut(_)>::new(move |event: web_sys::WheelEvent| {
-        //         event.prevent_default();
-        //         let mut state = state.borrow_mut(); // mutable borrow happens here
-        //         let delta_y = event.delta_y();
-        //         if delta_y > 0.0 {
-        //             if state.offset == u64::MAX
-        //                 || state.offset as usize + LINES_VISIBLE >= state.lines.len() + GAP_LINES
-        //             {
-        //                 return;
-        //             }
-        //             state.offset += 1;
-        //         } else {
-        //             if state.offset == 0 {
-        //                 return;
-        //             }
-        //             state.offset -= 1;
-        //         }
-        //     })
-        // };
-
-        // _state
-        //     .borrow()
-        //     .canvas
-        //     .add_event_listener_with_callback("wheel", closure.as_ref().unchecked_ref())
-        //     .expect("failed to add wheel listener");
-
-        // closure.forget();
-
-        // let closure = {
-        //     let state = _state.clone();
-        //     Closure::<dyn FnMut(_)>::new(move |event: web_sys::MouseEvent| {
-        //         let mut state = state.borrow_mut();
-        //         let total_lines = (state.lines.len() - LINES_VISIBLE) as u64;
-        //         let height = state.canvas.height() as f64;
-        //         let total_height = (LINE_HEIGHT as f64) * total_lines as f64;
-        //         let scroll_bar_height = cmp::max(
-        //             (height / total_height * height).round() as u64,
-        //             MIN_SCROLL_BAR_HEIGHT as u64,
-        //         );
-        //         let scroll_bar_y =
-        //             (height - scroll_bar_height as f64) * state.offset as f64 / total_lines as f64;
-
-        //         let (x, y) = (event.client_x() as f64, event.client_y() as f64);
-        //         let rect = state.canvas.get_bounding_client_rect();
-        //         let (x, y) = (x - rect.left(), y - rect.top());
-        //         // if the mouse isn't inside the scroll bar, return
-        //         // scrollbar width should be accounted for
-        //         if x < rect.width() as f64 - SCROLL_BAR_WIDTH as f64 {
-        //             state.scroll_bar_y_offset = -1.0;
-        //             return;
-        //         }
-        //         if y < scroll_bar_y || y > scroll_bar_y + scroll_bar_height as f64 {
-        //             state.scroll_bar_y_offset = (scroll_bar_height as f64) / 2.0;
-        //             state.offset = PyroConsole::calculate_offset(
-        //                 y - scroll_bar_height as f64 / 2.0,
-        //                 rect.height(),
-        //                 (state.lines.len() - LINES_VISIBLE) as u64,
-        //             );
-        //         } else {
-        //             state.scroll_bar_y_offset = y - scroll_bar_y;
-        //         }
-        //     })
-        // };
-
-        // _state
-        //     .borrow()
-        //     .canvas
-        //     .add_event_listener_with_callback("mousedown", closure.as_ref().unchecked_ref())
-        //     .expect("failed to add mousedown listener");
-
-        // closure.forget();
-
-        // let closure = {
-        //     let state = _state.clone();
-        //     Closure::<dyn FnMut(_)>::new(move |event: web_sys::MouseEvent| {
-        //         let mut state = state.borrow_mut();
-        //         if state.scroll_bar_y_offset < 0.0 {
-        //             return;
-        //         }
-        //         let y = event.client_y() - state.scroll_bar_y_offset as i32;
-        //         let rect = state.canvas.get_bounding_client_rect();
-        //         let y = y - rect.top() as i32;
-
-        //         // for debugging, just scroll anyway
-        //         // figure out what offset we need for the current y position -- the top pixel of the
-        //         // scroll bar should be at the current y position (approximately)
-        //         let offset = PyroConsole::calculate_offset(
-        //             y as f64,
-        //             rect.height(),
-        //             (state.lines.len() - LINES_VISIBLE) as u64,
-        //         );
-        //         state.offset = offset;
-        //     })
-        // };
-
-        // _state
-        //     .borrow()
-        //     .window
-        //     .add_event_listener_with_callback("mousemove", closure.as_ref().unchecked_ref())
-        //     .expect("failed to add mousemove listener");
-
-        // closure.forget();
-
-        // let closure = {
-        //     let state = _state.clone();
-        //     Closure::<dyn FnMut(_)>::new(move |_: web_sys::MouseEvent| {
-        //         let mut state = state.borrow_mut();
-        //         state.scroll_bar_y_offset = -1.0;
-        //     })
-        // };
-
-        // _state
-        //     .borrow()
-        //     .window
-        //     .add_event_listener_with_callback("mouseup", closure.as_ref().unchecked_ref())
-        //     .expect("failed to add mouseup listener");
-
-        // closure.forget();
-
         let closure = {
             let state = _state.clone();
             Closure::<dyn FnMut()>::new(move || {
                 let mut state = state.borrow_mut();
-                let new_fps = state.framerates.iter().sum::<f64>() / state.framerates.len() as f64;
+                let new_fps = state.framerates.iter().sum::<f64>()
+                    / state.framerates.len() as f64;
                 state.fps = cmp::min(new_fps.round() as u16, 360) as u16;
                 state.framerates.clear();
             })
@@ -236,10 +121,6 @@ impl PyroConsole {
         closure.forget();
 
         self.state.borrow().canvas.set_height(CANVAS_HEIGHT as u32);
-
-        // state.canvas.set_height(CANVAS_HEIGHT as u32);
-        // let f = Rc::new(RefCell::new(None));
-        // let g = f.clone();
 
         let f = Rc::new(RefCell::new(None));
         let g = f.clone();
@@ -261,7 +142,8 @@ impl PyroConsole {
                 let delta = now - state.last_frame_time;
                 state.last_frame_time = now;
                 state.framerates.push(1000.0 / delta);
-                state.animation_frame = request_animation_frame(f.borrow().as_ref().unwrap());
+                state.animation_frame =
+                    request_animation_frame(f.borrow().as_ref().unwrap());
             })
         };
 
@@ -274,7 +156,8 @@ impl PyroConsole {
         let max = cmp::min(len, state.offset as usize + LINES_VISIBLE);
         let range = cmp::min(state.offset as usize, max)..max;
         let lines = &state.lines[range];
-        let (width, height) = (state.canvas.width() as f64, state.canvas.height() as f64);
+        let (width, height) =
+            (state.canvas.width() as f64, state.canvas.height() as f64);
         state.ctx.set_fill_style_str("white");
         state
             .ctx
@@ -298,12 +181,15 @@ impl PyroConsole {
                             .fill_text(
                                 text.as_str(),
                                 (LINE_HEIGHT / 2) as f64 + x as f64,
-                                (i as f64 + 1.0) * LINE_HEIGHT as f64 + LINE_OFFSET as f64,
+                                (i as f64 + 1.0) * LINE_HEIGHT as f64
+                                    + LINE_OFFSET as f64,
                             )
                             .expect("failed to draw");
                         // x += state.ctx.measure_text(text.as_str()).unwrap().width();
                         // x += state.char_width * text.len() as f64;
-                        x += state.measure_cache.measure(FONT_SIZE, text.as_str());
+                        x += state
+                            .measure_cache
+                            .measure(FONT_SIZE, text.as_str());
                     }
                     AnsiCommand::ModifyStyle(control) => {
                         style = control.to_color();
@@ -320,7 +206,8 @@ impl PyroConsole {
 
         // ctx.fill_text(format!("FPS: {:.2}", fps).as_str(), width - 100.0, 20.0)
         //     .expect("failed to draw");
-        let str = format!("FPS: {:.2} | Lines: {}", state.fps, state.lines.len());
+        let str =
+            format!("FPS: {:.2} | Lines: {}", state.fps, state.lines.len());
         // let text_width = state.ctx.measure_text(str.as_str()).unwrap().width();
         // let text_width = state.char_width * str.len() as f64;
         let text_width = state.measure_cache.measure(12, str.as_str());
@@ -335,7 +222,8 @@ impl PyroConsole {
 
         // scroll bar
 
-        let total_lines = cmp::max(len as u64, LINES_VISIBLE as u64) - LINES_VISIBLE as u64;
+        let total_lines =
+            cmp::max(len as u64, LINES_VISIBLE as u64) - LINES_VISIBLE as u64;
 
         state.ctx.set_fill_style_str("rgba(0, 0, 0, 0.15)");
         state.ctx.fill_rect(
@@ -354,8 +242,9 @@ impl PyroConsole {
                 MIN_SCROLL_BAR_HEIGHT as u64,
             )
         };
-        let scroll_bar_y =
-            (height - scroll_bar_height as f64) * state.offset as f64 / total_lines as f64;
+        let scroll_bar_y = (height - scroll_bar_height as f64)
+            * state.offset as f64
+            / total_lines as f64;
         state.ctx.fill_rect(
             width - SCROLL_BAR_WIDTH as f64,
             scroll_bar_y as f64,
@@ -367,8 +256,8 @@ impl PyroConsole {
     pub fn add_line(&mut self, line: &str) {
         let parser = AnsiParser::new(line.to_owned());
         let mut state = self.state.borrow_mut();
-        let is_at_bottom =
-            state.offset + LINES_VISIBLE as u64 >= (state.lines.len() + GAP_LINES as usize) as u64;
+        let is_at_bottom = state.offset + LINES_VISIBLE as u64
+            >= (state.lines.len() + GAP_LINES as usize) as u64;
         let result = parser.parse();
         state.raw_lines.push(result.clone());
         // state.lines = PyroConsole::calculate_line_breaks(&state);
@@ -388,7 +277,9 @@ impl PyroConsole {
         // );
 
         if is_at_bottom {
-            state.offset = (state.lines.len() + GAP_LINES).saturating_sub(LINES_VISIBLE) as u64;
+            state.offset = (state.lines.len() + GAP_LINES)
+                .saturating_sub(LINES_VISIBLE)
+                as u64;
         }
     }
 
@@ -396,7 +287,8 @@ impl PyroConsole {
         state: &mut PyroConsoleState,
         line: Vec<AnsiCommand>,
     ) -> Vec<Vec<AnsiCommand>> {
-        let canvas_space = state.canvas.width() as f64 - SCROLL_BAR_WIDTH as f64 - 16.0;
+        let canvas_space =
+            state.canvas.width() as f64 - SCROLL_BAR_WIDTH as f64 - 16.0;
         let mut lines: Vec<Vec<AnsiCommand>> = Vec::new();
         let mut x = 0.0;
         let mut current_line = Vec::new();
@@ -415,7 +307,8 @@ impl PyroConsole {
                         };
                         let word = (*word).to_owned();
                         let word = word.as_str();
-                        let width = state.measure_cache.measure(FONT_SIZE, word);
+                        let width =
+                            state.measure_cache.measure(FONT_SIZE, word);
                         if x + width > canvas_space {
                             lines.push(current_line.clone());
                             let mut styles = Vec::new();
@@ -431,7 +324,8 @@ impl PyroConsole {
                             }
                             x = 0.0;
                         }
-                        current_line.push(AnsiCommand::RenderText(word.to_owned()));
+                        current_line
+                            .push(AnsiCommand::RenderText(word.to_owned()));
                         x += width;
                     }
                 }
@@ -455,7 +349,8 @@ impl PyroConsole {
     fn calculate_offset(y: f64, height: f64, total_lines: u64) -> u64 {
         let total_height = LINE_HEIGHT as f64 * total_lines as f64; // total scrollable content height
         let scroll_ratio = height / total_height; // proportion of the visible area to the total content height
-        let scroll_bar_height = f64::max(height * scroll_ratio, MIN_SCROLL_BAR_HEIGHT as f64); // actual scrollbar height
+        let scroll_bar_height =
+            f64::max(height * scroll_ratio, MIN_SCROLL_BAR_HEIGHT as f64); // actual scrollbar height
         let scroll_range = height - scroll_bar_height; // the scrollable range of the scrollbar
         let offset = ((y / scroll_range).clamp(0.0, 1.0)) * total_lines as f64;
         (offset.round() as u64).clamp(0, total_lines)
@@ -482,8 +377,10 @@ impl PyroConsole {
             state.lines.clear();
             for line in state.raw_lines.clone().iter() {
                 let is_hooked_on_last_line = state.lines.len() >= LINES_VISIBLE
-                    && state.lines.last().unwrap().raw_lines_index == state.raw_lines.len() - 1;
-                let new_lines = PyroConsole::calculate_line_breaks(state, line.clone());
+                    && state.lines.last().unwrap().raw_lines_index
+                        == state.raw_lines.len() - 1;
+                let new_lines =
+                    PyroConsole::calculate_line_breaks(state, line.clone());
                 for line in new_lines {
                     state.lines.push(PyroConsoleLine {
                         ansi_commands: line,
@@ -508,12 +405,20 @@ impl PyroConsole {
         // get the content height, where the content height is equal to get_scroll_px() when scrolled to the bottom
         let state = self.state.borrow();
         let total_lines =
-            cmp::max(state.lines.len() as u64, LINES_VISIBLE as u64) - LINES_VISIBLE as u64;
-        let total_height = (LINE_HEIGHT as f64) * (total_lines + GAP_LINES as u64) as f64;
+            cmp::max(state.lines.len() as u64, LINES_VISIBLE as u64)
+                - LINES_VISIBLE as u64;
+        let total_height =
+            (LINE_HEIGHT as f64) * (total_lines + GAP_LINES as u64) as f64;
         total_height as u32
     }
 
-    pub fn mouse_down(&mut self, x: f64, y: f64, client_width: u32, client_height: u32) {
+    pub fn mouse_down(
+        &mut self,
+        x: f64,
+        y: f64,
+        client_width: u32,
+        client_height: u32,
+    ) {
         let mut state = self.state.borrow_mut();
         let total_lines = (state.lines.len() - LINES_VISIBLE) as u64;
         let height = state.canvas.height() as f64;
@@ -522,8 +427,9 @@ impl PyroConsole {
             (height / total_height * height).round() as u64,
             MIN_SCROLL_BAR_HEIGHT as u64,
         );
-        let scroll_bar_y =
-            (height - scroll_bar_height as f64) * state.offset as f64 / total_lines as f64;
+        let scroll_bar_y = (height - scroll_bar_height as f64)
+            * state.offset as f64
+            / total_lines as f64;
 
         // if the mouse isn't inside the scroll bar, return
         // scrollbar width should be accounted for
@@ -567,7 +473,8 @@ impl PyroConsole {
         let mut state = self.state.borrow_mut();
         if delta_y > 0.0 {
             if state.offset == u64::MAX
-                || state.offset as usize + LINES_VISIBLE >= state.lines.len() + GAP_LINES
+                || state.offset as usize + LINES_VISIBLE
+                    >= state.lines.len() + GAP_LINES
             {
                 return;
             }

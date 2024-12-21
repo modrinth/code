@@ -1,7 +1,9 @@
 <template>
   <div class="contents">
-    <div v-if="serverData?.status === 'suspended'"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast">
+    <div
+      v-if="serverData?.status === 'suspended'"
+      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
@@ -26,8 +28,10 @@
         </ButtonStyled>
       </div>
     </div>
-    <div v-else-if="server.error && server.error.message.includes('Forbidden')"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast">
+    <div
+      v-else-if="server.error && server.error.message.includes('Forbidden')"
+      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
@@ -47,7 +51,10 @@
         </ButtonStyled>
       </div>
     </div>
-    <div v-else-if="server.error" class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast">
+    <div
+      v-else-if="server.error"
+      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
@@ -69,23 +76,33 @@
           </p>
         </div>
         <UiCopyCode :text="server.error ? String(server.error) : 'Unknown error'" />
-        <ButtonStyled :disabled="formattedTime !== '00'" size="large" color="brand" @click="() => reloadNuxtApp()">
+        <ButtonStyled
+          :disabled="formattedTime !== '00'"
+          size="large"
+          color="brand"
+          @click="() => reloadNuxtApp()"
+        >
           <button class="mt-6 !w-full">Reload</button>
         </ButtonStyled>
       </div>
     </div>
 
     <!-- SERVER START -->
-    <div v-else-if="serverData" data-pyro-server-manager-root
+    <div
+      v-else-if="serverData"
+      data-pyro-server-manager-root
       class="experimental-styles-within mobile-blurred-servericon relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
       :style="{
         '--server-bg-image': serverData.image
           ? `url(${serverData.image})`
           : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
-      }">
+      }"
+    >
       <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
         <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
-        <div class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start">
+        <div
+          class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
+        >
           <div class="hidden shrink-0 flex-row items-center gap-1 sm:flex">
             <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
               <LeftArrowIcon />
@@ -94,32 +111,52 @@
           </div>
           <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
             <h1
-              class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left">
+              class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
+            >
               {{ serverData.name }}
             </h1>
-            <div v-if="isConnected" data-pyro-server-action-buttons
-              class="server-action-buttons-anim flex w-fit flex-shrink-0">
-              <UiServersPanelServerActionButton class="flex-shrink-0" :is-online="isServerRunning"
-                :is-actioning="isActioning" :is-installing="serverData.status === 'installing'"
-                :disabled="isActioning || !!error" :server-name="serverData.name" :server-data="serverData"
-                :uptime-seconds="uptimeSeconds" @action="sendPowerAction" />
+            <div
+              v-if="isConnected"
+              data-pyro-server-action-buttons
+              class="server-action-buttons-anim flex w-fit flex-shrink-0"
+            >
+              <UiServersPanelServerActionButton
+                class="flex-shrink-0"
+                :is-online="isServerRunning"
+                :is-actioning="isActioning"
+                :is-installing="serverData.status === 'installing'"
+                :disabled="isActioning || !!error"
+                :server-name="serverData.name"
+                :server-data="serverData"
+                :uptime-seconds="uptimeSeconds"
+                @action="sendPowerAction"
+              />
             </div>
           </div>
 
-          <UiServersServerInfoLabels :server-data="serverData" :show-game-label="showGameLabel"
-            :show-loader-label="showLoaderLabel" :uptime-seconds="uptimeSeconds" :linked="true"
-            class="flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex" />
+          <UiServersServerInfoLabels
+            :server-data="serverData"
+            :show-game-label="showGameLabel"
+            :show-loader-label="showLoaderLabel"
+            :uptime-seconds="uptimeSeconds"
+            :linked="true"
+            class="flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+          />
         </div>
       </div>
 
-      <div data-pyro-navigation
-        class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center">
+      <div
+        data-pyro-navigation
+        class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
+      >
         <UiNavTabs :links="navLinks" />
       </div>
 
       <div data-pyro-mount class="h-full w-full flex-1">
-        <div v-if="error"
-          class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast">
+        <div
+          v-if="error"
+          class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+        >
           <div class="flex flex-row gap-4">
             <IssuesIcon class="hidden h-8 w-8 shrink-0 text-red sm:block" />
             <div class="flex flex-col gap-2 leading-[150%]">
@@ -128,10 +165,15 @@
                 <div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
               </div>
 
-              <div v-if="errorTitle.toLocaleLowerCase() === 'installation error'" class="font-normal">
-                <div v-if="
-                  errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
-                ">
+              <div
+                v-if="errorTitle.toLocaleLowerCase() === 'installation error'"
+                class="font-normal"
+              >
+                <div
+                  v-if="
+                    errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
+                  "
+                >
                   An invalid loader or Minecraft version was specified and could not be installed.
                   <ul class="m-0 mt-4 p-0 pl-4">
                     <li>
@@ -163,18 +205,21 @@
                   reinstalling your server, and if the problem persists, please contact Modrinth
                   support with your server's debug information.
                 </div>
-                <div v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'">
+                <div
+                  v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
+                >
                   An error occurred while installing your server because Modrinth Servers does not
                   support the version of Minecraft or the loader you specified. Try reinstalling
                   your server with a different version or loader, and if the problem persists,
                   please contact Modrinth support with your server's debug information.
                 </div>
 
-                <div v-if="errorTitle === 'Installation error'" class="mt-2 flex flex-col gap-4 sm:flex-row">
+                <div
+                  v-if="errorTitle === 'Installation error'"
+                  class="mt-2 flex flex-col gap-4 sm:flex-row"
+                >
                   <ButtonStyled v-if="errorLog">
-                    <button @click="openInstallLog">
-                      <FileIcon />Open Installation Log
-                    </button>
+                    <button @click="openInstallLog"><FileIcon />Open Installation Log</button>
                   </ButtonStyled>
                   <ButtonStyled>
                     <button @click="copyServerDebugInfo">
@@ -184,7 +229,10 @@
                     </button>
                   </ButtonStyled>
                   <ButtonStyled color="red" type="standard">
-                    <NuxtLink class="whitespace-pre" :to="`/servers/manage/${serverId}/options/loader`">
+                    <NuxtLink
+                      class="whitespace-pre"
+                      :to="`/servers/manage/${serverId}/options/loader`"
+                    >
                       <RightArrowIcon />
                       Change Loader
                     </NuxtLink>
@@ -195,27 +243,45 @@
           </div>
         </div>
 
-        <div v-if="!isConnected && !isReconnecting && !isLoading" data-pyro-server-ws-error
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast">
+        <div
+          v-if="!isConnected && !isReconnecting && !isLoading"
+          data-pyro-server-ws-error
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
+        >
           <IssuesIcon class="size-5 text-red" />
           Something went wrong...
         </div>
 
-        <div v-if="isReconnecting" data-pyro-server-ws-reconnecting
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast">
+        <div
+          v-if="isReconnecting"
+          data-pyro-server-ws-reconnecting
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
+        >
           <UiServersPanelSpinner />
           Hang on, we're reconnecting to your server.
         </div>
 
-        <div v-if="serverData.status === 'installing'" data-pyro-server-installing
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast">
+        <div
+          v-if="serverData.status === 'installing'"
+          data-pyro-server-installing
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
+        >
           <UiServersPanelSpinner />
           We're preparing your server, this may take a few minutes.
         </div>
 
-        <NuxtPage :route="route" :is-connected="isConnected" :is-ws-auth-incorrect="isWSAuthIncorrect"
-          :is-server-running="isServerRunning" :stats="stats" :server-power-state="serverPowerState"
-          :power-state-details="powerStateDetails" :socket="socket" :server="server" @reinstall="onReinstall" />
+        <NuxtPage
+          :route="route"
+          :is-connected="isConnected"
+          :is-ws-auth-incorrect="isWSAuthIncorrect"
+          :is-server-running="isServerRunning"
+          :stats="stats"
+          :server-power-state="serverPowerState"
+          :power-state-details="powerStateDetails"
+          :socket="socket"
+          :server="server"
+          @reinstall="onReinstall"
+        />
       </div>
 
       <UiServersPoweredByPyro />
@@ -606,7 +672,6 @@ const updatePowerState = (
   state: ServerState,
   details?: { oom_killed?: boolean; exit_code?: number },
 ) => {
-  console.log("Power state:", state, details);
   serverPowerState.value = state;
 
   if (state === "crashed") {
@@ -843,9 +908,11 @@ definePageMeta({
 .mobile-blurred-servericon::before {
   @apply absolute left-0 top-0 block h-36 w-full bg-cover bg-center bg-no-repeat blur-2xl sm:hidden;
   content: "";
-  background-image: linear-gradient(to bottom,
+  background-image: linear-gradient(
+      to bottom,
       rgba(from var(--color-raised-bg) r g b / 0.2),
-      rgb(from var(--color-raised-bg) r g b / 0.8)),
+      rgb(from var(--color-raised-bg) r g b / 0.8)
+    ),
     var(--server-bg-image);
 }
 </style>

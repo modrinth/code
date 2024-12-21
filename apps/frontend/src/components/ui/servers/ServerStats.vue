@@ -1,11 +1,20 @@
 <template>
-  <div data-pyro-server-stats style="font-variant-numeric: tabular-nums"
-    class="flex select-none flex-col items-center gap-6 md:flex-row">
-    <div v-for="(metric, index) in metrics" :key="index"
-      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
-      <div class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1" :style="{
-        backdropFilter: 'blur(6px)',
-      }">
+  <div
+    data-pyro-server-stats
+    style="font-variant-numeric: tabular-nums"
+    class="flex select-none flex-col items-center gap-6 md:flex-row"
+  >
+    <div
+      v-for="(metric, index) in metrics"
+      :key="index"
+      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+    >
+      <div
+        class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1"
+        :style="{
+          backdropFilter: 'blur(6px)',
+        }"
+      >
         <div class="-mb-0.5 mt-0.5 flex flex-row items-center gap-2">
           <h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">
             {{ metric.value }}
@@ -14,27 +23,38 @@
         </div>
         <h3 class="relative z-10 flex items-center gap-2 text-base font-normal text-secondary">
           {{ metric.title }}
-          <WarningIcon v-tooltip="getPotentialWarning(metric)" :style="{
-            color: 'var(--color-orange)',
-            width: '1.25rem',
-            height: '1.25rem',
-            display: getPotentialWarning(metric) ? 'block' : 'none',
-          }" />
+          <WarningIcon
+            v-tooltip="getPotentialWarning(metric)"
+            :style="{
+              color: 'var(--color-orange)',
+              width: '1.25rem',
+              height: '1.25rem',
+              display: getPotentialWarning(metric) ? 'block' : 'none',
+            }"
+          />
         </h3>
       </div>
 
       <component :is="metric.icon" class="absolute right-10 top-10 z-10" />
       <ClientOnly>
-        <VueApexCharts v-if="
-          metric.data.length && !(metric.title === 'Memory usage' && userPreferences.ramAsNumber)
-        " ref="chart" type="area" height="142" :options="generateOptions(metric)"
+        <VueApexCharts
+          v-if="
+            metric.data.length && !(metric.title === 'Memory usage' && userPreferences.ramAsNumber)
+          "
+          ref="chart"
+          type="area"
+          height="142"
+          :options="generateOptions(metric)"
           :series="[{ name: 'Chart', data: metric.data }]"
-          class="chart chart-animation absolute bottom-0 left-0 right-0 w-full" />
+          class="chart chart-animation absolute bottom-0 left-0 right-0 w-full"
+        />
       </ClientOnly>
     </div>
 
-    <NuxtLink :to="`/servers/manage/${serverId}/files`"
-      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100">
+    <NuxtLink
+      :to="`/servers/manage/${serverId}/files`"
+      class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
+    >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 -ml-0.5 mt-1 text-3xl font-extrabold text-contrast">
           {{ formatBytes(animatedStorageUsage) }}
@@ -139,7 +159,6 @@ const metrics = ref([
 ]);
 
 const updateMetrics = () => {
-  console.log(props.data.current.ram_usage_bytes);
   metrics.value = metrics.value.map((metric, index) => {
     if (userPreferences.value.ramAsNumber && index === 1) {
       return {
@@ -153,16 +172,16 @@ const updateMetrics = () => {
         index === 0
           ? props.data.current.cpu_percent
           : Math.min(
-            (props.data.current.ram_usage_bytes / props.data.current.ram_total_bytes) * 100,
-            100,
-          );
+              (props.data.current.ram_usage_bytes / props.data.current.ram_total_bytes) * 100,
+              100,
+            );
       const pastValue =
         index === 0
           ? props.data.past.cpu_percent
           : Math.min(
-            (props.data.past.ram_usage_bytes / props.data.past.ram_total_bytes) * 100,
-            100,
-          );
+              (props.data.past.ram_usage_bytes / props.data.past.ram_total_bytes) * 100,
+              100,
+            );
 
       const newValue = lerp(currentValue, pastValue);
       return {

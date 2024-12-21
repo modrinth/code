@@ -54,7 +54,6 @@ export const usePyroConsole = createGlobalState(() => {
     }
 
     for (const line of lines) {
-      console.log(line);
       for (const listener of Object.values(listeners.value)) {
         listener(line);
       }
