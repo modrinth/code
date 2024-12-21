@@ -7,7 +7,10 @@ members = [
   './apps/labrinth',
   './apps/daedalus_client',
   './packages/daedalus',
-  './packages/tartaros',
+]
+
+exclude = [
+  './packages/tartaros'
 ]
 
 # Optimize for speed and reduce size on release builds

@@ -38,6 +38,31 @@ struct PyroConsoleLine {
     raw_lines_index: usize,
 }
 
+impl PyroConsoleLine {
+    fn contains(&self, query: &str) -> bool {
+        // for command in self.ansi_commands.iter() {
+        //     match command {
+        //         AnsiCommand::RenderText(text) => {
+        //             if text.contains(query) {
+        //                 return true;
+        //             }
+        //         }
+        //         _ => continue,
+        //     }
+        // }
+        // false
+
+        let mut text = String::new();
+        for command in self.ansi_commands.iter() {
+            match command {
+                AnsiCommand::RenderText(t) => text.push_str(t),
+                _ => continue,
+            }
+        }
+        text.contains(query)
+    }
+}
+
 #[wasm_bindgen]
 #[derive(Clone, Debug)]
 pub struct PyroConsoleState {
@@ -48,6 +73,7 @@ pub struct PyroConsoleState {
     lines: Vec<PyroConsoleLine>,
     last_size: (u32, u32),
     measure_cache: TextMeasureCache,
+    query: String,
     raw_lines: Vec<Vec<AnsiCommand>>,
     offset: u64,
     last_frame_time: f64,
@@ -84,6 +110,7 @@ impl PyroConsole {
                 last_size: (0, 0),
                 raw_lines: Vec::new(),
                 offset: 0,
+                query: String::new(),
                 last_frame_time: 0.0,
                 framerates: Vec::new(),
                 fps: 360,
@@ -165,6 +192,7 @@ impl PyroConsole {
         state.ctx.fill_rect(0.0, 0.0, width, height);
         state.ctx.set_fill_style_str("black");
         state.current_fill_style = "black".to_owned();
+        // search through raw_lines for query
         for (i, line) in lines.iter().enumerate() {
             let mut style = "black".to_owned();
             let mut x = 0.0;
