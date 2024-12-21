@@ -6,7 +6,7 @@
         <h2 class="header__title text-2xl">Organizations</h2>
         <div class="input-group">
           <button class="iconified-button brand-button" @click="openCreateOrgModal">
-            <PlusIcon />
+            <PlusIcon aria-hidden="true" />
             Create organization
           </button>
         </div>
@@ -30,7 +30,7 @@
               </div>
               <span class="stat-bar">
                 <div class="stats">
-                  <UsersIcon />
+                  <UsersIcon aria-hidden="true" />
                   <span>
                     {{ onlyAcceptedMembers(org.members).length }} member<template
                       v-if="onlyAcceptedMembers(org.members).length !== 1"
@@ -76,8 +76,8 @@ if (error.value) {
   });
 }
 
-const openCreateOrgModal = () => {
-  createOrgModal.value?.show();
+const openCreateOrgModal = (event) => {
+  createOrgModal.value?.show(event);
 };
 </script>
 

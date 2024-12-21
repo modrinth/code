@@ -39,21 +39,12 @@ async fn main() -> theseus::Result<()> {
     let _log_guard = theseus::start_logger();
 
     // Initialize state
-    let st = State::get().await?;
-    //State::update();
+    State::init().await?;
 
     if minecraft_auth::users().await?.is_empty() {
         println!("No users found, authenticating.");
         authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
     }
-
-    // Autodetect java globals
-    st.settings.write().await.max_concurrent_downloads = 50;
-    st.settings.write().await.hooks.post_exit =
-        Some("echo This is after Minecraft runs- global setting!".to_string());
-    // Changed the settings, so need to reset the semaphore
-    st.reset_fetch_semaphore().await;
-
     //
     // st.settings
     //     .write()
@@ -63,56 +54,41 @@ async fn main() -> theseus::Result<()> {
     // Clear profiles
     println!("Clearing profiles.");
     {
-        let h = profile::list(None).await?;
-        for (path, _) in h.into_iter() {
-            profile::remove(&path).await?;
+        let h = profile::list().await?;
+        for profile in h.into_iter() {
+            profile::remove(&profile.path).await?;
         }
     }
 
     println!("Creating/adding profile.");
 
     let name = "Example".to_string();
-    let game_version = "1.19.2".to_string();
-    let modloader = ModLoader::Vanilla;
+    let game_version = "1.16.1".to_string();
+    let modloader = ModLoader::Forge;
     let loader_version = "stable".to_string();
 
     let profile_path = profile_create(
-        name.clone(),
+        name,
         game_version,
         modloader,
         Some(loader_version),
         None,
         None,
         None,
-        None,
-        None,
     )
     .await?;
 
-    State::sync().await?;
-
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process
-    let proc_lock = profile::run(&profile_path).await?;
-    let uuid = proc_lock.read().await.uuid;
-    let pid = proc_lock.read().await.current_child.read().await.id();
+    let process = profile::run(&profile_path).await?;
 
-    println!("Minecraft UUID: {}", uuid);
-    println!("Minecraft PID: {:?}", pid);
+    println!("Minecraft UUID: {}", process.uuid);
 
-    println!(
-        "All running process UUID {:?}",
-        process::get_all_running_uuids().await?
-    );
-    println!(
-        "All running process paths {:?}",
-        process::get_all_running_profile_paths().await?
-    );
+    println!("All running process UUID {:?}", process::get_all().await?);
 
     // hold the lock to the process until it ends
     println!("Waiting for process to end...");
-    let mut proc = proc_lock.write().await;
-    process::wait_for(&mut proc).await?;
+    process::wait_for(process.uuid).await?;
 
     Ok(())
 }

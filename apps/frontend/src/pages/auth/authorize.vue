@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { Button, Avatar } from "@modrinth/ui";
+import { Button, Avatar, commonMessages } from "@modrinth/ui";
 import { XIcon, CheckIcon } from "@modrinth/assets";
 import { useBaseFetch } from "@/composables/fetch.js";
 import { useAuth } from "@/composables/auth.js";
@@ -195,7 +195,7 @@ const onAuthorize = async () => {
     }
 
     throw new Error(formatMessage(messages.noRedirectUrlError));
-  } catch (error) {
+  } catch {
     data.$notify({
       group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
@@ -222,7 +222,7 @@ const onReject = async () => {
     }
 
     throw new Error(formatMessage(messages.noRedirectUrlError));
-  } catch (error) {
+  } catch {
     data.$notify({
       group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),

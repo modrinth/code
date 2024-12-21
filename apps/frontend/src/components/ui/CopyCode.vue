@@ -45,7 +45,7 @@ export default {
   margin: 0;
   padding: 0.25rem 0.5rem;
   background-color: var(--color-code-bg);
-  width: min-content;
+  width: fit-content;
   border-radius: 10px;
   user-select: text;
   transition:
@@ -55,7 +55,6 @@ export default {
     outline 0.2s ease-in-out;
 
   span {
-    max-width: 10rem;
     overflow: hidden;
     text-overflow: ellipsis;
   }

@@ -15,17 +15,17 @@
           <div class="card__overlay input-group">
             <template v-if="canEdit && isEditing === false">
               <Button @click="isEditing = true">
-                <EditIcon />
+                <EditIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.editButton) }}
               </Button>
               <Button id="delete-collection" @click="() => $refs.deleteModal.show()">
-                <TrashIcon />
+                <TrashIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.deleteLabel) }}
               </Button>
             </template>
             <template v-else-if="canEdit && isEditing === true">
-              <PopoutMenu class="btn" position="bottom" direction="right">
-                <EditIcon /> {{ formatMessage(messages.editIconButton) }}
+              <PopoutMenu class="btn">
+                <EditIcon aria-hidden="true" /> {{ formatMessage(messages.editIconButton) }}
                 <template #menu>
                   <span class="icon-edit-menu">
                     <FileInput
@@ -35,10 +35,10 @@
                       accept="image/png,image/jpeg,image/gif,image/webp"
                       class="btn btn-transparent upload"
                       style="white-space: nowrap"
-                      prompt=""
+                      aria-label="Upload icon"
                       @change="showPreviewImage"
                     >
-                      <UploadIcon />
+                      <UploadIcon aria-hidden="true" />
                       {{ formatMessage(messages.uploadIconButton) }}
                     </FileInput>
                     <Button
@@ -52,7 +52,7 @@
                         }
                       "
                     >
-                      <TrashIcon />
+                      <TrashIcon aria-hidden="true" />
                       {{ formatMessage(messages.deleteIconButton) }}
                     </Button>
                   </span>
@@ -103,11 +103,11 @@
             </div>
             <div class="push-right input-group">
               <Button @click="isEditing = false">
-                <XIcon />
+                <XIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.cancelButton) }}
               </Button>
               <Button color="primary" @click="saveChanges()">
-                <SaveIcon />
+                <SaveIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.saveButton) }}
               </Button>
             </div>
@@ -122,7 +122,7 @@
 
               <div>
                 <span class="collection-label">
-                  <BoxIcon /> {{ formatMessage(messages.collectionLabel) }}
+                  <BoxIcon aria-hidden="true" /> {{ formatMessage(messages.collectionLabel) }}
                 </span>
               </div>
 
@@ -187,7 +187,7 @@
                   "
                   class="date"
                 >
-                  <CalendarIcon />
+                  <CalendarIcon aria-hidden="true" />
                   <label>
                     {{
                       formatMessage(messages.createdAtLabel, {
@@ -208,7 +208,7 @@
                   "
                   class="date"
                 >
-                  <UpdatedIcon />
+                  <UpdatedIcon aria-hidden="true" />
                   <label>
                     {{
                       formatMessage(messages.updatedAtLabel, {
@@ -247,10 +247,11 @@
             </div>
           </template>
         </div>
+        <AdPlaceholder
+          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
+        />
       </div>
       <div class="normal-page__content">
-        <Promotion :external="false" query-param="" />
-
         <nav class="navigation-card">
           <NavRow
             :links="[
@@ -331,7 +332,7 @@
                 }
               "
             >
-              <TrashIcon />
+              <TrashIcon aria-hidden="true" />
               {{ formatMessage(messages.removeProjectButton) }}
             </button>
             <button
@@ -339,7 +340,7 @@
               class="iconified-button"
               @click="unfollowProject(project)"
             >
-              <TrashIcon />
+              <TrashIcon aria-hidden="true" />
               {{ formatMessage(messages.unfollowProjectButton) }}
             </button>
           </ProjectCard>
@@ -379,7 +380,14 @@ import {
   LibraryIcon,
   BoxIcon,
 } from "@modrinth/assets";
-import { PopoutMenu, FileInput, DropdownSelect, Promotion, Avatar, Button } from "@modrinth/ui";
+import {
+  PopoutMenu,
+  FileInput,
+  DropdownSelect,
+  Avatar,
+  Button,
+  commonMessages,
+} from "@modrinth/ui";
 
 import WorldIcon from "assets/images/utils/world.svg";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
@@ -387,6 +395,7 @@ import { addNotification } from "~/composables/notifs.js";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
@@ -479,6 +488,7 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
+const flags = useFeatureFlags();
 
 const isEditing = ref(false);
 
@@ -608,7 +618,7 @@ const visibility = ref(collection.value.status);
 const removeProjects = ref([]);
 
 async function unfollowProject(project) {
-  await userUnfollowProject(project);
+  await userFollowProject(project);
   projects.value = projects.value.filter((x) => x.id !== project.id);
 }
 

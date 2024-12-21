@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                        SELECT f.id id FROM hashes h\n                        INNER JOIN files f ON h.file_id = f.id\n                        WHERE h.algorithm = $2 AND h.hash = $1\n                        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bytea",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "d1566672369ea22cb1f638f073f8e3fb467b354351ae71c67941323749ec9bcd"
+}

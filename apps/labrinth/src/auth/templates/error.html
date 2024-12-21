@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/auth/style.css" />
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <title>Error - Modrinth</title>
+  </head>
+
+  <body>
+    <div class="content">
+      <img src="/logo.svg" alt="Modrinth Logo" class="logo" />
+      <h2>{{ code }}</h2>
+      <p>An error has occurred during the authentication process.</p>
+      <p>
+        Try closing this window and signing in again. Join
+        <a href="https://discord.modrinth.com">our Discord server</a> to get help if this error
+        persists after three attempts.
+      </p>
+      <p><b>Debug information:</b> {{ message }}</p>
+    </div>
+  </body>
+</html>

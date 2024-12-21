@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO threads_messages (\n                id, author_id, body, thread_id, hide_identity\n            )\n            VALUES (\n                $1, $2, $3, $4, $5\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Jsonb",
+        "Int8",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9d46594c3dda50dc84defee87fa98210989dd59b06941a5e71b6661f059c9692"
+}

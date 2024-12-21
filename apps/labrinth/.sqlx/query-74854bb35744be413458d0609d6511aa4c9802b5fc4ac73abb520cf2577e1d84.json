@@ -1,0 +1,95 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT id, user_id, session, created, last_login, expires, refresh_expires, os, platform,\n                    city, country, ip, user_agent\n                    FROM sessions\n                    WHERE id = ANY($1) OR session = ANY($2)\n                    ORDER BY created DESC\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "session",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "last_login",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "expires",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "refresh_expires",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "os",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "platform",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "city",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "country",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "ip",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "user_agent",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "74854bb35744be413458d0609d6511aa4c9802b5fc4ac73abb520cf2577e1d84"
+}

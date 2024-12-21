@@ -1,0 +1,54 @@
+:root,
+::backdrop,
+:root[data-theme='light'],
+[data-theme='light'] ::backdrop {
+  --sl-font-system: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto,
+    Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+
+  --sl-color-white: var(--color-contrast); /* “white” */
+  --sl-color-gray-1: var(--color-base);
+  --sl-color-gray-2: var(--color-base);
+  --sl-color-gray-3: var(--color-base);
+  --sl-color-gray-4: var(--color-raised-bg);
+  --sl-color-gray-5: var(--color-button-bg);
+  --sl-color-gray-6: var(--color-raised-bg);
+  --sl-color-black: var(--color-accent-contrast);
+
+  --sl-color-accent-low: var(--color-green-highlight);
+  --sl-color-accent: var(--color-brand);
+  --sl-color-accent-high: var(--color-brand-highlight);
+
+  --sl-color-orange-low: var(--color-orange-highlight);
+  --sl-color-orange: var(--color-orange);
+  --sl-color-orange-high: var(--color-orange-highlight);
+
+  --sl-color-green-low: var(--color-green-highlight);
+  --sl-color-green: var(--color-green);
+  --sl-color-green-high: var(--color-green-highlight);
+
+  --sl-color-blue-low: var(--color-blue-highlight);
+  --sl-color-blue: var(--color-blue);
+  --sl-color-blue-high: var(--color-blue-highlight);
+
+  --sl-color-purple-low: var(--color-purple-highlight);
+  --sl-color-purple: var(--color-purple);
+  --sl-color-purple-high: var(--color-purple-highlight);
+
+  --sl-color-red-low: var(--color-red-highlight);
+  --sl-color-red: var(--color-red);
+  --sl-color-red-high: var(--color-red-highlight);
+
+  --sl-color-text: var(--color-base);
+  --sl-color-text-accent: var(--color-brand);
+  --sl-color-text-invert: var(--color-accent-contrast);
+  --sl-color-bg: var(--color-bg);
+  --sl-color-bg-nav: var(--color-raised-bg);
+  --sl-color-bg-sidebar: var(--color-raised-bg);
+  --sl-color-bg-inline-code: var(--color-button-bg);
+  --sl-color-bg-accent: var(--color-brand-highlight);
+}
+
+:root[data-theme='light'],
+[data-theme='light'] ::backdrop {
+  --sl-color-bg: var(--color-raised-bg);
+}

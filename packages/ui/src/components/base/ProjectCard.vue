@@ -74,7 +74,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime.js'
 import { defineComponent } from 'vue'
 import Categories from '../search/Categories.vue'
-import Badge from './Badge.vue'
+import Badge from './SimpleBadge.vue'
 import Avatar from './Avatar.vue'
 import EnvironmentIndicator from './EnvironmentIndicator.vue'
 </script>

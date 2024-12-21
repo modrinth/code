@@ -42,8 +42,8 @@ export default defineConfig({
     port: 1420,
     strictPort: true,
   },
-  // to make use of `TAURI_DEBUG` and other env variables
-  // https://tauri.studio/v1/api/config#buildconfig.beforedevcommand
+  // to make use of `TAURI_ENV_DEBUG` and other env variables
+  // https://v2.tauri.app/reference/environment-variables/#tauri-cli-hook-commands
   envPrefix: ['VITE_', 'TAURI_'],
   build: {
     // Tauri supports es2021

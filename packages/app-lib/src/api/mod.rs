@@ -1,4 +1,6 @@
 //! API for interacting with Theseus
+pub mod cache;
+pub mod friends;
 pub mod handler;
 pub mod jre;
 pub mod logs;
@@ -8,17 +10,16 @@ pub mod mr_auth;
 pub mod pack;
 pub mod process;
 pub mod profile;
-pub mod safety;
 pub mod settings;
 pub mod tags;
 
 pub mod data {
     pub use crate::state::{
-        Credentials, DirectoryInfo, Hooks, JavaSettings, LinkedData,
-        MemorySettings, ModLoader, ModrinthCredentials,
-        ModrinthCredentialsResult, ModrinthProject, ModrinthTeamMember,
-        ModrinthUser, ModrinthVersion, ProfileMetadata, ProjectMetadata,
-        Settings, Theme, WindowSize,
+        CacheBehaviour, CacheValueType, Credentials, Dependency, DirectoryInfo,
+        Hooks, JavaVersion, LinkedData, MemorySettings, ModLoader,
+        ModrinthCredentials, Organization, ProcessMetadata, ProfileFile,
+        Project, ProjectType, SearchResult, SearchResults, Settings,
+        TeamMember, Theme, User, UserFriend, UserStatus, Version, WindowSize,
     };
 }
 
@@ -26,15 +27,10 @@ pub mod prelude {
     pub use crate::{
         data::*,
         event::CommandPayload,
-        jre, metadata, minecraft_auth, pack, process,
+        jre, metadata, minecraft_auth, mr_auth, pack, process,
         profile::{self, create, Profile},
         settings,
-        state::JavaGlobals,
-        state::{Dependency, ProfilePathId, ProjectPathId},
-        util::{
-            io::{canonicalize, IOError},
-            jre::JavaVersion,
-        },
+        util::io::{canonicalize, IOError},
         State,
     };
 }

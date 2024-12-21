@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO threads_members (\n                thread_id, user_id\n            )\n            SELECT * FROM UNNEST ($1::int8[], $2::int8[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c8c0bf5d298810a7a30caf03d7437af757303fa9aa0f500b83476e65cec7f1e9"
+}

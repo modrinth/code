@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT COUNT(f.id) FROM files f\n        INNER JOIN versions v on f.version_id = v.id AND v.status = ANY($2)\n        INNER JOIN mods m on v.mod_id = m.id AND m.status = ANY($1)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "a1ba3b5cc50b1eb24f5529e06be1439f4a313c4ea8845c2733db752e53f5ae1c"
+}

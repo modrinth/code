@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT DISTINCT mod_id,\n                        ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,\n                        ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,\n                        ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,\n                        ARRAY_AGG(DISTINCT lfl.loader_field_id) filter (where lfl.loader_field_id is not null) loader_fields\n                    FROM versions v\n                    INNER JOIN loaders_versions lv ON v.id = lv.version_id\n                    INNER JOIN loaders l ON lv.loader_id = l.id\n                    INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id\n                    INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id\n                    INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id\n                    INNER JOIN games g ON lptg.game_id = g.id\n                    LEFT JOIN loader_fields_loaders lfl ON lfl.loader_id = l.id\n                    WHERE v.id = ANY($1)\n                    GROUP BY mod_id\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "loaders",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 2,
+        "name": "project_types",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 3,
+        "name": "games",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 4,
+        "name": "loader_fields",
+        "type_info": "Int4Array"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "0d0f736e563abba7561c9b5de108c772541ad0049f706602d01460238f88ffd8"
+}

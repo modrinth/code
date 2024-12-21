@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO team_members (\n                id, team_id, user_id, role, permissions, organization_permissions, is_owner, accepted, payouts_split\n            )\n            VALUES (\n                $1, $2, $3, $4, $5, $6, $7, $8, $9\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8",
+        "Varchar",
+        "Int8",
+        "Int8",
+        "Bool",
+        "Bool",
+        "Numeric"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "02a585c845168c1bd8a82c30af351db75597da5456e29efc033ebb098e81e905"
+}

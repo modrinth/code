@@ -1,6 +1,6 @@
-const { resolve } = require("node:path");
+const { resolve } = require('node:path')
 
-const project = resolve(process.cwd(), "tsconfig.json");
+const project = resolve(process.cwd(), 'tsconfig.json')
 
 module.exports = {
   extends: [
@@ -12,19 +12,16 @@ module.exports = {
     'plugin:import/typescript',
     'turbo',
   ],
-  parserOptions: {
-    project,
-  },
   globals: {
     React: true,
     JSX: true,
   },
   settings: {
-    "import/resolver": {
+    'import/resolver': {
       typescript: {
         project,
       },
     },
   },
-  ignorePatterns: ["node_modules/", "dist/"],
-};
+  ignorePatterns: ['node_modules/', 'dist/'],
+}

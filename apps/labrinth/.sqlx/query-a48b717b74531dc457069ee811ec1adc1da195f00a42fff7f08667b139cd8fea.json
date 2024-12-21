@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO user_backup_codes (\n                    user_id, code\n                )\n                VALUES (\n                    $1, $2\n                )\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a48b717b74531dc457069ee811ec1adc1da195f00a42fff7f08667b139cd8fea"
+}

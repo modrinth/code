@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO uploaded_images (\n                id, url, raw_url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id\n            )\n            VALUES (\n                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11\n            );\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar",
+        "Text",
+        "Int4",
+        "Timestamptz",
+        "Int8",
+        "Varchar",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "dd2d94d97e4cc991041d871acd695a80ac298d9a6b2ea29e0b5be8d1bb10609c"
+}

@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created, t.id thread_id, r.closed\n            FROM reports r\n            INNER JOIN report_types rt ON rt.id = r.report_type_id\n            INNER JOIN threads t ON t.report_id = r.id\n            WHERE r.id = ANY($1)\n            ORDER BY r.created DESC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "body",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "reporter",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "thread_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "closed",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6b7958eac5f273af8f37c0c888594e106fe323cbb3b0c32868b02f869d30f33f"
+}

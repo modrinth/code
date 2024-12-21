@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE reports\n                SET body = $1\n                WHERE (id = $2)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "665e294e9737fd0299fc4639127d56811485dc8a5a4e08a4e7292044d8a2fb7a"
+}

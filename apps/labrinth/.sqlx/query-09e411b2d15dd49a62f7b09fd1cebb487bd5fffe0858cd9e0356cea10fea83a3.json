@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT mod_id, image_url, featured, ordering\n        FROM mods_gallery\n        WHERE mod_id = ANY($1)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "image_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "featured",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "ordering",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "09e411b2d15dd49a62f7b09fd1cebb487bd5fffe0858cd9e0356cea10fea83a3"
+}

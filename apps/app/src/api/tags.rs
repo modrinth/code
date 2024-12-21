@@ -1,5 +1,5 @@
 use crate::api::Result;
-use theseus::tags::{Category, DonationPlatform, GameVersion, Loader, Tags};
+use theseus::tags::{Category, DonationPlatform, GameVersion, Loader};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("tags")
@@ -9,7 +9,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             tags_get_loaders,
             tags_get_game_versions,
             tags_get_donation_platforms,
-            tags_get_tag_bundle,
         ])
         .build()
 }
@@ -42,10 +41,4 @@ pub async fn tags_get_game_versions() -> Result<Vec<GameVersion>> {
 #[tauri::command]
 pub async fn tags_get_donation_platforms() -> Result<Vec<DonationPlatform>> {
     Ok(theseus::tags::get_donation_platform_tags().await?)
-}
-
-/// Gets cached tag bundle from the database
-#[tauri::command]
-pub async fn tags_get_tag_bundle() -> Result<Tags> {
-    Ok(theseus::tags::get_tag_bundle().await?)
 }

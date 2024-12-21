@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                                        SELECT encode(mef.sha1, 'escape') sha1, mel.status status\n                                        FROM moderation_external_files mef\n                                        INNER JOIN moderation_external_licenses mel ON mef.external_license_id = mel.id\n                                        WHERE mef.sha1 = ANY($1)\n                                        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "sha1",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "status",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "ByteaArray"
+      ]
+    },
+    "nullable": [
+      null,
+      false
+    ]
+  },
+  "hash": "4cb9fe3dbb2cbfe30a49487f896fb7890f726af2ff11da53f450a88c3dc5fc64"
+}

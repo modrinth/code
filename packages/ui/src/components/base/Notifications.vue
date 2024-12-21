@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-notification-group">
+  <div class="vue-notification-group" :class="{ 'has-sidebar': sidebar }">
     <transition-group name="notifs">
       <div
         v-for="(item, index) in notifications"
@@ -19,6 +19,13 @@
 </template>
 <script setup>
 import { ref } from 'vue'
+
+defineProps({
+  sidebar: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const notifications = ref([])
 
@@ -89,6 +96,10 @@ function stopTimer(notif) {
   bottom: 25px;
   z-index: 99999999;
   width: 300px;
+
+  &.has-sidebar {
+    right: 325px;
+  }
 
   .vue-notification-wrapper {
     width: 100%;

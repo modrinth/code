@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE collections\n        SET icon_url = NULL, raw_icon_url = NULL, color = NULL\n        WHERE (id = $1)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "aebefe598486b0e1a5c74eeb9e69f6322fd745fce730843337eb82d7ceff3a2f"
+}

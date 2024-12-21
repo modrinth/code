@@ -5,33 +5,33 @@
         <h1>Dashboard</h1>
         <NavStack>
           <NavStackItem link="/dashboard" label="Overview">
-            <DashboardIcon />
+            <DashboardIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/dashboard/notifications" label="Notifications">
-            <NotificationsIcon />
+            <NotificationsIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/dashboard/reports" label="Active reports">
-            <ReportIcon />
+            <ReportIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/dashboard/analytics" label="Analytics">
-            <ChartIcon />
+            <ChartIcon aria-hidden="true" />
           </NavStackItem>
 
           <h3>Manage</h3>
           <NavStackItem v-if="true" link="/dashboard/projects" label="Projects">
-            <ListIcon />
+            <ListIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem v-if="true" link="/dashboard/organizations" label="Organizations">
-            <OrganizationIcon />
+            <OrganizationIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
             link="/dashboard/collections"
             :label="formatMessage(commonMessages.collectionsLabel)"
           >
-            <LibraryIcon />
+            <LibraryIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/dashboard/revenue" label="Revenue">
-            <CurrencyIcon />
+            <CurrencyIcon aria-hidden="true" />
           </NavStackItem>
         </NavStack>
       </aside>
@@ -42,16 +42,19 @@
   </div>
 </template>
 <script setup>
-import { LibraryIcon, ChartIcon } from "@modrinth/assets";
+import {
+  DashboardIcon,
+  CurrencyIcon,
+  ListIcon,
+  ReportIcon,
+  BellIcon as NotificationsIcon,
+  OrganizationIcon,
+  LibraryIcon,
+  ChartIcon,
+} from "@modrinth/assets";
+import { commonMessages } from "@modrinth/ui";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
-
-import DashboardIcon from "~/assets/images/utils/dashboard.svg?component";
-import CurrencyIcon from "~/assets/images/utils/currency.svg?component";
-import ListIcon from "~/assets/images/utils/list.svg?component";
-import ReportIcon from "~/assets/images/utils/report.svg?component";
-import NotificationsIcon from "~/assets/images/utils/bell.svg?component";
-import OrganizationIcon from "~/assets/images/utils/organization.svg?component";
 
 const { formatMessage } = useVIntl();
 

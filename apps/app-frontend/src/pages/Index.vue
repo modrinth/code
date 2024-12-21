@@ -1,14 +1,13 @@
 <script setup>
-import { ref, onUnmounted, shallowRef, computed } from 'vue'
+import { ref, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
-import { offline_listener, profile_listener } from '@/helpers/events'
+import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
-import { isOffline } from '@/helpers/utils'
+import { get_search_results } from '@/helpers/cache.js'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -19,45 +18,57 @@ const breadcrumbs = useBreadcrumbs()
 
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
-const recentInstances = shallowRef([])
+const recentInstances = ref([])
 
-const offline = ref(await isOffline())
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
+})
 
 const getInstances = async () => {
-  const profiles = await list(true).catch(handleError)
-  recentInstances.value = Object.values(profiles).sort((a, b) => {
-    return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
-  })
+  const profiles = await list().catch(handleError)
 
-  let filters = []
-  for (const instance of recentInstances.value) {
-    if (instance.metadata.linked_data && instance.metadata.linked_data.project_id) {
-      filters.push(`NOT"project_id"="${instance.metadata.linked_data.project_id}"`)
+  recentInstances.value = profiles
+    .filter((x) => x.last_played)
+    .sort((a, b) => {
+      const dateA = dayjs(a.last_played)
+      const dateB = dayjs(b.last_played)
+
+      if (dateA.isSame(dateB)) {
+        return a.name.localeCompare(b.name)
+      }
+
+      return dateB - dateA
+    })
+
+  const filters = []
+  for (const instance of profiles) {
+    if (instance.linked_data && instance.linked_data.project_id) {
+      filters.push(`NOT"project_id"="${instance.linked_data.project_id}"`)
     }
   }
   filter.value = filters.join(' AND ')
 }
 
 const getFeaturedModpacks = async () => {
-  const response = await useFetch(
-    `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
-    'featured modpacks',
-    offline.value,
+  const response = await get_search_results(
+    `?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
   )
+
   if (response) {
-    featuredModpacks.value = response.hits
+    featuredModpacks.value = response.result.hits
   } else {
     featuredModpacks.value = []
   }
 }
 const getFeaturedMods = async () => {
-  const response = await useFetch(
-    'https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows',
-    'featured mods',
-    offline.value,
-  )
+  const response = await get_search_results('?facets=[["project_type:mod"]]&limit=10&index=follows')
+
   if (response) {
-    featuredMods.value = response.hits
+    featuredMods.value = response.result.hits
   } else {
     featuredModpacks.value = []
   }
@@ -69,14 +80,8 @@ await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
 const unlistenProfile = await profile_listener(async (e) => {
   await getInstances()
-  if (e.event === 'created' || e.event === 'removed') {
-    await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
-  }
-})
 
-const unlistenOffline = await offline_listener(async (b) => {
-  offline.value = b
-  if (!b) {
+  if (e.event === 'added' || e.event === 'created' || e.event === 'removed') {
     await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
   }
 })
@@ -92,29 +97,32 @@ const total = computed(() => {
 
 onUnmounted(() => {
   unlistenProfile()
-  unlistenOffline()
 })
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="p-6 flex flex-col gap-2">
+    <h1 v-if="recentInstances" class="m-0 text-2xl">Welcome back!</h1>
+    <h1 v-else class="m-0 text-2xl">Welcome to Modrinth App!</h1>
     <RowDisplay
       v-if="total > 0"
       :instances="[
         {
-          label: 'Jump back in',
+          label: 'Recently played',
           route: '/library',
           instances: recentInstances,
+          instance: true,
           downloaded: true,
+          compact: true,
         },
         {
-          label: 'Popular packs',
+          label: 'Discover a modpack',
           route: '/browse/modpack',
           instances: featuredModpacks,
           downloaded: false,
         },
         {
-          label: 'Popular mods',
+          label: 'Discover mods',
           route: '/browse/mod',
           instances: featuredMods,
           downloaded: false,
@@ -124,13 +132,3 @@ onUnmounted(() => {
     />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.page-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-</style>

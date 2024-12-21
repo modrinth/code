@@ -12,27 +12,19 @@ import {
   EyeIcon,
   ChevronRightIcon,
 } from '@modrinth/assets'
-import { ConfirmModal } from '@modrinth/ui'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ProjectCard from '@/components/ui/ProjectCard.vue'
-import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import ModInstallModal from '@/components/ui/ModInstallModal.vue'
-import {
-  get_all_running_profile_paths,
-  get_uuids_by_profile_path,
-  kill_by_uuid,
-} from '@/helpers/process.js'
+import { get_by_profile_path } from '@/helpers/process.js'
 import { handleError } from '@/store/notifications.js'
-import { duplicate, remove, run } from '@/helpers/profile.js'
+import { duplicate, kill, remove, run } from '@/helpers/profile.js'
 import { useRouter } from 'vue-router'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { useFetch } from '@/helpers/fetch.js'
-import { install as pack_install } from '@/helpers/pack.js'
-import { useTheming } from '@/store/state.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
+import { install as installVersion } from '@/store/install.js'
 
 const router = useRouter()
 
@@ -58,11 +50,8 @@ const modsRow = ref(null)
 const instanceOptions = ref(null)
 const instanceComponents = ref(null)
 const rows = ref(null)
-const confirmModal = ref(null)
 const deleteConfirmModal = ref(null)
-const modInstallModal = ref(null)
 
-const themeStore = useTheming()
 const currentDeleteInstance = ref(null)
 
 async function deleteProfile() {
@@ -90,23 +79,24 @@ const handleInstanceRightClick = async (event, passedInstance) => {
     },
   ]
 
-  const running = await get_all_running_profile_paths().catch(handleError)
+  const runningProcesses = await get_by_profile_path(passedInstance.path).catch(handleError)
 
-  const options = running.includes(passedInstance.path)
-    ? [
-        {
-          name: 'stop',
-          color: 'danger',
-        },
-        ...baseOptions,
-      ]
-    : [
-        {
-          name: 'play',
-          color: 'primary',
-        },
-        ...baseOptions,
-      ]
+  const options =
+    runningProcesses.length > 0
+      ? [
+          {
+            name: 'stop',
+            color: 'danger',
+          },
+          ...baseOptions,
+        ]
+      : [
+          {
+            name: 'play',
+            color: 'primary',
+          },
+          ...baseOptions,
+        ]
 
   instanceOptions.value.showMenu(event, passedInstance, options)
 }
@@ -130,24 +120,24 @@ const handleProjectClick = (event, passedInstance) => {
 const handleOptionsClick = async (args) => {
   switch (args.option) {
     case 'play':
-      await run(args.item.path).catch(handleSevereError)
-      mixpanel_track('InstanceStart', {
-        loader: args.item.metadata.loader,
-        game_version: args.item.metadata.game_version,
+      await run(args.item.path).catch((err) =>
+        handleSevereError(err, { profilePath: args.item.path }),
+      )
+      trackEvent('InstanceStart', {
+        loader: args.item.loader,
+        game_version: args.item.game_version,
       })
       break
     case 'stop':
-      for (const u of await get_uuids_by_profile_path(args.item.path).catch(handleError)) {
-        await kill_by_uuid(u).catch(handleError)
-      }
-      mixpanel_track('InstanceStop', {
-        loader: args.item.metadata.loader,
-        game_version: args.item.metadata.game_version,
+      await kill(args.item.path).catch(handleError)
+      trackEvent('InstanceStop', {
+        loader: args.item.loader,
+        game_version: args.item.game_version,
       })
       break
     case 'add_content':
       await router.push({
-        path: `/browse/${args.item.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+        path: `/browse/${args.item.loader === 'vanilla' ? 'datapack' : 'mod'}`,
         query: { i: args.item.path },
       })
       break
@@ -170,21 +160,8 @@ const handleOptionsClick = async (args) => {
       await navigator.clipboard.writeText(args.item.path)
       break
     case 'install': {
-      const versions = await useFetch(
-        `https://api.modrinth.com/v2/project/${args.item.project_id}/version`,
-        'project versions',
-      )
+      await installVersion(args.item.project_id, null, null, 'ProjectCardContextMenu')
 
-      if (args.item.project_type === 'modpack') {
-        await pack_install(
-          args.item.project_id,
-          versions[0].id,
-          args.item.title,
-          args.item.icon_url,
-        )
-      } else {
-        modInstallModal.value.show(args.item.project_id, versions)
-      }
       break
     }
     case 'open_link':
@@ -204,6 +181,7 @@ const handleOptionsClick = async (args) => {
   }
 }
 
+const maxInstancesPerCompactRow = ref(1)
 const maxInstancesPerRow = ref(1)
 const maxProjectsPerRow = ref(1)
 
@@ -213,8 +191,20 @@ const calculateCardsPerRow = () => {
   // Convert container width from pixels to rem
   const containerWidthInRem =
     containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize)
-  maxInstancesPerRow.value = Math.floor((containerWidthInRem + 1) / 11)
-  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 1) / 19)
+
+  maxInstancesPerCompactRow.value = Math.floor((containerWidthInRem + 0.75) / 18.75)
+  maxInstancesPerRow.value = Math.floor((containerWidthInRem + 0.75) / 20.75)
+  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 0.75) / 18.75)
+
+  if (maxInstancesPerRow.value < 5) {
+    maxInstancesPerRow.value *= 2
+  }
+  if (maxInstancesPerCompactRow.value < 5) {
+    maxInstancesPerCompactRow.value *= 2
+  }
+  if (maxProjectsPerRow.value < 3) {
+    maxProjectsPerRow.value *= 2
+  }
 }
 
 onMounted(() => {
@@ -228,26 +218,41 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <ConfirmModal
+  <ConfirmModalWrapper
     ref="deleteConfirmModal"
     title="Are you sure you want to delete this instance?"
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"
     proceed-label="Delete"
-    :noblur="!themeStore.advancedRendering"
     @proceed="deleteProfile"
   />
-  <div class="content">
-    <div v-for="row in actualInstances" ref="rows" :key="row.label" class="row">
-      <div class="header">
-        <router-link :to="row.route">{{ row.label }}</router-link>
-        <ChevronRightIcon />
-      </div>
-      <section v-if="row.instances[0].metadata" ref="modsRow" class="instances">
+  <div class="flex flex-col gap-4">
+    <div v-for="(row, rowIndex) in actualInstances" ref="rows" :key="row.label" class="row">
+      <router-link
+        class="flex mb-3 leading-none items-center gap-1 text-primary text-lg font-bold hover:underline group"
+        :class="{ 'mt-1': rowIndex > 0 }"
+        :to="row.route"
+      >
+        {{ row.label }}
+        <ChevronRightIcon
+          class="h-5 w-5 stroke-[3px] group-hover:translate-x-1 transition-transform group-hover:text-brand"
+        />
+      </router-link>
+      <section
+        v-if="row.instance"
+        ref="modsRow"
+        class="instances"
+        :class="{ compact: row.compact }"
+      >
         <Instance
-          v-for="instance in row.instances.slice(0, maxInstancesPerRow)"
-          :key="(instance?.project_id || instance?.id) + instance.install_stage"
+          v-for="(instance, instanceIndex) in row.instances.slice(
+            0,
+            row.compact ? maxInstancesPerCompactRow : maxInstancesPerRow,
+          )"
+          :key="row.label + instance.path"
           :instance="instance"
+          :compact="row.compact"
+          :first="instanceIndex === 0"
           @contextmenu.prevent.stop="(event) => handleInstanceRightClick(event, instance)"
         />
       </section>
@@ -258,8 +263,6 @@ onUnmounted(() => {
           ref="instanceComponents"
           class="item"
           :project="project"
-          :confirm-modal="confirmModal"
-          :mod-install-modal="modInstallModal"
           @contextmenu.prevent.stop="(event) => handleProjectClick(event, project)"
         />
       </section>
@@ -278,8 +281,6 @@ onUnmounted(() => {
     <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
     <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
   </ContextMenu>
-  <InstallConfirmModal ref="confirmModal" />
-  <ModInstallModal ref="modInstallModal" />
 </template>
 <style lang="scss" scoped>
 .content {
@@ -288,7 +289,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 1rem;
   gap: 1rem;
 
   -ms-overflow-style: none;
@@ -322,31 +322,36 @@ onUnmounted(() => {
 
     a {
       margin: 0;
-      font-size: var(--font-size-lg);
+      font-size: var(--font-size-md);
       font-weight: bolder;
       white-space: nowrap;
-      color: var(--color-contrast);
+      color: var(--color-base);
     }
 
     svg {
-      height: 1.5rem;
-      width: 1.5rem;
-      color: var(--color-contrast);
+      height: 1.25rem;
+      width: 1.25rem;
+      color: var(--color-base);
     }
   }
 
   .instances {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    grid-gap: 0.75rem;
     width: 100%;
+
+    &.compact {
+      grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+      gap: 0.75rem;
+    }
   }
 
   .projects {
     display: grid;
     width: 100%;
     grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-    grid-gap: 1rem;
+    grid-gap: 0.75rem;
 
     .item {
       width: 100%;

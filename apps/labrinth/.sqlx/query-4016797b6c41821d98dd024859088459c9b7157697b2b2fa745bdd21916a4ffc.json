@@ -1,0 +1,47 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT DISTINCT joining_mod_id as mod_id, joining_platform_id as platform_id, lp.name as platform_name, url, lp.donation as donation\n                    FROM mods_links ml\n                    INNER JOIN mods m ON ml.joining_mod_id = m.id\n                    INNER JOIN link_platforms lp ON ml.joining_platform_id = lp.id\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "platform_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "platform_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "donation",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "4016797b6c41821d98dd024859088459c9b7157697b2b2fa745bdd21916a4ffc"
+}

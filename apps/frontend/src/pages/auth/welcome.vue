@@ -36,7 +36,7 @@
   </div>
 </template>
 <script setup>
-import { Checkbox } from "@modrinth/ui";
+import { Checkbox, commonMessages } from "@modrinth/ui";
 import { RightArrowIcon } from "@modrinth/assets";
 
 const { formatMessage } = useVIntl();
@@ -73,7 +73,7 @@ useHead({
 const subscribe = ref(true);
 
 async function continueSignUp() {
-  const route = useNativeRoute();
+  const route = useRoute();
 
   await useAuth(route.query.authToken);
   await useUser();

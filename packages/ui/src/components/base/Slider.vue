@@ -140,6 +140,9 @@ const onInput = (value: string) => {
   border-radius: var(--radius-sm);
   height: 0.25rem;
   width: 100%;
+  padding: 0;
+  min-height: 0px;
+  box-shadow: none;
 
   background: linear-gradient(
     to right,

@@ -5,6 +5,10 @@ export const useTheming = defineStore('themeStore', {
     themeOptions: ['dark', 'light', 'oled'],
     advancedRendering: true,
     selectedTheme: 'dark',
+
+    devMode: false,
+    featureFlag_pagePath: false,
+    featureFlag_projectBackground: false,
   }),
   actions: {
     setThemeState(newTheme) {

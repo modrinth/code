@@ -1,12 +1,11 @@
 <template>
   <Card>
-    <div class="markdown-body" v-html="renderHighlightedString(project?.body ?? '')" />
+    <ProjectPageDescription :description="project.body" />
   </Card>
 </template>
 
 <script setup>
-import { renderHighlightedString } from '@modrinth/utils'
-import { Card } from '@modrinth/ui'
+import { Card, ProjectPageDescription } from '@modrinth/ui'
 
 defineProps({
   project: {
@@ -21,22 +20,3 @@ export default {
   name: 'Description',
 }
 </script>
-
-<style scoped lang="scss">
-.markdown-body {
-  :deep(table) {
-    width: auto;
-  }
-
-  :deep(hr),
-  :deep(h1),
-  :deep(h2) {
-    max-width: max(60rem, 90%);
-  }
-
-  :deep(ul),
-  :deep(ol) {
-    margin-left: 2rem;
-  }
-}
-</style>

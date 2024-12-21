@@ -1,6 +1,6 @@
 name: 🌐 Website bug (modrinth.com)
 description: Report an issue on the Modrinth website.
-labels: [bug, frontend]
+labels: [bug, web]
 body:
   - type: checkboxes
     attributes:

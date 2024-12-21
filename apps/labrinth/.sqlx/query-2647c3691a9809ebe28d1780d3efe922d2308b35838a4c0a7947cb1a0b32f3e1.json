@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE mods\n            SET icon_url = $1, raw_icon_url = $2, color = $3\n            WHERE (id = $4)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text",
+        "Int4",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2647c3691a9809ebe28d1780d3efe922d2308b35838a4c0a7947cb1a0b32f3e1"
+}

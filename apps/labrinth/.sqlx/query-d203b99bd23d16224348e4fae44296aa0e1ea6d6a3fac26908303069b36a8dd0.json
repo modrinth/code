@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM threads_messages\n            WHERE thread_id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d203b99bd23d16224348e4fae44296aa0e1ea6d6a3fac26908303069b36a8dd0"
+}

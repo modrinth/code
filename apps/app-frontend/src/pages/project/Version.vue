@@ -190,6 +190,7 @@ import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { SwapIcon } from '@/assets/icons'
+import { get_project_many, get_version_many } from '@/helpers/cache.js'
 
 const breadcrumbs = useBreadcrumbs()
 
@@ -202,10 +203,6 @@ const props = defineProps({
   },
   versions: {
     type: Array,
-    required: true,
-  },
-  dependencies: {
-    type: Object,
     required: true,
   },
   members: {
@@ -238,20 +235,45 @@ watch(
   async () => {
     if (route.params.version) {
       version.value = props.versions.find((version) => version.id === route.params.version)
+      await refreshDisplayDependencies()
       breadcrumbs.setName('Version', version.value.name)
     }
   },
 )
 
 const author = computed(() =>
-  props.members.find((member) => member.user.id === version.value.author_id),
+  props.members ? props.members.find((member) => member.user.id === version.value.author_id) : null,
 )
 
-const displayDependencies = computed(() =>
-  version.value.dependencies.map((dependency) => {
-    const version = props.dependencies.versions.find((obj) => obj.id === dependency.version_id)
+const displayDependencies = ref({})
+
+async function refreshDisplayDependencies() {
+  const projectIds = new Set()
+  const versionIds = new Set()
+  if (version.value.dependencies) {
+    for (const dependency of version.value.dependencies) {
+      if (dependency.project_id) {
+        projectIds.add(dependency.project_id)
+      }
+      if (dependency.version_id) {
+        versionIds.add(dependency.version_id)
+      }
+    }
+  }
+  const [projectDeps, versionDeps] = await Promise.all([
+    get_project_many([...projectIds]),
+    get_version_many([...versionIds]),
+  ])
+
+  const dependencies = {
+    projects: projectDeps,
+    versions: versionDeps,
+  }
+
+  displayDependencies.value = version.value.dependencies.map((dependency) => {
+    const version = dependencies.versions.find((obj) => obj.id === dependency.version_id)
     if (version) {
-      const project = props.dependencies.projects.find(
+      const project = dependencies.projects.find(
         (obj) => obj.id === version.project_id || obj.id === dependency.project_id,
       )
       return {
@@ -261,7 +283,7 @@ const displayDependencies = computed(() =>
         link: `/project/${project.slug}/version/${version.id}`,
       }
     } else {
-      const project = props.dependencies.projects.find((obj) => obj.id === dependency.project_id)
+      const project = dependencies.projects.find((obj) => obj.id === dependency.project_id)
 
       if (project) {
         return {
@@ -279,8 +301,9 @@ const displayDependencies = computed(() =>
         }
       }
     }
-  }),
-)
+  })
+}
+await refreshDisplayDependencies()
 </script>
 
 <style scoped lang="scss">

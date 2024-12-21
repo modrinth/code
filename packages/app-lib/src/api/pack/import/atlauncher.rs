@@ -8,7 +8,7 @@ use crate::{
         import::{self, copy_dotminecraft},
         install_from::CreatePackDescription,
     },
-    prelude::{ModLoader, Profile, ProfilePathId},
+    prelude::ModLoader,
     state::{LinkedData, ProfileInstallStage},
     util::io,
     State,
@@ -116,11 +116,11 @@ pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
 }
 
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn import_atlauncher(
     atlauncher_base_path: PathBuf, // path to base atlauncher folder
     instance_folder: String,       // instance folder in atlauncher_base_path
-    profile_path: ProfilePathId,   // path to profile
+    profile_path: &str,            // path to profile
 ) -> crate::Result<()> {
     let atlauncher_instance_path = atlauncher_base_path
         .join("instances")
@@ -159,7 +159,7 @@ pub async fn import_atlauncher(
         project_id: None,
         version_id: None,
         existing_loading_bar: None,
-        profile_path: profile_path.clone(),
+        profile_path: profile_path.to_string(),
     };
 
     let backup_name = format!("ATLauncher-{}", instance_folder);
@@ -177,7 +177,7 @@ pub async fn import_atlauncher(
 }
 
 async fn import_atlauncher_unmanaged(
-    profile_path: ProfilePathId,
+    profile_path: &str,
     minecraft_folder: PathBuf,
     backup_name: String,
     description: CreatePackDescription,
@@ -198,10 +198,10 @@ async fn import_atlauncher_unmanaged(
     let game_version = atinstance.id;
 
     let loader_version = if mod_loader != ModLoader::Vanilla {
-        crate::profile::create::get_loader_version_from_loader(
-            game_version.clone(),
+        crate::launcher::get_loader_version_from_profile(
+            &game_version,
             mod_loader,
-            Some(atinstance.launcher.loader_version.version.clone()),
+            Some(&atinstance.launcher.loader_version.version),
         )
         .await?
     } else {
@@ -209,24 +209,30 @@ async fn import_atlauncher_unmanaged(
     };
 
     // Set profile data to created default profile
-    crate::api::profile::edit(&profile_path, |prof| {
-        prof.metadata.name = description
+    crate::api::profile::edit(profile_path, |prof| {
+        prof.name = description
             .override_title
             .clone()
             .unwrap_or_else(|| backup_name.to_string());
         prof.install_stage = ProfileInstallStage::PackInstalling;
-        prof.metadata.linked_data = Some(LinkedData {
-            project_id: description.project_id.clone(),
-            version_id: description.version_id.clone(),
-            locked: Some(
-                description.project_id.is_some()
-                    && description.version_id.is_some(),
-            ),
-        });
-        prof.metadata.icon.clone_from(&description.icon);
-        prof.metadata.game_version.clone_from(&game_version);
-        prof.metadata.loader_version.clone_from(&loader_version);
-        prof.metadata.loader = mod_loader;
+
+        if let Some(ref project_id) = description.project_id {
+            if let Some(ref version_id) = description.version_id {
+                prof.linked_data = Some(LinkedData {
+                    project_id: project_id.clone(),
+                    version_id: version_id.clone(),
+                    locked: true,
+                })
+            }
+        }
+
+        prof.icon_path = description
+            .icon
+            .clone()
+            .map(|x| x.to_string_lossy().to_string());
+        prof.game_version.clone_from(&game_version);
+        prof.loader_version = loader_version.clone().map(|x| x.id);
+        prof.loader = mod_loader;
 
         async { Ok(()) }
     })
@@ -235,32 +241,20 @@ async fn import_atlauncher_unmanaged(
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
     let loading_bar = copy_dotminecraft(
-        profile_path.clone(),
+        profile_path,
         minecraft_folder,
         &state.io_semaphore,
         None,
     )
     .await?;
 
-    if let Some(profile_val) =
-        crate::api::profile::get(&profile_path, None).await?
-    {
+    if let Some(profile_val) = crate::api::profile::get(profile_path).await? {
         crate::launcher::install_minecraft(
             &profile_val,
             Some(loading_bar),
             false,
         )
         .await?;
-        {
-            let state = State::get().await?;
-            let mut file_watcher = state.file_watcher.write().await;
-            Profile::watch_fs(
-                &profile_val.get_profile_full_path().await?,
-                &mut file_watcher,
-            )
-            .await?;
-        }
-        State::sync().await?;
     }
     Ok(())
 }

@@ -119,6 +119,16 @@ export const createDataPackVersion = async function (
     forgeModsToml.issueTrackerURL = project.issues_url;
   }
 
+  const neoModsToml = {
+    ...forgeModsToml,
+    modLoader: "javafml",
+    loaderVersion: "[1,)",
+    mods: forgeModsToml.mods.map((mod) => ({
+      ...mod,
+      updateJSONURL: mod.updateJSONURL + "?neoforge=only",
+    })),
+  };
+
   const primaryFileData = await (await fetch(primaryFile.url)).blob();
 
   const primaryZipReader = new JSZip();
@@ -132,6 +142,12 @@ export const createDataPackVersion = async function (
   }
   if (loaders.includes("forge")) {
     primaryZipReader.file("META-INF/mods.toml", TOML.stringify(forgeModsToml, { newline: "\n" })); // eslint-disable-line import/no-named-as-default-member
+  }
+  if (loaders.includes("neoforge")) {
+    primaryZipReader.file(
+      "META-INF/neoforge.mods.toml",
+      TOML.stringify(neoModsToml, { newline: "\n" }), // eslint-disable-line import/no-named-as-default-member
+    );
   }
 
   if (!newForge && loaders.includes("forge")) {

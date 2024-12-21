@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM loaders_versions\n            WHERE loaders_versions.version_id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "33fc96ac71cfa382991cfb153e89da1e9f43ebf5367c28b30c336b758222307b"
+}

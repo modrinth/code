@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                      SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1))\n                      ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "abf790170e3a807ffe8b3a188da620c89e6398f38ff066220fdadffe8e7481c1"
+}

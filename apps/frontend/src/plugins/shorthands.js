@@ -18,7 +18,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.provide("formatProjectType", formatProjectType);
   nuxtApp.provide("formatCategory", formatCategory);
   nuxtApp.provide("formatCategoryHeader", formatCategoryHeader);
-  nuxtApp.provide("formatProjectStatus", formatProjectStatus);
 
   /*
     Only use on the complete list of versions for a project, partial lists will generate
@@ -237,16 +236,6 @@ export const formatCategory = (name) => {
 };
 
 export const formatCategoryHeader = (name) => {
-  return capitalizeString(name);
-};
-
-export const formatProjectStatus = (name) => {
-  if (name === "approved") {
-    return "Listed";
-  } else if (name === "processing") {
-    return "Under review";
-  }
-
   return capitalizeString(name);
 };
 

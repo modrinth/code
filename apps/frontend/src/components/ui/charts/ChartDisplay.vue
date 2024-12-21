@@ -134,7 +134,6 @@
                   :data="analytics.formattedData.value.revenue.chart.data"
                   :labels="analytics.formattedData.value.revenue.chart.labels"
                   is-money
-                  suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='2' x2='12' y2='22'></line><path d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'></path></svg>"
                   :colors="
                     isUsingProjectColors
                       ? analytics.formattedData.value.revenue.chart.colors
@@ -193,15 +192,20 @@
                 class="country-value"
               >
                 <div class="country-flag-container">
-                  <img
-                    :src="
-                      name.toLowerCase() === 'xx' || !name
-                        ? 'https://cdn.modrinth.com/placeholder-banner.svg'
-                        : countryCodeToFlag(name)
-                    "
-                    alt="Hidden country"
-                    class="country-flag"
-                  />
+                  <template v-if="name.toLowerCase() === 'xx' || !name">
+                    <img
+                      src="https://cdn.modrinth.com/placeholder-banner.svg"
+                      alt="Placeholder flag"
+                      class="country-flag"
+                    />
+                  </template>
+                  <template v-else>
+                    <img
+                      :src="countryCodeToFlag(name)"
+                      :alt="`${countryCodeToName(name)}'s flag`"
+                      class="country-flag"
+                    />
+                  </template>
                 </div>
                 <div class="country-text">
                   <strong class="country-name"
@@ -247,15 +251,20 @@
                 class="country-value"
               >
                 <div class="country-flag-container">
-                  <img
-                    :src="
-                      name.toLowerCase() === 'xx' || !name
-                        ? 'https://cdn.modrinth.com/placeholder-banner.svg'
-                        : countryCodeToFlag(name)
-                    "
-                    alt="Hidden country"
-                    class="country-flag"
-                  />
+                  <template v-if="name.toLowerCase() === 'xx' || !name">
+                    <img
+                      src="https://cdn.modrinth.com/placeholder-banner.svg"
+                      alt="Placeholder flag"
+                      class="country-flag"
+                    />
+                  </template>
+                  <template v-else>
+                    <img
+                      :src="countryCodeToFlag(name)"
+                      :alt="`${countryCodeToName(name)}'s flag`"
+                      class="country-flag"
+                    />
+                  </template>
                 </div>
                 <div class="country-text">
                   <strong class="country-name">

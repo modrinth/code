@@ -296,3 +296,37 @@ export const acceptFileFromProjectType = (projectType) => {
       return '*'
   }
 }
+
+// Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
+// identifier[0], then if it ties, identifier[1], etc
+export const sortByNameOrNumber = (sortable, identifiers) => {
+  sortable.sort((a, b) => {
+    for (const identifier of identifiers) {
+      const aNum = parseFloat(a[identifier])
+      const bNum = parseFloat(b[identifier])
+      if (isNaN(aNum) && isNaN(bNum)) {
+        // Both are strings, sort alphabetically
+        const stringComp = a[identifier].localeCompare(b[identifier])
+        if (stringComp != 0) return stringComp
+      } else if (!isNaN(aNum) && !isNaN(bNum)) {
+        // Both are numbers, sort numerically
+        const numComp = aNum - bNum
+        if (numComp != 0) return numComp
+      } else {
+        // One is a number and one is a string, numbers go first
+        const numStringComp = isNaN(aNum) ? 1 : -1
+        if (numStringComp != 0) return numStringComp
+      }
+    }
+    return 0
+  })
+  return sortable
+}
+
+export const getArrayOrString = (x: string[] | string): string[] => {
+  if (typeof x === 'string') {
+    return [x]
+  } else {
+    return x
+  }
+}
