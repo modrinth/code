@@ -280,11 +280,10 @@ impl PyroConsole {
     }
 
     pub fn add_line(&mut self, line: &str) {
-        let parser = AnsiParser::new(line.to_owned());
         let mut state = self.state.borrow_mut();
         let is_at_bottom = state.offset + LINES_VISIBLE as u64
             >= (state.lines.len() + GAP_LINES) as u64;
-        let result = parser.parse();
+        let result = AnsiParser::parse(line);
         // state.lines = PyroConsole::calculate_line_breaks(&state);
         let new_lines = PyroConsole::calculate_line_breaks(&mut state, &result);
         for line in new_lines.clone() {

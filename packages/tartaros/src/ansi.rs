@@ -32,61 +32,55 @@ pub enum AnsiCommand {
     Reset,
 }
 
-pub struct AnsiParser {
-    input: String,
-}
+pub struct AnsiParser;
 
 impl AnsiParser {
-    pub fn new(input: String) -> Self {
-        AnsiParser { input }
-    }
+    pub fn parse(input: &str) -> Vec<AnsiCommand> {
+        let mut commands = Vec::with_capacity(input.len() / 5);
+        let mut current_text = String::with_capacity(64);
+        let mut escape_start: Option<usize> = None;
 
-    pub fn parse(&self) -> Vec<AnsiCommand> {
-        let mut commands = Vec::new();
-        let chars = self.input.chars().collect::<Vec<char>>();
-        let mut i = 0;
-
-        let mut current_text = String::new();
-
-        while i < chars.len() {
-            match chars[i] {
-                '\x1b' => {
-                    // read until 'm', which is the end of the escape sequence
-                    let start = i.clone();
-                    while i < chars.len() && chars[i] != 'm' {
-                        i += 1;
+        for (i, char) in input.chars().enumerate() {
+            match char {
+                '\x1B' => {
+                    if escape_start.is_none() {
+                        if !current_text.is_empty() {
+                            AnsiParser::run_render_text(
+                                &mut commands,
+                                &current_text,
+                            );
+                            current_text.clear();
+                        }
+                        escape_start = Some(i);
                     }
-                    let escape_sequence = &chars[start..i];
-                    i += 1;
-                    if escape_sequence.len() < 3 {
-                        continue;
-                    }
-                    if !current_text.is_empty() {
-                        AnsiParser::run_render_text(&mut commands, &mut current_text);
-                    }
-                    let escape_sequence = &escape_sequence[2..];
-                    let control_characters = escape_sequence
-                        .iter()
-                        .collect::<String>()
-                        .split(";")
-                        .filter_map(|x| x.parse::<u8>().ok())
-                        .collect::<Vec<u8>>();
+                }
+                'm' => {
+                    if let Some(start) = escape_start {
+                        // skip the '\x1B' and '[' characters
+                        let sequence = &input[start + 2..i];
 
-                    for control_character in control_characters {
-                        commands.push(AnsiParser::get_ansi_command(control_character))
+                        for num_str in sequence.split(';') {
+                            if let Ok(num) = num_str.parse::<u8>() {
+                                commands
+                                    .push(AnsiParser::get_ansi_command(num));
+                            }
+                        }
+
+                        escape_start = None;
+                    } else {
+                        current_text.push(char);
                     }
                 }
                 _ => {
-                    while i < chars.len() && chars[i] != '\x1b' {
-                        current_text.push(chars[i]);
-                        i += 1;
+                    if escape_start.is_none() {
+                        current_text.push(char);
                     }
                 }
             }
         }
 
         if !current_text.is_empty() {
-            AnsiParser::run_render_text(&mut commands, &mut current_text);
+            AnsiParser::run_render_text(&mut commands, &current_text);
         }
 
         commands
@@ -107,23 +101,29 @@ impl AnsiParser {
         }
     }
 
-    fn run_render_text(commands: &mut Vec<AnsiCommand>, current_text: &mut String) {
-        let mut text = String::new();
-        for c in current_text.chars() {
+    fn run_render_text(commands: &mut Vec<AnsiCommand>, current_text: &str) {
+        let mut word_start: Option<usize> = None;
+
+        for (i, c) in current_text.chars().enumerate() {
             if c == ' ' {
-                if !text.is_empty() {
-                    commands.push(AnsiCommand::RenderText(text.clone()));
-                    text.clear();
-                }
                 commands.push(AnsiCommand::RenderText(" ".to_string()));
-            } else {
-                text.push(c);
+
+                if let Some(start) = word_start {
+                    commands.push(AnsiCommand::RenderText(
+                        current_text[start..i].to_string(),
+                    ));
+                    word_start = None;
+                }
+            } else if word_start.is_none() {
+                word_start = Some(i);
             }
         }
-        if !text.is_empty() {
-            commands.push(AnsiCommand::RenderText(text.clone()));
+
+        if let Some(start) = word_start {
+            commands.push(AnsiCommand::RenderText(
+                current_text[start..].to_string(),
+            ));
         }
-        current_text.clear();
     }
 }
 
@@ -134,8 +134,7 @@ mod tests {
     #[test]
     fn properly_parse_ansi_string() {
         let input = "\x1b[31mhello\x1b[0m \x1b[34mworld\x1b[0m".to_string();
-        let parser = AnsiParser::new(input);
-        let commands = parser.parse();
+        let commands = AnsiParser::parse(&input);
         println!("{:?}", commands);
         assert_eq!(commands.len(), 7);
         assert_eq!(commands[0], AnsiCommand::ModifyStyle(AnsiControl::Red));
