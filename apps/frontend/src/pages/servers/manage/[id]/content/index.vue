@@ -110,7 +110,7 @@
           </ButtonStyled>
         </div>
       </div>
-      <div v-if="hasMods" class="flex flex-col gap-2 transition-all">
+      <div v-if="hasFilteredMods" class="flex flex-col gap-2 transition-all">
         <div ref="listContainer" class="relative w-full">
           <div :style="{ position: 'relative', height: `${totalHeight}px` }">
             <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
@@ -231,23 +231,40 @@
       <!-- no mods has platform -->
       <div
         v-else-if="
-          !hasMods &&
           props.server.general?.loader &&
           props.server.general?.loader.toLocaleLowerCase() !== 'vanilla'
         "
         class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
       >
-        <PackageClosedIcon class="size-24" />
-        <p class="m-0 font-bold text-contrast">No {{ type.toLocaleLowerCase() }}s found!</p>
-        <p class="m-0">
-          Add some {{ type.toLocaleLowerCase() }}s to your server to manage them here.
-        </p>
-        <ButtonStyled color="brand">
-          <NuxtLink :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`">
-            <PlusIcon />
-            Add {{ type.toLocaleLowerCase() }}
-          </NuxtLink>
-        </ButtonStyled>
+        <div
+          v-if="!hasFilteredMods && hasMods"
+          class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
+        >
+          <SearchIcon class="size-24" />
+          <p class="m-0 font-bold text-contrast">
+            No {{ type.toLocaleLowerCase() }}s found for your query!
+          </p>
+          <p class="m-0">Try another query, or show everything.</p>
+          <ButtonStyled>
+            <button @click="showAll">
+              <ListIcon />
+              Show everything
+            </button>
+          </ButtonStyled>
+        </div>
+        <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
+          <PackageClosedIcon class="size-24" />
+          <p class="m-0 font-bold text-contrast">No {{ type.toLocaleLowerCase() }}s found!</p>
+          <p class="m-0">
+            Add some {{ type.toLocaleLowerCase() }}s to your server to manage them here.
+          </p>
+          <ButtonStyled color="brand">
+            <NuxtLink :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`">
+              <PlusIcon />
+              Add {{ type.toLocaleLowerCase() }}
+            </NuxtLink>
+          </ButtonStyled>
+        </div>
       </div>
       <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
         <UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
@@ -290,6 +307,7 @@ import {
   MoreVerticalIcon,
   CompassIcon,
   WrenchIcon,
+  ListIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
@@ -327,6 +345,12 @@ const localMods = ref<Mod[]>([]);
 const searchInput = ref("");
 const modSearchInput = ref("");
 const filterMethod = ref("all");
+
+const showAll = () => {
+  searchInput.value = "";
+  modSearchInput.value = "";
+  filterMethod.value = "all";
+};
 
 const filterMethodLabel = computed(() => {
   switch (filterMethod.value) {
@@ -518,6 +542,10 @@ async function changeModVersion() {
 }
 
 const hasMods = computed(() => {
+  return localMods.value?.length > 0;
+});
+
+const hasFilteredMods = computed(() => {
   return filteredMods.value?.length > 0;
 });
 
