@@ -419,10 +419,13 @@ const debouncedSearch = debounce(() => {
   modSearchInput.value = searchInput.value;
 
   if (pyroContentSentinel.value) {
-    pyroContentSentinel.value.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    const sentinelRect = pyroContentSentinel.value.getBoundingClientRect();
+    if (sentinelRect.top < 0 || sentinelRect.bottom > window.innerHeight) {
+      pyroContentSentinel.value.scrollIntoView({
+        // behavior: "smooth",
+        block: "start",
+      });
+    }
   }
 }, 300);
 
