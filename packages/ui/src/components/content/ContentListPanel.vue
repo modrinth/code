@@ -5,7 +5,6 @@ import Checkbox from '../base/Checkbox.vue'
 import ContentListItem from './ContentListItem.vue'
 import type { ContentItem } from './ContentListItem.vue'
 import { DropdownIcon } from '@modrinth/assets'
-import { createVirtualScroller } from 'vue-typed-virtual-list'
 
 const props = withDefaults(
   defineProps<{
@@ -16,8 +15,6 @@ const props = withDefaults(
   }>(),
   {},
 )
-
-const VirtualScroller = createVirtualScroller()
 
 const selectionStates: Ref<Record<string, boolean>> = ref({})
 const selected: Ref<string[]> = computed(() =>
@@ -78,21 +75,19 @@ function setSelected(value: boolean) {
       </slot>
     </div>
     <div class="bg-bg-raised rounded-xl">
-      <VirtualScroller :items="items" :default-size="64" style="height: 100%">
-        <template #item="{ ref, index }">
-          <ContentListItem
-            v-model="selectionStates[ref.filename]"
-            :item="ref"
-            :last="index === items.length - 1"
-            class="mb-2"
-            @update:model-value="updateSelection"
-          >
-            <template #actions="{ item }">
-              <slot name="actions" :item="item" />
-            </template>
-          </ContentListItem>
+      <ContentListItem
+        v-for="(itemRef, index) in items"
+        :key="itemRef.filename"
+        v-model="selectionStates[itemRef.filename]"
+        :item="itemRef"
+        :last="index === items.length - 1"
+        class="mb-2"
+        @update:model-value="updateSelection"
+      >
+        <template #actions="{ item }">
+          <slot name="actions" :item="item" />
         </template>
-      </VirtualScroller>
+      </ContentListItem>
     </div>
   </div>
 </template>

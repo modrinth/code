@@ -207,13 +207,18 @@ const calculateCardsPerRow = () => {
   }
 }
 
+const rowContainer = ref(null)
+const resizeObserver = ref(null)
 onMounted(() => {
   calculateCardsPerRow()
+  resizeObserver.value = new ResizeObserver(calculateCardsPerRow)
+  resizeObserver.value.observe(rowContainer.value)
   window.addEventListener('resize', calculateCardsPerRow)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', calculateCardsPerRow)
+  resizeObserver.value.unobserve(rowContainer.value)
 })
 </script>
 
@@ -226,7 +231,7 @@ onUnmounted(() => {
     proceed-label="Delete"
     @proceed="deleteProfile"
   />
-  <div class="flex flex-col gap-4">
+  <div ref="rowContainer" class="flex flex-col gap-4">
     <div v-for="(row, rowIndex) in actualInstances" ref="rows" :key="row.label" class="row">
       <router-link
         class="flex mb-3 leading-none items-center gap-1 text-primary text-lg font-bold hover:underline group"

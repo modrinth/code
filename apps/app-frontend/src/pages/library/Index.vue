@@ -36,7 +36,7 @@ onUnmounted(() => {
 
 <template>
   <div class="p-6 flex flex-col gap-3">
-    <h1 class="m-0 text-2xl">Library</h1>
+    <h1 class="m-0 text-2xl hidden">Library</h1>
     <NavTabs
       :links="[
         { label: 'All instances', href: `/library` },

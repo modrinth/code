@@ -1,4 +1,6 @@
 //! Theseus settings file
+
+use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 // Types
@@ -13,10 +15,10 @@ pub struct Settings {
     pub collapsed_navigation: bool,
     pub advanced_rendering: bool,
     pub native_decorations: bool,
+    pub toggle_sidebar: bool,
 
     pub telemetry: bool,
     pub discord_rpc: bool,
-    pub developer_mode: bool,
     pub personalized_ads: bool,
 
     pub onboarded: bool,
@@ -32,6 +34,16 @@ pub struct Settings {
     pub custom_dir: Option<String>,
     pub prev_custom_dir: Option<String>,
     pub migrated: bool,
+
+    pub developer_mode: bool,
+    pub feature_flags: HashMap<FeatureFlag, bool>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum FeatureFlag {
+    PagePath,
+    ProjectBackground,
 }
 
 impl Settings {
@@ -48,7 +60,7 @@ impl Settings {
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
                 hook_pre_launch, hook_wrapper, hook_post_exit,
-                custom_dir, prev_custom_dir, migrated
+                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar
             FROM settings
             "
         )
@@ -63,6 +75,7 @@ impl Settings {
             collapsed_navigation: res.collapsed_navigation == 1,
             advanced_rendering: res.advanced_rendering == 1,
             native_decorations: res.native_decorations == 1,
+            toggle_sidebar: res.toggle_sidebar == 1,
             telemetry: res.telemetry == 1,
             discord_rpc: res.discord_rpc == 1,
             developer_mode: res.developer_mode == 1,
@@ -95,6 +108,9 @@ impl Settings {
             custom_dir: res.custom_dir,
             prev_custom_dir: res.prev_custom_dir,
             migrated: res.migrated == 1,
+            feature_flags: res.feature_flags.as_ref().and_then(|x| {
+                serde_json::from_str(x).ok()
+            }).unwrap_or_default(),
         })
     }
 

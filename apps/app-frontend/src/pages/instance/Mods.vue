@@ -16,56 +16,68 @@
       </div>
       <AddContentButton :instance="instance" />
     </div>
-    <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
-      <FilterIcon class="text-secondary h-5 w-5 mr-1" />
-      <button
-        v-for="filter in filterOptions"
-        :key="filter"
-        :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
-        @click="toggleArray(selectedFilters, filter.id)"
-      >
-        {{ filter.formattedName }}
-      </button>
+    <div class="flex items-center justify-between">
+      <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
+        <FilterIcon class="text-secondary h-5 w-5 mr-1" />
+        <button
+          v-for="filter in filterOptions"
+          :key="filter"
+          :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
+          @click="toggleArray(selectedFilters, filter.id)"
+        >
+          {{ filter.formattedName }}
+        </button>
+      </div>
+      <Pagination
+        v-if="search.length > 0"
+        :page="currentPage"
+        :count="Math.ceil(search.length / 20)"
+        :link-function="(page) => `?page=${page}`"
+        @switch-page="(page) => (currentPage = page)"
+      />
     </div>
+
     <ContentListPanel
       v-model="selectedFiles"
       :locked="isPackLocked"
       :items="
-        search.map((x) => {
-          const item: ContentItem<any> = {
-            path: x.path,
-            disabled: x.disabled,
-            filename: x.file_name,
-            icon: x.icon,
-            title: x.name,
-            data: x,
-          }
-
-          if (x.version) {
-            item.version = x.version
-            item.versionId = x.version
-          }
-
-          if (x.id) {
-            item.project = {
-              id: x.id,
-              link: { path: `/project/${x.id}`, query: { i: props.instance.path } },
-              linkProps: {},
+        search
+          .map((x) => {
+            const item: ContentItem<any> = {
+              path: x.path,
+              disabled: x.disabled,
+              filename: x.file_name,
+              icon: x.icon,
+              title: x.name,
+              data: x,
             }
-          }
 
-          if (x.author) {
-            item.creator = {
-              name: x.author,
-              type: 'user',
-              id: x.author,
-              link: 'https://modrinth.com/user/' + x.author,
-              linkProps: { target: '_blank' },
+            if (x.version) {
+              item.version = x.version
+              item.versionId = x.version
             }
-          }
 
-          return item
-        })
+            if (x.id) {
+              item.project = {
+                id: x.id,
+                link: { path: `/project/${x.id}`, query: { i: props.instance.path } },
+                linkProps: {},
+              }
+            }
+
+            if (x.author) {
+              item.creator = {
+                name: x.author,
+                type: 'user',
+                id: x.author,
+                link: 'https://modrinth.com/user/' + x.author,
+                linkProps: { target: '_blank' },
+              }
+            }
+
+            return item
+          })
+          .slice((currentPage - 1) * 20, currentPage * 20)
       "
       :sort-column="sortColumn"
       :sort-ascending="ascending"
@@ -255,7 +267,7 @@ import {
   CheckCircleIcon,
   SlashIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, ContentListPanel, OverflowMenu } from '@modrinth/ui'
+import { Button, ButtonStyled, ContentListPanel, OverflowMenu, Pagination } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -494,11 +506,10 @@ function toggleArray(array, value) {
 
 const searchFilter = ref('')
 const selectAll = ref(false)
-const selectedProjectType = ref('All')
-const hideNonSelected = ref(false)
 const shareModal = ref(null)
 const ascending = ref(true)
 const sortColumn = ref('Name')
+const currentPage = ref(1)
 
 const selected = computed(() =>
   Array.from(selectionMap.value)
@@ -514,32 +525,10 @@ const functionValues = computed(() =>
   selectedProjects.value.length > 0 ? selectedProjects.value : Array.from(projects.value.values()),
 )
 
-const selectableProjectTypes = computed(() => {
-  const obj = { All: 'all' }
-
-  for (const project of projects.value) {
-    obj[project.project_type ? formatProjectType(project.project_type) + 's' : 'Other'] =
-      project.project_type
-  }
-
-  return obj
-})
-
 const search = computed(() => {
-  const projectType = selectableProjectTypes.value[selectedProjectType.value]
-  const filtered = filteredProjects.value
-    .filter((mod) => {
-      return (
-        mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
-        (projectType === 'all' || mod.project_type === projectType)
-      )
-    })
-    .filter((mod) => {
-      if (hideNonSelected.value) {
-        return !mod.disabled
-      }
-      return true
-    })
+  const filtered = filteredProjects.value.filter((mod) => {
+    return mod.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+  })
 
   switch (sortColumn.value) {
     case 'Updated':
@@ -564,6 +553,8 @@ const search = computed(() => {
       })
   }
 })
+
+watch(search, () => (currentPage.value = 1))
 
 const sortProjects = (filter) => {
   if (sortColumn.value === filter) {

@@ -15,6 +15,7 @@ import {
   MaximizeIcon,
   RestoreIcon,
   LogOutIcon,
+  RightArrowIcon,
 } from '@modrinth/assets'
 import { Avatar, Button, ButtonStyled, Notifications, OverflowMenu } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
@@ -54,7 +55,7 @@ import { get_user } from '@/helpers/cache.js'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
-import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
+import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
@@ -263,13 +264,22 @@ const hasPlus = computed(
     (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
 )
 
+const sidebarToggled = ref(false)
+const forceSidebar = computed(
+  () => route.path.startsWith('/browse') || route.path.startsWith('/project'),
+)
+const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
+const showAd = computed(() => !(!sidebarVisible.value || hasPlus.value))
+
 watch(
-  hasPlus,
+  showAd,
   () => {
-    if (hasPlus.value) {
+    if (!showAd.value) {
       hide_ads_window(true)
     } else {
-      show_ads_window()
+      setTimeout(() => {
+        init_ads_window(true)
+      }, 400)
     }
   },
   { immediate: true },
@@ -367,7 +377,7 @@ function handleAuxClick(e) {
       <InstanceCreationModal ref="installationModal" />
     </Suspense>
     <div
-      class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10 w-[--left-bar-width]"
+      class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] z-10 w-[--left-bar-width]"
     >
       <NavButton to="/">
         <HomeIcon />
@@ -436,11 +446,24 @@ function handleAuxClick(e) {
       </NavButton>
     </div>
     <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
-      <div data-tauri-drag-region class="flex p-4">
+      <div data-tauri-drag-region class="flex p-3">
         <ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
         <Breadcrumbs />
       </div>
-      <section class="flex ml-auto">
+      <section class="flex ml-auto items-center">
+        <ButtonStyled
+          v-if="!forceSidebar"
+          :type="sidebarToggled ? 'standard' : 'transparent'"
+          circular
+        >
+          <button
+            class="mr-3 transition-transform"
+            :class="{ 'rotate-180': !sidebarToggled }"
+            @click="sidebarToggled = !sidebarToggled"
+          >
+            <RightArrowIcon />
+          </button>
+        </ButtonStyled>
         <div class="flex mr-3">
           <Suspense>
             <RunningAppBar />
@@ -465,7 +488,11 @@ function handleAuxClick(e) {
       </section>
     </div>
   </div>
-  <div v-if="stateInitialized" class="app-contents experimental-styles-within">
+  <div
+    v-if="stateInitialized"
+    class="app-contents experimental-styles-within"
+    :class="{ 'sidebar-enabled': sidebarVisible }"
+  >
     <div class="app-viewport flex-grow router-view">
       <div
         class="loading-indicator-container h-8 fixed z-50"
@@ -507,7 +534,7 @@ function handleAuxClick(e) {
         :class="{ 'pb-12': !hasPlus }"
       >
         <div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
-        <div class="sidebar-default-content">
+        <div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
             <h3 class="text-lg m-0">Playing as</h3>
             <suspense>
@@ -550,7 +577,7 @@ function handleAuxClick(e) {
           </div>
         </div>
       </div>
-      <template v-if="!hasPlus">
+      <template v-if="showAd">
         <a
           href="https://modrinth.plus?app"
           class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
@@ -577,21 +604,6 @@ function handleAuxClick(e) {
 </template>
 
 <style lang="scss" scoped>
-.sleek-primary {
-  background-color: var(--color-brand-highlight);
-  transition: all ease-in-out 0.1s;
-}
-
-.navigation-controls {
-  flex-grow: 1;
-  width: min-content;
-}
-
-.appbar-row {
-  display: flex;
-  flex-direction: row;
-}
-
 .window-controls {
   z-index: 20;
   display: none;
@@ -658,139 +670,10 @@ function handleAuxClick(e) {
   }
 }
 
-.app-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-
-  .view {
-    width: calc(100% - var(--sidebar-width));
-    background-color: var(--color-raised-bg);
-
-    .critical-error-banner {
-      margin-top: -1.25rem;
-      padding: 1rem;
-      background-color: rgba(203, 34, 69, 0.1);
-      border-left: 2px solid var(--color-red);
-      border-bottom: 2px solid var(--color-red);
-      border-right: 2px solid var(--color-red);
-      border-radius: 1rem;
-    }
-
-    .appbar {
-      display: flex;
-      align-items: center;
-      flex-grow: 1;
-      background: var(--color-raised-bg);
-      text-align: center;
-      padding: var(--gap-md);
-      height: 3.25rem;
-      gap: var(--gap-sm);
-      //no select
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .router-view {
-      width: 100%;
-      height: calc(100% - 3.125rem);
-      overflow: auto;
-      overflow-x: hidden;
-      background-color: var(--color-bg);
-      border-top-left-radius: var(--radius-xl);
-    }
-  }
-}
-
-.nav-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  background-color: var(--color-raised-bg);
-  box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-  padding: var(--gap-md);
-}
-
-.pages-list {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  width: 100%;
-  gap: 0.5rem;
-
-  a {
-    display: flex;
-    align-items: center;
-    word-spacing: 3px;
-    background: inherit;
-    transition: all ease-in-out 0.1s;
-    color: var(--color-base);
-    box-shadow: none;
-
-    &.router-link-active {
-      color: var(--color-contrast);
-      background: var(--color-button-bg);
-      box-shadow: var(--shadow-floating);
-    }
-
-    &:hover {
-      background-color: var(--color-button-bg);
-      color: var(--color-contrast);
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-      text-decoration: none;
-    }
-  }
-
-  &.primary {
-    color: var(--color-accent-contrast);
-    background-color: var(--color-brand);
-  }
-}
-
-.collapsed-button {
-  height: 3rem !important;
-  width: 3rem !important;
-  padding: 0.75rem;
-  border-radius: var(--radius-md);
-  box-shadow: none;
-
-  svg {
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    max-width: 1.5rem !important;
-    max-height: 1.5rem !important;
-  }
-}
-
-.nav-section {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  gap: 1rem;
-}
-
-.button-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: var(--gap-md);
-
-  .transparent {
-    padding: var(--gap-sm) 0;
-  }
-}
-
 .app-grid-layout,
 .app-contents {
-  --top-bar-height: 3.75rem;
-  --left-bar-width: 5rem;
+  --top-bar-height: 3rem;
+  --left-bar-width: 4rem;
   --right-bar-width: 300px;
 }
 
@@ -816,18 +699,21 @@ function handleAuxClick(e) {
 .app-contents {
   position: absolute;
   z-index: 1;
-  left: 5rem;
-  top: 3.75rem;
+  left: var(--left-bar-width);
+  top: var(--top-bar-height);
   right: 0;
   bottom: 0;
-  height: calc(100vh - 3.75rem);
+  height: calc(100vh - var(--top-bar-height));
   background-color: var(--color-bg);
   border-top-left-radius: var(--radius-xl);
 
   display: grid;
-  grid-template-columns: 1fr 300px;
-  //grid-template-columns: 1fr 0px;
+  grid-template-columns: 1fr 0px;
   transition: grid-template-columns 0.4s ease-in-out;
+
+  &.sidebar-enabled {
+    grid-template-columns: 1fr 300px;
+  }
 }
 
 .loading-indicator-container {
@@ -881,22 +767,15 @@ function handleAuxClick(e) {
   overflow-x: hidden;
 }
 
-//::-webkit-scrollbar-track {
-//  background-color: transparent; /* Make it transparent if needed */
-//  margin-block: 5px;
-//  margin-right: 5px;
-//}
-
 .app-contents::before {
   z-index: 1;
   content: '';
   position: fixed;
-  left: 5rem;
-  top: 3.75rem;
-  right: -5rem;
-  bottom: -5rem;
+  left: var(--left-bar-width);
+  top: var(--top-bar-height);
+  right: calc(-1 * var(--left-bar-width));
+  bottom: calc(-1 * var(--left-bar-width));
   border-radius: var(--radius-xl);
-  //box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.2) inset;
   box-shadow:
     1px 1px 15px rgba(0, 0, 0, 0.2) inset,
     inset 1px 1px 1px rgba(255, 255, 255, 0.23);
@@ -911,7 +790,7 @@ function handleAuxClick(e) {
   display: none;
 }
 
-.sidebar-teleport-content:empty + .sidebar-default-content {
+.sidebar-teleport-content:empty + .sidebar-default-content.sidebar-enabled {
   display: contents;
 }
 </style>
