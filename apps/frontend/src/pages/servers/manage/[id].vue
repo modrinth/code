@@ -86,7 +86,6 @@
         </ButtonStyled>
       </div>
     </div>
-
     <!-- SERVER START -->
     <div
       v-else-if="serverData"
