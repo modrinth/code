@@ -41,47 +41,46 @@
       v-model="selectedFiles"
       :locked="isPackLocked"
       :items="
-        search
-          .map((x) => {
-            const item: ContentItem<any> = {
-              path: x.path,
-              disabled: x.disabled,
-              filename: x.file_name,
-              icon: x.icon,
-              title: x.name,
-              data: x,
-            }
+        search.map((x) => {
+          const item: ContentItem<any> = {
+            path: x.path,
+            disabled: x.disabled,
+            filename: x.file_name,
+            icon: x.icon,
+            title: x.name,
+            data: x,
+          }
 
-            if (x.version) {
-              item.version = x.version
-              item.versionId = x.version
-            }
+          if (x.version) {
+            item.version = x.version
+            item.versionId = x.version
+          }
 
-            if (x.id) {
-              item.project = {
-                id: x.id,
-                link: { path: `/project/${x.id}`, query: { i: props.instance.path } },
-                linkProps: {},
-              }
+          if (x.id) {
+            item.project = {
+              id: x.id,
+              link: { path: `/project/${x.id}`, query: { i: props.instance.path } },
+              linkProps: {},
             }
+          }
 
-            if (x.author) {
-              item.creator = {
-                name: x.author,
-                type: 'user',
-                id: x.author,
-                link: 'https://modrinth.com/user/' + x.author,
-                linkProps: { target: '_blank' },
-              }
+          if (x.author) {
+            item.creator = {
+              name: x.author,
+              type: 'user',
+              id: x.author,
+              link: 'https://modrinth.com/user/' + x.author,
+              linkProps: { target: '_blank' },
             }
+          }
 
-            return item
-          })
-          .slice((currentPage - 1) * 20, currentPage * 20)
+          return item
+        })
       "
       :sort-column="sortColumn"
       :sort-ascending="ascending"
       :update-sort="sortProjects"
+      :current-page="currentPage"
     >
       <template v-if="selectedProjects.length > 0" #headers>
         <div class="flex gap-2">
@@ -250,28 +249,28 @@
 </template>
 <script setup lang="ts">
 import {
-  ExternalIcon,
-  LinkIcon,
+  CheckCircleIcon,
   ClipboardCopyIcon,
-  TrashIcon,
-  SearchIcon,
-  UpdatedIcon,
-  XIcon,
-  ShareIcon,
-  DropdownIcon,
-  FileIcon,
   CodeIcon,
   DownloadIcon,
+  DropdownIcon,
+  ExternalIcon,
+  FileIcon,
   FilterIcon,
+  LinkIcon,
   MoreVerticalIcon,
-  CheckCircleIcon,
+  SearchIcon,
+  ShareIcon,
   SlashIcon,
+  TrashIcon,
+  UpdatedIcon,
+  XIcon,
 } from '@modrinth/assets'
 import { Button, ButtonStyled, ContentListPanel, OverflowMenu, Pagination } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { useVIntl, defineMessages } from '@vintl/vintl'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import {
   add_project_from_path,
   get_projects,
@@ -417,7 +416,7 @@ const initProjects = async (cacheBehaviour?) => {
       icon: null,
       disabled: file.file_name.endsWith('.disabled'),
       outdated: false,
-      project_type: file.project_type,
+      project_type: file.project_type === 'shaderpack' ? 'shader' : file.project_type,
     })
   }
 
@@ -496,6 +495,15 @@ const filteredProjects = computed(() => {
   })
 })
 
+watch(filterOptions, () => {
+  for (let i = 0; i < selectedFilters.value.length; i++) {
+    const option = selectedFilters.value[i]
+    if (!filterOptions.value.some((x) => x.id === option)) {
+      selectedFilters.value.splice(i, 1)
+    }
+  }
+})
+
 function toggleArray(array, value) {
   if (array.includes(value)) {
     array.splice(array.indexOf(value), 1)
@@ -542,15 +550,7 @@ const search = computed(() => {
         return 0
       })
     default:
-      return filtered.slice().sort((a, b) => {
-        if (a.name < b.name) {
-          return ascending.value ? -1 : 1
-        }
-        if (a.name > b.name) {
-          return ascending.value ? 1 : -1
-        }
-        return 0
-      })
+      return filtered.slice().sort((a, b) => a.name.localeCompare(b.name))
   }
 })
 
@@ -621,35 +621,33 @@ const locks = {}
 
 const toggleDisableMod = async (mod) => {
   // Use mod's id as the key for the lock. If mod doesn't have a unique id, replace `mod.id` with some unique property.
-  if (!locks[mod.id]) {
-    locks[mod.id] = ref(null)
+  const lock = locks[mod.file_name]
+
+  while (lock) {
+    await new Promise((resolve) => {
+      setTimeout((_) => resolve(), 100)
+    })
   }
 
-  const lock = locks[mod.id]
+  locks[mod.file_name] = 'lock'
 
-  while (lock.value) {
-    await lock.value
+  try {
+    mod.path = await toggle_disable_project(props.instance.path, mod.path)
+    mod.disabled = !mod.disabled
+
+    trackEvent('InstanceProjectDisable', {
+      loader: props.instance.loader,
+      game_version: props.instance.game_version,
+      id: mod.id,
+      name: mod.name,
+      project_type: mod.project_type,
+      disabled: mod.disabled,
+    })
+  } catch (err) {
+    handleError(err)
   }
 
-  lock.value = toggle_disable_project(props.instance.path, mod.path)
-    .then((newPath) => {
-      mod.path = newPath
-      mod.disabled = !mod.disabled
-      trackEvent('InstanceProjectDisable', {
-        loader: props.instance.loader,
-        game_version: props.instance.game_version,
-        id: mod.id,
-        name: mod.name,
-        project_type: mod.project_type,
-        disabled: mod.disabled,
-      })
-    })
-    .catch(handleError)
-    .finally(() => {
-      lock.value = null
-    })
-
-  await lock.value
+  locks[mod.file_name] = null
 }
 
 const removeMod = async (mod) => {

@@ -1,7 +1,7 @@
 //! Theseus settings file
 
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 // Types
 /// Global Theseus settings
@@ -39,7 +39,7 @@ pub struct Settings {
     pub feature_flags: HashMap<FeatureFlag, bool>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum FeatureFlag {
     PagePath,
@@ -108,9 +108,11 @@ impl Settings {
             custom_dir: res.custom_dir,
             prev_custom_dir: res.prev_custom_dir,
             migrated: res.migrated == 1,
-            feature_flags: res.feature_flags.as_ref().and_then(|x| {
-                serde_json::from_str(x).ok()
-            }).unwrap_or_default(),
+            feature_flags: res
+                .feature_flags
+                .as_ref()
+                .and_then(|x| serde_json::from_str(x).ok())
+                .unwrap_or_default(),
         })
     }
 
@@ -124,6 +126,7 @@ impl Settings {
         let default_page = self.default_page.as_str();
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
+        let feature_flags = serde_json::to_string(&self.feature_flags)?;
 
         sqlx::query!(
             "
@@ -159,7 +162,10 @@ impl Settings {
 
                 custom_dir = $23,
                 prev_custom_dir = $24,
-                migrated = $25
+                migrated = $25,
+
+                toggle_sidebar = $26,
+                feature_flags = $27
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -185,7 +191,9 @@ impl Settings {
             self.hooks.post_exit,
             self.custom_dir,
             self.prev_custom_dir,
-            self.migrated
+            self.migrated,
+            self.toggle_sidebar,
+            feature_flags
         )
         .execute(exec)
         .await?;
@@ -201,6 +209,7 @@ pub enum Theme {
     Dark,
     Light,
     Oled,
+    System,
 }
 
 impl Theme {
@@ -209,6 +218,7 @@ impl Theme {
             Theme::Dark => "dark",
             Theme::Light => "light",
             Theme::Oled => "oled",
+            Theme::System => "system",
         }
     }
 
@@ -217,6 +227,7 @@ impl Theme {
             "dark" => Theme::Dark,
             "light" => Theme::Light,
             "oled" => Theme::Oled,
+            "system" => Theme::System,
             _ => Theme::Dark,
         }
     }

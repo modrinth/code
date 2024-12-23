@@ -12,6 +12,7 @@ const props = withDefaults(
     sortColumn: string
     sortAscending: boolean
     updateSort: (column: string) => void
+    currentPage: number
   }>(),
   {},
 )
@@ -39,6 +40,10 @@ function setSelected(value: boolean) {
   }
   updateSelection()
 }
+
+const paginatedItems = computed(() =>
+  props.items.slice((props.currentPage - 1) * 20, props.currentPage * 20),
+)
 </script>
 
 <template>
@@ -76,11 +81,11 @@ function setSelected(value: boolean) {
     </div>
     <div class="bg-bg-raised rounded-xl">
       <ContentListItem
-        v-for="(itemRef, index) in items"
+        v-for="(itemRef, index) in paginatedItems"
         :key="itemRef.filename"
         v-model="selectionStates[itemRef.filename]"
         :item="itemRef"
-        :last="index === items.length - 1"
+        :last="index === paginatedItems.length - 1"
         class="mb-2"
         @update:model-value="updateSelection"
       >

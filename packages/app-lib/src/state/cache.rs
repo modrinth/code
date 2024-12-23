@@ -474,7 +474,11 @@ impl CacheValue {
             | CacheValue::DonationPlatforms(_) => DEFAULT_ID.to_string(),
 
             CacheValue::FileHash(hash) => {
-                format!("{}-{}", hash.size, hash.path.replace(".disabled", ""))
+                format!(
+                    "{}-{}",
+                    hash.size,
+                    hash.path.trim_end_matches(".disabled")
+                )
             }
             CacheValue::FileUpdate(hash) => {
                 format!("{}-{}-{}", hash.hash, hash.loader, hash.game_version)

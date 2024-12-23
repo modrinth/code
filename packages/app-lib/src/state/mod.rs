@@ -122,10 +122,12 @@ impl State {
 
     #[tracing::instrument]
     async fn initialize_state() -> crate::Result<Arc<Self>> {
+        tracing::info!("Connecting to app database");
         let pool = db::connect().await?;
 
         legacy_converter::migrate_legacy_data(&pool).await?;
 
+        tracing::info!("Fetching app settings");
         let mut settings = Settings::get(&pool).await?;
 
         let fetch_semaphore =
@@ -135,6 +137,7 @@ impl State {
         let api_semaphore =
             FetchSemaphore(Semaphore::new(settings.max_concurrent_downloads));
 
+        tracing::info!("Initializing directories");
         DirectoryInfo::move_launcher_directory(
             &mut settings,
             &pool,
@@ -145,6 +148,7 @@ impl State {
 
         let discord_rpc = DiscordGuard::init()?;
 
+        tracing::info!("Initializing file watcher");
         let file_watcher = fs_watcher::init_watcher().await?;
         fs_watcher::watch_profiles_init(&file_watcher, &directories).await;
 

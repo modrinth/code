@@ -169,9 +169,13 @@ window.addEventListener('online', () => {
 const breadcrumbs = useBreadcrumbs()
 breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: route.query })
 
-const loading = ref(false)
+const loading = ref(true)
 
 const projectType = ref(route.params.projectType)
+
+watch(projectType, () => {
+  loading.value = true
+})
 
 type SearchResult = {
   project_id: string
@@ -240,6 +244,7 @@ async function refreshSearch() {
     query: params,
   })
   await router.replace({ path: route.path, query: params })
+  loading.value = false
 }
 
 async function setPage(newPageNumber: number) {
@@ -466,11 +471,10 @@ await refreshSearch()
                 loader.supported_project_types?.includes(projectType),
             ),
           ]"
-          :installed="result.installed"
+          :installed="result.installed || newlyInstalled.includes(result.project_id)"
           @install="
             (id) => {
               newlyInstalled.push(id)
-              refreshSearch()
             }
           "
         />

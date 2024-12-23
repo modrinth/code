@@ -457,6 +457,7 @@ const messages = defineMessages({
     :proceed-icon="HammerIcon"
     :proceed-label="formatMessage(messages.repairButton)"
     :danger="false"
+    :show-ad-on-close="false"
     @proceed="() => repairProfile(true)"
   />
   <ModpackVersionModal
@@ -480,6 +481,7 @@ const messages = defineMessages({
     :description="formatMessage(messages.unlinkInstanceConfirmDescription)"
     :proceed-icon="UnlinkIcon"
     :proceed-label="formatMessage(messages.unlinkInstanceButton)"
+    :show-ad-on-close="false"
     @proceed="() => unpairProfile()"
   />
   <ConfirmModalWrapper
@@ -488,6 +490,7 @@ const messages = defineMessages({
     :description="formatMessage(messages.reinstallModpackConfirmDescription)"
     :proceed-icon="DownloadIcon"
     :proceed-label="formatMessage(messages.reinstallModpackButton)"
+    :show-ad-on-close="false"
     @proceed="() => repairModpack()"
   />
   <div>

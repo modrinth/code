@@ -3,6 +3,7 @@
     ref="dropdown"
     no-auto-focus
     :aria-id="dropdownId || null"
+    placement="bottom-end"
     @apply-hide="focusTrigger"
     @apply-show="focusMenuChild"
   >

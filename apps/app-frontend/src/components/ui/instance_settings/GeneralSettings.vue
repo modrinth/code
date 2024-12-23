@@ -190,6 +190,7 @@ const messages = defineMessages({
     description="If you proceed, all data for your instance will be permanently erased, including your worlds. You will not be able to recover it."
     :has-to-type="false"
     proceed-label="Delete"
+    :show-ad-on-close="false"
     @proceed="removeProfile"
   />
   <div class="block">

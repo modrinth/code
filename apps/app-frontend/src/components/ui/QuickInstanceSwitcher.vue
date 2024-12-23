@@ -42,6 +42,7 @@ onUnmounted(() => {
   <NavButton
     v-for="instance in recentInstances"
     :key="instance.id"
+    v-tooltip.right="instance.name"
     :to="`/instance/${encodeURIComponent(instance.path)}`"
   >
     <Avatar
@@ -55,7 +56,6 @@ onUnmounted(() => {
     >
       <SpinnerIcon class="animate-spin w-4 h-4" />
     </div>
-    <template #label>{{ instance.name }}</template>
   </NavButton>
   <div v-if="recentInstances.length > 0" class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
 </template>

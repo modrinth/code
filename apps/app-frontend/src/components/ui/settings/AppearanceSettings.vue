@@ -23,8 +23,13 @@ watch(
   <p class="m-0 mt-1">Select your preferred color theme for Modrinth App.</p>
 
   <ThemeSelector
-    :update-color-theme="themeStore.setThemeState"
-    :current-theme="themeStore.selectedTheme"
+    :update-color-theme="
+      (theme) => {
+        themeStore.setThemeState(theme)
+        settings.theme = theme
+      }
+    "
+    :current-theme="settings.theme"
     :theme-options="themeStore.themeOptions"
     system-theme-color="system"
   />
@@ -95,6 +100,24 @@ watch(
       v-model="settings.default_page"
       name="Opening page dropdown"
       :options="['Home', 'Library']"
+    />
+  </div>
+
+  <div class="mt-4 flex items-center justify-between">
+    <div>
+      <h2 class="m-0 text-lg font-extrabold text-contrast">Toggle sidebar</h2>
+      <p class="m-0 mt-1">Enables the ability to toggle the sidebar.</p>
+    </div>
+    <Toggle
+      id="toggle-sidebar"
+      :model-value="settings.toggle_sidebar"
+      :checked="settings.toggle_sidebar"
+      @update:model-value="
+        (e) => {
+          settings.toggle_sidebar = e
+          themeStore.toggleSidebar = settings.toggle_sidebar
+        }
+      "
     />
   </div>
 </template>

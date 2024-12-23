@@ -62,33 +62,7 @@ import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 
 const themeStore = useTheming()
 
-const news = ref([
-  {
-    title: 'Introducing Modrinth Servers',
-    summary: 'Host your next Minecraft server with Modrinth.',
-    thumbnail:
-      'https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/asset/file/eefddc59-b4c4-4e7d-92e8-c26bdef42984/Modrinth-Servers-Thumb.png',
-    date: '2024-11-02T00:00:00Z',
-    link: 'https://blog.modrinth.com/p/modrinth-servers-beta',
-  },
-  {
-    title: 'Becoming Sustainable',
-    summary: 'Announcing 5x creator revenue and updates to the monetization program.',
-    thumbnail:
-      'https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/asset/file/c99b9885-8248-4d7a-b19a-3ae2c902fdd5/revenue.png',
-    date: '2024-09-13T00:00:00Z',
-    link: 'https://blog.modrinth.com/p/creator-revenue-update',
-  },
-  {
-    title: 'Modrinth+ and New Ads',
-    summary:
-      'Introducing a new advertising system, a subscription to remove ads, and a redesign of the website!\n',
-    thumbnail:
-      'https://media.beehiiv.com/cdn-cgi/image/fit=scale-down,format=auto,onerror=redirect,quality=80/uploads/asset/file/38ce85e4-5d93-43eb-b61b-b6296f6b9e66/things.png?t=1724260059',
-    date: '2024-08-21T00:00:00Z',
-    link: 'https://blog.modrinth.com/p/introducing-modrinth-refreshed-site-look-new-advertising-system',
-  },
-])
+const news = ref([])
 
 const urlModal = ref(null)
 
@@ -133,6 +107,9 @@ async function setupApp() {
     advanced_rendering,
     onboarded,
     default_page,
+    toggle_sidebar,
+    developer_mode,
+    feature_flags,
   } = await get()
 
   if (default_page === 'Library') {
@@ -150,6 +127,9 @@ async function setupApp() {
   themeStore.setThemeState(theme)
   themeStore.collapsedNavigation = collapsed_navigation
   themeStore.advancedRendering = advanced_rendering
+  themeStore.toggleSidebar = toggle_sidebar
+  themeStore.devMode = developer_mode
+  themeStore.featureFlags = feature_flags
 
   isMaximized.value = await getCurrentWindow().isMaximized()
 
@@ -188,6 +168,12 @@ async function setupApp() {
   ).then((res) => {
     if (res && res.header && res.body) {
       criticalErrorMessage.value = res
+    }
+  })
+
+  useFetch(`https://modrinth.com/blog/news.json`, 'news', true).then((res) => {
+    if (res && res.articles) {
+      news.value = res.articles
     }
   })
 
@@ -264,12 +250,19 @@ const hasPlus = computed(
     (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
 )
 
-const sidebarToggled = ref(false)
-const forceSidebar = computed(
-  () => route.path.startsWith('/browse') || route.path.startsWith('/project'),
-)
+const sidebarToggled = ref(true)
+
+themeStore.$subscribe(() => {
+  sidebarToggled.value = !themeStore.toggleSidebar
+})
+
+const forceSidebar = ref(false)
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 const showAd = computed(() => !(!sidebarVisible.value || hasPlus.value))
+
+router.afterEach((to) => {
+  forceSidebar.value = to.path.startsWith('/browse') || to.path.startsWith('/project')
+})
 
 watch(
   showAd,
@@ -377,21 +370,21 @@ function handleAuxClick(e) {
       <InstanceCreationModal ref="installationModal" />
     </Suspense>
     <div
-      class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] z-10 w-[--left-bar-width]"
+      class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
     >
-      <NavButton to="/">
+      <NavButton v-tooltip.right="'Home'" to="/">
         <HomeIcon />
-        <template #label>Home</template>
       </NavButton>
       <NavButton
+        v-tooltip.right="'Discover content'"
         to="/browse/modpack"
         :is-primary="() => route.path.startsWith('/browse') && !route.query.i"
         :is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
       >
         <CompassIcon />
-        <template #label>Discover content</template>
       </NavButton>
       <NavButton
+        v-tooltip.right="'Library'"
         to="/library"
         :is-subpage="
           () =>
@@ -401,24 +394,24 @@ function handleAuxClick(e) {
         "
       >
         <LibraryIcon />
-        <template #label>Library</template>
       </NavButton>
       <div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
       <suspense>
         <QuickInstanceSwitcher />
       </suspense>
-      <NavButton :to="() => $refs.installationModal.show()" :disabled="offline">
+      <NavButton
+        v-tooltip.right="'Create new instance'"
+        :to="() => $refs.installationModal.show()"
+        :disabled="offline"
+      >
         <PlusIcon />
-        <template #label>Create new instance</template>
       </NavButton>
       <div class="flex flex-grow"></div>
-      <NavButton v-if="updateAvailable" :to="() => restartApp()">
+      <NavButton v-if="updateAvailable" v-tooltip.right="'Install update'" :to="() => restartApp()">
         <DownloadIcon />
-        <template #label>Install update</template>
       </NavButton>
-      <NavButton :to="() => $refs.settingsModal.show()">
+      <NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
         <SettingsIcon />
-        <template #label>Settings</template>
       </NavButton>
       <ButtonStyled v-if="credentials" type="transparent" circular>
         <OverflowMenu
@@ -440,7 +433,7 @@ function handleAuxClick(e) {
           <template #sign-out> <LogOutIcon /> Sign out </template>
         </OverflowMenu>
       </ButtonStyled>
-      <NavButton v-else :to="() => signIn()">
+      <NavButton v-else v-tooltip.right="'Sign in'" :to="() => signIn()">
         <LogInIcon />
         <template #label>Sign in</template>
       </NavButton>
@@ -452,7 +445,7 @@ function handleAuxClick(e) {
       </div>
       <section class="flex ml-auto items-center">
         <ButtonStyled
-          v-if="!forceSidebar"
+          v-if="!forceSidebar && themeStore.toggleSidebar"
           :type="sidebarToggled ? 'standard' : 'transparent'"
           circular
         >
@@ -505,7 +498,7 @@ function handleAuxClick(e) {
         <ModrinthLoadingIndicator />
       </div>
       <div
-        v-if="themeStore.featureFlag_pagePath"
+        v-if="themeStore.featureFlags.page_path"
         class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50"
       >
         {{ route.fullPath }}
@@ -546,7 +539,7 @@ function handleAuxClick(e) {
               <FriendsList :credentials="credentials" :sign-in="() => signIn()" />
             </suspense>
           </div>
-          <div class="pt-4 flex flex-col">
+          <div v-if="news && news.length > 0" class="pt-4 flex flex-col">
             <h3 class="px-4 text-lg m-0">News</h3>
             <template v-for="(item, index) in news" :key="`news-${index}`">
               <a
@@ -725,7 +718,7 @@ function handleAuxClick(e) {
   overflow: visible;
   width: 300px;
   position: relative;
-  height: calc(100vh - 3.75rem);
+  height: calc(100vh - var(--top-bar-height));
   background: var(--brand-gradient-bg);
 
   --color-button-bg: var(--brand-gradient-button);
