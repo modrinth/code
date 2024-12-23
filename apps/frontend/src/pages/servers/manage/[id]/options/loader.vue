@@ -330,48 +330,76 @@
                 <UploadIcon class="size-4" /> Upload .mrpack file
               </button>
             </ButtonStyled>
+            <DownloadIcon v-if="hasNewerVersion" color="brand">
+              <button class="!w-full sm:!w-auto" @click="handleUpdateToLatest">
+                <UploadIcon class="size-4" /> Update modpack
+              </button>
+            </DownloadIcon>
           </div>
         </div>
-        <div
-          v-if="data.upstream"
-          class="flex w-full justify-between gap-2 rounded-3xl bg-table-alternateRow p-4"
-        >
-          <div class="flex flex-col gap-4 sm:flex-row">
-            <UiAvatar :src="data.project?.icon_url" size="120px" />
-
-            <div class="flex flex-col justify-between">
-              <div class="flex flex-col gap-2">
-                <h1 class="m-0 flex gap-2 text-2xl font-extrabold leading-none text-contrast">
-                  {{ data.project?.title }}
-                </h1>
-                <span class="text-md text-secondary">
-                  {{
-                    data.project?.description && data.project.description.length > 150
-                      ? data.project.description.substring(0, 150) + "..."
-                      : data.project?.description || ""
-                  }}
-                </span>
+        <div v-if="data.upstream" class="contents">
+          <div class="flex w-full justify-between gap-2 rounded-3xl bg-table-alternateRow p-4">
+            <div class="flex flex-col gap-4 sm:flex-row">
+              <UiAvatar :src="data.project?.icon_url" size="120px" />
+              <div class="flex flex-col justify-between">
+                <div class="flex flex-col gap-2">
+                  <h1 class="m-0 flex gap-2 text-2xl font-extrabold leading-none text-contrast">
+                    {{ data.project?.title }}
+                  </h1>
+                  <span class="text-md text-secondary">
+                    {{
+                      data.project?.description && data.project.description.length > 150
+                        ? data.project.description.substring(0, 150) + "..."
+                        : data.project?.description || ""
+                    }}
+                  </span>
+                </div>
               </div>
-              <div
-                class="mt-2 flex w-full max-w-[24rem] flex-col items-center gap-2 sm:mt-0 sm:flex-row"
-              >
-                <UiServersTeleportDropdownMenu
-                  v-if="versions && Array.isArray(versions) && versions.length > 0"
-                  v-model="version"
-                  :options="options"
-                  placeholder="Change version"
-                  name="version"
-                />
-                <ButtonStyled>
+            </div>
+          </div>
+          <div class="mt-4 flex flex-col gap-2">
+            <h2 class="m-0 text-lg font-bold text-contrast">Change modpack version</h2>
+            <p class="m-0">
+              Select the version of {{ data.project?.title || "the modpack" }} you want to install
+              on your server.
+            </p>
+
+            <div class="flex w-full flex-col items-center gap-2">
+              <UiServersTeleportDropdownMenu
+                v-if="versions && Array.isArray(versions) && versions.length > 0"
+                v-model="version"
+                :options="options"
+                placeholder="Change version"
+                name="version"
+                class="w-full max-w-full"
+              />
+              <div class="flex w-full flex-col rounded-2xl bg-table-alternateRow p-4">
+                <div class="flex w-full flex-row items-center justify-between">
+                  <label class="w-full text-lg font-bold text-contrast" for="modpack-hard-reset">
+                    Erase all data
+                  </label>
+                  <input
+                    id="modpack-hard-reset"
+                    :checked="hardReset"
+                    class="switch stylized-toggle shrink-0"
+                    type="checkbox"
+                    @change="hardReset = ($event.target as HTMLInputElement).checked"
+                  />
+                </div>
+                <p>
+                  If enabled, existing mods, worlds, and configurations, will be deleted before
+                  installing the new modpack version.
+                </p>
+                <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
                   <button
                     :disabled="
                       isLoading || (props.server.general?.status === 'installing' && isError)
                     "
-                    class="!w-full sm:!w-auto"
+                    class="ml-auto"
                     @click="reinstallCurrent"
                   >
                     <DownloadIcon class="size-4" />
-                    Reinstall
+                    {{ isDangerous ? "Erase and install" : "Install" }}
                   </button>
                 </ButtonStyled>
               </div>
@@ -618,6 +646,27 @@ const updateData = async () => {
 };
 updateData();
 
+const latestVersion = computed(() => {
+  if (!Array.isArray(versions?.value) || versions.value.length === 0) return null;
+  return versions.value.reduce((latest: any, current: any) => {
+    if (!latest) return current;
+    return latest.version_number > current.version_number ? latest : current;
+  }, null);
+});
+
+const hasNewerVersion = computed(() => {
+  if (!currentVersion.value?.version_number || !latestVersion.value?.version_number) return false;
+  return latestVersion.value.version_number > currentVersion.value.version_number;
+});
+
+const handleUpdateToLatest = async () => {
+  if (!latestVersion.value) return;
+
+  version.value = latestVersion.value.version_number;
+  hardReset.value = false;
+  await reinstallCurrent();
+};
+
 const paperVersions = ref<Record<string, number[]>>({});
 const purpurVersions = ref<Record<string, string[]>>({});
 
@@ -705,6 +754,7 @@ watch(selectedMCVersion, async () => {
 const onShow = () => {
   selectedMCVersion.value = props.server.general?.mc_version || "";
   selectedLoaderVersion.value = "";
+  hardReset.value = false;
 };
 
 const onHide = () => {
@@ -743,7 +793,14 @@ const reinstallCurrent = async () => {
   const resolvedVersionIds = versionIds.value;
   const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
   try {
-    await props.server.general?.reinstall(serverId, false, projectId, versionId);
+    await props.server.general?.reinstall(
+      serverId,
+      false,
+      projectId,
+      versionId,
+      undefined,
+      hardReset.value,
+    );
     emit("reinstall");
   } catch (error) {
     handleReinstallError(error);
