@@ -194,6 +194,16 @@
                     <div
                       class="flex items-center justify-end gap-2 pr-4 font-semibold text-contrast sm:min-w-44"
                     >
+                      <ButtonStyled color="red" type="transparent">
+                        <button
+                          v-tooltip="'Delete mod'"
+                          :disabled="mod.changing"
+                          class="!hidden sm:!block"
+                          @click="removeMod(mod)"
+                        >
+                          <TrashIcon />
+                        </button>
+                      </ButtonStyled>
                       <ButtonStyled type="transparent">
                         <button
                           v-tooltip="
@@ -209,16 +219,6 @@
                           <template v-else>
                             <EditIcon />
                           </template>
-                        </button>
-                      </ButtonStyled>
-                      <ButtonStyled type="transparent">
-                        <button
-                          v-tooltip="'Delete mod'"
-                          :disabled="mod.changing"
-                          class="!hidden sm:!block"
-                          @click="removeMod(mod)"
-                        >
-                          <TrashIcon />
                         </button>
                       </ButtonStyled>
 
