@@ -8,6 +8,7 @@ use tokio::sync::RwLock;
 
 pub struct AdsState {
     pub shown: bool,
+    pub modal_shown: bool,
     pub last_click: Option<Instant>,
     pub malicious_origins: HashSet<String>,
 }
@@ -19,6 +20,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .setup(|app, _api| {
             app.manage(RwLock::new(AdsState {
                 shown: true,
+                modal_shown: false,
                 last_click: None,
                 malicious_origins: HashSet::new(),
             }));
@@ -86,6 +88,10 @@ pub async fn init_ads_window<R: Runtime>(
         state.shown = true;
     }
 
+    if state.modal_shown {
+        return Ok(());
+    }
+
     if let Ok((position, size)) = get_webview_position(&app, dpr) {
         if let Some(webview) = app.webviews().get("ads-window") {
             if state.shown {
@@ -133,7 +139,9 @@ pub async fn show_ads_window<R: Runtime>(
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
-        let state = state.read().await;
+        let mut state = state.write().await;
+
+        state.modal_shown = false;
 
         if state.shown {
             let (position, size) = get_webview_position(&app, dpr)?;
@@ -151,11 +159,13 @@ pub async fn hide_ads_window<R: Runtime>(
     reset: Option<bool>,
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
-        if reset.unwrap_or(false) {
-            let state = app.state::<RwLock<AdsState>>();
-            let mut state = state.write().await;
+        let state = app.state::<RwLock<AdsState>>();
+        let mut state = state.write().await;
 
+        if reset.unwrap_or(false) {
             state.shown = false;
+        } else {
+            state.modal_shown = true;
         }
 
         let _ = webview.set_position(PhysicalPosition::new(-1000, -1000));

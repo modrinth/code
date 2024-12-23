@@ -1,9 +1,5 @@
 <template>
   <div class="action-groups">
-    <a href="https://support.modrinth.com" class="link">
-      <ChatIcon />
-      <span> Get support </span>
-    </a>
     <Button
       v-if="currentLoadingBars.length > 0"
       ref="infoButton"
@@ -123,7 +119,6 @@ import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
-import { ChatIcon } from '@/assets/icons'
 import { get_many } from '@/helpers/profile.js'
 import { trackEvent } from '@/helpers/analytics'
 

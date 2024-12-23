@@ -25,7 +25,10 @@
     <div class="flex flex-col gap-4 p-6">
       <InstanceIndicator v-if="instance" :instance="instance" />
       <template v-if="data">
-        <Teleport v-if="themeStore.featureFlag_projectBackground" to="#background-teleport-target">
+        <Teleport
+          v-if="themeStore.featureFlags.project_background"
+          to="#background-teleport-target"
+        >
           <ProjectBackgroundGradient :project="data" />
         </Teleport>
         <ProjectHeader :project="data">

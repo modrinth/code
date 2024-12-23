@@ -15,8 +15,14 @@ const getInstances = async () => {
 
   recentInstances.value = profiles
     .sort((a, b) => {
-      const dateA = dayjs(a.created > a.last_played ? a.last_played : a.created)
-      const dateB = dayjs(b.created > b.last_played ? b.last_played : b.created)
+      const dateACreated = dayjs(a.created)
+      const dateAPlayed = dayjs(a.last_played)
+
+      const dateBCreated = dayjs(b.created)
+      const dateBPlayed = dayjs(b.last_played)
+
+      const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
+      const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
 
       if (dateA.isSame(dateB)) {
         return a.name.localeCompare(b.name)
@@ -42,11 +48,13 @@ onUnmounted(() => {
   <NavButton
     v-for="instance in recentInstances"
     :key="instance.id"
+    v-tooltip.right="instance.name"
     :to="`/instance/${encodeURIComponent(instance.path)}`"
   >
     <Avatar
       :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-      circle
+      size="28px"
+      :tint-by="instance.path"
       :class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
     />
     <div
@@ -55,8 +63,8 @@ onUnmounted(() => {
     >
       <SpinnerIcon class="animate-spin w-4 h-4" />
     </div>
-    <template #label>{{ instance.name }}</template>
   </NavButton>
+  <div v-if="recentInstances.length > 0" class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
 </template>
 
 <style scoped lang="scss"></style>

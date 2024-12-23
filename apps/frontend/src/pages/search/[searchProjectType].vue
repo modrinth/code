@@ -42,7 +42,6 @@
           Install content to server
         </h1>
       </template>
-      <ContentPageHeader v-else></ContentPageHeader>
       <NavTabs v-if="!server" :links="selectableProjectTypes" class="hidden md:flex" />
     </section>
     <aside
@@ -312,7 +311,6 @@ import {
   ButtonStyled,
   NewProjectCard,
   SearchFilterControl,
-  ContentPageHeader,
 } from "@modrinth/ui";
 import { CheckIcon, DownloadIcon, GameIcon, LeftArrowIcon, XIcon } from "@modrinth/assets";
 import { computed } from "vue";

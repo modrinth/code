@@ -25,6 +25,7 @@ extern crate objc;
 #[tracing::instrument(skip_all)]
 #[tauri::command]
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
+    tracing::info!("Initializing app event state...");
     theseus::EventState::init(app.clone()).await?;
 
     #[cfg(feature = "updater")]
@@ -35,6 +36,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 
         let update_fut = updater.check();
 
+        tracing::info!("Initializing app state...");
         State::init().await?;
 
         let check_bar = theseus::init_loading(
@@ -44,6 +46,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
         )
         .await?;
 
+        tracing::info!("Checking for updates...");
         let update = update_fut.await;
 
         drop(check_bar);
@@ -88,6 +91,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
         State::init().await?;
     }
 
+    tracing::info!("Finished checking for updates!");
     let state = State::get().await?;
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir(), true)?;
@@ -169,19 +173,19 @@ fn main() {
     }
 
     builder = builder
-        //         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
-        //             if let Some(payload) = args.get(1) {
-        //                 tracing::info!("Handling deep link from arg {payload}");
-        //                 let payload = payload.clone();
-        //                 tauri::async_runtime::spawn(api::utils::handle_command(
-        //                     payload,
-        //                 ));
-        //             }
-        //
-        //             if let Some(win) = app.get_window("main") {
-        //                 let _ = win.set_focus();
-        //             }
-        //         }))
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+            if let Some(payload) = args.get(1) {
+                tracing::info!("Handling deep link from arg {payload}");
+                let payload = payload.clone();
+                tauri::async_runtime::spawn(api::utils::handle_command(
+                    payload,
+                ));
+            }
+
+            if let Some(win) = app.get_window("main") {
+                let _ = win.set_focus();
+            }
+        }))
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
@@ -274,6 +278,7 @@ fn main() {
         builder = builder.plugin(macos::window_ext::init());
     }
 
+    tracing::info!("Initializing app...");
     let app = builder.build(tauri::generate_context!());
 
     match app {
@@ -335,6 +340,7 @@ fn main() {
                 .show_alert()
                 .unwrap();
 
+            tracing::error!("Error while running tauri application: {:?}", e);
             panic!("{1}: {:?}", e, "error while running tauri application")
         }
     }

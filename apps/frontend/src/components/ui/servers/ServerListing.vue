@@ -6,11 +6,13 @@
     <div
       v-tooltip="
         status === 'suspended'
-          ? `This server is suspended visit the billing page to learn more`
+          ? suspension_reason === 'upgrading'
+            ? 'This server is being transferred to a new node. It will be unavailable until this process finishes.'
+            : 'This server has been suspended. Please visit your billing settings or contact Modrinth Support for more information.'
           : ''
       "
       class="flex cursor-pointer flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100"
-      :class="status === 'suspended' ? 'opacity-50' : 'active:scale-95'"
+      :class="status === 'suspended' ? '!rounded-b-none opacity-75' : 'active:scale-95'"
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
     >
@@ -50,6 +52,21 @@
           class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
         />
       </div>
+    </div>
+    <div
+      v-if="status === 'suspended' && suspension_reason === 'upgrading'"
+      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-blue p-4 text-sm font-bold text-contrast"
+    >
+      <UiServersPanelSpinner />
+      Your server's hardware is currently being upgraded and will be back online shortly.
+    </div>
+    <div
+      v-else-if="status === 'suspended'"
+      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
+    >
+      <UiServersIconsPanelErrorIcon class="!size-5" />
+      Your server has been suspended due to a billing issue. Please visit your billing settings or
+      contact Modrinth Support for more information.
     </div>
   </NuxtLink>
 </template>

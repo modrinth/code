@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 
 export const useTheming = defineStore('themeStore', {
   state: () => ({
-    themeOptions: ['dark', 'light', 'oled'],
+    themeOptions: ['dark', 'light', 'oled', 'system'],
     advancedRendering: true,
     selectedTheme: 'dark',
+    toggleSidebar: false,
 
     devMode: false,
-    featureFlag_pagePath: false,
-    featureFlag_projectBackground: false,
+    featureFlags: {},
   }),
   actions: {
     setThemeState(newTheme) {
@@ -21,7 +21,18 @@ export const useTheming = defineStore('themeStore', {
       for (const theme of this.themeOptions) {
         document.getElementsByTagName('html')[0].classList.remove(`${theme}-mode`)
       }
-      document.getElementsByTagName('html')[0].classList.add(`${this.selectedTheme}-mode`)
+
+      let theme = this.selectedTheme
+      if (this.selectedTheme === 'system') {
+        const darkThemeMq = window.matchMedia('(prefers-color-scheme: dark)')
+        if (darkThemeMq.matches) {
+          theme = 'dark'
+        } else {
+          theme = 'light'
+        }
+      }
+
+      document.getElementsByTagName('html')[0].classList.add(`${theme}-mode`)
     },
   },
 })

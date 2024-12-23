@@ -664,7 +664,7 @@ impl Profile {
                                 path: format!(
                                     "{}/{folder}/{}",
                                     self.path,
-                                    file_name.replace(".disabled", "")
+                                    file_name.trim_end_matches(".disabled")
                                 ),
                                 file_name: file_name.to_string(),
                                 project_type,
@@ -725,8 +725,9 @@ impl Profile {
             let info_index = file_info.iter().position(|x| x.hash == hash.hash);
             let file = info_index.map(|x| file_info.remove(x));
 
-            if let Some(initial_file_index) =
-                keys.iter().position(|x| x.path == hash.path)
+            if let Some(initial_file_index) = keys
+                .iter()
+                .position(|x| x.path == hash.path.trim_end_matches(".disabled"))
             {
                 let initial_file = keys.remove(initial_file_index);
 
@@ -890,7 +891,7 @@ impl Profile {
         let path = crate::api::profile::get_full_path(profile_path).await?;
 
         let new_path = if project_path.ends_with(".disabled") {
-            project_path.replace(".disabled", "")
+            project_path.trim_end_matches(".disabled").to_string()
         } else {
             format!("{project_path}.disabled")
         };
