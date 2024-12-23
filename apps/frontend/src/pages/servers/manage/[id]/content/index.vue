@@ -185,11 +185,13 @@
                       </div>
                     </NuxtLink>
                     <div class="ml-2 hidden min-w-0 flex-1 flex-col text-sm sm:flex">
-                      <div v-tooltip="'Mod version'" class="truncate font-semibold text-contrast">
-                        {{ mod.version_number || "External mod" }}
+                      <div class="truncate font-semibold text-contrast">
+                        <span v-tooltip="'Mod version'">{{
+                          mod.version_number || "External mod"
+                        }}</span>
                       </div>
-                      <div v-tooltip="'Mod file name'" class="truncate">
-                        {{ mod.filename }}
+                      <div class="truncate">
+                        <span v-tooltip="'Mod file name'">{{ mod.filename }}</span>
                       </div>
                     </div>
                     <div
