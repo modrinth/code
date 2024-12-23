@@ -58,7 +58,7 @@
     <div ref="pyroContentSentinel" class="sentinel" data-pyro-content-sentinel />
     <div class="relative flex h-full w-full flex-col">
       <div class="sticky top-0 z-20 -mt-4 flex items-center justify-between bg-bg py-4">
-        <div class="flex w-full flex-col items-center gap-2 sm:flex-row sm:gap-4">
+        <div class="flex w-full flex-col-reverse items-center gap-2 sm:flex-row sm:gap-4">
           <div class="flex w-full items-center gap-2 sm:gap-4">
             <div class="relative flex-1 text-sm">
               <label class="sr-only" for="search">Search</label>
@@ -88,7 +88,7 @@
                   { id: 'disabled', action: () => (filterMethod = 'disabled') },
                 ]"
               >
-                <span class="whitespace-pre text-sm font-medium">
+                <span class="hidden whitespace-pre text-sm font-medium sm:block">
                   {{ filterMethodLabel }}
                 </span>
                 <FilterIcon aria-hidden="true" />
@@ -99,196 +99,236 @@
               </UiServersTeleportOverflowMenu>
             </ButtonStyled>
           </div>
-          <ButtonStyled v-if="hasMods" color="brand" type="outlined">
-            <nuxt-link
-              class="w-full text-nowrap sm:w-fit"
-              :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
-            >
-              <PlusIcon />
-              Add {{ type.toLocaleLowerCase() }}
-            </nuxt-link>
-          </ButtonStyled>
-        </div>
-      </div>
-      <div v-if="hasFilteredMods" class="flex flex-col gap-2 transition-all">
-        <div ref="listContainer" class="relative w-full">
-          <div :style="{ position: 'relative', height: `${totalHeight}px` }">
-            <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
-              <template v-for="mod in visibleItems.items" :key="mod.filename">
-                <div
-                  class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised"
-                  :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
-                  style="height: 64px"
-                >
-                  <NuxtLink
-                    :to="
-                      mod.project_id
-                        ? `/project/${mod.project_id}/version/${mod.version_id}`
-                        : `files?path=mods`
-                    "
-                    class="group flex min-w-0 items-center rounded-xl p-2"
-                  >
-                    <div class="flex min-w-0 items-center gap-2">
-                      <UiAvatar
-                        :src="mod.icon_url"
-                        size="sm"
-                        alt="Server Icon"
-                        :class="mod.disabled ? 'grayscale' : ''"
-                      />
-                      <div class="flex min-w-0 flex-col">
-                        <span class="flex min-w-0 items-center gap-2 text-lg font-bold">
-                          <span class="truncate">{{
-                            mod.name || mod.filename.replace(".disabled", "")
-                          }}</span>
-                          <span
-                            v-if="mod.disabled"
-                            class="hidden rounded-full bg-button-bg p-1 px-2 text-xs text-contrast sm:block"
-                            >Disabled</span
-                          >
-                        </span>
-                        <span class="min-w-0 text-xs text-secondary">{{
-                          mod.version_number || "External mod"
-                        }}</span>
-                      </div>
-                    </div>
-                  </NuxtLink>
-                  <div class="flex items-center gap-2 pr-4 font-semibold text-contrast">
-                    <ButtonStyled v-if="mod.project_id" type="transparent">
-                      <button
-                        v-tooltip="'Edit mod version'"
-                        :disabled="mod.changing"
-                        class="!hidden sm:!block"
-                        @click="beginChangeModVersion(mod)"
-                      >
-                        <template v-if="mod.changing">
-                          <UiServersIconsLoadingIcon />
-                        </template>
-                        <template v-else>
-                          <EditIcon />
-                        </template>
-                      </button>
-                    </ButtonStyled>
-                    <ButtonStyled type="transparent">
-                      <button
-                        v-tooltip="'Delete mod'"
-                        :disabled="mod.changing"
-                        class="!hidden sm:!block"
-                        @click="removeMod(mod)"
-                      >
-                        <TrashIcon />
-                      </button>
-                    </ButtonStyled>
-
-                    <!-- Dropdown for mobile -->
-                    <div class="mr-2 flex items-center sm:hidden">
-                      <UiServersIconsLoadingIcon
-                        v-if="mod.changing"
-                        class="mr-2 h-5 w-5 animate-spin"
-                        style="color: var(--color-base)"
-                      />
-                      <ButtonStyled v-else circular type="transparent">
-                        <UiServersTeleportOverflowMenu
-                          :options="[
-                            {
-                              id: 'edit',
-                              action: () => beginChangeModVersion(mod),
-                              shown: !!(mod.project_id && !mod.changing),
-                            },
-                            {
-                              id: 'delete',
-                              action: () => removeMod(mod),
-                            },
-                          ]"
-                        >
-                          <MoreVerticalIcon aria-hidden="true" />
-                          <template #edit>
-                            <EditIcon class="h-5 w-5" />
-                            <span>Edit</span>
-                          </template>
-                          <template #delete>
-                            <TrashIcon class="h-5 w-5" />
-                            <span>Delete</span>
-                          </template>
-                        </UiServersTeleportOverflowMenu>
-                      </ButtonStyled>
-                    </div>
-
-                    <input
-                      :id="`toggle-${mod.filename}`"
-                      :checked="!mod.disabled"
-                      :disabled="mod.changing"
-                      class="switch stylized-toggle"
-                      type="checkbox"
-                      @change="toggleMod(mod)"
-                    />
-                  </div>
-                </div>
-              </template>
-            </div>
+          <div v-if="hasMods" class="flex w-full items-center gap-2 sm:w-fit sm:gap-4">
+            <ButtonStyled type="outlined">
+              <button class="w-full text-nowrap sm:w-fit" @click="initiateFileUpload">
+                <FileIcon />
+                Add file
+              </button>
+            </ButtonStyled>
+            <ButtonStyled color="brand" type="outlined">
+              <nuxt-link
+                class="w-full text-nowrap sm:w-fit"
+                :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
+              >
+                <PlusIcon />
+                Add {{ type.toLocaleLowerCase() }}
+              </nuxt-link>
+            </ButtonStyled>
           </div>
         </div>
       </div>
-      <!-- no mods has platform -->
-      <div
-        v-else-if="
-          props.server.general?.loader &&
-          props.server.general?.loader.toLocaleLowerCase() !== 'vanilla'
-        "
-        class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
+      <FilesUploadDropdown
+        v-if="props.server.fs"
+        ref="uploadDropdownRef"
+        class="rounded-xl bg-bg-raised"
+        :margin-bottom="16"
+        :file-type="type"
+        :current-path="'/mods'"
+        :fs="props.server.fs"
+        :accepted-types="acceptFileFromProjectType(type.toLocaleLowerCase()).split(',')"
+        @upload-complete="() => props.server.refresh(['content'])"
+      />
+      <FilesUploadDragAndDrop
+        v-if="server.general && localMods"
+        class="relative min-h-[50vh]"
+        overlay-class="rounded-xl border-2 border-dashed border-secondary"
+        @files-dropped="handleDroppedFiles"
       >
+        <div v-if="hasFilteredMods" class="flex flex-col gap-2 transition-all">
+          <div ref="listContainer" class="relative w-full">
+            <div :style="{ position: 'relative', height: `${totalHeight}px` }">
+              <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
+                <template v-for="mod in visibleItems.items" :key="mod.filename">
+                  <div
+                    class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised"
+                    :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
+                    style="height: 64px"
+                  >
+                    <NuxtLink
+                      :to="
+                        mod.project_id
+                          ? `/project/${mod.project_id}/version/${mod.version_id}`
+                          : `files?path=mods`
+                      "
+                      class="group flex min-w-0 items-center rounded-xl p-2"
+                    >
+                      <div class="flex min-w-0 items-center gap-2">
+                        <UiAvatar
+                          :src="mod.icon_url"
+                          size="sm"
+                          alt="Server Icon"
+                          :class="mod.disabled ? 'grayscale' : ''"
+                        />
+                        <div class="flex min-w-0 flex-col">
+                          <span class="flex min-w-0 items-center gap-2 text-lg font-bold">
+                            <span class="truncate">{{
+                              mod.name || mod.filename.replace(".disabled", "")
+                            }}</span>
+                            <span
+                              v-if="mod.disabled"
+                              class="hidden rounded-full bg-button-bg p-1 px-2 text-xs text-contrast sm:block"
+                              >Disabled</span
+                            >
+                          </span>
+                          <span class="min-w-0 text-xs text-secondary">{{
+                            mod.version_number || "External mod"
+                          }}</span>
+                        </div>
+                      </div>
+                    </NuxtLink>
+                    <div class="flex items-center gap-2 pr-4 font-semibold text-contrast">
+                      <ButtonStyled v-if="mod.project_id" type="transparent">
+                        <button
+                          v-tooltip="'Edit mod version'"
+                          :disabled="mod.changing"
+                          class="!hidden sm:!block"
+                          @click="beginChangeModVersion(mod)"
+                        >
+                          <template v-if="mod.changing">
+                            <UiServersIconsLoadingIcon />
+                          </template>
+                          <template v-else>
+                            <EditIcon />
+                          </template>
+                        </button>
+                      </ButtonStyled>
+                      <ButtonStyled type="transparent">
+                        <button
+                          v-tooltip="'Delete mod'"
+                          :disabled="mod.changing"
+                          class="!hidden sm:!block"
+                          @click="removeMod(mod)"
+                        >
+                          <TrashIcon />
+                        </button>
+                      </ButtonStyled>
+
+                      <!-- Dropdown for mobile -->
+                      <div class="mr-2 flex items-center sm:hidden">
+                        <UiServersIconsLoadingIcon
+                          v-if="mod.changing"
+                          class="mr-2 h-5 w-5 animate-spin"
+                          style="color: var(--color-base)"
+                        />
+                        <ButtonStyled v-else circular type="transparent">
+                          <UiServersTeleportOverflowMenu
+                            :options="[
+                              {
+                                id: 'edit',
+                                action: () => beginChangeModVersion(mod),
+                                shown: !!(mod.project_id && !mod.changing),
+                              },
+                              {
+                                id: 'delete',
+                                action: () => removeMod(mod),
+                              },
+                            ]"
+                          >
+                            <MoreVerticalIcon aria-hidden="true" />
+                            <template #edit>
+                              <EditIcon class="h-5 w-5" />
+                              <span>Edit</span>
+                            </template>
+                            <template #delete>
+                              <TrashIcon class="h-5 w-5" />
+                              <span>Delete</span>
+                            </template>
+                          </UiServersTeleportOverflowMenu>
+                        </ButtonStyled>
+                      </div>
+
+                      <input
+                        :id="`toggle-${mod.filename}`"
+                        :checked="!mod.disabled"
+                        :disabled="mod.changing"
+                        class="switch stylized-toggle"
+                        type="checkbox"
+                        @change="toggleMod(mod)"
+                      />
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- no mods has platform -->
         <div
-          v-if="!hasFilteredMods && hasMods"
+          v-else-if="
+            props.server.general?.loader &&
+            props.server.general?.loader.toLocaleLowerCase() !== 'vanilla'
+          "
           class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
         >
-          <SearchIcon class="size-24" />
-          <p class="m-0 font-bold text-contrast">
-            No {{ type.toLocaleLowerCase() }}s found for your query!
-          </p>
-          <p class="m-0">Try another query, or show everything.</p>
-          <ButtonStyled>
-            <button @click="showAll">
-              <ListIcon />
-              Show everything
-            </button>
-          </ButtonStyled>
+          <div
+            v-if="!hasFilteredMods && hasMods"
+            class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
+          >
+            <SearchIcon class="size-24" />
+            <p class="m-0 font-bold text-contrast">
+              No {{ type.toLocaleLowerCase() }}s found for your query!
+            </p>
+            <p class="m-0">Try another query, or show everything.</p>
+            <ButtonStyled>
+              <button @click="showAll">
+                <ListIcon />
+                Show everything
+              </button>
+            </ButtonStyled>
+          </div>
+          <div
+            v-else
+            class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center"
+          >
+            <PackageClosedIcon class="size-24" />
+            <p class="m-0 font-bold text-contrast">No {{ type.toLocaleLowerCase() }}s found!</p>
+            <p class="m-0">
+              Add some {{ type.toLocaleLowerCase() }}s to your server to manage them here.
+            </p>
+            <div class="flex flex-row items-center gap-4">
+              <ButtonStyled type="outlined">
+                <button class="w-full text-nowrap sm:w-fit" @click="initiateFileUpload">
+                  <FileIcon />
+                  Add file
+                </button>
+              </ButtonStyled>
+              <ButtonStyled color="brand">
+                <nuxt-link
+                  class="w-full text-nowrap sm:w-fit"
+                  :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
+                >
+                  <PlusIcon />
+                  Add {{ type.toLocaleLowerCase() }}
+                </nuxt-link>
+              </ButtonStyled>
+            </div>
+          </div>
         </div>
         <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
-          <PackageClosedIcon class="size-24" />
-          <p class="m-0 font-bold text-contrast">No {{ type.toLocaleLowerCase() }}s found!</p>
+          <UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
+          <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
           <p class="m-0">
-            Add some {{ type.toLocaleLowerCase() }}s to your server to manage them here.
+            Add content to your server by installing a modpack or choosing a different platform that
+            supports {{ type }}s.
           </p>
-          <ButtonStyled color="brand">
-            <NuxtLink :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`">
-              <PlusIcon />
-              Add {{ type.toLocaleLowerCase() }}
-            </NuxtLink>
-          </ButtonStyled>
+          <div class="flex flex-row items-center gap-4">
+            <ButtonStyled class="mt-8">
+              <NuxtLink :to="`/modpacks?sid=${props.server.serverId}`">
+                <CompassIcon />
+                Find a modpack
+              </NuxtLink>
+            </ButtonStyled>
+            <div>or</div>
+            <ButtonStyled class="mt-8">
+              <NuxtLink :to="`/servers/manage/${props.server.serverId}/options/loader`">
+                <WrenchIcon />
+                Change platform
+              </NuxtLink>
+            </ButtonStyled>
+          </div>
         </div>
-      </div>
-      <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
-        <UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
-        <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
-        <p class="m-0">
-          Add content to your server by installing a modpack or choosing a different platform that
-          supports {{ type }}s.
-        </p>
-        <div class="flex flex-row items-center gap-4">
-          <ButtonStyled class="mt-8">
-            <NuxtLink :to="`/modpacks?sid=${props.server.serverId}`">
-              <CompassIcon />
-              Find a modpack
-            </NuxtLink>
-          </ButtonStyled>
-          <div>or</div>
-          <ButtonStyled class="mt-8">
-            <NuxtLink :to="`/servers/manage/${props.server.serverId}/options/loader`">
-              <WrenchIcon />
-              Change platform
-            </NuxtLink>
-          </ButtonStyled>
-        </div>
-      </div>
+      </FilesUploadDragAndDrop>
     </div>
   </div>
 </template>
@@ -308,10 +348,14 @@ import {
   CompassIcon,
   WrenchIcon,
   ListIcon,
+  FileIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
+import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import type { Server } from "~/composables/pyroServers";
+import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
@@ -345,6 +389,29 @@ const localMods = ref<Mod[]>([]);
 const searchInput = ref("");
 const modSearchInput = ref("");
 const filterMethod = ref("all");
+
+const uploadDropdownRef = ref();
+
+const handleDroppedFiles = (files: File[]) => {
+  files.forEach((file) => {
+    uploadDropdownRef.value?.uploadFile(file);
+  });
+};
+
+const initiateFileUpload = () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = acceptFileFromProjectType(type.value.toLowerCase());
+  input.multiple = true;
+  input.onchange = () => {
+    if (input.files) {
+      Array.from(input.files).forEach((file) => {
+        uploadDropdownRef.value?.uploadFile(file);
+      });
+    }
+  };
+  input.click();
+};
 
 const showAll = () => {
   searchInput.value = "";

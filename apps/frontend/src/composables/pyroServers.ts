@@ -1364,7 +1364,7 @@ type ContentModule = { data: Mod[] } & ContentFunctions;
 type BackupsModule = { data: Backup[] } & BackupFunctions;
 type NetworkModule = { allocations: Allocation[] } & NetworkFunctions;
 type StartupModule = Startup & StartupFunctions;
-type FSModule = { auth: JWTAuth } & FSFunctions;
+export type FSModule = { auth: JWTAuth } & FSFunctions;
 
 type ModulesMap = {
   general: GeneralModule;

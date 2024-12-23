@@ -25,12 +25,9 @@
       @delete="handleDeleteItem"
     />
 
-    <div
+    <FilesUploadDragAndDrop
       class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
-      @dragenter.prevent="handleDragEnter"
-      @dragover.prevent="handleDragOver"
-      @dragleave.prevent="handleDragLeave"
-      @drop.prevent="handleDrop"
+      @files-dropped="handleDroppedFiles"
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
         <div v-if="!isEditing" class="contents">
@@ -44,94 +41,14 @@
             @upload="initiateFileUpload"
             @update:search-query="searchQuery = $event"
           />
-          <Transition
-            name="upload-status"
-            @enter="onUploadStatusEnter"
-            @leave="onUploadStatusLeave"
-          >
-            <div
-              v-if="isUploading"
-              ref="uploadStatusRef"
-              class="upload-status rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow text-contrast"
-            >
-              <div class="flex flex-col p-4 text-sm">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2 font-bold">
-                    <FolderOpenIcon class="size-4" />
-                    <span>
-                      File Uploads{{
-                        activeUploads.length > 0 ? ` - ${activeUploads.length} left` : ""
-                      }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="mt-2 space-y-2">
-                  <div
-                    v-for="item in uploadQueue"
-                    :key="item.file.name"
-                    class="flex h-6 items-center justify-between gap-2 text-xs"
-                  >
-                    <div class="flex flex-1 items-center gap-2 truncate">
-                      <transition-group name="status-icon" mode="out-in">
-                        <UiServersPanelSpinner
-                          v-show="item.status === 'uploading'"
-                          key="spinner"
-                          class="absolute !size-4"
-                        />
-                        <CheckCircleIcon
-                          v-show="item.status === 'completed'"
-                          key="check"
-                          class="absolute size-4 text-green"
-                        />
-                        <XCircleIcon
-                          v-show="item.status === 'error' || item.status === 'cancelled'"
-                          key="error"
-                          class="absolute size-4 text-red"
-                        />
-                      </transition-group>
-                      <span class="ml-6 truncate">{{ item.file.name }}</span>
-                      <span class="text-secondary">{{ item.size }}</span>
-                    </div>
-                    <div class="flex min-w-[80px] items-center justify-end gap-2">
-                      <template v-if="item.status === 'completed'">
-                        <span>Done</span>
-                      </template>
-                      <template v-else-if="item.status === 'error'">
-                        <span class="text-red">Failed - File already exists</span>
-                      </template>
-                      <template v-else>
-                        <template v-if="item.status === 'uploading'">
-                          <span>{{ item.progress }}%</span>
-                          <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
-                            <div
-                              class="h-full bg-contrast transition-all duration-200"
-                              :style="{ width: item.progress + '%' }"
-                            />
-                          </div>
-                          <ButtonStyled color="red" type="transparent" @click="cancelUpload(item)">
-                            <button>Cancel</button>
-                          </ButtonStyled>
-                        </template>
-                        <template v-else-if="item.status === 'cancelled'">
-                          <span class="text-red">Cancelled</span>
-                        </template>
-                        <template v-else>
-                          <span>{{ item.progress }}%</span>
-                          <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
-                            <div
-                              class="h-full bg-contrast transition-all duration-200"
-                              :style="{ width: item.progress + '%' }"
-                            />
-                          </div>
-                        </template>
-                      </template>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Transition>
+          <FilesUploadDropdown
+            v-if="props.server.fs"
+            ref="uploadDropdownRef"
+            class="rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow"
+            :current-path="currentPath"
+            :fs="props.server.fs"
+            @upload-complete="refreshList()"
+          />
         </div>
 
         <UiServersFilesEditingNavbar
@@ -220,7 +137,7 @@
           <p class="mt-2 text-xl">Drop files here to upload</p>
         </div>
       </div>
-    </div>
+    </FilesUploadDragAndDrop>
 
     <UiServersFilesContextMenu
       ref="contextMenu"
@@ -238,9 +155,10 @@
 
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
-import { UploadIcon, FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
+import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
+import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 
 interface BaseOperation {
   type: "move" | "rename";
@@ -262,14 +180,6 @@ interface RenameOperation extends BaseOperation {
 }
 
 type Operation = MoveOperation | RenameOperation;
-
-interface UploadItem {
-  file: File;
-  progress: number;
-  status: "pending" | "uploading" | "completed" | "error" | "cancelled";
-  size: string;
-  uploader?: any;
-}
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
@@ -312,46 +222,8 @@ const isEditingImage = ref(false);
 const imagePreview = ref();
 
 const isDragging = ref(false);
-const dragCounter = ref(0);
 
-const uploadStatusRef = ref<HTMLElement | null>(null);
-const isUploading = computed(() => uploadQueue.value.length > 0);
-const uploadQueue = ref<UploadItem[]>([]);
-
-const activeUploads = computed(() =>
-  uploadQueue.value.filter((item) => item.status === "pending" || item.status === "uploading"),
-);
-
-const onUploadStatusEnter = (el: Element) => {
-  const height = (el as HTMLElement).scrollHeight;
-  (el as HTMLElement).style.height = "0";
-  // eslint-disable-next-line no-void
-  void (el as HTMLElement).offsetHeight;
-  (el as HTMLElement).style.height = `${height}px`;
-};
-
-const onUploadStatusLeave = (el: Element) => {
-  const height = (el as HTMLElement).scrollHeight;
-  (el as HTMLElement).style.height = `${height}px`;
-  // eslint-disable-next-line no-void
-  void (el as HTMLElement).offsetHeight;
-  (el as HTMLElement).style.height = "0";
-};
-
-watch(
-  uploadQueue,
-  () => {
-    if (!uploadStatusRef.value) return;
-    const el = uploadStatusRef.value;
-    const itemsHeight = uploadQueue.value.length * 32;
-    const headerHeight = 12;
-    const gap = 8;
-    const padding = 32;
-    const totalHeight = padding + headerHeight + gap + itemsHeight;
-    el.style.height = `${totalHeight}px`;
-  },
-  { deep: true },
-);
+const uploadDropdownRef = ref();
 
 const data = computed(() => props.server.general);
 
@@ -917,135 +789,12 @@ const requestShareLink = async () => {
   }
 };
 
-const handleDragEnter = (event: DragEvent) => {
+const handleDroppedFiles = (files: File[]) => {
   if (isEditing.value) return;
-  event.preventDefault();
-  if (!event.dataTransfer?.types.includes("application/pyro-file-move")) {
-    dragCounter.value++;
-    isDragging.value = true;
-  }
-};
 
-const handleDragOver = (event: DragEvent) => {
-  if (isEditing.value) return;
-  event.preventDefault();
-};
-
-const handleDragLeave = (event: DragEvent) => {
-  if (isEditing.value) return;
-  event.preventDefault();
-  dragCounter.value--;
-  if (dragCounter.value === 0) {
-    isDragging.value = false;
-  }
-};
-
-// eslint-disable-next-line require-await
-const handleDrop = async (event: DragEvent) => {
-  if (isEditing.value) return;
-  event.preventDefault();
-  isDragging.value = false;
-  dragCounter.value = 0;
-
-  const isInternalMove = event.dataTransfer?.types.includes("application/pyro-file-move");
-  if (isInternalMove) return;
-
-  const files = event.dataTransfer?.files;
-  if (files) {
-    Array.from(files).forEach((file) => {
-      uploadFile(file);
-    });
-  }
-};
-
-const formatFileSize = (bytes: number): string => {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-};
-
-const cancelUpload = (item: UploadItem) => {
-  if (item.uploader && item.status === "uploading") {
-    item.uploader.cancel();
-    item.status = "cancelled";
-
-    setTimeout(async () => {
-      const index = uploadQueue.value.findIndex((qItem) => qItem.file.name === item.file.name);
-      if (index !== -1) {
-        uploadQueue.value.splice(index, 1);
-        await nextTick();
-      }
-    }, 5000);
-  }
-};
-
-const uploadFile = async (file: File) => {
-  const uploadItem: UploadItem = {
-    file,
-    progress: 0,
-    status: "pending",
-    size: formatFileSize(file.size),
-  };
-
-  uploadQueue.value.push(uploadItem);
-
-  try {
-    uploadItem.status = "uploading";
-    const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
-    const uploader = await props.server.fs?.uploadFile(filePath, file);
-    uploadItem.uploader = uploader;
-
-    if (uploader?.onProgress) {
-      uploader.onProgress(({ progress }: { progress: number }) => {
-        const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-        if (index !== -1) {
-          uploadQueue.value[index].progress = Math.round(progress);
-        }
-      });
-    }
-
-    await uploader?.promise;
-    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
-      uploadQueue.value[index].status = "completed";
-      uploadQueue.value[index].progress = 100;
-    }
-
-    await nextTick();
-
-    setTimeout(async () => {
-      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-      if (removeIndex !== -1) {
-        uploadQueue.value.splice(removeIndex, 1);
-        await nextTick();
-      }
-    }, 5000);
-
-    await refreshList();
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
-      uploadQueue.value[index].status = "error";
-    }
-
-    setTimeout(async () => {
-      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-      if (removeIndex !== -1) {
-        uploadQueue.value.splice(removeIndex, 1);
-        await nextTick();
-      }
-    }, 5000);
-
-    if (error instanceof Error && error.message !== "Upload cancelled") {
-      addNotification({
-        group: "files",
-        title: "Upload failed",
-        text: `Failed to upload ${file.name}`,
-        type: "error",
-      });
-    }
-  }
+  files.forEach((file) => {
+    uploadDropdownRef.value?.uploadFile(file);
+  });
 };
 
 const initiateFileUpload = () => {
@@ -1055,7 +804,7 @@ const initiateFileUpload = () => {
   input.onchange = () => {
     if (input.files) {
       Array.from(input.files).forEach((file) => {
-        uploadFile(file);
+        uploadDropdownRef.value?.uploadFile(file);
       });
     }
   };
