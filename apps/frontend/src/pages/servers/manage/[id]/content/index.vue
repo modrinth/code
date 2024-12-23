@@ -57,9 +57,9 @@
   <div v-if="server.general && localMods" class="relative isolate flex h-full w-full flex-col">
     <div ref="pyroContentSentinel" class="sentinel" data-pyro-content-sentinel />
     <div class="relative flex h-full w-full flex-col">
-      <div class="sticky top-0 z-20 -mt-4 flex items-center justify-between bg-bg py-4">
-        <div class="flex w-full flex-col-reverse items-center gap-2 sm:flex-row sm:gap-4">
-          <div class="flex w-full items-center gap-2 sm:gap-4">
+      <div class="sticky top-0 z-20 flex items-center justify-between bg-bg pb-3">
+        <div class="flex w-full flex-col-reverse items-center gap-2 sm:flex-row">
+          <div class="flex w-full items-center gap-2">
             <div class="relative flex-1 text-sm">
               <label class="sr-only" for="search">Search</label>
               <SearchIcon
@@ -99,14 +99,14 @@
               </UiServersTeleportOverflowMenu>
             </ButtonStyled>
           </div>
-          <div v-if="hasMods" class="flex w-full items-center gap-2 sm:w-fit sm:gap-4">
-            <ButtonStyled type="outlined">
+          <div v-if="hasMods" class="flex w-full items-center gap-2 sm:w-fit">
+            <ButtonStyled>
               <button class="w-full text-nowrap sm:w-fit" @click="initiateFileUpload">
                 <FileIcon />
                 Add file
               </button>
             </ButtonStyled>
-            <ButtonStyled color="brand" type="outlined">
+            <ButtonStyled color="brand">
               <nuxt-link
                 class="w-full text-nowrap sm:w-fit"
                 :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
