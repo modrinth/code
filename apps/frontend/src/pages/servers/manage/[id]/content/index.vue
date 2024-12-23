@@ -56,7 +56,7 @@
   <div v-if="server.general && localMods" class="relative isolate flex h-full w-full flex-col">
     <div ref="pyroContentSentinel" class="sentinel" data-pyro-content-sentinel />
     <div class="relative flex h-full w-full flex-col">
-      <div class="sticky top-0 z-20 flex items-center justify-between bg-bg pb-3">
+      <div class="sticky top-0 z-20 -mt-3 flex items-center justify-between bg-bg py-3">
         <div class="flex w-full flex-col-reverse items-center gap-2 sm:flex-row">
           <div class="flex w-full items-center gap-2">
             <div class="relative flex-1 text-sm">
@@ -172,12 +172,12 @@
                           >
                         </span>
                         <div class="min-w-0 text-xs text-secondary">
-                          <span class="hidden sm:block">
+                          <!-- <span class="hidden sm:block">
                             by
                             <span class="font-semibold">{{
                               mod.version_number ? "Author" : "Unknown"
                             }}</span>
-                          </span>
+                          </span> -->
                           <span class="block font-semibold sm:hidden">
                             {{ mod.version_number || "External mod" }}
                           </span>
