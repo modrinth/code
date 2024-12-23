@@ -152,33 +152,39 @@
                           ? `/project/${mod.project_id}/version/${mod.version_id}`
                           : `files?path=mods`
                       "
-                      class="group flex min-w-0 flex-1 items-center rounded-xl p-2"
+                      class="flex min-w-0 flex-1 items-center gap-2 rounded-xl p-2"
                     >
-                      <div class="flex min-w-0 items-center gap-2">
-                        <UiAvatar
-                          :src="mod.icon_url"
-                          size="sm"
-                          alt="Server Icon"
-                          :class="mod.disabled ? 'opacity-75 grayscale' : ''"
-                        />
-                        <div class="flex min-w-0 flex-col gap-1">
-                          <span class="text-md flex min-w-0 items-center gap-2 font-bold">
-                            <span class="truncate text-contrast">{{
-                              mod.name || mod.filename.replace(".disabled", "")
+                      <UiAvatar
+                        :src="mod.icon_url"
+                        size="sm"
+                        alt="Server Icon"
+                        :class="mod.disabled ? 'opacity-75 grayscale' : ''"
+                      />
+                      <div class="flex min-w-0 flex-col gap-1">
+                        <span class="text-md flex min-w-0 items-center gap-2 font-bold">
+                          <span class="truncate text-contrast">{{
+                            mod.name || mod.filename.replace(".disabled", "")
+                          }}</span>
+                          <span
+                            v-if="mod.disabled"
+                            class="hidden rounded-full bg-button-bg p-1 px-2 text-xs text-contrast sm:block"
+                            >Disabled</span
+                          >
+                        </span>
+                        <div class="min-w-0 text-xs text-secondary">
+                          <span class="hidden sm:block">
+                            by
+                            <span class="font-semibold">{{
+                              mod.version_number ? "Author" : "Unknown"
                             }}</span>
-                            <span
-                              v-if="mod.disabled"
-                              class="hidden rounded-full bg-button-bg p-1 px-2 text-xs text-contrast sm:block"
-                              >Disabled</span
-                            >
                           </span>
-                          <span class="min-w-0 text-xs text-secondary">
-                            by <span class="font-semibold">Author</span>
+                          <span class="block font-semibold sm:hidden">
+                            {{ mod.version_number || "External mod" }}
                           </span>
                         </div>
                       </div>
                     </NuxtLink>
-                    <div class="flex min-w-0 flex-1 flex-col text-sm">
+                    <div class="ml-2 hidden min-w-0 flex-1 flex-col text-sm sm:flex">
                       <div class="truncate font-semibold text-contrast">
                         {{ mod.version_number || "External mod" }}
                       </div>
@@ -186,11 +192,15 @@
                         {{ mod.filename }}
                       </div>
                     </div>
-                    <div class="flex items-center gap-2 pr-4 font-semibold text-contrast">
-                      <ButtonStyled v-if="mod.project_id" type="transparent">
+                    <div
+                      class="flex items-center justify-end gap-2 pr-4 font-semibold text-contrast sm:min-w-44"
+                    >
+                      <ButtonStyled type="transparent">
                         <button
-                          v-tooltip="'Edit mod version'"
-                          :disabled="mod.changing"
+                          v-tooltip="
+                            mod.project_id ? 'Edit mod version' : 'External mods cannot be edited'
+                          "
+                          :disabled="mod.changing || !mod.project_id"
                           class="!hidden sm:!block"
                           @click="beginChangeModVersion(mod)"
                         >
