@@ -16,10 +16,10 @@ const getInstances = async () => {
   recentInstances.value = profiles
     .sort((a, b) => {
       const dateACreated = dayjs(a.created)
-      const dateAPlayed = dayjs(a.last_played)
+      const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
 
       const dateBCreated = dayjs(b.created)
-      const dateBPlayed = dayjs(b.last_played)
+      const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
 
       const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
       const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
@@ -35,8 +35,10 @@ const getInstances = async () => {
 
 await getInstances()
 
-const unlistenProfile = await profile_listener(async () => {
-  await getInstances()
+const unlistenProfile = await profile_listener(async (event) => {
+  if (event.event !== 'synced') {
+    await getInstances()
+  }
 })
 
 onUnmounted(() => {
@@ -50,6 +52,7 @@ onUnmounted(() => {
     :key="instance.id"
     v-tooltip.right="instance.name"
     :to="`/instance/${encodeURIComponent(instance.path)}`"
+    class="relative"
   >
     <Avatar
       :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
@@ -59,7 +62,7 @@ onUnmounted(() => {
     />
     <div
       v-if="instance.install_stage !== 'installed'"
-      class="absolute inset-0 flex items-center justify-center"
+      class="absolute inset-0 flex items-center justify-center z-10"
     >
       <SpinnerIcon class="animate-spin w-4 h-4" />
     </div>

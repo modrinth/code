@@ -31,7 +31,7 @@
         >
           <ProjectBackgroundGradient :project="data" />
         </Teleport>
-        <ProjectHeader :project="data">
+        <ProjectHeader :project="data" @contextmenu.prevent.stop="handleRightClick">
           <template #actions>
             <ButtonStyled size="large" color="brand">
               <button
@@ -118,7 +118,7 @@
           :installed-version="installedVersion"
         />
       </template>
-      <template v-else> Project data coult not be loaded. </template>
+      <template v-else> Project data couldn't not be loaded. </template>
     </div>
     <ContextMenu ref="options" @option-clicked="handleOptionsClick">
       <template #install> <DownloadIcon /> Install </template>
@@ -165,6 +165,7 @@ import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { useTheming } from '@/store/state.js'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 dayjs.extend(relativeTime)
 
@@ -172,7 +173,6 @@ const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 
-const options = ref(null)
 const installing = ref(false)
 const data = shallowRef(null)
 const versions = shallowRef([])
@@ -245,19 +245,30 @@ async function install(version) {
   )
 }
 
+const options = ref(null)
+const handleRightClick = (event) => {
+  options.value.showMenu(event, data.value, [
+    {
+      name: 'install',
+    },
+    {
+      type: 'divider',
+    },
+    {
+      name: 'open_link',
+    },
+    {
+      name: 'copy_link',
+    },
+  ])
+}
 const handleOptionsClick = (args) => {
   switch (args.option) {
     case 'install':
       install(null)
       break
     case 'open_link':
-      window.__TAURI_INVOKE__('tauri', {
-        __tauriModule: 'Shell',
-        message: {
-          cmd: 'open',
-          path: `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
-        },
-      })
+      openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
       break
     case 'copy_link':
       navigator.clipboard.writeText(

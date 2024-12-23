@@ -218,6 +218,15 @@
         </ButtonStyled>
       </template>
     </ContentListPanel>
+    <div class="flex justify-end mt-4">
+      <Pagination
+        v-if="search.length > 0"
+        :page="currentPage"
+        :count="Math.ceil(search.length / 20)"
+        :link-function="(page) => `?page=${page}`"
+        @switch-page="(page) => (currentPage = page)"
+      />
+    </div>
   </template>
   <div v-else class="w-full flex flex-col items-center justify-center mt-6 max-w-[48rem] mx-auto">
     <div class="top-box w-full">
@@ -416,6 +425,7 @@ const initProjects = async (cacheBehaviour?) => {
       icon: null,
       disabled: file.file_name.endsWith('.disabled'),
       outdated: false,
+      updated: dayjs(0),
       project_type: file.project_type === 'shaderpack' ? 'shader' : file.project_type,
     })
   }
@@ -541,20 +551,19 @@ const search = computed(() => {
   switch (sortColumn.value) {
     case 'Updated':
       return filtered.slice().sort((a, b) => {
-        if (a.updated < b.updated) {
-          return ascending.value ? 1 : -1
-        }
-        if (a.updated > b.updated) {
-          return ascending.value ? -1 : 1
-        }
-        return 0
+        const updated = a.updated.isAfter(b.updated) ? 1 : -1
+        return ascending.value ? -updated : updated
       })
     default:
-      return filtered.slice().sort((a, b) => a.name.localeCompare(b.name))
+      return filtered
+        .slice()
+        .sort((a, b) =>
+          ascending.value ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name),
+        )
   }
 })
 
-watch(search, () => (currentPage.value = 1))
+watch([sortColumn, ascending, selectedFilters.value, searchFilter], () => (currentPage.value = 1))
 
 const sortProjects = (filter) => {
   if (sortColumn.value === filter) {
