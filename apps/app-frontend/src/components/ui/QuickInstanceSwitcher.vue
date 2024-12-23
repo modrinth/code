@@ -47,7 +47,8 @@ onUnmounted(() => {
   >
     <Avatar
       :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-      circle
+      size="28px"
+      :tint-by="instance.path"
       :class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
     />
     <div
