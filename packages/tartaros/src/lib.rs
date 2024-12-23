@@ -5,12 +5,14 @@ Each call to any function on `ctx` is a call to a JS function. This is very slow
 You need to minimize this -- see `measure.rs` for details.
 */
 mod ansi;
+mod line;
 mod measure;
 mod utils;
 
 use std::{cell::RefCell, cmp, rc::Rc};
 
-use ansi::{AnsiCommand, AnsiParser};
+use ansi::AnsiCommand;
+use line::LineManager;
 use log::{info, Level};
 use measure::TextMeasureCache;
 use utils::{
@@ -28,40 +30,9 @@ const LINES_VISIBLE: usize = 18;
 const BOTTOM_MARGIN: usize = 20;
 const CANVAS_HEIGHT: usize = (LINE_HEIGHT * (LINES_VISIBLE)) + BOTTOM_MARGIN;
 const LINE_OFFSET: isize = 0;
-const GAP_LINES: usize = 2;
+const GAP_LINES: usize = 3;
 const SCROLL_BAR_WIDTH: usize = 8;
 const MIN_SCROLL_BAR_HEIGHT: usize = 16;
-
-#[derive(Clone, Debug)]
-struct PyroConsoleLine {
-    ansi_commands: Vec<AnsiCommand>,
-    raw_lines_index: usize,
-}
-
-impl PyroConsoleLine {
-    fn contains(&self, query: &str) -> bool {
-        // for command in self.ansi_commands.iter() {
-        //     match command {
-        //         AnsiCommand::RenderText(text) => {
-        //             if text.contains(query) {
-        //                 return true;
-        //             }
-        //         }
-        //         _ => continue,
-        //     }
-        // }
-        // false
-
-        let mut text = String::new();
-        for command in self.ansi_commands.iter() {
-            match command {
-                AnsiCommand::RenderText(t) => text.push_str(t),
-                _ => continue,
-            }
-        }
-        text.contains(query)
-    }
-}
 
 #[wasm_bindgen]
 #[derive(Clone, Debug)]
@@ -70,11 +41,10 @@ pub struct PyroConsoleState {
     canvas: OffscreenCanvas,
     ctx: OffscreenCanvasRenderingContext2d,
     current_fill_style: String,
-    lines: Vec<PyroConsoleLine>,
     last_size: (u32, u32),
-    measure_cache: TextMeasureCache,
+    line_manager: LineManager,
+    measure_cache: Rc<RefCell<TextMeasureCache>>,
     query: String,
-    raw_lines: Vec<Vec<AnsiCommand>>,
     offset: u64,
     last_frame_time: f64,
     framerates: Vec<f64>,
@@ -100,15 +70,19 @@ impl PyroConsole {
             .expect("Failed to get canvas ctx")
             .dyn_into::<OffscreenCanvasRenderingContext2d>()
             .unwrap();
+        let measure_cache =
+            Rc::new(RefCell::new(TextMeasureCache::new(ctx.clone())));
         PyroConsole {
             state: Rc::new(RefCell::new(PyroConsoleState {
                 animation_frame: 0,
                 canvas: canvas.clone(),
                 ctx: ctx.clone(),
                 current_fill_style: "black".to_owned(),
-                lines: Vec::new(),
                 last_size: (0, 0),
-                raw_lines: Vec::new(),
+                line_manager: LineManager::new(
+                    &measure_cache,
+                    canvas.width() as f64,
+                ),
                 offset: 0,
                 query: String::new(),
                 last_frame_time: 0.0,
@@ -116,9 +90,8 @@ impl PyroConsole {
                 fps: 360,
                 scroll_bar_y_offset: -1.0,
                 worker_scope: worker(),
-                measure_cache: TextMeasureCache::new(ctx),
+                measure_cache,
             })),
-            // window: Rc::new(window()),
         }
     }
 
@@ -156,7 +129,9 @@ impl PyroConsole {
             let state = self.state.clone();
             Closure::<dyn FnMut()>::new(move || {
                 let mut state = state.borrow_mut();
-                if (state.offset as usize) >= state.lines.len() {
+                if (state.offset as usize)
+                    >= state.line_manager.len_linebreaks()
+                {
                     state.offset = 0;
                 }
                 let performance = state
@@ -179,10 +154,10 @@ impl PyroConsole {
     }
 
     fn draw_console(state: &mut PyroConsoleState) {
-        let len = state.lines.len();
+        let len = state.line_manager.len_linebreaks();
         let max = cmp::min(len, state.offset as usize + LINES_VISIBLE);
         let range = cmp::min(state.offset as usize, max)..max;
-        let lines = &state.lines[range];
+        let lines = &state.line_manager.get_lines(range);
         let (width, height) =
             (state.canvas.width() as f64, state.canvas.height() as f64);
         state.ctx.set_fill_style_str("white");
@@ -197,7 +172,7 @@ impl PyroConsole {
             let mut style = "black".to_owned();
             let mut x = 0.0;
 
-            for command in line.ansi_commands.iter() {
+            for command in line.iter() {
                 match command {
                     AnsiCommand::RenderText(text) => {
                         if style != state.current_fill_style {
@@ -217,6 +192,7 @@ impl PyroConsole {
                         // x += state.char_width * text.len() as f64;
                         x += state
                             .measure_cache
+                            .borrow_mut()
                             .measure(FONT_SIZE, text.as_str());
                     }
                     AnsiCommand::ModifyStyle(control) => {
@@ -234,11 +210,15 @@ impl PyroConsole {
 
         // ctx.fill_text(format!("FPS: {:.2}", fps).as_str(), width - 100.0, 20.0)
         //     .expect("failed to draw");
-        let str =
-            format!("FPS: {:.2} | Lines: {}", state.fps, state.lines.len());
+        let str = format!(
+            "FPS: {:.2} | Lines rendered: {}",
+            state.fps,
+            state.line_manager.len_linebreaks()
+        );
         // let text_width = state.ctx.measure_text(str.as_str()).unwrap().width();
         // let text_width = state.char_width * str.len() as f64;
-        let text_width = state.measure_cache.measure(12, str.as_str());
+        let text_width =
+            state.measure_cache.borrow_mut().measure(12, str.as_str());
         state
             .ctx
             .fill_text(
@@ -282,92 +262,17 @@ impl PyroConsole {
     }
 
     pub fn add_line(&mut self, line: &str) {
-        let parser = AnsiParser::new(line.to_owned());
+        // self.state.borrow_mut().line_manager.add_line(line, state);
         let mut state = self.state.borrow_mut();
         let is_at_bottom = state.offset + LINES_VISIBLE as u64
-            >= (state.lines.len() + GAP_LINES as usize) as u64;
-        let result = parser.parse();
-        state.raw_lines.push(result.clone());
-        // state.lines = PyroConsole::calculate_line_breaks(&state);
-        let new_lines = PyroConsole::calculate_line_breaks(&mut state, result);
-        for line in new_lines.clone() {
-            let len = state.raw_lines.len();
-            state.lines.push(PyroConsoleLine {
-                ansi_commands: line,
-                raw_lines_index: len - 1,
-            });
-        }
-
-        // info!(
-        //     "{}, {}",
-        //     state.offset + LINES_VISIBLE as u64,
-        //     (state.lines.len() + GAP_LINES as usize) as u64
-        // );
-
+            >= (state.line_manager.len_linebreaks() + GAP_LINES as usize)
+                as u64;
+        state.line_manager.add_line(line);
         if is_at_bottom {
-            state.offset = (state.lines.len() + GAP_LINES)
+            state.offset = (state.line_manager.len_linebreaks() + GAP_LINES)
                 .saturating_sub(LINES_VISIBLE)
                 as u64;
         }
-    }
-
-    fn calculate_line_breaks(
-        state: &mut PyroConsoleState,
-        line: Vec<AnsiCommand>,
-    ) -> Vec<Vec<AnsiCommand>> {
-        let canvas_space =
-            state.canvas.width() as f64 - SCROLL_BAR_WIDTH as f64 - 16.0;
-        let mut lines: Vec<Vec<AnsiCommand>> = Vec::new();
-        let mut x = 0.0;
-        let mut current_line = Vec::new();
-        let mut last_was_space = false;
-        for command in line.iter() {
-            match command {
-                AnsiCommand::RenderText(text) => {
-                    let split = text.split(' ').collect::<Vec<&str>>();
-                    for word in split.iter() {
-                        let word = if word.is_empty() && !last_was_space {
-                            last_was_space = true;
-                            " "
-                        } else {
-                            last_was_space = false;
-                            *word
-                        };
-                        let word = (*word).to_owned();
-                        let word = word.as_str();
-                        let width =
-                            state.measure_cache.measure(FONT_SIZE, word);
-                        if x + width > canvas_space {
-                            lines.push(current_line.clone());
-                            let mut styles = Vec::new();
-                            for style in current_line.iter().rev() {
-                                match style {
-                                    AnsiCommand::RenderText(_) => continue,
-                                    _ => styles.push(style.clone()),
-                                }
-                            }
-                            current_line.clear();
-                            for style in styles.iter().rev() {
-                                current_line.push(style.clone());
-                            }
-                            x = 0.0;
-                        }
-                        current_line
-                            .push(AnsiCommand::RenderText(word.to_owned()));
-                        x += width;
-                    }
-                }
-                _ => {
-                    current_line.push(command.clone());
-                }
-            }
-        }
-
-        if current_line.len() > 0 {
-            lines.push(current_line);
-        }
-
-        lines
     }
 
     pub fn destroy(&self) {
@@ -387,8 +292,7 @@ impl PyroConsole {
     pub fn clear(&mut self) {
         let mut state = self.state.borrow_mut();
         state.offset = 0;
-        state.raw_lines.clear();
-        state.lines.clear();
+        state.line_manager.clear();
     }
 
     pub fn redraw(&mut self) {
@@ -402,24 +306,13 @@ impl PyroConsole {
         let size = (state.canvas.width(), state.canvas.height());
         if size != state.last_size {
             state.last_size = size;
-            state.lines.clear();
-            for line in state.raw_lines.clone().iter() {
-                let is_hooked_on_last_line = state.lines.len() >= LINES_VISIBLE
-                    && state.lines.last().unwrap().raw_lines_index
-                        == state.raw_lines.len() - 1;
-                let new_lines =
-                    PyroConsole::calculate_line_breaks(state, line.clone());
-                for line in new_lines {
-                    state.lines.push(PyroConsoleLine {
-                        ansi_commands: line,
-                        raw_lines_index: state.raw_lines.len() - 1,
-                    });
-                }
-                if is_hooked_on_last_line {
-                    state.offset =
-                        // state.lines.len() as u64 - LINES_VISIBLE as u64 + GAP_LINES as u64;
-                        (state.lines.len() + GAP_LINES).saturating_sub(LINES_VISIBLE) as u64;
-                }
+            let is_hooked_on_last_line = state.offset as usize + LINES_VISIBLE
+                >= state.line_manager.len_linebreaks() + GAP_LINES;
+            state.line_manager.on_resize(size.0 as f64);
+            if is_hooked_on_last_line {
+                state.offset = (state.line_manager.len_linebreaks() + GAP_LINES)
+                    .saturating_sub(LINES_VISIBLE as usize)
+                    as u64;
             }
         }
     }
@@ -432,9 +325,10 @@ impl PyroConsole {
     pub fn get_content_height(&self) -> u32 {
         // get the content height, where the content height is equal to get_scroll_px() when scrolled to the bottom
         let state = self.state.borrow();
-        let total_lines =
-            cmp::max(state.lines.len() as u64, LINES_VISIBLE as u64)
-                - LINES_VISIBLE as u64;
+        let total_lines = cmp::max(
+            state.line_manager.len_linebreaks() as u64,
+            LINES_VISIBLE as u64,
+        ) - LINES_VISIBLE as u64;
         let total_height =
             (LINE_HEIGHT as f64) * (total_lines + GAP_LINES as u64) as f64;
         total_height as u32
@@ -448,7 +342,8 @@ impl PyroConsole {
         client_height: u32,
     ) {
         let mut state = self.state.borrow_mut();
-        let total_lines = (state.lines.len() - LINES_VISIBLE) as u64;
+        let total_lines =
+            (state.line_manager.len_linebreaks() - LINES_VISIBLE) as u64;
         let height = state.canvas.height() as f64;
         let total_height = (LINE_HEIGHT as f64) * total_lines as f64;
         let scroll_bar_height = cmp::max(
@@ -470,7 +365,8 @@ impl PyroConsole {
             state.offset = PyroConsole::calculate_offset(
                 y - scroll_bar_height as f64 / 2.0,
                 client_height as f64,
-                (state.lines.len() - LINES_VISIBLE + GAP_LINES) as u64,
+                (state.line_manager.len_linebreaks() - LINES_VISIBLE
+                    + GAP_LINES) as u64,
             );
         } else {
             state.scroll_bar_y_offset = y - scroll_bar_y;
@@ -487,7 +383,8 @@ impl PyroConsole {
         let offset = PyroConsole::calculate_offset(
             y as f64,
             client_height as f64,
-            (state.lines.len() - LINES_VISIBLE + GAP_LINES) as u64,
+            (state.line_manager.len_linebreaks() - LINES_VISIBLE + GAP_LINES)
+                as u64,
         );
         state.offset = offset;
     }
@@ -502,7 +399,7 @@ impl PyroConsole {
         if delta_y > 0.0 {
             if state.offset == u64::MAX
                 || state.offset as usize + LINES_VISIBLE
-                    >= state.lines.len() + GAP_LINES
+                    >= state.line_manager.len_linebreaks() + GAP_LINES
             {
                 return;
             }
