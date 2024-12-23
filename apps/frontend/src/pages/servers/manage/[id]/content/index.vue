@@ -133,6 +133,7 @@
         v-if="server.general && localMods"
         class="relative min-h-[50vh]"
         overlay-class="rounded-xl border-2 border-dashed border-secondary"
+        :type="type"
         @files-dropped="handleDroppedFiles"
       >
         <div v-if="hasFilteredMods" class="flex flex-col gap-2 transition-all">

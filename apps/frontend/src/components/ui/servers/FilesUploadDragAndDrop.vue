@@ -15,7 +15,9 @@
     >
       <div class="text-center">
         <UploadIcon class="mx-auto h-16 w-16" />
-        <p class="mt-2 text-xl">Drop files here to upload</p>
+        <p class="mt-2 text-xl">
+          Drop {{ type ? type.toLocaleLowerCase() : "file" }}s here to upload
+        </p>
       </div>
     </div>
   </div>
@@ -31,6 +33,7 @@ const emit = defineEmits<{
 
 defineProps<{
   overlayClass?: string;
+  type?: string;
 }>();
 
 const isDragging = ref(false);
