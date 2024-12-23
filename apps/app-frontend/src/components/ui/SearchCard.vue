@@ -38,7 +38,7 @@
       <div class="m-0 line-clamp-2">
         {{ project.description }}
       </div>
-      <div class="mt-auto flex items-center gap-1 no-wrap">
+      <div v-if="categories.length > 0" class="mt-auto flex items-center gap-1 no-wrap">
         <TagsIcon class="h-4 w-4 shrink-0" />
         <div
           v-for="tag in categories"

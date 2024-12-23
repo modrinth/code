@@ -125,15 +125,6 @@ export default new createRouter({
           },
         },
         {
-          path: 'options',
-          name: 'Options',
-          component: Instance.Options,
-          meta: {
-            useRootContext: true,
-            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Options' }],
-          },
-        },
-        {
           path: 'logs',
           name: 'Logs',
           component: Instance.Logs,

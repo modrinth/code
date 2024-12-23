@@ -218,14 +218,14 @@ const filteredResults = computed(() => {
 })
 </script>
 <template>
-  <div class="iconified-input">
-    <SearchIcon />
-    <input v-model="search" type="text" class="h-12" placeholder="Search" />
-    <Button class="r-btn" @click="() => (search = '')">
-      <XIcon />
-    </Button>
-  </div>
   <div class="flex gap-2">
+    <div class="iconified-input flex-1">
+      <SearchIcon />
+      <input v-model="search" type="text" placeholder="Search" />
+      <Button class="r-btn" @click="() => (search = '')">
+        <XIcon />
+      </Button>
+    </div>
     <DropdownSelect
       v-slot="{ selected }"
       v-model="sortBy"
@@ -363,7 +363,7 @@ const filteredResults = computed(() => {
 
 .instances {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
   width: 100%;
   gap: 0.75rem;
   margin-right: auto;

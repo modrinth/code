@@ -311,7 +311,6 @@ import {
   ButtonStyled,
   NewProjectCard,
   SearchFilterControl,
-  ContentPageHeader,
 } from "@modrinth/ui";
 import { CheckIcon, DownloadIcon, GameIcon, LeftArrowIcon, XIcon } from "@modrinth/assets";
 import { computed } from "vue";

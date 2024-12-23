@@ -169,9 +169,13 @@ window.addEventListener('online', () => {
 const breadcrumbs = useBreadcrumbs()
 breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: route.query })
 
-const loading = ref(false)
+const loading = ref(true)
 
 const projectType = ref(route.params.projectType)
+
+watch(projectType, () => {
+  loading.value = true
+})
 
 type SearchResult = {
   project_id: string
@@ -240,6 +244,7 @@ async function refreshSearch() {
     query: params,
   })
   await router.replace({ path: route.path, query: params })
+  loading.value = false
 }
 
 async function setPage(newPageNumber: number) {
@@ -375,10 +380,12 @@ await refreshSearch()
       button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
       content-class="mb-3"
       inner-panel-class="ml-2 mr-3"
-      :open-by-default="filter.id.startsWith('category') || filter.id === 'environment'"
+      :open-by-default="
+        filter.id.startsWith('category') || filter.id === 'environment' || filter.id === 'license'
+      "
     >
       <template #header>
-        <h3 class="text-lg m-0">{{ filter.formatted_name }}</h3>
+        <h3 class="text-base m-0">{{ filter.formatted_name }}</h3>
       </template>
       <template #locked-game_version>
         {{ formatMessage(messages.gameVersionProvidedByInstance) }}
@@ -394,7 +401,6 @@ await refreshSearch()
       <InstanceIndicator :instance="instance" />
       <h1 class="m-0 mb-1 text-xl">Install content to instance</h1>
     </template>
-    <h1 v-else class="m-0 text-2xl">Discover content</h1>
     <NavTabs :links="selectableProjectTypes" />
     <div class="iconified-input">
       <SearchIcon aria-hidden="true" class="text-lg" />
@@ -465,11 +471,10 @@ await refreshSearch()
                 loader.supported_project_types?.includes(projectType),
             ),
           ]"
-          :installed="result.installed"
+          :installed="result.installed || newlyInstalled.includes(result.project_id)"
           @install="
             (id) => {
               newlyInstalled.push(id)
-              refreshSearch()
             }
           "
         />

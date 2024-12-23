@@ -1,34 +1,36 @@
 <script setup lang="ts">
 import { Toggle } from '@modrinth/ui'
 import { useTheming } from '@/store/state'
-import { computed } from 'vue'
-import type { Ref } from 'vue'
+import { ref, watch } from 'vue'
+import { get, set } from '@/helpers/settings'
 
 const themeStore = useTheming()
 
-type ThemeStoreKeys = keyof typeof themeStore
+const settings = ref(await get())
+const options = ref(['project_background', 'page_path'])
 
-const options: Ref<ThemeStoreKeys[]> = computed(() => {
-  return Object.keys(themeStore).filter((key) => key.startsWith('featureFlag_')) as ThemeStoreKeys[]
-})
-
-function getStoreValue<K extends ThemeStoreKeys>(key: K): (typeof themeStore)[K] {
-  return themeStore[key]
+function getStoreValue(key: string) {
+  return themeStore.featureFlags[key] ?? false
 }
 
-function setStoreValue<K extends ThemeStoreKeys>(key: K, value: (typeof themeStore)[K]) {
-  themeStore[key] = value
+function setStoreValue(key: string, value: boolean) {
+  themeStore.featureFlags[key] = value
+  settings.value.feature_flags[key] = value
 }
 
-function formatFlagName(name: string) {
-  return name.replace('featureFlag_', '')
-}
+watch(
+  settings,
+  async () => {
+    await set(settings.value)
+  },
+  { deep: true },
+)
 </script>
 <template>
   <div v-for="option in options" :key="option" class="mt-4 flex items-center justify-between">
     <div>
       <h2 class="m-0 text-lg font-extrabold text-contrast capitalize">
-        {{ formatFlagName(option) }}
+        {{ option }}
       </h2>
     </div>
 
@@ -36,7 +38,7 @@ function formatFlagName(name: string) {
       id="advanced-rendering"
       :model-value="getStoreValue(option)"
       :checked="getStoreValue(option)"
-      @update:model-value="() => setStoreValue(option, !themeStore[option])"
+      @update:model-value="() => setStoreValue(option, !themeStore.featureFlags[option])"
     />
   </div>
 </template>

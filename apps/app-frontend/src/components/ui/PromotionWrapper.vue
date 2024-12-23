@@ -25,7 +25,7 @@ onMounted(() => {
 
 function updateAdPosition() {
   if (adsWrapper.value) {
-    init_ads_window(true)
+    init_ads_window()
     initDevicePixelRatioWatcher()
   }
 }

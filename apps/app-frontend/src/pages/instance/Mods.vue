@@ -16,17 +16,27 @@
       </div>
       <AddContentButton :instance="instance" />
     </div>
-    <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
-      <FilterIcon class="text-secondary h-5 w-5 mr-1" />
-      <button
-        v-for="filter in filterOptions"
-        :key="filter"
-        :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
-        @click="toggleArray(selectedFilters, filter.id)"
-      >
-        {{ filter.formattedName }}
-      </button>
+    <div class="flex items-center justify-between">
+      <div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
+        <FilterIcon class="text-secondary h-5 w-5 mr-1" />
+        <button
+          v-for="filter in filterOptions"
+          :key="filter"
+          :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
+          @click="toggleArray(selectedFilters, filter.id)"
+        >
+          {{ filter.formattedName }}
+        </button>
+      </div>
+      <Pagination
+        v-if="search.length > 0"
+        :page="currentPage"
+        :count="Math.ceil(search.length / 20)"
+        :link-function="(page) => `?page=${page}`"
+        @switch-page="(page) => (currentPage = page)"
+      />
     </div>
+
     <ContentListPanel
       v-model="selectedFiles"
       :locked="isPackLocked"
@@ -70,6 +80,7 @@
       :sort-column="sortColumn"
       :sort-ascending="ascending"
       :update-sort="sortProjects"
+      :current-page="currentPage"
     >
       <template v-if="selectedProjects.length > 0" #headers>
         <div class="flex gap-2">
@@ -238,28 +249,28 @@
 </template>
 <script setup lang="ts">
 import {
-  ExternalIcon,
-  LinkIcon,
+  CheckCircleIcon,
   ClipboardCopyIcon,
-  TrashIcon,
-  SearchIcon,
-  UpdatedIcon,
-  XIcon,
-  ShareIcon,
-  DropdownIcon,
-  FileIcon,
   CodeIcon,
   DownloadIcon,
+  DropdownIcon,
+  ExternalIcon,
+  FileIcon,
   FilterIcon,
+  LinkIcon,
   MoreVerticalIcon,
-  CheckCircleIcon,
+  SearchIcon,
+  ShareIcon,
   SlashIcon,
+  TrashIcon,
+  UpdatedIcon,
+  XIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, ContentListPanel, OverflowMenu } from '@modrinth/ui'
+import { Button, ButtonStyled, ContentListPanel, OverflowMenu, Pagination } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { useVIntl, defineMessages } from '@vintl/vintl'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import {
   add_project_from_path,
   get_projects,
@@ -405,7 +416,7 @@ const initProjects = async (cacheBehaviour?) => {
       icon: null,
       disabled: file.file_name.endsWith('.disabled'),
       outdated: false,
-      project_type: file.project_type,
+      project_type: file.project_type === 'shaderpack' ? 'shader' : file.project_type,
     })
   }
 
@@ -484,6 +495,15 @@ const filteredProjects = computed(() => {
   })
 })
 
+watch(filterOptions, () => {
+  for (let i = 0; i < selectedFilters.value.length; i++) {
+    const option = selectedFilters.value[i]
+    if (!filterOptions.value.some((x) => x.id === option)) {
+      selectedFilters.value.splice(i, 1)
+    }
+  }
+})
+
 function toggleArray(array, value) {
   if (array.includes(value)) {
     array.splice(array.indexOf(value), 1)
@@ -494,11 +514,10 @@ function toggleArray(array, value) {
 
 const searchFilter = ref('')
 const selectAll = ref(false)
-const selectedProjectType = ref('All')
-const hideNonSelected = ref(false)
 const shareModal = ref(null)
 const ascending = ref(true)
 const sortColumn = ref('Name')
+const currentPage = ref(1)
 
 const selected = computed(() =>
   Array.from(selectionMap.value)
@@ -514,32 +533,10 @@ const functionValues = computed(() =>
   selectedProjects.value.length > 0 ? selectedProjects.value : Array.from(projects.value.values()),
 )
 
-const selectableProjectTypes = computed(() => {
-  const obj = { All: 'all' }
-
-  for (const project of projects.value) {
-    obj[project.project_type ? formatProjectType(project.project_type) + 's' : 'Other'] =
-      project.project_type
-  }
-
-  return obj
-})
-
 const search = computed(() => {
-  const projectType = selectableProjectTypes.value[selectedProjectType.value]
-  const filtered = filteredProjects.value
-    .filter((mod) => {
-      return (
-        mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
-        (projectType === 'all' || mod.project_type === projectType)
-      )
-    })
-    .filter((mod) => {
-      if (hideNonSelected.value) {
-        return !mod.disabled
-      }
-      return true
-    })
+  const filtered = filteredProjects.value.filter((mod) => {
+    return mod.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+  })
 
   switch (sortColumn.value) {
     case 'Updated':
@@ -553,17 +550,11 @@ const search = computed(() => {
         return 0
       })
     default:
-      return filtered.slice().sort((a, b) => {
-        if (a.name < b.name) {
-          return ascending.value ? -1 : 1
-        }
-        if (a.name > b.name) {
-          return ascending.value ? 1 : -1
-        }
-        return 0
-      })
+      return filtered.slice().sort((a, b) => a.name.localeCompare(b.name))
   }
 })
+
+watch(search, () => (currentPage.value = 1))
 
 const sortProjects = (filter) => {
   if (sortColumn.value === filter) {
@@ -630,35 +621,33 @@ const locks = {}
 
 const toggleDisableMod = async (mod) => {
   // Use mod's id as the key for the lock. If mod doesn't have a unique id, replace `mod.id` with some unique property.
-  if (!locks[mod.id]) {
-    locks[mod.id] = ref(null)
+  const lock = locks[mod.file_name]
+
+  while (lock) {
+    await new Promise((resolve) => {
+      setTimeout((_) => resolve(), 100)
+    })
   }
 
-  const lock = locks[mod.id]
+  locks[mod.file_name] = 'lock'
 
-  while (lock.value) {
-    await lock.value
+  try {
+    mod.path = await toggle_disable_project(props.instance.path, mod.path)
+    mod.disabled = !mod.disabled
+
+    trackEvent('InstanceProjectDisable', {
+      loader: props.instance.loader,
+      game_version: props.instance.game_version,
+      id: mod.id,
+      name: mod.name,
+      project_type: mod.project_type,
+      disabled: mod.disabled,
+    })
+  } catch (err) {
+    handleError(err)
   }
 
-  lock.value = toggle_disable_project(props.instance.path, mod.path)
-    .then((newPath) => {
-      mod.path = newPath
-      mod.disabled = !mod.disabled
-      trackEvent('InstanceProjectDisable', {
-        loader: props.instance.loader,
-        game_version: props.instance.game_version,
-        id: mod.id,
-        name: mod.name,
-        project_type: mod.project_type,
-        disabled: mod.disabled,
-      })
-    })
-    .catch(handleError)
-    .finally(() => {
-      lock.value = null
-    })
-
-  await lock.value
+  locks[mod.file_name] = null
 }
 
 const removeMod = async (mod) => {

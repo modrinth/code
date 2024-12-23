@@ -6,7 +6,7 @@ import { useTheming } from '@/store/theme.js'
 
 const themeStore = useTheming()
 
-defineProps({
+const props = defineProps({
   confirmationText: {
     type: String,
     default: '',
@@ -37,6 +37,10 @@ defineProps({
     type: Boolean,
     default: true,
   },
+  showAdOnClose: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['proceed'])
@@ -54,7 +58,9 @@ defineExpose({
 })
 
 function onModalHide() {
-  show_ads_window()
+  if (props.showAdOnClose) {
+    show_ads_window()
+  }
 }
 
 function proceed() {
