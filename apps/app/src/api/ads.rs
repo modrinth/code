@@ -61,7 +61,7 @@ fn get_webview_position<R: Runtime>(
     let width = 300.0 * dpr;
     let height = 250.0 * dpr;
 
-    let main_window_size = main_window.inner_size()?;
+    let main_window_size = main_window.outer_size()?;
     let x = (main_window_size.width as f32) - width;
     let y = (main_window_size.height as f32) - height;
 

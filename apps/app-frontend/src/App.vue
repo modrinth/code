@@ -264,13 +264,15 @@ router.afterEach((to) => {
   forceSidebar.value = to.path.startsWith('/browse') || to.path.startsWith('/project')
 })
 
+const currentTimeout = ref(null)
 watch(
   showAd,
   () => {
     if (!showAd.value) {
+      if (currentTimeout.value) clearTimeout(currentTimeout.value)
       hide_ads_window(true)
     } else {
-      setTimeout(() => {
+      currentTimeout.value = setTimeout(() => {
         init_ads_window(true)
       }, 400)
     }
@@ -441,7 +443,7 @@ function handleAuxClick(e) {
     <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
       <div data-tauri-drag-region class="flex p-3">
         <ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
-        <Breadcrumbs />
+        <Breadcrumbs class="pt-[2px]" />
       </div>
       <section class="flex ml-auto items-center">
         <ButtonStyled

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { Ref } from 'vue'
-import { SearchIcon, XIcon } from '@modrinth/assets'
+import { SearchIcon, XIcon, ClipboardCopyIcon, GlobeIcon, ExternalIcon } from '@modrinth/assets'
 import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
   SearchFilterControl,
@@ -25,6 +25,8 @@ import NavTabs from '@/components/ui/NavTabs.vue'
 import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 const { formatMessage } = useVIntl()
 
@@ -351,6 +353,36 @@ const messages = defineMessages({
   },
 })
 
+const options = ref(null)
+const handleRightClick = (event, result) => {
+  options.value.showMenu(event, result, [
+    {
+      name: 'install',
+    },
+    {
+      type: 'divider',
+    },
+    {
+      name: 'open_link',
+    },
+    {
+      name: 'copy_link',
+    },
+  ])
+}
+const handleOptionsClick = (args) => {
+  switch (args.option) {
+    case 'open_link':
+      openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
+      break
+    case 'copy_link':
+      navigator.clipboard.writeText(
+        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+      )
+      break
+  }
+}
+
 await refreshSearch()
 </script>
 
@@ -477,7 +509,12 @@ await refreshSearch()
               newlyInstalled.push(id)
             }
           "
+          @contextmenu.prevent.stop="(event) => handleRightClick(event, result)"
         />
+        <ContextMenu ref="options" @option-clicked="handleOptionsClick">
+          <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
+          <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+        </ContextMenu>
       </section>
       <div class="flex justify-end">
         <pagination

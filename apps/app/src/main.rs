@@ -237,7 +237,7 @@ fn main() {
 
             if let Some(window) = app.get_window("main") {
                 // Hide window to prevent white flash on startup
-                let _ = window.hide();
+                // let _ = window.hide();
 
                 #[cfg(not(target_os = "linux"))]
                 {
