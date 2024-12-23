@@ -15,8 +15,14 @@ const getInstances = async () => {
 
   recentInstances.value = profiles
     .sort((a, b) => {
-      const dateA = dayjs(a.created > a.last_played ? a.last_played : a.created)
-      const dateB = dayjs(b.created > b.last_played ? b.last_played : b.created)
+      const dateACreated = dayjs(a.created)
+      const dateAPlayed = dayjs(a.last_played)
+
+      const dateBCreated = dayjs(b.created)
+      const dateBPlayed = dayjs(b.last_played)
+
+      const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
+      const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
 
       if (dateA.isSame(dateB)) {
         return a.name.localeCompare(b.name)
