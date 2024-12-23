@@ -373,7 +373,7 @@ export default defineNuxtComponent({
           clear: false,
         },
       },
-      commonMessages
+      commonMessages,
     };
   },
   head: {
