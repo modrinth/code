@@ -44,7 +44,6 @@ pub struct PyroConsoleState {
     last_size: (u32, u32),
     line_manager: LineManager,
     measure_cache: Rc<RefCell<TextMeasureCache>>,
-    query: String,
     offset: u64,
     last_frame_time: f64,
     framerates: Vec<f64>,
@@ -84,7 +83,6 @@ impl PyroConsole {
                     canvas.width() as f64,
                 ),
                 offset: 0,
-                query: String::new(),
                 last_frame_time: 0.0,
                 framerates: Vec::new(),
                 fps: 360,
@@ -172,7 +170,7 @@ impl PyroConsole {
             let mut style = "black".to_owned();
             let mut x = 0.0;
 
-            for command in line.iter() {
+            for command in line.commands.iter() {
                 match command {
                     AnsiCommand::RenderText(text) => {
                         if style != state.current_fill_style {
@@ -211,9 +209,10 @@ impl PyroConsole {
         // ctx.fill_text(format!("FPS: {:.2}", fps).as_str(), width - 100.0, 20.0)
         //     .expect("failed to draw");
         let str = format!(
-            "FPS: {:.2} | Lines rendered: {}",
+            "FPS: {:.2} | Lines: {} ({})",
             state.fps,
-            state.line_manager.len_linebreaks()
+            state.line_manager.len_linebreaks(),
+            state.line_manager.len_no_linebreaks()
         );
         // let text_width = state.ctx.measure_text(str.as_str()).unwrap().width();
         // let text_width = state.char_width * str.len() as f64;
@@ -410,5 +409,13 @@ impl PyroConsole {
             }
             state.offset -= 1;
         }
+    }
+
+    pub fn search(&mut self, query: &str) {
+        let mut state = self.state.borrow_mut();
+        state.line_manager.search(query);
+        state.offset = 0;
+        state.offset = (state.line_manager.len_linebreaks() + GAP_LINES)
+            .saturating_sub(LINES_VISIBLE) as u64;
     }
 }
