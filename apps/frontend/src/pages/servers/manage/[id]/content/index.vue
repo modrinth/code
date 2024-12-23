@@ -152,6 +152,7 @@
                           : `files?path=mods`
                       "
                       class="flex min-w-0 flex-1 items-center gap-2 rounded-xl p-2"
+                      draggable="false"
                     >
                       <UiAvatar
                         :src="mod.icon_url"
