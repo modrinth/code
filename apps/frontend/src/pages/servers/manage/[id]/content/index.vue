@@ -73,7 +73,7 @@
                 type="search"
                 name="search"
                 autocomplete="off"
-                :placeholder="`Search ${type.toLocaleLowerCase()}s...`"
+                :placeholder="`Search ${localMods.length} ${type.toLocaleLowerCase()}s...`"
                 @input="debouncedSearch"
               />
             </div>
@@ -172,9 +172,12 @@
                               >Disabled</span
                             >
                           </span>
-                          <span class="min-w-0 text-xs text-secondary">{{
+                          <!-- <span class="min-w-0 text-xs text-secondary">{{
                             mod.version_number || "External mod"
-                          }}</span>
+                          }}</span> -->
+                          <!-- <span class="min-w-0 text-xs text-secondary">
+                            {{ mod. }}
+                          </span> -->
                         </div>
                       </div>
                     </NuxtLink>
