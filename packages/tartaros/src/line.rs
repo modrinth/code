@@ -1,5 +1,5 @@
+use fuzzy_search::{automata::LevenshteinAutomata, symspell::SymSpell};
 use log::info;
-use rust_fuzzy_search::fuzzy_compare;
 
 use crate::{
     ansi::{AnsiCommand, AnsiParser},
@@ -23,12 +23,13 @@ impl ConsoleLine {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct LineManager {
     unbroken_lines: Vec<Vec<AnsiCommand>>,
-    lines: Vec<ConsoleLine>,
     measure_cache: Rc<RefCell<TextMeasureCache>>,
     canvas_width: f64,
+    cached_lines: Option<Vec<ConsoleLine>>,
+    search_results: Option<Vec<usize>>,
 }
 
 impl LineManager {
@@ -37,10 +38,11 @@ impl LineManager {
         canvas_width: f64,
     ) -> Self {
         Self {
-            lines: Vec::new(),
             unbroken_lines: Vec::new(),
+            cached_lines: None,
             measure_cache: measure_cache.clone(),
             canvas_width,
+            search_results: None,
         }
     }
 
@@ -48,20 +50,40 @@ impl LineManager {
         if self.unbroken_lines.len() > 1000 {
             self.remove_at(0);
         }
+
         let parser = AnsiParser::new(line.to_owned());
         let result = parser.parse();
         self.unbroken_lines.push(result.clone());
-        let new_lines = self.calculate_line_breaks(result);
-        let index = self.unbroken_lines.len().saturating_sub(1);
-        for line in new_lines.clone() {
-            self.lines.push(ConsoleLine::new(line.clone(), index));
+        if let Some(cache) = &mut self.cached_lines {
+            let index = self.unbroken_lines.len() - 1;
+            let new_broken_lines = Self::calculate_line_breaks(
+                result.clone(),
+                &self.measure_cache,
+                self.canvas_width,
+            );
+            for broken_line in new_broken_lines {
+                cache.push(ConsoleLine::new(broken_line, index));
+            }
+        } else {
+            self.invalidate_cache();
         }
-        new_lines.len()
+
+        Self::calculate_line_breaks(
+            result.clone(),
+            &self.measure_cache,
+            self.canvas_width,
+        )
+        .len()
+    }
+
+    pub fn invalidate_cache(&mut self) {
+        self.cached_lines = None;
     }
 
     pub fn calculate_line_breaks(
-        &self,
         line: Vec<AnsiCommand>,
+        measure_cache: &Rc<RefCell<TextMeasureCache>>,
+        canvas_width: f64,
     ) -> Vec<Vec<AnsiCommand>> {
         let mut lines: Vec<Vec<AnsiCommand>> = Vec::new();
         let mut x = 0.0;
@@ -81,11 +103,9 @@ impl LineManager {
                         };
                         let word = (*word).to_owned();
                         let word = word.as_str();
-                        let width = self
-                            .measure_cache
-                            .borrow_mut()
-                            .measure(FONT_SIZE, word);
-                        if x + width > self.canvas_width {
+                        let width =
+                            measure_cache.borrow_mut().measure(FONT_SIZE, word);
+                        if x + width > canvas_width {
                             lines.push(current_line.clone());
                             let mut styles = Vec::new();
                             for style in current_line.iter().rev() {
@@ -122,74 +142,114 @@ impl LineManager {
         self.unbroken_lines.len()
     }
 
-    pub fn len_linebreaks(&self) -> usize {
-        self.lines.len()
+    pub fn len_linebreaks(&mut self) -> usize {
+        if self.cached_lines.is_none() {
+            self.recalculate_cache();
+        }
+        if self.search_results.is_some() {
+            return self.search_results.as_ref().unwrap().len();
+        }
+        self.cached_lines.as_ref().unwrap().len()
     }
 
-    pub fn get_lines(&self, range: std::ops::Range<usize>) -> Vec<ConsoleLine> {
-        self.lines[range].to_vec()
+    pub fn get_lines(
+        &mut self,
+        range: std::ops::Range<usize>,
+    ) -> Vec<ConsoleLine> {
+        if self.cached_lines.is_none() {
+            self.recalculate_cache();
+        }
+        if self.search_results.is_some() {
+            let search_results = self.search_results.as_ref().unwrap();
+            return search_results
+                .iter()
+                .filter_map(|index| {
+                    if range.contains(index) {
+                        Some(
+                            self.cached_lines.as_ref().unwrap()[*index].clone(),
+                        )
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+        }
+        self.cached_lines.as_ref().unwrap()[range].to_vec()
+    }
+
+    fn recalculate_cache(&mut self) {
+        self.cached_lines = Some(
+            self.unbroken_lines
+                .iter()
+                .enumerate()
+                .flat_map(|(index, line)| {
+                    Self::calculate_line_breaks(
+                        line.clone(),
+                        &self.measure_cache,
+                        self.canvas_width,
+                    )
+                    .into_iter()
+                    .map(move |broken_line| {
+                        ConsoleLine::new(broken_line, index)
+                    })
+                })
+                .collect(),
+        );
     }
 
     pub fn clear(&mut self) {
-        self.lines.clear();
         self.unbroken_lines.clear();
+        self.cached_lines = None;
     }
 
     pub fn on_resize(&mut self, width: f64) {
         self.canvas_width = width;
-        self.lines.clear();
-        for line in self.unbroken_lines.clone().iter() {
-            let new_lines = self.calculate_line_breaks(line.clone());
-            let index = self.lines.len().saturating_sub(1);
-            for line in new_lines {
-                self.lines.push(ConsoleLine::new(line, index));
-            }
-        }
+        self.invalidate_cache();
     }
 
-    pub fn remove_at(&mut self, raw_index: usize) {
-        let mut index = 0;
-        for line in self.lines.clone().iter() {
-            if line.unbroken_line_index == raw_index {
-                self.lines.remove(index);
-            } else {
-                if let Some(line) = self.lines.get_mut(index) {
-                    line.unbroken_line_index -= 1;
-                }
-            }
-            index += 1;
-        }
-
-        self.unbroken_lines.remove(raw_index);
-    }
+    pub fn remove_at(&mut self, raw_index: usize) {}
 
     pub fn search(&mut self, query: &str) {
-        let mut scores = Vec::new();
-        for (index, line) in self.unbroken_lines.iter().enumerate() {
-            let text = line
-                .iter()
-                .filter_map(|command| match command {
-                    AnsiCommand::RenderText(text) => Some(text),
-                    _ => None,
-                })
-                .map(String::as_str)
-                .collect::<Vec<&str>>()
-                .join("");
+        let len = self.len_linebreaks();
+        let all_lines = self.get_lines(0..len);
 
-            info!("Searching in line: {}", text);
-
-            let score =
-                fuzzy_compare(&text.to_lowercase(), &query.to_lowercase());
-            scores.push((index, score));
-        }
-
-        // info!("Scores: {:?}", scores);
-        // sort score by score, return top 20
-        scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-        let top_scores = scores
+        let choices = all_lines
             .iter()
-            .filter(|x| x.1 != 0.0)
-            .take(20)
-            .collect::<Vec<_>>();
+            .enumerate()
+            .map(|(i, line)| {
+                (
+                    i,
+                    line.commands
+                        .iter()
+                        .filter_map(|command| match command {
+                            AnsiCommand::RenderText(text) => Some(text),
+                            _ => None,
+                        })
+                        .map(String::as_str)
+                        .collect::<Vec<&str>>()
+                        .join(""),
+                )
+            })
+            .filter(|(_, line)| {
+                line.to_lowercase().contains(&query.to_lowercase())
+            })
+            .map(|(i, _)| i)
+            .collect::<Vec<usize>>();
+
+        self.search_results = Some(choices);
+
+        // scores.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // let top_indices = scores
+        //     .iter()
+        //     .filter(|(_, score)| *score > 0.0)
+        //     .take(20)
+        //     .map(|(index, _)| *index)
+        //     .collect::<Vec<_>>();
+
+        // self.search_results = Some(top_indices.clone());
+    }
+
+    pub fn clear_search(&mut self) {
+        self.search_results = None;
     }
 }

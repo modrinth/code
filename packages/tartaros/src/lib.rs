@@ -35,7 +35,7 @@ const SCROLL_BAR_WIDTH: usize = 8;
 const MIN_SCROLL_BAR_HEIGHT: usize = 16;
 
 #[wasm_bindgen]
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct PyroConsoleState {
     animation_frame: i32,
     canvas: OffscreenCanvas,
@@ -50,6 +50,7 @@ pub struct PyroConsoleState {
     fps: u16,
     scroll_bar_y_offset: f64,
     worker_scope: DedicatedWorkerGlobalScope,
+    query: String,
 }
 
 #[wasm_bindgen]
@@ -89,6 +90,7 @@ impl PyroConsole {
                 scroll_bar_y_offset: -1.0,
                 worker_scope: worker(),
                 measure_cache,
+                query: String::new(),
             })),
         }
     }
@@ -323,7 +325,7 @@ impl PyroConsole {
 
     pub fn get_content_height(&self) -> u32 {
         // get the content height, where the content height is equal to get_scroll_px() when scrolled to the bottom
-        let state = self.state.borrow();
+        let mut state = self.state.borrow_mut();
         let total_lines = cmp::max(
             state.line_manager.len_linebreaks() as u64,
             LINES_VISIBLE as u64,
@@ -413,9 +415,11 @@ impl PyroConsole {
 
     pub fn search(&mut self, query: &str) {
         let mut state = self.state.borrow_mut();
-        state.line_manager.search(query);
-        state.offset = 0;
-        state.offset = (state.line_manager.len_linebreaks() + GAP_LINES)
-            .saturating_sub(LINES_VISIBLE) as u64;
+        if query.is_empty() {
+            state.line_manager.clear_search();
+        } else {
+            state.line_manager.search(query);
+            state.offset = 0;
+        }
     }
 }

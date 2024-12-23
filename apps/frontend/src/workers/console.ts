@@ -90,6 +90,7 @@ onmessage = async (e) => {
 
       case "search": {
         const { query } = e.data;
+        pyroConsole?.search(query);
         break;
       }
     }

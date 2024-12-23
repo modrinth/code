@@ -33,6 +33,7 @@ web-sys = { version = "0.3.76", features = [
 console_log = "1.0.0"
 log = "0.4.22"
 rust-fuzzy-search = "0.1.1"
+fuzzy-search = "0.1.0"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.34"
