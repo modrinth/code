@@ -88,7 +88,7 @@
                   { id: 'disabled', action: () => (filterMethod = 'disabled') },
                 ]"
               >
-                <span class="hidden whitespace-pre text-sm font-medium sm:block">
+                <span class="hidden whitespace-pre sm:block">
                   {{ filterMethodLabel }}
                 </span>
                 <FilterIcon aria-hidden="true" />
@@ -152,18 +152,18 @@
                           ? `/project/${mod.project_id}/version/${mod.version_id}`
                           : `files?path=mods`
                       "
-                      class="group flex min-w-0 items-center rounded-xl p-2"
+                      class="group flex min-w-0 flex-1 items-center rounded-xl p-2"
                     >
                       <div class="flex min-w-0 items-center gap-2">
                         <UiAvatar
                           :src="mod.icon_url"
                           size="sm"
                           alt="Server Icon"
-                          :class="mod.disabled ? 'grayscale' : ''"
+                          :class="mod.disabled ? 'opacity-75 grayscale' : ''"
                         />
-                        <div class="flex min-w-0 flex-col">
-                          <span class="flex min-w-0 items-center gap-2 text-lg font-bold">
-                            <span class="truncate">{{
+                        <div class="flex min-w-0 flex-col gap-1">
+                          <span class="text-md flex min-w-0 items-center gap-2 font-bold">
+                            <span class="truncate text-contrast">{{
                               mod.name || mod.filename.replace(".disabled", "")
                             }}</span>
                             <span
@@ -172,15 +172,20 @@
                               >Disabled</span
                             >
                           </span>
-                          <!-- <span class="min-w-0 text-xs text-secondary">{{
-                            mod.version_number || "External mod"
-                          }}</span> -->
-                          <!-- <span class="min-w-0 text-xs text-secondary">
-                            {{ mod. }}
-                          </span> -->
+                          <span class="min-w-0 text-xs text-secondary">
+                            by <span class="font-semibold">Author</span>
+                          </span>
                         </div>
                       </div>
                     </NuxtLink>
+                    <div class="flex min-w-0 flex-1 flex-col text-sm">
+                      <div class="truncate font-semibold text-contrast">
+                        {{ mod.version_number || "External mod" }}
+                      </div>
+                      <div class="truncate">
+                        {{ mod.filename }}
+                      </div>
+                    </div>
                     <div class="flex items-center gap-2 pr-4 font-semibold text-contrast">
                       <ButtonStyled v-if="mod.project_id" type="transparent">
                         <button
