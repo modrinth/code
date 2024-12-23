@@ -15,12 +15,11 @@
           </div>
         </div>
         <div>
-          <div v-if="props.server.general?.upstream" class="flex items-center gap-2">
+          <div v-if="props.server.general?.upstream" class="flex gap-2">
             <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">
-              Your server was created from a modpack. Changing the mod version may cause unexpected
-              issues. You can update the modpack version in your server's Options > Platform
-              settings.
+              Changing the mod version may cause unexpected issues. Because your server was created
+              from a modpack, it is recommended to use the modpack's version of the mod.
             </span>
           </div>
         </div>
