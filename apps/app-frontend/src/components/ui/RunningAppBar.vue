@@ -1,14 +1,10 @@
 <template>
   <div class="action-groups">
-    <Button
-      v-if="currentLoadingBars.length > 0"
-      ref="infoButton"
-      icon-only
-      class="icon-button show-card-icon"
-      @click="toggleCard()"
-    >
-      <DownloadIcon />
-    </Button>
+    <ButtonStyled v-if="currentLoadingBars.length > 0" color="brand" type="transparent" circular>
+      <button ref="infoButton" @click="toggleCard()">
+        <DownloadIcon />
+      </button>
+    </ButtonStyled>
     <div v-if="offline" class="status">
       <UnplugIcon />
       <div class="running-text">
@@ -40,15 +36,6 @@
       </Button>
       <Button v-tooltip="'View logs'" icon-only class="icon-button" @click="goToTerminal()">
         <TerminalSquareIcon />
-      </Button>
-      <Button
-        v-if="currentLoadingBars.length > 0"
-        ref="infoButton"
-        icon-only
-        class="icon-button show-card-icon"
-        @click="toggleCard()"
-      >
-        <DownloadIcon />
       </Button>
     </div>
     <div v-else class="status">
@@ -111,7 +98,7 @@ import {
   DropdownIcon,
   UnplugIcon,
 } from '@modrinth/assets'
-import { Button, Card } from '@modrinth/ui'
+import { Button, ButtonStyled, Card } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
 import { loading_listener, process_listener } from '@/helpers/events'
@@ -407,10 +394,6 @@ onBeforeUnmount(() => {
     width: 2.25rem;
     height: 2.25rem;
   }
-}
-
-.show-card-icon {
-  color: var(--color-brand);
 }
 
 .download-enter-active,

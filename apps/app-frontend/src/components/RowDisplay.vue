@@ -25,6 +25,7 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { install as installVersion } from '@/store/install.js'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 const router = useRouter()
 
@@ -165,13 +166,7 @@ const handleOptionsClick = async (args) => {
       break
     }
     case 'open_link':
-      window.__TAURI_INVOKE__('tauri', {
-        __tauriModule: 'Shell',
-        message: {
-          cmd: 'open',
-          path: `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
-        },
-      })
+      openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
       break
     case 'copy_link':
       await navigator.clipboard.writeText(

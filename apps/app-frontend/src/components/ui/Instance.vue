@@ -189,11 +189,12 @@ onUnmounted(() => unlisten())
             v-else-if="modLoading || installing"
             v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
             class="animate-spin w-8 h-8"
+            tabindex="-1"
           />
           <ButtonStyled v-else size="large" color="brand" circular>
             <button
               v-tooltip="'Play'"
-              class="transition-all scale-75 group-hover:scale-100 origin-bottom opacity-0 group-hover:opacity-100 card-shadow"
+              class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
               @click="(e) => play(e, 'InstanceCard')"
               @mousehover="checkProcess"
             >

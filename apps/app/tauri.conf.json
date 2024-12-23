@@ -44,7 +44,7 @@
     ]
   },
   "productName": "Modrinth App",
-  "version": "0.9.0-2",
+  "version": "0.9.0",
   "mainBinaryName": "Modrinth App",
   "identifier": "ModrinthApp",
   "plugins": {
@@ -69,7 +69,7 @@
         "width": 1280,
         "minHeight": 700,
         "minWidth": 1100,
-        "visible": false,
+        "visible": true,
         "zoomHotkeysEnabled": false,
         "decorations": false
       }

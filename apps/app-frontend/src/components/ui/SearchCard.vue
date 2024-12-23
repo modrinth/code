@@ -157,13 +157,13 @@ const installing = ref(false)
 async function install() {
   installing.value = true
   await installVersion(
-    props.project.project_id,
+    props.project.project_id ?? props.project.id,
     null,
     props.instance ? props.instance.path : null,
     'SearchCard',
     () => {
       installing.value = false
-      emit('install', props.project.project_id)
+      emit('install', props.project.project_id ?? props.project.id)
     },
   )
 }
