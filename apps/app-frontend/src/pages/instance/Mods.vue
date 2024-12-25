@@ -176,15 +176,18 @@
           </button>
         </ButtonStyled>
         <div v-else class="w-[36px]"></div>
+        <Toggle
+          class="!mx-2"
+          :model-value="!item.data.disabled"
+          :checked="!item.data.disabled"
+          @update:model-value="toggleDisableMod(item.data)"
+        />
         <ButtonStyled type="transparent" circular>
-          <button
-            v-tooltip="item.disabled ? `Enable` : `Disable`"
-            @click="toggleDisableMod(item.data)"
-          >
-            <CheckCircleIcon v-if="item.disabled" />
-            <SlashIcon v-else />
+          <button v-tooltip="'Remove'" @click="removeMod(item)">
+            <TrashIcon />
           </button>
         </ButtonStyled>
+
         <ButtonStyled type="transparent" circular>
           <OverflowMenu
             :options="[
@@ -197,23 +200,12 @@
                 shown: item.data !== undefined && item.data.slug !== undefined,
                 action: () => copyModLink(item),
               },
-              {
-                divider: true,
-              },
-              {
-                id: 'remove',
-                color: 'red',
-                action: () => removeMod(item),
-              },
             ]"
             direction="left"
           >
             <MoreVerticalIcon />
             <template #show-file> <ExternalIcon /> Show file </template>
             <template #copy-link> <ClipboardCopyIcon /> Copy link </template>
-            <template v-if="item.disabled" #toggle> <CheckCircleIcon /> Enable </template>
-            <template v-else #toggle> <SlashIcon /> Disable </template>
-            <template #remove> <TrashIcon /> Remove </template>
           </OverflowMenu>
         </ButtonStyled>
       </template>
@@ -275,7 +267,14 @@ import {
   UpdatedIcon,
   XIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, ContentListPanel, OverflowMenu, Pagination } from '@modrinth/ui'
+import {
+  Button,
+  ButtonStyled,
+  ContentListPanel,
+  OverflowMenu,
+  Pagination,
+  Toggle,
+} from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -462,6 +461,10 @@ const messages = defineMessages({
     id: 'instance.filter.updates-available',
     defaultMessage: 'Updates available',
   },
+  disabledFilter: {
+    id: 'instance.filter.disabled',
+    defaultMessage: 'Disabled projects',
+  },
 })
 
 const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
@@ -488,19 +491,30 @@ const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
     })
   }
 
+  if (projects.value.some((m) => m.disabled)) {
+    options.push({
+      id: 'disabled',
+      formattedName: formatMessage(messages.disabledFilter),
+    })
+  }
+
   return options
 })
 
 const selectedFilters = ref([])
 const filteredProjects = computed(() => {
   const updatesFilter = selectedFilters.value.includes('updates')
+  const disabledFilter = selectedFilters.value.includes('disabled')
 
-  const typeFilters = selectedFilters.value.filter((filter) => filter !== 'updates')
+  const typeFilters = selectedFilters.value.filter(
+    (filter) => filter !== 'updates' && filter !== 'disabled',
+  )
 
   return projects.value.filter((project) => {
     return (
       (typeFilters.length === 0 || typeFilters.includes(project.project_type)) &&
-      (!updatesFilter || project.outdated)
+      (!updatesFilter || project.outdated) &&
+      (!disabledFilter || project.disabled)
     )
   })
 })
