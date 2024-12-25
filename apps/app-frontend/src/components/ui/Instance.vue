@@ -35,10 +35,12 @@ const props = defineProps({
 })
 
 const playing = ref(false)
-
+const loading = ref(false)
 const modLoading = computed(
   () =>
-    currentEvent.value === 'installing' || (currentEvent.value === 'launched' && !playing.value),
+    loading.value ||
+    currentEvent.value === 'installing' ||
+    (currentEvent.value === 'launched' && !playing.value),
 )
 const installing = computed(() => props.instance.install_stage !== 'installed')
 
@@ -56,6 +58,7 @@ const checkProcess = async () => {
 
 const play = async (e, context) => {
   e?.stopPropagation()
+  loading.value = true
   await run(props.instance.path)
     .catch((err) => handleSevereError(err, { profilePath: props.instance.path }))
     .finally(() => {
@@ -65,6 +68,7 @@ const play = async (e, context) => {
         source: context,
       })
     })
+  loading.value = false
 }
 
 const stop = async (e, context) => {
@@ -118,7 +122,7 @@ onUnmounted(() => unlisten())
 <template>
   <template v-if="compact">
     <div
-      class="button-base card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer active:scale-[0.98] transition-transform"
+      class="card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer hover:brightness-90 transition-all"
       @click="seeInstance"
       @mouseenter="checkProcess"
     >
