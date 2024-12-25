@@ -7,7 +7,6 @@ use crate::common::dummy_data::{
 };
 use crate::common::get_json_val_str;
 use actix_http::StatusCode;
-use actix_web::test;
 use common::api_v3::ApiV3;
 use common::asserts::assert_common_version_ids;
 use common::database::USER_USER_PAT;
@@ -19,12 +18,13 @@ use labrinth::models::projects::{
     Dependency, DependencyType, VersionId, VersionStatus, VersionType,
 };
 use labrinth::routes::v3::version_file::FileUpdateData;
+use ntex::web::test;
 use serde_json::json;
 
 // importing common module.
 mod common;
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_get_version() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
@@ -84,7 +84,7 @@ async fn test_get_version() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn version_updates() {
     // Test setup and dummy data
     with_test_environment(
@@ -401,7 +401,7 @@ async fn version_updates() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn test_patch_version() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
@@ -528,7 +528,7 @@ pub async fn test_patch_version() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn test_project_versions() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
@@ -554,7 +554,7 @@ pub async fn test_project_versions() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn can_create_version_with_ordering() {
     with_test_environment(
         None,
@@ -589,7 +589,7 @@ async fn can_create_version_with_ordering() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn edit_version_ordering_works() {
     with_test_environment(
         None,
@@ -619,7 +619,7 @@ async fn edit_version_ordering_works() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn version_ordering_for_specified_orderings_orders_lower_order_first() {
     with_test_environment_all(None, |env| async move {
         let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
@@ -657,7 +657,7 @@ async fn version_ordering_for_specified_orderings_orders_lower_order_first() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn version_ordering_when_unspecified_orders_oldest_first() {
     with_test_environment_all(None, |env| async move {
         let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
@@ -692,7 +692,7 @@ async fn version_ordering_when_unspecified_orders_oldest_first() {
     .await
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn version_ordering_when_specified_orders_specified_before_unspecified() {
     with_test_environment_all(None, |env| async move {
         let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;

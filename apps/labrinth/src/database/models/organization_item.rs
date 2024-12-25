@@ -67,7 +67,7 @@ impl Organization {
         redis: &RedisPool,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         Self::get_many(&[string], exec, redis)
             .await
@@ -80,7 +80,7 @@ impl Organization {
         redis: &RedisPool,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         Self::get_many_ids(&[id], exec, redis)
             .await
@@ -93,7 +93,7 @@ impl Organization {
         redis: &RedisPool,
     ) -> Result<Vec<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         let ids = organization_ids
             .iter()
@@ -105,14 +105,14 @@ impl Organization {
     pub async fn get_many<
         'a,
         E,
-        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug + Send,
     >(
         organization_strings: &[T],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<Self>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         let val = redis
             .get_cached_keys_with_slug(

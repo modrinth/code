@@ -2,11 +2,11 @@ use crate::file_hosting::FileHostingError;
 use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
 use crate::util::env::parse_strings_from_var;
-use actix_cors::Cors;
-use actix_files::Files;
-use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse};
 use futures::FutureExt;
+use ntex::http::StatusCode;
+use ntex::web::{self, HttpRequest, HttpResponse};
+use ntex_cors::Cors;
+use ntex_files::Files;
 
 pub mod internal;
 pub mod v2;
@@ -35,45 +35,42 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
     );
     cfg.service(
         web::scope("analytics")
-            .wrap(
-                Cors::default()
-                    .allowed_origin_fn(|origin, _req_head| {
-                        let allowed_origins =
-                            parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS")
-                                .unwrap_or_default();
+            .wrap({
+                let mut cors = Cors::new();
 
-                        allowed_origins.contains(&"*".to_string())
-                            || allowed_origins.contains(
-                                &origin
-                                    .to_str()
-                                    .unwrap_or_default()
-                                    .to_string(),
-                            )
-                    })
-                    .allowed_methods(vec!["GET", "POST"])
+                for origin in
+                    parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS")
+                        .unwrap_or_default()
+                {
+                    cors = cors.allowed_origin(&*origin);
+                }
+
+                cors.allowed_methods(vec!["GET", "POST"])
                     .allowed_headers(vec![
-                        actix_web::http::header::AUTHORIZATION,
-                        actix_web::http::header::ACCEPT,
-                        actix_web::http::header::CONTENT_TYPE,
+                        ntex::http::header::AUTHORIZATION,
+                        ntex::http::header::ACCEPT,
+                        ntex::http::header::CONTENT_TYPE,
                     ])
-                    .max_age(3600),
-            )
+                    .max_age(3600)
+                    .finish()
+            })
             .service(page_view_ingest)
             .service(playtime_ingest),
     );
-    cfg.service(
-        web::scope("api/v1")
-            .wrap(default_cors())
-            .wrap_fn(|req, _srv| {
-            async {
-                Ok(req.into_response(
-                    HttpResponse::Gone()
-                        .content_type("application/json")
-                        .body(r#"{"error":"api_deprecated","description":"You are using an application that uses an outdated version of Modrinth's API. Please either update it or switch to another application. For developers: https://docs.modrinth.com/api/#versioning"}"#)
-                ))
-            }.boxed_local()
-        })
-    );
+    // TODO: FIX ME
+    // cfg.service(
+    //     web::scope("api/v1")
+    //         .wrap(default_cors())
+    //         .wrap_fn(|req, _srv| {
+    //         async {
+    //             Ok(req.into_response(
+    //                 HttpResponse::Gone()
+    //                     .content_type("application/json")
+    //                     .body(r#"{"error":"api_deprecated","description":"You are using an application that uses an outdated version of Modrinth's API. Please either update it or switch to another application. For developers: https://docs.modrinth.com/api/#versioning"}"#)
+    //             ))
+    //         }.boxed_local()
+    //     })
+    // );
     cfg.service(
         web::scope("")
             .wrap(default_cors())
@@ -177,7 +174,7 @@ impl ApiError {
     }
 }
 
-impl actix_web::ResponseError for ApiError {
+impl ntex::web::WebResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self {
             ApiError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -210,7 +207,7 @@ impl actix_web::ResponseError for ApiError {
         }
     }
 
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(self.as_api_error())
+    fn error_response(&self, _req: &HttpRequest) -> HttpResponse {
+        HttpResponse::build(self.status_code()).json(&self.as_api_error())
     }
 }

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use actix_web::{get, web, HttpRequest, HttpResponse};
+use ntex::web::{self, get, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -15,7 +15,7 @@ use crate::queue::session::AuthQueue;
 
 use super::ApiError;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut ntex::web::ServiceConfig) {
     cfg.service(forge_updates);
 }
 
@@ -32,23 +32,23 @@ fn default_neoforge() -> String {
 #[get("{id}/forge_updates.json")]
 pub async fn forge_updates(
     req: HttpRequest,
-    web::Query(neo): web::Query<NeoForge>,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(neo): web::types::Query<NeoForge>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     const ERROR: &str = "The specified project does not exist!";
 
     let (id,) = info.into_inner();
 
-    let project = database::models::Project::get(&id, &**pool, &redis)
+    let project = database::models::Project::get(&id, &*pool, &redis)
         .await?
         .ok_or_else(|| ApiError::InvalidInput(ERROR.to_string()))?;
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -62,7 +62,7 @@ pub async fn forge_updates(
     }
 
     let versions =
-        database::models::Version::get_many(&project.versions, &**pool, &redis)
+        database::models::Version::get_many(&project.versions, &*pool, &redis)
             .await?;
 
     let loaders = match &*neo.neoforge {
@@ -129,5 +129,5 @@ pub async fn forge_updates(
         }
     }
 
-    Ok(HttpResponse::Ok().json(response))
+    Ok(HttpResponse::Ok().json(&response))
 }

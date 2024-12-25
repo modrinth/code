@@ -11,7 +11,7 @@ use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectId;
 
 // Project version creation scopes
-#[actix_rt::test]
+#[ntex::test]
 pub async fn project_version_create_scopes() {
     with_test_environment(
         None,
@@ -57,7 +57,7 @@ pub async fn project_version_create_scopes() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn project_version_reads_scopes() {
     with_test_environment(
         None,

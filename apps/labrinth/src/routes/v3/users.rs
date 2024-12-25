@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
-use actix_web::{web, HttpRequest, HttpResponse};
 use lazy_static::lazy_static;
+use ntex::web::{self, HttpRequest, HttpResponse};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -46,14 +46,14 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 pub async fn projects_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -62,20 +62,20 @@ pub async fn projects_list(
     .map(|x| x.1)
     .ok();
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        let project_data = User::get_projects(id, &**pool, &redis).await?;
+        let project_data = User::get_projects(id, &*pool, &redis).await?;
 
         let projects: Vec<_> = crate::database::Project::get_many_ids(
             &project_data,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
         let projects =
             filter_visible_projects(projects, &user, &pool, true).await?;
-        Ok(HttpResponse::Ok().json(projects))
+        Ok(HttpResponse::Ok().json(&projects))
     } else {
         Err(ApiError::NotFound)
     }
@@ -83,13 +83,13 @@ pub async fn projects_list(
 
 pub async fn user_auth_get(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (scopes, mut user) = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_READ]),
@@ -104,7 +104,7 @@ pub async fn user_auth_get(
         user.payout_data = None;
     }
 
-    Ok(HttpResponse::Ok().json(user))
+    Ok(HttpResponse::Ok().json(&user))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -113,30 +113,30 @@ pub struct UserIds {
 }
 
 pub async fn users_get(
-    web::Query(ids): web::Query<UserIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    web::types::Query(ids): web::types::Query<UserIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)?;
 
-    let users_data = User::get_many(&user_ids, &**pool, &redis).await?;
+    let users_data = User::get_many(&user_ids, &*pool, &redis).await?;
 
     let users: Vec<crate::models::users::User> =
         users_data.into_iter().map(From::from).collect();
 
-    Ok(HttpResponse::Ok().json(users))
+    Ok(HttpResponse::Ok().json(&users))
 }
 
 pub async fn user_get(
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_data = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let user_data = User::get(&info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(data) = user_data {
         let response: crate::models::users::User = data.into();
-        Ok(HttpResponse::Ok().json(response))
+        Ok(HttpResponse::Ok().json(&response))
     } else {
         Err(ApiError::NotFound)
     }
@@ -144,14 +144,14 @@ pub async fn user_get(
 
 pub async fn collections_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_READ]),
@@ -160,7 +160,7 @@ pub async fn collections_list(
     .map(|x| x.1)
     .ok();
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         let user_id: UserId = id.into();
@@ -169,11 +169,11 @@ pub async fn collections_list(
             .map(|y| y.role.is_mod() || y.id == user_id)
             .unwrap_or(false);
 
-        let project_data = User::get_collections(id, &**pool).await?;
+        let project_data = User::get_collections(id, &*pool).await?;
 
         let response: Vec<_> = crate::database::models::Collection::get_many(
             &project_data,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?
@@ -184,7 +184,7 @@ pub async fn collections_list(
         .map(Collection::from)
         .collect();
 
-        Ok(HttpResponse::Ok().json(response))
+        Ok(HttpResponse::Ok().json(&response))
     } else {
         Err(ApiError::NotFound)
     }
@@ -192,14 +192,14 @@ pub async fn collections_list(
 
 pub async fn orgs_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -208,14 +208,14 @@ pub async fn orgs_list(
     .map(|x| x.1)
     .ok();
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        let org_data = User::get_organizations(id, &**pool).await?;
+        let org_data = User::get_organizations(id, &*pool).await?;
 
         let organizations_data =
             crate::database::models::organization_item::Organization::get_many_ids(
-                &org_data, &**pool, &redis,
+                &org_data, &*pool, &redis,
             )
             .await?;
 
@@ -226,12 +226,12 @@ pub async fn orgs_list(
 
         let teams_data =
             crate::database::models::TeamMember::get_from_team_full_many(
-                &team_ids, &**pool, &redis,
+                &team_ids, &*pool, &redis,
             )
             .await?;
         let users = User::get_many_ids(
             &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
@@ -275,7 +275,7 @@ pub async fn orgs_list(
             organizations.push(organization);
         }
 
-        Ok(HttpResponse::Ok().json(organizations))
+        Ok(HttpResponse::Ok().json(&organizations))
     } else {
         Err(ApiError::NotFound)
     }
@@ -305,15 +305,15 @@ pub struct EditUser {
 
 pub async fn user_edit(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    new_user: web::Json<EditUser>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    new_user: web::types::Json<EditUser>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (scopes, user) = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_WRITE]),
@@ -324,7 +324,7 @@ pub async fn user_edit(
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(actual_user) = id_option {
         let id = actual_user.id;
@@ -335,7 +335,7 @@ pub async fn user_edit(
 
             if let Some(username) = &new_user.username {
                 let existing_user_id_option =
-                    User::get(username, &**pool, &redis).await?;
+                    User::get(username, &*pool, &redis).await?;
 
                 if existing_user_id_option
                     .map(|x| UserId::from(x.id))
@@ -474,25 +474,25 @@ pub struct Extension {
 
 #[allow(clippy::too_many_arguments)]
 pub async fn user_icon_edit(
-    web::Query(ext): web::Query<Extension>,
+    web::types::Query(ext): web::types::Query<Extension>,
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    mut payload: web::Payload,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    mut payload: web::types::Payload,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_WRITE]),
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(actual_user) = id_option {
         if user.id != actual_user.id.into() && !user.role.is_mod() {
@@ -505,7 +505,7 @@ pub async fn user_icon_edit(
         delete_old_images(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
-            &***file_host,
+            &**file_host,
         )
         .await?;
 
@@ -523,7 +523,7 @@ pub async fn user_icon_edit(
             &ext.ext,
             Some(96),
             Some(1.0),
-            &***file_host,
+            &**file_host,
         )
         .await?;
 
@@ -537,7 +537,7 @@ pub async fn user_icon_edit(
             upload_result.raw_url,
             actual_user.id as crate::database::models::ids::UserId,
         )
-        .execute(&**pool)
+        .execute(&*pool)
         .await?;
         User::clear_caches(&[(actual_user.id, None)], &redis).await?;
 
@@ -549,21 +549,21 @@ pub async fn user_icon_edit(
 
 pub async fn user_delete(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_DELETE]),
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
@@ -590,21 +590,21 @@ pub async fn user_delete(
 
 pub async fn user_follows(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_READ]),
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
@@ -613,10 +613,10 @@ pub async fn user_follows(
             ));
         }
 
-        let project_ids = User::get_follows(id, &**pool).await?;
+        let project_ids = User::get_follows(id, &*pool).await?;
         let projects: Vec<_> = crate::database::Project::get_many_ids(
             &project_ids,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?
@@ -624,7 +624,7 @@ pub async fn user_follows(
         .map(Project::from)
         .collect();
 
-        Ok(HttpResponse::Ok().json(projects))
+        Ok(HttpResponse::Ok().json(&projects))
     } else {
         Err(ApiError::NotFound)
     }
@@ -632,21 +632,21 @@ pub async fn user_follows(
 
 pub async fn user_notifications(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::NOTIFICATION_READ]),
     )
     .await?
     .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
@@ -657,7 +657,7 @@ pub async fn user_notifications(
 
         let mut notifications: Vec<Notification> =
             crate::database::models::notification_item::Notification::get_many_user(
-                id, &**pool, &redis,
+                id, &*pool, &redis,
             )
             .await?
             .into_iter()
@@ -665,7 +665,7 @@ pub async fn user_notifications(
             .collect();
 
         notifications.sort_by(|a, b| b.created.cmp(&a.created));
-        Ok(HttpResponse::Ok().json(notifications))
+        Ok(HttpResponse::Ok().json(&notifications))
     } else {
         Err(ApiError::NotFound)
     }

@@ -16,7 +16,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_payload;
-use actix_web::{web, HttpRequest, HttpResponse};
+use ntex::web::{self, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -41,12 +41,12 @@ pub struct ImageUpload {
 
 pub async fn images_add(
     req: HttpRequest,
-    web::Query(data): web::Query<ImageUpload>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    mut payload: web::Payload,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(data): web::types::Query<ImageUpload>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    mut payload: web::types::Payload,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let mut context = ImageContext::from_str(&data.context, None);
 
@@ -54,7 +54,7 @@ pub async fn images_add(
 
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&scopes),
@@ -68,7 +68,7 @@ pub async fn images_add(
         ImageContext::Project { project_id } => {
             if let Some(id) = data.project_id {
                 let project =
-                    project_item::Project::get(&id, &**pool, &redis).await?;
+                    project_item::Project::get(&id, &*pool, &redis).await?;
                 if let Some(project) = project {
                     if is_team_member_project(
                         &project.inner,
@@ -93,7 +93,7 @@ pub async fn images_add(
         ImageContext::Version { version_id } => {
             if let Some(id) = data.version_id {
                 let version =
-                    version_item::Version::get(id.into(), &**pool, &redis)
+                    version_item::Version::get(id.into(), &*pool, &redis)
                         .await?;
                 if let Some(version) = version {
                     if is_team_member_version(
@@ -120,15 +120,14 @@ pub async fn images_add(
         ImageContext::ThreadMessage { thread_message_id } => {
             if let Some(id) = data.thread_message_id {
                 let thread_message =
-                    thread_item::ThreadMessage::get(id.into(), &**pool)
+                    thread_item::ThreadMessage::get(id.into(), &*pool)
                         .await?
                         .ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "The thread message could not found."
-                                    .to_string(),
-                            )
-                        })?;
-                let thread = thread_item::Thread::get(thread_message.thread_id, &**pool)
+                        ApiError::InvalidInput(
+                            "The thread message could not found.".to_string(),
+                        )
+                    })?;
+                let thread = thread_item::Thread::get(thread_message.thread_id, &*pool)
                     .await?
                     .ok_or_else(|| {
                         ApiError::InvalidInput(
@@ -148,14 +147,14 @@ pub async fn images_add(
         }
         ImageContext::Report { report_id } => {
             if let Some(id) = data.report_id {
-                let report = report_item::Report::get(id.into(), &**pool)
+                let report = report_item::Report::get(id.into(), &*pool)
                     .await?
                     .ok_or_else(|| {
                         ApiError::InvalidInput(
                             "The report could not be found.".to_string(),
                         )
                     })?;
-                let thread = thread_item::Thread::get(report.thread_id, &**pool)
+                let thread = thread_item::Thread::get(report.thread_id, &*pool)
                     .await?
                     .ok_or_else(|| {
                         ApiError::InvalidInput(
@@ -193,7 +192,7 @@ pub async fn images_add(
         &data.ext,
         None,
         None,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -255,5 +254,5 @@ pub async fn images_add(
 
     transaction.commit().await?;
 
-    Ok(HttpResponse::Ok().json(image))
+    Ok(HttpResponse::Ok().json(&image))
 }

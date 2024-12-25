@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::{models::ids::ProjectId, routes::ApiError};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -25,7 +23,7 @@ pub async fn fetch_playtimes(
     start_date: DateTime<Utc>,
     end_date: DateTime<Utc>,
     resolution_minute: u32,
-    client: Arc<clickhouse::Client>,
+    client: &clickhouse::Client,
 ) -> Result<Vec<ReturnIntervals>, ApiError> {
     let query = client
         .query(
@@ -56,7 +54,7 @@ pub async fn fetch_views(
     start_date: DateTime<Utc>,
     end_date: DateTime<Utc>,
     resolution_minutes: u32,
-    client: Arc<clickhouse::Client>,
+    client: &clickhouse::Client,
 ) -> Result<Vec<ReturnIntervals>, ApiError> {
     let query = client
         .query(
@@ -86,7 +84,7 @@ pub async fn fetch_downloads(
     start_date: DateTime<Utc>,
     end_date: DateTime<Utc>,
     resolution_minutes: u32,
-    client: Arc<clickhouse::Client>,
+    client: &clickhouse::Client,
 ) -> Result<Vec<ReturnIntervals>, ApiError> {
     let query = client
         .query(
@@ -113,7 +111,7 @@ pub async fn fetch_countries_downloads(
     projects: Vec<ProjectId>,
     start_date: DateTime<Utc>,
     end_date: DateTime<Utc>,
-    client: Arc<clickhouse::Client>,
+    client: &clickhouse::Client,
 ) -> Result<Vec<ReturnCountry>, ApiError> {
     let query = client
         .query(
@@ -140,7 +138,7 @@ pub async fn fetch_countries_views(
     projects: Vec<ProjectId>,
     start_date: DateTime<Utc>,
     end_date: DateTime<Utc>,
-    client: Arc<clickhouse::Client>,
+    client: &clickhouse::Client,
 ) -> Result<Vec<ReturnCountry>, ApiError> {
     let query = client
         .query(

@@ -6,7 +6,7 @@ use crate::models::users::UserId;
 use crate::models::v2::teams::LegacyTeamMember;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use ntex::web::{self, delete, get, patch, post, HttpRequest, HttpResponse};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -33,10 +33,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[get("{id}/members")]
 pub async fn team_members_get_project(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::teams::team_members_get_project(
         req,
@@ -54,7 +54,7 @@ pub async fn team_members_get_project(
                 .into_iter()
                 .map(LegacyTeamMember::from)
                 .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(members))
+            Ok(HttpResponse::Ok().json(&members))
         }
         Err(response) => Ok(response),
     }
@@ -64,10 +64,10 @@ pub async fn team_members_get_project(
 #[get("{id}/members")]
 pub async fn team_members_get(
     req: HttpRequest,
-    info: web::Path<(TeamId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response =
         v3::teams::team_members_get(req, info, pool, redis, session_queue)
@@ -80,7 +80,7 @@ pub async fn team_members_get(
                 .into_iter()
                 .map(LegacyTeamMember::from)
                 .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(members))
+            Ok(HttpResponse::Ok().json(&members))
         }
         Err(response) => Ok(response),
     }
@@ -94,14 +94,14 @@ pub struct TeamIds {
 #[get("teams")]
 pub async fn teams_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<TeamIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<TeamIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::teams::teams_get(
         req,
-        web::Query(v3::teams::TeamIds { ids: ids.ids }),
+        web::types::Query(v3::teams::TeamIds { ids: ids.ids }),
         pool,
         redis,
         session_queue,
@@ -120,7 +120,7 @@ pub async fn teams_get(
                         .collect::<Vec<_>>()
                 })
                 .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(members))
+            Ok(HttpResponse::Ok().json(&members))
         }
         Err(response) => Ok(response),
     }
@@ -129,10 +129,10 @@ pub async fn teams_get(
 #[post("{id}/join")]
 pub async fn join_team(
     req: HttpRequest,
-    info: web::Path<(TeamId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::teams::join_team(req, info, pool, redis, session_queue)
@@ -167,18 +167,18 @@ pub struct NewTeamMember {
 #[post("{id}/members")]
 pub async fn add_team_member(
     req: HttpRequest,
-    info: web::Path<(TeamId,)>,
-    pool: web::Data<PgPool>,
-    new_member: web::Json<NewTeamMember>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId,)>,
+    pool: web::types::State<PgPool>,
+    new_member: web::types::Json<NewTeamMember>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::teams::add_team_member(
         req,
         info,
         pool,
-        web::Json(v3::teams::NewTeamMember {
+        web::types::Json(v3::teams::NewTeamMember {
             user_id: new_member.user_id,
             role: new_member.role.clone(),
             permissions: new_member.permissions,
@@ -205,18 +205,18 @@ pub struct EditTeamMember {
 #[patch("{id}/members/{user_id}")]
 pub async fn edit_team_member(
     req: HttpRequest,
-    info: web::Path<(TeamId, UserId)>,
-    pool: web::Data<PgPool>,
-    edit_member: web::Json<EditTeamMember>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId, UserId)>,
+    pool: web::types::State<PgPool>,
+    edit_member: web::types::Json<EditTeamMember>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::teams::edit_team_member(
         req,
         info,
         pool,
-        web::Json(v3::teams::EditTeamMember {
+        web::types::Json(v3::teams::EditTeamMember {
             permissions: edit_member.permissions,
             organization_permissions: edit_member.organization_permissions,
             role: edit_member.role.clone(),
@@ -238,18 +238,18 @@ pub struct TransferOwnership {
 #[patch("{id}/owner")]
 pub async fn transfer_ownership(
     req: HttpRequest,
-    info: web::Path<(TeamId,)>,
-    pool: web::Data<PgPool>,
-    new_owner: web::Json<TransferOwnership>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId,)>,
+    pool: web::types::State<PgPool>,
+    new_owner: web::types::Json<TransferOwnership>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::teams::transfer_ownership(
         req,
         info,
         pool,
-        web::Json(v3::teams::TransferOwnership {
+        web::types::Json(v3::teams::TransferOwnership {
             user_id: new_owner.user_id,
         }),
         redis,
@@ -262,10 +262,10 @@ pub async fn transfer_ownership(
 #[delete("{id}/members/{user_id}")]
 pub async fn remove_team_member(
     req: HttpRequest,
-    info: web::Path<(TeamId, UserId)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId, UserId)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::teams::remove_team_member(req, info, pool, redis, session_queue)

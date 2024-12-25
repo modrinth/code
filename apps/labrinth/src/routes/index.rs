@@ -1,4 +1,4 @@
-use actix_web::{get, HttpResponse};
+use ntex::web::{get, HttpResponse};
 use serde_json::json;
 
 #[get("/")]
@@ -10,5 +10,5 @@ pub async fn index_get() -> HttpResponse {
         "about": "Welcome traveler!"
     });
 
-    HttpResponse::Ok().json(data)
+    HttpResponse::Ok().json(&data)
 }

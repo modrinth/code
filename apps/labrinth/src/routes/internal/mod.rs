@@ -12,9 +12,9 @@ use super::v3::oauth_clients;
 pub use super::ApiError;
 use crate::util::cors::default_cors;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn config(cfg: &mut ntex::web::ServiceConfig) {
     cfg.service(
-        actix_web::web::scope("_internal")
+        ntex::web::scope("_internal")
             .wrap(default_cors())
             .configure(admin::config)
             .configure(oauth_clients::config)
@@ -23,7 +23,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(pats::config)
             .configure(moderation::config)
             .configure(billing::config)
-            .configure(gdpr::config)
-            .configure(statuses::config),
+            .configure(gdpr::config), // .configure(statuses::config),
     );
 }

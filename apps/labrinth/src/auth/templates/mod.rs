@@ -1,6 +1,6 @@
 use crate::auth::AuthenticationError;
-use actix_web::http::StatusCode;
-use actix_web::{HttpResponse, ResponseError};
+use ntex::http::StatusCode;
+use ntex::web::{HttpRequest, HttpResponse, WebResponseError};
 use std::fmt::{Debug, Display, Formatter};
 
 pub struct Success<'a> {
@@ -13,7 +13,7 @@ impl Success<'_> {
         let html = include_str!("success.html");
 
         HttpResponse::Ok()
-            .append_header(("Content-Type", "text/html; charset=utf-8"))
+            .header("Content-Type", "text/html; charset=utf-8")
             .body(
                 html.replace("{{ icon }}", self.icon)
                     .replace("{{ name }}", self.name),
@@ -41,17 +41,17 @@ impl Display for ErrorPage {
 impl ErrorPage {
     pub fn render(&self) -> HttpResponse {
         HttpResponse::Ok()
-            .append_header(("Content-Type", "text/html; charset=utf-8"))
+            .header("Content-Type", "text/html; charset=utf-8")
             .body(self.to_string())
     }
 }
 
-impl actix_web::ResponseError for ErrorPage {
+impl WebResponseError for ErrorPage {
     fn status_code(&self) -> StatusCode {
         self.code
     }
 
-    fn error_response(&self) -> HttpResponse {
+    fn error_response(&self, _req: &HttpRequest) -> HttpResponse {
         self.render()
     }
 }

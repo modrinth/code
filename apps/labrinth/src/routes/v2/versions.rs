@@ -11,21 +11,21 @@ use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchConfig;
-use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
+use ntex::web::{self, delete, get, patch, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(versions_get);
-    cfg.service(super::version_creation::version_create);
+    // TODO: fix me
+    // cfg.service(super::version_creation::version_create);
 
     cfg.service(
         web::scope("version")
             .service(version_get)
             .service(version_delete)
-            .service(version_edit)
-            .service(super::version_creation::upload_file_to_version),
+            .service(version_edit), // .service(super::version_creation::upload_file_to_version),
     );
 }
 
@@ -42,11 +42,11 @@ pub struct VersionListFilters {
 #[get("version")]
 pub async fn version_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    web::Query(filters): web::Query<VersionListFilters>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    web::types::Query(filters): web::types::Query<VersionListFilters>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let loaders = if let Some(loaders) = filters.loaders {
         if let Ok(mut loaders) = serde_json::from_str::<Vec<String>>(&loaders) {
@@ -100,7 +100,7 @@ pub async fn version_list(
     let response = v3::versions::version_list(
         req,
         info,
-        web::Query(filters),
+        web::types::Query(filters),
         pool,
         redis,
         session_queue,
@@ -115,7 +115,7 @@ pub async fn version_list(
                 .into_iter()
                 .map(LegacyVersion::from)
                 .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(v2_versions))
+            Ok(HttpResponse::Ok().json(&v2_versions))
         }
         Err(response) => Ok(response),
     }
@@ -125,10 +125,10 @@ pub async fn version_list(
 #[get("version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
-    info: web::Path<(String, String)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String, String)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner();
     let response = v3::versions::version_project_get_helper(
@@ -144,7 +144,7 @@ pub async fn version_project_get(
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
             let v2_version = LegacyVersion::from(version);
-            Ok(HttpResponse::Ok().json(v2_version))
+            Ok(HttpResponse::Ok().json(&v2_version))
         }
         Err(response) => Ok(response),
     }
@@ -158,15 +158,15 @@ pub struct VersionIds {
 #[get("versions")]
 pub async fn versions_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<VersionIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<VersionIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = v3::versions::VersionIds { ids: ids.ids };
     let response = v3::versions::versions_get(
         req,
-        web::Query(ids),
+        web::types::Query(ids),
         pool,
         redis,
         session_queue,
@@ -181,7 +181,7 @@ pub async fn versions_get(
                 .into_iter()
                 .map(LegacyVersion::from)
                 .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(v2_versions))
+            Ok(HttpResponse::Ok().json(&v2_versions))
         }
         Err(response) => Ok(response),
     }
@@ -190,10 +190,10 @@ pub async fn versions_get(
 #[get("{version_id}")]
 pub async fn version_get(
     req: HttpRequest,
-    info: web::Path<(models::ids::VersionId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(models::ids::VersionId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
     let response =
@@ -204,7 +204,7 @@ pub async fn version_get(
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
             let v2_version = LegacyVersion::from(version);
-            Ok(HttpResponse::Ok().json(v2_version))
+            Ok(HttpResponse::Ok().json(&v2_version))
         }
         Err(response) => Ok(response),
     }
@@ -248,11 +248,11 @@ pub struct EditVersionFileType {
 #[patch("{id}")]
 pub async fn version_edit(
     req: HttpRequest,
-    info: web::Path<(VersionId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    new_version: web::Json<EditVersion>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(VersionId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    new_version: web::types::Json<EditVersion>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let new_version = new_version.into_inner();
 
@@ -322,7 +322,7 @@ pub async fn version_edit(
         info,
         pool,
         redis,
-        web::Json(serde_json::to_value(new_version)?),
+        web::types::Json(serde_json::to_value(new_version)?),
         session_queue,
     )
     .await
@@ -333,11 +333,11 @@ pub async fn version_edit(
 #[delete("{version_id}")]
 pub async fn version_delete(
     req: HttpRequest,
-    info: web::Path<(VersionId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    search_config: web::Data<SearchConfig>,
+    info: web::types::Path<(VersionId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    search_config: web::types::State<SearchConfig>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::versions::version_delete(

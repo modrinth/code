@@ -9,7 +9,8 @@ use crate::models::projects::{ProjectId, VersionId};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::{auth::get_user_from_headers, database};
-use actix_web::{get, route, web, HttpRequest, HttpResponse};
+use ntex::web;
+use ntex::web::{get, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 use std::collections::HashSet;
 use yaserde_derive::YaSerialize;
@@ -18,7 +19,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(maven_metadata);
     cfg.service(version_file_sha512);
     cfg.service(version_file_sha1);
-    cfg.service(version_file);
+    // cfg.service(version_file);
 }
 
 #[derive(Default, Debug, Clone, YaSerialize)]
@@ -69,21 +70,21 @@ pub struct MavenPom {
 #[get("maven/modrinth/{id}/maven-metadata.xml")]
 pub async fn maven_metadata(
     req: HttpRequest,
-    params: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    params: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let project_id = params.into_inner().0;
     let Some(project) =
-        database::models::Project::get(&project_id, &**pool, &redis).await?
+        database::models::Project::get(&project_id, &*pool, &redis).await?
     else {
         return Err(ApiError::NotFound);
     };
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -109,7 +110,7 @@ pub async fn maven_metadata(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_all(&**pool)
+    .fetch_all(&*pool)
     .await?;
 
     let mut new_versions = Vec::new();
@@ -268,28 +269,29 @@ fn find_file<'a>(
     None
 }
 
-#[route(
-    "maven/modrinth/{id}/{versionnum}/{file}",
-    method = "GET",
-    method = "HEAD"
-)]
+// TODO: fix me
+// #[route(
+//     "maven/modrinth/{id}/{versionnum}/{file}",
+//     method = "GET",
+//     method = "HEAD"
+// )]
 pub async fn version_file(
     req: HttpRequest,
-    params: web::Path<(String, String, String)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    params: web::types::Path<(String, String, String)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
-        database::models::Project::get(&project_id, &**pool, &redis).await?
+        database::models::Project::get(&project_id, &*pool, &redis).await?
     else {
         return Err(ApiError::NotFound);
     };
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -331,7 +333,7 @@ pub async fn version_file(
         find_file(&project_id, &vnum, &version, &file)
     {
         return Ok(HttpResponse::TemporaryRedirect()
-            .append_header(("location", &*selected_file.url))
+            .header("location", &*selected_file.url)
             .body(""));
     }
 
@@ -341,21 +343,21 @@ pub async fn version_file(
 #[get("maven/modrinth/{id}/{versionnum}/{file}.sha1")]
 pub async fn version_file_sha1(
     req: HttpRequest,
-    params: web::Path<(String, String, String)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    params: web::types::Path<(String, String, String)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
-        database::models::Project::get(&project_id, &**pool, &redis).await?
+        database::models::Project::get(&project_id, &*pool, &redis).await?
     else {
         return Err(ApiError::NotFound);
     };
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -386,21 +388,21 @@ pub async fn version_file_sha1(
 #[get("maven/modrinth/{id}/{versionnum}/{file}.sha512")]
 pub async fn version_file_sha512(
     req: HttpRequest,
-    params: web::Path<(String, String, String)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    params: web::types::Path<(String, String, String)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
-        database::models::Project::get(&project_id, &**pool, &redis).await?
+        database::models::Project::get(&project_id, &*pool, &redis).await?
     else {
         return Err(ApiError::NotFound);
     };
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),

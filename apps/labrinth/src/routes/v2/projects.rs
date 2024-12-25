@@ -14,7 +14,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{v2_reroute, v3, ApiError};
 use crate::search::{search_for_project, SearchConfig, SearchError};
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use ntex::web::{self, delete, get, patch, post, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -52,8 +52,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 #[get("search")]
 pub async fn project_search(
-    web::Query(info): web::Query<SearchRequest>,
-    config: web::Data<SearchConfig>,
+    web::types::Query(info): web::types::Query<SearchRequest>,
+    config: web::types::State<SearchConfig>,
 ) -> Result<HttpResponse, SearchError> {
     // Search now uses loader_fields instead of explicit 'client_side' and 'server_side' fields
     // While the backend for this has changed, it doesnt affect much
@@ -108,7 +108,7 @@ pub async fn project_search(
 
     let results = LegacySearchResults::from(results);
 
-    Ok(HttpResponse::Ok().json(results))
+    Ok(HttpResponse::Ok().json(&results))
 }
 
 /// Parses a facet into a key, operator, and value
@@ -153,14 +153,14 @@ pub struct RandomProjects {
 
 #[get("projects_random")]
 pub async fn random_projects_get(
-    web::Query(count): web::Query<RandomProjects>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    web::types::Query(count): web::types::Query<RandomProjects>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let count = v3::projects::RandomProjects { count: count.count };
 
     let response = v3::projects::random_projects_get(
-        web::Query(count),
+        web::types::Query(count),
         pool.clone(),
         redis.clone(),
     )
@@ -171,8 +171,8 @@ pub async fn random_projects_get(
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
-            Ok(HttpResponse::Ok().json(legacy_projects))
+                LegacyProject::from_many(project, &*pool, &redis).await?;
+            Ok(HttpResponse::Ok().json(&legacy_projects))
         }
         Err(response) => Ok(response),
     }
@@ -181,15 +181,15 @@ pub async fn random_projects_get(
 #[get("projects")]
 pub async fn projects_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<ProjectIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<ProjectIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Call V3 project creation
     let response = v3::projects::projects_get(
         req,
-        web::Query(ids),
+        web::types::Query(ids),
         pool.clone(),
         redis.clone(),
         session_queue,
@@ -202,8 +202,8 @@ pub async fn projects_get(
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
-            Ok(HttpResponse::Ok().json(legacy_projects))
+                LegacyProject::from_many(project, &*pool, &redis).await?;
+            Ok(HttpResponse::Ok().json(&legacy_projects))
         }
         Err(response) => Ok(response),
     }
@@ -212,10 +212,10 @@ pub async fn projects_get(
 #[get("{id}")]
 pub async fn project_get(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Convert V2 data to V3 data
     // Call V3 project creation
@@ -234,13 +234,13 @@ pub async fn project_get(
         Ok(project) => {
             let version_item = match project.versions.first() {
                 Some(vid) => {
-                    version_item::Version::get((*vid).into(), &**pool, &redis)
+                    version_item::Version::get((*vid).into(), &*pool, &redis)
                         .await?
                 }
                 None => None,
             };
             let project = LegacyProject::from(project, version_item);
-            Ok(HttpResponse::Ok().json(project))
+            Ok(HttpResponse::Ok().json(&project))
         }
         Err(response) => Ok(response),
     }
@@ -249,9 +249,9 @@ pub async fn project_get(
 //checks the validity of a project id or slug
 #[get("{id}/check")]
 pub async fn project_get_check(
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns an id only, do not need to convert
     v3::projects::project_get_check(info, pool, redis)
@@ -268,10 +268,10 @@ struct DependencyInfo {
 #[get("dependencies")]
 pub async fn dependency_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // TODO: tests, probably
     let response = v3::projects::dependency_list(
@@ -292,7 +292,7 @@ pub async fn dependency_list(
         Ok(dependency_info) => {
             let converted_projects = LegacyProject::from_many(
                 dependency_info.projects,
-                &**pool,
+                &*pool,
                 &redis,
             )
             .await?;
@@ -302,7 +302,7 @@ pub async fn dependency_list(
                 .map(LegacyVersion::from)
                 .collect();
 
-            Ok(HttpResponse::Ok().json(DependencyInfo {
+            Ok(HttpResponse::Ok().json(&DependencyInfo {
                 projects: converted_projects,
                 versions: converted_versions,
             }))
@@ -414,13 +414,13 @@ pub struct EditProject {
 #[allow(clippy::too_many_arguments)]
 pub async fn project_edit(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
-    new_project: web::Json<EditProject>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    search_config: web::types::State<SearchConfig>,
+    new_project: web::types::Json<EditProject>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    moderation_queue: web::types::State<AutomatedModerationQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let v2_new_project = new_project.into_inner();
     let client_side = v2_new_project.client_side;
@@ -474,7 +474,7 @@ pub async fn project_edit(
     if let Some(donation_urls) = v2_new_project.donation_urls {
         // Fetch current donation links from project so we know what to delete
         let fetched_example_project =
-            project_item::Project::get(&info.0, &**pool, &redis).await?;
+            project_item::Project::get(&info.0, &*pool, &redis).await?;
         let donation_links = fetched_example_project
             .map(|x| {
                 x.urls
@@ -525,7 +525,7 @@ pub async fn project_edit(
         info,
         pool.clone(),
         search_config,
-        web::Json(new_project),
+        web::types::Json(new_project),
         redis.clone(),
         session_queue.clone(),
         moderation_queue,
@@ -540,13 +540,13 @@ pub async fn project_edit(
     {
         let project_item = project_item::Project::get(
             &new_slug.unwrap_or(project_id),
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
         let version_ids = project_item.map(|x| x.versions).unwrap_or_default();
         let versions =
-            version_item::Version::get_many(&version_ids, &**pool, &redis)
+            version_item::Version::get_many(&version_ids, &*pool, &redis)
                 .await?;
         for version in versions {
             let version = Version::from(version);
@@ -643,11 +643,11 @@ pub struct BulkEditProject {
 #[patch("projects")]
 pub async fn projects_edit(
     req: HttpRequest,
-    web::Query(ids): web::Query<ProjectIds>,
-    pool: web::Data<PgPool>,
-    bulk_edit_project: web::Json<BulkEditProject>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<ProjectIds>,
+    pool: web::types::State<PgPool>,
+    bulk_edit_project: web::types::Json<BulkEditProject>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let bulk_edit_project = bulk_edit_project.into_inner();
 
@@ -656,7 +656,7 @@ pub async fn projects_edit(
     // If we are *setting* donation links, we will set every possible donation link to None, as
     // setting will delete all of them then 're-add' the ones we want to keep
     if let Some(donation_url) = bulk_edit_project.donation_urls {
-        let link_platforms = LinkPlatform::list(&**pool, &redis).await?;
+        let link_platforms = LinkPlatform::list(&*pool, &redis).await?;
         for link in link_platforms {
             if link.donation {
                 link_urls.insert(link.name, None);
@@ -717,9 +717,9 @@ pub async fn projects_edit(
     // This returns NoContent or failure so we don't need to do anything with it
     v3::projects::projects_edit(
         req,
-        web::Query(ids),
+        web::types::Query(ids),
         pool.clone(),
-        web::Json(v3::projects::BulkEditProject {
+        web::types::Json(v3::projects::BulkEditProject {
             categories: bulk_edit_project.categories,
             add_categories: bulk_edit_project.add_categories,
             remove_categories: bulk_edit_project.remove_categories,
@@ -745,18 +745,18 @@ pub struct Extension {
 #[patch("{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn project_icon_edit(
-    web::Query(ext): web::Query<Extension>,
+    web::types::Query(ext): web::types::Query<Extension>,
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    payload: web::Payload,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    payload: web::types::Payload,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::project_icon_edit(
-        web::Query(v3::projects::Extension { ext: ext.ext }),
+        web::types::Query(v3::projects::Extension { ext: ext.ext }),
         req,
         info,
         pool,
@@ -772,11 +772,11 @@ pub async fn project_icon_edit(
 #[delete("{id}/icon")]
 pub async fn delete_project_icon(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::delete_project_icon(
@@ -804,21 +804,21 @@ pub struct GalleryCreateQuery {
 #[post("{id}/gallery")]
 #[allow(clippy::too_many_arguments)]
 pub async fn add_gallery_item(
-    web::Query(ext): web::Query<Extension>,
+    web::types::Query(ext): web::types::Query<Extension>,
     req: HttpRequest,
-    web::Query(item): web::Query<GalleryCreateQuery>,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    payload: web::Payload,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(item): web::types::Query<GalleryCreateQuery>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    payload: web::types::Payload,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::add_gallery_item(
-        web::Query(v3::projects::Extension { ext: ext.ext }),
+        web::types::Query(v3::projects::Extension { ext: ext.ext }),
         req,
-        web::Query(v3::projects::GalleryCreateQuery {
+        web::types::Query(v3::projects::GalleryCreateQuery {
             featured: item.featured,
             name: item.title,
             description: item.description,
@@ -860,15 +860,15 @@ pub struct GalleryEditQuery {
 #[patch("{id}/gallery")]
 pub async fn edit_gallery_item(
     req: HttpRequest,
-    web::Query(item): web::Query<GalleryEditQuery>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(item): web::types::Query<GalleryEditQuery>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::edit_gallery_item(
         req,
-        web::Query(v3::projects::GalleryEditQuery {
+        web::types::Query(v3::projects::GalleryEditQuery {
             url: item.url,
             featured: item.featured,
             name: item.title,
@@ -891,16 +891,16 @@ pub struct GalleryDeleteQuery {
 #[delete("{id}/gallery")]
 pub async fn delete_gallery_item(
     req: HttpRequest,
-    web::Query(item): web::Query<GalleryDeleteQuery>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(item): web::types::Query<GalleryDeleteQuery>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::delete_gallery_item(
         req,
-        web::Query(v3::projects::GalleryDeleteQuery { url: item.url }),
+        web::types::Query(v3::projects::GalleryDeleteQuery { url: item.url }),
         pool,
         redis,
         file_host,
@@ -913,11 +913,11 @@ pub async fn delete_gallery_item(
 #[delete("{id}")]
 pub async fn project_delete(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    search_config: web::types::State<SearchConfig>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::project_delete(
@@ -935,10 +935,10 @@ pub async fn project_delete(
 #[post("{id}/follow")]
 pub async fn project_follow(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::project_follow(req, info, pool, redis, session_queue)
@@ -949,10 +949,10 @@ pub async fn project_follow(
 #[delete("{id}/follow")]
 pub async fn project_unfollow(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::projects::project_unfollow(req, info, pool, redis, session_queue)

@@ -103,7 +103,7 @@ impl User {
         redis: &RedisPool,
     ) -> Result<Option<User>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         User::get_many(&[string], executor, redis)
             .await
@@ -116,7 +116,7 @@ impl User {
         redis: &RedisPool,
     ) -> Result<Option<User>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         User::get_many(&[crate::models::ids::UserId::from(id)], executor, redis)
             .await
@@ -129,7 +129,7 @@ impl User {
         redis: &RedisPool,
     ) -> Result<Vec<User>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         let ids = user_ids
             .iter()
@@ -141,14 +141,14 @@ impl User {
     pub async fn get_many<
         'a,
         E,
-        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug + Send,
     >(
         users_strings: &[T],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<User>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         use futures::TryStreamExt;
 

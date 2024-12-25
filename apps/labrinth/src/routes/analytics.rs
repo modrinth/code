@@ -8,8 +8,8 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::env::parse_strings_from_var;
-use actix_web::{post, web};
-use actix_web::{HttpRequest, HttpResponse};
+use ntex::web;
+use ntex::web::{post, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -48,18 +48,18 @@ pub struct UrlInput {
 #[post("view")]
 pub async fn page_view_ingest(
     req: HttpRequest,
-    maxmind: web::Data<Arc<MaxMindIndexer>>,
-    analytics_queue: web::Data<Arc<AnalyticsQueue>>,
-    session_queue: web::Data<AuthQueue>,
-    url_input: web::Json<UrlInput>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    maxmind: web::types::State<Arc<MaxMindIndexer>>,
+    analytics_queue: web::types::State<Arc<AnalyticsQueue>>,
+    session_queue: web::types::State<AuthQueue>,
+    url_input: web::types::Json<UrlInput>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user =
-        get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
+        get_user_from_headers(&req, &*pool, &redis, &session_queue, None)
             .await
             .ok();
-    let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
+    let conn_info = req.peer_addr().map(|x| x.to_string());
 
     let url = Url::parse(&url_input.url).map_err(|_| {
         ApiError::InvalidInput("invalid page view URL specified!".to_string())
@@ -132,7 +132,7 @@ pub async fn page_view_ingest(
             if PROJECT_TYPES.contains(&segments_vec[0]) {
                 let project = crate::database::models::Project::get(
                     segments_vec[1],
-                    &**pool,
+                    &*pool,
                     &redis,
                 )
                 .await?;
@@ -164,17 +164,17 @@ pub struct PlaytimeInput {
 #[post("playtime")]
 pub async fn playtime_ingest(
     req: HttpRequest,
-    analytics_queue: web::Data<Arc<AnalyticsQueue>>,
-    session_queue: web::Data<AuthQueue>,
-    playtime_input: web::Json<
+    analytics_queue: web::types::State<Arc<AnalyticsQueue>>,
+    session_queue: web::types::State<AuthQueue>,
+    playtime_input: web::types::Json<
         HashMap<crate::models::ids::VersionId, PlaytimeInput>,
     >,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PERFORM_ANALYTICS]),
@@ -191,7 +191,7 @@ pub async fn playtime_ingest(
 
     let versions = crate::database::models::Version::get_many(
         &playtimes.iter().map(|x| (*x.0).into()).collect::<Vec<_>>(),
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?;

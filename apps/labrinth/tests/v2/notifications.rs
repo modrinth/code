@@ -5,7 +5,7 @@ use crate::common::{
     environment::{with_test_environment, TestEnvironment},
 };
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn get_user_notifications_after_team_invitation_returns_notification()
 {
     with_test_environment(

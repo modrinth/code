@@ -15,9 +15,9 @@ use crate::models::pats::Scopes;
 use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use log::{info, warn};
+use ntex::web::{self, delete, get, patch, post, HttpRequest, HttpResponse};
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
 use serde::Serialize;
@@ -56,10 +56,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 #[get("products")]
 pub async fn products(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let products = product_item::QueryProduct::list(&**pool, &redis).await?;
+    let products = product_item::QueryProduct::list(&*pool, &redis).await?;
 
     let products = products
         .into_iter()
@@ -80,19 +80,19 @@ pub async fn products(
         })
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(products))
+    Ok(HttpResponse::Ok().json(&products))
 }
 
 #[get("subscriptions")]
 pub async fn subscriptions(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -103,14 +103,14 @@ pub async fn subscriptions(
     let subscriptions =
         user_subscription_item::UserSubscriptionItem::get_all_user(
             user.id.into(),
-            &**pool,
+            &*pool,
         )
         .await?
         .into_iter()
         .map(UserSubscription::from)
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(subscriptions))
+    Ok(HttpResponse::Ok().json(&subscriptions))
 }
 
 #[derive(Deserialize)]
@@ -130,16 +130,16 @@ pub struct ChargeRefund {
 #[post("charge/{id}/refund")]
 pub async fn refund_charge(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    info: web::Path<(crate::models::ids::ChargeId,)>,
-    body: web::Json<ChargeRefund>,
-    stripe_client: web::Data<stripe::Client>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    info: web::types::Path<(crate::models::ids::ChargeId,)>,
+    body: web::types::Json<ChargeRefund>,
+    stripe_client: web::types::State<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -155,8 +155,8 @@ pub async fn refund_charge(
         ));
     }
 
-    if let Some(charge) = ChargeItem::get(id.into(), &**pool).await? {
-        let refunds = ChargeItem::get_children(id.into(), &**pool).await?;
+    if let Some(charge) = ChargeItem::get(id.into(), &*pool).await? {
+        let refunds = ChargeItem::get_children(id.into(), &*pool).await?;
         let refunds = -refunds
             .into_iter()
             .filter_map(|x| match x.status {
@@ -259,7 +259,7 @@ pub async fn refund_charge(
         if body.0.unprovision.unwrap_or(false) {
             if let Some(subscription_id) = charge.subscription_id {
                 let open_charge =
-                    ChargeItem::get_open_subscription(subscription_id, &**pool)
+                    ChargeItem::get_open_subscription(subscription_id, &*pool)
                         .await?;
                 if let Some(mut open_charge) = open_charge {
                     open_charge.status = ChargeStatus::Cancelled;
@@ -287,16 +287,16 @@ pub struct SubscriptionEdit {
 #[patch("subscription/{id}")]
 pub async fn edit_subscription(
     req: HttpRequest,
-    info: web::Path<(crate::models::ids::UserSubscriptionId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    edit_subscription: web::Json<SubscriptionEdit>,
-    stripe_client: web::Data<stripe::Client>,
+    info: web::types::Path<(crate::models::ids::UserSubscriptionId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    edit_subscription: web::types::Json<SubscriptionEdit>,
+    stripe_client: web::types::State<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -307,7 +307,7 @@ pub async fn edit_subscription(
     let (id,) = info.into_inner();
 
     if let Some(subscription) =
-        user_subscription_item::UserSubscriptionItem::get(id.into(), &**pool)
+        user_subscription_item::UserSubscriptionItem::get(id.into(), &*pool)
             .await?
     {
         if subscription.user_id != user.id.into() && !user.role.is_admin() {
@@ -526,7 +526,7 @@ pub async fn edit_subscription(
         transaction.commit().await?;
 
         if let Some((amount, tax, payment_intent)) = intent {
-            Ok(HttpResponse::Ok().json(serde_json::json!({
+            Ok(HttpResponse::Ok().json(&serde_json::json!({
                 "payment_intent_id": payment_intent.id,
                 "client_secret": payment_intent.client_secret,
                 "tax": tax,
@@ -543,14 +543,14 @@ pub async fn edit_subscription(
 #[get("customer")]
 pub async fn user_customer(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    stripe_client: web::Data<stripe::Client>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    stripe_client: web::types::State<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -570,19 +570,19 @@ pub async fn user_customer(
     let customer =
         stripe::Customer::retrieve(&stripe_client, &customer_id, &[]).await?;
 
-    Ok(HttpResponse::Ok().json(customer))
+    Ok(HttpResponse::Ok().json(&customer))
 }
 
 #[get("payments")]
 pub async fn charges(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -593,12 +593,12 @@ pub async fn charges(
     let charges =
         crate::database::models::charge_item::ChargeItem::get_from_user(
             user.id.into(),
-            &**pool,
+            &*pool,
         )
         .await?;
 
     Ok(HttpResponse::Ok().json(
-        charges
+        &charges
             .into_iter()
             .map(|x| Charge {
                 id: x.id.into(),
@@ -621,14 +621,14 @@ pub async fn charges(
 #[post("payment_method")]
 pub async fn add_payment_method_flow(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    stripe_client: web::Data<stripe::Client>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    stripe_client: web::types::State<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -661,7 +661,7 @@ pub async fn add_payment_method_flow(
     )
     .await?;
 
-    Ok(HttpResponse::Ok().json(serde_json::json!({
+    Ok(HttpResponse::Ok().json(&serde_json::json!({
         "client_secret": intent.client_secret
     })))
 }
@@ -674,15 +674,15 @@ pub struct EditPaymentMethod {
 #[patch("payment_method/{id}")]
 pub async fn edit_payment_method(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    stripe_client: web::Data<stripe::Client>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    stripe_client: web::types::State<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -743,15 +743,15 @@ pub async fn edit_payment_method(
 #[delete("payment_method/{id}")]
 pub async fn remove_payment_method(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    stripe_client: web::Data<stripe::Client>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    stripe_client: web::types::State<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -787,7 +787,7 @@ pub async fn remove_payment_method(
     let user_subscriptions =
         user_subscription_item::UserSubscriptionItem::get_all_user(
             user.id.into(),
-            &**pool,
+            &*pool,
         )
         .await?;
 
@@ -831,14 +831,14 @@ pub async fn remove_payment_method(
 #[get("payment_methods")]
 pub async fn payment_methods(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    stripe_client: web::Data<stripe::Client>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    stripe_client: web::types::State<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -861,7 +861,7 @@ pub async fn payment_methods(
         )
         .await?;
 
-        Ok(HttpResponse::Ok().json(methods.data))
+        Ok(HttpResponse::Ok().json(&methods.data))
     } else {
         Ok(HttpResponse::NoContent().finish())
     }
@@ -875,8 +875,8 @@ pub struct ActiveServersQuery {
 #[get("active_servers")]
 pub async fn active_servers(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    query: web::Query<ActiveServersQuery>,
+    pool: web::types::State<PgPool>,
+    query: web::types::Query<ActiveServersQuery>,
 ) -> Result<HttpResponse, ApiError> {
     let master_key = dotenvy::var("PYRO_API_KEY")?;
 
@@ -894,7 +894,7 @@ pub async fn active_servers(
     let servers =
         user_subscription_item::UserSubscriptionItem::get_all_servers(
             query.subscription_status,
-            &**pool,
+            &*pool,
         )
         .await?;
 
@@ -918,7 +918,7 @@ pub async fn active_servers(
         })
         .collect::<Vec<ActiveServer>>();
 
-    Ok(HttpResponse::Ok().json(server_ids))
+    Ok(HttpResponse::Ok().json(&server_ids))
 }
 
 #[derive(Deserialize)]
@@ -1021,15 +1021,15 @@ fn infer_currency_code(country: &str) -> String {
 #[post("payment")]
 pub async fn initiate_payment(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    stripe_client: web::Data<stripe::Client>,
-    payment_request: web::Json<PaymentRequest>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    stripe_client: web::types::State<stripe::Client>,
+    payment_request: web::types::Json<PaymentRequest>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -1109,7 +1109,7 @@ pub async fn initiate_payment(
                 let charge =
                     crate::database::models::charge_item::ChargeItem::get(
                         id.into(),
-                        &**pool,
+                        &*pool,
                     )
                     .await?
                     .ok_or_else(|| {
@@ -1131,7 +1131,7 @@ pub async fn initiate_payment(
                 interval,
             } => {
                 let product =
-                    product_item::ProductItem::get(product_id.into(), &**pool)
+                    product_item::ProductItem::get(product_id.into(), &*pool)
                         .await?
                         .ok_or_else(|| {
                             ApiError::InvalidInput(
@@ -1142,7 +1142,7 @@ pub async fn initiate_payment(
 
                 let mut product_prices =
                     product_item::ProductPriceItem::get_all_product_prices(
-                        product.id, &**pool,
+                        product.id, &*pool,
                     )
                     .await?;
 
@@ -1184,7 +1184,7 @@ pub async fn initiate_payment(
                         let user_subscriptions =
                         user_subscription_item::UserSubscriptionItem::get_all_user(
                             user.id.into(),
-                            &**pool,
+                            &*pool,
                         )
                         .await?;
 
@@ -1198,7 +1198,7 @@ pub async fn initiate_payment(
                                     })
                                     .map(|x| x.price_id)
                                     .collect::<Vec<_>>(),
-                                &**pool,
+                                &*pool,
                             )
                             .await?;
 
@@ -1259,7 +1259,7 @@ pub async fn initiate_payment(
         )
         .await?;
 
-        Ok(HttpResponse::Ok().json(serde_json::json!({
+        Ok(HttpResponse::Ok().json(&serde_json::json!({
             "price_id": to_base62(price_id.0 as u64),
             "tax": 0,
             "total": price,
@@ -1325,7 +1325,7 @@ pub async fn initiate_payment(
         let payment_intent =
             stripe::PaymentIntent::create(&stripe_client, intent).await?;
 
-        Ok(HttpResponse::Ok().json(serde_json::json!({
+        Ok(HttpResponse::Ok().json(&serde_json::json!({
             "payment_intent_id": payment_intent.id,
             "client_secret": payment_intent.client_secret,
             "price_id": to_base62(price_id.0 as u64),
@@ -1340,9 +1340,9 @@ pub async fn initiate_payment(
 pub async fn stripe_webhook(
     req: HttpRequest,
     payload: String,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    stripe_client: web::Data<stripe::Client>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    stripe_client: web::types::State<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let stripe_signature = req
         .headers()
@@ -1716,7 +1716,7 @@ pub async fn stripe_webhook(
                                         let minecraft_versions = crate::database::models::legacy_loader_fields::MinecraftGameVersion::list(
                                             Some("release"),
                                             None,
-                                            &**pool,
+                                            &*pool,
                                             &redis,
                                         ).await?;
 

@@ -16,8 +16,8 @@ use crate::models::threads::{MessageBody, Thread, ThreadId, ThreadType};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{web, HttpRequest, HttpResponse};
 use futures::TryStreamExt;
+use ntex::web::{self, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 
@@ -96,7 +96,7 @@ pub async fn is_authorized_thread(
 pub async fn filter_authorized_threads(
     threads: Vec<database::models::Thread>,
     user: &User,
-    pool: &web::Data<PgPool>,
+    pool: &web::types::State<PgPool>,
     redis: &RedisPool,
 ) -> Result<Vec<Thread>, ApiError> {
     let user_id: database::models::UserId = user.id.into();
@@ -132,7 +132,7 @@ pub async fn filter_authorized_threads(
                 &*project_thread_ids,
                 user_id as database::models::ids::UserId,
             )
-            .fetch(&***pool)
+            .fetch(&**pool)
             .map_ok(|row| {
                 check_threads.retain(|x| {
                     let bool = x.project_id.map(|x| x.0) == Some(row.id);
@@ -165,7 +165,7 @@ pub async fn filter_authorized_threads(
                 &*project_thread_ids,
                 user_id as database::models::ids::UserId,
             )
-            .fetch(&***pool)
+            .fetch(&**pool)
             .map_ok(|row| {
                 check_threads.retain(|x| {
                     let bool = x.project_id.map(|x| x.0) == Some(row.id);
@@ -196,7 +196,7 @@ pub async fn filter_authorized_threads(
                 &*report_thread_ids,
                 user_id as database::models::ids::UserId,
             )
-            .fetch(&***pool)
+            .fetch(&**pool)
             .map_ok(|row| {
                 check_threads.retain(|x| {
                     let bool = x.report_id.map(|x| x.0) == Some(row.id);
@@ -230,7 +230,7 @@ pub async fn filter_authorized_threads(
     );
 
     let users: Vec<User> =
-        database::models::User::get_many_ids(&user_ids, &***pool, redis)
+        database::models::User::get_many_ids(&user_ids, &**pool, redis)
             .await?
             .into_iter()
             .map(From::from)
@@ -271,18 +271,18 @@ pub async fn filter_authorized_threads(
 
 pub async fn thread_get(
     req: HttpRequest,
-    info: web::Path<(ThreadId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(ThreadId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0.into();
 
-    let thread_data = database::models::Thread::get(string, &**pool).await?;
+    let thread_data = database::models::Thread::get(string, &*pool).await?;
 
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::THREAD_READ]),
@@ -309,14 +309,14 @@ pub async fn thread_get(
             );
 
             let users: Vec<User> =
-                database::models::User::get_many_ids(authors, &**pool, &redis)
+                database::models::User::get_many_ids(authors, &*pool, &redis)
                     .await?
                     .into_iter()
                     .map(From::from)
                     .collect();
 
             return Ok(
-                HttpResponse::Ok().json(Thread::from(data, users, &user))
+                HttpResponse::Ok().json(&Thread::from(data, users, &user))
             );
         }
     }
@@ -330,14 +330,14 @@ pub struct ThreadIds {
 
 pub async fn threads_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<ThreadIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<ThreadIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::THREAD_READ]),
@@ -352,12 +352,12 @@ pub async fn threads_get(
             .collect();
 
     let threads_data =
-        database::models::Thread::get_many(&thread_ids, &**pool).await?;
+        database::models::Thread::get_many(&thread_ids, &*pool).await?;
 
     let threads =
         filter_authorized_threads(threads_data, &user, &pool, &redis).await?;
 
-    Ok(HttpResponse::Ok().json(threads))
+    Ok(HttpResponse::Ok().json(&threads))
 }
 
 #[derive(Deserialize)]
@@ -367,15 +367,15 @@ pub struct NewThreadMessage {
 
 pub async fn thread_send_message(
     req: HttpRequest,
-    info: web::Path<(ThreadId,)>,
-    pool: web::Data<PgPool>,
-    new_message: web::Json<NewThreadMessage>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(ThreadId,)>,
+    pool: web::types::State<PgPool>,
+    new_message: web::types::Json<NewThreadMessage>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::THREAD_WRITE]),
@@ -407,7 +407,7 @@ pub async fn thread_send_message(
         if let Some(replying_to) = replying_to {
             let thread_message = database::models::ThreadMessage::get(
                 (*replying_to).into(),
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -430,7 +430,7 @@ pub async fn thread_send_message(
         ));
     }
 
-    let result = database::models::Thread::get(string, &**pool).await?;
+    let result = database::models::Thread::get(string, &*pool).await?;
 
     if let Some(thread) = result {
         if !is_authorized_thread(&thread, &user, &pool).await? {
@@ -450,7 +450,7 @@ pub async fn thread_send_message(
 
         if let Some(project_id) = thread.project_id {
             let project =
-                database::models::Project::get_id(project_id, &**pool, &redis)
+                database::models::Project::get_id(project_id, &*pool, &redis)
                     .await?;
 
             if let Some(project) = project {
@@ -460,7 +460,7 @@ pub async fn thread_send_message(
                     let members =
                         database::models::TeamMember::get_from_team_full(
                             project.inner.team_id,
-                            &**pool,
+                            &*pool,
                             &redis,
                         )
                         .await?;
@@ -483,7 +483,7 @@ pub async fn thread_send_message(
             }
         } else if let Some(report_id) = thread.report_id {
             let report =
-                database::models::report_item::Report::get(report_id, &**pool)
+                database::models::report_item::Report::get(report_id, &*pool)
                     .await?;
 
             if let Some(report) = report {
@@ -565,15 +565,15 @@ pub async fn thread_send_message(
 
 pub async fn message_delete(
     req: HttpRequest,
-    info: web::Path<(ThreadMessageId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    info: web::types::Path<(ThreadMessageId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::THREAD_WRITE]),
@@ -583,7 +583,7 @@ pub async fn message_delete(
 
     let result = database::models::ThreadMessage::get(
         info.into_inner().0.into(),
-        &**pool,
+        &*pool,
     )
     .await?;
 

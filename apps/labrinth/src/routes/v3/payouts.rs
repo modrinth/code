@@ -8,10 +8,10 @@ use crate::models::payouts::{PayoutMethodType, PayoutStatus};
 use crate::queue::payouts::{make_aditude_request, PayoutsQueue};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use chrono::{Datelike, Duration, TimeZone, Utc, Weekday};
 use hex::ToHex;
 use hmac::{Hmac, Mac, NewMac};
+use ntex::web::{self, delete, get, post, HttpRequest, HttpResponse};
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -37,9 +37,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[post("_paypal")]
 pub async fn paypal_webhook(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    payouts: web::Data<PayoutsQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    payouts: web::types::State<PayoutsQueue>,
     body: String,
 ) -> Result<HttpResponse, ApiError> {
     let auth_algo = req
@@ -191,8 +191,8 @@ pub async fn paypal_webhook(
 #[post("_tremendous")]
 pub async fn tremendous_webhook(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
     body: String,
 ) -> Result<HttpResponse, ApiError> {
     let signature = req
@@ -298,13 +298,13 @@ pub async fn tremendous_webhook(
 #[get("")]
 pub async fn user_payouts(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PAYOUTS_READ]),
@@ -315,17 +315,17 @@ pub async fn user_payouts(
     let payout_ids =
         crate::database::models::payout_item::Payout::get_all_for_user(
             user.id.into(),
-            &**pool,
+            &*pool,
         )
         .await?;
     let payouts = crate::database::models::payout_item::Payout::get_many(
         &payout_ids,
-        &**pool,
+        &*pool,
     )
     .await?;
 
     Ok(HttpResponse::Ok().json(
-        payouts
+        &payouts
             .into_iter()
             .map(crate::models::payouts::Payout::from)
             .collect::<Vec<_>>(),
@@ -343,16 +343,16 @@ pub struct Withdrawal {
 #[post("")]
 pub async fn create_payout(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    body: web::Json<Withdrawal>,
-    session_queue: web::Data<AuthQueue>,
-    payouts_queue: web::Data<PayoutsQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    body: web::types::Json<Withdrawal>,
+    session_queue: web::types::State<AuthQueue>,
+    payouts_queue: web::types::State<PayoutsQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (scopes, user) = get_user_record_from_bearer_token(
         &req,
         None,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
     )
@@ -635,16 +635,16 @@ pub async fn create_payout(
 
 #[delete("{id}")]
 pub async fn cancel_payout(
-    info: web::Path<(PayoutId,)>,
+    info: web::types::Path<(PayoutId,)>,
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    payouts: web::Data<PayoutsQueue>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    payouts: web::types::State<PayoutsQueue>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PAYOUTS_WRITE]),
@@ -654,7 +654,7 @@ pub async fn cancel_payout(
 
     let id = info.into_inner().0;
     let payout =
-        crate::database::models::payout_item::Payout::get(id.into(), &**pool)
+        crate::database::models::payout_item::Payout::get(id.into(), &*pool)
             .await?;
 
     if let Some(payout) = payout {
@@ -738,8 +738,8 @@ pub struct MethodFilter {
 
 #[get("methods")]
 pub async fn payment_methods(
-    payouts_queue: web::Data<PayoutsQueue>,
-    filter: web::Query<MethodFilter>,
+    payouts_queue: web::types::State<PayoutsQueue>,
+    filter: web::types::Query<MethodFilter>,
 ) -> Result<HttpResponse, ApiError> {
     let methods = payouts_queue
         .get_payout_methods()
@@ -756,7 +756,7 @@ pub async fn payment_methods(
         })
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(methods))
+    Ok(HttpResponse::Ok().json(&methods))
 }
 
 #[derive(Serialize)]
@@ -768,13 +768,13 @@ pub struct UserBalance {
 #[get("balance")]
 pub async fn get_balance(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PAYOUTS_READ]),
@@ -784,7 +784,7 @@ pub async fn get_balance(
 
     let balance = get_user_balance(user.id.into(), &pool).await?;
 
-    Ok(HttpResponse::Ok().json(balance))
+    Ok(HttpResponse::Ok().json(&balance))
 }
 
 async fn get_user_balance(
@@ -862,8 +862,8 @@ pub struct RevenueData {
 
 #[get("platform_revenue")]
 pub async fn platform_revenue(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let mut redis = redis.connect().await?;
 
@@ -874,7 +874,7 @@ pub async fn platform_revenue(
         .await?;
 
     if let Some(res) = res {
-        return Ok(HttpResponse::Ok().json(res));
+        return Ok(HttpResponse::Ok().json(&res));
     }
 
     let all_time_payouts = sqlx::query!(
@@ -882,7 +882,7 @@ pub async fn platform_revenue(
         SELECT SUM(amount) from payouts_values
         ",
     )
-    .fetch_optional(&**pool)
+    .fetch_optional(&*pool)
     .await?
     .and_then(|x| x.sum)
     .unwrap_or(Decimal::ZERO);
@@ -968,7 +968,7 @@ pub async fn platform_revenue(
         )
         .await?;
 
-    Ok(HttpResponse::Ok().json(res))
+    Ok(HttpResponse::Ok().json(&res))
 }
 
 fn get_legacy_data_point(timestamp: u64) -> RevenueData {

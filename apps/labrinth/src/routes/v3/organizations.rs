@@ -15,13 +15,13 @@ use crate::models::organizations::OrganizationId;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::project_creation::CreateError;
+// use crate::routes::v3::project_creation::CreateError;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
-use actix_web::{web, HttpRequest, HttpResponse};
 use futures::TryStreamExt;
+use ntex::web::{self, HttpRequest, HttpResponse};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -52,15 +52,15 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 pub async fn organization_projects_get(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner().0;
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ORGANIZATION_READ, Scopes::PROJECT_READ]),
@@ -80,14 +80,14 @@ pub async fn organization_projects_get(
         possible_organization_id.map(|x| x as i64),
         info
     )
-    .fetch(&**pool)
+    .fetch(&*pool)
     .map_ok(|m| database::models::ProjectId(m.id))
     .try_collect::<Vec<database::models::ProjectId>>()
     .await?;
 
     let projects_data = crate::database::models::Project::get_many_ids(
         &project_ids,
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?;
@@ -95,7 +95,7 @@ pub async fn organization_projects_get(
     let projects =
         filter_visible_projects(projects_data, &current_user, &pool, true)
             .await?;
-    Ok(HttpResponse::Ok().json(projects))
+    Ok(HttpResponse::Ok().json(&projects))
 }
 
 #[derive(Deserialize, Validate)]
@@ -114,14 +114,14 @@ pub struct NewOrganization {
 
 pub async fn organization_create(
     req: HttpRequest,
-    new_organization: web::Json<NewOrganization>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, CreateError> {
+    new_organization: web::types::Json<NewOrganization>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ORGANIZATION_CREATE]),
@@ -130,7 +130,7 @@ pub async fn organization_create(
     .1;
 
     new_organization.validate().map_err(|err| {
-        CreateError::ValidationError(validation_errors_to_string(err, None))
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
     })?;
 
     let mut transaction = pool.begin().await?;
@@ -150,7 +150,7 @@ pub async fn organization_create(
     )
     .await?;
     if !results.is_empty() {
-        return Err(CreateError::SlugCollision);
+        return Err(ApiError::InvalidInput("Slug collision".to_owned()));
     }
 
     let organization_id = generate_organization_id(&mut transaction).await?;
@@ -185,7 +185,7 @@ pub async fn organization_create(
     transaction.commit().await?;
 
     // Only member is the owner, the logged in one
-    let member_data = TeamMember::get_from_team_full(team_id, &**pool, &redis)
+    let member_data = TeamMember::get_from_team_full(team_id, &*pool, &redis)
         .await?
         .into_iter()
         .next();
@@ -196,7 +196,7 @@ pub async fn organization_create(
             false,
         )]
     } else {
-        return Err(CreateError::InvalidInput(
+        return Err(ApiError::InvalidInput(
             "Failed to get created team.".to_owned(), // should never happen
         ));
     };
@@ -204,20 +204,20 @@ pub async fn organization_create(
     let organization =
         models::organizations::Organization::from(organization, members_data);
 
-    Ok(HttpResponse::Ok().json(organization))
+    Ok(HttpResponse::Ok().json(&organization))
 }
 
 pub async fn organization_get(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ORGANIZATION_READ]),
@@ -227,15 +227,15 @@ pub async fn organization_get(
     .ok();
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
-    let organization_data = Organization::get(&id, &**pool, &redis).await?;
+    let organization_data = Organization::get(&id, &*pool, &redis).await?;
     if let Some(data) = organization_data {
         let members_data =
-            TeamMember::get_from_team_full(data.team_id, &**pool, &redis)
+            TeamMember::get_from_team_full(data.team_id, &*pool, &redis)
                 .await?;
 
         let users = crate::database::models::User::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
@@ -271,7 +271,7 @@ pub async fn organization_get(
 
         let organization =
             models::organizations::Organization::from(data, team_members);
-        return Ok(HttpResponse::Ok().json(organization));
+        return Ok(HttpResponse::Ok().json(&organization));
     }
     Err(ApiError::NotFound)
 }
@@ -283,31 +283,31 @@ pub struct OrganizationIds {
 
 pub async fn organizations_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<OrganizationIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<OrganizationIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
     let organizations_data =
-        Organization::get_many(&ids, &**pool, &redis).await?;
+        Organization::get_many(&ids, &*pool, &redis).await?;
     let team_ids = organizations_data
         .iter()
         .map(|x| x.team_id)
         .collect::<Vec<_>>();
 
     let teams_data =
-        TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
+        TeamMember::get_from_team_full_many(&team_ids, &*pool, &redis).await?;
     let users = crate::database::models::User::get_many_ids(
         &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?;
 
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ORGANIZATION_READ]),
@@ -362,7 +362,7 @@ pub async fn organizations_get(
         organizations.push(organization);
     }
 
-    Ok(HttpResponse::Ok().json(organizations))
+    Ok(HttpResponse::Ok().json(&organizations))
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -380,15 +380,15 @@ pub struct OrganizationEdit {
 
 pub async fn organizations_edit(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    new_organization: web::Json<OrganizationEdit>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    new_organization: web::types::Json<OrganizationEdit>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ORGANIZATION_WRITE]),
@@ -402,14 +402,14 @@ pub async fn organizations_edit(
 
     let string = info.into_inner().0;
     let result =
-        database::models::Organization::get(&string, &**pool, &redis).await?;
+        database::models::Organization::get(&string, &*pool, &redis).await?;
     if let Some(organization_item) = result {
         let id = organization_item.id;
 
         let team_member = database::models::TeamMember::get_from_user_id(
             organization_item.team_id,
             user.id.into(),
-            &**pool,
+            &*pool,
         )
         .await?;
 
@@ -544,14 +544,14 @@ pub async fn organizations_edit(
 
 pub async fn organization_delete(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ORGANIZATION_DELETE]),
@@ -561,7 +561,7 @@ pub async fn organization_delete(
     let string = info.into_inner().0;
 
     let organization =
-        database::models::Organization::get(&string, &**pool, &redis)
+        database::models::Organization::get(&string, &*pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -575,7 +575,7 @@ pub async fn organization_delete(
                 organization.id,
                 user.id.into(),
                 false,
-                &**pool,
+                &*pool,
             )
             .await
             .map_err(ApiError::Database)?
@@ -606,7 +606,7 @@ pub async fn organization_delete(
         ",
         organization.team_id as database::models::ids::TeamId
     )
-    .fetch_one(&**pool)
+    .fetch_one(&*pool)
     .await?
     .user_id;
     let owner_id = database::models::ids::UserId(owner_id);
@@ -683,16 +683,16 @@ pub struct OrganizationProjectAdd {
 }
 pub async fn organization_projects_add(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    project_info: web::Json<OrganizationProjectAdd>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    project_info: web::types::Json<OrganizationProjectAdd>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner().0;
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE, Scopes::ORGANIZATION_WRITE]),
@@ -701,7 +701,7 @@ pub async fn organization_projects_add(
     .1;
 
     let organization =
-        database::models::Organization::get(&info, &**pool, &redis)
+        database::models::Organization::get(&info, &*pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -711,7 +711,7 @@ pub async fn organization_projects_add(
 
     let project_item = database::models::Project::get(
         &project_info.project_id,
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?
@@ -732,7 +732,7 @@ pub async fn organization_projects_add(
             project_item.inner.id,
             current_user.id.into(),
             false,
-            &**pool,
+            &*pool,
         )
         .await?
         .ok_or_else(|| {
@@ -745,7 +745,7 @@ pub async fn organization_projects_add(
             organization.id,
             current_user.id.into(),
             false,
-            &**pool,
+            &*pool,
         )
         .await?
         .ok_or_else(|| {
@@ -846,16 +846,16 @@ pub struct OrganizationProjectRemoval {
 
 pub async fn organization_projects_remove(
     req: HttpRequest,
-    info: web::Path<(String, String)>,
-    pool: web::Data<PgPool>,
-    data: web::Json<OrganizationProjectRemoval>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String, String)>,
+    pool: web::types::State<PgPool>,
+    data: web::types::Json<OrganizationProjectRemoval>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (organization_id, project_id) = info.into_inner();
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE, Scopes::ORGANIZATION_WRITE]),
@@ -864,7 +864,7 @@ pub async fn organization_projects_remove(
     .1;
 
     let organization =
-        database::models::Organization::get(&organization_id, &**pool, &redis)
+        database::models::Organization::get(&organization_id, &*pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -873,7 +873,7 @@ pub async fn organization_projects_remove(
             })?;
 
     let project_item =
-        database::models::Project::get(&project_id, &**pool, &redis)
+        database::models::Project::get(&project_id, &*pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -897,7 +897,7 @@ pub async fn organization_projects_remove(
             organization.id,
             current_user.id.into(),
             false,
-            &**pool,
+            &*pool,
         )
         .await?
         .ok_or_else(|| {
@@ -917,7 +917,7 @@ pub async fn organization_projects_remove(
             organization.id,
             data.new_owner.into(),
             false,
-            &**pool,
+            &*pool,
         )
         .await?
         .ok_or_else(|| {
@@ -933,7 +933,7 @@ pub async fn organization_projects_remove(
             project_item.inner.id,
             data.new_owner.into(),
             true,
-            &**pool,
+            &*pool,
         )
         .await?;
 
@@ -1028,18 +1028,18 @@ pub struct Extension {
 
 #[allow(clippy::too_many_arguments)]
 pub async fn organization_icon_edit(
-    web::Query(ext): web::Query<Extension>,
+    web::types::Query(ext): web::types::Query<Extension>,
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    mut payload: web::Payload,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    mut payload: web::types::Payload,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ORGANIZATION_WRITE]),
@@ -1049,7 +1049,7 @@ pub async fn organization_icon_edit(
     let string = info.into_inner().0;
 
     let organization_item =
-        database::models::Organization::get(&string, &**pool, &redis)
+        database::models::Organization::get(&string, &*pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -1061,7 +1061,7 @@ pub async fn organization_icon_edit(
         let team_member = database::models::TeamMember::get_from_user_id(
             organization_item.team_id,
             user.id.into(),
-            &**pool,
+            &*pool,
         )
         .await
         .map_err(ApiError::Database)?;
@@ -1083,7 +1083,7 @@ pub async fn organization_icon_edit(
     delete_old_images(
         organization_item.icon_url,
         organization_item.raw_icon_url,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1101,7 +1101,7 @@ pub async fn organization_icon_edit(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1134,15 +1134,15 @@ pub async fn organization_icon_edit(
 
 pub async fn delete_organization_icon(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ORGANIZATION_WRITE]),
@@ -1152,7 +1152,7 @@ pub async fn delete_organization_icon(
     let string = info.into_inner().0;
 
     let organization_item =
-        database::models::Organization::get(&string, &**pool, &redis)
+        database::models::Organization::get(&string, &*pool, &redis)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
@@ -1164,7 +1164,7 @@ pub async fn delete_organization_icon(
         let team_member = database::models::TeamMember::get_from_user_id(
             organization_item.team_id,
             user.id.into(),
-            &**pool,
+            &*pool,
         )
         .await
         .map_err(ApiError::Database)?;
@@ -1186,7 +1186,7 @@ pub async fn delete_organization_icon(
     delete_old_images(
         organization_item.icon_url,
         organization_item.raw_icon_url,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 

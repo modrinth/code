@@ -29,10 +29,10 @@ use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::TryStreamExt;
 use itertools::Itertools;
+use ntex::web::{self, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::PgPool;
@@ -84,9 +84,9 @@ pub struct RandomProjects {
 }
 
 pub async fn random_projects_get(
-    web::Query(count): web::Query<RandomProjects>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    web::types::Query(count): web::types::Query<RandomProjects>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     count.validate().map_err(|err| {
         ApiError::Validation(validation_errors_to_string(err, None))
@@ -102,19 +102,19 @@ pub async fn random_projects_get(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch(&**pool)
+    .fetch(&*pool)
     .map_ok(|m| db_ids::ProjectId(m.id))
     .try_collect::<Vec<_>>()
     .await?;
 
     let projects_data =
-        db_models::Project::get_many_ids(&project_ids, &**pool, &redis)
+        db_models::Project::get_many_ids(&project_ids, &*pool, &redis)
             .await?
             .into_iter()
             .map(Project::from)
             .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(projects_data))
+    Ok(HttpResponse::Ok().json(&projects_data))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -124,18 +124,18 @@ pub struct ProjectIds {
 
 pub async fn projects_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<ProjectIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<ProjectIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
     let projects_data =
-        db_models::Project::get_many(&ids, &**pool, &redis).await?;
+        db_models::Project::get_many(&ids, &*pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -148,23 +148,22 @@ pub async fn projects_get(
         filter_visible_projects(projects_data, &user_option, &pool, false)
             .await?;
 
-    Ok(HttpResponse::Ok().json(projects))
+    Ok(HttpResponse::Ok().json(&projects))
 }
 
 pub async fn project_get(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let project_data =
-        db_models::Project::get(&string, &**pool, &redis).await?;
+    let project_data = db_models::Project::get(&string, &*pool, &redis).await?;
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -175,7 +174,7 @@ pub async fn project_get(
 
     if let Some(data) = project_data {
         if is_visible_project(&data.inner, &user_option, &pool, false).await? {
-            return Ok(HttpResponse::Ok().json(Project::from(data)));
+            return Ok(HttpResponse::Ok().json(&Project::from(data)));
         }
     }
     Err(ApiError::NotFound)
@@ -244,17 +243,17 @@ pub struct EditProject {
 #[allow(clippy::too_many_arguments)]
 pub async fn project_edit(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
-    new_project: web::Json<EditProject>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    search_config: web::types::State<SearchConfig>,
+    new_project: web::types::Json<EditProject>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    moderation_queue: web::types::State<AutomatedModerationQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -267,7 +266,7 @@ pub async fn project_edit(
     })?;
 
     let string = info.into_inner().0;
-    let result = db_models::Project::get(&string, &**pool, &redis).await?;
+    let result = db_models::Project::get(&string, &*pool, &redis).await?;
     if let Some(project_item) = result {
         let id = project_item.inner.id;
 
@@ -275,7 +274,7 @@ pub async fn project_edit(
             db_models::TeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -949,8 +948,8 @@ pub async fn edit_project_categories(
 // }
 
 pub async fn project_search(
-    web::Query(info): web::Query<SearchRequest>,
-    config: web::Data<SearchConfig>,
+    web::types::Query(info): web::types::Query<SearchRequest>,
+    config: web::types::State<SearchConfig>,
 ) -> Result<HttpResponse, SearchError> {
     let results = search_for_project(&info, &config).await?;
 
@@ -966,21 +965,21 @@ pub async fn project_search(
     //     total_hits: results.total_hits,
     // };
 
-    Ok(HttpResponse::Ok().json(results))
+    Ok(HttpResponse::Ok().json(&results))
 }
 
 //checks the validity of a project id or slug
 pub async fn project_get_check(
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let slug = info.into_inner().0;
 
-    let project_data = db_models::Project::get(&slug, &**pool, &redis).await?;
+    let project_data = db_models::Project::get(&slug, &*pool, &redis).await?;
 
     if let Some(project) = project_data {
-        Ok(HttpResponse::Ok().json(json! ({
+        Ok(HttpResponse::Ok().json(&json! ({
             "id": models::ids::ProjectId::from(project.inner.id)
         })))
     } else {
@@ -996,18 +995,18 @@ pub struct DependencyInfo {
 
 pub async fn dependency_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result = db_models::Project::get(&string, &**pool, &redis).await?;
+    let result = db_models::Project::get(&string, &*pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -1025,7 +1024,7 @@ pub async fn dependency_list(
 
         let dependencies = database::Project::get_dependencies(
             project.inner.id,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
@@ -1051,8 +1050,8 @@ pub async fn dependency_list(
             .unique()
             .collect::<Vec<db_models::VersionId>>();
         let (projects_result, versions_result) = futures::future::try_join(
-            database::Project::get_many_ids(&project_ids, &**pool, &redis),
-            database::Version::get_many(&dep_version_ids, &**pool, &redis),
+            database::Project::get_many_ids(&project_ids, &*pool, &redis),
+            database::Version::get_many(&dep_version_ids, &*pool, &redis),
         )
         .await?;
 
@@ -1077,7 +1076,7 @@ pub async fn dependency_list(
         versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
         versions.dedup_by(|a, b| a.id == b.id);
 
-        Ok(HttpResponse::Ok().json(DependencyInfo { projects, versions }))
+        Ok(HttpResponse::Ok().json(&DependencyInfo { projects, versions }))
     } else {
         Err(ApiError::NotFound)
     }
@@ -1112,15 +1111,15 @@ pub struct BulkEditProject {
 
 pub async fn projects_edit(
     req: HttpRequest,
-    web::Query(ids): web::Query<ProjectIds>,
-    pool: web::Data<PgPool>,
-    bulk_edit_project: web::Json<BulkEditProject>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<ProjectIds>,
+    pool: web::types::State<PgPool>,
+    bulk_edit_project: web::types::Json<BulkEditProject>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -1139,7 +1138,7 @@ pub async fn projects_edit(
             .collect();
 
     let projects_data =
-        db_models::Project::get_many_ids(&project_ids, &**pool, &redis).await?;
+        db_models::Project::get_many_ids(&project_ids, &*pool, &redis).await?;
 
     if let Some(id) = project_ids
         .iter()
@@ -1156,7 +1155,7 @@ pub async fn projects_edit(
         .map(|x| x.inner.team_id)
         .collect::<Vec<db_models::TeamId>>();
     let team_members = db_models::TeamMember::get_from_team_full_many(
-        &team_ids, &**pool, &redis,
+        &team_ids, &*pool, &redis,
     )
     .await?;
 
@@ -1166,7 +1165,7 @@ pub async fn projects_edit(
         .collect::<Vec<db_models::OrganizationId>>();
     let organizations = db_models::Organization::get_many_ids(
         &organization_ids,
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?;
@@ -1178,15 +1177,15 @@ pub async fn projects_edit(
     let organization_team_members =
         db_models::TeamMember::get_from_team_full_many(
             &organization_team_ids,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
 
     let categories =
-        db_models::categories::Category::list(&**pool, &redis).await?;
+        db_models::categories::Category::list(&*pool, &redis).await?;
     let link_platforms =
-        db_models::categories::LinkPlatform::list(&**pool, &redis).await?;
+        db_models::categories::LinkPlatform::list(&*pool, &redis).await?;
 
     let mut transaction = pool.begin().await?;
 
@@ -1407,18 +1406,18 @@ pub struct Extension {
 
 #[allow(clippy::too_many_arguments)]
 pub async fn project_icon_edit(
-    web::Query(ext): web::Query<Extension>,
+    web::types::Query(ext): web::types::Query<Extension>,
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    mut payload: web::Payload,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    mut payload: web::types::Payload,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -1427,7 +1426,7 @@ pub async fn project_icon_edit(
     .1;
     let string = info.into_inner().0;
 
-    let project_item = db_models::Project::get(&string, &**pool, &redis)
+    let project_item = db_models::Project::get(&string, &*pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -1440,7 +1439,7 @@ pub async fn project_icon_edit(
             db_models::TeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -1469,7 +1468,7 @@ pub async fn project_icon_edit(
     delete_old_images(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1487,7 +1486,7 @@ pub async fn project_icon_edit(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1521,15 +1520,15 @@ pub async fn project_icon_edit(
 
 pub async fn delete_project_icon(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -1538,7 +1537,7 @@ pub async fn delete_project_icon(
     .1;
     let string = info.into_inner().0;
 
-    let project_item = db_models::Project::get(&string, &**pool, &redis)
+    let project_item = db_models::Project::get(&string, &*pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -1551,7 +1550,7 @@ pub async fn delete_project_icon(
             db_models::TeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -1579,7 +1578,7 @@ pub async fn delete_project_icon(
     delete_old_images(
         project_item.inner.icon_url,
         project_item.inner.raw_icon_url,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1620,15 +1619,15 @@ pub struct GalleryCreateQuery {
 
 #[allow(clippy::too_many_arguments)]
 pub async fn add_gallery_item(
-    web::Query(ext): web::Query<Extension>,
+    web::types::Query(ext): web::types::Query<Extension>,
     req: HttpRequest,
-    web::Query(item): web::Query<GalleryCreateQuery>,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    mut payload: web::Payload,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(item): web::types::Query<GalleryCreateQuery>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    mut payload: web::types::Payload,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     item.validate().map_err(|err| {
         ApiError::Validation(validation_errors_to_string(err, None))
@@ -1636,7 +1635,7 @@ pub async fn add_gallery_item(
 
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -1645,7 +1644,7 @@ pub async fn add_gallery_item(
     .1;
     let string = info.into_inner().0;
 
-    let project_item = db_models::Project::get(&string, &**pool, &redis)
+    let project_item = db_models::Project::get(&string, &*pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -1665,7 +1664,7 @@ pub async fn add_gallery_item(
             db_models::TeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -1705,7 +1704,7 @@ pub async fn add_gallery_item(
         &ext.ext,
         Some(350),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -1787,14 +1786,14 @@ pub struct GalleryEditQuery {
 
 pub async fn edit_gallery_item(
     req: HttpRequest,
-    web::Query(item): web::Query<GalleryEditQuery>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(item): web::types::Query<GalleryEditQuery>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -1813,7 +1812,7 @@ pub async fn edit_gallery_item(
         ",
         item.url
     )
-    .fetch_optional(&**pool)
+    .fetch_optional(&*pool)
     .await?
     .ok_or_else(|| {
         ApiError::InvalidInput(format!(
@@ -1824,7 +1823,7 @@ pub async fn edit_gallery_item(
 
     let project_item = db_models::Project::get_id(
         database::models::ProjectId(result.mod_id),
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?
@@ -1839,7 +1838,7 @@ pub async fn edit_gallery_item(
             db_models::TeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -1953,15 +1952,15 @@ pub struct GalleryDeleteQuery {
 
 pub async fn delete_gallery_item(
     req: HttpRequest,
-    web::Query(item): web::Query<GalleryDeleteQuery>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(item): web::types::Query<GalleryDeleteQuery>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -1976,7 +1975,7 @@ pub async fn delete_gallery_item(
         ",
         item.url
     )
-    .fetch_optional(&**pool)
+    .fetch_optional(&*pool)
     .await?
     .ok_or_else(|| {
         ApiError::InvalidInput(format!(
@@ -1987,7 +1986,7 @@ pub async fn delete_gallery_item(
 
     let project_item = db_models::Project::get_id(
         database::models::ProjectId(item.mod_id),
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?
@@ -2002,7 +2001,7 @@ pub async fn delete_gallery_item(
             db_models::TeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -2031,7 +2030,7 @@ pub async fn delete_gallery_item(
     delete_old_images(
         Some(item.image_url),
         Some(item.raw_image_url),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -2062,15 +2061,15 @@ pub async fn delete_gallery_item(
 
 pub async fn project_delete(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    search_config: web::types::State<SearchConfig>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_DELETE]),
@@ -2079,7 +2078,7 @@ pub async fn project_delete(
     .1;
     let string = info.into_inner().0;
 
-    let project = db_models::Project::get(&string, &**pool, &redis)
+    let project = db_models::Project::get(&string, &*pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -2092,7 +2091,7 @@ pub async fn project_delete(
             db_models::TeamMember::get_for_project_permissions(
                 &project.inner,
                 user.id.into(),
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -2162,14 +2161,14 @@ pub async fn project_delete(
 
 pub async fn project_follow(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_WRITE]),
@@ -2178,7 +2177,7 @@ pub async fn project_follow(
     .1;
     let string = info.into_inner().0;
 
-    let result = db_models::Project::get(&string, &**pool, &redis)
+    let result = db_models::Project::get(&string, &*pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -2200,7 +2199,7 @@ pub async fn project_follow(
         user_id as db_ids::UserId,
         project_id as db_ids::ProjectId
     )
-    .fetch_one(&**pool)
+    .fetch_one(&*pool)
     .await?
     .exists
     .unwrap_or(false);
@@ -2242,14 +2241,14 @@ pub async fn project_follow(
 
 pub async fn project_unfollow(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_WRITE]),
@@ -2258,7 +2257,7 @@ pub async fn project_unfollow(
     .1;
     let string = info.into_inner().0;
 
-    let result = db_models::Project::get(&string, &**pool, &redis)
+    let result = db_models::Project::get(&string, &*pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -2276,7 +2275,7 @@ pub async fn project_unfollow(
         user_id as db_ids::UserId,
         project_id as db_ids::ProjectId
     )
-    .fetch_one(&**pool)
+    .fetch_one(&*pool)
     .await?
     .exists
     .unwrap_or(false);
@@ -2318,14 +2317,14 @@ pub async fn project_unfollow(
 
 pub async fn project_get_organization(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ, Scopes::ORGANIZATION_READ]),
@@ -2336,7 +2335,7 @@ pub async fn project_get_organization(
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
     let string = info.into_inner().0;
-    let result = db_models::Project::get(&string, &**pool, &redis)
+    let result = db_models::Project::get(&string, &*pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -2350,7 +2349,7 @@ pub async fn project_get_organization(
         ))
     } else if let Some(organization_id) = result.inner.organization_id {
         let organization =
-            db_models::Organization::get_id(organization_id, &**pool, &redis)
+            db_models::Organization::get_id(organization_id, &*pool, &redis)
                 .await?
                 .ok_or_else(|| {
                     ApiError::InvalidInput(
@@ -2360,14 +2359,14 @@ pub async fn project_get_organization(
 
         let members_data = TeamMember::get_from_team_full(
             organization.team_id,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
 
         let users = crate::database::models::User::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
@@ -2405,7 +2404,7 @@ pub async fn project_get_organization(
             organization,
             team_members,
         );
-        return Ok(HttpResponse::Ok().json(organization));
+        return Ok(HttpResponse::Ok().json(&organization));
     } else {
         Err(ApiError::NotFound)
     }

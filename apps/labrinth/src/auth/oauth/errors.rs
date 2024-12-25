@@ -2,8 +2,8 @@ use super::ValidatedRedirectUri;
 use crate::auth::AuthenticationError;
 use crate::models::error::ApiError;
 use crate::models::ids::DecodingError;
-use actix_web::http::{header::LOCATION, StatusCode};
-use actix_web::HttpResponse;
+use ntex::http::{header::LOCATION, StatusCode};
+use ntex::web::{HttpRequest, HttpResponse};
 
 #[derive(thiserror::Error, Debug)]
 #[error("{}", .error_type)]
@@ -55,7 +55,7 @@ impl OAuthError {
     }
 }
 
-impl actix_web::ResponseError for OAuthError {
+impl ntex::web::WebResponseError for OAuthError {
     fn status_code(&self) -> StatusCode {
         match self.error_type {
             OAuthErrorType::AuthenticationError(_)
@@ -83,7 +83,7 @@ impl actix_web::ResponseError for OAuthError {
         }
     }
 
-    fn error_response(&self) -> HttpResponse {
+    fn error_response(&self, _req: &HttpRequest) -> HttpResponse {
         if let Some(ValidatedRedirectUri(mut redirect_uri)) =
             self.valid_redirect_uri.clone()
         {
@@ -99,10 +99,10 @@ impl actix_web::ResponseError for OAuthError {
             }
 
             HttpResponse::Ok()
-                .append_header((LOCATION, redirect_uri.clone()))
+                .header(LOCATION, redirect_uri.clone())
                 .body(redirect_uri)
         } else {
-            HttpResponse::build(self.status_code()).json(ApiError {
+            HttpResponse::build(self.status_code()).json(&ApiError {
                 error: &self.error_type.error_name(),
                 description: self.error_type.to_string(),
             })

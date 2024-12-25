@@ -16,7 +16,7 @@ mod common;
 // patch user icon
 // user follows
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn get_user_projects_after_creating_project_returns_new_project() {
     with_test_environment_all(None, |test_env| async move {
         let api = test_env.api;
@@ -40,7 +40,7 @@ pub async fn get_user_projects_after_creating_project_returns_new_project() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn get_user_projects_after_deleting_project_shows_removal() {
     with_test_environment_all(None, |test_env| async move {
         let api = test_env.api;
@@ -66,7 +66,7 @@ pub async fn get_user_projects_after_deleting_project_shows_removal() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn get_user_projects_after_joining_team_shows_team_projects() {
     with_test_environment_all(None, |test_env| async move {
         let alpha_team_id = &test_env.dummy.project_alpha.team_id;
@@ -101,7 +101,7 @@ pub async fn get_user_projects_after_joining_team_shows_team_projects() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn get_user_projects_after_leaving_team_shows_no_team_projects() {
     with_test_environment_all(None, |test_env| async move {
         let alpha_team_id = &test_env.dummy.project_alpha.team_id;

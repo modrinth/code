@@ -6,7 +6,7 @@ use crate::models::projects::ProjectStatus;
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
 use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
-use actix_web::{web, HttpRequest, HttpResponse};
+use ntex::web::{self, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -29,14 +29,14 @@ fn default_count() -> i16 {
 
 pub async fn get_projects(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    count: web::Query<ResultCount>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    count: web::types::Query<ResultCount>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -55,31 +55,31 @@ pub async fn get_projects(
         ProjectStatus::Processing.as_str(),
         count.count as i64
     )
-    .fetch(&**pool)
+    .fetch(&*pool)
     .map_ok(|m| database::models::ProjectId(m.id))
     .try_collect::<Vec<database::models::ProjectId>>()
     .await?;
 
     let projects: Vec<_> =
-        database::Project::get_many_ids(&project_ids, &**pool, &redis)
+        database::Project::get_many_ids(&project_ids, &*pool, &redis)
             .await?
             .into_iter()
             .map(crate::models::projects::Project::from)
             .collect();
 
-    Ok(HttpResponse::Ok().json(projects))
+    Ok(HttpResponse::Ok().json(&projects))
 }
 
 pub async fn get_project_meta(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    info: web::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    info: web::types::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -88,7 +88,7 @@ pub async fn get_project_meta(
 
     let project_id = info.into_inner().0;
     let project =
-        database::models::Project::get(&project_id, &**pool, &redis).await?;
+        database::models::Project::get(&project_id, &*pool, &redis).await?;
 
     if let Some(project) = project {
         let rows = sqlx::query!(
@@ -101,7 +101,7 @@ pub async fn get_project_meta(
             ",
             project.inner.id.0
         )
-        .fetch_all(&**pool)
+        .fetch_all(&*pool)
         .await?;
 
         let mut merged = MissingMetadata {
@@ -141,7 +141,7 @@ pub async fn get_project_meta(
                 .map(|x| x.as_bytes().to_vec())
                 .collect::<Vec<_>>()
         )
-        .fetch_all(&**pool)
+        .fetch_all(&*pool)
         .await?;
 
         for row in rows {
@@ -176,7 +176,7 @@ pub async fn get_project_meta(
             ",
             &check_flames,
         )
-        .fetch_all(&**pool)
+        .fetch_all(&*pool)
         .await?;
 
         for row in rows {
@@ -199,7 +199,7 @@ pub async fn get_project_meta(
             }
         }
 
-        Ok(HttpResponse::Ok().json(merged))
+        Ok(HttpResponse::Ok().json(&merged))
     } else {
         Err(ApiError::NotFound)
     }
@@ -224,14 +224,14 @@ pub enum Judgement {
 
 pub async fn set_project_meta(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    judgements: web::Json<HashMap<String, Judgement>>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    judgements: web::types::Json<HashMap<String, Judgement>>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),

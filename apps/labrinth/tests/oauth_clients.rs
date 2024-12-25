@@ -1,5 +1,4 @@
 use actix_http::StatusCode;
-use actix_web::test;
 use common::{
     api_v3::ApiV3,
     database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_ID, USER_USER_PAT},
@@ -14,12 +13,13 @@ use labrinth::{
     },
     routes::v3::oauth_clients::OAuthClientEdit,
 };
+use ntex::web::test;
 
 use common::database::USER_USER_ID_PARSED;
 
 mod common;
 
-#[actix_rt::test]
+#[ntex::test]
 async fn can_create_edit_get_oauth_client() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let client_name = "test_client".to_string();
@@ -75,7 +75,7 @@ async fn can_create_edit_get_oauth_client() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn create_oauth_client_with_restricted_scopes_fails() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let resp = env
@@ -93,7 +93,7 @@ async fn create_oauth_client_with_restricted_scopes_fails() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn get_oauth_client_for_client_creator_succeeds() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let DummyOAuthClientAlpha { client_id, .. } =
@@ -111,7 +111,7 @@ async fn get_oauth_client_for_client_creator_succeeds() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn can_delete_oauth_client() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let client_id = env.dummy.oauth_client_alpha.client_id.clone();
@@ -127,7 +127,7 @@ async fn can_delete_oauth_client() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn delete_oauth_client_after_issuing_access_tokens_revokes_tokens() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let DummyOAuthClientAlpha {
@@ -159,7 +159,7 @@ async fn delete_oauth_client_after_issuing_access_tokens_revokes_tokens() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn can_list_user_oauth_authorizations() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let DummyOAuthClientAlpha {

@@ -14,7 +14,7 @@ use rust_decimal::{prelude::ToPrimitive, Decimal};
 
 mod common;
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn analytics_revenue() {
     with_test_environment(
         None,
@@ -153,7 +153,7 @@ fn to_f64_vec_rounded_up(d: Vec<Decimal>) -> Vec<f64> {
     d.into_iter().map(to_f64_rounded_up).collect_vec()
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn permissions_analytics_revenue() {
     with_test_environment(
         None,

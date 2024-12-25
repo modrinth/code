@@ -12,7 +12,7 @@ use serde_json::json;
 
 mod common;
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_get_team() {
     // Test setup and dummy data
     // Perform get_team related tests for a project team
@@ -163,7 +163,7 @@ async fn test_get_team() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_get_team_organization() {
     // Test setup and dummy data
     // Perform get_team related tests for an organization team
@@ -322,7 +322,7 @@ async fn test_get_team_organization() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_get_team_project_orgs() {
     // Test setup and dummy data
     with_test_environment(
@@ -390,7 +390,7 @@ async fn test_get_team_project_orgs() {
 }
 
 // edit team member (Varying permissions, varying roles)
-#[actix_rt::test]
+#[ntex::test]
 async fn test_patch_project_team_member() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
@@ -461,7 +461,7 @@ async fn test_patch_project_team_member() {
 }
 
 // edit team member (Varying permissions, varying roles)
-#[actix_rt::test]
+#[ntex::test]
 async fn test_patch_organization_team_member() {
     // Test setup and dummy data
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
@@ -554,7 +554,7 @@ async fn test_patch_organization_team_member() {
 }
 
 // trasnfer ownership (requires being owner, etc)
-#[actix_rt::test]
+#[ntex::test]
 async fn transfer_ownership_v3() {
     // Test setup and dummy data
     with_test_environment(
@@ -688,7 +688,7 @@ async fn transfer_ownership_v3() {
 }
 
 // This test is currently not working.
-// #[actix_rt::test]
+// #[ntex::test]
 // pub async fn no_acceptance_permissions() {
 //     // Adding a user to a project team in an organization, when that user is in the organization but not the team,
 //     // should have those permissions apply regardless of whether the user has accepted the invite or not.

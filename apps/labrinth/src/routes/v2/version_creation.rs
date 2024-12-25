@@ -13,10 +13,8 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
 use crate::routes::{v2_reroute, v3};
-use actix_multipart::Multipart;
-use actix_web::http::header::ContentDisposition;
-use actix_web::web::Data;
-use actix_web::{post, web, HttpRequest, HttpResponse};
+use ntex::web::{self, post, HttpRequest, HttpResponse};
+use ntex_multipart::Multipart;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::postgres::PgPool;
@@ -85,11 +83,11 @@ struct InitialFileData {
 pub async fn version_create(
     req: HttpRequest,
     payload: Multipart,
-    client: Data<PgPool>,
-    redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: Data<AuthQueue>,
-    moderation_queue: Data<AutomatedModerationQueue>,
+    client: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
+    moderation_queue: web::types::State<AutomatedModerationQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let payload = v2_reroute::alter_actix_multipart(
         payload,
@@ -272,7 +270,7 @@ pub async fn version_create(
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
             let v2_version = LegacyVersion::from(version);
-            Ok(HttpResponse::Ok().json(v2_version))
+            Ok(HttpResponse::Ok().json(&v2_version))
         }
         Err(response) => Ok(response),
     }
@@ -281,7 +279,7 @@ pub async fn version_create(
 // Gets version fields of an example version of a project, if one exists.
 async fn get_example_version_fields(
     project_id: Option<ProjectId>,
-    pool: Data<PgPool>,
+    pool: web::types::State<PgPool>,
     redis: &RedisPool,
 ) -> Result<Option<Vec<VersionField>>, CreateError> {
     let project_id = match project_id {
@@ -290,7 +288,7 @@ async fn get_example_version_fields(
     };
 
     let vid =
-        match project_item::Project::get_id(project_id.into(), &**pool, redis)
+        match project_item::Project::get_id(project_id.into(), &*pool, redis)
             .await?
             .and_then(|p| p.versions.first().cloned())
         {
@@ -299,7 +297,7 @@ async fn get_example_version_fields(
         };
 
     let example_version =
-        match version_item::Version::get(vid, &**pool, redis).await? {
+        match version_item::Version::get(vid, &*pool, redis).await? {
             Some(version) => version,
             None => return Ok(None),
         };
@@ -310,12 +308,12 @@ async fn get_example_version_fields(
 #[post("{version_id}/file")]
 pub async fn upload_file_to_version(
     req: HttpRequest,
-    url_data: web::Path<(VersionId,)>,
+    url_data: web::types::Path<(VersionId,)>,
     payload: Multipart,
-    client: Data<PgPool>,
-    redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    client: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
     // Returns NoContent, so no need to convert to V2
     let response = v3::version_creation::upload_file_to_version(

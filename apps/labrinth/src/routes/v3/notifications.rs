@@ -6,7 +6,7 @@ use crate::models::notifications::Notification;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{web, HttpRequest, HttpResponse};
+use ntex::web::{self, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -30,14 +30,14 @@ pub struct NotificationIds {
 
 pub async fn notifications_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<NotificationIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<NotificationIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::NOTIFICATION_READ]),
@@ -57,7 +57,7 @@ pub async fn notifications_get(
     let notifications_data: Vec<DBNotification> =
         database::models::notification_item::Notification::get_many(
             &notification_ids,
-            &**pool,
+            &*pool,
         )
         .await?;
 
@@ -67,19 +67,19 @@ pub async fn notifications_get(
         .map(Notification::from)
         .collect();
 
-    Ok(HttpResponse::Ok().json(notifications))
+    Ok(HttpResponse::Ok().json(&notifications))
 }
 
 pub async fn notification_get(
     req: HttpRequest,
-    info: web::Path<(NotificationId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(NotificationId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::NOTIFICATION_READ]),
@@ -92,13 +92,13 @@ pub async fn notification_get(
     let notification_data =
         database::models::notification_item::Notification::get(
             id.into(),
-            &**pool,
+            &*pool,
         )
         .await?;
 
     if let Some(data) = notification_data {
         if user.id == data.user_id.into() || user.role.is_admin() {
-            Ok(HttpResponse::Ok().json(Notification::from(data)))
+            Ok(HttpResponse::Ok().json(&Notification::from(data)))
         } else {
             Err(ApiError::NotFound)
         }
@@ -109,14 +109,14 @@ pub async fn notification_get(
 
 pub async fn notification_read(
     req: HttpRequest,
-    info: web::Path<(NotificationId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(NotificationId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::NOTIFICATION_WRITE]),
@@ -129,7 +129,7 @@ pub async fn notification_read(
     let notification_data =
         database::models::notification_item::Notification::get(
             id.into(),
-            &**pool,
+            &*pool,
         )
         .await?;
 
@@ -159,14 +159,14 @@ pub async fn notification_read(
 
 pub async fn notification_delete(
     req: HttpRequest,
-    info: web::Path<(NotificationId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(NotificationId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::NOTIFICATION_WRITE]),
@@ -179,7 +179,7 @@ pub async fn notification_delete(
     let notification_data =
         database::models::notification_item::Notification::get(
             id.into(),
-            &**pool,
+            &*pool,
         )
         .await?;
 
@@ -210,14 +210,14 @@ pub async fn notification_delete(
 
 pub async fn notifications_read(
     req: HttpRequest,
-    web::Query(ids): web::Query<NotificationIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<NotificationIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::NOTIFICATION_WRITE]),
@@ -236,7 +236,7 @@ pub async fn notifications_read(
     let notifications_data =
         database::models::notification_item::Notification::get_many(
             &notification_ids,
-            &**pool,
+            &*pool,
         )
         .await?;
 
@@ -263,14 +263,14 @@ pub async fn notifications_read(
 
 pub async fn notifications_delete(
     req: HttpRequest,
-    web::Query(ids): web::Query<NotificationIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<NotificationIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::NOTIFICATION_WRITE]),
@@ -289,7 +289,7 @@ pub async fn notifications_delete(
     let notifications_data =
         database::models::notification_item::Notification::get_many(
             &notification_ids,
-            &**pool,
+            &*pool,
         )
         .await?;
 

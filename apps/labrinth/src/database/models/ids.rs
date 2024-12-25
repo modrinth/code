@@ -49,7 +49,7 @@ macro_rules! generate_bulk_ids {
             count: usize,
             con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         ) -> Result<Vec<$return_type>, DatabaseError> {
-            let mut rng = rand::thread_rng();
+            let mut rng = ChaCha20Rng::from_entropy();
             let mut retry_count = 0;
 
             // Check if ID is unique

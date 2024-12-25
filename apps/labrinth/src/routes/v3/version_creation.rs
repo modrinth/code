@@ -25,12 +25,11 @@ use crate::queue::session::AuthQueue;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{validate_file, ValidationResult};
-use actix_multipart::{Field, Multipart};
-use actix_web::web::Data;
-use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use itertools::Itertools;
+use ntex::web::{self, HttpRequest, HttpResponse};
+use ntex_multipart::{Field, Multipart};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
@@ -101,11 +100,11 @@ struct InitialFileData {
 pub async fn version_create(
     req: HttpRequest,
     mut payload: Multipart,
-    client: Data<PgPool>,
-    redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
+    client: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
+    moderation_queue: web::types::State<AutomatedModerationQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -115,7 +114,7 @@ pub async fn version_create(
         &mut payload,
         &mut transaction,
         &redis,
-        &***file_host,
+        &**file_host,
         &mut uploaded_files,
         &client,
         &session_queue,
@@ -125,7 +124,7 @@ pub async fn version_create(
 
     if result.is_err() {
         let undo_result = super::project_creation::undo_uploads(
-            &***file_host,
+            &**file_host,
             &uploaded_files,
         )
         .await;
@@ -526,17 +525,17 @@ async fn version_create_inner(
         }
     }
 
-    Ok(HttpResponse::Ok().json(response))
+    Ok(HttpResponse::Ok().json(&response))
 }
 
 pub async fn upload_file_to_version(
     req: HttpRequest,
-    url_data: web::Path<(VersionId,)>,
+    url_data: web::types::Path<(VersionId,)>,
     mut payload: Multipart,
-    client: Data<PgPool>,
-    redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    client: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -549,7 +548,7 @@ pub async fn upload_file_to_version(
         client,
         &mut transaction,
         redis,
-        &***file_host,
+        &**file_host,
         &mut uploaded_files,
         version_id,
         &session_queue,
@@ -558,7 +557,7 @@ pub async fn upload_file_to_version(
 
     if result.is_err() {
         let undo_result = super::project_creation::undo_uploads(
-            &***file_host,
+            &**file_host,
             &uploaded_files,
         )
         .await;
@@ -579,9 +578,9 @@ pub async fn upload_file_to_version(
 async fn upload_file_to_version_inner(
     req: HttpRequest,
     payload: &mut Multipart,
-    client: Data<PgPool>,
+    client: web::types::State<PgPool>,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    redis: Data<RedisPool>,
+    redis: web::types::State<RedisPool>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::VersionId,
@@ -594,7 +593,7 @@ async fn upload_file_to_version_inner(
 
     let user = get_user_from_headers(
         &req,
-        &**client,
+        &*client,
         &redis,
         session_queue,
         Some(&[Scopes::VERSION_WRITE]),
@@ -602,7 +601,7 @@ async fn upload_file_to_version_inner(
     .await?
     .1;
 
-    let result = models::Version::get(version_id, &**client, &redis).await?;
+    let result = models::Version::get(version_id, &*client, &redis).await?;
 
     let version = match result {
         Some(v) => v,
@@ -652,7 +651,7 @@ async fn upload_file_to_version_inner(
         let organization =
             Organization::get_associated_organization_project_id(
                 version.inner.project_id,
-                &**client,
+                &*client,
             )
             .await?;
 

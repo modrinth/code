@@ -54,8 +54,8 @@ pub async fn remove_documents(
 }
 
 pub async fn index_projects(
-    pool: PgPool,
-    redis: RedisPool,
+    pool: &PgPool,
+    redis: &RedisPool,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
     info!("Indexing projects.");
@@ -73,7 +73,7 @@ pub async fn index_projects(
 
     let all_loader_fields =
         crate::database::models::loader_fields::LoaderField::get_fields_all(
-            &pool, &redis,
+            pool, redis,
         )
         .await?
         .into_iter()

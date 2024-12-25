@@ -15,7 +15,6 @@ use crate::{
     },
 };
 use actix_http::StatusCode;
-use actix_web::test;
 use futures::StreamExt;
 use itertools::Itertools;
 use labrinth::{
@@ -26,9 +25,10 @@ use labrinth::{
     },
     util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData},
 };
+use ntex::web::test;
 use serde_json::json;
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_project_type_sanity() {
     with_test_environment(
         None,
@@ -109,7 +109,7 @@ async fn test_project_type_sanity() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_add_remove_project() {
     // Test setup and dummy data
     with_test_environment(
@@ -293,7 +293,7 @@ async fn test_add_remove_project() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_upload_version() {
     with_test_environment(
         None,
@@ -402,7 +402,7 @@ async fn permissions_upload_version() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn test_patch_v2() {
     // Hits V3-specific patchable fields
     // Other fields are tested in test_patch_project (the v2 version of that test)
@@ -441,7 +441,7 @@ pub async fn test_patch_v2() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_patch_project_v2() {
     with_test_environment(
         Some(8),
@@ -519,7 +519,7 @@ async fn permissions_patch_project_v2() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn test_bulk_edit_links() {
     with_test_environment(
         None,

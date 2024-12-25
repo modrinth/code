@@ -1,5 +1,5 @@
 use crate::routes::ApiError;
-use actix_web::{web, HttpResponse};
+use ntex::web::{self, HttpResponse};
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -15,7 +15,7 @@ pub struct V3Stats {
 }
 
 pub async fn get_stats(
-    pool: web::Data<PgPool>,
+    pool: web::types::State<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let projects = sqlx::query!(
         "
@@ -28,7 +28,7 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool)
+    .fetch_one(&*pool)
     .await?;
 
     let versions = sqlx::query!(
@@ -47,7 +47,7 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool)
+    .fetch_one(&*pool)
     .await?;
 
     let authors = sqlx::query!(
@@ -62,7 +62,7 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool)
+    .fetch_one(&*pool)
     .await?;
 
     let files = sqlx::query!(
@@ -80,7 +80,7 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool)
+    .fetch_one(&*pool)
     .await?;
 
     let v3_stats = V3Stats {
@@ -90,5 +90,5 @@ pub async fn get_stats(
         files: files.count,
     };
 
-    Ok(HttpResponse::Ok().json(v3_stats))
+    Ok(HttpResponse::Ok().json(&v3_stats))
 }

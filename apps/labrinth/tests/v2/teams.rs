@@ -16,7 +16,7 @@ use crate::{
 };
 
 // trasnfer ownership (requires being owner, etc)
-#[actix_rt::test]
+#[ntex::test]
 async fn transfer_ownership_v2() {
     // Test setup and dummy data
     with_test_environment(

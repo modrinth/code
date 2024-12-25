@@ -1,5 +1,5 @@
-use actix_web::{App, HttpServer};
-use actix_web_prom::PrometheusMetricsBuilder;
+use ntex::web::{App, HttpServer};
+// use actix_web_prom::PrometheusMetricsBuilder;
 use env_logger::Env;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;
@@ -18,7 +18,7 @@ pub struct Pepper {
     pub pepper: String,
 }
 
-#[actix_rt::main]
+#[ntex::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
     env_logger::Builder::from_env(Env::default().default_filter_or("info"))
@@ -90,10 +90,10 @@ async fn main() -> std::io::Result<()> {
     let maxmind_reader =
         Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
 
-    let prometheus = PrometheusMetricsBuilder::new("labrinth")
-        .endpoint("/metrics")
-        .build()
-        .expect("Failed to create prometheus metrics middleware");
+    // let prometheus = PrometheusMetricsBuilder::new("labrinth")
+    //     .endpoint("/metrics")
+    //     .build()
+    //     .expect("Failed to create prometheus metrics middleware");
 
     let search_config = search::SearchConfig::new(None);
 
@@ -111,11 +111,29 @@ async fn main() -> std::io::Result<()> {
     // Init App
     HttpServer::new(move || {
         App::new()
-            .wrap(prometheus.clone())
+            // .wrap(prometheus.clone())
             .wrap(RateLimit(Arc::clone(&labrinth_config.rate_limiter)))
-            .wrap(actix_web::middleware::Compress::default())
-            .wrap(sentry_actix::Sentry::new())
-            .configure(|cfg| labrinth::app_config(cfg, labrinth_config.clone()))
+            .wrap(ntex::web::middleware::Compress::default())
+            // .wrap(sentry_actix::Sentry::new())
+            .state(labrinth_config.redis_pool.clone())
+            .state(labrinth_config.pool.clone())
+            .state(labrinth_config.file_host.clone())
+            .state(labrinth_config.search_config.clone())
+            .state(labrinth_config.session_queue.clone())
+            .state(labrinth_config.payouts_queue.clone())
+            .state(labrinth_config.ip_salt.clone())
+            .state(labrinth_config.analytics_queue.clone())
+            .state(labrinth_config.clickhouse.clone())
+            .state(labrinth_config.maxmind.clone())
+            .state(labrinth_config.active_sockets.clone())
+            .state(labrinth_config.automated_moderation_queue.clone())
+            .state(labrinth_config.stripe_client.clone())
+            .configure(labrinth::routes::v2::config)
+            .configure(labrinth::routes::v3::config)
+            .configure(labrinth::routes::internal::config)
+            .configure(labrinth::routes::root_config)
+            // // TODO: fix me
+            .default_service(ntex::web::get()/*.wrap(default_cors())*/.to(labrinth::routes::not_found))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
     .run()

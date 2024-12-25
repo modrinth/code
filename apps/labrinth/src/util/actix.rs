@@ -1,5 +1,6 @@
-use actix_web::test::TestRequest;
 use bytes::{Bytes, BytesMut};
+use image::EncodableLayout;
+use ntex::web::test::TestRequest;
 
 // Multipart functionality for actix
 // Primarily for testing or some implementations of route-redirection
@@ -31,12 +32,14 @@ impl AppendsMultipart for TestRequest {
         self,
         data: impl IntoIterator<Item = MultipartSegment>,
     ) -> Self {
-        let (boundary, payload) = generate_multipart(data);
-        self.append_header((
-            "Content-Type",
-            format!("multipart/form-data; boundary={}", boundary),
-        ))
-        .set_payload(payload)
+        // TODO: fix me
+        // let (boundary, payload) = generate_multipart(data);
+        // self.header(
+        //     "Content-Type",
+        //     format!("multipart/form-data; boundary={}", boundary),
+        // )
+        // .set_payload(payload.as_bytes())
+        self
     }
 }
 

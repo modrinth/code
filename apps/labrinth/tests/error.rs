@@ -1,7 +1,7 @@
 use actix_http::StatusCode;
-use actix_web::test;
 use bytes::Bytes;
 use common::api_common::ApiProject;
+use ntex::web::test;
 
 use common::api_v3::ApiV3;
 use common::database::USER_USER_PAT;
@@ -9,7 +9,7 @@ use common::environment::{with_test_environment, TestEnvironment};
 
 mod common;
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn error_404_body() {
     with_test_environment(
         None,

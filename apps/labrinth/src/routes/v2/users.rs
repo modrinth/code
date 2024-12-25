@@ -8,8 +8,8 @@ use crate::models::v2::projects::LegacyProject;
 use crate::models::v2::user::LegacyUser;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use lazy_static::lazy_static;
+use ntex::web::{self, delete, get, patch, HttpRequest, HttpResponse};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -35,9 +35,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[get("user")]
 pub async fn user_auth_get(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::user_auth_get(req, pool, redis, session_queue)
         .await
@@ -47,7 +47,7 @@ pub async fn user_auth_get(
     match v2_reroute::extract_ok_json::<User>(response).await {
         Ok(user) => {
             let user = LegacyUser::from(user);
-            Ok(HttpResponse::Ok().json(user))
+            Ok(HttpResponse::Ok().json(&user))
         }
         Err(response) => Ok(response),
     }
@@ -60,12 +60,12 @@ pub struct UserIds {
 
 #[get("users")]
 pub async fn users_get(
-    web::Query(ids): web::Query<UserIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    web::types::Query(ids): web::types::Query<UserIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::users_get(
-        web::Query(v3::users::UserIds { ids: ids.ids }),
+        web::types::Query(v3::users::UserIds { ids: ids.ids }),
         pool,
         redis,
     )
@@ -77,7 +77,7 @@ pub async fn users_get(
         Ok(users) => {
             let legacy_users: Vec<LegacyUser> =
                 users.into_iter().map(LegacyUser::from).collect();
-            Ok(HttpResponse::Ok().json(legacy_users))
+            Ok(HttpResponse::Ok().json(&legacy_users))
         }
         Err(response) => Ok(response),
     }
@@ -85,9 +85,9 @@ pub async fn users_get(
 
 #[get("{id}")]
 pub async fn user_get(
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::user_get(info, pool, redis)
         .await
@@ -97,7 +97,7 @@ pub async fn user_get(
     match v2_reroute::extract_ok_json::<User>(response).await {
         Ok(user) => {
             let user = LegacyUser::from(user);
-            Ok(HttpResponse::Ok().json(user))
+            Ok(HttpResponse::Ok().json(&user))
         }
         Err(response) => Ok(response),
     }
@@ -106,10 +106,10 @@ pub async fn user_get(
 #[get("{user_id}/projects")]
 pub async fn projects_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::projects_list(
         req,
@@ -125,8 +125,8 @@ pub async fn projects_list(
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
-            Ok(HttpResponse::Ok().json(legacy_projects))
+                LegacyProject::from_many(project, &*pool, &redis).await?;
+            Ok(HttpResponse::Ok().json(&legacy_projects))
         }
         Err(response) => Ok(response),
     }
@@ -162,18 +162,18 @@ pub struct EditUser {
 #[patch("{id}")]
 pub async fn user_edit(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    new_user: web::Json<EditUser>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    new_user: web::types::Json<EditUser>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let new_user = new_user.into_inner();
     // Returns NoContent, so we don't need to convert to V2
     v3::users::user_edit(
         req,
         info,
-        web::Json(v3::users::EditUser {
+        web::types::Json(v3::users::EditUser {
             username: new_user.username,
             bio: new_user.bio,
             role: new_user.role,
@@ -197,18 +197,18 @@ pub struct Extension {
 #[patch("{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn user_icon_edit(
-    web::Query(ext): web::Query<Extension>,
+    web::types::Query(ext): web::types::Query<Extension>,
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    payload: web::Payload,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    payload: web::types::Payload,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert to V2
     v3::users::user_icon_edit(
-        web::Query(v3::users::Extension { ext: ext.ext }),
+        web::types::Query(v3::users::Extension { ext: ext.ext }),
         req,
         info,
         pool,
@@ -224,10 +224,10 @@ pub async fn user_icon_edit(
 #[delete("{id}")]
 pub async fn user_delete(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert to V2
     v3::users::user_delete(req, info, pool, redis, session_queue)
@@ -238,10 +238,10 @@ pub async fn user_delete(
 #[get("{id}/follows")]
 pub async fn user_follows(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::users::user_follows(
         req,
@@ -257,8 +257,8 @@ pub async fn user_follows(
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
-            Ok(HttpResponse::Ok().json(legacy_projects))
+                LegacyProject::from_many(project, &*pool, &redis).await?;
+            Ok(HttpResponse::Ok().json(&legacy_projects))
         }
         Err(response) => Ok(response),
     }
@@ -267,10 +267,10 @@ pub async fn user_follows(
 #[get("{id}/notifications")]
 pub async fn user_notifications(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response =
         v3::users::user_notifications(req, info, pool, redis, session_queue)
@@ -283,7 +283,7 @@ pub async fn user_notifications(
                 .into_iter()
                 .map(LegacyNotification::from)
                 .collect();
-            Ok(HttpResponse::Ok().json(legacy_notifications))
+            Ok(HttpResponse::Ok().json(&legacy_notifications))
         }
         Err(response) => Ok(response),
     }

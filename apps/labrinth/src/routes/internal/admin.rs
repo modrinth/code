@@ -9,8 +9,8 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
-use crate::util::guards::admin_key_guard;
-use actix_web::{patch, post, web, HttpRequest, HttpResponse};
+// use crate::util::guards::admin_key_guard;
+use ntex::web::{self, patch, post, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -36,16 +36,18 @@ pub struct DownloadBody {
 }
 
 // This is an internal route, cannot be used without key
-#[patch("/_count-download", guard = "admin_key_guard")]
+#[patch("/_count-download")]
+// TODO: fix me
+// #[patch("/_count-download", guard = "admin_key_guard")]
 #[allow(clippy::too_many_arguments)]
 pub async fn count_download(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    maxmind: web::Data<Arc<MaxMindIndexer>>,
-    analytics_queue: web::Data<Arc<AnalyticsQueue>>,
-    session_queue: web::Data<AuthQueue>,
-    download_body: web::Json<DownloadBody>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    maxmind: web::types::State<Arc<MaxMindIndexer>>,
+    analytics_queue: web::types::State<Arc<AnalyticsQueue>>,
+    session_queue: web::types::State<AuthQueue>,
+    download_body: web::types::Json<DownloadBody>,
 ) -> Result<HttpResponse, ApiError> {
     let token = download_body
         .headers
@@ -56,7 +58,7 @@ pub async fn count_download(
     let user = get_user_record_from_bearer_token(
         &req,
         token,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
     )
@@ -81,7 +83,7 @@ pub async fn count_download(
             ",
         download_body.url,
     )
-    .fetch_optional(pool.as_ref())
+    .fetch_optional(&*pool)
     .await?
     {
         (version.id, version.mod_id)
@@ -94,7 +96,7 @@ pub async fn count_download(
         project_id as crate::database::models::ids::ProjectId,
         id_option
     )
-    .fetch_optional(pool.as_ref())
+    .fetch_optional(&*pool)
     .await?
     {
         (version.id, version.mod_id)
@@ -147,14 +149,16 @@ pub async fn count_download(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[post("/_force_reindex", guard = "admin_key_guard")]
+#[post("/_force_reindex")]
+// TODO: fix me
+// #[post("/_force_reindex", guard = "admin_key_guard")]
 pub async fn force_reindex(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    config: web::Data<SearchConfig>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    config: web::types::State<SearchConfig>,
 ) -> Result<HttpResponse, ApiError> {
     use crate::search::indexing::index_projects;
     let redis = redis.get_ref();
-    index_projects(pool.as_ref().clone(), redis.clone(), &config).await?;
+    index_projects(&*pool, &redis, &config).await?;
     Ok(HttpResponse::NoContent().finish())
 }

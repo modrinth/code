@@ -3,7 +3,7 @@ use crate::models::reports::Report;
 use crate::models::v2::reports::LegacyReport;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use ntex::web::{self, delete, get, patch, post, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 use validator::Validate;
@@ -20,10 +20,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[post("report")]
 pub async fn report_create(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    body: web::Payload,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    body: web::types::Payload,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response =
         v3::reports::report_create(req, pool, body, redis, session_queue)
@@ -34,7 +34,7 @@ pub async fn report_create(
     match v2_reroute::extract_ok_json::<Report>(response).await {
         Ok(report) => {
             let report = LegacyReport::from(report);
-            Ok(HttpResponse::Ok().json(report))
+            Ok(HttpResponse::Ok().json(&report))
         }
         Err(response) => Ok(response),
     }
@@ -58,16 +58,16 @@ fn default_all() -> bool {
 #[get("report")]
 pub async fn reports(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    count: web::Query<ReportsRequestOptions>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    count: web::types::Query<ReportsRequestOptions>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::reports::reports(
         req,
         pool,
         redis,
-        web::Query(v3::reports::ReportsRequestOptions {
+        web::types::Query(v3::reports::ReportsRequestOptions {
             count: count.count,
             all: count.all,
         }),
@@ -81,7 +81,7 @@ pub async fn reports(
         Ok(reports) => {
             let reports: Vec<_> =
                 reports.into_iter().map(LegacyReport::from).collect();
-            Ok(HttpResponse::Ok().json(reports))
+            Ok(HttpResponse::Ok().json(&reports))
         }
         Err(response) => Ok(response),
     }
@@ -95,14 +95,14 @@ pub struct ReportIds {
 #[get("reports")]
 pub async fn reports_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<ReportIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<ReportIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::reports::reports_get(
         req,
-        web::Query(v3::reports::ReportIds { ids: ids.ids }),
+        web::types::Query(v3::reports::ReportIds { ids: ids.ids }),
         pool,
         redis,
         session_queue,
@@ -115,7 +115,7 @@ pub async fn reports_get(
         Ok(report_list) => {
             let report_list: Vec<_> =
                 report_list.into_iter().map(LegacyReport::from).collect();
-            Ok(HttpResponse::Ok().json(report_list))
+            Ok(HttpResponse::Ok().json(&report_list))
         }
         Err(response) => Ok(response),
     }
@@ -124,10 +124,10 @@ pub async fn reports_get(
 #[get("report/{id}")]
 pub async fn report_get(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    info: web::types::Path<(crate::models::reports::ReportId,)>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response =
         v3::reports::report_get(req, pool, redis, info, session_queue)
@@ -138,7 +138,7 @@ pub async fn report_get(
     match v2_reroute::extract_ok_json::<Report>(response).await {
         Ok(report) => {
             let report = LegacyReport::from(report);
-            Ok(HttpResponse::Ok().json(report))
+            Ok(HttpResponse::Ok().json(&report))
         }
         Err(response) => Ok(response),
     }
@@ -154,11 +154,11 @@ pub struct EditReport {
 #[patch("report/{id}")]
 pub async fn report_edit(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
-    session_queue: web::Data<AuthQueue>,
-    edit_report: web::Json<EditReport>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    info: web::types::Path<(crate::models::reports::ReportId,)>,
+    session_queue: web::types::State<AuthQueue>,
+    edit_report: web::types::Json<EditReport>,
 ) -> Result<HttpResponse, ApiError> {
     let edit_report = edit_report.into_inner();
     // Returns NoContent, so no need to convert
@@ -168,7 +168,7 @@ pub async fn report_edit(
         redis,
         info,
         session_queue,
-        web::Json(v3::reports::EditReport {
+        web::types::Json(v3::reports::EditReport {
             body: edit_report.body,
             closed: edit_report.closed,
         }),
@@ -180,10 +180,10 @@ pub async fn report_edit(
 #[delete("report/{id}")]
 pub async fn report_delete(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    info: web::types::Path<(crate::models::reports::ReportId,)>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::reports::report_delete(req, pool, info, redis, session_queue)

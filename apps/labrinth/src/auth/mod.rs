@@ -15,8 +15,8 @@ pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
 use crate::file_hosting::FileHostingError;
 use crate::models::error::ApiError;
-use actix_web::http::StatusCode;
-use actix_web::HttpResponse;
+use ntex::http::StatusCode;
+use ntex::web::{HttpRequest, HttpResponse};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -51,7 +51,7 @@ pub enum AuthenticationError {
     Url,
 }
 
-impl actix_web::ResponseError for AuthenticationError {
+impl ntex::web::WebResponseError for AuthenticationError {
     fn status_code(&self) -> StatusCode {
         match self {
             AuthenticationError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -77,8 +77,8 @@ impl actix_web::ResponseError for AuthenticationError {
         }
     }
 
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ApiError {
+    fn error_response(&self, _req: &HttpRequest) -> HttpResponse {
+        HttpResponse::build(self.status_code()).json(&ApiError {
             error: self.error_name(),
             description: self.to_string(),
         })

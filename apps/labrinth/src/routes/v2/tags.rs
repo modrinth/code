@@ -7,9 +7,9 @@ use crate::models::v2::projects::LegacySideType;
 use crate::routes::v2_reroute::capitalize_first;
 use crate::routes::v3::tags::{LinkPlatformQueryData, LoaderFieldsEnumQuery};
 use crate::routes::{v2_reroute, v3};
-use actix_web::{get, web, HttpResponse};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
+use ntex::web::{self, get, HttpResponse};
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -37,8 +37,8 @@ pub struct CategoryData {
 
 #[get("category")]
 pub async fn category_list(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::tags::category_list(pool, redis).await?;
 
@@ -56,7 +56,7 @@ pub async fn category_list(
                     header: c.header,
                 })
                 .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(categories))
+            Ok(HttpResponse::Ok().json(&categories))
         }
         Err(response) => Ok(response),
     }
@@ -71,8 +71,8 @@ pub struct LoaderData {
 
 #[get("loader")]
 pub async fn loader_list(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::tags::loader_list(pool, redis).await?;
 
@@ -110,7 +110,7 @@ pub async fn loader_list(
                     }
                 })
                 .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(loaders))
+            Ok(HttpResponse::Ok().json(&loaders))
         }
         Err(response) => Ok(response),
     }
@@ -133,9 +133,9 @@ pub struct GameVersionQuery {
 
 #[get("game_version")]
 pub async fn game_version_list(
-    pool: web::Data<PgPool>,
-    query: web::Query<GameVersionQuery>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    query: web::types::Query<GameVersionQuery>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let mut filters = HashMap::new();
     if let Some(type_) = &query.type_ {
@@ -146,7 +146,7 @@ pub async fn game_version_list(
     }
     let response = v3::tags::loader_fields_list(
         pool,
-        web::Query(LoaderFieldsEnumQuery {
+        web::types::Query(LoaderFieldsEnumQuery {
             loader_field: "game_versions".to_string(),
             filters: Some(filters),
         }),
@@ -178,7 +178,7 @@ pub async fn game_version_list(
                             .unwrap_or_default(),
                     })
                     .collect::<Vec<_>>();
-                HttpResponse::Ok().json(fields)
+                HttpResponse::Ok().json(&fields)
             }
             Err(response) => response,
         },
@@ -206,7 +206,7 @@ pub async fn license_list() -> HttpResponse {
                     name: l.name,
                 })
                 .collect::<Vec<_>>();
-            HttpResponse::Ok().json(licenses)
+            HttpResponse::Ok().json(&licenses)
         }
         Err(response) => response,
     }
@@ -220,7 +220,7 @@ pub struct LicenseText {
 
 #[get("license/{id}")]
 pub async fn license_text(
-    params: web::Path<(String,)>,
+    params: web::types::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
     let license = v3::tags::license_text(params)
         .await
@@ -231,7 +231,7 @@ pub async fn license_text(
         match v2_reroute::extract_ok_json::<v3::tags::LicenseText>(license)
             .await
         {
-            Ok(license) => HttpResponse::Ok().json(LicenseText {
+            Ok(license) => HttpResponse::Ok().json(&LicenseText {
                 title: license.title,
                 body: license.body,
             }),
@@ -251,8 +251,8 @@ pub struct DonationPlatformQueryData {
 
 #[get("donation_platform")]
 pub async fn donation_platform_list(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::tags::link_platform_list(pool, redis).await?;
 
@@ -287,7 +287,7 @@ pub async fn donation_platform_list(
                         }
                     })
                     .collect::<Vec<_>>();
-                HttpResponse::Ok().json(platforms)
+                HttpResponse::Ok().json(&platforms)
             }
             Err(response) => response,
         },
@@ -297,8 +297,8 @@ pub async fn donation_platform_list(
 
 #[get("report_type")]
 pub async fn report_type_list(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     // This returns a list of strings directly, so we don't need to convert to v2 format.
     v3::tags::report_type_list(pool, redis)
@@ -308,8 +308,8 @@ pub async fn report_type_list(
 
 #[get("project_type")]
 pub async fn project_type_list(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     // This returns a list of strings directly, so we don't need to convert to v2 format.
     v3::tags::project_type_list(pool, redis)
@@ -328,5 +328,5 @@ pub async fn side_type_list() -> Result<HttpResponse, ApiError> {
         LegacySideType::Unknown,
     ];
     let side_types = side_types.iter().map(|s| s.to_string()).collect_vec();
-    Ok(HttpResponse::Ok().json(side_types))
+    Ok(HttpResponse::Ok().json(&side_types))
 }

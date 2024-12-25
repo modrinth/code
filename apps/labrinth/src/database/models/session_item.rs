@@ -85,14 +85,14 @@ impl Session {
     pub async fn get<
         'a,
         E,
-        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug + Send,
     >(
         id: T,
         exec: E,
         redis: &RedisPool,
     ) -> Result<Option<Session>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         Self::get_many(&[id], exec, redis)
             .await
@@ -105,7 +105,7 @@ impl Session {
         redis: &RedisPool,
     ) -> Result<Option<Session>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         Session::get_many(
             &[crate::models::ids::SessionId::from(id)],
@@ -122,7 +122,7 @@ impl Session {
         redis: &RedisPool,
     ) -> Result<Vec<Session>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         let ids = session_ids
             .iter()
@@ -134,14 +134,14 @@ impl Session {
     pub async fn get_many<
         'a,
         E,
-        T: Display + Hash + Eq + PartialEq + Clone + Debug,
+        T: Display + Hash + Eq + PartialEq + Clone + Debug + Send,
     >(
         session_strings: &[T],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<Session>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Send + Sync,
     {
         use futures::TryStreamExt;
 

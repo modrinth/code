@@ -11,9 +11,8 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
 use crate::routes::{v2_reroute, v3};
-use actix_multipart::Multipart;
-use actix_web::web::Data;
-use actix_web::{post, HttpRequest, HttpResponse};
+use ntex::web::{self, post, HttpRequest, HttpResponse};
+use ntex_multipart::Multipart;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::postgres::PgPool;
@@ -24,7 +23,7 @@ use validator::Validate;
 
 use super::version_creation::InitialVersionData;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn config(cfg: &mut ntex::web::ServiceConfig) {
     cfg.service(project_create);
 }
 
@@ -139,10 +138,10 @@ struct ProjectCreateData {
 pub async fn project_create(
     req: HttpRequest,
     payload: Multipart,
-    client: Data<PgPool>,
-    redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: Data<AuthQueue>,
+    client: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
     // Convert V2 multipart payload to V3 multipart payload
     let payload = v2_reroute::alter_actix_multipart(
@@ -260,13 +259,13 @@ pub async fn project_create(
         Ok(project) => {
             let version_item = match project.versions.first() {
                 Some(vid) => {
-                    version_item::Version::get((*vid).into(), &**client, &redis)
+                    version_item::Version::get((*vid).into(), &*client, &redis)
                         .await?
                 }
                 None => None,
             };
             let project = LegacyProject::from(project, version_item);
-            Ok(HttpResponse::Ok().json(project))
+            Ok(HttpResponse::Ok().json(&project))
         }
         Err(response) => Ok(response),
     }

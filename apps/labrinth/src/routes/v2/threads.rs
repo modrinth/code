@@ -7,7 +7,7 @@ use crate::models::threads::{MessageBody, Thread, ThreadId};
 use crate::models::v2::threads::LegacyThread;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use ntex::web::{self, delete, get, post, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 
@@ -24,10 +24,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[get("{id}")]
 pub async fn thread_get(
     req: HttpRequest,
-    info: web::Path<(ThreadId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(ThreadId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     v3::threads::thread_get(req, info, pool, redis, session_queue)
         .await
@@ -42,14 +42,14 @@ pub struct ThreadIds {
 #[get("threads")]
 pub async fn threads_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<ThreadIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<ThreadIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::threads::threads_get(
         req,
-        web::Query(v3::threads::ThreadIds { ids: ids.ids }),
+        web::types::Query(v3::threads::ThreadIds { ids: ids.ids }),
         pool,
         redis,
         session_queue,
@@ -64,7 +64,7 @@ pub async fn threads_get(
                 .into_iter()
                 .map(LegacyThread::from)
                 .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(threads))
+            Ok(HttpResponse::Ok().json(&threads))
         }
         Err(response) => Ok(response),
     }
@@ -78,11 +78,11 @@ pub struct NewThreadMessage {
 #[post("{id}")]
 pub async fn thread_send_message(
     req: HttpRequest,
-    info: web::Path<(ThreadId,)>,
-    pool: web::Data<PgPool>,
-    new_message: web::Json<NewThreadMessage>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(ThreadId,)>,
+    pool: web::types::State<PgPool>,
+    new_message: web::types::Json<NewThreadMessage>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let new_message = new_message.into_inner();
     // Returns NoContent, so we don't need to convert the response
@@ -90,7 +90,7 @@ pub async fn thread_send_message(
         req,
         info,
         pool,
-        web::Json(v3::threads::NewThreadMessage {
+        web::types::Json(v3::threads::NewThreadMessage {
             body: new_message.body,
         }),
         redis,
@@ -103,11 +103,11 @@ pub async fn thread_send_message(
 #[delete("{id}")]
 pub async fn message_delete(
     req: HttpRequest,
-    info: web::Path<(ThreadMessageId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    info: web::types::Path<(ThreadMessageId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::threads::message_delete(

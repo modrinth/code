@@ -1,8 +1,8 @@
 use actix_http::StatusCode;
-use actix_web::test;
 use common::api_v3::ApiV3;
 use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
+use ntex::web::test;
 
 use common::environment::{
     with_test_environment, with_test_environment_all, TestEnvironment,
@@ -27,7 +27,7 @@ use crate::common::dummy_data::{
 };
 mod common;
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_get_project() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
@@ -99,7 +99,7 @@ async fn test_get_project() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_add_remove_project() {
     // Test setup and dummy data
     with_test_environment(
@@ -303,7 +303,7 @@ async fn test_add_remove_project() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn test_patch_project() {
     with_test_environment(
         None,
@@ -489,7 +489,7 @@ pub async fn test_patch_project() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn test_patch_v3() {
     // Hits V3-specific patchable fields
     with_test_environment(
@@ -525,7 +525,7 @@ pub async fn test_patch_v3() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn test_bulk_edit_categories() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
@@ -566,7 +566,7 @@ pub async fn test_bulk_edit_categories() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn test_bulk_edit_links() {
     with_test_environment(
         None,
@@ -627,7 +627,7 @@ pub async fn test_bulk_edit_links() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_patch_project_v3() {
     with_test_environment(Some(8), |test_env: TestEnvironment<ApiV3>| async move {
         let alpha_project_id = &test_env.dummy.project_alpha.project_id;
@@ -746,7 +746,7 @@ async fn permissions_patch_project_v3() {
 }
 
 // TODO: Project scheduling has been temporarily disabled, so this test is disabled as well
-// #[actix_rt::test]
+// #[ntex::test]
 // async fn permissions_schedule() {
 //     with_test_environment(None, |test_env : TestEnvironment<ApiV3>| async move {
 //         let DummyProjectAlpha {
@@ -796,7 +796,7 @@ async fn permissions_patch_project_v3() {
 // }
 
 // Not covered by PATCH /project
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_edit_details() {
     with_test_environment_all(Some(10), |test_env| async move {
         let DummyProjectAlpha {
@@ -907,7 +907,7 @@ async fn permissions_edit_details() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_upload_version() {
     with_test_environment(
         None,
@@ -1010,7 +1010,7 @@ async fn permissions_upload_version() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_manage_invites() {
     // Add member, remove member, edit member
     with_test_environment_all(None, |test_env| async move {
@@ -1112,7 +1112,7 @@ async fn permissions_manage_invites() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_delete_project() {
     // Add member, remove member, edit member
     with_test_environment_all(None, |test_env| async move {
@@ -1136,7 +1136,7 @@ async fn permissions_delete_project() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn project_permissions_consistency_test() {
     with_test_environment_all(Some(10), |test_env| async move {
         // Test that the permissions are consistent with each other
@@ -1183,7 +1183,7 @@ async fn project_permissions_consistency_test() {
 }
 
 // TODO: Re-add this if we want to match v3 Projects structure to v3 Search Result structure, otherwise, delete
-// #[actix_rt::test]
+// #[ntex::test]
 // async fn align_search_projects() {
 //     // Test setup and dummy data
 //     with_test_environment(Some(10), |test_env: TestEnvironment<ApiV3>| async move {
@@ -1219,7 +1219,7 @@ async fn project_permissions_consistency_test() {
 //     .await
 // }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn projects_various_visibility() {
     // For testing the filter_visible_projects and is_visible_project
     with_test_environment(

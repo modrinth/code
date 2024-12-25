@@ -7,7 +7,6 @@ use crate::common::dummy_data::{
     DummyImage, DummyProjectAlpha, DummyProjectBeta,
 };
 use actix_http::StatusCode;
-use actix_web::test;
 use chrono::{Duration, Utc};
 use common::api_common::models::CommonItemType;
 use common::api_common::Api;
@@ -22,6 +21,7 @@ use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectId;
 use labrinth::models::users::UserId;
+use ntex::web::test;
 use serde_json::json;
 
 // For each scope, we (using test_scope):
@@ -33,7 +33,7 @@ use serde_json::json;
 mod common;
 
 // Test for users, emails, and payout scopes (not user auth scope or notifs)
-#[actix_rt::test]
+#[ntex::test]
 async fn user_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
@@ -113,7 +113,7 @@ async fn user_scopes() {
 }
 
 // Notifications
-#[actix_rt::test]
+#[ntex::test]
 pub async fn notifications_scopes() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
@@ -237,7 +237,7 @@ pub async fn notifications_scopes() {
 }
 
 // Project version creation scopes
-#[actix_rt::test]
+#[ntex::test]
 pub async fn project_version_create_scopes_v3() {
     with_test_environment(
         None,
@@ -284,7 +284,7 @@ pub async fn project_version_create_scopes_v3() {
 }
 
 // Project management scopes
-#[actix_rt::test]
+#[ntex::test]
 pub async fn project_version_reads_scopes() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
@@ -511,7 +511,7 @@ pub async fn project_version_reads_scopes() {
 }
 
 // Project writing
-#[actix_rt::test]
+#[ntex::test]
 pub async fn project_write_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
@@ -689,7 +689,7 @@ pub async fn project_write_scopes() {
 }
 
 // Version write
-#[actix_rt::test]
+#[ntex::test]
 pub async fn version_write_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
@@ -759,7 +759,7 @@ pub async fn version_write_scopes() {
 }
 
 // Report scopes
-#[actix_rt::test]
+#[ntex::test]
 pub async fn report_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
@@ -841,7 +841,7 @@ pub async fn report_scopes() {
 }
 
 // Thread scopes
-#[actix_rt::test]
+#[ntex::test]
 pub async fn thread_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
@@ -889,7 +889,7 @@ pub async fn thread_scopes() {
 }
 
 // Pat scopes
-#[actix_rt::test]
+#[ntex::test]
 pub async fn pat_scopes() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
@@ -960,7 +960,7 @@ pub async fn pat_scopes() {
 }
 
 // Collection scopes
-#[actix_rt::test]
+#[ntex::test]
 pub async fn collections_scopes() {
     // Test setup and dummy data
     with_test_environment(
@@ -1065,7 +1065,7 @@ pub async fn collections_scopes() {
 }
 
 // Organization scopes (and a couple PROJECT_WRITE scopes that are only allowed for orgs)
-#[actix_rt::test]
+#[ntex::test]
 pub async fn organization_scopes() {
     // Test setup and dummy data
     with_test_environment(

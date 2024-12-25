@@ -27,38 +27,37 @@ use crate::search::indexing::remove_documents;
 use crate::search::SearchConfig;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{web, HttpRequest, HttpResponse};
 use itertools::Itertools;
+use ntex::web::{self, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route(
-        "version",
-        web::post().to(super::version_creation::version_create),
-    );
+    // cfg.route(
+    //     "version",
+    //     web::post().to(super::version_creation::version_create),
+    // );
     cfg.route("versions", web::get().to(versions_get));
 
     cfg.service(
         web::scope("version")
             .route("{id}", web::get().to(version_get))
             .route("{id}", web::patch().to(version_edit))
-            .route("{id}", web::delete().to(version_delete))
-            .route(
-                "{version_id}/file",
-                web::post().to(super::version_creation::upload_file_to_version),
-            ),
+            .route("{id}", web::delete().to(version_delete)), // .route(
+                                                              //     "{version_id}/file",
+                                                              //     web::post().to(super::version_creation::upload_file_to_version),
+                                                              // ),
     );
 }
 
 // Given a project ID/slug and a version slug
 pub async fn version_project_get(
     req: HttpRequest,
-    info: web::Path<(String, String)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String, String)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner();
     version_project_get_helper(req, info, pool, redis, session_queue).await
@@ -66,15 +65,15 @@ pub async fn version_project_get(
 pub async fn version_project_get_helper(
     req: HttpRequest,
     id: (String, String),
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let result = database::models::Project::get(&id.0, &**pool, &redis).await?;
+    let result = database::models::Project::get(&id.0, &*pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ, Scopes::VERSION_READ]),
@@ -92,7 +91,7 @@ pub async fn version_project_get_helper(
 
         let versions = database::models::Version::get_many(
             &project.versions,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
@@ -108,7 +107,7 @@ pub async fn version_project_get_helper(
                 .await?
             {
                 return Ok(HttpResponse::Ok()
-                    .json(models::projects::Version::from(version)));
+                    .json(&models::projects::Version::from(version)));
             }
         }
     }
@@ -123,10 +122,10 @@ pub struct VersionIds {
 
 pub async fn versions_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<VersionIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<VersionIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let version_ids =
         serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
@@ -134,12 +133,12 @@ pub async fn versions_get(
             .map(|x| x.into())
             .collect::<Vec<database::models::VersionId>>();
     let versions_data =
-        database::models::Version::get_many(&version_ids, &**pool, &redis)
+        database::models::Version::get_many(&version_ids, &*pool, &redis)
             .await?;
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::VERSION_READ]),
@@ -152,15 +151,15 @@ pub async fn versions_get(
         filter_visible_versions(versions_data, &user_option, &pool, &redis)
             .await?;
 
-    Ok(HttpResponse::Ok().json(versions))
+    Ok(HttpResponse::Ok().json(&versions))
 }
 
 pub async fn version_get(
     req: HttpRequest,
-    info: web::Path<(models::ids::VersionId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(models::ids::VersionId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
     version_get_helper(req, id, pool, redis, session_queue).await
@@ -169,16 +168,16 @@ pub async fn version_get(
 pub async fn version_get_helper(
     req: HttpRequest,
     id: models::ids::VersionId,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let version_data =
-        database::models::Version::get(id.into(), &**pool, &redis).await?;
+        database::models::Version::get(id.into(), &*pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::VERSION_READ]),
@@ -190,7 +189,7 @@ pub async fn version_get_helper(
     if let Some(data) = version_data {
         if is_visible_version(&data.inner, &user_option, &pool, &redis).await? {
             return Ok(
-                HttpResponse::Ok().json(models::projects::Version::from(data))
+                HttpResponse::Ok().json(&models::projects::Version::from(data))
             );
         }
     }
@@ -247,11 +246,11 @@ pub struct EditVersionFileType {
 
 pub async fn version_edit(
     req: HttpRequest,
-    info: web::Path<(VersionId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    new_version: web::Json<serde_json::Value>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(VersionId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    new_version: web::types::Json<serde_json::Value>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let new_version: EditVersion =
         serde_json::from_value(new_version.into_inner())?;
@@ -268,14 +267,14 @@ pub async fn version_edit(
 pub async fn version_edit_helper(
     req: HttpRequest,
     info: (VersionId,),
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
     new_version: EditVersion,
-    session_queue: web::Data<AuthQueue>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::VERSION_WRITE]),
@@ -290,7 +289,7 @@ pub async fn version_edit_helper(
     let version_id = info.0;
     let id = version_id.into();
 
-    let result = database::models::Version::get(id, &**pool, &redis).await?;
+    let result = database::models::Version::get(id, &*pool, &redis).await?;
 
     if let Some(version_item) = result {
         let team_member =
@@ -298,14 +297,14 @@ pub async fn version_edit_helper(
                 version_item.inner.project_id,
                 user.id.into(),
                 false,
-                &**pool,
+                &*pool,
             )
             .await?;
 
         let organization =
             Organization::get_associated_organization_project_id(
                 version_item.inner.project_id,
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -314,7 +313,7 @@ pub async fn version_edit_helper(
             database::models::TeamMember::get_from_user_id(
                 organization.team_id,
                 user.id.into(),
-                &**pool,
+                &*pool,
             )
             .await?
         } else {
@@ -621,7 +620,7 @@ pub async fn version_edit_helper(
                         file_type.hash.as_bytes(),
                         file_type.algorithm
                     )
-                    .fetch_optional(&**pool)
+                    .fetch_optional(&*pool)
                     .await?
                     .ok_or_else(|| {
                         ApiError::InvalidInput(format!(
@@ -714,20 +713,20 @@ pub struct VersionListFilters {
 
 pub async fn version_list(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    web::Query(filters): web::Query<VersionListFilters>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    web::types::Query(filters): web::types::Query<VersionListFilters>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
     let result =
-        database::models::Project::get(&string, &**pool, &redis).await?;
+        database::models::Project::get(&string, &*pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ, Scopes::VERSION_READ]),
@@ -752,7 +751,7 @@ pub async fn version_list(
         });
         let mut versions = database::models::Version::get_many(
             &project.versions,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?
@@ -806,11 +805,11 @@ pub async fn version_list(
             // TODO: This is a bandaid fix for detecting auto-featured versions.
             // In the future, not all versions will have 'game_versions' fields, so this will need to be changed.
             let (loaders, game_versions) = futures::future::try_join(
-                database::models::loader_fields::Loader::list(&**pool, &redis),
+                database::models::loader_fields::Loader::list(&*pool, &redis),
                 database::models::legacy_loader_fields::MinecraftGameVersion::list(
                     None,
                     Some(true),
-                    &**pool,
+                    &*pool,
                     &redis,
                 ),
             )
@@ -858,7 +857,7 @@ pub async fn version_list(
             filter_visible_versions(response, &user_option, &pool, &redis)
                 .await?;
 
-        Ok(HttpResponse::Ok().json(response))
+        Ok(HttpResponse::Ok().json(&response))
     } else {
         Err(ApiError::NotFound)
     }
@@ -866,15 +865,15 @@ pub async fn version_list(
 
 pub async fn version_delete(
     req: HttpRequest,
-    info: web::Path<(VersionId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    search_config: web::Data<SearchConfig>,
+    info: web::types::Path<(VersionId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    search_config: web::types::State<SearchConfig>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::VERSION_DELETE]),
@@ -883,7 +882,7 @@ pub async fn version_delete(
     .1;
     let id = info.into_inner().0;
 
-    let version = database::models::Version::get(id.into(), &**pool, &redis)
+    let version = database::models::Version::get(id.into(), &*pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -897,7 +896,7 @@ pub async fn version_delete(
                 version.inner.project_id,
                 user.id.into(),
                 false,
-                &**pool,
+                &*pool,
             )
             .await
             .map_err(ApiError::Database)?;
@@ -905,7 +904,7 @@ pub async fn version_delete(
         let organization =
             Organization::get_associated_organization_project_id(
                 version.inner.project_id,
-                &**pool,
+                &*pool,
             )
             .await?;
 
@@ -914,7 +913,7 @@ pub async fn version_delete(
             database::models::TeamMember::get_from_user_id(
                 organization.team_id,
                 user.id.into(),
-                &**pool,
+                &*pool,
             )
             .await?
         } else {

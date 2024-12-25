@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
 use std::collections::HashMap;
-
+use std::future::Future;
 use super::super::ids::OrganizationId;
 use super::super::teams::TeamId;
 use super::super::users::UserId;
@@ -226,30 +226,33 @@ impl LegacyProject {
     }
 
     // Because from needs a version_item, this is a helper function to get many from one db query.
-    pub async fn from_many<'a, E>(
+    #[allow(clippy::manual_async_fn)]
+    pub fn from_many<'a, 'c, E>(
         data: Vec<Project>,
         exec: E,
-        redis: &RedisPool,
-    ) -> Result<Vec<Self>, DatabaseError>
+        redis: &'a RedisPool,
+    ) -> impl Future<Output = Result<Vec<Self>, DatabaseError>> + Send + 'a
     where
-        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
+        E: sqlx::Acquire<'c, Database = sqlx::Postgres> + Send + 'a,
     {
-        let version_ids: Vec<_> = data
-            .iter()
-            .filter_map(|p| p.versions.first().map(|i| (*i).into()))
-            .collect();
-        let example_versions =
-            version_item::Version::get_many(&version_ids, exec, redis).await?;
-        let mut legacy_projects = Vec::new();
-        for project in data {
-            let version_item = example_versions
+        async move {
+            let version_ids: Vec<_> = data
                 .iter()
-                .find(|v| v.inner.project_id == project.id.into())
-                .cloned();
-            let project = LegacyProject::from(project, version_item);
-            legacy_projects.push(project);
+                .filter_map(|p| p.versions.first().map(|i| (*i).into()))
+                .collect();
+            let example_versions =
+                version_item::Version::get_many(&version_ids, exec, redis).await?;
+            let mut legacy_projects = Vec::new();
+            for project in data {
+                let version_item = example_versions
+                    .iter()
+                    .find(|v| v.inner.project_id == project.id.into())
+                    .cloned();
+                let project = LegacyProject::from(project, version_item);
+                legacy_projects.push(project);
+            }
+            Ok(legacy_projects)
         }
-        Ok(legacy_projects)
     }
 }
 

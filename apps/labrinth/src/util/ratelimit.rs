@@ -5,13 +5,9 @@ use std::sync::Arc;
 
 use crate::routes::ApiError;
 use crate::util::env::parse_var;
-use actix_web::{
-    body::EitherBody,
-    dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
-    Error, ResponseError,
-};
-use futures_util::future::LocalBoxFuture;
-use futures_util::future::{ready, Ready};
+use ntex::service::{Middleware, Service, ServiceCtx};
+use ntex::web;
+use ntex::web::{WebResponse, WebResponseError};
 
 pub type KeyedRateLimiter<
     K = String,
@@ -22,23 +18,14 @@ pub type KeyedRateLimiter<
 
 pub struct RateLimit(pub KeyedRateLimiter);
 
-impl<S, B> Transform<S, ServiceRequest> for RateLimit
-where
-    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
-    S::Future: 'static,
-    B: 'static,
-{
-    type Response = ServiceResponse<EitherBody<B>>;
-    type Error = Error;
-    type Transform = RateLimitService<S>;
-    type InitError = ();
-    type Future = Ready<Result<Self::Transform, Self::InitError>>;
+impl<S> Middleware<S> for RateLimit {
+    type Service = RateLimitService<S>;
 
-    fn new_transform(&self, service: S) -> Self::Future {
-        ready(Ok(RateLimitService {
+    fn create(&self, service: S) -> Self::Service {
+        RateLimitService {
             service,
             rate_limiter: Arc::clone(&self.0),
-        }))
+        }
     }
 }
 
@@ -48,41 +35,42 @@ pub struct RateLimitService<S> {
     rate_limiter: KeyedRateLimiter,
 }
 
-impl<S, B> Service<ServiceRequest> for RateLimitService<S>
+impl<S, Err> Service<web::WebRequest<Err>> for RateLimitService<S>
 where
-    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
-    S::Future: 'static,
-    B: 'static,
+    S: Service<
+        web::WebRequest<Err>,
+        Response = web::WebResponse,
+        Error = web::Error,
+    >,
+    Err: web::ErrorRenderer,
 {
-    type Response = ServiceResponse<EitherBody<B>>;
-    type Error = Error;
-    type Future = LocalBoxFuture<'static, Result<Self::Response, Self::Error>>;
+    type Response = web::WebResponse;
+    type Error = web::Error;
 
-    forward_ready!(service);
+    ntex::forward_ready!(service);
 
-    fn call(&self, req: ServiceRequest) -> Self::Future {
+    async fn call(
+        &self,
+        req: web::WebRequest<Err>,
+        ctx: ServiceCtx<'_, Self>,
+    ) -> Result<Self::Response, Self::Error> {
         if let Some(key) = req.headers().get("x-ratelimit-key") {
             if key.to_str().ok()
                 == dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok().as_deref()
             {
-                let res = self.service.call(req);
-
-                return Box::pin(async move {
-                    let service_response = res.await?;
-                    Ok(service_response.map_into_left_body())
-                });
+                let res = ctx.call(&self.service, req).await?;
+                return Ok(res);
             }
         }
 
-        let conn_info = req.connection_info().clone();
         let ip = if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
             if let Some(header) = req.headers().get("CF-Connecting-IP") {
-                header.to_str().ok()
+                header.to_str().ok().map(|x| x.to_string())
             } else {
-                conn_info.peer_addr()
+                req.peer_addr().map(|x| x.to_string())
             }
         } else {
-            conn_info.peer_addr()
+            req.peer_addr().map(|x| x.to_string())
         };
 
         if let Some(ip) = ip {
@@ -90,98 +78,85 @@ where
 
             match self.rate_limiter.check_key(&ip) {
                 Ok(snapshot) => {
-                    let fut = self.service.call(req);
+                    let mut service_response =
+                        ctx.call(&self.service, req).await?;
 
-                    Box::pin(async move {
-                        match fut.await {
-                            Ok(mut service_response) => {
-                                // Now you have a mutable reference to the ServiceResponse, so you can modify its headers.
-                                let headers = service_response.headers_mut();
-                                headers.insert(
-                                    actix_web::http::header::HeaderName::from_str(
-                                        "x-ratelimit-limit",
-                                    )
-                                    .unwrap(),
-                                    snapshot.quota().burst_size().get().into(),
-                                );
-                                headers.insert(
-                                    actix_web::http::header::HeaderName::from_str(
-                                        "x-ratelimit-remaining",
-                                    )
-                                    .unwrap(),
-                                    snapshot.remaining_burst_capacity().into(),
-                                );
+                    let headers = service_response.headers_mut();
+                    headers.insert(
+                        ntex::http::header::HeaderName::from_str(
+                            "x-ratelimit-limit",
+                        )
+                        .unwrap(),
+                        snapshot.quota().burst_size().get().into(),
+                    );
+                    headers.insert(
+                        ntex::http::header::HeaderName::from_str(
+                            "x-ratelimit-remaining",
+                        )
+                        .unwrap(),
+                        snapshot.remaining_burst_capacity().into(),
+                    );
 
-                                headers.insert(
-                                    actix_web::http::header::HeaderName::from_str(
-                                        "x-ratelimit-reset",
-                                    )
-                                    .unwrap(),
-                                    snapshot
-                                        .quota()
-                                        .burst_size_replenished_in()
-                                        .as_secs()
-                                        .into(),
-                                );
+                    headers.insert(
+                        ntex::http::header::HeaderName::from_str(
+                            "x-ratelimit-reset",
+                        )
+                        .unwrap(),
+                        snapshot
+                            .quota()
+                            .burst_size_replenished_in()
+                            .as_secs()
+                            .into(),
+                    );
 
-                                // Return the modified response as Ok.
-                                Ok(service_response.map_into_left_body())
-                            }
-                            Err(e) => {
-                                // Handle error case
-                                Err(e)
-                            }
-                        }
-                    })
+                    Ok(service_response)
                 }
                 Err(negative) => {
                     let wait_time =
                         negative.wait_time_from(DefaultClock::default().now());
 
+                    let (req, _) = req.into_parts();
                     let mut response = ApiError::RateLimitError(
                         wait_time.as_millis(),
                         negative.quota().burst_size().get(),
                     )
-                    .error_response();
+                    .error_response(&req);
 
                     let headers = response.headers_mut();
 
                     headers.insert(
-                        actix_web::http::header::HeaderName::from_str(
+                        ntex::http::header::HeaderName::from_str(
                             "x-ratelimit-limit",
                         )
                         .unwrap(),
                         negative.quota().burst_size().get().into(),
                     );
                     headers.insert(
-                        actix_web::http::header::HeaderName::from_str(
+                        ntex::http::header::HeaderName::from_str(
                             "x-ratelimit-remaining",
                         )
                         .unwrap(),
                         0.into(),
                     );
                     headers.insert(
-                        actix_web::http::header::HeaderName::from_str(
+                        ntex::http::header::HeaderName::from_str(
                             "x-ratelimit-reset",
                         )
                         .unwrap(),
                         wait_time.as_secs().into(),
                     );
 
-                    Box::pin(async {
-                        Ok(req.into_response(response.map_into_right_body()))
-                    })
+                    Ok(WebResponse::new(response, req))
                 }
             }
         } else {
+            let (req, _) = req.into_parts();
             let response = ApiError::CustomAuthentication(
                 "Unable to obtain user IP address!".to_string(),
             )
-            .error_response();
+            .error_response(&req);
 
-            Box::pin(async {
-                Ok(req.into_response(response.map_into_right_body()))
-            })
+            Ok(WebResponse::new(response, req))
         }
     }
 }

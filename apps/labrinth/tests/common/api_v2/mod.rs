@@ -41,7 +41,7 @@ impl Api for ApiV2 {
     }
 
     async fn reset_search_index(&self) -> ServiceResponse {
-        let req = actix_web::test::TestRequest::post()
+        let req = ntex::web::test::TestRequest::post()
             .uri("/v2/admin/_force_reindex")
             .append_header((
                 "Modrinth-Admin",

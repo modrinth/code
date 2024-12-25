@@ -13,7 +13,7 @@ use crate::models::teams::{
 use crate::models::users::UserId;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{web, HttpRequest, HttpResponse};
+use ntex::web::{self, HttpRequest, HttpResponse};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -42,19 +42,19 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 // They can be differentiated by the "organization_permissions" field being null or not
 pub async fn team_members_get_project(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
     let project_data =
-        crate::database::models::Project::get(&string, &**pool, &redis).await?;
+        crate::database::models::Project::get(&string, &*pool, &redis).await?;
 
     if let Some(project) = project_data {
         let current_user = get_user_from_headers(
             &req,
-            &**pool,
+            &*pool,
             &redis,
             &session_queue,
             Some(&[Scopes::PROJECT_READ]),
@@ -70,13 +70,13 @@ pub async fn team_members_get_project(
         }
         let members_data = TeamMember::get_from_team_full(
             project.inner.team_id,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
         let users = User::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
@@ -87,7 +87,7 @@ pub async fn team_members_get_project(
                 TeamMember::get_for_project_permissions(
                     &project.inner,
                     user_id,
-                    &**pool,
+                    &*pool,
                 )
                 .await?;
 
@@ -118,7 +118,7 @@ pub async fn team_members_get_project(
             })
             .collect();
 
-        Ok(HttpResponse::Ok().json(team_members))
+        Ok(HttpResponse::Ok().json(&team_members))
     } else {
         Err(ApiError::NotFound)
     }
@@ -126,20 +126,20 @@ pub async fn team_members_get_project(
 
 pub async fn team_members_get_organization(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
     let organization_data =
-        crate::database::models::Organization::get(&string, &**pool, &redis)
+        crate::database::models::Organization::get(&string, &*pool, &redis)
             .await?;
 
     if let Some(organization) = organization_data {
         let current_user = get_user_from_headers(
             &req,
-            &**pool,
+            &*pool,
             &redis,
             &session_queue,
             Some(&[Scopes::ORGANIZATION_READ]),
@@ -150,13 +150,13 @@ pub async fn team_members_get_organization(
 
         let members_data = TeamMember::get_from_team_full(
             organization.team_id,
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
         let users = crate::database::models::User::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
@@ -193,7 +193,7 @@ pub async fn team_members_get_organization(
             })
             .collect();
 
-        Ok(HttpResponse::Ok().json(team_members))
+        Ok(HttpResponse::Ok().json(&team_members))
     } else {
         Err(ApiError::NotFound)
     }
@@ -202,24 +202,24 @@ pub async fn team_members_get_organization(
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
 pub async fn team_members_get(
     req: HttpRequest,
-    info: web::Path<(TeamId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
     let members_data =
-        TeamMember::get_from_team_full(id.into(), &**pool, &redis).await?;
+        TeamMember::get_from_team_full(id.into(), &*pool, &redis).await?;
     let users = crate::database::models::User::get_many_ids(
         &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?;
 
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -257,7 +257,7 @@ pub async fn team_members_get(
         })
         .collect();
 
-    Ok(HttpResponse::Ok().json(team_members))
+    Ok(HttpResponse::Ok().json(&team_members))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -267,10 +267,10 @@ pub struct TeamIds {
 
 pub async fn teams_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<TeamIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<TeamIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     use itertools::Itertools;
 
@@ -280,17 +280,17 @@ pub async fn teams_get(
         .collect::<Vec<crate::database::models::ids::TeamId>>();
 
     let teams_data =
-        TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
+        TeamMember::get_from_team_full_many(&team_ids, &*pool, &redis).await?;
     let users = crate::database::models::User::get_many_ids(
         &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?;
 
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_READ]),
@@ -331,20 +331,20 @@ pub async fn teams_get(
         teams.push(team_members.collect());
     }
 
-    Ok(HttpResponse::Ok().json(teams))
+    Ok(HttpResponse::Ok().json(&teams))
 }
 
 pub async fn join_team(
     req: HttpRequest,
-    info: web::Path<(TeamId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let team_id = info.into_inner().0.into();
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -355,7 +355,7 @@ pub async fn join_team(
     let member = TeamMember::get_from_user_id_pending(
         team_id,
         current_user.id.into(),
-        &**pool,
+        &*pool,
     )
     .await?;
 
@@ -421,11 +421,11 @@ pub struct NewTeamMember {
 
 pub async fn add_team_member(
     req: HttpRequest,
-    info: web::Path<(TeamId,)>,
-    pool: web::Data<PgPool>,
-    new_member: web::Json<NewTeamMember>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId,)>,
+    pool: web::types::State<PgPool>,
+    new_member: web::types::Json<NewTeamMember>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let team_id = info.into_inner().0.into();
 
@@ -433,14 +433,14 @@ pub async fn add_team_member(
 
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
     )
     .await?
     .1;
-    let team_association = Team::get_association(team_id, &**pool)
+    let team_association = Team::get_association(team_id, &*pool)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
@@ -448,14 +448,14 @@ pub async fn add_team_member(
             )
         })?;
     let member =
-        TeamMember::get_from_user_id(team_id, current_user.id.into(), &**pool)
+        TeamMember::get_from_user_id(team_id, current_user.id.into(), &*pool)
             .await?;
     match team_association {
         // If team is associated with a project, check if they have permissions to invite users to that project
         TeamAssociationId::Project(pid) => {
             let organization =
                 Organization::get_associated_organization_project_id(
-                    pid, &**pool,
+                    pid, &*pool,
                 )
                 .await?;
             let organization_team_member =
@@ -463,7 +463,7 @@ pub async fn add_team_member(
                     TeamMember::get_from_user_id(
                         organization.team_id,
                         current_user.id.into(),
-                        &**pool,
+                        &*pool,
                     )
                     .await?
                 } else {
@@ -541,7 +541,7 @@ pub async fn add_team_member(
     let request = TeamMember::get_from_user_id_pending(
         team_id,
         new_member.user_id.into(),
-        &**pool,
+        &*pool,
     )
     .await?;
 
@@ -559,7 +559,7 @@ pub async fn add_team_member(
     }
     let new_user = crate::database::models::User::get_id(
         new_member.user_id.into(),
-        &**pool,
+        &*pool,
         &redis,
     )
     .await?
@@ -571,14 +571,14 @@ pub async fn add_team_member(
     if let TeamAssociationId::Project(pid) = team_association {
         // We cannot add the owner to a project team in their own org
         let organization =
-            Organization::get_associated_organization_project_id(pid, &**pool)
+            Organization::get_associated_organization_project_id(pid, &*pool)
                 .await?;
         let new_user_organization_team_member =
             if let Some(organization) = &organization {
                 TeamMember::get_from_user_id(
                     organization.team_id,
                     new_user.id,
-                    &**pool,
+                    &*pool,
                 )
                 .await?
             } else {
@@ -671,11 +671,11 @@ pub struct EditTeamMember {
 
 pub async fn edit_team_member(
     req: HttpRequest,
-    info: web::Path<(TeamId, UserId)>,
-    pool: web::Data<PgPool>,
-    edit_member: web::Json<EditTeamMember>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId, UserId)>,
+    pool: web::types::State<PgPool>,
+    edit_member: web::types::Json<EditTeamMember>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = info.into_inner();
     let id = ids.0.into();
@@ -683,7 +683,7 @@ pub async fn edit_team_member(
 
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -692,16 +692,16 @@ pub async fn edit_team_member(
     .1;
 
     let team_association =
-        Team::get_association(id, &**pool).await?.ok_or_else(|| {
+        Team::get_association(id, &*pool).await?.ok_or_else(|| {
             ApiError::InvalidInput(
                 "The team specified does not exist".to_string(),
             )
         })?;
     let member =
-        TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
+        TeamMember::get_from_user_id(id, current_user.id.into(), &*pool)
             .await?;
     let edit_member_db =
-        TeamMember::get_from_user_id_pending(id, user_id, &**pool)
+        TeamMember::get_from_user_id_pending(id, user_id, &*pool)
             .await?
             .ok_or_else(|| {
                 ApiError::CustomAuthentication(
@@ -725,7 +725,7 @@ pub async fn edit_team_member(
         TeamAssociationId::Project(project_id) => {
             let organization =
                 Organization::get_associated_organization_project_id(
-                    project_id, &**pool,
+                    project_id, &*pool,
                 )
                 .await?;
             let organization_team_member =
@@ -733,7 +733,7 @@ pub async fn edit_team_member(
                     TeamMember::get_from_user_id(
                         organization.team_id,
                         current_user.id.into(),
-                        &**pool,
+                        &*pool,
                     )
                     .await?
                 } else {
@@ -859,17 +859,17 @@ pub struct TransferOwnership {
 
 pub async fn transfer_ownership(
     req: HttpRequest,
-    info: web::Path<(TeamId,)>,
-    pool: web::Data<PgPool>,
-    new_owner: web::Json<TransferOwnership>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId,)>,
+    pool: web::types::State<PgPool>,
+    new_owner: web::types::Json<TransferOwnership>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
 
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -880,9 +880,9 @@ pub async fn transfer_ownership(
     // Forbid transferring ownership of a project team that is owned by an organization
     // These are owned by the organization owner, and must be removed from the organization first
     // There shouldnt be an ownr on these projects in these cases, but just in case.
-    let team_association_id = Team::get_association(id.into(), &**pool).await?;
+    let team_association_id = Team::get_association(id.into(), &*pool).await?;
     if let Some(TeamAssociationId::Project(pid)) = team_association_id {
-        let result = Project::get_id(pid, &**pool, &redis).await?;
+        let result = Project::get_id(pid, &*pool, &redis).await?;
         if let Some(project_item) = result {
             if project_item.inner.organization_id.is_some() {
                 return Err(ApiError::InvalidInput(
@@ -897,7 +897,7 @@ pub async fn transfer_ownership(
         let member = TeamMember::get_from_user_id(
             id.into(),
             current_user.id.into(),
-            &**pool,
+            &*pool,
         )
         .await?
         .ok_or_else(|| {
@@ -918,7 +918,7 @@ pub async fn transfer_ownership(
     let new_member = TeamMember::get_from_user_id(
         id.into(),
         new_owner.user_id.into(),
-        &**pool,
+        &*pool,
     )
     .await?
     .ok_or_else(|| {
@@ -1021,10 +1021,10 @@ pub async fn transfer_ownership(
 
 pub async fn remove_team_member(
     req: HttpRequest,
-    info: web::Path<(TeamId, UserId)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(TeamId, UserId)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = info.into_inner();
     let id = ids.0.into();
@@ -1032,7 +1032,7 @@ pub async fn remove_team_member(
 
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PROJECT_WRITE]),
@@ -1041,17 +1041,17 @@ pub async fn remove_team_member(
     .1;
 
     let team_association =
-        Team::get_association(id, &**pool).await?.ok_or_else(|| {
+        Team::get_association(id, &*pool).await?.ok_or_else(|| {
             ApiError::InvalidInput(
                 "The team specified does not exist".to_string(),
             )
         })?;
     let member =
-        TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
+        TeamMember::get_from_user_id(id, current_user.id.into(), &*pool)
             .await?;
 
     let delete_member =
-        TeamMember::get_from_user_id_pending(id, user_id, &**pool).await?;
+        TeamMember::get_from_user_id_pending(id, user_id, &*pool).await?;
 
     if let Some(delete_member) = delete_member {
         if delete_member.is_owner {
@@ -1068,7 +1068,7 @@ pub async fn remove_team_member(
             TeamAssociationId::Project(pid) => {
                 let organization =
                     Organization::get_associated_organization_project_id(
-                        pid, &**pool,
+                        pid, &*pool,
                     )
                     .await?;
                 let organization_team_member =
@@ -1076,7 +1076,7 @@ pub async fn remove_team_member(
                         TeamMember::get_from_user_id(
                             organization.team_id,
                             current_user.id.into(),
-                            &**pool,
+                            &*pool,
                         )
                         .await?
                     } else {

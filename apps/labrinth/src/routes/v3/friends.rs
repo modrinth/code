@@ -7,8 +7,8 @@ use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
 use crate::routes::internal::statuses::{close_socket, ServerToClientMessage};
 use crate::routes::ApiError;
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
+use ntex::web::{self, delete, get, post, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -20,15 +20,15 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[post("friend/{id}")]
 pub async fn add_friend(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    db: web::Data<ActiveSockets>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    db: web::types::State<ActiveSockets>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_WRITE]),
@@ -38,7 +38,7 @@ pub async fn add_friend(
 
     let string = info.into_inner().0;
     let friend =
-        crate::database::models::User::get(&string, &**pool, &redis).await?;
+        crate::database::models::User::get(&string, &*pool, &redis).await?;
 
     if let Some(friend) = friend {
         let mut transaction = pool.begin().await?;
@@ -47,7 +47,7 @@ pub async fn add_friend(
             crate::database::models::friend_item::FriendItem::get_friend(
                 user.id.into(),
                 friend.id,
-                &**pool,
+                &*pool,
             )
             .await?
         {
@@ -76,22 +76,23 @@ pub async fn add_friend(
                 friend_id: UserId,
                 sockets: &ActiveSockets,
             ) -> Result<(), ApiError> {
-                if let Some(pair) = sockets.auth_sockets.get(&user_id.into()) {
-                    let (friend_status, _) = pair.value();
-                    if let Some(mut socket) =
-                        sockets.auth_sockets.get_mut(&friend_id.into())
-                    {
-                        let (_, socket) = socket.value_mut();
-
-                        let _ = socket
-                            .text(serde_json::to_string(
-                                &ServerToClientMessage::StatusUpdate {
-                                    status: friend_status.clone(),
-                                },
-                            )?)
-                            .await;
-                    }
-                }
+                // TODO: FIX ME
+                // if let Some(pair) = sockets.auth_sockets.get(&user_id.into()) {
+                //     let (friend_status, _) = pair.value();
+                //     if let Some(mut socket) =
+                //         sockets.auth_sockets.get_mut(&friend_id.into())
+                //     {
+                //         let (_, socket) = socket.value_mut();
+                //
+                //         let _ = socket
+                //             .text(serde_json::to_string(
+                //                 &ServerToClientMessage::StatusUpdate {
+                //                     status: friend_status.clone(),
+                //                 },
+                //             )?)
+                //             .await;
+                //     }
+                // }
 
                 Ok(())
             }
@@ -120,20 +121,21 @@ pub async fn add_friend(
             .insert(&mut transaction)
             .await?;
 
-            if let Some(mut socket) = db.auth_sockets.get_mut(&friend.id.into())
-            {
-                let (_, socket) = socket.value_mut();
-
-                if socket
-                    .text(serde_json::to_string(
-                        &ServerToClientMessage::FriendRequest { from: user.id },
-                    )?)
-                    .await
-                    .is_err()
-                {
-                    close_socket(user.id, &pool, &db).await?;
-                }
-            }
+            // TODO: FIX ME
+            // if let Some(mut socket) = db.auth_sockets.get_mut(&friend.id.into())
+            // {
+            //     let (_, socket) = socket.value_mut();
+            //
+            //     if socket
+            //         .text(serde_json::to_string(
+            //             &ServerToClientMessage::FriendRequest { from: user.id },
+            //         )?)
+            //         .await
+            //         .is_err()
+            //     {
+            //         close_socket(user.id, &pool, &db).await?;
+            //     }
+            // }
         }
 
         transaction.commit().await?;
@@ -147,15 +149,15 @@ pub async fn add_friend(
 #[delete("friend/{id}")]
 pub async fn remove_friend(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    db: web::Data<ActiveSockets>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+    db: web::types::State<ActiveSockets>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_WRITE]),
@@ -165,7 +167,7 @@ pub async fn remove_friend(
 
     let string = info.into_inner().0;
     let friend =
-        crate::database::models::User::get(&string, &**pool, &redis).await?;
+        crate::database::models::User::get(&string, &*pool, &redis).await?;
 
     if let Some(friend) = friend {
         let mut transaction = pool.begin().await?;
@@ -177,17 +179,18 @@ pub async fn remove_friend(
         )
         .await?;
 
-        if let Some(mut socket) = db.auth_sockets.get_mut(&friend.id.into()) {
-            let (_, socket) = socket.value_mut();
-
-            let _ = socket
-                .text(serde_json::to_string(
-                    &ServerToClientMessage::FriendRequestRejected {
-                        from: user.id,
-                    },
-                )?)
-                .await;
-        }
+        // TODO: FIX ME
+        // if let Some(mut socket) = db.auth_sockets.get_mut(&friend.id.into()) {
+        //     let (_, socket) = socket.value_mut();
+        //
+        //     let _ = socket
+        //         .text(serde_json::to_string(
+        //             &ServerToClientMessage::FriendRequestRejected {
+        //                 from: user.id,
+        //             },
+        //         )?)
+        //         .await;
+        // }
 
         transaction.commit().await?;
 
@@ -200,13 +203,13 @@ pub async fn remove_friend(
 #[get("friends")]
 pub async fn friends(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_READ]),
@@ -218,12 +221,12 @@ pub async fn friends(
         crate::database::models::friend_item::FriendItem::get_user_friends(
             user.id.into(),
             None,
-            &**pool,
+            &*pool,
         )
         .await?
         .into_iter()
         .map(UserFriend::from)
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(friends))
+    Ok(HttpResponse::Ok().json(&friends))
 }

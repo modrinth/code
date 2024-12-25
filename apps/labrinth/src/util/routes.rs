@@ -1,9 +1,9 @@
-use crate::routes::v3::project_creation::CreateError;
+// use crate::routes::v3::project_creation::CreateError;
 use crate::routes::ApiError;
-use actix_multipart::Field;
-use actix_web::web::Payload;
 use bytes::BytesMut;
 use futures::StreamExt;
+use ntex::web::types::Payload;
+use ntex_multipart::Field;
 
 pub async fn read_from_payload(
     payload: &mut Payload,
@@ -25,18 +25,19 @@ pub async fn read_from_payload(
     Ok(bytes)
 }
 
-pub async fn read_from_field(
-    field: &mut Field,
-    cap: usize,
-    err_msg: &'static str,
-) -> Result<BytesMut, CreateError> {
-    let mut bytes = BytesMut::new();
-    while let Some(chunk) = field.next().await {
-        if bytes.len() >= cap {
-            return Err(CreateError::InvalidInput(String::from(err_msg)));
-        } else {
-            bytes.extend_from_slice(&chunk?);
-        }
-    }
-    Ok(bytes)
-}
+// TODO: fix me
+// pub async fn read_from_field(
+//     field: &mut Field,
+//     cap: usize,
+//     err_msg: &'static str,
+// ) -> Result<BytesMut, CreateError> {
+//     let mut bytes = BytesMut::new();
+//     while let Some(chunk) = field.next().await {
+//         if bytes.len() >= cap {
+//             return Err(CreateError::InvalidInput(String::from(err_msg)));
+//         } else {
+//             bytes.extend_from_slice(&chunk?);
+//         }
+//     }
+//     Ok(bytes)
+// }

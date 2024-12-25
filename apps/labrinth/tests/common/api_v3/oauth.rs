@@ -154,7 +154,7 @@ pub async fn get_access_token(response: ServiceResponse) -> String {
 
 pub fn get_redirect_location_query_params(
     response: &ServiceResponse,
-) -> actix_web::web::Query<HashMap<String, String>> {
+) -> actix_web::web::types::Query<HashMap<String, String>> {
     let redirect_location = response
         .headers()
         .get(LOCATION)

@@ -7,7 +7,7 @@ use common::{
 
 mod common;
 
-#[actix_rt::test]
+#[ntex::test]
 async fn get_games() {
     with_test_environment(
         None,

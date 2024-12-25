@@ -26,7 +26,7 @@ use serde_json::json;
 
 mod common;
 
-#[actix_rt::test]
+#[ntex::test]
 async fn create_organization() {
     with_test_environment(
         None,
@@ -125,7 +125,7 @@ async fn create_organization() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn get_project_organization() {
     with_test_environment(
         None,
@@ -158,7 +158,7 @@ async fn get_project_organization() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn patch_organization() {
     with_test_environment(
         None,
@@ -262,7 +262,7 @@ async fn patch_organization() {
 }
 
 // add/remove icon
-#[actix_rt::test]
+#[ntex::test]
 async fn add_remove_icon() {
     with_test_environment(
         Some(10),
@@ -326,7 +326,7 @@ async fn add_remove_icon() {
 }
 
 // delete org
-#[actix_rt::test]
+#[ntex::test]
 async fn delete_org() {
     with_test_environment(
         None,
@@ -351,7 +351,7 @@ async fn delete_org() {
 }
 
 // add/remove organization projects
-#[actix_rt::test]
+#[ntex::test]
 async fn add_remove_organization_projects() {
     with_test_environment(
         None,
@@ -457,7 +457,7 @@ async fn add_remove_organization_projects() {
 }
 
 // Like above, but specifically regarding ownership transferring
-#[actix_rt::test]
+#[ntex::test]
 async fn add_remove_organization_project_ownership_to_user() {
     with_test_environment(
         None,
@@ -731,7 +731,7 @@ async fn add_remove_organization_project_ownership_to_user() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn delete_organization_means_all_projects_to_org_owner() {
     with_test_environment(
         None,
@@ -910,7 +910,7 @@ async fn delete_organization_means_all_projects_to_org_owner() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_patch_organization() {
     with_test_environment(
         None,
@@ -952,7 +952,7 @@ async fn permissions_patch_organization() {
 }
 
 // Not covered by PATCH /organization
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_edit_details() {
     with_test_environment(
         Some(12),
@@ -1002,7 +1002,7 @@ async fn permissions_edit_details() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_manage_invites() {
     // Add member, remove member, edit member
     with_test_environment_all(None, |test_env| async move {
@@ -1104,7 +1104,7 @@ async fn permissions_manage_invites() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_add_remove_project() {
     with_test_environment(
         None,
@@ -1181,7 +1181,7 @@ async fn permissions_add_remove_project() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_delete_organization() {
     with_test_environment(
         None,
@@ -1211,7 +1211,7 @@ async fn permissions_delete_organization() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_add_default_project_permissions() {
     with_test_environment_all(None, |test_env| async move {
         let zeta_organization_id =
@@ -1291,7 +1291,7 @@ async fn permissions_add_default_project_permissions() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn permissions_organization_permissions_consistency_test() {
     with_test_environment(
         None,

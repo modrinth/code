@@ -194,7 +194,7 @@ impl TeamMember {
         redis: &RedisPool,
     ) -> Result<Vec<TeamMember>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy + Send + Sync,
     {
         Self::get_from_team_full_many(&[id], executor, redis).await
     }
@@ -205,7 +205,7 @@ impl TeamMember {
         redis: &RedisPool,
     ) -> Result<Vec<TeamMember>, super::DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy + Send + Sync,
     {
         if team_ids.is_empty() {
             return Ok(Vec::new());

@@ -4,7 +4,7 @@ use crate::models::v2::projects::LegacyProject;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal;
 use crate::{database::redis::RedisPool, routes::v2_reroute};
-use actix_web::{get, web, HttpRequest, HttpResponse};
+use ntex::web::{self, get, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 
@@ -25,16 +25,18 @@ fn default_count() -> i16 {
 #[get("projects")]
 pub async fn get_projects(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    count: web::Query<ResultCount>,
-    session_queue: web::Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    count: web::types::Query<ResultCount>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = internal::moderation::get_projects(
         req,
         pool.clone(),
         redis.clone(),
-        web::Query(internal::moderation::ResultCount { count: count.count }),
+        web::types::Query(internal::moderation::ResultCount {
+            count: count.count,
+        }),
         session_queue,
     )
     .await
@@ -44,8 +46,8 @@ pub async fn get_projects(
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
-                LegacyProject::from_many(project, &**pool, &redis).await?;
-            Ok(HttpResponse::Ok().json(legacy_projects))
+                LegacyProject::from_many(project, &*pool, &redis).await?;
+            Ok(HttpResponse::Ok().json(&legacy_projects))
         }
         Err(response) => Ok(response),
     }

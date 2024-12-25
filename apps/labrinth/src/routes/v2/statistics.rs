@@ -3,7 +3,7 @@ use crate::routes::{
     v3::{self, statistics::V3Stats},
     ApiError,
 };
-use actix_web::{get, web, HttpResponse};
+use ntex::web::{self, get, HttpResponse};
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -20,7 +20,7 @@ pub struct V2Stats {
 
 #[get("statistics")]
 pub async fn get_stats(
-    pool: web::Data<PgPool>,
+    pool: web::types::State<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::statistics::get_stats(pool)
         .await
@@ -34,7 +34,7 @@ pub async fn get_stats(
                 authors: stats.authors,
                 files: stats.files,
             };
-            Ok(HttpResponse::Ok().json(stats))
+            Ok(HttpResponse::Ok().json(&stats))
         }
         Err(response) => Ok(response),
     }

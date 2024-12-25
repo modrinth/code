@@ -61,7 +61,7 @@ pub async fn with_test_environment_all<Fut, F>(
 }
 
 // A complete test environment, with a test actix app and a database.
-// Must be called in an #[actix_rt::test] context. It also simulates a
+// Must be called in an #[ntex::test] context. It also simulates a
 // temporary sqlx db like #[sqlx::test] would.
 // Use .call(req) on it directly to make a test call as if test::call_service(req) were being used.
 #[derive(Clone)]

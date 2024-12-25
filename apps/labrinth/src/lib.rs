@@ -2,9 +2,9 @@ use std::num::NonZeroU32;
 use std::sync::Arc;
 use std::time::Duration;
 
-use actix_web::web;
 use database::redis::RedisPool;
 use log::{info, warn};
+use ntex::{web, ServiceFactory};
 use queue::{
     analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
     socket::ActiveSockets,
@@ -15,9 +15,11 @@ extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
 use governor::middleware::StateInformationMiddleware;
 use governor::{Quota, RateLimiter};
+use ntex::web::{App, DefaultError, ErrorRenderer, WebRequest};
 use util::cors::default_cors;
 
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::scheduler::schedule;
 use crate::util::ratelimit::KeyedRateLimiter;
 use crate::{
     queue::payouts::process_payout,
@@ -49,14 +51,13 @@ pub struct LabrinthConfig {
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     pub maxmind: Arc<queue::maxmind::MaxMindIndexer>,
-    pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
     pub search_config: search::SearchConfig,
-    pub session_queue: web::Data<AuthQueue>,
-    pub payouts_queue: web::Data<PayoutsQueue>,
+    pub session_queue: Arc<AuthQueue>,
+    pub payouts_queue: Arc<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
-    pub active_sockets: web::Data<ActiveSockets>,
-    pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
+    pub active_sockets: Arc<ActiveSockets>,
+    pub automated_moderation_queue: Arc<AutomatedModerationQueue>,
     pub rate_limiter: KeyedRateLimiter,
     pub stripe_client: stripe::Client,
 }
@@ -75,27 +76,25 @@ pub fn app_setup(
     );
 
     let automated_moderation_queue =
-        web::Data::new(AutomatedModerationQueue::default());
+        Arc::new(AutomatedModerationQueue::default());
 
     {
         let automated_moderation_queue_ref = automated_moderation_queue.clone();
         let pool_ref = pool.clone();
         let redis_pool_ref = redis_pool.clone();
-        actix_rt::spawn(async move {
+        tokio::task::spawn(async move {
             automated_moderation_queue_ref
                 .task(pool_ref, redis_pool_ref)
                 .await;
         });
     }
 
-    let mut scheduler = scheduler::Scheduler::new();
-
     let limiter: KeyedRateLimiter = Arc::new(
         RateLimiter::keyed(Quota::per_minute(NonZeroU32::new(300).unwrap()))
             .with_middleware::<StateInformationMiddleware>(),
     );
     let limiter_clone = Arc::clone(&limiter);
-    scheduler.run(Duration::from_secs(60), move || {
+    schedule(Duration::from_secs(60), move || {
         info!(
             "Clearing ratelimiter, storage size: {}",
             limiter_clone.len()
@@ -118,18 +117,15 @@ pub fn app_setup(
     let pool_ref = pool.clone();
     let search_config_ref = search_config.clone();
     let redis_pool_ref = redis_pool.clone();
-    scheduler.run(local_index_interval, move || {
+    schedule(local_index_interval, move || {
         let pool_ref = pool_ref.clone();
         let redis_pool_ref = redis_pool_ref.clone();
         let search_config_ref = search_config_ref.clone();
         async move {
             info!("Indexing local database");
-            let result = index_projects(
-                pool_ref,
-                redis_pool_ref.clone(),
-                &search_config_ref,
-            )
-            .await;
+            let result =
+                index_projects(&pool_ref, &redis_pool_ref, &search_config_ref)
+                    .await;
             if let Err(e) = result {
                 warn!("Local project indexing failed: {:?}", e);
             }
@@ -140,7 +136,7 @@ pub fn app_setup(
     // Changes statuses of scheduled projects/versions
     let pool_ref = pool.clone();
     // TODO: Clear cache when these are run
-    scheduler.run(std::time::Duration::from_secs(60 * 5), move || {
+    schedule(std::time::Duration::from_secs(60 * 5), move || {
         let pool_ref = pool_ref.clone();
         info!("Releasing scheduled versions/projects!");
 
@@ -157,7 +153,10 @@ pub fn app_setup(
             .await;
 
             if let Err(e) = projects_results {
-                warn!("Syncing scheduled releases for projects failed: {:?}", e);
+                warn!(
+                    "Syncing scheduled releases for projects failed: {:?}",
+                    e
+                );
             }
 
             let versions_results = sqlx::query!(
@@ -172,25 +171,24 @@ pub fn app_setup(
             .await;
 
             if let Err(e) = versions_results {
-                warn!("Syncing scheduled releases for versions failed: {:?}", e);
+                warn!(
+                    "Syncing scheduled releases for versions failed: {:?}",
+                    e
+                );
             }
 
             info!("Finished releasing scheduled versions/projects");
         }
     });
 
-    scheduler::schedule_versions(
-        &mut scheduler,
-        pool.clone(),
-        redis_pool.clone(),
-    );
+    scheduler::schedule_versions(pool.clone(), redis_pool.clone());
 
-    let session_queue = web::Data::new(AuthQueue::new());
+    let session_queue = Arc::new(AuthQueue::new());
 
     let pool_ref = pool.clone();
     let redis_ref = redis_pool.clone();
     let session_queue_ref = session_queue.clone();
-    scheduler.run(std::time::Duration::from_secs(60 * 30), move || {
+    schedule(std::time::Duration::from_secs(60 * 30), move || {
         let pool_ref = pool_ref.clone();
         let redis_ref = redis_ref.clone();
         let session_queue_ref = session_queue_ref.clone();
@@ -208,7 +206,7 @@ pub fn app_setup(
     let reader = maxmind.clone();
     {
         let reader_ref = reader;
-        scheduler.run(std::time::Duration::from_secs(60 * 60 * 24), move || {
+        schedule(std::time::Duration::from_secs(60 * 60 * 24), move || {
             let reader_ref = reader_ref.clone();
 
             async move {
@@ -232,7 +230,7 @@ pub fn app_setup(
         let analytics_queue_ref = analytics_queue.clone();
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
-        scheduler.run(std::time::Duration::from_secs(15), move || {
+        schedule(std::time::Duration::from_secs(15), move || {
             let client_ref = client_ref.clone();
             let analytics_queue_ref = analytics_queue_ref.clone();
             let pool_ref = pool_ref.clone();
@@ -254,7 +252,7 @@ pub fn app_setup(
     {
         let pool_ref = pool.clone();
         let client_ref = clickhouse.clone();
-        scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
+        schedule(std::time::Duration::from_secs(60 * 60 * 6), move || {
             let pool_ref = pool_ref.clone();
             let client_ref = client_ref.clone();
 
@@ -276,7 +274,7 @@ pub fn app_setup(
         let redis_ref = redis_pool.clone();
         let stripe_client_ref = stripe_client.clone();
 
-        actix_rt::spawn(async move {
+        tokio::task::spawn(async move {
             routes::internal::billing::task(
                 stripe_client_ref,
                 pool_ref,
@@ -290,7 +288,7 @@ pub fn app_setup(
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
 
-        actix_rt::spawn(async move {
+        tokio::task::spawn(async move {
             routes::internal::billing::subscription_task(pool_ref, redis_ref)
                 .await;
         });
@@ -301,8 +299,8 @@ pub fn app_setup(
             .to_string(),
     };
 
-    let payouts_queue = web::Data::new(PayoutsQueue::new());
-    let active_sockets = web::Data::new(ActiveSockets::default());
+    let payouts_queue = Arc::new(PayoutsQueue::new());
+    let active_sockets = Arc::new(ActiveSockets::default());
 
     LabrinthConfig {
         pool,
@@ -310,7 +308,6 @@ pub fn app_setup(
         clickhouse: clickhouse.clone(),
         file_host,
         maxmind,
-        scheduler: Arc::new(scheduler),
         ip_salt,
         search_config,
         session_queue,
@@ -323,41 +320,25 @@ pub fn app_setup(
     }
 }
 
-pub fn app_config(
-    cfg: &mut web::ServiceConfig,
-    labrinth_config: LabrinthConfig,
-) {
-    cfg.app_data(web::FormConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
-    }))
-    .app_data(web::PathConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
-    }))
-    .app_data(web::QueryConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
-    }))
-    .app_data(web::JsonConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
-    }))
-    .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
-    .app_data(web::Data::new(labrinth_config.pool.clone()))
-    .app_data(web::Data::new(labrinth_config.file_host.clone()))
-    .app_data(web::Data::new(labrinth_config.search_config.clone()))
-    .app_data(labrinth_config.session_queue.clone())
-    .app_data(labrinth_config.payouts_queue.clone())
-    .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
-    .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
-    .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
-    .app_data(web::Data::new(labrinth_config.maxmind.clone()))
-    .app_data(labrinth_config.active_sockets.clone())
-    .app_data(labrinth_config.automated_moderation_queue.clone())
-    .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
-    .configure(routes::v2::config)
-    .configure(routes::v3::config)
-    .configure(routes::internal::config)
-    .configure(routes::root_config)
-    .default_service(web::get().wrap(default_cors()).to(routes::not_found));
-}
+// TODO: fix me
+// pub fn app_config<M, F, Err: ErrorRenderer>(
+//     mut app: App<M, F, Err>,
+//     labrinth_config: LabrinthConfig,
+// ) -> App<M, F, Err>  where F: ServiceFactory<WebRequest<Err>>  {
+//     app /*.app_data(web::FormConfig::default().error_handler(|err, _req| {
+//             routes::ApiError::Validation(err.to_string()).into()
+//         }))
+//         .app_data(web::PathConfig::default().error_handler(|err, _req| {
+//             routes::ApiError::Validation(err.to_string()).into()
+//         }))
+//         .app_data(web::QueryConfig::default().error_handler(|err, _req| {
+//             routes::ApiError::Validation(err.to_string()).into()
+//         }))
+//         .app_data(web::JsonConfig::default().error_handler(|err, _req| {
+//             routes::ApiError::Validation(err.to_string()).into()
+//         }))*/
+//
+// }
 
 // This is so that env vars not used immediately don't panic at runtime
 pub fn check_env_vars() -> bool {

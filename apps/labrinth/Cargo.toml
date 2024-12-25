@@ -11,14 +11,14 @@ name = "labrinth"
 path = "src/main.rs"
 
 [dependencies]
-actix-web = "4.4.1"
-actix-rt = "2.9.0"
-actix-multipart = "0.6.1"
-actix-cors = "0.7.0"
-actix-ws = "0.3.0"
-actix-files = "0.6.5"
-actix-web-prom = { version = "0.8.0", features = ["process"] }
-governor = "0.6.3"
+ntex = { version = "2.0", features = ["tokio", "compress"] }
+# actix-rt = "2.9.0"
+ntex-multipart = "2.0.0"
+ntex-cors = "2.0.0"
+# actix-ws = "0.3.0"
+ntex-files = "2.0.0"
+# actix-web-prom = { version = "0.8.0", features = ["process"] }
+governor = "0.8.0"
 
 tokio = { version = "1.35.1", features = ["sync"] }
 tokio-stream = "0.1.14"
@@ -97,15 +97,15 @@ maxminddb = "0.24.0"
 flate2 = "1.0.25"
 tar = "0.4.38"
 
-sentry = { version = "0.34.0", default-features = false, features = [
-    "backtrace",
-    "contexts",
-    "debug-images",
-    "panic",
-    "rustls",
-    "reqwest",
-] }
-sentry-actix = "0.34.0"
+#sentry = { version = "0.34.0", default-features = false, features = [
+#    "backtrace",
+#    "contexts",
+#    "debug-images",
+#    "panic",
+#    "rustls",
+#    "reqwest",
+#] }
+#sentry-actix = "0.34.0"
 
 image = "0.24.6"
 color-thief = "0.2.2"

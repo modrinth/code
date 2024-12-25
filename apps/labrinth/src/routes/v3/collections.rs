@@ -10,16 +10,14 @@ use crate::models::ids::base62_impl::parse_base62;
 use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::project_creation::CreateError;
 use crate::routes::ApiError;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
-use actix_web::web::Data;
-use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use itertools::Itertools;
+use ntex::web::{self, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;
@@ -58,17 +56,17 @@ pub struct CollectionCreateData {
 
 pub async fn collection_create(
     req: HttpRequest,
-    collection_create_data: web::Json<CollectionCreateData>,
-    client: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
-) -> Result<HttpResponse, CreateError> {
+    collection_create_data: web::types::Json<CollectionCreateData>,
+    client: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
     let collection_create_data = collection_create_data.into_inner();
 
     // The currently logged in user
     let current_user = get_user_from_headers(
         &req,
-        &**client,
+        &*client,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_CREATE]),
@@ -77,7 +75,7 @@ pub async fn collection_create(
     .1;
 
     collection_create_data.validate().map_err(|err| {
-        CreateError::InvalidInput(validation_errors_to_string(err, None))
+        ApiError::InvalidInput(validation_errors_to_string(err, None))
     })?;
 
     let mut transaction = client.begin().await?;
@@ -126,7 +124,7 @@ pub async fn collection_create(
     };
     transaction.commit().await?;
 
-    Ok(HttpResponse::Ok().json(response))
+    Ok(HttpResponse::Ok().json(&response))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -135,10 +133,10 @@ pub struct CollectionIds {
 }
 pub async fn collections_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<CollectionIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<CollectionIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
     let ids = ids
@@ -149,11 +147,11 @@ pub async fn collections_get(
         .collect::<Result<Vec<_>, _>>()?;
 
     let collections_data =
-        database::models::Collection::get_many(&ids, &**pool, &redis).await?;
+        database::models::Collection::get_many(&ids, &*pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_READ]),
@@ -165,24 +163,24 @@ pub async fn collections_get(
     let collections =
         filter_visible_collections(collections_data, &user_option).await?;
 
-    Ok(HttpResponse::Ok().json(collections))
+    Ok(HttpResponse::Ok().json(&collections))
 }
 
 pub async fn collection_get(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
     let collection_data =
-        database::models::Collection::get(id, &**pool, &redis).await?;
+        database::models::Collection::get(id, &*pool, &redis).await?;
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_READ]),
@@ -193,7 +191,7 @@ pub async fn collection_get(
 
     if let Some(data) = collection_data {
         if is_visible_collection(&data, &user_option).await? {
-            return Ok(HttpResponse::Ok().json(Collection::from(data)));
+            return Ok(HttpResponse::Ok().json(&Collection::from(data)));
         }
     }
     Err(ApiError::NotFound)
@@ -220,15 +218,15 @@ pub struct EditCollection {
 
 pub async fn collection_edit(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    new_collection: web::Json<EditCollection>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    new_collection: web::types::Json<EditCollection>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_WRITE]),
@@ -242,7 +240,7 @@ pub async fn collection_edit(
 
     let string = info.into_inner().0;
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
-    let result = database::models::Collection::get(id, &**pool, &redis).await?;
+    let result = database::models::Collection::get(id, &*pool, &redis).await?;
 
     if let Some(collection_item) = result {
         if !can_modify_collection(&collection_item, &user) {
@@ -323,7 +321,7 @@ pub async fn collection_edit(
             let mut validated_project_ids = Vec::new();
             for project_id in new_project_ids {
                 let project =
-                    database::models::Project::get(project_id, &**pool, &redis)
+                    database::models::Project::get(project_id, &*pool, &redis)
                         .await?
                         .ok_or_else(|| {
                             ApiError::InvalidInput(format!(
@@ -374,18 +372,18 @@ pub struct Extension {
 
 #[allow(clippy::too_many_arguments)]
 pub async fn collection_icon_edit(
-    web::Query(ext): web::Query<Extension>,
+    web::types::Query(ext): web::types::Query<Extension>,
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    mut payload: web::Payload,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    mut payload: web::types::Payload,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_WRITE]),
@@ -395,14 +393,13 @@ pub async fn collection_icon_edit(
 
     let string = info.into_inner().0;
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
-    let collection_item =
-        database::models::Collection::get(id, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified collection does not exist!".to_string(),
-                )
-            })?;
+    let collection_item = database::models::Collection::get(id, &*pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The specified collection does not exist!".to_string(),
+            )
+        })?;
 
     if !can_modify_collection(&collection_item, &user) {
         return Ok(HttpResponse::Unauthorized().body(""));
@@ -411,7 +408,7 @@ pub async fn collection_icon_edit(
     delete_old_images(
         collection_item.icon_url,
         collection_item.raw_icon_url,
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -429,7 +426,7 @@ pub async fn collection_icon_edit(
         &ext.ext,
         Some(96),
         Some(1.0),
-        &***file_host,
+        &**file_host,
     )
     .await?;
 
@@ -458,15 +455,15 @@ pub async fn collection_icon_edit(
 
 pub async fn delete_collection_icon(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_WRITE]),
@@ -476,14 +473,13 @@ pub async fn delete_collection_icon(
 
     let string = info.into_inner().0;
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
-    let collection_item =
-        database::models::Collection::get(id, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified collection does not exist!".to_string(),
-                )
-            })?;
+    let collection_item = database::models::Collection::get(id, &*pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The specified collection does not exist!".to_string(),
+            )
+        })?;
     if !can_modify_collection(&collection_item, &user) {
         return Ok(HttpResponse::Unauthorized().body(""));
     }
@@ -491,7 +487,7 @@ pub async fn delete_collection_icon(
     delete_old_images(
         collection_item.icon_url,
         collection_item.raw_icon_url,
-        &***file_host,
+        &**file_host,
     )
     .await?;
     let mut transaction = pool.begin().await?;
@@ -516,14 +512,14 @@ pub async fn delete_collection_icon(
 
 pub async fn collection_delete(
     req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_DELETE]),
@@ -533,7 +529,7 @@ pub async fn collection_delete(
 
     let string = info.into_inner().0;
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
-    let collection = database::models::Collection::get(id, &**pool, &redis)
+    let collection = database::models::Collection::get(id, &*pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(

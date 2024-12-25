@@ -8,10 +8,10 @@ use crate::models::sessions::Session;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::env::parse_var;
-use actix_web::http::header::AUTHORIZATION;
-use actix_web::web::{scope, Data, ServiceConfig};
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
+use ntex::http::header::AUTHORIZATION;
+use ntex::web::{self, delete, get, post, HttpRequest, HttpResponse};
+use ntex::web::{scope, ServiceConfig};
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
@@ -22,7 +22,7 @@ pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(
         scope("session")
             .service(list)
-            .service(delete)
+            .service(delete_session)
             .service(refresh),
     );
 }
@@ -40,15 +40,14 @@ pub struct SessionMetadata {
 pub async fn get_session_metadata(
     req: &HttpRequest,
 ) -> Result<SessionMetadata, AuthenticationError> {
-    let conn_info = req.connection_info().clone();
     let ip_addr = if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
         if let Some(header) = req.headers().get("CF-Connecting-IP") {
-            header.to_str().ok()
+            header.to_str().map(|x| x.to_string()).ok()
         } else {
-            conn_info.peer_addr()
+            req.peer_addr().map(|x| x.to_string())
         }
     } else {
-        conn_info.peer_addr()
+        req.peer_addr().map(|x| x.to_string())
     };
 
     let country = req
@@ -132,13 +131,13 @@ pub async fn issue_session(
 #[get("list")]
 pub async fn list(
     req: HttpRequest,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_READ]),
@@ -153,29 +152,29 @@ pub async fn list(
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
     let session_ids =
-        DBSession::get_user_sessions(current_user.id.into(), &**pool, &redis)
+        DBSession::get_user_sessions(current_user.id.into(), &*pool, &redis)
             .await?;
-    let sessions = DBSession::get_many_ids(&session_ids, &**pool, &redis)
+    let sessions = DBSession::get_many_ids(&session_ids, &*pool, &redis)
         .await?
         .into_iter()
         .filter(|x| x.expires > Utc::now())
         .map(|x| Session::from(x, false, Some(session)))
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(sessions))
+    Ok(HttpResponse::Ok().json(&sessions))
 }
 
 #[delete("{id}")]
-pub async fn delete(
-    info: web::Path<(String,)>,
+pub async fn delete_session(
+    info: web::types::Path<(String,)>,
     req: HttpRequest,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_DELETE]),
@@ -183,7 +182,7 @@ pub async fn delete(
     .await?
     .1;
 
-    let session = DBSession::get(info.into_inner().0, &**pool, &redis).await?;
+    let session = DBSession::get(info.into_inner().0, &*pool, &redis).await?;
 
     if let Some(session) = session {
         if session.user_id == current_user.id.into() {
@@ -208,12 +207,12 @@ pub async fn delete(
 #[post("refresh")]
 pub async fn refresh(
     req: HttpRequest,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let current_user =
-        get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
+        get_user_from_headers(&req, &*pool, &redis, &session_queue, None)
             .await?
             .1;
     let session = req
@@ -224,7 +223,7 @@ pub async fn refresh(
             ApiError::Authentication(AuthenticationError::InvalidCredentials)
         })?;
 
-    let session = DBSession::get(session, &**pool, &redis).await?;
+    let session = DBSession::get(session, &*pool, &redis).await?;
 
     if let Some(session) = session {
         if current_user.id != session.user_id.into()
@@ -252,7 +251,7 @@ pub async fn refresh(
         )
         .await?;
 
-        Ok(HttpResponse::Ok().json(Session::from(new_session, true, None)))
+        Ok(HttpResponse::Ok().json(&Session::from(new_session, true, None)))
     } else {
         Err(ApiError::Authentication(
             AuthenticationError::InvalidCredentials,

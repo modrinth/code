@@ -6,7 +6,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v2_reroute;
 use crate::routes::v3;
 use crate::routes::ApiError;
-use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
+use ntex::web::{self, delete, get, patch, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -31,14 +31,14 @@ pub struct NotificationIds {
 #[get("notifications")]
 pub async fn notifications_get(
     req: HttpRequest,
-    web::Query(ids): web::Query<NotificationIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<NotificationIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let resp = v3::notifications::notifications_get(
         req,
-        web::Query(v3::notifications::NotificationIds { ids: ids.ids }),
+        web::types::Query(v3::notifications::NotificationIds { ids: ids.ids }),
         pool,
         redis,
         session_queue,
@@ -51,7 +51,7 @@ pub async fn notifications_get(
                 .into_iter()
                 .map(LegacyNotification::from)
                 .collect();
-            Ok(HttpResponse::Ok().json(notifications))
+            Ok(HttpResponse::Ok().json(&notifications))
         }
         Err(response) => Ok(response),
     }
@@ -60,10 +60,10 @@ pub async fn notifications_get(
 #[get("{id}")]
 pub async fn notification_get(
     req: HttpRequest,
-    info: web::Path<(NotificationId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(NotificationId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::notifications::notification_get(
         req,
@@ -77,7 +77,7 @@ pub async fn notification_get(
     match v2_reroute::extract_ok_json::<Notification>(response).await {
         Ok(notification) => {
             let notification = LegacyNotification::from(notification);
-            Ok(HttpResponse::Ok().json(notification))
+            Ok(HttpResponse::Ok().json(&notification))
         }
         Err(response) => Ok(response),
     }
@@ -86,10 +86,10 @@ pub async fn notification_get(
 #[patch("{id}")]
 pub async fn notification_read(
     req: HttpRequest,
-    info: web::Path<(NotificationId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(NotificationId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::notifications::notification_read(req, info, pool, redis, session_queue)
@@ -100,10 +100,10 @@ pub async fn notification_read(
 #[delete("{id}")]
 pub async fn notification_delete(
     req: HttpRequest,
-    info: web::Path<(NotificationId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    info: web::types::Path<(NotificationId,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::notifications::notification_delete(
@@ -120,15 +120,15 @@ pub async fn notification_delete(
 #[patch("notifications")]
 pub async fn notifications_read(
     req: HttpRequest,
-    web::Query(ids): web::Query<NotificationIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<NotificationIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::notifications::notifications_read(
         req,
-        web::Query(v3::notifications::NotificationIds { ids: ids.ids }),
+        web::types::Query(v3::notifications::NotificationIds { ids: ids.ids }),
         pool,
         redis,
         session_queue,
@@ -140,15 +140,15 @@ pub async fn notifications_read(
 #[delete("notifications")]
 pub async fn notifications_delete(
     req: HttpRequest,
-    web::Query(ids): web::Query<NotificationIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    web::types::Query(ids): web::types::Query<NotificationIds>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
     v3::notifications::notifications_delete(
         req,
-        web::Query(v3::notifications::NotificationIds { ids: ids.ids }),
+        web::types::Query(v3::notifications::NotificationIds { ids: ids.ids }),
         pool,
         redis,
         session_queue,

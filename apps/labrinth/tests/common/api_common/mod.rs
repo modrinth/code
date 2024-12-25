@@ -479,8 +479,8 @@ pub trait ApiVersion {
 pub trait AppendsOptionalPat {
     fn append_pat(self, pat: Option<&str>) -> Self;
 }
-// Impl this on all actix_web::test::TestRequest
-impl AppendsOptionalPat for actix_web::test::TestRequest {
+// Impl this on all ntex::web::test::TestRequest
+impl AppendsOptionalPat for ntex::web::test::TestRequest {
     fn append_pat(self, pat: Option<&str>) -> Self {
         if let Some(pat) = pat {
             self.append_header(("Authorization", pat))

@@ -1,12 +1,12 @@
 use std::collections::HashSet;
 
 use actix_http::StatusCode;
-use actix_web::test;
 use common::api_v3::ApiV3;
 use common::environment::{with_test_environment, TestEnvironment};
 use itertools::Itertools;
 use labrinth::database::models::legacy_loader_fields::MinecraftGameVersion;
 use labrinth::models::v3;
+use ntex::web::test;
 use serde_json::json;
 
 use crate::common::api_common::{ApiProject, ApiVersion};
@@ -20,7 +20,7 @@ use crate::common::dummy_data::{
 // importing common module.
 mod common;
 
-#[actix_rt::test]
+#[ntex::test]
 
 async fn creating_loader_fields() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
@@ -378,7 +378,7 @@ async fn creating_loader_fields() {
     .await
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn get_loader_fields_variants() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
@@ -414,7 +414,7 @@ async fn get_loader_fields_variants() {
     .await
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn get_available_loader_fields() {
     // Get available loader fields for a given loader
     // (ie: which fields are relevant for 'fabric', etc)
@@ -475,7 +475,7 @@ async fn get_available_loader_fields() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_multi_get_redis_cache() {
     // Ensures a multi-project get including both modpacks and mods ddoes not
     // incorrectly cache loader fields
@@ -576,7 +576,7 @@ async fn test_multi_get_redis_cache() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn minecraft_game_version_update() {
     // We simulate adding a Minecraft game version, to ensure other data doesn't get overwritten
     // This is basically a test for the insertion/concatenation query

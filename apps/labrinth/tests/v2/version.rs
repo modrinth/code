@@ -1,11 +1,11 @@
 use actix_http::StatusCode;
-use actix_web::test;
 use futures::StreamExt;
 use labrinth::models::projects::VersionId;
 use labrinth::{
     models::projects::{Loader, VersionStatus, VersionType},
     routes::v2::version_file::FileUpdateData,
 };
+use ntex::web::test;
 use serde_json::json;
 
 use crate::assert_status;
@@ -20,7 +20,7 @@ use crate::common::{
     dummy_data::TestFile,
 };
 
-#[actix_rt::test]
+#[ntex::test]
 pub async fn test_patch_version() {
     with_test_environment(
         None,
@@ -141,7 +141,7 @@ pub async fn test_patch_version() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn version_updates() {
     // Test setup and dummy data
     with_test_environment(
@@ -447,7 +447,7 @@ async fn version_updates() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn add_version_project_types_v2() {
     with_test_environment(
         None,
@@ -518,7 +518,7 @@ async fn add_version_project_types_v2() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn test_incorrect_file_parts() {
     // Ensures that a version get that 'should' have mrpack_loaders does still display them
     //   if the file is 'mrpack' but the file_parts are incorrect

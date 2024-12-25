@@ -2,13 +2,13 @@
 use std::io::{Cursor, Write};
 
 use actix_http::StatusCode;
-use actix_web::test::{self, TestRequest};
 use labrinth::models::{
     oauth_clients::OAuthClient,
     organizations::Organization,
     pats::Scopes,
     projects::{Project, ProjectId, Version},
 };
+use ntex::web::test::{self, TestRequest};
 use serde_json::json;
 use sqlx::Executor;
 use zip::{write::FileOptions, CompressionMethod, ZipWriter};

@@ -24,14 +24,13 @@ use crate::search::indexing::IndexingError;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
-use actix_multipart::{Field, Multipart};
-use actix_web::http::StatusCode;
-use actix_web::web::{self, Data};
-use actix_web::{HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use image::ImageError;
 use itertools::Itertools;
+use ntex::http::StatusCode;
+use ntex::web::{self, HttpRequest, HttpResponse};
+use ntex_multipart::{Field, Multipart};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
@@ -40,7 +39,7 @@ use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn config(cfg: &mut ntex::web::ServiceConfig) {
     cfg.route("project", web::post().to(project_create));
 }
 
@@ -55,7 +54,7 @@ pub enum CreateError {
     #[error("Indexing Error: {0}")]
     IndexingError(#[from] IndexingError),
     #[error("Error while parsing multipart payload: {0}")]
-    MultipartError(#[from] actix_multipart::MultipartError),
+    MultipartError(#[from] ntex_multipart::MultipartError),
     #[error("Error while parsing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
     #[error("Error while validating input: {0}")]
@@ -90,7 +89,7 @@ pub enum CreateError {
     RerouteError(#[from] reqwest::Error),
 }
 
-impl actix_web::ResponseError for CreateError {
+impl ntex::web::WebResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
             CreateError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -123,8 +122,8 @@ impl actix_web::ResponseError for CreateError {
         }
     }
 
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ApiError {
+    fn error_response(&self, _req: &HttpRequest) -> HttpResponse {
+        HttpResponse::build(self.status_code()).json(&ApiError {
             error: match self {
                 CreateError::EnvError(..) => "environment_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
@@ -265,10 +264,10 @@ pub async fn undo_uploads(
 pub async fn project_create(
     req: HttpRequest,
     mut payload: Multipart,
-    client: Data<PgPool>,
-    redis: Data<RedisPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: Data<AuthQueue>,
+    client: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    file_host: web::types::State<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -277,7 +276,7 @@ pub async fn project_create(
         req,
         &mut payload,
         &mut transaction,
-        &***file_host,
+        &**file_host,
         &mut uploaded_files,
         &client,
         &redis,
@@ -286,7 +285,7 @@ pub async fn project_create(
     .await;
 
     if result.is_err() {
-        let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
+        let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
         let rollback_result = transaction.rollback().await;
 
         undo_result?;
@@ -377,10 +376,12 @@ async fn project_create_inner(
                 )))
             })?;
 
-        let content_disposition = field.content_disposition();
-        let name = content_disposition.get_name().ok_or_else(|| {
-            CreateError::MissingValueError(String::from("Missing content name"))
-        })?;
+        // TODO: fix me
+        // let content_disposition = field.content_disposition();
+        // let name = content_disposition.get_name().ok_or_else(|| {
+        //     CreateError::MissingValueError(String::from("Missing content name"))
+        // })?;
+        let name = "TODO FIX ME";
 
         if name != "data" {
             return Err(CreateError::InvalidInput(String::from(
@@ -476,14 +477,17 @@ async fn project_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().clone();
+            // let content_disposition = field.content_disposition().clone();
+            //
+            // let name = content_disposition.get_name().ok_or_else(|| {
+            //     CreateError::MissingValueError("Missing content name".to_string())
+            // })?;
+            // TODO: fix me
+            let name = "TODO FIX ME".to_string();
 
-            let name = content_disposition.get_name().ok_or_else(|| {
-                CreateError::MissingValueError("Missing content name".to_string())
-            })?;
-
-            let (file_name, file_extension) =
-                super::version_creation::get_name_ext(&content_disposition)?;
+            let (file_name, file_extension) = ("TODO FIX ME", "TODO FIX ME");
+            // let (file_name, file_extension) =
+            //     super::version_creation::get_name_ext(&content_disposition)?;
 
             if name == "icon" {
                 if icon_data.is_some() {
@@ -915,7 +919,7 @@ async fn project_create_inner(
             fields: HashMap::new(), // Fields instantiate to empty
         };
 
-        Ok(HttpResponse::Ok().json(response))
+        Ok(HttpResponse::Ok().json(&response))
     }
 }
 

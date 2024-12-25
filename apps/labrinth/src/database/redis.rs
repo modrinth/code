@@ -67,9 +67,9 @@ impl RedisPool {
         closure: F,
     ) -> Result<Vec<T>, DatabaseError>
     where
-        F: FnOnce(Vec<K>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>>,
-        T: Serialize + DeserializeOwned,
+        F: FnOnce(Vec<K>) -> Fut + Send,
+        Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>> + Send,
+        T: Serialize + DeserializeOwned + Send,
         K: Display
             + Hash
             + Eq
@@ -77,7 +77,8 @@ impl RedisPool {
             + Clone
             + DeserializeOwned
             + Serialize
-            + Debug,
+            + Debug
+            + Send,
     {
         Ok(self
             .get_cached_keys_raw(namespace, keys, closure)
@@ -94,9 +95,9 @@ impl RedisPool {
         closure: F,
     ) -> Result<HashMap<K, T>, DatabaseError>
     where
-        F: FnOnce(Vec<K>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>>,
-        T: Serialize + DeserializeOwned,
+        F: FnOnce(Vec<K>) -> Fut + Send,
+        Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>> + Send,
+        T: Serialize + DeserializeOwned + Send,
         K: Display
             + Hash
             + Eq
@@ -104,7 +105,8 @@ impl RedisPool {
             + Clone
             + DeserializeOwned
             + Serialize
-            + Debug,
+            + Debug
+            + Send,
     {
         self.get_cached_keys_raw_with_slug(
             namespace,
@@ -131,18 +133,20 @@ impl RedisPool {
         closure: F,
     ) -> Result<Vec<T>, DatabaseError>
     where
-        F: FnOnce(Vec<I>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>,
-        T: Serialize + DeserializeOwned,
-        I: Display + Hash + Eq + PartialEq + Clone + Debug,
+        F: FnOnce(Vec<I>) -> Fut + Send,
+        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>
+            + Send,
+        T: Serialize + DeserializeOwned + Send,
+        I: Display + Hash + Eq + PartialEq + Clone + Debug + Send,
         K: Display
             + Hash
             + Eq
             + PartialEq
             + Clone
             + DeserializeOwned
-            + Serialize,
-        S: Display + Clone + DeserializeOwned + Serialize + Debug,
+            + Serialize
+            + Send,
+        S: Display + Clone + DeserializeOwned + Serialize + Debug + Send,
     {
         Ok(self
             .get_cached_keys_raw_with_slug(
@@ -167,18 +171,20 @@ impl RedisPool {
         closure: F,
     ) -> Result<HashMap<K, T>, DatabaseError>
     where
-        F: FnOnce(Vec<I>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>,
-        T: Serialize + DeserializeOwned,
-        I: Display + Hash + Eq + PartialEq + Clone + Debug,
+        F: FnOnce(Vec<I>) -> Fut + Send,
+        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>
+            + Send,
+        T: Serialize + DeserializeOwned + Send,
+        I: Display + Hash + Eq + PartialEq + Clone + Debug + Send,
         K: Display
             + Hash
             + Eq
             + PartialEq
             + Clone
             + DeserializeOwned
-            + Serialize,
-        S: Display + Clone + DeserializeOwned + Serialize + Debug,
+            + Serialize
+            + Send,
+        S: Display + Clone + DeserializeOwned + Serialize + Debug + Send,
     {
         let connection = self.connect().await?.connection;
 
@@ -338,11 +344,11 @@ impl RedisPool {
             Pin<
                 Box<
                     dyn Future<
-                        Output = Result<
-                            HashMap<K, RedisValue<T, K, S>>,
-                            DatabaseError,
-                        >,
-                    >,
+                            Output = Result<
+                                HashMap<K, RedisValue<T, K, S>>,
+                                DatabaseError,
+                            >,
+                        > + Send,
                 >,
             >,
         > = Vec::new();
@@ -547,23 +553,6 @@ impl RedisConnection {
         Ok(res)
     }
 
-    pub async fn get_many(
-        &mut self,
-        namespace: &str,
-        ids: &[String],
-    ) -> Result<Vec<Option<String>>, DatabaseError> {
-        let mut cmd = cmd("MGET");
-        redis_args(
-            &mut cmd,
-            ids.iter()
-                .map(|x| format!("{}_{}:{}", self.meta_namespace, namespace, x))
-                .collect::<Vec<_>>()
-                .as_slice(),
-        );
-        let res = redis_execute(&mut cmd, &mut self.connection).await?;
-        Ok(res)
-    }
-
     pub async fn get_deserialized_from_json<R>(
         &mut self,
         namespace: &str,
@@ -576,22 +565,6 @@ impl RedisConnection {
             .get(namespace, id)
             .await?
             .and_then(|x| serde_json::from_str(&x).ok()))
-    }
-
-    pub async fn get_many_deserialized_from_json<R>(
-        &mut self,
-        namespace: &str,
-        ids: &[String],
-    ) -> Result<Vec<Option<R>>, DatabaseError>
-    where
-        R: for<'a> serde::Deserialize<'a>,
-    {
-        Ok(self
-            .get_many(namespace, ids)
-            .await?
-            .into_iter()
-            .map(|x| x.and_then(|val| serde_json::from_str::<R>(&val).ok()))
-            .collect::<Vec<_>>())
     }
 
     pub async fn delete<T1>(

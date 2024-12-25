@@ -8,7 +8,7 @@ use crate::common::{
     environment::{with_test_environment, TestEnvironment},
 };
 
-#[actix_rt::test]
+#[ntex::test]
 async fn get_tags() {
     with_test_environment(
         None,
@@ -69,7 +69,7 @@ async fn get_tags() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn get_donation_platforms() {
     with_test_environment(
         None,

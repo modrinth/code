@@ -11,8 +11,8 @@ use crate::{
     },
     queue::session::AuthQueue,
 };
-use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Duration, Utc};
+use ntex::web::{self, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::types::PgInterval;
 use sqlx::PgPool;
@@ -69,15 +69,15 @@ pub struct FetchedPlaytime {
 }
 pub async fn playtimes_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
-    data: web::Query<GetData>,
-    session_queue: web::Data<AuthQueue>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    clickhouse: web::types::State<clickhouse::Client>,
+    data: web::types::Query<GetData>,
+    session_queue: web::types::State<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ANALYTICS]),
@@ -107,7 +107,7 @@ pub async fn playtimes_get(
         start_date,
         end_date,
         resolution_minutes,
-        clickhouse.into_inner(),
+        &*clickhouse,
     )
     .await?;
 
@@ -122,7 +122,7 @@ pub async fn playtimes_get(
         }
     }
 
-    Ok(HttpResponse::Ok().json(hm))
+    Ok(HttpResponse::Ok().json(&hm))
 }
 
 /// Get view data for a set of projects or versions
@@ -136,15 +136,15 @@ pub async fn playtimes_get(
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 pub async fn views_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
-    data: web::Query<GetData>,
-    session_queue: web::Data<AuthQueue>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    clickhouse: web::types::State<clickhouse::Client>,
+    data: web::types::Query<GetData>,
+    session_queue: web::types::State<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ANALYTICS]),
@@ -174,7 +174,7 @@ pub async fn views_get(
         start_date,
         end_date,
         resolution_minutes,
-        clickhouse.into_inner(),
+        &*clickhouse,
     )
     .await?;
 
@@ -189,7 +189,7 @@ pub async fn views_get(
         }
     }
 
-    Ok(HttpResponse::Ok().json(hm))
+    Ok(HttpResponse::Ok().json(&hm))
 }
 
 /// Get download data for a set of projects or versions
@@ -203,15 +203,15 @@ pub async fn views_get(
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 pub async fn downloads_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
-    data: web::Query<GetData>,
-    session_queue: web::Data<AuthQueue>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    clickhouse: web::types::State<clickhouse::Client>,
+    data: web::types::Query<GetData>,
+    session_queue: web::types::State<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ANALYTICS]),
@@ -242,7 +242,7 @@ pub async fn downloads_get(
         start_date,
         end_date,
         resolution_minutes,
-        clickhouse.into_inner(),
+        &*clickhouse,
     )
     .await?;
 
@@ -257,7 +257,7 @@ pub async fn downloads_get(
         }
     }
 
-    Ok(HttpResponse::Ok().json(hm))
+    Ok(HttpResponse::Ok().json(&hm))
 }
 
 /// Get payout data for a set of projects
@@ -271,14 +271,14 @@ pub async fn downloads_get(
 /// ONLY project IDs can be used. Unauthorized projects will be filtered out.
 pub async fn revenue_get(
     req: HttpRequest,
-    data: web::Query<GetData>,
-    session_queue: web::Data<AuthQueue>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    data: web::types::Query<GetData>,
+    session_queue: web::types::State<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PAYOUTS_READ]),
@@ -345,7 +345,7 @@ pub async fn revenue_get(
             end_date,
             duration,
         )
-            .fetch_all(&**pool)
+            .fetch_all(&*pool)
             .await?.into_iter().map(|x| PayoutValue {
             mod_id: x.mod_id,
             amount_sum: x.amount_sum,
@@ -364,7 +364,7 @@ pub async fn revenue_get(
             end_date,
             duration,
         )
-            .fetch_all(&**pool)
+            .fetch_all(&*pool)
             .await?.into_iter().map(|x| PayoutValue {
             mod_id: x.mod_id,
             amount_sum: x.amount_sum,
@@ -392,7 +392,7 @@ pub async fn revenue_get(
         }
     }
 
-    Ok(HttpResponse::Ok().json(hm))
+    Ok(HttpResponse::Ok().json(&hm))
 }
 
 /// Get country data for a set of projects or versions
@@ -409,15 +409,15 @@ pub async fn revenue_get(
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
 pub async fn countries_downloads_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
-    data: web::Query<GetData>,
-    session_queue: web::Data<AuthQueue>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    clickhouse: web::types::State<clickhouse::Client>,
+    data: web::types::Query<GetData>,
+    session_queue: web::types::State<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ANALYTICS]),
@@ -445,7 +445,7 @@ pub async fn countries_downloads_get(
         project_ids.unwrap_or_default(),
         start_date,
         end_date,
-        clickhouse.into_inner(),
+        &*clickhouse,
     )
     .await?;
 
@@ -465,7 +465,7 @@ pub async fn countries_downloads_get(
         .map(|(key, value)| (key, condense_countries(value)))
         .collect();
 
-    Ok(HttpResponse::Ok().json(hm))
+    Ok(HttpResponse::Ok().json(&hm))
 }
 
 /// Get country data for a set of projects or versions
@@ -482,15 +482,15 @@ pub async fn countries_downloads_get(
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
 pub async fn countries_views_get(
     req: HttpRequest,
-    clickhouse: web::Data<clickhouse::Client>,
-    data: web::Query<GetData>,
-    session_queue: web::Data<AuthQueue>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
+    clickhouse: web::types::State<clickhouse::Client>,
+    data: web::types::Query<GetData>,
+    session_queue: web::types::State<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::ANALYTICS]),
@@ -518,7 +518,7 @@ pub async fn countries_views_get(
         project_ids.unwrap_or_default(),
         start_date,
         end_date,
-        clickhouse.into_inner(),
+        &*clickhouse,
     )
     .await?;
 
@@ -538,7 +538,7 @@ pub async fn countries_views_get(
         .map(|(key, value)| (key, condense_countries(value)))
         .collect();
 
-    Ok(HttpResponse::Ok().json(hm))
+    Ok(HttpResponse::Ok().json(&hm))
 }
 
 fn condense_countries(countries: HashMap<String, u64>) -> HashMap<String, u64> {
@@ -561,14 +561,14 @@ fn condense_countries(countries: HashMap<String, u64>) -> HashMap<String, u64> {
 async fn filter_allowed_ids(
     mut project_ids: Option<Vec<String>>,
     user: crate::models::users::User,
-    pool: &web::Data<PgPool>,
+    pool: &web::types::State<PgPool>,
     redis: &RedisPool,
     remove_defaults: Option<bool>,
 ) -> Result<Option<Vec<ProjectId>>, ApiError> {
     // If no project_ids or version_ids are provided, we default to all projects the user has *public* access to
     if project_ids.is_none() && !remove_defaults.unwrap_or(false) {
         project_ids = Some(
-            user_item::User::get_projects(user.id.into(), &***pool, redis)
+            user_item::User::get_projects(user.id.into(), &**pool, redis)
                 .await?
                 .into_iter()
                 .map(|x| ProjectId::from(x).to_string())
@@ -581,7 +581,7 @@ async fn filter_allowed_ids(
     let project_ids = if let Some(project_strings) = project_ids {
         let projects_data = database::models::Project::get_many(
             &project_strings,
-            &***pool,
+            &**pool,
             redis,
         )
         .await?;
@@ -592,7 +592,7 @@ async fn filter_allowed_ids(
             .collect::<Vec<database::models::TeamId>>();
         let team_members =
             database::models::TeamMember::get_from_team_full_many(
-                &team_ids, &***pool, redis,
+                &team_ids, &**pool, redis,
             )
             .await?;
 
@@ -602,7 +602,7 @@ async fn filter_allowed_ids(
             .collect::<Vec<database::models::OrganizationId>>();
         let organizations = database::models::Organization::get_many_ids(
             &organization_ids,
-            &***pool,
+            &**pool,
             redis,
         )
         .await?;
@@ -614,7 +614,7 @@ async fn filter_allowed_ids(
         let organization_team_members =
             database::models::TeamMember::get_from_team_full_many(
                 &organization_team_ids,
-                &***pool,
+                &**pool,
                 redis,
             )
             .await?;

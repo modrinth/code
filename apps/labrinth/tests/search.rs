@@ -19,7 +19,7 @@ mod common;
 // TODO: Revisit this wit   h the new modify_json in the version maker
 // That change here should be able to simplify it vastly
 
-#[actix_rt::test]
+#[ntex::test]
 async fn search_projects() {
     // Test setup and dummy data
     with_test_environment(
@@ -125,7 +125,7 @@ async fn search_projects() {
     .await;
 }
 
-#[actix_rt::test]
+#[ntex::test]
 async fn index_swaps() {
     with_test_environment(
         Some(10),

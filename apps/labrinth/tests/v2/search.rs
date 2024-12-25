@@ -16,7 +16,7 @@ use serde_json::json;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-#[actix_rt::test]
+#[ntex::test]
 async fn search_projects() {
     // Test setup and dummy data
     with_test_environment(Some(10), |test_env: TestEnvironment<ApiV2>| async move {

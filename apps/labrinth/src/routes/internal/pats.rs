@@ -5,9 +5,8 @@ use crate::auth::get_user_from_headers;
 use crate::routes::ApiError;
 
 use crate::database::redis::RedisPool;
-use actix_web::web::{self, Data};
-use actix_web::{delete, get, patch, post, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
+use ntex::web::{self, delete, get, patch, post, HttpRequest, HttpResponse};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 use rand_chacha::rand_core::SeedableRng;
@@ -30,13 +29,13 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[get("pat")]
 pub async fn get_pats(
     req: HttpRequest,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PAT_READ]),
@@ -47,17 +46,18 @@ pub async fn get_pats(
     let pat_ids =
         database::models::pat_item::PersonalAccessToken::get_user_pats(
             user.id.into(),
-            &**pool,
+            &*pool,
             &redis,
         )
         .await?;
     let pats = database::models::pat_item::PersonalAccessToken::get_many_ids(
-        &pat_ids, &**pool, &redis,
+        &pat_ids, &*pool, &redis,
     )
     .await?;
 
     Ok(HttpResponse::Ok().json(
-        pats.into_iter()
+        &pats
+            .into_iter()
             .map(|x| PersonalAccessToken::from(x, false))
             .collect::<Vec<_>>(),
     ))
@@ -74,10 +74,10 @@ pub struct NewPersonalAccessToken {
 #[post("pat")]
 pub async fn create_pat(
     req: HttpRequest,
-    info: web::Json<NewPersonalAccessToken>,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    info: web::types::Json<NewPersonalAccessToken>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     info.0.validate().map_err(|err| {
         ApiError::InvalidInput(validation_errors_to_string(err, None))
@@ -96,7 +96,7 @@ pub async fn create_pat(
 
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PAT_CREATE]),
@@ -136,7 +136,7 @@ pub async fn create_pat(
     )
     .await?;
 
-    Ok(HttpResponse::Ok().json(PersonalAccessToken {
+    Ok(HttpResponse::Ok().json(&PersonalAccessToken {
         id: id.into(),
         name,
         access_token: Some(token),
@@ -159,11 +159,11 @@ pub struct ModifyPersonalAccessToken {
 #[patch("pat/{id}")]
 pub async fn edit_pat(
     req: HttpRequest,
-    id: web::Path<(String,)>,
-    info: web::Json<ModifyPersonalAccessToken>,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    id: web::types::Path<(String,)>,
+    info: web::types::Json<ModifyPersonalAccessToken>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     info.0.validate().map_err(|err| {
         ApiError::InvalidInput(validation_errors_to_string(err, None))
@@ -171,7 +171,7 @@ pub async fn edit_pat(
 
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PAT_WRITE]),
@@ -181,7 +181,7 @@ pub async fn edit_pat(
 
     let id = id.into_inner().0;
     let pat = database::models::pat_item::PersonalAccessToken::get(
-        &id, &**pool, &redis,
+        &id, &*pool, &redis,
     )
     .await?;
 
@@ -256,14 +256,14 @@ pub async fn edit_pat(
 #[delete("pat/{id}")]
 pub async fn delete_pat(
     req: HttpRequest,
-    id: web::Path<(String,)>,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    id: web::types::Path<(String,)>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::PAT_DELETE]),
@@ -272,7 +272,7 @@ pub async fn delete_pat(
     .1;
     let id = id.into_inner().0;
     let pat = database::models::pat_item::PersonalAccessToken::get(
-        &id, &**pool, &redis,
+        &id, &*pool, &redis,
     )
     .await?;
 

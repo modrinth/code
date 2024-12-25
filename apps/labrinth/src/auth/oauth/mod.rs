@@ -14,14 +14,14 @@ use crate::models;
 use crate::models::ids::OAuthClientId;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use actix_web::http::header::LOCATION;
-use actix_web::web::{Data, Query, ServiceConfig};
-use actix_web::{get, post, web, HttpRequest, HttpResponse};
 use chrono::Duration;
+use ntex::http::header::LOCATION;
+use ntex::http::header::{CACHE_CONTROL, PRAGMA};
+use ntex::web::ServiceConfig;
+use ntex::web::{self, get, post, HttpRequest, HttpResponse};
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use reqwest::header::{CACHE_CONTROL, PRAGMA};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 
@@ -59,14 +59,14 @@ pub struct OAuthClientAccessRequest {
 #[get("authorize")]
 pub async fn init_oauth(
     req: HttpRequest,
-    Query(oauth_info): Query<OAuthInit>,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    web::types::Query(oauth_info): web::types::Query<OAuthInit>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::USER_AUTH_WRITE]),
@@ -75,7 +75,7 @@ pub async fn init_oauth(
     .1;
 
     let client_id = oauth_info.client_id.into();
-    let client = DBOAuthClient::get(client_id, &**pool).await?;
+    let client = DBOAuthClient::get(client_id, &*pool).await?;
 
     if let Some(client) = client {
         let redirect_uri = ValidatedRedirectUri::validate(
@@ -107,7 +107,7 @@ pub async fn init_oauth(
         }
 
         let existing_authorization =
-            OAuthClientAuthorization::get(client.id, user.id.into(), &**pool)
+            OAuthClientAuthorization::get(client.id, user.id.into(), &*pool)
                 .await
                 .map_err(|e| {
                     OAuthError::redirect(e, &oauth_info.state, &redirect_uri)
@@ -154,7 +154,7 @@ pub async fn init_oauth(
                     flow_id,
                     requested_scopes,
                 };
-                Ok(HttpResponse::Ok().json(access_request))
+                Ok(HttpResponse::Ok().json(&access_request))
             }
         }
     } else {
@@ -172,10 +172,10 @@ pub struct RespondToOAuthClientScopes {
 #[post("accept")]
 pub async fn accept_client_scopes(
     req: HttpRequest,
-    accept_body: web::Json<RespondToOAuthClientScopes>,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    accept_body: web::types::Json<RespondToOAuthClientScopes>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
     accept_or_reject_client_scopes(
         true,
@@ -191,10 +191,10 @@ pub async fn accept_client_scopes(
 #[post("reject")]
 pub async fn reject_client_scopes(
     req: HttpRequest,
-    body: web::Json<RespondToOAuthClientScopes>,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    body: web::types::Json<RespondToOAuthClientScopes>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
     accept_or_reject_client_scopes(false, req, body, pool, redis, session_queue)
         .await
@@ -221,12 +221,12 @@ pub struct TokenResponse {
 /// Per IETF RFC6749 Section 4.1.3 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3)
 pub async fn request_token(
     req: HttpRequest,
-    req_params: web::Form<TokenRequest>,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
+    req_params: web::types::Form<TokenRequest>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
 ) -> Result<HttpResponse, OAuthError> {
     let req_client_id = req_params.client_id;
-    let client = DBOAuthClient::get(req_client_id.into(), &**pool).await?;
+    let client = DBOAuthClient::get(req_client_id.into(), &*pool).await?;
     if let Some(client) = client {
         authenticate_client_token_request(&req, &client)?;
 
@@ -294,9 +294,9 @@ pub async fn request_token(
 
             // IETF RFC6749 Section 5.1 (https://datatracker.ietf.org/doc/html/rfc6749#section-5.1)
             Ok(HttpResponse::Ok()
-                .append_header((CACHE_CONTROL, "no-store"))
-                .append_header((PRAGMA, "no-cache"))
-                .json(TokenResponse {
+                .header(CACHE_CONTROL, "no-store")
+                .header(PRAGMA, "no-cache")
+                .json(&TokenResponse {
                     access_token: token,
                     token_type: "Bearer".to_string(),
                     expires_in: time_until_expiration.num_seconds(),
@@ -314,14 +314,14 @@ pub async fn request_token(
 pub async fn accept_or_reject_client_scopes(
     accept: bool,
     req: HttpRequest,
-    body: web::Json<RespondToOAuthClientScopes>,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
+    body: web::types::Json<RespondToOAuthClientScopes>,
+    pool: web::types::State<PgPool>,
+    redis: web::types::State<RedisPool>,
+    session_queue: web::types::State<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
     let current_user = get_user_from_headers(
         &req,
-        &**pool,
+        &*pool,
         &redis,
         &session_queue,
         Some(&[Scopes::SESSION_ACCESS]),
@@ -449,7 +449,7 @@ async fn init_oauth_code_flow(
 
     // IETF RFC 6749 Section 4.1.2 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2)
     Ok(HttpResponse::Ok()
-        .append_header((LOCATION, redirect_uri.clone()))
+        .header(LOCATION, redirect_uri.clone())
         .body(redirect_uri))
 }
 
