@@ -176,7 +176,7 @@ impl ProjectType {
         }
     }
 
-    pub fn get_from_parent_folder(path: &PathBuf) -> Option<Self> {
+    pub fn get_from_parent_folder(path: &Path) -> Option<Self> {
         // Get parent folder
         let path = path.parent()?.file_name()?;
         match path.to_str()? {
