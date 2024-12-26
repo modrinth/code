@@ -176,7 +176,7 @@ impl ProjectType {
         }
     }
 
-    pub fn get_from_parent_folder(path: PathBuf) -> Option<Self> {
+    pub fn get_from_parent_folder(path: &PathBuf) -> Option<Self> {
         // Get parent folder
         let path = path.parent()?.file_name()?;
         match path.to_str()? {
@@ -203,6 +203,15 @@ impl ProjectType {
             ProjectType::DataPack => "datapacks",
             ProjectType::ResourcePack => "resourcepacks",
             ProjectType::ShaderPack => "shaderpacks",
+        }
+    }
+
+    pub fn get_loaders(&self) -> &'static [&'static str] {
+        match self {
+            ProjectType::Mod => &["fabric", "forge", "quilt", "neoforge"],
+            ProjectType::DataPack => &["datapack"],
+            ProjectType::ResourcePack => &["vanilla", "canvas", "minecraft"],
+            ProjectType::ShaderPack => &["iris", "optifine"],
         }
     }
 
@@ -593,7 +602,13 @@ impl Profile {
                         format!(
                             "{}-{}-{}",
                             x.hash,
-                            profile.loader.as_str(),
+                            // TODO: Maybe deduplicate this code? But where to put the function?
+                            x.project_type
+                                .map(|x| x.get_loaders().join("+"))
+                                .unwrap_or_else(|| profile
+                                    .loader
+                                    .as_str()
+                                    .to_string()),
                             profile.game_version
                         )
                     },
@@ -694,7 +709,9 @@ impl Profile {
                 format!(
                     "{}-{}-{}",
                     x.hash,
-                    self.loader.as_str(),
+                    x.project_type
+                        .map(|x| x.get_loaders().join("+"))
+                        .unwrap_or_else(|| self.loader.as_str().to_string()),
                     self.game_version
                 )
             })
@@ -873,8 +890,15 @@ impl Profile {
         let project_path =
             format!("{}/{}", project_type.get_folder(), file_name);
 
-        cache_file_hash(bytes.clone(), profile_path, &project_path, hash, exec)
-            .await?;
+        cache_file_hash(
+            bytes.clone(),
+            profile_path,
+            &project_path,
+            hash,
+            Some(project_type),
+            exec,
+        )
+        .await?;
 
         util::fetch::write(&path.join(&project_path), &bytes, io_semaphore)
             .await?;
