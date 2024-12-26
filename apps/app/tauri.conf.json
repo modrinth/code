@@ -44,7 +44,7 @@
     ]
   },
   "productName": "Modrinth App",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "mainBinaryName": "Modrinth App",
   "identifier": "ModrinthApp",
   "plugins": {
