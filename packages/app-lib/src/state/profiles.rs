@@ -146,7 +146,7 @@ pub struct FileMetadata {
     pub version_id: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Copy)]
+#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectType {
     Mod,
@@ -604,6 +604,7 @@ impl Profile {
                             x.hash,
                             // TODO: Maybe deduplicate this code? But where to put the function?
                             x.project_type
+                                .filter(|x| *x != ProjectType::Mod)
                                 .map(|x| x.get_loaders().join("+"))
                                 .unwrap_or_else(|| profile
                                     .loader
@@ -710,6 +711,7 @@ impl Profile {
                     "{}-{}-{}",
                     x.hash,
                     x.project_type
+                        .filter(|x| *x != ProjectType::Mod)
                         .map(|x| x.get_loaders().join("+"))
                         .unwrap_or_else(|| self.loader.as_str().to_string()),
                     self.game_version
