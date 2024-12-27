@@ -1,5 +1,7 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::state::{cache_file_hash, CacheBehaviour, CachedEntry};
+use crate::state::{
+    cache_file_hash, CacheBehaviour, CachedEntry, CachedFileHash,
+};
 use crate::util;
 use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
 use crate::util::io::{self};
@@ -596,24 +598,10 @@ impl Profile {
 
         let file_updates = file_hashes
             .iter()
-            .filter_map(|x| {
-                all.iter().find(|prof| x.path.contains(&prof.path)).map(
-                    |profile| {
-                        format!(
-                            "{}-{}-{}",
-                            x.hash,
-                            // TODO: Maybe deduplicate this code? But where to put the function?
-                            x.project_type
-                                .filter(|x| *x != ProjectType::Mod)
-                                .map(|x| x.get_loaders().join("+"))
-                                .unwrap_or_else(|| profile
-                                    .loader
-                                    .as_str()
-                                    .to_string()),
-                            profile.game_version
-                        )
-                    },
-                )
+            .filter_map(|file| {
+                all.iter()
+                    .find(|prof| file.path.contains(&prof.path))
+                    .map(|profile| Self::get_cache_key(file, profile))
             })
             .collect::<Vec<_>>();
 
@@ -706,17 +694,7 @@ impl Profile {
 
         let file_updates = file_hashes
             .iter()
-            .map(|x| {
-                format!(
-                    "{}-{}-{}",
-                    x.hash,
-                    x.project_type
-                        .filter(|x| *x != ProjectType::Mod)
-                        .map(|x| x.get_loaders().join("+"))
-                        .unwrap_or_else(|| self.loader.as_str().to_string()),
-                    self.game_version
-                )
-            })
+            .map(|x| Self::get_cache_key(x, self))
             .collect::<Vec<_>>();
 
         let file_hashes_ref =
@@ -790,6 +768,18 @@ impl Profile {
         }
 
         Ok(files)
+    }
+
+    fn get_cache_key(file: &CachedFileHash, profile: &Profile) -> String {
+        format!(
+            "{}-{}-{}",
+            file.hash,
+            file.project_type
+                .filter(|x| *x != ProjectType::Mod)
+                .map(|x| x.get_loaders().join("+"))
+                .unwrap_or_else(|| profile.loader.as_str().to_string()),
+            profile.game_version
+        )
     }
 
     #[tracing::instrument(skip(pool))]
