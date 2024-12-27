@@ -53,11 +53,11 @@ jobs:
             !target/release/bundle/*/*.app.tar.gz
             !target/release/bundle/*/*.app.tar.gz.sig
 
-            !target/release/bundle/*/*.AppImage
-            !target/release/bundle/*/*.AppImage.tar.gz
-            !target/release/bundle/*/*.AppImage.tar.gz.sig
-            !target/release/bundle/*/*.deb
-            !target/release/bundle/*/*.rpm
+            !target/release/bundle/appimage/*.AppImage
+            !target/release/bundle/appimage/*.AppImage.tar.gz
+            !target/release/bundle/appimage/*.AppImage.tar.gz.sig
+            !target/release/bundle/deb/*.deb
+            !target/release/bundle/rpm/*.rpm
 
             !target/release/bundle/msi/*.msi
             !target/release/bundle/msi/*.msi.zip
