@@ -344,9 +344,13 @@ const auth = await useAuth();
 
 const projectType = ref();
 function setProjectType() {
-  projectType.value = tags.value.projectTypes.find(
+  const projType = tags.value.projectTypes.find(
     (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
   );
+
+  if (projType) {
+    projectType.value = projType;
+  }
 }
 setProjectType();
 router.afterEach(() => {
