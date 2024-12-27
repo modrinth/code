@@ -433,6 +433,11 @@ impl RedisPool {
 
                 for (key, _) in ids {
                     pipe.atomic().del(format!(
+                        "{}_{namespace}:{}/lock",
+                        self.meta_namespace,
+                        key.to_lowercase()
+                    ));
+                    pipe.atomic().del(format!(
                         "{}_{namespace}:{key}/lock",
                         self.meta_namespace
                     ));
