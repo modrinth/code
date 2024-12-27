@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use std::convert::TryFrom;
 use std::convert::TryInto;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
