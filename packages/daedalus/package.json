@@ -1,0 +1,10 @@
+{
+  "name": "@modrinth/daedalus",
+  "scripts": {
+    "build": "cargo build --release",
+    "lint": "cargo fmt --check && cargo clippy --all-targets --all-features -- -D warnings",
+    "fix": "cargo fmt && cargo clippy --fix",
+    "dev": "cargo run",
+    "test": "cargo test"
+  }
+}

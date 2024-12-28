@@ -1,5 +1,5 @@
 <template>
-  <ModalWrapper ref="detectJavaModal" header="Select java version">
+  <ModalWrapper ref="detectJavaModal" header="Select java version" :show-ad-on-close="false">
     <div class="auto-detect-modal">
       <div class="table">
         <div class="table-row table-head">
@@ -73,8 +73,6 @@ function setJavaInstall(javaInstall) {
 </script>
 <style lang="scss" scoped>
 .auto-detect-modal {
-  padding: 1rem;
-
   .table {
     .table-row {
       grid-template-columns: 1fr 4fr min-content;

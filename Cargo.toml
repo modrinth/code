@@ -3,7 +3,10 @@ resolver = '2'
 members = [
   './packages/app-lib',
 	'./apps/app-playground',
-  './apps/app'
+  './apps/app',
+  './apps/labrinth',
+    './apps/daedalus_client',
+    './packages/daedalus',
 ]
 
 # Optimize for speed and reduce size on release builds
@@ -18,5 +21,4 @@ strip = true # Remove debug symbols
 opt-level = 3
 
 [patch.crates-io]
-wry = { git = "https://github.com/modrinth/wry", rev = "5840108" }
-tauri = { git = "https://github.com/modrinth/tauri", rev = "5e29428" }
+wry = { git = "https://github.com/modrinth/wry", rev ="cdbf938" }

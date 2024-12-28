@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                        UPDATE users\n                        SET paypal_country = NULL, paypal_email = NULL, paypal_id = NULL\n                        WHERE (id = $1)\n                        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "06bfc01bafa2db73eb049f268eb9f333aeeb23a048ee524b278fe184e2d3ae45"
+}

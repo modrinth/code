@@ -44,11 +44,11 @@ pub enum PackFileHash {
 
 impl From<String> for PackFileHash {
     fn from(s: String) -> Self {
-        return match s.as_str() {
+        match s.as_str() {
             "sha1" => PackFileHash::Sha1,
             "sha512" => PackFileHash::Sha512,
             _ => PackFileHash::Unknown(s),
-        };
+        }
     }
 }
 
@@ -324,7 +324,6 @@ pub async fn generate_pack_from_file(
 
 /// Sets generated profile attributes to the pack ones (using profile::edit)
 /// This includes the pack name, icon, game version, loader version, and loader
-
 pub async fn set_profile_information(
     profile_path: String,
     description: &CreatePackDescription,

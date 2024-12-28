@@ -35,7 +35,6 @@
                       accept="image/png,image/jpeg,image/gif,image/webp"
                       class="btn btn-transparent upload"
                       style="white-space: nowrap"
-                      prompt="Upload icon"
                       aria-label="Upload icon"
                       @change="showPreviewImage"
                     >
@@ -381,7 +380,14 @@ import {
   LibraryIcon,
   BoxIcon,
 } from "@modrinth/assets";
-import { PopoutMenu, FileInput, DropdownSelect, Avatar, Button } from "@modrinth/ui";
+import {
+  PopoutMenu,
+  FileInput,
+  DropdownSelect,
+  Avatar,
+  Button,
+  commonMessages,
+} from "@modrinth/ui";
 
 import WorldIcon from "assets/images/utils/world.svg";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
@@ -612,7 +618,7 @@ const visibility = ref(collection.value.status);
 const removeProjects = ref([]);
 
 async function unfollowProject(project) {
-  await userUnfollowProject(project);
+  await userFollowProject(project);
   projects.value = projects.value.filter((x) => x.id !== project.id);
 }
 

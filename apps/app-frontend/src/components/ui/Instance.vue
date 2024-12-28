@@ -1,8 +1,8 @@
 <script setup>
-import { onUnmounted, ref, computed } from 'vue'
+import { onUnmounted, ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { StopCircleIcon, PlayIcon } from '@modrinth/assets'
-import { Card, Avatar, AnimatedLogo } from '@modrinth/ui'
+import { SpinnerIcon, GameIcon, TimerIcon, StopCircleIcon, PlayIcon } from '@modrinth/assets'
+import { ButtonStyled, Avatar } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
@@ -11,6 +11,11 @@ import { handleError } from '@/store/state.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { trackEvent } from '@/helpers/analytics'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { formatCategory } from '@modrinth/utils'
+
+dayjs.extend(relativeTime)
 
 const props = defineProps({
   instance: {
@@ -19,16 +24,30 @@ const props = defineProps({
       return {}
     },
   },
+  compact: {
+    type: Boolean,
+    default: false,
+  },
+  first: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const playing = ref(false)
-
-const modLoading = computed(() => props.instance.install_stage !== 'installed')
+const loading = ref(false)
+const modLoading = computed(
+  () =>
+    loading.value ||
+    currentEvent.value === 'installing' ||
+    (currentEvent.value === 'launched' && !playing.value),
+)
+const installing = computed(() => props.instance.install_stage !== 'installed')
 
 const router = useRouter()
 
 const seeInstance = async () => {
-  await router.push(`/instance/${encodeURIComponent(props.instance.path)}/`)
+  await router.push(`/instance/${encodeURIComponent(props.instance.path)}`)
 }
 
 const checkProcess = async () => {
@@ -39,17 +58,17 @@ const checkProcess = async () => {
 
 const play = async (e, context) => {
   e?.stopPropagation()
-  modLoading.value = true
-  await run(props.instance.path).catch((err) =>
-    handleSevereError(err, { profilePath: props.instance.path }),
-  )
-  modLoading.value = false
-
-  trackEvent('InstancePlay', {
-    loader: props.instance.loader,
-    game_version: props.instance.game_version,
-    source: context,
-  })
+  loading.value = true
+  await run(props.instance.path)
+    .catch((err) => handleSevereError(err, { profilePath: props.instance.path }))
+    .finally(() => {
+      trackEvent('InstancePlay', {
+        loader: props.instance.loader,
+        game_version: props.instance.game_version,
+        source: context,
+      })
+    })
+  loading.value = false
 }
 
 const stop = async (e, context) => {
@@ -85,175 +104,120 @@ defineExpose({
   instance: props.instance,
 })
 
+const currentEvent = ref(null)
+
 const unlisten = await process_listener((e) => {
-  if (e.event === 'finished' && e.profile_path_id === props.instance.path) playing.value = false
+  if (e.profile_path_id === props.instance.path) {
+    currentEvent.value = e.event
+    if (e.event === 'finished') {
+      playing.value = false
+    }
+  }
 })
 
+onMounted(() => checkProcess())
 onUnmounted(() => unlisten())
 </script>
 
 <template>
-  <div class="instance">
-    <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
-      <Avatar
-        size="lg"
-        :src="props.instance.icon_path ? convertFileSrc(props.instance.icon_path) : null"
-        alt="Mod card"
-        class="mod-image"
-      />
-      <div class="project-info">
-        <p class="title">{{ props.instance.name }}</p>
-        <p
-          v-if="
-            props.instance.install_stage === 'installing' ||
-            props.instance.install_stage === 'not_installed' ||
-            props.instance.install_stage === 'pack_installing'
-          "
-          class="description"
-        >
-          Installing...
-        </p>
-        <p v-else class="description">
-          {{ props.instance.loader }}
-          {{ props.instance.game_version }}
-        </p>
-      </div>
-    </Card>
+  <template v-if="compact">
     <div
-      v-if="playing === true"
-      class="stop cta button-base"
-      @click="(e) => stop(e, 'InstanceCard')"
-      @mousehover="checkProcess"
+      class="card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer hover:brightness-90 transition-all"
+      @click="seeInstance"
+      @mouseenter="checkProcess"
     >
-      <StopCircleIcon />
+      <Avatar
+        size="48px"
+        :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+        :tint-by="instance.path"
+        alt="Mod card"
+      />
+      <div class="h-full flex items-center font-bold text-contrast leading-normal">
+        <span class="line-clamp-2">{{ instance.name }}</span>
+      </div>
+      <div class="flex items-center">
+        <ButtonStyled v-if="playing" color="red" circular @mousehover="checkProcess">
+          <button v-tooltip="'Stop'" @click="(e) => stop(e, 'InstanceCard')">
+            <StopCircleIcon />
+          </button>
+        </ButtonStyled>
+        <ButtonStyled v-else-if="modLoading" color="standard" circular>
+          <button v-tooltip="'Instance is loading...'" disabled>
+            <SpinnerIcon class="animate-spin" />
+          </button>
+        </ButtonStyled>
+        <ButtonStyled v-else :color="first ? 'brand' : 'standard'" circular>
+          <button
+            v-tooltip="'Play'"
+            @click="(e) => play(e, 'InstanceCard')"
+            @mousehover="checkProcess"
+          >
+            <!-- Translate for optical centering -->
+            <PlayIcon class="translate-x-[1px]" />
+          </button>
+        </ButtonStyled>
+      </div>
+      <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
+        <TimerIcon />
+        <span class="text-sm"> Played {{ dayjs(instance.last_played).fromNow() }} </span>
+      </div>
     </div>
-    <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
-      <AnimatedLogo class="loading-indicator" />
-    </div>
-    <div v-else class="install cta button-base" @click="(e) => play(e, 'InstanceCard')">
-      <PlayIcon />
+  </template>
+  <div v-else>
+    <div
+      class="button-base bg-bg-raised p-4 rounded-xl flex gap-3 group"
+      @click="seeInstance"
+      @mouseenter="checkProcess"
+    >
+      <div class="relative flex items-center justify-center">
+        <Avatar
+          size="48px"
+          :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+          :tint-by="instance.path"
+          alt="Mod card"
+          :class="`transition-all ${modLoading || installing ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
+        />
+        <div class="absolute inset-0 flex items-center justify-center">
+          <ButtonStyled v-if="playing" size="large" color="red" circular>
+            <button
+              v-tooltip="'Stop'"
+              :class="{ 'scale-100 opacity-100': playing }"
+              class="transition-all scale-75 origin-bottom opacity-0 card-shadow"
+              @click="(e) => stop(e, 'InstanceCard')"
+              @mousehover="checkProcess"
+            >
+              <StopCircleIcon />
+            </button>
+          </ButtonStyled>
+          <SpinnerIcon
+            v-else-if="modLoading || installing"
+            v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
+            class="animate-spin w-8 h-8"
+            tabindex="-1"
+          />
+          <ButtonStyled v-else size="large" color="brand" circular>
+            <button
+              v-tooltip="'Play'"
+              class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
+              @click="(e) => play(e, 'InstanceCard')"
+              @mousehover="checkProcess"
+            >
+              <PlayIcon class="translate-x-[2px]" />
+            </button>
+          </ButtonStyled>
+        </div>
+      </div>
+      <div class="flex flex-col gap-1">
+        <p class="m-0 text-md font-bold text-contrast leading-tight line-clamp-1">
+          {{ instance.name }}
+        </p>
+        <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold mt-auto">
+          <GameIcon class="shrink-0" />
+          <span class="text-sm">
+            {{ formatCategory(instance.loader) }} {{ instance.game_version }}
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
-
-<style lang="scss">
-.loading-indicator {
-  width: 2.5rem !important;
-  height: 2.5rem !important;
-
-  svg {
-    width: 2.5rem !important;
-    height: 2.5rem !important;
-  }
-}
-</style>
-
-<style lang="scss" scoped>
-.instance {
-  position: relative;
-
-  &:hover {
-    .cta {
-      opacity: 1;
-      bottom: calc(var(--gap-md) + 4.25rem);
-    }
-  }
-}
-
-.cta {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-md);
-  z-index: 1;
-  width: 3rem;
-  height: 3rem;
-  right: calc(var(--gap-md) * 2);
-  bottom: 3.25rem;
-  opacity: 0;
-  transition:
-    0.2s ease-in-out bottom,
-    0.2s ease-in-out opacity,
-    0.1s ease-in-out filter !important;
-  cursor: pointer;
-  box-shadow: var(--shadow-floating);
-
-  svg {
-    color: var(--color-accent-contrast);
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-  }
-
-  &.install {
-    background: var(--color-brand);
-    display: flex;
-  }
-
-  &.stop {
-    background: var(--color-red);
-    display: flex;
-  }
-
-  &.loading-cta {
-    background: hsl(220, 11%, 10%) !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-}
-
-.instance-card-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: var(--gap-md);
-  transition: 0.1s ease-in-out all !important; /* overrides Omorphia defaults */
-  margin-bottom: 0;
-
-  .mod-image {
-    --size: 100%;
-
-    width: 100% !important;
-    height: auto !important;
-    max-width: unset !important;
-    max-height: unset !important;
-    aspect-ratio: 1 / 1 !important;
-  }
-
-  .project-info {
-    margin-top: 1rem;
-    width: 100%;
-
-    .title {
-      color: var(--color-contrast);
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      width: 100%;
-      margin: 0;
-      font-weight: 600;
-      font-size: 1rem;
-      line-height: 110%;
-      display: inline-block;
-    }
-
-    .description {
-      color: var(--color-base);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      font-weight: 500;
-      font-size: 0.775rem;
-      line-height: 125%;
-      margin: 0.25rem 0 0;
-      text-transform: capitalize;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
-}
-</style>

@@ -8,10 +8,9 @@
     }"
   >
     <template v-if="members[message.author_id]">
-      <ConditionalNuxtLink
+      <AutoLink
         class="message__icon"
-        :is-link="!noLinks"
-        :to="`/user/${members[message.author_id].username}`"
+        :to="noLinks ? '' : `/user/${members[message.author_id].username}`"
         tabindex="-1"
         aria-hidden="true"
       >
@@ -21,19 +20,16 @@
           circle
           :raised="raised"
         />
-      </ConditionalNuxtLink>
+      </AutoLink>
       <span :class="`message__author role-${members[message.author_id].role}`">
         <LockIcon
           v-if="message.body.private"
           v-tooltip="'Only visible to moderators'"
           class="private-icon"
         />
-        <ConditionalNuxtLink
-          :is-link="!noLinks"
-          :to="`/user/${members[message.author_id].username}`"
-        >
+        <AutoLink :to="noLinks ? '' : `/user/${members[message.author_id].username}`">
           {{ members[message.author_id].username }}
-        </ConditionalNuxtLink>
+        </AutoLink>
         <ScaleIcon v-if="members[message.author_id].role === 'moderator'" v-tooltip="'Moderator'" />
         <ModrinthIcon
           v-else-if="members[message.author_id].role === 'admin'"
@@ -107,7 +103,7 @@ import {
   ModrinthIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import { OverflowMenu, ConditionalNuxtLink } from "@modrinth/ui";
+import { AutoLink, OverflowMenu } from "@modrinth/ui";
 import { renderString } from "@modrinth/utils";
 import Avatar from "~/components/ui/Avatar.vue";
 import Badge from "~/components/ui/Badge.vue";
@@ -287,7 +283,7 @@ a:active + .message__author a,
 }
 
 .moderation-color,
-role-moderator {
+.role-moderator {
   color: var(--color-orange);
 }
 

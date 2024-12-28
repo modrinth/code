@@ -1,5 +1,7 @@
 //! Theseus settings file
+
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 // Types
 /// Global Theseus settings
@@ -13,10 +15,11 @@ pub struct Settings {
     pub collapsed_navigation: bool,
     pub advanced_rendering: bool,
     pub native_decorations: bool,
+    pub toggle_sidebar: bool,
 
     pub telemetry: bool,
     pub discord_rpc: bool,
-    pub developer_mode: bool,
+    pub personalized_ads: bool,
 
     pub onboarded: bool,
 
@@ -31,6 +34,16 @@ pub struct Settings {
     pub custom_dir: Option<String>,
     pub prev_custom_dir: Option<String>,
     pub migrated: bool,
+
+    pub developer_mode: bool,
+    pub feature_flags: HashMap<FeatureFlag, bool>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum FeatureFlag {
+    PagePath,
+    ProjectBackground,
 }
 
 impl Settings {
@@ -42,12 +55,12 @@ impl Settings {
             SELECT
                 max_concurrent_writes, max_concurrent_downloads,
                 theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,
-                discord_rpc, developer_mode, telemetry,
+                discord_rpc, developer_mode, telemetry, personalized_ads,
                 onboarded,
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
                 hook_pre_launch, hook_wrapper, hook_post_exit,
-                custom_dir, prev_custom_dir, migrated
+                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar
             FROM settings
             "
         )
@@ -62,9 +75,11 @@ impl Settings {
             collapsed_navigation: res.collapsed_navigation == 1,
             advanced_rendering: res.advanced_rendering == 1,
             native_decorations: res.native_decorations == 1,
+            toggle_sidebar: res.toggle_sidebar == 1,
             telemetry: res.telemetry == 1,
             discord_rpc: res.discord_rpc == 1,
             developer_mode: res.developer_mode == 1,
+            personalized_ads: res.personalized_ads == 1,
             onboarded: res.onboarded == 1,
             extra_launch_args: res
                 .extra_launch_args
@@ -93,6 +108,11 @@ impl Settings {
             custom_dir: res.custom_dir,
             prev_custom_dir: res.prev_custom_dir,
             migrated: res.migrated == 1,
+            feature_flags: res
+                .feature_flags
+                .as_ref()
+                .and_then(|x| serde_json::from_str(x).ok())
+                .unwrap_or_default(),
         })
     }
 
@@ -106,6 +126,7 @@ impl Settings {
         let default_page = self.default_page.as_str();
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
+        let feature_flags = serde_json::to_string(&self.feature_flags)?;
 
         sqlx::query!(
             "
@@ -123,24 +144,28 @@ impl Settings {
                 discord_rpc = $8,
                 developer_mode = $9,
                 telemetry = $10,
+                personalized_ads = $11,
 
-                onboarded = $11,
+                onboarded = $12,
 
-                extra_launch_args = jsonb($12),
-                custom_env_vars = jsonb($13),
-                mc_memory_max = $14,
-                mc_force_fullscreen = $15,
-                mc_game_resolution_x = $16,
-                mc_game_resolution_y = $17,
-                hide_on_process_start = $18,
+                extra_launch_args = jsonb($13),
+                custom_env_vars = jsonb($14),
+                mc_memory_max = $15,
+                mc_force_fullscreen = $16,
+                mc_game_resolution_x = $17,
+                mc_game_resolution_y = $18,
+                hide_on_process_start = $19,
 
-                hook_pre_launch = $19,
-                hook_wrapper = $20,
-                hook_post_exit = $21,
+                hook_pre_launch = $20,
+                hook_wrapper = $21,
+                hook_post_exit = $22,
 
-                custom_dir = $22,
-                prev_custom_dir = $23,
-                migrated = $24
+                custom_dir = $23,
+                prev_custom_dir = $24,
+                migrated = $25,
+
+                toggle_sidebar = $26,
+                feature_flags = $27
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -152,6 +177,7 @@ impl Settings {
             self.discord_rpc,
             self.developer_mode,
             self.telemetry,
+            self.personalized_ads,
             self.onboarded,
             extra_launch_args,
             custom_env_vars,
@@ -165,7 +191,9 @@ impl Settings {
             self.hooks.post_exit,
             self.custom_dir,
             self.prev_custom_dir,
-            self.migrated
+            self.migrated,
+            self.toggle_sidebar,
+            feature_flags
         )
         .execute(exec)
         .await?;
@@ -181,6 +209,7 @@ pub enum Theme {
     Dark,
     Light,
     Oled,
+    System,
 }
 
 impl Theme {
@@ -189,6 +218,7 @@ impl Theme {
             Theme::Dark => "dark",
             Theme::Light => "light",
             Theme::Oled => "oled",
+            Theme::System => "system",
         }
     }
 
@@ -197,6 +227,7 @@ impl Theme {
             "dark" => Theme::Dark,
             "light" => Theme::Light,
             "oled" => Theme::Oled,
+            "system" => Theme::System,
             _ => Theme::Dark,
         }
     }

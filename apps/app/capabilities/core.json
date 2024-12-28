@@ -2,9 +2,7 @@
   "identifier": "core",
   "description": "",
   "local": true,
-  "windows": [
-    "main"
-  ],
+  "windows": ["main"],
   "permissions": [
     "core:default",
     "core:path:default",

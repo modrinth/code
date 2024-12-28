@@ -1,74 +1,128 @@
 <template>
-  <Card
-    class="card button-base"
+  <div
+    class="card-shadow p-4 bg-bg-raised rounded-xl flex gap-3 group cursor-pointer hover:brightness-90 transition-all"
     @click="
       () => {
-        emits('open')
+        emit('open')
         $router.push({
-          path: `/project/${project.project_id ?? project.id}/`,
+          path: `/project/${project.project_id ?? project.id}`,
           query: { i: props.instance ? props.instance.path : undefined },
         })
       }
     "
   >
-    <div class="icon">
-      <Avatar :src="project.icon_url" size="md" class="search-icon" />
+    <div class="icon w-[96px] h-[96px] relative">
+      <Avatar :src="project.icon_url" size="96px" class="search-icon origin-top transition-all" />
     </div>
-    <div class="content-wrapper">
-      <div class="title joined-text">
-        <h2>{{ project.title }}</h2>
-        <span v-if="project.author">by {{ project.author }}</span>
+    <div class="flex flex-col gap-2 overflow-hidden">
+      <div class="gap-2 overflow-hidden no-wrap text-ellipsis">
+        <span class="text-lg font-extrabold text-contrast m-0 leading-none">
+          {{ project.title }}
+        </span>
+        <span v-if="project.author" class="text-secondary"> by {{ project.author }}</span>
       </div>
-      <div class="description">
+      <div class="m-0 line-clamp-2">
         {{ project.description }}
       </div>
-      <div class="tags">
-        <Categories :categories="categories" :type="project.project_type">
-          <EnvironmentIndicator
-            :type-only="project.moderation"
-            :client-side="project.client_side"
-            :server-side="project.server_side"
-            :type="project.project_type"
-            :search="true"
-          />
-        </Categories>
+      <div v-if="categories.length > 0" class="mt-auto flex items-center gap-1 no-wrap">
+        <TagsIcon class="h-4 w-4 shrink-0" />
+        <div
+          v-if="project.project_type === 'mod' || project.project_type === 'modpack'"
+          class="text-sm font-semibold text-secondary flex gap-1 px-[0.375rem] py-0.5 bg-button-bg rounded-full"
+        >
+          <template v-if="project.client_side === 'optional' && project.server_side === 'optional'">
+            Client or server
+          </template>
+          <template
+            v-else-if="
+              (project.client_side === 'optional' || project.client_side === 'required') &&
+              (project.server_side === 'optional' || project.server_side === 'unsupported')
+            "
+          >
+            Client
+          </template>
+          <template
+            v-else-if="
+              (project.server_side === 'optional' || project.server_side === 'required') &&
+              (project.client_side === 'optional' || project.client_side === 'unsupported')
+            "
+          >
+            Server
+          </template>
+          <template
+            v-else-if="
+              project.client_side === 'unsupported' && project.server_side === 'unsupported'
+            "
+          >
+            Unsupported
+          </template>
+          <template
+            v-else-if="project.client_side === 'required' && project.server_side === 'required'"
+          >
+            Client and server
+          </template>
+        </div>
+        <div
+          v-for="tag in categories"
+          :key="tag"
+          class="text-sm font-semibold text-secondary flex gap-1 px-[0.375rem] py-0.5 bg-button-bg rounded-full"
+        >
+          {{ formatCategory(tag.name) }}
+        </div>
       </div>
     </div>
-    <div class="stats button-group">
-      <div v-if="featured" class="badge">
-        <StarIcon />
-        Featured
+    <div class="flex flex-col gap-2 items-end shrink-0 ml-auto">
+      <div class="flex items-center gap-2">
+        <DownloadIcon class="shrink-0" />
+        <span>
+          {{ formatNumber(project.downloads) }}
+          <span class="text-secondary">downloads</span>
+        </span>
       </div>
-      <div class="badge">
-        <DownloadIcon />
-        {{ formatNumber(project.downloads) }}
+      <div class="flex items-center gap-2">
+        <HeartIcon class="shrink-0" />
+        <span>
+          {{ formatNumber(project.follows ?? project.followers) }}
+          <span class="text-secondary">followers</span>
+        </span>
       </div>
-      <div class="badge">
-        <HeartIcon />
-        {{ formatNumber(project.follows ?? project.followers) }}
-      </div>
-      <div class="badge">
-        <CalendarIcon />
-        {{ formatCategory(dayjs(project.date_modified ?? project.updated).fromNow()) }}
+      <div class="mt-auto relative">
+        <div class="absolute bottom-0 right-0 w-fit">
+          <ButtonStyled color="brand" type="outlined">
+            <button
+              :disabled="installed || installing"
+              class="shrink-0 no-wrap"
+              @click.stop="install()"
+            >
+              <template v-if="!installed">
+                <DownloadIcon v-if="modpack || instance" />
+                <PlusIcon v-else />
+              </template>
+              <CheckIcon v-else />
+              {{
+                installing
+                  ? 'Installing'
+                  : installed
+                    ? 'Installed'
+                    : modpack || instance
+                      ? 'Install'
+                      : 'Add to an instance'
+              }}
+            </button>
+          </ButtonStyled>
+        </div>
       </div>
     </div>
-    <div v-if="project.author" class="install">
-      <Button color="primary" :disabled="installed || installing" @click.stop="install()">
-        <DownloadIcon v-if="!installed" />
-        <CheckIcon v-else />
-        {{ installing ? 'Installing' : installed ? 'Installed' : 'Install' }}
-      </Button>
-    </div>
-  </Card>
+  </div>
 </template>
 
 <script setup>
-import { DownloadIcon, HeartIcon, CalendarIcon, CheckIcon, StarIcon } from '@modrinth/assets'
-import { Avatar, Card, Categories, EnvironmentIndicator, Button } from '@modrinth/ui'
+import { TagsIcon, DownloadIcon, HeartIcon, PlusIcon, CheckIcon } from '@modrinth/assets'
+import { ButtonStyled, Avatar } from '@modrinth/ui'
 import { formatNumber, formatCategory } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { install as installVersion } from '@/store/install.js'
 dayjs.extend(relativeTime)
 
@@ -99,99 +153,23 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['open'])
+const emit = defineEmits(['open', 'install'])
 
 const installing = ref(false)
-const installed = ref(props.installed)
 
 async function install() {
   installing.value = true
   await installVersion(
-    props.project.project_id,
+    props.project.project_id ?? props.project.id,
     null,
     props.instance ? props.instance.path : null,
     'SearchCard',
-    (version) => {
+    () => {
       installing.value = false
-
-      if (props.instance && version) {
-        installed.value = true
-      }
+      emit('install', props.project.project_id ?? props.project.id)
     },
   )
 }
+
+const modpack = computed(() => props.project.project_type === 'modpack')
 </script>
-
-<style scoped lang="scss">
-.icon {
-  grid-column: 1;
-  grid-row: 1;
-  align-self: center;
-  height: 6rem;
-}
-
-.content-wrapper {
-  display: flex;
-  justify-content: space-between;
-  grid-column: 2 / 4;
-  flex-direction: column;
-  grid-row: 1;
-  gap: 0.5rem;
-
-  .description {
-    word-wrap: break-word;
-    overflow-wrap: anywhere;
-  }
-}
-
-.stats {
-  grid-column: 1 / 3;
-  grid-row: 2;
-  justify-self: stretch;
-  align-self: start;
-}
-
-.install {
-  grid-column: 3 / 4;
-  grid-row: 2;
-  justify-self: end;
-  align-self: start;
-}
-
-.card {
-  margin-bottom: 0;
-  display: grid;
-  grid-template-columns: 6rem auto 7rem;
-  gap: 0.75rem;
-  padding: 1rem;
-
-  &:active:not(&:disabled) {
-    scale: 0.98 !important;
-  }
-}
-
-.joined-text {
-  display: inline-flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  column-gap: 0.5rem;
-  align-items: baseline;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  h2 {
-    margin-bottom: 0 !important;
-    word-wrap: break-word;
-    overflow-wrap: anywhere;
-  }
-}
-
-.button-group {
-  display: inline-flex;
-  flex-direction: row;
-  gap: 0.5rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-</style>

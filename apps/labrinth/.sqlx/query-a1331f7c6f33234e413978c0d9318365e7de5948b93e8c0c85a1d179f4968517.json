@@ -1,0 +1,65 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                        SELECT id, name, access_token, scopes, user_id, created, expires, last_used\n                        FROM pats\n                        WHERE id = ANY($1) OR access_token = ANY($2)\n                        ORDER BY created DESC\n                        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "access_token",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "scopes",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "expires",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "last_used",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "a1331f7c6f33234e413978c0d9318365e7de5948b93e8c0c85a1d179f4968517"
+}

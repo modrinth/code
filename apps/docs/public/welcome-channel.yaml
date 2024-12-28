@@ -1,0 +1,81 @@
+- type: text
+  text: https://cdn.discordapp.com/attachments/734084240408444949/975414177550200902/welcome-channel.png
+
+- type: embed
+  embeds:
+    - title: __Welcome to Modrinth's Discord server!__
+      url: https://modrinth.com
+      color: 0x1bd96a
+      description:
+        'Modrinth is the place for Minecraft mods, plugins, data packs, shaders, resource packs, and
+        modpacks. Discover, play, and share Minecraft content through our open-source platform built for the community.'
+
+- type: embed
+  embeds:
+    - title: '**:scroll: __Rules__**'
+      color: 0x4f9cff
+      description:
+        "Modrinth's rules are easy to follow. Despite this, please keep in mind that this is not an entirely
+        open forum. First and foremost, this Discord server is intended to facilitate the development of Modrinth and
+        for communication regarding Modrinth. Ultimately, it is up to the discretion of the moderators whether your
+        messages are in violation of our rules.\n\n
+        Modrinth's rules are split up into two categories: the **__DOs__** and the **__DO NOTs__**."
+    - title: ':white_check_mark: Do:'
+      color: 0x1bd96a
+      description: >-
+        1. Treat every user with respect and consider the opinions and viewpoints of others
+
+        2. Stay on-topic in all channels; all channels are only for discussion of **Modrinth itself** with the
+        exceptions of <#783091855616901200>, <#1109517383074328686>, and <#1061855024252207167>
+
+        3. Follow Discord's rules, including the [Community Guidelines](https://discord.com/guidelines) and the [Terms
+        of Service](https://discord.com/terms) (this also means that discussions regarding "cracked" launchers and
+        Discord client modifications are **prohibited under all circumstances**)
+
+        4. Contact the moderators at any time via the <@&895382919772766219> ping
+
+        5. Respect the use of accessibility and self-identity tools such as [PluralKit](https://pluralkit.me)
+    - title: ':no_entry: Do not:'
+      color: 0xff496e
+      description: >-
+        6. Harass, bother, provoke, or insult anyone, including by sending unsolicited DMs or friend requests
+
+        7. Cause problems or impede Modrinth's development
+
+        8. Discuss drama from other places, including bashing or hating on other websites and platforms (though
+        constructive criticism for the betterment of Modrinth is encouraged)
+
+        9. Report Modrinth content in the Discord (use the Report button on the website)
+
+        10. Assume staff member's opinions reflect those of Modrinth
+    - title: ':pencil2: Nickname policy:'
+      color: 0xffa347
+      description: >-
+        We want to keep this server clean and therefore require that display names of all members on the server are
+        readable, accessible, and free of attention-seeking elements, which includes, but is not limited to, display
+        names that begin with hoisting characters, have an excessive number of emojis in them, or use "fancy fonts",
+        "glitch effects" and any other Unicode characters, which are either very inaccessible to screen readers or cause
+        annoyance to other members.
+
+        When we find that your display name does not adhere to this policy, we will try to correct it by changing your
+        nickname on the server. Repetitive attempts to revert to a violating display name may result in your removal
+        from the server. We will also permanently remove any users whose profiles contain inappropriate content.
+- type: links
+  color: 0x4f9cff
+  title: '**:link: __Links__**'
+  links:
+    Website: https://modrinth.com
+    Support: https://support.modrinth.com
+    Status page: https://status.modrinth.com
+    Roadmap: https://roadmap.modrinth.com
+    Blog and newsletter: https://blog.modrinth.com/subscribe?utm_medium=social&utm_source=discord&utm_campaign=welcome
+    API documentation: https://docs.modrinth.com
+    Modrinth source code: https://github.com/modrinth
+    Help translate Modrinth: https://crowdin.com/project/modrinth
+    Follow Modrinth on Mastodon: https://floss.social/@modrinth
+    Follow Modrinth on Twitter: https://twitter.com/modrinth
+
+- type: text
+  text: |
+    **Main server:** <https://discord.modrinth.com>
+    **Testing server:** <https://discord.modrinth.com/labs>

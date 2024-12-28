@@ -1,4 +1,4 @@
-use super::LoadingBarId;
+use super::{FriendPayload, LoadingBarId};
 use crate::event::{
     CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
     ProfilePayloadType,
@@ -44,7 +44,6 @@ const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
 /// total is the total amount of work to be done- all emissions will be considered a fraction of this value (should be 1 or 100 for simplicity)
 /// title is the title of the loading bar
 /// The app will wait for this loading bar to finish before exiting, as it is considered safe.
-
 pub async fn init_loading(
     bar_type: LoadingBarType,
     total: f64,
@@ -56,7 +55,6 @@ pub async fn init_loading(
 
 /// An unsafe loading bar can be created without adding it to the SafeProcesses list,
 /// meaning that the app won't ask to wait for it to finish before exiting.
-
 pub async fn init_loading_unsafe(
     bar_type: LoadingBarType,
     total: f64,
@@ -295,6 +293,20 @@ pub async fn emit_profile(
             )
             .map_err(EventError::from)?;
     }
+    Ok(())
+}
+
+#[allow(unused_variables)]
+pub async fn emit_friend(payload: FriendPayload) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get()?;
+        event_state
+            .app
+            .emit("friend", payload)
+            .map_err(EventError::from)?;
+    }
+
     Ok(())
 }
 

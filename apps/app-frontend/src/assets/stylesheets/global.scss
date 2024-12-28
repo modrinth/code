@@ -80,19 +80,25 @@ input {
 
 /* Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
-  width: var(--gap-md);
-  border: 3px solid var(--color-scrollbar);
+  width: 16px;
+  border: 3px solid transparent;
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
+}
+
+*::-webkit-scrollbar:hover {
+  opacity: 1;
 }
 
 *::-webkit-scrollbar-track {
-  background: var(--color-bg);
-  border: 3px solid var(--color-bg);
+  background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
   background-color: var(--color-scrollbar);
   border-radius: var(--radius-lg);
-  border: 3px solid var(--color-bg);
+  border: 5px solid transparent;
+  background-clip: content-box;
 }
 
 .highlighted {
@@ -109,6 +115,10 @@ img {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+}
+
+.card-shadow {
+  box-shadow: var(--shadow-card);
 }
 
 @import '@modrinth/assets/omorphia.scss';

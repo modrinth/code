@@ -167,39 +167,6 @@
   "auth.welcome.title": {
     "message": "Welcome"
   },
-  "button.cancel": {
-    "message": "Cancel"
-  },
-  "button.continue": {
-    "message": "Continue"
-  },
-  "button.copy-id": {
-    "message": "Copy ID"
-  },
-  "button.create-a-project": {
-    "message": "Create a project"
-  },
-  "button.edit": {
-    "message": "Edit"
-  },
-  "button.report": {
-    "message": "Report"
-  },
-  "button.save": {
-    "message": "Save"
-  },
-  "button.save-changes": {
-    "message": "Save changes"
-  },
-  "button.sign-in": {
-    "message": "Sign in"
-  },
-  "button.sign-out": {
-    "message": "Sign out"
-  },
-  "button.upload-image": {
-    "message": "Upload image"
-  },
   "collection.button.delete-icon": {
     "message": "Delete icon"
   },
@@ -248,9 +215,6 @@
   "collection.label.owner": {
     "message": "Owner"
   },
-  "collection.label.private": {
-    "message": "Private"
-  },
   "collection.label.projects-count": {
     "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
   },
@@ -286,72 +250,6 @@
   },
   "frog.title": {
     "message": "Frog"
-  },
-  "input.view.gallery": {
-    "message": "Gallery view"
-  },
-  "input.view.grid": {
-    "message": "Grid view"
-  },
-  "input.view.list": {
-    "message": "Rows view"
-  },
-  "label.changes-saved": {
-    "message": "Changes saved"
-  },
-  "label.collections": {
-    "message": "Collections"
-  },
-  "label.created-ago": {
-    "message": "Created {ago}"
-  },
-  "label.dashboard": {
-    "message": "Dashboard"
-  },
-  "label.delete": {
-    "message": "Delete"
-  },
-  "label.description": {
-    "message": "Description"
-  },
-  "label.error": {
-    "message": "Error"
-  },
-  "label.followed-projects": {
-    "message": "Followed projects"
-  },
-  "label.moderation": {
-    "message": "Moderation"
-  },
-  "label.notifications": {
-    "message": "Notifications"
-  },
-  "label.password": {
-    "message": "Password"
-  },
-  "label.public": {
-    "message": "Public"
-  },
-  "label.rejected": {
-    "message": "Rejected"
-  },
-  "label.scopes": {
-    "message": "Scopes"
-  },
-  "label.settings": {
-    "message": "Settings"
-  },
-  "label.title": {
-    "message": "Title"
-  },
-  "label.unlisted": {
-    "message": "Unlisted"
-  },
-  "label.visibility": {
-    "message": "Visibility"
-  },
-  "label.visit-your-profile": {
-    "message": "Visit your profile"
   },
   "layout.action.change-theme": {
     "message": "Change theme"
@@ -440,9 +338,6 @@
   "layout.nav.search": {
     "message": "Search"
   },
-  "notification.error.title": {
-    "message": "An error occurred"
-  },
   "profile.button.manage-projects": {
     "message": "Manage projects"
   },
@@ -490,9 +385,6 @@
   },
   "profile.user-id": {
     "message": "User ID: {id}"
-  },
-  "project-type.all": {
-    "message": "All"
   },
   "project-type.collection.plural": {
     "message": "Collections"
@@ -542,24 +434,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.compatibility.environments": {
-    "message": "Supported environments"
-  },
-  "project.about.compatibility.game.minecraftJava": {
-    "message": "Minecraft: Java Edition"
-  },
-  "project.about.compatibility.platforms": {
-    "message": "Platforms"
-  },
-  "project.about.compatibility.title": {
-    "message": "Compatibility"
-  },
-  "project.about.creators.owner": {
-    "message": "Project owner"
-  },
-  "project.about.creators.title": {
-    "message": "Creators"
-  },
   "project.about.details.created": {
     "message": "Created {date}"
   },
@@ -577,39 +451,6 @@
   },
   "project.about.details.updated": {
     "message": "Updated {date}"
-  },
-  "project.about.links.discord": {
-    "message": "Join Discord server"
-  },
-  "project.about.links.donate.bmac": {
-    "message": "Buy Me a Coffee"
-  },
-  "project.about.links.donate.generic": {
-    "message": "Donate"
-  },
-  "project.about.links.donate.github": {
-    "message": "Sponsor on GitHub"
-  },
-  "project.about.links.donate.kofi": {
-    "message": "Donate on Ko-fi"
-  },
-  "project.about.links.donate.patreon": {
-    "message": "Donate on Patreon"
-  },
-  "project.about.links.donate.paypal": {
-    "message": "Donate on PayPal"
-  },
-  "project.about.links.issues": {
-    "message": "Report issues"
-  },
-  "project.about.links.source": {
-    "message": "View source"
-  },
-  "project.about.links.title": {
-    "message": "Links"
-  },
-  "project.about.links.wiki": {
-    "message": "Visit wiki"
   },
   "project.description.title": {
     "message": "Description"
@@ -887,17 +728,17 @@
   "scopes.versionWrite.label": {
     "message": "Write versions"
   },
-  "settings.account.title": {
-    "message": "Account and security"
+  "search.filter.locked.server": {
+    "message": "Provided by the server"
   },
-  "settings.appearance.title": {
-    "message": "Appearance"
+  "search.filter.locked.server-game-version.title": {
+    "message": "Game version is provided by the server"
   },
-  "settings.applications.title": {
-    "message": "Your applications"
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader is provided by the server"
   },
-  "settings.authorized-apps.title": {
-    "message": "Authorized apps"
+  "search.filter.locked.server.sync": {
+    "message": "Sync with server"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Cancel subscription"
@@ -977,14 +818,17 @@
   "settings.billing.payment_method_type.visa": {
     "message": "Visa"
   },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Manage your Modrinth Server subscriptions."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Modrinth Server Subscriptions"
+  },
   "settings.billing.subscription.description": {
     "message": "Manage your Modrinth subscriptions."
   },
   "settings.billing.subscription.title": {
     "message": "Subscriptions"
-  },
-  "settings.billing.title": {
-    "message": "Billing and subscriptions"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Deactivate developer mode"
@@ -1058,29 +902,8 @@
   "settings.display.sidebar.right-aligned-filters-sidebar.title": {
     "message": "Right-aligned filters sidebar on search pages"
   },
-  "settings.display.theme.dark": {
-    "message": "Dark"
-  },
   "settings.display.theme.description": {
     "message": "Select your preferred color theme for Modrinth on this device."
-  },
-  "settings.display.theme.light": {
-    "message": "Light"
-  },
-  "settings.display.theme.oled": {
-    "message": "OLED"
-  },
-  "settings.display.theme.preferred-dark-theme": {
-    "message": "Preferred dark theme"
-  },
-  "settings.display.theme.preferred-light-theme": {
-    "message": "Preferred light theme"
-  },
-  "settings.display.theme.retro": {
-    "message": "Retro"
-  },
-  "settings.display.theme.system": {
-    "message": "Sync with system"
   },
   "settings.display.theme.title": {
     "message": "Color theme"
@@ -1127,9 +950,6 @@
   "settings.language.languages.search.no-results": {
     "message": "No languages match your search."
   },
-  "settings.language.title": {
-    "message": "Language"
-  },
   "settings.pats.action.create": {
     "message": "Create a PAT"
   },
@@ -1162,9 +982,6 @@
   },
   "settings.pats.modal.edit.title": {
     "message": "Edit personal access token"
-  },
-  "settings.pats.title": {
-    "message": "Personal access tokens"
   },
   "settings.pats.token.action.edit": {
     "message": "Edit token"
@@ -1202,9 +1019,6 @@
   "settings.profile.profile-picture.title": {
     "message": "Profile picture"
   },
-  "settings.profile.title": {
-    "message": "Public profile"
-  },
   "settings.profile.username.description": {
     "message": "A unique case-insensitive name to identify your profile."
   },
@@ -1226,16 +1040,10 @@
   "settings.sessions.last-accessed-ago": {
     "message": "Last accessed {ago}"
   },
-  "settings.sessions.title": {
-    "message": "Sessions"
-  },
   "settings.sessions.unknown-os": {
     "message": "Unknown OS"
   },
   "settings.sessions.unknown-platform": {
     "message": "Unknown platform"
-  },
-  "tooltip.date-at-time": {
-    "message": "{date, date, long} at {time, time, short}"
   }
 }

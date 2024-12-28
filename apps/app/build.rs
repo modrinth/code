@@ -102,13 +102,7 @@ fn main() {
             .plugin(
                 "mr-auth",
                 InlinedPlugin::new()
-                    .commands(&[
-                        "login_pass",
-                        "login_2fa",
-                        "create_account",
-                        "logout",
-                        "get",
-                    ])
+                    .commands(&["modrinth_login", "logout", "get"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
@@ -228,6 +222,20 @@ fn main() {
                         "show_ads_window",
                         "record_ads_click",
                         "open_link",
+                        "get_ads_personalization",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
+                "friends",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "friends",
+                        "friend_statuses",
+                        "add_friend",
+                        "remove_friend",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

@@ -81,9 +81,9 @@
     <h3 id="pending">What does "pending" revenue mean in my dashboard?</h3>
     <p>
       Modrinth receives ad revenue from our ad providers on a NET 60 day basis. Due to this, not all
-      revenue is not immediately available to withdraw. We pay creators as soon as we receive the
-      money from our ad providers, which is 60 days after the last day of each month. This table
-      outlines some example dates of how NET 60 payments are made:
+      revenue is immediately available to withdraw. We pay creators as soon as we receive the money
+      from our ad providers, which is 60 days after the last day of each month. This table outlines
+      some example dates of how NET 60 payments are made:
     </p>
     <table>
       <thead>
@@ -123,7 +123,7 @@
     <p>
       We aim to be as transparent as possible with creator revenue. All of our code is open source,
       including our
-      <a href="https://github.com/modrinth/labrinth/blob/master/src/queue/payouts.rs#L561">
+      <a href="https://github.com/modrinth/code/blob/main/apps/labrinth/src/queue/payouts.rs#L598">
         revenue distribution system </a
       >. We also have an
       <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a> that allows users
