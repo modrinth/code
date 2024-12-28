@@ -172,12 +172,7 @@
                           >
                         </span>
                         <div class="min-w-0 text-xs text-secondary">
-                          <!-- <span class="hidden sm:block">
-                            by
-                            <span class="font-semibold">{{
-                              mod.version_number ? "Author" : "Unknown"
-                            }}</span>
-                          </span> -->
+                          <span v-if="mod.owner" class="hidden sm:block"> by {{ mod.owner }} </span>
                           <span class="block font-semibold sm:hidden">
                             {{ mod.version_number || "External mod" }}
                           </span>

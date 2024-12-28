@@ -205,6 +205,7 @@ export interface Mod {
   name: string | undefined;
   version_number: string | undefined;
   icon_url: string | undefined;
+  owner: string | undefined;
   disabled: boolean;
   installing: boolean;
 }
