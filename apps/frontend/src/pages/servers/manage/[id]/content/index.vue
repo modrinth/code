@@ -387,14 +387,7 @@ const type = computed(() => {
   return loader === "paper" || loader === "purpur" ? "Plugin" : "Mod";
 });
 
-interface Mod {
-  name?: string;
-  filename: string;
-  project_id?: string;
-  version_id?: string;
-  version_number?: string;
-  icon_url?: string;
-  disabled: boolean;
+interface ContentItem extends Mod {
   changing?: boolean;
 }
 
@@ -405,7 +398,7 @@ const listContainer = ref<HTMLElement | null>(null);
 const windowScrollY = ref(0);
 const windowHeight = ref(0);
 
-const localMods = ref<Mod[]>([]);
+const localMods = ref<ContentItem[]>([]);
 
 const searchInput = ref("");
 const modSearchInput = ref("");
@@ -541,7 +534,7 @@ const debouncedSearch = debounce(() => {
   }
 }, 300);
 
-async function toggleMod(mod: Mod) {
+async function toggleMod(mod: ContentItem) {
   mod.changing = true;
 
   const originalFilename = mod.filename;
@@ -573,7 +566,7 @@ async function toggleMod(mod: Mod) {
   mod.changing = false;
 }
 
-async function removeMod(mod: Mod) {
+async function removeMod(mod: ContentItem) {
   mod.changing = true;
 
   try {
