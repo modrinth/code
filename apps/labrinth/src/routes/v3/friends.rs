@@ -178,7 +178,7 @@ pub async fn remove_friend(
         )
         .await?;
 
-        if let Some(mut socket) = db.auth_sockets.get(&friend.id.into()) {
+        if let Some(socket) = db.auth_sockets.get(&friend.id.into()) {
             let (_, socket) = socket.value();
 
             let _ = socket

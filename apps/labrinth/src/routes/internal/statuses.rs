@@ -184,7 +184,7 @@ pub async fn ws_init(
                 }
 
                 Ok(Message::Ping(msg)) => {
-                    if let Some(mut socket) = db.auth_sockets.get(&user.id) {
+                    if let Some(socket) = db.auth_sockets.get(&user.id) {
                         let (_, socket) = socket.value();
                         let _ = socket.clone().pong(&msg).await;
                     }
@@ -221,9 +221,7 @@ pub async fn broadcast_friends(
         };
 
         if friend.accepted {
-            if let Some(mut socket) =
-                sockets.auth_sockets.get(&friend_id.into())
-            {
+            if let Some(socket) = sockets.auth_sockets.get(&friend_id.into()) {
                 let (_, socket) = socket.value();
 
                 let _ =
