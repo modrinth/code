@@ -175,6 +175,7 @@ interface General {
     | "other"
     | "transferring"
     | "upgrading"
+    | "support"
     | (string & {});
   loader: string;
   loader_version: string;
