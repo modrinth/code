@@ -19,6 +19,25 @@
       </div>
     </div>
     <div
+      v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'support'"
+      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+    >
+      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="grid place-content-center rounded-full bg-bg-blue p-4">
+              <TransferIcon class="size-12 text-blue" />
+            </div>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">We're working on your server</h1>
+          </div>
+          <p class="text-lg text-secondary">
+            You recently contacted Modrinth Support, and we're actively working on your server. It
+            will be back online shortly.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div
       v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason !== 'upgrading'"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
