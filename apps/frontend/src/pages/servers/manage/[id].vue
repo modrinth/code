@@ -19,7 +19,7 @@
       </div>
     </div>
     <div
-      v-else-if="serverData?.status === 'suspended'"
+      v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason !== 'upgrading'"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
