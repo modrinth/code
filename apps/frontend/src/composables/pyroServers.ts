@@ -198,14 +198,16 @@ interface Startup {
   jdk_build: "corretto" | "temurin" | "graal";
 }
 
-interface Mod {
+export interface Mod {
   filename: string;
-  project_id: string;
-  version_id: string;
-  name: string;
-  version_number: string;
-  icon_url: string;
+  project_id: string | undefined;
+  version_id: string | undefined;
+  name: string | undefined;
+  version_number: string | undefined;
+  icon_url: string | undefined;
+  owner: string | undefined;
   disabled: boolean;
+  installing: boolean;
 }
 
 interface Backup {
@@ -1364,7 +1366,7 @@ type ContentModule = { data: Mod[] } & ContentFunctions;
 type BackupsModule = { data: Backup[] } & BackupFunctions;
 type NetworkModule = { allocations: Allocation[] } & NetworkFunctions;
 type StartupModule = Startup & StartupFunctions;
-type FSModule = { auth: JWTAuth } & FSFunctions;
+export type FSModule = { auth: JWTAuth } & FSFunctions;
 
 type ModulesMap = {
   general: GeneralModule;
