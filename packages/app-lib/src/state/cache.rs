@@ -1,4 +1,5 @@
 use crate::config::{META_URL, MODRINTH_API_URL, MODRINTH_API_URL_V3};
+use crate::state::ProjectType;
 use crate::util::fetch::{fetch_json, sha1_async, FetchSemaphore};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
@@ -194,7 +195,7 @@ pub struct SearchEntry {
 pub struct CachedFileUpdate {
     pub hash: String,
     pub game_version: String,
-    pub loader: String,
+    pub loaders: Vec<String>,
     pub update_version_id: String,
 }
 
@@ -203,6 +204,7 @@ pub struct CachedFileHash {
     pub path: String,
     pub size: u64,
     pub hash: String,
+    pub project_type: Option<ProjectType>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -481,7 +483,12 @@ impl CacheValue {
                 )
             }
             CacheValue::FileUpdate(hash) => {
-                format!("{}-{}-{}", hash.hash, hash.loader, hash.game_version)
+                format!(
+                    "{}-{}-{}",
+                    hash.hash,
+                    hash.loaders.join("+"),
+                    hash.game_version
+                )
             }
             CacheValue::SearchResults(search) => search.search.clone(),
         }
@@ -1240,6 +1247,9 @@ impl CachedEntry {
                             path: path.to_string(),
                             size,
                             hash,
+                            project_type: ProjectType::get_from_parent_folder(
+                                &full_path,
+                            ),
                         })
                         .get_entry(),
                         true,
@@ -1270,18 +1280,21 @@ impl CachedEntry {
 
                     if key.len() == 3 {
                         let hash = key[0];
-                        let loader = key[1];
+                        let loaders_key = key[1];
                         let game_version = key[2];
 
                         if let Some(values) =
                             filtered_keys.iter_mut().find(|x| {
-                                x.0 .0 == loader && x.0 .1 == game_version
+                                x.0 .0 == loaders_key && x.0 .1 == game_version
                             })
                         {
                             values.1.push(hash.to_string());
                         } else {
                             filtered_keys.push((
-                                (loader.to_string(), game_version.to_string()),
+                                (
+                                    loaders_key.to_string(),
+                                    game_version.to_string(),
+                                ),
                                 vec![hash.to_string()],
                             ))
                         }
@@ -1297,7 +1310,7 @@ impl CachedEntry {
                     format!("{}version_files/update", MODRINTH_API_URL);
                 let variations =
                     futures::future::try_join_all(filtered_keys.iter().map(
-                        |((loader, game_version), hashes)| {
+                        |((loaders_key, game_version), hashes)| {
                             fetch_json::<HashMap<String, Version>>(
                                 Method::POST,
                                 &version_update_url,
@@ -1305,7 +1318,7 @@ impl CachedEntry {
                                 Some(serde_json::json!({
                                     "algorithm": "sha1",
                                     "hashes": hashes,
-                                    "loaders": [loader],
+                                    "loaders": loaders_key.split('+').collect::<Vec<_>>(),
                                     "game_versions": [game_version]
                                 })),
                                 fetch_semaphore,
@@ -1317,7 +1330,7 @@ impl CachedEntry {
 
                 for (index, mut variation) in variations.into_iter().enumerate()
                 {
-                    let ((loader, game_version), hashes) =
+                    let ((loaders_key, game_version), hashes) =
                         &filtered_keys[index];
 
                     for hash in hashes {
@@ -1334,7 +1347,10 @@ impl CachedEntry {
                                 CacheValue::FileUpdate(CachedFileUpdate {
                                     hash: hash.clone(),
                                     game_version: game_version.clone(),
-                                    loader: loader.clone(),
+                                    loaders: loaders_key
+                                        .split('+')
+                                        .map(|x| x.to_string())
+                                        .collect(),
                                     update_version_id: version_id,
                                 })
                                 .get_entry(),
@@ -1343,7 +1359,9 @@ impl CachedEntry {
                         } else {
                             vals.push((
                                 CacheValueType::FileUpdate.get_empty_entry(
-                                    format!("{hash}-{loader}-{game_version}"),
+                                    format!(
+                                        "{hash}-{loaders_key}-{game_version}"
+                                    ),
                                 ),
                                 true,
                             ))
@@ -1450,6 +1468,7 @@ pub async fn cache_file_hash(
     profile_path: &str,
     path: &str,
     known_hash: Option<&str>,
+    project_type: Option<ProjectType>,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<()> {
     let size = bytes.len();
@@ -1465,6 +1484,7 @@ pub async fn cache_file_hash(
             path: format!("{}/{}", profile_path, path),
             size: size as u64,
             hash,
+            project_type,
         })
         .get_entry()],
         exec,
