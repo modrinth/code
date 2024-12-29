@@ -168,7 +168,14 @@ interface General {
   backup_quota: number;
   used_backup_quota: number;
   status: string;
-  suspension_reason: string;
+  suspension_reason:
+    | "moderated"
+    | "paymentfailed"
+    | "cancelled"
+    | "other"
+    | "transferring"
+    | "upgrading"
+    | (string & {});
   loader: string;
   loader_version: string;
   mc_version: string;
