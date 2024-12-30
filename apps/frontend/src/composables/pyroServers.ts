@@ -67,10 +67,10 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
     });
     return response;
   } catch (error) {
-    console.error("[PYROSERVERS]:", error);
+    console.error("[PyroServers/PyroFetch]:", error);
     if (error instanceof FetchError) {
       const statusCode = error.response?.status;
-      const statusText = error.response?.statusText || "Unknown error";
+      const statusText = error.response?.statusText || "[no status text available]";
       const errorMessages: { [key: number]: string } = {
         400: "Bad Request",
         401: "Unauthorized",
@@ -85,11 +85,11 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
       const message =
         statusCode && statusCode in errorMessages
           ? errorMessages[statusCode]
-          : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
-      throw new PyroFetchError(`[PYROSERVERS][PYRO] ${message}`, statusCode, error);
+          : `HTTP Error: ${statusCode || "[unhandled status code]"} ${statusText}`;
+      throw new PyroFetchError(`[PyroServers/PyroFetch] ${message}`, statusCode, error);
     }
     throw new PyroFetchError(
-      "[PYROSERVERS][PYRO] An unexpected error occurred during the fetch operation.",
+      "[PyroServers/PyroFetch] An unexpected error occurred during the fetch operation.",
       undefined,
       error as Error,
     );
