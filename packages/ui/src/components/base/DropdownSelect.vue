@@ -22,7 +22,13 @@
       }"
       @click="toggleDropdown"
     >
-      <span>{{ selectedOption }}</span>
+      <div>
+        <slot :selected="selectedOption">
+          <span>
+            {{ selectedOption }}
+          </span>
+        </slot>
+      </div>
       <DropdownIcon class="arrow" :class="{ rotate: dropdownVisible }" />
     </div>
     <div class="options-wrapper" :class="{ down: !renderUp, up: renderUp }">

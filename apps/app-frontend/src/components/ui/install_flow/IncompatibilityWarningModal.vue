@@ -7,37 +7,43 @@
         installed.
       </p>
       <table>
-        <tr class="header">
-          <th>{{ instance?.name }}</th>
-          <th>{{ project.title }}</th>
-        </tr>
-        <tr class="content">
-          <td class="data">{{ instance?.loader }} {{ instance?.game_version }}</td>
-          <td>
-            <DropdownSelect
-              v-if="versions?.length > 1"
-              v-model="selectedVersion"
-              :options="versions"
-              placeholder="Select version"
-              name="Version select"
-              :display-name="
-                (version) =>
-                  `${version?.name} (${version?.loaders
-                    .map((name) => formatCategory(name))
-                    .join(', ')} - ${version?.game_versions.join(', ')})`
-              "
-              render-up
-            />
-            <span v-else>
-              <span>
-                {{ selectedVersion?.name }} ({{
-                  selectedVersion?.loaders.map((name) => formatCategory(name)).join(', ')
-                }}
-                - {{ selectedVersion?.game_versions.join(', ') }})
+        <thead>
+          <tr class="header">
+            <th>{{ instance?.name }}</th>
+            <th>{{ project.title }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="content">
+            <td class="data">{{ instance?.loader }} {{ instance?.game_version }}</td>
+            <td>
+              <multiselect
+                v-if="versions?.length > 1"
+                v-model="selectedVersion"
+                :options="versions"
+                :searchable="true"
+                placeholder="Select version"
+                open-direction="top"
+                :show-labels="false"
+                :custom-label="
+                  (version) =>
+                    `${version?.name} (${version?.loaders
+                      .map((name) => formatCategory(name))
+                      .join(', ')} - ${version?.game_versions.join(', ')})`
+                "
+                :max-height="150"
+              />
+              <span v-else>
+                <span>
+                  {{ selectedVersion?.name }} ({{
+                    selectedVersion?.loaders.map((name) => formatCategory(name)).join(', ')
+                  }}
+                  - {{ selectedVersion?.game_versions.join(', ') }})
+                </span>
               </span>
-            </span>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        </tbody>
       </table>
       <div class="button-group">
         <Button @click="() => incompatibleModal.hide()"><XIcon />Cancel</Button>
@@ -52,12 +58,13 @@
 <script setup>
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { XIcon, DownloadIcon } from '@modrinth/assets'
-import { Button, DropdownSelect } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 import { add_project_from_version as installMod } from '@/helpers/profile'
 import { ref } from 'vue'
 import { handleError } from '@/store/state.js'
 import { trackEvent } from '@/helpers/analytics'
+import Multiselect from 'vue-multiselect'
 
 const instance = ref(null)
 const project = ref(null)
@@ -151,7 +158,6 @@ td:first-child {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem;
 
   :deep(.animated-dropdown .options) {
     max-height: 13.375rem;

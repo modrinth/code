@@ -52,6 +52,7 @@ import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
 import _CodeIcon from './icons/code.svg?component'
+import _CoffeeIcon from './icons/coffee.svg?component'
 import _CoinsIcon from './icons/coins.svg?component'
 import _CollectionIcon from './icons/collection.svg?component'
 import _CompassIcon from './icons/compass.svg?component'
@@ -75,6 +76,7 @@ import _FilterXIcon from './icons/filter-x.svg?component'
 import _FolderOpenIcon from './icons/folder-open.svg?component'
 import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _GapIcon from './icons/gap.svg?component'
+import _GaugeIcon from './icons/gauge.svg?component'
 import _GameIcon from './icons/game.svg?component'
 import _GitHubIcon from './icons/github.svg?component'
 import _GlassesIcon from './icons/glasses.svg?component'
@@ -99,11 +101,17 @@ import _LinkIcon from './icons/link.svg?component'
 import _ListIcon from './icons/list.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
 import _LockIcon from './icons/lock.svg?component'
+import _LockOpenIcon from './icons/lock-open.svg?component'
 import _LogInIcon from './icons/log-in.svg?component'
 import _LogOutIcon from './icons/log-out.svg?component'
 import _MailIcon from './icons/mail.svg?component'
+import _ManageIcon from './icons/manage.svg?component'
+import _MaximizeIcon from './icons/maximize.svg?component'
 import _MessageIcon from './icons/message.svg?component'
 import _MicrophoneIcon from './icons/microphone.svg?component'
+import _MinimizeIcon from './icons/minimize.svg?component'
+import _MinusIcon from './icons/minus.svg?component'
+import _MonitorIcon from './icons/monitor.svg?component'
 import _MonitorSmartphoneIcon from './icons/monitor-smartphone.svg?component'
 import _MoonIcon from './icons/moon.svg?component'
 import _MoreHorizontalIcon from './icons/more-horizontal.svg?component'
@@ -111,6 +119,7 @@ import _MoreVerticalIcon from './icons/more-vertical.svg?component'
 import _NewspaperIcon from './icons/newspaper.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
+import _PackageIcon from './icons/package.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PaintBrushIcon from './icons/paintbrush.svg?component'
@@ -122,6 +131,7 @@ import _RadioButtonChecked from './icons/radio-button-checked.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
+import _RestoreIcon from './icons/restore.svg?component'
 import _RightArrowIcon from './icons/right-arrow.svg?component'
 import _SaveIcon from './icons/save.svg?component'
 import _ScaleIcon from './icons/scale.svg?component'
@@ -136,6 +146,7 @@ import _SlashIcon from './icons/slash.svg?component'
 import _SortAscendingIcon from './icons/sort-asc.svg?component'
 import _SortDescendingIcon from './icons/sort-desc.svg?component'
 import _SparklesIcon from './icons/sparkles.svg?component'
+import _SpinnerIcon from './icons/spinner.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _SunIcon from './icons/sun.svg?component'
@@ -150,6 +161,8 @@ import _RedoIcon from './icons/redo.svg?component'
 import _UnknownIcon from './icons/unknown.svg?component'
 import _UnknownDonationIcon from './icons/unknown-donation.svg?component'
 import _UpdatedIcon from './icons/updated.svg?component'
+import _UnlinkIcon from './icons/unlink.svg?component'
+import _UnplugIcon from './icons/unplug.svg?component'
 import _UploadIcon from './icons/upload.svg?component'
 import _UserIcon from './icons/user.svg?component'
 import _UserPlusIcon from './icons/user-plus.svg?component'
@@ -170,6 +183,7 @@ import _CPUIcon from './icons/cpu.svg?component'
 import _DBIcon from './icons/db.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _ImportIcon from './icons/import.svg?component'
+import _TimerIcon from './icons/timer.svg?component'
 
 // Editor Icons
 import _BoldIcon from './icons/bold.svg?component'
@@ -231,6 +245,7 @@ export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
 export const CodeIcon = _CodeIcon
+export const CoffeeIcon = _CoffeeIcon
 export const CoinsIcon = _CoinsIcon
 export const CollectionIcon = _CollectionIcon
 export const CompassIcon = _CompassIcon
@@ -255,6 +270,7 @@ export const FilterXIcon = _FilterXIcon
 export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
 export const GapIcon = _GapIcon
+export const GaugeIcon = _GaugeIcon
 export const GameIcon = _GameIcon
 export const GitHubIcon = _GitHubIcon
 export const GlassesIcon = _GlassesIcon
@@ -279,11 +295,17 @@ export const LinkIcon = _LinkIcon
 export const ListIcon = _ListIcon
 export const ListEndIcon = _ListEndIcon
 export const LockIcon = _LockIcon
+export const LockOpenIcon = _LockOpenIcon
 export const LogInIcon = _LogInIcon
 export const LogOutIcon = _LogOutIcon
 export const MailIcon = _MailIcon
+export const ManageIcon = _ManageIcon
+export const MaximizeIcon = _MaximizeIcon
 export const MessageIcon = _MessageIcon
 export const MicrophoneIcon = _MicrophoneIcon
+export const MinimizeIcon = _MinimizeIcon
+export const MinusIcon = _MinusIcon
+export const MonitorIcon = _MonitorIcon
 export const MonitorSmartphoneIcon = _MonitorSmartphoneIcon
 export const MoonIcon = _MoonIcon
 export const MoreHorizontalIcon = _MoreHorizontalIcon
@@ -291,6 +313,7 @@ export const MoreVerticalIcon = _MoreVerticalIcon
 export const NewspaperIcon = _NewspaperIcon
 export const OmorphiaIcon = _OmorphiaIcon
 export const OrganizationIcon = _OrganizationIcon
+export const PackageIcon = _PackageIcon
 export const PackageOpenIcon = _PackageOpenIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PaintBrushIcon = _PaintBrushIcon
@@ -302,6 +325,7 @@ export const RadioButtonChecked = _RadioButtonChecked
 export const ReceiptTextIcon = _ReceiptTextIcon
 export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon
+export const RestoreIcon = _RestoreIcon
 export const RightArrowIcon = _RightArrowIcon
 export const SaveIcon = _SaveIcon
 export const ScaleIcon = _ScaleIcon
@@ -315,6 +339,8 @@ export const ShieldIcon = _ShieldIcon
 export const SlashIcon = _SlashIcon
 export const SortAscendingIcon = _SortAscendingIcon
 export const SortDescendingIcon = _SortDescendingIcon
+export const SparklesIcon = _SparklesIcon
+export const SpinnerIcon = _SpinnerIcon
 export const StarIcon = _StarIcon
 export const StopCircleIcon = _StopCircleIcon
 export const SunIcon = _SunIcon
@@ -329,6 +355,8 @@ export const RedoIcon = _RedoIcon
 export const UnknownIcon = _UnknownIcon
 export const UnknownDonationIcon = _UnknownDonationIcon
 export const UpdatedIcon = _UpdatedIcon
+export const UnlinkIcon = _UnlinkIcon
+export const UnplugIcon = _UnplugIcon
 export const UploadIcon = _UploadIcon
 export const UserIcon = _UserIcon
 export const UserPlusIcon = _UserPlusIcon
@@ -360,4 +388,4 @@ export const DBIcon = _DBIcon
 export const LoaderIcon = _LoaderIcon
 export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
-export const SparklesIcon = _SparklesIcon
+export const TimerIcon = _TimerIcon

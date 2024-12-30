@@ -1,11 +1,28 @@
 <template>
-  <NuxtLink class="contents" :to="`/servers/manage/${props.server_id}`">
+  <NuxtLink
+    class="contents"
+    :to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
+  >
     <div
-      class="flex cursor-pointer flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100 active:scale-95"
+      v-tooltip="
+        status === 'suspended'
+          ? suspension_reason === 'upgrading'
+            ? 'This server is being transferred to a new node. It will be unavailable until this process finishes.'
+            : 'This server has been suspended. Please visit your billing settings or contact Modrinth Support for more information.'
+          : ''
+      "
+      class="flex cursor-pointer flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4 transition-transform duration-100"
+      :class="status === 'suspended' ? '!rounded-b-none opacity-75' : 'active:scale-95'"
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
     >
-      <UiServersServerIcon :image="image" />
+      <UiServersServerIcon v-if="status !== 'suspended'" :image="image" />
+      <div
+        v-else
+        class="bg-bg-secondary flex size-24 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+      >
+        <LockIcon class="size-20 text-secondary" />
+      </div>
       <div class="ml-8 flex flex-col gap-2.5">
         <div class="flex flex-row items-center gap-2">
           <h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
@@ -36,11 +53,26 @@
         />
       </div>
     </div>
+    <div
+      v-if="status === 'suspended' && suspension_reason === 'upgrading'"
+      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-blue p-4 text-sm font-bold text-contrast"
+    >
+      <UiServersPanelSpinner />
+      Your server's hardware is currently being upgraded and will be back online shortly.
+    </div>
+    <div
+      v-else-if="status === 'suspended'"
+      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
+    >
+      <UiServersIconsPanelErrorIcon class="!size-5" />
+      Your server has been suspended due to a billing issue. Please visit your billing settings or
+      contact Modrinth Support for more information.
+    </div>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon } from "@modrinth/assets";
+import { ChevronRightIcon, LockIcon } from "@modrinth/assets";
 import type { Project, Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();

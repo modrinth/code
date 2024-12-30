@@ -237,7 +237,7 @@ const display_icon = ref(null)
 const showAdvanced = ref(false)
 const creating = ref(false)
 const showSnapshots = ref(false)
-const creationType = ref('from file')
+const creationType = ref('custom')
 const isShowing = ref(false)
 
 defineExpose({
@@ -525,8 +525,8 @@ const next = async () => {
 .modal-body {
   display: flex;
   flex-direction: column;
-  padding: var(--gap-lg);
   gap: var(--gap-md);
+  margin-top: var(--gap-lg);
 }
 
 .input-label {
@@ -595,7 +595,6 @@ const next = async () => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: var(--gap-lg);
   padding-bottom: 0;
 }
 

@@ -2,19 +2,23 @@
   <div
     v-if="mode !== 'isolated'"
     ref="button"
-    v-tooltip.right="'Minecraft accounts'"
-    class="button-base avatar-button"
+    class="button-base mt-2 px-3 py-2 bg-button-bg rounded-xl flex items-center gap-2"
     :class="{ expanded: mode === 'expanded' }"
     @click="toggleMenu"
   >
     <Avatar
-      :size="mode === 'expanded' ? 'xs' : 'sm'"
+      size="36px"
       :src="
         selectedAccount
           ? `https://mc-heads.net/avatar/${selectedAccount.id}/128`
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
+    <div class="flex flex-col w-full">
+      <span>{{ selectedAccount ? selectedAccount.username : 'Select account' }}</span>
+      <span class="text-secondary text-xs">Minecraft account</span>
+    </div>
+    <DropdownIcon class="w-5 h-5 shrink-0" />
   </div>
   <transition name="fade">
     <Card
@@ -59,7 +63,7 @@
 </template>
 
 <script setup>
-import { PlusIcon, TrashIcon, LogInIcon } from '@modrinth/assets'
+import { DropdownIcon, PlusIcon, TrashIcon, LogInIcon } from '@modrinth/assets'
 import { Avatar, Button, Card } from '@modrinth/ui'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import {
@@ -73,7 +77,6 @@ import { handleError } from '@/store/state.js'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
-import { show_ads_window, hide_ads_window } from '@/helpers/ads.js'
 
 defineProps({
   mode: {
@@ -151,13 +154,8 @@ const handleClickOutside = (event) => {
 
 function toggleMenu(override = true) {
   if (showCard.value || !override) {
-    if (showCard.value) {
-      show_ads_window()
-    }
-
     showCard.value = false
   } else {
-    hide_ads_window()
     showCard.value = true
   }
 }
@@ -209,11 +207,11 @@ onUnmounted(() => {
 }
 
 .account-card {
-  position: absolute;
+  position: fixed;
   display: flex;
   flex-direction: column;
-  top: 0.5rem;
-  left: 5.5rem;
+  margin-top: 0.5rem;
+  right: 2rem;
   z-index: 11;
   gap: 0.5rem;
   padding: 1rem;
@@ -288,12 +286,17 @@ onUnmounted(() => {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition:
+    opacity 0.25s ease,
+    translate 0.25s ease,
+    scale 0.25s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  translate: 0 -2rem;
+  scale: 0.9;
 }
 
 .avatar-button {
@@ -301,9 +304,10 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   color: var(--color-base);
-  background-color: var(--color-raised-bg);
+  background-color: var(--color-button-bg);
   border-radius: var(--radius-md);
   width: 100%;
+  padding: 0.5rem 0.75rem;
   text-align: left;
 
   &.expanded {

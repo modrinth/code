@@ -115,6 +115,7 @@ impl UserSubscriptionItem {
             INNER JOIN products_prices pp ON us.price_id = pp.id
             INNER JOIN products p ON p.metadata  @> '{"type": "pyro"}'
             WHERE $1::text IS NULL OR us.status = $1::text
+            GROUP BY us.id
             "#,
             status
         )

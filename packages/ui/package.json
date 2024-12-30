@@ -16,7 +16,9 @@
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
-    "vue": "^3.4.31"
+    "vue": "^3.5.13",
+    "vue-router": "4.3.0",
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "@codemirror/commands": "^6.3.2",
@@ -29,13 +31,15 @@
     "@types/markdown-it": "^14.1.1",
     "apexcharts": "^3.44.0",
     "dayjs": "^1.11.10",
-    "floating-vue": "2.0.0-beta.24",
+    "floating-vue": "^5.2.2",
     "highlight.js": "^11.9.0",
     "markdown-it": "^13.0.2",
     "qrcode.vue": "^3.4.1",
     "vue-multiselect": "3.0.0",
     "vue-select": "4.0.0-beta.6",
+    "vue-typed-virtual-list": "^1.0.10",
     "vue3-apexcharts": "^1.4.4",
     "xss": "^1.0.14"
-  }
+  },
+  "web-types": "../../web-types.json"
 }

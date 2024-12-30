@@ -7,7 +7,7 @@
       :class="{ shown: visible }"
       class="tauri-overlay"
       data-tauri-drag-region
-      @click="() => (closable ? hide() : {})"
+      @click="() => (closeOnClickOutside && closable ? hide() : {})"
     />
     <div
       :class="{
@@ -16,12 +16,13 @@
         danger: danger,
       }"
       class="modal-overlay"
-      @click="() => (closable ? hide() : {})"
+      @click="() => (closeOnClickOutside && closable ? hide() : {})"
     />
     <div class="modal-container experimental-styles-within" :class="{ shown: visible }">
       <div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
         <div
-          class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-button-bg max-w-full"
+          data-tauri-drag-region
+          class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
         >
           <div class="flex text-wrap break-words items-center gap-3 min-w-0">
             <slot name="title">
@@ -31,7 +32,7 @@
             </slot>
           </div>
           <ButtonStyled v-if="closable" circular>
-            <button @click="hide" aria-label="Close">
+            <button v-tooltip="'Close'" aria-label="Close" @click="hide">
               <XIcon aria-hidden="true" />
             </button>
           </ButtonStyled>
@@ -56,6 +57,7 @@ const props = withDefaults(
     closable?: boolean
     danger?: boolean
     closeOnEsc?: boolean
+    closeOnClickOutside?: boolean
     warnOnClose?: boolean
     header?: string
     onHide?: () => void
@@ -65,8 +67,10 @@ const props = withDefaults(
     type: true,
     closable: true,
     danger: false,
+    closeOnClickOutside: true,
     closeOnEsc: true,
     warnOnClose: false,
+    header: null,
     onHide: () => {},
     onShow: () => {},
   },
@@ -161,7 +165,13 @@ function handleKeyDown(event: KeyboardEvent) {
   opacity: 0;
   transition: all 0.2s ease-out;
   background: linear-gradient(to bottom, rgba(29, 48, 43, 0.52) 0%, rgba(14, 21, 26, 0.95) 100%);
-  filter: blur(5px);
+  //transform: translate(
+  //    calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 2),
+  //    calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 2)
+  //  )
+  //  scaleX(0.8) scaleY(0.5);
+  border-radius: 180px;
+  //filter: blur(5px);
 
   @media (prefers-reduced-motion) {
     transition: none !important;
@@ -205,14 +215,14 @@ function handleKeyDown(event: KeyboardEvent) {
     visibility: visible;
     transform: translate(0, 0);
 
-    .modal-body {
+    > .modal-body {
       opacity: 1;
       visibility: visible;
       scale: 1;
     }
   }
 
-  .modal-body {
+  > .modal-body {
     position: fixed;
     box-shadow: 4px 4px 26px 10px rgba(0, 0, 0, 0.08);
     max-height: calc(100% - 2 * var(--gap-lg));

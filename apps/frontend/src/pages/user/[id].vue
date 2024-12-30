@@ -22,14 +22,14 @@
           </template>
           <template #stats>
             <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <BoxIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(projects?.length || 0) }}
               projects
             </div>
             <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <DownloadIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(sumDownloads) }}
@@ -68,7 +68,7 @@
                   { divider: true, shown: auth.user && auth.user.id === user.id },
                   {
                     id: 'report',
-                    action: () => reportUser(user.id),
+                    action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
                     color: 'red',
                     hoverOnly: true,
                     shown: auth.user?.id !== user.id,
@@ -96,7 +96,7 @@
         </ContentPageHeader>
       </div>
       <div class="normal-page__content">
-        <div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
+        <div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
           <NavTabs :links="navLinks" />
         </div>
         <div v-if="projects.length > 0">
@@ -265,7 +265,7 @@ import {
   ClipboardCopyIcon,
   MoreVerticalIcon,
 } from "@modrinth/assets";
-import { OverflowMenu, ButtonStyled, ContentPageHeader } from "@modrinth/ui";
+import { OverflowMenu, ButtonStyled, ContentPageHeader, commonMessages } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import { reportUser } from "~/utils/report-helpers.ts";

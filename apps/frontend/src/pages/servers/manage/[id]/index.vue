@@ -88,7 +88,7 @@
             <UiServersPanelServerStatus :state="serverPowerState" />
           </div>
         </div>
-        <UiServersPanelTerminal :console-output="consoleOutput" :full-screen="fullScreen">
+        <UiServersPanelTerminal :full-screen="fullScreen">
           <div class="relative w-full px-4 pt-4">
             <ul
               v-if="suggestions.length"
@@ -192,14 +192,13 @@ type ServerProps = {
   isConnected: boolean;
   isWsAuthIncorrect: boolean;
   stats: Stats;
-  consoleOutput: string[];
   serverPowerState: ServerState;
   powerStateDetails?: {
     oom_killed?: boolean;
     exit_code?: number;
   };
   isServerRunning: boolean;
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 };
 
 const props = defineProps<ServerProps>();
@@ -254,6 +253,7 @@ const inspectError = async () => {
 
   mcError.value = response;
 
+  // @ts-ignore
   const analysis = (await $fetch(`https://api.mclo.gs/1/insights/${response.id}`, {
     method: "POST",
     headers: {

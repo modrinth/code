@@ -5,10 +5,6 @@
   "remote": {
     "urls": ["https://modrinth.com/*", "http://localhost:3000/*"]
   },
-  "webviews": [
-    "ads-window"
-  ],
-  "permissions": [
-    "ads:default"
-  ]
+  "webviews": ["ads-window"],
+  "permissions": ["ads:default"]
 }

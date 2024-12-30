@@ -61,7 +61,7 @@ pub async fn get_session_metadata(
         .headers()
         .get("user-agent")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+        .unwrap_or("No user agent");
 
     let parser = Parser::new();
     let info = parser.parse(user_agent);

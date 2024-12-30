@@ -1,4 +1,112 @@
 {
+  "button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "button.continue": {
+    "defaultMessage": "Continue"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Copy ID"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Create a project"
+  },
+  "button.edit": {
+    "defaultMessage": "Edit"
+  },
+  "button.report": {
+    "defaultMessage": "Report"
+  },
+  "button.save": {
+    "defaultMessage": "Save"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Save changes"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Sign in"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Sign out"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Upload image"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Private"
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Gallery view"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Grid view"
+  },
+  "input.view.list": {
+    "defaultMessage": "Rows view"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Changes saved"
+  },
+  "label.collections": {
+    "defaultMessage": "Collections"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Created {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Dashboard"
+  },
+  "label.delete": {
+    "defaultMessage": "Delete"
+  },
+  "label.description": {
+    "defaultMessage": "Description"
+  },
+  "label.error": {
+    "defaultMessage": "Error"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Followed projects"
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderation"
+  },
+  "label.notifications": {
+    "defaultMessage": "Notifications"
+  },
+  "label.password": {
+    "defaultMessage": "Password"
+  },
+  "label.public": {
+    "defaultMessage": "Public"
+  },
+  "label.rejected": {
+    "defaultMessage": "Rejected"
+  },
+  "label.scopes": {
+    "defaultMessage": "Scopes"
+  },
+  "label.servers": {
+    "defaultMessage": "Servers"
+  },
+  "label.settings": {
+    "defaultMessage": "Settings"
+  },
+  "label.title": {
+    "defaultMessage": "Title"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Unlisted"
+  },
+  "label.visibility": {
+    "defaultMessage": "Visibility"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Visit your profile"
+  },
+  "notification.error.title": {
+    "defaultMessage": "An error occurred"
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Accepted"
   },
@@ -115,5 +223,227 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "All"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Supported environments"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platforms"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Compatibility"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Project owner"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Creators"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Created {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "Licensed {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Published {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Submitted {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Details"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Updated {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Join Discord server"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Donate"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponsor on GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Donate on Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Donate on Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Donate on PayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Report issues"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "View source"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Links"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Visit wiki"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Archived"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Draft"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Private"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Public"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Rejected"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Scheduled"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Under review"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Unknown"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Unlisted"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Unlisted by staff"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filter locked"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Unlocking this filter may allow you to install incompatible content."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Sync filter"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} is locked"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Unlock filter"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Environment"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Client"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Server"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Game version"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Show all versions"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "License"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Open source"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Loader"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Loader"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Loader"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platform"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "Project ID"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Loader"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Account and security"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Appearance"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Your applications"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Authorized apps"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Billing and subscriptions"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Dark"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Select your preferred color theme for Modrinth on this device."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Light"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Preferred dark theme"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Preferred light theme"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Sync with system"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Color theme"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Language"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Personal access tokens"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Public profile"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Sessions"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} at {time, time, short}"
   }
 }

@@ -24,6 +24,8 @@ defineExpose({
   },
 })
 
+const emit = defineEmits(['finish-install'])
+
 const filteredVersions = computed(() => {
   return props.versions
 })
@@ -34,9 +36,17 @@ const installing = computed(() => props.instance.install_stage !== 'installed')
 const inProgress = ref(false)
 
 const switchVersion = async (versionId) => {
+  modpackVersionModal.value.hide()
   inProgress.value = true
   await update_managed_modrinth_version(props.instance.path, versionId)
   inProgress.value = false
+  emit('finish-install')
+}
+
+const onHide = () => {
+  if (!inProgress.value) {
+    emit('finish-install')
+  }
 }
 </script>
 
@@ -45,9 +55,10 @@ const switchVersion = async (versionId) => {
     ref="modpackVersionModal"
     class="modpack-version-modal"
     header="Change modpack version"
+    :on-hide="onHide"
   >
     <div class="modal-body">
-      <Card v-if="instance.linked_data" class="mod-card">
+      <div v-if="instance.linked_data" class="mod-card">
         <div class="table">
           <div class="table-row with-columns table-head">
             <div class="table-cell table-text download-cell" />
@@ -106,7 +117,7 @@ const switchVersion = async (versionId) => {
             </div>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   </ModalWrapper>
 </template>
@@ -173,7 +184,6 @@ const switchVersion = async (versionId) => {
 }
 
 .modal-body {
-  padding: var(--gap-xl);
   display: flex;
   flex-direction: column;
   gap: var(--gap-md);

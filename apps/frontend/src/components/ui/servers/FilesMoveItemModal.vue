@@ -8,7 +8,7 @@
           autofocus
           type="text"
           class="bg-bg-input w-full rounded-lg p-4"
-          placeholder="e.g. mods/modname"
+          placeholder="e.g. /mods/modname"
           required
         />
       </div>
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { ArrowBigUpDashIcon, XIcon } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { ref, nextTick } from "vue";
+import { ref, nextTick, computed } from "vue";
 
 const destinationInput = ref<HTMLInputElement | null>(null);
 
@@ -55,11 +55,12 @@ const emit = defineEmits<{
 const modal = ref<typeof NewModal>();
 const destination = ref("");
 const newpath = computed(() => {
-  return destination.value.replace("//", "/");
+  const path = destination.value.replace("//", "/");
+  return path.startsWith("/") ? path : `/${path}`;
 });
 
 const handleSubmit = () => {
-  emit("move", destination.value);
+  emit("move", newpath.value);
   hide();
 };
 
