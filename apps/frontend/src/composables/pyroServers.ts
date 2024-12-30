@@ -80,6 +80,7 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
         429: "Too Many Requests",
         500: "Internal Server Error",
         502: "Bad Gateway",
+        503: "Service Unavailable",
       };
       const message =
         statusCode && statusCode in errorMessages
