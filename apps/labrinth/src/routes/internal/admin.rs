@@ -5,12 +5,13 @@ use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::maxmind::MaxMindIndexer;
+use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::guards::admin_key_guard;
-use actix_web::{patch, post, web, HttpRequest, HttpResponse};
+use actix_web::{get, patch, post, web, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -21,7 +22,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("admin")
             .service(count_download)
-            .service(force_reindex),
+            .service(force_reindex)
+            .service(get_balances),
     );
 }
 
@@ -157,4 +159,22 @@ pub async fn force_reindex(
     let redis = redis.get_ref();
     index_projects(pool.as_ref().clone(), redis.clone(), &config).await?;
     Ok(HttpResponse::NoContent().finish())
+}
+
+#[get("/_balances", guard = "admin_key_guard")]
+pub async fn get_balances(
+    payouts: web::Data<PayoutsQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let (paypal, brex, tremendous) = futures::future::try_join3(
+        PayoutsQueue::get_paypal_balance(),
+        PayoutsQueue::get_brex_balance(),
+        payouts.get_tremendous_balance(),
+    )
+    .await?;
+
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "paypal": paypal,
+        "brex": brex,
+        "tremendous": tremendous,
+    })))
 }
