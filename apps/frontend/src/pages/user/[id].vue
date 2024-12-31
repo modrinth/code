@@ -17,7 +17,7 @@
                 ? user.bio
                 : projects.length === 0
                   ? "A Modrinth user."
-                  : "A Modrinth creator."
+                  : "Creator on Modrinth."
             }}
           </template>
           <template #stats>
