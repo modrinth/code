@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "ui:intl:extract": "pnpm run --filter=@modrinth/ui intl:extract",
-    "web:dev": "turbo run dev --filter=@modrinth/frontend",
-    "web:build": "turbo run build --filter=@modrinth/frontend",
+    "web:dev": "turbo run dev --filter=@modrinth/frontend --filter=@pyro/tartaros",
+    "web:build": "turbo run build --filter=@modrinth/frontend --filter=@pyro/tartaros",
     "web:intl:extract": "pnpm run --filter=@modrinth/frontend intl:extract",
     "app:dev": "turbo run dev --filter=@modrinth/app",
     "docs:dev": "turbo run dev --filter=@modrinth/docs",
@@ -13,6 +13,7 @@
     "app:intl:extract": "pnpm run --filter=@modrinth/app-frontend intl:extract",
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "build": "turbo run build --continue",
+    "tartaros:build": "turbo run build --filter=@pyro/tartaros",
     "lint": "turbo run lint --continue",
     "test": "turbo run test --continue",
     "fix": "turbo run fix --continue",
