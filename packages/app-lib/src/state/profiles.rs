@@ -549,11 +549,11 @@ impl Profile {
 
     pub(crate) async fn refresh_all() -> crate::Result<()> {
         let state = crate::State::get().await?;
-        let all = Self::get_all(&state.pool).await?;
+        let mut all = Self::get_all(&state.pool).await?;
 
         let mut keys = vec![];
 
-        for profile in &all {
+        for profile in &mut all {
             let path =
                 crate::api::profile::get_full_path(&profile.path).await?;
 
@@ -585,6 +585,13 @@ impl Profile {
                         }
                     }
                 }
+            }
+
+            if profile.install_stage == ProfileInstallStage::Installing
+                || profile.install_stage == ProfileInstallStage::PackInstalling
+            {
+                profile.install_stage = ProfileInstallStage::NotInstalled;
+                profile.upsert(&state.pool).await?; // TODO: Do multiple at once?
             }
         }
 

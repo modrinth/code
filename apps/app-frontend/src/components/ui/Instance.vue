@@ -1,19 +1,26 @@
 <script setup>
-import { onUnmounted, ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { SpinnerIcon, GameIcon, TimerIcon, StopCircleIcon, PlayIcon } from '@modrinth/assets'
-import { ButtonStyled, Avatar } from '@modrinth/ui'
-import { convertFileSrc } from '@tauri-apps/api/core'
-import { kill, run } from '@/helpers/profile'
-import { get_by_profile_path } from '@/helpers/process'
-import { process_listener } from '@/helpers/events'
-import { handleError } from '@/store/state.js'
-import { showProfileInFolder } from '@/helpers/utils.js'
-import { handleSevereError } from '@/store/error.js'
-import { trackEvent } from '@/helpers/analytics'
+import {computed, onMounted, onUnmounted, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {
+  DownloadIcon,
+  GameIcon,
+  PlayIcon,
+  SpinnerIcon,
+  StopCircleIcon,
+  TimerIcon
+} from '@modrinth/assets'
+import {Avatar, ButtonStyled} from '@modrinth/ui'
+import {convertFileSrc} from '@tauri-apps/api/core'
+import {install, kill, run} from '@/helpers/profile'
+import {get_by_profile_path} from '@/helpers/process'
+import {process_listener} from '@/helpers/events'
+import {handleError} from '@/store/state.js'
+import {showProfileInFolder} from '@/helpers/utils.js'
+import {handleSevereError} from '@/store/error.js'
+import {trackEvent} from '@/helpers/analytics'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { formatCategory } from '@modrinth/utils'
+import {formatCategory} from '@modrinth/utils'
 
 dayjs.extend(relativeTime)
 
@@ -42,7 +49,12 @@ const modLoading = computed(
     currentEvent.value === 'installing' ||
     (currentEvent.value === 'launched' && !playing.value),
 )
-const installing = computed(() => props.instance.install_stage !== 'installed')
+const installing = computed(
+  () =>
+    props.instance.install_stage !== 'installed' &&
+    props.instance.install_stage !== 'not_installed'
+)
+const installed = computed(() => props.instance.install_stage === 'installed')
 
 const router = useRouter()
 
@@ -82,6 +94,12 @@ const stop = async (e, context) => {
     game_version: props.instance.game_version,
     source: context,
   })
+}
+
+const repair = async (e) => {
+  e?.stopPropagation()
+
+  await install(props.instance.path, false).catch(handleError)
 }
 
 const openFolder = async () => {
@@ -195,6 +213,15 @@ onUnmounted(() => unlisten())
             class="animate-spin w-8 h-8"
             tabindex="-1"
           />
+          <ButtonStyled v-else-if="!installed" size="large" color="brand" circular>
+            <button
+              v-tooltip="'Install'"
+              class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
+              @click="(e) => repair(e)"
+            >
+              <DownloadIcon />
+            </button>
+          </ButtonStyled>
           <ButtonStyled v-else size="large" color="brand" circular>
             <button
               v-tooltip="'Play'"
