@@ -40,7 +40,7 @@
           <TagItem
             v-for="(category, index) in project.categories"
             :key="index"
-            :action="() => router.push(`../${project.project_type}s?g=categories:${category}`)"
+            :action="() => router.push(`../${project.project_type}s?f=categories:${category}`)"
           >
             {{ formatCategory(category) }}
           </TagItem>
