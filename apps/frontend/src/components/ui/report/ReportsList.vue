@@ -35,7 +35,7 @@ defineProps({
 const viewMode = ref("open");
 const reports = ref([]);
 
-let { data: rawReports } = await useAsyncData("report", () => useBaseFetch("report"));
+let { data: rawReports } = await useAsyncData("report", () => useBaseFetch("report?count=1000"));
 
 rawReports = rawReports.value.map((report) => {
   report.item_id = report.item_id.replace(/"/g, "");
