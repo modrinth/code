@@ -1,4 +1,4 @@
-import type { ModrinthId } from '@modrinth/utils'
+import type {ModrinthId} from '@modrinth/utils'
 
 type GameInstance = {
   path: string
@@ -32,7 +32,7 @@ type GameInstance = {
   hooks: Hooks
 }
 
-type InstallStage = 'installed' | 'installing' | 'pack_installing' | 'not_installed'
+type InstallStage = 'installed' | 'minecraft_installing' | 'pack_installed' | 'pack_installing' | 'not_installed'
 
 type LinkedData = {
   project_id: ModrinthId

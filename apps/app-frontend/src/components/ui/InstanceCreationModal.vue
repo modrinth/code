@@ -199,33 +199,33 @@
 <script setup>
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import {
-  PlusIcon,
-  UploadIcon,
-  XIcon,
   CodeIcon,
   FolderOpenIcon,
-  InfoIcon,
   FolderSearchIcon,
+  InfoIcon,
+  PlusIcon,
   UpdatedIcon,
+  UploadIcon,
+  XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Chips, Checkbox } from '@modrinth/ui'
-import { computed, onUnmounted, ref, shallowRef } from 'vue'
-import { get_loaders } from '@/helpers/tags'
-import { create } from '@/helpers/profile'
-import { open } from '@tauri-apps/plugin-dialog'
-import { convertFileSrc } from '@tauri-apps/api/core'
-import { get_game_versions, get_loader_versions } from '@/helpers/metadata'
-import { handleError } from '@/store/notifications.js'
+import {Avatar, Button, Checkbox, Chips} from '@modrinth/ui'
+import {computed, onUnmounted, ref, shallowRef} from 'vue'
+import {get_loaders} from '@/helpers/tags'
+import {create} from '@/helpers/profile'
+import {open} from '@tauri-apps/plugin-dialog'
+import {convertFileSrc} from '@tauri-apps/api/core'
+import {get_game_versions, get_loader_versions} from '@/helpers/metadata'
+import {handleError} from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
-import { trackEvent } from '@/helpers/analytics'
-import { install_from_file } from '@/helpers/pack.js'
+import {trackEvent} from '@/helpers/analytics'
+import {create_profile_and_install_from_file} from '@/helpers/pack.js'
 import {
   get_default_launcher_path,
   get_importable_instances,
   import_instance,
 } from '@/helpers/import.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
-import { getCurrentWebview } from '@tauri-apps/api/webview'
+import {getCurrentWebview} from '@tauri-apps/api/webview'
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -263,7 +263,7 @@ defineExpose({
       hide()
       const { paths } = event.payload
       if (paths && paths.length > 0 && paths[0].endsWith('.mrpack')) {
-        await install_from_file(paths[0]).catch(handleError)
+        await create_profile_and_install_from_file(paths[0]).catch(handleError)
         trackEvent('InstanceCreate', {
           source: 'CreationModalFileDrop',
         })
@@ -419,7 +419,7 @@ const openFile = async () => {
   const newProject = await open({ multiple: false })
   if (!newProject) return
   hide()
-  await install_from_file(newProject.path ?? newProject).catch(handleError)
+  await create_profile_and_install_from_file(newProject.path ?? newProject).catch(handleError)
 
   trackEvent('InstanceCreate', {
     source: 'CreationModalFileOpen',

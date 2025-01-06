@@ -21,6 +21,7 @@ import {trackEvent} from '@/helpers/analytics'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import {formatCategory} from '@modrinth/utils'
+import {install_to_existing_profile} from "@/helpers/pack.js";
 
 dayjs.extend(relativeTime)
 
@@ -93,8 +94,21 @@ const stop = async (e, context) => {
   })
 }
 
-const repairMinecraft = async (e) => {
+const repair = async (e) => {
   e?.stopPropagation()
+
+  console.log('Repairing instance', props.instance)
+
+  if (!packInstalled.value) {
+    console.log('Reinstalling pack')
+    let linkedData = props.instance.linked_data
+    await install_to_existing_profile(
+      linkedData.project_id,
+      linkedData.version_id,
+      props.instance.name,
+      props.instance.path
+    ).catch(handleError)
+  }
 
   await install(props.instance.path, false).catch(handleError)
 }
@@ -214,7 +228,7 @@ onUnmounted(() => unlisten())
             <button
               v-tooltip="'Repair'"
               class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
-              @click="(e) => packInstalled ? repairMinecraft(e) : undefined"
+              @click="(e) => repair(e)"
             >
               <DownloadIcon />
             </button>
