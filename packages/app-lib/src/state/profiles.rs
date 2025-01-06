@@ -53,7 +53,9 @@ pub enum ProfileInstallStage {
     /// Profile is installed
     Installed,
     /// Profile's minecraft game is still installing
-    Installing,
+    MinecraftInstalling,
+    /// Pack is installed, but Minecraft installation has not begun
+    PackInstalled,
     /// Profile created for pack, but the pack hasn't been fully installed yet
     PackInstalling,
     /// Profile is not installed
@@ -64,7 +66,8 @@ impl ProfileInstallStage {
     pub fn as_str(&self) -> &'static str {
         match *self {
             Self::Installed => "installed",
-            Self::Installing => "installing",
+            Self::MinecraftInstalling => "minecraft_installing",
+            Self::PackInstalled => "pack_installed",
             Self::PackInstalling => "pack_installing",
             Self::NotInstalled => "not_installed",
         }
@@ -73,7 +76,9 @@ impl ProfileInstallStage {
     pub fn from_str(val: &str) -> Self {
         match val {
             "installed" => Self::Installed,
-            "installing" => Self::Installing,
+            "minecraft_installing" => Self::MinecraftInstalling,
+            "installing" => Self::MinecraftInstalling, // Backwards compatibility
+            "pack_installed" => Self::PackInstalled,
             "pack_installing" => Self::PackInstalling,
             "not_installed" => Self::NotInstalled,
             _ => Self::NotInstalled,
@@ -587,11 +592,15 @@ impl Profile {
                 }
             }
 
-            if profile.install_stage == ProfileInstallStage::Installing
-                || profile.install_stage == ProfileInstallStage::PackInstalling
+            if profile.install_stage == ProfileInstallStage::MinecraftInstalling
+            {
+                profile.install_stage = ProfileInstallStage::PackInstalled;
+                profile.upsert(&state.pool).await?;
+            } else if profile.install_stage
+                == ProfileInstallStage::PackInstalling
             {
                 profile.install_stage = ProfileInstallStage::NotInstalled;
-                profile.upsert(&state.pool).await?; // TODO: Do multiple at once?
+                profile.upsert(&state.pool).await?;
             }
         }
 
