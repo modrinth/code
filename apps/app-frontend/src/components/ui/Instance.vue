@@ -11,7 +11,7 @@ import {
 } from '@modrinth/assets'
 import {Avatar, ButtonStyled} from '@modrinth/ui'
 import {convertFileSrc} from '@tauri-apps/api/core'
-import {install, kill, run} from '@/helpers/profile'
+import {finish_install, kill, run} from '@/helpers/profile'
 import {get_by_profile_path} from '@/helpers/process'
 import {process_listener} from '@/helpers/events'
 import {handleError} from '@/store/state.js'
@@ -21,7 +21,6 @@ import {trackEvent} from '@/helpers/analytics'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import {formatCategory} from '@modrinth/utils'
-import {install_to_existing_profile} from "@/helpers/pack.js";
 
 dayjs.extend(relativeTime)
 
@@ -97,18 +96,7 @@ const stop = async (e, context) => {
 const repair = async (e) => {
   e?.stopPropagation()
 
-  if (props.instance.install_stage !== 'pack_installed') {
-    console.log('Reinstalling pack')
-    let linkedData = props.instance.linked_data
-    await install_to_existing_profile(
-      linkedData.project_id,
-      linkedData.version_id,
-      props.instance.name,
-      props.instance.path
-    ).catch(handleError)
-  } else {
-    await install(props.instance.path, false).catch(handleError)
-  }
+  await finish_install(props.instance)
 }
 
 const openFolder = async () => {

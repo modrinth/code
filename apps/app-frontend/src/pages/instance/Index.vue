@@ -171,7 +171,7 @@ import {
   UserPlusIcon,
   XIcon,
 } from '@modrinth/assets'
-import {get, get_full_path, install, kill, run} from '@/helpers/profile'
+import {finish_install, get, get_full_path, kill, run} from '@/helpers/profile'
 import {get_by_profile_path} from '@/helpers/process'
 import {process_listener, profile_listener} from '@/helpers/events'
 import {useRoute, useRouter} from 'vue-router'
@@ -189,7 +189,6 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
-import {install_to_existing_profile} from "@/helpers/pack.js";
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -303,19 +302,7 @@ const stopInstance = async (context) => {
 }
 
 const repairInstance = async () => {
-  // TODO: Maybe deduplicate with Instance.vue
-  if (instance.value.install_stage !== 'pack_installed') {
-    console.log('Reinstalling pack')
-    let linkedData = instance.value.linked_data
-    await install_to_existing_profile(
-      linkedData.project_id,
-      linkedData.version_id,
-      instance.value.name,
-      instance.value.path
-    ).catch(handleError)
-  } else {
-    await install(instance.value.path, false).catch(handleError)
-  }
+  await finish_install(instance.value)
 }
 
 const handleRightClick = (event) => {
