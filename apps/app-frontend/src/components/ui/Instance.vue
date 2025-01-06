@@ -97,9 +97,7 @@ const stop = async (e, context) => {
 const repair = async (e) => {
   e?.stopPropagation()
 
-  console.log('Repairing instance', props.instance)
-
-  if (!packInstalled.value) {
+  if (props.instance.install_stage !== 'pack_installed') {
     console.log('Reinstalling pack')
     let linkedData = props.instance.linked_data
     await install_to_existing_profile(
@@ -108,9 +106,9 @@ const repair = async (e) => {
       props.instance.name,
       props.instance.path
     ).catch(handleError)
+  } else {
+    await install(props.instance.path, false).catch(handleError)
   }
-
-  await install(props.instance.path, false).catch(handleError)
 }
 
 const openFolder = async () => {

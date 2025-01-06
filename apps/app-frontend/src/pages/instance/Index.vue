@@ -30,8 +30,14 @@
       </template>
       <template #actions>
         <div class="flex gap-2">
-          <ButtonStyled v-if="instance.install_stage !== 'installed'" color="brand" size="large">
+          <ButtonStyled v-if="instance.install_stage.includes('installing')" color="brand" size="large">
             <button disabled>Installing...</button>
+          </ButtonStyled>
+          <ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand" size="large">
+            <button @click="repairInstance()">
+              <DownloadIcon />
+              Repair
+            </button>
           </ButtonStyled>
           <ButtonStyled v-else-if="playing === true" color="red" size="large">
             <button @click="stopInstance('InstancePage')">
@@ -137,51 +143,53 @@
 <script setup>
 import {
   Avatar,
-  ContentPageHeader,
   ButtonStyled,
-  OverflowMenu,
+  ContentPageHeader,
   LoadingIndicator,
+  OverflowMenu,
 } from '@modrinth/ui'
 import {
-  UserPlusIcon,
-  ServerIcon,
-  PackageIcon,
-  SettingsIcon,
-  PlayIcon,
-  StopCircleIcon,
-  EditIcon,
-  FolderOpenIcon,
-  ClipboardCopyIcon,
-  PlusIcon,
-  ExternalIcon,
-  HashIcon,
-  GlobeIcon,
-  EyeIcon,
-  XIcon,
   CheckCircleIcon,
-  UpdatedIcon,
-  MoreVerticalIcon,
+  ClipboardCopyIcon,
+  DownloadIcon,
+  EditIcon,
+  ExternalIcon,
+  EyeIcon,
+  FolderOpenIcon,
   GameIcon,
+  GlobeIcon,
+  HashIcon,
+  MoreVerticalIcon,
+  PackageIcon,
+  PlayIcon,
+  PlusIcon,
+  ServerIcon,
+  SettingsIcon,
+  StopCircleIcon,
   TimerIcon,
+  UpdatedIcon,
+  UserPlusIcon,
+  XIcon,
 } from '@modrinth/assets'
-import { get, get_full_path, kill, run } from '@/helpers/profile'
-import { get_by_profile_path } from '@/helpers/process'
-import { process_listener, profile_listener } from '@/helpers/events'
-import { useRoute, useRouter } from 'vue-router'
-import { ref, onUnmounted, computed, watch } from 'vue'
-import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
-import { showProfileInFolder } from '@/helpers/utils.js'
+import {get, get_full_path, install, kill, run} from '@/helpers/profile'
+import {get_by_profile_path} from '@/helpers/process'
+import {process_listener, profile_listener} from '@/helpers/events'
+import {useRoute, useRouter} from 'vue-router'
+import {computed, onUnmounted, ref, watch} from 'vue'
+import {handleError, useBreadcrumbs, useLoading} from '@/store/state'
+import {showProfileInFolder} from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
-import { trackEvent } from '@/helpers/analytics'
-import { convertFileSrc } from '@tauri-apps/api/core'
-import { handleSevereError } from '@/store/error.js'
-import { get_project, get_version_many } from '@/helpers/cache.js'
+import {trackEvent} from '@/helpers/analytics'
+import {convertFileSrc} from '@tauri-apps/api/core'
+import {handleSevereError} from '@/store/error.js'
+import {get_project, get_version_many} from '@/helpers/cache.js'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
+import {install_to_existing_profile} from "@/helpers/pack.js";
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -292,6 +300,22 @@ const stopInstance = async (context) => {
     game_version: instance.value.game_version,
     source: context,
   })
+}
+
+const repairInstance = async () => {
+  // TODO: Maybe deduplicate with Instance.vue
+  if (instance.value.install_stage !== 'pack_installed') {
+    console.log('Reinstalling pack')
+    let linkedData = instance.value.linked_data
+    await install_to_existing_profile(
+      linkedData.project_id,
+      linkedData.version_id,
+      instance.value.name,
+      instance.value.path
+    ).catch(handleError)
+  } else {
+    await install(instance.value.path, false).catch(handleError)
+  }
 }
 
 const handleRightClick = (event) => {
