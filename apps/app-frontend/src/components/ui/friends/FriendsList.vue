@@ -20,7 +20,7 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const props = defineProps<{
   credentials: unknown | null
-  signIn: () => void2
+  signIn: () => void
 }>()
 
 const userCredentials = computed(() => props.credentials)
