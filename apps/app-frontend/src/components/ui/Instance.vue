@@ -1,15 +1,8 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  DownloadIcon,
-  GameIcon,
-  PlayIcon,
-  SpinnerIcon,
-  StopCircleIcon,
-  TimerIcon,
-} from '@modrinth/assets'
-import { Avatar, ButtonStyled } from '@modrinth/ui'
+import { SpinnerIcon, GameIcon, TimerIcon, StopCircleIcon, PlayIcon, DownloadIcon } from '@modrinth/assets'
+import { ButtonStyled, Avatar, SmartClickable } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { finish_install, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
@@ -134,11 +127,13 @@ onUnmounted(() => unlisten())
 </script>
 
 <template>
-  <template v-if="compact">
+  <SmartClickable class="card-shadow bg-bg-raised rounded-xl" @mouseenter="checkProcess">
+    <template #clickable>
+      <router-link class="no-click-animation" :to="`/instance/${encodeURIComponent(instance.path)}/`" />
+    </template>
     <div
-      class="card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer hover:brightness-90 transition-all"
-      @click="seeInstance"
-      @mouseenter="checkProcess"
+      v-if="compact"
+      class="grid grid-cols-[auto_1fr_auto] p-3 pl-4 gap-2"
     >
       <Avatar
         size="48px"
@@ -146,10 +141,10 @@ onUnmounted(() => unlisten())
         :tint-by="instance.path"
         alt="Mod card"
       />
-      <div class="h-full flex items-center font-bold text-contrast leading-normal">
+      <div class="h-full flex items-center font-bold text-contrast leading-normal smart-clickable:underline-on-hover">
         <span class="line-clamp-2">{{ instance.name }}</span>
       </div>
-      <div class="flex items-center">
+      <div class="flex items-center smart-clickable:allow-pointer-events">
         <ButtonStyled v-if="playing" color="red" circular @mousehover="checkProcess">
           <button v-tooltip="'Stop'" @click="(e) => stop(e, 'InstanceCard')">
             <StopCircleIcon />
@@ -176,11 +171,9 @@ onUnmounted(() => unlisten())
         <span class="text-sm"> Played {{ dayjs(instance.last_played).fromNow() }} </span>
       </div>
     </div>
-  </template>
-  <div v-else>
     <div
-      class="button-base bg-bg-raised p-4 rounded-xl flex gap-3 group"
-      @click="seeInstance"
+      v-else
+      class="p-4 rounded-xl flex gap-3 group"
       @mouseenter="checkProcess"
     >
       <div class="relative flex items-center justify-center">
@@ -231,7 +224,7 @@ onUnmounted(() => unlisten())
         </div>
       </div>
       <div class="flex flex-col gap-1">
-        <p class="m-0 text-md font-bold text-contrast leading-tight line-clamp-1">
+        <p class="m-0 text-md font-bold text-contrast leading-tight line-clamp-1 smart-clickable:underline-on-hover">
           {{ instance.name }}
         </p>
         <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold mt-auto">
@@ -242,5 +235,5 @@ onUnmounted(() => unlisten())
         </div>
       </div>
     </div>
-  </div>
+  </SmartClickable>
 </template>

@@ -8,11 +8,29 @@
   "button.copy-id": {
     "defaultMessage": "Copy ID"
   },
+  "button.copy-link": {
+    "defaultMessage": "Copy link"
+  },
   "button.create-a-project": {
     "defaultMessage": "Create a project"
   },
   "button.edit": {
     "defaultMessage": "Edit"
+  },
+  "button.install": {
+    "defaultMessage": "Install"
+  },
+  "button.install-to": {
+    "defaultMessage": "Install to..."
+  },
+  "button.installed": {
+    "defaultMessage": "Installed"
+  },
+  "button.installing": {
+    "defaultMessage": "Installing..."
+  },
+  "button.open-in-browser": {
+    "defaultMessage": "Open in browser"
   },
   "button.report": {
     "defaultMessage": "Report"
@@ -122,61 +140,61 @@
   "notification.error.title": {
     "defaultMessage": "An error occurred"
   },
-  "omorphia.component.badge.label.accepted": {
+  "omorphia.component.badges.label.accepted": {
     "defaultMessage": "Accepted"
   },
-  "omorphia.component.badge.label.approved": {
+  "omorphia.component.badges.label.approved": {
     "defaultMessage": "Approved"
   },
-  "omorphia.component.badge.label.archived": {
+  "omorphia.component.badges.label.archived": {
     "defaultMessage": "Archived"
   },
-  "omorphia.component.badge.label.closed": {
+  "omorphia.component.badges.label.closed": {
     "defaultMessage": "Closed"
   },
-  "omorphia.component.badge.label.creator": {
+  "omorphia.component.badges.label.creator": {
     "defaultMessage": "Creator"
   },
-  "omorphia.component.badge.label.draft": {
+  "omorphia.component.badges.label.draft": {
     "defaultMessage": "Draft"
   },
-  "omorphia.component.badge.label.failed": {
+  "omorphia.component.badges.label.failed": {
     "defaultMessage": "Failed"
   },
-  "omorphia.component.badge.label.listed": {
+  "omorphia.component.badges.label.listed": {
     "defaultMessage": "Listed"
   },
-  "omorphia.component.badge.label.moderator": {
+  "omorphia.component.badges.label.moderator": {
     "defaultMessage": "Moderator"
   },
-  "omorphia.component.badge.label.modrinth-team": {
+  "omorphia.component.badges.label.modrinth-team": {
     "defaultMessage": "Modrinth Team"
   },
-  "omorphia.component.badge.label.pending": {
+  "omorphia.component.badges.label.pending": {
     "defaultMessage": "Pending"
   },
-  "omorphia.component.badge.label.private": {
+  "omorphia.component.badges.label.private": {
     "defaultMessage": "Private"
   },
-  "omorphia.component.badge.label.processed": {
+  "omorphia.component.badges.label.processed": {
     "defaultMessage": "Processed"
   },
-  "omorphia.component.badge.label.rejected": {
+  "omorphia.component.badges.label.rejected": {
     "defaultMessage": "Rejected"
   },
-  "omorphia.component.badge.label.returned": {
+  "omorphia.component.badges.label.returned": {
     "defaultMessage": "Returned"
   },
-  "omorphia.component.badge.label.scheduled": {
+  "omorphia.component.badges.label.scheduled": {
     "defaultMessage": "Scheduled"
   },
-  "omorphia.component.badge.label.under-review": {
+  "omorphia.component.badges.label.under-review": {
     "defaultMessage": "Under review"
   },
-  "omorphia.component.badge.label.unlisted": {
+  "omorphia.component.badges.label.unlisted": {
     "defaultMessage": "Unlisted"
   },
-  "omorphia.component.badge.label.withheld": {
+  "omorphia.component.badges.label.withheld": {
     "defaultMessage": "Withheld"
   },
   "omorphia.component.copy.action.copy": {
@@ -239,8 +257,83 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "organization.description.default": {
+    "defaultMessage": "An organization on Modrinth."
+  },
+  "organization.members.owner": {
+    "defaultMessage": "Organization owner"
+  },
+  "organization.members.title": {
+    "defaultMessage": "Members"
+  },
   "project-type.all": {
     "defaultMessage": "All"
+  },
+  "project-type.any": {
+    "defaultMessage": "Any type"
+  },
+  "project-type.datapack.body": {
+    "defaultMessage": "{count, plural, one {data pack} other {data packs}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Data Packs"
+  },
+  "project-type.datapack.title": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
+  },
+  "project-type.mod.body": {
+    "defaultMessage": "{count, plural, one {mod} other {mods}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mods"
+  },
+  "project-type.mod.title": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.modpack.body": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpacks}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacks"
+  },
+  "project-type.modpack.title": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
+  },
+  "project-type.plugin.body": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugins"
+  },
+  "project-type.plugin.title": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
+  "project-type.project.body": {
+    "defaultMessage": "{count, plural, one {project} other {projects}}"
+  },
+  "project-type.project.category": {
+    "defaultMessage": "Projects"
+  },
+  "project-type.project.title": {
+    "defaultMessage": "{count, plural, one {Project} other {Projects}}"
+  },
+  "project-type.resourcepack.body": {
+    "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resource Packs"
+  },
+  "project-type.resourcepack.title": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packs}}"
+  },
+  "project-type.shader.body": {
+    "defaultMessage": "{count, plural, one {shader} other {shaders}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
+  },
+  "project-type.shader.title": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Supported environments"
@@ -310,6 +403,39 @@
   },
   "project.about.links.wiki": {
     "defaultMessage": "Visit wiki"
+  },
+  "project.card.environment.client": {
+    "defaultMessage": "Client"
+  },
+  "project.card.environment.client-and-server": {
+    "defaultMessage": "Client and server"
+  },
+  "project.card.environment.client-or-server": {
+    "defaultMessage": "Client or server"
+  },
+  "project.card.environment.server": {
+    "defaultMessage": "Server"
+  },
+  "project.list.clear-search-query": {
+    "defaultMessage": "Clear search query"
+  },
+  "project.list.no-projects": {
+    "defaultMessage": "This user has no projects."
+  },
+  "project.list.no-projects-found": {
+    "defaultMessage": "No {project_type} found matching \"{search_query}\""
+  },
+  "project.list.sort.downloads": {
+    "defaultMessage": "Downloads"
+  },
+  "project.list.sort.followers": {
+    "defaultMessage": "Followers"
+  },
+  "project.list.sort.published": {
+    "defaultMessage": "Date published"
+  },
+  "project.list.sort.updated": {
+    "defaultMessage": "Date updated"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -458,7 +584,349 @@
   "settings.sessions.title": {
     "defaultMessage": "Sessions"
   },
+  "stat.downloads": {
+    "defaultMessage": "{count} {count, plural, one {download} other {downloads}}"
+  },
+  "stat.followers": {
+    "defaultMessage": "{count} {count, plural, one {follower} other {followers}}"
+  },
+  "stat.members": {
+    "defaultMessage": "{count} {count, plural, one {member} other {members}}"
+  },
+  "stat.projects": {
+    "defaultMessage": "{count} {count, plural, one {project} other {projects}}"
+  },
+  "tags.category.128x.name": {
+    "defaultMessage": "128x"
+  },
+  "tags.category.16x.name": {
+    "defaultMessage": "16x"
+  },
+  "tags.category.256x.name": {
+    "defaultMessage": "256x"
+  },
+  "tags.category.32x.name": {
+    "defaultMessage": "32x"
+  },
+  "tags.category.48x.name": {
+    "defaultMessage": "48x"
+  },
+  "tags.category.512x+.name": {
+    "defaultMessage": "512x or higher"
+  },
+  "tags.category.64x.name": {
+    "defaultMessage": "64x"
+  },
+  "tags.category.8x-.name": {
+    "defaultMessage": "8x or lower"
+  },
+  "tags.category.adventure.name": {
+    "defaultMessage": "Adventure"
+  },
+  "tags.category.atmosphere.name": {
+    "defaultMessage": "Atmosphere"
+  },
+  "tags.category.audio.name": {
+    "defaultMessage": "Audio"
+  },
+  "tags.category.blocks.name": {
+    "defaultMessage": "Blocks"
+  },
+  "tags.category.bloom.name": {
+    "defaultMessage": "Bloom"
+  },
+  "tags.category.cartoon.name": {
+    "defaultMessage": "Cartoon"
+  },
+  "tags.category.challenging.name": {
+    "defaultMessage": "Challenging"
+  },
+  "tags.category.colored-lighting.name": {
+    "defaultMessage": "Colored Lighting"
+  },
+  "tags.category.combat.name": {
+    "defaultMessage": "Combat"
+  },
+  "tags.category.core-shaders.name": {
+    "defaultMessage": "Core Shaders"
+  },
+  "tags.category.cursed.name": {
+    "defaultMessage": "Cursed"
+  },
+  "tags.category.decoration.name": {
+    "defaultMessage": "Decoration"
+  },
+  "tags.category.economy.name": {
+    "defaultMessage": "Economy"
+  },
+  "tags.category.entities.name": {
+    "defaultMessage": "Entities"
+  },
+  "tags.category.environment.name": {
+    "defaultMessage": "Environment"
+  },
+  "tags.category.equipment.name": {
+    "defaultMessage": "Equipment"
+  },
+  "tags.category.fantasy.name": {
+    "defaultMessage": "Fantasy"
+  },
+  "tags.category.foliage.name": {
+    "defaultMessage": "Foliage"
+  },
+  "tags.category.fonts.name": {
+    "defaultMessage": "Fonts"
+  },
+  "tags.category.food.name": {
+    "defaultMessage": "Food"
+  },
+  "tags.category.game-mechanics.name": {
+    "defaultMessage": "Game Mechanics"
+  },
+  "tags.category.gui.name": {
+    "defaultMessage": "GUI"
+  },
+  "tags.category.high.name": {
+    "defaultMessage": "High"
+  },
+  "tags.category.items.name": {
+    "defaultMessage": "Items"
+  },
+  "tags.category.kitchen-sink.name": {
+    "defaultMessage": "Kitchen Sink"
+  },
+  "tags.category.library.name": {
+    "defaultMessage": "Library"
+  },
+  "tags.category.lightweight.name": {
+    "defaultMessage": "Lightweight"
+  },
+  "tags.category.locale.name": {
+    "defaultMessage": "Locale"
+  },
+  "tags.category.low.name": {
+    "defaultMessage": "Low"
+  },
+  "tags.category.magic.name": {
+    "defaultMessage": "Magic"
+  },
+  "tags.category.management.name": {
+    "defaultMessage": "Management"
+  },
+  "tags.category.medium.name": {
+    "defaultMessage": "Medium"
+  },
+  "tags.category.minigame.name": {
+    "defaultMessage": "Minigame"
+  },
+  "tags.category.mobs.name": {
+    "defaultMessage": "Mobs"
+  },
+  "tags.category.modded.name": {
+    "defaultMessage": "Modded"
+  },
+  "tags.category.models.name": {
+    "defaultMessage": "Models"
+  },
+  "tags.category.multiplayer.name": {
+    "defaultMessage": "Multiplayer"
+  },
+  "tags.category.optimization.name": {
+    "defaultMessage": "Optimization"
+  },
+  "tags.category.path-tracing.name": {
+    "defaultMessage": "Path Tracing"
+  },
+  "tags.category.pbr.name": {
+    "defaultMessage": "PBR"
+  },
+  "tags.category.potato.name": {
+    "defaultMessage": "Potato"
+  },
+  "tags.category.quests.name": {
+    "defaultMessage": "Quests"
+  },
+  "tags.category.realistic.name": {
+    "defaultMessage": "Realistic"
+  },
+  "tags.category.reflections.name": {
+    "defaultMessage": "Reflections"
+  },
+  "tags.category.screenshot.name": {
+    "defaultMessage": "Screenshot"
+  },
+  "tags.category.semi-realistic.name": {
+    "defaultMessage": "Semi-realistic"
+  },
+  "tags.category.shadows.name": {
+    "defaultMessage": "Shadows"
+  },
+  "tags.category.simplistic.name": {
+    "defaultMessage": "Simplistic"
+  },
+  "tags.category.social.name": {
+    "defaultMessage": "Social"
+  },
+  "tags.category.storage.name": {
+    "defaultMessage": "Storage"
+  },
+  "tags.category.technology.name": {
+    "defaultMessage": "Technology"
+  },
+  "tags.category.themed.name": {
+    "defaultMessage": "Themed"
+  },
+  "tags.category.transportation.name": {
+    "defaultMessage": "Transportation"
+  },
+  "tags.category.tweaks.name": {
+    "defaultMessage": "Tweaks"
+  },
+  "tags.category.utility.name": {
+    "defaultMessage": "Utility"
+  },
+  "tags.category.vanilla-like.name": {
+    "defaultMessage": "Vanilla-like"
+  },
+  "tags.category.worldgen.name": {
+    "defaultMessage": "World Generation"
+  },
+  "tags.platform.bukkit.name": {
+    "defaultMessage": "Bukkit"
+  },
+  "tags.platform.bungeecord.name": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tags.platform.canvas.name": {
+    "defaultMessage": "Canvas"
+  },
+  "tags.platform.datapack.name": {
+    "defaultMessage": "Data Pack"
+  },
+  "tags.platform.fabric.name": {
+    "defaultMessage": "Fabric"
+  },
+  "tags.platform.folia.name": {
+    "defaultMessage": "Folia"
+  },
+  "tags.platform.forge.name": {
+    "defaultMessage": "Forge"
+  },
+  "tags.platform.iris.name": {
+    "defaultMessage": "Iris"
+  },
+  "tags.platform.liteloader.name": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tags.platform.minecraft.name": {
+    "defaultMessage": "Resource Pack"
+  },
+  "tags.platform.modloader.name": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tags.platform.neoforge.name": {
+    "defaultMessage": "NeoForge"
+  },
+  "tags.platform.optifine.name": {
+    "defaultMessage": "OptiFine"
+  },
+  "tags.platform.paper.name": {
+    "defaultMessage": "Paper"
+  },
+  "tags.platform.purpur.name": {
+    "defaultMessage": "Purpur"
+  },
+  "tags.platform.quilt.name": {
+    "defaultMessage": "Quilt"
+  },
+  "tags.platform.rift.name": {
+    "defaultMessage": "Rift"
+  },
+  "tags.platform.spigot.name": {
+    "defaultMessage": "Spigot"
+  },
+  "tags.platform.sponge.name": {
+    "defaultMessage": "Sponge"
+  },
+  "tags.platform.vanilla.name": {
+    "defaultMessage": "Vanilla"
+  },
+  "tags.platform.velocity.name": {
+    "defaultMessage": "Velocity"
+  },
+  "tags.platform.waterfall.name": {
+    "defaultMessage": "Waterfall"
+  },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} at {time, time, short}"
+  },
+  "user.badges.10m-club.description": {
+    "defaultMessage": "This user is a creator with over 10 million downloads on their projects"
+  },
+  "user.badges.10m-club.title": {
+    "defaultMessage": "10,000,000 Downloads"
+  },
+  "user.badges.alpha-tester.description": {
+    "defaultMessage": "This user has had a Modrinth account since Modrinth Alpha (Ended November 30th, 2020)"
+  },
+  "user.badges.alpha-tester.title": {
+    "defaultMessage": "Since Alpha"
+  },
+  "user.badges.beta-tester.description": {
+    "defaultMessage": "This user has had a Modrinth account since Modrinth Beta (Ended February 27th, 2022)"
+  },
+  "user.badges.beta-tester.title": {
+    "defaultMessage": "Since Beta"
+  },
+  "user.badges.contributor.description": {
+    "defaultMessage": "This user has meaningfully contributed to Modrinth's development"
+  },
+  "user.badges.contributor.title": {
+    "defaultMessage": "Contributor"
+  },
+  "user.badges.early-adopter.description": {
+    "defaultMessage": "This user participated in an Early Adopter program to help Modrinth launch a new product"
+  },
+  "user.badges.early-adopter.title": {
+    "defaultMessage": "Early Adopter"
+  },
+  "user.badges.mod.description": {
+    "defaultMessage": "This user is a member of Modrinth's content moderation team"
+  },
+  "user.badges.mod.title": {
+    "defaultMessage": "Modrinth Content Moderator"
+  },
+  "user.badges.plus.description": {
+    "defaultMessage": "Upgrade to Modrinth+ for ad-free browsing while still supporting creators and the platform"
+  },
+  "user.badges.plus.title": {
+    "defaultMessage": "Modrinth+ Subscriber"
+  },
+  "user.badges.staff.description": {
+    "defaultMessage": "This user is a member of the Modrinth Team"
+  },
+  "user.badges.staff.title": {
+    "defaultMessage": "Modrinth Staff"
+  },
+  "user.badges.title": {
+    "defaultMessage": "Badges"
+  },
+  "user.badges.translator.description": {
+    "defaultMessage": "This user has substantially contributed to Modrinth's translations into other languages"
+  },
+  "user.badges.translator.title": {
+    "defaultMessage": "Translator"
+  },
+  "user.bio.creator": {
+    "defaultMessage": "A creator on Modrinth."
+  },
+  "user.bio.default": {
+    "defaultMessage": "A Modrinth user."
+  },
+  "user.organizations.title": {
+    "defaultMessage": "Organizations"
+  },
+  "user.stat.joined": {
+    "defaultMessage": "Joined {date}"
   }
 }

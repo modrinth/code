@@ -19,7 +19,7 @@
         "
         class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold cursor-help"
       >
-        <DownloadIcon class="h-6 w-6 text-secondary" />
+        <DownloadIcon class="h-5 w-5 text-secondary" />
         {{ formatNumber(project.downloads) }}
       </div>
       <div
@@ -29,13 +29,13 @@
         class="flex items-center gap-2 border-0 border-solid border-divider pr-4 cursor-help"
         :class="{ 'md:border-r': project.categories.length > 0 }"
       >
-        <HeartIcon class="h-6 w-6 text-secondary" />
+        <HeartIcon class="h-5 w-5 text-secondary" />
         <span class="font-semibold">
           {{ formatNumber(project.followers) }}
         </span>
       </div>
       <div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
-        <TagsIcon class="h-6 w-6 text-secondary" />
+        <TagsIcon class="h-5 w-5 text-secondary" />
         <div class="flex flex-wrap gap-2">
           <TagItem
             v-for="(category, index) in project.categories"

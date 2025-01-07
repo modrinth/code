@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref } from 'vue'
+import { type Ref, ref, computed } from 'vue'
 import Button from './Button.vue'
 import PopoutMenu from './PopoutMenu.vue'
 
@@ -122,7 +122,11 @@ function isDivider(option: BaseOption): option is Divider {
   return 'divider' in option
 }
 
-defineExpose({ open, close })
+const isOpen = computed(() => {
+  return dropdown.value?.isOpen
+})
+
+defineExpose({ open, close, isOpen })
 </script>
 
 <style lang="scss" scoped>

@@ -18,7 +18,12 @@ export type DonationPlatform =
   | { short: 'ko-fi'; name: 'Ko-fi' }
   | { short: 'other'; name: 'Other' }
 
-export type ProjectType = 'mod' | 'modpack' | 'resourcepack' | 'shader'
+export const REAL_PROJECT_TYPES = ['mod', 'modpack', 'resourcepack', 'shader'] as const
+
+export const VIRTUAL_PROJECT_TYPES = [...REAL_PROJECT_TYPES, 'plugin', 'datapack'] as const
+
+export type ProjectType = (typeof REAL_PROJECT_TYPES)[number]
+export type VirtualProjectType = (typeof VIRTUAL_PROJECT_TYPES)[number]
 export type MonetizationStatus = 'monetized' | 'demonetized' | 'force-demonetized'
 
 export type GameVersion = string
@@ -49,8 +54,8 @@ export interface Project {
   title: string
   description: string
   status: ProjectStatus
-  requested_status: RequestableStatus
-  monetization_status: MonetizationStatus
+  requested_status?: RequestableStatus
+  monetization_status?: MonetizationStatus
 
   body: string
   icon_url?: string
@@ -66,7 +71,7 @@ export interface Project {
   server_side: Environment
 
   team: ModrinthId
-  thread_id: ModrinthId
+  thread_id?: ModrinthId
 
   issues_url?: string
   source_url?: string
@@ -77,7 +82,7 @@ export interface Project {
   published: string
   updated: string
   approved: string
-  queued: string
+  queued?: string
 
   game_versions: GameVersion[]
   loaders: Platform[]
@@ -92,8 +97,56 @@ export interface Project {
   }
 }
 
-export interface SearchResult {
+export interface ProjectV3 {
   id: ModrinthId
+  slug: string
+  project_types: VirtualProjectType[]
+  games: ['minecraft-java']
+  team_id: ModrinthId
+  organization: ModrinthId
+  name: string
+  summary: string
+  description: string
+  published: string
+  updated: string
+  approved: string
+  queued?: string
+  status: ProjectStatus
+  requested_status?: RequestableStatus
+  moderator_message?: string
+  license: {
+    id: string
+    name: string
+    url?: string
+  }
+  downloads: number
+  followers: number
+  categories: Category[]
+  additional_categories: Category[]
+  loaders: Platform[]
+  versions: ModrinthId[]
+  icon_url?: string
+  link_urls: Record<
+    string,
+    {
+      platform: 'wiki' | 'source' | 'discord' | 'issues'
+      donation: boolean
+      url: string
+    }
+  >
+  Gallery: GalleryImage[]
+  color: number
+  thread_id?: ModrinthId
+  monetization_status?: MonetizationStatus
+  game_versions: GameVersion[]
+  singleplayer?: boolean[]
+  client_and_server?: boolean[]
+  client_only?: boolean[]
+  server_only?: boolean[]
+}
+
+export interface SearchResult {
+  project_id: ModrinthId
   project_type: ProjectType
   slug: string
   title: string
@@ -123,6 +176,10 @@ export interface SearchResult {
   featured_gallery?: string[]
 
   license: string
+}
+
+export function isSearchResult(project: Project | SearchResult): project is SearchResult {
+  return 'project_id' in project
 }
 
 export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
@@ -188,16 +245,6 @@ export interface PayoutData {
 
 export type UserRole = 'admin' | 'moderator' | 'pyro' | 'developer'
 
-export enum UserBadge {
-  MIDAS = 1 << 0,
-  EARLY_MODPACK_ADOPTER = 1 << 1,
-  EARLY_RESPACK_ADOPTER = 1 << 2,
-  EARLY_PLUGIN_ADOPTER = 1 << 3,
-  ALPHA_TESTER = 1 << 4,
-  CONTRIBUTOR = 1 << 5,
-  TRANSLATOR = 1 << 6,
-}
-
 export type UserBadges = number
 
 export interface User {
@@ -251,4 +298,40 @@ export type Report = {
   closed: boolean
   created: string
   body: string
+}
+
+export type UserBadge =
+  | 'staff'
+  | 'mod'
+  | 'plus'
+  | '10m-club'
+  | 'early-adopter'
+  | 'alpha-tester'
+  | 'beta-tester'
+  | 'contributor'
+  | 'translator'
+
+export type Organization = {
+  id: ModrinthId
+  slug: string
+  name: string
+  team_id: ModrinthId
+  description: string
+  icon_url: string
+  color: number
+  members: OrganizationMember[]
+}
+
+export type OrganizationPermissions = number
+
+export type OrganizationMember = {
+  team_id: ModrinthId
+  user: User
+  role: string
+  is_owner: boolean
+  permissions: TeamMemberPermissions
+  organization_permissions: OrganizationPermissions
+  accepted: boolean
+  payouts_split: number
+  ordering: number
 }

@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import * as Pages from '@/pages'
 import * as Project from '@/pages/project'
+import * as User from '@/pages/user'
+import * as Organization from '@/pages/organization'
 import * as Instance from '@/pages/instance'
 import * as Library from '@/pages/library'
 
@@ -99,6 +101,26 @@ export default new createRouter({
           },
         },
       ],
+    },
+    {
+      path: '/user/:id',
+      name: 'User',
+      component: User.Index,
+      props: true,
+      meta: {
+        useContext: true,
+        breadcrumb: [{ name: '?User', link: '/user/{id}' }],
+      },
+    },
+    {
+      path: '/organization/:id',
+      name: 'Organization',
+      component: Organization.Index,
+      props: true,
+      meta: {
+        useContext: true,
+        breadcrumb: [{ name: '?Organization', link: '/organization/{id}' }],
+      },
     },
     {
       path: '/instance/:id',

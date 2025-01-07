@@ -14,7 +14,7 @@
         <p class="m-0 line-clamp-2 max-w-[40rem] empty:hidden">
           <slot name="summary" />
         </p>
-        <div class="mt-auto flex flex-wrap gap-4 empty:hidden">
+        <div class="mt-auto flex flex-wrap gap-x-4 gap-y-2 empty:hidden">
           <slot name="stats" />
         </div>
       </div>

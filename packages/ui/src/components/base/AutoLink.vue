@@ -1,22 +1,34 @@
 <template>
-  <router-link v-if="to.path || to.query || to.startsWith('/')" :to="to" v-bind="$attrs">
-    <slot />
-  </router-link>
-  <a v-else-if="to.startsWith('http')" :href="to" v-bind="$attrs">
-    <slot />
-  </a>
-  <span v-else v-bind="$attrs">
+  <span v-if="to === undefined" v-bind="$attrs">
     <slot />
   </span>
+  <router-link v-else-if="link.type === 'router'" :to="link.destination" v-bind="$attrs" class="has-link has-router-link" @click="link.callback">
+    <slot />
+  </router-link>
+  <a v-else-if="link.type === 'external'" :href="link.destination" v-bind="$attrs" class="has-link has-external-link" @click="link.callback">
+    <slot />
+  </a>
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  to: any
+import { computed, type Ref } from 'vue'
+import {
+  asLink,
+  type Link,
+  type Linkish
+} from '../../utils/link'
+
+const props = defineProps<{
+  to?: Linkish
 }>()
 
 defineOptions({
   inheritAttrs: false,
+})
+
+const link: Ref<Link> = computed(() => {
+  const linkTest = asLink(props.to as Link)
+  console.log(linkTest)
+  return linkTest
 })
 </script>

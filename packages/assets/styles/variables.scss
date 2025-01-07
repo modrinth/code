@@ -84,6 +84,9 @@
   --color-platform-velocity: #4b98b0;
   --color-platform-waterfall: #5f83cb;
   --color-platform-sponge: #c49528;
+
+  --hover-filter-weak: brightness(0.96);
+  --hover-filter-strong: brightness(0.85);
 }
 
 html {
@@ -196,6 +199,9 @@ html {
   --color-platform-velocity: #83d5ef;
   --color-platform-waterfall: #78a4fb;
   --color-platform-sponge: #f9e580;
+
+  --hover-filter-weak: brightness(1.15);
+  --hover-filter-strong: brightness(1.25);
 }
 
 .oled-mode {
@@ -212,10 +218,13 @@ html {
     rgba(55, 137, 73, 0.1) 100%
   );
   --brand-gradient-strong-bg: linear-gradient(
-    270deg,
-    rgba(9, 18, 14, 0.6) 10%,
-    rgba(19, 31, 23, 0.5) 100%
+      270deg,
+      rgba(9, 18, 14, 0.6) 10%,
+      rgba(19, 31, 23, 0.5) 100%
   );
+
+  --hover-filter-weak: brightness(1.25);
+  --hover-filter-strong: brightness(1.4);
 }
 
 .retro-mode {

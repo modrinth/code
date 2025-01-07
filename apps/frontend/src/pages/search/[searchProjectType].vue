@@ -281,14 +281,16 @@
                   </button>
                 </template>
               </ProjectCard>
-              <NuxtLink
+              <NewProjectCard
                 v-if="flags.newProjectCards"
-                :to="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`"
+                :project="result"
+                :categories="result.display_categories"
+                :link="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`"
+                :creator-link="`/user/${result.author}`"
+                :platform-tags="tags.loaders"
               >
-                <NewProjectCard :project="result" :categories="result.display_categories">
-                  <template v-if="false" #actions> </template>
-                </NewProjectCard>
-              </NuxtLink>
+                <template v-if="false" #actions> </template>
+              </NewProjectCard>
             </template>
           </div>
         </div>

@@ -20,6 +20,7 @@ export { default as FileInput } from './base/FileInput.vue'
 export { default as LoadingIndicator } from './base/LoadingIndicator.vue'
 export { default as ManySelect } from './base/ManySelect.vue'
 export { default as MarkdownEditor } from './base/MarkdownEditor.vue'
+export { default as NavTabs } from './base/NavTabs.vue'
 export { default as Notifications } from './base/Notifications.vue'
 export { default as OverflowMenu } from './base/OverflowMenu.vue'
 export { default as Page } from './base/Page.vue'
@@ -32,6 +33,7 @@ export { default as RadioButtons } from './base/RadioButtons.vue'
 export { default as ScrollablePanel } from './base/ScrollablePanel.vue'
 export { default as SimpleBadge } from './base/SimpleBadge.vue'
 export { default as Slider } from './base/Slider.vue'
+export { default as SmartClickable } from './base/SmartClickable.vue'
 export { default as StatItem } from './base/StatItem.vue'
 export { default as TagItem } from './base/TagItem.vue'
 export { default as TeleportDropdownMenu } from './base/TeleportDropdownMenu.vue'
@@ -75,6 +77,7 @@ export { default as ProjectSidebarCompatibility } from './project/ProjectSidebar
 export { default as ProjectSidebarCreators } from './project/ProjectSidebarCreators.vue'
 export { default as ProjectSidebarDetails } from './project/ProjectSidebarDetails.vue'
 export { default as ProjectSidebarLinks } from './project/ProjectSidebarLinks.vue'
+export { default as ProjectsList } from './project/ProjectsList.vue'
 export { default as ProjectStatusBadge } from './project/ProjectStatusBadge.vue'
 
 // Search
@@ -96,3 +99,13 @@ export { default as VersionSummary } from './version/VersionSummary.vue'
 
 // Settings
 export { default as ThemeSelector } from './settings/ThemeSelector.vue'
+
+// User
+export { default as UserBadge } from './user/UserBadge.vue'
+export { default as UserHeader } from './user/UserHeader.vue'
+export { default as UserSidebarBadges } from './user/UserSidebarBadges.vue'
+export { default as UserSidebarOrganizations } from './user/UserSidebarOrganizations.vue'
+
+// Organization
+export { default as OrganizationHeader } from './organization/OrganizationHeader.vue'
+export { default as OrganizationSidebarMembers } from './organization/OrganizationSidebarMembers.vue'

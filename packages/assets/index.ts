@@ -1,5 +1,16 @@
 // NOTE: re-export using consts to help TypeScript resolve the proper type
 
+// Badges
+import _StaffBadge from './badges/staff.svg?component'
+import _ModBadge from './badges/mod.svg?component'
+import _PlusBadge from './badges/plus.svg?component'
+import _TenMClubBadge from './badges/10m-club.svg?component'
+import _EarlyAdopterBadge from './badges/early-adopter.svg?component'
+import _AlphaTesterBadge from './badges/alpha-tester.svg?component'
+import _BetaTesterBadge from './badges/beta-tester.svg?component'
+import _ContributorBadge from './badges/contributor.svg?component'
+import _TranslatorBadge from './badges/translator.svg?component'
+
 // Branding
 import _ModrinthIcon from './branding/logo.svg?component'
 import _FourOhFourNotFound from './branding/404.svg?component'
@@ -34,6 +45,7 @@ import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
+import _BadgeCheckIcon from './icons/badge-check.svg?component'
 import _BanIcon from './icons/ban.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
@@ -188,6 +200,84 @@ import _LoaderIcon from './icons/loader.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
 
+import _AdventureIcon from './icons/category/adventure.svg?component'
+import _AtmosphereIcon from './icons/category/atmosphere.svg?component'
+import _AudioIcon from './icons/category/audio.svg?component'
+import _BlocksIcon from './icons/category/blocks.svg?component'
+import _BloomIcon from './icons/category/bloom.svg?component'
+import _CartoonIcon from './icons/category/cartoon.svg?component'
+import _ChallengingIcon from './icons/category/challenging.svg?component'
+import _ColoredLightingIcon from './icons/category/colored-lighting.svg?component'
+import _CombatIcon from './icons/category/combat.svg?component'
+import _CoreShadersIcon from './icons/category/core-shaders.svg?component'
+import _CursedIcon from './icons/category/cursed.svg?component'
+import _DecorationIcon from './icons/category/decoration.svg?component'
+import _EconomyIcon from './icons/category/economy.svg?component'
+import _EntitiesIcon from './icons/category/entities.svg?component'
+import _EnvironmentIcon from './icons/category/environment.svg?component'
+import _EquipmentIcon from './icons/category/equipment.svg?component'
+import _FantasyIcon from './icons/category/fantasy.svg?component'
+import _FoliageIcon from './icons/category/foliage.svg?component'
+import _FontsIcon from './icons/category/fonts.svg?component'
+import _FoodIcon from './icons/category/food.svg?component'
+import _GameMechanicsIcon from './icons/category/game-mechanics.svg?component'
+import _GuiIcon from './icons/category/gui.svg?component'
+import _HighIcon from './icons/category/high.svg?component'
+import _ItemsIcon from './icons/category/items.svg?component'
+import _KitchenSinkIcon from './icons/category/kitchen-sink.svg?component'
+import _LightweightIcon from './icons/category/lightweight.svg?component'
+import _LocaleIcon from './icons/category/locale.svg?component'
+import _LowIcon from './icons/category/low.svg?component'
+import _MagicIcon from './icons/category/magic.svg?component'
+import _ManagementIcon from './icons/category/management.svg?component'
+import _MediumIcon from './icons/category/medium.svg?component'
+import _MinigameIcon from './icons/category/minigame.svg?component'
+import _MobsIcon from './icons/category/mobs.svg?component'
+import _ModdedIcon from './icons/category/modded.svg?component'
+import _ModelsIcon from './icons/category/models.svg?component'
+import _MultiplayerIcon from './icons/category/multiplayer.svg?component'
+import _OptimizationIcon from './icons/category/optimization.svg?component'
+import _PathTracingIcon from './icons/category/path-tracing.svg?component'
+import _PbrIcon from './icons/category/pbr.svg?component'
+import _PotatoIcon from './icons/category/potato.svg?component'
+import _QuestsIcon from './icons/category/quests.svg?component'
+import _RealisticIcon from './icons/category/realistic.svg?component'
+import _ReflectionsIcon from './icons/category/reflections.svg?component'
+import _ScreenshotIcon from './icons/category/screenshot.svg?component'
+import _SemiRealisticIcon from './icons/category/semi-realistic.svg?component'
+import _ShadowsIcon from './icons/category/shadows.svg?component'
+import _SimplisticIcon from './icons/category/simplistic.svg?component'
+import _SocialIcon from './icons/category/social.svg?component'
+import _StorageIcon from './icons/category/storage.svg?component'
+import _TechnologyIcon from './icons/category/technology.svg?component'
+import _ThemedIcon from './icons/category/themed.svg?component'
+import _TransportationIcon from './icons/category/transportation.svg?component'
+import _TweaksIcon from './icons/category/tweaks.svg?component'
+import _UtilityIcon from './icons/category/utility.svg?component'
+import _VanillaLikeIcon from './icons/category/vanilla-like.svg?component'
+import _WorldgenIcon from './icons/category/worldgen.svg?component'
+
+import _BukkitIcon from './icons/platform/bukkit.svg?component'
+import _BungeeCordIcon from './icons/platform/bungeecord.svg?component'
+import _CanvasIcon from './icons/platform/canvas.svg?component'
+import _FabricIcon from './icons/platform/fabric.svg?component'
+import _FoliaIcon from './icons/platform/folia.svg?component'
+import _ForgeIcon from './icons/platform/forge.svg?component'
+import _IrisIcon from './icons/platform/iris.svg?component'
+import _LiteLoaderIcon from './icons/platform/liteloader.svg?component'
+import _ModLoaderIcon from './icons/platform/modloader.svg?component'
+import _NeoForgeIcon from './icons/platform/neoforge.svg?component'
+import _OptiFineIcon from './icons/platform/optifine.svg?component'
+import _PaperIcon from './icons/platform/paper.svg?component'
+import _PurpurIcon from './icons/platform/purpur.svg?component'
+import _QuiltIcon from './icons/platform/quilt.svg?component'
+import _RiftIcon from './icons/platform/rift.svg?component'
+import _SpigotIcon from './icons/platform/spigot.svg?component'
+import _SpongeIcon from './icons/platform/sponge.svg?component'
+import _VanillaIcon from './icons/platform/vanilla.svg?component'
+import _VelocityIcon from './icons/platform/velocity.svg?component'
+import _WaterfallIcon from './icons/platform/waterfall.svg?component'
+
 // Editor Icons
 import _BoldIcon from './icons/bold.svg?component'
 import _ItalicIcon from './icons/italic.svg?component'
@@ -202,6 +292,15 @@ import _Heading3Icon from './icons/heading-3.svg?component'
 
 import './omorphia.scss'
 
+export const StaffBadge = _StaffBadge
+export const ModBadge = _ModBadge
+export const PlusBadge = _PlusBadge
+export const TenMClubBadge = _TenMClubBadge
+export const EarlyAdopterBadge = _EarlyAdopterBadge
+export const AlphaTesterBadge = _AlphaTesterBadge
+export const BetaTesterBadge = _BetaTesterBadge
+export const ContributorBadge = _ContributorBadge
+export const TranslatorBadge = _TranslatorBadge
 export const ModrinthIcon = _ModrinthIcon
 export const FourOhFourNotFound = _FourOhFourNotFound
 export const ModrinthPlusIcon = _ModrinthPlusIcon
@@ -231,6 +330,7 @@ export const AlignLeftIcon = _AlignLeftIcon
 export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
 export const AsteriskIcon = _AsteriskIcon
+export const BadgeCheckIcon = _BadgeCheckIcon
 export const BanIcon = _BanIcon
 export const BellIcon = _BellIcon
 export const BellRingIcon = _BellRingIcon
@@ -395,3 +495,81 @@ export const LoaderIcon = _LoaderIcon
 export const ImportIcon = _ImportIcon
 export const CardIcon = _CardIcon
 export const TimerIcon = _TimerIcon
+
+export const AdventureIcon = _AdventureIcon
+export const AtmosphereIcon = _AtmosphereIcon
+export const AudioIcon = _AudioIcon
+export const BlocksIcon = _BlocksIcon
+export const BloomIcon = _BloomIcon
+export const CartoonIcon = _CartoonIcon
+export const ChallengingIcon = _ChallengingIcon
+export const ColoredLightingIcon = _ColoredLightingIcon
+export const CombatIcon = _CombatIcon
+export const CoreShadersIcon = _CoreShadersIcon
+export const CursedIcon = _CursedIcon
+export const DecorationIcon = _DecorationIcon
+export const EconomyIcon = _EconomyIcon
+export const EntitiesIcon = _EntitiesIcon
+export const EnvironmentIcon = _EnvironmentIcon
+export const EquipmentIcon = _EquipmentIcon
+export const FantasyIcon = _FantasyIcon
+export const FoliageIcon = _FoliageIcon
+export const FontsIcon = _FontsIcon
+export const FoodIcon = _FoodIcon
+export const GameMechanicsIcon = _GameMechanicsIcon
+export const GuiIcon = _GuiIcon
+export const HighIcon = _HighIcon
+export const ItemsIcon = _ItemsIcon
+export const KitchenSinkIcon = _KitchenSinkIcon
+export const LightweightIcon = _LightweightIcon
+export const LocaleIcon = _LocaleIcon
+export const LowIcon = _LowIcon
+export const MagicIcon = _MagicIcon
+export const ManagementIcon = _ManagementIcon
+export const MediumIcon = _MediumIcon
+export const MinigameIcon = _MinigameIcon
+export const MobsIcon = _MobsIcon
+export const ModdedIcon = _ModdedIcon
+export const ModelsIcon = _ModelsIcon
+export const MultiplayerIcon = _MultiplayerIcon
+export const OptimizationIcon = _OptimizationIcon
+export const PathTracingIcon = _PathTracingIcon
+export const PbrIcon = _PbrIcon
+export const PotatoIcon = _PotatoIcon
+export const QuestsIcon = _QuestsIcon
+export const RealisticIcon = _RealisticIcon
+export const ReflectionsIcon = _ReflectionsIcon
+export const ScreenshotIcon = _ScreenshotIcon
+export const SemiRealisticIcon = _SemiRealisticIcon
+export const ShadowsIcon = _ShadowsIcon
+export const SimplisticIcon = _SimplisticIcon
+export const SocialIcon = _SocialIcon
+export const StorageIcon = _StorageIcon
+export const TechnologyIcon = _TechnologyIcon
+export const ThemedIcon = _ThemedIcon
+export const TransportationIcon = _TransportationIcon
+export const TweaksIcon = _TweaksIcon
+export const UtilityIcon = _UtilityIcon
+export const VanillaLikeIcon = _VanillaLikeIcon
+export const WorldgenIcon = _WorldgenIcon
+
+export const BukkitIcon = _BukkitIcon
+export const BungeeCordIcon = _BungeeCordIcon
+export const CanvasIcon = _CanvasIcon
+export const FabricIcon = _FabricIcon
+export const FoliaIcon = _FoliaIcon
+export const ForgeIcon = _ForgeIcon
+export const IrisIcon = _IrisIcon
+export const LiteLoaderIcon = _LiteLoaderIcon
+export const ModLoaderIcon = _ModLoaderIcon
+export const NeoForgeIcon = _NeoForgeIcon
+export const OptiFineIcon = _OptiFineIcon
+export const PaperIcon = _PaperIcon
+export const PurpurIcon = _PurpurIcon
+export const QuiltIcon = _QuiltIcon
+export const RiftIcon = _RiftIcon
+export const SpigotIcon = _SpigotIcon
+export const SpongeIcon = _SpongeIcon
+export const VanillaIcon = _VanillaIcon
+export const VelocityIcon = _VelocityIcon
+export const WaterfallIcon = _WaterfallIcon

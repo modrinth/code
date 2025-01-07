@@ -1,5 +1,11 @@
 import { defineStore } from 'pinia'
 
+export const DEFAULT_FEATURE_FLAGS = {
+  'project_background': false,
+  'page_path': false,
+  'project_card_background': false,
+}
+
 export const useTheming = defineStore('themeStore', {
   state: () => ({
     themeOptions: ['dark', 'light', 'oled', 'system'],
@@ -8,7 +14,7 @@ export const useTheming = defineStore('themeStore', {
     toggleSidebar: false,
 
     devMode: false,
-    featureFlags: {},
+    featureFlags: DEFAULT_FEATURE_FLAGS,
   }),
   actions: {
     setThemeState(newTheme) {

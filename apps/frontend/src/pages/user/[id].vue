@@ -55,51 +55,7 @@
     </NewModal>
     <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
       <div class="normal-page__header py-4">
-        <ContentPageHeader>
-          <template #icon>
-            <Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
-          </template>
-          <template #title>
-            {{ user.username }}
-          </template>
-          <template #summary>
-            {{
-              user.bio
-                ? user.bio
-                : projects.length === 0
-                  ? "A Modrinth user."
-                  : "A Modrinth creator."
-            }}
-          </template>
-          <template #stats>
-            <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-            >
-              <BoxIcon class="h-6 w-6 text-secondary" />
-              {{ formatCompactNumber(projects?.length || 0) }}
-              projects
-            </div>
-            <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-            >
-              <DownloadIcon class="h-6 w-6 text-secondary" />
-              {{ formatCompactNumber(sumDownloads) }}
-              downloads
-            </div>
-            <div
-              v-tooltip="
-                formatMessage(commonMessages.dateAtTimeTooltip, {
-                  date: new Date(user.created),
-                  time: new Date(user.created),
-                })
-              "
-              class="flex items-center gap-2 font-semibold"
-            >
-              <CalendarIcon class="h-6 w-6 text-secondary" />
-              Joined
-              {{ formatRelativeTime(user.created) }}
-            </div>
-          </template>
+        <UserHeader :user="user" :project-count="projects.length" :download-count="sumDownloads">
           <template #actions>
             <ButtonStyled size="large">
               <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
@@ -162,13 +118,36 @@
               </OverflowMenu>
             </ButtonStyled>
           </template>
-        </ContentPageHeader>
+        </UserHeader>
       </div>
       <div class="normal-page__content">
         <div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
           <NavTabs :links="navLinks" />
         </div>
         <div v-if="projects.length > 0">
+          <ProjectsList :projects="projects" :project-link="(project) => `/project/${project.id}`">
+            <template #project-actions>
+              <ButtonStyled color="brand">
+                <button><DownloadIcon /> Install</button>
+              </ButtonStyled>
+              <ButtonStyled circular>
+                <button v-tooltip="'Follow'">
+                  <HeartIcon />
+                </button>
+              </ButtonStyled>
+              <ButtonStyled circular>
+                <button v-tooltip="'Save'">
+                  <BookmarkIcon />
+                </button>
+              </ButtonStyled>
+              <ButtonStyled circular type="transparent">
+                <button>
+                  <MoreVerticalIcon />
+                </button>
+              </ButtonStyled>
+            </template>
+          </ProjectsList>
+
           <div
             v-if="route.params.projectType !== 'collections'"
             :class="'project-list display-mode--' + cosmetics.searchDisplayMode.user"
@@ -292,36 +271,16 @@
         </div>
       </div>
       <div class="normal-page__sidebar">
-        <div v-if="organizations.length > 0" class="card flex-card">
-          <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
-          <div class="flex flex-wrap gap-2">
-            <nuxt-link
-              v-for="org in organizations"
-              :key="org.id"
-              v-tooltip="org.name"
-              class="organization"
-              :to="`/organization/${org.slug}`"
-            >
-              <Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="3rem" />
-            </nuxt-link>
-          </div>
-        </div>
-        <div v-if="badges.length > 0" class="card flex-card">
-          <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileBadges) }}</h2>
-          <div class="flex flex-wrap gap-2">
-            <div v-for="badge in badges" :key="badge">
-              <StaffBadge v-if="badge === 'staff'" class="h-14 w-14" />
-              <ModBadge v-else-if="badge === 'mod'" class="h-14 w-14" />
-              <nuxt-link v-else-if="badge === 'plus'" to="/plus">
-                <PlusBadge class="h-14 w-14" />
-              </nuxt-link>
-              <TenMClubBadge v-else-if="badge === '10m-club'" class="h-14 w-14" />
-              <EarlyAdopterBadge v-else-if="badge === 'early-adopter'" class="h-14 w-14" />
-              <AlphaTesterBadge v-else-if="badge === 'alpha-tester'" class="h-14 w-14" />
-              <BetaTesterBadge v-else-if="badge === 'beta-tester'" class="h-14 w-14" />
-            </div>
-          </div>
-        </div>
+        <UserSidebarOrganizations
+          :organizations="organizations"
+          :link="(org) => '/organization/' + org.slug"
+          class="card flex-card experimental-styles-within"
+        />
+        <UserSidebarBadges
+          :user="user"
+          :download-count="sumDownloads"
+          class="card flex-card experimental-styles-within"
+        />
         <AdPlaceholder
           v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
         />
@@ -336,10 +295,11 @@ import {
   LinkIcon,
   LockIcon,
   XIcon,
-  CalendarIcon,
-  DownloadIcon,
   ClipboardCopyIcon,
   MoreVerticalIcon,
+  DownloadIcon,
+  BookmarkIcon,
+  HeartIcon,
   CurrencyIcon,
   InfoIcon,
   CheckIcon,
@@ -347,22 +307,17 @@ import {
 import {
   OverflowMenu,
   ButtonStyled,
-  ContentPageHeader,
-  commonMessages,
   NewModal,
+  UserHeader,
+  commonMessages,
+  UserSidebarBadges,
+  UserSidebarOrganizations,
+  ProjectsList,
 } from "@modrinth/ui";
 import { isStaff } from "~/helpers/users.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import { reportUser } from "~/utils/report-helpers.ts";
-
-import StaffBadge from "~/assets/images/badges/staff.svg?component";
-import ModBadge from "~/assets/images/badges/mod.svg?component";
-import PlusBadge from "~/assets/images/badges/plus.svg?component";
-import TenMClubBadge from "~/assets/images/badges/10m-club.svg?component";
-import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?component";
-import AlphaTesterBadge from "~/assets/images/badges/alpha-tester.svg?component";
-import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
 
 import ReportIcon from "~/assets/images/utils/report.svg?component";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
@@ -382,10 +337,6 @@ const flags = useFeatureFlags();
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
-
-const formatCompactNumber = useCompactNumber();
-
-const formatRelativeTime = useRelativeTime();
 
 const messages = defineMessages({
   profileProjectsStats: {

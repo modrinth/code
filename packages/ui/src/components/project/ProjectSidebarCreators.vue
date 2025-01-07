@@ -5,7 +5,7 @@
       <template v-if="organization">
         <AutoLink
           class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
-          :to="orgLink(organization.slug)"
+          :to="orgLink(organization)"
           :target="linkTarget ?? null"
         >
           <Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
@@ -24,7 +24,7 @@
         v-for="member in sortedMembers"
         :key="`member-${member.id}`"
         class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
-        :to="userLink(member.user.username)"
+        :to="userLink(member.user)"
         :target="linkTarget ?? null"
       >
         <Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
@@ -50,6 +50,8 @@ import { useVIntl, defineMessages } from '@vintl/vintl'
 import Avatar from '../base/Avatar.vue'
 import AutoLink from '../base/AutoLink.vue'
 import { computed } from 'vue'
+import type { User } from '@modrinth/utils'
+import type { Linkish } from '../../utils/link'
 
 const { formatMessage } = useVIntl()
 
@@ -58,25 +60,23 @@ type TeamMember = {
   role: string
   is_owner: boolean
   accepted: boolean
-  user: {
-    id: string
-    username: string
-    avatar_url: string
-  }
+  user: User
+}
+
+type Organization = {
+  id: string
+  slug: string
+  name: string
+  icon_url: string
+  avatar_url: string
+  members: TeamMember[]
 }
 
 const props = defineProps<{
-  organization?: {
-    id: string
-    slug: string
-    name: string
-    icon_url: string
-    avatar_url: string
-    members: TeamMember[]
-  } | null
+  organization?: Organization | null
   members: TeamMember[]
-  orgLink: (slug: string) => string
-  userLink: (username: string) => string
+  orgLink: (org: Organization) => Linkish
+  userLink: (user: User) => Linkish
   linkTarget?: string
 }>()
 

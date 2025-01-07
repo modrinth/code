@@ -116,10 +116,6 @@ function devModeCount() {
     themeStore.devMode = !themeStore.devMode
     settings.value.developer_mode = !!themeStore.devMode
     devModeCounter.value = 0
-
-    if (!themeStore.devMode && tabs[modal.value.selectedTab].developerOnly) {
-      modal.value.setTab(0)
-    }
   }
 }
 </script>

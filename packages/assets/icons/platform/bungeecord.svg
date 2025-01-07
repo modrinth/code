@@ -1,0 +1,7 @@
+<svg viewBox="0 0 24 24" version="1.1" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
+    <rect id="Bungeecord" x="-0" y="0" width="24" height="24" style="fill:none;"/>
+    <path d="M3.778,19.778C3.778,21.004 4.774,22 6,22C7.226,22 8.222,21.004 8.222,19.778L8.222,16.444C8.222,15.218 7.226,14.222 6,14.222L6,7.556C6,5.727 7.171,4.222 9,4.222C10.829,4.222 12,5.727 12,7.556L12,16.444" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    <path d="M7,15L6,13L5,15L7,15" style="fill:none;stroke:currentColor;stroke-width:2px;stroke-miterlimit:1.5;"/>
+    <path d="M20.222,4.444C20.222,3.218 19.226,2.222 18,2.222C16.774,2.222 15.778,3.218 15.778,4.444L15.778,7.778C15.778,9.004 16.774,10 18,10L18,16.667C18,18.495 16.829,20 15,20C13.171,20 12,18.495 12,16.667L12,7.778" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+    <path d="M17,9.222L18,11.222L19,9.222L17,9.222" style="fill:none;stroke:currentColor;stroke-width:2px;stroke-miterlimit:1.5;"/>
+</svg>

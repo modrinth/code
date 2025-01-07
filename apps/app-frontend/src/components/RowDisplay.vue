@@ -181,24 +181,26 @@ const maxInstancesPerRow = ref(1)
 const maxProjectsPerRow = ref(1)
 
 const calculateCardsPerRow = () => {
-  // Calculate how many cards fit in one row
-  const containerWidth = rows.value[0].clientWidth
-  // Convert container width from pixels to rem
-  const containerWidthInRem =
-    containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize)
+  if (rows.value && rows.value[0]) {
+    // Calculate how many cards fit in one row
+    const containerWidth = rows.value[0].clientWidth
+    // Convert container width from pixels to rem
+    const containerWidthInRem =
+      containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize)
 
-  maxInstancesPerCompactRow.value = Math.floor((containerWidthInRem + 0.75) / 18.75)
-  maxInstancesPerRow.value = Math.floor((containerWidthInRem + 0.75) / 20.75)
-  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 0.75) / 18.75)
+    maxInstancesPerCompactRow.value = Math.floor((containerWidthInRem + 0.75) / 18.75)
+    maxInstancesPerRow.value = Math.floor((containerWidthInRem + 0.75) / 20.75)
+    maxProjectsPerRow.value = Math.floor((containerWidthInRem + 0.75) / 18.75)
 
-  if (maxInstancesPerRow.value < 5) {
-    maxInstancesPerRow.value *= 2
-  }
-  if (maxInstancesPerCompactRow.value < 5) {
-    maxInstancesPerCompactRow.value *= 2
-  }
-  if (maxProjectsPerRow.value < 3) {
-    maxProjectsPerRow.value *= 2
+    if (maxInstancesPerRow.value < 5) {
+      maxInstancesPerRow.value *= 2
+    }
+    if (maxInstancesPerCompactRow.value < 5) {
+      maxInstancesPerCompactRow.value *= 2
+    }
+    if (maxProjectsPerRow.value < 3) {
+      maxProjectsPerRow.value *= 2
+    }
   }
 }
 
@@ -207,13 +209,17 @@ const resizeObserver = ref(null)
 onMounted(() => {
   calculateCardsPerRow()
   resizeObserver.value = new ResizeObserver(calculateCardsPerRow)
-  resizeObserver.value.observe(rowContainer.value)
+  if (rowContainer.value) {
+    resizeObserver.value.observe(rowContainer.value)
+  }
   window.addEventListener('resize', calculateCardsPerRow)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', calculateCardsPerRow)
-  resizeObserver.value.unobserve(rowContainer.value)
+  if (rowContainer.value) {
+    resizeObserver.value.unobserve(rowContainer.value)
+  }
 })
 </script>
 

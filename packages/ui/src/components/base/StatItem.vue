@@ -22,6 +22,6 @@ defineProps({
 </script>
 <style scoped>
 :slotted(*) {
-  @apply h-6 w-6 text-secondary;
+  @apply h-5 w-5 text-secondary;
 }
 </style>

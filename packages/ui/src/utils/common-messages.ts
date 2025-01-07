@@ -85,6 +85,30 @@ export const commonMessages = defineMessages({
     id: 'label.notifications',
     defaultMessage: 'Notifications',
   },
+  publishedDate: {
+    id: 'project.about.details.published',
+    defaultMessage: 'Published {date}',
+  },
+  updatedDate: {
+    id: 'project.about.details.updated',
+    defaultMessage: 'Updated {date}',
+  },
+  downloadsStat: {
+    id: 'stat.downloads',
+    defaultMessage: '{count} {count, plural, one {download} other {downloads}}',
+  },
+  followersStat: {
+    id: 'stat.followers',
+    defaultMessage: '{count} {count, plural, one {follower} other {followers}}',
+  },
+  projectsStat: {
+    id: 'stat.projects',
+    defaultMessage: '{count} {count, plural, one {project} other {projects}}',
+  },
+  membersStat: {
+    id: 'stat.members',
+    defaultMessage: '{count} {count, plural, one {member} other {members}}',
+  },
   privateLabel: {
     id: 'collection.label.private',
     defaultMessage: 'Private',
@@ -100,6 +124,30 @@ export const commonMessages = defineMessages({
   reportButton: {
     id: 'button.report',
     defaultMessage: 'Report',
+  },
+  installButton: {
+    id: 'button.install',
+    defaultMessage: 'Install',
+  },
+  installToButton: {
+    id: 'button.install-to',
+    defaultMessage: 'Install to...',
+  },
+  installedButton: {
+    id: 'button.installed',
+    defaultMessage: 'Installed',
+  },
+  installingButton: {
+    id: 'button.installing',
+    defaultMessage: 'Installing...',
+  },
+  openInBrowserButton: {
+    id: 'button.open-in-browser',
+    defaultMessage: 'Open in browser',
+  },
+  copyLinkButton: {
+    id: 'button.copy-link',
+    defaultMessage: 'Copy link',
   },
   passwordLabel: {
     id: 'label.password',

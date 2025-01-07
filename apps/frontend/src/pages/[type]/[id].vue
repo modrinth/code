@@ -703,8 +703,8 @@
         <ProjectSidebarCreators
           :organization="organization"
           :members="members"
-          :org-link="(slug) => `/organization/${slug}`"
-          :user-link="(username) => `/user/${username}`"
+          :org-link="(org) => `/organization/${org.slug}`"
+          :user-link="(user) => `/user/${user.username}`"
           class="card flex-card experimental-styles-within"
         />
         <!-- TODO: Finish license modal and enable -->
