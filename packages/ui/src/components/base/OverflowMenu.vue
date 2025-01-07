@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref } from 'vue'
+import { type Ref, ref, computed } from 'vue'
 import Button from './Button.vue'
 import PopoutMenu from './PopoutMenu.vue'
 
@@ -99,8 +99,8 @@ withDefaults(
   {
     options: () => [],
     disabled: false,
-    dropdownId: null,
-    tooltip: null,
+    dropdownId: undefined,
+    tooltip: undefined,
   },
 )
 
@@ -118,7 +118,11 @@ const open = () => {
   dropdown.value?.show()
 }
 
-defineExpose({ open, close })
+const isOpen = computed(() => {
+  return dropdown.value?.isOpen
+})
+
+defineExpose({ open, close, isOpen })
 </script>
 
 <style lang="scss" scoped>

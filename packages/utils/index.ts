@@ -1,8 +1,10 @@
 export * from './highlight'
 export * from './parse'
+export * from './permissions'
 export * from './projects'
 export * from './users'
 export * from './utils'
 export * from './billing'
+export * from './color'
 
 export * from './types'
