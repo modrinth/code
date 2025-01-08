@@ -1247,6 +1247,19 @@ if (!route.name.startsWith("type-id-settings")) {
 
 const onUserCollectProject = useClientTry(userCollectProject);
 
+watch(downloadModal, (modal) => {
+  if (!modal) return;
+
+  const {version, loader} = route.query;
+  if (!version && !loader) return;
+  if (version && !project.value.game_versions.includes(version)) return;
+  if (loader && !project.value.loaders.includes(loader)) return;
+
+  if (version) userSelectedGameVersion.value = version;
+  if (loader) userSelectedPlatform.value = loader;
+  modal.show();
+})
+
 async function setProcessing() {
   startLoading();
 
