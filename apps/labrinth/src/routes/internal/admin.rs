@@ -20,6 +20,7 @@ use sqlx::PgPool;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
+use log::info;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -197,6 +198,11 @@ pub async fn delphi_result_ingest(
     redis: web::Data<RedisPool>,
     body: web::Json<DelphiIngest>,
 ) -> Result<HttpResponse, ApiError> {
+    if body.issues.is_empty() {
+        info!("No issues found for file {}", body.url);
+        return Ok(HttpResponse::NoContent().finish());
+    }
+
     let webhook_url = dotenvy::var("DELPHI_SLACK_WEBHOOK")?;
 
     let project = crate::database::models::Project::get_id(
