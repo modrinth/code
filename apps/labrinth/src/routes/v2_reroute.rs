@@ -190,28 +190,6 @@ pub fn convert_side_types_v3(
     fields
 }
 
-// Converts plugin loaders from v2 to v3, for search facets
-// Within every 1st and 2nd level (the ones allowed in v2), we convert every instance of:
-// "project_type:mod" to "project_type:plugin" OR "project_type:mod"
-pub fn convert_plugin_loader_facets_v3(
-    facets: Vec<Vec<String>>,
-) -> Vec<Vec<String>> {
-    facets
-        .into_iter()
-        .map(|inner_facets| {
-            if inner_facets == ["project_type:mod"] {
-                vec![
-                    "project_type:plugin".to_string(),
-                    "project_type:datapack".to_string(),
-                    "project_type:mod".to_string(),
-                ]
-            } else {
-                inner_facets
-            }
-        })
-        .collect::<Vec<_>>()
-}
-
 // Convert search facets from V3 back to v2
 // this is not lossless. (See tests)
 pub fn convert_side_types_v2(

@@ -71,7 +71,6 @@ async function install() {
   align-items: center;
   justify-content: center;
   gap: var(--gap-md);
-  padding: var(--gap-lg);
 }
 
 .button-row {

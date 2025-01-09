@@ -2,12 +2,16 @@
   <div v-if="count > 1" class="flex items-center gap-1">
     <ButtonStyled v-if="page > 1" circular type="transparent">
       <a
+        v-if="linkFunction"
         aria-label="Previous Page"
         :href="linkFunction(page - 1)"
         @click.prevent="switchPage(page - 1)"
       >
         <ChevronLeftIcon />
       </a>
+      <button v-else aria-label="Previous Page" @click="switchPage(page - 1)">
+        <ChevronLeftIcon />
+      </button>
     </ButtonStyled>
     <div
       v-for="(item, index) in pages"
@@ -27,27 +31,35 @@
         :color="page === item ? 'brand' : 'standard'"
         :type="page === item ? 'standard' : 'transparent'"
       >
-        <a :href="linkFunction(item)" @click.prevent="page !== item ? switchPage(item) : null">
+        <a
+          v-if="linkFunction"
+          :href="linkFunction(item)"
+          @click.prevent="page !== item ? switchPage(item) : null"
+        >
           {{ item }}
         </a>
+        <button v-else @click="page !== item ? switchPage(item) : null">{{ item }}</button>
       </ButtonStyled>
     </div>
 
     <ButtonStyled v-if="page !== pages[pages.length - 1]" circular type="transparent">
       <a
+        v-if="linkFunction"
         aria-label="Next Page"
         :href="linkFunction(page + 1)"
         @click.prevent="switchPage(page + 1)"
       >
         <ChevronRightIcon />
       </a>
+      <button v-else aria-label="Next Page" @click="switchPage(page + 1)">
+        <ChevronRightIcon />
+      </button>
     </ButtonStyled>
   </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
 import { GapIcon, ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
-import Button from './Button.vue'
 import ButtonStyled from './ButtonStyled.vue'
 
 const emit = defineEmits<{
@@ -68,7 +80,7 @@ const props = withDefaults(
 )
 
 const pages = computed(() => {
-  let pages: ('-' | number)[] = []
+  const pages: ('-' | number)[] = []
 
   const first = 1
   const last = props.count

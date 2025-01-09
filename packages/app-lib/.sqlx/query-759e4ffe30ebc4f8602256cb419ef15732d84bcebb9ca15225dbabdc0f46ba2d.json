@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE settings\n            SET\n                max_concurrent_writes = $1,\n                max_concurrent_downloads = $2,\n\n                theme = $3,\n                default_page = $4,\n                collapsed_navigation = $5,\n                advanced_rendering = $6,\n                native_decorations = $7,\n\n                discord_rpc = $8,\n                developer_mode = $9,\n                telemetry = $10,\n                personalized_ads = $11,\n\n                onboarded = $12,\n\n                extra_launch_args = jsonb($13),\n                custom_env_vars = jsonb($14),\n                mc_memory_max = $15,\n                mc_force_fullscreen = $16,\n                mc_game_resolution_x = $17,\n                mc_game_resolution_y = $18,\n                hide_on_process_start = $19,\n\n                hook_pre_launch = $20,\n                hook_wrapper = $21,\n                hook_post_exit = $22,\n\n                custom_dir = $23,\n                prev_custom_dir = $24,\n                migrated = $25,\n\n                toggle_sidebar = $26,\n                feature_flags = $27\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 27
+    },
+    "nullable": []
+  },
+  "hash": "759e4ffe30ebc4f8602256cb419ef15732d84bcebb9ca15225dbabdc0f46ba2d"
+}

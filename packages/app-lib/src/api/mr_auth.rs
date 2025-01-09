@@ -1,7 +1,7 @@
 use crate::state::ModrinthCredentials;
 
 #[tracing::instrument]
-pub fn authenticate_begin_flow() -> &'static str {
+pub fn authenticate_begin_flow() -> String {
     crate::state::get_login_url()
 }
 
@@ -19,6 +19,10 @@ pub async fn authenticate_finish_flow(
     .await?;
 
     creds.upsert(&state.pool).await?;
+    state
+        .friends_socket
+        .connect(&state.pool, &state.api_semaphore, &state.process_manager)
+        .await?;
 
     Ok(creds)
 }
@@ -30,6 +34,7 @@ pub async fn logout() -> crate::Result<()> {
 
     if let Some(current) = current {
         ModrinthCredentials::remove(&current.user_id, &state.pool).await?;
+        state.friends_socket.disconnect().await?;
     }
 
     Ok(())

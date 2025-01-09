@@ -1,20 +1,12 @@
 <template>
   <div class="action-groups">
-    <a href="https://support.modrinth.com" class="link">
-      <ChatIcon />
-      <span> Get support </span>
-    </a>
-    <Button
-      v-if="currentLoadingBars.length > 0"
-      ref="infoButton"
-      icon-only
-      class="icon-button show-card-icon"
-      @click="toggleCard()"
-    >
-      <DownloadIcon />
-    </Button>
+    <ButtonStyled v-if="currentLoadingBars.length > 0" color="brand" type="transparent" circular>
+      <button ref="infoButton" @click="toggleCard()">
+        <DownloadIcon />
+      </button>
+    </ButtonStyled>
     <div v-if="offline" class="status">
-      <span class="circle stopped" />
+      <UnplugIcon />
       <div class="running-text">
         <span> Offline </span>
       </div>
@@ -44,15 +36,6 @@
       </Button>
       <Button v-tooltip="'View logs'" icon-only class="icon-button" @click="goToTerminal()">
         <TerminalSquareIcon />
-      </Button>
-      <Button
-        v-if="currentLoadingBars.length > 0"
-        ref="infoButton"
-        icon-only
-        class="icon-button show-card-icon"
-        @click="toggleCard()"
-      >
-        <DownloadIcon />
       </Button>
     </div>
     <div v-else class="status">
@@ -108,8 +91,14 @@
 </template>
 
 <script setup>
-import { DownloadIcon, StopCircleIcon, TerminalSquareIcon, DropdownIcon } from '@modrinth/assets'
-import { Button, Card } from '@modrinth/ui'
+import {
+  DownloadIcon,
+  StopCircleIcon,
+  TerminalSquareIcon,
+  DropdownIcon,
+  UnplugIcon,
+} from '@modrinth/assets'
+import { Button, ButtonStyled, Card } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { get_all as getRunningProcesses, kill as killProcess } from '@/helpers/process'
 import { loading_listener, process_listener } from '@/helpers/events'
@@ -117,7 +106,6 @@ import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
-import { ChatIcon } from '@/assets/icons'
 import { get_many } from '@/helpers/profile.js'
 import { trackEvent } from '@/helpers/analytics'
 
@@ -406,10 +394,6 @@ onBeforeUnmount(() => {
     width: 2.25rem;
     height: 2.25rem;
   }
-}
-
-.show-card-icon {
-  color: var(--color-brand);
 }
 
 .download-enter-active,

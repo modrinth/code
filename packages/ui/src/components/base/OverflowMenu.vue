@@ -3,8 +3,8 @@
     ref="dropdown"
     v-bind="$attrs"
     :disabled="disabled"
-    :position="position"
-    :direction="direction"
+    :dropdown-id="dropdownId"
+    :tooltip="tooltip"
   >
     <slot></slot>
     <template #menu>
@@ -17,10 +17,12 @@
         <Button
           v-else
           :key="`option-${option.id}`"
+          v-tooltip="option.tooltip"
           :color="option.color ? option.color : 'default'"
           :hover-filled="option.hoverFilled"
           :hover-filled-only="option.hoverFilledOnly"
           transparent
+          :v-close-popper="!option.remainOnClick"
           :action="
             option.action
               ? (event) => {
@@ -33,6 +35,7 @@
           "
           :link="option.link ? option.link : null"
           :external="option.external ? option.external : false"
+          :disabled="option.disabled"
           @click="
             () => {
               if (option.link && !option.remainOnClick) {
@@ -50,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { type Ref, ref } from 'vue'
 import Button from './Button.vue'
 import PopoutMenu from './PopoutMenu.vue'
 
@@ -80,22 +83,24 @@ interface Item extends BaseOption {
   hoverFilled?: boolean
   hoverFilledOnly?: boolean
   remainOnClick?: boolean
+  disabled?: boolean
+  tooltip?: string
 }
 
 type Option = Divider | Item
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     options: Option[]
     disabled?: boolean
-    position?: string
-    direction?: string
+    dropdownId?: string
+    tooltip?: string
   }>(),
   {
     options: () => [],
     disabled: false,
-    position: 'auto',
-    direction: 'auto',
+    dropdownId: null,
+    tooltip: null,
   },
 )
 
@@ -103,12 +108,17 @@ defineOptions({
   inheritAttrs: false,
 })
 
-const dropdown = ref(null)
+const dropdown: Ref<InstanceType<typeof PopoutMenu> | null> = ref(null)
 
 const close = () => {
-  console.log('closing!')
-  dropdown.value.hide()
+  dropdown.value?.hide()
 }
+
+const open = () => {
+  dropdown.value?.show()
+}
+
+defineExpose({ open, close })
 </script>
 
 <style lang="scss" scoped>

@@ -243,7 +243,7 @@ const createInstance = async () => {
             "
           >
             <Button
-              :disabled="profile.installedMod || profile.installing || profile.linked_data?.locked"
+              :disabled="profile.installedMod || profile.installing"
               @click="install(profile)"
             >
               <DownloadIcon v-if="!profile.installedMod && !profile.installing" />
@@ -253,9 +253,7 @@ const createInstance = async () => {
                   ? 'Installing...'
                   : profile.installedMod
                     ? 'Installed'
-                    : profile.linked_data && profile.linked_data.locked
-                      ? 'Paired'
-                      : 'Install'
+                    : 'Install'
               }}
             </Button>
           </div>
@@ -308,7 +306,6 @@ const createInstance = async () => {
   flex-direction: column;
   gap: 1rem;
   margin: 0;
-  padding: 1rem;
   background-color: var(--color-bg);
 }
 
@@ -360,7 +357,7 @@ const createInstance = async () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem;
+  min-width: 350px;
 }
 
 .profiles {
@@ -381,7 +378,6 @@ const createInstance = async () => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 0.5rem;
   gap: 0.5rem;
 
   img {

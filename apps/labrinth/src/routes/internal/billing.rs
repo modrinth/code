@@ -898,14 +898,25 @@ pub async fn active_servers(
         )
         .await?;
 
+    #[derive(Serialize)]
+    struct ActiveServer {
+        pub user_id: crate::models::ids::UserId,
+        pub server_id: String,
+        pub interval: PriceDuration,
+    }
+
     let server_ids = servers
         .into_iter()
         .filter_map(|x| {
-            x.metadata.map(|x| match x {
-                SubscriptionMetadata::Pyro { id } => id,
+            x.metadata.as_ref().map(|metadata| match metadata {
+                SubscriptionMetadata::Pyro { id } => ActiveServer {
+                    user_id: x.user_id.into(),
+                    server_id: id.clone(),
+                    interval: x.interval,
+                },
             })
         })
-        .collect::<Vec<_>>();
+        .collect::<Vec<ActiveServer>>();
 
     Ok(HttpResponse::Ok().json(server_ids))
 }
@@ -1747,7 +1758,7 @@ pub async fn stripe_webhook(
                                             "source": source,
                                             "payment_interval": metadata.charge_item.subscription_interval.map(|x| match x {
                                                 PriceDuration::Monthly => 1,
-                                                PriceDuration::Yearly => 3,
+                                                PriceDuration::Yearly => 12,
                                             })
                                         }))
                                         .send()

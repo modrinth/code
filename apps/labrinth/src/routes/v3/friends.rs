@@ -74,56 +74,31 @@ pub async fn add_friend(
             async fn send_friend_status(
                 user_id: UserId,
                 friend_id: UserId,
-                pool: &PgPool,
-                redis: &RedisPool,
                 sockets: &ActiveSockets,
             ) -> Result<(), ApiError> {
                 if let Some(pair) = sockets.auth_sockets.get(&user_id.into()) {
                     let (friend_status, _) = pair.value();
-                    if let Some(mut socket) =
-                        sockets.auth_sockets.get_mut(&friend_id.into())
+                    if let Some(socket) =
+                        sockets.auth_sockets.get(&friend_id.into())
                     {
-                        let (_, socket) = socket.value_mut();
+                        let (_, socket) = socket.value();
 
-                        if socket
+                        let _ = socket
+                            .clone()
                             .text(serde_json::to_string(
                                 &ServerToClientMessage::StatusUpdate {
                                     status: friend_status.clone(),
                                 },
                             )?)
-                            .await
-                            .is_err()
-                        {
-                            close_socket(
-                                friend_id.into(),
-                                pool,
-                                redis,
-                                sockets,
-                            )
-                            .await?;
-                        }
+                            .await;
                     }
                 }
 
                 Ok(())
             }
 
-            send_friend_status(
-                friend.user_id,
-                friend.friend_id,
-                &pool,
-                &redis,
-                &db,
-            )
-            .await?;
-            send_friend_status(
-                friend.friend_id,
-                friend.user_id,
-                &pool,
-                &redis,
-                &db,
-            )
-            .await?;
+            send_friend_status(friend.user_id, friend.friend_id, &db).await?;
+            send_friend_status(friend.friend_id, friend.user_id, &db).await?;
         } else {
             if friend.id == user.id.into() {
                 return Err(ApiError::InvalidInput(
@@ -146,18 +121,18 @@ pub async fn add_friend(
             .insert(&mut transaction)
             .await?;
 
-            if let Some(mut socket) = db.auth_sockets.get_mut(&friend.id.into())
-            {
-                let (_, socket) = socket.value_mut();
+            if let Some(socket) = db.auth_sockets.get(&friend.id.into()) {
+                let (_, socket) = socket.value();
 
                 if socket
+                    .clone()
                     .text(serde_json::to_string(
                         &ServerToClientMessage::FriendRequest { from: user.id },
                     )?)
                     .await
                     .is_err()
                 {
-                    close_socket(user.id, &pool, &redis, &db).await?;
+                    close_socket(user.id, &pool, &db).await?;
                 }
             }
         }
@@ -177,6 +152,7 @@ pub async fn remove_friend(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    db: web::Data<ActiveSockets>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -201,6 +177,19 @@ pub async fn remove_friend(
             &mut transaction,
         )
         .await?;
+
+        if let Some(socket) = db.auth_sockets.get(&friend.id.into()) {
+            let (_, socket) = socket.value();
+
+            let _ = socket
+                .clone()
+                .text(serde_json::to_string(
+                    &ServerToClientMessage::FriendRequestRejected {
+                        from: user.id,
+                    },
+                )?)
+                .await;
+        }
 
         transaction.commit().await?;
 

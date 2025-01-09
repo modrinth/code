@@ -6,6 +6,48 @@
     <Head>
       <Title>Search {{ projectType.display }}s - Modrinth</Title>
     </Head>
+    <Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
+      <div class="search-background"></div>
+    </Teleport>
+    <section class="normal-page__header mb-4 flex flex-col gap-4">
+      <template v-if="server">
+        <div
+          class="flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-divider pb-4"
+        >
+          <nuxt-link
+            :to="`/servers/manage/${server.serverId}/content`"
+            tabindex="-1"
+            class="flex flex-col gap-4 text-primary"
+          >
+            <span class="flex items-center gap-2">
+              <Avatar :src="server.general.image" size="48px" />
+              <span class="flex flex-col gap-2">
+                <span class="bold font-extrabold text-contrast">
+                  {{ server.general.name }}
+                </span>
+                <span class="flex items-center gap-2 font-semibold text-secondary">
+                  <GameIcon class="h-5 w-5 text-secondary" />
+                  {{ server.general.loader }} {{ server.general.mc_version }}
+                </span>
+              </span>
+            </span>
+          </nuxt-link>
+          <ButtonStyled>
+            <nuxt-link :to="`/servers/manage/${server.serverId}/content`">
+              <LeftArrowIcon /> Back to server
+            </nuxt-link>
+          </ButtonStyled>
+        </div>
+        <h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
+          Install content to server
+        </h1>
+      </template>
+      <NavTabs
+        v-if="!server && !flags.projectTypesPrimaryNav"
+        :links="selectableProjectTypes"
+        class="hidden md:flex"
+      />
+    </section>
     <aside
       :class="{
         'normal-page__sidebar': true,
@@ -18,432 +60,427 @@
           !server
         "
       />
-      <section v-if="server" class="card">
-        <nuxt-link
-          :to="`/servers/manage/${server.serverId}/content`"
-          class="mb-2 flex items-center gap-2"
-        >
-          <Avatar :src="server.general.image" size="sm" />
-          <div class="flex flex-col gap-2">
-            <span class="font-bold">{{ server.general.name }}</span>
-            <span>{{ server.general.loader }} {{ server.general.mc_version }}</span>
-          </div>
-        </nuxt-link>
-        <Checkbox
-          v-if="projectType.id !== 'modpack'"
-          v-model="serverOverrideGameVersions"
-          label="Override game versions"
-        />
-        <Checkbox
-          v-if="projectType.id !== 'modpack'"
-          v-model="serverOverrideLoaders"
-          label="Override loaders"
-        />
-        <Checkbox
-          v-if="projectType.id !== 'modpack'"
-          v-model="serverHideInstalled"
-          label="Hide already installed"
-        />
-      </section>
-      <section class="card gap-1" :class="{ 'max-lg:!hidden': !sidebarMenuOpen }">
-        <div class="flex items-center gap-2">
-          <div class="iconified-input w-full">
-            <label class="hidden" for="filter-search">Search</label>
-            <SearchIcon aria-hidden="true" />
-            <input
-              id="filter-search"
-              v-model="queryFilter"
-              name="filter-search"
-              type="search"
-              placeholder="Search filters..."
-              autocomplete="off"
-            />
-          </div>
-          <button
-            v-if="
-              !(
-                onlyOpenSource === false &&
-                selectedEnvironments.length === 0 &&
-                selectedVersions.length === 0 &&
-                facets.length === 0 &&
-                orFacets.length === 0 &&
-                negativeFacets.length === 0
-              )
-            "
-            v-tooltip="`Reset all filters`"
-            class="btn icon-only"
-            aria-label="Reset all filters"
-            @click="clearFilters"
-          >
-            <FilterXIcon aria-hidden="true" />
-          </button>
-        </div>
+      <div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
+      <div
+        class="flex flex-col gap-3"
+        :class="{
+          'fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl bg-bg-raised': filtersMenuOpen,
+        }"
+      >
         <div
-          v-for="(categories, header, index) in filters"
-          :key="header"
-          :class="`border-0 border-b border-solid border-button-bg py-2 last:border-b-0`"
+          v-if="filtersMenuOpen"
+          class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
         >
-          <button
-            class="flex !w-full bg-transparent px-0 py-2 font-extrabold text-contrast transition-all active:scale-[0.98]"
-            @click="
-              () => {
-                filterAccordions[index].isOpen
-                  ? filterAccordions[index].close()
-                  : filterAccordions[index].open();
-              }
-            "
-          >
-            <template v-if="header === 'gameVersion'"> Game versions </template>
-            <template v-else>
-              {{ $formatCategoryHeader(header) }}
-            </template>
-            <DropdownIcon
-              class="ml-auto h-5 w-5 transition-transform"
-              :class="{ 'rotate-180': filterAccordions[index]?.isOpen }"
-            />
-          </button>
-          <Accordion ref="filterAccordions" :open-by-default="true">
-            <ScrollablePanel
-              :class="{ 'h-[18rem]': categories.length >= 8 && header === 'gameVersion' }"
-              :no-max-height="header !== 'gameVersion'"
+          <h3 class="m-0 text-lg text-contrast">Filters</h3>
+          <ButtonStyled circular>
+            <button
+              @click="
+                () => {
+                  filtersMenuOpen = false;
+                  scrollToTop('instant');
+                }
+              "
             >
-              <div class="mr-1 flex flex-col gap-1">
-                <div v-for="category in categories" :key="category.name" class="group flex gap-1">
-                  <button
-                    :class="`flex !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all active:scale-[0.98] ${filterSelected(category) ? 'bg-brand-highlight text-contrast hover:brightness-125' : negativeFilterSelected(category) ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg'}`"
-                    @click="
-                      negativeFilterSelected(category)
-                        ? toggleNegativeFilter(category)
-                        : toggleFilter(category)
-                    "
-                  >
-                    <ClientIcon v-if="category.name === 'client'" class="h-4 w-4" />
-                    <ServerIcon v-else-if="category.name === 'server'" class="h-4 w-4" />
-                    <div v-if="category.icon" class="h-4" v-html="category.icon" />
-                    <span class="truncate text-sm">{{ $formatCategory(category.name) }}</span>
-                    <BanIcon
-                      v-if="negativeFilterSelected(category)"
-                      :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${negativeFilterSelected(category) ? '' : 'opacity-0'}`"
-                      aria-hidden="true"
-                    />
-                    <CheckIcon
-                      v-else
-                      :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${filterSelected(category) ? '' : 'opacity-0'}`"
-                      aria-hidden="true"
-                    />
-                  </button>
-                  <button
-                    v-if="
-                      (category.type === 'or' || category.type === 'normal') &&
-                      !negativeFilterSelected(category)
-                    "
-                    v-tooltip="negativeFilterSelected(category) ? 'Include' : 'Exclude'"
-                    class="flex items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary opacity-0 transition-all hover:bg-button-bg hover:text-red active:scale-[0.96] group-hover:opacity-100"
-                    @click="toggleNegativeFilter(category)"
-                  >
-                    <BanIcon class="h-4 w-4" aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
-            </ScrollablePanel>
-            <Checkbox
-              v-if="header === 'gameVersion'"
-              v-model="showSnapshots"
-              class="mx-2"
-              :label="`Show all versions`"
-            />
-            <Checkbox
-              v-if="header === 'loaders' && projectType.id === 'mod'"
-              v-model="showAllLoaders"
-              class="mx-2"
-              :label="`Show all loaders`"
-            />
-          </Accordion>
+              <XIcon />
+            </button>
+          </ButtonStyled>
         </div>
-      </section>
+        <div v-if="server && projectType.id === 'modpack'" class="rounded-2xl bg-bg-raised">
+          <div class="flex flex-row items-center gap-2 px-6 py-4 text-contrast">
+            <h3 class="m-0 text-lg">Options</h3>
+          </div>
+          <div class="flex flex-row items-center justify-between gap-2 px-6">
+            <label for="erase-data-on-install"> Erase all data on install </label>
+            <input
+              id="erase-data-on-install"
+              v-model="eraseDataOnInstall"
+              label="Erase all data on install"
+              class="switch stylized-toggle flex-none"
+              type="checkbox"
+            />
+          </div>
+          <div class="px-6 py-4 text-sm">
+            If enabled, existing mods, worlds, and configurations, will be deleted before installing
+            the selected modpack.
+          </div>
+        </div>
+        <div v-if="server && projectType.id !== 'modpack'" class="rounded-2xl bg-bg-raised p-4">
+          <Checkbox
+            v-model="serverHideInstalled"
+            label="Hide installed content"
+            class="filter-checkbox"
+            @update:model-value="updateSearchResults()"
+          />
+        </div>
+        <SearchSidebarFilter
+          v-for="filter in filters.filter((f) => f.display !== 'none')"
+          :key="`filter-${filter.id}`"
+          v-model:selected-filters="currentFilters"
+          v-model:toggled-groups="toggledGroups"
+          v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
+          :provided-filters="serverFilters"
+          :filter-type="filter"
+          :class="
+            filtersMenuOpen
+              ? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+              : 'rounded-2xl bg-bg-raised'
+          "
+          button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
+          content-class="mb-4 mx-3"
+          inner-panel-class="p-1"
+          :open-by-default="true"
+        >
+          <template #header>
+            <h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
+          </template>
+          <template #locked-game_version>
+            {{ formatMessage(messages.gameVersionProvidedByServer) }}
+          </template>
+          <template #locked-mod_loader>
+            {{ formatMessage(messages.modLoaderProvidedByServer) }}
+          </template>
+          <template #sync-button> {{ formatMessage(messages.syncFilterButton) }} </template>
+        </SearchSidebarFilter>
+      </div>
     </aside>
     <section class="normal-page__content">
-      <div class="card search-controls">
-        <div class="search-filter-container">
-          <button
-            class="iconified-button sidebar-menu-close-button"
-            :class="{ open: sidebarMenuOpen }"
-            @click="sidebarMenuOpen = !sidebarMenuOpen"
-          >
-            <FilterIcon aria-hidden="true" />
-            Filters...
-          </button>
-          <div class="iconified-input">
-            <label class="hidden" for="project-search">Search</label>
-            <SearchIcon aria-hidden="true" />
-            <input
-              id="project-search"
-              v-model="query"
-              type="search"
-              name="project-search"
-              :placeholder="`Search ${projectType.display}s...`"
-              autocomplete="off"
-              @input="onSearchChange(1)"
-            />
-          </div>
+      <div class="flex flex-col gap-3">
+        <div class="iconified-input w-full">
+          <SearchIcon aria-hidden="true" class="text-lg" />
+          <input
+            v-model="query"
+            class="h-12"
+            autocomplete="off"
+            spellcheck="false"
+            type="text"
+            :placeholder="`Search ${projectType.display}s...`"
+            @input="updateSearchResults()"
+          />
+          <Button v-if="query" class="r-btn" @click="() => (query = '')">
+            <XIcon />
+          </Button>
         </div>
-        <div class="sort-controls">
-          <div class="labeled-control">
-            <span class="labeled-control__label">Sort by</span>
-            <Multiselect
-              v-model="sortType"
-              placeholder="Select one"
-              class="search-controls__sorting labeled-control__control"
-              track-by="display"
-              label="display"
-              :options="sortTypes"
-              :searchable="false"
-              :close-on-select="true"
-              :show-labels="false"
-              :allow-empty="false"
-              @update:model-value="onSearchChange(1)"
+        <div class="flex flex-wrap items-center gap-2">
+          <DropdownSelect
+            v-slot="{ selected }"
+            v-model="currentSortType"
+            class="!w-auto flex-grow md:flex-grow-0"
+            name="Sort by"
+            :options="sortTypes"
+            :display-name="(option) => option?.display"
+            @change="updateSearchResults(1)"
+          >
+            <span class="font-semibold text-primary">Sort by: </span>
+            <span class="font-semibold text-secondary">{{ selected }}</span>
+          </DropdownSelect>
+          <DropdownSelect
+            v-slot="{ selected }"
+            v-model="maxResults"
+            name="Max results"
+            :options="currentMaxResultsOptions"
+            :default-value="maxResults"
+            :model-value="maxResults"
+            class="!w-auto flex-grow md:flex-grow-0"
+            @change="updateSearchResults(1)"
+          >
+            <span class="font-semibold text-primary">View: </span>
+            <span class="font-semibold text-secondary">{{ selected }}</span>
+          </DropdownSelect>
+          <div class="lg:hidden">
+            <ButtonStyled>
+              <button @click="filtersMenuOpen = true"><FilterIcon /> Filter results...</button>
+            </ButtonStyled>
+          </div>
+          <ButtonStyled circular>
+            <button
+              v-tooltip="$capitalizeString(cosmetics.searchDisplayMode[projectType.id]) + ' view'"
+              :aria-label="$capitalizeString(cosmetics.searchDisplayMode[projectType.id]) + ' view'"
+              @click="cycleSearchDisplayMode()"
             >
-              <template #singleLabel="{ option }">
-                {{ option.display }}
-              </template>
-            </Multiselect>
-          </div>
-          <div class="labeled-control">
-            <span class="labeled-control__label">Show per page</span>
-            <Multiselect
-              v-model="maxResults"
-              placeholder="Select one"
-              class="labeled-control__control"
-              :options="maxResultsForView[cosmetics.searchDisplayMode[projectType.id]]"
-              :searchable="false"
-              :close-on-select="true"
-              :show-labels="false"
-              :allow-empty="false"
-              @update:model-value="onMaxResultsChange(currentPage)"
-            />
-          </div>
-          <button
-            v-tooltip="$capitalizeString(cosmetics.searchDisplayMode[projectType.id]) + ' view'"
-            :aria-label="$capitalizeString(cosmetics.searchDisplayMode[projectType.id]) + ' view'"
-            class="square-button"
-            @click="cycleSearchDisplayMode()"
-          >
-            <GridIcon v-if="cosmetics.searchDisplayMode[projectType.id] === 'grid'" />
-            <ImageIcon v-else-if="cosmetics.searchDisplayMode[projectType.id] === 'gallery'" />
-            <ListIcon v-else />
-          </button>
+              <GridIcon v-if="cosmetics.searchDisplayMode[projectType.id] === 'grid'" />
+              <ImageIcon v-else-if="cosmetics.searchDisplayMode[projectType.id] === 'gallery'" />
+              <ListIcon v-else />
+            </button>
+          </ButtonStyled>
+          <Pagination
+            :page="currentPage"
+            :count="pageCount"
+            class="mx-auto sm:ml-auto sm:mr-0"
+            @switch-page="setPage"
+          />
         </div>
-      </div>
-      <LogoAnimated v-if="searchLoading && !noLoad" />
-      <div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
-        <p>No results found for your query!</p>
-      </div>
-      <div v-else class="search-results-container">
-        <div
-          id="search-results"
-          class="project-list"
-          :class="'display-mode--' + cosmetics.searchDisplayMode[projectType.id]"
-          role="list"
-          aria-label="Search results"
-        >
-          <ProjectCard
-            v-for="result in results?.hits"
-            :id="result.slug ? result.slug : result.project_id"
-            :key="result.project_id"
-            :display="cosmetics.searchDisplayMode[projectType.id]"
-            :featured-image="result.featured_gallery ? result.featured_gallery : result.gallery[0]"
-            :type="result.project_type"
-            :author="result.author"
-            :name="result.title"
-            :description="result.description"
-            :created-at="result.date_created"
-            :updated-at="result.date_modified"
-            :downloads="result.downloads.toString()"
-            :follows="result.follows.toString()"
-            :icon-url="result.icon_url"
-            :client-side="result.client_side"
-            :server-side="result.server_side"
-            :categories="result.display_categories"
-            :search="true"
-            :show-updated-date="!server && sortType.name !== 'newest'"
-            :show-created-date="!server"
-            :hide-loaders="['resourcepack', 'datapack'].includes(projectType.id)"
-            :color="result.color"
-          >
-            <template v-if="server">
-              <button
-                v-if="
-                  result.installed ||
-                  server.mods.data.find((x) => x.project_id === result.project_id) ||
-                  server.general?.project?.id === result.project_id
-                "
-                disabled
-                class="btn btn-outline btn-primary"
-              >
-                <CheckIcon />
-                Installed
-              </button>
-              <button v-else-if="result.installing" disabled class="btn btn-outline btn-primary">
-                Installing...
-              </button>
-              <button v-else class="btn btn-outline btn-primary" @click="serverInstall(result)">
-                <DownloadIcon />
-                Install
-              </button>
-            </template>
-          </ProjectCard>
-        </div>
-      </div>
-      <div class="pagination-after">
-        <pagination
-          :page="currentPage"
-          :count="pageCount"
-          :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
-          class="justify-end"
-          @switch-page="onSearchChangeToTop"
+        <SearchFilterControl
+          v-model:selected-filters="currentFilters"
+          :filters="filters.filter((f) => f.display !== 'none')"
+          :provided-filters="serverFilters"
+          :overridden-provided-filter-types="overriddenProvidedFilterTypes"
+          :provided-message="messages.providedByServer"
         />
+        <LogoAnimated v-if="searchLoading && !noLoad" />
+        <div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
+          <p>No results found for your query!</p>
+        </div>
+        <div v-else class="search-results-container">
+          <div
+            id="search-results"
+            class="project-list"
+            :class="'display-mode--' + cosmetics.searchDisplayMode[projectType.id]"
+            role="list"
+            aria-label="Search results"
+          >
+            <template v-for="result in results?.hits" :key="result.project_id">
+              <ProjectCard
+                v-if="flags.oldProjectCards"
+                :id="result.slug ? result.slug : result.project_id"
+                :display="cosmetics.searchDisplayMode[projectType.id]"
+                :featured-image="
+                  result.featured_gallery ? result.featured_gallery : result.gallery[0]
+                "
+                :type="result.project_type"
+                :author="result.author"
+                :name="result.title"
+                :description="result.description"
+                :created-at="result.date_created"
+                :updated-at="result.date_modified"
+                :downloads="result.downloads.toString()"
+                :follows="result.follows.toString()"
+                :icon-url="result.icon_url"
+                :client-side="result.client_side"
+                :server-side="result.server_side"
+                :categories="result.display_categories"
+                :search="true"
+                :show-updated-date="!server && currentSortType.name !== 'newest'"
+                :show-created-date="!server"
+                :hide-loaders="['resourcepack', 'datapack'].includes(projectType.id)"
+                :color="result.color"
+              >
+                <template v-if="server">
+                  <button
+                    v-if="
+                      result.installed ||
+                      server.content.data.find((x) => x.project_id === result.project_id) ||
+                      server.general?.project?.id === result.project_id
+                    "
+                    disabled
+                    class="btn btn-outline btn-primary"
+                  >
+                    <CheckIcon />
+                    Installed
+                  </button>
+                  <button
+                    v-else-if="result.installing"
+                    disabled
+                    class="btn btn-outline btn-primary"
+                  >
+                    Installing...
+                  </button>
+                  <button v-else class="btn btn-outline btn-primary" @click="serverInstall(result)">
+                    <DownloadIcon />
+                    Install
+                  </button>
+                </template>
+              </ProjectCard>
+              <NuxtLink
+                v-if="flags.newProjectCards"
+                :to="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`"
+              >
+                <NewProjectCard :project="result" :categories="result.display_categories">
+                  <template v-if="false" #actions> </template>
+                </NewProjectCard>
+              </NuxtLink>
+            </template>
+          </div>
+        </div>
+        <div class="pagination-after">
+          <pagination
+            :page="currentPage"
+            :count="pageCount"
+            class="justify-end"
+            @switch-page="setPage"
+          />
+        </div>
       </div>
     </section>
   </div>
 </template>
 <script setup>
-import { Multiselect } from "vue-multiselect";
-import { Pagination, ScrollablePanel, Checkbox, Avatar } from "@modrinth/ui";
-import { BanIcon, DropdownIcon, CheckIcon, FilterXIcon, DownloadIcon } from "@modrinth/assets";
+import {
+  Pagination,
+  Checkbox,
+  Avatar,
+  SearchSidebarFilter,
+  useSearch,
+  DropdownSelect,
+  Button,
+  ButtonStyled,
+  NewProjectCard,
+  SearchFilterControl,
+} from "@modrinth/ui";
+import { CheckIcon, DownloadIcon, GameIcon, LeftArrowIcon, XIcon } from "@modrinth/assets";
+import { computed } from "vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
-
-import ClientIcon from "~/assets/images/categories/client.svg?component";
-import ServerIcon from "~/assets/images/categories/server.svg?component";
 
 import SearchIcon from "~/assets/images/utils/search.svg?component";
 import FilterIcon from "~/assets/images/utils/filter.svg?component";
 import GridIcon from "~/assets/images/utils/grid.svg?component";
 import ListIcon from "~/assets/images/utils/list.svg?component";
 import ImageIcon from "~/assets/images/utils/image.svg?component";
-import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+import NavTabs from "~/components/ui/NavTabs.vue";
 
-const sidebarMenuOpen = ref(false);
-const showAllLoaders = ref(false);
+const { formatMessage } = useVIntl();
 
-const filterAccordions = ref([]);
+const filtersMenuOpen = ref(false);
 
 const data = useNuxtApp();
 const route = useNativeRoute();
+const router = useNativeRouter();
 
 const cosmetics = useCosmetics();
 const tags = useTags();
 const flags = useFeatureFlags();
 const auth = await useAuth();
 
-const query = ref("");
-const facets = ref([]);
-const orFacets = ref([]);
-const negativeFacets = ref([]);
-const selectedVersions = ref([]);
-const onlyOpenSource = ref(false);
-const showSnapshots = ref(false);
-const selectedEnvironments = ref([]);
-const sortTypes = shallowReadonly([
-  { display: "Relevance", name: "relevance" },
-  { display: "Download count", name: "downloads" },
-  { display: "Follow count", name: "follows" },
-  { display: "Recently published", name: "newest" },
-  { display: "Recently updated", name: "updated" },
-]);
-const sortType = ref({ display: "Relevance", name: "relevance" });
-const maxResults = ref(20);
-const currentPage = ref(1);
-const projectType = ref({ id: "mod", display: "mod", actual: "mod" });
+const projectType = ref();
+function setProjectType() {
+  const projType = tags.value.projectTypes.find(
+    (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
+  );
 
-const ogTitle = computed(
-  () => `Search ${projectType.value.display}s${query.value ? " | " + query.value : ""}`,
-);
-const description = computed(
-  () =>
-    `Search and browse thousands of Minecraft ${projectType.value.display}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value.display}s.`,
-);
-
-useSeoMeta({
-  description,
-  ogTitle,
-  ogDescription: description,
-});
-
-if (route.query.q) {
-  query.value = route.query.q;
-}
-if (route.query.f) {
-  facets.value = getArrayOrString(route.query.f);
-}
-if (route.query.g) {
-  orFacets.value = getArrayOrString(route.query.g);
-}
-if (route.query.nf) {
-  negativeFacets.value = getArrayOrString(route.query.nf);
-}
-if (route.query.v) {
-  selectedVersions.value = getArrayOrString(route.query.v);
-}
-if (route.query.l) {
-  onlyOpenSource.value = route.query.l === "true";
-}
-if (route.query.h) {
-  showSnapshots.value = route.query.h === "true";
-}
-if (route.query.e) {
-  selectedEnvironments.value = getArrayOrString(route.query.e);
-}
-if (route.query.s) {
-  sortType.value.name = route.query.s;
-
-  switch (sortType.value.name) {
-    case "relevance":
-      sortType.value.display = "Relevance";
-      break;
-    case "downloads":
-      sortType.value.display = "Downloads";
-      break;
-    case "newest":
-      sortType.value.display = "Recently published";
-      break;
-    case "updated":
-      sortType.value.display = "Recently updated";
-      break;
-    case "follows":
-      sortType.value.display = "Follow count";
-      break;
+  if (projType) {
+    projectType.value = projType;
   }
 }
+setProjectType();
+router.afterEach(() => {
+  setProjectType();
+});
 
-if (route.query.m) {
-  maxResults.value = route.query.m;
-}
-if (route.query.o) {
-  currentPage.value = Math.ceil(route.query.o / maxResults.value) + 1;
-}
+const projectTypes = computed(() => [projectType.value.id]);
 
 const server = ref();
 const serverHideInstalled = ref(false);
-const serverOverrideGameVersions = ref(false);
-const serverOverrideLoaders = ref(false);
+const eraseDataOnInstall = ref(false);
 
-if (route.query.sid) {
-  server.value = await usePyroServer(route.query.sid, ["general", "mods"]);
+const PERSISTENT_QUERY_PARAMS = ["sid", "shi"];
+
+await updateServerContext();
+
+watch(route, () => {
+  updateServerContext();
+});
+
+async function updateServerContext() {
+  if (route.query.sid && (!server.value || server.value.serverId !== route.query.sid)) {
+    if (!auth.value.user) {
+      router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
+    } else if (route.query.sid !== null) {
+      server.value = await usePyroServer(route.query.sid, ["general", "content"]);
+    }
+  }
+
+  if (
+    server.value &&
+    server.value.serverId !== route.query.sid &&
+    route.name.startsWith("search")
+  ) {
+    server.value = undefined;
+  }
+
+  if (route.query.shi && projectType.value.id !== "modpack" && server.value) {
+    serverHideInstalled.value = route.query.shi === "true";
+  }
 }
 
-if (route.query.shi && projectType.value.id !== "modpack") {
-  serverHideInstalled.value = route.query.shi === "true";
-}
+const serverFilters = computed(() => {
+  const filters = [];
+  if (server.value) {
+    const gameVersion = server.value.general?.mc_version;
+    if (gameVersion) {
+      filters.push({
+        type: "game_version",
+        option: gameVersion,
+      });
+    }
 
-if (route.query.sogv && projectType.value.id !== "modpack") {
-  serverOverrideGameVersions.value = route.query.sogv === "true";
-}
+    const platform = server.value.general?.loader?.toLowerCase();
 
-if (route.query.sol && projectType.value.id !== "modpack") {
-  serverOverrideLoaders.value = route.query.sol === "true";
-}
+    const modLoaders = ["fabric", "forge", "quilt", "neoforge"];
+
+    if (platform && modLoaders.includes(platform)) {
+      filters.push({
+        type: "mod_loader",
+        option: platform,
+      });
+    }
+
+    if (serverHideInstalled.value) {
+      const installedMods = server.value.content?.data
+        .filter((x) => x.project_id)
+        .map((x) => x.project_id);
+
+      installedMods
+        ?.map((x) => ({
+          type: "project_id",
+          option: `project_id:${x}`,
+          negative: true,
+        }))
+        .forEach((x) => filters.push(x));
+    }
+  }
+  return filters;
+});
+
+const maxResultsForView = ref({
+  list: [5, 10, 15, 20, 50, 100],
+  grid: [6, 12, 18, 24, 48, 96],
+  gallery: [6, 10, 16, 20, 50, 100],
+});
+
+const currentMaxResultsOptions = computed(
+  () => maxResultsForView.value[cosmetics.value.searchDisplayMode[projectType.value.id]],
+);
+
+const {
+  // Selections
+  query,
+  currentSortType,
+  currentFilters,
+  toggledGroups,
+  maxResults,
+  currentPage,
+  overriddenProvidedFilterTypes,
+
+  // Lists
+  filters,
+  sortTypes,
+
+  // Computed
+  requestParams,
+
+  // Functions
+  createPageParams,
+} = useSearch(projectTypes, tags, serverFilters);
+
+const messages = defineMessages({
+  gameVersionProvidedByServer: {
+    id: "search.filter.locked.server-game-version.title",
+    defaultMessage: "Game version is provided by the server",
+  },
+  modLoaderProvidedByServer: {
+    id: "search.filter.locked.server-loader.title",
+    defaultMessage: "Loader is provided by the server",
+  },
+  providedByServer: {
+    id: "search.filter.locked.server",
+    defaultMessage: "Provided by the server",
+  },
+  syncFilterButton: {
+    id: "search.filter.locked.server.sync",
+    defaultMessage: "Sync with server",
+  },
+});
 
 async function serverInstall(project) {
   project.installing = true;
@@ -458,12 +495,23 @@ async function serverInstall(project) {
       ) ?? versions[0];
 
     if (projectType.value.id === "modpack") {
-      await server.value.general?.reinstall(route.query.sid, false, project.project_id, version.id);
+      await server.value.general?.reinstall(
+        route.query.sid,
+        false,
+        project.project_id,
+        version.id,
+        undefined,
+        eraseDataOnInstall.value,
+      );
       project.installed = true;
       navigateTo(`/servers/manage/${route.query.sid}/options/loader`);
     } else if (projectType.value.id === "mod") {
-      await server.value.mods.install(version.project_id, version.id);
-      await server.value.refresh(["mods"]);
+      await server.value.content.install("mod", version.project_id, version.id);
+      await server.value.refresh(["content"]);
+      project.installed = true;
+    } else if (projectType.value.id === "plugin") {
+      await server.value.content.install("plugin", version.project_id, version.id);
+      await server.value.refresh(["content"]);
       project.installed = true;
     }
   } catch (e) {
@@ -471,10 +519,6 @@ async function serverInstall(project) {
   }
   project.installing = false;
 }
-
-projectType.value = tags.value.projectTypes.find(
-  (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
-);
 
 const noLoad = ref(false);
 const {
@@ -485,123 +529,8 @@ const {
   () => {
     const config = useRuntimeConfig();
     const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
-    const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`];
 
-    if (query.value.length > 0) {
-      params.push(`query=${encodeURIComponent(query.value)}`);
-    }
-
-    if (
-      facets.value.length > 0 ||
-      orFacets.value.length > 0 ||
-      negativeFacets.value.length > 0 ||
-      selectedVersions.value.length > 0 ||
-      selectedEnvironments.value.length > 0 ||
-      projectType.value
-    ) {
-      let formattedFacets = [];
-      for (const facet of facets.value) {
-        formattedFacets.push([facet]);
-      }
-
-      for (const facet of negativeFacets.value) {
-        formattedFacets.push([facet.replace(":", "!=")]);
-      }
-
-      if (server.value && serverHideInstalled.value) {
-        const installedMods = server.value.mods.data
-          .filter((x) => x.project_id)
-          .map((x) => x.project_id);
-
-        installedMods.map((x) => [`project_id != ${x}`]).forEach((x) => formattedFacets.push(x));
-      }
-
-      // loaders specifier
-      if (server.value && !(serverOverrideLoaders.value || projectType.value.id === "modpack")) {
-        formattedFacets.push([
-          `categories:${encodeURIComponent(server.value.general.loader.toLowerCase())}`,
-        ]);
-      } else if (orFacets.value.length > 0) {
-        formattedFacets.push(orFacets.value);
-      } else if (projectType.value.id === "plugin") {
-        formattedFacets.push(
-          tags.value.loaderData.allPluginLoaders.map(
-            (x) => `categories:'${encodeURIComponent(x)}'`,
-          ),
-        );
-      } else if (projectType.value.id === "mod") {
-        formattedFacets.push(
-          tags.value.loaderData.modLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`),
-        );
-      } else if (projectType.value.id === "datapack") {
-        formattedFacets.push(
-          tags.value.loaderData.dataPackLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`),
-        );
-      }
-
-      if (
-        server.value &&
-        !(serverOverrideGameVersions.value || projectType.value.id === "modpack")
-      ) {
-        formattedFacets.push([`versions:${encodeURIComponent(server.value.general.mc_version)}`]);
-      } else if (selectedVersions.value.length > 0) {
-        const versionFacets = [];
-        for (const facet of selectedVersions.value) {
-          versionFacets.push("versions:" + facet);
-        }
-        formattedFacets.push(versionFacets);
-      }
-
-      if (onlyOpenSource.value) {
-        formattedFacets.push(["open_source:true"]);
-      }
-
-      if (selectedEnvironments.value.length > 0) {
-        let environmentFacets = [];
-
-        const includesClient = selectedEnvironments.value.includes("client");
-        const includesServer = selectedEnvironments.value.includes("server");
-        if (includesClient && includesServer) {
-          environmentFacets = [["client_side:required"], ["server_side:required"]];
-        } else {
-          if (includesClient) {
-            environmentFacets = [
-              ["client_side:optional", "client_side:required"],
-              ["server_side:optional", "server_side:unsupported"],
-            ];
-          }
-          if (includesServer) {
-            environmentFacets = [
-              ["client_side:optional", "client_side:unsupported"],
-              ["server_side:optional", "server_side:required"],
-            ];
-          }
-        }
-
-        formattedFacets = [...formattedFacets, ...environmentFacets];
-      }
-
-      if (projectType.value) {
-        formattedFacets.push([`project_type:${projectType.value.actual}`]);
-      }
-
-      params.push(`facets=${encodeURIComponent(JSON.stringify(formattedFacets))}`);
-    }
-
-    const offset = (currentPage.value - 1) * maxResults.value;
-    if (currentPage.value !== 1) {
-      params.push(`offset=${offset}`);
-    }
-
-    let url = "search";
-
-    if (params.length > 0) {
-      for (let i = 0; i < params.length; i++) {
-        url += i === 0 ? `?${params[i]}` : `&${params[i]}`;
-      }
-    }
-
-    return `${base}${url}`;
+    return `${base}search${requestParams.value}`;
   },
   {
     transform: (hits) => {
@@ -616,12 +545,20 @@ const pageCount = computed(() =>
   results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
 );
 
-const router = useNativeRouter();
-
-function onSearchChange(newPageNumber) {
-  noLoad.value = true;
-
+function setPage(newPageNumber) {
   currentPage.value = newPageNumber;
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  updateSearchResults();
+}
+
+function scrollToTop(behavior = "smooth") {
+  window.scrollTo({ top: 0, behavior });
+}
+
+function updateSearchResults() {
+  noLoad.value = true;
 
   if (query.value === null) {
     return;
@@ -630,106 +567,32 @@ function onSearchChange(newPageNumber) {
   refreshSearch();
 
   if (import.meta.client) {
-    const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true);
-    router.replace({ path: route.path, query: obj });
-  }
-}
+    const persistentParams = {};
 
-function getSearchUrl(offset, useObj) {
-  const queryItems = [];
-  const obj = {};
-
-  if (query.value) {
-    queryItems.push(`q=${encodeURIComponent(query.value)}`);
-    obj.q = query.value;
-  }
-  if (offset > 0) {
-    queryItems.push(`o=${offset}`);
-    obj.o = offset;
-  }
-  if (facets.value.length > 0) {
-    queryItems.push(`f=${encodeURIComponent(facets.value)}`);
-    obj.f = facets.value;
-  }
-  if (orFacets.value.length > 0) {
-    queryItems.push(`g=${encodeURIComponent(orFacets.value)}`);
-    obj.g = orFacets.value;
-  }
-  if (negativeFacets.value.length > 0) {
-    queryItems.push(`nf=${encodeURIComponent(negativeFacets.value)}`);
-    obj.nf = negativeFacets.value;
-  }
-  if (selectedVersions.value.length > 0) {
-    queryItems.push(`v=${encodeURIComponent(selectedVersions.value)}`);
-    obj.v = selectedVersions.value;
-  }
-  if (onlyOpenSource.value) {
-    queryItems.push("l=true");
-    obj.l = true;
-  }
-  if (showSnapshots.value) {
-    queryItems.push("h=true");
-    obj.h = true;
-  }
-  if (selectedEnvironments.value.length > 0) {
-    queryItems.push(`e=${encodeURIComponent(selectedEnvironments.value)}`);
-    obj.e = selectedEnvironments.value;
-  }
-  if (sortType.value.name !== "relevance") {
-    queryItems.push(`s=${encodeURIComponent(sortType.value.name)}`);
-    obj.s = sortType.value.name;
-  }
-  if (maxResults.value !== 20) {
-    queryItems.push(`m=${encodeURIComponent(maxResults.value)}`);
-    obj.m = maxResults.value;
-  }
-  if (server.value) {
-    queryItems.push(`sid=${encodeURIComponent(server.value.serverId)}`);
-    obj.sid = server.value.serverId;
-  }
-  if (serverHideInstalled.value) {
-    queryItems.push("shi=true");
-    obj.shi = true;
-  }
-  if (serverOverrideGameVersions.value) {
-    queryItems.push("sogv=true");
-    obj.sogv = true;
-  }
-  if (serverOverrideLoaders.value) {
-    queryItems.push("sol=true");
-    obj.sol = true;
-  }
-
-  let url = `${route.path}`;
-
-  if (queryItems.length > 0) {
-    url += `?${queryItems[0]}`;
-
-    for (let i = 1; i < queryItems.length; i++) {
-      url += `&${queryItems[i]}`;
+    for (const [key, value] of Object.entries(route.query)) {
+      if (PERSISTENT_QUERY_PARAMS.includes(key)) {
+        persistentParams[key] = value;
+      }
     }
+
+    if (serverHideInstalled.value) {
+      persistentParams.shi = "true";
+    } else {
+      delete persistentParams.shi;
+    }
+
+    const params = {
+      ...persistentParams,
+      ...createPageParams(),
+    };
+
+    router.replace({ path: route.path, query: params });
   }
-
-  return useObj ? obj : url;
 }
 
-function clearFilters() {
-  facets.value = [];
-  orFacets.value = [];
-  negativeFacets.value = [];
-  onlyOpenSource.value = false;
-  selectedVersions.value = [];
-  selectedEnvironments.value = [];
-  onSearchChange(1);
-}
-
-function onSearchChangeToTop(newPageNumber) {
-  if (import.meta.client) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  onSearchChange(newPageNumber);
-}
+watch([currentFilters, requestParams], () => {
+  updateSearchResults();
+});
 
 function cycleSearchDisplayMode() {
   cosmetics.value.searchDisplayMode[projectType.value.id] = data.$cycleValue(
@@ -737,25 +600,6 @@ function cycleSearchDisplayMode() {
     tags.value.projectViewModes,
   );
   setClosestMaxResults();
-}
-
-const previousMaxResults = ref(20);
-const maxResultsForView = ref({
-  list: [5, 10, 15, 20, 50, 100],
-  grid: [6, 12, 18, 24, 48, 96],
-  gallery: [6, 10, 16, 20, 50, 100],
-});
-
-function onMaxResultsChange(newPageNumber) {
-  newPageNumber = Math.max(
-    1,
-    Math.min(
-      Math.floor(newPageNumber / (maxResults.value / previousMaxResults.value)),
-      pageCount.value,
-    ),
-  );
-  previousMaxResults.value = maxResults.value;
-  onSearchChange(newPageNumber);
 }
 
 function setClosestMaxResults() {
@@ -769,230 +613,30 @@ function setClosestMaxResults() {
   }
 }
 
-const queryFilter = ref("");
-const filters = computed(() => {
-  const filters = {};
-
-  if (
-    projectType.value.id !== "resourcepack" &&
-    projectType.value.id !== "datapack" &&
-    (!server.value || serverOverrideLoaders.value || projectType.value.id === "modpack")
-  ) {
-    const loaders = tags.value.loaders
-      .filter((x) => {
-        if (projectType.value.id === "mod" && !showAllLoaders.value) {
-          return (
-            tags.value.loaderData.modLoaders.includes(x.name) &&
-            !tags.value.loaderData.hiddenModLoaders.includes(x.name)
-          );
-        } else if (projectType.value.id === "mod" && showAllLoaders.value) {
-          return tags.value.loaderData.modLoaders.includes(x.name);
-        } else if (projectType.value.id === "plugin") {
-          return tags.value.loaderData.pluginLoaders.includes(x.name);
-        } else if (projectType.value.id === "datapack") {
-          return tags.value.loaderData.dataPackLoaders.includes(x.name);
-        } else {
-          return x.supported_project_types.includes(projectType.value.actual);
-        }
-      })
-      .slice();
-
-    loaders.sort((a, b) => {
-      const isAHidden = tags.value.loaderData.hiddenModLoaders.includes(a.name);
-      const isBHidden = tags.value.loaderData.hiddenModLoaders.includes(b.name);
-
-      // Sort hidden mod loaders (true) after visible ones (false)
-      if (isAHidden && !isBHidden) return 1;
-      if (!isAHidden && isBHidden) return -1;
-      return 0; // No sorting if both are hidden or both are visible
-    });
-
-    if (loaders.length > 0) {
-      filters.loaders = loaders.map((x) => ({
-        icon: x.icon,
-        name: x.name,
-        type: "or",
-        facet: `categories:${x.name}`,
-      }));
-    }
-
-    if (projectType.value.id === "plugin") {
-      const platforms = tags.value.loaders.filter((x) =>
-        tags.value.loaderData.pluginPlatformLoaders.includes(x.name),
-      );
-
-      filters.platforms = platforms.map((x) => ({
-        icon: x.icon,
-        name: x.name,
-        type: "or",
-        facet: `categories:${x.name}`,
-      }));
-    }
-  }
-
-  if (!server.value || serverOverrideGameVersions.value || projectType.value.id === "modpack") {
-    filters.gameVersion = tags.value.gameVersions
-      .filter((x) => (showSnapshots.value ? true : x.version_type === "release"))
-      .map((x) => ({ name: x.version, type: "gameVersion" }));
-  }
-
-  if (!["resourcepack", "plugin", "shader", "datapack"].includes(projectType.value.id)) {
-    filters.environment = [
-      { name: "client", type: "env" },
-      { name: "server", type: "env" },
-    ];
-  }
-
-  for (const category of data.$sortedCategories()) {
-    if (category.project_type === projectType.value.actual) {
-      const parsedCategory = {
-        name: category.name,
-        icon: category.icon,
-        facet: `categories:${category.name}`,
-        type: category.header === "resolutions" ? "or" : "normal",
-      };
-
-      if (filters[category.header]) {
-        filters[category.header].push(parsedCategory);
-      } else {
-        filters[category.header] = [parsedCategory];
-      }
-    }
-  }
-
-  filters.license = [{ name: "Open source only", type: "license" }];
-
-  const filteredObj = {};
-
-  for (const [key, value] of Object.entries(filters)) {
-    const filters = queryFilter.value
-      ? value.filter((x) => x.name.toLowerCase().includes(queryFilter.value.toLowerCase()))
-      : value;
-
-    if (filters.length > 0) {
-      filteredObj[key] = filters;
-    }
-  }
-
-  return filteredObj;
+const selectableProjectTypes = computed(() => {
+  return [
+    { label: "Mods", href: `/mods` },
+    { label: "Resource Packs", href: `/resourcepacks` },
+    { label: "Data Packs", href: `/datapacks` },
+    { label: "Shaders", href: `/shaders` },
+    { label: "Modpacks", href: `/modpacks` },
+    { label: "Plugins", href: `/plugins` },
+  ];
 });
 
-function filterSelected(filter) {
-  if (filter.type === "or") {
-    return orFacets.value.includes(filter.facet);
-  } else if (filter.type === "normal") {
-    return facets.value.includes(filter.facet);
-  } else if (filter.type === "env") {
-    return selectedEnvironments.value.includes(filter.name);
-  } else if (filter.type === "gameVersion") {
-    return selectedVersions.value.includes(filter.name);
-  } else if (filter.type === "license") {
-    return onlyOpenSource.value;
-  }
-}
+const ogTitle = computed(
+  () => `Search ${projectType.value.display}s${query.value ? " | " + query.value : ""}`,
+);
+const description = computed(
+  () =>
+    `Search and browse thousands of Minecraft ${projectType.value.display}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value.display}s.`,
+);
 
-function negativeFilterSelected(filter) {
-  if (filter.type === "or" || filter.type === "normal") {
-    return negativeFacets.value.includes(filter.facet);
-  }
-}
-
-function toggleNegativeFilter(filter) {
-  const elementName = filter.facet;
-
-  if (filterSelected(filter)) {
-    if (filter.type === "or") {
-      const index = orFacets.value.indexOf(elementName);
-      orFacets.value.splice(index, 1);
-    } else if (filter.type === "normal") {
-      const index = facets.value.indexOf(elementName);
-      facets.value.splice(index, 1);
-    }
-  }
-
-  if (filter.type === "or" || filter.type === "normal") {
-    const index = negativeFacets.value.indexOf(elementName);
-    if (index !== -1) {
-      negativeFacets.value.splice(index, 1);
-    } else {
-      negativeFacets.value.push(elementName);
-    }
-  }
-
-  onSearchChange(1);
-}
-
-function toggleFilter(filter, doNotSendRequest) {
-  const elementName = filter.facet;
-
-  if (negativeFilterSelected(filter)) {
-    const index = negativeFacets.value.indexOf(elementName);
-    negativeFacets.value.splice(index, 1);
-  }
-
-  if (filter.type === "or") {
-    const index = orFacets.value.indexOf(elementName);
-    if (index !== -1) {
-      orFacets.value.splice(index, 1);
-    } else {
-      if (elementName === "categories:purpur") {
-        if (!orFacets.value.includes("categories:paper")) {
-          orFacets.value.push("categories:paper");
-        }
-        if (!orFacets.value.includes("categories:spigot")) {
-          orFacets.value.push("categories:spigot");
-        }
-        if (!orFacets.value.includes("categories:bukkit")) {
-          orFacets.value.push("categories:bukkit");
-        }
-      } else if (elementName === "categories:paper") {
-        if (!orFacets.value.includes("categories:spigot")) {
-          orFacets.value.push("categories:spigot");
-        }
-        if (!orFacets.value.includes("categories:bukkit")) {
-          orFacets.value.push("categories:bukkit");
-        }
-      } else if (elementName === "categories:spigot") {
-        if (!orFacets.value.includes("categories:bukkit")) {
-          orFacets.value.push("categories:bukkit");
-        }
-      } else if (elementName === "categories:waterfall") {
-        if (!orFacets.value.includes("categories:bungeecord")) {
-          orFacets.value.push("categories:bungeecord");
-        }
-      }
-      orFacets.value.push(elementName);
-    }
-  } else if (filter.type === "normal") {
-    const index = facets.value.indexOf(elementName);
-
-    if (index !== -1) {
-      facets.value.splice(index, 1);
-    } else {
-      facets.value.push(elementName);
-    }
-  } else if (filter.type === "env") {
-    const index = selectedEnvironments.value.indexOf(filter.name);
-    if (index !== -1) {
-      selectedEnvironments.value.splice(index, 1);
-    } else {
-      selectedEnvironments.value.push(filter.name);
-    }
-  } else if (filter.type === "gameVersion") {
-    const index = selectedVersions.value.indexOf(filter.name);
-    if (index !== -1) {
-      selectedVersions.value.splice(index, 1);
-    } else {
-      selectedVersions.value.push(filter.name);
-    }
-  } else if (filter.type === "license") {
-    onlyOpenSource.value = !onlyOpenSource.value;
-  }
-
-  if (!doNotSendRequest) {
-    onSearchChange(1);
-  }
-}
+useSeoMeta({
+  description,
+  ogTitle,
+  ogDescription: description,
+});
 </script>
 
 <style lang="scss" scoped>
@@ -1198,5 +842,20 @@ function toggleFilter(filter, doNotSendRequest) {
     flex-wrap: nowrap !important;
     flex-direction: row !important;
   }
+}
+
+.search-background {
+  width: 100%;
+  height: 20rem;
+  background-image: url("https://minecraft.wiki/images/The_Garden_Awakens_Key_Art_No_Creaking.jpg?9968c");
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, black, transparent);
+  opacity: 0.25;
+}
+
+.stylized-toggle:checked::after {
+  background: var(--color-accent-contrast) !important;
 }
 </style>

@@ -23,7 +23,7 @@
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "glob": "^10.2.7",
-    "nuxt": "^3.12.3",
+    "nuxt": "^3.14.1592",
     "postcss": "^8.4.39",
     "prettier-plugin-tailwindcss": "^0.6.5",
     "sass": "^1.58.0",
@@ -46,7 +46,7 @@
     "ansi-to-html": "^0.7.2",
     "dayjs": "^1.11.7",
     "dompurify": "^3.1.7",
-    "floating-vue": "2.0.0-beta.20",
+    "floating-vue": "^5.2.2",
     "fuse.js": "^6.6.2",
     "highlight.js": "^11.7.0",
     "iso-3166-1": "^2.1.1",
@@ -62,5 +62,6 @@
     "vue3-ace-editor": "^2.2.4",
     "vue3-apexcharts": "^1.5.2",
     "xss": "^1.0.14"
-  }
+  },
+  "web-types": "../../web-types.json"
 }
