@@ -1247,17 +1247,21 @@ if (!route.name.startsWith("type-id-settings")) {
 
 const onUserCollectProject = useClientTry(userCollectProject);
 
+const {version, loader} = route.query;
+if (version !== undefined && project.value.game_versions.includes(version)) {
+  userSelectedGameVersion.value = version;
+}
+if (loader !== undefined && project.value.loaders.includes(loader)) {
+  userSelectedPlatform.value = loader;
+}
+
 watch(downloadModal, (modal) => {
   if (!modal) return;
 
-  const {version, loader} = route.query;
-  if (!version && !loader) return;
-  if (version && !project.value.game_versions.includes(version)) return;
-  if (loader && !project.value.loaders.includes(loader)) return;
-
-  if (version) userSelectedGameVersion.value = version;
-  if (loader) userSelectedPlatform.value = loader;
-  modal.show();
+  // route.hash returns everything in the hash string, including the # itself
+  if (route.hash === "#download") {
+    modal.show();
+  }
 })
 
 async function setProcessing() {
