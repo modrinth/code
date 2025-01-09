@@ -25,6 +25,7 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { install as installVersion } from '@/store/install.js'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 const router = useRouter()
 
@@ -165,13 +166,7 @@ const handleOptionsClick = async (args) => {
       break
     }
     case 'open_link':
-      window.__TAURI_INVOKE__('tauri', {
-        __tauriModule: 'Shell',
-        message: {
-          cmd: 'open',
-          path: `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
-        },
-      })
+      openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
       break
     case 'copy_link':
       await navigator.clipboard.writeText(
@@ -181,6 +176,7 @@ const handleOptionsClick = async (args) => {
   }
 }
 
+const maxInstancesPerCompactRow = ref(1)
 const maxInstancesPerRow = ref(1)
 const maxProjectsPerRow = ref(1)
 
@@ -190,17 +186,34 @@ const calculateCardsPerRow = () => {
   // Convert container width from pixels to rem
   const containerWidthInRem =
     containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize)
-  maxInstancesPerRow.value = Math.floor((containerWidthInRem + 1) / 11)
-  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 1) / 19)
+
+  maxInstancesPerCompactRow.value = Math.floor((containerWidthInRem + 0.75) / 18.75)
+  maxInstancesPerRow.value = Math.floor((containerWidthInRem + 0.75) / 20.75)
+  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 0.75) / 18.75)
+
+  if (maxInstancesPerRow.value < 5) {
+    maxInstancesPerRow.value *= 2
+  }
+  if (maxInstancesPerCompactRow.value < 5) {
+    maxInstancesPerCompactRow.value *= 2
+  }
+  if (maxProjectsPerRow.value < 3) {
+    maxProjectsPerRow.value *= 2
+  }
 }
 
+const rowContainer = ref(null)
+const resizeObserver = ref(null)
 onMounted(() => {
   calculateCardsPerRow()
+  resizeObserver.value = new ResizeObserver(calculateCardsPerRow)
+  resizeObserver.value.observe(rowContainer.value)
   window.addEventListener('resize', calculateCardsPerRow)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', calculateCardsPerRow)
+  resizeObserver.value.unobserve(rowContainer.value)
 })
 </script>
 
@@ -213,17 +226,33 @@ onUnmounted(() => {
     proceed-label="Delete"
     @proceed="deleteProfile"
   />
-  <div class="content">
-    <div v-for="row in actualInstances" ref="rows" :key="row.label" class="row">
-      <div class="header">
-        <router-link :to="row.route">{{ row.label }}</router-link>
-        <ChevronRightIcon />
-      </div>
-      <section v-if="row.instance" ref="modsRow" class="instances">
+  <div ref="rowContainer" class="flex flex-col gap-4">
+    <div v-for="(row, rowIndex) in actualInstances" ref="rows" :key="row.label" class="row">
+      <router-link
+        class="flex mb-3 leading-none items-center gap-1 text-primary text-lg font-bold hover:underline group"
+        :class="{ 'mt-1': rowIndex > 0 }"
+        :to="row.route"
+      >
+        {{ row.label }}
+        <ChevronRightIcon
+          class="h-5 w-5 stroke-[3px] group-hover:translate-x-1 transition-transform group-hover:text-brand"
+        />
+      </router-link>
+      <section
+        v-if="row.instance"
+        ref="modsRow"
+        class="instances"
+        :class="{ compact: row.compact }"
+      >
         <Instance
-          v-for="instance in row.instances.slice(0, maxInstancesPerRow)"
-          :key="(instance?.project_id || instance?.id) + instance.install_stage"
+          v-for="(instance, instanceIndex) in row.instances.slice(
+            0,
+            row.compact ? maxInstancesPerCompactRow : maxInstancesPerRow,
+          )"
+          :key="row.label + instance.path"
           :instance="instance"
+          :compact="row.compact"
+          :first="instanceIndex === 0"
           @contextmenu.prevent.stop="(event) => handleInstanceRightClick(event, instance)"
         />
       </section>
@@ -308,16 +337,21 @@ onUnmounted(() => {
 
   .instances {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    grid-gap: 0.75rem;
     width: 100%;
+
+    &.compact {
+      grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+      gap: 0.75rem;
+    }
   }
 
   .projects {
     display: grid;
     width: 100%;
     grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-    grid-gap: 1rem;
+    grid-gap: 0.75rem;
 
     .item {
       width: 100%;

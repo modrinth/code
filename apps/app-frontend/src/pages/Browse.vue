@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { Ref } from 'vue'
-import { SearchIcon, XIcon } from '@modrinth/assets'
+import { SearchIcon, XIcon, ClipboardCopyIcon, GlobeIcon, ExternalIcon } from '@modrinth/assets'
 import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
   SearchFilterControl,
@@ -21,11 +21,12 @@ import { useRoute, useRouter } from 'vue-router'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_search_results } from '@/helpers/cache.js'
-import { debounce } from '@/helpers/utils.js'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 const { formatMessage } = useVIntl()
 
@@ -170,9 +171,13 @@ window.addEventListener('online', () => {
 const breadcrumbs = useBreadcrumbs()
 breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: route.query })
 
-const loading = ref(false)
+const loading = ref(true)
 
 const projectType = ref(route.params.projectType)
+
+watch(projectType, () => {
+  loading.value = true
+})
 
 type SearchResult = {
   project_id: string
@@ -190,6 +195,7 @@ const pageCount = computed(() =>
 )
 
 watch(requestParams, () => {
+  if (!route.params.projectType) return
   refreshSearch()
 })
 
@@ -214,44 +220,40 @@ async function refreshSearch() {
     }
   }
   results.value = rawResults.result
+
+  const persistentParams: LocationQuery = {}
+
+  for (const [key, value] of Object.entries(route.query)) {
+    if (PERSISTENT_QUERY_PARAMS.includes(key)) {
+      persistentParams[key] = value
+    }
+  }
+
+  if (instanceHideInstalled.value) {
+    persistentParams.ai = 'true'
+  } else {
+    delete persistentParams.ai
+  }
+
+  const params = {
+    ...persistentParams,
+    ...createPageParams(),
+  }
+
+  breadcrumbs.setContext({
+    name: 'Discover content',
+    link: `/browse/${projectType.value}`,
+    query: params,
+  })
+  await router.replace({ path: route.path, query: params })
+  loading.value = false
 }
 
-function setPage(newPageNumber: number) {
+async function setPage(newPageNumber: number) {
   currentPage.value = newPageNumber
 
-  updateSearchResults()
-  onSearchChangeToTop()
+  await onSearchChangeToTop()
 }
-
-async function updateSearchResults() {
-  await refreshSearch()
-
-  if (import.meta.client) {
-    const persistentParams: LocationQuery = {}
-
-    for (const [key, value] of Object.entries(route.query)) {
-      if (PERSISTENT_QUERY_PARAMS.includes(key)) {
-        persistentParams[key] = value
-      }
-    }
-
-    if (instanceHideInstalled.value) {
-      persistentParams.ai = 'true'
-    } else {
-      delete persistentParams.ai
-    }
-
-    const params = {
-      ...persistentParams,
-      ...createPageParams(),
-    }
-
-    await router.replace({ path: route.path, query: params })
-    breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: params })
-  }
-}
-
-const debouncedSearchChange = debounce(() => updateSearchResults(1), 200)
 
 const searchWrapper: Ref<HTMLElement | null> = ref(null)
 
@@ -261,12 +263,9 @@ async function onSearchChangeToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-async function clearSearch() {
+function clearSearch() {
   query.value = ''
-  await updateSearchResults()
 }
-
-async function clearFilters() {}
 
 watch(
   () => route.params.projectType,
@@ -275,14 +274,9 @@ watch(
     if (!newType || newType === projectType.value) return
 
     projectType.value = newType
-    breadcrumbs.setContext({ name: 'Discover content', link: `/browse/${projectType.value}` })
 
     currentSortType.value = { display: 'Relevance', name: 'relevance' }
     query.value = ''
-
-    loading.value = true
-    await clearFilters()
-    loading.value = false
   },
 )
 
@@ -359,6 +353,30 @@ const messages = defineMessages({
   },
 })
 
+const options = ref(null)
+const handleRightClick = (event, result) => {
+  options.value.showMenu(event, result, [
+    {
+      name: 'open_link',
+    },
+    {
+      name: 'copy_link',
+    },
+  ])
+}
+const handleOptionsClick = (args) => {
+  switch (args.option) {
+    case 'open_link':
+      openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
+      break
+    case 'copy_link':
+      navigator.clipboard.writeText(
+        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+      )
+      break
+  }
+}
+
 await refreshSearch()
 </script>
 
@@ -388,10 +406,12 @@ await refreshSearch()
       button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
       content-class="mb-3"
       inner-panel-class="ml-2 mr-3"
-      :open-by-default="filter.id.startsWith('category') || filter.id === 'environment'"
+      :open-by-default="
+        filter.id.startsWith('category') || filter.id === 'environment' || filter.id === 'license'
+      "
     >
       <template #header>
-        <h3 class="text-lg m-0">{{ filter.formatted_name }}</h3>
+        <h3 class="text-base m-0">{{ filter.formatted_name }}</h3>
       </template>
       <template #locked-game_version>
         {{ formatMessage(messages.gameVersionProvidedByInstance) }}
@@ -407,18 +427,16 @@ await refreshSearch()
       <InstanceIndicator :instance="instance" />
       <h1 class="m-0 mb-1 text-xl">Install content to instance</h1>
     </template>
-    <h1 v-else class="m-0 mb-1 text-2xl">Discover content</h1>
     <NavTabs :links="selectableProjectTypes" />
     <div class="iconified-input">
       <SearchIcon aria-hidden="true" class="text-lg" />
       <input
         v-model="query"
-        class="h-12"
+        class="h-12 card-shadow"
         autocomplete="off"
         spellcheck="false"
         type="text"
         :placeholder="`Search ${projectType}s...`"
-        @input="debouncedSearchChange()"
       />
       <Button v-if="query" class="r-btn" @click="() => clearSearch()">
         <XIcon />
@@ -432,7 +450,6 @@ await refreshSearch()
         name="Sort by"
         :options="sortTypes as any"
         :display-name="(option: SortType | undefined) => option?.display"
-        @change="updateSearchResults()"
       >
         <span class="font-semibold text-primary">Sort by: </span>
         <span class="font-semibold text-secondary">{{ selected }}</span>
@@ -443,7 +460,6 @@ await refreshSearch()
         name="Max results"
         :options="[5, 10, 15, 20, 50, 100]"
         class="max-w-[9rem]"
-        @change="updateSearchResults()"
       >
         <span class="font-semibold text-primary">View: </span>
         <span class="font-semibold text-secondary">{{ selected }}</span>
@@ -481,14 +497,18 @@ await refreshSearch()
                 loader.supported_project_types?.includes(projectType),
             ),
           ]"
-          :installed="result.installed"
+          :installed="result.installed || newlyInstalled.includes(result.project_id)"
           @install="
             (id) => {
               newlyInstalled.push(id)
-              refreshSearch()
             }
           "
+          @contextmenu.prevent.stop="(event) => handleRightClick(event, result)"
         />
+        <ContextMenu ref="options" @option-clicked="handleOptionsClick">
+          <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
+          <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+        </ContextMenu>
       </section>
       <div class="flex justify-end">
         <pagination

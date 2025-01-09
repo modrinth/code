@@ -295,7 +295,12 @@ impl RedisPool {
 
             fetch_ids.iter().for_each(|key| {
                 pipe.atomic().set_options(
-                    format!("{}_{namespace}:{}/lock", self.meta_namespace, key),
+                    // We store locks in lowercase because they are case insensitive
+                    format!(
+                        "{}_{namespace}:{}/lock",
+                        self.meta_namespace,
+                        key.to_lowercase()
+                    ),
                     100,
                     SetOptions::default()
                         .get(true)
@@ -395,7 +400,9 @@ impl RedisPool {
 
                                 pipe.atomic().del(format!(
                                     "{}_{namespace}:{}/lock",
-                                    self.meta_namespace, actual_slug
+                                    // Locks are stored in lowercase
+                                    self.meta_namespace,
+                                    actual_slug.to_lowercase()
                                 ));
                             }
                         }
@@ -408,8 +415,10 @@ impl RedisPool {
                             ids.remove(&base62);
 
                             pipe.atomic().del(format!(
-                                "{}_{namespace}:{base62}/lock",
-                                self.meta_namespace
+                                "{}_{namespace}:{}/lock",
+                                self.meta_namespace,
+                                // Locks are stored in lowercase
+                                base62.to_lowercase()
                             ));
                         }
 
@@ -423,6 +432,11 @@ impl RedisPool {
                 }
 
                 for (key, _) in ids {
+                    pipe.atomic().del(format!(
+                        "{}_{namespace}:{}/lock",
+                        self.meta_namespace,
+                        key.to_lowercase()
+                    ));
                     pipe.atomic().del(format!(
                         "{}_{namespace}:{key}/lock",
                         self.meta_namespace
@@ -451,7 +465,8 @@ impl RedisPool {
                                     format!(
                                         "{}_{namespace}:{}/lock",
                                         self.meta_namespace,
-                                        x.key()
+                                        // We lowercase key because locks are stored in lowercase
+                                        x.key().to_lowercase()
                                     )
                                 })
                                 .collect::<Vec<_>>(),

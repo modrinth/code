@@ -117,4 +117,8 @@ img {
   -ms-user-select: none;
 }
 
+.card-shadow {
+  box-shadow: var(--shadow-card);
+}
+
 @import '@modrinth/assets/omorphia.scss';

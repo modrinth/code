@@ -18,7 +18,7 @@
       <DropdownIcon v-else-if="collapsingToggleStyle" aria-hidden="true" />
     </button>
     <!-- aria-hidden is set so screenreaders only use the <button>'s aria-label -->
-    <p v-if="label" aria-hidden="true">
+    <p v-if="label" aria-hidden="true" class="checkbox-label">
       {{ label }}
     </p>
     <slot v-else />
@@ -137,5 +137,9 @@ function toggle() {
     box-shadow: none;
     cursor: not-allowed;
   }
+}
+
+.checkbox-label {
+  color: var(--color-base);
 }
 </style>

@@ -15,6 +15,8 @@ import {
   MaximizeIcon,
   RestoreIcon,
   LogOutIcon,
+  RightArrowIcon,
+  LeftArrowIcon,
 } from '@modrinth/assets'
 import { Avatar, Button, ButtonStyled, Notifications, OverflowMenu } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
@@ -56,39 +58,14 @@ import { get_user } from '@/helpers/cache.js'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
-import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
+import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 
 const themeStore = useTheming()
 
-const news = ref([
-  {
-    title: 'Introducing Modrinth Servers',
-    summary: 'Host your next Minecraft server with Modrinth.',
-    thumbnail:
-      'https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/asset/file/eefddc59-b4c4-4e7d-92e8-c26bdef42984/Modrinth-Servers-Thumb.png',
-    date: '2024-11-02T00:00:00Z',
-    link: 'https://blog.modrinth.com/p/modrinth-servers-beta',
-  },
-  {
-    title: 'Becoming Sustainable',
-    summary: 'Announcing 5x creator revenue and updates to the monetization program.',
-    thumbnail:
-      'https://media.beehiiv.com/cdn-cgi/image/format=auto,width=800,height=421,fit=scale-down,onerror=redirect/uploads/asset/file/c99b9885-8248-4d7a-b19a-3ae2c902fdd5/revenue.png',
-    date: '2024-09-13T00:00:00Z',
-    link: 'https://blog.modrinth.com/p/creator-revenue-update',
-  },
-  {
-    title: 'Modrinth+ and New Ads',
-    summary:
-      'Introducing a new advertising system, a subscription to remove ads, and a redesign of the website!\n',
-    thumbnail:
-      'https://media.beehiiv.com/cdn-cgi/image/fit=scale-down,format=auto,onerror=redirect,quality=80/uploads/asset/file/38ce85e4-5d93-43eb-b61b-b6296f6b9e66/things.png?t=1724260059',
-    date: '2024-08-21T00:00:00Z',
-    link: 'https://blog.modrinth.com/p/introducing-modrinth-refreshed-site-look-new-advertising-system',
-  },
-])
+const news = ref([])
 
 const urlModal = ref(null)
 
@@ -133,6 +110,9 @@ async function setupApp() {
     advanced_rendering,
     onboarded,
     default_page,
+    toggle_sidebar,
+    developer_mode,
+    feature_flags,
   } = await get()
 
   if (default_page === 'Library') {
@@ -150,6 +130,9 @@ async function setupApp() {
   themeStore.setThemeState(theme)
   themeStore.collapsedNavigation = collapsed_navigation
   themeStore.advancedRendering = advanced_rendering
+  themeStore.toggleSidebar = toggle_sidebar
+  themeStore.devMode = developer_mode
+  themeStore.featureFlags = feature_flags
 
   isMaximized.value = await getCurrentWindow().isMaximized()
 
@@ -188,6 +171,12 @@ async function setupApp() {
   ).then((res) => {
     if (res && res.header && res.body) {
       criticalErrorMessage.value = res
+    }
+  })
+
+  useFetch(`https://modrinth.com/blog/news.json`, 'news', true).then((res) => {
+    if (res && res.articles) {
+      news.value = res.articles
     }
   })
 
@@ -265,13 +254,25 @@ const hasPlus = computed(
     (credentials.value.user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG,
 )
 
+const sidebarToggled = ref(true)
+
+themeStore.$subscribe(() => {
+  sidebarToggled.value = !themeStore.toggleSidebar
+})
+
+const forceSidebar = computed(
+  () => route.path.startsWith('/browse') || route.path.startsWith('/project'),
+)
+const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
+const showAd = computed(() => !(!sidebarVisible.value || hasPlus.value))
+
 watch(
-  hasPlus,
+  showAd,
   () => {
-    if (hasPlus.value) {
+    if (!showAd.value) {
       hide_ads_window(true)
     } else {
-      show_ads_window()
+      init_ads_window(true)
     }
   },
   { immediate: true },
@@ -360,6 +361,7 @@ function handleAuxClick(e) {
 
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
+  <div id="teleports"></div>
   <div v-if="stateInitialized" class="app-grid-layout relative">
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
@@ -368,21 +370,21 @@ function handleAuxClick(e) {
       <InstanceCreationModal ref="installationModal" />
     </Suspense>
     <div
-      class="app-grid-navbar bg-bg-raised flex flex-col p-[1rem] pt-0 gap-[0.5rem] z-10 w-[--left-bar-width]"
+      class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
     >
-      <NavButton to="/">
+      <NavButton v-tooltip.right="'Home'" to="/">
         <HomeIcon />
-        <template #label>Home</template>
       </NavButton>
       <NavButton
+        v-tooltip.right="'Discover content'"
         to="/browse/modpack"
         :is-primary="() => route.path.startsWith('/browse') && !route.query.i"
         :is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
       >
         <CompassIcon />
-        <template #label>Discover content</template>
       </NavButton>
       <NavButton
+        v-tooltip.right="'Library'"
         to="/library"
         :is-subpage="
           () =>
@@ -392,25 +394,28 @@ function handleAuxClick(e) {
         "
       >
         <LibraryIcon />
-        <template #label>Library</template>
       </NavButton>
       <NavButton v-if="!offline" to="/SkinManager">
         <SkinManagerIcon />
         <template #label>Skin Manager</template>
       </NavButton>
       <div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
-      <NavButton :to="() => $refs.installationModal.show()" :disabled="offline">
+      <suspense>
+        <QuickInstanceSwitcher />
+      </suspense>
+      <NavButton
+        v-tooltip.right="'Create new instance'"
+        :to="() => $refs.installationModal.show()"
+        :disabled="offline"
+      >
         <PlusIcon />
-        <template #label>Create new instance</template>
       </NavButton>
       <div class="flex flex-grow"></div>
-      <NavButton v-if="updateAvailable" :to="() => restartApp()">
+      <NavButton v-if="updateAvailable" v-tooltip.right="'Install update'" :to="() => restartApp()">
         <DownloadIcon />
-        <template #label>Install update</template>
       </NavButton>
-      <NavButton :to="() => $refs.settingsModal.show()">
+      <NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
         <SettingsIcon />
-        <template #label>Settings</template>
       </NavButton>
       <ButtonStyled v-if="credentials" type="transparent" circular>
         <OverflowMenu
@@ -432,17 +437,44 @@ function handleAuxClick(e) {
           <template #sign-out> <LogOutIcon /> Sign out </template>
         </OverflowMenu>
       </ButtonStyled>
-      <NavButton v-else :to="() => signIn()">
+      <NavButton v-else v-tooltip.right="'Sign in'" :to="() => signIn()">
         <LogInIcon />
         <template #label>Sign in</template>
       </NavButton>
     </div>
     <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
-      <div data-tauri-drag-region class="flex p-4">
+      <div data-tauri-drag-region class="flex p-3">
         <ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
-        <Breadcrumbs />
+        <div class="flex items-center gap-1 ml-3">
+          <button
+            class="cursor-pointer p-0 m-0 border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+            @click="router.back()"
+          >
+            <LeftArrowIcon />
+          </button>
+          <button
+            class="cursor-pointer p-0 m-0 border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+            @click="router.forward()"
+          >
+            <RightArrowIcon />
+          </button>
+        </div>
+        <Breadcrumbs class="pt-[2px]" />
       </div>
-      <section class="flex ml-auto">
+      <section class="flex ml-auto items-center">
+        <ButtonStyled
+          v-if="!forceSidebar && themeStore.toggleSidebar"
+          :type="sidebarToggled ? 'standard' : 'transparent'"
+          circular
+        >
+          <button
+            class="mr-3 transition-transform"
+            :class="{ 'rotate-180': !sidebarToggled }"
+            @click="sidebarToggled = !sidebarToggled"
+          >
+            <RightArrowIcon />
+          </button>
+        </ButtonStyled>
         <div class="flex mr-3">
           <Suspense>
             <RunningAppBar />
@@ -467,7 +499,11 @@ function handleAuxClick(e) {
       </section>
     </div>
   </div>
-  <div v-if="stateInitialized" class="app-contents experimental-styles-within">
+  <div
+    v-if="stateInitialized"
+    class="app-contents experimental-styles-within"
+    :class="{ 'sidebar-enabled': sidebarVisible }"
+  >
     <div class="app-viewport flex-grow router-view">
       <div
         class="loading-indicator-container h-8 fixed z-50"
@@ -480,7 +516,7 @@ function handleAuxClick(e) {
         <ModrinthLoadingIndicator />
       </div>
       <div
-        v-if="themeStore.featureFlag_pagePath"
+        v-if="themeStore.featureFlags.page_path"
         class="absolute bottom-0 left-0 m-2 bg-tooltip-bg text-tooltip-text font-semibold rounded-full px-2 py-1 text-xs z-50"
       >
         {{ route.fullPath }}
@@ -509,7 +545,7 @@ function handleAuxClick(e) {
         :class="{ 'pb-12': !hasPlus }"
       >
         <div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
-        <div class="sidebar-default-content">
+        <div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
             <h3 class="text-lg m-0">Playing as</h3>
             <suspense>
@@ -521,7 +557,7 @@ function handleAuxClick(e) {
               <FriendsList :credentials="credentials" :sign-in="() => signIn()" />
             </suspense>
           </div>
-          <div class="pt-4 flex flex-col">
+          <div v-if="news && news.length > 0" class="pt-4 flex flex-col">
             <h3 class="px-4 text-lg m-0">News</h3>
             <template v-for="(item, index) in news" :key="`news-${index}`">
               <a
@@ -552,7 +588,7 @@ function handleAuxClick(e) {
           </div>
         </div>
       </div>
-      <template v-if="!hasPlus">
+      <template v-if="showAd">
         <a
           href="https://modrinth.plus?app"
           class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
@@ -579,21 +615,6 @@ function handleAuxClick(e) {
 </template>
 
 <style lang="scss" scoped>
-.sleek-primary {
-  background-color: var(--color-brand-highlight);
-  transition: all ease-in-out 0.1s;
-}
-
-.navigation-controls {
-  flex-grow: 1;
-  width: min-content;
-}
-
-.appbar-row {
-  display: flex;
-  flex-direction: row;
-}
-
 .window-controls {
   z-index: 20;
   display: none;
@@ -660,139 +681,10 @@ function handleAuxClick(e) {
   }
 }
 
-.app-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-
-  .view {
-    width: calc(100% - var(--sidebar-width));
-    background-color: var(--color-raised-bg);
-
-    .critical-error-banner {
-      margin-top: -1.25rem;
-      padding: 1rem;
-      background-color: rgba(203, 34, 69, 0.1);
-      border-left: 2px solid var(--color-red);
-      border-bottom: 2px solid var(--color-red);
-      border-right: 2px solid var(--color-red);
-      border-radius: 1rem;
-    }
-
-    .appbar {
-      display: flex;
-      align-items: center;
-      flex-grow: 1;
-      background: var(--color-raised-bg);
-      text-align: center;
-      padding: var(--gap-md);
-      height: 3.25rem;
-      gap: var(--gap-sm);
-      //no select
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .router-view {
-      width: 100%;
-      height: calc(100% - 3.125rem);
-      overflow: auto;
-      overflow-x: hidden;
-      background-color: var(--color-bg);
-      border-top-left-radius: var(--radius-xl);
-    }
-  }
-}
-
-.nav-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  background-color: var(--color-raised-bg);
-  box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-  padding: var(--gap-md);
-}
-
-.pages-list {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  width: 100%;
-  gap: 0.5rem;
-
-  a {
-    display: flex;
-    align-items: center;
-    word-spacing: 3px;
-    background: inherit;
-    transition: all ease-in-out 0.1s;
-    color: var(--color-base);
-    box-shadow: none;
-
-    &.router-link-active {
-      color: var(--color-contrast);
-      background: var(--color-button-bg);
-      box-shadow: var(--shadow-floating);
-    }
-
-    &:hover {
-      background-color: var(--color-button-bg);
-      color: var(--color-contrast);
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-      text-decoration: none;
-    }
-  }
-
-  &.primary {
-    color: var(--color-accent-contrast);
-    background-color: var(--color-brand);
-  }
-}
-
-.collapsed-button {
-  height: 3rem !important;
-  width: 3rem !important;
-  padding: 0.75rem;
-  border-radius: var(--radius-md);
-  box-shadow: none;
-
-  svg {
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    max-width: 1.5rem !important;
-    max-height: 1.5rem !important;
-  }
-}
-
-.nav-section {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  gap: 1rem;
-}
-
-.button-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: var(--gap-md);
-
-  .transparent {
-    padding: var(--gap-sm) 0;
-  }
-}
-
 .app-grid-layout,
 .app-contents {
-  --top-bar-height: 3.75rem;
-  --left-bar-width: 5rem;
+  --top-bar-height: 3rem;
+  --left-bar-width: 4rem;
   --right-bar-width: 300px;
 }
 
@@ -818,18 +710,21 @@ function handleAuxClick(e) {
 .app-contents {
   position: absolute;
   z-index: 1;
-  left: 5rem;
-  top: 3.75rem;
+  left: var(--left-bar-width);
+  top: var(--top-bar-height);
   right: 0;
   bottom: 0;
-  height: calc(100vh - 3.75rem);
+  height: calc(100vh - var(--top-bar-height));
   background-color: var(--color-bg);
   border-top-left-radius: var(--radius-xl);
 
   display: grid;
-  grid-template-columns: 1fr 300px;
-  //grid-template-columns: 1fr 0px;
-  transition: grid-template-columns 0.4s ease-in-out;
+  grid-template-columns: 1fr 0px;
+  // transition: grid-template-columns 0.4s ease-in-out;
+
+  &.sidebar-enabled {
+    grid-template-columns: 1fr 300px;
+  }
 }
 
 .loading-indicator-container {
@@ -841,7 +736,7 @@ function handleAuxClick(e) {
   overflow: visible;
   width: 300px;
   position: relative;
-  height: calc(100vh - 3.75rem);
+  height: calc(100vh - var(--top-bar-height));
   background: var(--brand-gradient-bg);
 
   --color-button-bg: var(--brand-gradient-button);
@@ -883,22 +778,15 @@ function handleAuxClick(e) {
   overflow-x: hidden;
 }
 
-//::-webkit-scrollbar-track {
-//  background-color: transparent; /* Make it transparent if needed */
-//  margin-block: 5px;
-//  margin-right: 5px;
-//}
-
 .app-contents::before {
   z-index: 1;
   content: '';
   position: fixed;
-  left: 5rem;
-  top: 3.75rem;
-  right: -5rem;
-  bottom: -5rem;
+  left: var(--left-bar-width);
+  top: var(--top-bar-height);
+  right: calc(-1 * var(--left-bar-width));
+  bottom: calc(-1 * var(--left-bar-width));
   border-radius: var(--radius-xl);
-  //box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.2) inset;
   box-shadow:
     1px 1px 15px rgba(0, 0, 0, 0.2) inset,
     inset 1px 1px 1px rgba(255, 255, 255, 0.23);
@@ -913,7 +801,7 @@ function handleAuxClick(e) {
   display: none;
 }
 
-.sidebar-teleport-content:empty + .sidebar-default-content {
+.sidebar-teleport-content:empty + .sidebar-default-content.sidebar-enabled {
   display: contents;
 }
 </style>

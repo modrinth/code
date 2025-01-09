@@ -133,15 +133,6 @@ export default new createRouter({
           },
         },
         {
-          path: 'options',
-          name: 'Options',
-          component: Instance.Options,
-          meta: {
-            useRootContext: true,
-            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Options' }],
-          },
-        },
-        {
           path: 'logs',
           name: 'Logs',
           component: Instance.Logs,
@@ -157,9 +148,9 @@ export default new createRouter({
   linkExactActiveClass: 'router-link-exact-active',
   scrollBehavior() {
     // Sometimes Vue's scroll behavior is not working as expected, so we need to manually scroll to top (especially on Linux)
-    document.querySelector('.router-view')?.scrollTo(0, 0)
+    document.querySelector('.app-viewport')?.scrollTo(0, 0)
     return {
-      el: '.router-view',
+      el: '.app-viewport',
       top: 0,
     }
   },

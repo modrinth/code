@@ -282,19 +282,59 @@ pub struct EditProfile {
 
     pub game_version: Option<String>,
     pub loader: Option<ModLoader>,
-    pub loader_version: Option<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub loader_version: Option<Option<String>>,
 
     pub groups: Option<Vec<String>>,
 
-    pub linked_data: Option<LinkedData>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub linked_data: Option<Option<LinkedData>>,
 
-    pub java_path: Option<String>,
-    pub extra_launch_args: Option<Vec<String>>,
-    pub custom_env_vars: Option<Vec<(String, String)>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub java_path: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub extra_launch_args: Option<Option<Vec<String>>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub custom_env_vars: Option<Option<Vec<(String, String)>>>,
 
-    pub memory: Option<MemorySettings>,
-    pub force_fullscreen: Option<bool>,
-    pub game_resolution: Option<WindowSize>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub memory: Option<Option<MemorySettings>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub force_fullscreen: Option<Option<bool>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,
 }
 
@@ -312,28 +352,40 @@ pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
         if let Some(loader) = edit_profile.loader {
             prof.loader = loader;
         }
-        prof.loader_version.clone_from(&edit_profile.loader_version);
-        prof.linked_data.clone_from(&edit_profile.linked_data);
-
+        if let Some(loader_version) = edit_profile.loader_version.clone() {
+            prof.loader_version = loader_version;
+        }
+        if let Some(linked_data) = edit_profile.linked_data.clone() {
+            prof.linked_data = linked_data;
+        }
         if let Some(groups) = edit_profile.groups.clone() {
             prof.groups = groups;
         }
-
-        prof.java_path.clone_from(&edit_profile.java_path);
-        prof.memory = edit_profile.memory;
-        prof.game_resolution = edit_profile.game_resolution;
-        prof.force_fullscreen = edit_profile.force_fullscreen;
-
+        if let Some(java_path) = edit_profile.java_path.clone() {
+            prof.java_path = java_path;
+        }
+        if let Some(memory) = edit_profile.memory {
+            prof.memory = memory;
+        }
+        if let Some(game_resolution) = edit_profile.game_resolution {
+            prof.game_resolution = game_resolution;
+        }
+        if let Some(force_fullscreen) = edit_profile.force_fullscreen {
+            prof.force_fullscreen = force_fullscreen;
+        }
         if let Some(hooks) = edit_profile.hooks.clone() {
             prof.hooks = hooks;
         }
 
         prof.modified = chrono::Utc::now();
 
-        prof.custom_env_vars
-            .clone_from(&edit_profile.custom_env_vars);
-        prof.extra_launch_args
-            .clone_from(&edit_profile.extra_launch_args);
+        if let Some(custom_env_vars) = edit_profile.custom_env_vars.clone() {
+            prof.custom_env_vars = custom_env_vars;
+        }
+        if let Some(extra_launch_args) = edit_profile.extra_launch_args.clone()
+        {
+            prof.extra_launch_args = extra_launch_args;
+        }
 
         async { Ok(()) }
     })

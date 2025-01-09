@@ -17,19 +17,21 @@
           <tr class="content">
             <td class="data">{{ instance?.loader }} {{ instance?.game_version }}</td>
             <td>
-              <DropdownSelect
+              <multiselect
                 v-if="versions?.length > 1"
                 v-model="selectedVersion"
                 :options="versions"
+                :searchable="true"
                 placeholder="Select version"
-                name="Version select"
-                :display-name="
+                open-direction="top"
+                :show-labels="false"
+                :custom-label="
                   (version) =>
                     `${version?.name} (${version?.loaders
                       .map((name) => formatCategory(name))
                       .join(', ')} - ${version?.game_versions.join(', ')})`
                 "
-                render-up
+                :max-height="150"
               />
               <span v-else>
                 <span>
@@ -56,12 +58,13 @@
 <script setup>
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { XIcon, DownloadIcon } from '@modrinth/assets'
-import { Button, DropdownSelect } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 import { add_project_from_version as installMod } from '@/helpers/profile'
 import { ref } from 'vue'
 import { handleError } from '@/store/state.js'
 import { trackEvent } from '@/helpers/analytics'
+import Multiselect from 'vue-multiselect'
 
 const instance = ref(null)
 const project = ref(null)
