@@ -506,7 +506,7 @@
                       placeholder="Search collections..."
                       class="search-input menu-search"
                     />
-                    <div v-if="collections.length > 0" class="collections-list">
+                    <div v-if="collections.length > 0" class="collections-list text-primary">
                       <Checkbox
                         v-for="option in collections
                           .slice()
