@@ -31,6 +31,7 @@ use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use itertools::Itertools;
+use log::error;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
@@ -978,6 +979,24 @@ pub async fn upload_file(
         if primary {
             return Err(CreateError::InvalidInput(msg.to_string()));
         }
+    }
+
+    let url = format!("{cdn_url}/{file_path_encode}");
+
+    let client = reqwest::Client::new();
+    let delphi_url = dotenvy::var("DELPHI_URL")?;
+    let res = client
+        .post(delphi_url)
+        .json(&serde_json::json!({
+            "url": url,
+            "project_id": project_id,
+            "version_id": version_id,
+        }))
+        .send()
+        .await?;
+
+    if !res.status().is_success() {
+        error!("Failed to upload file to Delphi: {url}");
     }
 
     version_files.push(VersionFileBuilder {
