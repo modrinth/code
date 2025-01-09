@@ -38,9 +38,13 @@
     <div class="withdraw-options-scroll">
       <div class="withdraw-options">
         <button
-          v-for="method in payoutMethods.filter((x) =>
-            x.name.toLowerCase().includes(search.toLowerCase()),
-          )"
+          v-for="method in payoutMethods
+            .filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+            .sort((a, b) =>
+              a.type !== 'tremendous'
+                ? -1
+                : a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+            )"
           :key="method.id"
           class="withdraw-option button-base"
           :class="{ selected: selectedMethodId === method.id }"
