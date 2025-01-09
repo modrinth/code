@@ -4,8 +4,8 @@
  *  and deserialized into a usable JS object.
  */
 import {invoke} from '@tauri-apps/api/core'
-import {install_to_existing_profile} from "@/helpers/pack.js";
-import {handleError} from "@/store/notifications.js";
+import {install_to_existing_profile} from '@/helpers/pack.js'
+import {handleError} from '@/store/notifications.js'
 
 /// Add instance
 /*
@@ -196,7 +196,7 @@ export async function finish_install(instance) {
       linkedData.project_id,
       linkedData.version_id,
       instance.name,
-      instance.path
+      instance.path,
     ).catch(handleError)
   } else {
     await install(instance.path, false).catch(handleError)

@@ -7,7 +7,7 @@ import {
   PlayIcon,
   SpinnerIcon,
   StopCircleIcon,
-  TimerIcon
+  TimerIcon,
 } from '@modrinth/assets'
 import {Avatar, ButtonStyled} from '@modrinth/ui'
 import {convertFileSrc} from '@tauri-apps/api/core'
@@ -51,7 +51,6 @@ const modLoading = computed(
 )
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
-const packInstalled = computed(() => props.instance.install_stage === 'pack_installed')
 
 const router = useRouter()
 

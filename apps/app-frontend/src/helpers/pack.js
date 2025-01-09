@@ -33,7 +33,7 @@ export async function install_to_existing_profile(projectId, versionId, title, p
     type: 'fromVersionId',
     project_id: projectId,
     version_id: versionId,
-    title
+    title,
   }
   return await invoke('plugin:pack|pack_install', { location, profile: profilePath })
 }

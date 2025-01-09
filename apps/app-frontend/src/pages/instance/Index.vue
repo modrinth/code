@@ -30,10 +30,18 @@
       </template>
       <template #actions>
         <div class="flex gap-2">
-          <ButtonStyled v-if="instance.install_stage.includes('installing')" color="brand" size="large">
+          <ButtonStyled
+            v-if="instance.install_stage.includes('installing')"
+            color="brand"
+            size="large"
+          >
             <button disabled>Installing...</button>
           </ButtonStyled>
-          <ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand" size="large">
+          <ButtonStyled
+            v-else-if="instance.install_stage !== 'installed'"
+            color="brand"
+            size="large"
+          >
             <button @click="repairInstance()">
               <DownloadIcon />
               Repair
