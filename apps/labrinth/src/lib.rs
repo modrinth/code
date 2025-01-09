@@ -489,7 +489,10 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("PYRO_API_KEY");
 
+    failed |= check_var::<String>("BREX_API_URL");
     failed |= check_var::<String>("BREX_API_KEY");
+
+    failed |= check_var::<String>("DELPHI_URL");
 
     failed
 }
