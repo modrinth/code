@@ -357,12 +357,6 @@ const options = ref(null)
 const handleRightClick = (event, result) => {
   options.value.showMenu(event, result, [
     {
-      name: 'install',
-    },
-    {
-      type: 'divider',
-    },
-    {
       name: 'open_link',
     },
     {

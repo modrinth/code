@@ -32,6 +32,7 @@ export type FilterType = {
   }[]
   searchable: boolean
   allows_custom_options?: 'and' | 'or'
+  ordering?: number
 } & (
   | {
       display: 'all' | 'scrollable' | 'none'
@@ -215,6 +216,7 @@ export function useSearch(
           query_value: gameVersion.version,
           method: 'or',
         })),
+        ordering: projectTypes.value.includes('mod') ? 2 : undefined,
       },
       {
         id: 'mod_loader',
@@ -243,6 +245,7 @@ export function useSearch(
               value: `categories:${loader.name}`,
             }
           }),
+        ordering: projectTypes.value.includes('mod') ? 1 : undefined,
       },
       {
         id: 'modpack_loader',
@@ -375,11 +378,13 @@ export function useSearch(
       },
     ]
 
-    return filterTypes.filter((filterType) =>
-      filterType.supported_project_types.some((projectType) =>
-        projectTypes.value.includes(projectType),
-      ),
-    )
+    return filterTypes
+      .filter((filterType) =>
+        filterType.supported_project_types.some((projectType) =>
+          projectTypes.value.includes(projectType),
+        ),
+      )
+      .sort((a, b) => (b.ordering ?? 0) - (a.ordering ?? 0))
   })
 
   const facets = computed(() => {

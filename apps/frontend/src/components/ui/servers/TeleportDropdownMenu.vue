@@ -72,6 +72,8 @@
                   :class="{
                     'bg-brand font-bold text-brand-inverted': selectedValue === item.option,
                     'bg-bg-raised': focusedOptionIndex === item.index,
+                    'rounded-b-xl': item.index === props.options.length - 1 && !isRenderingUp,
+                    'rounded-t-xl': item.index === 0 && isRenderingUp,
                   }"
                   :aria-selected="selectedValue === item.option"
                   @click="selectOption(item.option, item.index)"

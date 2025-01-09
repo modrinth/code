@@ -1,4 +1,4 @@
-use crate::data::{Dependency, User, Version};
+use crate::data::{Dependency, ProjectType, User, Version};
 use crate::jre::check_jre;
 use crate::prelude::ModLoader;
 use crate::state;
@@ -226,6 +226,7 @@ where
                                             path: file_name,
                                             size: metadata.len(),
                                             hash: sha1.clone(),
+                                            project_type: ProjectType::get_from_parent_folder(&full_path),
                                         },
                                     ));
                                 }
@@ -249,9 +250,9 @@ where
                                                     .metadata
                                                     .game_version
                                                     .clone(),
-                                                loader: mod_loader
+                                                loaders: vec![mod_loader
                                                     .as_str()
-                                                    .to_string(),
+                                                    .to_string()],
                                                 update_version_id:
                                                     update_version.id.clone(),
                                             },

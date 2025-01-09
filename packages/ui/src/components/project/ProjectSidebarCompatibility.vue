@@ -27,7 +27,7 @@
     </section>
     <section
       v-if="
-        (project.actualProjectType === 'mod' || project.project_type === 'modpack') &&
+        (project.project_type === 'mod' || project.project_type === 'modpack') &&
         !(project.client_side === 'unsupported' && project.server_side === 'unsupported') &&
         !(project.client_side === 'unknown' && project.server_side === 'unknown')
       "

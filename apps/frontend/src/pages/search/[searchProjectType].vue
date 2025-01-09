@@ -42,7 +42,11 @@
           Install content to server
         </h1>
       </template>
-      <NavTabs v-if="!server" :links="selectableProjectTypes" class="hidden md:flex" />
+      <NavTabs
+        v-if="!server && !flags.projectTypesPrimaryNav"
+        :links="selectableProjectTypes"
+        class="hidden md:flex"
+      />
     </section>
     <aside
       :class="{
@@ -338,11 +342,21 @@ const tags = useTags();
 const flags = useFeatureFlags();
 const auth = await useAuth();
 
-const projectType = computed(() =>
-  tags.value.projectTypes.find(
+const projectType = ref();
+function setProjectType() {
+  const projType = tags.value.projectTypes.find(
     (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
-  ),
-);
+  );
+
+  if (projType) {
+    projectType.value = projType;
+  }
+}
+setProjectType();
+router.afterEach(() => {
+  setProjectType();
+});
+
 const projectTypes = computed(() => [projectType.value.id]);
 
 const server = ref();
@@ -516,7 +530,7 @@ const {
     const config = useRuntimeConfig();
     const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
 
-    return `${base}/search${requestParams.value}`;
+    return `${base}search${requestParams.value}`;
   },
   {
     transform: (hits) => {

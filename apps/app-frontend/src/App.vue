@@ -16,6 +16,7 @@ import {
   RestoreIcon,
   LogOutIcon,
   RightArrowIcon,
+  LeftArrowIcon,
 } from '@modrinth/assets'
 import { Avatar, Button, ButtonStyled, Notifications, OverflowMenu } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
@@ -256,25 +257,19 @@ themeStore.$subscribe(() => {
   sidebarToggled.value = !themeStore.toggleSidebar
 })
 
-const forceSidebar = ref(false)
+const forceSidebar = computed(
+  () => route.path.startsWith('/browse') || route.path.startsWith('/project'),
+)
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
 const showAd = computed(() => !(!sidebarVisible.value || hasPlus.value))
 
-router.afterEach((to) => {
-  forceSidebar.value = to.path.startsWith('/browse') || to.path.startsWith('/project')
-})
-
-const currentTimeout = ref(null)
 watch(
   showAd,
   () => {
     if (!showAd.value) {
-      if (currentTimeout.value) clearTimeout(currentTimeout.value)
       hide_ads_window(true)
     } else {
-      currentTimeout.value = setTimeout(() => {
-        init_ads_window(true)
-      }, 400)
+      init_ads_window(true)
     }
   },
   { immediate: true },
@@ -443,6 +438,20 @@ function handleAuxClick(e) {
     <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
       <div data-tauri-drag-region class="flex p-3">
         <ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
+        <div class="flex items-center gap-1 ml-3">
+          <button
+            class="cursor-pointer p-0 m-0 border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+            @click="router.back()"
+          >
+            <LeftArrowIcon />
+          </button>
+          <button
+            class="cursor-pointer p-0 m-0 border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
+            @click="router.forward()"
+          >
+            <RightArrowIcon />
+          </button>
+        </div>
         <Breadcrumbs class="pt-[2px]" />
       </div>
       <section class="flex ml-auto items-center">
@@ -704,7 +713,7 @@ function handleAuxClick(e) {
 
   display: grid;
   grid-template-columns: 1fr 0px;
-  transition: grid-template-columns 0.4s ease-in-out;
+  // transition: grid-template-columns 0.4s ease-in-out;
 
   &.sidebar-enabled {
     grid-template-columns: 1fr 300px;

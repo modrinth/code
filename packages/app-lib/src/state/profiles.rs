@@ -1,5 +1,7 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::state::{cache_file_hash, CacheBehaviour, CachedEntry};
+use crate::state::{
+    cache_file_hash, CacheBehaviour, CachedEntry, CachedFileHash,
+};
 use crate::util;
 use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
 use crate::util::io::{self};
@@ -9,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use std::convert::TryFrom;
 use std::convert::TryInto;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -146,7 +148,7 @@ pub struct FileMetadata {
     pub version_id: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Copy)]
+#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectType {
     Mod,
@@ -176,7 +178,7 @@ impl ProjectType {
         }
     }
 
-    pub fn get_from_parent_folder(path: PathBuf) -> Option<Self> {
+    pub fn get_from_parent_folder(path: &Path) -> Option<Self> {
         // Get parent folder
         let path = path.parent()?.file_name()?;
         match path.to_str()? {
@@ -203,6 +205,15 @@ impl ProjectType {
             ProjectType::DataPack => "datapacks",
             ProjectType::ResourcePack => "resourcepacks",
             ProjectType::ShaderPack => "shaderpacks",
+        }
+    }
+
+    pub fn get_loaders(&self) -> &'static [&'static str] {
+        match self {
+            ProjectType::Mod => &["fabric", "forge", "quilt", "neoforge"],
+            ProjectType::DataPack => &["datapack"],
+            ProjectType::ResourcePack => &["vanilla", "canvas", "minecraft"],
+            ProjectType::ShaderPack => &["iris", "optifine"],
         }
     }
 
@@ -587,17 +598,10 @@ impl Profile {
 
         let file_updates = file_hashes
             .iter()
-            .filter_map(|x| {
-                all.iter().find(|prof| x.path.contains(&prof.path)).map(
-                    |profile| {
-                        format!(
-                            "{}-{}-{}",
-                            x.hash,
-                            profile.loader.as_str(),
-                            profile.game_version
-                        )
-                    },
-                )
+            .filter_map(|file| {
+                all.iter()
+                    .find(|prof| file.path.contains(&prof.path))
+                    .map(|profile| Self::get_cache_key(file, profile))
             })
             .collect::<Vec<_>>();
 
@@ -690,14 +694,7 @@ impl Profile {
 
         let file_updates = file_hashes
             .iter()
-            .map(|x| {
-                format!(
-                    "{}-{}-{}",
-                    x.hash,
-                    self.loader.as_str(),
-                    self.game_version
-                )
-            })
+            .map(|x| Self::get_cache_key(x, self))
             .collect::<Vec<_>>();
 
         let file_hashes_ref =
@@ -771,6 +768,18 @@ impl Profile {
         }
 
         Ok(files)
+    }
+
+    fn get_cache_key(file: &CachedFileHash, profile: &Profile) -> String {
+        format!(
+            "{}-{}-{}",
+            file.hash,
+            file.project_type
+                .filter(|x| *x != ProjectType::Mod)
+                .map(|x| x.get_loaders().join("+"))
+                .unwrap_or_else(|| profile.loader.as_str().to_string()),
+            profile.game_version
+        )
     }
 
     #[tracing::instrument(skip(pool))]
@@ -873,8 +882,15 @@ impl Profile {
         let project_path =
             format!("{}/{}", project_type.get_folder(), file_name);
 
-        cache_file_hash(bytes.clone(), profile_path, &project_path, hash, exec)
-            .await?;
+        cache_file_hash(
+            bytes.clone(),
+            profile_path,
+            &project_path,
+            hash,
+            Some(project_type),
+            exec,
+        )
+        .await?;
 
         util::fetch::write(&path.join(&project_path), &bytes, io_semaphore)
             .await?;

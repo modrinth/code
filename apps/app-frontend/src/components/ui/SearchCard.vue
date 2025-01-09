@@ -1,6 +1,6 @@
 <template>
   <div
-    class="card-shadow button-base p-4 bg-bg-raised rounded-xl flex gap-3 group"
+    class="card-shadow p-4 bg-bg-raised rounded-xl flex gap-3 group cursor-pointer hover:brightness-90 transition-all"
     @click="
       () => {
         emit('open')
@@ -12,21 +12,7 @@
     "
   >
     <div class="icon w-[96px] h-[96px] relative">
-      <Avatar
-        :src="project.icon_url"
-        size="96px"
-        class="search-icon origin-top transition-all"
-        :class="{ 'scale-[0.85]': installed, 'brightness-50': installing }"
-      />
-      <div v-if="installing" class="rounded-2xl absolute inset-0 flex items-center justify-center">
-        <SpinnerIcon class="h-8 w-8 animate-spin" />
-      </div>
-      <div
-        v-if="installed"
-        class="absolute shadow-sm font-semibold bottom-0 w-full p-1 bg-button-bg rounded-full text-xs justify-center items-center flex gap-1 text-brand border-[1px] border-solid border-[--color-button-border]"
-      >
-        <CheckIcon class="shrink-0 stroke-[3px]" /> Installed
-      </div>
+      <Avatar :src="project.icon_url" size="96px" class="search-icon origin-top transition-all" />
     </div>
     <div class="flex flex-col gap-2 overflow-hidden">
       <div class="gap-2 overflow-hidden no-wrap text-ellipsis">
@@ -40,6 +26,42 @@
       </div>
       <div v-if="categories.length > 0" class="mt-auto flex items-center gap-1 no-wrap">
         <TagsIcon class="h-4 w-4 shrink-0" />
+        <div
+          v-if="project.project_type === 'mod' || project.project_type === 'modpack'"
+          class="text-sm font-semibold text-secondary flex gap-1 px-[0.375rem] py-0.5 bg-button-bg rounded-full"
+        >
+          <template v-if="project.client_side === 'optional' && project.server_side === 'optional'">
+            Client or server
+          </template>
+          <template
+            v-else-if="
+              (project.client_side === 'optional' || project.client_side === 'required') &&
+              (project.server_side === 'optional' || project.server_side === 'unsupported')
+            "
+          >
+            Client
+          </template>
+          <template
+            v-else-if="
+              (project.server_side === 'optional' || project.server_side === 'required') &&
+              (project.client_side === 'optional' || project.client_side === 'unsupported')
+            "
+          >
+            Server
+          </template>
+          <template
+            v-else-if="
+              project.client_side === 'unsupported' && project.server_side === 'unsupported'
+            "
+          >
+            Unsupported
+          </template>
+          <template
+            v-else-if="project.client_side === 'required' && project.server_side === 'required'"
+          >
+            Client and server
+          </template>
+        </div>
         <div
           v-for="tag in categories"
           :key="tag"
@@ -65,19 +87,8 @@
         </span>
       </div>
       <div class="mt-auto relative">
-        <div
-          class="flex items-center gap-2 group-hover:-translate-y-3 group-hover:opacity-0 group-focus-within:opacity-0 group-hover:scale-95 group-focus-within:scale-95 transition-all"
-        >
-          <HistoryIcon class="shrink-0" />
-          <span>
-            <span class="text-secondary">Updated</span>
-            {{ dayjs(project.date_modified ?? project.updated).fromNow() }}
-          </span>
-        </div>
-        <div
-          class="opacity-0 scale-95 translate-y-3 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:opacity-100 group-focus-within:scale-100 absolute bottom-0 right-0 transition-all w-fit"
-        >
-          <ButtonStyled color="brand">
+        <div class="absolute bottom-0 right-0 w-fit">
+          <ButtonStyled color="brand" type="outlined">
             <button
               :disabled="installed || installing"
               class="shrink-0 no-wrap"
@@ -106,15 +117,7 @@
 </template>
 
 <script setup>
-import {
-  SpinnerIcon,
-  TagsIcon,
-  DownloadIcon,
-  HeartIcon,
-  PlusIcon,
-  CheckIcon,
-  HistoryIcon,
-} from '@modrinth/assets'
+import { TagsIcon, DownloadIcon, HeartIcon, PlusIcon, CheckIcon } from '@modrinth/assets'
 import { ButtonStyled, Avatar } from '@modrinth/ui'
 import { formatNumber, formatCategory } from '@modrinth/utils'
 import dayjs from 'dayjs'
