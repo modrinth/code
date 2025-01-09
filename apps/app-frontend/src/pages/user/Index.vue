@@ -7,6 +7,7 @@
       :download-count="sumDownloads"
       class="project-sidebar-section"
     />
+    <UserSidebarCollections :collections="collections" :link="(collection: Collection) => `/collection/${collection.id}${instanceQueryAppendage}`" class="project-sidebar-section" />
   </Teleport>
   <div v-if="user" class="p-6 flex flex-col gap-4">
     <InstanceIndicator :instance="instance" />
@@ -54,12 +55,12 @@ import {
   commonMessages,
   OverflowMenu,
   UserHeader,
-  UserSidebarBadges
+  UserSidebarBadges, UserSidebarCollections
 } from '@modrinth/ui'
 import { ReportIcon, ClipboardCopyIcon, MoreVerticalIcon } from '@modrinth/assets'
 import { useVIntl } from '@vintl/vintl'
 import { useFetch } from '@/helpers/fetch'
-import type { User, Project, Organization } from '@modrinth/utils'
+import type { User, Project, Organization, Collection } from '@modrinth/utils'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useTheming } from '@/store/theme'
 import { useInstanceContext } from '@/composables/instance-context'
@@ -73,11 +74,15 @@ const { formatMessage } = useVIntl()
 const user: Ref<User | null> = ref(null)
 const projects: Ref<Project[]> = ref([])
 const organizations: Ref<Organization[]> = ref([])
+const collections: Ref<Collection[]> = ref([])
 
 async function fetchUser() {
-  user.value = await useFetch(`https://api.modrinth.com/v2/user/${route.params.id}`).catch(handleError)
-  projects.value = await useFetch(`https://api.modrinth.com/v2/user/${route.params.id}/projects`).catch(handleError)
-  organizations.value = await useFetch(`https://api.modrinth.com/v3/user/${route.params.id}/organizations`).catch(handleError)
+  [ user.value, projects.value, organizations.value, collections.value ] = await Promise.all([
+    useFetch(`https://api.modrinth.com/v2/user/${route.params.id}`).catch(handleError),
+    useFetch(`https://api.modrinth.com/v2/user/${route.params.id}/projects`).catch(handleError),
+    useFetch(`https://api.modrinth.com/v3/user/${route.params.id}/organizations`).catch(handleError),
+    useFetch(`https://api.modrinth.com/v3/user/${route.params.id}/collections`).catch(handleError)
+  ])
 
   if (!user.value) {
     return;
