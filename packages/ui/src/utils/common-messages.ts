@@ -110,7 +110,7 @@ export const commonMessages = defineMessages({
     defaultMessage: '{count} {count, plural, one {member} other {members}}',
   },
   privateLabel: {
-    id: 'collection.label.private',
+    id: 'label.private',
     defaultMessage: 'Private',
   },
   publicLabel: {
@@ -188,6 +188,10 @@ export const commonMessages = defineMessages({
   unlistedLabel: {
     id: 'label.unlisted',
     defaultMessage: 'Unlisted',
+  },
+  unknownLabel: {
+    id: 'label.unknown',
+    defaultMessage: 'Unknown',
   },
   uploadImageButton: {
     id: 'button.upload-image',

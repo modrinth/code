@@ -335,3 +335,18 @@ export type OrganizationMember = {
   payouts_split: number
   ordering: number
 }
+
+export type Collection = {
+  id: ModrinthId
+  user: User
+  name: string
+  description: string
+  icon_url: string
+  color: number
+  status: CollectionStatus
+  created: string
+  updated: string
+  projects: ModrinthId[]
+}
+
+export type CollectionStatus = 'listed' | 'unlisted' | 'private' | 'unknown'

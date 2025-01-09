@@ -1,8 +1,7 @@
 <template>
   <template v-if="projects.length > 0">
-
-    <div class="mb-3">
       <NavTabs
+        v-if="availableProjectTypes.length > 1"
         :tabs="[
         {
           label: formatMessage(ANY_PROJECT_TYPE_MESSAGE),
@@ -19,7 +18,6 @@
       ]"
         class="mb-3"
       />
-    </div>
     <div class="mb-3 flex gap-2">
       <div class="iconified-input flex-1">
         <SearchIcon />

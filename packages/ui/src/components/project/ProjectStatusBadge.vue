@@ -19,6 +19,7 @@ import type { Component } from 'vue'
 import { computed } from 'vue'
 import Badge from '../base/SimpleBadge.vue'
 import type { ProjectStatus } from '@modrinth/utils'
+import { commonMessages } from '../../utils/common-messages'
 
 const props = defineProps<{
   status: ProjectStatus
@@ -34,17 +35,11 @@ const metadata = computed(() => ({
 const statusMetadata: Record<ProjectStatus, { icon?: Component; message: MessageDescriptor }> = {
   approved: {
     icon: GlobeIcon,
-    message: defineMessage({
-      id: 'project.visibility.public',
-      defaultMessage: 'Public',
-    }),
+    message: commonMessages.publicLabel,
   },
   unlisted: {
     icon: LinkIcon,
-    message: defineMessage({
-      id: 'project.visibility.unlisted',
-      defaultMessage: 'Unlisted',
-    }),
+    message: commonMessages.unlistedLabel,
   },
   withheld: {
     icon: LinkIcon,
@@ -55,10 +50,7 @@ const statusMetadata: Record<ProjectStatus, { icon?: Component; message: Message
   },
   private: {
     icon: LockIcon,
-    message: defineMessage({
-      id: 'project.visibility.private',
-      defaultMessage: 'Private',
-    }),
+    message: commonMessages.privateLabel,
   },
   scheduled: {
     icon: CalendarIcon,
@@ -83,10 +75,7 @@ const statusMetadata: Record<ProjectStatus, { icon?: Component; message: Message
   },
   rejected: {
     icon: XIcon,
-    message: defineMessage({
-      id: 'project.visibility.rejected',
-      defaultMessage: 'Rejected',
-    }),
+    message: commonMessages.rejectedLabel,
   },
   processing: {
     icon: UpdatedIcon,
@@ -97,10 +86,7 @@ const statusMetadata: Record<ProjectStatus, { icon?: Component; message: Message
   },
   unknown: {
     icon: UnknownIcon,
-    message: defineMessage({
-      id: 'project.visibility.unknown',
-      defaultMessage: 'Unknown',
-    }),
+    message: commonMessages.unknownLabel,
   },
 }
 </script>

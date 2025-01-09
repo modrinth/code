@@ -104,8 +104,16 @@ export { default as ThemeSelector } from './settings/ThemeSelector.vue'
 export { default as UserBadge } from './user/UserBadge.vue'
 export { default as UserHeader } from './user/UserHeader.vue'
 export { default as UserSidebarBadges } from './user/UserSidebarBadges.vue'
+export { default as UserSidebarCollections } from './user/UserSidebarCollections.vue'
 export { default as UserSidebarOrganizations } from './user/UserSidebarOrganizations.vue'
 
 // Organization
 export { default as OrganizationHeader } from './organization/OrganizationHeader.vue'
 export { default as OrganizationSidebarMembers } from './organization/OrganizationSidebarMembers.vue'
+
+// Collection
+export { default as CollectionHeader } from './collection/CollectionHeader.vue'
+export { default as CollectionSidebarCurator } from './collection/CollectionSidebarCurator.vue'
+export { default as CollectionSidebarDescription } from './collection/CollectionSidebarDescription.vue'
+export { default as CollectionSidebarDetails } from './collection/CollectionSidebarDetails.vue'
+export { default as CollectionStatusBadge } from './collection/CollectionStatusBadge.vue'

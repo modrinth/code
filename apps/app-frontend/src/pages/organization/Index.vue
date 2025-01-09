@@ -6,7 +6,7 @@
     <InstanceIndicator :instance="instance" />
     <OrganizationHeader :organization="organization" :download-count="sumDownloads" :project-count="projects.length">
       <template #actions>
-        <ButtonStyled circular type="transparent" size="large">
+        <ButtonStyled v-if="themeStore.devMode" circular type="transparent" size="large">
           <OverflowMenu
             :options="[
                   { id: 'copy-id', action: () => copyId(), shown: themeStore.devMode },

@@ -3,6 +3,7 @@ import * as Pages from '@/pages'
 import * as Project from '@/pages/project'
 import * as User from '@/pages/user'
 import * as Organization from '@/pages/organization'
+import * as Collection from '@/pages/collection'
 import * as Instance from '@/pages/instance'
 import * as Library from '@/pages/library'
 
@@ -120,6 +121,16 @@ export default new createRouter({
       meta: {
         useContext: true,
         breadcrumb: [{ name: '?Organization', link: '/organization/{id}' }],
+      },
+    },
+    {
+      path: '/collection/:id',
+      name: 'Collection',
+      component: Collection.Index,
+      props: true,
+      meta: {
+        useContext: true,
+        breadcrumb: [{ name: '?Collection', link: '/collection/{id}' }],
       },
     },
     {
