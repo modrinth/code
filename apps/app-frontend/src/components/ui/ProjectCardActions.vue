@@ -32,15 +32,10 @@ const installing = ref(false)
 
 const installed: Ref<boolean> = ref(false)
 
-checkInstallStatus()
-
 function checkInstallStatus() {
   if (props.instanceContent) {
-    installed.value = Object.values(props.instanceContent).some((content) => {
-      if (content.metadata?.project_id === projectId.value) {
-        return true
-      }
-    })
+    installed.value = Object.values(props.instanceContent)
+      .some((content) => content.metadata?.project_id === projectId.value)
   }
 }
 
@@ -64,7 +59,9 @@ async function install(toInstance: boolean) {
 
 const modpack = computed(() => props.project.project_type === 'modpack')
 
-const projectWebUrl = computed(() => `https://modrinth.com/${props.project.project_type}/${props.project.slug}`)
+const projectWebUrl = computed(
+  () => `https://modrinth.com/${props.project.project_type}/${props.project.slug}`,
+)
 
 const tooltip = defineMessages({
   installing: {
@@ -88,23 +85,41 @@ const messages = defineMessages({
   },
 })
 
-const projectId = computed(() => isSearchResult(props.project) ? props.project.project_id : props.project.id)
+const projectId = computed(() =>
+  isSearchResult(props.project) ? props.project.project_id : props.project.id,
+)
 
 const copyText = (text: string) => {
-  navigator.clipboard.writeText(text);
+  navigator.clipboard.writeText(text)
 }
+
+checkInstallStatus()
 </script>
 
 <template>
   <ButtonStyled color="brand">
-    <button v-tooltip="installing ? formatMessage(tooltip.installing) : installed ? formatMessage(tooltip.installed) : null" :disabled="installing || installed" @click="() => install(true)">
+    <button
+      v-tooltip="
+        installing
+          ? formatMessage(tooltip.installing)
+          : installed
+            ? formatMessage(tooltip.installed)
+            : null
+      "
+      :disabled="installing || installed"
+      @click="() => install(true)"
+    >
       <SpinnerIcon v-if="installing" />
       <CheckIcon v-else-if="installed" />
       <DownloadIcon v-else />
-      {{ formatMessage(
-        installing ? commonMessages.installingButton :
-        installed ? commonMessages.installedButton :
-        commonMessages.installButton)
+      {{
+        formatMessage(
+          installing
+            ? commonMessages.installingButton
+            : installed
+              ? commonMessages.installedButton
+              : commonMessages.installButton,
+        )
       }}
     </button>
   </ButtonStyled>
@@ -164,12 +179,8 @@ const copyText = (text: string) => {
       <template #install-elsewhere>
         <DownloadIcon /> {{ formatMessage(commonMessages.installToButton) }}
       </template>
-      <template #versions>
-        <VersionIcon /> {{ formatMessage(messages.viewVersions) }}
-      </template>
-      <template #gallery>
-        <ImageIcon /> {{ formatMessage(messages.viewGallery) }}
-      </template>
+      <template #versions> <VersionIcon /> {{ formatMessage(messages.viewVersions) }} </template>
+      <template #gallery> <ImageIcon /> {{ formatMessage(messages.viewGallery) }} </template>
       <template #open-link>
         <ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
       </template>
