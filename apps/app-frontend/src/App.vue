@@ -395,10 +395,6 @@ function handleAuxClick(e) {
       >
         <LibraryIcon />
       </NavButton>
-      <NavButton v-if="!offline" to="/SkinManager">
-        <SkinManagerIcon />
-        <template #label>Skin Manager</template>
-      </NavButton>
       <div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
       <suspense>
         <QuickInstanceSwitcher />
@@ -549,7 +545,7 @@ function handleAuxClick(e) {
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
             <h3 class="text-lg m-0">Playing as</h3>
             <suspense>
-              <AccountsCard ref="accounts" mode="small" />
+              <AccountsCard ref="accounts" />
             </suspense>
           </div>
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">

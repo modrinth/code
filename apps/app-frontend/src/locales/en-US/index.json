@@ -20,6 +20,9 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
+  "instance.filter.disabled": {
+    "message": "Disabled projects"
+  },
   "instance.filter.updates-available": {
     "message": "Updates available"
   },
@@ -304,6 +307,18 @@
   },
   "instance.settings.title": {
     "message": "Settings"
+  },
+  "minecraft-account.add-account": {
+    "message": "Add account"
+  },
+  "minecraft-account.change-skin": {
+    "message": "Change skin"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "Not signed in"
+  },
+  "minecraft-account.remove-account": {
+    "message": "Remove account"
   },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"
