@@ -44,7 +44,6 @@
         <NewProjectCard
           :project="project"
           :link="projectLink(project)"
-          :platform-tags="platformTags"
           :experimental-colors="experimentalColors"
           :date-type="sortBy.id === 'published' ? 'published' : 'updated'"
         >
@@ -75,7 +74,7 @@
 <script setup lang="ts">
 import { useVIntl, defineMessages, defineMessage } from '@vintl/vintl'
 import { XCircleIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import type { PlatformTag, Project, VirtualProjectType } from '@modrinth/utils'
+import type { Project, VirtualProjectType } from '@modrinth/utils'
 import NewProjectCard from './NewProjectCard.vue'
 import { ref, computed, type Ref } from 'vue'
 import { Button, DropdownSelect } from '../index'
@@ -121,11 +120,9 @@ const props = withDefaults(
   defineProps<{
     projects: Project[]
     projectLink: (project: Project) => Linkish
-    platformTags?: PlatformTag[]
     experimentalColors?: boolean
   }>(),
   {
-    platformTags: undefined,
     experimentalColors: false,
   },
 )
@@ -136,6 +133,8 @@ const sortedProjects = computed(() => props.projects.slice().sort(sortBy.value.s
 
 const projectType: Ref<VirtualProjectType | null> = ref(null)
 
+const PROJECT_TYPES_ORDER = ['mod', 'resourcepack', 'datapack', 'shader', 'modpack', 'plugin']
+
 const availableProjectTypes = computed(() => {
   const types = new Set<VirtualProjectType>()
 
@@ -143,7 +142,9 @@ const availableProjectTypes = computed(() => {
     types.add(project.project_type)
   }
 
-  return [...types]
+  const typesArray = [...types]
+  typesArray.sort((a, b) => PROJECT_TYPES_ORDER.indexOf(a) - PROJECT_TYPES_ORDER.indexOf(b))
+  return typesArray
 })
 
 const filteredProjects = computed(() =>

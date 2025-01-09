@@ -287,7 +287,6 @@
                 :categories="result.display_categories"
                 :link="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`"
                 :creator-link="`/user/${result.author}`"
-                :platform-tags="tags.loaders"
               >
                 <template v-if="false" #actions> </template>
               </NewProjectCard>
