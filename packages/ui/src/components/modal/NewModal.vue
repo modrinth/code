@@ -70,7 +70,7 @@ const props = withDefaults(
     closeOnClickOutside: true,
     closeOnEsc: true,
     warnOnClose: false,
-    header: null,
+    header: undefined,
     onHide: () => {},
     onShow: () => {},
   },

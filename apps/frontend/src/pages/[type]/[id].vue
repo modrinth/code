@@ -184,7 +184,19 @@
         </div>
       </div>
     </div>
-    <NewModal ref="downloadModal">
+    <NewModal
+      ref="downloadModal"
+      :on-show="
+        () => {
+          navigateTo({ query: route.query, hash: '#download' });
+        }
+      "
+      :on-hide="
+        () => {
+          navigateTo({ query: route.query, hash: '' });
+        }
+      "
+    >
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
         <div class="truncate text-lg font-extrabold text-contrast">
@@ -303,6 +315,15 @@
                         if (!currentPlatform && platformAccordion) {
                           platformAccordion.open();
                         }
+
+                        navigateTo({
+                          query: {
+                            ...route.query,
+                            ...(userSelectedGameVersion && { version: userSelectedGameVersion }),
+                            ...(userSelectedPlatform && { loader: userSelectedPlatform }),
+                          },
+                          hash: route.hash,
+                        });
                       }
                     "
                   >
@@ -379,6 +400,15 @@
                         if (!currentGameVersion && gameVersionAccordion) {
                           gameVersionAccordion.open();
                         }
+
+                        navigateTo({
+                          query: {
+                            ...route.query,
+                            ...(userSelectedGameVersion && { version: userSelectedGameVersion }),
+                            ...(userSelectedPlatform && { loader: userSelectedPlatform }),
+                          },
+                          hash: route.hash,
+                        });
                       }
                     "
                   >
@@ -828,6 +858,7 @@ import {
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
+import { navigateTo } from "#app";
 import dayjs from "dayjs";
 import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
 import Accordion from "~/components/ui/Accordion.vue";
