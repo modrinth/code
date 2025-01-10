@@ -18,7 +18,7 @@
         <TagItem
           v-for="platform in project.loaders"
           :key="`platform-tag-${platform}`"
-          :action="() => router.push(`../${project.project_type}s?g=categories:${platform}`)"
+          :action="() => router.push(`/${project.project_type}s?g=categories:${platform}`)"
           :style="`--_color: var(--color-platform-${platform})`"
         >
           <svg v-html="tags.loaders.find((x) => x.name === platform).icon"></svg>
