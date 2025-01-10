@@ -186,12 +186,12 @@
     </div>
     <NewModal
       ref="downloadModal"
-      @on-show="
+      :on-show="
         () => {
           navigateTo({ query: route.query, hash: '#download' });
         }
       "
-      @on-hide="
+      :on-hide="
         () => {
           navigateTo({ query: route.query, hash: '' });
         }

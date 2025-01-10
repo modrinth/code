@@ -60,6 +60,8 @@ const props = withDefaults(
     closeOnClickOutside?: boolean
     warnOnClose?: boolean
     header?: string
+    onHide?: () => void
+    onShow?: () => void
   }>(),
   {
     type: true,
@@ -68,11 +70,11 @@ const props = withDefaults(
     closeOnClickOutside: true,
     closeOnEsc: true,
     warnOnClose: false,
-    header: undefined
+    header: undefined,
+    onHide: () => {},
+    onShow: () => {},
   },
 )
-
-const emit = defineEmits(["onShow", "onHide"]);
 
 const open = ref(false)
 const visible = ref(false)
@@ -88,7 +90,7 @@ function addBodyPadding() {
 }
 
 function show(event?: MouseEvent) {
-  emit("onShow")
+  props.onShow()
   open.value = true
 
   addBodyPadding()
@@ -107,7 +109,7 @@ function show(event?: MouseEvent) {
 }
 
 function hide() {
-  emit("onHide");
+  props.onHide()
   visible.value = false
   document.body.style.overflow = ''
   document.body.style.paddingRight = ''
