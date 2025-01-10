@@ -290,7 +290,7 @@
                   <button
                     v-tooltip="
                       !possibleGameVersions.includes(gameVersion)
-                        ? `${project.title} does not support ${version} for ${formatCategory(currentPlatform)}`
+                        ? `${project.title} does not support ${gameVersion} for ${formatCategory(currentPlatform)}`
                         : null
                     "
                     :class="{
