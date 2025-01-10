@@ -3,8 +3,8 @@
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import {invoke} from '@tauri-apps/api/core'
-import {create} from './profile'
+import { invoke } from '@tauri-apps/api/core'
+import { create } from './profile'
 
 // Installs pack from a version ID
 export async function create_profile_and_install(projectId, versionId, packTitle, iconUrl) {

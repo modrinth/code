@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia'
+import { defineStore } from 'pinia'
 import {
   add_project_from_version,
   check_installed,
@@ -7,10 +7,10 @@ import {
   list,
   remove_project,
 } from '@/helpers/profile.js'
-import {handleError} from '@/store/notifications.js'
-import {get_project, get_version_many} from '@/helpers/cache.js'
-import {create_profile_and_install as packInstall} from '@/helpers/pack.js'
-import {trackEvent} from '@/helpers/analytics.js'
+import { handleError } from '@/store/notifications.js'
+import { get_project, get_version_many } from '@/helpers/cache.js'
+import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
+import { trackEvent } from '@/helpers/analytics.js'
 import dayjs from 'dayjs'
 
 export const useInstall = defineStore('installStore', {
