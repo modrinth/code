@@ -184,7 +184,19 @@
         </div>
       </div>
     </div>
-    <NewModal ref="downloadModal">
+    <NewModal
+      ref="downloadModal"
+      @on-show="
+        () => {
+          navigateTo({ query: route.query, hash: '#download' });
+        }
+      "
+      @on-hide="
+        () => {
+          navigateTo({ query: route.query, hash: '' });
+        }
+      "
+    >
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
         <div class="truncate text-lg font-extrabold text-contrast">
@@ -299,10 +311,20 @@
                     @click="
                       () => {
                         userSelectedGameVersion = version;
+
                         gameVersionAccordion.close();
                         if (!currentPlatform && platformAccordion) {
                           platformAccordion.open();
                         }
+
+                        navigateTo({
+                          query: {
+                            ...route.query,
+                            ...(userSelectedGameVersion && { version: userSelectedGameVersion }),
+                            ...(userSelectedPlatform && { loader: userSelectedPlatform }),
+                          },
+                          hash: route.hash,
+                        });
                       }
                     "
                   >
@@ -379,6 +401,15 @@
                         if (!currentGameVersion && gameVersionAccordion) {
                           gameVersionAccordion.open();
                         }
+
+                        navigateTo({
+                          query: {
+                            ...route.query,
+                            ...(userSelectedGameVersion && { version: userSelectedGameVersion }),
+                            ...(userSelectedPlatform && { loader: userSelectedPlatform }),
+                          },
+                          hash: route.hash,
+                        });
                       }
                     "
                   >
@@ -827,6 +858,7 @@ import {
   ProjectBackgroundGradient,
 } from "@modrinth/ui";
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
+import { navigateTo } from "#app";
 import dayjs from "dayjs";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import Badge from "~/components/ui/Badge.vue";
@@ -1247,7 +1279,7 @@ if (!route.name.startsWith("type-id-settings")) {
 
 const onUserCollectProject = useClientTry(userCollectProject);
 
-const {version, loader} = route.query;
+const { version, loader } = route.query;
 if (version !== undefined && project.value.game_versions.includes(version)) {
   userSelectedGameVersion.value = version;
 }
@@ -1262,7 +1294,7 @@ watch(downloadModal, (modal) => {
   if (route.hash === "#download") {
     modal.show();
   }
-})
+});
 
 async function setProcessing() {
   startLoading();
