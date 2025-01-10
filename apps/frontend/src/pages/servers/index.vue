@@ -495,6 +495,97 @@
     </section>
 
     <section
+      class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
+    >
+      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
+      <div class="mx-auto flex w-full max-w-7xl flex-col gap-8">
+        <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+          <div class="flex flex-col gap-8">
+            <div class="flex flex-col gap-4">
+              <div
+                class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+              >
+                Server Locations
+              </div>
+              <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
+                Coast-to-Coast Coverage
+              </h1>
+            </div>
+
+            <div class="flex flex-col gap-8">
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="grid size-8 place-content-center rounded-full bg-highlight-green">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-brand"
+                    >
+                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                  </div>
+                  <h2 class="relative m-0 text-xl font-medium leading-[155%] md:text-2xl">
+                    US Coverage
+                  </h2>
+                </div>
+                <p
+                  class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+                >
+                  With strategically placed servers in New York, Los Angeles, Seattle, and Miami, we
+                  ensure low latency connections for players across North America. Each location is
+                  equipped with high-performance hardware and DDoS protection.
+                </p>
+              </div>
+
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="grid size-8 place-content-center rounded-full bg-highlight-blue">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-blue"
+                    >
+                      <path d="M12 2a10 10 0 1 0 10 10" />
+                      <path d="M18 13a6 6 0 0 0-6-6" />
+                      <path d="M13 2.05a10 10 0 0 1 2 2" />
+                      <path d="M19.5 8.5a10 10 0 0 1 2 2" />
+                    </svg>
+                  </div>
+                  <h2 class="relative m-0 text-xl font-medium leading-[155%] md:text-2xl">
+                    Global Expansion
+                  </h2>
+                </div>
+                <p
+                  class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+                >
+                  We're expanding to Europe and Asia-Pacific regions soon, bringing Modrinth's
+                  seamless hosting experience worldwide. Join our Discord to stay updated on new
+                  region launches.
+                </p>
+              </div>
+            </div>
+          </div>
+          <Globe />
+        </div>
+      </div>
+    </section>
+
+    <section
       id="plan"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
@@ -511,16 +602,17 @@
               ? "We are currently at capacity. Please try again later."
               : "There's a plan for everyone! Choose the one that fits your needs."
           }}
-          <span class="font-bold">
-            Servers are currently US only, in New York, Los Angeles, and Miami. More regions coming
-            soon!</span
-          >
         </h2>
 
         <ul class="m-0 flex w-full flex-col gap-8 p-0 lg:flex-row">
           <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3">
             <div class="flex flex-row items-center justify-between">
-              <h1 class="m-0">Small</h1>
+              <div class="flex flex-col gap-1">
+                <h1 class="m-0">Small</h1>
+                <div v-if="isSmallLowStock" class="text-orange-400 text-sm font-medium">
+                  Only {{ capacityStatuses?.small?.available }} left in stock!
+                </div>
+              </div>
               <div
                 class="grid size-8 place-content-center rounded-full bg-highlight-blue text-xs font-bold text-blue"
               >
@@ -574,7 +666,12 @@
             class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3"
           >
             <div class="flex flex-row items-center justify-between">
-              <h1 class="m-0">Medium</h1>
+              <div class="flex flex-col gap-1">
+                <h1 class="m-0">Medium</h1>
+                <div v-if="isMediumLowStock" class="text-orange-400 text-sm font-medium">
+                  Only {{ capacityStatuses?.medium?.available }} left in stock!
+                </div>
+              </div>
               <div
                 class="grid size-8 place-content-center rounded-full bg-highlight-green text-xs font-bold text-brand"
               >
@@ -615,7 +712,12 @@
 
           <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3">
             <div class="flex flex-row items-center justify-between">
-              <h1 class="m-0">Large</h1>
+              <div class="flex flex-col gap-1">
+                <h1 class="m-0">Large</h1>
+                <div v-if="isLargeLowStock" class="text-orange-400 text-sm font-medium">
+                  Only {{ capacityStatuses?.large?.available }} left in stock!
+                </div>
+              </div>
               <div
                 class="grid size-8 place-content-center rounded-full bg-highlight-purple text-xs font-bold text-purple"
               >
@@ -697,6 +799,7 @@ import {
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
+import Globe from "~/components/ui/servers/Globe.vue";
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 const pyroPlanProducts = pyroProducts.filter(
@@ -804,6 +907,21 @@ const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
 const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0);
 const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0);
+
+const isSmallLowStock = computed(() => {
+  const available = capacityStatuses.value?.small?.available;
+  return available !== undefined && available > 0 && available < 8;
+});
+
+const isMediumLowStock = computed(() => {
+  const available = capacityStatuses.value?.medium?.available;
+  return available !== undefined && available > 0 && available < 8;
+});
+
+const isLargeLowStock = computed(() => {
+  const available = capacityStatuses.value?.large?.available;
+  return available !== undefined && available > 0 && available < 8;
+});
 
 const startTyping = () => {
   const currentWord = words[currentWordIndex.value];
