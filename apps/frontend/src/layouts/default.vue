@@ -136,7 +136,7 @@
             :highlighted="isDiscovering || isDiscoveringSubpage"
             :highlighted-style="isDiscoveringSubpage ? 'main-nav-secondary' : 'main-nav-primary'"
           >
-            <OverflowMenu
+            <TeleportOverflowMenu
               :options="[
                 {
                   id: 'mods',
@@ -163,6 +163,7 @@
                   action: '/plugins',
                 },
               ]"
+              hoverable
             >
               <BoxIcon
                 v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
@@ -203,7 +204,7 @@
               <template #plugins> <PlugIcon aria-hidden="true" /> Plugins </template>
               <template #shaders> <GlassesIcon aria-hidden="true" /> Shaders </template>
               <template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
-            </OverflowMenu>
+            </TeleportOverflowMenu>
           </ButtonStyled>
 
           <ButtonStyled
