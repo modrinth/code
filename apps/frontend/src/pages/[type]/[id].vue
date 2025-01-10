@@ -311,7 +311,6 @@
                     @click="
                       () => {
                         userSelectedGameVersion = gameVersion;
-                        
                         gameVersionAccordion.close();
                         if (!currentPlatform && platformAccordion) {
                           platformAccordion.open();
