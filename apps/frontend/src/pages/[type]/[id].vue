@@ -275,7 +275,7 @@
               </div>
               <ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
                 <ButtonStyled
-                  v-for="version in project.game_versions
+                  v-for="gameVersion in project.game_versions
                     .filter(
                       (x) =>
                         (versionFilter && x.includes(versionFilter)) ||
@@ -284,21 +284,21 @@
                     )
                     .slice()
                     .reverse()"
-                  :key="version"
-                  :color="currentGameVersion === version ? 'brand' : 'standard'"
+                  :key="gameVersion"
+                  :color="currentGameVersion === gameVersion ? 'brand' : 'standard'"
                 >
                   <button
                     v-tooltip="
-                      !possibleGameVersions.includes(version)
+                      !possibleGameVersions.includes(gameVersion)
                         ? `${project.title} does not support ${version} for ${formatCategory(currentPlatform)}`
                         : null
                     "
                     :class="{
-                      'looks-disabled !text-brand-red': !possibleGameVersions.includes(version),
+                      'looks-disabled !text-brand-red': !possibleGameVersions.includes(gameVersion),
                     }"
                     @click="
                       () => {
-                        userSelectedGameVersion = version;
+                        userSelectedGameVersion = gameVersion;
                         gameVersionAccordion.close();
                         if (!currentPlatform && platformAccordion) {
                           platformAccordion.open();
@@ -306,8 +306,8 @@
                       }
                     "
                   >
-                    {{ version }}
-                    <CheckIcon v-if="userSelectedGameVersion === version" />
+                    {{ gameVersion }}
+                    <CheckIcon v-if="userSelectedGameVersion === gameVersion" />
                   </button>
                 </ButtonStyled>
               </ScrollablePanel>
@@ -785,31 +785,31 @@
 </template>
 <script setup>
 import {
-  ScaleIcon,
-  AlignLeftIcon as DescriptionIcon,
   BookmarkIcon,
+  BookTextIcon,
+  CalendarIcon,
   ChartIcon,
   CheckIcon,
   ClipboardCopyIcon,
   CopyrightIcon,
+  AlignLeftIcon as DescriptionIcon,
   DownloadIcon,
   ExternalIcon,
+  ImageIcon as GalleryIcon,
   GameIcon,
   HeartIcon,
-  ImageIcon as GalleryIcon,
   InfoIcon,
   LinkIcon as LinksIcon,
   MoreVerticalIcon,
   PlusIcon,
   ReportIcon,
+  ScaleIcon,
   SearchIcon,
   SettingsIcon,
   TagsIcon,
   UsersIcon,
   VersionIcon,
   WrenchIcon,
-  BookTextIcon,
-  CalendarIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -818,32 +818,32 @@ import {
   NewModal,
   OverflowMenu,
   PopoutMenu,
-  ScrollablePanel,
+  ProjectBackgroundGradient,
   ProjectHeader,
   ProjectSidebarCompatibility,
   ProjectSidebarCreators,
-  ProjectSidebarLinks,
   ProjectSidebarDetails,
-  ProjectBackgroundGradient,
+  ProjectSidebarLinks,
+  ScrollablePanel,
 } from "@modrinth/ui";
+import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
 import dayjs from "dayjs";
-import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
+import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
+import Accordion from "~/components/ui/Accordion.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 import Badge from "~/components/ui/Badge.vue";
-import NavTabs from "~/components/ui/NavTabs.vue";
+import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
+import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
+import MessageBanner from "~/components/ui/MessageBanner.vue";
+import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
+import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
-import MessageBanner from "~/components/ui/MessageBanner.vue";
-import { reportProject } from "~/utils/report-helpers.ts";
-import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import { userCollectProject } from "~/composables/user.js";
-import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
-import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
-import Accordion from "~/components/ui/Accordion.vue";
-import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
-import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+import { reportProject } from "~/utils/report-helpers.ts";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
@@ -1247,7 +1247,7 @@ if (!route.name.startsWith("type-id-settings")) {
 
 const onUserCollectProject = useClientTry(userCollectProject);
 
-const {version, loader} = route.query;
+const { version, loader } = route.query;
 if (version !== undefined && project.value.game_versions.includes(version)) {
   userSelectedGameVersion.value = version;
 }
@@ -1262,7 +1262,7 @@ watch(downloadModal, (modal) => {
   if (route.hash === "#download") {
     modal.show();
   }
-})
+});
 
 async function setProcessing() {
   startLoading();
