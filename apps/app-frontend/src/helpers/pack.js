@@ -7,7 +7,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { create } from './profile'
 
 // Installs pack from a version ID
-export async function install(projectId, versionId, packTitle, iconUrl) {
+export async function create_profile_and_install(projectId, versionId, packTitle, iconUrl) {
   const location = {
     type: 'fromVersionId',
     project_id: projectId,
@@ -28,8 +28,18 @@ export async function install(projectId, versionId, packTitle, iconUrl) {
   return await invoke('plugin:pack|pack_install', { location, profile })
 }
 
+export async function install_to_existing_profile(projectId, versionId, title, profilePath) {
+  const location = {
+    type: 'fromVersionId',
+    project_id: projectId,
+    version_id: versionId,
+    title,
+  }
+  return await invoke('plugin:pack|pack_install', { location, profile: profilePath })
+}
+
 // Installs pack from a path
-export async function install_from_file(path) {
+export async function create_profile_and_install_from_file(path) {
   const location = {
     type: 'fromFile',
     path: path,

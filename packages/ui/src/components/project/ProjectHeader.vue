@@ -37,7 +37,11 @@
       <div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
         <TagsIcon class="h-6 w-6 text-secondary" />
         <div class="flex flex-wrap gap-2">
-          <TagItem v-for="(category, index) in project.categories" :key="index">
+          <TagItem
+            v-for="(category, index) in project.categories"
+            :key="index"
+            :action="() => router.push(`/${project.project_type}s?f=categories:${category}`)"
+          >
             {{ formatCategory(category) }}
           </TagItem>
         </div>
@@ -53,8 +57,11 @@ import { DownloadIcon, HeartIcon, TagsIcon } from '@modrinth/assets'
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
 import { formatCategory, formatNumber, type Project } from '@modrinth/utils'
+import { useRouter } from 'vue-router'
 import TagItem from '../base/TagItem.vue'
 import ProjectStatusBadge from './ProjectStatusBadge.vue'
+
+const router = useRouter()
 
 withDefaults(
   defineProps<{
