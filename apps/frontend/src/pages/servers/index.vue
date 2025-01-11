@@ -604,156 +604,178 @@
           }}
         </h2>
 
-        <ul class="m-0 flex w-full flex-col gap-8 p-0 lg:flex-row">
-          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3">
-            <div class="flex flex-row items-center justify-between">
-              <div class="flex flex-col gap-1">
-                <h1 class="m-0">Small</h1>
-                <div v-if="isSmallLowStock" class="text-orange-400 text-sm font-medium">
-                  Only {{ capacityStatuses?.small?.available }} left in stock!
+        <ul class="m-0 mt-8 flex w-full flex-col gap-8 p-0 lg:flex-row">
+          <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
+            <div
+              v-if="isSmallLowStock"
+              class="absolute -top-0 left-0 right-0 rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
+            >
+              Only {{ capacityStatuses?.small?.available }} left in stock!
+            </div>
+            <div
+              class="flex w-full flex-col justify-between gap-4 rounded-2xl bg-bg p-8 text-left"
+              :class="{ '!rounded-t-none': isSmallLowStock }"
+            >
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-row items-center justify-between">
+                  <h1 class="m-0">Small</h1>
+                  <div
+                    class="grid size-8 place-content-center rounded-full bg-highlight-blue text-xs font-bold text-blue"
+                  >
+                    S
+                  </div>
                 </div>
+                <p class="m-0">
+                  Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding.
+                </p>
+                <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
+                  <p class="m-0">4 GB RAM</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">4 vCPUs</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">32 GB Storage</p>
+                </div>
+                <h2 class="m-0 text-3xl text-contrast">
+                  $12<span class="text-sm font-normal text-secondary">/month</span>
+                </h2>
               </div>
-              <div
-                class="grid size-8 place-content-center rounded-full bg-highlight-blue text-xs font-bold text-blue"
-              >
-                S
-              </div>
+              <ButtonStyled color="blue" size="large">
+                <NuxtLink
+                  v-if="!loggedOut && isSmallAtCapacity"
+                  :to="outOfStockUrl"
+                  target="_blank"
+                  class="flex items-center gap-2 !bg-highlight-blue !font-medium !text-blue"
+                >
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
+                </NuxtLink>
+                <button
+                  v-else
+                  class="!bg-highlight-blue !font-medium !text-blue"
+                  @click="selectProduct('small')"
+                >
+                  Get Started
+                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
+                </button>
+              </ButtonStyled>
             </div>
-            <p class="m-0">
-              Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding.
-            </p>
-            <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
-              <p class="m-0">4 GB RAM</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">4 vCPUs</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">32 GB Storage</p>
-            </div>
-            <h2 class="m-0 text-3xl text-contrast">
-              $12<span class="text-sm font-normal text-secondary">/month</span>
-            </h2>
-            <ButtonStyled color="blue" size="large">
-              <NuxtLink
-                v-if="!loggedOut && isSmallAtCapacity"
-                :to="outOfStockUrl"
-                target="_blank"
-                class="!bg-highlight-blue !font-medium !text-blue"
-              >
-                Out of Stock
-                <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
-              </NuxtLink>
-              <button
-                v-else
-                class="!bg-highlight-blue !font-medium !text-blue"
-                @click="selectProduct('small')"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
-              </button>
-            </ButtonStyled>
           </li>
 
-          <li
-            style="
-              background: radial-gradient(
-                86.12% 101.64% at 95.97% 94.07%,
-                rgba(27, 217, 106, 0.23) 0%,
-                rgba(14, 115, 56, 0.2) 100%
-              );
-              border: 1px solid rgba(12, 107, 52, 0.55);
-              box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
-            "
-            class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3"
-          >
-            <div class="flex flex-row items-center justify-between">
-              <div class="flex flex-col gap-1">
-                <h1 class="m-0">Medium</h1>
-                <div v-if="isMediumLowStock" class="text-orange-400 text-sm font-medium">
-                  Only {{ capacityStatuses?.medium?.available }} left in stock!
+          <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
+            <div
+              v-if="isMediumLowStock"
+              class="absolute -top-0 left-0 right-0 rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
+            >
+              Only {{ capacityStatuses?.medium?.available }} left in stock!
+            </div>
+            <div
+              style="
+                background: radial-gradient(
+                  86.12% 101.64% at 95.97% 94.07%,
+                  rgba(27, 217, 106, 0.23) 0%,
+                  rgba(14, 115, 56, 0.2) 100%
+                );
+                border: 1px solid rgba(12, 107, 52, 0.55);
+                box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
+              "
+              class="flex w-full flex-col justify-between gap-4 rounded-2xl p-8 text-left"
+              :class="{ '!rounded-t-none': isMediumLowStock }"
+            >
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-row items-center justify-between">
+                  <h1 class="m-0">Medium</h1>
+                  <div
+                    class="grid size-8 place-content-center rounded-full bg-highlight-green text-xs font-bold text-brand"
+                  >
+                    M
+                  </div>
                 </div>
+                <p class="m-0">Great for modded multiplayer and small communities.</p>
+                <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
+                  <p class="m-0">6 GB RAM</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">6 vCPUs</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">48 GB Storage</p>
+                </div>
+                <h2 class="m-0 text-3xl text-contrast">
+                  $18<span class="text-sm font-normal text-secondary">/month</span>
+                </h2>
               </div>
-              <div
-                class="grid size-8 place-content-center rounded-full bg-highlight-green text-xs font-bold text-brand"
-              >
-                M
-              </div>
+              <ButtonStyled color="brand" size="large">
+                <NuxtLink
+                  v-if="!loggedOut && isMediumAtCapacity"
+                  :to="outOfStockUrl"
+                  target="_blank"
+                  class="flex items-center gap-2 !bg-highlight-green !font-medium !text-green"
+                >
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
+                </NuxtLink>
+                <button
+                  v-else
+                  class="!bg-highlight-green !font-medium !text-green"
+                  @click="selectProduct('medium')"
+                >
+                  Get Started
+                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-green" />
+                </button>
+              </ButtonStyled>
             </div>
-            <p class="m-0">Great for modded multiplayer and small communities.</p>
-            <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
-              <p class="m-0">6 GB RAM</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">6 vCPUs</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">48 GB Storage</p>
-            </div>
-            <h2 class="m-0 text-3xl text-contrast">
-              $18<span class="text-sm font-normal text-secondary">/month</span>
-            </h2>
-            <ButtonStyled color="brand" size="large">
-              <NuxtLink
-                v-if="!loggedOut && isMediumAtCapacity"
-                :to="outOfStockUrl"
-                target="_blank"
-                class="!bg-highlight-green !font-medium !text-green"
-              >
-                Out of Stock
-                <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
-              </NuxtLink>
-              <button
-                v-else
-                class="!bg-highlight-green !font-medium !text-green"
-                @click="selectProduct('medium')"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4 !text-green" />
-              </button>
-            </ButtonStyled>
           </li>
 
-          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3">
-            <div class="flex flex-row items-center justify-between">
-              <div class="flex flex-col gap-1">
-                <h1 class="m-0">Large</h1>
-                <div v-if="isLargeLowStock" class="text-orange-400 text-sm font-medium">
-                  Only {{ capacityStatuses?.large?.available }} left in stock!
+          <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
+            <div
+              v-if="isLargeLowStock"
+              class="bg-orange-500/20 absolute -top-0 left-0 right-0 rounded-t-2xl p-4 text-center font-bold"
+            >
+              Only {{ capacityStatuses?.large?.available }} left in stock!
+            </div>
+            <div
+              class="flex w-full flex-col justify-between gap-4 rounded-2xl bg-bg p-8 text-left"
+              :class="{ '!rounded-t-none': isLargeLowStock }"
+            >
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-row items-center justify-between">
+                  <h1 class="m-0">Large</h1>
+                  <div
+                    class="grid size-8 place-content-center rounded-full bg-highlight-purple text-xs font-bold text-purple"
+                  >
+                    L
+                  </div>
                 </div>
+                <p class="m-0">Ideal for larger communities, modpacks, and heavy modding.</p>
+                <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
+                  <p class="m-0">8 GB RAM</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">8 vCPUs</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">64 GB Storage</p>
+                </div>
+                <h2 class="m-0 text-3xl text-contrast">
+                  $24<span class="text-sm font-normal text-secondary">/month</span>
+                </h2>
               </div>
-              <div
-                class="grid size-8 place-content-center rounded-full bg-highlight-purple text-xs font-bold text-purple"
-              >
-                L
-              </div>
+              <ButtonStyled color="brand" size="large">
+                <NuxtLink
+                  v-if="!loggedOut && isLargeAtCapacity"
+                  :to="outOfStockUrl"
+                  target="_blank"
+                  class="flex items-center gap-2 !bg-highlight-purple !font-medium !text-purple"
+                >
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
+                </NuxtLink>
+                <button
+                  v-else
+                  class="!bg-highlight-purple !font-medium !text-purple"
+                  @click="selectProduct('large')"
+                >
+                  Get Started
+                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
+                </button>
+              </ButtonStyled>
             </div>
-            <p class="m-0">Ideal for larger communities, modpacks, and heavy modding.</p>
-            <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
-              <p class="m-0">8 GB RAM</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">8 vCPUs</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">64 GB Storage</p>
-            </div>
-            <h2 class="m-0 text-3xl text-contrast">
-              $24<span class="text-sm font-normal text-secondary">/month</span>
-            </h2>
-            <ButtonStyled color="brand" size="large">
-              <NuxtLink
-                v-if="!loggedOut && isLargeAtCapacity"
-                :to="outOfStockUrl"
-                target="_blank"
-                class="!bg-highlight-purple !font-medium !text-purple"
-              >
-                Out of Stock
-                <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
-              </NuxtLink>
-              <button
-                v-else
-                class="!bg-highlight-purple !font-medium !text-purple"
-                @click="selectProduct('large')"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
-              </button>
-            </ButtonStyled>
           </li>
         </ul>
 
@@ -909,7 +931,7 @@ const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.availa
 const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0);
 
 const isSmallLowStock = computed(() => {
-  const available = capacityStatuses.value?.small?.available;
+  const available = capacityStatuses.value?.small?.available + 1; // DEBUG: Remove +1 for production
   return available !== undefined && available > 0 && available < 8;
 });
 
