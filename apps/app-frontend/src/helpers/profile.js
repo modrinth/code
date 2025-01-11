@@ -4,6 +4,8 @@
  *  and deserialized into a usable JS object.
  */
 import { invoke } from '@tauri-apps/api/core'
+import { install_to_existing_profile } from '@/helpers/pack.js'
+import { handleError } from '@/store/notifications.js'
 
 /// Add instance
 /*
@@ -185,4 +187,18 @@ export async function edit(path, editProfile) {
 // Edits a profile's icon
 export async function edit_icon(path, iconPath) {
   return await invoke('plugin:profile|profile_edit_icon', { path, iconPath })
+}
+
+export async function finish_install(instance) {
+  if (instance.install_stage !== 'pack_installed') {
+    let linkedData = instance.linked_data
+    await install_to_existing_profile(
+      linkedData.project_id,
+      linkedData.version_id,
+      instance.name,
+      instance.path,
+    ).catch(handleError)
+  } else {
+    await install(instance.path, false).catch(handleError)
+  }
 }
