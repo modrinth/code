@@ -3,16 +3,18 @@
     <div
       v-for="location in locations"
       :key="location.name"
+      @click="toggleLocationClicked(location)"
       :class="{
         'opacity-0': !showLabels,
         hidden: !isLocationVisible(location),
+        'z-40': location.clicked,
       }"
       :style="{
         position: 'absolute',
         left: `${location.screenPosition?.x || 0}px`,
         top: `${location.screenPosition?.y || 0}px`,
       }"
-      class="pointer-events-none flex transform items-center gap-2 transition-opacity duration-200"
+      class="flex transform items-center gap-2 rounded-full bg-bg p-3 transition-opacity duration-200"
     >
       <div
         :class="{
@@ -24,7 +26,12 @@
         }"
         class="size-2.5 rounded-full border-2"
       ></div>
-      <span class="whitespace-nowrap text-sm">
+      <span
+        :class="{
+          hidden: !location.clicked,
+        }"
+        class="whitespace-nowrap text-sm"
+      >
         {{ location.name }}
         <span v-if="!location.active" class="text-brand/70 ml-1 text-xs">Coming Soon</span>
       </span>
@@ -41,19 +48,21 @@ const container = ref(null);
 const showLabels = ref(false);
 
 const locations = ref([
-  { name: "New York", lat: 40.7128, lng: -74.006, active: true },
-  { name: "Los Angeles", lat: 34.0522, lng: -118.2437, active: true },
-  { name: "Miami", lat: 25.7617, lng: -80.1918, active: true },
-  { name: "Seattle", lat: 47.6062, lng: -122.3321, active: true },
-  { name: "London", lat: 51.5074, lng: -0.1278, active: false },
-  { name: "Frankfurt", lat: 50.1109, lng: 8.6821, active: false },
-  { name: "Amsterdam", lat: 52.3676, lng: 4.9041, active: false },
-  { name: "Paris", lat: 48.8566, lng: 2.3522, active: false },
-  { name: "Singapore", lat: 1.3521, lng: 103.8198, active: false },
-  { name: "Tokyo", lat: 35.6762, lng: 139.6503, active: false },
-  { name: "Sydney", lat: -33.8688, lng: 151.2093, active: false },
-  { name: "São Paulo", lat: -23.5505, lng: -46.6333, active: false },
-  { name: "Toronto", lat: 43.6532, lng: -79.3832, active: false },
+  // Active locations
+  { name: "New York", lat: 40.7128, lng: -74.006, active: true, clicked: false },
+  { name: "Los Angeles", lat: 34.0522, lng: -118.2437, active: true, clicked: false },
+  { name: "Miami", lat: 25.7617, lng: -80.1918, active: true, clicked: false },
+  { name: "Seattle", lat: 47.608013, lng: -122.3321, active: true, clicked: false },
+  // Future Locations
+  { name: "London", lat: 51.5074, lng: -0.1278, active: false, clicked: false },
+  { name: "Frankfurt", lat: 50.1109, lng: 8.6821, active: false, clicked: false },
+  { name: "Amsterdam", lat: 52.3676, lng: 4.9041, active: false, clicked: false },
+  { name: "Paris", lat: 48.8566, lng: 2.3522, active: false, clicked: false },
+  { name: "Singapore", lat: 1.3521, lng: 103.8198, active: false, clicked: false },
+  { name: "Tokyo", lat: 35.6762, lng: 139.6503, active: false, clicked: false },
+  { name: "Sydney", lat: -33.8688, lng: 151.2093, active: false, clicked: false },
+  { name: "São Paulo", lat: -23.5505, lng: -46.6333, active: false, clicked: false },
+  { name: "Toronto", lat: 43.6532, lng: -79.3832, active: false, clicked: false },
 ]);
 
 const isLocationVisible = (location) => {
@@ -74,6 +83,11 @@ const isLocationVisible = (location) => {
   return dotProduct < -0.15;
 };
 
+const toggleLocationClicked = (location) => {
+  console.log("clicked", location.name);
+  locations.value.find((loc) => loc.name === location.name).clicked = !location.clicked;
+};
+
 let scene, camera, renderer, globe, controls;
 let animationFrame;
 
@@ -88,7 +102,7 @@ const init = () => {
   renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
-    powerPreference: "high-performance",
+    powerPreference: "low-power",
   });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(container.value.clientWidth, container.value.clientHeight);
@@ -117,7 +131,7 @@ const init = () => {
       varying vec2 vUv;
       void main() {
         vec4 texColor = texture2D(outlineTexture, vUv);
-        
+
         float brightness = max(max(texColor.r, texColor.g), texColor.b);
         gl_FragColor = vec4(globeColor, brightness * 0.8);
       }
