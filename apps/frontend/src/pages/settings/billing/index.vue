@@ -278,7 +278,8 @@
                     <ButtonStyled
                       v-if="
                         getPyroCharge(subscription) &&
-                        getPyroCharge(subscription).status !== 'cancelled'
+                        getPyroCharge(subscription).status !== 'cancelled' &&
+                        getPyroCharge(subscription).status !== 'failed'
                       "
                       type="standard"
                       @click="showPyroCancelModal(subscription.id)"
