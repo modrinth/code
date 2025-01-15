@@ -1247,7 +1247,7 @@ if (!route.name.startsWith("type-id-settings")) {
 
 const onUserCollectProject = useClientTry(userCollectProject);
 
-const {version, loader} = route.query;
+const { version, loader } = route.query;
 if (version !== undefined && project.value.game_versions.includes(version)) {
   userSelectedGameVersion.value = version;
 }
@@ -1262,7 +1262,7 @@ watch(downloadModal, (modal) => {
   if (route.hash === "#download") {
     modal.show();
   }
-})
+});
 
 async function setProcessing() {
   startLoading();

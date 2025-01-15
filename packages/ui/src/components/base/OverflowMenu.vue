@@ -119,7 +119,7 @@ const open = () => {
 }
 
 function isDivider(option: BaseOption): option is Divider {
-  return 'divider' in option;
+  return 'divider' in option
 }
 
 defineExpose({ open, close })
