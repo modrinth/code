@@ -270,7 +270,8 @@
                         v-else-if="getPyroCharge(subscription).status === 'failed'"
                         class="text-sm text-red"
                       >
-                        Your subscription payment failed. Please update your payment method.
+                        Your subscription payment failed. Please update your payment method, then
+                        resubscribe.
                       </span>
                     </div>
                   </div>
