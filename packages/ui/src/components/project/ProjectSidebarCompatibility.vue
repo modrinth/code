@@ -18,6 +18,7 @@
         <TagItem
           v-for="platform in project.loaders"
           :key="`platform-tag-${platform}`"
+          :action="() => router.push(`/${project.project_type}s?g=categories:${platform}`)"
           :style="`--_color: var(--color-platform-${platform})`"
         >
           <svg v-html="tags.loaders.find((x) => x.name === platform).icon"></svg>
@@ -78,9 +79,11 @@ import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrin
 import { formatCategory, getVersionsToDisplay } from '@modrinth/utils'
 import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { useVIntl, defineMessages } from '@vintl/vintl'
+import { useRouter } from 'vue-router'
 import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()
+const router = useRouter()
 
 type EnvironmentValue = 'optional' | 'required' | 'unsupported' | 'unknown'
 

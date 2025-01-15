@@ -30,8 +30,22 @@
       </template>
       <template #actions>
         <div class="flex gap-2">
-          <ButtonStyled v-if="instance.install_stage !== 'installed'" color="brand" size="large">
+          <ButtonStyled
+            v-if="instance.install_stage.includes('installing')"
+            color="brand"
+            size="large"
+          >
             <button disabled>Installing...</button>
+          </ButtonStyled>
+          <ButtonStyled
+            v-else-if="instance.install_stage !== 'installed'"
+            color="brand"
+            size="large"
+          >
+            <button @click="repairInstance()">
+              <DownloadIcon />
+              Repair
+            </button>
           </ButtonStyled>
           <ButtonStyled v-else-if="playing === true" color="red" size="large">
             <button @click="stopInstance('InstancePage')">
@@ -137,38 +151,39 @@
 <script setup>
 import {
   Avatar,
-  ContentPageHeader,
   ButtonStyled,
-  OverflowMenu,
+  ContentPageHeader,
   LoadingIndicator,
+  OverflowMenu,
 } from '@modrinth/ui'
 import {
-  UserPlusIcon,
-  ServerIcon,
-  PackageIcon,
-  SettingsIcon,
-  PlayIcon,
-  StopCircleIcon,
-  EditIcon,
-  FolderOpenIcon,
-  ClipboardCopyIcon,
-  PlusIcon,
-  ExternalIcon,
-  HashIcon,
-  GlobeIcon,
-  EyeIcon,
-  XIcon,
   CheckCircleIcon,
-  UpdatedIcon,
-  MoreVerticalIcon,
+  ClipboardCopyIcon,
+  DownloadIcon,
+  EditIcon,
+  ExternalIcon,
+  EyeIcon,
+  FolderOpenIcon,
   GameIcon,
+  GlobeIcon,
+  HashIcon,
+  MoreVerticalIcon,
+  PackageIcon,
+  PlayIcon,
+  PlusIcon,
+  ServerIcon,
+  SettingsIcon,
+  StopCircleIcon,
   TimerIcon,
+  UpdatedIcon,
+  UserPlusIcon,
+  XIcon,
 } from '@modrinth/assets'
-import { get, get_full_path, kill, run } from '@/helpers/profile'
+import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, onUnmounted, computed, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -292,6 +307,10 @@ const stopInstance = async (context) => {
     game_version: instance.value.game_version,
     source: context,
   })
+}
+
+const repairInstance = async () => {
+  await finish_install(instance.value)
 }
 
 const handleRightClick = (event) => {

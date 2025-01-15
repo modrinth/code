@@ -257,7 +257,7 @@
                         v-else-if="getPyroCharge(subscription).status === 'processing'"
                         class="text-sm text-orange"
                       >
-                        Your payment is being processed. Perks will activate once payment is
+                        Your payment is being processed. Your server will activate once payment is
                         complete.
                       </span>
                       <span
@@ -270,7 +270,8 @@
                         v-else-if="getPyroCharge(subscription).status === 'failed'"
                         class="text-sm text-red"
                       >
-                        Your subscription payment failed. Please update your payment method.
+                        Your subscription payment failed. Please update your payment method, then
+                        resubscribe.
                       </span>
                     </div>
                   </div>
@@ -278,7 +279,8 @@
                     <ButtonStyled
                       v-if="
                         getPyroCharge(subscription) &&
-                        getPyroCharge(subscription).status !== 'cancelled'
+                        getPyroCharge(subscription).status !== 'cancelled' &&
+                        getPyroCharge(subscription).status !== 'failed'
                       "
                       type="standard"
                       @click="showPyroCancelModal(subscription.id)"
@@ -291,7 +293,8 @@
                     <ButtonStyled
                       v-else-if="
                         getPyroCharge(subscription) &&
-                        getPyroCharge(subscription).status === 'cancelled'
+                        (getPyroCharge(subscription).status === 'cancelled' ||
+                          getPyroCharge(subscription).status === 'failed')
                       "
                       type="standard"
                       color="green"
