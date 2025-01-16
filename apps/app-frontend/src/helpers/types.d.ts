@@ -32,7 +32,12 @@ type GameInstance = {
   hooks: Hooks
 }
 
-type InstallStage = 'installed' | 'installing' | 'pack_installing' | 'not_installed'
+type InstallStage =
+  | 'installed'
+  | 'minecraft_installing'
+  | 'pack_installed'
+  | 'pack_installing'
+  | 'not_installed'
 
 type LinkedData = {
   project_id: ModrinthId
@@ -107,4 +112,13 @@ type AppSettings = {
 export type InstanceSettingsTabProps = {
   instance: GameInstance
   offline?: boolean
+}
+
+export type MinecraftCredentials = {
+  id: string
+  username: string,
+  access_token: string,
+  refresh_token: string,
+  expires: string,
+  active: boolean,
 }

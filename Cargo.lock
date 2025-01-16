@@ -660,19 +660,18 @@ dependencies = [
 
 [[package]]
 name = "async-tungstenite"
-version = "0.27.0"
+version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5359381fd414fbdb272c48f2111c16cb0bb3447bfacd59311ff3736da9f6664"
+checksum = "2cca750b12e02c389c1694d35c16539f88b8bbaa5945934fdc1b41a776688589"
 dependencies = [
  "futures-io",
  "futures-util",
  "log",
+ "native-tls",
  "pin-project-lite",
- "rustls-pki-types",
  "tokio 1.42.0",
- "tokio-rustls 0.26.0",
+ "tokio-native-tls",
  "tungstenite",
- "webpki-roots 0.26.6",
 ]
 
 [[package]]
@@ -6603,6 +6602,7 @@ dependencies = [
  "js-sys",
  "log",
  "mime",
+ "mime_guess",
  "native-tls",
  "once_cell",
  "percent-encoding",
@@ -8886,6 +8886,7 @@ dependencies = [
  "dunce",
  "flate2",
  "futures 0.3.30",
+ "image 0.24.9",
  "indicatif",
  "lazy_static",
  "notify",
@@ -9588,9 +9589,9 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "tungstenite"
-version = "0.23.0"
+version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e2e2ce1e47ed2994fd43b04c8f618008d4cabdd5ee34027cf14f9d918edd9c8"
+checksum = "9ef1a641ea34f399a848dea702823bbecfb4c486f911735368f1f137cb8257e1"
 dependencies = [
  "byteorder",
  "bytes 1.7.2",
@@ -9598,11 +9599,11 @@ dependencies = [
  "http 1.1.0",
  "httparse",
  "log",
+ "native-tls",
  "rand 0.8.5",
- "rustls 0.23.13",
- "rustls-pki-types",
  "sha1 0.10.6",
  "thiserror 1.0.64",
+ "url",
  "utf-8",
 ]
 

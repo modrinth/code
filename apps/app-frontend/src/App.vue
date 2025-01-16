@@ -1,24 +1,32 @@
-<script setup>
-import { computed, ref, onMounted, watch, onUnmounted } from 'vue'
-import { RouterView, useRouter, useRoute } from 'vue-router'
+<script async setup>
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
-  LogInIcon,
+  CompassIcon,
+  DownloadIcon,
   HomeIcon,
+  LeftArrowIcon,
   LibraryIcon,
+  LogInIcon,
+  LogOutIcon,
+  MaximizeIcon,
+  MinimizeIcon,
   PlusIcon,
+  RestoreIcon,
+  RightArrowIcon,
   SettingsIcon,
   XIcon,
-  DownloadIcon,
-  CompassIcon,
-  MinimizeIcon,
-  MaximizeIcon,
-  RestoreIcon,
-  LogOutIcon,
-  RightArrowIcon,
-  LeftArrowIcon,
+  SpinnerIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, ButtonStyled, Notifications, OverflowMenu } from '@modrinth/ui'
+import {
+  Avatar,
+  Button,
+  ButtonStyled,
+  commonMessages,
+  Notifications,
+  OverflowMenu
+} from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -32,14 +40,16 @@ import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { type } from '@tauri-apps/plugin-os'
-import { isDev, getOS, restartApp } from '@/helpers/utils.js'
-import { initAnalytics, debugAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import { install_from_file } from './helpers/pack'
+import { create_profile_and_install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { save_filters } from '@/helpers/skin_manager.js'
+import { SkinManagerIcon } from '@/assets/icons/index.js'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
@@ -51,7 +61,7 @@ import { renderString } from '@modrinth/utils'
 import { useFetch } from '@/helpers/fetch.js'
 import { check } from '@tauri-apps/plugin-updater'
 import NavButton from '@/components/ui/NavButton.vue'
-import { get as getCreds, logout, login } from '@/helpers/mr_auth.js'
+import { get as getCreds, login, logout } from '@/helpers/mr_auth.js'
 import { get_user } from '@/helpers/cache.js'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
@@ -60,6 +70,9 @@ import { hide_ads_window, init_ads_window } from '@/helpers/ads.js'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+
+const { formatMessage } = useVIntl()
 
 const themeStore = useTheming()
 
@@ -199,6 +212,7 @@ initialize_state()
   })
 
 const handleClose = async () => {
+  await save_filters()
   await saveWindowState(StateFlags.ALL)
   await getCurrentWindow().close()
 }
@@ -296,7 +310,7 @@ async function handleCommand(e) {
   if (e.event === 'RunMRPack') {
     // RunMRPack should directly install a local mrpack given a path
     if (e.path.endsWith('.mrpack')) {
-      await install_from_file(e.path).catch(handleError)
+      await create_profile_and_install_from_file(e.path).catch(handleError)
       trackEvent('InstanceCreate', {
         source: 'CreationModalFileDrop',
       })
@@ -354,6 +368,45 @@ function handleAuxClick(e) {
     e.target.dispatchEvent(event)
   }
 }
+
+const messages = defineMessages({
+  playingAs: {
+    id: 'app.sidebar.accounts.title',
+    defaultMessage: 'Playing as',
+  },
+  loadingAccounts: {
+    id: 'app.sidebar.accounts.loading-accounts',
+    defaultMessage: 'Loading accounts...',
+  },
+  news: {
+    id: 'app.sidebar.news.title',
+    defaultMessage: 'News',
+  },
+  home: {
+    id: 'app.nav.home.title',
+    defaultMessage: 'Home',
+  },
+  discoverContent: {
+    id: 'app.nav.discover-content.title',
+    defaultMessage: 'Discover content',
+  },
+  library: {
+    id: 'app.nav.library.title',
+    defaultMessage: 'Library',
+  },
+  settings: {
+    id: 'app.nav.settings.title',
+    defaultMessage: 'Settings',
+  },
+  createInstance: {
+    id: 'app.nav.create-instance.title',
+    defaultMessage: 'Create new instance',
+  },
+  installUpdate: {
+    id: 'app.nav.install-update.title',
+    defaultMessage: 'Install update',
+  },
+})
 </script>
 
 <template>
@@ -369,11 +422,11 @@ function handleAuxClick(e) {
     <div
       class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
     >
-      <NavButton v-tooltip.right="'Home'" to="/">
+      <NavButton v-tooltip.right="formatMessage(messages.home)" to="/">
         <HomeIcon />
       </NavButton>
       <NavButton
-        v-tooltip.right="'Discover content'"
+        v-tooltip.right="formatMessage(messages.discoverContent)"
         to="/browse/modpack"
         :is-primary="() => route.path.startsWith('/browse') && !route.query.i"
         :is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
@@ -381,7 +434,7 @@ function handleAuxClick(e) {
         <CompassIcon />
       </NavButton>
       <NavButton
-        v-tooltip.right="'Library'"
+        v-tooltip.right="formatMessage(messages.library)"
         to="/library"
         :is-subpage="
           () =>
@@ -397,17 +450,17 @@ function handleAuxClick(e) {
         <QuickInstanceSwitcher />
       </suspense>
       <NavButton
-        v-tooltip.right="'Create new instance'"
+        v-tooltip.right="formatMessage(messages.createInstance)"
         :to="() => $refs.installationModal.show()"
         :disabled="offline"
       >
         <PlusIcon />
       </NavButton>
       <div class="flex flex-grow"></div>
-      <NavButton v-if="updateAvailable" v-tooltip.right="'Install update'" :to="() => restartApp()">
+      <NavButton v-if="updateAvailable" v-tooltip.right="formatMessage(messages.installUpdate)" :to="() => restartApp()">
         <DownloadIcon />
       </NavButton>
-      <NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
+      <NavButton v-tooltip.right="formatMessage(messages.settings)" :to="() => $refs.settingsModal.show()">
         <SettingsIcon />
       </NavButton>
       <ButtonStyled v-if="credentials" type="transparent" circular>
@@ -427,12 +480,11 @@ function handleAuxClick(e) {
             size="32px"
             circle
           />
-          <template #sign-out> <LogOutIcon /> Sign out </template>
+          <template #sign-out> <LogOutIcon /> {{ formatMessage(commonMessages.signOutButton) }} </template>
         </OverflowMenu>
       </ButtonStyled>
-      <NavButton v-else v-tooltip.right="'Sign in'" :to="() => signIn()">
+      <NavButton v-else v-tooltip.right="formatMessage(commonMessages.signInButton)" :to="() => signIn()">
         <LogInIcon />
-        <template #label>Sign in</template>
       </NavButton>
     </div>
     <div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
@@ -540,10 +592,15 @@ function handleAuxClick(e) {
         <div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
         <div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-            <h3 class="text-lg m-0">Playing as</h3>
-            <suspense>
-              <AccountsCard ref="accounts" mode="small" />
-            </suspense>
+            <h3 class="text-lg m-0">{{ formatMessage(messages.playingAs) }}</h3>
+            <Suspense>
+              <AccountsCard ref="accounts" />
+              <template #fallback>
+                <div class="flex items-center gap-2 pt-4 pb-1">
+                  <SpinnerIcon class="animate-spin" /> {{ formatMessage(messages.loadingAccounts) }}
+                </div>
+              </template>
+            </Suspense>
           </div>
           <div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
             <suspense>

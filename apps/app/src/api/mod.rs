@@ -13,6 +13,7 @@ pub mod process;
 pub mod profile;
 pub mod profile_create;
 pub mod settings;
+pub mod skin_manager;
 pub mod tags;
 pub mod utils;
 

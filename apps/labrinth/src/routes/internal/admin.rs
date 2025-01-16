@@ -15,12 +15,12 @@ use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::guards::admin_key_guard;
 use actix_web::{get, patch, post, web, HttpRequest, HttpResponse};
+use log::info;
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
-use log::info;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
