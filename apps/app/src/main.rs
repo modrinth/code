@@ -4,6 +4,7 @@
 )]
 
 use native_dialog::{MessageDialog, MessageType};
+use std::env;
 use tauri::{Listener, Manager};
 use theseus::prelude::*;
 
@@ -29,7 +30,12 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app.clone()).await?;
 
     #[cfg(feature = "updater")]
-    {
+    'updater: {
+        if env::var("MODRINTH_EXTERNAL_UPDATE_PROVIDER").is_ok() {
+            State::init().await?;
+            break 'updater;
+        }
+
         use tauri_plugin_updater::UpdaterExt;
 
         let updater = app.updater_builder().build()?;

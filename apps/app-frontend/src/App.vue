@@ -1,22 +1,22 @@
 <script async setup>
-import { computed, ref, onMounted, watch, onUnmounted } from 'vue'
-import { RouterView, useRouter, useRoute } from 'vue-router'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
-  LogInIcon,
+  CompassIcon,
+  DownloadIcon,
   HomeIcon,
+  LeftArrowIcon,
   LibraryIcon,
+  LogInIcon,
+  LogOutIcon,
+  MaximizeIcon,
+  MinimizeIcon,
   PlusIcon,
+  RestoreIcon,
+  RightArrowIcon,
   SettingsIcon,
   XIcon,
-  DownloadIcon,
-  CompassIcon,
-  MinimizeIcon,
-  MaximizeIcon,
-  RestoreIcon,
-  LogOutIcon,
-  RightArrowIcon,
-  LeftArrowIcon,
   SpinnerIcon,
 } from '@modrinth/assets'
 import {
@@ -40,12 +40,12 @@ import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { type } from '@tauri-apps/plugin-os'
-import { isDev, getOS, restartApp } from '@/helpers/utils.js'
-import { initAnalytics, debugAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import { install_from_file } from './helpers/pack'
+import { create_profile_and_install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { save_filters } from '@/helpers/skin_manager.js'
@@ -61,7 +61,7 @@ import { renderString } from '@modrinth/utils'
 import { useFetch } from '@/helpers/fetch.js'
 import { check } from '@tauri-apps/plugin-updater'
 import NavButton from '@/components/ui/NavButton.vue'
-import { get as getCreds, logout, login } from '@/helpers/mr_auth.js'
+import { get as getCreds, login, logout } from '@/helpers/mr_auth.js'
 import { get_user } from '@/helpers/cache.js'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
@@ -310,7 +310,7 @@ async function handleCommand(e) {
   if (e.event === 'RunMRPack') {
     // RunMRPack should directly install a local mrpack given a path
     if (e.path.endsWith('.mrpack')) {
-      await install_from_file(e.path).catch(handleError)
+      await create_profile_and_install_from_file(e.path).catch(handleError)
       trackEvent('InstanceCreate', {
         source: 'CreationModalFileDrop',
       })

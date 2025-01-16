@@ -111,7 +111,7 @@ async fn replace_managed_modrinth(
     ignore_lock: bool,
 ) -> crate::Result<()> {
     crate::profile::edit(profile_path, |profile| {
-        profile.install_stage = ProfileInstallStage::Installing;
+        profile.install_stage = ProfileInstallStage::MinecraftInstalling;
         async { Ok(()) }
     })
     .await?;
