@@ -1,63 +1,57 @@
 <template>
-  <div class="p-6 flex flex-col gap-3">
-    <h1 class="m-0 text-2xl">Skin Manager</h1>
-    <div class="iconified-input">
-      <SearchIcon />
-      <input v-model="search" type="text" placeholder="Search" class="h-12" />
-      <Button class="r-btn" @click="() => (search = '')">
-        <XIcon />
-      </Button>
-    </div>
-    <div class="flex gap-2">
-      <DropdownSelect
-        v-slot="{ selected }"
-        v-model="Filters.sort"
-        name="Sort Dropdown"
-        class="max-w-[16rem]"
-        :options="['Name', 'Custom', 'Date created', 'Date modified']"
-        placeholder="Select..."
-      >
-        <span class="font-semibold text-primary">Sort by: </span>
-        <span class="font-semibold text-secondary">{{ selected }}</span>
-      </DropdownSelect>
-      <DropdownSelect
-        v-slot="{ selected }"
-        v-model="Filters.filter"
-        class="max-w-[16rem]"
-        name="Filter Dropdown"
-        :options="['Current user', 'All users']"
-        placeholder="Select..."
-      >
-        <span class="font-semibold text-primary">Filter by: </span>
-        <span class="font-semibold text-secondary">{{ selected }}</span>
-      </DropdownSelect>
-    </div>
-    <div class="content">
-      <div class="instance">
-        <Card class="instance-card-item">
-          <div class="overlap">
-            <canvas id="skin_container" class="render" />
-            <AnimatedLogo v-if="!loaded_skins" />
-          </div>
-          <div class="card-row">
-            <div class="project-info">
-              <p class="title">Current Skin</p>
-              <p class="description">{{ skinData.arms }}, {{ skinData.cape }}</p>
-            </div>
-            <Button v-if="!InLibrary" color="primary" @click="handleAdd"> Add to Library </Button>
-          </div>
-        </Card>
+  <div class="p-6 flex gap-3">
+    <div class="flex flex-col gap-3">
+      <h2 class="m-0 text-lg leading-none font-extrabold">{{ formatMessage(messages.currentSkin) }}</h2>
+      <div class="w-[200px] h-[250px] bg-bg-raised rounded-2xl flex items-center justify-center">
+        <SpinnerIcon v-if="!loaded_skins" class="animate-spin w-12 h-12" />
+        <canvas id="skin_container" class="cursor-grab active:cursor-grabbing" :class="{ 'hidden': !loaded_skins }" />
       </div>
-
-      <div class="row">
+      <div class="card-row">
+        <div class="project-info">
+          <p class="description">{{ skinData.arms }}, {{ skinData.cape }}</p>
+        </div>
+        <Button v-if="!InLibrary" color="primary" @click="handleAdd"> Add to Library </Button>
+      </div>
+    </div>
+    <div class="flex flex-col gap-3 w-full">
+      <div class="flex gap-2">
+        <div class="iconified-input flex-1">
+          <SearchIcon />
+          <input v-model="search" type="text" placeholder="Search" />
+          <Button class="r-btn" @click="() => (search = '')">
+            <XIcon />
+          </Button>
+        </div>
+        <DropdownSelect
+          v-slot="{ selected }"
+          v-model="Filters.sort"
+          name="Sort Dropdown"
+          class="max-w-[16rem]"
+          :options="['Name', 'Custom', 'Date created', 'Date modified']"
+          placeholder="Select..."
+        >
+          <span class="font-semibold text-primary">Sort by: </span>
+          <span class="font-semibold text-secondary">{{ selected }}</span>
+        </DropdownSelect>
+        <DropdownSelect
+          v-if="false"
+          v-slot="{ selected }"
+          v-model="Filters.filter"
+          class="max-w-[16rem]"
+          name="Filter Dropdown"
+          :options="['Current user', 'All users']"
+          placeholder="Select..."
+        >
+          <span class="font-semibold text-primary">Filter by: </span>
+          <span class="font-semibold text-secondary">{{ selected }}</span>
+        </DropdownSelect>
+      </div>
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-2">
         <div class="instance">
-          <Card class="instance-card-item button-base" @click="handleModal">
-            <PlusIcon size="lg" alt="Mod card" class="mod-image" />
-            <div class="project-info">
-              <p class="title">Add new skin</p>
-              <p class="description">&nbsp;</p>
-            </div>
-          </Card>
+          <div class="button-base bg-bg-raised rounded-2xl p-4 text-center h-full w-full flex items-center justify-center flex-col gap-3" @click="handleModal">
+            <PlusIcon alt="Mod card" class="w-8 h-8 text-secondary" />
+            <span>Add new skin</span>
+          </div>
         </div>
         <SkinSave
           v-for="skin in filteredResults"
@@ -66,70 +60,128 @@
           @contextmenu.prevent.stop="(event) => handleRightClick(event, skin)"
           @set-skin="(data) => clickCard(data)"
         />
-        <ContextMenu ref="skinOptions" @option-clicked="handleOptionsClick">
-          <template #use> <PlayIcon /> Use </template>
-          <template v-if="Filters.sort === 'Custom'" #left>
-            <ChevronLeftIcon /> Move Left
-          </template>
-          <template v-if="Filters.sort === 'Custom'" #right>
-            <ChevronRightIcon /> Move Right
-          </template>
-          <template #edit> <EyeIcon /> Edit </template>
-          <template #duplicate> <ClipboardCopyIcon /> Duplicate </template>
-          <template #delete> <TrashIcon /> Delete </template>
-        </ContextMenu>
       </div>
+      <ContextMenu ref="skinOptions" @option-clicked="handleOptionsClick">
+        <template #use> <PlayIcon /> Use </template>
+        <template v-if="Filters.sort === 'Custom'" #left>
+          <ChevronLeftIcon /> Move Left
+        </template>
+        <template v-if="Filters.sort === 'Custom'" #right>
+          <ChevronRightIcon /> Move Right
+        </template>
+        <template #edit> <EyeIcon /> Edit </template>
+        <template #duplicate> <ClipboardCopyIcon /> Duplicate </template>
+        <template #delete> <TrashIcon /> Delete </template>
+      </ContextMenu>
     </div>
   </div>
-
-  <Modal ref="skinModal" class="modal" header="Change skin" :noblur="!themeStore.advancedRendering">
-    <div v-if="!editSkin" class="modal-header">
-      <Chips
-        v-model="changeSkinType"
-        :items="['from file', 'import from launcher']"
-        @click="handleModalType"
-      />
-    </div>
-    <hr v-if="!editSkin" class="card-divider" />
-    <div v-if="changeSkinType == 'from file'" class="modal-column">
-      <div class="modal-row">
-        <div class="modal-colum">
-          <div class="image-upload">
-            <Avatar :src="displaySkin" size="lg" />
-          </div>
-          <div class="image-input">
-            <Button @click="openskin">
-              <FolderOpenIcon />
-              Select skin
-            </Button>
-          </div>
-          <div class="input-row">
-            <p class="input-label">Name</p>
-            <input
-              v-model="selectedSkin.name"
-              autocomplete="off"
-              class="text-input"
-              type="text"
-              maxlength="30"
-              size="15"
-            />
-          </div>
-          <div class="input-row">
-            <p class="input-label">Arm style</p>
-            <Chips v-model="selectedSkin.arms" :items="['classic', 'slim']" @click="handleArms" />
-          </div>
+  <ModalWrapper ref="skinModal" :header="formatMessage(messages.addANewSkin)" :noblur="!themeStore.advancedRendering">
+    <div v-if="changeSkinType === 'from file'" class="flex flex-col gap-4" :class="{ 'w-[50rem]': displaySkin }">
+      <div>
+        <canvas id="new_render" class="float-start pt-2 mr-4 cursor-grab active:cursor-grabbing" width="0" height="0" :class="{ 'hidden': !displaySkin }" />
+        <template v-if="displaySkin">
+          <label for="skin-name-input" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
+            {{ formatMessage(messages.name) }}
+          </label>
+          <input
+            id="skin-name-input"
+            v-model="selectedSkin.name"
+            autocomplete="off"
+            class="text-input"
+            type="text"
+            maxlength="30"
+            size="25"
+            :placeholder="formatMessage(messages.namePlaceholder, { username: selectedAccount.username })"
+          />
+          <span class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
+            {{ formatMessage(messages.armStyle) }}
+          </span>
+          <RadioButtons v-slot="{ item }" v-model="selectedSkin.arms" :items="['classic', 'slim']" @click="handleArms">
+            {{ formatMessage(armStyleMessages[item]) }}
+          </RadioButtons>
+          <span class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
+            {{ formatMessage(messages.cape) }}
+          </span>
+          <p v-if="capeData.length < 1 || capeData.length === 1 && capeData[0].id === 'no cape'" class="m-0">
+            {{ formatMessage(messages.noCapes) }}
+          </p>
+          <ScrollablePanel v-else :class="capeData.length > 10 ? 'h-[16rem]' : ''">
+            <div class="grid grid-cols-5 gap-2 cape-container items-center">
+              <button
+                v-for="cape in capeData"
+                :key="cape"
+                v-tooltip="cape.id !== 'no cape' ? cape.id : null"
+                class="p-0 py-2 px-2 transition-all border-0 flex gap-2 items-center cursor-pointer active:scale-95 hover:bg-button-bg rounded-xl"
+                :class="{
+                  'text-contrast font-medium bg-button-bg': selectedSkin.cape === cape.id,
+                  'text-primary bg-transparent': selectedSkin.cape !== cape.id,
+                }"
+                @click="() => {
+                  selectedSkin.cape = cape.id
+                  handleCape()
+                }"
+              >
+                <div class="flex gap-2 items-center">
+                  <RadioButtonChecked v-if="selectedSkin.cape === cape.id" class="h-5 w-5 text-brand" />
+                  <RadioButtonIcon v-else class="h-5 w-5" />
+                  <img v-if="cape.url" :src="cape.url" class="cape-img" :alt="cape.id" />
+                  <div v-else class="flex items-center h-20">
+                    {{ formatMessage(messages.capeNone) }}
+                  </div>
+                </div>
+              </button>
+            </div>
+          </ScrollablePanel>
+        </template>
+        <div v-else>
+          <button class="flex flex-col items-center gap-4 button-animation bg-button-bg cursor-pointer border-2 justify-center font-semibold rounded-2xl border-dashed border-button-border w-[34rem] h-60" @click="openskin">
+            <div class="flex items-center text-primary gap-2">
+              <UploadIcon class="h-5 w-5" />
+              {{ formatMessage(messages.selectSkinFile) }}
+            </div>
+            <p v-if="!validSkin" class="m-0 text-sm text-brand-red">
+              {{ formatMessage(messages.invalidSkin) }}
+            </p>
+          </button>
         </div>
-        <canvas id="new_render" class="render" width="0" height="0" />
       </div>
-      <div class="input-row">
-        <p class="input-label">Cape</p>
-        <Chips v-model="selectedSkin.cape" :items="skinData.unlocked_capes" @click="handleCape" />
+      <div class="flex gap-2 flex-wrap">
+        <template v-if="displaySkin">
+          <ButtonStyled color="brand">
+            <button
+              :disabled="uploadingSkin || !selectedSkin.name.trim()"
+              @click="handleSkin('saveupload')"
+            >
+              <SpinnerIcon v-if="uploadingSkin" class="animate-spin" />
+              <CheckIcon v-else />
+              {{ formatMessage(uploadingSkin ? messages.uploadingSkin : messages.addAndUseSkin) }}
+            </button>
+          </ButtonStyled>
+          <ButtonStyled>
+            <button
+              :disabled="!selectedSkin.name.trim()"
+              @click="handleSkin('save')"
+            >
+              <PlusIcon />
+              {{ formatMessage(messages.addSkin) }}
+            </button>
+          </ButtonStyled>
+          <ButtonStyled>
+            <button :disabled="uploadingSkin" @click="handleSkin('upload')">
+              <SpinnerIcon v-if="uploadingSkin" class="animate-spin" />
+              <UploadIcon v-else />
+              {{ formatMessage(uploadingSkin ? messages.uploadingSkin : messages.useSkin) }}
+            </button>
+          </ButtonStyled>
+        </template>
+        <ButtonStyled>
+          <button @click="skinModal.hide()">
+            <XIcon />
+            Cancel
+          </button>
+        </ButtonStyled>
       </div>
-      <div v-if="!editSkin" class="input-group push-right">
-        <Button @click="skinModal.hide()">
-          <XIcon />
-          Cancel
-        </Button>
+      <div v-if="false && !editSkin" class="input-group push-right">
         <Button :disabled="!validSkin || uploadingSkin" @click="handleSkin('upload')">
           <UploadIcon />
           {{ uploadingSkin ? 'Uploading...' : 'Use' }}
@@ -150,7 +202,7 @@
           {{ uploadingSkin ? 'Uploading...' : 'Save & Use' }}
         </Button>
       </div>
-      <div v-else class="input-group push-right">
+      <div v-else-if="false" class="input-group push-right">
         <Button @click="skinModal.hide()">
           <XIcon />
           Cancel
@@ -190,7 +242,7 @@
           <div class="toggle-all table-cell">
             <Checkbox
               class="select-checkbox"
-              :model-value="importer.skinNames.every((child) => child.selected)"
+              :model-value="false"
               @update:model-value="
                 (newValue) => importer.skinNames.forEach((child) => (child.selected = newValue))
               "
@@ -238,7 +290,7 @@
         <ProgressBar v-if="loading" :progress="(importedSkins / (totalSkins + 0.0001)) * 100" />
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
   <ConfirmModal
     ref="deleteConfirmModal"
     title="Are you sure you want to delete this skin?"
@@ -253,19 +305,21 @@
 
 <script setup>
 import {
-  Avatar,
   Notifications,
-  Card,
   Button,
-  Modal,
   ConfirmModal,
   Chips,
   Checkbox,
   DropdownSelect,
-  AnimatedLogo,
+  ButtonStyled,
+  ScrollablePanel, RadioButtons
 } from '@modrinth/ui'
 import {
+  CheckIcon,
+  RadioButtonIcon,
+  RadioButtonChecked,
   PlusIcon,
+  SpinnerIcon,
   SaveIcon,
   SearchIcon,
   UploadIcon,
@@ -280,7 +334,7 @@ import {
   ChevronRightIcon,
   ChevronLeftIcon,
 } from '@modrinth/assets'
-import { ref, onMounted, watch, computed, onBeforeUnmount } from 'vue'
+import { ref, onMounted, watch, computed, onBeforeUnmount, onUnmounted } from 'vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError, useTheming } from '@/store/state.js'
 import { useNotifications } from '@/store/notifications.js'
@@ -312,6 +366,11 @@ import {
   Filters,
 } from '@/helpers/skin_manager.js'
 import { IdleAnimation, SkinViewer, WalkingAnimation } from 'skinview3d'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
+import { defineMessage, defineMessages, useVIntl } from '@vintl/vintl'
+
+const { formatMessage } = useVIntl()
 
 const themeStore = useTheming()
 const notificationsWrapper = ref(null)
@@ -351,6 +410,8 @@ const importType = ref('Mojang')
 
 const skinSaves = ref(await get_skins().catch(handleError))
 const skinOrder = ref([])
+
+const capeData = ref([])
 
 const search = ref('')
 
@@ -398,19 +459,19 @@ const filteredResults = computed(() => {
 const moveCard = async (move, id) => {
   let order = Array.from(skinOrder.value)
   if (Filters.value.filter === 'Current user') {
-    let saves = Array.from(skinSaves.value).sort((a, b) => {
+    const saves = Array.from(skinSaves.value).sort((a, b) => {
       return skinOrder.value.indexOf(a.id) - skinOrder.value.indexOf(b.id)
     })
     order = order.filter((_, i) => {
       return saves[i].user === selectedAccount.value.id
     })
   }
-  let index = order.indexOf(id)
+  const index = order.indexOf(id)
   if (index == 0 && move == -1) return
   if (index == order.length - 1 && move == 1) return
 
-  let targetIndex = skinOrder.value.indexOf(order[index + move])
-  let currentIndex = skinOrder.value.indexOf(id)
+  const targetIndex = skinOrder.value.indexOf(order[index + move])
+  const currentIndex = skinOrder.value.indexOf(id)
   skinOrder.value.splice(currentIndex, 1)
   skinOrder.value.splice(targetIndex, 0, id)
   await save_order(skinOrder.value, selectedAccount.value.id)
@@ -527,11 +588,11 @@ const next = async () => {
   skinModal.value.hide()
 }
 
-const handleModal = async () => {
+const handleModal = async (skin = undefined) => {
   changeSkinType.value = 'from file'
   editSkin.value = false
   validSkin.value = true
-  displaySkin.value = skinData.value.skin
+  displaySkin.value = undefined
   selectedSkin.value.skin = skinData.value.skin
   await skinModal.value.show()
   selectedSkin.value.arms = skinData.value.arms
@@ -693,7 +754,7 @@ const edit_skin_end = async () => {
 }
 
 const duplicate_skin = async (args) => {
-  let data = {}
+  const data = {}
   data.skin = args.skin
   data.cape = args.cape
   data.arms = args.arms
@@ -703,8 +764,19 @@ const duplicate_skin = async (args) => {
   skinOrder.value = await get_order(selectedAccount.value.id).catch(handleError)
 }
 
+const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
+  // Only if modal is showing
+  if (event.payload.type !== 'drop') return
+  const { paths } = event.payload
+  if (paths && paths.length > 0 && paths[0].endsWith('.png')) {
+    await handleModal()
+    await loadSkinFile(paths[0]).catch(handleError)
+    skinModal.value.show()
+  }
+})
+
 const openskin = async () => {
-  selectedSkin.value.skin = await open({
+  await loadSkinFile(await open({
     multiple: false,
     filters: [
       {
@@ -712,7 +784,12 @@ const openskin = async () => {
         extensions: ['png'],
       },
     ],
-  })
+  }))
+}
+
+const loadSkinFile = async (file) => {
+  selectedSkin.value.skin = file
+
   if (!selectedSkin.value.skin) {
     skinClear()
     return
@@ -729,8 +806,8 @@ const openskin = async () => {
 const create_modal_render = async () => {
   modalRender.value = new SkinViewer({
     canvas: document.getElementById('new_render'),
-    width: 247.5,
-    height: 330,
+    width: 230,
+    height: 400,
   })
   modalRender.value.animation = new IdleAnimation()
   modalRender.value.controls.enableZoom = false
@@ -750,8 +827,8 @@ const create_render = async () => {
   const cape = await get_cape_data(skinData.value.cape, 'url').catch(handleError)
   currentRender.value = new SkinViewer({
     canvas: document.getElementById('skin_container'),
-    width: 300,
-    height: 400,
+    width: 200,
+    height: 250,
     skin: skinData.value.skin,
     model: arms,
   })
@@ -793,6 +870,7 @@ const handleImportType = async () => {
 }
 
 watch(selectedAccount, async (newAccount) => {
+  console.log(newAccount)
   skinOrder.value = await get_order(newAccount.id).catch(handleError)
   await update_render(newAccount.id)
 })
@@ -813,333 +891,117 @@ function convert_arms(arms) {
 }
 
 onMounted(async () => {
+  Filters.value.filter = 'All users'
   await create_render()
+  await get_capes()
 })
 
 onBeforeUnmount(async () => {
   await save_filters()
 })
+
+onUnmounted(() => {
+  unlisten()
+})
+
+async function get_capes() {
+  capeData.value = []
+  for (const cape of skinData.value.unlocked_capes) {
+    const url = cape === 'no cape' ? null : await get_cape_data(cape, 'url').catch(handleError)
+    capeData.value.push({
+      id: cape,
+      url,
+    })
+  }
+}
+
+const messages = defineMessages({
+  currentSkin: {
+    id: 'app.skin-manager.current-skin',
+    defaultMessage: 'Current skin'
+  },
+  addNewSkin: {
+    id: 'app.skin-manager.add-new-skin',
+    defaultMessage: 'Add new skin',
+  },
+  addANewSkin: {
+    id: 'app.skin-manager.add-a-new-skin',
+    defaultMessage: 'Add a new skin',
+  },
+  name: {
+    id: 'app.skin-manager.skin-name',
+    defaultMessage: 'Name'
+  },
+  namePlaceholder: {
+    id: 'app.skin-manager.skin-name.placeholder',
+    defaultMessage: `{username}'s skin`
+  },
+  armStyle: {
+    id: 'app.skin-manager.arm-style',
+    defaultMessage: 'Arm style'
+  },
+  cape: {
+    id: 'app.skin-manager.cape',
+    defaultMessage: 'Cape'
+  },
+  noCapes: {
+    id: 'app.skin-manager.no-capes',
+    defaultMessage: `You don't have any capes unlocked. Unlock capes through official Minecraft events and campaigns.`
+  },
+  capeNone: {
+    id: 'app.skin-manager.cape.none',
+    defaultMessage: 'None'
+  },
+  selectSkinFile: {
+    id: 'app.skin-manager.select-skin-file',
+    defaultMessage: 'Select or drop a valid skin file here to begin'
+  },
+  useSkin: {
+    id: 'app.skin-manager.use',
+    defaultMessage: 'Use skin'
+  },
+  addSkin: {
+    id: 'app.skin-manager.add',
+    defaultMessage: 'Add to library'
+  },
+  addAndUseSkin: {
+    id: 'app.skin-manager.add-and-use',
+    defaultMessage: 'Add and use'
+  },
+  uploadingSkin: {
+    id: 'app.skin-manager.uploading-skin',
+    defaultMessage: 'Uploading...'
+  },
+  invalidSkin: {
+    id: 'app.skin-manager.invalid-skin',
+    defaultMessage: 'Selected skin file is invalid. Please try another one.'
+  },
+})
+
+const armStyleMessages = {
+  classic: defineMessage({
+    id: 'app.skin-manager.arm-style.wide',
+    defaultMessage: 'Wide'
+  }),
+  slim: defineMessage({
+    id: 'app.skin-manager.arm-style.slim',
+    defaultMessage: 'Slim'
+  }),
+}
 </script>
 
 <style scoped lang="scss">
-.content {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  padding: 1rem;
-  padding-left: 0rem;
-  padding-top: 0rem;
-  gap: 1rem;
-
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
-  }
-}
-
-.overlap {
-  display: grid;
-  justify-items: start;
-  align-items: end;
-
-  .loading {
-    margin: 0;
-    padding: 0;
-    width: 1rem;
-    height: 1rem;
-  }
-}
-.overlap > * {
-  grid-column-start: 1;
-  grid-row-start: 1;
-}
-
-.modal {
-  position: absolute;
-}
-
-.image-upload {
-  display: flex;
-  gap: 1rem;
-}
-
-.image-input {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.input-label {
-  font-size: 1rem;
-  font-weight: bolder;
-  color: var(--color-contrast);
-  margin-bottom: 0.5rem;
-}
-
-.modal-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--gap-lg);
-  padding-bottom: 0;
-}
-
-.modal-column {
-  display: flex;
-  flex-direction: column;
-  padding: var(--gap-lg);
-  gap: var(--gap-sm);
-}
-
-.modal-row {
-  display: flex;
-  flex-direction: row;
-  gap: var(--gap-sm);
-}
-
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  gap: 1rem;
-
-  .divider {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: 1rem;
-    margin-bottom: 1rem;
-
-    p {
-      margin: 0;
-      font-size: 1rem;
-      white-space: nowrap;
-      color: var(--color-contrast);
-    }
-
-    hr {
-      background-color: var(--color-gray);
-      height: 1px;
-      width: 100%;
-      border: none;
-    }
-  }
-}
-
-.header {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: inherit;
-  margin: 1rem 1rem 0 !important;
-  padding: 1rem;
-  width: calc(100% - 2rem);
-
-  .iconified-input {
-    flex-grow: 1;
-
-    input {
-      min-width: 100%;
-    }
-  }
-
-  .sort-dropdown {
-    width: 10rem;
-  }
-
-  .filter-dropdown {
-    width: 15rem;
-  }
-
-  .labeled_button {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    white-space: nowrap;
-  }
-}
-
-.render {
-  cursor: pointer;
-}
-
-.instance-card-item {
-  display: block;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  padding: var(--gap-md);
-  transition: 0.1s ease-in-out all !important; /* overrides Omorphia defaults */
-  margin-bottom: 0;
-
-  .card-row {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .mod-image {
-    --size: 100%;
-    width: 144px;
-    height: 144px;
-  }
-
-  .project-info {
-    margin-top: 1rem;
-    width: 100%;
-
-    .title {
-      color: var(--color-contrast);
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      width: 144px;
-      margin: 0;
-      font-weight: 600;
-      font-size: 1rem;
-      line-height: 110%;
-      display: inline-block;
-    }
-
-    .description {
-      color: var(--color-base);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      font-weight: 500;
-      font-size: 0.775rem;
-      line-height: 125%;
-      margin: 0.25rem 0 0;
-      text-transform: capitalize;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
-}
-
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  padding: var(--gap-lg);
-  gap: var(--gap-md);
-}
-
-.input-label {
-  font-size: 1rem;
-  font-weight: bolder;
-  color: var(--color-contrast);
-  margin-bottom: 0.5rem;
-}
-
-.text-input {
-  width: 20rem;
-}
-
-.image-upload {
-  display: flex;
-  gap: 1rem;
-}
-
-.image-input {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.warning {
-  font-style: italic;
-}
-
-.modal-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--gap-lg);
-  padding-bottom: 0;
-}
-
-.path-selection {
-  padding: var(--gap-xl);
-  background-color: var(--color-bg);
-  border-radius: var(--radius-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-md);
-
-  h3 {
-    margin: 0;
-  }
-
-  .path-input {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    flex-direction: row;
-    gap: var(--gap-sm);
-
-    .iconified-input {
-      flex-grow: 1;
-      :deep(input) {
-        width: 100%;
-        flex-basis: auto;
-      }
-    }
-  }
-}
-
-.table {
-  border: 1px solid var(--color-bg);
-}
-
-.table-row {
-  grid-template-columns: min-content auto;
-}
-
-.table-content {
-  max-height: calc(5 * (18px + 2rem));
-  height: calc(5 * (18px + 2rem));
-  overflow-y: auto;
-}
-
-.select-checkbox {
-  button.checkbox {
-    border: none;
-  }
-}
-
-.button-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--gap-md);
-
-  .transparent {
-    padding: var(--gap-sm) 0;
-  }
-}
-
-.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bolder;
-  color: var(--color-contrast);
-}
-
-.card-divider {
-  margin: var(--gap-md) var(--gap-lg) 0 var(--gap-lg);
+.cape-img {
+  box-sizing: content-box;
+  width: 10px;
+  height: 16px;
+  object-fit: none;
+  image-rendering: pixelated;
+  object-position: -1px -1px;
+  zoom: 5;
+  background-color: var(--color-button-bg);
+  border: 0.25px solid var(--color-button-border);
+  border-radius: 1px;
+  box-shadow: 0px 0.25px 2px rgba(0, 0, 0, 0.25);
 }
 </style>

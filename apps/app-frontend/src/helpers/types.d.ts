@@ -108,3 +108,12 @@ export type InstanceSettingsTabProps = {
   instance: GameInstance
   offline?: boolean
 }
+
+export type MinecraftCredentials = {
+  id: string
+  username: string,
+  access_token: string,
+  refresh_token: string,
+  expires: string,
+  active: boolean,
+}

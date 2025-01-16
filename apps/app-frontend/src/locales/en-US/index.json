@@ -20,6 +20,60 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
+  "app.sidebar.friends.title": {
+    "message": "Friends"
+  },
+  "app.skin-manager.add": {
+    "message": "Add to library"
+  },
+  "app.skin-manager.add-a-new-skin": {
+    "message": "Add a new skin"
+  },
+  "app.skin-manager.add-and-use": {
+    "message": "Add and use"
+  },
+  "app.skin-manager.add-new-skin": {
+    "message": "Add new skin"
+  },
+  "app.skin-manager.arm-style": {
+    "message": "Arm style"
+  },
+  "app.skin-manager.arm-style.slim": {
+    "message": "Slim"
+  },
+  "app.skin-manager.arm-style.wide": {
+    "message": "Wide"
+  },
+  "app.skin-manager.cape": {
+    "message": "Cape"
+  },
+  "app.skin-manager.cape.none": {
+    "message": "None"
+  },
+  "app.skin-manager.current-skin": {
+    "message": "Current skin"
+  },
+  "app.skin-manager.invalid-skin": {
+    "message": "Selected skin file is invalid. Please try another one."
+  },
+  "app.skin-manager.no-capes": {
+    "message": "You don't have any capes unlocked. Unlock capes through official Minecraft events and campaigns."
+  },
+  "app.skin-manager.select-skin-file": {
+    "message": "Select or drop a valid skin file here to begin"
+  },
+  "app.skin-manager.skin-name": {
+    "message": "Name"
+  },
+  "app.skin-manager.skin-name.placeholder": {
+    "message": "{username}'s skin"
+  },
+  "app.skin-manager.uploading-skin": {
+    "message": "Uploading..."
+  },
+  "app.skin-manager.use": {
+    "message": "Use skin"
+  },
   "instance.filter.disabled": {
     "message": "Disabled projects"
   },

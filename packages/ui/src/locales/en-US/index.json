@@ -14,6 +14,9 @@
   "button.edit": {
     "defaultMessage": "Edit"
   },
+  "button.remove": {
+    "defaultMessage": "Remove"
+  },
   "button.report": {
     "defaultMessage": "Report"
   },

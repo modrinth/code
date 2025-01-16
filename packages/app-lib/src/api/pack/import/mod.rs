@@ -74,7 +74,7 @@ pub async fn get_importable_instances(
                 "Launcher type Unsupported".to_string(),
             )
             .into())
-        },
+        }
         ImportLauncherType::Unknown => {
             return Err(crate::ErrorKind::InputError(
                 "Launcher type Unknown".to_string(),
@@ -156,7 +156,7 @@ pub async fn import_instance(
                 "Launcher type Unsupported".to_string(),
             )
             .into())
-        },
+        }
         ImportLauncherType::Unknown => {
             return Err(crate::ErrorKind::InputError(
                 "Launcher type Unknown".to_string(),

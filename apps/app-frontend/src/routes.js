@@ -56,7 +56,7 @@ export default new createRouter({
       name: 'SkinManager',
       component: Pages.SkinManager,
       meta: {
-        breadcrumb: [{ name: 'Skin Manager' }],
+        breadcrumb: [{ name: 'Change skin' }],
       },
     },
     {
