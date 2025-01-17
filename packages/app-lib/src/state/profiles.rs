@@ -1,5 +1,7 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::state::{cache_file_hash, CacheBehaviour, CachedEntry};
+use crate::state::{
+    cache_file_hash, CacheBehaviour, CachedEntry, CachedFileHash,
+};
 use crate::util;
 use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
 use crate::util::io::{self};
@@ -9,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use std::convert::TryFrom;
 use std::convert::TryInto;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -51,7 +53,9 @@ pub enum ProfileInstallStage {
     /// Profile is installed
     Installed,
     /// Profile's minecraft game is still installing
-    Installing,
+    MinecraftInstalling,
+    /// Pack is installed, but Minecraft installation has not begun
+    PackInstalled,
     /// Profile created for pack, but the pack hasn't been fully installed yet
     PackInstalling,
     /// Profile is not installed
@@ -62,7 +66,8 @@ impl ProfileInstallStage {
     pub fn as_str(&self) -> &'static str {
         match *self {
             Self::Installed => "installed",
-            Self::Installing => "installing",
+            Self::MinecraftInstalling => "minecraft_installing",
+            Self::PackInstalled => "pack_installed",
             Self::PackInstalling => "pack_installing",
             Self::NotInstalled => "not_installed",
         }
@@ -71,7 +76,9 @@ impl ProfileInstallStage {
     pub fn from_str(val: &str) -> Self {
         match val {
             "installed" => Self::Installed,
-            "installing" => Self::Installing,
+            "minecraft_installing" => Self::MinecraftInstalling,
+            "installing" => Self::MinecraftInstalling, // Backwards compatibility
+            "pack_installed" => Self::PackInstalled,
             "pack_installing" => Self::PackInstalling,
             "not_installed" => Self::NotInstalled,
             _ => Self::NotInstalled,
@@ -146,7 +153,7 @@ pub struct FileMetadata {
     pub version_id: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Copy)]
+#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectType {
     Mod,
@@ -176,7 +183,7 @@ impl ProjectType {
         }
     }
 
-    pub fn get_from_parent_folder(path: PathBuf) -> Option<Self> {
+    pub fn get_from_parent_folder(path: &Path) -> Option<Self> {
         // Get parent folder
         let path = path.parent()?.file_name()?;
         match path.to_str()? {
@@ -193,7 +200,7 @@ impl ProjectType {
             ProjectType::Mod => "mod",
             ProjectType::DataPack => "datapack",
             ProjectType::ResourcePack => "resourcepack",
-            ProjectType::ShaderPack => "shaderpack",
+            ProjectType::ShaderPack => "shader",
         }
     }
 
@@ -203,6 +210,15 @@ impl ProjectType {
             ProjectType::DataPack => "datapacks",
             ProjectType::ResourcePack => "resourcepacks",
             ProjectType::ShaderPack => "shaderpacks",
+        }
+    }
+
+    pub fn get_loaders(&self) -> &'static [&'static str] {
+        match self {
+            ProjectType::Mod => &["fabric", "forge", "quilt", "neoforge"],
+            ProjectType::DataPack => &["datapack"],
+            ProjectType::ResourcePack => &["vanilla", "canvas", "minecraft"],
+            ProjectType::ShaderPack => &["iris", "optifine"],
         }
     }
 
@@ -538,11 +554,11 @@ impl Profile {
 
     pub(crate) async fn refresh_all() -> crate::Result<()> {
         let state = crate::State::get().await?;
-        let all = Self::get_all(&state.pool).await?;
+        let mut all = Self::get_all(&state.pool).await?;
 
         let mut keys = vec![];
 
-        for profile in &all {
+        for profile in &mut all {
             let path =
                 crate::api::profile::get_full_path(&profile.path).await?;
 
@@ -575,6 +591,17 @@ impl Profile {
                     }
                 }
             }
+
+            if profile.install_stage == ProfileInstallStage::MinecraftInstalling
+            {
+                profile.install_stage = ProfileInstallStage::PackInstalled;
+                profile.upsert(&state.pool).await?;
+            } else if profile.install_stage
+                == ProfileInstallStage::PackInstalling
+            {
+                profile.install_stage = ProfileInstallStage::NotInstalled;
+                profile.upsert(&state.pool).await?;
+            }
         }
 
         let file_hashes = CachedEntry::get_file_hash_many(
@@ -587,17 +614,10 @@ impl Profile {
 
         let file_updates = file_hashes
             .iter()
-            .filter_map(|x| {
-                all.iter().find(|prof| x.path.contains(&prof.path)).map(
-                    |profile| {
-                        format!(
-                            "{}-{}-{}",
-                            x.hash,
-                            profile.loader.as_str(),
-                            profile.game_version
-                        )
-                    },
-                )
+            .filter_map(|file| {
+                all.iter()
+                    .find(|prof| file.path.contains(&prof.path))
+                    .map(|profile| Self::get_cache_key(file, profile))
             })
             .collect::<Vec<_>>();
 
@@ -664,7 +684,7 @@ impl Profile {
                                 path: format!(
                                     "{}/{folder}/{}",
                                     self.path,
-                                    file_name.replace(".disabled", "")
+                                    file_name.trim_end_matches(".disabled")
                                 ),
                                 file_name: file_name.to_string(),
                                 project_type,
@@ -690,14 +710,7 @@ impl Profile {
 
         let file_updates = file_hashes
             .iter()
-            .map(|x| {
-                format!(
-                    "{}-{}-{}",
-                    x.hash,
-                    self.loader.as_str(),
-                    self.game_version
-                )
-            })
+            .map(|x| Self::get_cache_key(x, self))
             .collect::<Vec<_>>();
 
         let file_hashes_ref =
@@ -725,8 +738,9 @@ impl Profile {
             let info_index = file_info.iter().position(|x| x.hash == hash.hash);
             let file = info_index.map(|x| file_info.remove(x));
 
-            if let Some(initial_file_index) =
-                keys.iter().position(|x| x.path == hash.path)
+            if let Some(initial_file_index) = keys
+                .iter()
+                .position(|x| x.path == hash.path.trim_end_matches(".disabled"))
             {
                 let initial_file = keys.remove(initial_file_index);
 
@@ -770,6 +784,18 @@ impl Profile {
         }
 
         Ok(files)
+    }
+
+    fn get_cache_key(file: &CachedFileHash, profile: &Profile) -> String {
+        format!(
+            "{}-{}-{}",
+            file.hash,
+            file.project_type
+                .filter(|x| *x != ProjectType::Mod)
+                .map(|x| x.get_loaders().join("+"))
+                .unwrap_or_else(|| profile.loader.as_str().to_string()),
+            profile.game_version
+        )
     }
 
     #[tracing::instrument(skip(pool))]
@@ -872,8 +898,15 @@ impl Profile {
         let project_path =
             format!("{}/{}", project_type.get_folder(), file_name);
 
-        cache_file_hash(bytes.clone(), profile_path, &project_path, hash, exec)
-            .await?;
+        cache_file_hash(
+            bytes.clone(),
+            profile_path,
+            &project_path,
+            hash,
+            Some(project_type),
+            exec,
+        )
+        .await?;
 
         util::fetch::write(&path.join(&project_path), &bytes, io_semaphore)
             .await?;
@@ -890,7 +923,7 @@ impl Profile {
         let path = crate::api::profile::get_full_path(profile_path).await?;
 
         let new_path = if project_path.ends_with(".disabled") {
-            project_path.replace(".disabled", "")
+            project_path.trim_end_matches(".disabled").to_string()
         } else {
             format!("{project_path}.disabled")
         };

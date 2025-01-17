@@ -10,9 +10,9 @@ use crate::queue::socket::ActiveSockets;
 use crate::routes::ApiError;
 use actix_web::web::{Data, Payload};
 use actix_web::{get, web, HttpRequest, HttpResponse};
-use actix_ws::AggregatedMessage;
+use actix_ws::Message;
 use chrono::Utc;
-use futures_util::StreamExt;
+use futures_util::{StreamExt, TryStreamExt};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -33,6 +33,7 @@ pub enum ServerToClientMessage {
     UserOffline { id: UserId },
     FriendStatuses { statuses: Vec<UserStatus> },
     FriendRequest { from: UserId },
+    FriendRequestRejected { from: UserId },
 }
 
 #[derive(Deserialize)]
@@ -40,7 +41,7 @@ struct LauncherHeartbeatInit {
     code: String,
 }
 
-#[get("launcher_heartbeat")]
+#[get("launcher_socket")]
 pub async fn ws_init(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -122,22 +123,18 @@ pub async fn ws_init(
         user.id,
         ServerToClientMessage::StatusUpdate { status },
         &pool,
-        &redis,
         &db,
         Some(friends),
     )
     .await?;
 
-    let mut stream = msg_stream
-        .aggregate_continuations()
-        // aggregate continuation frames up to 1MiB
-        .max_continuation_size(2_usize.pow(20));
+    let mut stream = msg_stream.into_stream();
 
     actix_web::rt::spawn(async move {
         // receive messages from websocket
         while let Some(msg) = stream.next().await {
             match msg {
-                Ok(AggregatedMessage::Text(text)) => {
+                Ok(Message::Text(text)) => {
                     if let Ok(message) =
                         serde_json::from_str::<ClientToServerMessage>(&text)
                     {
@@ -162,13 +159,16 @@ pub async fn ws_init(
                                     status.profile_name = profile_name;
                                     status.last_update = Utc::now();
 
+                                    let user_status = status.clone();
+                                    // We drop the pair to avoid holding the lock for too long
+                                    drop(pair);
+
                                     let _ = broadcast_friends(
                                         user.id,
                                         ServerToClientMessage::StatusUpdate {
-                                            status: status.clone(),
+                                            status: user_status,
                                         },
                                         &pool,
-                                        &redis,
                                         &db,
                                         None,
                                     )
@@ -179,13 +179,22 @@ pub async fn ws_init(
                     }
                 }
 
-                Ok(AggregatedMessage::Close(_)) => {
-                    let _ = close_socket(user.id, &pool, &redis, &db).await;
+                Ok(Message::Close(_)) => {
+                    let _ = close_socket(user.id, &pool, &db).await;
+                }
+
+                Ok(Message::Ping(msg)) => {
+                    if let Some(socket) = db.auth_sockets.get(&user.id) {
+                        let (_, socket) = socket.value();
+                        let _ = socket.clone().pong(&msg).await;
+                    }
                 }
 
                 _ => {}
             }
         }
+
+        let _ = close_socket(user.id, &pool, &db).await;
     });
 
     Ok(res)
@@ -195,7 +204,6 @@ pub async fn broadcast_friends(
     user_id: UserId,
     message: ServerToClientMessage,
     pool: &PgPool,
-    redis: &RedisPool,
     sockets: &ActiveSockets,
     friends: Option<Vec<FriendItem>>,
 ) -> Result<(), crate::database::models::DatabaseError> {
@@ -213,22 +221,11 @@ pub async fn broadcast_friends(
         };
 
         if friend.accepted {
-            if let Some(mut socket) =
-                sockets.auth_sockets.get_mut(&friend_id.into())
-            {
-                let (_, socket) = socket.value_mut();
+            if let Some(socket) = sockets.auth_sockets.get(&friend_id.into()) {
+                let (_, socket) = socket.value();
 
-                // TODO: bulk close sockets for better perf
-                if socket.text(serde_json::to_string(&message)?).await.is_err()
-                {
-                    Box::pin(close_socket(
-                        friend_id.into(),
-                        pool,
-                        redis,
-                        sockets,
-                    ))
-                    .await?;
-                }
+                let _ =
+                    socket.clone().text(serde_json::to_string(&message)?).await;
             }
         }
     }
@@ -239,22 +236,20 @@ pub async fn broadcast_friends(
 pub async fn close_socket(
     id: UserId,
     pool: &PgPool,
-    redis: &RedisPool,
     sockets: &ActiveSockets,
 ) -> Result<(), crate::database::models::DatabaseError> {
     if let Some((_, (_, socket))) = sockets.auth_sockets.remove(&id) {
         let _ = socket.close(None).await;
-    }
 
-    broadcast_friends(
-        id,
-        ServerToClientMessage::UserOffline { id },
-        pool,
-        redis,
-        sockets,
-        None,
-    )
-    .await?;
+        broadcast_friends(
+            id,
+            ServerToClientMessage::UserOffline { id },
+            pool,
+            sockets,
+            None,
+        )
+        .await?;
+    }
 
     Ok(())
 }

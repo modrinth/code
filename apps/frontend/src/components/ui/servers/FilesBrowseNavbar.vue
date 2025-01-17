@@ -80,6 +80,7 @@
             :options="[
               { id: 'normal', action: () => $emit('sort', 'default') },
               { id: 'modified', action: () => $emit('sort', 'modified') },
+              { id: 'created', action: () => $emit('sort', 'created') },
               { id: 'filesOnly', action: () => $emit('sort', 'filesOnly') },
               { id: 'foldersOnly', action: () => $emit('sort', 'foldersOnly') },
             ]"
@@ -91,11 +92,12 @@
             <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
             <template #normal> Alphabetical </template>
             <template #modified> Date modified </template>
+            <template #created> Date created </template>
             <template #filesOnly> Files only </template>
             <template #foldersOnly> Folders only </template>
           </UiServersTeleportOverflowMenu>
         </ButtonStyled>
-        <div class="mx-1 w-full text-sm sm:w-40">
+        <div class="mx-1 w-full text-sm sm:w-48">
           <label for="search-folder" class="sr-only">Search folder</label>
           <div class="relative">
             <SearchIcon
@@ -108,7 +110,7 @@
               type="search"
               name="search"
               autocomplete="off"
-              class="h-8 min-h-[unset] w-full border-[1px] border-solid border-button-bg bg-transparent py-2 pl-9"
+              class="h-8 min-h-[unset] w-full border-[1px] border-solid border-divider bg-transparent py-2 pl-9"
               placeholder="Search..."
               @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
             />
@@ -183,6 +185,8 @@ const sortMethodLabel = computed(() => {
   switch (props.sortMethod) {
     case "modified":
       return "Date modified";
+    case "created":
+      return "Date created";
     case "filesOnly":
       return "Files only";
     case "foldersOnly":

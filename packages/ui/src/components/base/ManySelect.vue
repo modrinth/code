@@ -6,6 +6,7 @@
       :disabled="disabled"
       :position="position"
       :direction="direction"
+      :dropdown-id="dropdownId"
       @open="
         () => {
           searchQuery = ''
@@ -15,15 +16,15 @@
       <slot />
       <DropdownIcon class="h-5 w-5 text-secondary" />
       <template #menu>
-        <div class="iconified-input mb-2 w-full" v-if="search">
+        <div v-if="search" class="iconified-input mb-2 w-full">
           <label for="search-input" hidden>Search...</label>
           <SearchIcon aria-hidden="true" />
           <input
             id="search-input"
+            ref="searchInput"
             v-model="searchQuery"
             placeholder="Search..."
             type="text"
-            ref="searchInput"
             @keydown.enter="
               () => {
                 toggleOption(filteredOptions[0])
@@ -40,7 +41,7 @@
             class="!w-full"
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
-            <slot name="option" :option="option">{{ displayName(option) }}</slot>
+            <slot name="option" :option="option">{{ displayName?.(option) }}</slot>
             <CheckIcon
               class="h-5 w-5 text-contrast ml-auto transition-opacity"
               :class="{ 'opacity-0': !manyValues.includes(option) }"
@@ -56,7 +57,7 @@
             class="!w-full"
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
-            <slot name="option" :option="option">{{ displayName(option) }}</slot>
+            <slot name="option" :option="option">{{ displayName?.(option) }}</slot>
             <CheckIcon
               class="h-5 w-5 text-contrast ml-auto transition-opacity"
               :class="{ 'opacity-0': !manyValues.includes(option) }"
@@ -69,7 +70,7 @@
   </ButtonStyled>
 </template>
 <script setup lang="ts">
-import { CheckIcon, DropdownIcon, SearchIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, DropdownIcon, SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, PopoutMenu, Button } from '../index'
 import { computed, ref } from 'vue'
 import ScrollablePanel from './ScrollablePanel.vue'
@@ -85,6 +86,7 @@ const props = withDefaults(
     direction?: string
     displayName?: (option: Option) => string
     search?: boolean
+    dropdownId?: string
   }>(),
   {
     disabled: false,
@@ -92,6 +94,7 @@ const props = withDefaults(
     direction: 'auto',
     displayName: (option: Option) => option as string,
     search: false,
+    dropdownId: null,
   },
 )
 

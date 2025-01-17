@@ -880,11 +880,11 @@ pub async fn active_servers(
 ) -> Result<HttpResponse, ApiError> {
     let master_key = dotenvy::var("PYRO_API_KEY")?;
 
-    if !req
+    if req
         .head()
         .headers()
         .get("X-Master-Key")
-        .map_or(false, |it| it.as_bytes() == master_key.as_bytes())
+        .is_none_or(|it| it.as_bytes() != master_key.as_bytes())
     {
         return Err(ApiError::CustomAuthentication(
             "Invalid master key".to_string(),
@@ -898,14 +898,25 @@ pub async fn active_servers(
         )
         .await?;
 
+    #[derive(Serialize)]
+    struct ActiveServer {
+        pub user_id: crate::models::ids::UserId,
+        pub server_id: String,
+        pub interval: PriceDuration,
+    }
+
     let server_ids = servers
         .into_iter()
         .filter_map(|x| {
-            x.metadata.map(|x| match x {
-                SubscriptionMetadata::Pyro { id } => id,
+            x.metadata.as_ref().map(|metadata| match metadata {
+                SubscriptionMetadata::Pyro { id } => ActiveServer {
+                    user_id: x.user_id.into(),
+                    server_id: id.clone(),
+                    interval: x.interval,
+                },
             })
         })
-        .collect::<Vec<_>>();
+        .collect::<Vec<ActiveServer>>();
 
     Ok(HttpResponse::Ok().json(server_ids))
 }
@@ -1747,7 +1758,7 @@ pub async fn stripe_webhook(
                                             "source": source,
                                             "payment_interval": metadata.charge_item.subscription_interval.map(|x| match x {
                                                 PriceDuration::Monthly => 1,
-                                                PriceDuration::Yearly => 3,
+                                                PriceDuration::Yearly => 12,
                                             })
                                         }))
                                         .send()

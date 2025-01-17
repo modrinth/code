@@ -1,7 +1,7 @@
 <template>
   <div
     data-pyro-server-list-root
-    class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-3"
+    class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-6"
   >
     <div
       v-if="serverList.length > 0 || isPollingForNewServers"

@@ -1,7 +1,7 @@
 <template>
   <nav
     ref="scrollContainer"
-    class="experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
+    class="card-shadow experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
   >
     <NuxtLink
       v-for="(link, index) in filteredLinks"
@@ -11,7 +11,7 @@
       :to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
       class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
       :class="{
-        'text-brand': activeIndex === index && !subpageSelected,
+        'text-button-textSelected': activeIndex === index && !subpageSelected,
         'text-contrast': activeIndex === index && subpageSelected,
       }"
     >
@@ -20,7 +20,7 @@
     </NuxtLink>
     <div
       :class="`navtabs-transition pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1 ${
-        subpageSelected ? 'bg-button-bg' : 'bg-brand-highlight'
+        subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected'
       }`"
       :style="{
         left: sliderLeftPx,
@@ -160,5 +160,9 @@ watch(
   transition:
     all 150ms cubic-bezier(0.4, 0, 0.2, 1),
     opacity 250ms cubic-bezier(0.5, 0, 0.2, 1) 50ms;
+}
+
+.card-shadow {
+  box-shadow: var(--shadow-card);
 }
 </style>

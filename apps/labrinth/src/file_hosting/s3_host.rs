@@ -74,10 +74,10 @@ impl FileHost for S3Host {
                 content_type,
             )
             .await
-            .map_err(|_| {
-                FileHostingError::S3Error(
-                    "Error while uploading file to S3".to_string(),
-                )
+            .map_err(|err| {
+                FileHostingError::S3Error(format!(
+                    "Error while uploading file {file_name} to S3: {err}"
+                ))
             })?;
 
         Ok(UploadFileData {
@@ -100,10 +100,10 @@ impl FileHost for S3Host {
         self.bucket
             .delete_object(format!("/{file_name}"))
             .await
-            .map_err(|_| {
-                FileHostingError::S3Error(
-                    "Error while deleting file from S3".to_string(),
-                )
+            .map_err(|err| {
+                FileHostingError::S3Error(format!(
+                    "Error while deleting file {file_name} to S3: {err}"
+                ))
             })?;
 
         Ok(DeleteFileData {

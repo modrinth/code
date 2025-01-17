@@ -1,11 +1,11 @@
-export interface Mod {
-  id: string;
-  filename: string;
-  modrinth_ids: {
-    project_id: string;
-    version_id: string;
-  };
-}
+// export interface Mod {
+//   id: string;
+//   filename: string;
+//   modrinth_ids: {
+//     project_id: string;
+//     version_id: string;
+//   };
+// }
 
 interface License {
   id: string;
@@ -148,6 +148,17 @@ export type ServerState = "running" | "stopped" | "crashed";
 //   message: string;
 //   state: ServerState;
 // }
+
+export type Loaders =
+  | "Fabric"
+  | "Quilt"
+  | "Forge"
+  | "NeoForge"
+  | "Paper"
+  | "Spigot"
+  | "Bukkit"
+  | "Vanilla"
+  | "Purpur";
 
 export interface WSLogEvent {
   event: "log";

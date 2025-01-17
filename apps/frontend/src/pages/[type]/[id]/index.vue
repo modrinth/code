@@ -1,15 +1,13 @@
 <template>
   <section class="normal-page__content">
-    <div
-      v-if="project.body"
-      class="markdown-body card"
-      v-html="renderHighlightedString(project.body || '')"
-    />
+    <div v-if="project.body" class="card">
+      <ProjectPageDescription :description="project.body" />
+    </div>
   </section>
 </template>
 
 <script setup>
-import { renderHighlightedString } from "~/helpers/highlight.js";
+import { ProjectPageDescription } from "@modrinth/ui";
 
 defineProps({
   project: {

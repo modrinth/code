@@ -1,0 +1,176 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar\n            FROM settings\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "max_concurrent_writes",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "max_concurrent_downloads",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "theme",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "default_page",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "collapsed_navigation",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "advanced_rendering",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "native_decorations",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "discord_rpc",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "developer_mode",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "telemetry",
+        "ordinal": 9,
+        "type_info": "Integer"
+      },
+      {
+        "name": "personalized_ads",
+        "ordinal": 10,
+        "type_info": "Integer"
+      },
+      {
+        "name": "onboarded",
+        "ordinal": 11,
+        "type_info": "Integer"
+      },
+      {
+        "name": "extra_launch_args",
+        "ordinal": 12,
+        "type_info": "Text"
+      },
+      {
+        "name": "custom_env_vars",
+        "ordinal": 13,
+        "type_info": "Text"
+      },
+      {
+        "name": "mc_memory_max",
+        "ordinal": 14,
+        "type_info": "Integer"
+      },
+      {
+        "name": "mc_force_fullscreen",
+        "ordinal": 15,
+        "type_info": "Integer"
+      },
+      {
+        "name": "mc_game_resolution_x",
+        "ordinal": 16,
+        "type_info": "Integer"
+      },
+      {
+        "name": "mc_game_resolution_y",
+        "ordinal": 17,
+        "type_info": "Integer"
+      },
+      {
+        "name": "hide_on_process_start",
+        "ordinal": 18,
+        "type_info": "Integer"
+      },
+      {
+        "name": "hook_pre_launch",
+        "ordinal": 19,
+        "type_info": "Text"
+      },
+      {
+        "name": "hook_wrapper",
+        "ordinal": 20,
+        "type_info": "Text"
+      },
+      {
+        "name": "hook_post_exit",
+        "ordinal": 21,
+        "type_info": "Text"
+      },
+      {
+        "name": "custom_dir",
+        "ordinal": 22,
+        "type_info": "Text"
+      },
+      {
+        "name": "prev_custom_dir",
+        "ordinal": 23,
+        "type_info": "Text"
+      },
+      {
+        "name": "migrated",
+        "ordinal": 24,
+        "type_info": "Integer"
+      },
+      {
+        "name": "feature_flags",
+        "ordinal": 25,
+        "type_info": "Text"
+      },
+      {
+        "name": "toggle_sidebar",
+        "ordinal": 26,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      null,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      null,
+      false
+    ]
+  },
+  "hash": "d90a2f2f823fc546661a94af07249758c5ca82db396268bca5087bac88f733d9"
+}

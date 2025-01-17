@@ -75,7 +75,15 @@
           /> -->
           <div class="grid lg:grid-cols-5 grid-cols-3 gap-4">
             <button
-              v-for="loader in ['Vanilla', 'Fabric', 'Forge', 'Quilt', 'NeoForge']"
+              v-for="loader in [
+                'Vanilla',
+                'Fabric',
+                'Forge',
+                'Quilt',
+                'NeoForge',
+                'Paper',
+                'Purpur',
+              ]"
               :key="loader"
               class="!h-24 btn flex !flex-col !items-center !justify-between !pt-4 !pb-3 !w-full"
               :style="{
@@ -934,7 +942,6 @@ async function submitPayment() {
 
 defineExpose({
   show: () => {
-    // eslint-disable-next-line no-undef
     stripe = Stripe(props.publishableKey)
 
     selectedPlan.value = 'yearly'
