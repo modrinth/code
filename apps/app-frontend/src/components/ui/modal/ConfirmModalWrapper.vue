@@ -6,7 +6,7 @@ import { useTheming } from '@/store/theme.js'
 
 const themeStore = useTheming()
 
-defineProps({
+const props = defineProps({
   confirmationText: {
     type: String,
     default: '',
@@ -25,9 +25,21 @@ defineProps({
     default: 'No description defined',
     required: true,
   },
+  proceedIcon: {
+    type: Object,
+    default: undefined,
+  },
   proceedLabel: {
     type: String,
     default: 'Proceed',
+  },
+  danger: {
+    type: Boolean,
+    default: true,
+  },
+  showAdOnClose: {
+    type: Boolean,
+    default: true,
   },
 })
 
@@ -46,7 +58,9 @@ defineExpose({
 })
 
 function onModalHide() {
-  show_ads_window()
+  if (props.showAdOnClose) {
+    show_ads_window()
+  }
 }
 
 function proceed() {
@@ -61,9 +75,11 @@ function proceed() {
     :has-to-type="hasToType"
     :title="title"
     :description="description"
+    :proceed-icon="proceedIcon"
     :proceed-label="proceedLabel"
     :on-hide="onModalHide"
     :noblur="!themeStore.advancedRendering"
+    :danger="danger"
     @proceed="proceed"
   />
 </template>

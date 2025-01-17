@@ -6,9 +6,9 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::billing::{
-    Charge, ChargeStatus, ChargeType, Price, PriceDuration, Product,
-    ProductMetadata, ProductPrice, SubscriptionMetadata, SubscriptionStatus,
-    UserSubscription,
+    Charge, ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
+    Product, ProductMetadata, ProductPrice, SubscriptionMetadata,
+    SubscriptionStatus, UserSubscription,
 };
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::pats::Scopes;
@@ -26,11 +26,11 @@ use sqlx::{PgPool, Postgres, Transaction};
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use stripe::{
-    CreateCustomer, CreatePaymentIntent, CreateSetupIntent,
+    CreateCustomer, CreatePaymentIntent, CreateRefund, CreateSetupIntent,
     CreateSetupIntentAutomaticPaymentMethods,
     CreateSetupIntentAutomaticPaymentMethodsAllowRedirects, Currency,
     CustomerId, CustomerInvoiceSettings, CustomerPaymentMethodRetrieval,
-    EventObject, EventType, PaymentIntentOffSession,
+    EventObject, EventType, PaymentIntentId, PaymentIntentOffSession,
     PaymentIntentSetupFutureUsage, PaymentMethodId, SetupIntent,
     UpdateCustomer, Webhook,
 };
@@ -47,8 +47,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(edit_payment_method)
             .service(remove_payment_method)
             .service(charges)
+            .service(active_servers)
             .service(initiate_payment)
-            .service(stripe_webhook),
+            .service(stripe_webhook)
+            .service(refund_charge),
     );
 }
 
@@ -109,6 +111,169 @@ pub async fn subscriptions(
         .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(subscriptions))
+}
+
+#[derive(Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ChargeRefundAmount {
+    Full,
+    Partial { amount: u64 },
+}
+
+#[derive(Deserialize)]
+pub struct ChargeRefund {
+    #[serde(flatten)]
+    pub amount: ChargeRefundAmount,
+    pub unprovision: Option<bool>,
+}
+
+#[post("charge/{id}/refund")]
+pub async fn refund_charge(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    info: web::Path<(crate::models::ids::ChargeId,)>,
+    body: web::Json<ChargeRefund>,
+    stripe_client: web::Data<stripe::Client>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::SESSION_ACCESS]),
+    )
+    .await?
+    .1;
+
+    let (id,) = info.into_inner();
+
+    if !user.role.is_admin() {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to refund a subscription!".to_string(),
+        ));
+    }
+
+    if let Some(charge) = ChargeItem::get(id.into(), &**pool).await? {
+        let refunds = ChargeItem::get_children(id.into(), &**pool).await?;
+        let refunds = -refunds
+            .into_iter()
+            .filter_map(|x| match x.status {
+                ChargeStatus::Open
+                | ChargeStatus::Processing
+                | ChargeStatus::Succeeded => Some(x.amount),
+                ChargeStatus::Failed | ChargeStatus::Cancelled => None,
+            })
+            .sum::<i64>();
+
+        let refundable = charge.amount - refunds;
+
+        let refund_amount = match body.0.amount {
+            ChargeRefundAmount::Full => refundable,
+            ChargeRefundAmount::Partial { amount } => amount as i64,
+        };
+
+        if charge.status != ChargeStatus::Succeeded {
+            return Err(ApiError::InvalidInput(
+                "This charge cannot be refunded!".to_string(),
+            ));
+        }
+
+        if (refundable - refund_amount) < 0 || refund_amount == 0 {
+            return Err(ApiError::InvalidInput(
+                "You cannot refund more than the amount of the charge!"
+                    .to_string(),
+            ));
+        }
+
+        let (id, net) = match charge.payment_platform {
+            PaymentPlatform::Stripe => {
+                if let Some(payment_platform_id) = charge
+                    .payment_platform_id
+                    .and_then(|x| stripe::PaymentIntentId::from_str(&x).ok())
+                {
+                    let mut metadata = HashMap::new();
+
+                    metadata.insert(
+                        "modrinth_user_id".to_string(),
+                        to_base62(user.id.0),
+                    );
+                    metadata.insert(
+                        "modrinth_charge_id".to_string(),
+                        to_base62(charge.id.0 as u64),
+                    );
+
+                    let refund = stripe::Refund::create(
+                        &stripe_client,
+                        CreateRefund {
+                            amount: Some(refund_amount),
+                            metadata: Some(metadata),
+                            payment_intent: Some(payment_platform_id),
+
+                            expand: &["balance_transaction"],
+
+                            ..Default::default()
+                        },
+                    )
+                    .await?;
+
+                    (
+                        refund.id.to_string(),
+                        refund
+                            .balance_transaction
+                            .and_then(|x| x.into_object())
+                            .map(|x| x.net),
+                    )
+                } else {
+                    return Err(ApiError::InvalidInput(
+                        "Charge does not have attached payment id!".to_string(),
+                    ));
+                }
+            }
+        };
+
+        let mut transaction = pool.begin().await?;
+
+        let charge_id = generate_charge_id(&mut transaction).await?;
+        ChargeItem {
+            id: charge_id,
+            user_id: charge.user_id,
+            price_id: charge.price_id,
+            amount: -refund_amount,
+            currency_code: charge.currency_code,
+            status: ChargeStatus::Succeeded,
+            due: Utc::now(),
+            last_attempt: None,
+            type_: ChargeType::Refund,
+            subscription_id: charge.subscription_id,
+            subscription_interval: charge.subscription_interval,
+            payment_platform: charge.payment_platform,
+            payment_platform_id: Some(id),
+            parent_charge_id: Some(charge.id),
+            net,
+        }
+        .upsert(&mut transaction)
+        .await?;
+
+        if body.0.unprovision.unwrap_or(false) {
+            if let Some(subscription_id) = charge.subscription_id {
+                let open_charge =
+                    ChargeItem::get_open_subscription(subscription_id, &**pool)
+                        .await?;
+                if let Some(mut open_charge) = open_charge {
+                    open_charge.status = ChargeStatus::Cancelled;
+                    open_charge.due = Utc::now();
+
+                    open_charge.upsert(&mut transaction).await?;
+                }
+            }
+        }
+
+        transaction.commit().await?;
+    }
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[derive(Deserialize)]
@@ -264,78 +429,94 @@ pub async fn edit_subscription(
                     )
                 })?;
 
-            // TODO: Add downgrading plans
-            if proration <= 0 {
-                return Err(ApiError::InvalidInput(
-                    "You may not downgrade plans!".to_string(),
-                ));
-            }
+            // Plan downgrade, update future charge
+            if current_amount > amount {
+                open_charge.price_id = product_price.id;
+                open_charge.amount = amount as i64;
 
-            let charge_id = generate_charge_id(&mut transaction).await?;
-            let charge = ChargeItem {
-                id: charge_id,
-                user_id: user.id.into(),
-                price_id: product_price.id,
-                amount: proration as i64,
-                currency_code: current_price.currency_code.clone(),
-                status: ChargeStatus::Processing,
-                due: Utc::now(),
-                last_attempt: None,
-                type_: ChargeType::Proration,
-                subscription_id: Some(subscription.id),
-                subscription_interval: Some(duration),
-            };
+                None
+            } else {
+                // For small transactions (under 30 cents), we make a loss on the proration due to fees
+                if proration < 30 {
+                    return Err(ApiError::InvalidInput(
+                        "Proration is too small!".to_string(),
+                    ));
+                }
 
-            let customer_id = get_or_create_customer(
-                user.id,
-                user.stripe_customer_id.as_deref(),
-                user.email.as_deref(),
-                &stripe_client,
-                &pool,
-                &redis,
-            )
-            .await?;
+                let charge_id = generate_charge_id(&mut transaction).await?;
+                let mut charge = ChargeItem {
+                    id: charge_id,
+                    user_id: user.id.into(),
+                    price_id: product_price.id,
+                    amount: proration as i64,
+                    currency_code: current_price.currency_code.clone(),
+                    status: ChargeStatus::Processing,
+                    due: Utc::now(),
+                    last_attempt: None,
+                    type_: ChargeType::Proration,
+                    subscription_id: Some(subscription.id),
+                    subscription_interval: Some(duration),
+                    payment_platform: PaymentPlatform::Stripe,
+                    payment_platform_id: None,
+                    parent_charge_id: None,
+                    net: None,
+                };
 
-            let currency =
-                Currency::from_str(&current_price.currency_code.to_lowercase())
-                    .map_err(|_| {
-                        ApiError::InvalidInput(
-                            "Invalid currency code".to_string(),
-                        )
-                    })?;
+                let customer_id = get_or_create_customer(
+                    user.id,
+                    user.stripe_customer_id.as_deref(),
+                    user.email.as_deref(),
+                    &stripe_client,
+                    &pool,
+                    &redis,
+                )
+                .await?;
 
-            let mut intent =
-                CreatePaymentIntent::new(proration as i64, currency);
+                let currency = Currency::from_str(
+                    &current_price.currency_code.to_lowercase(),
+                )
+                .map_err(|_| {
+                    ApiError::InvalidInput("Invalid currency code".to_string())
+                })?;
 
-            let mut metadata = HashMap::new();
-            metadata
-                .insert("modrinth_user_id".to_string(), to_base62(user.id.0));
+                let mut intent =
+                    CreatePaymentIntent::new(proration as i64, currency);
 
-            intent.customer = Some(customer_id);
-            intent.metadata = Some(metadata);
-            intent.receipt_email = user.email.as_deref();
-            intent.setup_future_usage =
-                Some(PaymentIntentSetupFutureUsage::OffSession);
+                let mut metadata = HashMap::new();
+                metadata.insert(
+                    "modrinth_user_id".to_string(),
+                    to_base62(user.id.0),
+                );
 
-            if let Some(payment_method) = &edit_subscription.payment_method {
-                let payment_method_id =
-                    if let Ok(id) = PaymentMethodId::from_str(payment_method) {
+                intent.customer = Some(customer_id);
+                intent.metadata = Some(metadata);
+                intent.receipt_email = user.email.as_deref();
+                intent.setup_future_usage =
+                    Some(PaymentIntentSetupFutureUsage::OffSession);
+
+                if let Some(payment_method) = &edit_subscription.payment_method
+                {
+                    let payment_method_id = if let Ok(id) =
+                        PaymentMethodId::from_str(payment_method)
+                    {
                         id
                     } else {
                         return Err(ApiError::InvalidInput(
                             "Invalid payment method id".to_string(),
                         ));
                     };
-                intent.payment_method = Some(payment_method_id);
+                    intent.payment_method = Some(payment_method_id);
+                }
+
+                let intent =
+                    stripe::PaymentIntent::create(&stripe_client, intent)
+                        .await?;
+
+                charge.payment_platform_id = Some(intent.id.to_string());
+                charge.upsert(&mut transaction).await?;
+
+                Some((proration, 0, intent))
             }
-
-            charge.upsert(&mut transaction).await?;
-
-            Some((
-                proration,
-                0,
-                stripe::PaymentIntent::create(&stripe_client, intent).await?,
-            ))
         } else {
             None
         };
@@ -423,7 +604,7 @@ pub async fn charges(
                 id: x.id.into(),
                 user_id: x.user_id.into(),
                 price_id: x.price_id.into(),
-                amount: x.amount,
+                amount: x.amount as u64,
                 currency_code: x.currency_code,
                 status: x.status,
                 due: x.due,
@@ -431,6 +612,7 @@ pub async fn charges(
                 type_: x.type_,
                 subscription_id: x.subscription_id.map(|x| x.into()),
                 subscription_interval: x.subscription_interval,
+                platform: x.payment_platform,
             })
             .collect::<Vec<_>>(),
     ))
@@ -683,6 +865,60 @@ pub async fn payment_methods(
     } else {
         Ok(HttpResponse::NoContent().finish())
     }
+}
+
+#[derive(Deserialize)]
+pub struct ActiveServersQuery {
+    pub subscription_status: Option<SubscriptionStatus>,
+}
+
+#[get("active_servers")]
+pub async fn active_servers(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    query: web::Query<ActiveServersQuery>,
+) -> Result<HttpResponse, ApiError> {
+    let master_key = dotenvy::var("PYRO_API_KEY")?;
+
+    if req
+        .head()
+        .headers()
+        .get("X-Master-Key")
+        .is_none_or(|it| it.as_bytes() != master_key.as_bytes())
+    {
+        return Err(ApiError::CustomAuthentication(
+            "Invalid master key".to_string(),
+        ));
+    }
+
+    let servers =
+        user_subscription_item::UserSubscriptionItem::get_all_servers(
+            query.subscription_status,
+            &**pool,
+        )
+        .await?;
+
+    #[derive(Serialize)]
+    struct ActiveServer {
+        pub user_id: crate::models::ids::UserId,
+        pub server_id: String,
+        pub interval: PriceDuration,
+    }
+
+    let server_ids = servers
+        .into_iter()
+        .filter_map(|x| {
+            x.metadata.as_ref().map(|metadata| match metadata {
+                SubscriptionMetadata::Pyro { id } => ActiveServer {
+                    user_id: x.user_id.into(),
+                    server_id: id.clone(),
+                    interval: x.interval,
+                },
+            })
+        })
+        .collect::<Vec<ActiveServer>>();
+
+    Ok(HttpResponse::Ok().json(server_ids))
 }
 
 #[derive(Deserialize)]
@@ -1130,6 +1366,7 @@ pub async fn stripe_webhook(
         }
 
         async fn get_payment_intent_metadata(
+            payment_intent_id: PaymentIntentId,
             metadata: HashMap<String, String>,
             pool: &PgPool,
             redis: &RedisPool,
@@ -1203,6 +1440,8 @@ pub async fn stripe_webhook(
 
                     charge.status = charge_status;
                     charge.last_attempt = Some(Utc::now());
+                    charge.payment_platform_id =
+                        Some(payment_intent_id.to_string());
                     charge.upsert(transaction).await?;
 
                     if let Some(subscription_id) = charge.subscription_id {
@@ -1228,6 +1467,11 @@ pub async fn stripe_webhook(
                             }
                             ChargeType::Proration => {
                                 subscription.price_id = charge.price_id;
+                            }
+                            ChargeType::Refund => {
+                                return Err(ApiError::InvalidInput(
+                                    "Invalid charge type: Refund".to_string(),
+                                ));
                             }
                         }
 
@@ -1332,6 +1576,12 @@ pub async fn stripe_webhook(
                         subscription_interval: subscription
                             .as_ref()
                             .map(|x| x.interval),
+                        payment_platform: PaymentPlatform::Stripe,
+                        payment_platform_id: Some(
+                            payment_intent_id.to_string(),
+                        ),
+                        parent_charge_id: None,
+                        net: None,
                     };
 
                     if charge_status != ChargeStatus::Failed {
@@ -1364,6 +1614,7 @@ pub async fn stripe_webhook(
                     let mut transaction = pool.begin().await?;
 
                     let mut metadata = get_payment_intent_metadata(
+                        payment_intent.id,
                         payment_intent.metadata,
                         &pool,
                         &redis,
@@ -1371,6 +1622,27 @@ pub async fn stripe_webhook(
                         &mut transaction,
                     )
                     .await?;
+
+                    if let Some(latest_charge) = payment_intent.latest_charge {
+                        let charge = stripe::Charge::retrieve(
+                            &stripe_client,
+                            &latest_charge.id(),
+                            &["balance_transaction"],
+                        )
+                        .await?;
+
+                        if let Some(balance_transaction) = charge
+                            .balance_transaction
+                            .and_then(|x| x.into_object())
+                        {
+                            metadata.charge_item.net =
+                                Some(balance_transaction.net);
+                            metadata
+                                .charge_item
+                                .upsert(&mut transaction)
+                                .await?;
+                        }
+                    }
 
                     // Provision subscription
                     match metadata.product_item.metadata {
@@ -1415,7 +1687,20 @@ pub async fn stripe_webhook(
                                         .await?
                                         .error_for_status()?;
 
-                                    // TODO: Send plan upgrade request for proration
+                                    client.post(format!(
+                                        "https://archon.pyro.host/modrinth/v0/servers/{}/reallocate",
+                                        id
+                                    ))
+                                    .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                                    .json(&serde_json::json!({
+                                        "memory_mb": ram,
+                                        "cpu": cpu,
+                                        "swap_mb": swap,
+                                        "storage_mb": storage,
+                                    }))
+                                    .send()
+                                    .await?
+                                    .error_for_status()?;
                                 } else {
                                     let (server_name, source) = if let Some(
                                         PaymentRequestMetadata::Pyro {
@@ -1471,6 +1756,10 @@ pub async fn stripe_webhook(
                                                 "storage_mb": storage,
                                             },
                                             "source": source,
+                                            "payment_interval": metadata.charge_item.subscription_interval.map(|x| match x {
+                                                PriceDuration::Monthly => 1,
+                                                PriceDuration::Yearly => 12,
+                                            })
                                         }))
                                         .send()
                                         .await?
@@ -1546,6 +1835,10 @@ pub async fn stripe_webhook(
                                 subscription_interval: Some(
                                     subscription.interval,
                                 ),
+                                payment_platform: PaymentPlatform::Stripe,
+                                payment_platform_id: None,
+                                parent_charge_id: None,
+                                net: None,
                             }
                             .upsert(&mut transaction)
                             .await?;
@@ -1569,6 +1862,7 @@ pub async fn stripe_webhook(
                 {
                     let mut transaction = pool.begin().await?;
                     get_payment_intent_metadata(
+                        payment_intent.id,
                         payment_intent.metadata,
                         &pool,
                         &redis,
@@ -1586,6 +1880,7 @@ pub async fn stripe_webhook(
                     let mut transaction = pool.begin().await?;
 
                     let metadata = get_payment_intent_metadata(
+                        payment_intent.id,
                         payment_intent.metadata,
                         &pool,
                         &redis,
@@ -1596,7 +1891,7 @@ pub async fn stripe_webhook(
 
                     if let Some(email) = metadata.user_item.email {
                         let money = rusty_money::Money::from_minor(
-                            metadata.charge_item.amount,
+                            metadata.charge_item.amount as i64,
                             rusty_money::iso::find(
                                 &metadata.charge_item.currency_code,
                             )

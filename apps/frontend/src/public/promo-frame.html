@@ -4,12 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Modrinth App Ad</title>
-    <script src="https://cadmus.script.ac/d14pdm1b7fi5kh/script.js"></script>
-    <script
-      src="https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js"
-      async
-    ></script>
-    <script src="/inmobi.js" async></script>
+    <script src="/inmobi.js"></script>
+    <script src="https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js"></script>
     <link rel="preload" href="https://www.googletagservices.com/tag/js/gpt.js" as="script" />
     <style>
       * {
@@ -50,73 +46,44 @@
       <div id="modrinth-rail-1"></div>
     </div>
     <script>
-      function getCookie(name) {
-        function escape(s) {
-          return s.replace(/([.*+?\^$(){}|\[\]\/\\])/g, "\\$1");
-        }
+      window.tude = window.tude || { cmd: [] };
 
-        const match = document.cookie.match(RegExp("(?:^|;\\s*)" + escape(name) + "=([^;]*)"));
-        return match ? match[1] : null;
-      }
+      window.Raven = window.Raven || { cmd: [] };
 
-      function initAds(personalized) {
-        window.tude = window.tude || { cmd: [] };
-
-        window.Raven = window.Raven || { cmd: [] };
-
-        window.Raven.cmd.push(({ config }) => {
-          config.setCustom({
-            param1: "app",
-          });
+      window.Raven.cmd.push(({ config }) => {
+        config.setCustom({
+          param1: "app",
         });
+      });
 
-        tude.cmd.push(function () {
-          tude.refreshAdsViaDivMappings([
-            {
-              divId: "modrinth-rail-1",
-              baseDivId: "pb-slot-square-2",
-              targeting: {
-                location: "app",
-              },
+      tude.cmd.push(function () {
+        tude.refreshAdsViaDivMappings([
+          {
+            divId: "modrinth-rail-1",
+            baseDivId: "pb-slot-square-2",
+            targeting: {
+              location: "app",
             },
-          ]);
+          },
+        ]);
+      });
 
-          tude.setPrivacySettings({
-            personalizedAds: personalized ?? true,
-          });
-        });
-      }
-
-      try {
-        if (window.__TAURI_INTERNALS__) {
-          window.__TAURI_INTERNALS__
-            .invoke("plugin:ads|get_ads_personalization", {})
-            .then(initAds)
-            .catch(() => initAds(true));
-        } else {
-          initAds(true);
-        }
-      } catch (err) {
-        initAds(true);
-        console.error(err);
-      }
-
-      window.addEventListener(
-        "message",
-        (event) => {
-          if (event.data.modrinthAdClick && window.__TAURI_INTERNALS__) {
-            window.__TAURI_INTERNALS__.invoke("plugin:ads|record_ads_click", {});
-          }
-
-          if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__) {
-            window.__TAURI_INTERNALS__.invoke("plugin:ads|open_link", {
-              path: event.data.modrinthOpenUrl,
-              origin: event.origin,
-            });
-          }
-        },
-        false,
-      );
+      // window.addEventListener(
+      //   "message",
+      //   (event) => {
+      //     if (event.data.modrinthAdClick && window.__TAURI_INTERNALS__) {
+      //       window.__TAURI_INTERNALS__.invoke("plugin:ads|record_ads_click", {});
+      //     }
+      //
+      //     if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__) {
+      //       window.__TAURI_INTERNALS__.invoke("plugin:ads|open_link", {
+      //         path: event.data.modrinthOpenUrl,
+      //         origin: event.origin,
+      //       });
+      //     }
+      //   },
+      //   false,
+      // );
 
       window.addEventListener("mousewheel", (event) => {
         if (window.__TAURI_INTERNALS__) {
@@ -136,17 +103,6 @@
           origin: "https://modrinth.com",
         });
       });
-
-      function syncAgreeState() {
-        const primaryButton = document.querySelector('[mode="primary"]');
-
-        if (primaryButton) {
-          primaryButton.click();
-        } else {
-          setTimeout(syncAgreeState, 100);
-        }
-      }
-      syncAgreeState();
     </script>
   </body>
 </html>

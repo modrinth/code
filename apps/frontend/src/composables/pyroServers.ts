@@ -47,8 +47,11 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
     "Access-Control-Allow-Headers": "Authorization",
     "User-Agent": "Pyro/1.0 (https://pyro.host)",
     Vary: "Accept, Origin",
-    "Content-Type": contentType,
   };
+
+  if (contentType !== "none") {
+    headers["Content-Type"] = contentType;
+  }
 
   if (import.meta.client && typeof window !== "undefined") {
     headers.Origin = window.location.origin;
@@ -64,10 +67,10 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
     });
     return response;
   } catch (error) {
-    console.error("[PYROSERVERS]:", error);
+    console.error("[PyroServers/PyroFetch]:", error);
     if (error instanceof FetchError) {
       const statusCode = error.response?.status;
-      const statusText = error.response?.statusText || "Unknown error";
+      const statusText = error.response?.statusText || "[no status text available]";
       const errorMessages: { [key: number]: string } = {
         400: "Bad Request",
         401: "Unauthorized",
@@ -77,15 +80,16 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
         429: "Too Many Requests",
         500: "Internal Server Error",
         502: "Bad Gateway",
+        503: "Service Unavailable",
       };
       const message =
         statusCode && statusCode in errorMessages
           ? errorMessages[statusCode]
-          : `HTTP Error: ${statusCode || "unknown"} ${statusText}`;
-      throw new PyroFetchError(`[PYROSERVERS][PYRO] ${message}`, statusCode, error);
+          : `HTTP Error: ${statusCode || "[unhandled status code]"} ${statusText}`;
+      throw new PyroFetchError(`[PyroServers/PyroFetch] ${message}`, statusCode, error);
     }
     throw new PyroFetchError(
-      "[PYROSERVERS][PYRO] An unexpected error occurred during the fetch operation.",
+      "[PyroServers/PyroFetch] An unexpected error occurred during the fetch operation.",
       undefined,
       error as Error,
     );
@@ -165,7 +169,15 @@ interface General {
   backup_quota: number;
   used_backup_quota: number;
   status: string;
-  suspension_reason: string;
+  suspension_reason:
+    | "moderated"
+    | "paymentfailed"
+    | "cancelled"
+    | "other"
+    | "transferring"
+    | "upgrading"
+    | "support"
+    | (string & {});
   loader: string;
   loader_version: string;
   mc_version: string;
@@ -195,14 +207,16 @@ interface Startup {
   jdk_build: "corretto" | "temurin" | "graal";
 }
 
-interface Mod {
+export interface Mod {
   filename: string;
-  project_id: string;
-  version_id: string;
-  name: string;
-  version_number: string;
-  icon_url: string;
+  project_id: string | undefined;
+  version_id: string | undefined;
+  name: string | undefined;
+  version_number: string | undefined;
+  icon_url: string | undefined;
+  owner: string | undefined;
   disabled: boolean;
+  installing: boolean;
 }
 
 interface Backup {
@@ -210,6 +224,7 @@ interface Backup {
   name: string;
   created_at: string;
   ongoing: boolean;
+  locked: boolean;
 }
 
 interface AutoBackupSettings {
@@ -221,6 +236,23 @@ interface JWTAuth {
   url: string;
   token: string;
 }
+
+export interface DirectoryItem {
+  name: string;
+  type: "directory" | "file";
+  count?: number;
+  modified: number;
+  created: number;
+  path: string;
+}
+
+export interface DirectoryResponse {
+  items: DirectoryItem[];
+  total: number;
+  current?: number;
+}
+
+type ContentType = "Mod" | "Plugin";
 
 const constructServerProperties = (properties: any): string => {
   let fileContent = `#Minecraft server properties\n#${new Date().toUTCString()}\n`;
@@ -396,12 +428,24 @@ const reinstallFromMrpack = async (mrpack: File, hardReset: boolean = false) => 
       `servers/${internalServerRefrence.value.serverId}/reinstallFromMrpack`,
     );
 
-    return await PyroFetch(`/reinstallMrpack?hard=${hardResetParam}`, {
-      method: "POST",
-      contentType: "application/octet-stream",
-      body: mrpack,
-      override: auth,
-    });
+    const formData = new FormData();
+    formData.append("file", mrpack);
+
+    const response = await fetch(
+      `https://${auth.url}/reinstallMrpackMultiparted?hard=${hardResetParam}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+        body: formData,
+        signal: AbortSignal.timeout(30 * 60 * 1000),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`[pyroservers] native fetch err status: ${response.status}`);
+    }
   } catch (error) {
     console.error("Error reinstalling from mrpack:", error);
     throw error;
@@ -468,13 +512,16 @@ const setMotd = async (motd: string) => {
   }
 };
 
-// ------------------ MODS ------------------ //
+// ------------------ CONTENT ------------------ //
 
-const installMod = async (projectId: string, versionId: string) => {
+const installContent = async (contentType: ContentType, projectId: string, versionId: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods`, {
       method: "POST",
-      body: { rinth_ids: { project_id: projectId, version_id: versionId } },
+      body: {
+        install_as: contentType,
+        rinth_ids: { project_id: projectId, version_id: versionId },
+      },
     });
   } catch (error) {
     console.error("Error installing mod:", error);
@@ -482,12 +529,13 @@ const installMod = async (projectId: string, versionId: string) => {
   }
 };
 
-const removeMod = async (modId: string) => {
+const removeContent = async (contentType: ContentType, contentId: string) => {
   try {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/deleteMod`, {
       method: "POST",
       body: {
-        path: modId,
+        install_as: contentType,
+        path: contentId,
       },
     });
   } catch (error) {
@@ -496,11 +544,15 @@ const removeMod = async (modId: string) => {
   }
 };
 
-const reinstallMod = async (modId: string, versionId: string) => {
+const reinstallContent = async (
+  contentType: ContentType,
+  contentId: string,
+  newContentId: string,
+) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods/${modId}`, {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods/${contentId}`, {
       method: "PUT",
-      body: { version_id: versionId },
+      body: { install_as: contentType, version_id: newContentId },
     });
   } catch (error) {
     console.error("Error reinstalling mod:", error);
@@ -512,10 +564,11 @@ const reinstallMod = async (modId: string, versionId: string) => {
 
 const createBackup = async (backupName: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
+    const response = (await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
       method: "POST",
       body: { name: backupName },
-    });
+    })) as { id: string };
+    return response.id;
   } catch (error) {
     console.error("Error creating backup:", error);
     throw error;
@@ -585,6 +638,34 @@ const getAutoBackup = async () => {
     return await PyroFetch(`servers/${internalServerRefrence.value.serverId}/autobackup`);
   } catch (error) {
     console.error("Error getting auto backup settings:", error);
+    throw error;
+  }
+};
+
+const lockBackup = async (backupId: string) => {
+  try {
+    return await PyroFetch(
+      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/lock`,
+      {
+        method: "POST",
+      },
+    );
+  } catch (error) {
+    console.error("Error locking backup:", error);
+    throw error;
+  }
+};
+
+const unlockBackup = async (backupId: string) => {
+  try {
+    return await PyroFetch(
+      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/unlock`,
+      {
+        method: "POST",
+      },
+    );
+  } catch (error) {
+    console.error("Error locking backup:", error);
     throw error;
   }
 };
@@ -683,12 +764,15 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
       await internalServerRefrence.value.refresh(["fs"]);
       return await requestFn();
     }
+
+    throw error;
   }
 };
 
 const listDirContents = (path: string, page: number, pageSize: number) => {
   return retryWithAuth(async () => {
-    return await PyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
+    const encodedPath = encodeURIComponent(path);
+    return await PyroFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
       override: internalServerRefrence.value.fs.auth,
       retry: false,
     });
@@ -697,7 +781,8 @@ const listDirContents = (path: string, page: number, pageSize: number) => {
 
 const createFileOrFolder = (path: string, type: "file" | "directory") => {
   return retryWithAuth(async () => {
-    return await PyroFetch(`/create?path=${path}&type=${type}`, {
+    const encodedPath = encodeURIComponent(path);
+    return await PyroFetch(`/create?path=${encodedPath}&type=${type}`, {
       method: "POST",
       contentType: "application/octet-stream",
       override: internalServerRefrence.value.fs.auth,
@@ -706,20 +791,74 @@ const createFileOrFolder = (path: string, type: "file" | "directory") => {
 };
 
 const uploadFile = (path: string, file: File) => {
+  // eslint-disable-next-line require-await
   return retryWithAuth(async () => {
-    return await PyroFetch(`/create?path=${path}&type=file`, {
-      method: "POST",
-      contentType: "application/octet-stream",
-      body: file,
-      override: internalServerRefrence.value.fs.auth,
+    const encodedPath = encodeURIComponent(path);
+    const progressSubject = new EventTarget();
+    const abortController = new AbortController();
+
+    const uploadPromise = new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          const progress = (e.loaded / e.total) * 100;
+          progressSubject.dispatchEvent(
+            new CustomEvent("progress", {
+              detail: {
+                loaded: e.loaded,
+                total: e.total,
+                progress,
+              },
+            }),
+          );
+        }
+      });
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.response);
+        } else {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error("Upload failed"));
+      xhr.onabort = () => reject(new Error("Upload cancelled"));
+
+      xhr.open(
+        "POST",
+        `https://${internalServerRefrence.value.fs.auth.url}/create?path=${encodedPath}&type=file`,
+      );
+      xhr.setRequestHeader("Authorization", `Bearer ${internalServerRefrence.value.fs.auth.token}`);
+      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+      xhr.send(file);
+
+      abortController.signal.addEventListener("abort", () => {
+        xhr.abort();
+      });
     });
+
+    return {
+      promise: uploadPromise,
+      onProgress: (
+        callback: (progress: { loaded: number; total: number; progress: number }) => void,
+      ) => {
+        progressSubject.addEventListener("progress", ((e: CustomEvent) => {
+          callback(e.detail);
+        }) as EventListener);
+      },
+      cancel: () => {
+        abortController.abort();
+      },
+    };
   });
 };
 
 const renameFileOrFolder = (path: string, name: string) => {
   const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
   return retryWithAuth(async () => {
-    return await PyroFetch(`/move`, {
+    await PyroFetch(`/move`, {
       method: "POST",
       override: internalServerRefrence.value.fs.auth,
       body: {
@@ -727,6 +866,7 @@ const renameFileOrFolder = (path: string, name: string) => {
         destination: pathName,
       },
     });
+    return true;
   });
 };
 
@@ -788,7 +928,8 @@ const deleteFileOrFolder = (path: string, recursive: boolean) => {
 
 const downloadFile = (path: string, raw?: boolean) => {
   return retryWithAuth(async () => {
-    const fileData = await PyroFetch(`/download?path=${path}`, {
+    const encodedPath = encodeURIComponent(path);
+    const fileData = await PyroFetch(`/download?path=${encodedPath}`, {
       override: internalServerRefrence.value.fs.auth,
     });
 
@@ -839,7 +980,7 @@ const modules: any = {
     setMotd,
     fetchConfigFile,
   },
-  mods: {
+  content: {
     get: async (serverId: string) => {
       try {
         const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`);
@@ -854,9 +995,9 @@ const modules: any = {
         return undefined;
       }
     },
-    install: installMod,
-    remove: removeMod,
-    reinstall: reinstallMod,
+    install: installContent,
+    remove: removeContent,
+    reinstall: reinstallContent,
   },
   backups: {
     get: async (serverId: string) => {
@@ -874,6 +1015,8 @@ const modules: any = {
     download: downloadBackup,
     updateAutoBackup,
     getAutoBackup,
+    lock: lockBackup,
+    unlock: unlockBackup,
   },
   network: {
     get: async (serverId: string) => {
@@ -999,9 +1142,9 @@ type GeneralFunctions = {
   fetchConfigFile: (fileName: string) => Promise<any>;
 };
 
-type ModFunctions = {
+type ContentFunctions = {
   /**
-   * INTERNAL: Gets the mods of a server.
+   * INTERNAL: Gets the list content of a server.
    * @param serverId - The ID of the server.
    * @returns
    */
@@ -1009,23 +1152,26 @@ type ModFunctions = {
 
   /**
    * Installs a mod to a server.
+   * @param contentType - The type of content to install.
    * @param projectId - The ID of the project.
    * @param versionId - The ID of the version.
    */
-  install: (projectId: string, versionId: string) => Promise<void>;
+  install: (contentType: ContentType, projectId: string, versionId: string) => Promise<void>;
 
   /**
    * Removes a mod from a server.
-   * @param modId - The ID of the mod.
+   * @param contentType - The type of content to remove.
+   * @param contentId - The ID of the content.
    */
-  remove: (modId: string) => Promise<void>;
+  remove: (contentType: ContentType, contentId: string) => Promise<void>;
 
   /**
    * Reinstalls a mod to a server.
-   * @param modId - The ID of the mod.
-   * @param versionId - The ID of the version.
+   * @param contentType - The type of content to reinstall.
+   * @param contentId - The ID of the content.
+   * @param newContentId - The ID of the new version.
    */
-  reinstall: (modId: string, versionId: string) => Promise<void>;
+  reinstall: (contentType: ContentType, contentId: string, newContentId: string) => Promise<void>;
 };
 
 type BackupFunctions = {
@@ -1039,6 +1185,7 @@ type BackupFunctions = {
   /**
    * Creates a new backup for the server.
    * @param backupName - The name of the backup.
+   * @returns The ID of the backup.
    */
   create: (backupName: string) => Promise<void>;
 
@@ -1079,6 +1226,18 @@ type BackupFunctions = {
    * Gets the auto backup settings of the server.
    */
   getAutoBackup: () => Promise<AutoBackupSettings>;
+
+  /**
+   * Locks a backup for the server.
+   * @param backupId - The ID of the backup.
+   */
+  lock: (backupId: string) => Promise<void>;
+
+  /**
+   * Unlocks a backup for the server.
+   * @param backupId - The ID of the backup.
+   */
+  unlock: (backupId: string) => Promise<void>;
 };
 
 type NetworkFunctions = {
@@ -1158,7 +1317,7 @@ type FSFunctions = {
    * @param pageSize - The page size to list.
    * @returns
    */
-  listDirContents: (path: string, page: number, pageSize: number) => Promise<any>;
+  listDirContents: (path: string, page: number, pageSize: number) => Promise<DirectoryResponse>;
 
   /**
    * @param path - The path to create the file or folder at.
@@ -1212,15 +1371,15 @@ type FSFunctions = {
 };
 
 type GeneralModule = General & GeneralFunctions;
-type ModsModule = { data: Mod[] } & ModFunctions;
+type ContentModule = { data: Mod[] } & ContentFunctions;
 type BackupsModule = { data: Backup[] } & BackupFunctions;
 type NetworkModule = { allocations: Allocation[] } & NetworkFunctions;
 type StartupModule = Startup & StartupFunctions;
-type FSModule = { auth: JWTAuth } & FSFunctions;
+export type FSModule = { auth: JWTAuth } & FSFunctions;
 
 type ModulesMap = {
   general: GeneralModule;
-  mods: ModsModule;
+  content: ContentModule;
   backups: BackupsModule;
   network: NetworkModule;
   startup: StartupModule;
@@ -1228,7 +1387,7 @@ type ModulesMap = {
   fs: FSModule;
 };
 
-type avaliableModules = ("general" | "mods" | "backups" | "network" | "startup" | "ws" | "fs")[];
+type avaliableModules = ("general" | "content" | "backups" | "network" | "startup" | "ws" | "fs")[];
 
 export type Server<T extends avaliableModules> = {
   [K in T[number]]?: ModulesMap[K];

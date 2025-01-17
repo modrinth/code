@@ -35,6 +35,31 @@
             </li>
           </div>
         </div>
+        <div v-else-if="props.serverPowerState === 'crashed'" class="flex flex-row gap-4">
+          <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
+
+          <div class="flex flex-col gap-2">
+            <div class="font-semibold">{{ serverData?.name }} shut down unexpectedly.</div>
+            <div class="font-normal">
+              <template v-if="props.powerStateDetails?.oom_killed">
+                The server stopped because it ran out of memory. There may be a memory leak caused
+                by a mod or plugin, or you may need to upgrade your Modrinth Server.
+              </template>
+              <template v-else-if="props.powerStateDetails?.exit_code !== undefined">
+                We could not automatically determine the specific cause of the crash, but your
+                server exited with code
+                {{ props.powerStateDetails.exit_code }}.
+                {{
+                  props.powerStateDetails.exit_code === 1
+                    ? "There may be a mod or plugin causing the issue, or an issue with your server configuration."
+                    : ""
+                }}
+              </template>
+              <template v-else> We could not determine the specific cause of the crash. </template>
+              <div class="mt-2">You can try restarting the server.</div>
+            </div>
+          </div>
+        </div>
         <div v-else class="flex flex-row gap-4">
           <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
 
@@ -63,7 +88,7 @@
             <UiServersPanelServerStatus :state="serverPowerState" />
           </div>
         </div>
-        <UiServersPanelTerminal :console-output="consoleOutput" :full-screen="fullScreen">
+        <UiServersPanelTerminal :full-screen="fullScreen">
           <div class="relative w-full px-4 pt-4">
             <ul
               v-if="suggestions.length"
@@ -167,10 +192,13 @@ type ServerProps = {
   isConnected: boolean;
   isWsAuthIncorrect: boolean;
   stats: Stats;
-  consoleOutput: string[];
   serverPowerState: ServerState;
+  powerStateDetails?: {
+    oom_killed?: boolean;
+    exit_code?: number;
+  };
   isServerRunning: boolean;
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 };
 
 const props = defineProps<ServerProps>();
@@ -225,6 +253,7 @@ const inspectError = async () => {
 
   mcError.value = response;
 
+  // @ts-ignore
   const analysis = (await $fetch(`https://api.mclo.gs/1/insights/${response.id}`, {
     method: "POST",
     headers: {

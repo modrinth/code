@@ -1,52 +1,60 @@
 <template>
-  <div
-    v-for="loader in loaders"
-    :key="loader.name"
-    class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
-  >
-    <div class="flex items-center gap-4">
+  <div class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2">
+    <div
+      v-for="loader in vanillaLoaders"
+      :key="loader.name"
+      class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
+    >
+      <UiServersLoaderSelectorCard
+        :loader="loader"
+        :is-current="isCurrentLoader(loader.name)"
+        :loader-version="data.loader_version"
+        :current-loader="data.loader"
+        @select="selectLoader"
+      />
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h2 class="mb-2 px-2 text-lg font-bold text-contrast">Mod loaders</h2>
+    <div class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2">
       <div
-        class="grid size-10 place-content-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
-        :class="isCurrentLoader(loader.name) ? '[&&]:bg-bg-green' : ''"
+        v-for="loader in modLoaders"
+        :key="loader.name"
+        class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
       >
-        <UiServersIconsLoaderIcon
-          :loader="loader.name"
-          class="[&&]:size-6"
-          :class="isCurrentLoader(loader.name) ? 'text-brand' : ''"
+        <UiServersLoaderSelectorCard
+          :loader="loader"
+          :is-current="isCurrentLoader(loader.name)"
+          :loader-version="data.loader_version"
+          :current-loader="data.loader"
+          @select="selectLoader"
         />
       </div>
-      <div class="flex flex-col gap-0.5">
-        <div class="flex flex-row items-center gap-2">
-          <h1 class="m-0 text-xl font-bold leading-none text-contrast">
-            {{ loader.displayName }}
-          </h1>
-          <span
-            v-if="isCurrentLoader(loader.name)"
-            class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
-          >
-            <CheckIcon class="h-4 w-4" />
-            Current
-          </span>
-        </div>
-        <p v-if="isCurrentLoader(loader.name)" class="m-0 text-xs text-secondary">
-          {{ data.loader_version }}
-        </p>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h2 class="mb-2 px-2 text-lg font-bold text-contrast">Plugin loaders</h2>
+    <div class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2">
+      <div
+        v-for="loader in pluginLoaders"
+        :key="loader.name"
+        class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
+      >
+        <UiServersLoaderSelectorCard
+          :loader="loader"
+          :is-current="isCurrentLoader(loader.name)"
+          :loader-version="data.loader_version"
+          :current-loader="data.loader"
+          @select="selectLoader"
+        />
       </div>
     </div>
-
-    <ButtonStyled>
-      <button @click="selectLoader(loader.name)">
-        <DownloadIcon class="h-5 w-5" />
-        {{ isCurrentLoader(loader.name) ? "Reinstall" : "Install" }}
-      </button>
-    </ButtonStyled>
   </div>
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, DownloadIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
-
 const props = defineProps<{
   data: {
     loader: string | null;
@@ -58,12 +66,18 @@ const emit = defineEmits<{
   (e: "selectLoader", loader: string): void;
 }>();
 
-const loaders = [
-  { name: "Vanilla" as const, displayName: "Vanilla" },
+const vanillaLoaders = [{ name: "Vanilla" as const, displayName: "Vanilla" }];
+
+const modLoaders = [
   { name: "Fabric" as const, displayName: "Fabric" },
   { name: "Quilt" as const, displayName: "Quilt" },
   { name: "Forge" as const, displayName: "Forge" },
   { name: "NeoForge" as const, displayName: "NeoForge" },
+];
+
+const pluginLoaders = [
+  { name: "Paper" as const, displayName: "Paper" },
+  { name: "Purpur" as const, displayName: "Purpur" },
 ];
 
 const isCurrentLoader = (loaderName: string) => {

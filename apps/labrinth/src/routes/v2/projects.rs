@@ -61,11 +61,6 @@ pub async fn project_search(
     let facets: Option<Vec<Vec<String>>> = if let Some(facets) = info.facets {
         let facets = serde_json::from_str::<Vec<Vec<String>>>(&facets)?;
 
-        // These loaders specifically used to be combined with 'mod' to be a plugin, but now
-        // they are their own loader type. We will convert 'mod' to 'mod' OR 'plugin'
-        // as it essentially was before.
-        let facets = v2_reroute::convert_plugin_loader_facets_v3(facets);
-
         Some(
             facets
                 .into_iter()
@@ -861,7 +856,6 @@ pub struct GalleryEditQuery {
 pub async fn edit_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
-    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -876,7 +870,6 @@ pub async fn edit_gallery_item(
             description: item.description,
             ordering: item.ordering,
         }),
-        info,
         pool,
         redis,
         session_queue,
@@ -894,7 +887,6 @@ pub struct GalleryDeleteQuery {
 pub async fn delete_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
-    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
@@ -904,7 +896,6 @@ pub async fn delete_gallery_item(
     v3::projects::delete_gallery_item(
         req,
         web::Query(v3::projects::GalleryDeleteQuery { url: item.url }),
-        info,
         pool,
         redis,
         file_host,

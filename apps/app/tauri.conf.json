@@ -11,12 +11,7 @@
     "copyright": "",
     "targets": "all",
     "externalBin": [],
-    "icon": [
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ],
+    "icon": ["icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
@@ -49,7 +44,7 @@
     ]
   },
   "productName": "Modrinth App",
-  "version": "0.8.9",
+  "version": "0.9.2",
   "mainBinaryName": "Modrinth App",
   "identifier": "ModrinthApp",
   "plugins": {
@@ -72,33 +67,27 @@
         "resizable": true,
         "title": "Modrinth App",
         "width": 1280,
-        "minHeight": 750,
+        "minHeight": 700,
         "minWidth": 1100,
-        "visible": false,
+        "visible": true,
         "zoomHotkeysEnabled": false,
         "decorations": false
       }
     ],
     "security": {
       "assetProtocol": {
-        "scope": [
-          "$APPDATA/caches/icons/*",
-          "$APPCONFIG/caches/icons/*",
-          "$CONFIG/caches/icons/*"
-        ],
+        "scope": ["$APPDATA/caches/icons/*", "$APPCONFIG/caches/icons/*", "$CONFIG/caches/icons/*"],
         "enable": true
       },
       "capabilities": ["ads", "core", "plugins"],
       "csp": {
         "default-src": "'self' customprotocol: asset:",
-        "connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://*.cloudflare.com https://api.mclo.gs https://cmp.inmobi.com",
-        "font-src": [
-          "https://cdn-raw.modrinth.com/fonts/inter/"
-        ],
+        "connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://api.mclo.gs",
+        "font-src": ["https://cdn-raw.modrinth.com/fonts/inter/"],
         "img-src": "https: 'unsafe-inline' 'self' asset: http://asset.localhost blob: data:",
         "style-src": "'unsafe-inline' 'self'",
-        "script-src": "https://cmp.inmobi.com https://*.cloudflare.com https://*.posthog.com 'self'",
-        "frame-src": "https://*.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'"
+        "script-src": "https://*.posthog.com 'self'",
+        "frame-src": "https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'"
       }
     }
   }

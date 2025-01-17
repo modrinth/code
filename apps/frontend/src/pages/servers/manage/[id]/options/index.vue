@@ -5,7 +5,7 @@
         <div class="card flex flex-col gap-4">
           <label for="server-name-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server name</span>
-            <span> Change the name of your server. This name is only visible on Modrinth.</span>
+            <span> Change your server's name. This name is only visible on Modrinth.</span>
           </label>
           <div class="flex flex-col gap-2">
             <input
@@ -51,7 +51,7 @@
             />
             .modrinth.gg
           </div>
-          <div class="flex flex-col text-sm text-rose-400">
+          <div v-if="!isValidSubdomain" class="flex flex-col text-sm text-rose-400">
             <span v-if="!isValidLengthSubdomain">
               Subdomain must be at least 5 characters long.
             </span>
@@ -134,7 +134,7 @@ import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
 const data = computed(() => props.server.general);

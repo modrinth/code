@@ -295,7 +295,12 @@ impl RedisPool {
 
             fetch_ids.iter().for_each(|key| {
                 pipe.atomic().set_options(
-                    format!("{}_{namespace}:{}/lock", self.meta_namespace, key),
+                    // We store locks in lowercase because they are case insensitive
+                    format!(
+                        "{}_{namespace}:{}/lock",
+                        self.meta_namespace,
+                        key.to_lowercase()
+                    ),
                     100,
                     SetOptions::default()
                         .get(true)
@@ -395,7 +400,9 @@ impl RedisPool {
 
                                 pipe.atomic().del(format!(
                                     "{}_{namespace}:{}/lock",
-                                    self.meta_namespace, actual_slug
+                                    // Locks are stored in lowercase
+                                    self.meta_namespace,
+                                    actual_slug.to_lowercase()
                                 ));
                             }
                         }
@@ -408,8 +415,10 @@ impl RedisPool {
                             ids.remove(&base62);
 
                             pipe.atomic().del(format!(
-                                "{}_{namespace}:{base62}/lock",
-                                self.meta_namespace
+                                "{}_{namespace}:{}/lock",
+                                self.meta_namespace,
+                                // Locks are stored in lowercase
+                                base62.to_lowercase()
                             ));
                         }
 
@@ -423,6 +432,11 @@ impl RedisPool {
                 }
 
                 for (key, _) in ids {
+                    pipe.atomic().del(format!(
+                        "{}_{namespace}:{}/lock",
+                        self.meta_namespace,
+                        key.to_lowercase()
+                    ));
                     pipe.atomic().del(format!(
                         "{}_{namespace}:{key}/lock",
                         self.meta_namespace
@@ -451,7 +465,8 @@ impl RedisPool {
                                     format!(
                                         "{}_{namespace}:{}/lock",
                                         self.meta_namespace,
-                                        x.key()
+                                        // We lowercase key because locks are stored in lowercase
+                                        x.key().to_lowercase()
                                     )
                                 })
                                 .collect::<Vec<_>>(),
@@ -547,6 +562,23 @@ impl RedisConnection {
         Ok(res)
     }
 
+    pub async fn get_many(
+        &mut self,
+        namespace: &str,
+        ids: &[String],
+    ) -> Result<Vec<Option<String>>, DatabaseError> {
+        let mut cmd = cmd("MGET");
+        redis_args(
+            &mut cmd,
+            ids.iter()
+                .map(|x| format!("{}_{}:{}", self.meta_namespace, namespace, x))
+                .collect::<Vec<_>>()
+                .as_slice(),
+        );
+        let res = redis_execute(&mut cmd, &mut self.connection).await?;
+        Ok(res)
+    }
+
     pub async fn get_deserialized_from_json<R>(
         &mut self,
         namespace: &str,
@@ -559,6 +591,22 @@ impl RedisConnection {
             .get(namespace, id)
             .await?
             .and_then(|x| serde_json::from_str(&x).ok()))
+    }
+
+    pub async fn get_many_deserialized_from_json<R>(
+        &mut self,
+        namespace: &str,
+        ids: &[String],
+    ) -> Result<Vec<Option<R>>, DatabaseError>
+    where
+        R: for<'a> serde::Deserialize<'a>,
+    {
+        Ok(self
+            .get_many(namespace, ids)
+            .await?
+            .into_iter()
+            .map(|x| x.and_then(|val| serde_json::from_str::<R>(&val).ok()))
+            .collect::<Vec<_>>())
     }
 
     pub async fn delete<T1>(

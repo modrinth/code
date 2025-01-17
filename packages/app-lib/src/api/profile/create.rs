@@ -118,7 +118,7 @@ pub async fn profile_create(
             &state.file_watcher,
             &state.directories,
         )
-        .await?;
+        .await;
 
         profile.upsert(&state.pool).await?;
 

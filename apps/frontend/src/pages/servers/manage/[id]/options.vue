@@ -19,7 +19,7 @@ const route = useRoute();
 const serverId = route.params.id as string;
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
 useHead({

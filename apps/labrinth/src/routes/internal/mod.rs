@@ -6,6 +6,8 @@ pub mod moderation;
 pub mod pats;
 pub mod session;
 
+pub mod statuses;
+
 use super::v3::oauth_clients;
 pub use super::ApiError;
 use crate::util::cors::default_cors;
@@ -21,6 +23,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(pats::config)
             .configure(moderation::config)
             .configure(billing::config)
-            .configure(gdpr::config),
+            .configure(gdpr::config)
+            .configure(statuses::config),
     );
 }

@@ -1,12 +1,12 @@
 <template>
-  <NewModal ref="modal" :noblur="noblur" danger :on-hide="onHide">
+  <NewModal ref="modal" :noblur="noblur" :danger="danger" :on-hide="onHide">
     <template #title>
       <slot name="title">
         <span class="font-extrabold text-contrast text-lg">{{ title }}</span>
       </slot>
     </template>
     <div>
-      <div class="markdown-body" v-html="renderString(description)" />
+      <div class="markdown-body max-w-[35rem]" v-html="renderString(description)" />
       <label v-if="hasToType" for="confirmation" class="confirmation-label">
         <span>
           <strong>To verify, type</strong>
@@ -25,9 +25,9 @@
         />
       </div>
       <div class="flex gap-2 mt-6">
-        <ButtonStyled color="red">
+        <ButtonStyled :color="danger ? 'red' : 'brand'">
           <button :disabled="action_disabled" @click="proceed">
-            <TrashIcon />
+            <component :is="proceedIcon" />
             {{ proceedLabel }}
           </button>
         </ButtonStyled>
@@ -68,6 +68,10 @@ const props = defineProps({
     default: 'No description defined',
     required: true,
   },
+  proceedIcon: {
+    type: Object,
+    default: TrashIcon,
+  },
   proceedLabel: {
     type: String,
     default: 'Proceed',
@@ -75,6 +79,10 @@ const props = defineProps({
   noblur: {
     type: Boolean,
     default: false,
+  },
+  danger: {
+    type: Boolean,
+    default: true,
   },
   onHide: {
     type: Function,

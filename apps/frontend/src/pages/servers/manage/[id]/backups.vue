@@ -66,7 +66,11 @@
                       : ''
                   "
                   class="w-full sm:w-fit"
-                  :disabled="isServerRunning && !userPreferences.backupWhileRunning"
+                  :disabled="
+                    (isServerRunning && !userPreferences.backupWhileRunning) ||
+                    data.used_backup_quota >= data.backup_quota ||
+                    backups.some((backup) => backup.ongoing)
+                  "
                   @click="showCreateModel"
                 >
                   <PlusIcon class="h-5 w-5" />
@@ -75,6 +79,15 @@
               </ButtonStyled>
             </div>
           </div>
+        </div>
+
+        <div
+          v-if="backups.some((backup) => backup.ongoing)"
+          data-pyro-server-backup-ongoing
+          class="flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
+        >
+          A backup is currently being created. This may take a few minutes. This page will
+          automatically refresh when the backup is complete.
         </div>
 
         <li
@@ -94,6 +107,7 @@
                     v-tooltip="'Backup in progress'"
                     class="size-6 animate-spin"
                   />
+                  <LockIcon v-else-if="backup.locked" class="size-8" />
                   <BoxIcon v-else class="size-8" />
                 </div>
                 <div class="flex min-w-0 flex-col gap-2">
@@ -147,6 +161,16 @@
                     },
                     { id: 'download', action: () => initiateDownload(backup.id) },
                     {
+                      id: 'lock',
+                      action: () => {
+                        if (backup.locked) {
+                          unlockBackup(backup.id);
+                        } else {
+                          lockBackup(backup.id);
+                        }
+                      },
+                    },
+                    {
                       id: 'delete',
                       action: () => {
                         currentBackup = backup.id;
@@ -159,6 +183,8 @@
                   <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
                   <template #rename> <EditIcon /> Rename </template>
                   <template #restore> <ClipboardCopyIcon /> Restore </template>
+                  <template v-if="backup.locked" #lock> <LockOpenIcon /> Unlock </template>
+                  <template v-else #lock> <LockIcon /> Lock </template>
                   <template #download> <DownloadIcon /> Download </template>
                   <template #delete> <TrashIcon /> Delete </template>
                 </UiServersTeleportOverflowMenu>
@@ -204,12 +230,14 @@ import {
   TrashIcon,
   SettingsIcon,
   BoxIcon,
+  LockIcon,
+  LockOpenIcon,
 } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
   isServerRunning: boolean;
 }>();
 
@@ -245,6 +273,8 @@ const backupSettingsModal = ref<typeof NewModal>();
 
 const renameBackupName = ref("");
 const currentBackup = ref("");
+
+const refreshInterval = ref<ReturnType<typeof setInterval>>();
 
 const currentBackupDetails = computed(() => {
   return backups.value.find((backup) => backup.id === currentBackup.value);
@@ -304,10 +334,10 @@ const initiateDownload = async (backupId: string) => {
       throw new Error("Invalid download URL.");
     }
 
-    let finalDownloadUrl = downloadurl.download_url;
+    let finalDownloadUrl: string = downloadurl.download_url;
 
     if (!/^https?:\/\//i.test(finalDownloadUrl)) {
-      finalDownloadUrl = `${window.location.origin}${finalDownloadUrl.startsWith("/") ? "" : "/"}${finalDownloadUrl}`;
+      finalDownloadUrl = `https://${finalDownloadUrl.startsWith("/") ? finalDownloadUrl.substring(1) : finalDownloadUrl}`;
     }
 
     const a = document.createElement("a");
@@ -319,6 +349,47 @@ const initiateDownload = async (backupId: string) => {
     console.error("Download failed:", error);
   }
 };
+
+const lockBackup = async (backupId: string) => {
+  try {
+    await props.server.backups?.lock(backupId);
+    await props.server.refresh(["backups"]);
+  } catch (error) {
+    console.error("Failed to toggle lock:", error);
+  }
+};
+
+const unlockBackup = async (backupId: string) => {
+  try {
+    await props.server.backups?.unlock(backupId);
+    await props.server.refresh(["backups"]);
+  } catch (error) {
+    console.error("Failed to toggle lock:", error);
+  }
+};
+
+onMounted(() => {
+  watchEffect(() => {
+    const hasOngoingBackups = backups.value.some((backup) => backup.ongoing);
+
+    if (refreshInterval.value) {
+      clearInterval(refreshInterval.value);
+      refreshInterval.value = undefined;
+    }
+
+    if (hasOngoingBackups) {
+      refreshInterval.value = setInterval(() => {
+        props.server.refresh(["backups"]);
+      }, 10000);
+    }
+  });
+});
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value);
+  }
+});
 </script>
 
 <style scoped>

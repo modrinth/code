@@ -1,0 +1,106 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "price_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "amount",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "currency_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "due",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "last_attempt",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "charge_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "subscription_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "subscription_interval?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "payment_platform",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "payment_platform_id?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "parent_charge_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 14,
+        "name": "net?",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "7fb6f7e0b2b993d4b89146fdd916dbd7efe31a42127f15c9617caa00d60b7bcc"
+}

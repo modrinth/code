@@ -22,7 +22,7 @@
     </div>
     <div class="collections-grid">
       <nuxt-link
-        v-if="'followed projects'.includes(filterQuery)"
+        v-if="'followed projects'.includes(filterQuery.toLowerCase())"
         :to="`/collection/following`"
         class="universal-card recessed collection"
       >
@@ -95,7 +95,7 @@
 </template>
 <script setup>
 import { BoxIcon, SearchIcon, XIcon, PlusIcon, LinkIcon, LockIcon } from "@modrinth/assets";
-import { Avatar, Button } from "@modrinth/ui";
+import { Avatar, Button, commonMessages } from "@modrinth/ui";
 import WorldIcon from "~/assets/images/utils/world.svg?component";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 

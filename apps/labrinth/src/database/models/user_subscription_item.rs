@@ -104,6 +104,30 @@ impl UserSubscriptionItem {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
+    pub async fn get_all_servers(
+        status: Option<SubscriptionStatus>,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<UserSubscriptionItem>, DatabaseError> {
+        let status = status.map(|x| x.as_str());
+
+        let results = select_user_subscriptions_with_predicate!(
+            r#"
+            INNER JOIN products_prices pp ON us.price_id = pp.id
+            INNER JOIN products p ON p.metadata  @> '{"type": "pyro"}'
+            WHERE $1::text IS NULL OR us.status = $1::text
+            GROUP BY us.id
+            "#,
+            status
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(results
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
+
     pub async fn upsert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,

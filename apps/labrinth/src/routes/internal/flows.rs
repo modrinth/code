@@ -9,17 +9,15 @@ use crate::models::ids::random_base62_rng;
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
 use crate::queue::session::AuthQueue;
-use crate::queue::socket::ActiveSockets;
 use crate::routes::internal::session::issue_session;
 use crate::routes::ApiError;
-use crate::util::captcha::check_turnstile_captcha;
+use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::validate::{validation_errors_to_string, RE_URL_SAFE};
-use actix_web::web::{scope, Data, Payload, Query, ServiceConfig};
+use actix_web::web::{scope, Data, Query, ServiceConfig};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
-use actix_ws::Closed;
 use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use base64::Engine;
@@ -32,13 +30,11 @@ use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
-use tokio::sync::RwLock;
 use validator::Validate;
 
 pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(
         scope("auth")
-            .service(ws_init)
             .service(init)
             .service(auth_callback)
             .service(delete_auth_provider)
@@ -233,6 +229,7 @@ impl TempUser {
                 created: Utc::now(),
                 role: Role::Developer.to_string(),
                 badges: Badges::default(),
+                allow_friend_requests: true,
             }
             .insert(transaction)
             .await?;
@@ -1090,7 +1087,7 @@ pub async fn init(
 
     let state = Flow::OAuth {
         user_id,
-        url: Some(info.url),
+        url: info.url,
         provider: info.provider,
     }
     .insert(Duration::minutes(30), &redis)
@@ -1102,59 +1099,10 @@ pub async fn init(
         .json(serde_json::json!({ "url": url })))
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct WsInit {
-    pub provider: AuthProvider,
-}
-
-#[get("ws")]
-pub async fn ws_init(
-    req: HttpRequest,
-    Query(info): Query<WsInit>,
-    body: Payload,
-    db: Data<RwLock<ActiveSockets>>,
-    redis: Data<RedisPool>,
-) -> Result<HttpResponse, actix_web::Error> {
-    let (res, session, _msg_stream) = actix_ws::handle(&req, body)?;
-
-    async fn sock(
-        mut ws_stream: actix_ws::Session,
-        info: WsInit,
-        db: Data<RwLock<ActiveSockets>>,
-        redis: Data<RedisPool>,
-    ) -> Result<(), Closed> {
-        let flow = Flow::OAuth {
-            user_id: None,
-            url: None,
-            provider: info.provider,
-        }
-        .insert(Duration::minutes(30), &redis)
-        .await;
-
-        if let Ok(state) = flow {
-            if let Ok(url) = info.provider.get_redirect_url(state.clone()) {
-                ws_stream
-                    .text(serde_json::json!({ "url": url }).to_string())
-                    .await?;
-
-                let db = db.write().await;
-                db.auth_sockets.insert(state, ws_stream);
-            }
-        }
-
-        Ok(())
-    }
-
-    let _ = sock(session, info, db, redis).await;
-
-    Ok(res)
-}
-
 #[get("callback")]
 pub async fn auth_callback(
     req: HttpRequest,
     Query(query): Query<HashMap<String, String>>,
-    active_sockets: Data<RwLock<ActiveSockets>>,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     redis: Data<RedisPool>,
@@ -1164,10 +1112,8 @@ pub async fn auth_callback(
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?
         .clone();
 
-    let sockets = active_sockets.clone();
     let state = state_string.clone();
     let res: Result<HttpResponse, AuthenticationError> = async move {
-
         let flow = Flow::get(&state, &redis).await?;
 
         // Extract cookie header from request
@@ -1223,13 +1169,9 @@ pub async fn auth_callback(
                 transaction.commit().await?;
                 crate::database::models::User::clear_caches(&[(id, None)], &redis).await?;
 
-                if let Some(url) = url {
-                    Ok(HttpResponse::TemporaryRedirect()
-                        .append_header(("Location", &*url))
-                        .json(serde_json::json!({ "url": url })))
-                } else {
-                    Err(AuthenticationError::InvalidCredentials)
-                }
+                Ok(HttpResponse::TemporaryRedirect()
+                    .append_header(("Location", &*url))
+                    .json(serde_json::json!({ "url": url })))
             } else {
                 let user_id = if let Some(user_id) = user_id_opt {
                     let user = crate::database::models::User::get_id(user_id, &**client, &redis)
@@ -1241,45 +1183,16 @@ pub async fn auth_callback(
                             .insert(Duration::minutes(30), &redis)
                             .await?;
 
-                        if let Some(url) = url {
-                            let redirect_url = format!(
-                                "{}{}error=2fa_required&flow={}",
-                                url,
-                                if url.contains('?') { "&" } else { "?" },
-                                flow
-                            );
+                        let redirect_url = format!(
+                            "{}{}error=2fa_required&flow={}",
+                            url,
+                            if url.contains('?') { "&" } else { "?" },
+                            flow
+                        );
 
-                            return Ok(HttpResponse::TemporaryRedirect()
-                                .append_header(("Location", &*redirect_url))
-                                .json(serde_json::json!({ "url": redirect_url })));
-                        } else {
-                            let mut ws_conn = {
-                                let db = sockets.read().await;
-
-                                let mut x = db
-                                    .auth_sockets
-                                    .get_mut(&state)
-                                    .ok_or_else(|| AuthenticationError::SocketError)?;
-
-                                x.value_mut().clone()
-                            };
-
-                            ws_conn
-                                .text(
-                                    serde_json::json!({
-                                        "error": "2fa_required",
-                                        "flow": flow,
-                                    }).to_string()
-                                )
-                                .await.map_err(|_| AuthenticationError::SocketError)?;
-
-                            let _ = ws_conn.close(None).await;
-
-                            return Ok(crate::auth::templates::Success {
-                                icon: user.avatar_url.as_deref().unwrap_or("https://cdn-raw.modrinth.com/placeholder.svg"),
-                                name: &user.username,
-                            }.render());
-                        }
+                        return Ok(HttpResponse::TemporaryRedirect()
+                            .append_header(("Location", &*redirect_url))
+                            .json(serde_json::json!({ "url": redirect_url })));
                     }
 
                     user_id
@@ -1290,82 +1203,26 @@ pub async fn auth_callback(
                 let session = issue_session(req, user_id, &mut transaction, &redis).await?;
                 transaction.commit().await?;
 
-                if let Some(url) = url {
-                    let redirect_url = format!(
-                        "{}{}code={}{}",
-                        url,
-                        if url.contains('?') { '&' } else { '?' },
-                        session.session,
-                        if user_id_opt.is_none() {
-                            "&new_account=true"
-                        } else {
-                            ""
-                        }
-                    );
+                let redirect_url = format!(
+                    "{}{}code={}{}",
+                    url,
+                    if url.contains('?') { '&' } else { '?' },
+                    session.session,
+                    if user_id_opt.is_none() {
+                        "&new_account=true"
+                    } else {
+                        ""
+                    }
+                );
 
-                    Ok(HttpResponse::TemporaryRedirect()
-                        .append_header(("Location", &*redirect_url))
-                        .json(serde_json::json!({ "url": redirect_url })))
-                } else {
-                    let user = crate::database::models::user_item::User::get_id(
-                        user_id,
-                        &**client,
-                        &redis,
-                    )
-                        .await?.ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-
-                    let mut ws_conn = {
-                        let db = sockets.read().await;
-
-                        let mut x = db
-                            .auth_sockets
-                            .get_mut(&state)
-                            .ok_or_else(|| AuthenticationError::SocketError)?;
-
-                        x.value_mut().clone()
-                    };
-
-                    ws_conn
-                        .text(
-                            serde_json::json!({
-                                        "code": session.session,
-                                    }).to_string()
-                        )
-                        .await.map_err(|_| AuthenticationError::SocketError)?;
-                    let _ = ws_conn.close(None).await;
-
-                    return Ok(crate::auth::templates::Success {
-                        icon: user.avatar_url.as_deref().unwrap_or("https://cdn-raw.modrinth.com/placeholder.svg"),
-                        name: &user.username,
-                    }.render());
-                }
+                Ok(HttpResponse::TemporaryRedirect()
+                    .append_header(("Location", &*redirect_url))
+                    .json(serde_json::json!({ "url": redirect_url })))
             }
         } else {
             Err::<HttpResponse, AuthenticationError>(AuthenticationError::InvalidCredentials)
         }
     }.await;
-
-    // Because this is callback route, if we have an error, we need to ensure we close the original socket if it exists
-    if let Err(ref e) = res {
-        let db = active_sockets.read().await;
-        let mut x = db.auth_sockets.get_mut(&state_string);
-
-        if let Some(x) = x.as_mut() {
-            let mut ws_conn = x.value_mut().clone();
-
-            ws_conn
-                .text(
-                    serde_json::json!({
-                                "error": &e.error_name(),
-                                "description": &e.to_string(),
-                            }        )
-                    .to_string(),
-                )
-                .await
-                .map_err(|_| AuthenticationError::SocketError)?;
-            let _ = ws_conn.close(None).await;
-        }
-    }
 
     Ok(res?)
 }
@@ -1430,23 +1287,23 @@ pub async fn delete_auth_provider(
     Ok(HttpResponse::NoContent().finish())
 }
 
-pub async fn sign_up_beehiiv(email: &str) -> Result<(), AuthenticationError> {
-    let id = dotenvy::var("BEEHIIV_PUBLICATION_ID")?;
-    let api_key = dotenvy::var("BEEHIIV_API_KEY")?;
+pub async fn sign_up_sendy(email: &str) -> Result<(), AuthenticationError> {
+    let url = dotenvy::var("SENDY_URL")?;
+    let id = dotenvy::var("SENDY_LIST_ID")?;
+    let api_key = dotenvy::var("SENDY_API_KEY")?;
     let site_url = dotenvy::var("SITE_URL")?;
+
+    let mut form = HashMap::new();
+
+    form.insert("api_key", &*api_key);
+    form.insert("email", email);
+    form.insert("list", &*id);
+    form.insert("referrer", &*site_url);
 
     let client = reqwest::Client::new();
     client
-        .post(format!(
-            "https://api.beehiiv.com/v2/publications/{id}/subscriptions"
-        ))
-        .header(AUTHORIZATION, format!("Bearer {}", api_key))
-        .json(&serde_json::json!({
-            "email": email,
-            "utm_source": "modrinth",
-            "utm_medium": "account_creation",
-            "referring_site": site_url,
-        }))
+        .post(format!("{url}/subscribe"))
+        .form(&form)
         .send()
         .await?
         .error_for_status()?
@@ -1479,7 +1336,7 @@ pub async fn create_account_with_password(
         ApiError::InvalidInput(validation_errors_to_string(err, None))
     })?;
 
-    if !check_turnstile_captcha(&req, &new_account.challenge).await? {
+    if !check_hcaptcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -1533,19 +1390,6 @@ pub async fn create_account_with_password(
         ));
     }
 
-    let flow = Flow::ConfirmEmail {
-        user_id,
-        confirm_email: new_account.email.clone(),
-    }
-    .insert(Duration::hours(24), &redis)
-    .await?;
-
-    send_email_verify(
-        new_account.email.clone(),
-        flow,
-        &format!("Welcome to Modrinth, {}!", new_account.username),
-    )?;
-
     crate::database::models::User {
         id: user_id,
         github_id: None,
@@ -1570,6 +1414,7 @@ pub async fn create_account_with_password(
         created: Utc::now(),
         role: Role::Developer.to_string(),
         badges: Badges::default(),
+        allow_friend_requests: true,
     }
     .insert(&mut transaction)
     .await?;
@@ -1577,8 +1422,21 @@ pub async fn create_account_with_password(
     let session = issue_session(req, user_id, &mut transaction, &redis).await?;
     let res = crate::models::sessions::Session::from(session, true, None);
 
+    let flow = Flow::ConfirmEmail {
+        user_id,
+        confirm_email: new_account.email.clone(),
+    }
+    .insert(Duration::hours(24), &redis)
+    .await?;
+
+    send_email_verify(
+        new_account.email.clone(),
+        flow,
+        &format!("Welcome to Modrinth, {}!", new_account.username),
+    )?;
+
     if new_account.sign_up_newsletter.unwrap_or(false) {
-        sign_up_beehiiv(&new_account.email).await?;
+        sign_up_sendy(&new_account.email).await?;
     }
 
     transaction.commit().await?;
@@ -1600,7 +1458,7 @@ pub async fn login_password(
     redis: Data<RedisPool>,
     login: web::Json<Login>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_turnstile_captcha(&req, &login.challenge).await? {
+    if !check_hcaptcha(&req, &login.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -1678,26 +1536,26 @@ async fn validate_2fa_code(
             .map_err(|_| AuthenticationError::InvalidCredentials)?,
     )
     .map_err(|_| AuthenticationError::InvalidCredentials)?;
-    let token = totp
-        .generate_current()
-        .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
     const TOTP_NAMESPACE: &str = "used_totp";
     let mut conn = redis.connect().await?;
 
     // Check if TOTP has already been used
     if conn
-        .get(TOTP_NAMESPACE, &format!("{}-{}", token, user_id.0))
+        .get(TOTP_NAMESPACE, &format!("{}-{}", input, user_id.0))
         .await?
         .is_some()
     {
         return Err(AuthenticationError::InvalidCredentials);
     }
 
-    if input == token {
+    if totp
+        .check_current(input.as_str())
+        .map_err(|_| AuthenticationError::InvalidCredentials)?
+    {
         conn.set(
             TOTP_NAMESPACE,
-            &format!("{}-{}", token, user_id.0),
+            &format!("{}-{}", input, user_id.0),
             "",
             Some(60),
         )
@@ -2050,7 +1908,7 @@ pub async fn reset_password_begin(
     redis: Data<RedisPool>,
     reset_password: web::Json<ResetPassword>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_turnstile_captcha(&req, &reset_password.challenge).await? {
+    if !check_hcaptcha(&req, &reset_password.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -2453,7 +2311,7 @@ pub async fn subscribe_newsletter(
     .1;
 
     if let Some(email) = user.email {
-        sign_up_beehiiv(&email).await?;
+        sign_up_sendy(&email).await?;
 
         Ok(HttpResponse::NoContent().finish())
     } else {
