@@ -1,6 +1,8 @@
 ALTER TABLE version_fields
     ALTER COLUMN enum_value SET DEFAULT -1;
 
+UPDATE version_fields SET enum_value = -1 WHERE enum_value IS NULL;
+
 ALTER TABLE version_fields
     ALTER COLUMN enum_value SET NOT NULL;
 
