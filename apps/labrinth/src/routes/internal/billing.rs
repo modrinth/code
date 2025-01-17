@@ -880,11 +880,11 @@ pub async fn active_servers(
 ) -> Result<HttpResponse, ApiError> {
     let master_key = dotenvy::var("PYRO_API_KEY")?;
 
-    if !req
+    if req
         .head()
         .headers()
         .get("X-Master-Key")
-        .is_some_and(|it| it.as_bytes() == master_key.as_bytes())
+        .is_none_or(|it| it.as_bytes() != master_key.as_bytes())
     {
         return Err(ApiError::CustomAuthentication(
             "Invalid master key".to_string(),
