@@ -102,30 +102,28 @@
   <div class="px-6">
     <NavTabs :links="tabs" />
   </div>
-  <div class="p-6 pt-4">
-    <RouterView v-slot="{ Component }" :key="instance.path">
-      <template v-if="Component">
-        <Suspense
-          :key="instance.path"
-          @pending="loadingBar.startLoading()"
-          @resolve="loadingBar.stopLoading()"
-        >
-          <component
-            :is="Component"
-            :instance="instance"
-            :options="options"
-            :offline="offline"
-            :playing="playing"
-            :versions="modrinthVersions"
-            :installed="instance.install_stage !== 'installed'"
-          ></component>
-          <template #fallback>
-            <LoadingIndicator />
-          </template>
-        </Suspense>
-      </template>
-    </RouterView>
-  </div>
+  <RouterView v-slot="{ Component }" :key="instance.path">
+    <template v-if="Component">
+      <Suspense
+        :key="instance.path"
+        @pending="loadingBar.startLoading()"
+        @resolve="loadingBar.stopLoading()"
+      >
+        <component
+          :is="Component"
+          :instance="instance"
+          :options="options"
+          :offline="offline"
+          :playing="playing"
+          :versions="modrinthVersions"
+          :installed="instance.install_stage !== 'installed'"
+        ></component>
+        <template #fallback>
+          <LoadingIndicator />
+        </template>
+      </Suspense>
+    </template>
+  </RouterView>
   <ContextMenu ref="options" @option-clicked="handleOptionsClick">
     <template #play> <PlayIcon /> Play </template>
     <template #stop> <StopCircleIcon /> Stop </template>

@@ -76,15 +76,15 @@
         </div>
       </RecycleScroller>
     </div>
-    <ShareModalWrapper
-      ref="shareModal"
-      header="Share Log"
-      share-title="Instance Log"
-      share-text="Check out this log from an instance on the Modrinth App"
-      :open-in-new-tab="false"
-      link
-    />
   </Card>
+  <ShareModalWrapper
+    ref="shareModal"
+    header="Share Log"
+    share-title="Instance Log"
+    share-text="Check out this log from an instance on the Modrinth App"
+    :open-in-new-tab="false"
+    link
+  />
 </template>
 
 <script setup>
@@ -461,7 +461,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  height: calc(100vh - 6rem);
+  height: 110vh;
+  margin: 1rem 1.5rem 1rem 1.5rem;
 }
 
 .button-row {
@@ -484,7 +485,7 @@ onUnmounted(() => {
   background-color: var(--color-accent-contrast);
   color: var(--color-contrast);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: 0.5rem;
   overflow-x: auto; /* Enables horizontal scrolling */
   overflow-y: hidden; /* Disables vertical scrolling on this wrapper */
   white-space: nowrap; /* Keeps content on a single line */
