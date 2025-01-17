@@ -1,3 +1,9 @@
+ALTER TABLE version_fields
+    ALTER COLUMN enum_value SET DEFAULT -1;
+
+ALTER TABLE version_fields
+    ALTER COLUMN enum_value SET NOT NULL;
+
 WITH CTE AS (
     SELECT ctid,
            ROW_NUMBER() OVER (PARTITION BY version_id, field_id, enum_value ORDER BY ctid) AS row_num
