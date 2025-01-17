@@ -20,7 +20,7 @@ WHERE ctid IN (
     FROM CTE
     WHERE row_num > 1
 );
-
+x
 ALTER TABLE version_fields
 ADD PRIMARY KEY (version_id, field_id, enum_value);
 
