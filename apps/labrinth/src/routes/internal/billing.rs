@@ -884,7 +884,7 @@ pub async fn active_servers(
         .head()
         .headers()
         .get("X-Master-Key")
-        .map_or(false, |it| it.as_bytes() == master_key.as_bytes())
+        .is_some_and(|it| it.as_bytes() == master_key.as_bytes())
     {
         return Err(ApiError::CustomAuthentication(
             "Invalid master key".to_string(),
