@@ -1,4 +1,7 @@
 ALTER TABLE version_fields
+DROP CONSTRAINT version_fields_enum_value_fkey;
+
+ALTER TABLE version_fields
     ALTER COLUMN enum_value SET DEFAULT -1;
 
 UPDATE version_fields SET enum_value = -1 WHERE enum_value IS NULL;
