@@ -44,7 +44,7 @@
           </button>
         </ButtonStyled>
         <ButtonStyled>
-          <button @click="modModal.value.hide()">
+          <button @click="modModal.hide()">
             <XIcon />
             Cancel
           </button>
