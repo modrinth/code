@@ -1,5 +1,5 @@
 <template>
-  <NewModal ref="modModal" header="Editing mod version">
+  <NewModal ref="modModal" :header="`Editing ${type.toLocaleLowerCase()} version`">
     <div>
       <div class="mb-4 flex flex-col gap-4">
         <div class="inline-flex flex-wrap items-center">
@@ -174,19 +174,21 @@
                         <div class="min-w-0 text-xs text-secondary">
                           <span v-if="mod.owner" class="hidden sm:block"> by {{ mod.owner }} </span>
                           <span class="block font-semibold sm:hidden">
-                            {{ mod.version_number || "External mod" }}
+                            {{ mod.version_number || `External ${type.toLocaleLowerCase()}` }}
                           </span>
                         </div>
                       </div>
                     </NuxtLink>
                     <div class="ml-2 hidden min-w-0 flex-1 flex-col text-sm sm:flex">
                       <div class="truncate font-semibold text-contrast">
-                        <span v-tooltip="'Mod version'">{{
-                          mod.version_number || "External mod"
+                        <span v-tooltip="`${type} version`">{{
+                          mod.version_number || `External ${type.toLocaleLowerCase()}`
                         }}</span>
                       </div>
                       <div class="truncate">
-                        <span v-tooltip="'Mod file name'">{{ mod.filename }}</span>
+                        <span v-tooltip="`${type} file name`">
+                          {{ mod.filename }}
+                        </span>
                       </div>
                     </div>
                     <div
@@ -194,7 +196,7 @@
                     >
                       <ButtonStyled color="red" type="transparent">
                         <button
-                          v-tooltip="'Delete mod'"
+                          v-tooltip="`Delete ${type.toLocaleLowerCase()}`"
                           :disabled="mod.changing"
                           class="!hidden sm:!block"
                           @click="removeMod(mod)"
@@ -205,7 +207,9 @@
                       <ButtonStyled type="transparent">
                         <button
                           v-tooltip="
-                            mod.project_id ? 'Edit mod version' : 'External mods cannot be edited'
+                            mod.project_id
+                              ? `Edit ${type.toLocaleLowerCase()} version`
+                              : `External ${type.toLocaleLowerCase()}s cannot be edited`
                           "
                           :disabled="mod.changing || !mod.project_id"
                           class="!hidden sm:!block"
