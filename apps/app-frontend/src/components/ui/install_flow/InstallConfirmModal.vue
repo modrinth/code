@@ -1,7 +1,7 @@
 <script setup>
-import { XIcon, DownloadIcon } from '@modrinth/assets'
+import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
-import { install as pack_install } from '@/helpers/pack'
+import { create_profile_and_install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
 import { trackEvent } from '@/helpers/analytics'
 import { handleError } from '@/store/state.js'
