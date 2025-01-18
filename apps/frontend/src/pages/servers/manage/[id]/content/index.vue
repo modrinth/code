@@ -214,7 +214,7 @@
                           @click="beginChangeModVersion(mod)"
                         >
                           <template v-if="mod.changing">
-                            <UiServersIconsLoadingIcon />
+                            <UiServersIconsLoadingIcon class="animate-spin" />
                           </template>
                           <template v-else>
                             <EditIcon />
@@ -552,8 +552,9 @@ async function toggleMod(mod: ContentItem) {
       ? mod.filename.slice(0, -9)
       : `${mod.filename}.disabled`;
 
-    const sourcePath = `/mods/${mod.filename}`;
-    const destinationPath = `/mods/${newFilename}`;
+    const folder = `${type.value.toLocaleLowerCase()}s`;
+    const sourcePath = `/${folder}/${mod.filename}`;
+    const destinationPath = `/${folder}/${newFilename}`;
 
     mod.disabled = newFilename.endsWith(".disabled");
     mod.filename = newFilename;
