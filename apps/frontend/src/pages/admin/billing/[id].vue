@@ -79,6 +79,7 @@
         </span>
         <div class="mb-4 mt-2 flex items-center gap-1">
           {{ subscription.status }} ⋅ {{ $dayjs(subscription.created).format("YYYY-MM-DD") }}
+          <template v-if="subscription.metadata?.id"> ⋅ {{ subscription.metadata.id }}</template>
         </div>
         <div
           v-for="charge in subscription.charges"
