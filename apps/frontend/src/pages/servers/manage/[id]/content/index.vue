@@ -162,9 +162,7 @@
                       />
                       <div class="flex min-w-0 flex-col gap-1">
                         <span class="text-md flex min-w-0 items-center gap-2 font-bold">
-                          <span class="truncate text-contrast">{{
-                            mod.name || mod.filename.replace(".disabled", "")
-                          }}</span>
+                          <span class="truncate text-contrast">{{ friendlyModName(mod) }}</span>
                           <span
                             v-if="mod.disabled"
                             class="hidden rounded-full bg-button-bg p-1 px-2 text-xs text-contrast sm:block"
@@ -533,13 +531,25 @@ const debouncedSearch = debounce(() => {
   }
 }, 300);
 
+function friendlyModName(mod: ContentItem) {
+  if (mod.name) return mod.name;
+
+  // remove .disabled if at the end of the filename
+  let cleanName = mod.filename.endsWith(".disabled") ? mod.filename.slice(0, -9) : mod.filename;
+
+  // remove everything after the last dot
+  const lastDotIndex = cleanName.lastIndexOf(".");
+  if (lastDotIndex !== -1) cleanName = cleanName.substring(0, lastDotIndex);
+  return cleanName;
+}
+
 async function toggleMod(mod: ContentItem) {
   mod.changing = true;
 
   const originalFilename = mod.filename;
   try {
     const newFilename = mod.filename.endsWith(".disabled")
-      ? mod.filename.replace(".disabled", "")
+      ? mod.filename.slice(0, -9)
       : `${mod.filename}.disabled`;
 
     const sourcePath = `/mods/${mod.filename}`;
@@ -557,7 +567,7 @@ async function toggleMod(mod: ContentItem) {
 
     console.error("Error toggling mod:", error);
     addNotification({
-      text: `Something went wrong toggling ${mod.name || mod.filename.replace(".disabled", "")}`,
+      text: `Something went wrong toggling ${friendlyModName(mod)}`,
       type: "error",
     });
   }
@@ -650,9 +660,7 @@ const filteredMods = computed(() => {
   })();
 
   return statusFilteredMods.sort((a, b) => {
-    const aName = a.name || a.filename.replace(".disabled", "");
-    const bName = b.name || b.filename.replace(".disabled", "");
-    return aName.localeCompare(bName);
+    return friendlyModName(a).localeCompare(friendlyModName(b));
   });
 });
 </script>
