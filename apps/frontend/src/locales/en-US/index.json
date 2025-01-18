@@ -1,4 +1,7 @@
 {
+  "admin.billing.error.not-found": {
+    "message": "User not found"
+  },
   "auth.authorize.action.authorize": {
     "message": "Authorize"
   },
@@ -337,6 +340,12 @@
   },
   "layout.nav.search": {
     "message": "Search"
+  },
+  "profile.button.billing": {
+    "message": "Manage user billing"
+  },
+  "profile.button.info": {
+    "message": "View user details"
   },
   "profile.button.manage-projects": {
     "message": "Manage projects"
