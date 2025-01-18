@@ -144,7 +144,7 @@ if (!user.value) {
 
 let subscriptions, charges, refreshCharges;
 try {
-  [{ data: subscriptions }, { data: charges, refreshCharges }] = await Promise.all([
+  [{ data: subscriptions }, { data: charges, refresh: refreshCharges }] = await Promise.all([
     useAsyncData(`billing/subscriptions?user_id=${route.params.id}`, () =>
       useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
         internal: true,
