@@ -25,7 +25,10 @@
             Amount
             <span class="text-brand-red">*</span>
           </span>
-          <span> Enter the amount in cents of USD. For example for $2, enter 200. </span>
+          <span>
+            Enter the amount in cents of USD. For example for $2, enter 200. (net
+            {{ selectedCharge.net }})
+          </span>
         </label>
         <input id="amount" v-model="refundAmount" type="number" autocomplete="off" />
       </div>
@@ -46,7 +49,7 @@
       </div>
       <div class="flex gap-2">
         <ButtonStyled color="brand">
-          <button @click="refundCharge">
+          <button :disabled="refunding" @click="refundCharge">
             <CheckIcon aria-hidden="true" />
             Refund charge
           </button>
@@ -89,13 +92,15 @@
                 :type="charge.status"
               />
               ⋅
+              {{ charge.type }}
+              ⋅
               {{ $dayjs(charge.due).format("YYYY-MM-DD") }}
               ⋅
               <span>{{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}</span>
               <template v-if="subscription.interval"> ⋅ {{ subscription.interval }} </template>
             </div>
             <button
-              v-if="charge.status === 'succeeded'"
+              v-if="charge.status === 'succeeded' && charge.type !== 'refund'"
               class="btn"
               @click="showRefundModal(charge)"
             >
@@ -137,9 +142,9 @@ if (!user.value) {
   });
 }
 
-let subscriptions, charges;
+let subscriptions, charges, refreshCharges;
 try {
-  [{ data: subscriptions }, { data: charges }] = await Promise.all([
+  [{ data: subscriptions }, { data: charges, refreshCharges }] = await Promise.all([
     useAsyncData(`billing/subscriptions?user_id=${route.params.id}`, () =>
       useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
         internal: true,
@@ -171,6 +176,7 @@ const subscriptionCharges = computed(() => {
   });
 });
 
+const refunding = ref(false);
 const refundModal = ref();
 const selectedCharge = ref(null);
 const refundType = ref("full");
@@ -187,6 +193,7 @@ function showRefundModal(charge) {
 }
 
 async function refundCharge() {
+  refunding.value = true;
   try {
     await useBaseFetch(`billing/charge/${selectedCharge.value.id}/refund`, {
       method: "POST",
@@ -197,14 +204,16 @@ async function refundCharge() {
       }),
       internal: true,
     });
+    await refreshCharges();
+    refundModal.value.hide();
   } catch (err) {
     data.$notify({
       group: "main",
-      title: "Error resubscribing",
-      text: err.message ?? (err.data ? err.data.description : err),
+      title: "Error refunding",
+      text: err.data?.description ?? err,
       type: "error",
     });
   }
-  return data;
+  refunding.value = false;
 }
 </script>
