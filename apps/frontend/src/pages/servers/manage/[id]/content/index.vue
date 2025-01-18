@@ -123,7 +123,7 @@
         class="rounded-xl bg-bg-raised"
         :margin-bottom="16"
         :file-type="type"
-        :current-path="'/mods'"
+        :current-path="`/${type.toLocaleLowerCase()}s`"
         :fs="props.server.fs"
         :accepted-types="acceptFileFromProjectType(type.toLocaleLowerCase()).split(',')"
         @upload-complete="() => props.server.refresh(['content'])"
