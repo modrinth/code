@@ -638,7 +638,7 @@ pub async fn charges(
                 id: x.id.into(),
                 user_id: x.user_id.into(),
                 price_id: x.price_id.into(),
-                amount: x.amount as u64,
+                amount: x.amount,
                 currency_code: x.currency_code,
                 status: x.status,
                 due: x.due,
@@ -647,6 +647,8 @@ pub async fn charges(
                 subscription_id: x.subscription_id.map(|x| x.into()),
                 subscription_interval: x.subscription_interval,
                 platform: x.payment_platform,
+                parent_charge_id: x.parent_charge_id.map(|x| x.into()),
+                net: if user.role.is_admin() { x.net } else { None },
             })
             .collect::<Vec<_>>(),
     ))
