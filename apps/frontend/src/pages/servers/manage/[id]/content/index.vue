@@ -580,10 +580,7 @@ async function removeMod(mod: ContentItem) {
   mod.changing = true;
 
   try {
-    await props.server.content?.remove(
-      type.value as "Mod" | "Plugin",
-      `/${type.value.toLowerCase()}s/${mod.filename}`,
-    );
+    await props.server.content?.remove(`/${type.value.toLowerCase()}s/${mod.filename}`);
     await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error removing mod:", error);
@@ -621,8 +618,8 @@ async function changeModVersion() {
   try {
     modModal.value.hide();
     await props.server.content?.reinstall(
-      type.value,
-      currentMod.value.version_id,
+      `/${type.value.toLowerCase()}s/${currentMod.value.filename}`,
+      currentMod.value.project_id,
       currentVersion.value.id,
     );
     await props.server.refresh(["general", "content"]);
