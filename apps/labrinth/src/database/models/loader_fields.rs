@@ -757,12 +757,7 @@ impl VersionField {
                     l.field_id.0,
                     l.version_id.0,
                     l.int_value,
-                    if let Some(enum_value) = l.enum_value.as_ref().map(|e| e.0)
-                    {
-                        enum_value
-                    } else {
-                        -1
-                    },
+                    l.enum_value.as_ref().map(|e| e.0).unwrap_or(-1),
                     l.string_value.clone(),
                 )
             })
