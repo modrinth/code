@@ -617,11 +617,23 @@ async function changeModVersion() {
   currentMod.value.changing = true;
   try {
     modModal.value.hide();
-    await props.server.content?.reinstall(
-      `/${type.value.toLowerCase()}s/${currentMod.value.filename}`,
+
+    // await props.server.content?.reinstall(
+    //   `/${type.value.toLowerCase()}s/${currentMod.value.filename}`,
+    //   currentMod.value.project_id,
+    //   currentVersion.value.id,
+    // );
+
+    await props.server.content?.install(
+      type.value.toLowerCase() as "mod" | "plugin",
       currentMod.value.project_id,
       currentVersion.value.id,
     );
+
+    await props.server.content?.remove(
+      `/${type.value.toLowerCase()}s/${currentMod.value.filename}`,
+    );
+
     await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error changing mod version:", error);
