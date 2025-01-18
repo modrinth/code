@@ -149,7 +149,7 @@
                       :to="
                         mod.project_id
                           ? `/project/${mod.project_id}/version/${mod.version_id}`
-                          : `files?path=mods`
+                          : `files?path=${type.toLocaleLowerCase()}s`
                       "
                       class="flex min-w-0 flex-1 items-center gap-2 rounded-xl p-2"
                       draggable="false"
