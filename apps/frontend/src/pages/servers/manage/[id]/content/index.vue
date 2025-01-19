@@ -1,46 +1,55 @@
 <template>
   <NewModal ref="modModal" :header="`Editing ${type.toLocaleLowerCase()} version`">
-    <div>
-      <div class="mb-4 flex flex-col gap-4">
-        <div class="inline-flex flex-wrap items-center">
-          You're changing the version of
-          <div class="inline-flex flex-wrap items-center gap-1 text-nowrap pl-2">
-            <UiAvatar
-              :src="currentMod?.icon_url"
-              size="24px"
-              class="inline-block"
-              alt="Server Icon"
-            />
-            <strong>{{ currentMod?.name + "." }}</strong>
-          </div>
-        </div>
-        <div>
-          <div v-if="props.server.general?.upstream" class="flex gap-2">
-            <InfoIcon class="hidden sm:block" />
-            <span class="text-sm text-secondary">
-              Changing the mod version may cause unexpected issues. Because your server was created
-              from a modpack, it is recommended to use the modpack's version of the mod.
-            </span>
-          </div>
-        </div>
+    <template #title>
+      <div class="flex items-center gap-2">
+        <UiAvatar :src="currentMod?.icon_url" size="48px" :alt="`${currentMod?.name} Icon`" />
+        <span class="text-xl font-extrabold text-contrast">{{ currentMod?.name }}</span>
       </div>
-      <div class="flex items-center gap-4">
+    </template>
+    <div class="flex flex-col gap-2 md:w-[420px]">
+      <template v-if="versionsLoading">
+        <div class="w-fit animate-pulse select-none rounded-md bg-button-bg font-semibold">
+          <span class="opacity-0" aria-hidden="true">Version</span>
+        </div>
+        <div class="min-h-9 w-full animate-pulse rounded-xl bg-button-bg" />
+      </template>
+      <template v-else>
+        <div class="font-semibold text-contrast">Version</div>
         <UiServersTeleportDropdownMenu
           v-model="currentVersion"
           name="Project"
           :options="currentVersions"
           placeholder="Select project..."
-          class="!w-full"
+          class="!min-w-full"
           :display-name="
             (version) => (typeof version === 'object' ? version?.version_number : version)
           "
         />
+      </template>
+
+      <div
+        v-if="props.server.general?.upstream"
+        class="flex justify-between rounded-2xl border-2 border-solid border-warning-text bg-bg-orange p-4 font-semibold text-contrast"
+      >
+        <div class="flex w-full justify-between gap-2">
+          <div class="flex flex-row gap-4">
+            <IssuesIcon class="hidden h-8 w-8 flex-none text-warning-text sm:block" />
+
+            <div class="flex flex-col gap-2">
+              <div class="font-semibold">Changing version may cause issues</div>
+              <div class="font-normal">
+                Your server was created using a modpack. It's recommended to use the modpack's
+                version of the mod.
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="mt-4 flex flex-row items-center gap-4">
         <ButtonStyled color="brand">
-          <button :disabled="currentMod.changing" @click="changeModVersion">
-            <PlusIcon />
-            Install
+          <button :disabled="currentMod.changing || versionsLoading" @click="changeModVersion">
+            <CheckIcon />
+            Apply
           </button>
         </ButtonStyled>
         <ButtonStyled>
@@ -367,8 +376,11 @@ import {
   WrenchIcon,
   ListIcon,
   FileIcon,
+  CheckIcon,
+  IssuesIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
+import Admonition from "@modrinth/ui/src/components/base/Admonition.vue";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
@@ -598,8 +610,11 @@ const modModal = ref();
 const currentMod = ref();
 const currentVersions = ref();
 const currentVersion = ref();
+const versionsLoading = ref(false);
 
 async function beginChangeModVersion(mod: Mod) {
+  modModal.value.show();
+  versionsLoading.value = true;
   currentMod.value = mod;
   currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false);
 
@@ -610,7 +625,7 @@ async function beginChangeModVersion(mod: Mod) {
   currentVersion.value = currentVersions.value.find(
     (version: any) => version.id === mod.version_id,
   );
-  modModal.value.show();
+  versionsLoading.value = false;
 }
 
 async function changeModVersion() {
