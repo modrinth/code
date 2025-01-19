@@ -27,25 +27,16 @@
         />
       </template>
 
-      <div
+      <Admonition
         v-if="props.server.general?.upstream"
-        class="flex justify-between rounded-2xl border-2 border-solid border-warning-text bg-bg-orange p-4 font-semibold text-contrast"
+        type="warning"
+        header="Changing version may cause issues"
       >
-        <div class="flex w-full justify-between gap-2">
-          <div class="flex flex-row gap-4">
-            <IssuesIcon class="hidden h-8 w-8 flex-none text-warning-text sm:block" />
+        Your server was created using a modpack. It's recommended to use the modpack's version of
+        the mod.
+      </Admonition>
 
-            <div class="flex flex-col gap-2">
-              <div class="font-semibold">Changing version may cause issues</div>
-              <div class="font-normal">
-                Your server was created using a modpack. It's recommended to use the modpack's
-                version of the mod.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="mt-4 flex flex-row items-center gap-4">
+      <div class="mt-2 flex flex-row items-center gap-4">
         <ButtonStyled color="brand">
           <button :disabled="currentMod.changing || versionsLoading" @click="changeModVersion">
             <CheckIcon />
