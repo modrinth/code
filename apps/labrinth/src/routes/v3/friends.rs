@@ -5,10 +5,11 @@ use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
-use crate::routes::internal::statuses::{close_socket, ServerToClientMessage};
+use crate::routes::internal::statuses::close_socket;
 use crate::routes::ApiError;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
+use rust_common::networking::message::ServerToClientMessage;
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

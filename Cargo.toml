@@ -2,11 +2,12 @@
 resolver = '2'
 members = [
   './packages/app-lib',
+  './packages/rust-common',
 	'./apps/app-playground',
   './apps/app',
   './apps/labrinth',
-    './apps/daedalus_client',
-    './packages/daedalus',
+  './apps/daedalus_client',
+  './packages/daedalus',
 ]
 
 # Optimize for speed and reduce size on release builds

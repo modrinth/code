@@ -34,7 +34,7 @@ pub enum AuthenticationError {
     #[error("Error uploading user profile picture")]
     FileHosting(#[from] FileHostingError),
     #[error("Error while decoding PAT: {0}")]
-    Decoding(#[from] crate::models::ids::DecodingError),
+    Decoding(#[from] rust_common::ids::DecodingError),
     #[error("{0}")]
     Mail(#[from] email::MailError),
     #[error("Invalid Authentication Credentials")]

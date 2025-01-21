@@ -2,13 +2,13 @@
 pub mod local_import;
 
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::to_base62;
 use crate::search::{SearchConfig, UploadSearchProject};
 use local_import::index_local;
 use log::info;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
+use rust_common::ids::base62_impl::to_base62;
 use sqlx::postgres::PgPool;
 use thiserror::Error;
 #[derive(Error, Debug)]

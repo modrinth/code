@@ -1,6 +1,6 @@
 //! Theseus state management system
-use crate::state::UserStatus;
 use dashmap::DashMap;
+use rust_common::users::{UserId, UserStatus};
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
 #[cfg(feature = "tauri")]
@@ -262,8 +262,8 @@ pub enum EventError {
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "event")]
 pub enum FriendPayload {
-    FriendRequest { from: String },
-    UserOffline { id: String },
+    FriendRequest { from: UserId },
+    UserOffline { id: UserId },
     StatusUpdate { user_status: UserStatus },
     StatusSync,
 }

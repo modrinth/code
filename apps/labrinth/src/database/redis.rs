@@ -1,9 +1,9 @@
 use super::models::DatabaseError;
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
 use redis::{cmd, Cmd, ExistenceCheck, SetExpiry, SetOptions};
+use rust_common::ids::base62_impl::{parse_base62, to_base62};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

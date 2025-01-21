@@ -2,9 +2,8 @@ use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::AuthenticationError;
 use crate::database::models::friend_item::FriendItem;
 use crate::database::redis::RedisPool;
-use crate::models::ids::UserId;
 use crate::models::pats::Scopes;
-use crate::models::users::{User, UserStatus};
+use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
 use crate::routes::ApiError;
@@ -12,28 +11,18 @@ use actix_web::web::{Data, Payload};
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use actix_ws::Message;
 use chrono::Utc;
+use either::Either;
 use futures_util::{StreamExt, TryStreamExt};
-use serde::{Deserialize, Serialize};
+use rust_common::ids::UserId;
+use rust_common::networking::message::{
+    ClientToServerMessage, ServerToClientMessage,
+};
+use rust_common::users::UserStatus;
+use serde::Deserialize;
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(ws_init);
-}
-
-#[derive(Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum ClientToServerMessage {
-    StatusUpdate { profile_name: Option<String> },
-}
-
-#[derive(Serialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum ServerToClientMessage {
-    StatusUpdate { status: UserStatus },
-    UserOffline { id: UserId },
-    FriendStatuses { statuses: Vec<UserStatus> },
-    FriendRequest { from: UserId },
-    FriendRequestRejected { from: UserId },
 }
 
 #[derive(Deserialize)]
@@ -133,57 +122,59 @@ pub async fn ws_init(
     actix_web::rt::spawn(async move {
         // receive messages from websocket
         while let Some(msg) = stream.next().await {
-            match msg {
-                Ok(Message::Text(text)) => {
-                    if let Ok(message) =
-                        serde_json::from_str::<ClientToServerMessage>(&text)
-                    {
-                        match message {
-                            ClientToServerMessage::StatusUpdate {
-                                profile_name,
-                            } => {
-                                if let Some(mut pair) =
-                                    db.auth_sockets.get_mut(&user.id)
+            if msg.is_err() {
+                continue;
+            }
+            match ClientToServerMessage::deserialize(msg.unwrap()) {
+                Ok(Either::Left(message)) => {
+                    match message {
+                        ClientToServerMessage::StatusUpdate {
+                            profile_name,
+                        } => {
+                            if let Some(mut pair) =
+                                db.auth_sockets.get_mut(&user.id)
+                            {
+                                let (status, _) = pair.value_mut();
+
+                                if status
+                                    .profile_name
+                                    .as_ref()
+                                    .map(|x| x.len() > 64)
+                                    .unwrap_or(false)
                                 {
-                                    let (status, _) = pair.value_mut();
-
-                                    if status
-                                        .profile_name
-                                        .as_ref()
-                                        .map(|x| x.len() > 64)
-                                        .unwrap_or(false)
-                                    {
-                                        continue;
-                                    }
-
-                                    status.profile_name = profile_name;
-                                    status.last_update = Utc::now();
-
-                                    let user_status = status.clone();
-                                    // We drop the pair to avoid holding the lock for too long
-                                    drop(pair);
-
-                                    let _ = broadcast_friends(
-                                        user.id,
-                                        ServerToClientMessage::StatusUpdate {
-                                            status: user_status,
-                                        },
-                                        &pool,
-                                        &db,
-                                        None,
-                                    )
-                                    .await;
+                                    return;
                                 }
+
+                                status.profile_name = profile_name;
+                                status.last_update = Utc::now();
+
+                                let user_status = status.clone();
+                                // We drop the pair to avoid holding the lock for too long
+                                drop(pair);
+
+                                let _ = broadcast_friends(
+                                    user.id,
+                                    ServerToClientMessage::StatusUpdate {
+                                        status: user_status,
+                                    },
+                                    &pool,
+                                    &db,
+                                    None,
+                                )
+                                .await;
                             }
                         }
+                        ClientToServerMessage::SocketOpen
+                        | ClientToServerMessage::SocketClose { .. }
+                        | ClientToServerMessage::SocketSend { .. } => todo!(),
                     }
                 }
 
-                Ok(Message::Close(_)) => {
+                Ok(Either::Right(Message::Close(_))) => {
                     let _ = close_socket(user.id, &pool, &db).await;
                 }
 
-                Ok(Message::Ping(msg)) => {
+                Ok(Either::Right(Message::Ping(msg))) => {
                     if let Some(socket) = db.auth_sockets.get(&user.id) {
                         let (_, socket) = socket.value();
                         let _ = socket.clone().pong(&msg).await;
@@ -207,6 +198,7 @@ pub async fn broadcast_friends(
     sockets: &ActiveSockets,
     friends: Option<Vec<FriendItem>>,
 ) -> Result<(), crate::database::models::DatabaseError> {
+    // FIXME Probably shouldn't be using database errors for this
     let friends = if let Some(friends) = friends {
         friends
     } else {
@@ -224,8 +216,7 @@ pub async fn broadcast_friends(
             if let Some(socket) = sockets.auth_sockets.get(&friend_id.into()) {
                 let (_, socket) = socket.value();
 
-                let _ =
-                    socket.clone().text(serde_json::to_string(&message)?).await;
+                let _ = message.send(&mut socket.clone()).await; // FIXME Probably shouldn't swallow this error
             }
         }
     }

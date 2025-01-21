@@ -1,9 +1,9 @@
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::to_base62;
 use crate::models::projects::ProjectId;
 use crate::routes::ApiError;
 use chrono::{DateTime, Utc};
+use rust_common::ids::base62_impl::to_base62;
 use serde::Serialize;
 use sqlx::PgPool;
 

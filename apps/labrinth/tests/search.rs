@@ -8,7 +8,7 @@ use common::environment::with_test_environment;
 use common::environment::TestEnvironment;
 use common::search::setup_search_projects;
 use futures::stream::StreamExt;
-use labrinth::models::ids::base62_impl::parse_base62;
+use rust_common::ids::base62_impl::parse_base62;
 use serde_json::json;
 
 use crate::common::api_common::Api;

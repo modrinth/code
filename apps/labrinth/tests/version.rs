@@ -14,11 +14,11 @@ use common::database::USER_USER_PAT;
 use common::environment::{with_test_environment, with_test_environment_all};
 use futures::StreamExt;
 use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
-use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::projects::{
     Dependency, DependencyType, VersionId, VersionStatus, VersionType,
 };
 use labrinth::routes::v3::version_file::FileUpdateData;
+use rust_common::ids::base62_impl::parse_base62;
 use serde_json::json;
 
 // importing common module.

@@ -14,6 +14,10 @@ use futures::stream::SplitSink;
 use futures::{SinkExt, StreamExt};
 use reqwest::header::HeaderValue;
 use reqwest::Method;
+use rust_common::networking::message::{
+    ClientToServerMessage, ServerToClientMessage,
+};
+use rust_common::users::{UserId, UserStatus};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -23,7 +27,7 @@ type WriteSocket =
 
 pub struct FriendsSocket {
     write: WriteSocket,
-    user_statuses: Arc<DashMap<String, UserStatus>>,
+    user_statuses: Arc<DashMap<UserId, UserStatus>>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -32,28 +36,6 @@ pub struct UserFriend {
     pub friend_id: String,
     pub accepted: bool,
     pub created: DateTime<Utc>,
-}
-
-#[derive(Serialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum ClientToServerMessage {
-    StatusUpdate { profile_name: Option<String> },
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum ServerToClientMessage {
-    StatusUpdate { status: UserStatus },
-    UserOffline { id: String },
-    FriendStatuses { statuses: Vec<UserStatus> },
-    FriendRequest { from: String },
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct UserStatus {
-    pub user_id: String,
-    pub profile_name: Option<String>,
-    pub last_update: DateTime<Utc>,
 }
 
 impl Default for FriendsSocket {
@@ -126,6 +108,7 @@ impl FriendsSocket {
                         while let Some(msg_result) = read_stream.next().await {
                             match msg_result {
                                 Ok(msg) => {
+                                    // TODO: Make wire package work with this other library
                                     let server_message = match msg {
                                         Message::Text(text) => {
                                             serde_json::from_str::<
@@ -165,7 +148,7 @@ impl FriendsSocket {
                                     {
                                         match server_message {
                                             ServerToClientMessage::StatusUpdate { status } => {
-                                                statuses.insert(status.user_id.clone(), status.clone());
+                                                statuses.insert(status.user_id, status.clone());
                                                 let _ = emit_friend(FriendPayload::StatusUpdate { user_status: status }).await;
                                             },
                                             ServerToClientMessage::UserOffline { id } => {
@@ -175,13 +158,18 @@ impl FriendsSocket {
                                             ServerToClientMessage::FriendStatuses { statuses: new_statuses } => {
                                                 statuses.clear();
                                                 new_statuses.into_iter().for_each(|status| {
-                                                    statuses.insert(status.user_id.clone(), status);
+                                                    statuses.insert(status.user_id, status);
                                                 });
                                                 let _ = emit_friend(FriendPayload::StatusSync).await;
                                             }
                                             ServerToClientMessage::FriendRequest { from } => {
                                                 let _ = emit_friend(FriendPayload::FriendRequest { from }).await;
                                             }
+                                            ServerToClientMessage::FriendRequestRejected { .. } => todo!(),
+                                            ServerToClientMessage::SocketOpened { .. } => todo!(),
+                                            ServerToClientMessage::SocketClosed { .. } => todo!(),
+                                            ServerToClientMessage::FriendSocketOpened { .. } => todo!(),
+                                            ServerToClientMessage::SocketData { .. } => todo!(),
                                         }
                                     }
                                 }
