@@ -84,23 +84,31 @@
           </template>
           <template #stats>
             <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+              v-tooltip="
+                `${formatNumber(acceptedMembers?.length || 0, false)} member${(acceptedMembers?.length || 0) !== 1 ? 's' : ''}`
+              "
+              class="flex cursor-help items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <UsersIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(acceptedMembers?.length || 0) }}
-              members
             </div>
             <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+              v-tooltip="
+                `${formatNumber(projects?.length || 0, false)} project${(projects?.length || 0) !== 1 ? 's' : ''}`
+              "
+              class="flex cursor-help items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <BoxIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(projects?.length || 0) }}
-              projects
             </div>
-            <div class="flex items-center gap-2 font-semibold">
+            <div
+              v-tooltip="
+                `${formatNumber(sumDownloads, false)} download${sumDownloads !== 1 ? 's' : ''}`
+              "
+              class="flex cursor-help items-center gap-2 font-semibold"
+            >
               <DownloadIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(sumDownloads) }}
-              downloads
             </div>
           </template>
           <template #actions>
@@ -260,6 +268,7 @@ import {
   OverflowMenu,
   commonMessages,
 } from "@modrinth/ui";
+import { formatNumber } from "@modrinth/utils";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
