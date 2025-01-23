@@ -122,66 +122,71 @@ pub async fn ws_init(
     actix_web::rt::spawn(async move {
         // receive messages from websocket
         while let Some(msg) = stream.next().await {
-            if msg.is_err() {
-                continue;
-            }
-            match ClientToServerMessage::deserialize(msg.unwrap()) {
-                Ok(Either::Left(message)) => {
-                    match message {
-                        ClientToServerMessage::StatusUpdate {
-                            profile_name,
-                        } => {
-                            if let Some(mut pair) =
-                                db.auth_sockets.get_mut(&user.id)
-                            {
-                                let (status, _) = pair.value_mut();
-
-                                if status
-                                    .profile_name
-                                    .as_ref()
-                                    .map(|x| x.len() > 64)
-                                    .unwrap_or(false)
-                                {
-                                    return;
-                                }
-
-                                status.profile_name = profile_name;
-                                status.last_update = Utc::now();
-
-                                let user_status = status.clone();
-                                // We drop the pair to avoid holding the lock for too long
-                                drop(pair);
-
-                                let _ = broadcast_friends(
-                                    user.id,
-                                    ServerToClientMessage::StatusUpdate {
-                                        status: user_status,
-                                    },
-                                    &pool,
-                                    &db,
-                                    None,
-                                )
-                                .await;
-                            }
-                        }
-                        ClientToServerMessage::SocketOpen
-                        | ClientToServerMessage::SocketClose { .. }
-                        | ClientToServerMessage::SocketSend { .. } => todo!(),
-                    }
+            let message = match msg {
+                Ok(Message::Text(text)) => {
+                    ClientToServerMessage::deserialize(Either::Left(&text))
                 }
 
-                Ok(Either::Right(Message::Close(_))) => {
+                Ok(Message::Binary(bytes)) => {
+                    ClientToServerMessage::deserialize(Either::Right(&bytes))
+                }
+
+                Ok(Message::Close(_)) => {
                     let _ = close_socket(user.id, &pool, &db).await;
+                    continue;
                 }
 
-                Ok(Either::Right(Message::Ping(msg))) => {
+                Ok(Message::Ping(msg)) => {
                     if let Some(socket) = db.auth_sockets.get(&user.id) {
                         let (_, socket) = socket.value();
                         let _ = socket.clone().pong(&msg).await;
                     }
+                    continue;
                 }
 
-                _ => {}
+                _ => continue,
+            };
+
+            if message.is_err() {
+                continue;
+            }
+
+            match message.unwrap() {
+                ClientToServerMessage::StatusUpdate { profile_name } => {
+                    if let Some(mut pair) = db.auth_sockets.get_mut(&user.id) {
+                        let (status, _) = pair.value_mut();
+
+                        if status
+                            .profile_name
+                            .as_ref()
+                            .map(|x| x.len() > 64)
+                            .unwrap_or(false)
+                        {
+                            return;
+                        }
+
+                        status.profile_name = profile_name;
+                        status.last_update = Utc::now();
+
+                        let user_status = status.clone();
+                        // We drop the pair to avoid holding the lock for too long
+                        drop(pair);
+
+                        let _ = broadcast_friends(
+                            user.id,
+                            ServerToClientMessage::StatusUpdate {
+                                status: user_status,
+                            },
+                            &pool,
+                            &db,
+                            None,
+                        )
+                        .await;
+                    }
+                }
+                ClientToServerMessage::SocketOpen
+                | ClientToServerMessage::SocketClose { .. }
+                | ClientToServerMessage::SocketSend { .. } => todo!(),
             }
         }
 
@@ -216,7 +221,14 @@ pub async fn broadcast_friends(
             if let Some(socket) = sockets.auth_sockets.get(&friend_id.into()) {
                 let (_, socket) = socket.value();
 
-                let _ = message.send(&mut socket.clone()).await; // FIXME Probably shouldn't swallow this error
+                // FIXME Probably shouldn't swallow sending errors
+                let _ = match message.serialize() {
+                    Ok(Either::Left(text)) => socket.clone().text(text).await,
+                    Ok(Either::Right(bytes)) => {
+                        socket.clone().binary(bytes).await
+                    }
+                    Err(_) => Ok(()), // TODO: Maybe should log these? Though it is the backend
+                };
             }
         }
     }

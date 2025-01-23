@@ -10,6 +10,7 @@ use async_tungstenite::tungstenite::Message;
 use async_tungstenite::WebSocketStream;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use either::Either;
 use futures::stream::SplitSink;
 use futures::{SinkExt, StreamExt};
 use reqwest::header::HeaderValue;
@@ -108,21 +109,16 @@ impl FriendsSocket {
                         while let Some(msg_result) = read_stream.next().await {
                             match msg_result {
                                 Ok(msg) => {
-                                    // TODO: Make wire package work with this other library
                                     let server_message = match msg {
                                         Message::Text(text) => {
-                                            serde_json::from_str::<
-                                                ServerToClientMessage,
-                                            >(
-                                                &text
+                                            ServerToClientMessage::deserialize(
+                                                Either::Left(&text),
                                             )
                                             .ok()
                                         }
                                         Message::Binary(bytes) => {
-                                            serde_json::from_slice::<
-                                                ServerToClientMessage,
-                                            >(
-                                                &bytes
+                                            ServerToClientMessage::deserialize(
+                                                Either::Right(&bytes),
                                             )
                                             .ok()
                                         }
@@ -257,16 +253,8 @@ impl FriendsSocket {
         &self,
         profile_name: Option<String>,
     ) -> crate::Result<()> {
-        let mut write_lock = self.write.write().await;
-        if let Some(ref mut write_half) = *write_lock {
-            write_half
-                .send(Message::Text(serde_json::to_string(
-                    &ClientToServerMessage::StatusUpdate { profile_name },
-                )?))
-                .await?;
-        }
-
-        Ok(())
+        self.send_message(ClientToServerMessage::StatusUpdate { profile_name })
+            .await
     }
 
     #[tracing::instrument(skip_all)]
@@ -331,6 +319,24 @@ impl FriendsSocket {
             exec,
         )
         .await?;
+
+        Ok(())
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn send_message(
+        &self,
+        message: ClientToServerMessage,
+    ) -> crate::Result<()> {
+        let serialized = match message.serialize()? {
+            Either::Left(text) => Message::text(text),
+            Either::Right(bytes) => Message::binary(bytes),
+        };
+
+        let mut write_lock = self.write.write().await;
+        if let Some(ref mut write_half) = *write_lock {
+            write_half.send(serialized).await?;
+        }
 
         Ok(())
     }

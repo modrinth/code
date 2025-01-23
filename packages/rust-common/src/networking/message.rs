@@ -3,7 +3,7 @@ use crate::users::UserStatus;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ClientToServerMessage {
     StatusUpdate {
@@ -21,7 +21,7 @@ pub enum ClientToServerMessage {
     },
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ServerToClientMessage {
     StatusUpdate {

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 #[serde(into = "Base62Id")]
 pub struct UserId(pub u64);
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UserStatus {
     pub user_id: UserId,
     pub profile_name: Option<String>,

@@ -6771,7 +6771,6 @@ dependencies = [
 name = "rust-common"
 version = "0.1.0"
 dependencies = [
- "actix-ws",
  "chrono",
  "either",
  "rand 0.8.5",

@@ -1,2 +1,2 @@
 pub mod message;
-pub mod wire;
+pub mod serialization;
