@@ -162,8 +162,9 @@ impl FriendsSocket {
                                                 let _ = emit_friend(FriendPayload::FriendRequest { from }).await;
                                             }
                                             ServerToClientMessage::FriendRequestRejected { .. } => todo!(),
-                                            ServerToClientMessage::SocketOpened { .. } => todo!(),
-                                            ServerToClientMessage::SocketClosed { .. } => todo!(),
+
+                                            ServerToClientMessage::SocketConnected { .. } => todo!(),
+                                            ServerToClientMessage::SocketDisconnected { .. } => todo!(),
                                             ServerToClientMessage::FriendSocketOpened { .. } => todo!(),
                                             ServerToClientMessage::SocketData { .. } => todo!(),
                                         }

@@ -10,7 +10,9 @@ pub enum ClientToServerMessage {
         profile_name: Option<String>,
     },
 
-    SocketOpen,
+    SocketOpen {
+        socket: Uuid,
+    },
     SocketClose {
         socket: Uuid,
     },
@@ -40,10 +42,11 @@ pub enum ServerToClientMessage {
         from: UserId,
     },
 
-    SocketOpened {
-        socket: Uuid,
+    SocketConnected {
+        to_socket: Uuid,
+        new_socket: Uuid,
     },
-    SocketClosed {
+    SocketDisconnected {
         socket: Uuid,
     },
     FriendSocketOpened {

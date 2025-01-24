@@ -184,9 +184,10 @@ pub async fn ws_init(
                         .await;
                     }
                 }
-                ClientToServerMessage::SocketOpen
-                | ClientToServerMessage::SocketClose { .. }
-                | ClientToServerMessage::SocketSend { .. } => todo!(),
+
+                ClientToServerMessage::SocketOpen { .. } => todo!(),
+                ClientToServerMessage::SocketClose { .. } => todo!(),
+                ClientToServerMessage::SocketSend { .. } => todo!(),
             }
         }
 

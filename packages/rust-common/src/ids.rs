@@ -136,6 +136,13 @@ pub mod base62_impl {
                     formatter.write_str("a base62 string id")
                 }
 
+                fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
+                where
+                    E: de::Error,
+                {
+                    Ok(Base62Id(v))
+                }
+
                 fn visit_str<E>(self, string: &str) -> Result<Base62Id, E>
                 where
                     E: de::Error,
@@ -144,7 +151,11 @@ pub mod base62_impl {
                 }
             }
 
-            deserializer.deserialize_str(Base62Visitor)
+            if deserializer.is_human_readable() {
+                deserializer.deserialize_str(Base62Visitor)
+            } else {
+                deserializer.deserialize_u64(Base62Visitor)
+            }
         }
     }
 
@@ -153,7 +164,11 @@ pub mod base62_impl {
         where
             S: Serializer,
         {
-            serializer.serialize_str(&to_base62(self.0))
+            if serializer.is_human_readable() {
+                serializer.serialize_str(&to_base62(self.0))
+            } else {
+                serializer.serialize_u64(self.0)
+            }
         }
     }
 
