@@ -4,7 +4,7 @@ use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
 use crate::queue::session::AuthQueue;
-use crate::queue::socket::ActiveSockets;
+use crate::queue::socket::{ActiveSocket, ActiveSockets};
 use crate::routes::internal::statuses::close_socket;
 use crate::routes::ApiError;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
@@ -77,12 +77,14 @@ pub async fn add_friend(
                 friend_id: UserId,
                 sockets: &ActiveSockets,
             ) -> Result<(), ApiError> {
-                if let Some(pair) = sockets.auth_sockets.get(&user_id.into()) {
-                    let (friend_status, _) = pair.value();
-                    if let Some(socket) =
-                        sockets.auth_sockets.get(&friend_id.into())
+                if let Some(pair) = sockets.sockets.get(&user_id.into()) {
+                    let ActiveSocket {
+                        status: friend_status,
+                        ..
+                    } = pair.value();
+                    if let Some(socket) = sockets.sockets.get(&friend_id.into())
                     {
-                        let (_, socket) = socket.value();
+                        let ActiveSocket { socket, .. } = socket.value();
 
                         let _ = socket
                             .clone()
@@ -122,8 +124,8 @@ pub async fn add_friend(
             .insert(&mut transaction)
             .await?;
 
-            if let Some(socket) = db.auth_sockets.get(&friend.id.into()) {
-                let (_, socket) = socket.value();
+            if let Some(socket) = db.sockets.get(&friend.id.into()) {
+                let ActiveSocket { socket, .. } = socket.value();
 
                 if socket
                     .clone()
@@ -179,8 +181,8 @@ pub async fn remove_friend(
         )
         .await?;
 
-        if let Some(socket) = db.auth_sockets.get(&friend.id.into()) {
-            let (_, socket) = socket.value();
+        if let Some(socket) = db.sockets.get(&friend.id.into()) {
+            let ActiveSocket { socket, .. } = socket.value();
 
             let _ = socket
                 .clone()

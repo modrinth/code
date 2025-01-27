@@ -4,13 +4,27 @@ use actix_ws::Session;
 use dashmap::DashMap;
 
 pub struct ActiveSockets {
-    pub auth_sockets: DashMap<UserId, (UserStatus, Session)>,
+    pub sockets: DashMap<UserId, ActiveSocket>,
 }
 
 impl Default for ActiveSockets {
     fn default() -> Self {
         Self {
-            auth_sockets: DashMap::new(),
+            sockets: DashMap::new(),
+        }
+    }
+}
+
+pub struct ActiveSocket {
+    pub status: UserStatus,
+    pub socket: Session,
+}
+
+impl ActiveSocket {
+    pub fn new(status: UserStatus, session: Session) -> Self {
+        Self {
+            status,
+            socket: session,
         }
     }
 }

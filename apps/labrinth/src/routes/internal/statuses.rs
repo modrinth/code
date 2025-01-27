@@ -5,7 +5,7 @@ use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
-use crate::queue::socket::ActiveSockets;
+use crate::queue::socket::{ActiveSocket, ActiveSockets};
 use crate::routes::ApiError;
 use actix_web::web::{Data, Payload};
 use actix_web::{get, web, HttpRequest, HttpResponse};
@@ -60,8 +60,9 @@ pub async fn ws_init(
 
     let user = User::from_full(db_user);
 
-    if let Some((_, (_, session))) = db.auth_sockets.remove(&user.id) {
-        let _ = session.close(None).await;
+    if let Some((_, ActiveSocket { socket, .. })) = db.sockets.remove(&user.id)
+    {
+        let _ = socket.close(None).await;
     }
 
     let (res, mut session, msg_stream) = match actix_ws::handle(&req, body) {
@@ -83,7 +84,7 @@ pub async fn ws_init(
         friends
             .iter()
             .filter_map(|x| {
-                db.auth_sockets.get(
+                db.sockets.get(
                     &if x.user_id == user.id.into() {
                         x.friend_id
                     } else {
@@ -92,7 +93,7 @@ pub async fn ws_init(
                     .into(),
                 )
             })
-            .map(|x| x.value().0.clone())
+            .map(|x| x.value().status.clone())
             .collect::<Vec<_>>()
     } else {
         Vec::new()
@@ -106,7 +107,8 @@ pub async fn ws_init(
         )?)
         .await;
 
-    db.auth_sockets.insert(user.id, (status.clone(), session));
+    db.sockets
+        .insert(user.id, ActiveSocket::new(status.clone(), session));
 
     broadcast_friends(
         user.id,
@@ -137,8 +139,8 @@ pub async fn ws_init(
                 }
 
                 Ok(Message::Ping(msg)) => {
-                    if let Some(socket) = db.auth_sockets.get(&user.id) {
-                        let (_, socket) = socket.value();
+                    if let Some(socket) = db.sockets.get(&user.id) {
+                        let ActiveSocket { socket, .. } = socket.value();
                         let _ = socket.clone().pong(&msg).await;
                     }
                     continue;
@@ -153,8 +155,8 @@ pub async fn ws_init(
 
             match message.unwrap() {
                 ClientToServerMessage::StatusUpdate { profile_name } => {
-                    if let Some(mut pair) = db.auth_sockets.get_mut(&user.id) {
-                        let (status, _) = pair.value_mut();
+                    if let Some(mut pair) = db.sockets.get_mut(&user.id) {
+                        let ActiveSocket { status, .. } = pair.value_mut();
 
                         if status
                             .profile_name
@@ -219,8 +221,8 @@ pub async fn broadcast_friends(
         };
 
         if friend.accepted {
-            if let Some(socket) = sockets.auth_sockets.get(&friend_id.into()) {
-                let (_, socket) = socket.value();
+            if let Some(socket) = sockets.sockets.get(&friend_id.into()) {
+                let ActiveSocket { socket, .. } = socket.value();
 
                 // FIXME Probably shouldn't swallow sending errors
                 let _ = match message.serialize() {
@@ -242,7 +244,8 @@ pub async fn close_socket(
     pool: &PgPool,
     sockets: &ActiveSockets,
 ) -> Result<(), crate::database::models::DatabaseError> {
-    if let Some((_, (_, socket))) = sockets.auth_sockets.remove(&id) {
+    if let Some((_, ActiveSocket { socket, .. })) = sockets.sockets.remove(&id)
+    {
         let _ = socket.close(None).await;
 
         broadcast_friends(
