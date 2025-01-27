@@ -156,7 +156,7 @@ pub struct NewOAuthApp {
 }
 
 #[post("app")]
-pub async fn oauth_client_create<'a>(
+pub async fn oauth_client_create(
     req: HttpRequest,
     new_oauth_app: web::Json<NewOAuthApp>,
     pool: web::Data<PgPool>,
@@ -217,7 +217,7 @@ pub async fn oauth_client_create<'a>(
 }
 
 #[delete("app/{id}")]
-pub async fn oauth_client_delete<'a>(
+pub async fn oauth_client_delete(
     req: HttpRequest,
     client_id: web::Path<ApiOAuthClientId>,
     pool: web::Data<PgPool>,

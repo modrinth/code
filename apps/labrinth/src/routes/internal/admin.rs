@@ -189,7 +189,7 @@ pub struct DelphiIngest {
     pub url: String,
     pub project_id: crate::models::ids::ProjectId,
     pub version_id: crate::models::ids::VersionId,
-    pub issues: Vec<String>,
+    pub issues: HashMap<String, HashMap<String, String>>,
 }
 
 #[post("/_delphi", guard = "admin_key_guard")]
@@ -218,29 +218,41 @@ pub async fn delphi_result_ingest(
         ))
     })?;
 
+    let mut header = format!("Suspicious traces found at {}", body.url);
+
+    for (issue, trace) in &body.issues {
+        for (path, code) in trace {
+            header.push_str(&format!(
+                "\n issue {issue} found at file {}: \n ```\n{}\n```",
+                path, code
+            ));
+        }
+    }
+
     crate::util::webhook::send_slack_webhook(
         body.project_id,
         &pool,
         &redis,
         webhook_url,
-        Some(format!(
-            "Suspicious traces found at {}. Traces: {}",
-            body.url,
-            body.issues.join(", ")
-        )),
+        Some(header),
     )
     .await
     .ok();
+
+    let mut thread_header = format!("Suspicious traces found at [version {}](https://modrinth.com/project/{}/version/{})", body.version_id, body.project_id, body.version_id);
+
+    for (issue, trace) in &body.issues {
+        for path in trace.keys() {
+            thread_header
+                .push_str(&format!("\n issue {issue} found at file {}", path));
+        }
+    }
 
     let mut transaction = pool.begin().await?;
     ThreadMessageBuilder {
         author_id: Some(crate::database::models::UserId(AUTOMOD_ID)),
         body: MessageBody::Text {
-            body: format!(
-                "WSR; Suspicious traces found for version_id {}. Traces: {}",
-                body.version_id,
-                body.issues.join(", ")
-            ),
+            body: thread_header,
             private: true,
             replying_to: None,
             associated_images: vec![],

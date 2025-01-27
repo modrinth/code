@@ -83,12 +83,18 @@ pub async fn products(
     Ok(HttpResponse::Ok().json(products))
 }
 
+#[derive(Deserialize)]
+struct SubscriptionsQuery {
+    pub user_id: Option<crate::models::ids::UserId>,
+}
+
 #[get("subscriptions")]
 pub async fn subscriptions(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    query: web::Query<SubscriptionsQuery>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -102,7 +108,18 @@ pub async fn subscriptions(
 
     let subscriptions =
         user_subscription_item::UserSubscriptionItem::get_all_user(
-            user.id.into(),
+            if let Some(user_id) = query.user_id {
+                if user.role.is_admin() {
+                    user_id.into()
+                } else {
+                    return Err(ApiError::InvalidInput(
+                        "You cannot see the subscriptions of other users!"
+                            .to_string(),
+                    ));
+                }
+            } else {
+                user.id.into()
+            },
             &**pool,
         )
         .await?
@@ -573,12 +590,18 @@ pub async fn user_customer(
     Ok(HttpResponse::Ok().json(customer))
 }
 
+#[derive(Deserialize)]
+pub struct ChargesQuery {
+    pub user_id: Option<crate::models::ids::UserId>,
+}
+
 #[get("payments")]
 pub async fn charges(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    query: web::Query<ChargesQuery>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -592,7 +615,18 @@ pub async fn charges(
 
     let charges =
         crate::database::models::charge_item::ChargeItem::get_from_user(
-            user.id.into(),
+            if let Some(user_id) = query.user_id {
+                if user.role.is_admin() {
+                    user_id.into()
+                } else {
+                    return Err(ApiError::InvalidInput(
+                        "You cannot see the subscriptions of other users!"
+                            .to_string(),
+                    ));
+                }
+            } else {
+                user.id.into()
+            },
             &**pool,
         )
         .await?;
@@ -604,7 +638,7 @@ pub async fn charges(
                 id: x.id.into(),
                 user_id: x.user_id.into(),
                 price_id: x.price_id.into(),
-                amount: x.amount as u64,
+                amount: x.amount,
                 currency_code: x.currency_code,
                 status: x.status,
                 due: x.due,
@@ -613,6 +647,8 @@ pub async fn charges(
                 subscription_id: x.subscription_id.map(|x| x.into()),
                 subscription_interval: x.subscription_interval,
                 platform: x.payment_platform,
+                parent_charge_id: x.parent_charge_id.map(|x| x.into()),
+                net: if user.role.is_admin() { x.net } else { None },
             })
             .collect::<Vec<_>>(),
     ))
@@ -880,11 +916,11 @@ pub async fn active_servers(
 ) -> Result<HttpResponse, ApiError> {
     let master_key = dotenvy::var("PYRO_API_KEY")?;
 
-    if !req
+    if req
         .head()
         .headers()
         .get("X-Master-Key")
-        .map_or(false, |it| it.as_bytes() == master_key.as_bytes())
+        .is_none_or(|it| it.as_bytes() != master_key.as_bytes())
     {
         return Err(ApiError::CustomAuthentication(
             "Invalid master key".to_string(),

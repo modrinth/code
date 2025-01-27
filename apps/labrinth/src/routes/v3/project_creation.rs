@@ -86,8 +86,6 @@ pub enum CreateError {
     CustomAuthenticationError(String),
     #[error("Image Parsing Error: {0}")]
     ImageError(#[from] ImageError),
-    #[error("Reroute Error: {0}")]
-    RerouteError(#[from] reqwest::Error),
 }
 
 impl actix_web::ResponseError for CreateError {
@@ -119,7 +117,6 @@ impl actix_web::ResponseError for CreateError {
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
-            CreateError::RerouteError(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -146,7 +143,6 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::ValidationError(..) => "invalid_input",
                 CreateError::FileValidationError(..) => "invalid_input",
                 CreateError::ImageError(..) => "invalid_image",
-                CreateError::RerouteError(..) => "reroute_error",
             },
             description: self.to_string(),
         })

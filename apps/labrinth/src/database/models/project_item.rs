@@ -595,12 +595,12 @@ impl Project {
                                 version_id: VersionId(m.version_id),
                                 field_id: LoaderFieldId(m.field_id),
                                 int_value: m.int_value,
-                                enum_value: m.enum_value.map(LoaderFieldEnumValueId),
+                                enum_value: if m.enum_value == -1  { None } else { Some(LoaderFieldEnumValueId(m.enum_value)) },
                                 string_value: m.string_value,
                             };
 
-                            if let Some(enum_value) = m.enum_value {
-                                loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(enum_value));
+                            if m.enum_value != -1 {
+                                loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(m.enum_value));
                             }
 
                             acc.entry(ProjectId(m.mod_id)).or_default().push(qvf);
