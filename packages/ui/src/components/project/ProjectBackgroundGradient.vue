@@ -1,5 +1,5 @@
 <template>
-  <div :style="{ '--_accent-color': rgbToOklchHue(props.project.color) }" />
+  <div :style="{ '--_accent-color': color }" />
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -15,12 +15,14 @@ const props = withDefaults(
   {},
 )
 
+const color = computed(() => rgbToOklchHue(props.project.color))
+
 </script>
 <style scoped lang="scss">
 div {
   width: 100%;
   height: 60rem;
-  background: linear-gradient(to bottom, oklch(40% 10% var(--_accent-color) / 25%), transparent);
+  background: linear-gradient(to bottom, oklch(40% 30% var(--_accent-color) / 10%), transparent);
   opacity: 1;
 }
 </style>

@@ -121,154 +121,161 @@
         </UserHeader>
       </div>
       <div class="normal-page__content">
-        <div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
-          <NavTabs :links="navLinks" />
-        </div>
-        <div v-if="projects.length > 0">
-          <ProjectsList :projects="projects" :project-link="(project) => `/project/${project.id}`">
-            <template #project-actions>
-              <ButtonStyled color="brand">
-                <button><DownloadIcon /> Install</button>
-              </ButtonStyled>
-              <ButtonStyled circular>
-                <button v-tooltip="'Follow'">
-                  <HeartIcon />
-                </button>
-              </ButtonStyled>
-              <ButtonStyled circular>
-                <button v-tooltip="'Save'">
-                  <BookmarkIcon />
-                </button>
-              </ButtonStyled>
-              <ButtonStyled circular type="transparent">
-                <button>
-                  <MoreVerticalIcon />
-                </button>
-              </ButtonStyled>
-            </template>
-          </ProjectsList>
-
-          <div
-            v-if="route.params.projectType !== 'collections'"
-            :class="'project-list display-mode--' + cosmetics.searchDisplayMode.user"
-          >
-            <ProjectCard
-              v-for="project in (route.params.projectType !== undefined
-                ? projects.filter(
-                    (x) =>
-                      x.project_type ===
-                      route.params.projectType.substr(0, route.params.projectType.length - 1),
-                  )
-                : projects
-              )
-                .slice()
-                .sort((a, b) => b.downloads - a.downloads)"
-              :id="project.slug || project.id"
-              :key="project.id"
-              :name="project.title"
-              :display="cosmetics.searchDisplayMode.user"
-              :featured-image="project.gallery.find((element) => element.featured)?.url"
-              :description="project.description"
-              :created-at="project.published"
-              :updated-at="project.updated"
-              :downloads="project.downloads.toString()"
-              :follows="project.followers.toString()"
-              :icon-url="project.icon_url"
-              :categories="project.categories"
-              :client-side="project.client_side"
-              :server-side="project.server_side"
-              :status="
-                auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
-                  ? project.status
-                  : null
-              "
-              :type="project.project_type"
-              :color="project.color"
-            />
+        <ProjectsList
+          v-if="flags.newProjectListUserPage"
+          :projects="projects.filter((x) => x.status === 'approved' || x.status === 'archived')"
+          :project-link="(project) => `/project/${project.id}`"
+          :experimental-colors="flags.projectCardBackground"
+        >
+          <template #project-actions>
+            <ButtonStyled color="brand">
+              <button><DownloadIcon /> Install</button>
+            </ButtonStyled>
+            <ButtonStyled circular>
+              <button v-tooltip="'Follow'">
+                <HeartIcon />
+              </button>
+            </ButtonStyled>
+            <ButtonStyled circular>
+              <button v-tooltip="'Save'">
+                <BookmarkIcon />
+              </button>
+            </ButtonStyled>
+            <ButtonStyled circular type="transparent">
+              <button>
+                <MoreVerticalIcon />
+              </button>
+            </ButtonStyled>
+          </template>
+        </ProjectsList>
+        <template v-else>
+          <div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
+            <NavTabs :links="navLinks" />
           </div>
-        </div>
-        <div v-else-if="route.params.projectType !== 'collections'" class="error">
-          <UpToDate class="icon" /><br />
-          <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
-            <IntlFormatted :message-id="messages.profileNoProjectsAuthLabel">
-              <template #create-link="{ children }">
-                <a class="link" @click.prevent="$refs.modal_creation.show()">
-                  <component :is="() => children" />
-                </a>
-              </template>
-            </IntlFormatted>
-          </span>
-          <span v-else class="text">{{ formatMessage(messages.profileNoProjectsLabel) }}</span>
-        </div>
-        <div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
-          <nuxt-link
-            v-for="collection in collections.sort(
+          <div v-if="projects.length > 0">
+            <div
+              v-if="route.params.projectType !== 'collections'"
+              :class="'project-list display-mode--' + cosmetics.searchDisplayMode.user"
+            >
+              <ProjectCard
+                v-for="project in (route.params.projectType !== undefined
+                  ? projects.filter(
+                      (x) =>
+                        x.project_type ===
+                        route.params.projectType.substr(0, route.params.projectType.length - 1),
+                    )
+                  : projects
+                )
+                  .slice()
+                  .sort((a, b) => b.downloads - a.downloads)"
+                :id="project.slug || project.id"
+                :key="project.id"
+                :name="project.title"
+                :display="cosmetics.searchDisplayMode.user"
+                :featured-image="project.gallery.find((element) => element.featured)?.url"
+                :description="project.description"
+                :created-at="project.published"
+                :updated-at="project.updated"
+                :downloads="project.downloads.toString()"
+                :follows="project.followers.toString()"
+                :icon-url="project.icon_url"
+                :categories="project.categories"
+                :client-side="project.client_side"
+                :server-side="project.server_side"
+                :status="
+                  auth.user &&
+                  (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
+                    ? project.status
+                    : null
+                "
+                :type="project.project_type"
+                :color="project.color"
+              />
+            </div>
+          </div>
+          <div v-else-if="route.params.projectType !== 'collections'" class="error">
+            <UpToDate class="icon" /><br />
+            <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
+              <IntlFormatted :message-id="messages.profileNoProjectsAuthLabel">
+                <template #create-link="{ children }">
+                  <a class="link" @click.prevent="$refs.modal_creation.show()">
+                    <component :is="() => children" />
+                  </a>
+                </template>
+              </IntlFormatted>
+            </span>
+            <span v-else class="text">{{ formatMessage(messages.profileNoProjectsLabel) }}</span>
+          </div>
+          <div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
+            <nuxt-link
+              v-for="collection in collections.sort(
               (a, b) => new Date(b.created) - new Date(a.created),
             )"
-            :key="collection.id"
-            :to="`/collection/${collection.id}`"
-            class="card collection-item"
-          >
-            <div class="collection">
-              <Avatar :src="collection.icon_url" class="icon" />
-              <div class="details">
-                <h2 class="title">{{ collection.name }}</h2>
-                <div class="stats">
-                  <LibraryIcon aria-hidden="true" />
-                  Collection
+              :key="collection.id"
+              :to="`/collection/${collection.id}`"
+              class="card collection-item"
+            >
+              <div class="collection">
+                <Avatar :src="collection.icon_url" class="icon" />
+                <div class="details">
+                  <h2 class="title">{{ collection.name }}</h2>
+                  <div class="stats">
+                    <LibraryIcon aria-hidden="true" />
+                    Collection
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="description">
-              {{ collection.description }}
-            </div>
-            <div class="stat-bar">
-              <div class="stats">
+              <div class="description">
+                {{ collection.description }}
+              </div>
+              <div class="stat-bar">
+                <div class="stats">
                 <BoxIcon />
                 {{
                   `${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? "s" : ""}`
                 }}
               </div>
-              <div class="stats">
-                <template v-if="collection.status === 'listed'">
-                  <WorldIcon />
-                  <span> Public </span>
-                </template>
-                <template v-else-if="collection.status === 'unlisted'">
-                  <LinkIcon />
-                  <span> Unlisted </span>
-                </template>
-                <template v-else-if="collection.status === 'private'">
-                  <LockIcon />
-                  <span> Private </span>
-                </template>
-                <template v-else-if="collection.status === 'rejected'">
-                  <XIcon />
-                  <span> Rejected </span>
-                </template>
+                <div class="stats">
+                  <template v-if="collection.status === 'listed'">
+                    <WorldIcon />
+                    <span> Public </span>
+                  </template>
+                  <template v-else-if="collection.status === 'unlisted'">
+                    <LinkIcon />
+                    <span> Unlisted </span>
+                  </template>
+                  <template v-else-if="collection.status === 'private'">
+                    <LockIcon />
+                    <span> Private </span>
+                  </template>
+                  <template v-else-if="collection.status === 'rejected'">
+                    <XIcon />
+                    <span> Rejected </span>
+                  </template>
+                </div>
               </div>
-            </div>
-          </nuxt-link>
-        </div>
-        <div
-          v-if="route.params.projectType === 'collections' && collections.length === 0"
-          class="error"
-        >
-          <UpToDate class="icon" /><br />
-          <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
-            <IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
-              <template #create-link="{ children }">
-                <a
-                  class="link"
-                  @click.prevent="(event) => $refs.modal_collection_creation.show(event)"
-                >
-                  <component :is="() => children" />
-                </a>
-              </template>
-            </IntlFormatted>
-          </span>
-          <span v-else class="text">{{ formatMessage(messages.profileNoCollectionsLabel) }}</span>
-        </div>
+            </nuxt-link>
+          </div>
+          <div
+            v-if="route.params.projectType === 'collections' && collections.length === 0"
+            class="error"
+          >
+            <UpToDate class="icon" /><br />
+            <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
+              <IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
+                <template #create-link="{ children }">
+                  <a
+                    class="link"
+                    @click.prevent="(event) => $refs.modal_collection_creation.show(event)"
+                  >
+                    <component :is="() => children" />
+                  </a>
+                </template>
+              </IntlFormatted>
+            </span>
+            <span v-else class="text">{{ formatMessage(messages.profileNoCollectionsLabel) }}</span>
+          </div>
+        </template>
       </div>
       <div class="normal-page__sidebar">
         <UserSidebarOrganizations
@@ -279,6 +286,11 @@
         <UserSidebarBadges
           :user="user"
           :download-count="sumDownloads"
+          class="card flex-card experimental-styles-within"
+        />
+        <UserSidebarCollections
+          :collections="collections.filter((x) => x.status === 'listed')"
+          :link="(collection) => `/collection/${collection.id}`"
           class="card flex-card experimental-styles-within"
         />
         <AdPlaceholder
@@ -313,6 +325,7 @@ import {
   UserSidebarBadges,
   UserSidebarOrganizations,
   ProjectsList,
+  UserSidebarCollections,
 } from "@modrinth/ui";
 import { isStaff } from "~/helpers/users.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
