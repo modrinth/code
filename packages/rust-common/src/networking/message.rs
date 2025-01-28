@@ -46,10 +46,14 @@ pub enum ServerToClientMessage {
         from: UserId,
     },
 
-    FriendSocketOpened {
+    FriendSocketListening {
         user: UserId,
         socket: Uuid,
     },
+    FriendSocketStoppedListening {
+        socket: Uuid,
+    },
+
     SocketConnected {
         to_socket: Uuid,
         new_socket: Uuid,

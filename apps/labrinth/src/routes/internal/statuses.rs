@@ -206,7 +206,7 @@ pub async fn ws_init(
                     active_socket.owned_tunnel_sockets.insert(socket);
                     let _ = broadcast_friends(
                         user.id,
-                        ServerToClientMessage::FriendSocketOpened {
+                        ServerToClientMessage::FriendSocketListening {
                             user: user.id,
                             socket,
                         },
@@ -228,6 +228,12 @@ pub async fn ws_init(
                     else {
                         continue;
                     };
+                    if !matches!(
+                        other_tunnel.socket_type,
+                        TunnelSocketType::Listening
+                    ) {
+                        continue;
+                    }
                     let Some(other_user) = db.sockets.get(&other_tunnel.owner)
                     else {
                         continue;
@@ -276,7 +282,7 @@ pub async fn ws_init(
                         TunnelSocketType::Listening => {
                             let _ = broadcast_friends(
                                 user.id,
-                                ServerToClientMessage::SocketClosed { socket },
+                                ServerToClientMessage::FriendSocketStoppedListening { socket },
                                 &pool,
                                 &db,
                                 None,
