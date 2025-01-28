@@ -24,7 +24,8 @@ use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::ops::Deref;
 use std::sync::Arc;
-use tokio::io::AsyncWriteExt;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::net::tcp::OwnedReadHalf;
 use tokio::net::TcpStream;
 use tokio::sync::{Mutex, RwLock};
 use uuid::Uuid;
@@ -180,7 +181,9 @@ impl FriendsSocket {
                                                 if let Some(connected_to) = sockets.get(&to_socket) {
                                                     if let InternalTunnelSocket::Listening(local_addr) = *connected_to.value().clone() {
                                                         if let Ok(new_stream) = TcpStream::connect(local_addr).await {
-                                                            sockets.insert(new_socket, Arc::new(InternalTunnelSocket::Connected(Mutex::new(new_stream))));
+                                                            let (read, write) = new_stream.into_split();
+                                                            sockets.insert(new_socket, Arc::new(InternalTunnelSocket::Connected(Mutex::new(write))));
+                                                            Self::socket_read_loop(write_handle.clone(), read, new_socket);
                                                             continue;
                                                         }
                                                     }
@@ -380,8 +383,9 @@ impl FriendsSocket {
         stream: TcpStream,
     ) -> crate::Result<TunnelSocket> {
         let socket_id = Uuid::new_v4();
+        let (read, write) = stream.into_split();
         let socket = self.tunnel_sockets.entry(socket_id).insert(Arc::new(
-            InternalTunnelSocket::Connected(Mutex::new(stream)),
+            InternalTunnelSocket::Connected(Mutex::new(write)),
         ));
         Self::send_message(
             &self.write,
@@ -391,6 +395,7 @@ impl FriendsSocket {
             },
         )
         .await?;
+        Self::socket_read_loop(self.write.clone(), read, socket_id);
         self.create_tunnel_socket(socket_id, socket)
     }
 
@@ -405,6 +410,31 @@ impl FriendsSocket {
             sockets: self.tunnel_sockets.clone(),
             internal: socket.clone(),
         })
+    }
+
+    fn socket_read_loop(
+        write: WriteSocket,
+        mut read_half: OwnedReadHalf,
+        socket_id: Uuid,
+    ) {
+        tokio::spawn(async move {
+            let mut read_buffer = [0u8; 8192];
+            loop {
+                match read_half.read(&mut read_buffer).await {
+                    Ok(0) | Err(_) => break,
+                    Ok(n) => {
+                        let _ = Self::send_message(
+                            &write,
+                            ClientToServerMessage::SocketSend {
+                                socket: socket_id,
+                                data: read_buffer[..n].to_vec(),
+                            },
+                        )
+                        .await;
+                    }
+                };
+            }
+        });
     }
 
     #[tracing::instrument(skip(write))]

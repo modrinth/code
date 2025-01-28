@@ -4,13 +4,13 @@ use rust_common::networking::message::ClientToServerMessage;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::io::AsyncWriteExt;
-use tokio::net::TcpStream;
+use tokio::net::tcp::OwnedWriteHalf;
 use tokio::sync::Mutex;
 use uuid::Uuid;
 
 pub(super) enum InternalTunnelSocket {
     Listening(SocketAddr),
-    Connected(Mutex<TcpStream>),
+    Connected(Mutex<OwnedWriteHalf>),
 }
 
 pub struct TunnelSocket {

@@ -82,7 +82,7 @@ async fn main_client() -> theseus::Result<()> {
         .expect("Expected second CLI arg to be socket ID")
         .parse::<Uuid>()?;
 
-    tracing::info!("Listening on port 25565 to connect to {socket_id}");
+    tracing::info!("Listening on port 25585 to connect to {socket_id}");
     let tcp_stream =
         TcpListener::bind(SocketAddr::new("127.0.0.1".parse().unwrap(), 25585))
             .await?
