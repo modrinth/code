@@ -51,7 +51,7 @@ pub enum ServerToClientMessage {
         socket: Uuid,
     },
     FriendSocketStoppedListening {
-        socket: Uuid,
+        user: UserId,
     },
 
     SocketConnected {

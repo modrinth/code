@@ -3,9 +3,12 @@
     windows_subsystem = "windows"
 )]
 
+use std::env::args;
+use std::net::SocketAddr;
 use theseus::prelude::*;
-
-use theseus::profile::create::profile_create;
+use tokio::net::TcpListener;
+use tokio::signal::ctrl_c;
+use uuid::Uuid;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -41,54 +44,61 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
-    if minecraft_auth::users().await?.is_empty() {
-        println!("No users found, authenticating.");
-        authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
-    }
-    //
-    // st.settings
-    //     .write()
-    //     .await
-    //     .java_globals
-    //     .insert(JAVA_8_KEY.to_string(), check_jre(path).await?.unwrap());
-    // Clear profiles
-    println!("Clearing profiles.");
-    {
-        let h = profile::list().await?;
-        for profile in h.into_iter() {
-            profile::remove(&profile.path).await?;
-        }
+    // if minecraft_auth::users().await?.is_empty() {
+    //     println!("No users found, authenticating.");
+    //     authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
+    // }
+
+    match args().nth(1).as_deref() {
+        Some("host") => main_host().await?,
+        Some("client") => main_client().await?,
+        Some(other) => tracing::error!(
+            "'host' or 'client' expected as first CLI arg, but found '{other}'"
+        ),
+        None => tracing::error!("Expected first CLI arg 'host' or 'client'"),
     }
 
-    println!("Creating/adding profile.");
+    Ok(())
+}
 
-    let name = "Example".to_string();
-    let game_version = "1.16.1".to_string();
-    let modloader = ModLoader::Forge;
-    let loader_version = "stable".to_string();
+async fn main_host() -> theseus::Result<()> {
+    tracing::info!("Starting host");
 
-    let profile_path = profile_create(
-        name,
-        game_version,
-        modloader,
-        Some(loader_version),
-        None,
-        None,
-        None,
-    )
-    .await?;
+    let socket = State::get().await?.friends_socket.open_port(25565).await?;
+    tracing::info!("Running host on socket {}", socket.socket_id());
 
-    println!("running");
-    // Run a profile, running minecraft and store the RwLock to the process
-    let process = profile::run(&profile_path).await?;
+    ctrl_c().await?;
+    tracing::info!("Stopping host");
+    socket.shutdown().await?;
 
-    println!("Minecraft UUID: {}", process.uuid);
+    Ok(())
+}
 
-    println!("All running process UUID {:?}", process::get_all().await?);
+async fn main_client() -> theseus::Result<()> {
+    tracing::info!("Starting client");
 
-    // hold the lock to the process until it ends
-    println!("Waiting for process to end...");
-    process::wait_for(process.uuid).await?;
+    let socket_id = args()
+        .nth(2)
+        .expect("Expected second CLI arg to be socket ID")
+        .parse::<Uuid>()?;
+
+    tracing::info!("Listening on port 25565 to connect to {socket_id}");
+    let tcp_stream =
+        TcpListener::bind(SocketAddr::new("127.0.0.1".parse().unwrap(), 25585))
+            .await?
+            .accept()
+            .await?
+            .0;
+    tracing::info!("Connecting to {socket_id}");
+    let socket = State::get()
+        .await?
+        .friends_socket
+        .connect_to_socket(socket_id, tcp_stream)
+        .await?;
+
+    ctrl_c().await?;
+    tracing::info!("Stopping client");
+    socket.shutdown().await?;
 
     Ok(())
 }

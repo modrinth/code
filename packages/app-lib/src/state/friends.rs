@@ -2,8 +2,8 @@ use crate::config::{MODRINTH_API_URL_V3, MODRINTH_SOCKET_URL};
 use crate::data::ModrinthCredentials;
 use crate::event::emit::emit_friend;
 use crate::event::FriendPayload;
-use crate::state::tunnel::TunnelSocket;
-use crate::state::{ProcessManager, Profile};
+use crate::state::tunnel::InternalTunnelSocket;
+use crate::state::{ProcessManager, Profile, TunnelSocket};
 use crate::util::fetch::{fetch_advanced, fetch_json, FetchSemaphore};
 use async_tungstenite::tokio::{connect_async, ConnectStream};
 use async_tungstenite::tungstenite::client::IntoClientRequest;
@@ -21,19 +21,22 @@ use rust_common::networking::message::{
 };
 use rust_common::users::{UserId, UserStatus};
 use serde::{Deserialize, Serialize};
+use std::net::SocketAddr;
+use std::ops::Deref;
 use std::sync::Arc;
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
-use tokio::sync::RwLock;
+use tokio::sync::{Mutex, RwLock};
 use uuid::Uuid;
 
-type WriteSocket =
+pub(super) type WriteSocket =
     Arc<RwLock<Option<SplitSink<WebSocketStream<ConnectStream>, Message>>>>;
+pub(super) type TunnelSockets = Arc<DashMap<Uuid, Arc<InternalTunnelSocket>>>;
 
 pub struct FriendsSocket {
     write: WriteSocket,
     user_statuses: Arc<DashMap<UserId, UserStatus>>,
-    tunnel_sockets: Arc<DashMap<Uuid, TunnelSocket>>,
+    tunnel_sockets: TunnelSockets,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -175,26 +178,22 @@ impl FriendsSocket {
 
                                             ServerToClientMessage::SocketConnected { to_socket, new_socket } => {
                                                 if let Some(connected_to) = sockets.get(&to_socket) {
-                                                    if let TunnelSocket::Listening(connected_to) = connected_to.value() {
-                                                        if let Ok(local_addr) = connected_to.local_addr() {
-                                                            if let Ok(new_stream) = TcpStream::connect(local_addr).await {
-                                                                sockets.insert(new_socket, TunnelSocket::Connected(new_stream));
-                                                                continue;
-                                                            }
+                                                    if let InternalTunnelSocket::Listening(local_addr) = *connected_to.value().clone() {
+                                                        if let Ok(new_stream) = TcpStream::connect(local_addr).await {
+                                                            sockets.insert(new_socket, Arc::new(InternalTunnelSocket::Connected(Mutex::new(new_stream))));
+                                                            continue;
                                                         }
                                                     }
                                                 }
                                                 let _ = Self::send_message(&write_handle, ClientToServerMessage::SocketClose { socket: new_socket }).await;
                                             },
                                             ServerToClientMessage::SocketClosed { socket } => {
-                                                if let Some((_, TunnelSocket::Connected(mut stream))) = sockets.remove(&socket) {
-                                                    let _ = stream.shutdown().await;
-                                                }
+                                                sockets.remove_if(&socket, |_, x| matches!(*x.clone(), InternalTunnelSocket::Connected(_)));
                                             },
                                             ServerToClientMessage::SocketData { socket, data } => {
                                                 if let Some(mut socket) = sockets.get_mut(&socket) {
-                                                    if let TunnelSocket::Connected(ref mut stream) = socket.value_mut() {
-                                                        let _ = stream.write_all(&data).await;
+                                                    if let InternalTunnelSocket::Connected(ref stream) = *socket.value_mut().clone() {
+                                                        let _ = stream.lock().await.write_all(&data).await;
                                                     }
                                                 }
                                             },
@@ -358,8 +357,58 @@ impl FriendsSocket {
         Ok(())
     }
 
+    #[tracing::instrument(skip(self))]
+    pub async fn open_port(&self, port: u16) -> crate::Result<TunnelSocket> {
+        let socket_id = Uuid::new_v4();
+        let socket = self.tunnel_sockets.entry(socket_id).insert(Arc::new(
+            InternalTunnelSocket::Listening(SocketAddr::new(
+                "127.0.0.1".parse().unwrap(),
+                port,
+            )),
+        ));
+        Self::send_message(
+            &self.write,
+            ClientToServerMessage::SocketListen { socket: socket_id },
+        )
+        .await?;
+        self.create_tunnel_socket(socket_id, socket)
+    }
+
+    pub async fn connect_to_socket(
+        &self,
+        to_socket: Uuid,
+        stream: TcpStream,
+    ) -> crate::Result<TunnelSocket> {
+        let socket_id = Uuid::new_v4();
+        let socket = self.tunnel_sockets.entry(socket_id).insert(Arc::new(
+            InternalTunnelSocket::Connected(Mutex::new(stream)),
+        ));
+        Self::send_message(
+            &self.write,
+            ClientToServerMessage::SocketConnect {
+                from_socket: socket_id,
+                to_socket,
+            },
+        )
+        .await?;
+        self.create_tunnel_socket(socket_id, socket)
+    }
+
+    fn create_tunnel_socket(
+        &self,
+        socket_id: Uuid,
+        socket: impl Deref<Target = Arc<InternalTunnelSocket>>,
+    ) -> crate::Result<TunnelSocket> {
+        Ok(TunnelSocket {
+            socket_id,
+            write: self.write.clone(),
+            sockets: self.tunnel_sockets.clone(),
+            internal: socket.clone(),
+        })
+    }
+
     #[tracing::instrument(skip(write))]
-    async fn send_message(
+    pub(super) async fn send_message(
         write: &WriteSocket,
         message: ClientToServerMessage,
     ) -> crate::Result<()> {

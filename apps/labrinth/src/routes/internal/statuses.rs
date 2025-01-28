@@ -282,7 +282,7 @@ pub async fn ws_init(
                         TunnelSocketType::Listening => {
                             let _ = broadcast_friends(
                                 user.id,
-                                ServerToClientMessage::FriendSocketStoppedListening { socket },
+                                ServerToClientMessage::FriendSocketStoppedListening { user: user.id },
                                 &pool,
                                 &db,
                                 None,
