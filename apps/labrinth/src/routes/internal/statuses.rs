@@ -128,9 +128,6 @@ pub async fn ws_init(
     let mut stream = msg_stream.into_stream();
 
     actix_web::rt::spawn(async move {
-        let Some(active_socket) = db.sockets.get(&user.id) else {
-            return;
-        };
         // receive messages from websocket
         while let Some(msg) = stream.next().await {
             let message = match msg {
@@ -196,6 +193,9 @@ pub async fn ws_init(
                 }
 
                 ClientToServerMessage::SocketListen { socket } => {
+                    let Some(active_socket) = db.sockets.get(&user.id) else {
+                        return;
+                    };
                     let Vacant(entry) = db.tunnel_sockets.entry(socket) else {
                         continue;
                     };
@@ -220,6 +220,9 @@ pub async fn ws_init(
                     from_socket,
                     to_socket,
                 } => {
+                    let Some(active_socket) = db.sockets.get(&user.id) else {
+                        return;
+                    };
                     let Vacant(entry) = db.tunnel_sockets.entry(from_socket)
                     else {
                         continue;
@@ -266,6 +269,9 @@ pub async fn ws_init(
                     .await;
                 }
                 ClientToServerMessage::SocketClose { socket } => {
+                    let Some(active_socket) = db.sockets.get(&user.id) else {
+                        return;
+                    };
                     if active_socket
                         .owned_tunnel_sockets
                         .remove(&socket)
