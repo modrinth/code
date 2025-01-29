@@ -330,11 +330,11 @@
                 <UploadIcon class="size-4" /> Upload .mrpack file
               </button>
             </ButtonStyled>
-            <DownloadIcon v-if="hasNewerVersion" color="brand">
+            <ButtonStyled v-if="hasNewerVersion" color="brand">
               <button class="!w-full sm:!w-auto" @click="handleUpdateToLatest">
                 <UploadIcon class="size-4" /> Update modpack
               </button>
-            </DownloadIcon>
+            </ButtonStyled>
           </div>
         </div>
         <div v-if="data.upstream" class="contents">

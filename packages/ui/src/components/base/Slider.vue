@@ -41,9 +41,12 @@
     <input
       ref="value"
       :value="currentValue"
-      type="text"
+      type="number"
       class="slider-input"
       :disabled="disabled"
+      :min="min"
+      :max="max"
+      :step="step"
       @change="onInput(($event.target as HTMLInputElement).value)"
     />
   </div>

@@ -80,7 +80,9 @@ impl SearchConfig {
         }
     }
 
-    pub fn make_client(&self) -> Client {
+    pub fn make_client(
+        &self,
+    ) -> Result<Client, meilisearch_sdk::errors::Error> {
         Client::new(self.address.as_str(), Some(self.key.as_str()))
     }
 
@@ -190,7 +192,7 @@ pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
 ) -> Result<SearchResults, SearchError> {
-    let client = Client::new(&*config.address, Some(&*config.key));
+    let client = Client::new(&*config.address, Some(&*config.key))?;
 
     let offset: usize = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
