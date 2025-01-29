@@ -693,6 +693,14 @@ const defaultRanges: RangeObject[] = [
     }),
     timeResolution: 40320,
   },
+  {
+    getLabel: () => "All Time",
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(0),
+      endDate: currentDate,
+    }),
+    timeResolution: 40320,
+  },
 ];
 </script>
 
