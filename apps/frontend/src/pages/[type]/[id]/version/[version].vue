@@ -381,6 +381,7 @@
         />
         <ButtonStyled v-if="isEditing">
           <button
+            class="raised-button"
             :disabled="primaryFile.hashes.sha1 === file.hashes.sha1"
             @click="
               () => {
