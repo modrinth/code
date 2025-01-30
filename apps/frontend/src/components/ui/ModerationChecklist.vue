@@ -847,6 +847,7 @@ async function generateMessage() {
     for (const mod of mods) {
       message.value += `- ${mod}\n`;
     }
+    message.value += "\n";
   }
 
   if (modPackData.value && modPackData.value.length > 0) {
@@ -913,7 +914,7 @@ async function generateMessage() {
       permanentNoMods.length > 0 ||
       unidentifiedMods.length > 0
     ) {
-      message.value += "## Copyrighted Content \n";
+      message.value += "## Copyrighted content \n";
 
       printMods(
         attributeMods,
