@@ -802,6 +802,7 @@
           :reset-members="resetMembers"
           :route="route"
           @on-download="triggerDownloadAnimation"
+          @delete-version="deleteVersion"
         />
       </div>
     </div>
@@ -1449,6 +1450,20 @@ function onDownload(event) {
   setTimeout(() => {
     closeDownloadModal(event);
   }, 400);
+}
+
+async function deleteVersion(id) {
+  if (!id) return;
+
+  startLoading();
+
+  await useBaseFetch(`version/${id}`, {
+    method: "DELETE",
+  });
+
+  versions.value = versions.value.filter((x) => x.id !== id);
+
+  stopLoading();
 }
 
 const navLinks = computed(() => {
