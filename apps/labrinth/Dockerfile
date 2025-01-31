@@ -3,7 +3,7 @@ ENV PKG_CONFIG_ALLOW_CROSS=1
 
 WORKDIR /usr/src/labrinth
 COPY . .
-RUN cargo build --release
+RUN cargo build --release --package labrinth
 
 
 FROM debian:bookworm-slim
@@ -20,8 +20,8 @@ RUN apt-get update \
 RUN update-ca-certificates
 
 COPY --from=build /usr/src/labrinth/target/release/labrinth /labrinth/labrinth
-COPY --from=build /usr/src/labrinth/migrations/* /labrinth/migrations/
-COPY --from=build /usr/src/labrinth/assets /labrinth/assets
+COPY --from=build /usr/src/labrinth/apps/labrinth/migrations/* /labrinth/migrations/
+COPY --from=build /usr/src/labrinth/apps/labrinth/assets /labrinth/assets
 WORKDIR /labrinth
 
 CMD /labrinth/labrinth
