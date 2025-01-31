@@ -235,10 +235,7 @@ impl FriendsSocket {
             let mut last_ping = Utc::now();
 
             loop {
-                let connected = {
-                    let read = state.friends_socket.write.read().await;
-                    read.is_some()
-                };
+                let connected = state.friends_socket.is_connected().await;
 
                 if !connected
                     && Utc::now().signed_duration_since(last_connection)
@@ -397,6 +394,10 @@ impl FriendsSocket {
         .await?;
         Self::socket_read_loop(self.write.clone(), read, socket_id);
         self.create_tunnel_socket(socket_id, socket)
+    }
+
+    pub async fn is_connected(&self) -> bool {
+        self.write.read().await.is_some()
     }
 
     fn create_tunnel_socket(

@@ -44,6 +44,12 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
+    loop {
+        if State::get().await?.friends_socket.is_connected().await {
+            break;
+        }
+    }
+
     // if minecraft_auth::users().await?.is_empty() {
     //     println!("No users found, authenticating.");
     //     authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
