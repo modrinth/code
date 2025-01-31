@@ -35,11 +35,11 @@ jobs:
 #          components: rustfmt, clippy
 #          targets: aarch64-apple-darwin, x86_64-apple-darwin
 
-      - name: Rust setup
+#      - name: Rust setup
 #        if: "!startsWith(matrix.platform, 'macos')"
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
+#        uses: dtolnay/rust-toolchain@stable
+#        with:
+#          components: rustfmt, clippy
 
       - name: Setup rust cache
         uses: actions/cache@v4
