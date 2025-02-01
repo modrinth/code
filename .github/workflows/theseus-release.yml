@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, [self-hosted, Windows], ubuntu-22.04]
+        platform: [macos-latest, [self-hosted, windows], ubuntu-22.04]
 
     runs-on: ${{ matrix.platform }}
 
@@ -127,6 +127,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          DIGICERT_PASSWORD: ${{ secrets.DIGICERT_PASSWORD }}
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v4

@@ -2,7 +2,8 @@
   "bundle": {
     "createUpdaterArtifacts": "v1Compatible",
     "windows": {
-      "certificateThumbprint": "6007d6ed9b1ba057aa29144d58ca3ed89ac4ef94"
+      "certificateThumbprint": "6007d6ed9b1ba057aa29144d58ca3ed89ac4ef94",
+      "signCommand": "jsign --storetype ETOKEN --alg SHA-256 --storepass $env:DIGICERT_PASSWORD --tsurl https://timestamp.digicert.com --name Modrinth\\ App %1"
     }
   },
   "build": {
