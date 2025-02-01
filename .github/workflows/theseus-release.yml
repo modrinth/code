@@ -18,22 +18,22 @@ on:
 
 jobs:
   build:
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        platform: [macos-latest, self-hosted, ubuntu-22.04]
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, [self-hosted, Windows], ubuntu-22.04]
 
-    runs-on: self-hosted
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - uses: actions/checkout@v4
 
-#      - name: Rust setup (mac)
-#        if: startsWith(matrix.platform, 'macos')
-#        uses: dtolnay/rust-toolchain@stable
-#        with:
-#          components: rustfmt, clippy
-#          targets: aarch64-apple-darwin, x86_64-apple-darwin
+      - name: Rust setup (mac)
+        if: startsWith(matrix.platform, 'macos')
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: aarch64-apple-darwin, x86_64-apple-darwin
 
       - name: Rust setup
         if: "!startsWith(matrix.platform, 'macos')"
@@ -95,29 +95,29 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-#      - name: install dependencies (ubuntu only)
-#        if: startsWith(matrix.platform, 'ubuntu')
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev pkg-config libayatana-appindicator3-dev librsvg2-dev
+      - name: install dependencies (ubuntu only)
+        if: startsWith(matrix.platform, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev pkg-config libayatana-appindicator3-dev librsvg2-dev
 
       - name: Install frontend dependencies
         run: pnpm install
 
-#      - name: build app (macos)
-#        run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config "tauri-release.conf.json"
-#        if: startsWith(matrix.platform, 'macos')
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
-#          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-#          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-#          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-#          APPLE_ID: ${{ secrets.APPLE_ID }}
-#          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-#          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-#          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-#          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+      - name: build app (macos)
+        run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config "tauri-release.conf.json"
+        if: startsWith(matrix.platform, 'macos')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: build app
         run: pnpm --filter=@modrinth/app run tauri build --config "tauri-release.conf.json"
