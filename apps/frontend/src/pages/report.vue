@@ -174,17 +174,14 @@
               </RadioButtons>
             </div>
             <div
-              v-if="reportType === 'copyright'"
+              v-if="warnings[reportType]"
               class="flex gap-2 rounded-xl border-2 border-solid border-brand-orange bg-highlight-orange p-4 text-contrast"
             >
               <IssuesIcon class="h-5 w-5 shrink-0 text-orange" />
               <div class="flex flex-col gap-2">
-                <p class="m-0 leading-tight">
-                  {{ formatMessage(messages.reuploadNote1) }}
-                </p>
-                <p class="m-0 leading-tight">
-                  <IntlFormatted :message-id="messages.reuploadNote2">
-                    <template #policy-link="{ children }">
+                <p v-for="warning in warnings[reportType]" class="m-0 leading-tight">
+                  <IntlFormatted :message-id="warning">
+                    <template #copyright-policy-link="{ children }">
                       <nuxt-link class="text-link" :to="`/legal/copyright`">
                         <component :is="() => children" />
                       </nuxt-link>
@@ -249,7 +246,7 @@ import {
   VersionIcon,
 } from "@modrinth/assets";
 import type { User, Version, Report } from "@modrinth/utils";
-import { useVIntl, defineMessages } from "@vintl/vintl";
+import { useVIntl, defineMessages, type MessageDescriptor } from "@vintl/vintl";
 import { useImageUpload } from "~/composables/image-upload.ts";
 
 const tags = useTags();
@@ -464,6 +461,33 @@ const onImageUpload = async (file: File) => {
   return item.url;
 };
 
+const warnings: Record<string, MessageDescriptor[]> = {
+  copyright: [
+    defineMessage({
+      id: "report.note.copyright.1",
+      defaultMessage:
+        "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content.",
+    }),
+    defineMessage({
+      id: "report.note.copyright.2",
+      defaultMessage:
+        "If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <copyright-policy-link>Copyright Policy</copyright-policy-link>.",
+    }),
+  ],
+  malicious: [
+    defineMessage({
+      id: "report.note.malicious.1",
+      defaultMessage:
+        "Reports for malicious or deceptive content must include substantial evidence of the behavior, such as code samples.",
+    }),
+    defineMessage({
+      id: "report.note.malicious.2",
+      defaultMessage:
+        "Summaries from Microsoft Defender, VirusTotal, or AI malware detection are not sufficient forms of evidence and will not be accepted.",
+    }),
+  ],
+};
+
 const messages = defineMessages({
   reportContent: {
     id: "report.report-content",
@@ -539,16 +563,6 @@ const messages = defineMessages({
   couldNotFind: {
     id: "report.could-not-find",
     defaultMessage: "Could not find {item}",
-  },
-  reuploadNote1: {
-    id: "report.reupload-note.1",
-    defaultMessage:
-      "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content.",
-  },
-  reuploadNote2: {
-    id: "report.reupload-note.2",
-    defaultMessage:
-      "If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <policy-link>Copyright Policy</policy-link>.",
   },
   reportBodyTitle: {
     id: "report.body.title",

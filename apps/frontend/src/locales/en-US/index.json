@@ -527,6 +527,18 @@
   "report.not-for.dmca.description": {
     "message": "See our <policy-link>Copyright Policy</policy-link>."
   },
+  "report.note.copyright.1": {
+    "message": "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content."
+  },
+  "report.note.copyright.2": {
+    "message": "If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <copyright-policy-link>Copyright Policy</copyright-policy-link>."
+  },
+  "report.note.malicious.1": {
+    "message": "Reports for malicious or deceptive content must include substantial evidence of the behavior, such as code samples."
+  },
+  "report.note.malicious.2": {
+    "message": "Summaries from Microsoft Defender, VirusTotal, or AI malware detection are not sufficient forms of evidence and will not be accepted."
+  },
   "report.please-report": {
     "message": "Please report:"
   },
@@ -544,12 +556,6 @@
   },
   "report.report-item": {
     "message": "Report {title} to moderators"
-  },
-  "report.reupload-note.1": {
-    "message": "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content."
-  },
-  "report.reupload-note.2": {
-    "message": "If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <policy-link>Copyright Policy</policy-link>."
   },
   "report.submit": {
     "message": "Submit report"
