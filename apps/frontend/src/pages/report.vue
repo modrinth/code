@@ -63,7 +63,20 @@
             <h2 class="m-0 text-lg font-extrabold">{{ formatMessage(messages.formNotFor) }}</h2>
             <div class="text-md flex items-center gap-2 font-semibold text-contrast">
               <XCircleIcon class="h-8 w-8 shrink-0 text-brand-red" />
-              <span>{{ formatMessage(messages.bugReports) }}</span>
+
+              <div class="flex flex-col">
+                <span>{{ formatMessage(messages.bugReports) }}</span>
+                <span v-if="itemIssueTracker" class="text-sm font-medium text-secondary">
+                  <IntlFormatted :message-id="messages.bugReportsDescription">
+                    <template #issues-link="{ children }">
+                      <a class="text-link" :href="itemIssueTracker" target="_blank">
+                        <component :is="() => children" />
+                        <ExternalIcon aria-hidden="true" class="mb-1 ml-1 h-2.5 w-2.5" />
+                      </a>
+                    </template>
+                  </IntlFormatted>
+                </span>
+              </div>
             </div>
             <div class="text-md flex items-center gap-2 font-semibold text-contrast">
               <XCircleIcon class="h-8 w-8 shrink-0 text-brand-red" />
@@ -238,6 +251,7 @@ import {
   AutoLink,
 } from "@modrinth/ui";
 import {
+  ExternalIcon,
   LeftArrowIcon,
   RightArrowIcon,
   CheckIcon,
@@ -289,6 +303,7 @@ const itemIcon = ref<string | Component | undefined>();
 const itemName = ref<string | undefined>();
 const itemLink = ref<string | undefined>();
 const itemId = ref<string | undefined>();
+const itemIssueTracker = ref<string | undefined>();
 
 const reports = ref<Report[]>([]);
 const existingReport = computed(() =>
@@ -319,6 +334,7 @@ async function fetchItem() {
     itemName.value = undefined;
     itemLink.value = undefined;
     itemId.value = undefined;
+    itemIssueTracker.value = undefined;
     try {
       if (reportItem.value === "project") {
         const project = (await useBaseFetch(`project/${reportItemID.value}`)) as Project;
@@ -328,6 +344,7 @@ async function fetchItem() {
         itemName.value = project.title;
         itemLink.value = `/project/${project.id}`;
         itemId.value = project.id;
+        itemIssueTracker.value = project.issues_url;
       } else if (reportItem.value === "version") {
         const version = (await useBaseFetch(`version/${reportItemID.value}`)) as Version;
         currentVersion.value = version;
@@ -539,6 +556,10 @@ const messages = defineMessages({
   bugReports: {
     id: "report.not-for.bug-reports",
     defaultMessage: "Bug reports",
+  },
+  bugReportsDescription: {
+    id: "report.not-for.bug-reports.description",
+    defaultMessage: "You can report bugs to their <issues-link>issue tracker</issues-link>.",
   },
   dmcaTakedown: {
     id: "report.not-for.dmca",
