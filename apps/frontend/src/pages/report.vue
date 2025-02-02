@@ -179,7 +179,11 @@
             >
               <IssuesIcon class="h-5 w-5 shrink-0 text-orange" />
               <div class="flex flex-col gap-2">
-                <p v-for="warning in warnings[reportType]" class="m-0 leading-tight">
+                <p
+                  v-for="(warning, index) in warnings[reportType]"
+                  :key="`warning-${reportType}-${index}`"
+                  class="m-0 leading-tight"
+                >
                   <IntlFormatted :message-id="warning">
                     <template #copyright-policy-link="{ children }">
                       <nuxt-link class="text-link" :to="`/legal/copyright`">
