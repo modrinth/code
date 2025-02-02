@@ -631,7 +631,7 @@
                       auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
                     color: 'red',
                     hoverOnly: true,
-                    shown: !currentMember,
+                    shown: !isMember,
                   },
                   { id: 'copy-id', action: () => copyId() },
                 ]"
@@ -1203,6 +1203,10 @@ const members = computed(() => {
 
   return owner ? [owner, ...rest] : rest;
 });
+
+const isMember = computed(
+  () => auth.value.user && allMembers.value.some((x) => x.user.id === auth.value.user.id),
+);
 
 const currentMember = computed(() => {
   let val = auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null;
