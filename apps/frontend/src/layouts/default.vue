@@ -603,7 +603,7 @@ import {
   ScaleIcon as ModerationIcon,
   BellIcon as NotificationIcon,
 } from "@modrinth/assets";
-import { Button, ButtonStyled, OverflowMenu, Avatar, commonMessages } from "@modrinth/ui";
+import { Button, ButtonStyled, OverflowMenu, Avatar, commonMessages, NewModal } from "@modrinth/ui";
 
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";

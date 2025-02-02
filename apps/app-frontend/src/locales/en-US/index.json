@@ -20,6 +20,9 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
+  "instance.filter.disabled": {
+    "message": "Disabled projects"
+  },
   "instance.filter.updates-available": {
     "message": "Updates available"
   },

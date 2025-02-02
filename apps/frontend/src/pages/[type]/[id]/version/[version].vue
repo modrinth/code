@@ -750,6 +750,10 @@ export default defineNuxtComponent({
     const path = route.name.split("-");
     const mode = path[path.length - 1];
 
+    const isMember = computed(
+      () => auth.value.user && allMembers.value.some((x) => x.user.id === auth.value.user.id),
+    );
+
     const fileTypes = [
       {
         display: "Required resource pack",

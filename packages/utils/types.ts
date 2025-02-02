@@ -1,7 +1,7 @@
 export const BASE62_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 export type Base62Char = (typeof BASE62_CHARS)[number]
 
-export type ModrinthId = `${Base62Char}`[]
+export type ModrinthId = string
 
 export type Environment = 'required' | 'optional' | 'unsupported' | 'unknown'
 
@@ -240,4 +240,16 @@ export interface TeamMember {
   accepted: boolean
   payouts_split: number
   ordering: number
+}
+
+export type Report = {
+  id: ModrinthId
+  item_id: ModrinthId
+  item_type: 'project' | 'version' | 'user'
+  report_type: string
+  reporter: ModrinthId
+  thread_id: ModrinthId
+  closed: boolean
+  created: string
+  body: string
 }
