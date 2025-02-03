@@ -168,7 +168,7 @@
             name="Sort by"
             :options="sortTypes"
             :display-name="(option) => option?.display"
-            @change="updateSearchResults(1)"
+            @change="updateSearchResults()"
           >
             <span class="font-semibold text-primary">Sort by: </span>
             <span class="font-semibold text-secondary">{{ selected }}</span>
@@ -181,7 +181,7 @@
             :default-value="maxResults"
             :model-value="maxResults"
             class="!w-auto flex-grow md:flex-grow-0"
-            @change="updateSearchResults(1)"
+            @change="updateSearchResults()"
           >
             <span class="font-semibold text-primary">View: </span>
             <span class="font-semibold text-secondary">{{ selected }}</span>
@@ -206,7 +206,7 @@
             :page="currentPage"
             :count="pageCount"
             class="mx-auto sm:ml-auto sm:mr-0"
-            @switch-page="setPage"
+            @switch-page="updateSearchResults"
           />
         </div>
         <SearchFilterControl
@@ -296,7 +296,7 @@
             :page="currentPage"
             :count="pageCount"
             class="justify-end"
-            @switch-page="setPage"
+            @switch-page="updateSearchResults"
           />
         </div>
       </div>
@@ -545,19 +545,13 @@ const pageCount = computed(() =>
   results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
 );
 
-function setPage(newPageNumber) {
-  currentPage.value = newPageNumber;
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  updateSearchResults();
-}
-
 function scrollToTop(behavior = "smooth") {
   window.scrollTo({ top: 0, behavior });
 }
 
-function updateSearchResults() {
+function updateSearchResults(pageNumber) {
+  currentPage.value = pageNumber || 1;
+  scrollToTop();
   noLoad.value = true;
 
   if (query.value === null) {
@@ -590,8 +584,8 @@ function updateSearchResults() {
   }
 }
 
-watch([currentFilters, requestParams], () => {
-  updateSearchResults();
+watch([currentFilters], () => {
+  updateSearchResults(1);
 });
 
 function cycleSearchDisplayMode() {

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <ModalConfirm
-      v-if="auth.user && auth.user.id === creator.id"
+    <ConfirmModal
+      v-if="canEdit"
       ref="deleteModal"
       :title="formatMessage(messages.deleteModalTitle)"
       :description="formatMessage(messages.deleteModalDescription)"
@@ -387,12 +387,13 @@ import {
   Avatar,
   Button,
   commonMessages,
+  ConfirmModal,
 } from "@modrinth/ui";
 
+import { isAdmin } from "@modrinth/utils";
 import WorldIcon from "assets/images/utils/world.svg";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
 import { addNotification } from "~/composables/notifs.js";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
@@ -596,7 +597,7 @@ useSeoMeta({
 const canEdit = computed(
   () =>
     auth.value.user &&
-    auth.value.user.id === collection.value.user &&
+    (auth.value.user.id === collection.value.user || isAdmin(auth.value.user)) &&
     collection.value.id !== "following",
 );
 
@@ -685,7 +686,11 @@ async function deleteCollection() {
       method: "DELETE",
       apiVersion: 3,
     });
-    await navigateTo("/dashboard/collections");
+    if (auth.value.user.id === collection.value.user) {
+      await navigateTo("/dashboard/collections");
+    } else {
+      await navigateTo(`/user/${collection.value.user}/collections`);
+    }
   } catch (err) {
     addNotification({
       group: "main",

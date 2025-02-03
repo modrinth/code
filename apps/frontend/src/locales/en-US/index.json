@@ -1,4 +1,7 @@
 {
+  "admin.billing.error.not-found": {
+    "message": "User not found"
+  },
   "auth.authorize.action.authorize": {
     "message": "Authorize"
   },
@@ -338,6 +341,12 @@
   "layout.nav.search": {
     "message": "Search"
   },
+  "profile.button.billing": {
+    "message": "Manage user billing"
+  },
+  "profile.button.info": {
+    "message": "View user details"
+  },
   "profile.button.manage-projects": {
     "message": "Manage projects"
   },
@@ -475,6 +484,81 @@
   },
   "project.versions.title": {
     "message": "Versions"
+  },
+  "report.already-reported": {
+    "message": "You've already reported {title}"
+  },
+  "report.already-reported-description": {
+    "message": "You have an open report for this {item} already. You can add more details to your report if you have more information to add."
+  },
+  "report.back-to-item": {
+    "message": "Back to {item}"
+  },
+  "report.body.description": {
+    "message": "Include links and images if possible and relevant. Empty or insufficient reports will be closed and ignored."
+  },
+  "report.body.title": {
+    "message": "Please provide additional context about your report"
+  },
+  "report.checking": {
+    "message": "Checking {item}..."
+  },
+  "report.could-not-find": {
+    "message": "Could not find {item}"
+  },
+  "report.for.violation": {
+    "message": "Violation of Modrinth <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>"
+  },
+  "report.for.violation.description": {
+    "message": "Examples include malicious, spam, offensive, deceptive, misleading, and illegal content."
+  },
+  "report.form-not-for": {
+    "message": "This form is not for:"
+  },
+  "report.go-to-report": {
+    "message": "Go to report"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Bug reports"
+  },
+  "report.not-for.dmca": {
+    "message": "DMCA takedowns"
+  },
+  "report.not-for.dmca.description": {
+    "message": "See our <policy-link>Copyright Policy</policy-link>."
+  },
+  "report.note.copyright.1": {
+    "message": "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content."
+  },
+  "report.note.copyright.2": {
+    "message": "If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <copyright-policy-link>Copyright Policy</copyright-policy-link>."
+  },
+  "report.note.malicious.1": {
+    "message": "Reports for malicious or deceptive content must include substantial evidence of the behavior, such as code samples."
+  },
+  "report.note.malicious.2": {
+    "message": "Summaries from Microsoft Defender, VirusTotal, or AI malware detection are not sufficient forms of evidence and will not be accepted."
+  },
+  "report.please-report": {
+    "message": "Please report:"
+  },
+  "report.question.content-id": {
+    "message": "What is the ID of the {item}?"
+  },
+  "report.question.content-type": {
+    "message": "What type of content are you reporting?"
+  },
+  "report.question.report-reason": {
+    "message": "Which of Modrinth's rules is this {item} violating?"
+  },
+  "report.report-content": {
+    "message": "Report content to moderators"
+  },
+  "report.report-item": {
+    "message": "Report {title} to moderators"
+  },
+  "report.submit": {
+    "message": "Submit report"
   },
   "revenue.transfers.total": {
     "message": "You have withdrawn {amount} in total."

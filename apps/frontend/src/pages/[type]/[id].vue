@@ -631,7 +631,7 @@
                       auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
                     color: 'red',
                     hoverOnly: true,
-                    shown: !currentMember,
+                    shown: !isMember,
                   },
                   { id: 'copy-id', action: () => copyId() },
                 ]"
@@ -802,6 +802,7 @@
           :reset-members="resetMembers"
           :route="route"
           @on-download="triggerDownloadAnimation"
+          @delete-version="deleteVersion"
         />
       </div>
     </div>
@@ -1203,6 +1204,10 @@ const members = computed(() => {
   return owner ? [owner, ...rest] : rest;
 });
 
+const isMember = computed(
+  () => auth.value.user && allMembers.value.some((x) => x.user.id === auth.value.user.id),
+);
+
 const currentMember = computed(() => {
   let val = auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null;
 
@@ -1449,6 +1454,20 @@ function onDownload(event) {
   setTimeout(() => {
     closeDownloadModal(event);
   }, 400);
+}
+
+async function deleteVersion(id) {
+  if (!id) return;
+
+  startLoading();
+
+  await useBaseFetch(`version/${id}`, {
+    method: "DELETE",
+  });
+
+  versions.value = versions.value.filter((x) => x.id !== id);
+
+  stopLoading();
 }
 
 const navLinks = computed(() => {

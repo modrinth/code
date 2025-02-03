@@ -128,14 +128,33 @@ pub async fn users_get(
 }
 
 pub async fn user_get(
+    req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user_data = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(data) = user_data {
-        let response: crate::models::users::User = data.into();
+        let auth_user = get_user_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Some(&[Scopes::SESSION_ACCESS]),
+        )
+        .await
+        .map(|x| x.1)
+        .ok();
+
+        let response: crate::models::users::User =
+            if auth_user.map(|x| x.role.is_admin()).unwrap_or(false) {
+                crate::models::users::User::from_full(data)
+            } else {
+                data.into()
+            };
+
         Ok(HttpResponse::Ok().json(response))
     } else {
         Err(ApiError::NotFound)

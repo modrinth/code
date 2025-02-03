@@ -237,24 +237,11 @@ interface ErrorData {
 }
 
 const inspectingError = ref<ErrorData | null>(null);
-const mcError = ref<any>(null);
 
 const inspectError = async () => {
   const log = await props.server.fs?.downloadFile("logs/latest.log");
-  const response = (await $fetch("https://api.mclo.gs/1/log", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      content: log,
-    }),
-  })) as any;
-
-  mcError.value = response;
-
   // @ts-ignore
-  const analysis = (await $fetch(`https://api.mclo.gs/1/insights/${response.id}`, {
+  const analysis = (await $fetch(`https://api.mclo.gs/1/analyse`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -269,7 +256,6 @@ const inspectError = async () => {
 
 const clearError = () => {
   inspectingError.value = null;
-  mcError.value = null;
 };
 
 watch(
