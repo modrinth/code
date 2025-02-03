@@ -6,6 +6,7 @@
     placement="bottom-end"
     @apply-hide="focusTrigger"
     @apply-show="focusMenuChild"
+    :class="dropdownClass"
   >
     <button ref="trigger" v-bind="$attrs" v-tooltip="tooltip">
       <slot></slot>
@@ -30,6 +31,11 @@ const dropdown = ref()
 
 defineProps({
   dropdownId: {
+    type: String,
+    default: null,
+    required: false,
+  },
+  dropdownClass: {
     type: String,
     default: null,
     required: false,

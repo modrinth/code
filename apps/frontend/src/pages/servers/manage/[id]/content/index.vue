@@ -1,57 +1,13 @@
 <template>
-  <NewModal ref="modModal" :header="`Editing ${type.toLocaleLowerCase()} version`">
-    <template #title>
-      <div class="flex items-center gap-2">
-        <UiAvatar :src="currentMod?.icon_url" size="48px" :alt="`${currentMod?.name} Icon`" />
-        <span class="text-xl font-extrabold text-contrast">{{ currentMod?.name }}</span>
-      </div>
-    </template>
-    <div class="flex flex-col gap-2 md:w-[420px]">
-      <template v-if="versionsLoading">
-        <div class="w-fit animate-pulse select-none rounded-md bg-button-bg font-semibold">
-          <span class="opacity-0" aria-hidden="true">Version</span>
-        </div>
-        <div class="min-h-9 w-full animate-pulse rounded-xl bg-button-bg" />
-      </template>
-      <template v-else>
-        <div class="font-semibold text-contrast">Version</div>
-        <UiServersTeleportDropdownMenu
-          v-model="currentVersion"
-          name="Project"
-          :options="currentVersions"
-          placeholder="Select project..."
-          class="!min-w-full"
-          :display-name="
-            (version) => (typeof version === 'object' ? version?.version_number : version)
-          "
-        />
-      </template>
-
-      <Admonition
-        v-if="props.server.general?.upstream"
-        type="warning"
-        header="Changing version may cause issues"
-      >
-        Your server was created using a modpack. It's recommended to use the modpack's version of
-        the mod.
-      </Admonition>
-
-      <div class="mt-2 flex flex-row items-center gap-4">
-        <ButtonStyled color="brand">
-          <button :disabled="currentMod.changing || versionsLoading" @click="changeModVersion">
-            <CheckIcon />
-            Apply
-          </button>
-        </ButtonStyled>
-        <ButtonStyled>
-          <button @click="modModal.hide()">
-            <XIcon />
-            Cancel
-          </button>
-        </ButtonStyled>
-      </div>
-    </div>
-  </NewModal>
+  <UiServersContentVersionEditModal
+    v-if="!invalidModal"
+    ref="versionEditModal"
+    :type="type"
+    :mod-pack="Boolean(props.server.general?.upstream)"
+    :game-version="props.server.general?.mc_version"
+    :loader="props.server.general?.loader?.toLowerCase()"
+    @change-version="changeModVersion($event)"
+  />
 
   <div v-if="server.general && localMods" class="relative isolate flex h-full w-full flex-col">
     <div ref="pyroContentSentinel" class="sentinel" data-pyro-content-sentinel />
@@ -211,7 +167,7 @@
                           "
                           :disabled="mod.changing || !mod.project_id"
                           class="!hidden sm:!block"
-                          @click="beginChangeModVersion(mod)"
+                          @click="showVersionModal(mod)"
                         >
                           <template v-if="mod.changing">
                             <UiServersIconsLoadingIcon class="animate-spin" />
@@ -234,7 +190,7 @@
                             :options="[
                               {
                                 id: 'edit',
-                                action: () => beginChangeModVersion(mod),
+                                action: () => showVersionModal(mod),
                                 shown: !!(mod.project_id && !mod.changing),
                               },
                               {
@@ -359,19 +315,14 @@ import {
   PackageClosedIcon,
   FilterIcon,
   DropdownIcon,
-  InfoIcon,
-  XIcon,
   PlusIcon,
   MoreVerticalIcon,
   CompassIcon,
   WrenchIcon,
   ListIcon,
   FileIcon,
-  CheckIcon,
-  IssuesIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import Admonition from "@modrinth/ui/src/components/base/Admonition.vue";
+import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
@@ -405,6 +356,64 @@ const modSearchInput = ref("");
 const filterMethod = ref("all");
 
 const uploadDropdownRef = ref();
+
+const versionEditModal = ref();
+const currentEditMod = ref<ContentItem | null>(null);
+const invalidModal = computed(
+  () => !props.server.general?.mc_version || !props.server.general?.loader,
+);
+async function changeModVersion(event: string) {
+  const mod = currentEditMod.value;
+
+  if (mod) mod.changing = true;
+
+  try {
+    versionEditModal.value.hide();
+
+    // This will be used instead once backend implementation is done
+    // await props.server.content?.reinstall(
+    //   `/${type.value.toLowerCase()}s/${event.fileName}`,
+    //   currentMod.value.project_id,
+    //   currentVersion.value.id,
+    // );
+
+    await props.server.content?.install(
+      type.value.toLowerCase() as "mod" | "plugin",
+      mod?.project_id || "",
+      event,
+    );
+
+    await props.server.content?.remove(`/${type.value.toLowerCase()}s/${mod?.filename}`);
+
+    await props.server.refresh(["general", "content"]);
+  } catch (error) {
+    const errmsg = `Error changing mod version: ${error}`;
+    console.error(errmsg);
+    addNotification({
+      text: errmsg,
+      type: "error",
+    });
+    return;
+  }
+  if (mod) mod.changing = false;
+}
+
+function showVersionModal(mod: ContentItem) {
+  if (invalidModal.value || !mod?.project_id || !mod?.filename) {
+    const errmsg = invalidModal.value
+      ? "Data required for changing mod version was not found."
+      : `${!mod?.project_id ? "No mod project ID found" : "No mod filename found"} for ${friendlyModName(mod!)}`;
+    console.error(errmsg);
+    addNotification({
+      text: errmsg,
+      type: "error",
+    });
+    return;
+  }
+
+  currentEditMod.value = mod;
+  versionEditModal.value.show(mod);
+}
 
 const handleDroppedFiles = (files: File[]) => {
   files.forEach((file) => {
@@ -595,56 +604,6 @@ async function removeMod(mod: ContentItem) {
   }
 
   mod.changing = false;
-}
-
-const modModal = ref();
-const currentMod = ref();
-const currentVersions = ref();
-const currentVersion = ref();
-const versionsLoading = ref(false);
-
-async function beginChangeModVersion(mod: Mod) {
-  modModal.value.show();
-  versionsLoading.value = true;
-  currentMod.value = mod;
-  currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false);
-
-  currentVersions.value = currentVersions.value.filter((version: any) =>
-    version.loaders.includes(props.server.general?.loader?.toLowerCase()),
-  );
-
-  currentVersion.value = currentVersions.value.find(
-    (version: any) => version.id === mod.version_id,
-  );
-  versionsLoading.value = false;
-}
-
-async function changeModVersion() {
-  currentMod.value.changing = true;
-  try {
-    modModal.value.hide();
-
-    // await props.server.content?.reinstall(
-    //   `/${type.value.toLowerCase()}s/${currentMod.value.filename}`,
-    //   currentMod.value.project_id,
-    //   currentVersion.value.id,
-    // );
-
-    await props.server.content?.install(
-      type.value.toLowerCase() as "mod" | "plugin",
-      currentMod.value.project_id,
-      currentVersion.value.id,
-    );
-
-    await props.server.content?.remove(
-      `/${type.value.toLowerCase()}s/${currentMod.value.filename}`,
-    );
-
-    await props.server.refresh(["general", "content"]);
-  } catch (error) {
-    console.error("Error changing mod version:", error);
-  }
-  currentMod.value.changing = false;
 }
 
 const hasMods = computed(() => {
