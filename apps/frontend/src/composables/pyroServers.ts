@@ -977,7 +977,6 @@ const modules: any = {
     suspend: suspendServer,
     getMotd,
     setMotd,
-    fetchConfigFile,
   },
   content: {
     get: async (serverId: string) => {
@@ -1135,8 +1134,7 @@ type GeneralFunctions = {
   setMotd: (motd: string) => Promise<void>;
 
   /**
-   * INTERNAL: Gets the config file of a server.
-   * @param fileName - The name of the file.
+   * @deprecated Use fs.downloadFile instead
    */
   fetchConfigFile: (fileName: string) => Promise<any>;
 };
