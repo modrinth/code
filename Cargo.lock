@@ -4277,7 +4277,6 @@ dependencies = [
  "redis",
  "regex",
  "reqwest 0.11.27",
- "rust-common",
  "rust-s3",
  "rust_decimal",
  "rust_iso3166",
@@ -4285,6 +4284,7 @@ dependencies = [
  "sentry",
  "sentry-actix",
  "serde",
+ "serde_bytes",
  "serde_cbor",
  "serde_json",
  "serde_with",
@@ -6768,21 +6768,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rust-common"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "either",
- "rand 0.8.5",
- "serde",
- "serde_bytes",
- "serde_cbor",
- "serde_json",
- "thiserror 2.0.7",
- "uuid 1.12.0",
-]
-
-[[package]]
 name = "rust-ini"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8931,6 +8916,7 @@ dependencies = [
  "flate2",
  "futures 0.3.30",
  "indicatif",
+ "labrinth",
  "lazy_static",
  "notify",
  "notify-debouncer-mini",
@@ -8939,7 +8925,6 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "reqwest 0.12.7",
- "rust-common",
  "serde",
  "serde_ini",
  "serde_json",

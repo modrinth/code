@@ -3,6 +3,7 @@ use super::loader_fields::{
     VersionField,
 };
 use super::{ids::*, User};
+use crate::common::ids::base62_impl::parse_base62;
 use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
@@ -11,7 +12,6 @@ use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
 use itertools::Itertools;
-use rust_common::ids::base62_impl::parse_base62;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;

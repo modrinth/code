@@ -1,6 +1,6 @@
 //! Theseus state management system
 use dashmap::DashMap;
-use rust_common::users::{UserId, UserStatus};
+use labrinth::common::users::{UserId, UserStatus};
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
 #[cfg(feature = "tauri")]

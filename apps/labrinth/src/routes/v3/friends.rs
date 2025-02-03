@@ -1,4 +1,5 @@
 use crate::auth::get_user_from_headers;
+use crate::common::networking::message::ServerToClientMessage;
 use crate::database::models::UserId;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
@@ -9,7 +10,6 @@ use crate::routes::internal::statuses::close_socket;
 use crate::routes::ApiError;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
-use rust_common::networking::message::ServerToClientMessage;
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

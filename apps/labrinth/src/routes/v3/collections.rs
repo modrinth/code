@@ -1,5 +1,6 @@
 use crate::auth::checks::is_visible_collection;
 use crate::auth::{filter_visible_collections, get_user_from_headers};
+use crate::common::ids::base62_impl::parse_base62;
 use crate::database::models::{
     collection_item, generate_collection_id, project_item,
 };
@@ -19,7 +20,6 @@ use actix_web::web::Data;
 use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use itertools::Itertools;
-use rust_common::ids::base62_impl::parse_base62;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;

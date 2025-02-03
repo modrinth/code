@@ -1,6 +1,7 @@
 use std::{collections::HashSet, fmt::Display, sync::Arc};
 
 use super::ApiError;
+use crate::common::ids::base62_impl::parse_base62;
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
     database::{
@@ -34,7 +35,6 @@ use chrono::Utc;
 use itertools::Itertools;
 use rand::{distributions::Alphanumeric, Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use rust_common::ids::base62_impl::parse_base62;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;

@@ -1,5 +1,6 @@
 use super::version_creation::{try_create_version_fields, InitialVersionData};
 use crate::auth::{get_user_from_headers, AuthenticationError};
+use crate::common::ids::base62_impl::to_base62;
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
@@ -31,7 +32,6 @@ use chrono::Utc;
 use futures::stream::StreamExt;
 use image::ImageError;
 use itertools::Itertools;
-use rust_common::ids::base62_impl::to_base62;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;

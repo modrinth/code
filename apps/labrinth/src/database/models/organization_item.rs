@@ -1,7 +1,7 @@
+use crate::common::ids::base62_impl::parse_base62;
 use crate::database::redis::RedisPool;
 use dashmap::DashMap;
 use futures::TryStreamExt;
-use rust_common::ids::base62_impl::parse_base62;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 

@@ -1,6 +1,6 @@
+pub use crate::common::users::{UserId, UserStatus};
 use crate::{auth::AuthProvider, bitflags_serde_impl};
 use chrono::{DateTime, Utc};
-pub use rust_common::users::{UserId, UserStatus};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 

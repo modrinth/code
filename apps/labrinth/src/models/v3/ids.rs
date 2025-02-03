@@ -13,11 +13,11 @@ pub use super::teams::TeamId;
 pub use super::threads::ThreadId;
 pub use super::threads::ThreadMessageId;
 pub use super::users::UserId;
+use crate::common::ids::base62_id_impl;
+pub use crate::common::ids::Base62Id;
 pub use crate::models::billing::{
     ChargeId, ProductId, ProductPriceId, UserSubscriptionId,
 };
-use rust_common::ids::base62_id_impl;
-pub use rust_common::ids::Base62Id;
 
 base62_id_impl!(ProjectId, ProjectId);
 base62_id_impl!(VersionId, VersionId);

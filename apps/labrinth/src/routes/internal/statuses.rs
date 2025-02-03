@@ -1,5 +1,10 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::AuthenticationError;
+use crate::common::ids::UserId;
+use crate::common::networking::message::{
+    ClientToServerMessage, ServerToClientMessage,
+};
+use crate::common::users::UserStatus;
 use crate::database::models::friend_item::FriendItem;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
@@ -16,11 +21,6 @@ use chrono::Utc;
 use dashmap::mapref::entry::Entry;
 use either::Either;
 use futures_util::{StreamExt, TryStreamExt};
-use rust_common::ids::UserId;
-use rust_common::networking::message::{
-    ClientToServerMessage, ServerToClientMessage,
-};
-use rust_common::users::UserStatus;
 use serde::Deserialize;
 use sqlx::PgPool;
 use uuid::Uuid;

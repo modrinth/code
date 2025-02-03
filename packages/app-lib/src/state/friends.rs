@@ -14,12 +14,12 @@ use dashmap::DashMap;
 use either::Either;
 use futures::stream::SplitSink;
 use futures::{SinkExt, StreamExt};
-use reqwest::header::HeaderValue;
-use reqwest::Method;
-use rust_common::networking::message::{
+use labrinth::common::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
 };
-use rust_common::users::{UserId, UserStatus};
+use labrinth::common::users::{UserId, UserStatus};
+use reqwest::header::HeaderValue;
+use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::ops::Deref;
