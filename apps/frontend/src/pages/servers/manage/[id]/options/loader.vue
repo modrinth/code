@@ -659,6 +659,15 @@ const hasNewerVersion = computed(() => {
   return latestVersion.value.version_number > currentVersion.value.version_number;
 });
 
+watch(
+  () => props.server.general?.upstream?.version_id,
+  async () => {
+    if (props.server.general?.upstream?.version_id) {
+      await updateData();
+    }
+  },
+);
+
 const handleUpdateToLatest = async () => {
   if (!latestVersion.value) return;
 
@@ -792,6 +801,7 @@ const reinstallCurrent = async () => {
   }
   const resolvedVersionIds = versionIds.value;
   const versionId = resolvedVersionIds.find((entry: any) => entry[version.value])?.[version.value];
+
   try {
     await props.server.general?.reinstall(
       serverId,
@@ -973,6 +983,7 @@ const handleReinstallUpload = async () => {
     if (!mrpackFile.value) {
       throw new Error("No mrpack file selected");
     }
+
     const mrpack = new File([mrpackFile.value], mrpackFile.value.name, {
       type: mrpackFile.value.type,
     });
