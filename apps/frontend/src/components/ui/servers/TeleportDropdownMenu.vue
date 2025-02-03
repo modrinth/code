@@ -227,7 +227,7 @@ const radioValue = computed<OptionValue>({
 });
 
 const triggerClasses = computed(() => ({
-  "cursor-not-allowed opacity-50 grayscale": props.disabled,
+  "!cursor-not-allowed opacity-50 grayscale": props.disabled,
   "rounded-b-none": dropdownVisible.value && !isRenderingUp.value && !props.disabled,
   "rounded-t-none": dropdownVisible.value && isRenderingUp.value && !props.disabled,
 }));
