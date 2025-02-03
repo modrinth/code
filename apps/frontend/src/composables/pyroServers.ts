@@ -546,15 +546,16 @@ const removeContent = async (contentType: ContentType, contentId: string) => {
 
 const reinstallContent = async (
   contentType: ContentType,
-  oldVersionId: string,
-  projectId: string,
-  newVersionId: string,
+  contentId: string,
+  newContentId: string,
 ) => {
   try {
-    await removeContent(contentType, oldVersionId);
-    await installContent(contentType.toLowerCase() as ContentType, projectId, newVersionId);
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/mods/${contentId}`, {
+      method: "PUT",
+      body: { install_as: contentType, version_id: newContentId },
+    });
   } catch (error) {
-    console.error("Error reinstalling content:", error);
+    console.error("Error reinstalling mod:", error);
     throw error;
   }
 };
@@ -1165,16 +1166,10 @@ type ContentFunctions = {
   /**
    * Reinstalls a mod to a server.
    * @param contentType - The type of content to reinstall.
-   * @param oldVersionId - The ID of the old version.
-   * @param projectId - The ID of the project.
-   * @param newVersionId - The ID of the new version.
+   * @param contentId - The ID of the content.
+   * @param newContentId - The ID of the new version.
    */
-  reinstall: (
-    contentType: ContentType,
-    oldVersionId: string,
-    projectId: string,
-    newVersionId: string,
-  ) => Promise<void>;
+  reinstall: (contentType: ContentType, contentId: string, newContentId: string) => Promise<void>;
 };
 
 type BackupFunctions = {
