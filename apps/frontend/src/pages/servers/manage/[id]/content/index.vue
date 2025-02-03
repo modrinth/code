@@ -607,12 +607,19 @@ async function changeModVersion() {
     modModal.value.hide();
     await props.server.content?.reinstall(
       type.value,
-      currentMod.value.version_id,
+      `/mods/${currentMod.value.filename}`,
+      currentMod.value.project_id!,
       currentVersion.value.id,
     );
     await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error changing mod version:", error);
+    addNotification({
+      group: "main",
+      title: "Failed to change mod version",
+      text: error instanceof Error ? error.message : "An unexpected error occurred",
+      type: "error",
+    });
   }
   currentMod.value.changing = false;
 }
