@@ -7,13 +7,11 @@ on:
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
-      - 'apps/rust-common/**'
   pull_request:
     types: [opened, synchronize]
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
-      - 'apps/rust-common/**'
   merge_group:
     types: [checks_requested]
 

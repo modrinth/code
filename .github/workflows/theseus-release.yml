@@ -11,7 +11,6 @@ on:
       - 'apps/app-frontend/**'
       - 'packages/app-lib/**'
       - 'packages/app-macros/**'
-      - 'packages/rust-common/**'
       - 'packages/assets/**'
       - 'packages/ui/**'
       - 'packages/utils/**'
