@@ -85,6 +85,10 @@ import type { Project, Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();
 
+if (props.server_id) {
+  await usePyroServer(props.server_id, ["general"]);
+}
+
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 const showSubdomainLabel = computed(() => !!props.net?.domain);
