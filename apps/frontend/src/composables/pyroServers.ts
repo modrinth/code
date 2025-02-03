@@ -1398,8 +1398,15 @@ export type Server<T extends avaliableModules> = {
   /**
    * Refreshes the included modules of the server
    * @param refreshModules - The modules to refresh.
+   * @param options - The options to use when refreshing the modules.
    */
-  refresh: (refreshModules?: avaliableModules) => Promise<void>;
+  refresh: (
+    refreshModules?: avaliableModules,
+    options?: {
+      preserveConnection?: boolean;
+      preserveInstallState?: boolean;
+    },
+  ) => Promise<void>;
   setError: (error: Error) => void;
   error?: Error;
   serverId: string;
@@ -1407,33 +1414,53 @@ export type Server<T extends avaliableModules> = {
 
 export const usePyroServer = async (serverId: string, includedModules: avaliableModules) => {
   const server: Server<typeof includedModules> = reactive({
-    refresh: async (refreshModules?: avaliableModules) => {
+    refresh: async (
+      refreshModules?: avaliableModules,
+      options?: {
+        preserveConnection?: boolean;
+        preserveInstallState?: boolean;
+      },
+    ) => {
+      if (server.general?.status === "installing" && !refreshModules) {
+        return;
+      }
+
+      const modulesToRefresh = refreshModules || includedModules;
       const promises: Promise<void>[] = [];
-      if (refreshModules) {
-        for (const module of refreshModules) {
+
+      const uniqueModules = [...new Set(modulesToRefresh)];
+
+      for (const module of uniqueModules) {
+        const mods = modules[module];
+        if (mods.get) {
           promises.push(
             (async () => {
-              const mods = modules[module];
-              if (mods.get) {
-                const data = await mods.get(serverId);
-                server[module] = { ...server[module], ...data };
-              }
-            })(),
-          );
-        }
-      } else {
-        for (const module of includedModules) {
-          promises.push(
-            (async () => {
-              const mods = modules[module];
-              if (mods.get) {
-                const data = await mods.get(serverId);
-                server[module] = { ...server[module], ...data };
+              const data = await mods.get(serverId);
+              if (data) {
+                if (module === "general" && options?.preserveConnection) {
+                  const updatedData = {
+                    ...server[module],
+                    ...data,
+                  };
+                  if (server[module]?.image) {
+                    updatedData.image = server[module].image;
+                  }
+                  if (server[module]?.motd) {
+                    updatedData.motd = server[module].motd;
+                  }
+                  if (options.preserveInstallState && server[module]?.status === "installing") {
+                    updatedData.status = "installing";
+                  }
+                  server[module] = updatedData;
+                } else {
+                  server[module] = { ...server[module], ...data };
+                }
               }
             })(),
           );
         }
       }
+
       await Promise.all(promises);
     },
     setError: (error: Error) => {

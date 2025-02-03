@@ -887,13 +887,11 @@ const handleReinstall = async () => {
       mVersion: selectedMCVersion.value,
     });
 
-    await nextTick();
-    window.scrollTo(0, 0);
+    versionSelectModal.value.hide();
   } catch (error) {
     handleReinstallError(error);
   } finally {
     isLoading.value = false;
-    versionSelectModal.value.hide();
   }
 };
 

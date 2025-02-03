@@ -662,22 +662,49 @@ const newMCVersion = ref<string | null>(null);
 
 const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   switch (data.result) {
-    case "ok":
+    case "ok": {
       if (!serverData.value) break;
-      serverData.value.status = "available";
 
-      if (!isFirstMount.value) {
-        await server.refresh();
+      stopPolling();
+
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        let attempts = 0;
+        const maxAttempts = 3;
+        let hasValidData = false;
+
+        while (!hasValidData && attempts < maxAttempts) {
+          attempts++;
+
+          await server.refresh(["general"], {
+            preserveConnection: true,
+            preserveInstallState: true,
+          });
+
+          if (serverData.value?.loader && serverData.value?.mc_version) {
+            hasValidData = true;
+            serverData.value.status = "available";
+            await server.refresh(["content", "startup"]);
+            break;
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
+
+        if (!hasValidData) {
+          console.error("Failed to get valid server data after installation");
+        }
+      } catch (err: unknown) {
+        console.error("Error refreshing data after installation:", err);
       }
 
-      if (server.general) {
-        if (newLoader.value) server.general.loader = newLoader.value;
-        if (newLoaderVersion.value) server.general.loader_version = newLoaderVersion.value;
-        if (newMCVersion.value) server.general.mc_version = newMCVersion.value;
-      }
-
+      newLoader.value = null;
+      newLoaderVersion.value = null;
+      newMCVersion.value = null;
       error.value = null;
       break;
+    }
     case "err": {
       console.log("failed to install");
       console.log(data);
@@ -708,20 +735,9 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
 
 const onReinstall = (potentialArgs: any) => {
   if (!serverData.value) return;
+
   serverData.value.status = "installing";
-  // serverData.value.loader = potentialArgs.loader;
-  // serverData.value.loader_version = potentialArgs.lVersion;
-  // serverData.value.mc_version = potentialArgs.mVersion;
-  // if (potentialArgs?.loader) {
-  //   console.log("setting loadeconsole
-  //   serverData.value.loader = potentialArgs.loader;
-  // }
-  // if (potentialArgs?.lVersion) {
-  //   serverData.value.loader_version = potentialArgs.lVersion;
-  // }
-  // if (potentialArgs?.mVersion) {
-  //   serverData.value.mc_version = potentialArgs.mVersion;
-  // }
+
   if (potentialArgs?.loader) {
     newLoader.value = potentialArgs.loader;
   }
@@ -732,15 +748,9 @@ const onReinstall = (potentialArgs: any) => {
     newMCVersion.value = potentialArgs.mVersion;
   }
 
-  if (!isFirstMount.value) {
-    server.refresh();
-  }
-
   error.value = null;
   errorTitle.value = "Error";
   errorMessage.value = "An unexpected error occurred.";
-
-  console.log(serverData.value);
 };
 
 const updateStats = (currentStats: Stats["current"]) => {
@@ -959,17 +969,15 @@ onUnmounted(() => {
 
 watch(
   () => serverData.value?.status,
-  (newStatus) => {
+  (newStatus, oldStatus) => {
     if (isFirstMount.value) {
       isFirstMount.value = false;
       return;
     }
 
-    if (newStatus === "installing") {
+    if (newStatus === "installing" && oldStatus !== "installing") {
+      countdown.value = 15;
       startPolling();
-    } else {
-      stopPolling();
-      server.refresh();
     }
   },
 );
