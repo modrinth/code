@@ -38,8 +38,57 @@
     </div>
 
     <LazyUiServersServerManageEmptyState
-      v-if="serverList.length === 0 && !isPollingForNewServers"
+      v-if="serverList.length === 0 && !isPollingForNewServers && !hasError"
     />
+
+    <div
+      v-else-if="hasError"
+      class="mx-auto flex h-full min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 text-left"
+    >
+      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="grid place-content-center rounded-full bg-bg-blue p-4">
+              <HammerIcon class="size-12 text-blue" />
+            </div>
+            <h1 class="m-0 w-fit text-3xl font-bold">Servers could not be loaded</h1>
+          </div>
+          <p class="text-lg text-secondary">
+            We're experiencing temporary issues with our servers.
+          </p>
+          <ul class="m-0 list-disc space-y-4 p-0 pl-4 text-left text-sm leading-[170%]">
+            <li>
+              Our systems automatically alert our team when there's an issue. We are already working
+              on fixing your server.
+            </li>
+            <li>
+              If you recently purchased your Modrinth Server, it's currently in a queue and will
+              appear here as soon as it's ready. <br />
+              <span class="font-medium text-contrast"
+                >Do not attempt to purchase a new server.</span
+              >
+            </li>
+            <li>
+              Please contact Modrinth Support for personalized assistance regarding the status of
+              your server.
+            </li>
+
+            <li v-if="fetchError" class="text-red">
+              <p>Error details:</p>
+              <UiCopyCode
+                :text="(fetchError as PyroFetchError).message || 'Unknown error'"
+                :copyable="false"
+                :selectable="false"
+                :language="'json'"
+              />
+            </li>
+          </ul>
+        </div>
+        <ButtonStyled size="large" type="standard" color="brand">
+          <a class="mt-6 !w-full" href="https://support.modrinth.com">Contact Modrinth Support</a>
+        </ButtonStyled>
+      </div>
+    </div>
 
     <template v-else>
       <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
@@ -70,9 +119,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import Fuse from "fuse.js";
-import { PlusIcon, SearchIcon } from "@modrinth/assets";
+import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import type { Server } from "~/types/servers";
+import type { PyroFetchError } from "~/composables/pyroFetch";
 
 definePageMeta({
   middleware: "auth",
@@ -87,21 +137,28 @@ interface ServerResponse {
 }
 
 const route = useRoute();
+const hasError = ref(false);
 const isPollingForNewServers = ref(false);
 
-const { data: serverResponse, refresh } = await useAsyncData<ServerResponse>(
-  "ServerList",
-  async () => {
-    try {
-      const response = await usePyroFetch<{ servers: Server[] }>("servers");
-      return response;
-    } catch {
-      throw new PyroFetchError("Unable to load servers");
-    }
-  },
-);
+const {
+  data: serverResponse,
+  error: fetchError,
+  refresh,
+} = await useAsyncData<ServerResponse>("ServerList", async () => {
+  try {
+    const response = await usePyroFetch<ServerResponse>("servers");
+    hasError.value = false;
+    return response;
+  } catch (error) {
+    hasError.value = true;
+    throw error;
+  }
+});
 
-const serverList = computed(() => serverResponse.value?.servers || []);
+const serverList = computed(() => {
+  if (!serverResponse.value) return [];
+  return serverResponse.value.servers;
+});
 
 const searchInput = ref("");
 
