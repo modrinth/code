@@ -174,8 +174,8 @@ impl FriendsSocket {
                                             }
                                             ServerToClientMessage::FriendRequestRejected { .. } => todo!(),
 
-                                            ServerToClientMessage::FriendSocketListening { .. } => todo!(),
-                                            ServerToClientMessage::FriendSocketStoppedListening { .. } => todo!(),
+                                            ServerToClientMessage::FriendSocketListening { .. } => {}, // TODO
+                                            ServerToClientMessage::FriendSocketStoppedListening { .. } => {}, // TODO
 
                                             ServerToClientMessage::SocketConnected { to_socket, new_socket } => {
                                                 if let Some(connected_to) = sockets.get(&to_socket) {
