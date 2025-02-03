@@ -9,6 +9,8 @@ on:
       - .github/workflows/theseus-release.yml
       - 'apps/app/**'
       - 'apps/app-frontend/**'
+      - 'apps/labrinth/src/common/**'
+      - 'apps/labrinth/Cargo.toml'
       - 'packages/app-lib/**'
       - 'packages/app-macros/**'
       - 'packages/assets/**'
