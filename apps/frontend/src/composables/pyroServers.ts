@@ -272,6 +272,10 @@ const constructServerProperties = (properties: any): string => {
 
 const processImage = async (iconUrl: string | undefined) => {
   const image = ref<string | null>(null);
+  const sharedImage = useState<string | undefined>(
+    `server-icon-${internalServerRefrence.value.serverId}`,
+    () => undefined,
+  );
   const auth = await PyroFetch<JWTAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
   try {
     const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
@@ -293,6 +297,7 @@ const processImage = async (iconUrl: string | undefined) => {
             const dataURL = canvas.toDataURL("image/png");
             internalServerRefrence.value.general.image = dataURL;
             image.value = dataURL;
+            sharedImage.value = dataURL; // Store in useState
             resolve();
           };
         });
@@ -300,7 +305,7 @@ const processImage = async (iconUrl: string | undefined) => {
     }
   } catch (error) {
     if (error instanceof PyroFetchError && error.statusCode === 404) {
-      console.log("[PYROSERVERS] No server icon found");
+      sharedImage.value = undefined;
     } else {
       console.error(error);
     }

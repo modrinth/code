@@ -103,39 +103,11 @@ if (props.upstream) {
   projectData = ref(null);
 }
 
-const image = ref<string | undefined>();
+const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
 
-onMounted(async () => {
-  const auth = (await usePyroFetch(`servers/${props.server_id}/fs`)) as any;
-  try {
-    const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
-      override: auth,
-    });
-
-    if (fileData instanceof Blob) {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
-      img.src = URL.createObjectURL(fileData);
-      await new Promise<void>((resolve) => {
-        img.onload = () => {
-          canvas.width = 512;
-          canvas.height = 512;
-          ctx?.drawImage(img, 0, 0, 512, 512);
-          const dataURL = canvas.toDataURL("image/png");
-          image.value = dataURL;
-          resolve();
-        };
-      });
-    }
-  } catch (error) {
-    if (error instanceof PyroFetchError && error.statusCode === 404) {
-      image.value = undefined;
-    } else {
-      console.error(error);
-    }
-  }
-});
+if (process.server && projectData.value?.icon_url) {
+  await usePyroServer(props.server_id!, ["general"]);
+}
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 </script>
