@@ -355,7 +355,7 @@
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
         >
           <UiServersPanelSpinner />
-          We're preparing your server, this may take a few minutes.
+          <span> We're preparing your server, this may take a few minutes. </span>
         </div>
 
         <NuxtPage
@@ -1004,7 +1004,16 @@ definePageMeta({
 }
 
 .mobile-blurred-servericon::before {
-  @apply absolute left-0 top-0 block h-36 w-full bg-cover bg-center bg-no-repeat blur-2xl sm:hidden;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  height: 9rem;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(1rem);
   content: "";
   background-image: linear-gradient(
       to bottom,
@@ -1012,5 +1021,9 @@ definePageMeta({
       rgb(from var(--color-raised-bg) r g b / 0.8)
     ),
     var(--server-bg-image);
+
+  @media screen and (min-width: 640px) {
+    display: none;
+  }
 }
 </style>
