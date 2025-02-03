@@ -9,13 +9,13 @@ use common::environment::{
 };
 use common::permissions::{PermissionsTest, PermissionsTestContext};
 use futures::StreamExt;
+use labrinth::common::ids::base62_impl::parse_base62;
 use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
 };
 use labrinth::models::projects::ProjectId;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
-use rust_common::ids::base62_impl::parse_base62;
 use serde_json::json;
 
 use crate::common::api_common::models::CommonProject;

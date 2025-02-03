@@ -18,12 +18,12 @@ use actix_http::StatusCode;
 use actix_web::test;
 use futures::StreamExt;
 use itertools::Itertools;
+use labrinth::common::ids::base62_impl::parse_base62;
 use labrinth::{
     database::models::project_item::PROJECTS_SLUGS_NAMESPACE,
     models::{projects::ProjectId, teams::ProjectPermissions},
     util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData},
 };
-use rust_common::ids::base62_impl::parse_base62;
 use serde_json::json;
 
 #[actix_rt::test]

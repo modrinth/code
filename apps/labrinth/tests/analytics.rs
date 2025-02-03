@@ -7,9 +7,9 @@ use common::{
     environment::{with_test_environment, TestEnvironment},
 };
 use itertools::Itertools;
+use labrinth::common::ids::base62_impl::parse_base62;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::queue::payouts;
-use rust_common::ids::base62_impl::parse_base62;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
 
 mod common;
