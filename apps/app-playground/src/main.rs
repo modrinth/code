@@ -5,6 +5,7 @@
 
 use std::env::args;
 use std::net::SocketAddr;
+use std::time::Duration;
 use theseus::prelude::*;
 use tokio::net::TcpListener;
 use tokio::signal::ctrl_c;
@@ -48,6 +49,7 @@ async fn main() -> theseus::Result<()> {
         if State::get().await?.friends_socket.is_connected().await {
             break;
         }
+        tokio::time::sleep(Duration::from_millis(500)).await;
     }
 
     // if minecraft_auth::users().await?.is_empty() {

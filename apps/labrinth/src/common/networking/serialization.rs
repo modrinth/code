@@ -14,6 +14,10 @@ pub enum SerializationError {
 macro_rules! message_serialization {
     ($message_enum:ty, $binary_pattern:pat) => {
         impl $message_enum {
+            pub fn is_binary(&self) -> bool {
+                matches!(self, $binary_pattern)
+            }
+
             pub fn serialize(
                 &self,
             ) -> Result<Either<String, Vec<u8>>, SerializationError> {

@@ -3,10 +3,15 @@
 use crate::models::users::{UserId, UserStatus};
 use actix_ws::Session;
 use dashmap::{DashMap, DashSet};
+use std::sync::atomic::AtomicU32;
 use uuid::Uuid;
 
+pub type SocketId = u32;
+
 pub struct ActiveSockets {
-    pub sockets: DashMap<UserId, ActiveSocket>,
+    pub sockets: DashMap<SocketId, ActiveSocket>,
+    pub sockets_by_user_id: DashMap<UserId, DashSet<SocketId>>,
+    pub next_socket_id: AtomicU32,
     pub tunnel_sockets: DashMap<Uuid, TunnelSocket>,
 }
 
@@ -14,8 +19,19 @@ impl Default for ActiveSockets {
     fn default() -> Self {
         Self {
             sockets: DashMap::new(),
+            sockets_by_user_id: DashMap::new(),
+            next_socket_id: AtomicU32::new(0),
             tunnel_sockets: DashMap::new(),
         }
+    }
+}
+
+impl ActiveSockets {
+    pub fn get_status(&self, user: UserId) -> Option<UserStatus> {
+        self.sockets_by_user_id
+            .get(&user)
+            .and_then(|x| x.iter().next().and_then(|x| self.sockets.get(&*x)))
+            .map(|x| x.status.clone())
     }
 }
 
@@ -36,12 +52,12 @@ impl ActiveSocket {
 }
 
 pub struct TunnelSocket {
-    pub owner: UserId,
+    pub owner: SocketId,
     pub socket_type: TunnelSocketType,
 }
 
 impl TunnelSocket {
-    pub fn new(owner: UserId, socket_type: TunnelSocketType) -> Self {
+    pub fn new(owner: SocketId, socket_type: TunnelSocketType) -> Self {
         Self { owner, socket_type }
     }
 }

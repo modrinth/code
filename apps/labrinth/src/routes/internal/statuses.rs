@@ -11,7 +11,7 @@ use crate::models::pats::Scopes;
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::{
-    ActiveSocket, ActiveSockets, TunnelSocket, TunnelSocketType,
+    ActiveSocket, ActiveSockets, SocketId, TunnelSocket, TunnelSocketType,
 };
 use crate::routes::ApiError;
 use actix_web::web::{Data, Payload};
@@ -23,6 +23,7 @@ use either::Either;
 use futures_util::{StreamExt, TryStreamExt};
 use serde::Deserialize;
 use sqlx::PgPool;
+use std::sync::atomic::Ordering;
 use uuid::Uuid;
 use Entry::Vacant;
 
@@ -65,10 +66,6 @@ pub async fn ws_init(
 
     let user = User::from_full(db_user);
 
-    if let Some((_, socket)) = db.sockets.remove(&user.id) {
-        let _ = socket.socket.close(None).await;
-    }
-
     let (res, mut session, msg_stream) = match actix_ws::handle(&req, body) {
         Ok(x) => x,
         Err(e) => return Ok(e.error_response()),
@@ -88,8 +85,8 @@ pub async fn ws_init(
         friends
             .iter()
             .filter_map(|x| {
-                db.sockets.get(
-                    &if x.user_id == user.id.into() {
+                db.get_status(
+                    if x.user_id == user.id.into() {
                         x.friend_id
                     } else {
                         x.user_id
@@ -97,7 +94,6 @@ pub async fn ws_init(
                     .into(),
                 )
             })
-            .map(|x| x.status.clone())
             .collect::<Vec<_>>()
     } else {
         Vec::new()
@@ -112,9 +108,16 @@ pub async fn ws_init(
         .await;
 
     let db = db.clone();
+    let socket_id = db.next_socket_id.fetch_add(1, Ordering::Relaxed);
     db.sockets
+        .insert(socket_id, ActiveSocket::new(status.clone(), session));
+    db.sockets_by_user_id
         .entry(user.id)
-        .insert(ActiveSocket::new(status.clone(), session));
+        .or_default()
+        .insert(socket_id);
+
+    #[cfg(debug_assertions)]
+    log::info!("Connection {socket_id} opened by {}", user.id);
 
     broadcast_friends(
         user.id,
@@ -140,12 +143,12 @@ pub async fn ws_init(
                 }
 
                 Ok(Message::Close(_)) => {
-                    let _ = close_socket(user.id, &pool, &db).await;
+                    let _ = close_socket(socket_id, &pool, &db).await;
                     continue;
                 }
 
                 Ok(Message::Ping(msg)) => {
-                    if let Some(socket) = db.sockets.get(&user.id) {
+                    if let Some(socket) = db.sockets.get(&socket_id) {
                         let _ = socket.socket.clone().pong(&msg).await;
                     }
                     continue;
@@ -157,10 +160,16 @@ pub async fn ws_init(
             if message.is_err() {
                 continue;
             }
+            let message = message.unwrap();
 
-            match message.unwrap() {
+            #[cfg(debug_assertions)]
+            if !message.is_binary() {
+                log::info!("Received message from {socket_id}: {:?}", message);
+            }
+
+            match message {
                 ClientToServerMessage::StatusUpdate { profile_name } => {
-                    if let Some(mut pair) = db.sockets.get_mut(&user.id) {
+                    if let Some(mut pair) = db.sockets.get_mut(&socket_id) {
                         let ActiveSocket { status, .. } = pair.value_mut();
 
                         if status
@@ -193,14 +202,14 @@ pub async fn ws_init(
                 }
 
                 ClientToServerMessage::SocketListen { socket } => {
-                    let Some(active_socket) = db.sockets.get(&user.id) else {
+                    let Some(active_socket) = db.sockets.get(&socket_id) else {
                         return;
                     };
                     let Vacant(entry) = db.tunnel_sockets.entry(socket) else {
                         continue;
                     };
                     entry.insert(TunnelSocket::new(
-                        user.id,
+                        socket_id,
                         TunnelSocketType::Listening,
                     ));
                     active_socket.owned_tunnel_sockets.insert(socket);
@@ -220,7 +229,7 @@ pub async fn ws_init(
                     from_socket,
                     to_socket,
                 } => {
-                    let Some(active_socket) = db.sockets.get(&user.id) else {
+                    let Some(active_socket) = db.sockets.get(&socket_id) else {
                         return;
                     };
                     let Vacant(entry) = db.tunnel_sockets.entry(from_socket)
@@ -243,7 +252,7 @@ pub async fn ws_init(
                     };
                     let new_socket_id = Uuid::new_v4();
                     entry.insert(TunnelSocket::new(
-                        user.id,
+                        socket_id,
                         TunnelSocketType::Connected {
                             connected_to: new_socket_id,
                         },
@@ -269,7 +278,7 @@ pub async fn ws_init(
                     .await;
                 }
                 ClientToServerMessage::SocketClose { socket } => {
-                    let Some(active_socket) = db.sockets.get(&user.id) else {
+                    let Some(active_socket) = db.sockets.get(&socket_id) else {
                         return;
                     };
                     if active_socket
@@ -318,7 +327,7 @@ pub async fn ws_init(
                     else {
                         continue;
                     };
-                    if tunnel_socket.owner != user.id {
+                    if tunnel_socket.owner != socket_id {
                         continue;
                     }
                     let TunnelSocketType::Connected { connected_to } =
@@ -347,7 +356,7 @@ pub async fn ws_init(
             }
         }
 
-        let _ = close_socket(user.id, &pool, &db).await;
+        let _ = close_socket(socket_id, &pool, &db).await;
     });
 
     Ok(res)
@@ -360,7 +369,7 @@ pub async fn broadcast_friends(
     sockets: &ActiveSockets,
     friends: Option<Vec<FriendItem>>,
 ) -> Result<(), crate::database::models::DatabaseError> {
-    // FIXME Probably shouldn't be using database errors for this
+    // FIXME Probably shouldn't be using database errors for this. Maybe ApiError?
     let friends = if let Some(friends) = friends {
         friends
     } else {
@@ -375,8 +384,14 @@ pub async fn broadcast_friends(
         };
 
         if friend.accepted {
-            if let Some(socket) = sockets.sockets.get(&friend_id.into()) {
-                let _ = send_message(socket.value(), &message).await;
+            if let Some(socket_ids) =
+                sockets.sockets_by_user_id.get(&friend_id.into())
+            {
+                for socket_id in socket_ids.iter() {
+                    if let Some(socket) = sockets.sockets.get(&socket_id) {
+                        let _ = send_message(socket.value(), &message).await;
+                    }
+                }
             }
         }
     }
@@ -400,17 +415,39 @@ pub async fn send_message(
     Ok(())
 }
 
+pub async fn send_message_to_user(
+    db: &ActiveSockets,
+    user: UserId,
+    message: &ServerToClientMessage,
+) -> Result<(), crate::database::models::DatabaseError> {
+    if let Some(socket_ids) = db.sockets_by_user_id.get(&user) {
+        for socket_id in socket_ids.iter() {
+            if let Some(socket) = db.sockets.get(&socket_id) {
+                send_message(&socket, message).await?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
 pub async fn close_socket(
-    id: UserId,
+    id: SocketId,
     pool: &PgPool,
     db: &ActiveSockets,
 ) -> Result<(), crate::database::models::DatabaseError> {
     if let Some((_, socket)) = db.sockets.remove(&id) {
+        let user_id = socket.status.user_id;
+        db.sockets_by_user_id.remove_if(&user_id, |_, sockets| {
+            sockets.remove(&id);
+            sockets.is_empty()
+        });
+
         let _ = socket.socket.close(None).await;
 
         broadcast_friends(
-            id,
-            ServerToClientMessage::UserOffline { id },
+            user_id,
+            ServerToClientMessage::UserOffline { id: user_id },
             pool,
             db,
             None,
@@ -426,7 +463,7 @@ pub async fn close_socket(
             match tunnel_socket.socket_type {
                 TunnelSocketType::Listening => {
                     let _ = broadcast_friends(
-                        id,
+                        user_id,
                         ServerToClientMessage::SocketClosed {
                             socket: owned_socket,
                         },
