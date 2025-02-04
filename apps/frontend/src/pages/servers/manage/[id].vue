@@ -392,7 +392,7 @@ import {
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
-import { reloadNuxtApp } from "#app";
+import { reloadNuxtApp, navigateTo } from "#app";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
 import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
