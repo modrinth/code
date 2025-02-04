@@ -6,7 +6,6 @@
         <span class="truncate text-xl font-extrabold text-contrast">{{ modDetails?.name }}</span>
       </div>
     </template>
-    <!-- <p>{{ platforms }} {{ gameVersions }}</p> -->
     <div class="flex flex-col gap-2 md:w-[420px]">
       <div class="flex flex-col gap-2">
         <template v-if="versionsLoading">
@@ -18,7 +17,9 @@
           </div>
           <div class="min-h-9 w-full animate-pulse rounded-xl bg-button-bg" />
           <div class="w-fit animate-pulse select-none rounded-md bg-button-bg">
-            <span class="ml-6 opacity-0" aria-hidden="true"> Show any beta or alpha releases </span>
+            <span class="ml-6 opacity-0" aria-hidden="true">
+              Show any beta and alpha releases
+            </span>
           </div>
         </template>
 
@@ -70,7 +71,7 @@
               (version) => (typeof version === 'object' ? version?.version_number : version)
             "
           />
-          <Checkbox v-model="showBetaAlphaReleases"> Show any beta or alpha releases </Checkbox>
+          <Checkbox v-model="showBetaAlphaReleases"> Show any beta and alpha releases </Checkbox>
         </template>
       </div>
 
@@ -103,7 +104,6 @@
                 : "You might see versions listed that aren't compatible with your server configuration."
           }}
         </p>
-        <!-- <p v-if="currentVersions">hai</p> -->
         <ContentVersionFilter
           v-if="currentVersions"
           ref="filtersRef"
@@ -224,7 +224,7 @@ import { ButtonStyled, NewModal } from "@modrinth/ui";
 import Admonition from "@modrinth/ui/src/components/base/Admonition.vue";
 import TagItem from "@modrinth/ui/src/components/base/TagItem.vue";
 import { ref, computed } from "vue";
-import { formatCategory, formatVersionsForDisplay } from "@modrinth/utils";
+import { formatCategory, formatVersionsForDisplay, type Version } from "@modrinth/utils";
 import Accordion from "~/components/ui/Accordion.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import ContentVersionFilter, {
@@ -246,7 +246,7 @@ interface ContentItem extends Mod {
 
 const modModal = ref();
 const modDetails = ref<ContentItem>();
-const currentVersions = ref();
+const currentVersions = ref<Version[] | null>(null);
 const versionsLoading = ref(false);
 const versionsError = ref("");
 const showBetaAlphaReleases = ref(false);
@@ -307,8 +307,6 @@ const updateFiltersToUi = () => {
   filtersRef.value.selectedGameVersions = selectedFilters.value.selectedGameVersions;
   filtersRef.value.selectedPlatforms = selectedFilters.value.selectedPlatforms;
 
-  console.log(currentVersions.value);
-
   selectedVersion.value = filteredVersions.value[0];
 };
 
@@ -323,7 +321,7 @@ const filteredVersions = computed(() => {
   if (!currentVersions.value) return [];
 
   const versionsWithoutReleaseFilter = currentVersions.value.filter(
-    (version: any, index: number) => {
+    (version: Version, index: number) => {
       if (index === 0) return true;
       return (
         filtersRef.value?.selectedPlatforms.every((platform) =>
@@ -340,14 +338,13 @@ const filteredVersions = computed(() => {
     },
   );
 
-  const versionTypes = new Set(versionsWithoutReleaseFilter.map((v: any) => v.version_type));
+  const versionTypes = new Set(versionsWithoutReleaseFilter.map((v: Version) => v.version_type));
   const releaseVersions = versionTypes.has("release");
   const betaVersions = versionTypes.has("beta");
   const alphaVersions = versionTypes.has("alpha");
 
-  const versions = versionsWithoutReleaseFilter.filter((version: any, index: number) => {
+  const versions = versionsWithoutReleaseFilter.filter((version: Version, index: number) => {
     if (showBetaAlphaReleases.value || index === 0) return true;
-    console.log(releaseVersions, betaVersions, alphaVersions);
     return releaseVersions
       ? version.version_type === "release"
       : betaVersions
@@ -357,22 +354,20 @@ const filteredVersions = computed(() => {
           : false;
   });
 
-  return versions.map(
-    (version: { version_type: string; version_number: string }, index: number) => {
-      let suffix = "";
+  return versions.map((version: { version_type: string; version_number: string }) => {
+    let suffix = "";
 
-      if (version.version_type === "alpha" && releaseVersions && betaVersions) {
-        suffix += " (alpha)";
-      } else if (version.version_type === "beta" && releaseVersions) {
-        suffix += " (beta)";
-      }
+    if (version.version_type === "alpha" && releaseVersions && betaVersions) {
+      suffix += " (alpha)";
+    } else if (version.version_type === "beta" && releaseVersions) {
+      suffix += " (beta)";
+    }
 
-      return {
-        ...version,
-        version_number: version.version_number + suffix,
-      };
-    },
-  );
+    return {
+      ...version,
+      version_number: version.version_number + suffix,
+    };
+  });
 });
 
 const formattedVersions = computed(() => {
@@ -408,7 +403,22 @@ async function show(mod: ContentItem) {
   currentVersions.value = null;
 
   try {
-    currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false);
+    const result = await useBaseFetch(`project/${mod.project_id}/version`, {}, false);
+    if (
+      Array.isArray(result) &&
+      result.every(
+        (item) =>
+          "id" in item &&
+          "version_number" in item &&
+          "version_type" in item &&
+          "loaders" in item &&
+          "game_versions" in item,
+      )
+    ) {
+      currentVersions.value = result as Version[];
+    } else {
+      throw new Error("Invalid version data received.");
+    }
 
     // find the installed version and move it to the top of the list
     const currentModIndex = currentVersions.value.findIndex(
@@ -489,12 +499,12 @@ async function show(mod: ContentItem) {
 }
 
 const emit = defineEmits<{
-  changeVersion: any;
+  changeVersion: [string];
 }>();
 
 function emitChangeModVersion() {
   if (!selectedVersion.value) return;
-  emit("changeVersion", selectedVersion.value?.id.toString());
+  emit("changeVersion", selectedVersion.value.id.toString());
 }
 
 defineExpose({

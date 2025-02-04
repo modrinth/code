@@ -127,14 +127,12 @@ const filterOptions = computed(() => {
 
   filters.gameVersion = props.listedGameVersions
     .filter((x) => {
-      console.log("Filtering game versions:", x);
       return showSnapshots.value || hasOnlySnapshots.value ? true : x.release;
     })
     .map((x) => x.name);
 
   filters.platform = props.listedPlatforms
     .filter((x) => {
-      console.log("Filtering platforms:", x);
       return !showSupportedPlatformsOnly.value || hasOnlyUnsupportedPlatforms.value
         ? true
         : x.isType;
