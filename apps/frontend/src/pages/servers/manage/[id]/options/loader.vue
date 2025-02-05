@@ -69,7 +69,7 @@
 
           <NewProjectCard
             v-if="!versionsError && !currentVersionError"
-            class="!bg-bg"
+            class="!cursor-default !bg-bg !filter-none"
             :project="projectCardData"
             :categories="data.project?.categories || []"
           >
