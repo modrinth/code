@@ -7,7 +7,6 @@
       :is-link="linked"
     />
     <UiServersServerLoaderLabel
-      v-if="showLoaderLabel"
       :loader="serverData.loader"
       :loader-version="serverData.loader_version ?? ''"
       :no-separator="column"
