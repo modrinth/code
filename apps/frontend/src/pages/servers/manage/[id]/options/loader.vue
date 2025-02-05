@@ -101,7 +101,7 @@
       <div class="card flex flex-col gap-4">
         <div class="flex flex-col gap-2">
           <h2 class="m-0 text-lg font-bold text-contrast">Platform</h2>
-          <p class="m-0">Your server's platform is the software that runs your mods and plugins.</p>
+          <p class="m-0">Your server's platform is the software that runs mods and plugins.</p>
           <div v-if="data.upstream" class="mt-2 flex items-center gap-2">
             <InfoIcon class="hidden sm:block" />
             <span class="text-sm text-secondary">

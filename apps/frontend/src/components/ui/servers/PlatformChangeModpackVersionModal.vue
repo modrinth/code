@@ -23,7 +23,7 @@
           :options="versionOptions"
           placeholder="Select version..."
           name="version"
-          class="w-full"
+          class="w-full max-w-full"
         />
 
         <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
