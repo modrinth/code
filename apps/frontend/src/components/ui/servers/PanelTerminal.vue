@@ -1,145 +1,146 @@
 <template>
-  <div
-    data-pyro-terminal
-    :class="[
-      'terminal-font console relative z-[1] flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
-      { 'scale-fullscreen screen-fixed inset-0 z-50 !rounded-none': isFullScreen },
-    ]"
-    tabindex="-1"
-  >
+  <div class="contents">
     <div
-      v-if="cosmetics.advancedRendering"
-      class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[2] h-[10rem] w-full overflow-hidden rounded-xl"
-      :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 8))}%`"
-      aria-hidden="true"
+      data-pyro-terminal
+      :class="[
+        'terminal-font console relative z-[1] flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
+        { 'scale-fullscreen screen-fixed inset-0 z-50 !rounded-none': isFullScreen },
+      ]"
+      tabindex="-1"
     >
       <div
-        v-for="i in progressiveBlurIterations"
-        :key="i"
+        v-if="cosmetics.advancedRendering"
+        class="progressive-gradient pointer-events-none absolute -bottom-6 left-0 z-[2] h-[10rem] w-full overflow-hidden rounded-xl"
+        :style="`--transparency: ${Math.max(0, lerp(100, 0, bottomThreshold * 8))}%`"
         aria-hidden="true"
-        class="absolute left-0 top-0 h-full w-full"
-        :style="getBlurStyle(i)"
-      />
-    </div>
-    <div
-      v-else
-      class="pointer-events-none absolute bottom-0 left-0 right-0 z-[2] h-[196px] w-full"
-      :style="
-        bottomThreshold > 0
-          ? { background: 'linear-gradient(transparent 30%, var(--console-bg) 70%)' }
-          : {}
-      "
-    ></div>
-    <div
-      aria-hidden="true"
-      class="pointer-events-none absolute left-0 top-0 z-[60] h-full w-full"
-      :style="{
-        visibility: isFullScreen ? 'hidden' : 'visible',
-      }"
-    >
-      <div
-        aria-hidden="true"
-        class="absolute -bottom-2 -right-2 h-7 w-7"
-        :style="{
-          background: `radial-gradient(circle at 0% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
-        }"
-      ></div>
-      <div
-        aria-hidden="true"
-        class="absolute -bottom-2 -left-2 h-7 w-7"
-        :style="{
-          background: `radial-gradient(circle at 100% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
-        }"
-      ></div>
-    </div>
-    <div data-pyro-terminal-scroll-root class="relative h-full w-full">
-      <div
-        ref="scrollbarTrack"
-        data-pyro-terminal-scrollbar-track
-        class="absolute -right-1 bottom-16 top-4 z-[4] w-4"
-        @mousedown="handleTrackClick"
       >
         <div
-          data-pyro-terminal-scrollbar
-          class="flex h-full justify-center rounded-full transition-all"
-          :style="{ opacity: bottomThreshold > 0 ? '1' : '0.5' }"
-        >
-          <div
-            ref="scrollbarThumb"
-            data-pyro-terminal-scrollbar-thumb
-            class="absolute w-1.5 cursor-default rounded-full bg-button-bg"
-            :style="{
-              height: `${getThumbHeight()}px`,
-              transform: `translateY(${getThumbPosition()}px)`,
-            }"
-            @mousedown="startDragging"
-          ></div>
-        </div>
+          v-for="i in progressiveBlurIterations"
+          :key="i"
+          aria-hidden="true"
+          class="absolute left-0 top-0 h-full w-full"
+          :style="getBlurStyle(i)"
+        />
       </div>
       <div
-        ref="scrollContainer"
-        data-pyro-terminal-root
-        class="scrollbar-none absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
-        @scroll.passive="(e: Event) => handleScrollEvent()"
+        v-else
+        class="pointer-events-none absolute bottom-0 left-0 right-0 z-[2] h-[196px] w-full"
+        :style="
+          bottomThreshold > 0
+            ? { background: 'linear-gradient(transparent 30%, var(--console-bg) 70%)' }
+            : {}
+        "
+      ></div>
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute left-0 top-0 z-[60] h-full w-full"
+        :style="{
+          visibility: isFullScreen ? 'hidden' : 'visible',
+        }"
       >
-        <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
-          <ul
-            class="m-0 list-none p-0"
-            data-pyro-terminal-virtual-list
-            :style="virtualListStyle"
-            aria-live="polite"
-            role="listbox"
+        <div
+          aria-hidden="true"
+          class="absolute -bottom-2 -right-2 h-7 w-7"
+          :style="{
+            background: `radial-gradient(circle at 0% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
+          }"
+        ></div>
+        <div
+          aria-hidden="true"
+          class="absolute -bottom-2 -left-2 h-7 w-7"
+          :style="{
+            background: `radial-gradient(circle at 100% 0%, transparent 50%, var(--color-raised-bg) 52%)`,
+          }"
+        ></div>
+      </div>
+      <div data-pyro-terminal-scroll-root class="relative h-full w-full">
+        <div
+          ref="scrollbarTrack"
+          data-pyro-terminal-scrollbar-track
+          class="absolute -right-1 bottom-16 top-4 z-[4] w-4"
+          @mousedown="handleTrackClick"
+        >
+          <div
+            data-pyro-terminal-scrollbar
+            class="flex h-full justify-center rounded-full transition-all"
+            :style="{ opacity: bottomThreshold > 0 ? '1' : '0.5' }"
           >
-            <template
-              v-for="(item, index) in visibleItems"
-              :key="`${visibleStartIndex + index}-${item}`"
+            <div
+              ref="scrollbarThumb"
+              data-pyro-terminal-scrollbar-thumb
+              class="absolute w-1.5 cursor-default rounded-full bg-button-bg"
+              :style="{
+                height: `${getThumbHeight()}px`,
+                transform: `translateY(${getThumbPosition()}px)`,
+              }"
+              @mousedown="startDragging"
+            ></div>
+          </div>
+        </div>
+        <div
+          ref="scrollContainer"
+          data-pyro-terminal-root
+          class="scrollbar-none absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
+          @scroll.passive="(e: Event) => handleScrollEvent()"
+        >
+          <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
+            <ul
+              class="m-0 list-none p-0"
+              data-pyro-terminal-virtual-list
+              :style="virtualListStyle"
+              aria-live="polite"
+              role="listbox"
             >
-              <li>
-                <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
-              </li>
-            </template>
-          </ul>
+              <template
+                v-for="(item, index) in visibleItems"
+                :key="`${visibleStartIndex + index}-${item}`"
+              >
+                <li>
+                  <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
+                </li>
+              </template>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div
-      class="absolute bottom-4 z-[3] w-full"
-      :style="{
-        filter: `drop-shadow(0 8px 12px rgba(0, 0, 0, ${lerp(0.1, 0.5, bottomThreshold)}))`,
-      }"
-    >
-      <slot />
-    </div>
-    <button
-      data-pyro-fullscreen
-      :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
-      class="experimental-styles-within absolute right-4 top-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
-      @click="toggleFullscreen"
-    >
-      <UiServersPanelTerminalMinimize v-if="isFullScreen" />
-      <UiServersPanelTerminalFullscreen v-else />
-    </button>
-
-    <Transition name="scroll-to-bottom">
-      <button
-        v-if="bottomThreshold > 0 && !isScrolledToBottom"
-        data-pyro-scrolltobottom
-        label="Scroll to bottom"
-        class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
-        @click="scrollToBottom"
+      <div
+        class="absolute bottom-4 z-[3] w-full"
+        :style="{
+          filter: `drop-shadow(0 8px 12px rgba(0, 0, 0, ${lerp(0.1, 0.5, bottomThreshold)}))`,
+        }"
       >
-        <RightArrowIcon class="rotate-90" />
-        <span class="sr-only">Scroll to bottom</span>
+        <slot />
+      </div>
+      <button
+        data-pyro-fullscreen
+        :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
+        class="experimental-styles-within absolute right-4 top-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+        @click="toggleFullscreen"
+      >
+        <UiServersPanelTerminalMinimize v-if="isFullScreen" />
+        <UiServersPanelTerminalFullscreen v-else />
       </button>
-    </Transition>
-  </div>
 
-  <NewModal ref="logModal" header="Full Log Message">
-    <div class="text-contrast">
-      <pre class="whitespace-pre-wrap break-all font-mono">{{ selectedLog }}</pre>
+      <Transition name="scroll-to-bottom">
+        <button
+          v-if="bottomThreshold > 0 && !isScrolledToBottom"
+          data-pyro-scrolltobottom
+          label="Scroll to bottom"
+          class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+          @click="scrollToBottom"
+        >
+          <RightArrowIcon class="rotate-90" />
+          <span class="sr-only">Scroll to bottom</span>
+        </button>
+      </Transition>
     </div>
-  </NewModal>
+    <NewModal ref="logModal" class="z-[9999]" header="Full Log Message">
+      <div class="text-contrast">
+        <pre class="whitespace-pre-wrap break-all font-mono">{{ selectedLog }}</pre>
+      </div>
+    </NewModal>
+  </div>
 </template>
 
 <script setup lang="ts">
