@@ -75,7 +75,7 @@ const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
   project: any;
   versions: any[];
-  currentVersion?: { version_number: string };
+  currentVersion?: any;
   currentVersionId?: string;
   serverStatus?: string;
 }>();

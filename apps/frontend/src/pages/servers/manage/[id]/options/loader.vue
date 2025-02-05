@@ -60,14 +60,7 @@
           </div> -->
           <NewProjectCard
             class="!bg-bg"
-            :project="{
-              icon_url: data.project?.icon_url,
-              title: data.project?.title,
-              description: data.project?.description,
-              downloads: data.project?.downloads,
-              follows: data.project?.followers,
-              date_modified: currentVersion.date_published,
-            }"
+            :project="projectCardData"
             :categories="data.project?.categories || []"
           >
             <template #actions>
@@ -149,46 +142,45 @@ const modpackVersionModal = ref();
 
 const data = computed(() => props.server.general);
 
-const { data: versions } = await useLazyAsyncData(
+const { data: versions } = await useAsyncData(
   `content-loader-versions-${data.value?.upstream?.project_id}`,
   async () => {
     if (!data.value?.upstream?.project_id) return [];
-    const result = await useBaseFetch(`project/${data.value.upstream.project_id}/version`);
-    return (result || []) as any[];
+    try {
+      const result = await useBaseFetch(`project/${data.value.upstream.project_id}/version`);
+      return result || [];
+    } catch (e) {
+      console.error("Failed to fetch versions:", e);
+      return [];
+    }
   },
+  { default: () => [] },
 );
 
-const currentVersion = ref<any | null>(null);
+const { data: currentVersion } = await useAsyncData(
+  `content-loader-version-${data.value?.upstream?.version_id}`,
+  async () => {
+    if (!data.value?.upstream?.version_id) return null;
+    try {
+      const result = await useBaseFetch(`version/${data.value.upstream.version_id}`);
+      return result || null;
+    } catch (e) {
+      console.error("Failed to fetch current version:", e);
+      return null;
+    }
+  },
+  { default: () => null },
+);
 
-const updateData = async () => {
-  if (!data.value?.upstream?.version_id) {
-    currentVersion.value = null;
-    return;
-  }
-  const result = await useBaseFetch(`version/${data.value.upstream.version_id}`);
-  currentVersion.value = result as any;
-};
-
-updateData();
-
-watch(() => props.server.general?.upstream?.version_id, updateData);
-
-// const latestVersion = computed(() => {
-//   if (!Array.isArray(versions?.value) || versions.value.length === 0) return null;
-//   return versions.value.reduce((latest: any, current: any) => {
-//     if (!latest) return current;
-//     return latest.version_number > current.version_number ? latest : current;
-//   }, null);
-// });
-
-// const hasNewerVersion = computed(() => {
-//   if (!currentVersion.value?.version_number || !latestVersion.value?.version_number) return false;
-//   return latestVersion.value.version_number > currentVersion.value.version_number;
-// });
-
-// const handleUpdateToLatest = () => {
-//   modpackVersionModal.value?.show();
-// };
+const projectCardData = computed(() => ({
+  icon_url: data.value?.project?.icon_url,
+  title: data.value?.project?.title,
+  description: data.value?.project?.description,
+  downloads: data.value?.project?.downloads,
+  follows: data.value?.project?.followers,
+  // @ts-ignore
+  date_modified: currentVersion.value?.date_published || data.value?.project?.updated,
+}));
 
 const selectLoader = (loader: string) => {
   versionSelectModal.value?.show(loader as Loaders);
