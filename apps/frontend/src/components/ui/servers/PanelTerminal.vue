@@ -398,9 +398,21 @@ const handleTrackClick = (event: MouseEvent) => {
   scrollContainer.value.scrollTop = newScrollTop;
 };
 
+const setBodyScroll = (enabled: boolean) => {
+  if (enabled) {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+  } else {
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+  }
+};
+
 const enterFullScreen = () => {
   isFullScreen.value = true;
-  document.body.style.overflow = "hidden";
+  setBodyScroll(false);
   nextTick(() => {
     updateClientHeight();
   });
@@ -408,7 +420,7 @@ const enterFullScreen = () => {
 
 const exitFullScreen = () => {
   isFullScreen.value = false;
-  document.body.style.overflow = "";
+  setBodyScroll(true);
   nextTick(() => {
     updateClientHeight();
   });
@@ -488,6 +500,7 @@ onUnmounted(() => {
   window.removeEventListener("keydown", handleKeydown);
   stopDragging();
   cachedHeights.value.clear();
+  setBodyScroll(true);
 });
 
 const virtualListStyle = computed(() => ({
