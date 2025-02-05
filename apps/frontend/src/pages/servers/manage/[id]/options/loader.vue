@@ -54,11 +54,21 @@
           </div>
         </div>
         <div v-if="data.upstream" class="flex flex-col gap-2">
-          <!-- <div v-if="hasNewerVersion" class="text-brand">
-            {{ data.project?.title }} has a newer version available! from
-            {{ currentVersion?.version_number }} to {{ latestVersion?.version_number }}
-          </div> -->
+          <div
+            v-if="versionsError || currentVersionError"
+            class="rounded-2xl border border-solid border-red p-4 text-contrast"
+          >
+            <p class="m-0 font-bold">Something went wrong while loading your modpack.</p>
+            <p class="m-0 mb-2 mt-1 text-sm">
+              {{ versionsError || currentVersionError }}
+            </p>
+            <ButtonStyled>
+              <button :disabled="isInstalling" @click="refreshData">Retry</button>
+            </ButtonStyled>
+          </div>
+
           <NewProjectCard
+            v-if="!versionsError && !currentVersionError"
             class="!bg-bg"
             :project="projectCardData"
             :categories="data.project?.categories || []"
@@ -142,7 +152,11 @@ const modpackVersionModal = ref();
 
 const data = computed(() => props.server.general);
 
-const { data: versions } = await useAsyncData(
+const {
+  data: versions,
+  error: versionsError,
+  refresh: refreshVersions,
+} = await useAsyncData(
   `content-loader-versions-${data.value?.upstream?.project_id}`,
   async () => {
     if (!data.value?.upstream?.project_id) return [];
@@ -150,23 +164,27 @@ const { data: versions } = await useAsyncData(
       const result = await useBaseFetch(`project/${data.value.upstream.project_id}/version`);
       return result || [];
     } catch (e) {
-      console.error("Failed to fetch versions:", e);
-      return [];
+      console.error("couldnt fetch all versions:", e);
+      throw new Error("Failed to load modpack versions.");
     }
   },
   { default: () => [] },
 );
 
-const { data: currentVersion } = await useAsyncData(
+const {
+  data: currentVersion,
+  error: currentVersionError,
+  refresh: refreshCurrentVersion,
+} = await useAsyncData(
   `content-loader-version-${data.value?.upstream?.version_id}`,
   async () => {
     if (!data.value?.upstream?.version_id) return null;
     try {
-      const result = await useBaseFetch(`version/${data.value.upstream.version_id}`);
+      const result = await useBaseFetch(`version/a${data.value.upstream.version_id}`);
       return result || null;
     } catch (e) {
-      console.error("Failed to fetch current version:", e);
-      return null;
+      console.error("couldnt fetch version:", e);
+      throw new Error("Failed to load modpack version.");
     }
   },
   { default: () => null },
@@ -184,6 +202,10 @@ const projectCardData = computed(() => ({
 
 const selectLoader = (loader: string) => {
   versionSelectModal.value?.show(loader as Loaders);
+};
+
+const refreshData = async () => {
+  await Promise.all([refreshVersions(), refreshCurrentVersion()]);
 };
 </script>
 
