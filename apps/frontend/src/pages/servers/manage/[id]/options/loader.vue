@@ -41,7 +41,7 @@
             <!-- dumb hack to make a button link not a link -->
             <ButtonStyled :disabled="isInstalling">
               <template v-if="isInstalling">
-                <button class="cursor-not-allowed opacity-50">
+                <button>
                   <TransferIcon class="size-4" />
                   Switch modpack
                 </button>
