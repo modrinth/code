@@ -772,7 +772,6 @@ const updatePowerState = (
   state: ServerState,
   details?: { oom_killed?: boolean; exit_code?: number },
 ) => {
-  console.log("Power state:", state, details);
   serverPowerState.value = state;
 
   if (state === "crashed") {
