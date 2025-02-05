@@ -288,16 +288,60 @@ const fetchPurpurVersions = async (mcVersion: string) => {
   }
 };
 
+const selectedLoaderVersions = computed(() => {
+  const loader = selectedLoader.value.toLowerCase();
+
+  if (loader === "paper") {
+    return paperVersions.value[selectedMCVersion.value] || [];
+  }
+
+  if (loader === "purpur") {
+    return purpurVersions.value[selectedMCVersion.value] || [];
+  }
+
+  if (loader === "vanilla") {
+    return [];
+  }
+
+  let apiLoader = loader;
+  if (loader === "neoforge") {
+    apiLoader = "neo";
+  }
+
+  const backwardsCompatibleVersion = loaderVersions.value[apiLoader]?.find(
+    // eslint-disable-next-line no-template-curly-in-string
+    (x) => x.id === "${modrinth.gameVersion}",
+  );
+
+  if (backwardsCompatibleVersion) {
+    return backwardsCompatibleVersion.loaders.map((x) => x.id);
+  }
+
+  return (
+    loaderVersions.value[apiLoader]
+      ?.find((x) => x.id === selectedMCVersion.value)
+      ?.loaders.map((x) => x.id) || []
+  );
+});
+
 watch(selectedLoader, async () => {
   if (selectedMCVersion.value) {
-    // Reset version-specific states
     selectedLoaderVersion.value = "";
     serverCheckError.value = "";
 
-    // Re-check versions for the new loader
     await checkVersionAvailability(selectedMCVersion.value);
   }
 });
+
+watch(
+  selectedLoaderVersions,
+  (newVersions) => {
+    if (newVersions.length > 0 && !selectedLoaderVersion.value) {
+      selectedLoaderVersion.value = String(newVersions[0]); // Ensure string type
+    }
+  },
+  { immediate: true },
+);
 
 const checkVersionAvailability = async (version: string) => {
   if (!version || version.trim().length < 3) return;
@@ -351,42 +395,6 @@ const mcVersions = tags.value.gameVersions
     const segment = parseInt(x.split(".")[1], 10);
     return !isNaN(segment) && segment > 2;
   });
-
-const selectedLoaderVersions = computed(() => {
-  const loader = selectedLoader.value.toLowerCase();
-
-  if (loader === "paper") {
-    return paperVersions.value[selectedMCVersion.value] || [];
-  }
-
-  if (loader === "purpur") {
-    return purpurVersions.value[selectedMCVersion.value] || [];
-  }
-
-  if (loader === "vanilla") {
-    return [];
-  }
-
-  let apiLoader = loader;
-  if (loader === "neoforge") {
-    apiLoader = "neo";
-  }
-
-  const backwardsCompatibleVersion = loaderVersions.value[apiLoader]?.find(
-    // eslint-disable-next-line no-template-curly-in-string
-    (x) => x.id === "${modrinth.gameVersion}",
-  );
-
-  if (backwardsCompatibleVersion) {
-    return backwardsCompatibleVersion.loaders.map((x) => x.id);
-  }
-
-  return (
-    loaderVersions.value[apiLoader]
-      ?.find((x) => x.id === selectedMCVersion.value)
-      ?.loaders.map((x) => x.id) || []
-  );
-});
 
 const isDangerous = computed(() => hardReset.value);
 const canInstall = computed(() => {
