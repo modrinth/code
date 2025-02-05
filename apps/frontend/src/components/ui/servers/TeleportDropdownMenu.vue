@@ -130,7 +130,7 @@ const isRenderingUp = ref(false);
 const virtualListHeight = ref(300);
 const isOpen = ref(false);
 const openDropdownCount = ref(0);
-const listboxId = `listbox-${Math.random().toString(36).substr(2, 9)}`;
+const listboxId = `pyro-listbox-${Math.random().toString(36).substring(2, 11)}`;
 const triggerRef = ref<HTMLButtonElement | null>(null);
 
 const positionStyle = ref<CSSProperties>({
