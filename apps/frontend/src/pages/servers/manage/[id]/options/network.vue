@@ -25,7 +25,7 @@
       </form>
     </NewModal>
 
-    <NewModal ref="editAllocationModal" header="Edit Allocation">
+    <NewModal ref="editAllocationModal" header="Edit allocation">
       <form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="editAllocation">
         <label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
         <input
@@ -40,7 +40,7 @@
         <div class="mb-1 mt-4 flex justify-start gap-4">
           <ButtonStyled color="brand">
             <button :disabled="!newAllocationName" type="submit">
-              <SaveIcon /> Update Allocation
+              <SaveIcon /> Update allocation
             </button>
           </ButtonStyled>
           <ButtonStyled>
