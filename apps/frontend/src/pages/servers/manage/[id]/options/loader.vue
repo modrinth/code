@@ -66,7 +66,7 @@
               description: data.project?.description,
               downloads: data.project?.downloads,
               follows: data.project?.followers,
-              date_modified: data.project?.updated,
+              date_modified: currentVersion.date_published,
             }"
             :categories="data.project?.categories || []"
           >
