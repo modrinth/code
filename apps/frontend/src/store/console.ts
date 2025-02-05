@@ -1,11 +1,13 @@
 import { createGlobalState } from "@vueuse/core";
-import { type Ref, ref } from "vue";
+import { type Ref, shallowRef } from "vue";
 
 /**
  * Maximum number of console output lines to store
  * @type {number}
  */
 const maxLines = 5000;
+const batchTimeout = 300; // ms
+const initialBatchSize = 100;
 
 /**
  * Provides a global console output state management system
@@ -21,7 +23,31 @@ export const usePyroConsole = createGlobalState(() => {
    * Reactive array storing console output lines
    * @type {Ref<string[]>}
    */
-  const output: Ref<string[]> = ref<string[]>([]);
+  const output: Ref<string[]> = shallowRef<string[]>([]);
+
+  let lineBuffer: string[] = [];
+  let batchTimer: NodeJS.Timeout | null = null;
+  let isProcessingInitialBatch = false;
+
+  const flushBuffer = () => {
+    if (lineBuffer.length === 0) return;
+
+    const processedLines = lineBuffer.flatMap((line) => line.split("\n").filter(Boolean));
+
+    if (isProcessingInitialBatch && processedLines.length >= initialBatchSize) {
+      isProcessingInitialBatch = false;
+      output.value = processedLines.slice(-maxLines);
+      lineBuffer = [];
+      batchTimer = null;
+      return;
+    }
+
+    const newOutput = [...output.value, ...processedLines];
+    output.value = newOutput.slice(-maxLines);
+
+    lineBuffer = [];
+    batchTimer = null;
+  };
 
   /**
    * Adds a new output line to the console output
@@ -30,10 +56,10 @@ export const usePyroConsole = createGlobalState(() => {
    * @param {string} line - The console output line to add
    */
   const addLine = (line: string): void => {
-    output.value.push(line);
+    lineBuffer.push(line);
 
-    if (output.value.length > maxLines) {
-      output.value.shift();
+    if (!batchTimer) {
+      batchTimer = setTimeout(flushBuffer, batchTimeout);
     }
   };
 
@@ -45,10 +71,17 @@ export const usePyroConsole = createGlobalState(() => {
    * @returns {void}
    */
   const addLines = (lines: string[]): void => {
-    output.value.push(...lines);
+    if (output.value.length === 0 && lines.length >= initialBatchSize) {
+      isProcessingInitialBatch = true;
+      lineBuffer = lines;
+      flushBuffer();
+      return;
+    }
 
-    if (output.value.length > maxLines) {
-      output.value.splice(0, output.value.length - maxLines);
+    lineBuffer.push(...lines);
+
+    if (!batchTimer) {
+      batchTimer = setTimeout(flushBuffer, batchTimeout);
     }
   };
 
@@ -57,6 +90,12 @@ export const usePyroConsole = createGlobalState(() => {
    */
   const clear = (): void => {
     output.value = [];
+    lineBuffer = [];
+    isProcessingInitialBatch = false;
+    if (batchTimer) {
+      clearTimeout(batchTimer);
+      batchTimer = null;
+    }
   };
 
   return {

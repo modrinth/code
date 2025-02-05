@@ -80,7 +80,7 @@
         ref="scrollContainer"
         data-pyro-terminal-root
         class="scrollbar-none absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
-        @scroll="handleScrollEvent"
+        @scroll.passive="(e: Event) => handleScrollEvent()"
       >
         <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
           <ul
@@ -90,9 +90,12 @@
             aria-live="polite"
             role="listbox"
           >
-            <template v-for="(item, index) in visibleItems" :key="index">
+            <template
+              v-for="(item, index) in visibleItems"
+              :key="`${visibleStartIndex + index}-${item}`"
+            >
               <li>
-                <UiServersLogParser :log="item" :index="visibleStartIndex + index" />
+                <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
               </li>
             </template>
           </ul>
@@ -131,11 +134,19 @@
       </button>
     </Transition>
   </div>
+
+  <NewModal ref="logModal" header="Full Log Message">
+    <div class="text-contrast">
+      <pre class="whitespace-pre-wrap break-all font-mono">{{ selectedLog }}</pre>
+    </div>
+  </NewModal>
 </template>
 
 <script setup lang="ts">
 import { RightArrowIcon } from "@modrinth/assets";
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch, nextTick, shallowRef } from "vue";
+import { useThrottleFn } from "@vueuse/core";
+import { NewModal } from "@modrinth/ui";
 import { usePyroConsole } from "~/store/console.ts";
 
 const { $cosmetics } = useNuxtApp();
@@ -149,11 +160,9 @@ const pyroConsole = usePyroConsole();
 const consoleOutput = pyroConsole.output;
 
 const scrollContainer = ref<HTMLElement | null>(null);
-const itemHeights = ref<number[]>([]);
-const averageItemHeight = ref(36);
 const bottomThreshold = ref(0);
 const bufferSize = 5;
-const cachedHeights = ref<Map<string, number>>(new Map());
+const cachedHeights = shallowRef<Map<string, number>>(new Map());
 const isAutoScrolling = ref(false);
 
 const progressiveBlurIterations = ref(8);
@@ -166,24 +175,29 @@ const initial = ref(false);
 const userHasScrolled = ref(false);
 const isScrolledToBottom = ref(true);
 
-const handleScrollEvent = () => {
+const BATCH_SIZE = 50;
+const SCROLL_THROTTLE = 16;
+
+const LINE_HEIGHT = 32;
+
+const handleScrollEvent = useThrottleFn(() => {
   handleListScroll();
-};
+}, SCROLL_THROTTLE);
 
-const totalHeight = computed(
-  () =>
-    itemHeights.value.reduce((sum, height) => sum + height, 0) ||
-    consoleOutput.value.length * averageItemHeight.value,
-);
+const totalHeight = computed(() => consoleOutput.value.length * LINE_HEIGHT);
 
-watch(totalHeight, () => {
-  if (isScrolledToBottom.value) {
-    scrollToBottom();
-  }
-  if (!initial.value) {
-    initial.value = true;
-  }
+const visibleStartIndex = computed(() => {
+  return Math.max(0, Math.floor(scrollTop.value / LINE_HEIGHT) - bufferSize);
 });
+
+const visibleEndIndex = computed(() => {
+  return Math.min(
+    consoleOutput.value.length - 1,
+    Math.ceil((scrollTop.value + clientHeight.value) / LINE_HEIGHT) + bufferSize,
+  );
+});
+
+const offsetY = computed(() => visibleStartIndex.value * LINE_HEIGHT);
 
 const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
 
@@ -218,41 +232,18 @@ const getBlurStyle = (i: number) => {
   };
 };
 
-const getItemOffset = (index: number) => {
-  return itemHeights.value.slice(0, index).reduce((sum, height) => sum + height, 0);
-};
+const visibleItems = computed(() => {
+  const start = visibleStartIndex.value;
+  const end = visibleEndIndex.value;
+  const items = [];
 
-const visibleStartIndex = computed(() => {
-  let index = 0;
-  let offset = 0;
-  while (
-    index < consoleOutput.value.length &&
-    offset < scrollTop.value - bufferSize * averageItemHeight.value
-  ) {
-    offset += itemHeights.value[index] || averageItemHeight.value;
-    index++;
+  for (let i = start; i <= end; i += BATCH_SIZE) {
+    const chunk = consoleOutput.value.slice(i, Math.min(i + BATCH_SIZE, end + 1));
+    items.push(...chunk);
   }
-  return Math.max(0, index - 1);
+
+  return items;
 });
-
-const visibleEndIndex = computed(() => {
-  let index = visibleStartIndex.value;
-  let offset = getItemOffset(index);
-  while (
-    index < consoleOutput.value.length &&
-    offset < scrollTop.value + clientHeight.value + bufferSize * averageItemHeight.value
-  ) {
-    offset += itemHeights.value[index] || averageItemHeight.value;
-    index++;
-  }
-  return Math.min(consoleOutput.value.length - 1, index);
-});
-
-const visibleItems = computed(() =>
-  consoleOutput.value.slice(visibleStartIndex.value, visibleEndIndex.value + 1),
-);
-
-const offsetY = computed(() => getItemOffset(visibleStartIndex.value));
 
 const handleListScroll = () => {
   if (!scrollContainer.value) return;
@@ -271,23 +262,6 @@ const handleListScroll = () => {
   }
 
   bottomThreshold.value = Math.min(1, (scrollHeight - scrollTop.value - clientHeight.value) / 256);
-};
-
-const updateItemHeights = async () => {
-  if (!scrollContainer.value) return;
-
-  await nextTick();
-  const items =
-    scrollContainer.value?.querySelectorAll("[data-pyro-terminal-virtual-list] li") || [];
-  items.forEach((el, idx) => {
-    const index = visibleStartIndex.value + idx;
-    const height = el.getBoundingClientRect().height;
-    itemHeights.value[index] = height;
-    const content = consoleOutput.value[index];
-    if (content) {
-      cachedHeights.value.set(content, height);
-    }
-  });
 };
 
 const updateClientHeight = () => {
@@ -428,7 +402,6 @@ const enterFullScreen = () => {
   document.body.style.overflow = "hidden";
   nextTick(() => {
     updateClientHeight();
-    updateItemHeights();
   });
 };
 
@@ -437,7 +410,6 @@ const exitFullScreen = () => {
   document.body.style.overflow = "";
   nextTick(() => {
     updateClientHeight();
-    updateItemHeights();
   });
 };
 
@@ -455,29 +427,56 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
-const initializeTerminal = async () => {
+const initializeTerminal = () => {
   if (!scrollContainer.value) return;
 
   updateClientHeight();
 
-  const initialHeights = consoleOutput.value.map(
-    (content) => cachedHeights.value.get(content) || averageItemHeight.value,
-  );
-  itemHeights.value = initialHeights;
-
-  await nextTick();
-  await updateItemHeights();
-  await nextTick();
-
-  const container = scrollContainer.value;
-  container.scrollTop = container.scrollHeight;
-
-  handleListScroll();
-  initial.value = true;
+  nextTick(() => {
+    nextTick(() => {
+      const container = scrollContainer.value;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+        handleListScroll();
+        initial.value = true;
+      }
+    });
+  });
 };
 
-onMounted(async () => {
-  await initializeTerminal();
+const isInitialLoad = ref(true);
+
+const logModal = ref<InstanceType<typeof NewModal>>();
+const selectedLog = ref("");
+
+const showFullLogMessage = (log: string) => {
+  selectedLog.value = log;
+  logModal.value?.show();
+};
+
+watch(
+  () => consoleOutput.value,
+  (newOutput, oldOutput) => {
+    if (!oldOutput || newOutput.length <= oldOutput.length) return;
+
+    const shouldScroll = isScrolledToBottom.value || !userHasScrolled.value || isInitialLoad.value;
+
+    if (shouldScroll) {
+      if (isInitialLoad.value) {
+        setTimeout(() => {
+          scrollToBottom();
+          isInitialLoad.value = false;
+        }, 100);
+      } else {
+        nextTick(scrollToBottom);
+      }
+    }
+  },
+  { flush: "post" },
+);
+
+onMounted(() => {
+  initializeTerminal();
 
   window.addEventListener("resize", updateClientHeight);
   window.addEventListener("keydown", handleKeydown);
@@ -487,43 +486,12 @@ onUnmounted(() => {
   window.removeEventListener("resize", updateClientHeight);
   window.removeEventListener("keydown", handleKeydown);
   stopDragging();
+  cachedHeights.value.clear();
 });
 
-watch(
-  () => consoleOutput.value,
-  async (newOutput) => {
-    const newItemsCount = newOutput.length - itemHeights.value.length;
-
-    if (newItemsCount > 0) {
-      const shouldScroll = isScrolledToBottom.value || !userHasScrolled.value;
-
-      const newHeights = Array(newItemsCount)
-        .fill(0)
-        .map((_, i) => {
-          const index = itemHeights.value.length + i;
-          const content = newOutput[index];
-          return cachedHeights.value.get(content) || averageItemHeight.value;
-        });
-
-      itemHeights.value.push(...newHeights);
-
-      if (shouldScroll) {
-        await nextTick();
-        scrollToBottom();
-
-        await nextTick();
-        await updateItemHeights();
-        scrollToBottom();
-      }
-    }
-  },
-  { deep: true },
-);
 const virtualListStyle = computed(() => ({
   transform: `translateY(${offsetY.value}px)`,
 }));
-
-watch([visibleStartIndex, visibleEndIndex], updateItemHeights);
 
 watch(
   () => props.fullScreen,
@@ -531,7 +499,6 @@ watch(
     isFullScreen.value = newValue;
     nextTick(() => {
       updateClientHeight();
-      updateItemHeights();
     });
   },
 );
@@ -539,18 +506,8 @@ watch(
 watch(isFullScreen, () => {
   nextTick(() => {
     updateClientHeight();
-    updateItemHeights();
   });
 });
-
-watch(
-  itemHeights,
-  () => {
-    const totalHeight = itemHeights.value.reduce((sum, height) => sum + height, 0);
-    averageItemHeight.value = totalHeight / itemHeights.value.length || averageItemHeight.value;
-  },
-  { deep: true },
-);
 </script>
 
 <style scoped>
@@ -683,5 +640,19 @@ html.dark-mode .progressive-gradient {
 
 .selection-in-progress {
   pointer-events: none;
+}
+
+[data-pyro-terminal-virtual-list] {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+[data-pyro-terminal-scrollbar-thumb] {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+[data-pyro-terminal-virtual-list] li {
+  height: 32px;
 }
 </style>
