@@ -180,7 +180,7 @@ const {
   async () => {
     if (!data.value?.upstream?.version_id) return null;
     try {
-      const result = await useBaseFetch(`version/a${data.value.upstream.version_id}`);
+      const result = await useBaseFetch(`version/${data.value.upstream.version_id}`);
       return result || null;
     } catch (e) {
       console.error("couldnt fetch version:", e);
