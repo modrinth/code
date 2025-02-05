@@ -315,23 +315,32 @@
           <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
           <div v-if="data.upstream" class="flex gap-4">
             <ButtonStyled>
-              <nuxt-link
-                :class="{
-                  'looks-disabled': props.server.general?.status === 'installing' && isError,
-                }"
-                :to="`/modpacks?sid=${props.server.serverId}`"
-              >
+              <template v-if="isInstalling">
+                <button class="cursor-not-allowed opacity-50">
+                  <TransferIcon class="size-4" />
+                  Change modpack
+                </button>
+              </template>
+              <nuxt-link v-else :to="`/modpacks?sid=${props.server.serverId}`">
                 <TransferIcon class="size-4" />
                 Change modpack
               </nuxt-link>
             </ButtonStyled>
             <ButtonStyled>
-              <button class="!w-full sm:!w-auto" @click="mrpackModal.show()">
+              <button
+                class="!w-full sm:!w-auto"
+                :disabled="isInstalling"
+                @click="mrpackModal.show()"
+              >
                 <UploadIcon class="size-4" /> Upload .mrpack file
               </button>
             </ButtonStyled>
             <ButtonStyled v-if="hasNewerVersion" color="brand">
-              <button class="!w-full sm:!w-auto" @click="handleUpdateToLatest">
+              <button
+                class="!w-full sm:!w-auto"
+                :disabled="isInstalling"
+                @click="handleUpdateToLatest"
+              >
                 <UploadIcon class="size-4" /> Update modpack
               </button>
             </ButtonStyled>
@@ -393,7 +402,9 @@
                 <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
                   <button
                     :disabled="
-                      isLoading || (props.server.general?.status === 'installing' && isError)
+                      isLoading ||
+                      (props.server.general?.status === 'installing' && isError) ||
+                      isInstalling
                     "
                     class="ml-auto"
                     @click="reinstallCurrent"
@@ -444,7 +455,11 @@
           }"
           :tabindex="props.server.general?.status === 'installing' ? -1 : 0"
         >
-          <UiServersLoaderSelector :data="data" @select-loader="selectLoader" />
+          <UiServersLoaderSelector
+            :data="data"
+            :is-installing="isInstalling"
+            @select-loader="selectLoader"
+          />
         </div>
       </div>
     </div>
@@ -1005,6 +1020,8 @@ const handleReinstallUpload = async () => {
     mrpackModal.value.hide();
   }
 };
+
+const isInstalling = computed(() => props.server.general?.status === "installing");
 </script>
 
 <style scoped>
