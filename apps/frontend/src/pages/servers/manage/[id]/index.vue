@@ -89,7 +89,7 @@
             <UiServersPanelServerStatus :state="serverPowerState" />
           </div>
         </div>
-        <div>Click and drag to select lines, then CMD+C to copy</div>
+        <div class="text-sm font-medium">Click and drag to select lines, then CMD+C to copy</div>
         <UiServersPanelTerminal :full-screen="fullScreen">
           <div class="relative w-full px-4 pt-4">
             <ul
