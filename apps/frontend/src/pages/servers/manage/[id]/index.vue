@@ -89,7 +89,10 @@
             <UiServersPanelServerStatus :state="serverPowerState" />
           </div>
         </div>
-        <div class="text-sm font-medium">Click and drag to select lines, then CMD+C to copy</div>
+        <div class="flex flex-row items-center gap-2 text-sm font-medium">
+          <InfoIcon class="hidden sm:block" />
+          Click and drag to select lines, then CMD+C to copy
+        </div>
         <UiServersPanelTerminal :full-screen="fullScreen">
           <div class="relative w-full px-4 pt-4">
             <ul
@@ -184,7 +187,7 @@
 </template>
 
 <script setup lang="ts">
-import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
+import { TerminalSquareIcon, XIcon, IssuesIcon, InfoIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import type { ServerState, Stats } from "~/types/servers";
 import type { Server } from "~/composables/pyroServers";
