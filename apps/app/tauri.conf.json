@@ -79,7 +79,7 @@
         "scope": ["$APPDATA/caches/icons/*", "$APPCONFIG/caches/icons/*", "$CONFIG/caches/icons/*"],
         "enable": true
       },
-      "capabilities": ["ads", "core", "plugins"],
+      "capabilities": ["core", "plugins"],
       "csp": {
         "default-src": "'self' customprotocol: asset:",
         "connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://api.mclo.gs",

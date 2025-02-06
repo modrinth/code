@@ -213,22 +213,6 @@ fn main() {
                     ),
             )
             .plugin(
-                "ads",
-                InlinedPlugin::new()
-                    .commands(&[
-                        "init_ads_window",
-                        "hide_ads_window",
-                        "scroll_ads_window",
-                        "show_ads_window",
-                        "record_ads_click",
-                        "open_link",
-                        "get_ads_personalization",
-                    ])
-                    .default_permission(
-                        DefaultPermissionRule::AllowAllCommands,
-                    ),
-            )
-            .plugin(
                 "friends",
                 InlinedPlugin::new()
                     .commands(&[
