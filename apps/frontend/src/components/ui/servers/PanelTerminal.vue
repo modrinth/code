@@ -596,12 +596,14 @@ onMounted(() => {
   window.addEventListener("resize", updateClientHeight);
   window.addEventListener("keydown", handleKeydown);
   window.addEventListener("mouseup", handleGlobalMouseUp);
+  window.addEventListener("contextmenu", handleContextMenu);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateClientHeight);
   window.removeEventListener("keydown", handleKeydown);
   window.removeEventListener("mouseup", handleGlobalMouseUp);
+  window.removeEventListener("contextmenu", handleContextMenu);
   stopDragging();
   cachedHeights.value.clear();
   setBodyScroll(true);
@@ -641,7 +643,20 @@ const isLineSelected = (index: number) => {
 
 const lastClickIndex = ref<number | null>(null);
 
+const handleContextMenu = () => {
+  if (isSelecting.value) {
+    endLineSelection();
+  }
+};
+
 const handleMouseDown = (event: MouseEvent) => {
+  if (event.button === 2) {
+    if (isSelecting.value) {
+      endLineSelection();
+    }
+    return;
+  }
+
   const lineIndex = getLineIndexFromEvent(event);
   if (lineIndex === null) return;
 
