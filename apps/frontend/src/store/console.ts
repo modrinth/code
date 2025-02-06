@@ -5,7 +5,7 @@ import { type Ref, shallowRef } from "vue";
  * Maximum number of console output lines to store
  * @type {number}
  */
-const maxLines = 5000;
+const maxLines = 10000;
 const batchTimeout = 300; // ms
 const initialBatchSize = 100;
 
