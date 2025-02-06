@@ -2,7 +2,7 @@
   <NewModal ref="purchaseModal">
     <template #title>
       <span class="text-contrast text-xl font-extrabold">
-        <template v-if="productType === 'midas'">Subscribe to Modrinth Plus!</template>
+        <template v-if="productType === 'midas'">Subscribe to Modrinth+!</template>
         <template v-else-if="productType === 'pyro'">
           <template v-if="existingSubscription"> Upgrade server plan </template>
           <template v-else> Subscribe to Modrinth Servers! </template>
@@ -430,7 +430,7 @@
           "
           @click="nextStep"
         >
-          <template v-if="customLoading">
+          <template v-if="customServer && customLoading">
             <SpinnerIcon class="animate-spin" />
             Checking availability...
           </template>
@@ -1021,7 +1021,9 @@ const hasUpgradeCapacityForConfig = computed(() => {
 
 defineExpose({
   show: () => {
+    if (props.customServer) {
     updateRamValues()
+    }
 
     stripe = Stripe(props.publishableKey)
 
