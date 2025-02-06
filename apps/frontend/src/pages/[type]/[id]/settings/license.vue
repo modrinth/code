@@ -1,38 +1,32 @@
 <template>
   <div>
     <section class="universal-card">
+      <h2 class="label__title size-card-header">License</h2>
+      <p class="label__description">
+        It is important to choose a proper license for your
+        {{ $formatProjectType(project.project_type).toLowerCase() }}. You may choose one from our
+        list or provide a custom license. You may also provide a custom URL to your chosen license;
+        otherwise, the license text will be displayed. See our
+        <a
+          href="https://blog.modrinth.com/licensing-guide/"
+          target="_blank"
+          rel="noopener"
+          class="text-link"
+        >
+          licensing guide
+        </a>
+        for more information.
+      </p>
+
       <div class="adjacent-input">
         <label for="license-multiselect">
-          <span class="label__title size-card-header">License</span>
+          <span class="label__title">Select a license</span>
           <span class="label__description">
-            It is very important to choose a proper license for your
-            {{ $formatProjectType(project.project_type).toLowerCase() }}. You may choose one from
-            our list or provide a custom license. You may also provide a custom URL to your chosen
-            license; otherwise, the license text will be displayed.
-            <span v-if="license && license.friendly === 'Custom'" class="label__subdescription">
-              Enter a valid
-              <a href="https://spdx.org/licenses/" target="_blank" rel="noopener" class="text-link">
-                SPDX license identifier</a
-              >
-              in the marked area. If your license does not have a SPDX identifier (for example, if
-              you created the license yourself or if the license is Minecraft-specific), simply
-              check the box and enter the name of the license instead.
-            </span>
-            <span class="label__subdescription">
-              Confused? See our
-              <a
-                href="https://blog.modrinth.com/licensing-guide/"
-                target="_blank"
-                rel="noopener"
-                class="text-link"
-              >
-                licensing guide</a
-              >
-              for more information.
-            </span>
+            How users are and aren't allowed to use your project.
           </span>
         </label>
-        <div class="input-stack">
+
+        <div class="input-stack w-1/2">
           <Multiselect
             id="license-multiselect"
             v-model="license"
@@ -49,13 +43,83 @@
             :disabled="!hasPermission"
           />
           <Checkbox
-            v-if="license?.requiresOnlyOrLater"
             v-model="allowOrLater"
-            :disabled="!hasPermission"
+            :disabled="!hasPermission || !license?.requiresOnlyOrLater"
             description="Allow later editions of this license"
           >
             Allow later editions of this license
           </Checkbox>
+        </div>
+      </div>
+
+      <div class="adjacent-input">
+        <label for="license-url">
+          <span class="label__title">License URL</span>
+          <span class="label__description">
+            The web location of the full license text. If you don't provide a link, the license text
+            will be displayed instead.
+          </span>
+        </label>
+
+        <div class="w-1/2">
+          <input
+            id="license-url"
+            v-model="licenseUrl"
+            type="url"
+            maxlength="2048"
+            placeholder="License URL (optional)"
+            :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
+            class="w-full"
+          />
+        </div>
+      </div>
+
+      <div class="adjacent-input" v-if="license?.friendly === 'Custom'">
+        <label for="license-spdx" v-if="!nonSpdxLicense">
+          <span class="label__title">SPDX identifier</span>
+          <span class="label__description">
+            If your license does not have an offical
+            <a href="https://spdx.org/licenses/" target="_blank" rel="noopener" class="text-link">
+              SPDX license identifier</a
+            >, check the box and enter the name of the license instead.
+          </span>
+        </label>
+        <label for="license-name" v-else>
+          <span class="label__title">License name</span>
+          <span class="label__description"
+            >The full name of the license. If the license has a SPDX identifier, please uncheck the
+            checkbox and use the identifier instead.</span
+          >
+        </label>
+
+        <div class="input-stack w-1/2">
+          <input
+            v-if="!nonSpdxLicense"
+            v-model="license.short"
+            id="license-spdx"
+            class="w-full"
+            type="text"
+            maxlength="128"
+            placeholder="SPDX identifier"
+            :class="{
+              'known-error': license.short === '' && showKnownErrors,
+            }"
+            :disabled="!hasPermission"
+          />
+          <input
+            v-else
+            v-model="license.short"
+            id="license-name"
+            class="w-full"
+            type="text"
+            maxlength="128"
+            placeholder="License name"
+            :class="{
+              'known-error': license.short === '' && showKnownErrors,
+            }"
+            :disabled="!hasPermission"
+          />
+
           <Checkbox
             v-if="license?.friendly === 'Custom'"
             v-model="nonSpdxLicense"
@@ -64,26 +128,9 @@
           >
             License does not have a SPDX identifier
           </Checkbox>
-          <input
-            v-if="license?.friendly === 'Custom'"
-            v-model="license.short"
-            type="text"
-            maxlength="2048"
-            :placeholder="nonSpdxLicense ? 'License name' : 'SPDX identifier'"
-            :class="{
-              'known-error': license.short === '' && showKnownErrors,
-            }"
-            :disabled="!hasPermission"
-          />
-          <input
-            v-model="licenseUrl"
-            type="url"
-            maxlength="2048"
-            placeholder="License URL (optional)"
-            :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
-          />
         </div>
       </div>
+
       <div class="input-stack">
         <button
           type="button"
@@ -101,8 +148,8 @@
 
 <script>
 import Multiselect from "vue-multiselect";
-import Checkbox from "~/components/ui/Checkbox";
 import SaveIcon from "~/assets/images/utils/save.svg?component";
+import Checkbox from "~/components/ui/Checkbox";
 
 export default defineNuxtComponent({
   components: {
