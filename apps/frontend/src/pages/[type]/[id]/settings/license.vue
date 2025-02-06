@@ -55,9 +55,13 @@
       <div class="adjacent-input">
         <label for="license-url">
           <span class="label__title">License URL</span>
-          <span class="label__description">
+          <span class="label__description" v-if="license?.friendly !== 'Custom'">
             The web location of the full license text. If you don't provide a link, the license text
             will be displayed instead.
+          </span>
+          <span class="label__description" v-else>
+            The web location of the full license text. You have to provide a link since this is a
+            custom license.
           </span>
         </label>
 
@@ -67,7 +71,7 @@
             v-model="licenseUrl"
             type="url"
             maxlength="2048"
-            placeholder="License URL (optional)"
+            :placeholder="license?.friendly !== 'Custom' ? `License URL (optional)` : `License URL`"
             :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
             class="w-full"
           />
