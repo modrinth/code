@@ -125,6 +125,19 @@
         <UiServersPanelTerminalFullscreen v-else />
       </button>
 
+      <Transition name="fade">
+        <button
+          v-if="hasSelection"
+          data-pyro-copy
+          label="Copy selected lines"
+          class="experimental-styles-within absolute right-20 top-4 z-[3] flex h-12 flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+          @click="copySelectedLines"
+        >
+          <CopyIcon class="h-5 w-5" />
+          <span class="">Copy</span>
+        </button>
+      </Transition>
+
       <Transition name="scroll-to-bottom">
         <button
           v-if="bottomThreshold > 0 && !isScrolledToBottom"
@@ -147,7 +160,7 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon } from "@modrinth/assets";
+import { RightArrowIcon, CopyIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, shallowRef } from "vue";
 import { useThrottleFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
@@ -644,6 +657,23 @@ onUnmounted(() => {
 });
 
 const lastMouseEvent = ref<MouseEvent | null>(null);
+
+const hasSelection = computed(
+  () =>
+    selectionStart.value !== null &&
+    selectionEnd.value !== null &&
+    selectionStart.value !== selectionEnd.value,
+);
+
+const copySelectedLines = () => {
+  if (!hasSelection.value) return;
+
+  const start = Math.min(selectionStart.value!, selectionEnd.value!);
+  const end = Math.max(selectionStart.value!, selectionEnd.value!);
+  const selectedLines = consoleOutput.value.slice(start, end + 1);
+
+  navigator.clipboard.writeText(selectedLines.join("\n"));
+};
 </script>
 
 <style scoped>
@@ -815,5 +845,15 @@ html.dark-mode .progressive-gradient {
 
 [data-pyro-terminal-virtual-list] li {
   height: 32px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 200ms ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
