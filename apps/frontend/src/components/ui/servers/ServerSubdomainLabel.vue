@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="subdomain"
+    v-if="subdomain && !isHidden"
     v-tooltip="'Copy custom URL'"
     class="flex min-w-0 flex-row items-center gap-4 truncate hover:cursor-pointer"
   >
@@ -20,6 +20,8 @@
 
 <script setup lang="ts">
 import { LinkIcon } from "@modrinth/assets";
+import { useStorage } from "@vueuse/core";
+
 const props = defineProps<{
   subdomain: string;
   noSeparator?: boolean;
@@ -37,4 +39,10 @@ const copySubdomain = () => {
 
 const route = useNativeRoute();
 const serverId = computed(() => route.params.id as string);
+
+const userPreferences = useStorage(`pyro-server-${serverId.value}-preferences`, {
+  hideSubdomainLabel: false,
+});
+
+const isHidden = computed(() => userPreferences.value.hideSubdomain);
 </script>
