@@ -525,6 +525,12 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
+const handleGlobalMouseUp = () => {
+  if (isSelecting.value) {
+    endLineSelection();
+  }
+};
+
 const initializeTerminal = () => {
   if (!scrollContainer.value) return;
 
@@ -589,11 +595,13 @@ onMounted(() => {
 
   window.addEventListener("resize", updateClientHeight);
   window.addEventListener("keydown", handleKeydown);
+  window.addEventListener("mouseup", handleGlobalMouseUp);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", updateClientHeight);
   window.removeEventListener("keydown", handleKeydown);
+  window.removeEventListener("mouseup", handleGlobalMouseUp);
   stopDragging();
   cachedHeights.value.clear();
   setBodyScroll(true);
@@ -662,13 +670,16 @@ const updateLineSelection = (event: MouseEvent) => {
   const rect = scrollContainer.value?.getBoundingClientRect();
   if (!rect) return;
 
-  const threshold = 50;
+  const threshold = 80;
   const y = event.clientY;
 
-  if (y < rect.top + threshold) {
-    autoScrollSpeed.value = -5;
-  } else if (y > rect.bottom - threshold) {
-    autoScrollSpeed.value = 5;
+  const distanceFromTop = Math.max(0, threshold - (y - rect.top));
+  const distanceFromBottom = Math.max(0, threshold - (rect.bottom - y));
+
+  if (distanceFromTop > 0) {
+    autoScrollSpeed.value = -Math.min(20, distanceFromTop / 2);
+  } else if (distanceFromBottom > 0) {
+    autoScrollSpeed.value = Math.min(20, distanceFromBottom / 2);
   } else {
     autoScrollSpeed.value = 0;
   }
@@ -697,7 +708,9 @@ const startAutoScroll = () => {
   autoScrollInterval.value = setInterval(() => {
     if (!scrollContainer.value || autoScrollSpeed.value === 0) return;
     scrollContainer.value.scrollTop += autoScrollSpeed.value;
-    updateLineSelection(lastMouseEvent.value!);
+    if (lastMouseEvent.value) {
+      updateLineSelection(lastMouseEvent.value);
+    }
   }, 16);
 };
 
