@@ -90,12 +90,15 @@
               :style="virtualListStyle"
               aria-live="polite"
               role="listbox"
+              @mousedown.prevent="startLineSelection"
+              @mousemove="updateLineSelection"
+              @mouseup="endLineSelection"
             >
               <template
                 v-for="(item, index) in visibleItems"
                 :key="`${visibleStartIndex + index}-${item}`"
               >
-                <li>
+                <li :class="{ 'selected-line': isLineSelected(visibleStartIndex + index) }">
                   <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
                 </li>
               </template>
@@ -115,7 +118,7 @@
       <button
         data-pyro-fullscreen
         :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
-        class="experimental-styles-within absolute right-4 top-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+        class="experimental-styles-within absolute right-4 top-4 z-[3] grid h-12 w-12 place-content-center rounded-full border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
         @click="toggleFullscreen"
       >
         <UiServersPanelTerminalMinimize v-if="isFullScreen" />
@@ -127,7 +130,7 @@
           v-if="bottomThreshold > 0 && !isScrolledToBottom"
           data-pyro-scrolltobottom
           label="Scroll to bottom"
-          class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[3] grid h-12 w-12 place-content-center rounded-lg border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+          class="scroll-to-bottom-btn experimental-styles-within absolute bottom-[4.5rem] right-4 z-[3] grid h-12 w-12 place-content-center rounded-full border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
           @click="scrollToBottom"
         >
           <RightArrowIcon class="rotate-90" />
@@ -522,6 +525,113 @@ watch(isFullScreen, () => {
     updateClientHeight();
   });
 });
+
+const selectionStart = ref<number | null>(null);
+const selectionEnd = ref<number | null>(null);
+const isSelecting = ref(false);
+const autoScrollInterval = ref<NodeJS.Timeout | null>(null);
+
+const isLineSelected = (index: number) => {
+  if (selectionStart.value === null || selectionEnd.value === null) return false;
+  const start = Math.min(selectionStart.value, selectionEnd.value);
+  const end = Math.max(selectionStart.value, selectionEnd.value);
+  return index >= start && index <= end;
+};
+
+const startLineSelection = (event: MouseEvent) => {
+  const lineIndex = getLineIndexFromEvent(event);
+  if (lineIndex === null) return;
+
+  isSelecting.value = true;
+  selectionStart.value = lineIndex;
+  selectionEnd.value = lineIndex;
+  startAutoScroll();
+};
+
+const updateLineSelection = (event: MouseEvent) => {
+  if (!isSelecting.value) return;
+
+  const lineIndex = getLineIndexFromEvent(event);
+  if (lineIndex === null) return;
+
+  selectionEnd.value = lineIndex;
+
+  const rect = scrollContainer.value?.getBoundingClientRect();
+  if (!rect) return;
+
+  const threshold = 50;
+  const y = event.clientY;
+
+  if (y < rect.top + threshold) {
+    autoScrollSpeed.value = -5;
+  } else if (y > rect.bottom - threshold) {
+    autoScrollSpeed.value = 5;
+  } else {
+    autoScrollSpeed.value = 0;
+  }
+};
+
+const endLineSelection = () => {
+  isSelecting.value = false;
+  stopAutoScroll();
+};
+
+const getLineIndexFromEvent = (event: MouseEvent): number | null => {
+  if (!scrollContainer.value) return null;
+
+  const rect = scrollContainer.value.getBoundingClientRect();
+  const relativeY = event.clientY - rect.top + scrollContainer.value.scrollTop - 24;
+  const lineIndex = Math.floor(relativeY / LINE_HEIGHT);
+
+  return Math.max(0, Math.min(lineIndex, consoleOutput.value.length - 1));
+};
+
+const autoScrollSpeed = ref(0);
+
+const startAutoScroll = () => {
+  if (autoScrollInterval.value) return;
+  autoScrollInterval.value = setInterval(() => {
+    if (!scrollContainer.value || autoScrollSpeed.value === 0) return;
+    scrollContainer.value.scrollTop += autoScrollSpeed.value;
+    updateLineSelection(lastMouseEvent.value!);
+  }, 16);
+};
+
+const stopAutoScroll = () => {
+  if (autoScrollInterval.value) {
+    clearInterval(autoScrollInterval.value);
+    autoScrollInterval.value = null;
+  }
+  autoScrollSpeed.value = 0;
+};
+
+const handleCopy = (event: KeyboardEvent) => {
+  if (!event.metaKey && !event.ctrlKey) return;
+  if (event.key !== "c") return;
+  if (selectionStart.value === null || selectionEnd.value === null) return;
+
+  event.preventDefault();
+
+  const start = Math.min(selectionStart.value, selectionEnd.value);
+  const end = Math.max(selectionStart.value, selectionEnd.value);
+  const selectedLines = consoleOutput.value.slice(start, end + 1);
+
+  navigator.clipboard.writeText(selectedLines.join("\n"));
+
+  selectionStart.value = null;
+  selectionEnd.value = null;
+};
+
+onMounted(() => {
+  window.addEventListener("keydown", handleCopy);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleCopy);
+  stopAutoScroll();
+});
+
+const lastMouseEvent = ref<MouseEvent | null>(null);
 </script>
 
 <style scoped>
@@ -664,6 +774,31 @@ html.dark-mode .progressive-gradient {
 [data-pyro-terminal-scrollbar-thumb] {
   will-change: transform;
   transform: translateZ(0);
+}
+
+[data-pyro-terminal-virtual-list] li {
+  height: 32px;
+  transition: background-color 0.1s ease;
+}
+
+.selected-line {
+  background: color-mix(in srgb, var(--color-blue) 20%, transparent) !important;
+  position: relative;
+}
+
+.selected-line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -2px;
+  bottom: -2px;
+  width: 3px;
+  border-radius: 0.5rem;
+  background: var(--color-blue);
+}
+
+.selected-line:hover {
+  background: color-mix(in srgb, var(--color-blue) 24%, transparent) !important;
 }
 
 [data-pyro-terminal-virtual-list] li {

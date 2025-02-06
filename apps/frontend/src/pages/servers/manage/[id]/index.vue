@@ -85,9 +85,11 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
+
             <UiServersPanelServerStatus :state="serverPowerState" />
           </div>
         </div>
+        <div>Click and drag to select lines, then CMD+C to copy</div>
         <UiServersPanelTerminal :full-screen="fullScreen">
           <div class="relative w-full px-4 pt-4">
             <ul

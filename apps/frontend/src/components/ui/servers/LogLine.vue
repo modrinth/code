@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import Convert from "ansi-to-html";
 import DOMPurify from "dompurify";
 
@@ -55,6 +55,18 @@ const sanitizedLog = computed(() =>
     USE_PROFILES: { html: true },
   }),
 );
+
+const preventSelection = (e: MouseEvent) => {
+  e.preventDefault();
+};
+
+onMounted(() => {
+  logContent.value?.addEventListener("mousedown", preventSelection);
+});
+
+onUnmounted(() => {
+  logContent.value?.removeEventListener("mousedown", preventSelection);
+});
 </script>
 
 <style scoped>
@@ -67,7 +79,7 @@ const sanitizedLog = computed(() =>
   background: rgba(128, 128, 128, 0.1);
 }
 
-:deep(.log-content) {
-  user-select: text;
+.log-content > span {
+  user-select: none;
 }
 </style>
