@@ -221,6 +221,11 @@ const SCROLL_THROTTLE = 16;
 
 const LINE_HEIGHT = 32;
 
+const SCROLL_END_DELAY = 150;
+
+const scrollEndTimeout = ref<NodeJS.Timeout | null>(null);
+const isScrolling = ref(false);
+
 const handleScrollEvent = useThrottleFn(() => {
   handleListScroll();
 }, SCROLL_THROTTLE);
@@ -331,6 +336,19 @@ const handleListScroll = () => {
 
   const scrollHeight = container.scrollHeight;
   const threshold = 32;
+
+  isScrolling.value = true;
+
+  if (scrollEndTimeout.value) {
+    clearTimeout(scrollEndTimeout.value);
+  }
+
+  scrollEndTimeout.value = setTimeout(() => {
+    isScrolling.value = false;
+    const finalPosition = scrollHeight - container.scrollTop - clientHeight.value;
+    isScrolledToBottom.value = finalPosition <= threshold;
+    bottomThreshold.value = Math.min(1, finalPosition / 256);
+  }, SCROLL_END_DELAY);
 
   isScrolledToBottom.value = scrollHeight - scrollTop.value - clientHeight.value <= threshold;
 
@@ -607,6 +625,9 @@ onUnmounted(() => {
   stopDragging();
   cachedHeights.value.clear();
   setBodyScroll(true);
+  if (scrollEndTimeout.value) {
+    clearTimeout(scrollEndTimeout.value);
+  }
 });
 
 const virtualListStyle = computed(() => ({
