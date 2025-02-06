@@ -90,7 +90,7 @@
               :style="virtualListStyle"
               aria-live="polite"
               role="listbox"
-              @mousedown.prevent="startLineSelection"
+              @mousedown.prevent="handleMouseDown"
               @mousemove="updateLineSelection"
               @mouseup="endLineSelection"
             >
@@ -538,14 +538,23 @@ const isLineSelected = (index: number) => {
   return index >= start && index <= end;
 };
 
-const startLineSelection = (event: MouseEvent) => {
+const lastClickIndex = ref<number | null>(null);
+
+const handleMouseDown = (event: MouseEvent) => {
   const lineIndex = getLineIndexFromEvent(event);
   if (lineIndex === null) return;
 
-  isSelecting.value = true;
-  selectionStart.value = lineIndex;
-  selectionEnd.value = lineIndex;
-  startAutoScroll();
+  if (event.shiftKey && lastClickIndex.value !== null) {
+    selectionStart.value = lastClickIndex.value;
+    selectionEnd.value = lineIndex;
+    isSelecting.value = false;
+  } else {
+    isSelecting.value = true;
+    selectionStart.value = lineIndex;
+    selectionEnd.value = lineIndex;
+    lastClickIndex.value = lineIndex;
+    startAutoScroll();
+  }
 };
 
 const updateLineSelection = (event: MouseEvent) => {
@@ -555,6 +564,7 @@ const updateLineSelection = (event: MouseEvent) => {
   if (lineIndex === null) return;
 
   selectionEnd.value = lineIndex;
+  lastMouseEvent.value = event;
 
   const rect = scrollContainer.value?.getBoundingClientRect();
   if (!rect) return;
@@ -572,6 +582,7 @@ const updateLineSelection = (event: MouseEvent) => {
 };
 
 const endLineSelection = () => {
+  if (!isSelecting.value) return;
   isSelecting.value = false;
   stopAutoScroll();
 };
@@ -620,6 +631,7 @@ const handleCopy = (event: KeyboardEvent) => {
 
   selectionStart.value = null;
   selectionEnd.value = null;
+  lastClickIndex.value = null;
 };
 
 onMounted(() => {
