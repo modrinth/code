@@ -1,5 +1,28 @@
 <template>
   <div class="contents">
+    <div class="flex items-center gap-4">
+      <div class="relative w-full">
+        <input
+          v-model="searchInput"
+          type="text"
+          placeholder="Search logs..."
+          class="h-12 !w-full rounded-full border-[1px] border-solid border-button-border bg-bg-raised !pl-10 pr-10 text-contrast transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-button-border"
+          @keydown.escape="clearSearch"
+        />
+        <SearchIcon class="absolute left-4 top-1/2 -translate-y-1/2" />
+        <ButtonStyled v-if="searchInput" @click="clearSearch">
+          <button class="absolute right-2 top-1/2 -translate-y-1/2">
+            <XIcon class="h-5 w-5" />
+          </button>
+        </ButtonStyled>
+      </div>
+      <span
+        v-if="pyroConsole.filteredOutput.value.length && searchInput"
+        class="whitespace-pre text-sm opacity-50"
+      >
+        {{ pyroConsole.filteredOutput.value.length }} results
+      </span>
+    </div>
     <div
       data-pyro-terminal
       :class="[
@@ -160,10 +183,11 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon, CopyIcon } from "@modrinth/assets";
+import { RightArrowIcon, CopyIcon, XIcon, SearchIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, shallowRef } from "vue";
-import { useThrottleFn } from "@vueuse/core";
+import { useThrottleFn, useDebounceFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
+import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import { usePyroConsole } from "~/store/console.ts";
 
 const { $cosmetics } = useNuxtApp();
@@ -201,7 +225,43 @@ const handleScrollEvent = useThrottleFn(() => {
   handleListScroll();
 }, SCROLL_THROTTLE);
 
-const totalHeight = computed(() => consoleOutput.value.length * LINE_HEIGHT);
+const searchInput = ref("");
+const updateSearch = useDebounceFn((value: string) => {
+  pyroConsole.setSearchQuery(value);
+
+  selectionStart.value = null;
+  selectionEnd.value = null;
+  lastClickIndex.value = null;
+
+  nextTick(() => {
+    if (!scrollContainer.value) return;
+
+    if (!value) {
+      handleListScroll();
+      return;
+    }
+
+    if (pyroConsole.filteredOutput.value.length > 0) {
+      scrollContainer.value.scrollTop = 0;
+      handleListScroll();
+    }
+  });
+}, 300);
+
+watch(searchInput, (value) => {
+  updateSearch(value);
+});
+
+const clearSearch = () => {
+  searchInput.value = "";
+  pyroConsole.setSearchQuery("");
+};
+
+const activeOutput = computed(() => {
+  return searchInput.value ? pyroConsole.filteredOutput.value : consoleOutput.value;
+});
+
+const totalHeight = computed(() => activeOutput.value.length * LINE_HEIGHT);
 
 const visibleStartIndex = computed(() => {
   return Math.max(0, Math.floor(scrollTop.value / LINE_HEIGHT) - bufferSize);
@@ -209,7 +269,7 @@ const visibleStartIndex = computed(() => {
 
 const visibleEndIndex = computed(() => {
   return Math.min(
-    consoleOutput.value.length - 1,
+    activeOutput.value.length - 1,
     Math.ceil((scrollTop.value + clientHeight.value) / LINE_HEIGHT) + bufferSize,
   );
 });
@@ -255,7 +315,7 @@ const visibleItems = computed(() => {
   const items = [];
 
   for (let i = start; i <= end; i += BATCH_SIZE) {
-    const chunk = consoleOutput.value.slice(i, Math.min(i + BATCH_SIZE, end + 1));
+    const chunk = activeOutput.value.slice(i, Math.min(i + BATCH_SIZE, end + 1));
     items.push(...chunk);
   }
 
@@ -279,6 +339,15 @@ const handleListScroll = () => {
   }
 
   bottomThreshold.value = Math.min(1, (scrollHeight - scrollTop.value - clientHeight.value) / 256);
+
+  if (searchInput.value) {
+    nextTick(() => {
+      container.style.transform = "translateZ(0)";
+      requestAnimationFrame(() => {
+        container.style.transform = "";
+      });
+    });
+  }
 };
 
 const updateClientHeight = () => {
@@ -504,6 +573,17 @@ watch(
   { flush: "post" },
 );
 
+watch(
+  () => pyroConsole.filteredOutput.value,
+  () => {
+    if (searchInput.value && scrollContainer.value) {
+      nextTick(() => {
+        handleListScroll();
+      });
+    }
+  },
+);
+
 onMounted(() => {
   initializeTerminal();
 
@@ -607,7 +687,7 @@ const getLineIndexFromEvent = (event: MouseEvent): number | null => {
   const relativeY = event.clientY - rect.top + scrollContainer.value.scrollTop - 24;
   const lineIndex = Math.floor(relativeY / LINE_HEIGHT);
 
-  return Math.max(0, Math.min(lineIndex, consoleOutput.value.length - 1));
+  return Math.max(0, Math.min(lineIndex, activeOutput.value.length - 1));
 };
 
 const autoScrollSpeed = ref(0);
@@ -638,7 +718,7 @@ const handleCopy = (event: KeyboardEvent) => {
 
   const start = Math.min(selectionStart.value, selectionEnd.value);
   const end = Math.max(selectionStart.value, selectionEnd.value);
-  const selectedLines = consoleOutput.value.slice(start, end + 1);
+  const selectedLines = activeOutput.value.slice(start, end + 1);
 
   navigator.clipboard.writeText(selectedLines.join("\n"));
 
@@ -670,7 +750,7 @@ const copySelectedLines = () => {
 
   const start = Math.min(selectionStart.value!, selectionEnd.value!);
   const end = Math.max(selectionStart.value!, selectionEnd.value!);
-  const selectedLines = consoleOutput.value.slice(start, end + 1);
+  const selectedLines = activeOutput.value.slice(start, end + 1);
 
   navigator.clipboard.writeText(selectedLines.join("\n"));
 };

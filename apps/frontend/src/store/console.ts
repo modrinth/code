@@ -24,10 +24,34 @@ export const usePyroConsole = createGlobalState(() => {
    * @type {Ref<string[]>}
    */
   const output: Ref<string[]> = shallowRef<string[]>([]);
+  const searchQuery: Ref<string> = shallowRef("");
+  const filteredOutput: Ref<string[]> = shallowRef([]);
+  let searchRegex: RegExp | null = null;
 
   let lineBuffer: string[] = [];
   let batchTimer: NodeJS.Timeout | null = null;
   let isProcessingInitialBatch = false;
+
+  let refilterTimer: NodeJS.Timeout | null = null;
+  const refilterTimeout = 100; // ms
+
+  const updateFilter = () => {
+    if (!searchQuery.value) {
+      filteredOutput.value = [];
+      return;
+    }
+
+    if (!searchRegex) {
+      searchRegex = new RegExp(searchQuery.value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    }
+
+    filteredOutput.value = output.value.filter((line) => searchRegex?.test(line) ?? false);
+  };
+
+  const scheduleRefilter = () => {
+    if (refilterTimer) clearTimeout(refilterTimer);
+    refilterTimer = setTimeout(updateFilter, refilterTimeout);
+  };
 
   const flushBuffer = () => {
     if (lineBuffer.length === 0) return;
@@ -37,16 +61,17 @@ export const usePyroConsole = createGlobalState(() => {
     if (isProcessingInitialBatch && processedLines.length >= initialBatchSize) {
       isProcessingInitialBatch = false;
       output.value = processedLines.slice(-maxLines);
-      lineBuffer = [];
-      batchTimer = null;
-      return;
+    } else {
+      const newOutput = [...output.value, ...processedLines];
+      output.value = newOutput.slice(-maxLines);
     }
-
-    const newOutput = [...output.value, ...processedLines];
-    output.value = newOutput.slice(-maxLines);
 
     lineBuffer = [];
     batchTimer = null;
+
+    if (searchQuery.value) {
+      scheduleRefilter();
+    }
   };
 
   /**
@@ -86,22 +111,43 @@ export const usePyroConsole = createGlobalState(() => {
   };
 
   /**
+   * Sets the search query and filters the output based on the query
+   *
+   * @param {string} query - The search query
+   */
+  const setSearchQuery = (query: string): void => {
+    searchQuery.value = query;
+    searchRegex = null;
+    updateFilter();
+  };
+
+  /**
    * Clears all console output lines
    */
   const clear = (): void => {
     output.value = [];
+    filteredOutput.value = [];
+    searchQuery.value = "";
     lineBuffer = [];
     isProcessingInitialBatch = false;
     if (batchTimer) {
       clearTimeout(batchTimer);
       batchTimer = null;
     }
+    if (refilterTimer) {
+      clearTimeout(refilterTimer);
+      refilterTimer = null;
+    }
+    searchRegex = null;
   };
 
   return {
     output,
+    searchQuery,
+    filteredOutput,
     addLine,
     addLines,
+    setSearchQuery,
     clear,
   };
 });
