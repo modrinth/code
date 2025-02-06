@@ -29,8 +29,8 @@ const copySubdomain = () => {
   navigator.clipboard.writeText(props.subdomain + ".modrinth.gg");
   addNotification({
     group: "servers",
-    title: "Subdomain copied",
-    text: "Your subdomain has been copied to your clipboard.",
+    title: "Custom URL copied",
+    text: "Your server's URL has been copied to your clipboard.",
     type: "success",
   });
 };
