@@ -100,7 +100,7 @@
           <li
             v-for="(backup, index) in backups"
             :key="backup.id"
-            class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-4 shadow-md"
+            class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-2 shadow-md"
           >
             <div class="flex flex-col gap-4">
               <div class="flex items-center justify-between">
@@ -117,9 +117,9 @@
                     <LockIcon v-else-if="backup.locked" class="size-8" />
                     <BoxIcon v-else class="size-8" />
                   </div>
-                  <div class="flex min-w-0 flex-col gap-1">
+                  <div class="flex min-w-0 flex-col gap-2">
                     <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
-                      <div class="max-w-full truncate text-xl font-bold text-contrast">
+                      <div class="max-w-full truncate font-bold text-contrast">
                         {{ backup.name }}
                       </div>
 
@@ -130,7 +130,7 @@
                         <CheckIcon class="size-4" /> Latest
                       </div>
                     </div>
-                    <div class="flex items-center gap-2 text-sm">
+                    <div class="flex items-center gap-1 text-xs">
                       <CalendarIcon class="size-4" />
                       {{
                         new Date(backup.created_at).toLocaleString("en-US", {
@@ -150,6 +150,7 @@
                     direction="left"
                     position="bottom"
                     class="bg-transparent"
+                    :disabled="backups.some((b) => b.ongoing)"
                     :options="[
                       {
                         id: 'rename',
