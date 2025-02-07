@@ -132,7 +132,8 @@ const handleReinstall = async () => {
 
 const onShow = () => {
   hardReset.value = false;
-  selectedVersion.value = props.currentVersion?.version_number || "";
+  selectedVersion.value =
+    props.currentVersion?.version_number ?? props.versions?.[0]?.version_number ?? "";
 };
 
 const onHide = () => {
