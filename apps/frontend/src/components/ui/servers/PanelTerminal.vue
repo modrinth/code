@@ -81,13 +81,24 @@
         <div
           ref="scrollbarTrack"
           data-pyro-terminal-scrollbar-track
-          class="absolute -right-1 bottom-16 top-4 z-[4] w-4"
+          class="absolute -right-1 bottom-16 top-4 z-[4] w-4 overflow-hidden"
           @mousedown="handleTrackClick"
         >
           <div
+            v-if="hasSelection"
+            class="absolute h-full w-full opacity-20"
+            :style="{
+              background: `linear-gradient(to bottom,
+                transparent ${getSelectionPosition().start}%,
+                var(--color-blue) ${getSelectionPosition().start}%,
+                var(--color-blue) ${getSelectionPosition().end}%,
+                transparent ${getSelectionPosition().end}%)`,
+            }"
+          />
+          <div
             data-pyro-terminal-scrollbar
-            class="flex h-full justify-center rounded-full transition-all"
-            :style="{ opacity: bottomThreshold > 0 ? '1' : '0.5' }"
+            class="relative flex h-full justify-center rounded-full transition-all"
+            :style="{ opacity: bottomThreshold > 0 ? '0.7' : '0.3' }"
           >
             <div
               ref="scrollbarThumb"
@@ -836,6 +847,20 @@ const copySelectedLines = () => {
 
   navigator.clipboard.writeText(selectedLines.join("\n"));
 };
+
+const getSelectionPosition = () => {
+  if (!hasSelection.value || !scrollContainer.value) return { start: 0, end: 0 };
+
+  const start = Math.min(selectionStart.value!, selectionEnd.value!);
+  const end = Math.max(selectionStart.value!, selectionEnd.value!);
+
+  const totalLines = activeOutput.value.length;
+
+  return {
+    start: (start / totalLines) * 100,
+    end: ((end + 1) / totalLines) * 100,
+  };
+};
 </script>
 
 <style scoped>
@@ -1025,5 +1050,15 @@ html.dark-mode .progressive-gradient {
 
 .scrolling-active li {
   pointer-events: none;
+}
+
+[data-pyro-terminal-scrollbar-track] {
+  background: color-mix(in srgb, var(--color-bg) 50%, transparent);
+  backdrop-filter: blur(4px);
+  border-radius: 24px;
+}
+
+[data-pyro-terminal-scrollbar-thumb] {
+  background: color-mix(in srgb, var(--color-contrast) 40%, transparent);
 }
 </style>
