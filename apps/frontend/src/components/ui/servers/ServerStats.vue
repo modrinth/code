@@ -95,7 +95,10 @@ const updateGraphData = (arr: number[], newValue: number) => {
 };
 
 const metrics = computed(() => {
-  const ramPercent = (stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100;
+  const ramPercent = Math.min(
+    (stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100,
+    100,
+  );
   const cpuPercent = Math.min(stats.value.cpu_percent, 100);
 
   updateGraphData(cpuData.value, cpuPercent);
