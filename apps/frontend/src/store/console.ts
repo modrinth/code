@@ -141,6 +141,16 @@ export const usePyroConsole = createGlobalState(() => {
     searchRegex = null;
   };
 
+  /**
+   * Finds the index of a line in the main output
+   *
+   * @param {string} line - The line to find
+   * @returns {number} The index of the line, or -1 if not found
+   */
+  const findLineIndex = (line: string): number => {
+    return output.value.findIndex((l) => l === line);
+  };
+
   return {
     output,
     searchQuery,
@@ -149,5 +159,6 @@ export const usePyroConsole = createGlobalState(() => {
     addLines,
     setSearchQuery,
     clear,
+    findLineIndex,
   };
 });

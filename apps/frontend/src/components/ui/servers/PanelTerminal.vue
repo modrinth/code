@@ -82,6 +82,7 @@
           ref="scrollbarTrack"
           data-pyro-terminal-scrollbar-track
           class="absolute -right-1 bottom-16 top-4 z-[4] w-4 overflow-hidden"
+          :class="{ hidden: !isScrollable }"
           @mousedown="handleTrackClick"
         >
           <div
@@ -135,7 +136,17 @@
                 :key="`${visibleStartIndex + index}-${item}`"
               >
                 <li :class="{ 'selected-line': isLineSelected(visibleStartIndex + index) }">
-                  <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
+                  <div class="flex items-center gap-2">
+                    <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
+                    <button
+                      v-if="searchInput"
+                      class="jump-button mr-4 flex items-center gap-1 rounded-md bg-bg-blue px-2 py-1 text-xs text-blue transition-all hover:scale-105 active:scale-95"
+                      @click="jumpToLine(item)"
+                    >
+                      <RightArrowIcon class="h-3 w-3" />
+                      Jump
+                    </button>
+                  </div>
                 </li>
               </template>
             </ul>
@@ -155,6 +166,7 @@
         data-pyro-fullscreen
         :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
         class="experimental-styles-within absolute right-4 top-4 z-[3] grid h-12 w-12 place-content-center rounded-full border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+        :class="{ hidden: searchInput }"
         @click="toggleFullscreen"
       >
         <LazyUiServersIconsMinimizeIconVue v-if="isFullScreen" />
@@ -884,6 +896,71 @@ const getSelectionPosition = () => {
     end: ((end + 1) / totalLines) * 100,
   };
 };
+
+const jumpToLine = (line: string) => {
+  const index = pyroConsole.findLineIndex(line);
+  if (index === -1) return;
+
+  const currentLinePosition = getLinePosition(line);
+
+  clearSearch();
+
+  nextTick(() => {
+    if (!scrollContainer.value || currentLinePosition === null) return;
+
+    const targetScrollTop = index * LINE_HEIGHT - currentLinePosition.offset + 24;
+    scrollContainer.value.scrollTop = Math.max(0, targetScrollTop);
+
+    setTimeout(() => {
+      const elements = scrollContainer.value?.getElementsByTagName("li");
+      if (!elements) return;
+
+      for (const element of elements) {
+        if (element.textContent?.includes(line)) {
+          element.classList.add("jumped-line");
+          requestAnimationFrame(() => {
+            element.classList.add("jumped-line-active");
+            setTimeout(() => {
+              element.classList.remove("jumped-line-active");
+              element.classList.remove("jumped-line");
+            }, 2000);
+          });
+          break;
+        }
+      }
+    }, 50);
+  });
+};
+
+const getLinePosition = (line: string) => {
+  if (!scrollContainer.value) return null;
+
+  const elements = scrollContainer.value.getElementsByTagName("li");
+  for (const element of elements) {
+    if (element.textContent?.includes(line)) {
+      const rect = element.getBoundingClientRect();
+      const containerRect = scrollContainer.value.getBoundingClientRect();
+      return {
+        offset: rect.top - containerRect.top + scrollContainer.value.scrollTop,
+      };
+    }
+  }
+  return null;
+};
+
+const isScrollable = computed(() => {
+  if (!scrollContainer.value) return false;
+  return scrollContainer.value.scrollHeight > scrollContainer.value.clientHeight;
+});
+
+watch(
+  () => pyroConsole.filteredOutput.value,
+  () => {
+    nextTick(() => {
+      handleListScroll();
+    });
+  },
+);
 </script>
 
 <style scoped>
@@ -1116,5 +1193,40 @@ html.dark-mode .progressive-gradient {
   opacity: 0;
   width: 0;
   margin-left: 0;
+}
+
+.jumped-line {
+  position: relative;
+  z-index: 1;
+}
+
+.jumped-line-active {
+  animation: highlight-jump 2s ease;
+}
+
+@keyframes highlight-jump {
+  0% {
+    background: transparent;
+  }
+  15%,
+  85% {
+    background: color-mix(in srgb, var(--color-blue) 15%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.jump-button {
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.jump-button:hover {
+  opacity: 1;
+}
+
+[data-pyro-terminal-scrollbar-track].hidden {
+  display: none;
 }
 </style>
