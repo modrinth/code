@@ -17,7 +17,7 @@
         <span v-else class="inline-block h-3 w-12 animate-pulse rounded bg-button-border"></span>
       </div>
     </NuxtLink>
-    <div v-else class="min-w-0 truncate text-sm font-semibold">
+    <div v-else class="flex min-w-0 flex-row items-center gap-2 truncate text-sm font-semibold">
       {{ game[0].toUpperCase() + game.slice(1) }}
       <span v-if="mcVersion">{{ mcVersion }}</span>
       <span
