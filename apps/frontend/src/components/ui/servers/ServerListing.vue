@@ -107,7 +107,7 @@ if (props.upstream) {
 
 const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
 
-if (process.server && projectData.value?.icon_url) {
+if (import.meta.server && projectData.value?.icon_url) {
   await usePyroServer(props.server_id!, ["general"]);
 }
 
