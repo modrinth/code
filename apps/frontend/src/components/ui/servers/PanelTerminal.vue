@@ -105,7 +105,7 @@
           ref="scrollContainer"
           data-pyro-terminal-root
           class="scrollbar-none absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
-          @scroll.passive="(e: Event) => handleScrollEvent()"
+          @scroll.passive="() => handleScrollEvent()"
         >
           <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
             <ul
