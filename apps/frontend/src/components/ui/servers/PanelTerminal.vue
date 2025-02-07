@@ -164,7 +164,7 @@
       <Transition name="fade">
         <div
           v-if="hasSelection || isSingleLineSelected"
-          class="absolute right-20 top-4 z-[3] flex flex-row gap-2"
+          class="absolute right-20 top-4 z-[3] flex flex-row items-center"
         >
           <button
             data-pyro-copy
@@ -175,16 +175,18 @@
             <CopyIcon class="h-5 w-5" />
             <span class="">Copy</span>
           </button>
-          <button
-            v-if="hasSelection"
-            data-pyro-view
-            label="View full content"
-            class="experimental-styles-within flex h-12 flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
-            @click="showSelectedLines"
-          >
-            <EyeIcon class="h-5 w-5" />
-            <span class="">View</span>
-          </button>
+          <Transition name="view-button">
+            <button
+              v-if="hasSelection"
+              data-pyro-view
+              label="View full content"
+              class="experimental-styles-within ml-2 flex h-12 w-[100px] flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+              @click="showSelectedLines"
+            >
+              <EyeIcon class="h-5 w-5" />
+              <span class="">View</span>
+            </button>
+          </Transition>
         </div>
       </Transition>
 
@@ -1079,5 +1081,40 @@ html.dark-mode .progressive-gradient {
 
 [data-pyro-terminal-scrollbar-thumb] {
   background: color-mix(in srgb, var(--color-contrast) 40%, transparent);
+}
+
+.view-button-enter-active {
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 100px;
+  margin-left: 0.5rem;
+  overflow: hidden;
+}
+
+.view-button-leave-active {
+  transition: all 200ms cubic-bezier(0.4, 0, 1, 1);
+  overflow: hidden;
+}
+
+.view-button-enter-from,
+.view-button-leave-to {
+  opacity: 0;
+  width: 0;
+  margin-left: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.view-button-enter-active,
+.view-button-leave-active {
+  transition: all 200ms ease;
+  width: 100px;
+  margin-left: 0.5rem;
+}
+
+.view-button-enter-from,
+.view-button-leave-to {
+  opacity: 0;
+  width: 0;
+  margin-left: 0;
 }
 </style>
