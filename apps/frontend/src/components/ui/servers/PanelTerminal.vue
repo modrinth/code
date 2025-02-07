@@ -162,7 +162,10 @@
       </button>
 
       <Transition name="fade">
-        <div v-if="hasSelection" class="absolute right-20 top-4 z-[3] flex flex-row gap-2">
+        <div
+          v-if="hasSelection || isSingleLineSelected"
+          class="absolute right-20 top-4 z-[3] flex flex-row gap-2"
+        >
           <button
             data-pyro-copy
             label="Copy selected lines"
@@ -173,6 +176,7 @@
             <span class="">Copy</span>
           </button>
           <button
+            v-if="hasSelection"
             data-pyro-view
             label="View full content"
             class="experimental-styles-within flex h-12 flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
@@ -838,14 +842,31 @@ const hasSelection = computed(
     selectionStart.value !== selectionEnd.value,
 );
 
-const copySelectedLines = () => {
-  if (!hasSelection.value) return;
+const isSingleLineSelected = computed(
+  () =>
+    selectionStart.value !== null &&
+    selectionEnd.value !== null &&
+    selectionStart.value === selectionEnd.value,
+);
 
-  const start = Math.min(selectionStart.value!, selectionEnd.value!);
-  const end = Math.max(selectionStart.value!, selectionEnd.value!);
-  const selectedLines = activeOutput.value.slice(start, end + 1);
+const copySelectedLines = () => {
+  if (!hasSelection.value && !isSingleLineSelected.value) return;
+
+  let selectedLines;
+  if (isSingleLineSelected.value) {
+    const index = selectionStart.value!;
+    selectedLines = [activeOutput.value[index]];
+  } else {
+    const start = Math.min(selectionStart.value!, selectionEnd.value!);
+    const end = Math.max(selectionStart.value!, selectionEnd.value!);
+    selectedLines = activeOutput.value.slice(start, end + 1);
+  }
 
   navigator.clipboard.writeText(selectedLines.join("\n"));
+
+  selectionStart.value = null;
+  selectionEnd.value = null;
+  lastClickIndex.value = null;
 };
 
 const getSelectionPosition = () => {
