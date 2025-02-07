@@ -34,7 +34,7 @@
           v-if="metric.showGraph"
           type="area"
           height="142"
-          :options="chartOptions"
+          :options="getChartOptions(metric.warning)"
           :series="[{ name: metric.title, data: metric.data }]"
           class="chart absolute bottom-0 left-0 right-0 w-full opacity-0"
         />
@@ -109,7 +109,6 @@ const metrics = computed(() => {
       icon: CPUIcon,
       data: cpuData.value,
       showGraph: true,
-      // rinth TUAHHH!!!
       warning: cpuPercent >= 90 ? "CPU usage is very high" : null,
     },
     {
@@ -120,13 +119,13 @@ const metrics = computed(() => {
       max: userPreferences.value.ramAsNumber ? formatBytes(stats.value.ram_total_bytes) : "100%",
       icon: DBIcon,
       data: ramData.value,
-      showGraph: !userPreferences.value.ramAsNumber,
+      showGraph: true,
       warning: ramPercent >= 90 ? "Memory usage is very high" : null,
     },
   ];
 });
 
-const chartOptions = {
+const getChartOptions = (hasWarning: string | null) => ({
   chart: {
     type: "area",
     animations: { enabled: false },
@@ -164,11 +163,11 @@ const chartOptions = {
     max: 100,
     forceNiceScale: false,
   },
-  colors: ["var(--color-brand)"],
+  colors: [hasWarning ? "var(--color-orange)" : "var(--color-brand)"],
   dataLabels: {
     enabled: false,
   },
-};
+});
 
 watch(
   () => props.data.current,
