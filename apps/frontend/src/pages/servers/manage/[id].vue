@@ -343,7 +343,7 @@
         <div
           v-if="isReconnecting"
           data-pyro-server-ws-reconnecting
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
         >
           <UiServersPanelSpinner />
           Hang on, we're reconnecting to your server.
@@ -352,10 +352,16 @@
         <div
           v-if="serverData.status === 'installing'"
           data-pyro-server-installing
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
         >
-          <UiServersPanelSpinner />
-          <span> We're preparing your server, this may take a few minutes. </span>
+          <UiServersServerIcon :image="serverData.image" class="!h-10 !w-10" />
+
+          <div class="flex flex-col gap-1">
+            <span class="text-lg font-bold"> We're preparing your server! </span>
+            <div class="flex flex-row items-center gap-2">
+              <UiServersPanelSpinner class="!h-3 !w-3" /> <InstallingTicker />
+            </div>
+          </div>
         </div>
 
         <NuxtPage
@@ -392,6 +398,7 @@ import {
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
+import InstallingTicker from "~/components/ui/servers/InstallingTicker.vue";
 import { reloadNuxtApp, navigateTo } from "#app";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";

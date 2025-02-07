@@ -26,8 +26,16 @@
   <div class="flex h-full w-full flex-col">
     <div v-if="data && versions" class="flex w-full flex-col">
       <div class="card flex flex-col gap-4">
-        <div class="flex flex-row items-center justify-between gap-2">
-          <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
+        <div class="flex select-none flex-col items-center justify-between gap-2 lg:flex-row">
+          <div class="flex flex-row items-center gap-2">
+            <h2 class="m-0 text-lg font-bold text-contrast">Modpack</h2>
+            <div
+              v-if="updateAvailable"
+              class="rounded-full bg-bg-orange px-2 py-1 text-xs font-medium text-orange"
+            >
+              <span>Update available</span>
+            </div>
+          </div>
           <div v-if="data.upstream" class="flex gap-4">
             <ButtonStyled>
               <button
@@ -207,6 +215,19 @@ const selectLoader = (loader: string) => {
 const refreshData = async () => {
   await Promise.all([refreshVersions(), refreshCurrentVersion()]);
 };
+
+const updateAvailable = computed(() => {
+  // so sorry
+  // @ts-ignore
+  if (!data.value?.upstream || !versions.value?.length || !currentVersion.value) {
+    return false;
+  }
+
+  // @ts-ignore
+  const latestVersion = versions.value[0];
+  // @ts-ignore
+  return latestVersion.id !== currentVersion.value.id;
+});
 
 watch(
   () => props.server.general?.status,
