@@ -18,7 +18,7 @@
       </div>
       <span
         v-if="pyroConsole.filteredOutput.value.length && searchInput"
-        class="whitespace-pre text-sm opacity-50"
+        class="whitespace-pre text-sm text-contrast"
       >
         {{ pyroConsole.filteredOutput.value.length }} results
       </span>
