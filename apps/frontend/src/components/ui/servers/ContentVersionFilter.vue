@@ -152,7 +152,6 @@ function updateFilters() {
   emit("update:query", {
     g: selectedGameVersions.value,
     l: selectedPlatforms.value,
-    page: undefined,
   });
 }
 

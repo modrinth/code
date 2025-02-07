@@ -204,7 +204,7 @@
             @click="emitChangeModVersion"
           >
             <CheckIcon />
-            Apply
+            Install
           </button>
         </ButtonStyled>
         <ButtonStyled>
@@ -244,9 +244,14 @@ interface ContentItem extends Mod {
   changing?: boolean;
 }
 
+interface EditVersion extends Version {
+  installed: boolean;
+  upgrade?: boolean;
+}
+
 const modModal = ref();
 const modDetails = ref<ContentItem>();
-const currentVersions = ref<Version[] | null>(null);
+const currentVersions = ref<EditVersion[] | null>(null);
 const versionsLoading = ref(false);
 const versionsError = ref("");
 const showBetaAlphaReleases = ref(false);
@@ -267,8 +272,6 @@ const { pluginLoaders, modLoaders } = tags.value.loaders.reduce(
   },
   { pluginLoaders: [] as string[], modLoaders: [] as string[] },
 );
-
-const installedModVersion = ref();
 
 const selectedVersion = ref();
 const filtersRef: Ref<InstanceType<typeof ContentVersionFilter> | null> = ref(null);
@@ -310,7 +313,7 @@ const updateFiltersToUi = () => {
   selectedVersion.value = filteredVersions.value[0];
 };
 
-const updateFiltersFromUi = (event) => {
+const updateFiltersFromUi = (event: { g: string[]; l: string[] }) => {
   selectedFilters.value = {
     selectedGameVersions: event.g,
     selectedPlatforms: event.l,
@@ -320,31 +323,31 @@ const updateFiltersFromUi = (event) => {
 const filteredVersions = computed(() => {
   if (!currentVersions.value) return [];
 
-  const versionsWithoutReleaseFilter = currentVersions.value.filter(
-    (version: Version, index: number) => {
-      if (index === 0) return true;
-      return (
-        filtersRef.value?.selectedPlatforms.every((platform) =>
-          (
-            backwardCompatPlatformMap[platform as keyof typeof backwardCompatPlatformMap] || [
-              platform,
-            ]
-          ).some((loader) => version.loaders.includes(loader)),
-        ) &&
-        filtersRef.value?.selectedGameVersions.every((gameVersion) =>
-          version.game_versions.includes(gameVersion),
-        )
-      );
-    },
-  );
+  const versionsWithoutReleaseFilter = currentVersions.value.filter((version: EditVersion) => {
+    if (version.installed) return true;
+    return (
+      filtersRef.value?.selectedPlatforms.every((platform) =>
+        (
+          backwardCompatPlatformMap[platform as keyof typeof backwardCompatPlatformMap] || [
+            platform,
+          ]
+        ).some((loader) => version.loaders.includes(loader)),
+      ) &&
+      filtersRef.value?.selectedGameVersions.every((gameVersion) =>
+        version.game_versions.includes(gameVersion),
+      )
+    );
+  });
 
-  const versionTypes = new Set(versionsWithoutReleaseFilter.map((v: Version) => v.version_type));
+  const versionTypes = new Set(
+    versionsWithoutReleaseFilter.map((v: EditVersion) => v.version_type),
+  );
   const releaseVersions = versionTypes.has("release");
   const betaVersions = versionTypes.has("beta");
   const alphaVersions = versionTypes.has("alpha");
 
-  const versions = versionsWithoutReleaseFilter.filter((version: Version, index: number) => {
-    if (showBetaAlphaReleases.value || index === 0) return true;
+  const versions = versionsWithoutReleaseFilter.filter((version: EditVersion) => {
+    if (showBetaAlphaReleases.value || version.installed) return true;
     return releaseVersions
       ? version.version_type === "release"
       : betaVersions
@@ -354,7 +357,7 @@ const filteredVersions = computed(() => {
           : false;
   });
 
-  return versions.map((version: { version_type: string; version_number: string }) => {
+  return versions.map((version: EditVersion) => {
     let suffix = "";
 
     if (version.version_type === "alpha" && releaseVersions && betaVersions) {
@@ -415,7 +418,7 @@ async function show(mod: ContentItem) {
           "game_versions" in item,
       )
     ) {
-      currentVersions.value = result as Version[];
+      currentVersions.value = result as EditVersion[];
     } else {
       throw new Error("Invalid version data received.");
     }
@@ -425,16 +428,15 @@ async function show(mod: ContentItem) {
       (item: { id: string }) => item.id === mod.version_id,
     );
     if (currentModIndex === -1) {
-      installedModVersion.value = {
-        id: mod.version_id,
+      currentVersions.value[currentModIndex] = {
+        ...currentVersions.value[currentModIndex],
+        installed: true,
         version_number: `${mod.version_number} (current) (external)`,
       };
     } else {
-      installedModVersion.value = currentVersions.value[currentModIndex];
-      installedModVersion.value.version_number = `${mod.version_number} (current)`;
+      currentVersions.value[currentModIndex].version_number = `${mod.version_number} (current)`;
+      currentVersions.value[currentModIndex].installed = true;
     }
-    currentVersions.value.splice(currentModIndex, 1);
-    currentVersions.value = [installedModVersion.value, ...currentVersions.value];
 
     // initially filter the platform and game versions for the server config
     const platformSet = new Set<string>();
