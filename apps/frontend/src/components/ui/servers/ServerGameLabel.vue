@@ -11,14 +11,11 @@
       class="flex min-w-0 items-center truncate text-sm font-semibold"
       :class="serverId ? 'hover:underline' : ''"
     >
-      <span>
+      <div class="flex flex-row items-center gap-2">
         {{ game[0].toUpperCase() + game.slice(1) }}
         <span v-if="mcVersion">{{ mcVersion }}</span>
-        <span
-          v-else
-          class="inline-block h-3 w-12 animate-pulse rounded bg-button-border align-[0.1em]"
-        ></span>
-      </span>
+        <span v-else class="inline-block h-3 w-12 animate-pulse rounded bg-button-border"></span>
+      </div>
     </NuxtLink>
     <div v-else class="min-w-0 truncate text-sm font-semibold">
       {{ game[0].toUpperCase() + game.slice(1) }}
