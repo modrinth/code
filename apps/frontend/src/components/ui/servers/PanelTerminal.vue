@@ -110,6 +110,7 @@
             <ul
               class="m-0 list-none p-0"
               data-pyro-terminal-virtual-list
+              :class="{ 'scrolling-active': isScrolling && !isSelecting }"
               :style="virtualListStyle"
               aria-live="polite"
               role="listbox"
@@ -344,7 +345,9 @@ const handleListScroll = () => {
   }
 
   scrollEndTimeout.value = setTimeout(() => {
-    isScrolling.value = false;
+    if (!isSelecting.value) {
+      isScrolling.value = false;
+    }
     const finalPosition = scrollHeight - container.scrollTop - clientHeight.value;
     isScrolledToBottom.value = finalPosition <= threshold;
     bottomThreshold.value = Math.min(1, finalPosition / 256);
@@ -992,5 +995,13 @@ html.dark-mode .progressive-gradient {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.scrolling-active {
+  pointer-events: none;
+}
+
+.scrolling-active li {
+  pointer-events: none;
 }
 </style>
