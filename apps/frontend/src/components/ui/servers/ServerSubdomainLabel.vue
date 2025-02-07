@@ -44,5 +44,5 @@ const userPreferences = useStorage(`pyro-server-${serverId.value}-preferences`, 
   hideSubdomainLabel: false,
 });
 
-const isHidden = computed(() => userPreferences.value.hideSubdomain);
+const isHidden = computed(() => userPreferences.value.hideSubdomainLabel);
 </script>
