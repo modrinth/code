@@ -20,7 +20,8 @@
         v-if="pyroConsole.filteredOutput.value.length && searchInput"
         class="whitespace-pre text-sm text-contrast"
       >
-        {{ pyroConsole.filteredOutput.value.length }} results
+        {{ pyroConsole.filteredOutput.value.length }}
+        {{ pyroConsole.filteredOutput.value.length === 1 ? "result" : "results" }}
       </span>
     </div>
     <div
