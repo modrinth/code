@@ -151,16 +151,26 @@
       </button>
 
       <Transition name="fade">
-        <button
-          v-if="hasSelection"
-          data-pyro-copy
-          label="Copy selected lines"
-          class="experimental-styles-within absolute right-20 top-4 z-[3] flex h-12 flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
-          @click="copySelectedLines"
-        >
-          <CopyIcon class="h-5 w-5" />
-          <span class="">Copy</span>
-        </button>
+        <div v-if="hasSelection" class="absolute right-20 top-4 z-[3] flex flex-row gap-2">
+          <button
+            data-pyro-copy
+            label="Copy selected lines"
+            class="experimental-styles-within flex h-12 flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+            @click="copySelectedLines"
+          >
+            <CopyIcon class="h-5 w-5" />
+            <span class="">Copy</span>
+          </button>
+          <button
+            data-pyro-view
+            label="View full content"
+            class="experimental-styles-within flex h-12 flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+            @click="showSelectedLines"
+          >
+            <EyeIcon class="h-5 w-5" />
+            <span class="">View</span>
+          </button>
+        </div>
       </Transition>
 
       <Transition name="scroll-to-bottom">
@@ -176,16 +186,16 @@
         </button>
       </Transition>
     </div>
-    <NewModal ref="logModal" class="z-[9999]" header="Full Log Message">
+    <NewModal ref="logModal" class="z-[9999]" header="Viewing full log">
       <div class="text-contrast">
-        <pre class="whitespace-pre-wrap break-all font-mono">{{ selectedLog }}</pre>
+        <pre class="select-text overflow-x-auto whitespace-pre font-mono">{{ selectedLog }}</pre>
       </div>
     </NewModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon, CopyIcon, XIcon, SearchIcon } from "@modrinth/assets";
+import { RightArrowIcon, CopyIcon, XIcon, SearchIcon, EyeIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, shallowRef } from "vue";
 import { useThrottleFn, useDebounceFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
@@ -585,6 +595,17 @@ const selectedLog = ref("");
 
 const showFullLogMessage = (log: string) => {
   selectedLog.value = log;
+  logModal.value?.show();
+};
+
+const showSelectedLines = () => {
+  if (!hasSelection.value) return;
+
+  const start = Math.min(selectionStart.value!, selectionEnd.value!);
+  const end = Math.max(selectionStart.value!, selectionEnd.value!);
+  const selectedLines = activeOutput.value.slice(start, end + 1);
+
+  selectedLog.value = selectedLines.join("\n");
   logModal.value?.show();
 };
 
