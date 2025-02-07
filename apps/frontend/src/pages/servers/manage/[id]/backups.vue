@@ -53,7 +53,10 @@
             </div>
             <div class="flex w-full flex-col gap-2 sm:w-fit sm:flex-row">
               <ButtonStyled type="standard">
-                <button @click="showbackupSettingsModal">
+                <button
+                  :disabled="server.general?.status === 'installing'"
+                  @click="showbackupSettingsModal"
+                >
                   <SettingsIcon class="h-5 w-5" />
                   Auto backups
                 </button>
@@ -63,13 +66,16 @@
                   v-tooltip="
                     isServerRunning && !userPreferences.backupWhileRunning
                       ? 'Cannot create backup while server is running. You can disable this from your server Options > Preferences.'
-                      : ''
+                      : server.general?.status === 'installing'
+                        ? 'Cannot create backups while server is being installed'
+                        : ''
                   "
                   class="w-full sm:w-fit"
                   :disabled="
                     (isServerRunning && !userPreferences.backupWhileRunning) ||
                     data.used_backup_quota >= data.backup_quota ||
-                    backups.some((backup) => backup.ongoing)
+                    backups.some((backup) => backup.ongoing) ||
+                    server.general?.status === 'installing'
                   "
                   @click="showCreateModel"
                 >
