@@ -430,7 +430,7 @@ const performBackup = async (): Promise<boolean> => {
     let attempts = 0;
     while (true) {
       attempts++;
-      if (attempts > 20) {
+      if (attempts > 100) {
         addNotification({
           group: "server",
           title: "Backup Failed",

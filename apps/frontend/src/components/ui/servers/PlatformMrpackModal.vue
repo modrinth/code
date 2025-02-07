@@ -188,7 +188,7 @@ const performBackup = async (): Promise<boolean> => {
         isBackingUp.value = false;
         break;
       }
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
     return true;
   } catch {
