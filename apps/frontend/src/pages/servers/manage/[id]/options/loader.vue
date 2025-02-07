@@ -207,6 +207,19 @@ const selectLoader = (loader: string) => {
 const refreshData = async () => {
   await Promise.all([refreshVersions(), refreshCurrentVersion()]);
 };
+
+watch(
+  () => props.server.general?.status,
+  async (newStatus, oldStatus) => {
+    if (oldStatus === "installing" && newStatus === "available") {
+      await Promise.all([
+        refreshVersions(),
+        refreshCurrentVersion(),
+        props.server.refresh(["general"]),
+      ]);
+    }
+  },
+);
 </script>
 
 <style scoped>

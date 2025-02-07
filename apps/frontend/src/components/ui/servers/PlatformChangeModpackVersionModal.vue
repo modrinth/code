@@ -130,6 +130,15 @@ const handleReinstall = async () => {
   }
 };
 
+watch(
+  () => props.serverStatus,
+  (newStatus) => {
+    if (newStatus === "installing") {
+      hide();
+    }
+  },
+);
+
 const onShow = () => {
   hardReset.value = false;
   selectedVersion.value =
