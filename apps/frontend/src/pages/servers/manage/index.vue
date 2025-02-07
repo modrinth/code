@@ -4,45 +4,7 @@
     class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-6"
   >
     <div
-      v-if="serverList.length > 0 || isPollingForNewServers"
-      class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row"
-    >
-      <h1 class="w-full text-4xl font-bold text-contrast">Servers</h1>
-      <div class="mb-4 flex w-full flex-row items-center justify-end gap-2 md:mb-0 md:gap-4">
-        <div class="relative w-full text-sm md:w-72">
-          <label class="sr-only" for="search">Search</label>
-          <SearchIcon
-            class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
-            aria-hidden="true"
-          />
-          <input
-            id="search"
-            v-model="searchInput"
-            class="w-full border-[1px] border-solid border-button-border pl-9"
-            type="search"
-            name="search"
-            autocomplete="off"
-            placeholder="Search servers..."
-          />
-        </div>
-        <ButtonStyled type="standard">
-          <NuxtLink
-            class="!h-10 whitespace-pre !border-[1px] !border-solid !border-button-border text-sm !font-medium"
-            :to="{ path: '/servers', hash: '#plan' }"
-          >
-            <PlusIcon class="size-4" />
-            New server
-          </NuxtLink>
-        </ButtonStyled>
-      </div>
-    </div>
-
-    <LazyUiServersServerManageEmptyState
-      v-if="serverList.length === 0 && !isPollingForNewServers && !hasError"
-    />
-
-    <div
-      v-else-if="hasError"
+      v-if="hasError || fetchError"
       class="mx-auto flex h-full min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 text-left"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -53,24 +15,22 @@
             </div>
             <h1 class="m-0 w-fit text-3xl font-bold">Servers could not be loaded</h1>
           </div>
-          <p class="text-lg text-secondary">
-            We're experiencing temporary issues with our servers.
-          </p>
+          <p class="text-lg text-secondary">We may have temporary issues with our servers.</p>
           <ul class="m-0 list-disc space-y-4 p-0 pl-4 text-left text-sm leading-[170%]">
             <li>
               Our systems automatically alert our team when there's an issue. We are already working
-              on fixing your server.
+              on getting them back online.
             </li>
             <li>
-              If you recently purchased your Modrinth Server, it's currently in a queue and will
+              If you recently purchased your Modrinth Server, it is currently in a queue and will
               appear here as soon as it's ready. <br />
               <span class="font-medium text-contrast"
                 >Do not attempt to purchase a new server.</span
               >
             </li>
             <li>
-              Please contact Modrinth Support for personalized assistance regarding the status of
-              your server.
+              If you require personalized support regarding the status of your server, please
+              contact Modrinth Support.
             </li>
 
             <li v-if="fetchError" class="text-red">
@@ -87,10 +47,48 @@
         <ButtonStyled size="large" type="standard" color="brand">
           <a class="mt-6 !w-full" href="https://support.modrinth.com">Contact Modrinth Support</a>
         </ButtonStyled>
+        <ButtonStyled size="large" @click="() => reloadNuxtApp()">
+          <button class="mt-3 !w-full">Reload</button>
+        </ButtonStyled>
       </div>
     </div>
 
+    <LazyUiServersServerManageEmptyState
+      v-else-if="serverList.length === 0 && !isPollingForNewServers && !hasError"
+    />
+
     <template v-else>
+      <div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
+        <h1 class="w-full text-4xl font-bold text-contrast">Servers</h1>
+        <div class="mb-4 flex w-full flex-row items-center justify-end gap-2 md:mb-0 md:gap-4">
+          <div class="relative w-full text-sm md:w-72">
+            <label class="sr-only" for="search">Search</label>
+            <SearchIcon
+              class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
+              aria-hidden="true"
+            />
+            <input
+              id="search"
+              v-model="searchInput"
+              class="w-full border-[1px] border-solid border-button-border pl-9"
+              type="search"
+              name="search"
+              autocomplete="off"
+              placeholder="Search servers..."
+            />
+          </div>
+          <ButtonStyled type="standard">
+            <NuxtLink
+              class="!h-10 whitespace-pre !border-[1px] !border-solid !border-button-border text-sm !font-medium"
+              :to="{ path: '/servers', hash: '#plan' }"
+            >
+              <PlusIcon class="size-4" />
+              New server
+            </NuxtLink>
+          </ButtonStyled>
+        </div>
+      </div>
+
       <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
         <UiServersServerListing
           v-for="server in filteredData"
@@ -117,12 +115,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import type { Server } from "~/types/servers";
 import type { PyroFetchError } from "~/composables/pyroFetch";
+import { reloadNuxtApp } from "#app";
 
 definePageMeta({
   middleware: "auth",
@@ -144,15 +143,10 @@ const {
   data: serverResponse,
   error: fetchError,
   refresh,
-} = await useAsyncData<ServerResponse>("ServerList", async () => {
-  try {
-    const response = await usePyroFetch<ServerResponse>("servers");
-    hasError.value = false;
-    return response;
-  } catch (error) {
-    hasError.value = true;
-    throw error;
-  }
+} = await useAsyncData<ServerResponse>("ServerList", () => usePyroFetch<ServerResponse>("servers"));
+
+watch([fetchError, serverResponse], ([error, response]) => {
+  hasError.value = !!error || !response;
 });
 
 const serverList = computed(() => {
