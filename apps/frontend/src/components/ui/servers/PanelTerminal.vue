@@ -6,7 +6,7 @@
           v-model="searchInput"
           type="text"
           placeholder="Search logs..."
-          class="h-12 !w-full rounded-full border-[1px] border-solid border-button-border bg-bg-raised !pl-10 pr-10 text-contrast transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-button-border"
+          class="h-12 !w-full !pl-10 pr-10"
           @keydown.escape="clearSearch"
         />
         <SearchIcon class="absolute left-4 top-1/2 -translate-y-1/2" />
@@ -538,8 +538,16 @@ const toggleFullscreen = () => {
 };
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (event.key === "Escape" && isFullScreen.value) {
-    exitFullScreen();
+  if (event.key === "Escape") {
+    if (selectionStart.value !== null || selectionEnd.value !== null) {
+      selectionStart.value = null;
+      selectionEnd.value = null;
+      lastClickIndex.value = null;
+      return;
+    }
+    if (isFullScreen.value) {
+      exitFullScreen();
+    }
   }
 };
 

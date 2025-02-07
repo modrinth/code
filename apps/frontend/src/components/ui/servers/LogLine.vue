@@ -1,6 +1,6 @@
 <template>
   <div
-    class="parsed-log relative flex h-8 w-full items-center overflow-hidden px-6"
+    class="parsed-log relative flex h-8 w-full items-center overflow-hidden rounded-lg px-6"
     @mouseenter="checkOverflow"
     @touchstart="checkOverflow"
   >
@@ -72,11 +72,12 @@ onUnmounted(() => {
 <style scoped>
 .parsed-log {
   background: transparent;
-  transition: background-color 0.2s;
+  transition: background-color 0.1s;
 }
 
 .parsed-log:hover {
-  background: rgba(128, 128, 128, 0.1);
+  background: rgba(128, 128, 128, 0.25);
+  transition: 0s;
 }
 
 .log-content > span {
