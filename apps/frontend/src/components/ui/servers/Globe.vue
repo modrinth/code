@@ -1,9 +1,8 @@
 <template>
-  <div ref="container" class="relative h-[400px] w-full lg:h-[600px]">
+  <div ref="container" class="relative h-[400px] w-full cursor-move lg:h-[600px]">
     <div
       v-for="location in locations"
       :key="location.name"
-      @click="toggleLocationClicked(location)"
       :class="{
         'opacity-0': !showLabels,
         hidden: !isLocationVisible(location),
@@ -14,27 +13,30 @@
         left: `${location.screenPosition?.x || 0}px`,
         top: `${location.screenPosition?.y || 0}px`,
       }"
-      class="flex transform items-center gap-2 rounded-full bg-bg p-3 transition-opacity duration-200"
+      class="location-button center-on-top-left flex transform cursor-pointer items-center rounded-full bg-bg px-3 outline-1 outline-red transition-opacity duration-200 hover:z-50"
+      @click="toggleLocationClicked(location)"
     >
       <div
         :class="{
           'animate-pulse': location.active,
           'border-gray-400': !location.active,
-          'border-brand bg-brand': location.active,
+          'border-purple bg-purple': location.active,
           'border-dashed': !location.active,
           'opacity-40': !location.active,
         }"
-        class="size-2.5 rounded-full border-2"
+        class="my-3 size-2.5 shrink-0 rounded-full border-2"
       ></div>
-      <span
+      <div
+        class="expanding-item"
         :class="{
-          hidden: !location.clicked,
+          expanded: location.clicked,
         }"
-        class="whitespace-nowrap text-sm"
       >
-        {{ location.name }}
-        <span v-if="!location.active" class="text-brand/70 ml-1 text-xs">Coming Soon</span>
-      </span>
+        <div class="whitespace-nowrap text-sm">
+          <span class="ml-2"> {{ location.name }} </span>
+          <span v-if="!location.active" class="ml-1 text-xs text-secondary">(Coming Soon)</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -54,15 +56,15 @@ const locations = ref([
   { name: "Miami", lat: 25.7617, lng: -80.1918, active: true, clicked: false },
   { name: "Seattle", lat: 47.608013, lng: -122.3321, active: true, clicked: false },
   // Future Locations
-  { name: "London", lat: 51.5074, lng: -0.1278, active: false, clicked: false },
-  { name: "Frankfurt", lat: 50.1109, lng: 8.6821, active: false, clicked: false },
-  { name: "Amsterdam", lat: 52.3676, lng: 4.9041, active: false, clicked: false },
-  { name: "Paris", lat: 48.8566, lng: 2.3522, active: false, clicked: false },
-  { name: "Singapore", lat: 1.3521, lng: 103.8198, active: false, clicked: false },
-  { name: "Tokyo", lat: 35.6762, lng: 139.6503, active: false, clicked: false },
-  { name: "Sydney", lat: -33.8688, lng: 151.2093, active: false, clicked: false },
-  { name: "São Paulo", lat: -23.5505, lng: -46.6333, active: false, clicked: false },
-  { name: "Toronto", lat: 43.6532, lng: -79.3832, active: false, clicked: false },
+  // { name: "London", lat: 51.5074, lng: -0.1278, active: false, clicked: false },
+  // { name: "Frankfurt", lat: 50.1109, lng: 8.6821, active: false, clicked: false },
+  // { name: "Amsterdam", lat: 52.3676, lng: 4.9041, active: false, clicked: false },
+  // { name: "Paris", lat: 48.8566, lng: 2.3522, active: false, clicked: false },
+  // { name: "Singapore", lat: 1.3521, lng: 103.8198, active: false, clicked: false },
+  // { name: "Tokyo", lat: 35.6762, lng: 139.6503, active: false, clicked: false },
+  // { name: "Sydney", lat: -33.8688, lng: 151.2093, active: false, clicked: false },
+  // { name: "São Paulo", lat: -23.5505, lng: -46.6333, active: false, clicked: false },
+  // { name: "Toronto", lat: 43.6532, lng: -79.3832, active: false, clicked: false },
 ]);
 
 const isLocationVisible = (location) => {
@@ -116,7 +118,7 @@ const init = () => {
   const material = new THREE.ShaderMaterial({
     uniforms: {
       outlineTexture: { value: outlineTexture },
-      globeColor: { value: new THREE.Color("#1BD96A") },
+      globeColor: { value: new THREE.Color("#60fbb5") },
     },
     vertexShader: `
       varying vec2 vUv;
@@ -148,7 +150,7 @@ const init = () => {
     transparent: true,
     side: THREE.BackSide,
     uniforms: {
-      color: { value: new THREE.Color("#1BD96A") },
+      color: { value: new THREE.Color("#56f690") },
       viewVector: { value: camera.position },
     },
     vertexShader: `
@@ -271,5 +273,31 @@ onUnmounted(() => {
 
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.center-on-top-left {
+  transform: translate(-50%, -50%);
+}
+
+.location-button:hover .expanding-item,
+.expanding-item.expanded {
+  grid-template-columns: 1fr;
+}
+
+.expanding-item {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 0.15s ease-in-out;
+  overflow: hidden;
+
+  > div {
+    overflow: hidden;
+  }
+}
+
+@media (prefers-reduced-motion) {
+  .expanding-item {
+    transition: none !important;
+  }
 }
 </style>
