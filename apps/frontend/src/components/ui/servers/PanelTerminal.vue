@@ -5,7 +5,7 @@
         <input
           v-model="searchInput"
           type="text"
-          placeholder="Search logs..."
+          placeholder="Search logs"
           class="h-12 !w-full !pl-10 pr-10"
           @keydown.escape="clearSearch"
         />
