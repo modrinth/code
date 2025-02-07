@@ -39,9 +39,9 @@
               </button>
             </ButtonStyled>
             <!-- dumb hack to make a button link not a link -->
-            <ButtonStyled :disabled="isInstalling">
+            <ButtonStyled>
               <template v-if="isInstalling">
-                <button>
+                <button :disabled="isInstalling">
                   <TransferIcon class="size-4" />
                   Switch modpack
                 </button>
