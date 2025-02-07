@@ -1053,8 +1053,6 @@ html.dark-mode .progressive-gradient {
 }
 
 [data-pyro-terminal-scrollbar-track] {
-  background: color-mix(in srgb, var(--color-bg) 50%, transparent);
-  backdrop-filter: blur(4px);
   border-radius: 24px;
 }
 
