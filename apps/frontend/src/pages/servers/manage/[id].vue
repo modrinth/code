@@ -1027,8 +1027,10 @@ definePageMeta({
       rgb(from var(--color-raised-bg) r g b / 0.8)
     ),
     var(--server-bg-image);
+}
 
-  @media screen and (min-width: 640px) {
+@media screen and (min-width: 640px) {
+  .mobile-blurred-servericon::before {
     display: none;
   }
 }
