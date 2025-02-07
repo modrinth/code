@@ -4,7 +4,7 @@
     @mouseenter="checkOverflow"
     @touchstart="checkOverflow"
   >
-    <div ref="logContent" class="log-content flex-1 truncate whitespace-nowrap">
+    <div ref="logContent" class="log-content flex-1 truncate whitespace-pre">
       <span v-html="sanitizedLog"></span>
     </div>
     <button
@@ -82,5 +82,10 @@ onUnmounted(() => {
 
 .log-content > span {
   user-select: none;
+  white-space: pre;
+}
+
+.log-content {
+  white-space: pre;
 }
 </style>
