@@ -215,7 +215,7 @@
         </button>
       </Transition>
     </div>
-    <NewModal ref="logModal" class="z-[9999]" header="Viewing full log">
+    <NewModal ref="logModal" class="z-[9999]" header="Viewing log">
       <div class="text-contrast">
         <pre class="select-text overflow-x-auto whitespace-pre font-mono">{{ selectedLog }}</pre>
       </div>
