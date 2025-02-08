@@ -1,7 +1,7 @@
 <template>
   <NewModal ref="modModal" :header="`Editing ${type.toLocaleLowerCase()} version`">
     <template #title>
-      <div class="flex items-center gap-2">
+      <div class="flex min-w-full items-center gap-2 md:w-[calc(420px-5.5rem)]">
         <UiAvatar :src="modDetails?.icon_url" size="48px" :alt="`${modDetails?.name} Icon`" />
         <span class="truncate text-xl font-extrabold text-contrast">{{ modDetails?.name }}</span>
       </div>
@@ -195,6 +195,13 @@
       >
         Your server was created using a modpack. It's recommended to use the modpack's version of
         the mod.
+        <NuxtLink
+          class="mt-2 flex items-center gap-1"
+          :to="`/servers/manage/${props.serverId}/options/loader`"
+          target="_blank"
+        >
+          <ExternalIcon class="size-5 flex-none"></ExternalIcon> Modify modpack version
+        </NuxtLink>
       </Admonition>
 
       <div class="flex flex-row items-center gap-4">
@@ -219,9 +226,15 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon, XIcon, CheckIcon, LockOpenIcon, GameIcon } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import Admonition from "@modrinth/ui/src/components/base/Admonition.vue";
+import {
+  DropdownIcon,
+  XIcon,
+  CheckIcon,
+  LockOpenIcon,
+  GameIcon,
+  ExternalIcon,
+} from "@modrinth/assets";
+import { Admonition, ButtonStyled, NewModal } from "@modrinth/ui";
 import TagItem from "@modrinth/ui/src/components/base/TagItem.vue";
 import { ref, computed } from "vue";
 import { formatCategory, formatVersionsForDisplay, type Version } from "@modrinth/utils";
@@ -238,6 +251,7 @@ const props = defineProps<{
   loader: string;
   gameVersion: string;
   modPack: boolean;
+  serverId: string;
 }>();
 
 interface ContentItem extends Mod {

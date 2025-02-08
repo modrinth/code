@@ -6,6 +6,7 @@
     :mod-pack="Boolean(props.server.general?.upstream)"
     :game-version="props.server.general?.mc_version ?? ''"
     :loader="props.server.general?.loader?.toLowerCase() ?? ''"
+    :server-id="props.server.serverId"
     @change-version="changeModVersion($event)"
   />
 
