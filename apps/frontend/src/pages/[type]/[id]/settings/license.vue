@@ -7,7 +7,12 @@
         {{ formatProjectType(project.project_type).toLowerCase() }}. You may choose one from our
         list or provide a custom license. You may also provide a custom URL to your chosen license;
         otherwise, the license text will be displayed. See our
-        <a href="https://blog.modrinth.com/licensing-guide/" target="_blank" rel="noopener" class="text-link">
+        <a
+          href="https://blog.modrinth.com/licensing-guide/"
+          target="_blank"
+          rel="noopener"
+          class="text-link"
+        >
           licensing guide
         </a>
         for more information.
@@ -22,12 +27,22 @@
         </label>
 
         <div class="input-stack w-1/2">
-          <DropdownSelect v-model="license" name="License selector" :options="builtinLicenses"
-            :display-name="(option: BuiltinLicense) => builtinLicenses.find((license) => license.short === option.short)?.friendly"
-            placeholder="Select license..." />
+          <DropdownSelect
+            v-model="license"
+            name="License selector"
+            :options="builtinLicenses"
+            :display-name="
+              (option: BuiltinLicense) =>
+                builtinLicenses.find((license) => license.short === option.short)?.friendly
+            "
+            placeholder="Select license..."
+          />
 
-          <Checkbox v-model="allowOrLater" :disabled="!hasPermission || !license?.requiresOnlyOrLater"
-            description="Allow later editions of this license">
+          <Checkbox
+            v-model="allowOrLater"
+            :disabled="!hasPermission || !license?.requiresOnlyOrLater"
+            description="Allow later editions of this license"
+          >
             Allow later editions of this license
           </Checkbox>
         </div>
@@ -47,9 +62,15 @@
         </label>
 
         <div class="w-1/2">
-          <input id="license-url" v-model="licenseUrl" type="url" maxlength="2048"
+          <input
+            id="license-url"
+            v-model="licenseUrl"
+            type="url"
+            maxlength="2048"
             :placeholder="license?.friendly !== 'Custom' ? `License URL (optional)` : `License URL`"
-            :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'" class="w-full" />
+            :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
+            class="w-full"
+          />
         </div>
       </div>
 
@@ -59,32 +80,58 @@
           <span class="label__description">
             If your license does not have an offical
             <a href="https://spdx.org/licenses/" target="_blank" rel="noopener" class="text-link">
-              SPDX license identifier</a>, check the box and enter the name of the license instead.
+              SPDX license identifier</a
+            >, check the box and enter the name of the license instead.
           </span>
         </label>
         <label for="license-name" v-else>
           <span class="label__title">License name</span>
-          <span class="label__description">The full name of the license. If the license has a SPDX identifier, please
-            uncheck the
-            checkbox and use the identifier instead.</span>
+          <span class="label__description"
+            >The full name of the license. If the license has a SPDX identifier, please uncheck the
+            checkbox and use the identifier instead.</span
+          >
         </label>
 
         <div class="input-stack w-1/2">
-          <input v-if="!nonSpdxLicense" v-model="license.short" id="license-spdx" class="w-full" type="text"
-            maxlength="128" placeholder="SPDX identifier" :disabled="!hasPermission" />
-          <input v-else v-model="license.short" id="license-name" class="w-full" type="text" maxlength="128"
-            placeholder="License name" :disabled="!hasPermission" />
+          <input
+            v-if="!nonSpdxLicense"
+            v-model="license.short"
+            id="license-spdx"
+            class="w-full"
+            type="text"
+            maxlength="128"
+            placeholder="SPDX identifier"
+            :disabled="!hasPermission"
+          />
+          <input
+            v-else
+            v-model="license.short"
+            id="license-name"
+            class="w-full"
+            type="text"
+            maxlength="128"
+            placeholder="License name"
+            :disabled="!hasPermission"
+          />
 
-          <Checkbox v-if="license?.friendly === 'Custom'" v-model="nonSpdxLicense" :disabled="!hasPermission"
-            description="License does not have a SPDX identifier">
+          <Checkbox
+            v-if="license?.friendly === 'Custom'"
+            v-model="nonSpdxLicense"
+            :disabled="!hasPermission"
+            description="License does not have a SPDX identifier"
+          >
             License does not have a SPDX identifier
           </Checkbox>
         </div>
       </div>
 
       <div class="input-stack">
-        <button type="button" class="iconified-button brand-button" :disabled="!hasChanges || !license.friendly"
-          @click="saveChanges()">
+        <button
+          type="button"
+          class="iconified-button brand-button"
+          :disabled="!hasChanges || !license.friendly"
+          @click="saveChanges()"
+        >
           <SaveIcon />
           Save changes
         </button>
@@ -95,7 +142,14 @@
 
 <script setup lang="ts">
 import { Checkbox, DropdownSelect } from "@modrinth/ui";
-import { TeamMemberPermission, builtinLicenses, formatProjectType, type BuiltinLicense, type Project, type TeamMember } from "@modrinth/utils";
+import {
+  TeamMemberPermission,
+  builtinLicenses,
+  formatProjectType,
+  type BuiltinLicense,
+  type Project,
+  type TeamMember,
+} from "@modrinth/utils";
 import { computed, ref, shallowRef, type ShallowRef } from "vue";
 import SaveIcon from "~/assets/images/utils/save.svg?component";
 
@@ -142,7 +196,7 @@ if (oldLicenseId === "LicenseRef-Unknown") {
 
 const hasPermission = computed(() => {
   return (props.currentMember?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS;
-})
+});
 
 const licenseId = computed(() => {
   let id = "";
@@ -165,7 +219,7 @@ const licenseId = computed(() => {
   }
 
   return id;
-})
+});
 
 const patchRequestPayload = computed(() => {
   const payload: {
@@ -186,7 +240,7 @@ const patchRequestPayload = computed(() => {
 
 const hasChanges = computed(() => {
   return Object.keys(patchRequestPayload.value).length > 0;
-})
+});
 
 function saveChanges() {
   if (hasChanges.value) {
