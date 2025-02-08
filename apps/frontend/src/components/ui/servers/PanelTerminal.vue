@@ -170,7 +170,7 @@
                       <div class="size-1 rounded-full bg-contrast opacity-70"></div>
                       <div class="size-1 rounded-full bg-contrast opacity-70"></div>
                     </div>
-                    <span class="whitespace-pre text-xs text-contrast">
+                    <span class="select-none whitespace-pre text-xs text-contrast">
                       {{
                         shouldShowSeparator(
                           visibleStartIndex + index,
