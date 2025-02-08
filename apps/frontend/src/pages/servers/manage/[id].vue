@@ -96,7 +96,7 @@
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
             <div class="grid place-content-center rounded-full bg-bg-red p-4">
-              <PanelErrorIcon class="size-12 text-red" />
+              <UiServersIconsPanelErrorIcon class="size-12 text-red" />
             </div>
             <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
           </div>
@@ -359,7 +359,7 @@
           <div class="flex flex-col gap-1">
             <span class="text-lg font-bold"> We're preparing your server! </span>
             <div class="flex flex-row items-center gap-2">
-              <UiServersPanelSpinner class="!h-3 !w-3" /> <InstallingTicker />
+              <UiServersPanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
             </div>
           </div>
         </div>
@@ -398,11 +398,9 @@ import {
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
-import InstallingTicker from "~/components/ui/servers/InstallingTicker.vue";
 import { reloadNuxtApp, navigateTo } from "#app";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
-import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
