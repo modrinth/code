@@ -166,7 +166,7 @@
         data-pyro-fullscreen
         :label="isFullScreen ? 'Exit full screen' : 'Enter full screen'"
         class="experimental-styles-within absolute right-4 top-4 z-[3] grid h-12 w-12 place-content-center rounded-full border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
-        :class="{ hidden: searchInput }"
+        :class="{ hidden: searchInput || hasSelection || isSingleLineSelected }"
         @click="toggleFullscreen"
       >
         <LazyUiServersIconsMinimizeIconVue v-if="isFullScreen" />
@@ -177,6 +177,7 @@
         <div
           v-if="hasSelection || isSingleLineSelected"
           class="absolute right-20 top-4 z-[3] flex flex-row items-center"
+          :class="{ '!right-4': searchInput || hasSelection || isSingleLineSelected }"
         >
           <button
             data-pyro-copy
@@ -600,6 +601,16 @@ const handleGlobalMouseUp = () => {
   }
 };
 
+const handleClickOutside = (event: MouseEvent) => {
+  if (!event.target || !(event.target instanceof Node)) return;
+  const terminalElement = document.querySelector("[data-pyro-terminal]");
+  if (!terminalElement || !terminalElement.contains(event.target)) {
+    selectionStart.value = null;
+    selectionEnd.value = null;
+    lastClickIndex.value = null;
+  }
+};
+
 const initializeTerminal = () => {
   if (!scrollContainer.value) return;
 
@@ -677,6 +688,7 @@ onMounted(() => {
   window.addEventListener("keydown", handleKeydown);
   window.addEventListener("mouseup", handleGlobalMouseUp);
   window.addEventListener("contextmenu", handleContextMenu);
+  window.addEventListener("click", handleClickOutside);
 });
 
 onUnmounted(() => {
@@ -684,6 +696,7 @@ onUnmounted(() => {
   window.removeEventListener("keydown", handleKeydown);
   window.removeEventListener("mouseup", handleGlobalMouseUp);
   window.removeEventListener("contextmenu", handleContextMenu);
+  window.removeEventListener("click", handleClickOutside);
   stopDragging();
   cachedHeights.value.clear();
   setBodyScroll(true);
