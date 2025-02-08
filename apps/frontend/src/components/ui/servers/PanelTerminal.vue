@@ -369,15 +369,18 @@ const totalHeight = computed(() => {
   return baseHeight + separatorCount * SEPARATOR_HEIGHT;
 });
 
-const visibleStartIndex = computed(() => {
+const getLineIndexForPosition = (position: number) => {
   if (!searchInput.value) {
-    return Math.max(0, Math.floor(scrollTop.value / LINE_HEIGHT) - bufferSize);
+    return Math.floor(position / LINE_HEIGHT);
   }
 
   let accHeight = 0;
   let index = 0;
 
-  while (accHeight <= scrollTop.value && index < activeOutput.value.length) {
+  while (index < activeOutput.value.length) {
+    if (accHeight >= position) {
+      break;
+    }
     accHeight += LINE_HEIGHT;
     if (shouldShowSeparator(index, index + 1)) {
       accHeight += SEPARATOR_HEIGHT;
@@ -385,48 +388,37 @@ const visibleStartIndex = computed(() => {
     index++;
   }
 
-  return Math.max(0, index - bufferSize - 1);
+  return index;
+};
+
+const getPositionForLineIndex = (index: number) => {
+  if (!searchInput.value) {
+    return index * LINE_HEIGHT;
+  }
+
+  let position = 0;
+  for (let i = 0; i < index; i++) {
+    position += LINE_HEIGHT;
+    if (shouldShowSeparator(i, i + 1)) {
+      position += SEPARATOR_HEIGHT;
+    }
+  }
+
+  return position;
+};
+
+const visibleStartIndex = computed(() => {
+  const rawPosition = Math.max(0, scrollTop.value - LINE_HEIGHT * bufferSize);
+  return getLineIndexForPosition(rawPosition);
 });
 
 const visibleEndIndex = computed(() => {
-  if (!searchInput.value) {
-    return Math.min(
-      activeOutput.value.length - 1,
-      Math.ceil((scrollTop.value + clientHeight.value) / LINE_HEIGHT) + bufferSize,
-    );
-  }
-
-  let accHeight = 0;
-  let index = visibleStartIndex.value;
-
-  while (
-    accHeight <= clientHeight.value + LINE_HEIGHT * bufferSize &&
-    index < activeOutput.value.length
-  ) {
-    accHeight += LINE_HEIGHT;
-    if (shouldShowSeparator(index, index + 1)) {
-      accHeight += SEPARATOR_HEIGHT;
-    }
-    index++;
-  }
-
-  return Math.min(activeOutput.value.length - 1, index);
+  const rawPosition = scrollTop.value + clientHeight.value + LINE_HEIGHT * bufferSize;
+  return Math.min(activeOutput.value.length - 1, getLineIndexForPosition(rawPosition));
 });
 
 const offsetY = computed(() => {
-  if (!searchInput.value) {
-    return visibleStartIndex.value * LINE_HEIGHT;
-  }
-
-  let offset = 0;
-  for (let i = 0; i < visibleStartIndex.value; i++) {
-    offset += LINE_HEIGHT;
-    if (shouldShowSeparator(i, i + 1)) {
-      offset += SEPARATOR_HEIGHT;
-    }
-  }
-
-  return offset;
+  return getPositionForLineIndex(visibleStartIndex.value);
 });
 
 const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
@@ -914,30 +906,7 @@ const getLineIndexFromEvent = (event: MouseEvent): number | null => {
   const rect = scrollContainer.value.getBoundingClientRect();
   const relativeY = event.clientY - rect.top + scrollContainer.value.scrollTop - 24;
 
-  if (!searchInput.value) {
-    const lineIndex = Math.floor(relativeY / LINE_HEIGHT);
-    return Math.max(0, Math.min(lineIndex, activeOutput.value.length - 1));
-  }
-
-  let accumulatedHeight = 0;
-  let currentIndex = 0;
-
-  while (currentIndex < activeOutput.value.length) {
-    if (accumulatedHeight + LINE_HEIGHT > relativeY) {
-      return currentIndex;
-    }
-    accumulatedHeight += LINE_HEIGHT;
-
-    if (shouldShowSeparator(currentIndex, currentIndex + 1)) {
-      if (accumulatedHeight + SEPARATOR_HEIGHT > relativeY) {
-        return currentIndex;
-      }
-      accumulatedHeight += SEPARATOR_HEIGHT;
-    }
-    currentIndex++;
-  }
-
-  return Math.max(0, activeOutput.value.length - 1);
+  return Math.max(0, Math.min(getLineIndexForPosition(relativeY), activeOutput.value.length - 1));
 };
 
 const autoScrollSpeed = ref(0);
@@ -1043,18 +1012,34 @@ const jumpToLine = (line: string) => {
   if (index === -1) return;
 
   const filteredLineIndex = pyroConsole.filteredOutput.value.indexOf(line);
-  const filteredScrollTop = scrollContainer.value?.scrollTop ?? 0;
-  const viewportHeight = scrollContainer.value?.clientHeight ?? 0;
+  if (filteredLineIndex === -1) return;
 
-  const relativePosition = (filteredLineIndex * LINE_HEIGHT - filteredScrollTop) / viewportHeight;
+  let filteredTargetPosition = 0;
+  for (let i = 0; i < filteredLineIndex; i++) {
+    filteredTargetPosition += LINE_HEIGHT;
+    if (shouldShowSeparator(i, i + 1)) {
+      filteredTargetPosition += SEPARATOR_HEIGHT;
+    }
+  }
+
+  const viewportHeight = scrollContainer.value?.clientHeight ?? 0;
+  const currentScrollPosition = scrollContainer.value?.scrollTop ?? 0;
+  const relativePosition = (filteredTargetPosition - currentScrollPosition) / viewportHeight;
+
+  const targetLineRelativeOffset = relativePosition;
+  const targetLine = line;
 
   clearSearch();
 
   nextTick(() => {
     if (!scrollContainer.value) return;
 
+    const targetPosition = index * LINE_HEIGHT;
     const containerHeight = scrollContainer.value.clientHeight;
-    const targetScrollTop = Math.max(0, index * LINE_HEIGHT - containerHeight * relativePosition);
+    const targetScrollTop = Math.max(
+      0,
+      targetPosition - containerHeight * targetLineRelativeOffset,
+    );
 
     scrollContainer.value.scrollTop = targetScrollTop;
 
@@ -1064,7 +1049,10 @@ const jumpToLine = (line: string) => {
       const elements = scrollContainer.value?.getElementsByTagName("li");
       if (!elements) return;
 
-      const targetElement = Array.from(elements).find((el) => el.textContent?.includes(line));
+      const targetElement = Array.from(elements).find(
+        (el) =>
+          el.textContent?.includes(targetLine) && !el.hasAttribute("data-pyro-terminal-separator"),
+      );
 
       if (targetElement) {
         targetElement.classList.add("jumped-line");
@@ -1073,7 +1061,7 @@ const jumpToLine = (line: string) => {
           setTimeout(() => {
             targetElement.classList.remove("jumped-line-active");
             targetElement.classList.remove("jumped-line");
-          }, 2000);
+          }, 4000);
         });
       }
     });
