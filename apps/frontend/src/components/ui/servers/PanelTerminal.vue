@@ -905,8 +905,9 @@ const getLineIndexFromEvent = (event: MouseEvent): number | null => {
 
   const rect = scrollContainer.value.getBoundingClientRect();
   const relativeY = event.clientY - rect.top + scrollContainer.value.scrollTop - 24;
+  const adjustedY = Math.max(0, relativeY - 24);
 
-  return Math.max(0, Math.min(getLineIndexForPosition(relativeY), activeOutput.value.length - 1));
+  return Math.max(0, Math.min(getLineIndexForPosition(adjustedY), activeOutput.value.length - 1));
 };
 
 const autoScrollSpeed = ref(0);
