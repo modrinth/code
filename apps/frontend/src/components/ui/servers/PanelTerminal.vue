@@ -6,7 +6,7 @@
           v-model="searchInput"
           type="text"
           placeholder="Search logs"
-          class="h-12 !w-full !pl-10 pr-10"
+          class="h-12 !w-full !pl-10 !pr-48"
           @keydown.escape="clearSearch"
         />
         <SearchIcon class="absolute left-4 top-1/2 -translate-y-1/2" />
@@ -15,14 +15,14 @@
             <XIcon class="h-5 w-5" />
           </button>
         </ButtonStyled>
+        <span
+          v-if="pyroConsole.filteredOutput.value.length && searchInput"
+          class="absolute right-12 top-1/2 -translate-y-1/2 whitespace-pre text-sm text-contrast"
+        >
+          {{ pyroConsole.filteredOutput.value.length }}
+          {{ pyroConsole.filteredOutput.value.length === 1 ? "result" : "results" }}
+        </span>
       </div>
-      <span
-        v-if="pyroConsole.filteredOutput.value.length && searchInput"
-        class="whitespace-pre text-sm text-contrast"
-      >
-        {{ pyroConsole.filteredOutput.value.length }}
-        {{ pyroConsole.filteredOutput.value.length === 1 ? "result" : "results" }}
-      </span>
     </div>
     <div
       data-pyro-terminal
@@ -134,7 +134,10 @@
                 v-for="(item, index) in visibleItems"
                 :key="`${visibleStartIndex + index}-${item}`"
               >
-                <li :class="{ 'selected-line': isLineSelected(visibleStartIndex + index) }">
+                <li
+                  data-pyro-terminal-line
+                  :class="{ 'selected-line': isLineSelected(visibleStartIndex + index) }"
+                >
                   <div class="flex items-center gap-2">
                     <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
                     <button
@@ -152,12 +155,36 @@
                     searchInput &&
                     shouldShowSeparator(visibleStartIndex + index, visibleStartIndex + index + 1)
                   "
-                  class="flex h-8 items-center justify-center opacity-50"
+                  data-pyro-terminal-separator
+                  class="flex h-8 select-none items-center justify-center opacity-50"
                   aria-hidden="true"
                 >
-                  <div class="h-[1px] w-full bg-contrast opacity-10"></div>
-                  <span class="mx-4 text-xs text-contrast">...</span>
-                  <div class="h-[1px] w-full bg-contrast opacity-10"></div>
+                  <div class="h-[1px] w-full bg-contrast opacity-50"></div>
+                  <div class="mx-4 flex flex-row items-center gap-4">
+                    <div class="flex flex-row items-center gap-1">
+                      <div class="size-1 rounded-full bg-contrast opacity-70"></div>
+                      <div class="size-1 rounded-full bg-contrast opacity-70"></div>
+                      <div class="size-1 rounded-full bg-contrast opacity-70"></div>
+                    </div>
+                    <span class="whitespace-pre text-xs text-contrast">
+                      {{
+                        shouldShowSeparator(
+                          visibleStartIndex + index,
+                          visibleStartIndex + index + 1,
+                        )
+                      }}
+                      line{{
+                        shouldShowSeparator(
+                          visibleStartIndex + index,
+                          visibleStartIndex + index + 1,
+                        ) === 1
+                          ? ""
+                          : "s"
+                      }}
+                      between
+                    </span>
+                  </div>
+                  <div class="h-[1px] w-full bg-contrast opacity-50"></div>
                 </li>
               </template>
             </ul>
@@ -227,7 +254,7 @@
         </button>
       </Transition>
     </div>
-    <NewModal ref="logModal" class="z-[9999]" header="Viewing log">
+    <NewModal ref="logModal" class="z-[9999]" header="Viewing selected logs">
       <div class="text-contrast">
         <pre class="select-text overflow-x-auto whitespace-pre font-mono">{{ selectedLog }}</pre>
       </div>
@@ -316,7 +343,7 @@ const activeOutput = computed(() => {
 });
 
 const shouldShowSeparator = (currentIndex: number, nextIndex: number) => {
-  if (!searchInput.value || nextIndex >= activeOutput.value.length) return false;
+  if (!searchInput.value || nextIndex >= activeOutput.value.length) return 0;
 
   const currentLine = activeOutput.value[currentIndex];
   const nextLine = activeOutput.value[nextIndex];
@@ -324,18 +351,8 @@ const shouldShowSeparator = (currentIndex: number, nextIndex: number) => {
   const currentOriginalIndex = consoleOutput.value.indexOf(currentLine);
   const nextOriginalIndex = consoleOutput.value.indexOf(nextLine);
 
-  return nextOriginalIndex - currentOriginalIndex > 1;
-};
-
-const getTotalSeparatorsBeforeIndex = (index: number) => {
-  if (!searchInput.value) return 0;
-  let count = 0;
-  for (let i = 0; i < index - 1; i++) {
-    if (shouldShowSeparator(i, i + 1)) {
-      count++;
-    }
-  }
-  return count;
+  const linesBetween = nextOriginalIndex - currentOriginalIndex - 1;
+  return linesBetween > 0 ? linesBetween : 0;
 };
 
 const totalHeight = computed(() => {
@@ -353,21 +370,63 @@ const totalHeight = computed(() => {
 });
 
 const visibleStartIndex = computed(() => {
-  const rawIndex = Math.max(0, Math.floor(scrollTop.value / LINE_HEIGHT) - bufferSize);
-  return rawIndex;
+  if (!searchInput.value) {
+    return Math.max(0, Math.floor(scrollTop.value / LINE_HEIGHT) - bufferSize);
+  }
+
+  let accHeight = 0;
+  let index = 0;
+
+  while (accHeight <= scrollTop.value && index < activeOutput.value.length) {
+    accHeight += LINE_HEIGHT;
+    if (shouldShowSeparator(index, index + 1)) {
+      accHeight += SEPARATOR_HEIGHT;
+    }
+    index++;
+  }
+
+  return Math.max(0, index - bufferSize - 1);
 });
 
 const visibleEndIndex = computed(() => {
-  return Math.min(
-    activeOutput.value.length - 1,
-    Math.ceil((scrollTop.value + clientHeight.value) / LINE_HEIGHT) + bufferSize,
-  );
+  if (!searchInput.value) {
+    return Math.min(
+      activeOutput.value.length - 1,
+      Math.ceil((scrollTop.value + clientHeight.value) / LINE_HEIGHT) + bufferSize,
+    );
+  }
+
+  let accHeight = 0;
+  let index = visibleStartIndex.value;
+
+  while (
+    accHeight <= clientHeight.value + LINE_HEIGHT * bufferSize &&
+    index < activeOutput.value.length
+  ) {
+    accHeight += LINE_HEIGHT;
+    if (shouldShowSeparator(index, index + 1)) {
+      accHeight += SEPARATOR_HEIGHT;
+    }
+    index++;
+  }
+
+  return Math.min(activeOutput.value.length - 1, index);
 });
 
 const offsetY = computed(() => {
-  const baseOffset = visibleStartIndex.value * LINE_HEIGHT;
-  if (!searchInput.value) return baseOffset;
-  return baseOffset + getTotalSeparatorsBeforeIndex(visibleStartIndex.value) * SEPARATOR_HEIGHT;
+  if (!searchInput.value) {
+    return visibleStartIndex.value * LINE_HEIGHT;
+  }
+
+  let offset = 0;
+  for (let i = 0; i < visibleStartIndex.value; i++) {
+    offset += LINE_HEIGHT;
+    if (shouldShowSeparator(i, i + 1)) {
+      offset += SEPARATOR_HEIGHT;
+    }
+  }
+
+  return offset;
 });
 
 const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
