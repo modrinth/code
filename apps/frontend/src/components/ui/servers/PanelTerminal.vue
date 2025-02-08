@@ -137,6 +137,7 @@
                 <li
                   data-pyro-terminal-line
                   :class="{ 'selected-line': isLineSelected(visibleStartIndex + index) }"
+                  class="group"
                 >
                   <div class="flex items-center gap-2">
                     <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
@@ -1351,11 +1352,15 @@ html.dark-mode .progressive-gradient {
 }
 
 .jump-button {
-  opacity: 0.8;
+  opacity: 0.4;
   transition: all 0.2s ease;
 }
 
-.jump-button:hover {
+.group:hover .jump-button {
+  opacity: 0.8;
+}
+
+.group:hover .jump-button:hover {
   opacity: 1;
 }
 </style>
