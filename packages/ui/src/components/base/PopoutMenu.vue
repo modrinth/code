@@ -4,6 +4,7 @@
     no-auto-focus
     :aria-id="dropdownId || null"
     placement="bottom-end"
+    :class="dropdownClass"
     @apply-hide="focusTrigger"
     @apply-show="focusMenuChild"
   >
@@ -30,6 +31,11 @@ const dropdown = ref()
 
 defineProps({
   dropdownId: {
+    type: String,
+    default: null,
+    required: false,
+  },
+  dropdownClass: {
     type: String,
     default: null,
     required: false,
