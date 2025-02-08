@@ -907,10 +907,15 @@ const getLineIndexFromEvent = (event: MouseEvent): number | null => {
   if (!scrollContainer.value) return null;
 
   const rect = scrollContainer.value.getBoundingClientRect();
-  const relativeY = event.clientY - rect.top + scrollContainer.value.scrollTop - 24;
-  const adjustedY = Math.max(0, relativeY - 24);
+  const rawY = event.clientY - rect.top + scrollContainer.value.scrollTop;
 
-  return Math.max(0, Math.min(getLineIndexForPosition(adjustedY), activeOutput.value.length - 1));
+  if (searchInput.value) {
+    const adjustedY = Math.max(0, rawY - 48);
+    return Math.max(0, Math.min(getLineIndexForPosition(adjustedY), activeOutput.value.length - 1));
+  }
+
+  const adjustedY = Math.max(0, rawY - 24);
+  return Math.floor(adjustedY / LINE_HEIGHT);
 };
 
 const autoScrollSpeed = ref(0);
