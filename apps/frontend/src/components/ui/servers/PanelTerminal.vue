@@ -914,51 +914,42 @@ const jumpToLine = (line: string) => {
   const index = pyroConsole.findLineIndex(line);
   if (index === -1) return;
 
-  const currentLinePosition = getLinePosition(line);
+  const filteredLineIndex = pyroConsole.filteredOutput.value.indexOf(line);
+  const filteredScrollTop = scrollContainer.value?.scrollTop ?? 0;
+  const viewportHeight = scrollContainer.value?.clientHeight ?? 0;
+
+  const relativePosition = (filteredLineIndex * LINE_HEIGHT - filteredScrollTop) / viewportHeight;
 
   clearSearch();
 
   nextTick(() => {
-    if (!scrollContainer.value || currentLinePosition === null) return;
+    if (!scrollContainer.value) return;
 
-    const targetScrollTop = index * LINE_HEIGHT - currentLinePosition.offset + 24;
-    scrollContainer.value.scrollTop = Math.max(0, targetScrollTop);
+    const containerHeight = scrollContainer.value.clientHeight;
+    const targetScrollTop = Math.max(0, index * LINE_HEIGHT - containerHeight * relativePosition);
 
-    setTimeout(() => {
+    scrollContainer.value.scrollTop = targetScrollTop;
+
+    requestAnimationFrame(() => {
+      handleListScroll();
+
       const elements = scrollContainer.value?.getElementsByTagName("li");
       if (!elements) return;
 
-      for (const element of elements) {
-        if (element.textContent?.includes(line)) {
-          element.classList.add("jumped-line");
-          requestAnimationFrame(() => {
-            element.classList.add("jumped-line-active");
-            setTimeout(() => {
-              element.classList.remove("jumped-line-active");
-              element.classList.remove("jumped-line");
-            }, 2000);
-          });
-          break;
-        }
+      const targetElement = Array.from(elements).find((el) => el.textContent?.includes(line));
+
+      if (targetElement) {
+        targetElement.classList.add("jumped-line");
+        requestAnimationFrame(() => {
+          targetElement.classList.add("jumped-line-active");
+          setTimeout(() => {
+            targetElement.classList.remove("jumped-line-active");
+            targetElement.classList.remove("jumped-line");
+          }, 2000);
+        });
       }
-    }, 50);
+    });
   });
-};
-
-const getLinePosition = (line: string) => {
-  if (!scrollContainer.value) return null;
-
-  const elements = scrollContainer.value.getElementsByTagName("li");
-  for (const element of elements) {
-    if (element.textContent?.includes(line)) {
-      const rect = element.getBoundingClientRect();
-      const containerRect = scrollContainer.value.getBoundingClientRect();
-      return {
-        offset: rect.top - containerRect.top + scrollContainer.value.scrollTop,
-      };
-    }
-  }
-  return null;
 };
 
 const isScrollable = computed(() => {
