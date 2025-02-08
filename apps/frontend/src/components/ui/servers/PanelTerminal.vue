@@ -117,7 +117,7 @@
           ref="scrollContainer"
           data-pyro-terminal-root
           class="scrollbar-none absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
-          @scroll.passive="() => handleScrollEvent()"
+          @scroll.passive="() => handleListScroll()"
         >
           <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
             <ul
@@ -147,6 +147,18 @@
                       Jump
                     </button>
                   </div>
+                </li>
+                <li
+                  v-if="
+                    searchInput &&
+                    shouldShowSeparator(visibleStartIndex + index, visibleStartIndex + index + 1)
+                  "
+                  class="flex h-8 items-center justify-center opacity-50"
+                  aria-hidden="true"
+                >
+                  <div class="h-[1px] w-full bg-contrast opacity-10"></div>
+                  <span class="mx-4 text-xs text-contrast">...</span>
+                  <div class="h-[1px] w-full bg-contrast opacity-10"></div>
                 </li>
               </template>
             </ul>
@@ -227,7 +239,7 @@
 <script setup lang="ts">
 import { RightArrowIcon, CopyIcon, XIcon, SearchIcon, EyeIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, shallowRef } from "vue";
-import { useThrottleFn, useDebounceFn } from "@vueuse/core";
+import { useDebounceFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import { usePyroConsole } from "~/store/console.ts";
@@ -259,18 +271,14 @@ const userHasScrolled = ref(false);
 const isScrolledToBottom = ref(true);
 
 const BATCH_SIZE = 50;
-const SCROLL_THROTTLE = 16;
 
 const LINE_HEIGHT = 32;
+const SEPARATOR_HEIGHT = 32;
 
 const SCROLL_END_DELAY = 150;
 
 const scrollEndTimeout = ref<NodeJS.Timeout | null>(null);
 const isScrolling = ref(false);
-
-const handleScrollEvent = useThrottleFn(() => {
-  handleListScroll();
-}, SCROLL_THROTTLE);
 
 const searchInput = ref("");
 const updateSearch = useDebounceFn((value: string) => {
@@ -308,10 +316,46 @@ const activeOutput = computed(() => {
   return searchInput.value ? pyroConsole.filteredOutput.value : consoleOutput.value;
 });
 
-const totalHeight = computed(() => activeOutput.value.length * LINE_HEIGHT);
+const shouldShowSeparator = (currentIndex: number, nextIndex: number) => {
+  if (!searchInput.value || nextIndex >= activeOutput.value.length) return false;
+
+  const currentLine = activeOutput.value[currentIndex];
+  const nextLine = activeOutput.value[nextIndex];
+
+  const currentOriginalIndex = consoleOutput.value.indexOf(currentLine);
+  const nextOriginalIndex = consoleOutput.value.indexOf(nextLine);
+
+  return nextOriginalIndex - currentOriginalIndex > 1;
+};
+
+const getTotalSeparatorsBeforeIndex = (index: number) => {
+  if (!searchInput.value) return 0;
+  let count = 0;
+  for (let i = 0; i < index - 1; i++) {
+    if (shouldShowSeparator(i, i + 1)) {
+      count++;
+    }
+  }
+  return count;
+};
+
+const totalHeight = computed(() => {
+  const baseHeight = activeOutput.value.length * LINE_HEIGHT;
+  if (!searchInput.value) return baseHeight;
+
+  let separatorCount = 0;
+  for (let i = 0; i < activeOutput.value.length - 1; i++) {
+    if (shouldShowSeparator(i, i + 1)) {
+      separatorCount++;
+    }
+  }
+
+  return baseHeight + separatorCount * SEPARATOR_HEIGHT;
+});
 
 const visibleStartIndex = computed(() => {
-  return Math.max(0, Math.floor(scrollTop.value / LINE_HEIGHT) - bufferSize);
+  const rawIndex = Math.max(0, Math.floor(scrollTop.value / LINE_HEIGHT) - bufferSize);
+  return rawIndex;
 });
 
 const visibleEndIndex = computed(() => {
@@ -321,7 +365,11 @@ const visibleEndIndex = computed(() => {
   );
 });
 
-const offsetY = computed(() => visibleStartIndex.value * LINE_HEIGHT);
+const offsetY = computed(() => {
+  const baseOffset = visibleStartIndex.value * LINE_HEIGHT;
+  if (!searchInput.value) return baseOffset;
+  return baseOffset + getTotalSeparatorsBeforeIndex(visibleStartIndex.value) * SEPARATOR_HEIGHT;
+});
 
 const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
 
@@ -807,9 +855,31 @@ const getLineIndexFromEvent = (event: MouseEvent): number | null => {
 
   const rect = scrollContainer.value.getBoundingClientRect();
   const relativeY = event.clientY - rect.top + scrollContainer.value.scrollTop - 24;
-  const lineIndex = Math.floor(relativeY / LINE_HEIGHT);
 
-  return Math.max(0, Math.min(lineIndex, activeOutput.value.length - 1));
+  if (!searchInput.value) {
+    const lineIndex = Math.floor(relativeY / LINE_HEIGHT);
+    return Math.max(0, Math.min(lineIndex, activeOutput.value.length - 1));
+  }
+
+  let accumulatedHeight = 0;
+  let currentIndex = 0;
+
+  while (currentIndex < activeOutput.value.length) {
+    if (accumulatedHeight + LINE_HEIGHT > relativeY) {
+      return currentIndex;
+    }
+    accumulatedHeight += LINE_HEIGHT;
+
+    if (shouldShowSeparator(currentIndex, currentIndex + 1)) {
+      if (accumulatedHeight + SEPARATOR_HEIGHT > relativeY) {
+        return currentIndex;
+      }
+      accumulatedHeight += SEPARATOR_HEIGHT;
+    }
+    currentIndex++;
+  }
+
+  return Math.max(0, activeOutput.value.length - 1);
 };
 
 const autoScrollSpeed = ref(0);
