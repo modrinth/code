@@ -4,9 +4,9 @@
     no-auto-focus
     :aria-id="dropdownId || null"
     placement="bottom-end"
+    :class="dropdownClass"
     @apply-hide="focusTrigger"
     @apply-show="focusMenuChild"
-    :class="dropdownClass"
   >
     <button ref="trigger" v-bind="$attrs" v-tooltip="tooltip">
       <slot></slot>
