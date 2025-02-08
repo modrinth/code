@@ -82,7 +82,6 @@
           ref="scrollbarTrack"
           data-pyro-terminal-scrollbar-track
           class="absolute -right-1 bottom-16 top-4 z-[4] w-4 overflow-hidden"
-          :class="{ hidden: !isScrollable }"
           @mousedown="handleTrackClick"
         >
           <div
@@ -1022,11 +1021,6 @@ const jumpToLine = (line: string) => {
   });
 };
 
-const isScrollable = computed(() => {
-  if (!scrollContainer.value) return false;
-  return scrollContainer.value.scrollHeight > scrollContainer.value.clientHeight;
-});
-
 watch(
   () => pyroConsole.filteredOutput.value,
   () => {
@@ -1298,9 +1292,5 @@ html.dark-mode .progressive-gradient {
 
 .jump-button:hover {
   opacity: 1;
-}
-
-[data-pyro-terminal-scrollbar-track].hidden {
-  display: none;
 }
 </style>
