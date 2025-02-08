@@ -4,15 +4,10 @@
       <h2 class="label__title size-card-header">License</h2>
       <p class="label__description">
         It is important to choose a proper license for your
-        {{ $formatProjectType(project.project_type).toLowerCase() }}. You may choose one from our
+        {{ formatProjectType(project.project_type).toLowerCase() }}. You may choose one from our
         list or provide a custom license. You may also provide a custom URL to your chosen license;
         otherwise, the license text will be displayed. See our
-        <a
-          href="https://blog.modrinth.com/licensing-guide/"
-          target="_blank"
-          rel="noopener"
-          class="text-link"
-        >
+        <a href="https://blog.modrinth.com/licensing-guide/" target="_blank" rel="noopener" class="text-link">
           licensing guide
         </a>
         for more information.
@@ -27,26 +22,12 @@
         </label>
 
         <div class="input-stack w-1/2">
-          <Multiselect
-            id="license-multiselect"
-            v-model="license"
-            placeholder="Select license..."
-            track-by="short"
-            label="friendly"
-            :options="defaultLicenses"
-            :searchable="true"
-            :close-on-select="true"
-            :show-labels="false"
-            :class="{
-              'known-error': license?.short === '' && showKnownErrors,
-            }"
-            :disabled="!hasPermission"
-          />
-          <Checkbox
-            v-model="allowOrLater"
-            :disabled="!hasPermission || !license?.requiresOnlyOrLater"
-            description="Allow later editions of this license"
-          >
+          <DropdownSelect v-model="license" name="License selector" :options="builtinLicenses"
+            :display-name="(option: BuiltinLicense) => builtinLicenses.find((license) => license.short === option.short)?.friendly"
+            placeholder="Select license..." />
+
+          <Checkbox v-model="allowOrLater" :disabled="!hasPermission || !license?.requiresOnlyOrLater"
+            description="Allow later editions of this license">
             Allow later editions of this license
           </Checkbox>
         </div>
@@ -66,15 +47,9 @@
         </label>
 
         <div class="w-1/2">
-          <input
-            id="license-url"
-            v-model="licenseUrl"
-            type="url"
-            maxlength="2048"
+          <input id="license-url" v-model="licenseUrl" type="url" maxlength="2048"
             :placeholder="license?.friendly !== 'Custom' ? `License URL (optional)` : `License URL`"
-            :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
-            class="w-full"
-          />
+            :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'" class="w-full" />
         </div>
       </div>
 
@@ -84,64 +59,32 @@
           <span class="label__description">
             If your license does not have an offical
             <a href="https://spdx.org/licenses/" target="_blank" rel="noopener" class="text-link">
-              SPDX license identifier</a
-            >, check the box and enter the name of the license instead.
+              SPDX license identifier</a>, check the box and enter the name of the license instead.
           </span>
         </label>
         <label for="license-name" v-else>
           <span class="label__title">License name</span>
-          <span class="label__description"
-            >The full name of the license. If the license has a SPDX identifier, please uncheck the
-            checkbox and use the identifier instead.</span
-          >
+          <span class="label__description">The full name of the license. If the license has a SPDX identifier, please
+            uncheck the
+            checkbox and use the identifier instead.</span>
         </label>
 
         <div class="input-stack w-1/2">
-          <input
-            v-if="!nonSpdxLicense"
-            v-model="license.short"
-            id="license-spdx"
-            class="w-full"
-            type="text"
-            maxlength="128"
-            placeholder="SPDX identifier"
-            :class="{
-              'known-error': license.short === '' && showKnownErrors,
-            }"
-            :disabled="!hasPermission"
-          />
-          <input
-            v-else
-            v-model="license.short"
-            id="license-name"
-            class="w-full"
-            type="text"
-            maxlength="128"
-            placeholder="License name"
-            :class="{
-              'known-error': license.short === '' && showKnownErrors,
-            }"
-            :disabled="!hasPermission"
-          />
+          <input v-if="!nonSpdxLicense" v-model="license.short" id="license-spdx" class="w-full" type="text"
+            maxlength="128" placeholder="SPDX identifier" :disabled="!hasPermission" />
+          <input v-else v-model="license.short" id="license-name" class="w-full" type="text" maxlength="128"
+            placeholder="License name" :disabled="!hasPermission" />
 
-          <Checkbox
-            v-if="license?.friendly === 'Custom'"
-            v-model="nonSpdxLicense"
-            :disabled="!hasPermission"
-            description="License does not have a SPDX identifier"
-          >
+          <Checkbox v-if="license?.friendly === 'Custom'" v-model="nonSpdxLicense" :disabled="!hasPermission"
+            description="License does not have a SPDX identifier">
             License does not have a SPDX identifier
           </Checkbox>
         </div>
       </div>
 
       <div class="input-stack">
-        <button
-          type="button"
-          class="iconified-button brand-button"
-          :disabled="!hasChanges || license === null"
-          @click="saveChanges()"
-        >
+        <button type="button" class="iconified-button brand-button" :disabled="!hasChanges || !license.friendly"
+          @click="saveChanges()">
           <SaveIcon />
           Save changes
         </button>
@@ -150,199 +93,104 @@
   </div>
 </template>
 
-<script>
-import Multiselect from "vue-multiselect";
+<script setup lang="ts">
+import { Checkbox, DropdownSelect } from "@modrinth/ui";
+import { TeamMemberPermission, builtinLicenses, formatProjectType, type BuiltinLicense, type Project, type TeamMember } from "@modrinth/utils";
+import { computed, ref, shallowRef, type ShallowRef } from "vue";
 import SaveIcon from "~/assets/images/utils/save.svg?component";
-import Checkbox from "~/components/ui/Checkbox";
 
-export default defineNuxtComponent({
-  components: {
-    Multiselect,
-    Checkbox,
-    SaveIcon,
-  },
-  props: {
-    project: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
-    currentMember: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-    patchProject: {
-      type: Function,
-      default() {
-        return () => {
-          this.$notify({
-            group: "main",
-            title: "An error occurred",
-            text: "Patch project function not found",
-            type: "error",
-          });
-        };
-      },
-    },
-  },
-  data() {
-    return {
-      licenseUrl: "",
-      license: { friendly: "", short: "", requiresOnlyOrLater: false },
-      allowOrLater: this.project.license.id.includes("-or-later"),
-      nonSpdxLicense: this.project.license.id.includes("LicenseRef-"),
-      showKnownErrors: false,
-    };
-  },
-  async setup(props) {
-    const defaultLicenses = shallowRef([
-      { friendly: "Custom", short: "" },
-      {
-        friendly: "All Rights Reserved/No License",
-        short: "All-Rights-Reserved",
-      },
-      { friendly: "Apache License 2.0", short: "Apache-2.0" },
-      {
-        friendly: 'BSD 2-Clause "Simplified" License',
-        short: "BSD-2-Clause",
-      },
-      {
-        friendly: 'BSD 3-Clause "New" or "Revised" License',
-        short: "BSD-3-Clause",
-      },
-      {
-        friendly: "CC Zero (Public Domain equivalent)",
-        short: "CC0-1.0",
-      },
-      { friendly: "CC-BY 4.0", short: "CC-BY-4.0" },
-      {
-        friendly: "CC-BY-SA 4.0",
-        short: "CC-BY-SA-4.0",
-      },
-      {
-        friendly: "CC-BY-NC 4.0",
-        short: "CC-BY-NC-4.0",
-      },
-      {
-        friendly: "CC-BY-NC-SA 4.0",
-        short: "CC-BY-NC-SA-4.0",
-      },
-      {
-        friendly: "CC-BY-ND 4.0",
-        short: "CC-BY-ND-4.0",
-      },
-      {
-        friendly: "CC-BY-NC-ND 4.0",
-        short: "CC-BY-NC-ND-4.0",
-      },
-      {
-        friendly: "GNU Affero General Public License v3",
-        short: "AGPL-3.0",
-        requiresOnlyOrLater: true,
-      },
-      {
-        friendly: "GNU Lesser General Public License v2.1",
-        short: "LGPL-2.1",
-        requiresOnlyOrLater: true,
-      },
-      {
-        friendly: "GNU Lesser General Public License v3",
-        short: "LGPL-3.0",
-        requiresOnlyOrLater: true,
-      },
-      {
-        friendly: "GNU General Public License v2",
-        short: "GPL-2.0",
-        requiresOnlyOrLater: true,
-      },
-      {
-        friendly: "GNU General Public License v3",
-        short: "GPL-3.0",
-        requiresOnlyOrLater: true,
-      },
-      { friendly: "ISC License", short: "ISC" },
-      { friendly: "MIT License", short: "MIT" },
-      { friendly: "Mozilla Public License 2.0", short: "MPL-2.0" },
-      { friendly: "zlib License", short: "Zlib" },
-    ]);
+const props = defineProps<{
+  project: Project;
+  currentMember: TeamMember | undefined;
+  patchProject: (payload: Object, quiet?: boolean) => Object;
+}>();
 
-    const licenseUrl = ref(props.project.license.url);
-
-    const licenseId = props.project.license.id;
-    const trimmedLicenseId = licenseId
-      .replaceAll("-only", "")
-      .replaceAll("-or-later", "")
-      .replaceAll("LicenseRef-", "");
-
-    const license = ref(
-      defaultLicenses.value.find((x) => x.short === trimmedLicenseId) ?? {
-        friendly: "Custom",
-        short: licenseId.replaceAll("LicenseRef-", ""),
-      },
-    );
-
-    if (licenseId === "LicenseRef-Unknown") {
-      license.value = {
-        friendly: "Unknown",
-        short: licenseId.replaceAll("LicenseRef-", ""),
-      };
-    }
-
-    return {
-      defaultLicenses,
-      licenseUrl,
-      license,
-    };
-  },
-  computed: {
-    hasPermission() {
-      const EDIT_DETAILS = 1 << 2;
-      return (this.currentMember.permissions & EDIT_DETAILS) === EDIT_DETAILS;
-    },
-    licenseId() {
-      let id = "";
-      if (this.license === null) return id;
-      if (
-        (this.nonSpdxLicense && this.license.friendly === "Custom") ||
-        this.license.short === "All-Rights-Reserved" ||
-        this.license.short === "Unknown"
-      ) {
-        id += "LicenseRef-";
-      }
-      id += this.license.short;
-      if (this.license.requiresOnlyOrLater) {
-        id += this.allowOrLater ? "-or-later" : "-only";
-      }
-      if (this.nonSpdxLicense && this.license.friendly === "Custom") {
-        id = id.replaceAll(" ", "-");
-      }
-      return id;
-    },
-    patchData() {
-      const data = {};
-
-      if (this.licenseId !== this.project.license.id) {
-        data.license_id = this.licenseId;
-        data.license_url = this.licenseUrl ? this.licenseUrl : null;
-      } else if (this.licenseUrl !== this.project.license.url) {
-        data.license_url = this.licenseUrl ? this.licenseUrl : null;
-      }
-
-      return data;
-    },
-    hasChanges() {
-      return Object.keys(this.patchData).length > 0;
-    },
-  },
-  methods: {
-    saveChanges() {
-      if (this.hasChanges) {
-        this.patchProject(this.patchData);
-      }
-    },
-  },
+const licenseUrl = ref(props.project.license.url);
+const license: ShallowRef<{
+  friendly: string;
+  short: string;
+  requiresOnlyOrLater?: boolean;
+}> = shallowRef({
+  friendly: "",
+  short: "",
+  requiresOnlyOrLater: false,
 });
+
+const allowOrLater = ref(props.project.license.id.includes("-or-later"));
+const nonSpdxLicense = ref(props.project.license.id.includes("LicenseRef-"));
+
+const oldLicenseId = props.project.license.id;
+const trimmedLicenseId = oldLicenseId
+  .replaceAll("-only", "")
+  .replaceAll("-or-later", "")
+  .replaceAll("LicenseRef-", "");
+
+license.value = builtinLicenses.find((x) => x.short === trimmedLicenseId) ?? {
+  friendly: "Custom",
+  short: oldLicenseId.replaceAll("LicenseRef-", ""),
+  requiresOnlyOrLater: oldLicenseId.includes("-or-later"),
+};
+
+if (oldLicenseId === "LicenseRef-Unknown") {
+  // Mark it as not having a license, forcing the user to select one
+  license.value = {
+    friendly: "",
+    short: oldLicenseId.replaceAll("LicenseRef-", ""),
+    requiresOnlyOrLater: false,
+  };
+}
+
+const hasPermission = computed(() => {
+  return (props.currentMember?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS;
+})
+
+const licenseId = computed(() => {
+  let id = "";
+
+  if (
+    (nonSpdxLicense && license.value.friendly === "Custom") ||
+    license.value.short === "All-Rights-Reserved" ||
+    license.value.short === "Unknown"
+  ) {
+    id += "LicenseRef-";
+  }
+
+  id += license.value.short;
+  if (license.value.requiresOnlyOrLater) {
+    id += allowOrLater.value ? "-or-later" : "-only";
+  }
+
+  if (nonSpdxLicense && license.value.friendly === "Custom") {
+    id = id.replaceAll(" ", "-");
+  }
+
+  return id;
+})
+
+const patchRequestPayload = computed(() => {
+  const payload: {
+    license_id?: string;
+    license_url?: string | null; // null = remove url
+  } = {};
+
+  if (licenseId.value !== props.project.license.id) {
+    payload.license_id = licenseId.value;
+  }
+
+  if (licenseUrl.value !== props.project.license.url) {
+    payload.license_url = licenseUrl.value ? licenseUrl.value : null;
+  }
+
+  return payload;
+});
+
+const hasChanges = computed(() => {
+  return Object.keys(patchRequestPayload.value).length > 0;
+})
+
+function saveChanges() {
+  if (hasChanges.value) {
+    props.patchProject(patchRequestPayload.value);
+  }
+}
 </script>
