@@ -119,8 +119,8 @@ import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import Fuse from "fuse.js";
 import { HammerIcon, PlusIcon, SearchIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import type { PyroFetchError } from "~/composables/pyroFetch";
 import { reloadNuxtApp } from "#app";
+import type { PyroFetchError } from "~/composables/pyroFetch";
 import type { Server } from "~/types/servers";
 
 definePageMeta({
