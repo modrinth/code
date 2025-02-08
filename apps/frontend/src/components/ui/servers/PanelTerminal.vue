@@ -690,6 +690,12 @@ const handleKeydown = (event: KeyboardEvent) => {
       lastClickIndex.value = null;
       return;
     }
+
+    if (searchInput.value) {
+      clearSearch();
+      return;
+    }
+
     if (isFullScreen.value) {
       exitFullScreen();
     }
