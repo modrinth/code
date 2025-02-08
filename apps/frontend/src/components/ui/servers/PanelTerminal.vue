@@ -140,14 +140,17 @@
                 >
                   <div class="flex items-center gap-2">
                     <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
-                    <button
-                      v-if="searchInput"
-                      class="jump-button mr-4 flex items-center gap-1 rounded-md bg-bg-blue px-2 py-1 text-xs text-blue transition-all hover:scale-105 active:scale-95"
-                      @click="jumpToLine(item)"
-                    >
-                      <RightArrowIcon class="h-3 w-3" />
-                      Jump
-                    </button>
+                    <div @mousedown.stop @click.stop>
+                      <button
+                        v-if="searchInput"
+                        class="jump-button mr-4 flex items-center gap-1 rounded-md bg-bg-blue px-2 py-1 text-xs text-blue transition-all hover:scale-105 active:scale-95"
+                        @mousedown.stop
+                        @click.stop="() => jumpToLine(item)"
+                      >
+                        <RightArrowIcon class="h-3 w-3" />
+                        Jump
+                      </button>
+                    </div>
                   </div>
                 </li>
                 <li
@@ -1008,7 +1011,10 @@ const getSelectionPosition = () => {
   };
 };
 
-const jumpToLine = (line: string) => {
+const jumpToLine = (line: string, event?: MouseEvent) => {
+  event?.preventDefault();
+  event?.stopPropagation();
+
   const index = pyroConsole.findLineIndex(line);
   if (index === -1) return;
 
