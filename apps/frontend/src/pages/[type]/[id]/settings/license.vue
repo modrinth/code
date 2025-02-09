@@ -26,7 +26,7 @@
           </span>
         </label>
 
-        <div class="input-stack w-1/2">
+        <div class="w-1/2">
           <DropdownSelect
             v-model="license"
             name="License selector"
@@ -34,15 +34,27 @@
             :display-name="(chosen: BuiltinLicense) => chosen.friendly"
             placeholder="Select license..."
           />
-
-          <Checkbox
-            v-model="allowOrLater"
-            :disabled="!hasPermission || !license?.requiresOnlyOrLater"
-            description="Allow later editions of this license"
-          >
-            Allow later editions of this license
-          </Checkbox>
         </div>
+      </div>
+
+      <div class="adjacent-input" v-if="license.requiresOnlyOrLater">
+        <label for="or-later-checkbox">
+          <span class="label__title">Later editions</span>
+          <span class="label__description">
+            The license you selected has an "or later" clause. If you check this box, users may use
+            your project under later editions of the license.
+          </span>
+        </label>
+
+        <Checkbox
+          id="or-later-checkbox"
+          v-model="allowOrLater"
+          :disabled="!hasPermission"
+          description="Allow later editions"
+          class="w-1/2"
+        >
+          Allow later editions
+        </Checkbox>
       </div>
 
       <div class="adjacent-input">
