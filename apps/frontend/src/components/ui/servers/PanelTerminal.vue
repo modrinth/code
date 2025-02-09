@@ -628,23 +628,13 @@ const handleTrackClick = (event: MouseEvent) => {
     return;
 
   const trackRect = scrollbarTrack.value.getBoundingClientRect();
-  const thumbHeight = getThumbHeight();
+  const trackHeight = trackRect.height;
+  const clickRatio = (event.clientY - trackRect.top) / trackHeight;
 
-  const clickOffset = event.clientY - trackRect.top;
+  const maxScroll = scrollContainer.value.scrollHeight - scrollContainer.value.clientHeight;
+  const newScrollTop = clickRatio * maxScroll;
 
-  const currentThumbPosition = getThumbPosition();
-  const thumbCenterPosition = currentThumbPosition + thumbHeight / 2;
-  const scrollAmount = clientHeight.value * (clickOffset < thumbCenterPosition ? -1 : 1);
-
-  const newScrollTop = Math.max(
-    0,
-    Math.min(
-      scrollContainer.value.scrollTop + scrollAmount,
-      scrollContainer.value.scrollHeight - scrollContainer.value.clientHeight,
-    ),
-  );
-
-  scrollContainer.value.scrollTop = newScrollTop;
+  scrollContainer.value.scrollTop = Math.max(0, Math.min(newScrollTop, maxScroll));
 };
 
 const setBodyScroll = (enabled: boolean) => {
