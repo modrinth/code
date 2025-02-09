@@ -7,7 +7,7 @@ import { type Ref, shallowRef } from "vue";
  */
 const maxLines = 10000;
 const batchTimeout = 300; // ms
-const initialBatchSize = 100;
+const initialBatchSize = 256;
 
 /**
  * Provides a global console output state management system
