@@ -31,10 +31,7 @@
             v-model="license"
             name="License selector"
             :options="builtinLicenses"
-            :display-name="
-              (option: BuiltinLicense) =>
-                builtinLicenses.find((license) => license.short === option.short)?.friendly
-            "
+            :display-name="(chosen: BuiltinLicense) => chosen.friendly"
             placeholder="Select license..."
           />
 
@@ -129,7 +126,11 @@
         <button
           type="button"
           class="iconified-button brand-button"
-          :disabled="!hasChanges || !license.friendly"
+          :disabled="
+            !hasChanges ||
+            !hasPermission ||
+            (license.friendly === 'Custom' && (license.short === '' || licenseUrl === ''))
+          "
           @click="saveChanges()"
         >
           <SaveIcon />
@@ -150,7 +151,7 @@ import {
   type Project,
   type TeamMember,
 } from "@modrinth/utils";
-import { computed, ref, shallowRef, type ShallowRef } from "vue";
+import { computed, ref, type Ref } from "vue";
 import SaveIcon from "~/assets/images/utils/save.svg?component";
 
 const props = defineProps<{
@@ -160,11 +161,11 @@ const props = defineProps<{
 }>();
 
 const licenseUrl = ref(props.project.license.url);
-const license: ShallowRef<{
+const license: Ref<{
   friendly: string;
   short: string;
   requiresOnlyOrLater?: boolean;
-}> = shallowRef({
+}> = ref({
   friendly: "",
   short: "",
   requiresOnlyOrLater: false,
@@ -243,8 +244,6 @@ const hasChanges = computed(() => {
 });
 
 function saveChanges() {
-  if (hasChanges.value) {
-    props.patchProject(patchRequestPayload.value);
-  }
+  props.patchProject(patchRequestPayload.value);
 }
 </script>
