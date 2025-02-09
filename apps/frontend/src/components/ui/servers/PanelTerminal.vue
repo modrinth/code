@@ -17,7 +17,7 @@
         </ButtonStyled>
         <span
           v-if="pyroConsole.filteredOutput.value.length && searchInput"
-          class="absolute right-12 top-1/2 -translate-y-1/2 whitespace-pre text-sm text-contrast"
+          class="pointer-events-none absolute right-12 top-1/2 -translate-y-1/2 select-none whitespace-pre text-sm"
         >
           {{ pyroConsole.filteredOutput.value.length }}
           {{ pyroConsole.filteredOutput.value.length === 1 ? "result" : "results" }}
@@ -258,7 +258,7 @@
         </button>
       </Transition>
     </div>
-    <NewModal ref="logModal" class="z-[9999]" header="Viewing selected logs">
+    <NewModal ref="viewLogModal" class="z-[9999]" header="Viewing selected logs">
       <div class="text-contrast">
         <pre class="select-text overflow-x-auto whitespace-pre font-mono">{{ selectedLog }}</pre>
       </div>
@@ -268,7 +268,7 @@
 
 <script setup lang="ts">
 import { RightArrowIcon, CopyIcon, XIcon, SearchIcon, EyeIcon } from "@modrinth/assets";
-import { ref, computed, onMounted, onUnmounted, watch, nextTick, shallowRef } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
@@ -281,36 +281,83 @@ const props = defineProps<{
   fullScreen: boolean;
 }>();
 
+const BUFFER_SIZE = 5;
+const BATCH_SIZE = 50;
+const LINE_HEIGHT = 32;
+const SEPARATOR_HEIGHT = 32;
+const SCROLL_END_DELAY = 150;
+const progressiveBlurIterations = ref(8);
+
 const pyroConsole = usePyroConsole();
 const consoleOutput = pyroConsole.output;
 
 const scrollContainer = ref<HTMLElement | null>(null);
-const bottomThreshold = ref(0);
-const bufferSize = 5;
-const cachedHeights = shallowRef<Map<string, number>>(new Map());
-const isAutoScrolling = ref(false);
 
-const progressiveBlurIterations = ref(8);
-
-const scrollTop = ref(0);
-const clientHeight = ref(0);
 const isFullScreen = ref(props.fullScreen);
 
-const initial = ref(false);
+const initialBatch = ref(false);
+const isInitialLoad = ref(true);
+
+const startY = ref(0);
+const scrollTop = ref(0);
+const clientHeight = ref(0);
+const startScrollTop = ref(0);
+const bottomThreshold = ref(0);
+const isAutoScrolling = ref(false);
 const userHasScrolled = ref(false);
 const isScrolledToBottom = ref(true);
-
-const BATCH_SIZE = 50;
-
-const LINE_HEIGHT = 32;
-const SEPARATOR_HEIGHT = 32;
-
-const SCROLL_END_DELAY = 150;
-
 const scrollEndTimeout = ref<NodeJS.Timeout | null>(null);
 const isScrolling = ref(false);
 
+const scrollbarTrack = ref<HTMLElement | null>(null);
+const scrollbarThumb = ref<HTMLElement | null>(null);
+const isDragging = ref(false);
+
 const searchInput = ref("");
+
+const viewLogModal = ref<InstanceType<typeof NewModal>>();
+const selectedLog = ref("");
+const selectionStart = ref<number | null>(null);
+const selectionEnd = ref<number | null>(null);
+const isSelecting = ref(false);
+const autoScrollSpeed = ref(0);
+const autoScrollInterval = ref<NodeJS.Timeout | null>(null);
+const lastClickIndex = ref<number | null>(null);
+const lastMouseEvent = ref<MouseEvent | null>(null);
+
+const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
+
+const getBlurStyle = (i: number) => {
+  const properBlurIteration = i + 1;
+  const blur = lerp(0, 2 ** (properBlurIteration - 3), bottomThreshold.value);
+  const singular = 100 / progressiveBlurIterations.value;
+  let mask = "linear-gradient(";
+
+  switch (i) {
+    case 0:
+      mask += `rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) ${singular}%`;
+      break;
+    case 1:
+      mask += `rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) ${singular}%, rgb(0, 0, 0) ${singular * 2}%`;
+      break;
+    case 2:
+      mask += `rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) ${singular}%, rgba(0, 0, 0, 0) ${singular * 2}%, rgb(0, 0, 0) ${singular * 3}%`;
+      break;
+    default:
+      mask += `rgba(0, 0, 0, 0) ${singular * (i - 3)}%, rgb(0, 0, 0) ${singular * (i + 1 - 3)}%, rgb(0, 0, 0) ${singular * (i + 2 - 3)}%, rgba(0, 0, 0, 0) ${singular * (i + 3 - 3)}%`;
+      break;
+  }
+
+  mask += `)`;
+
+  return {
+    backdropFilter: `blur(${blur}px)`,
+    mask,
+    position: "absolute" as any,
+    zIndex: progressiveBlurIterations.value - i,
+  };
+};
+
 const updateSearch = useDebounceFn((value: string) => {
   pyroConsole.setSearchQuery(value);
 
@@ -332,10 +379,6 @@ const updateSearch = useDebounceFn((value: string) => {
     }
   });
 }, 300);
-
-watch(searchInput, (value) => {
-  updateSearch(value);
-});
 
 const clearSearch = () => {
   searchInput.value = "";
@@ -412,51 +455,18 @@ const getPositionForLineIndex = (index: number) => {
 };
 
 const visibleStartIndex = computed(() => {
-  const rawPosition = Math.max(0, scrollTop.value - LINE_HEIGHT * bufferSize);
+  const rawPosition = Math.max(0, scrollTop.value - LINE_HEIGHT * BUFFER_SIZE);
   return getLineIndexForPosition(rawPosition);
 });
 
 const visibleEndIndex = computed(() => {
-  const rawPosition = scrollTop.value + clientHeight.value + LINE_HEIGHT * bufferSize;
+  const rawPosition = scrollTop.value + clientHeight.value + LINE_HEIGHT * BUFFER_SIZE;
   return Math.min(activeOutput.value.length - 1, getLineIndexForPosition(rawPosition));
 });
 
 const offsetY = computed(() => {
   return getPositionForLineIndex(visibleStartIndex.value);
 });
-
-const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
-
-const getBlurStyle = (i: number) => {
-  const properBlurIteration = i + 1;
-  const blur = lerp(0, 2 ** (properBlurIteration - 3), bottomThreshold.value);
-  const singular = 100 / progressiveBlurIterations.value;
-  let mask = "linear-gradient(";
-
-  switch (i) {
-    case 0:
-      mask += `rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) ${singular}%`;
-      break;
-    case 1:
-      mask += `rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) ${singular}%, rgb(0, 0, 0) ${singular * 2}%`;
-      break;
-    case 2:
-      mask += `rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) ${singular}%, rgba(0, 0, 0, 0) ${singular * 2}%, rgb(0, 0, 0) ${singular * 3}%`;
-      break;
-    default:
-      mask += `rgba(0, 0, 0, 0) ${singular * (i - 3)}%, rgb(0, 0, 0) ${singular * (i + 1 - 3)}%, rgb(0, 0, 0) ${singular * (i + 2 - 3)}%, rgba(0, 0, 0, 0) ${singular * (i + 3 - 3)}%`;
-      break;
-  }
-
-  mask += `)`;
-
-  return {
-    backdropFilter: `blur(${blur}px)`,
-    mask,
-    position: "absolute" as any,
-    zIndex: progressiveBlurIterations.value - i,
-  };
-};
 
 const visibleItems = computed(() => {
   const start = visibleStartIndex.value;
@@ -541,12 +551,6 @@ const scrollToBottom = () => {
     }, 50);
   });
 };
-
-const scrollbarTrack = ref<HTMLElement | null>(null);
-const scrollbarThumb = ref<HTMLElement | null>(null);
-const isDragging = ref(false);
-const startY = ref(0);
-const startScrollTop = ref(0);
 
 const getThumbHeight = () => {
   if (!scrollContainer.value || !scrollbarTrack.value) return 30;
@@ -720,20 +724,15 @@ const initializeTerminal = () => {
       if (container) {
         container.scrollTop = container.scrollHeight;
         handleListScroll();
-        initial.value = true;
+        initialBatch.value = true;
       }
     });
   });
 };
 
-const isInitialLoad = ref(true);
-
-const logModal = ref<InstanceType<typeof NewModal>>();
-const selectedLog = ref("");
-
 const showFullLogMessage = (log: string) => {
   selectedLog.value = log;
-  logModal.value?.show();
+  viewLogModal.value?.show();
 };
 
 const showSelectedLines = () => {
@@ -744,89 +743,12 @@ const showSelectedLines = () => {
   const selectedLines = activeOutput.value.slice(start, end + 1);
 
   selectedLog.value = selectedLines.join("\n");
-  logModal.value?.show();
+  viewLogModal.value?.show();
 };
-
-watch(
-  () => consoleOutput.value,
-  (newOutput, oldOutput) => {
-    if (!oldOutput || newOutput.length <= oldOutput.length) return;
-
-    const shouldScroll = isScrolledToBottom.value || !userHasScrolled.value || isInitialLoad.value;
-
-    if (shouldScroll) {
-      if (isInitialLoad.value) {
-        setTimeout(() => {
-          scrollToBottom();
-          isInitialLoad.value = false;
-        }, 100);
-      } else {
-        nextTick(scrollToBottom);
-      }
-    }
-  },
-  { flush: "post" },
-);
-
-watch(
-  () => pyroConsole.filteredOutput.value,
-  () => {
-    if (searchInput.value && scrollContainer.value) {
-      nextTick(() => {
-        handleListScroll();
-      });
-    }
-  },
-);
-
-onMounted(() => {
-  initializeTerminal();
-
-  window.addEventListener("resize", updateClientHeight);
-  window.addEventListener("keydown", handleKeydown);
-  window.addEventListener("mouseup", handleGlobalMouseUp);
-  window.addEventListener("contextmenu", handleContextMenu);
-  window.addEventListener("click", handleClickOutside);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("resize", updateClientHeight);
-  window.removeEventListener("keydown", handleKeydown);
-  window.removeEventListener("mouseup", handleGlobalMouseUp);
-  window.removeEventListener("contextmenu", handleContextMenu);
-  window.removeEventListener("click", handleClickOutside);
-  stopDragging();
-  cachedHeights.value.clear();
-  setBodyScroll(true);
-  if (scrollEndTimeout.value) {
-    clearTimeout(scrollEndTimeout.value);
-  }
-});
 
 const virtualListStyle = computed(() => ({
   transform: `translateY(${offsetY.value}px)`,
 }));
-
-watch(
-  () => props.fullScreen,
-  (newValue) => {
-    isFullScreen.value = newValue;
-    nextTick(() => {
-      updateClientHeight();
-    });
-  },
-);
-
-watch(isFullScreen, () => {
-  nextTick(() => {
-    updateClientHeight();
-  });
-});
-
-const selectionStart = ref<number | null>(null);
-const selectionEnd = ref<number | null>(null);
-const isSelecting = ref(false);
-const autoScrollInterval = ref<NodeJS.Timeout | null>(null);
 
 const isLineSelected = (index: number) => {
   if (selectionStart.value === null || selectionEnd.value === null) return false;
@@ -834,8 +756,6 @@ const isLineSelected = (index: number) => {
   const end = Math.max(selectionStart.value, selectionEnd.value);
   return index >= start && index <= end;
 };
-
-const lastClickIndex = ref<number | null>(null);
 
 const handleContextMenu = () => {
   if (isSelecting.value) {
@@ -915,8 +835,6 @@ const getLineIndexFromEvent = (event: MouseEvent): number | null => {
   return Math.floor(adjustedY / LINE_HEIGHT);
 };
 
-const autoScrollSpeed = ref(0);
-
 const startAutoScroll = () => {
   if (autoScrollInterval.value) return;
   autoScrollInterval.value = setInterval(() => {
@@ -953,17 +871,6 @@ const handleCopy = (event: KeyboardEvent) => {
   selectionEnd.value = null;
   lastClickIndex.value = null;
 };
-
-onMounted(() => {
-  window.addEventListener("keydown", handleCopy);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("keydown", handleCopy);
-  stopAutoScroll();
-});
-
-const lastMouseEvent = ref<MouseEvent | null>(null);
 
 const hasSelection = computed(
   () =>
@@ -1085,6 +992,90 @@ watch(
     });
   },
 );
+
+watch(searchInput, (value) => {
+  updateSearch(value);
+});
+
+watch(
+  () => consoleOutput.value,
+  (newOutput, oldOutput) => {
+    if (!oldOutput || newOutput.length <= oldOutput.length) return;
+
+    const shouldScroll = isScrolledToBottom.value || !userHasScrolled.value || isInitialLoad.value;
+
+    if (shouldScroll) {
+      if (isInitialLoad.value) {
+        setTimeout(() => {
+          scrollToBottom();
+          isInitialLoad.value = false;
+        }, 100);
+      } else {
+        nextTick(scrollToBottom);
+      }
+    }
+  },
+  { flush: "post" },
+);
+
+watch(
+  () => pyroConsole.filteredOutput.value,
+  () => {
+    if (searchInput.value && scrollContainer.value) {
+      nextTick(() => {
+        handleListScroll();
+      });
+    }
+  },
+);
+
+watch(
+  () => props.fullScreen,
+  (newValue) => {
+    isFullScreen.value = newValue;
+    nextTick(() => {
+      updateClientHeight();
+    });
+  },
+);
+
+watch(isFullScreen, () => {
+  nextTick(() => {
+    updateClientHeight();
+  });
+});
+
+onMounted(() => {
+  initializeTerminal();
+
+  window.addEventListener("resize", updateClientHeight);
+  window.addEventListener("keydown", handleKeydown);
+  window.addEventListener("mouseup", handleGlobalMouseUp);
+  window.addEventListener("contextmenu", handleContextMenu);
+  window.addEventListener("click", handleClickOutside);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", updateClientHeight);
+  window.removeEventListener("keydown", handleKeydown);
+  window.removeEventListener("mouseup", handleGlobalMouseUp);
+  window.removeEventListener("contextmenu", handleContextMenu);
+  window.removeEventListener("click", handleClickOutside);
+  stopDragging();
+  setBodyScroll(true);
+  if (scrollEndTimeout.value) {
+    clearTimeout(scrollEndTimeout.value);
+  }
+});
+
+onMounted(() => {
+  window.addEventListener("keydown", handleCopy);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleCopy);
+  stopAutoScroll();
+});
 </script>
 
 <style scoped>
