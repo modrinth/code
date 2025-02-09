@@ -234,7 +234,7 @@
             <button
               v-if="hasSelection"
               data-pyro-view
-              label="View full content"
+              label="View selected lines"
               class="experimental-styles-within ml-2 flex h-12 w-[100px] flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
               @click="showSelectedLines"
             >
