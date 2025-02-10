@@ -59,6 +59,11 @@ const preferences = {
       "When enabled, RAM will be displayed as bytes instead of a percentage in your server's Overview.",
     implemented: true,
   },
+  hideSubdomainLabel: {
+    displayName: "Hide subdomain label",
+    description: "When enabled, the subdomain label will be hidden from the server header.",
+    implemented: true,
+  },
   autoRestart: {
     displayName: "Auto restart",
     description: "When enabled, your server will automatically restart if it crashes.",
@@ -84,6 +89,7 @@ type UserPreferences = {
 
 const defaultPreferences: UserPreferences = {
   ramAsNumber: false,
+  hideSubdomainLabel: false,
   autoRestart: false,
   powerDontAskAgain: false,
   backupWhileRunning: false,
