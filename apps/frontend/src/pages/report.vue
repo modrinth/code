@@ -607,7 +607,7 @@ const messages = defineMessages({
 
 <style scoped lang="scss">
 .page {
-  padding: 0.5rem;
+  padding: 1rem;
   margin-left: auto;
   margin-right: auto;
   max-width: 56rem;
