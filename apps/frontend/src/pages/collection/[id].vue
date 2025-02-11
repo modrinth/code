@@ -9,7 +9,134 @@
       :proceed-label="formatMessage(commonMessages.deleteLabel)"
       @proceed="deleteCollection()"
     />
-    <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
+    <div
+      class="experimental-styles-within new-page sidebar"
+      :class="{ 'alt-layout': cosmetics.leftContentLayout }"
+    >
+      <div class="normal-page__header py-4">
+        <ContentPageHeader>
+          <template #icon>
+            <Avatar :src="collection.icon_url" :alt="collection.name" size="96px" />
+          </template>
+          <template #title>
+            {{ collection.name }}
+          </template>
+          <template #title-suffix>
+            <div class="ml-1 flex items-center gap-2 font-semibold">
+              <CollectionIcon /> Collection
+            </div>
+          </template>
+          <template #summary>
+            {{ collection.description }}
+          </template>
+          <template #stats>
+            <div
+              v-if="canEdit"
+              class="flex cursor-help items-center border-0 border-r border-solid border-divider pr-4"
+            >
+              <SimpleBadge
+                v-if="collection.status === 'listed'"
+                v-tooltip="'This collection is visible to all users.'"
+                :icon="WorldIcon"
+                :formatted-name="formatMessage(commonMessages.publicLabel)"
+              />
+              <SimpleBadge
+                v-else-if="collection.status === 'unlisted'"
+                v-tooltip="'This collection is only visible to users with the link.'"
+                :icon="LinkIcon"
+                :formatted-name="formatMessage(commonMessages.unlistedLabel)"
+              />
+              <SimpleBadge
+                v-else-if="collection.status === 'private'"
+                v-tooltip="'This collection is only visible to you.'"
+                :icon="LockIcon"
+                :formatted-name="formatMessage(commonMessages.privateLabel)"
+              />
+              <SimpleBadge
+                v-else-if="collection.status === 'rejected'"
+                v-tooltip="'This collection has been rejected.'"
+                :icon="XIcon"
+                :formatted-name="formatMessage(commonMessages.rejectedLabel)"
+              />
+            </div>
+            <div
+              v-tooltip="
+                `${$formatNumber(projects.length || 0, false)} project${(projects.length || 0) !== 1 ? 's' : ''}`
+              "
+              class="flex cursor-help items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+            >
+              <BoxIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(projects.length || 0) }}
+            </div>
+            <div
+              v-tooltip="
+                formatMessage(commonMessages.dateAtTimeTooltip, {
+                  date: new Date(collection.created),
+                  time: new Date(collection.created),
+                })
+              "
+              class="flex cursor-help items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+            >
+              <CalendarIcon class="h-6 w-6 text-secondary" />
+
+              {{
+                formatMessage(messages.createdAtLabel, {
+                  ago: formatRelativeTime(collection.created),
+                })
+              }}
+            </div>
+            <div
+              v-tooltip="
+                formatMessage(commonMessages.dateAtTimeTooltip, {
+                  date: new Date(collection.updated),
+                  time: new Date(collection.updated),
+                })
+              "
+              class="flex cursor-help items-center gap-2 font-semibold"
+            >
+              <UpdatedIcon class="h-6 w-6 text-secondary" />
+
+              {{
+                formatMessage(messages.updatedAtLabel, {
+                  ago: formatRelativeTime(collection.updated),
+                })
+              }}
+            </div>
+          </template>
+          <template #actions>
+            <ButtonStyled size="large">
+              <button v-if="canEdit && isEditing === false" @click="isEditing = true">
+                <EditIcon aria-hidden="true" />
+                {{ formatMessage(commonMessages.editButton) }}
+              </button>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular>
+              <OverflowMenu
+                :options="[
+                  {
+                    id: 'delete',
+                    action: () => $refs.deleteModal.show(),
+                    color: 'red',
+                    hoverOnly: true,
+                    shown: canEdit && isEditing === false,
+                  },
+                  { id: 'copy-id', action: () => copyId() },
+                ]"
+              >
+                <MoreVerticalIcon aria-hidden="true" />
+                <template #delete>
+                  <TrashIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.deleteLabel) }}
+                </template>
+                <template #copy-id>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyIdButton) }}
+                </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </template>
+        </ContentPageHeader>
+      </div>
       <div class="normal-page__sidebar">
         <div class="card">
           <div class="card__overlay input-group">
@@ -379,6 +506,9 @@ import {
   UpdatedIcon,
   LibraryIcon,
   BoxIcon,
+  CollectionIcon,
+  MoreVerticalIcon,
+  ClipboardCopyIcon,
 } from "@modrinth/assets";
 import {
   PopoutMenu,
@@ -393,6 +523,10 @@ import {
 import { isAdmin } from "@modrinth/utils";
 import WorldIcon from "assets/images/utils/world.svg";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
+import ContentPageHeader from "@modrinth/ui/src/components/base/ContentPageHeader.vue";
+import SimpleBadge from "@modrinth/ui/src/components/base/SimpleBadge.vue";
+import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
+import OverflowMenu from "@modrinth/ui/src/components/base/OverflowMenu.vue";
 import { addNotification } from "~/composables/notifs.js";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
@@ -711,6 +845,10 @@ function showPreviewImage(files) {
   reader.onload = (event) => {
     previewImage.value = event.target.result;
   };
+}
+
+async function copyId() {
+  await navigator.clipboard.writeText(collection.value.id);
 }
 </script>
 
