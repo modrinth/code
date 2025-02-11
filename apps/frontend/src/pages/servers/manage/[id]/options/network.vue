@@ -25,7 +25,7 @@
       </form>
     </NewModal>
 
-    <NewModal ref="editAllocationModal" header="Edit Allocation">
+    <NewModal ref="editAllocationModal" header="Edit allocation">
       <form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="editAllocation">
         <label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
         <input
@@ -40,7 +40,7 @@
         <div class="mb-1 mt-4 flex justify-start gap-4">
           <ButtonStyled color="brand">
             <button :disabled="!newAllocationName" type="submit">
-              <SaveIcon /> Update Allocation
+              <SaveIcon /> Update allocation
             </button>
           </ButtonStyled>
           <ButtonStyled>
@@ -94,7 +94,7 @@
             />
 
             <div
-              class="flex max-w-full flex-none overflow-auto rounded-xl bg-table-alternateRow p-4"
+              class="flex max-w-full flex-none overflow-auto rounded-xl bg-table-alternateRow px-4 py-2"
             >
               <table
                 class="w-full flex-none border-collapse truncate rounded-lg border-2 border-gray-300"
@@ -108,7 +108,7 @@
                         >
                           {{ record.type }}
                         </span>
-                        <span class="text-xs uppercase text-secondary">type</span>
+                        <span class="text-xs text-secondary">Type</span>
                       </div>
                     </td>
                     <td class="w-2/6 py-3 md:w-1/3">
@@ -118,7 +118,7 @@
                         >
                           {{ record.name }}
                         </span>
-                        <span class="text-xs uppercase text-secondary">name</span>
+                        <span class="text-xs text-secondary">Name</span>
                       </div>
                     </td>
                     <td class="w-3/6 py-3 pl-4 md:w-5/12 lg:w-5/12">
@@ -128,7 +128,7 @@
                         >
                           {{ record.content }}
                         </span>
-                        <span class="text-xs uppercase text-secondary">content</span>
+                        <span class="text-xs text-secondary">Content</span>
                       </div>
                     </td>
                   </tr>
@@ -190,7 +190,7 @@
                       <span class="text-md font-bold tracking-wide text-contrast">
                         {{ allocation.name }}
                       </span>
-                      <span class="hidden text-xs uppercase text-secondary sm:block">name</span>
+                      <span class="hidden text-xs text-secondary sm:block">Name</span>
                     </div>
                     <div class="flex flex-col gap-1">
                       <span
@@ -198,7 +198,7 @@
                       >
                         {{ allocation.port }}
                       </span>
-                      <span class="hidden text-xs uppercase text-secondary sm:block">port</span>
+                      <span class="hidden text-xs text-secondary sm:block">Port</span>
                     </div>
                   </div>
                 </div>

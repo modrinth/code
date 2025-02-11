@@ -36,7 +36,7 @@ const emit = defineEmits(["reinstall"]);
 const props = defineProps<{
   navLinks: { label: string; href: string; icon: Component; external?: boolean }[];
   route: RouteLocationNormalized;
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
 const onReinstall = (...args: any[]) => {
