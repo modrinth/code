@@ -53,7 +53,7 @@ const props = defineProps<{
 
 const description = ref(props.project.body);
 
-const descriptionUpdatePayload = computed(() => {
+const patchRequestPayload = computed(() => {
   const payload: {
     body?: string;
   } = {};
@@ -66,11 +66,11 @@ const descriptionUpdatePayload = computed(() => {
 });
 
 const hasChanges = computed(() => {
-  return Object.keys(descriptionUpdatePayload.value).length > 0;
+  return Object.keys(patchRequestPayload.value).length > 0;
 });
 
 function saveChanges() {
-  props.patchProject(descriptionUpdatePayload.value);
+  props.patchProject(patchRequestPayload.value);
 }
 
 async function onUploadHandler(file: File) {
