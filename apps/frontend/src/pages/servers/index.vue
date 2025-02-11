@@ -456,9 +456,9 @@
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
               <p class="m-0 !leading-[190%]">
-                Currently, Modrinth Servers are located in New York, Los Angeles, and Miami. More
-                regions are coming soon! Your server's location is currently chosen algorithmically,
-                but you will be able to choose a region in the future.
+                Currently, Modrinth Servers are located in New York, Los Angeles, Seattle, and
+                Miami. More regions are coming soon! Your server's location is currently chosen
+                algorithmically, but you will be able to choose a region in the future.
               </p>
             </details>
 
@@ -512,9 +512,9 @@
               : "There's a plan for everyone! Choose the one that fits your needs."
           }}
           <span class="font-bold">
-            Servers are currently US only, in New York, Los Angeles, and Miami. More regions coming
-            soon!</span
-          >
+            Servers are currently US only, in New York, Los Angeles, Seattle, and Miami. More
+            regions coming soon!
+          </span>
         </h2>
 
         <ul class="m-0 flex w-full flex-col gap-8 p-0 lg:flex-row">
@@ -533,9 +533,9 @@
             <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
               <p class="m-0">4 GB RAM</p>
               <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">32 GB Storage</p>
+              <p class="m-0">4 vCPUs</p>
               <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">2 vCPUs</p>
+              <p class="m-0">32 GB Storage</p>
             </div>
             <h2 class="m-0 text-3xl text-contrast">
               $12<span class="text-sm font-normal text-secondary">/month</span>
@@ -585,9 +585,9 @@
             <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
               <p class="m-0">6 GB RAM</p>
               <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">48 GB Storage</p>
+              <p class="m-0">6 vCPUs</p>
               <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">3 vCPUs</p>
+              <p class="m-0">48 GB Storage</p>
             </div>
             <h2 class="m-0 text-3xl text-contrast">
               $18<span class="text-sm font-normal text-secondary">/month</span>
@@ -626,9 +626,9 @@
             <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
               <p class="m-0">8 GB RAM</p>
               <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">64 GB Storage</p>
+              <p class="m-0">8 vCPUs</p>
               <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">4 vCPUs</p>
+              <p class="m-0">64 GB Storage</p>
             </div>
             <h2 class="m-0 text-3xl text-contrast">
               $24<span class="text-sm font-normal text-secondary">/month</span>
@@ -656,11 +656,11 @@
         </ul>
 
         <div
-          class="flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left md:flex-row md:gap-0"
+          class="flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
         >
           <div class="flex flex-col gap-4">
             <h1 class="m-0">Build your own</h1>
-            <h2 class="m-0 text-base font-normal">
+            <h2 class="m-0 text-base font-normal text-primary">
               If you're a more technical server administrator, you can pick your own RAM and storage
               options.
             </h2>

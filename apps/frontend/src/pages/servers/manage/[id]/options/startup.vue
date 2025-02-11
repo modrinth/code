@@ -35,10 +35,9 @@
             <div class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Java version</span>
               <span>
-                The version of Java that your server will run on. Your server is running Minecraft
-                {{ data.mc_version }}. By default, only the Java versions compatible with this
-                version of Minecraft are shown. Some mods or modpacks may require a specific Java
-                version.
+                The version of Java that your server will run on. By default, only the Java versions
+                compatible with this version of Minecraft are shown. Some mods may require a
+                different Java version to work properly.
               </span>
             </div>
             <div class="flex items-center gap-2">

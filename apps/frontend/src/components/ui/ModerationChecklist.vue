@@ -411,18 +411,21 @@ Per section 5.2 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#m
           name: "Insufficient",
           resultingMessage: `## Insufficient Summary
 Per section 5.3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) Your project summary should provide a brief overview of your project that informs and entices users.
+
 This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
         },
         {
           name: "Repeat of title",
           resultingMessage: `## Insufficient Summary
 Per section 5.3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) your Summary can not be the same as your project's Title. Your project summary should provide a brief overview of your project that informs and entices users.
+
 This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
         },
         {
           name: "Formatting",
           resultingMessage: `## Insufficient Summary
 Per section 5.3 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) your Summary can not include any extra formatting such as lists, or links. Your project summary should provide a brief overview of your project that informs and entices users.
+
 This is the first thing most people will see about your mod other than the Logo, so it's important it be accurate, reasonably detailed, and exciting.`,
         },
       ],
@@ -559,7 +562,9 @@ Per section 5.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#m
           name: "Inaccurate (modpack)",
           resultingMessage: `## Incorrect Environment Information
 Per section 5.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous), it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
+
 For a brief rundown of how this works:
+
 Some modpacks can be client-side, usually aimed at providing utility and optimization while allowing the player to join an unmodded server, for instance, [Fabulously Optimized](https://modrinth.com/modpack/fabulously-optimized).
 Most other modpacks that change how the game is played are going to be required on both the client and server, like the modpack [Dying Light](https://modrinth.com/modpack/dying-light).
 When in doubt, test for yourself or check the requirements of the mods in your pack.`,
@@ -568,10 +573,11 @@ When in doubt, test for yourself or check the requirements of the mods in your p
           name: "Inaccurate (mod)",
           resultingMessage: `## Environment Information
 Per section 5.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous), it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
+
 For a brief rundown of how this works:
-**Client side** refers to a mod that is only required by the client, like [Sodium](https://modrinth.com/mod/sodium).
-**Server side** mods change the behavior of the server without the client needing the mod, like Datapacks, recipes, or server-side behaviors, like [Falling Tree](https://modrinth.com/mod/fallingtree).
-A mod that adds features, entities, or new blocks and items, generally will be required on **both** the server and the client, for example [Cobblemon](https://modrinth.com/mod/cobblemon).`,
+- **Client side** refers to a mod that is only required by the client, like [Sodium](https://modrinth.com/mod/sodium).
+- **Server side** mods change the behavior of the server without the client needing the mod, like Datapacks, recipes, or server-side behaviors, like [Falling Tree](https://modrinth.com/mod/fallingtree).
+- A mod that adds features, entities, or new blocks and items, generally will be required on **both** the server and the client, for example [Cobblemon](https://modrinth.com/mod/cobblemon).`,
         },
       ],
     },
@@ -602,6 +608,7 @@ Per section 5.5 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#m
           name: "Incorrect additional files",
           resultingMessage: `## Incorrect Use of Additional Files
 It looks like you've uploaded multiple \`mod.jar\` files to one Version as Additional Files. Per section 5.7 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#miscellaneous) each Version of your project must include only one \`mod.jar\` that corresponds to its respective Minecraft and loader versions. This allows users to easily find and download the file they need for the version they're on with ease. The Additional Files feature can be used for things like a \`Sources.jar\`.
+
 Please upload each version of your mod separately, thank you.`,
         },
         {
@@ -629,7 +636,9 @@ It looks like you've selected loaders for your Resource Pack that are causing it
           name: "Re-upload",
           resultingMessage: `## Reuploads are forbidden
 This project appears to contain content from %ORIGINAL_PROJECT% by %ORIGINAL_AUTHOR%.
+
 Per section 4 of [Modrinth's Content Rules](https://modrinth.com/legal/rules) this is strictly forbidden.
+
 If you believe this is an error, or you can verify you are the creator and rightful owner of this content please let us know. Otherwise, we ask that you **do not resubmit this project**.`,
           fillers: [
             {
@@ -847,6 +856,7 @@ async function generateMessage() {
     for (const mod of mods) {
       message.value += `- ${mod}\n`;
     }
+    message.value += "\n";
   }
 
   if (modPackData.value && modPackData.value.length > 0) {
@@ -913,7 +923,7 @@ async function generateMessage() {
       permanentNoMods.length > 0 ||
       unidentifiedMods.length > 0
     ) {
-      message.value += "## Copyrighted Content \n";
+      message.value += "## Copyrighted content \n";
 
       printMods(
         attributeMods,
