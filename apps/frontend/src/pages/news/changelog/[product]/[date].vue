@@ -35,20 +35,15 @@ if (!changelogEntry.value) {
   <div v-if="changelogEntry" class="page experimental-styles-within">
     <nuxt-link
       :to="`/news/changelog?filter=${changelogEntry.product}`"
-      class="flex w-fit items-center gap-2 text-link"
+      class="mb-4 flex w-fit items-center gap-2 text-link"
     >
       <ChevronLeftIcon /> View full changelog
     </nuxt-link>
     <div class="relative flex flex-col gap-4 pb-6">
       <div class="absolute flex h-full w-4 justify-center">
-        <div class="timeline-indicator" />
+        <div class="timeline-indicator" :class="{ first: isFirst }" />
       </div>
-      <ChangelogEntry
-        :entry="changelogEntry"
-        :first="isFirst"
-        show-type
-        class="relative z-10 mt-[1.5rem]"
-      />
+      <ChangelogEntry :entry="changelogEntry" :first="isFirst" show-type class="relative z-10" />
     </div>
   </div>
 </template>
@@ -77,9 +72,15 @@ if (!changelogEntry.value) {
   mask-image: linear-gradient(
     to bottom,
     transparent 0%,
-    black 15rem,
-    black calc(100% - 15rem),
+    black 8rem,
+    black calc(100% - 8rem),
     transparent 100%
   );
+
+  &.first {
+    margin-top: 1rem;
+
+    mask-image: linear-gradient(black calc(100% - 15rem), transparent 100%);
+  }
 }
 </style>
