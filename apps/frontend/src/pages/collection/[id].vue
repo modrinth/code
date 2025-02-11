@@ -9,7 +9,7 @@
       :proceed-label="formatMessage(commonMessages.deleteLabel)"
       @proceed="deleteCollection()"
     />
-    <div class="normal-page">
+    <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
       <div class="normal-page__sidebar">
         <div class="card">
           <div class="card__overlay input-group">
