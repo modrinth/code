@@ -11,6 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-02-11T13:00:00-09:00`,
+    product: 'web',
+    body: `### Improvements
+- Added project issues link to report page if present.
+- Added relative times for all recent versions to changelog page.
+- Added header to changelog sub-pages.
+- Fixed various padding issues and changelog overlapping navbar on mobile.`,
+  },
+  {
     date: `2025-02-11T09:00:00-09:00`,
     product: 'web',
     body: `### Added
@@ -84,7 +93,7 @@ Contributed by [IMB11](https://github.com/modrinth/code/pull/1301).`,
     product: 'web',
     body: `### Improvements
 - Tags on project pages are now clickable to view other projects with that tag (Contributed by [Neddo](https://github.com/modrinth/code/pull/3126))
-- You can now send someone a link to the download interface with a specific version and loader selected, like so: https://modrinth.com/mod/sodium?version=1.21.2&loader=quilt#download (Contributed by [AwakenedRedstone](https://github.com/modrinth/code/pull/3138)`,
+- You can now send someone a link to the download interface with a specific version and loader selected, like so: https://modrinth.com/mod/sodium?version=1.21.2&loader=quilt#download (Contributed by [AwakenedRedstone](https://github.com/modrinth/code/pull/3138))`,
   },
   {
     date: `2024-12-25T14:00:00-09:00`,

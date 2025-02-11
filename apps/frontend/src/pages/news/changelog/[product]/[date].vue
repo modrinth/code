@@ -32,10 +32,10 @@ if (!changelogEntry.value) {
 </script>
 
 <template>
-  <div v-if="changelogEntry" class="page experimental-styles-within">
+  <div v-if="changelogEntry">
     <nuxt-link
       :to="`/news/changelog?filter=${changelogEntry.product}`"
-      class="mb-4 flex w-fit items-center gap-2 text-link"
+      class="mb-4 mt-4 flex w-fit items-center gap-2 text-link"
     >
       <ChevronLeftIcon /> View full changelog
     </nuxt-link>
@@ -43,19 +43,12 @@ if (!changelogEntry.value) {
       <div class="absolute flex h-full w-4 justify-center">
         <div class="timeline-indicator" :class="{ first: isFirst }" />
       </div>
-      <ChangelogEntry :entry="changelogEntry" :first="isFirst" show-type class="relative z-10" />
+      <ChangelogEntry :entry="changelogEntry" :first="isFirst" show-type class="relative z-[1]" />
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.page {
-  padding: 0.5rem;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 56rem;
-}
-
 .timeline-indicator {
   background-image: linear-gradient(
     to bottom,
