@@ -40,6 +40,9 @@ export { default as Toggle } from './base/Toggle.vue'
 export { default as AnimatedLogo } from './brand/AnimatedLogo.vue'
 export { default as TextLogo } from './brand/TextLogo.vue'
 
+// Changelog
+export { default as ChangelogEntry } from './changelog/ChangelogEntry.vue'
+
 // Charts
 export { default as Chart } from './chart/Chart.vue'
 export { default as CompactChart } from './chart/CompactChart.vue'
