@@ -26,7 +26,7 @@
         </div>
       </AutoLink>
     </div>
-    <div class="ml-8 mt-3 rounded-2xl bg-bg-raised p-4">
+    <div class="ml-8 mt-3 rounded-2xl bg-bg-raised px-4 py-3">
       <div class="changelog-body" v-html="renderHighlightedString(entry.body)" />
     </div>
   </div>
@@ -135,6 +135,10 @@ const messages = defineMessages({
 
   * + li {
     margin-top: 0.5rem;
+  }
+
+  li ul li {
+    margin-top: 0.25rem;
   }
 
   img {
