@@ -6,24 +6,25 @@ import NavTabs from "~/components/ui/NavTabs.vue";
 const route = useRoute();
 
 const filter = ref<Product | undefined>(undefined);
+const allChangelogEntries = ref(getChangelog());
 
-if (route.query.filter) {
-  filter.value = route.query.filter as Product;
+function updateFilter() {
+  if (route.query.filter) {
+    filter.value = route.query.filter as Product;
+  } else {
+    filter.value = undefined;
+  }
 }
+
+updateFilter();
 
 watch(
   () => route.query,
-  () => {
-    if (route.query.filter) {
-      filter.value = route.query.filter as Product;
-    } else {
-      filter.value = undefined;
-    }
-  },
+  () => updateFilter(),
 );
 
 const changelogEntries = computed(() =>
-  getChangelog().filter((x) => !filter.value || x.product === filter.value),
+  allChangelogEntries.value.filter((x) => !filter.value || x.product === filter.value),
 );
 </script>
 
@@ -63,6 +64,7 @@ const changelogEntries = computed(() =>
         :entry="entry"
         :first="index === 0"
         :show-type="filter === undefined"
+        has-link
         class="relative z-10"
       />
     </div>

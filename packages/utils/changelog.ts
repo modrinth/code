@@ -1,7 +1,9 @@
+import dayjs from 'dayjs'
+
 export type Product = 'web' | 'servers' | 'api' | 'app'
 
 export type VersionEntry = {
-  date: string
+  date: dayjs.Dayjs
   product: Product
   version?: string
   body: string
@@ -82,7 +84,7 @@ const VERSIONS: VersionEntry[] = [
 - Fixed issue where cards would shrink when clicking button inside them causing click not to register.
 - Made sidebar hide instantly.`,
   },
-]
+].map((x) => ({ ...x, date: dayjs(x.date) }) as VersionEntry)
 
 export function getChangelog() {
   return VERSIONS
