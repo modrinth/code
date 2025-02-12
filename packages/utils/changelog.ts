@@ -11,6 +11,16 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-02-12T12:10:00-08:00`,
+    product: 'web',
+    body: `### Added
+- Added a 3D globe to visualize node locations to Modrinth Servers marketing page.
+- Added an indicator to show when certain server plans are running low on availability.
+
+### Improvements
+- Improved out-of-stock notifications on Modrinth Servers page to be more accurate.`,
+  },
+  {
     date: `2025-02-11T13:00:00-08:00`,
     product: 'web',
     body: `### Improvements

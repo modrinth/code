@@ -18,11 +18,16 @@
               <div class="w-2 h-2 rounded-full bg-secondary" />
             </template>
             <span :class="{ 'text-primary font-bold': showType }">
-              {{ entry.version ?? formattedDate }}
+              {{ versionName }}
             </span>
           </h2>
         </AutoLink>
-        <div v-if="recent" v-tooltip="dateTooltip" class="hidden sm:flex" :class="{ 'cursor-help': dateTooltip }">
+        <div
+          v-if="recent"
+          v-tooltip="dateTooltip"
+          class="hidden sm:flex"
+          :class="{ 'cursor-help': dateTooltip }"
+        >
           {{ relativeDate }}
         </div>
         <div v-else-if="entry.version" :class="{ 'cursor-help': dateTooltip }">
@@ -61,11 +66,12 @@ const props = withDefaults(
 )
 
 const currentDate = ref(dayjs())
-const recent = computed(() => props.entry.date.isAfter(currentDate.value.subtract(1, 'week')))
-const dateTooltip = computed(() => props.entry.date.format('MMMM D, YYYY [at] h:mm A'))
-const formattedDate = computed(() =>
-  props.entry.version ? props.entry.date.fromNow() : props.entry.date.format('MMMM D, YYYY'),
+const recent = computed(
+  () =>
+    props.entry.date.isAfter(currentDate.value.subtract(1, 'week')) &&
+    props.entry.date.isBefore(currentDate.value),
 )
+const dateTooltip = computed(() => props.entry.date.format('MMMM D, YYYY [at] h:mm A'))
 
 const relativeDate = computed(() => props.entry.date.fromNow())
 const longDate = computed(() => props.entry.date.format('MMMM D, YYYY'))
