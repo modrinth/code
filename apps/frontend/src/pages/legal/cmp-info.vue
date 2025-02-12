@@ -175,7 +175,7 @@ const endOfMonthDayjs = computed(() => selectedDateDayjs.value.endOf('month'))
 const withdrawalDateDayjs = computed(() => endOfMonthDayjs.value.add(60, 'days'))
 
 let deadlineEnding = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')
-if (deadlineEnding.isAfter(dayjs().startOf('day'))) {
+if (deadlineEnding.isBefore(dayjs().startOf('day'))) {
   deadlineEnding = dayjs().subtract(1, 'month').endOf('month').add(60, 'days')
 }
 

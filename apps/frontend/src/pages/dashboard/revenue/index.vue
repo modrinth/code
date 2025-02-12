@@ -151,7 +151,7 @@ async function updateVenmo() {
 }
 
 let targetDate = dayjs().subtract(2, 'month').startOf('month')
-if (targetDate.endOf('month').add(60, 'days').isAfter(dayjs().startOf('day'))) {
+if (targetDate.endOf('month').add(60, 'days').isBefore(dayjs().startOf('day'))) {
   targetDate = dayjs().subtract(1, 'month').startOf('month');
 }
 
