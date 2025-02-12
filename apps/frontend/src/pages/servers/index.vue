@@ -608,7 +608,7 @@
           <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
             <div
               v-if="isSmallLowStock"
-              class="absolute -top-0 left-0 right-0 rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
+              class="absolute left-0 right-0 top-[-2px] rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
             >
               Only {{ capacityStatuses?.small?.available }} left in stock!
             </div>
@@ -664,7 +664,7 @@
           <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
             <div
               v-if="isMediumLowStock"
-              class="absolute -top-0 left-0 right-0 rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
+              class="absolute left-0 right-0 top-[-2px] rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
             >
               Only {{ capacityStatuses?.medium?.available }} left in stock!
             </div>
@@ -727,7 +727,7 @@
           <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
             <div
               v-if="isLargeLowStock"
-              class="bg-orange-500/20 absolute -top-0 left-0 right-0 rounded-t-2xl p-4 text-center font-bold"
+              class="absolute left-0 right-0 top-[-2px] rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
             >
               Only {{ capacityStatuses?.large?.available }} left in stock!
             </div>
