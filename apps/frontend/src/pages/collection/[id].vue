@@ -271,10 +271,10 @@
           >
             <Avatar :src="creator.avatar_url" circle />
             <div class="rows">
-              <span class="flex items-center gap-1">
+              <span class="flex items-center gap-1 font-bold text-primary">
                 {{ creator.username }}
               </span>
-              <span class="details-list__item__text--style-secondary">
+              <span class="text-sm font-medium text-secondary">
                 {{ formatMessage(messages.ownerLabel) }}
               </span>
             </div>
@@ -285,40 +285,31 @@
         />
       </div>
       <div class="normal-page__content">
-        <nav class="navigation-card">
-          <NavRow
-            :links="[
-              {
-                label: formatMessage(commonMessages.allProjectType),
-                href: `/collection/${collection.id}`,
-              },
-              ...projectTypes.map((x) => {
-                return {
-                  label: formatMessage(getProjectTypeMessage(x, true)),
-                  href: `/collection/${collection.id}/${x}s`,
-                };
-              }),
-            ]"
-          />
-          <button
-            v-tooltip="
-              formatMessage(
-                commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
-              )
-            "
-            :aria-label="
-              formatMessage(
-                commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
-              )
-            "
-            class="square-button"
-            @click="cycleSearchDisplayMode()"
-          >
-            <GridIcon v-if="cosmetics.searchDisplayMode.collection === 'grid'" />
-            <ImageIcon v-else-if="cosmetics.searchDisplayMode.collection === 'gallery'" />
-            <ListIcon v-else />
-          </button>
-        </nav>
+        <div v-if="navLinks.length >= 2" class="mb-4 flex flex-row items-center gap-2">
+          <div class="max-w-full overflow-x-auto">
+            <NavTabs :links="navLinks" />
+          </div>
+          <ButtonStyled circular>
+            <button
+              v-tooltip="
+                formatMessage(
+                  commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
+                )
+              "
+              :aria-label="
+                formatMessage(
+                  commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
+                )
+              "
+              class="square-button"
+              @click="cycleSearchDisplayMode()"
+            >
+              <GridIcon v-if="cosmetics.searchDisplayMode.collection === 'grid'" />
+              <ImageIcon v-else-if="cosmetics.searchDisplayMode.collection === 'gallery'" />
+              <ListIcon v-else />
+            </button>
+          </ButtonStyled>
+        </div>
 
         <div
           v-if="projects && projects?.length > 0"
@@ -434,9 +425,9 @@ import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import OverflowMenu from "@modrinth/ui/src/components/base/OverflowMenu.vue";
 import NewModal from "@modrinth/ui/src/components/modal/NewModal.vue";
 import { addNotification } from "~/composables/notifs.js";
-import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+import NavTabs from "~/components/ui/NavTabs.vue";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
@@ -649,6 +640,22 @@ const projectTypes = computed(() => {
   projectSet.delete("project");
   return Array.from(projectSet);
 });
+
+const navLinks = computed(() => [
+  {
+    label: formatMessage(commonMessages.allProjectType),
+    href: `/collection/${collection.value.id}`,
+  },
+  ...projectTypes.value
+    .map((x) => {
+      return {
+        label: formatMessage(getProjectTypeMessage(x, true)),
+        href: `/collection/${collection.value.id}/${x}s`,
+      };
+    })
+    .slice()
+    .sort((a, b) => a.label.localeCompare(b.label)),
+]);
 
 const icon = ref(null);
 const deletedIcon = ref(false);
