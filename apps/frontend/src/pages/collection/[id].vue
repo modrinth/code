@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- COLLECTION DELETION -->
     <ConfirmModal
       v-if="canEdit"
       ref="deleteModal"
@@ -9,6 +10,129 @@
       :proceed-label="formatMessage(commonMessages.deleteLabel)"
       @proceed="deleteCollection()"
     />
+    <!-- COLLECTION EDITING -->
+    <NewModal
+      v-if="canEdit"
+      ref="editCollectionModal"
+      :on-show="() => (isEditing = true)"
+      :on-hide="() => (isEditing = false)"
+      header="Editing a collection"
+    >
+      <div class="flex flex-col gap-3">
+        <span class="text-lg font-semibold text-contrast"> Preview </span>
+        <div
+          class="flex flex-row items-center gap-3 overflow-x-hidden rounded-3xl bg-bg p-3 sm:overflow-x-auto"
+        >
+          <Avatar
+            size="md"
+            :src="deletedIcon ? null : previewImage ? previewImage : collection.icon_url"
+          />
+          <div class="short flex flex-col justify-between gap-2">
+            <div class="flex w-48 flex-col gap-0 sm:w-96 sm:max-w-96">
+              <span
+                class="line-clamp-2 overflow-ellipsis text-wrap text-xl font-extrabold text-contrast sm:line-clamp-1"
+                >{{ name }}</span
+              >
+              <span class="line-clamp-2 w-full overflow-ellipsis sm:line-clamp-1">{{
+                summary
+              }}</span>
+            </div>
+            <PopoutMenu class="btn">
+              <EditIcon aria-hidden="true" />
+              {{ formatMessage(messages.editIconButton) }}
+              <template #menu>
+                <span class="icon-edit-menu h-fit">
+                  <FileInput
+                    id="project-icon"
+                    :max-size="262144"
+                    :show-icon="true"
+                    accept="image/png,image/jpeg,image/gif,image/webp"
+                    class="btn btn-transparent upload"
+                    style="white-space: nowrap"
+                    aria-label="Upload icon"
+                    @change="showPreviewImage"
+                  >
+                    <UploadIcon aria-hidden="true" />
+                  </FileInput>
+                  <Button
+                    v-if="!deletedIcon && (previewImage || collection.icon_url)"
+                    style="white-space: nowrap"
+                    transparent
+                    @click="
+                      () => {
+                        deletedIcon = true;
+                        previewImage = null;
+                      }
+                    "
+                  >
+                    <TrashIcon aria-hidden="true" />
+                    {{ formatMessage(messages.deleteIconButton) }}
+                  </Button>
+                </span>
+              </template>
+            </PopoutMenu>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="name">
+            <span class="text-lg font-semibold text-contrast"> Name </span>
+          </label>
+          <input
+            id="name"
+            v-model="name"
+            type="text"
+            maxlength="64"
+            :placeholder="`Enter collection name...`"
+            autocomplete="off"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-lg font-semibold text-contrast"> Visibility </span>
+          <DropdownSelect
+            id="visibility"
+            v-model="visibility"
+            :options="['listed', 'unlisted', 'private']"
+            :disabled="visibility === 'rejected'"
+            :multiple="false"
+            :display-name="
+              (s) => {
+                if (s === 'listed') return formatMessage(commonMessages.publicLabel);
+                return formatMessage(commonMessages[`${s}Label`]);
+              }
+            "
+            :searchable="false"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="summary" class="flex flex-col gap-1">
+            <span class="text-lg font-semibold text-contrast"> Summary </span>
+            <span>A sentence or two that describes your collection.</span>
+          </label>
+          <div class="textarea-wrapper">
+            <textarea id="summary" v-model="summary" maxlength="256" />
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <ButtonStyled color="brand">
+            <button
+              @click="
+                saveChanges();
+                editCollectionModal.hide();
+              "
+            >
+              <SaveIcon aria-hidden="true" />
+              Save
+            </button>
+          </ButtonStyled>
+          <ButtonStyled>
+            <button @click="editCollectionModal.hide()">
+              <XIcon aria-hidden="true" />
+              Cancel
+            </button>
+          </ButtonStyled>
+        </div>
+      </div>
+    </NewModal>
     <div
       class="experimental-styles-within new-page sidebar"
       :class="{ 'alt-layout': cosmetics.leftContentLayout }"
@@ -18,54 +142,18 @@
           <template #icon>
             <Avatar :src="collection.icon_url" :alt="collection.name" size="96px" />
           </template>
-          <template v-if="isEditing && canEdit" #title>
-            <input
-              id="collection-title"
-              v-model="name"
-              :placeholder="formatMessage(commonMessages.titleLabel)"
-              maxlength="255"
-              type="text"
-            />
-          </template>
-          <template v-else #title>
+          <template #title>
             {{ collection.name }}
           </template>
-          <template v-if="!isEditing" #title-suffix>
+          <template #title-suffix>
             <div class="ml-1 flex items-center gap-2 font-semibold">
               <CollectionIcon /> Collection
             </div>
           </template>
-          <template v-if="isEditing && canEdit" #summary>
-            <span class="m-0 flex flex-row items-center gap-2 leading-none">
-              <input
-                id="collection-description"
-                v-model="summary"
-                :placeholder="formatMessage(commonMessages.descriptionLabel)"
-                class="mt-1"
-                maxlength="255"
-                type="text"
-              />
-              <DropdownSelect
-                id="visibility"
-                v-model="visibility"
-                class="w-fit"
-                :options="['listed', 'unlisted', 'private']"
-                :disabled="visibility === 'rejected'"
-                :multiple="false"
-                :display-name="
-                  (s) => {
-                    if (s === 'listed') return formatMessage(commonMessages.publicLabel);
-                    return formatMessage(commonMessages[`${s}Label`]);
-                  }
-                "
-                :searchable="false"
-              />
-            </span>
-          </template>
-          <template v-else #summary>
+          <template #summary>
             {{ collection.description }}
           </template>
-          <template v-if="!isEditing" #stats>
+          <template #stats>
             <div
               v-if="canEdit"
               class="flex cursor-help items-center border-0 border-r border-solid border-divider pr-4"
@@ -140,20 +228,8 @@
             </div>
           </template>
           <template #actions>
-            <ButtonStyled v-if="canEdit && isEditing" size="large">
-              <button @click="isEditing = false">
-                <XIcon aria-hidden="true" />
-                {{ formatMessage(commonMessages.cancelButton) }}
-              </button>
-            </ButtonStyled>
-            <ButtonStyled v-if="canEdit && isEditing" color="brand" size="large">
-              <button @click="saveChanges()">
-                <SaveIcon aria-hidden="true" />
-                {{ formatMessage(commonMessages.saveButton) }}
-              </button>
-            </ButtonStyled>
-            <ButtonStyled v-if="canEdit && isEditing === false" size="large">
-              <button @click="isEditing = true">
+            <ButtonStyled v-if="canEdit" size="large">
+              <button @click="$refs.editCollectionModal.show()">
                 <EditIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.editButton) }}
               </button>
@@ -204,6 +280,7 @@
             </div>
           </nuxt-link>
         </div>
+        <!-- SLATED FOR REMOVAL -->
         <div class="card">
           <div class="card__overlay input-group">
             <template v-if="canEdit && isEditing === false">
@@ -442,6 +519,7 @@
             </div>
           </template>
         </div>
+        <!-- END SLATED FOR REMOVAL -->
         <AdPlaceholder
           v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
         />
@@ -595,6 +673,7 @@ import ContentPageHeader from "@modrinth/ui/src/components/base/ContentPageHeade
 import SimpleBadge from "@modrinth/ui/src/components/base/SimpleBadge.vue";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import OverflowMenu from "@modrinth/ui/src/components/base/OverflowMenu.vue";
+import NewModal from "@modrinth/ui/src/components/modal/NewModal.vue";
 import { addNotification } from "~/composables/notifs.js";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
@@ -604,6 +683,7 @@ const vintl = useVIntl();
 const { formatMessage } = vintl;
 const formatRelativeTime = useRelativeTime();
 const formatCompactNumber = useCompactNumber();
+const editCollectionModal = ref();
 
 const messages = defineMessages({
   collectionDescription: {
@@ -926,10 +1006,8 @@ async function copyId() {
   width: 100% !important;
 }
 
-.collectionInput {
-  label {
-    margin-right: 0.5rem;
-  }
+.short > * {
+  height: fit-content;
 }
 
 .inputs {
