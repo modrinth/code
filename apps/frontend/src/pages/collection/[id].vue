@@ -31,10 +31,10 @@
             <div class="flex w-48 flex-col gap-0 sm:w-96 sm:max-w-96">
               <span
                 class="line-clamp-2 overflow-ellipsis text-wrap text-xl font-extrabold text-contrast sm:line-clamp-1"
-                >{{ name }}</span
+                >{{ name != "" ? name : "Collection Name" }}</span
               >
               <span class="line-clamp-2 w-full overflow-ellipsis sm:line-clamp-1">{{
-                summary
+                summary != "" ? summary : "Collection summary"
               }}</span>
             </div>
             <PopoutMenu class="btn">
