@@ -14,22 +14,58 @@
       :class="{ 'alt-layout': cosmetics.leftContentLayout }"
     >
       <div class="normal-page__header py-4">
-        <ContentPageHeader>
+        <ContentPageHeader class="collectionInput">
           <template #icon>
             <Avatar :src="collection.icon_url" :alt="collection.name" size="96px" />
           </template>
-          <template #title>
+          <template v-if="isEditing && canEdit" #title>
+            <input
+              id="collection-title"
+              v-model="name"
+              :placeholder="formatMessage(commonMessages.titleLabel)"
+              maxlength="255"
+              type="text"
+            />
+          </template>
+          <template v-else #title>
             {{ collection.name }}
           </template>
-          <template #title-suffix>
+          <template v-if="!isEditing" #title-suffix>
             <div class="ml-1 flex items-center gap-2 font-semibold">
               <CollectionIcon /> Collection
             </div>
           </template>
-          <template #summary>
+          <template v-if="isEditing && canEdit" #summary>
+            <span class="m-0 flex flex-row items-center gap-2 leading-none">
+              <input
+                id="collection-description"
+                v-model="summary"
+                :placeholder="formatMessage(commonMessages.descriptionLabel)"
+                class="mt-1"
+                maxlength="255"
+                type="text"
+              />
+              <DropdownSelect
+                id="visibility"
+                v-model="visibility"
+                class="w-fit"
+                :options="['listed', 'unlisted', 'private']"
+                :disabled="visibility === 'rejected'"
+                :multiple="false"
+                :display-name="
+                  (s) => {
+                    if (s === 'listed') return formatMessage(commonMessages.publicLabel);
+                    return formatMessage(commonMessages[`${s}Label`]);
+                  }
+                "
+                :searchable="false"
+              />
+            </span>
+          </template>
+          <template v-else #summary>
             {{ collection.description }}
           </template>
-          <template #stats>
+          <template v-if="!isEditing" #stats>
             <div
               v-if="canEdit"
               class="flex cursor-help items-center border-0 border-r border-solid border-divider pr-4"
@@ -104,8 +140,20 @@
             </div>
           </template>
           <template #actions>
-            <ButtonStyled size="large">
-              <button v-if="canEdit && isEditing === false" @click="isEditing = true">
+            <ButtonStyled v-if="canEdit && isEditing" size="large">
+              <button @click="isEditing = false">
+                <XIcon aria-hidden="true" />
+                {{ formatMessage(commonMessages.cancelButton) }}
+              </button>
+            </ButtonStyled>
+            <ButtonStyled v-if="canEdit && isEditing" color="brand" size="large">
+              <button @click="saveChanges()">
+                <SaveIcon aria-hidden="true" />
+                {{ formatMessage(commonMessages.saveButton) }}
+              </button>
+            </ButtonStyled>
+            <ButtonStyled v-if="canEdit && isEditing === false" size="large">
+              <button @click="isEditing = true">
                 <EditIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.editButton) }}
               </button>
@@ -138,6 +186,24 @@
         </ContentPageHeader>
       </div>
       <div class="normal-page__sidebar">
+        <div class="card flex-card">
+          <h2>{{ formatMessage(messages.curatedByLabel) }}</h2>
+
+          <nuxt-link
+            class="details-list__item details-list__item--type-large"
+            :to="`/user/${creator.username}`"
+          >
+            <Avatar :src="creator.avatar_url" circle />
+            <div class="rows">
+              <span class="flex items-center gap-1">
+                {{ creator.username }}
+              </span>
+              <span class="details-list__item__text--style-secondary">
+                {{ formatMessage(messages.ownerLabel) }}
+              </span>
+            </div>
+          </nuxt-link>
+        </div>
         <div class="card">
           <div class="card__overlay input-group">
             <template v-if="canEdit && isEditing === false">
@@ -197,7 +263,9 @@
                 />
               </div>
               <label for="collection-title">
-                <span class="label__title"> {{ formatMessage(commonMessages.titleLabel) }} </span>
+                <span class="label__title">
+                  {{ formatMessage(commonMessages.titleLabel) }}
+                </span>
               </label>
               <input id="collection-title" v-model="name" maxlength="255" type="text" />
               <label for="collection-description">
@@ -856,6 +924,12 @@ async function copyId() {
 .animated-dropdown {
   // Omorphia's dropdowns are harcoded in width, so we need to override that
   width: 100% !important;
+}
+
+.collectionInput {
+  label {
+    margin-right: 0.5rem;
+  }
 }
 
 .inputs {
