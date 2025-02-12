@@ -931,7 +931,7 @@ const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.availa
 const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0);
 
 const isSmallLowStock = computed(() => {
-  const available = capacityStatuses.value?.small?.available + 1; // DEBUG: Remove +1 for production
+  const available = capacityStatuses.value?.small?.available;
   return available !== undefined && available > 0 && available < 8;
 });
 
