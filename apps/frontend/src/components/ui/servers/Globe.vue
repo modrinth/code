@@ -187,12 +187,12 @@ const init = () => {
   controls.enableZoom = false;
   controls.enablePan = false;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.12;
+  controls.autoRotateSpeed = 0.05;
   controls.minPolarAngle = Math.PI * 0.3;
   controls.maxPolarAngle = Math.PI * 0.7;
 
-  globe.rotation.y = Math.PI * 1.3;
-  globe.rotation.x = -Math.PI * 0.05;
+  globe.rotation.y = Math.PI * 1.9;
+  globe.rotation.x = Math.PI * 0.15;
 };
 
 const animate = () => {
