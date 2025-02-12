@@ -279,9 +279,14 @@ onUnmounted(() => {
   transform: translate(-50%, -50%);
 }
 
-.location-button:hover .expanding-item,
 .expanding-item.expanded {
   grid-template-columns: 1fr;
+}
+
+@media (hover: hover) {
+  .location-button:hover .expanding-item {
+    grid-template-columns: 1fr;
+  }
 }
 
 .expanding-item {

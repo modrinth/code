@@ -885,7 +885,14 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
 
 async function fetchCapacityStatuses(customProduct = null) {
   try {
-    const productsToCheck = customProduct?.metadata ? [customProduct] : pyroPlanProducts;
+    const productsToCheck = customProduct?.metadata
+      ? [customProduct]
+      : [
+          ...pyroPlanProducts,
+          pyroProducts.reduce((min, product) =>
+            product.metadata.ram < min.metadata.ram ? product : min,
+          ),
+        ];
     const capacityChecks = productsToCheck.map((product) =>
       usePyroFetch("stock", {
         method: "POST",
@@ -899,6 +906,7 @@ async function fetchCapacityStatuses(customProduct = null) {
     );
 
     const results = await Promise.all(capacityChecks);
+
     if (customProduct?.metadata) {
       return {
         custom: results[0],
@@ -908,6 +916,7 @@ async function fetchCapacityStatuses(customProduct = null) {
         small: results[0],
         medium: results[1],
         large: results[2],
+        custom: results[3],
       };
     }
   } catch (error) {
@@ -929,6 +938,7 @@ const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
 const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0);
 const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0);
+const isCustomAtCapacity = computed(() => capacityStatuses.value?.custom?.available === 0);
 
 const isSmallLowStock = computed(() => {
   const available = capacityStatuses.value?.small?.available;
@@ -1047,7 +1057,9 @@ const selectProduct = async (product) => {
   }
 
   await refreshCapacity();
-  if (isAtCapacity.value) {
+  console.log(capacityStatuses.value);
+
+  if ((product === "custom" && isCustomAtCapacity.value) || isAtCapacity.value) {
     addNotification({
       group: "main",
       title: "Server Capacity Full",
