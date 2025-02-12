@@ -73,18 +73,22 @@
           </template>
           <template #stats>
             <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+              v-tooltip="
+                `${formatNumber(projects?.length || 0, false)} project${(projects?.length || 0) !== 1 ? 's' : ''}`
+              "
+              class="flex cursor-help items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <BoxIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(projects?.length || 0) }}
-              projects
             </div>
             <div
-              class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+              v-tooltip="
+                `${formatNumber(sumDownloads, false)} download${sumDownloads !== 1 ? 's' : ''}`
+              "
+              class="flex cursor-help items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
             >
               <DownloadIcon class="h-6 w-6 text-secondary" />
               {{ formatCompactNumber(sumDownloads) }}
-              downloads
             </div>
             <div
               v-tooltip="
@@ -93,7 +97,7 @@
                   time: new Date(user.created),
                 })
               "
-              class="flex items-center gap-2 font-semibold"
+              class="flex cursor-help items-center gap-2 font-semibold"
             >
               <CalendarIcon class="h-6 w-6 text-secondary" />
               Joined
@@ -344,6 +348,7 @@ import {
   commonMessages,
   NewModal,
 } from "@modrinth/ui";
+import { formatNumber } from "@modrinth/utils";
 import { isStaff } from "~/helpers/users.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
