@@ -88,8 +88,7 @@
     <p id="pending-in-transit-explanation">
       <strong>Pending In Transit:</strong> This is an estimate of the total amount of pending
       revenue that
-      you can expect to move into your current balance - it is essentially the revenue you earned 2
-      months ago -
+      you can expect to move into your current balance after the next NET 60 day period has passed. The next NET 60 day period ends on {{ formatDate(deadlineEnding) }}.
     </p>
 
     <p>
@@ -174,6 +173,11 @@ const selectedDateValue = ref(dayjs().format('YYYY-MM-DD'))
 const selectedDateDayjs = computed(() => dayjs(selectedDateValue.value))
 const endOfMonthDayjs = computed(() => selectedDateDayjs.value.endOf('month'))
 const withdrawalDateDayjs = computed(() => endOfMonthDayjs.value.add(60, 'days'))
+
+let deadlineEnding = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')
+if (deadlineEnding.isAfter(dayjs().startOf('day'))) {
+  deadlineEnding = dayjs().subtract(1, 'month').endOf('month').add(60, 'days')
+}
 
 const { data: transparencyInformation } = await useAsyncData('payout/platform_revenue', () =>
   useBaseFetch('payout/platform_revenue', {

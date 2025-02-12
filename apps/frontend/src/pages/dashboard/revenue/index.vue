@@ -150,21 +150,24 @@ async function updateVenmo() {
   stopLoading()
 }
 
+let targetDate = dayjs().subtract(2, 'month').startOf('month')
+if (targetDate.endOf('month').add(60, 'days').isAfter(dayjs().startOf('day'))) {
+  targetDate = dayjs().subtract(1, 'month').startOf('month');
+}
+
 const { data: pendingInTransit } = await useAsyncData('analytics/revenue', () =>
   useBaseFetch('analytics/revenue', {
     apiVersion: 3,
     query: {
-      start_date: dayjs().subtract(2, 'month').startOf('month').toISOString(),
-      end_date: dayjs().subtract(2, 'month').endOf('month').toISOString(),
+      start_date: targetDate.toISOString(),
+      end_date: targetDate.endOf('month').toISOString(),
       resolution_minutes: 1140
     }
   })
 )
 
-const deadlineEnding = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')
-const totalTwoMonthsAgo = dayjs().startOf('day').isAfter(deadlineEnding)
-  ? 0
-  : Object.values(pendingInTransit.value || {}).reduce((acc, project) => {
+const deadlineEnding = targetDate.endOf('month').add(60, 'days')
+const totalTwoMonthsAgo = Object.values(pendingInTransit.value || {}).reduce((acc, project) => {
     return acc + Object.values(project || {}).reduce((acc, value) => acc + parseFloat(value), 0)
   }, 0)
 </script>
