@@ -138,7 +138,7 @@
       <tr>
         <th>Date</th>
         <th>Revenue</th>
-        <th>Creator Revenue</th>
+        <th>Creator Revenue (75%)</th>
         <th>Modrinth's Cut (25%)</th>
       </tr>
       <tr v-for="item in platformRevenueData">
