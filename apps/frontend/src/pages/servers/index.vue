@@ -887,7 +887,7 @@ async function fetchCapacityStatuses(customProduct = null) {
   try {
     const productsToCheck = customProduct?.metadata ? [customProduct] : pyroPlanProducts;
     const capacityChecks = productsToCheck.map((product) =>
-      usePyroFetch("capacity", {
+      usePyroFetch("stock", {
         method: "POST",
         body: {
           cpu: product.metadata.cpu,
