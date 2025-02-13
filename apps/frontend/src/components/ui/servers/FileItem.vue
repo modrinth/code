@@ -75,7 +75,7 @@ import {
   RightArrowIcon,
 } from "@modrinth/assets";
 import { computed, shallowRef, ref } from "vue";
-import { renderToString } from "@vue/server-renderer";
+import { renderToString } from "vue/server-renderer";
 import { useRouter, useRoute } from "vue-router";
 import {
   UiServersIconsCogFolderIcon,

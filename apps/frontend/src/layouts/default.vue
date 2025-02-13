@@ -1444,10 +1444,6 @@ function hideStagingBanner() {
   .mobile-navigation {
     display: flex;
   }
-
-  main {
-    padding-top: 1.5rem;
-  }
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
