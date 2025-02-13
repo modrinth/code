@@ -96,7 +96,7 @@
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
             <div class="grid place-content-center rounded-full bg-bg-red p-4">
-              <PanelErrorIcon class="size-12 text-red" />
+              <UiServersIconsPanelErrorIcon class="size-12 text-red" />
             </div>
             <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
           </div>
@@ -343,7 +343,7 @@
         <div
           v-if="isReconnecting"
           data-pyro-server-ws-reconnecting
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
         >
           <UiServersPanelSpinner />
           Hang on, we're reconnecting to your server.
@@ -352,10 +352,16 @@
         <div
           v-if="serverData.status === 'installing'"
           data-pyro-server-installing
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
+          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
         >
-          <UiServersPanelSpinner />
-          We're preparing your server, this may take a few minutes.
+          <UiServersServerIcon :image="serverData.image" class="!h-10 !w-10" />
+
+          <div class="flex flex-col gap-1">
+            <span class="text-lg font-bold"> We're preparing your server! </span>
+            <div class="flex flex-row items-center gap-2">
+              <UiServersPanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
+            </div>
+          </div>
         </div>
 
         <NuxtPage
@@ -392,10 +398,9 @@ import {
 import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
-import { reloadNuxtApp } from "#app";
+import { reloadNuxtApp, navigateTo } from "#app";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
-import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
@@ -662,22 +667,49 @@ const newMCVersion = ref<string | null>(null);
 
 const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   switch (data.result) {
-    case "ok":
+    case "ok": {
       if (!serverData.value) break;
-      serverData.value.status = "available";
 
-      if (!isFirstMount.value) {
-        await server.refresh();
+      stopPolling();
+
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        let attempts = 0;
+        const maxAttempts = 3;
+        let hasValidData = false;
+
+        while (!hasValidData && attempts < maxAttempts) {
+          attempts++;
+
+          await server.refresh(["general"], {
+            preserveConnection: true,
+            preserveInstallState: true,
+          });
+
+          if (serverData.value?.loader && serverData.value?.mc_version) {
+            hasValidData = true;
+            serverData.value.status = "available";
+            await server.refresh(["content", "startup"]);
+            break;
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
+
+        if (!hasValidData) {
+          console.error("Failed to get valid server data after installation");
+        }
+      } catch (err: unknown) {
+        console.error("Error refreshing data after installation:", err);
       }
 
-      if (server.general) {
-        if (newLoader.value) server.general.loader = newLoader.value;
-        if (newLoaderVersion.value) server.general.loader_version = newLoaderVersion.value;
-        if (newMCVersion.value) server.general.mc_version = newMCVersion.value;
-      }
-
+      newLoader.value = null;
+      newLoaderVersion.value = null;
+      newMCVersion.value = null;
       error.value = null;
       break;
+    }
     case "err": {
       console.log("failed to install");
       console.log(data);
@@ -708,20 +740,9 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
 
 const onReinstall = (potentialArgs: any) => {
   if (!serverData.value) return;
+
   serverData.value.status = "installing";
-  // serverData.value.loader = potentialArgs.loader;
-  // serverData.value.loader_version = potentialArgs.lVersion;
-  // serverData.value.mc_version = potentialArgs.mVersion;
-  // if (potentialArgs?.loader) {
-  //   console.log("setting loadeconsole
-  //   serverData.value.loader = potentialArgs.loader;
-  // }
-  // if (potentialArgs?.lVersion) {
-  //   serverData.value.loader_version = potentialArgs.lVersion;
-  // }
-  // if (potentialArgs?.mVersion) {
-  //   serverData.value.mc_version = potentialArgs.mVersion;
-  // }
+
   if (potentialArgs?.loader) {
     newLoader.value = potentialArgs.loader;
   }
@@ -732,15 +753,9 @@ const onReinstall = (potentialArgs: any) => {
     newMCVersion.value = potentialArgs.mVersion;
   }
 
-  if (!isFirstMount.value) {
-    server.refresh();
-  }
-
   error.value = null;
   errorTitle.value = "Error";
   errorMessage.value = "An unexpected error occurred.";
-
-  console.log(serverData.value);
 };
 
 const updateStats = (currentStats: Stats["current"]) => {
@@ -762,7 +777,6 @@ const updatePowerState = (
   state: ServerState,
   details?: { oom_killed?: boolean; exit_code?: number },
 ) => {
-  console.log("Power state:", state, details);
   serverPowerState.value = state;
 
   if (state === "crashed") {
@@ -959,17 +973,15 @@ onUnmounted(() => {
 
 watch(
   () => serverData.value?.status,
-  (newStatus) => {
+  (newStatus, oldStatus) => {
     if (isFirstMount.value) {
       isFirstMount.value = false;
       return;
     }
 
-    if (newStatus === "installing") {
+    if (newStatus === "installing" && oldStatus !== "installing") {
+      countdown.value = 15;
       startPolling();
-    } else {
-      stopPolling();
-      server.refresh();
     }
   },
 );
@@ -996,7 +1008,16 @@ definePageMeta({
 }
 
 .mobile-blurred-servericon::before {
-  @apply absolute left-0 top-0 block h-36 w-full bg-cover bg-center bg-no-repeat blur-2xl sm:hidden;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  height: 9rem;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(1rem);
   content: "";
   background-image: linear-gradient(
       to bottom,
@@ -1004,5 +1025,11 @@ definePageMeta({
       rgb(from var(--color-raised-bg) r g b / 0.8)
     ),
     var(--server-bg-image);
+}
+
+@media screen and (min-width: 640px) {
+  .mobile-blurred-servericon::before {
+    display: none;
+  }
 }
 </style>
