@@ -640,15 +640,15 @@
                 </h2>
               </div>
               <ButtonStyled color="blue" size="large">
-                <NuxtLink
+                <a
                   v-if="!loggedOut && isSmallAtCapacity"
-                  :to="outOfStockUrl"
+                  :href="outOfStockUrl"
                   target="_blank"
                   class="flex items-center gap-2 !bg-highlight-blue !font-medium !text-blue"
                 >
                   Out of Stock
                   <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </NuxtLink>
+                </a>
                 <button
                   v-else
                   class="!bg-highlight-blue !font-medium !text-blue"
@@ -703,15 +703,15 @@
                 </h2>
               </div>
               <ButtonStyled color="brand" size="large">
-                <NuxtLink
+                <a
                   v-if="!loggedOut && isMediumAtCapacity"
-                  :to="outOfStockUrl"
+                  :href="outOfStockUrl"
                   target="_blank"
                   class="flex items-center gap-2 !bg-highlight-green !font-medium !text-green"
                 >
                   Out of Stock
                   <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
-                </NuxtLink>
+                </a>
                 <button
                   v-else
                   class="!bg-highlight-green !font-medium !text-green"
@@ -757,15 +757,15 @@
                 </h2>
               </div>
               <ButtonStyled color="brand" size="large">
-                <NuxtLink
+                <a
                   v-if="!loggedOut && isLargeAtCapacity"
-                  :to="outOfStockUrl"
+                  :href="outOfStockUrl"
                   target="_blank"
                   class="flex items-center gap-2 !bg-highlight-purple !font-medium !text-purple"
                 >
                   Out of Stock
                   <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </NuxtLink>
+                </a>
                 <button
                   v-else
                   class="!bg-highlight-purple !font-medium !text-purple"
@@ -871,7 +871,7 @@ const deletingSpeed = 25;
 const pauseTime = 2000;
 
 const loggedOut = computed(() => !auth.value.user);
-const outOfStockUrl = "https://support.modrinth.com";
+const outOfStockUrl = "https://discord.modrinth.com";
 
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
   try {
