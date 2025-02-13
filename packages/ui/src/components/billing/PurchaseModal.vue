@@ -1010,7 +1010,7 @@ const hasUpgradeCapacityForConfig = computed(() => {
 defineExpose({
   show: () => {
     if (props.customServer) {
-    updateRamValues()
+      updateRamValues()
     }
 
     stripe = Stripe(props.publishableKey)
