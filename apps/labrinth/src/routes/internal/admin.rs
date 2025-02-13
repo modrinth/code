@@ -243,8 +243,10 @@ pub async fn delphi_result_ingest(
 
     for (issue, trace) in &body.issues {
         for path in trace.keys() {
-            thread_header
-                .push_str(&format!("\n issue {issue} found at file {}", path));
+            thread_header.push_str(&format!(
+                "\n\n- issue {issue} found at file {}",
+                path
+            ));
         }
     }
 

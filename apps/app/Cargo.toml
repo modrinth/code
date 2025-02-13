@@ -1,6 +1,6 @@
 [package]
 name = "theseus_gui"
-version = "0.9.2"
+version = "0.9.3"
 description = "The Modrinth App is a desktop application for managing your Minecraft mods"
 license = "GPL-3.0-only"
 repository = "https://github.com/modrinth/code/apps/app/"

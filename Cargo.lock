@@ -8870,7 +8870,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.9.2"
+version = "0.9.3"
 dependencies = [
  "async-recursion",
  "async-tungstenite",
@@ -8921,7 +8921,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_gui"
-version = "0.9.2"
+version = "0.9.3"
 dependencies = [
  "chrono",
  "cocoa 0.25.0",
@@ -10780,7 +10780,7 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 [[package]]
 name = "wry"
 version = "0.47.2"
-source = "git+https://github.com/modrinth/wry?rev=cdbf938#cdbf9384263db4e692e22dcf9bf6085e334a10f3"
+source = "git+https://github.com/modrinth/wry?rev=51907c6#51907c61541f2e389856f07773a32bac04f9a843"
 dependencies = [
  "base64 0.22.1",
  "block2",

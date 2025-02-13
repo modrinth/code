@@ -139,32 +139,19 @@
               <input v-model="customServerConfig.storageGbFormatted" disabled class="input" />
             </div>
           </div>
-          <div
-            v-else
-            class="flex justify-between rounded-2xl border-2 border-solid border-blue bg-bg-blue p-4 font-semibold text-contrast"
+          <Admonition
+            v-else-if="customOutOfStock && customMatchingProduct"
+            type="info"
+            header="This plan is currently out of stock"
           >
-            <div class="flex w-full justify-between gap-2">
-              <div class="flex flex-row gap-4">
-                <InfoIcon class="hidden flex-none h-8 w-8 text-blue sm:block" />
-
-                <div v-if="customOutOfStock && customMatchingProduct" class="flex flex-col gap-2">
-                  <div class="font-semibold">This plan is currently out of stock</div>
-                  <div class="font-normal">
-                    We are currently
-                    <a :href="outOfStockUrl" class="underline" target="_blank">out of capacity</a>
-                    for your selected RAM amount. Please try again later, or try a different amount.
-                  </div>
-                </div>
-                <div v-else class="flex flex-col gap-2">
-                  <div class="font-semibold">We can't seem to find your selected plan</div>
-                  <div class="font-normal">
-                    We are currently unable to find a server for your selected RAM amount. Please
-                    try again later, or try a different amount.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            We are currently
+            <a :href="outOfStockUrl" class="underline" target="_blank">out of capacity</a>
+            for your selected RAM amount. Please try again later, or try a different amount.
+          </Admonition>
+          <Admonition v-else type="info" header="We can't seem to find your selected plan">
+            We are currently unable to find a server for your selected RAM amount. Please try again
+            later, or try a different amount.
+          </Admonition>
 
           <div class="flex items-center gap-2">
             <InfoIcon class="hidden sm:block" />
@@ -532,6 +519,7 @@ import { Multiselect } from 'vue-multiselect'
 import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
 import dayjs from 'dayjs'
+import Admonition from '../base/Admonition.vue'
 
 const { locale, formatMessage } = useVIntl()
 

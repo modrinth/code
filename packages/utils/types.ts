@@ -87,8 +87,7 @@ export interface Project {
 
   license: {
     id: string
-    name
-    string
+    name: string
     url?: string
   }
 }

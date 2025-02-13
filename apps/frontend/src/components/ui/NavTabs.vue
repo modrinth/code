@@ -76,7 +76,12 @@ function pickLink() {
   subpageSelected.value = false;
   for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
     const link = filteredLinks.value[i];
-    if (decodeURIComponent(route.path) === link.href) {
+    if (props.query) {
+      if (route.query[props.query] === link.href || (!route.query[props.query] && !link.href)) {
+        index = i;
+        break;
+      }
+    } else if (decodeURIComponent(route.path) === link.href) {
       index = i;
       break;
     } else if (
@@ -150,7 +155,7 @@ onMounted(() => {
 });
 
 watch(
-  () => route.path,
+  () => [route.path, route.query],
   () => pickLink(),
 );
 </script>
