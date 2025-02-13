@@ -11,7 +11,29 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
-    date: `2025-02-11T13:00:00-09:00`,
+    date: `2025-02-12T19:10:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Servers out of stock link now links to Modrinth Discord instead of support page.`,
+  },
+  {
+    date: `2025-02-12T19:10:00-08:00`,
+    product: 'servers',
+    body: `### Added
+- Added server upgrades to switch to a larger plan as an option in billing settings.`,
+  },
+  {
+    date: `2025-02-12T12:10:00-08:00`,
+    product: 'web',
+    body: `### Added
+- Added a 3D globe to visualize node locations to Modrinth Servers marketing page.
+- Added an indicator to show when certain server plans are running low on availability.
+
+### Improvements
+- Improved out-of-stock notifications on Modrinth Servers page to be more accurate.`,
+  },
+  {
+    date: `2025-02-11T13:00:00-08:00`,
     product: 'web',
     body: `### Improvements
 - Added project issues link to report page if present.
@@ -20,19 +42,19 @@ const VERSIONS: VersionEntry[] = [
 - Fixed various padding issues and changelog overlapping navbar on mobile.`,
   },
   {
-    date: `2025-02-11T09:00:00-09:00`,
+    date: `2025-02-11T09:00:00-08:00`,
     product: 'web',
     body: `### Added
 - Added a changelog page to view recent changes to Modrinth.`,
   },
   {
-    date: `2025-02-10T14:00:00-09:00`,
+    date: `2025-02-10T14:00:00-08:00`,
     product: 'web',
     body: `### Improvements
 - The license selector in project settings has been updated to make selecting a license a clearer process. (Contributed by [Erb3](https://github.com/modrinth/code/pull/3225))`,
   },
   {
-    date: `2025-02-10T08:00:00-09:00`,
+    date: `2025-02-10T08:00:00-08:00`,
     product: 'servers',
     body: `### Added
 - You can now search and filter through your server's console in the Overview tab, jump to specific results to see the log in context, select them, and copy them.
@@ -52,7 +74,7 @@ const VERSIONS: VersionEntry[] = [
 - Opening a platform modal, then opening another, no longer causes versions of that platform to fail to load.`,
   },
   {
-    date: `2025-02-06T10:00:00-09:00`,
+    date: `2025-02-06T10:00:00-08:00`,
     product: 'app',
     version: `0.9.3`,
     body: `### Improvements
@@ -64,7 +86,7 @@ const VERSIONS: VersionEntry[] = [
 - Improved ability for package managers to update Modrinth App by skipping the updater at runtime with an environment variable.`,
   },
   {
-    date: `2025-02-02T14:00:00-09:00`,
+    date: `2025-02-02T14:00:00-08:00`,
     product: 'web',
     body: `### Improvements
 - The report form has been updated to walk you through the report process better and clarify some things like that the form is for Modrinth rules and terms violations, not for bug reports or DMCA takedowns.
@@ -72,7 +94,7 @@ const VERSIONS: VersionEntry[] = [
 ![A screenshot of the new report form on Modrinth, using Iris Shaders as an example. The title says "Report Iris Shaders to moderators". Below that, it says "Please report violations of Modrinth Rules or Terms of Use. Examples include malicious, spam, offensive, deceptive, misleading, and illegal content. This form is not for bug reports or DMCA takedowns (See our Copyright Policy)." Then, there is a form that asks "Which of Modrinth's rules is this project violating?" with many options: Spam, Reuploaded work, Inappropriate, Malicious, Name-squatting, Poor description, Invalid metadata, Other. Reuploaded work is selected. Below that, is a note in an orange box with a warning icon: "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content. If you meant to file a DMCA takedown request (which is a legal action) instead, please see our Copyright Policy." Then, it asks you to provide additional context, including links and images, with a text editor and a submit button at the bottom.](https://cdn-raw.modrinth.com/changelog/web/2025-02-02/reports.jpg)`,
   },
   {
-    date: `2025-01-28T19:00:00-09:00`,
+    date: `2025-01-28T19:00:00-08:00`,
     product: 'web',
     body: `### Improvements
 - The UI for analytics has been updated to make it way more useful. What was previously called "Last month" really meant "Previous 30 days". Now, many more options have been added such as:
@@ -82,28 +104,28 @@ const VERSIONS: VersionEntry[] = [
 Contributed by [IMB11](https://github.com/modrinth/code/pull/1301).`,
   },
   {
-    date: `2025-01-10T09:00:00-09:00`,
+    date: `2025-01-10T09:00:00-08:00`,
     product: 'servers',
     body: `### Improvements
 - The content page layout has been enhanced, now showing the file name and author of each installed item.
 - You can now upload directly from the content page, instead of having to go to the Files page.`,
   },
   {
-    date: `2025-01-10T09:00:00-09:00`,
+    date: `2025-01-10T09:00:00-08:00`,
     product: 'web',
     body: `### Improvements
 - Tags on project pages are now clickable to view other projects with that tag (Contributed by [Neddo](https://github.com/modrinth/code/pull/3126))
 - You can now send someone a link to the download interface with a specific version and loader selected, like so: https://modrinth.com/mod/sodium?version=1.21.2&loader=quilt#download (Contributed by [AwakenedRedstone](https://github.com/modrinth/code/pull/3138))`,
   },
   {
-    date: `2024-12-25T14:00:00-09:00`,
+    date: `2024-12-25T14:00:00-08:00`,
     product: 'app',
     version: `0.9.2`,
     body: `### Improvements
 - Prevent ads from being able to play audio.`,
   },
   {
-    date: `2024-12-24T22:00:00-09:00`,
+    date: `2024-12-24T22:00:00-08:00`,
     product: 'app',
     version: `0.9.1`,
     body: `### Added
@@ -118,7 +140,7 @@ Contributed by [IMB11](https://github.com/modrinth/code/pull/1301).`,
 - Made sidebar hide instantly.`,
   },
   {
-    date: `2024-12-23T22:16:00-09:00`,
+    date: `2024-12-23T22:16:00-08:00`,
     product: 'app',
     version: `0.9.0`,
     body: `### Improvements

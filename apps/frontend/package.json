@@ -57,6 +57,8 @@
     "pinia": "^2.1.7",
     "qrcode.vue": "^3.4.0",
     "semver": "^7.5.4",
+    "three": "^0.172.0",
+    "@types/three": "^0.172.0",
     "vue-multiselect": "3.0.0-alpha.2",
     "vue-typed-virtual-list": "^1.0.10",
     "vue3-ace-editor": "^2.2.4",
