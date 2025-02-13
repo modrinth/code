@@ -1745,31 +1745,30 @@ pub async fn stripe_webhook(
                                 if let Some(SubscriptionMetadata::Pyro { id }) =
                                     &subscription.metadata
                                 {
-                                    println!("unsuspending and reallocating server with id {id} and memory {ram} cpu {cpu} disk {storage} swap {swap}");
-                                    // client
-                                    //     .post(format!(
-                                    //         "https://archon.pyro.host/modrinth/v0/servers/{}/unsuspend",
-                                    //         id
-                                    //     ))
-                                    //     .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
-                                    //     .send()
-                                    //     .await?
-                                    //     .error_for_status()?;
-                                    //
-                                    // client.post(format!(
-                                    //     "https://archon.pyro.host/modrinth/v0/servers/{}/reallocate",
-                                    //     id
-                                    // ))
-                                    // .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
-                                    // .json(&serde_json::json!({
-                                    //     "memory_mb": ram,
-                                    //     "cpu": cpu,
-                                    //     "swap_mb": swap,
-                                    //     "storage_mb": storage,
-                                    // }))
-                                    // .send()
-                                    // .await?
-                                    // .error_for_status()?;
+                                    client
+                                        .post(format!(
+                                            "https://archon.pyro.host/modrinth/v0/servers/{}/unsuspend",
+                                            id
+                                        ))
+                                        .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                                        .send()
+                                        .await?
+                                        .error_for_status()?;
+
+                                    client.post(format!(
+                                        "https://archon.pyro.host/modrinth/v0/servers/{}/reallocate",
+                                        id
+                                    ))
+                                    .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                                    .json(&serde_json::json!({
+                                        "memory_mb": ram,
+                                        "cpu": cpu,
+                                        "swap_mb": swap,
+                                        "storage_mb": storage,
+                                    }))
+                                    .send()
+                                    .await?
+                                    .error_for_status()?;
                                 } else {
                                     let (server_name, source) = if let Some(
                                         PaymentRequestMetadata::Pyro {
