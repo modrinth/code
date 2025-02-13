@@ -23,7 +23,7 @@
           </h2>
         </AutoLink>
         <div
-          v-if="recent"
+          v-if="recent && !future"
           v-tooltip="dateTooltip"
           class="hidden sm:flex"
           :class="{ 'cursor-help': dateTooltip }"
@@ -66,11 +66,8 @@ const props = withDefaults(
 )
 
 const currentDate = ref(dayjs())
-const recent = computed(
-  () =>
-    props.entry.date.isAfter(currentDate.value.subtract(1, 'week')) &&
-    props.entry.date.isBefore(currentDate.value),
-)
+const recent = computed(() => props.entry.date.isAfter(currentDate.value.subtract(1, 'week')))
+const future = computed(() => props.entry.date.isBefore(currentDate.value))
 const dateTooltip = computed(() => props.entry.date.format('MMMM D, YYYY [at] h:mm A'))
 
 const relativeDate = computed(() => props.entry.date.fromNow())

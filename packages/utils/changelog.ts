@@ -11,6 +11,18 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-02-12T19:10:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Servers out of stock link now links to Modrinth Discord instead of support page.`,
+  },
+  {
+    date: `2025-02-12T19:10:00-08:00`,
+    product: 'servers',
+    body: `### Added
+- Added server upgrades to switch to a larger plan as an option in billing settings.`,
+  },
+  {
     date: `2025-02-12T12:10:00-08:00`,
     product: 'web',
     body: `### Added
