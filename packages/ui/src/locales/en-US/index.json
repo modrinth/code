@@ -32,6 +32,18 @@
   "button.upload-image": {
     "defaultMessage": "Upload image"
   },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "App"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Servers"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Website"
+  },
   "collection.label.private": {
     "defaultMessage": "Private"
   },

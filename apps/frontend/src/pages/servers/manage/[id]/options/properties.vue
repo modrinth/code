@@ -17,7 +17,7 @@
             >
               Minecraft Wiki
             </NuxtLink>
-            has more detailed information about each property.
+            has more detailed information.
           </div>
         </div>
         <div class="flex flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
@@ -134,10 +134,29 @@ const isUpdating = ref(false);
 const searchInput = ref("");
 
 const data = computed(() => props.server.general);
-const { data: propsData, status } = await useAsyncData(
-  "ServerProperties",
-  async () => await props.server.general?.fetchConfigFile("ServerProperties"),
-);
+const { data: propsData, status } = await useAsyncData("ServerProperties", async () => {
+  const rawProps = await props.server.fs?.downloadFile("server.properties");
+  if (!rawProps) return null;
+
+  const properties: Record<string, any> = {};
+  const lines = rawProps.split("\n");
+
+  for (const line of lines) {
+    if (line.startsWith("#") || !line.includes("=")) continue;
+    const [key, ...valueParts] = line.split("=");
+    let value = valueParts.join("=");
+
+    if (value.toLowerCase() === "true" || value.toLowerCase() === "false") {
+      value = value.toLowerCase() === "true";
+    } else if (!isNaN(value as any) && value !== "") {
+      value = Number(value);
+    }
+
+    properties[key.trim()] = value;
+  }
+
+  return properties;
+});
 
 const liveProperties = ref<Record<string, any>>({});
 const originalProperties = ref<Record<string, any>>({});

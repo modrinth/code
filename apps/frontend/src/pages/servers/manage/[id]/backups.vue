@@ -53,7 +53,10 @@
             </div>
             <div class="flex w-full flex-col gap-2 sm:w-fit sm:flex-row">
               <ButtonStyled type="standard">
-                <button @click="showbackupSettingsModal">
+                <button
+                  :disabled="server.general?.status === 'installing'"
+                  @click="showbackupSettingsModal"
+                >
                   <SettingsIcon class="h-5 w-5" />
                   Auto backups
                 </button>
@@ -63,13 +66,16 @@
                   v-tooltip="
                     isServerRunning && !userPreferences.backupWhileRunning
                       ? 'Cannot create backup while server is running. You can disable this from your server Options > Preferences.'
-                      : ''
+                      : server.general?.status === 'installing'
+                        ? 'Cannot create backups while server is being installed'
+                        : ''
                   "
                   class="w-full sm:w-fit"
                   :disabled="
                     (isServerRunning && !userPreferences.backupWhileRunning) ||
                     data.used_backup_quota >= data.backup_quota ||
-                    backups.some((backup) => backup.ongoing)
+                    backups.some((backup) => backup.ongoing) ||
+                    server.general?.status === 'installing'
                   "
                   @click="showCreateModel"
                 >
@@ -90,108 +96,111 @@
           automatically refresh when the backup is complete.
         </div>
 
-        <li
-          v-for="(backup, index) in backups"
-          :key="backup.id"
-          class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-4 shadow-md"
-        >
-          <div class="flex flex-col gap-4">
-            <div class="flex items-center justify-between">
-              <div class="flex min-w-0 flex-row items-center gap-4">
-                <div
-                  class="grid size-14 shrink-0 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border shadow-sm"
-                  :class="backup.ongoing ? 'text-green [&&]:bg-bg-green' : 'bg-button-bg'"
-                >
-                  <UiServersIconsLoadingIcon
-                    v-if="backup.ongoing"
-                    v-tooltip="'Backup in progress'"
-                    class="size-6 animate-spin"
-                  />
-                  <LockIcon v-else-if="backup.locked" class="size-8" />
-                  <BoxIcon v-else class="size-8" />
-                </div>
-                <div class="flex min-w-0 flex-col gap-2">
-                  <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
-                    <div class="max-w-full truncate text-xl font-bold text-contrast">
-                      {{ backup.name }}
-                    </div>
+        <div class="flex w-full flex-col gap-2">
+          <li
+            v-for="(backup, index) in backups"
+            :key="backup.id"
+            class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-2 shadow-md"
+          >
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center justify-between">
+                <div class="flex min-w-0 flex-row items-center gap-4">
+                  <div
+                    class="grid size-14 shrink-0 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border shadow-sm"
+                    :class="backup.ongoing ? 'text-green [&&]:bg-bg-green' : 'bg-button-bg'"
+                  >
+                    <UiServersIconsLoadingIcon
+                      v-if="backup.ongoing"
+                      v-tooltip="'Backup in progress'"
+                      class="size-6 animate-spin"
+                    />
+                    <LockIcon v-else-if="backup.locked" class="size-8" />
+                    <BoxIcon v-else class="size-8" />
+                  </div>
+                  <div class="flex min-w-0 flex-col gap-2">
+                    <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+                      <div class="max-w-full truncate font-bold text-contrast">
+                        {{ backup.name }}
+                      </div>
 
-                    <div
-                      v-if="index == 0"
-                      class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
-                    >
-                      <CheckIcon class="size-4" /> Latest
+                      <div
+                        v-if="index == 0"
+                        class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
+                      >
+                        <CheckIcon class="size-4" /> Latest
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1 text-xs">
+                      <CalendarIcon class="size-4" />
+                      {{
+                        new Date(backup.created_at).toLocaleString("en-US", {
+                          month: "numeric",
+                          day: "numeric",
+                          year: "2-digit",
+                          hour: "numeric",
+                          minute: "numeric",
+                          hour12: true,
+                        })
+                      }}
                     </div>
                   </div>
-                  <div class="flex items-center gap-2 text-sm font-semibold">
-                    <CalendarIcon class="size-4" />
-                    {{
-                      new Date(backup.created_at).toLocaleString("en-US", {
-                        month: "numeric",
-                        day: "numeric",
-                        year: "2-digit",
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: true,
-                      })
-                    }}
-                  </div>
                 </div>
+                <ButtonStyled v-if="!backup.ongoing" circular type="transparent">
+                  <UiServersTeleportOverflowMenu
+                    direction="left"
+                    position="bottom"
+                    class="bg-transparent"
+                    :disabled="backups.some((b) => b.ongoing)"
+                    :options="[
+                      {
+                        id: 'rename',
+                        action: () => {
+                          renameBackupName = backup.name;
+                          currentBackup = backup.id;
+                          renameBackupModal?.show();
+                        },
+                      },
+                      {
+                        id: 'restore',
+                        action: () => {
+                          currentBackup = backup.id;
+                          restoreBackupModal?.show();
+                        },
+                      },
+                      { id: 'download', action: () => initiateDownload(backup.id) },
+                      {
+                        id: 'lock',
+                        action: () => {
+                          if (backup.locked) {
+                            unlockBackup(backup.id);
+                          } else {
+                            lockBackup(backup.id);
+                          }
+                        },
+                      },
+                      {
+                        id: 'delete',
+                        action: () => {
+                          currentBackup = backup.id;
+                          deleteBackupModal?.show();
+                        },
+                        color: 'red',
+                      },
+                    ]"
+                  >
+                    <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+                    <template #rename> <EditIcon /> Rename </template>
+                    <template #restore> <ClipboardCopyIcon /> Restore </template>
+                    <template v-if="backup.locked" #lock> <LockOpenIcon /> Unlock </template>
+                    <template v-else #lock> <LockIcon /> Lock </template>
+                    <template #download> <DownloadIcon /> Download </template>
+                    <template #delete> <TrashIcon /> Delete </template>
+                  </UiServersTeleportOverflowMenu>
+                </ButtonStyled>
               </div>
-              <ButtonStyled v-if="!backup.ongoing" circular type="transparent">
-                <UiServersTeleportOverflowMenu
-                  direction="left"
-                  position="bottom"
-                  class="bg-transparent"
-                  :options="[
-                    {
-                      id: 'rename',
-                      action: () => {
-                        renameBackupName = backup.name;
-                        currentBackup = backup.id;
-                        renameBackupModal?.show();
-                      },
-                    },
-                    {
-                      id: 'restore',
-                      action: () => {
-                        currentBackup = backup.id;
-                        restoreBackupModal?.show();
-                      },
-                    },
-                    { id: 'download', action: () => initiateDownload(backup.id) },
-                    {
-                      id: 'lock',
-                      action: () => {
-                        if (backup.locked) {
-                          unlockBackup(backup.id);
-                        } else {
-                          lockBackup(backup.id);
-                        }
-                      },
-                    },
-                    {
-                      id: 'delete',
-                      action: () => {
-                        currentBackup = backup.id;
-                        deleteBackupModal?.show();
-                      },
-                      color: 'red',
-                    },
-                  ]"
-                >
-                  <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-                  <template #rename> <EditIcon /> Rename </template>
-                  <template #restore> <ClipboardCopyIcon /> Restore </template>
-                  <template v-if="backup.locked" #lock> <LockOpenIcon /> Unlock </template>
-                  <template v-else #lock> <LockIcon /> Lock </template>
-                  <template #download> <DownloadIcon /> Download </template>
-                  <template #delete> <TrashIcon /> Delete </template>
-                </UiServersTeleportOverflowMenu>
-              </ButtonStyled>
             </div>
-          </div>
-        </li>
+          </li>
+        </div>
       </ul>
 
       <div
