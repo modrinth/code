@@ -577,8 +577,13 @@ function makeEdits(event) {
     visibility.value = event.visibility;
 
     saveChanges();
-  } catch {
-    console.error("uhh.... This isn't good.");
+  } catch (error) {
+    addNotification({
+      group: "main",
+      title: formatMessage(commonMessages.errorNotificationTitle),
+      text: error,
+      type: "error",
+    });
   }
 }
 
@@ -661,16 +666,6 @@ async function deleteCollection() {
   await initUserCollections();
   stopLoading();
 }
-
-/* function showPreviewImage(files) {
-  const reader = new FileReader();
-  icon.value = files[0];
-  deletedIcon.value = false;
-  reader.readAsDataURL(icon.value);
-  reader.onload = (event) => {
-    previewImage.value = event.target.result;
-  };
-} */
 
 async function copyId() {
   await navigator.clipboard.writeText(collection.value.id);
