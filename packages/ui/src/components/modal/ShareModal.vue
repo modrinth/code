@@ -5,13 +5,14 @@ import {
   ShareIcon,
   MailIcon,
   GlobeIcon,
-  TwitterIcon,
   MastodonIcon,
   RedditIcon,
+  BlueskyIcon,
 } from '@modrinth/assets'
 import { computed, ref, nextTick } from 'vue'
 import QrcodeVue from 'qrcode.vue'
-import { Button, Modal } from '../index'
+import { Button } from '../index'
+import NewModal from './NewModal.vue'
 
 const props = defineProps({
   header: {
@@ -24,7 +25,7 @@ const props = defineProps({
   },
   shareText: {
     type: String,
-    default: null,
+    default: '',
   },
   link: {
     type: Boolean,
@@ -50,7 +51,7 @@ const shareModal = ref(null)
 
 const qrCode = ref(null)
 const qrImage = ref(null)
-const content = ref(null)
+const content = ref('')
 const url = ref(null)
 const canShare = ref(false)
 const share = () => {
@@ -69,16 +70,20 @@ const share = () => {
 }
 
 const show = async (passedContent) => {
-  content.value = props.shareText ? `${props.shareText}\n\n${passedContent}` : passedContent
+  if (passedContent) {
+    content.value = props.shareText ? `${props.shareText}\n\n${passedContent}` : passedContent
+  } else {
+    content.value = props.shareText ? props.shareText : ''
+  }
   shareModal.value.show()
   if (props.link) {
     url.value = passedContent
     nextTick(() => {
-      console.log(qrCode.value)
+      //console.log(qrCode.value)
       fetch(qrCode.value.getElementsByTagName('canvas')[0].toDataURL('image/png'))
         .then((res) => res.blob())
         .then((blob) => {
-          console.log(blob)
+          //console.log(blob)
           qrImage.value = blob
         })
     })
@@ -106,9 +111,8 @@ const sendEmail = computed(
 
 const targetParameter = computed(() => (props.openInNewTab ? '_blank' : '_self'))
 
-const sendTweet = computed(
-  () => `https://twitter.com/intent/tweet?text=${encodeURIComponent(content.value)}`,
-)
+// eslint-disable-next-line no-unused-vars
+const sendTweet = computed(() => `https://www.youtube.com/watch?v=dQw4w9WgXcQ`)
 
 const sendToot = computed(() => `https://tootpick.org/#text=${encodeURIComponent(content.value)}`)
 
@@ -119,14 +123,22 @@ const postOnReddit = computed(
     )}`,
 )
 
+const postOnBluesky = computed(
+  () => `https://bsky.app/intent/compose?text=${encodeURIComponent(content.value)}`,
+)
+
 defineExpose({
   show,
 })
 </script>
 
 <template>
-  <Modal ref="shareModal" :header="header" :noblur="noblur" :on-hide="onHide">
-    <div class="share-body">
+  <NewModal ref="shareModal" :header="header" :on-hide="onHide">
+    <div class="flex items-center flex-wrap gap-2 p-lg">
+      <div class="flex flex-col">
+        <span v-if="!link" class="text-lg font-semibold text-contrast"> Content </span>
+        <span class="text-xs"> Markdown is not supported. </span>
+      </div>
       <div v-if="link" class="qr-wrapper">
         <div ref="qrCode">
           <QrcodeVue :value="url" class="qr-code" margin="3" />
@@ -141,6 +153,7 @@ defineExpose({
           <ClipboardCopyIcon aria-hidden="true" />
         </Button>
       </div>
+
       <div v-else class="resizable-textarea-wrapper">
         <textarea v-model="content" />
         <Button
@@ -153,7 +166,7 @@ defineExpose({
           <ClipboardCopyIcon aria-hidden="true" />
         </Button>
       </div>
-      <div class="all-buttons">
+      <div class="flex flex-col gap-2 grow justify-center">
         <div v-if="link" class="iconified-input">
           <LinkIcon />
           <input type="text" :value="url" readonly />
@@ -161,7 +174,7 @@ defineExpose({
             <ClipboardCopyIcon aria-hidden="true" />
           </Button>
         </div>
-        <div class="button-row">
+        <div class="flex gap-2 items-center flex-wrap">
           <Button v-if="canShare" v-tooltip="'Share'" aria-label="Share" icon-only @click="share">
             <ShareIcon aria-hidden="true" />
           </Button>
@@ -174,6 +187,7 @@ defineExpose({
           >
             <MailIcon aria-hidden="true" />
           </a>
+
           <a
             v-if="link"
             v-tooltip="'Open link in browser'"
@@ -185,6 +199,15 @@ defineExpose({
             <GlobeIcon aria-hidden="true" />
           </a>
           <a
+            v-tooltip="'Post about it on Bluesky'"
+            class="btn bsky icon-only"
+            :target="targetParameter"
+            :href="postOnBluesky"
+            aria-label="Post about it on Bluesky"
+          >
+            <BlueskyIcon aria-hidden="true" />
+          </a>
+          <a
             v-tooltip="'Toot about it'"
             class="btn mastodon icon-only"
             :target="targetParameter"
@@ -192,15 +215,6 @@ defineExpose({
             aria-label="Toot about it"
           >
             <MastodonIcon aria-hidden="true" />
-          </a>
-          <a
-            v-tooltip="'Tweet about it'"
-            class="btn twitter icon-only"
-            :target="targetParameter"
-            :href="sendTweet"
-            aria-label="Tweet about it"
-          >
-            <TwitterIcon aria-hidden="true" />
           </a>
           <a
             v-tooltip="'Share on Reddit'"
@@ -214,27 +228,10 @@ defineExpose({
         </div>
       </div>
     </div>
-  </Modal>
+  </NewModal>
 </template>
 
 <style scoped lang="scss">
-.share-body {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--gap-sm);
-  padding: var(--gap-lg);
-}
-
-.all-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-sm);
-  flex-grow: 1;
-  justify-content: center;
-}
-
 .iconified-input {
   width: 100%;
 
@@ -243,26 +240,20 @@ defineExpose({
   }
 }
 
-.button-row {
-  display: flex;
-  flex-direction: row;
-  gap: var(--gap-sm);
+.btn {
+  fill: var(--color-contrast);
+  color: var(--color-contrast);
 
-  .btn {
-    fill: var(--color-contrast);
-    color: var(--color-contrast);
+  &.reddit {
+    background-color: #ff4500;
+  }
 
-    &.reddit {
-      background-color: #ff4500;
-    }
+  &.mastodon {
+    background-color: #563acc;
+  }
 
-    &.mastodon {
-      background-color: #563acc;
-    }
-
-    &.twitter {
-      background-color: #1da1f2;
-    }
+  &.bsky {
+    background-color: #0085ff;
   }
 }
 
