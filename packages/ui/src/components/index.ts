@@ -48,6 +48,7 @@ export { default as CompactChart } from './chart/CompactChart.vue'
 export { default as ContentListPanel } from './content/ContentListPanel.vue'
 
 // Modals
+export { default as EditCollectionModal } from './modal/CollectionEditModal.vue'
 export { default as NewModal } from './modal/NewModal.vue'
 export { default as Modal } from './modal/Modal.vue'
 export { default as ConfirmModal } from './modal/ConfirmModal.vue'

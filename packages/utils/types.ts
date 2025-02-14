@@ -252,3 +252,13 @@ export type Report = {
   created: string
   body: string
 }
+
+export type CollectionEditData = {
+  id: ModrinthId
+  name: string
+  description: string
+  icon_url: string
+  icon_data: Blob
+  icon_removed: boolean
+  visibility: ProjectStatus
+}

@@ -11,134 +11,28 @@
       @proceed="deleteCollection()"
     />
     <!-- COLLECTION EDITING -->
-    <NewModal
+    <CollectionEditModal
       v-if="canEdit"
-      ref="editCollectionModal"
+      ref="editModal"
       :on-show="() => (isEditing = true)"
       :on-hide="() => (isEditing = false)"
-      header="Editing a collection"
-    >
-      <div class="flex flex-col gap-3">
-        <span class="text-lg font-semibold text-contrast"> Preview </span>
-        <div
-          class="flex flex-row items-center gap-3 overflow-x-hidden rounded-3xl bg-bg p-3 sm:overflow-x-auto"
-        >
-          <Avatar
-            size="md"
-            :src="deletedIcon ? null : previewImage ? previewImage : collection.icon_url"
-          />
-          <div class="short flex flex-col justify-between gap-2">
-            <div class="flex w-48 flex-col gap-0 sm:w-96 sm:max-w-96">
-              <span
-                class="line-clamp-2 overflow-ellipsis text-wrap text-xl font-extrabold text-contrast sm:line-clamp-1"
-                >{{ name != "" ? name : "Collection Name" }}</span
-              >
-              <span class="line-clamp-2 w-full overflow-ellipsis sm:line-clamp-1">{{
-                summary != "" ? summary : "Collection summary"
-              }}</span>
-            </div>
-            <PopoutMenu class="btn">
-              <EditIcon aria-hidden="true" />
-              {{ formatMessage(messages.editIconButton) }}
-              <template #menu>
-                <span class="icon-edit-menu h-fit">
-                  <FileInput
-                    id="project-icon"
-                    :max-size="262144"
-                    :show-icon="true"
-                    accept="image/png,image/jpeg,image/gif,image/webp"
-                    class="btn btn-transparent upload"
-                    style="white-space: nowrap"
-                    aria-label="Upload icon"
-                    @change="showPreviewImage"
-                  >
-                    <UploadIcon aria-hidden="true" />
-                  </FileInput>
-                  <Button
-                    v-if="!deletedIcon && (previewImage || collection.icon_url)"
-                    style="white-space: nowrap"
-                    transparent
-                    @click="
-                      () => {
-                        deletedIcon = true;
-                        previewImage = null;
-                      }
-                    "
-                  >
-                    <TrashIcon aria-hidden="true" />
-                    {{ formatMessage(messages.deleteIconButton) }}
-                  </Button>
-                </span>
-              </template>
-            </PopoutMenu>
-          </div>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="name">
-            <span class="text-lg font-semibold text-contrast"> Name </span>
-          </label>
-          <input
-            id="name"
-            v-model="name"
-            type="text"
-            maxlength="64"
-            :placeholder="`Enter collection name...`"
-            autocomplete="off"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <span class="text-lg font-semibold text-contrast"> Visibility </span>
-          <DropdownSelect
-            id="visibility"
-            v-model="visibility"
-            :options="['listed', 'unlisted', 'private']"
-            :disabled="visibility === 'rejected'"
-            :multiple="false"
-            :display-name="
-              (s) => {
-                if (s === 'listed') return formatMessage(commonMessages.publicLabel);
-                return formatMessage(commonMessages[`${s}Label`]);
-              }
-            "
-            :searchable="false"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="summary" class="flex flex-col gap-1">
-            <span class="text-lg font-semibold text-contrast"> Summary </span>
-            <span>A sentence or two that describes your collection.</span>
-          </label>
-          <div class="textarea-wrapper">
-            <textarea id="summary" v-model="summary" maxlength="256" />
-          </div>
-        </div>
-        <div class="flex gap-2">
-          <ButtonStyled color="brand">
-            <button
-              @click="
-                saveChanges();
-                editCollectionModal.hide();
-              "
-            >
-              <SaveIcon aria-hidden="true" />
-              Save
-            </button>
-          </ButtonStyled>
-          <ButtonStyled>
-            <button @click="editCollectionModal.hide()">
-              <XIcon aria-hidden="true" />
-              Cancel
-            </button>
-          </ButtonStyled>
-        </div>
-      </div>
-    </NewModal>
+      :existing-data="{
+        id: collection.id,
+        name: collection.name,
+        description: collection.description,
+        icon_url: collection.icon_url,
+        icon_data: null,
+        icon_removed: false,
+        visibility: collection.status,
+      }"
+      @save="makeEdits"
+    />
     <ShareModal
       ref="shareModal"
       :share-title="`${collection.name} on Modrinth`"
       :share-text="
         canEdit
-          ? `Check out my collection, ${collection.name} on Modrinth!\n\nhttps://modrinth.com/collection/${collection.id}`
+          ? `Check out my collection ${collection.name} on Modrinth!\n\nhttps://modrinth.com/collection/${collection.id}`
           : `Check out the collection ${collection.name} on Modrinth!\n\nhttps://modrinth.com/collection/${collection.id}`
       "
       header="Sharing a collection"
@@ -236,7 +130,7 @@
           </template>
           <template #actions>
             <ButtonStyled v-if="canEdit" size="large">
-              <button @click="$refs.editCollectionModal.show()">
+              <button @click="$refs.editModal.show()">
                 <EditIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.editButton) }}
               </button>
@@ -250,7 +144,7 @@
               <OverflowMenu
                 :options="[
                   {
-                    id: 'delete',
+                    id: 'delete-collection',
                     action: () => $refs.deleteModal.show(),
                     color: 'red',
                     hoverOnly: true,
@@ -260,7 +154,7 @@
                 ]"
               >
                 <MoreVerticalIcon aria-hidden="true" />
-                <template #delete>
+                <template #delete-collection>
                   <TrashIcon aria-hidden="true" />
                   {{ formatMessage(commonMessages.deleteLabel) }}
                 </template>
@@ -404,8 +298,6 @@ import {
   CalendarIcon,
   EditIcon,
   XIcon,
-  SaveIcon,
-  UploadIcon,
   TrashIcon,
   LinkIcon,
   LockIcon,
@@ -419,16 +311,7 @@ import {
   ClipboardCopyIcon,
   ShareIcon,
 } from "@modrinth/assets";
-import {
-  PopoutMenu,
-  FileInput,
-  DropdownSelect,
-  Avatar,
-  Button,
-  commonMessages,
-  ConfirmModal,
-  ShareModal,
-} from "@modrinth/ui";
+import { Avatar, commonMessages, ConfirmModal, ShareModal } from "@modrinth/ui";
 
 import { isAdmin } from "@modrinth/utils";
 import WorldIcon from "assets/images/utils/world.svg";
@@ -437,7 +320,7 @@ import ContentPageHeader from "@modrinth/ui/src/components/base/ContentPageHeade
 import SimpleBadge from "@modrinth/ui/src/components/base/SimpleBadge.vue";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import OverflowMenu from "@modrinth/ui/src/components/base/OverflowMenu.vue";
-import NewModal from "@modrinth/ui/src/components/modal/NewModal.vue";
+import CollectionEditModal from "@modrinth/ui/src/components/modal/CollectionEditModal.vue";
 import { addNotification } from "~/composables/notifs.js";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
@@ -447,7 +330,7 @@ const vintl = useVIntl();
 const { formatMessage } = vintl;
 const formatRelativeTime = useRelativeTime();
 const formatCompactNumber = useCompactNumber();
-const editCollectionModal = ref();
+// const editCollectionModal = ref();
 
 const messages = defineMessages({
   collectionDescription: {
@@ -673,7 +556,6 @@ const navLinks = computed(() => [
 
 const icon = ref(null);
 const deletedIcon = ref(false);
-const previewImage = ref(null);
 
 const name = ref(collection.value.name);
 const summary = ref(collection.value.description);
@@ -683,6 +565,21 @@ const removeProjects = ref([]);
 async function unfollowProject(project) {
   await userFollowProject(project);
   projects.value = projects.value.filter((x) => x.id !== project.id);
+}
+
+function makeEdits(event) {
+  try {
+    icon.value = event.icon_data;
+    deletedIcon.value = event.icon_removed;
+
+    name.value = event.name;
+    summary.value = event.description;
+    visibility.value = event.visibility;
+
+    saveChanges();
+  } catch {
+    console.error("uhh.... This isn't good.");
+  }
 }
 
 async function saveChanges() {
@@ -765,7 +662,7 @@ async function deleteCollection() {
   stopLoading();
 }
 
-function showPreviewImage(files) {
+/* function showPreviewImage(files) {
   const reader = new FileReader();
   icon.value = files[0];
   deletedIcon.value = false;
@@ -773,7 +670,7 @@ function showPreviewImage(files) {
   reader.onload = (event) => {
     previewImage.value = event.target.result;
   };
-}
+} */
 
 async function copyId() {
   await navigator.clipboard.writeText(collection.value.id);
@@ -784,10 +681,6 @@ async function copyId() {
 .animated-dropdown {
   // Omorphia's dropdowns are harcoded in width, so we need to override that
   width: 100% !important;
-}
-
-.short > * {
-  height: fit-content;
 }
 
 .inputs {
