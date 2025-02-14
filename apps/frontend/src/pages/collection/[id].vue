@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="experimental-styles-within">
     <!-- COLLECTION DELETION -->
     <ConfirmModal
       v-if="canEdit"
@@ -133,10 +133,17 @@
         </div>
       </div>
     </NewModal>
-    <div
-      class="experimental-styles-within new-page sidebar"
-      :class="{ 'alt-layout': cosmetics.leftContentLayout }"
-    >
+    <ShareModal
+      ref="shareModal"
+      :share-title="`${collection.name} on Modrinth`"
+      :share-text="
+        canEdit
+          ? `Check out my collection, ${collection.name} on Modrinth!\n\nhttps://modrinth.com/collection/${collection.id}`
+          : `Check out the collection ${collection.name} on Modrinth!\n\nhttps://modrinth.com/collection/${collection.id}`
+      "
+      header="Sharing a collection"
+    />
+    <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
       <div class="normal-page__header py-4">
         <ContentPageHeader class="collectionInput">
           <template #icon>
@@ -232,6 +239,11 @@
               <button @click="$refs.editCollectionModal.show()">
                 <EditIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.editButton) }}
+              </button>
+            </ButtonStyled>
+            <ButtonStyled circular size="large">
+              <button @click="$refs.shareModal.show()">
+                <ShareIcon />
               </button>
             </ButtonStyled>
             <ButtonStyled size="large" circular>
@@ -405,6 +417,7 @@ import {
   CollectionIcon,
   MoreVerticalIcon,
   ClipboardCopyIcon,
+  ShareIcon,
 } from "@modrinth/assets";
 import {
   PopoutMenu,
@@ -414,6 +427,7 @@ import {
   Button,
   commonMessages,
   ConfirmModal,
+  ShareModal,
 } from "@modrinth/ui";
 
 import { isAdmin } from "@modrinth/utils";
