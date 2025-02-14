@@ -287,11 +287,17 @@ const constructServerProperties = (properties: any): string => {
 };
 
 const processImage = async (iconUrl: string | undefined) => {
-  const image = ref<string | null>(null);
   const sharedImage = useState<string | undefined>(
     `server-icon-${internalServerRefrence.value.serverId}`,
     () => undefined,
   );
+
+  if (sharedImage.value) {
+    return sharedImage.value;
+  }
+
+  const image = ref<string | null>(null);
+
   const auth = await PyroFetch<JWTAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
   try {
     const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
@@ -313,7 +319,7 @@ const processImage = async (iconUrl: string | undefined) => {
             const dataURL = canvas.toDataURL("image/png");
             internalServerRefrence.value.general.image = dataURL;
             image.value = dataURL;
-            sharedImage.value = dataURL; // Store in useState
+            sharedImage.value = dataURL;
             resolve();
           };
         });
@@ -380,6 +386,7 @@ const processImage = async (iconUrl: string | undefined) => {
       }
     }
   }
+
   return image.value;
 };
 
@@ -580,10 +587,14 @@ const reinstallContent = async (replace: string, projectId: string, versionId: s
 
 const createBackup = async (backupName: string) => {
   try {
-    const response = (await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups`, {
-      method: "POST",
-      body: { name: backupName },
-    })) as { id: string };
+    const response = await PyroFetch<{ id: string }>(
+      `servers/${internalServerRefrence.value.serverId}/backups`,
+      {
+        method: "POST",
+        body: { name: backupName },
+      },
+    );
+    await internalServerRefrence.value.refresh(["backups"]);
     return response.id;
   } catch (error) {
     console.error("Error creating backup:", error);
@@ -597,6 +608,7 @@ const renameBackup = async (backupId: string, newName: string) => {
       method: "POST",
       body: { name: newName },
     });
+    await internalServerRefrence.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error renaming backup:", error);
     throw error;
@@ -608,6 +620,7 @@ const deleteBackup = async (backupId: string) => {
     await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}`, {
       method: "DELETE",
     });
+    await internalServerRefrence.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error deleting backup:", error);
     throw error;
@@ -622,6 +635,7 @@ const restoreBackup = async (backupId: string) => {
         method: "POST",
       },
     );
+    await internalServerRefrence.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error restoring backup:", error);
     throw error;
@@ -660,12 +674,10 @@ const getAutoBackup = async () => {
 
 const lockBackup = async (backupId: string) => {
   try {
-    return await PyroFetch(
-      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/lock`,
-      {
-        method: "POST",
-      },
-    );
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}/lock`, {
+      method: "POST",
+    });
+    await internalServerRefrence.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error locking backup:", error);
     throw error;
@@ -674,14 +686,12 @@ const lockBackup = async (backupId: string) => {
 
 const unlockBackup = async (backupId: string) => {
   try {
-    return await PyroFetch(
-      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/unlock`,
-      {
-        method: "POST",
-      },
-    );
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}/unlock`, {
+      method: "POST",
+    });
+    await internalServerRefrence.value.refresh(["backups"]);
   } catch (error) {
-    console.error("Error locking backup:", error);
+    console.error("Error unlocking backup:", error);
     throw error;
   }
 };
@@ -970,10 +980,31 @@ const modules: any = {
             `https://api.modrinth.com/v2/project/${data.upstream.project_id}`,
           );
           data.project = res as Project;
+
+          if (data.project?.icon_url) {
+            const sharedImage = useState<string | undefined>(
+              `server-icon-${serverId}`,
+              () => undefined,
+            );
+            if (!sharedImage.value) {
+              data.image = (await processImage(data.project.icon_url)) ?? undefined;
+              sharedImage.value = data.image;
+            } else {
+              data.image = sharedImage.value;
+            }
+          }
         }
+
+        const sharedImage = useState<string | undefined>(
+          `server-icon-${serverId}`,
+          () => undefined,
+        );
+
         if (import.meta.client) {
-          data.image = (await processImage(data.project?.icon_url)) ?? undefined;
+          data.image =
+            sharedImage.value ?? (await processImage(data.project?.icon_url)) ?? undefined;
         }
+
         const motd = await getMotd();
         if (motd === "A Minecraft Server") {
           await setMotd(
@@ -1417,6 +1448,7 @@ export type Server<T extends avaliableModules> = {
       preserveInstallState?: boolean;
     },
   ) => Promise<void>;
+  loadModules: (modulesToLoad: avaliableModules) => Promise<void>;
   setError: (error: Error) => void;
   error?: Error;
   serverId: string;
@@ -1469,18 +1501,37 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
 
       await Promise.allSettled(modulePromises);
     },
+    loadModules: async (modulesToLoad: avaliableModules) => {
+      const newModules = modulesToLoad.filter((module) => !server[module]);
+      if (newModules.length === 0) return;
+
+      newModules.forEach((module) => {
+        server[module] = modules[module];
+      });
+
+      await server.refresh(newModules);
+    },
     setError: (error: Error) => {
       server.error = error;
     },
     serverId,
   });
 
-  includedModules.forEach((module) => {
+  const initialModules = includedModules.filter((module) => ["general", "ws"].includes(module));
+  const deferredModules = includedModules.filter((module) => !["general", "ws"].includes(module));
+
+  initialModules.forEach((module) => {
     server[module] = modules[module];
   });
 
   internalServerRefrence.value = server;
-  await server.refresh();
+  await server.refresh(initialModules);
+
+  if (deferredModules.length > 0) {
+    nextTick(async () => {
+      await server.loadModules(deferredModules);
+    });
+  }
 
   return server as Server<typeof includedModules>;
 };
