@@ -1,4 +1,5 @@
 export * from './billing'
+export * from './changelog'
 export * from './highlight'
 export * from './licenses'
 export * from './parse'
