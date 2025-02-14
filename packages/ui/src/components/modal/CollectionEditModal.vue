@@ -129,7 +129,6 @@ import Button from '../base/Button.vue'
 import FileInput from '../base/FileInput.vue'
 import PopoutMenu from '../base/PopoutMenu.vue'
 import Avatar from '../base/Avatar.vue'
-import { commonMessages } from '../../utils/common-messages'
 
 const props = defineProps({
   header: {
