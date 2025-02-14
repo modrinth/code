@@ -928,7 +928,8 @@ impl Profile {
             format!("{project_path}.disabled")
         };
 
-        io::rename(&path.join(project_path), &path.join(&new_path)).await?;
+        io::rename_or_move(&path.join(project_path), &path.join(&new_path))
+            .await?;
 
         Ok(new_path)
     }
