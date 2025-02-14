@@ -179,6 +179,14 @@ where
 
                     headers.insert(
                         actix_web::http::header::HeaderName::from_str(
+                            "Access-Control-Allow-Methods",
+                        )
+                        .unwrap(),
+                        "*".parse().unwrap(),
+                    );
+
+                    headers.insert(
+                        actix_web::http::header::HeaderName::from_str(
                             "Access-Control-Expose-Headers",
                         )
                         .unwrap(),
