@@ -454,7 +454,6 @@ const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const pyroConsole = usePyroConsole();
-console.log("||||||||||||||||||||||| console", pyroConsole.output);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
