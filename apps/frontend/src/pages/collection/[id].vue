@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="experimental-styles-within">
+    <!-- COLLECTION DELETION -->
     <ConfirmModal
       v-if="canEdit"
       ref="deleteModal"
@@ -9,283 +10,212 @@
       :proceed-label="formatMessage(commonMessages.deleteLabel)"
       @proceed="deleteCollection()"
     />
-    <div class="normal-page">
-      <div class="normal-page__sidebar">
-        <div class="card">
-          <div class="card__overlay input-group">
-            <template v-if="canEdit && isEditing === false">
-              <Button @click="isEditing = true">
-                <EditIcon aria-hidden="true" />
-                {{ formatMessage(commonMessages.editButton) }}
-              </Button>
-              <Button id="delete-collection" @click="() => $refs.deleteModal.show()">
-                <TrashIcon aria-hidden="true" />
-                {{ formatMessage(commonMessages.deleteLabel) }}
-              </Button>
-            </template>
-            <template v-else-if="canEdit && isEditing === true">
-              <PopoutMenu class="btn">
-                <EditIcon aria-hidden="true" /> {{ formatMessage(messages.editIconButton) }}
-                <template #menu>
-                  <span class="icon-edit-menu">
-                    <FileInput
-                      id="project-icon"
-                      :max-size="262144"
-                      :show-icon="true"
-                      accept="image/png,image/jpeg,image/gif,image/webp"
-                      class="btn btn-transparent upload"
-                      style="white-space: nowrap"
-                      aria-label="Upload icon"
-                      @change="showPreviewImage"
-                    >
-                      <UploadIcon aria-hidden="true" />
-                      {{ formatMessage(messages.uploadIconButton) }}
-                    </FileInput>
-                    <Button
-                      v-if="!deletedIcon && (previewImage || collection.icon_url)"
-                      style="white-space: nowrap"
-                      transparent
-                      @click="
-                        () => {
-                          deletedIcon = true;
-                          previewImage = null;
-                        }
-                      "
-                    >
-                      <TrashIcon aria-hidden="true" />
-                      {{ formatMessage(messages.deleteIconButton) }}
-                    </Button>
-                  </span>
-                </template>
-              </PopoutMenu>
-            </template>
-          </div>
-          <!-- Editing -->
-          <template v-if="isEditing">
-            <div class="inputs universal-labels">
-              <div class="avatar-section">
-                <Avatar
-                  size="md"
-                  :src="deletedIcon ? null : previewImage ? previewImage : collection.icon_url"
-                />
-              </div>
-              <label for="collection-title">
-                <span class="label__title"> {{ formatMessage(commonMessages.titleLabel) }} </span>
-              </label>
-              <input id="collection-title" v-model="name" maxlength="255" type="text" />
-              <label for="collection-description">
-                <span class="label__title">
-                  {{ formatMessage(commonMessages.descriptionLabel) }}
-                </span>
-              </label>
-              <div class="textarea-wrapper">
-                <textarea id="collection-description" v-model="summary" maxlength="255" />
-              </div>
-              <label for="visibility">
-                <span class="label__title">
-                  {{ formatMessage(commonMessages.visibilityLabel) }}
-                </span>
-              </label>
-              <DropdownSelect
-                id="visibility"
-                v-model="visibility"
-                :options="['listed', 'unlisted', 'private']"
-                :disabled="visibility === 'rejected'"
-                :multiple="false"
-                :display-name="
-                  (s) => {
-                    if (s === 'listed') return formatMessage(commonMessages.publicLabel);
-                    return formatMessage(commonMessages[`${s}Label`]);
-                  }
-                "
-                :searchable="false"
+    <!-- COLLECTION EDITING -->
+    <CollectionEditModal
+      v-if="canEdit"
+      ref="editModal"
+      :on-show="() => (isEditing = true)"
+      :on-hide="() => (isEditing = false)"
+      :existing-data="{
+        id: collection.id,
+        name: collection.name,
+        description: collection.description,
+        icon_url: collection.icon_url,
+        icon_data: null,
+        icon_removed: false,
+        visibility: collection.status,
+      }"
+      @save="makeEdits"
+    />
+    <ShareModal
+      ref="shareModal"
+      :share-title="`${collection.name} on Modrinth`"
+      :share-text="
+        canEdit
+          ? `Check out my collection ${collection.name} on Modrinth!\n\nhttps://modrinth.com/collection/${collection.id}`
+          : `Check out the collection ${collection.name} on Modrinth!\n\nhttps://modrinth.com/collection/${collection.id}`
+      "
+      header="Sharing a collection"
+    />
+    <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
+      <div class="normal-page__header py-4">
+        <ContentPageHeader class="collectionInput">
+          <template #icon>
+            <Avatar :src="collection.icon_url" :alt="collection.name" size="96px" />
+          </template>
+          <template #title>
+            {{ collection.name }}
+          </template>
+          <template #title-suffix>
+            <div class="ml-1 flex items-center gap-2 font-semibold">
+              <CollectionIcon /> Collection
+            </div>
+          </template>
+          <template #summary>
+            {{ collection.description }}
+          </template>
+          <template #stats>
+            <div
+              v-if="canEdit"
+              class="flex cursor-help items-center border-0 border-r border-solid border-divider pr-4"
+            >
+              <SimpleBadge
+                v-if="collection.status === 'listed'"
+                v-tooltip="'This collection is visible to all users.'"
+                :icon="WorldIcon"
+                :formatted-name="formatMessage(commonMessages.publicLabel)"
+              />
+              <SimpleBadge
+                v-else-if="collection.status === 'unlisted'"
+                v-tooltip="'This collection is only visible to users with the link.'"
+                :icon="LinkIcon"
+                :formatted-name="formatMessage(commonMessages.unlistedLabel)"
+              />
+              <SimpleBadge
+                v-else-if="collection.status === 'private'"
+                v-tooltip="'This collection is only visible to you.'"
+                :icon="LockIcon"
+                :formatted-name="formatMessage(commonMessages.privateLabel)"
+              />
+              <SimpleBadge
+                v-else-if="collection.status === 'rejected'"
+                v-tooltip="'This collection has been rejected.'"
+                :icon="XIcon"
+                :formatted-name="formatMessage(commonMessages.rejectedLabel)"
               />
             </div>
-            <div class="push-right input-group">
-              <Button @click="isEditing = false">
-                <XIcon aria-hidden="true" />
-                {{ formatMessage(commonMessages.cancelButton) }}
-              </Button>
-              <Button color="primary" @click="saveChanges()">
-                <SaveIcon aria-hidden="true" />
-                {{ formatMessage(commonMessages.saveButton) }}
-              </Button>
+            <div
+              v-tooltip="
+                `${$formatNumber(projects.length || 0, false)} project${(projects.length || 0) !== 1 ? 's' : ''}`
+              "
+              class="flex cursor-help items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+            >
+              <BoxIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(projects.length || 0) }}
+            </div>
+            <div
+              v-tooltip="
+                formatMessage(commonMessages.dateAtTimeTooltip, {
+                  date: new Date(collection.created),
+                  time: new Date(collection.created),
+                })
+              "
+              class="flex cursor-help items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+            >
+              <CalendarIcon class="h-6 w-6 text-secondary" />
+
+              {{
+                formatMessage(messages.createdAtLabel, {
+                  ago: formatRelativeTime(collection.created),
+                })
+              }}
+            </div>
+            <div
+              v-tooltip="
+                formatMessage(commonMessages.dateAtTimeTooltip, {
+                  date: new Date(collection.updated),
+                  time: new Date(collection.updated),
+                })
+              "
+              class="flex cursor-help items-center gap-2 font-semibold"
+            >
+              <UpdatedIcon class="h-6 w-6 text-secondary" />
+
+              {{
+                formatMessage(messages.updatedAtLabel, {
+                  ago: formatRelativeTime(collection.updated),
+                })
+              }}
             </div>
           </template>
-          <!-- Content -->
-          <template v-if="!isEditing">
-            <div class="page-header__icon">
-              <Avatar size="md" :src="collection.icon_url" />
-            </div>
-            <div class="page-header__text">
-              <h1 class="title">{{ collection.name }}</h1>
-
-              <div>
-                <span class="collection-label">
-                  <BoxIcon aria-hidden="true" /> {{ formatMessage(messages.collectionLabel) }}
-                </span>
-              </div>
-
-              <div class="collection-info">
-                <div class="metadata-item markdown-body collection-description">
-                  <p>{{ collection.description }}</p>
-                </div>
-
-                <hr class="card-divider" />
-
-                <div v-if="canEdit" class="primary-stat">
-                  <template v-if="collection.status === 'listed'">
-                    <WorldIcon class="primary-stat__icon" aria-hidden="true" />
-                    <div class="primary-stat__text">
-                      <strong> {{ formatMessage(commonMessages.publicLabel) }} </strong>
-                    </div>
-                  </template>
-                  <template v-else-if="collection.status === 'unlisted'">
-                    <LinkIcon class="primary-stat__icon" aria-hidden="true" />
-                    <div class="primary-stat__text">
-                      <strong> {{ formatMessage(commonMessages.unlistedLabel) }} </strong>
-                    </div>
-                  </template>
-                  <template v-else-if="collection.status === 'private'">
-                    <LockIcon class="primary-stat__icon" aria-hidden="true" />
-                    <div class="primary-stat__text">
-                      <strong> {{ formatMessage(commonMessages.privateLabel) }} </strong>
-                    </div>
-                  </template>
-                  <template v-else-if="collection.status === 'rejected'">
-                    <XIcon class="primary-stat__icon" aria-hidden="true" />
-                    <div class="primary-stat__text">
-                      <strong> {{ formatMessage(commonMessages.rejectedLabel) }} </strong>
-                    </div>
-                  </template>
-                </div>
-              </div>
-
-              <div class="primary-stat">
-                <LibraryIcon class="primary-stat__icon" aria-hidden="true" />
-                <div v-if="projects" class="primary-stat__text">
-                  <IntlFormatted
-                    :message-id="messages.projectsCountLabel"
-                    :values="{ count: formatCompactNumber(projects.length || 0) }"
-                  >
-                    <template #stat="{ children }">
-                      <span class="primary-stat__counter">
-                        <component :is="() => normalizeChildren(children)" />
-                      </span>
-                    </template>
-                  </IntlFormatted>
-                </div>
-              </div>
-
-              <div class="metadata-item">
-                <div
-                  v-tooltip="
-                    formatMessage(commonMessages.dateAtTimeTooltip, {
-                      date: new Date(collection.created),
-                      time: new Date(collection.created),
-                    })
-                  "
-                  class="date"
-                >
-                  <CalendarIcon aria-hidden="true" />
-                  <label>
-                    {{
-                      formatMessage(messages.createdAtLabel, {
-                        ago: formatRelativeTime(collection.created),
-                      })
-                    }}
-                  </label>
-                </div>
-              </div>
-
-              <div v-if="collection.id !== 'following'" class="metadata-item">
-                <div
-                  v-tooltip="
-                    formatMessage(commonMessages.dateAtTimeTooltip, {
-                      date: new Date(collection.updated),
-                      time: new Date(collection.updated),
-                    })
-                  "
-                  class="date"
-                >
-                  <UpdatedIcon aria-hidden="true" />
-                  <label>
-                    {{
-                      formatMessage(messages.updatedAtLabel, {
-                        ago: formatRelativeTime(collection.updated),
-                      })
-                    }}
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <hr class="card-divider" />
-
-            <div class="collection-info">
-              <h2 class="card-header">{{ formatMessage(messages.curatedByLabel) }}</h2>
-              <div class="metadata-item">
-                <nuxt-link
-                  class="team-member columns button-transparent"
-                  :to="'/user/' + creator.username"
-                >
-                  <Avatar :src="creator.avatar_url" :alt="creator.username" size="sm" circle />
-
-                  <div class="member-info">
-                    <p class="name">{{ creator.username }}</p>
-                    <p class="role">{{ formatMessage(messages.ownerLabel) }}</p>
-                  </div>
-                </nuxt-link>
-              </div>
-              <!-- <hr class="card-divider" />
-            <div class="input-group">
-              <Button @click="() => $refs.shareModal.show()">
+          <template #actions>
+            <ButtonStyled v-if="canEdit" size="large">
+              <button @click="$refs.editModal.show()">
+                <EditIcon aria-hidden="true" />
+                {{ formatMessage(commonMessages.editButton) }}
+              </button>
+            </ButtonStyled>
+            <ButtonStyled circular size="large">
+              <button @click="$refs.shareModal.show()">
                 <ShareIcon />
-                Share
-              </Button>
-            </div> -->
-            </div>
+              </button>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular>
+              <OverflowMenu
+                :options="[
+                  {
+                    id: 'delete-collection',
+                    action: () => $refs.deleteModal.show(),
+                    color: 'red',
+                    hoverOnly: true,
+                    shown: canEdit && isEditing === false,
+                  },
+                  { id: 'copy-id', action: () => copyId() },
+                ]"
+              >
+                <MoreVerticalIcon aria-hidden="true" />
+                <template #delete-collection>
+                  <TrashIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.deleteLabel) }}
+                </template>
+                <template #copy-id>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyIdButton) }}
+                </template>
+              </OverflowMenu>
+            </ButtonStyled>
           </template>
+        </ContentPageHeader>
+      </div>
+      <div class="normal-page__sidebar">
+        <div class="card flex-card">
+          <h2>{{ formatMessage(messages.curatedByLabel) }}</h2>
+
+          <nuxt-link
+            class="details-list__item details-list__item--type-large"
+            :to="`/user/${creator.username}`"
+          >
+            <Avatar :src="creator.avatar_url" circle />
+            <div class="rows">
+              <span class="flex items-center gap-1 font-bold text-primary">
+                {{ creator.username }}
+              </span>
+              <span class="text-sm font-medium text-secondary">
+                {{ formatMessage(messages.ownerLabel) }}
+              </span>
+            </div>
+          </nuxt-link>
         </div>
         <AdPlaceholder
           v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
         />
       </div>
       <div class="normal-page__content">
-        <nav class="navigation-card">
-          <NavRow
-            :links="[
-              {
-                label: formatMessage(commonMessages.allProjectType),
-                href: `/collection/${collection.id}`,
-              },
-              ...projectTypes.map((x) => {
-                return {
-                  label: formatMessage(getProjectTypeMessage(x, true)),
-                  href: `/collection/${collection.id}/${x}s`,
-                };
-              }),
-            ]"
-          />
-          <button
-            v-tooltip="
-              formatMessage(
-                commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
-              )
-            "
-            :aria-label="
-              formatMessage(
-                commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
-              )
-            "
-            class="square-button"
-            @click="cycleSearchDisplayMode()"
-          >
-            <GridIcon v-if="cosmetics.searchDisplayMode.collection === 'grid'" />
-            <ImageIcon v-else-if="cosmetics.searchDisplayMode.collection === 'gallery'" />
-            <ListIcon v-else />
-          </button>
-        </nav>
+        <div v-if="navLinks.length >= 2" class="mb-4 flex flex-row items-center gap-2">
+          <div class="max-w-full overflow-x-auto">
+            <NavTabs :links="navLinks" />
+          </div>
+          <ButtonStyled circular>
+            <button
+              v-tooltip="
+                formatMessage(
+                  commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
+                )
+              "
+              :aria-label="
+                formatMessage(
+                  commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
+                )
+              "
+              class="square-button"
+              @click="cycleSearchDisplayMode()"
+            >
+              <GridIcon v-if="cosmetics.searchDisplayMode.collection === 'grid'" />
+              <ImageIcon v-else-if="cosmetics.searchDisplayMode.collection === 'gallery'" />
+              <ListIcon v-else />
+            </button>
+          </ButtonStyled>
+        </div>
 
         <div
           v-if="projects && projects?.length > 0"
@@ -368,8 +298,6 @@ import {
   CalendarIcon,
   EditIcon,
   XIcon,
-  SaveIcon,
-  UploadIcon,
   TrashIcon,
   LinkIcon,
   LockIcon,
@@ -377,31 +305,32 @@ import {
   ImageIcon,
   ListIcon,
   UpdatedIcon,
-  LibraryIcon,
   BoxIcon,
+  CollectionIcon,
+  MoreVerticalIcon,
+  ClipboardCopyIcon,
+  ShareIcon,
 } from "@modrinth/assets";
-import {
-  PopoutMenu,
-  FileInput,
-  DropdownSelect,
-  Avatar,
-  Button,
-  commonMessages,
-  ConfirmModal,
-} from "@modrinth/ui";
+import { Avatar, commonMessages, ConfirmModal, ShareModal } from "@modrinth/ui";
 
 import { isAdmin } from "@modrinth/utils";
 import WorldIcon from "assets/images/utils/world.svg";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
+import ContentPageHeader from "@modrinth/ui/src/components/base/ContentPageHeader.vue";
+import SimpleBadge from "@modrinth/ui/src/components/base/SimpleBadge.vue";
+import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
+import OverflowMenu from "@modrinth/ui/src/components/base/OverflowMenu.vue";
+import CollectionEditModal from "@modrinth/ui/src/components/modal/CollectionEditModal.vue";
 import { addNotification } from "~/composables/notifs.js";
-import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+import NavTabs from "~/components/ui/NavTabs.vue";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;
 const formatRelativeTime = useRelativeTime();
 const formatCompactNumber = useCompactNumber();
+// const editCollectionModal = ref();
 
 const messages = defineMessages({
   collectionDescription: {
@@ -609,9 +538,24 @@ const projectTypes = computed(() => {
   return Array.from(projectSet);
 });
 
+const navLinks = computed(() => [
+  {
+    label: formatMessage(commonMessages.allProjectType),
+    href: `/collection/${collection.value.id}`,
+  },
+  ...projectTypes.value
+    .map((x) => {
+      return {
+        label: formatMessage(getProjectTypeMessage(x, true)),
+        href: `/collection/${collection.value.id}/${x}s`,
+      };
+    })
+    .slice()
+    .sort((a, b) => a.label.localeCompare(b.label)),
+]);
+
 const icon = ref(null);
 const deletedIcon = ref(false);
-const previewImage = ref(null);
 
 const name = ref(collection.value.name);
 const summary = ref(collection.value.description);
@@ -621,6 +565,26 @@ const removeProjects = ref([]);
 async function unfollowProject(project) {
   await userFollowProject(project);
   projects.value = projects.value.filter((x) => x.id !== project.id);
+}
+
+function makeEdits(event) {
+  try {
+    icon.value = event.icon_data;
+    deletedIcon.value = event.icon_removed;
+
+    name.value = event.name;
+    summary.value = event.description;
+    visibility.value = event.visibility;
+
+    saveChanges();
+  } catch (error) {
+    addNotification({
+      group: "main",
+      title: formatMessage(commonMessages.errorNotificationTitle),
+      text: error,
+      type: "error",
+    });
+  }
 }
 
 async function saveChanges() {
@@ -703,14 +667,8 @@ async function deleteCollection() {
   stopLoading();
 }
 
-function showPreviewImage(files) {
-  const reader = new FileReader();
-  icon.value = files[0];
-  deletedIcon.value = false;
-  reader.readAsDataURL(icon.value);
-  reader.onload = (event) => {
-    previewImage.value = event.target.result;
-  };
+async function copyId() {
+  await navigator.clipboard.writeText(collection.value.id);
 }
 </script>
 
