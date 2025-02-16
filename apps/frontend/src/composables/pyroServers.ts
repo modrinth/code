@@ -296,98 +296,86 @@ const processImage = async (iconUrl: string | undefined) => {
     return sharedImage.value;
   }
 
-  const image = ref<string | null>(null);
-
-  const auth = await PyroFetch<JWTAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
   try {
-    const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
-      override: auth,
-      retry: false,
-    });
-
-    if (fileData instanceof Blob) {
-      if (import.meta.client) {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const img = new Image();
-        img.src = URL.createObjectURL(fileData);
-        await new Promise<void>((resolve) => {
-          img.onload = () => {
-            canvas.width = 512;
-            canvas.height = 512;
-            ctx?.drawImage(img, 0, 0, 512, 512);
-            const dataURL = canvas.toDataURL("image/png");
-            internalServerRefrence.value.general.image = dataURL;
-            image.value = dataURL;
-            sharedImage.value = dataURL;
-            resolve();
-          };
-        });
-      }
-    }
-  } catch (error) {
-    if (error instanceof PyroServersFetchError && error.statusCode === 404) {
-      sharedImage.value = undefined;
-    } else {
-      console.error(error);
-    }
-  }
-
-  if (image.value === null && iconUrl) {
-    console.log("iconUrl", iconUrl);
+    const auth = await PyroFetch<JWTAuth>(`servers/${internalServerRefrence.value.serverId}/fs`);
     try {
-      const response = await fetch(iconUrl);
-      const file = await response.blob();
-      const originalfile = new File([file], "server-icon-original.png", {
-        type: "image/png",
+      const fileData = await PyroFetch(`/download?path=/server-icon-original.png`, {
+        override: auth,
+        retry: false,
       });
-      if (import.meta.client) {
-        const scaledFile = await new Promise<File>((resolve, reject) => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          const img = new Image();
-          img.src = URL.createObjectURL(file);
-          img.onload = () => {
-            canvas.width = 64;
-            canvas.height = 64;
-            ctx?.drawImage(img, 0, 0, 64, 64);
-            canvas.toBlob((blob) => {
-              if (blob) {
-                const data = new File([blob], "server-icon.png", { type: "image/png" });
-                resolve(data);
-              } else {
-                reject(new Error("Canvas toBlob failed"));
-              }
-            }, "image/png");
-          };
-          img.onerror = reject;
-        });
-        if (scaledFile) {
-          await PyroFetch(`/create?path=/server-icon.png&type=file`, {
-            method: "POST",
-            contentType: "application/octet-stream",
-            body: scaledFile,
-            override: auth,
-          });
 
-          await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
-            method: "POST",
-            contentType: "application/octet-stream",
-            body: originalfile,
-            override: auth,
+      if (fileData instanceof Blob) {
+        if (import.meta.client) {
+          const dataURL = await new Promise<string>((resolve) => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+            img.onload = () => {
+              canvas.width = 512;
+              canvas.height = 512;
+              ctx?.drawImage(img, 0, 0, 512, 512);
+              resolve(canvas.toDataURL("image/png"));
+              URL.revokeObjectURL(img.src);
+            };
+            img.src = URL.createObjectURL(fileData);
           });
+          sharedImage.value = dataURL;
+          return dataURL;
         }
       }
     } catch (error) {
-      if (error instanceof PyroServersFetchError && error.statusCode === 404) {
-        console.log("[PYROSERVERS] No server icon found");
-      } else {
-        console.error(error);
+      if (error instanceof PyroServersFetchError && error.statusCode === 404 && iconUrl) {
+        try {
+          const response = await fetch(iconUrl);
+          if (!response.ok) throw new Error("Failed to fetch icon");
+          const file = await response.blob();
+          const originalFile = new File([file], "server-icon-original.png", { type: "image/png" });
+
+          if (import.meta.client) {
+            const dataURL = await new Promise<string>((resolve) => {
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+              const img = new Image();
+              img.onload = () => {
+                canvas.width = 64;
+                canvas.height = 64;
+                ctx?.drawImage(img, 0, 0, 64, 64);
+                canvas.toBlob(async (blob) => {
+                  if (blob) {
+                    const scaledFile = new File([blob], "server-icon.png", { type: "image/png" });
+                    await PyroFetch(`/create?path=/server-icon.png&type=file`, {
+                      method: "POST",
+                      contentType: "application/octet-stream",
+                      body: scaledFile,
+                      override: auth,
+                    });
+                    await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
+                      method: "POST",
+                      contentType: "application/octet-stream",
+                      body: originalFile,
+                      override: auth,
+                    });
+                  }
+                }, "image/png");
+                const dataURL = canvas.toDataURL("image/png");
+                resolve(dataURL);
+                URL.revokeObjectURL(img.src);
+              };
+              img.src = URL.createObjectURL(file);
+            });
+            sharedImage.value = dataURL;
+            return dataURL;
+          }
+        } catch (error) {
+          console.error("Failed to process external icon:", error);
+        }
       }
     }
+  } catch (error) {
+    console.error("Failed to process server icon:", error);
   }
 
-  return image.value;
+  return undefined;
 };
 
 // ------------------ GENERAL ------------------ //
@@ -974,35 +962,15 @@ const modules: any = {
     get: async (serverId: string) => {
       try {
         const data = await PyroFetch<General>(`servers/${serverId}`);
-        // TODO: temp hack to fix hydration error
         if (data.upstream?.project_id) {
           const res = await $fetch(
             `https://api.modrinth.com/v2/project/${data.upstream.project_id}`,
           );
           data.project = res as Project;
-
-          if (data.project?.icon_url) {
-            const sharedImage = useState<string | undefined>(
-              `server-icon-${serverId}`,
-              () => undefined,
-            );
-            if (!sharedImage.value) {
-              data.image = (await processImage(data.project.icon_url)) ?? undefined;
-              sharedImage.value = data.image;
-            } else {
-              data.image = sharedImage.value;
-            }
-          }
         }
 
-        const sharedImage = useState<string | undefined>(
-          `server-icon-${serverId}`,
-          () => undefined,
-        );
-
         if (import.meta.client) {
-          data.image =
-            sharedImage.value ?? (await processImage(data.project?.icon_url)) ?? undefined;
+          data.image = (await processImage(data.project?.icon_url)) ?? undefined;
         }
 
         const motd = await getMotd();
