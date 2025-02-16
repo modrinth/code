@@ -13,24 +13,98 @@ interface PyroFetchOptions {
   retry?: number | boolean;
 }
 
+class PyroServerError extends Error {
+  public readonly errors: Map<string, Error> = new Map();
+  public readonly timestamp: number = Date.now();
+
+  constructor(message?: string) {
+    super(message || "Multiple errors occurred");
+    this.name = "PyroServerError";
+  }
+
+  addError(module: string, error: Error) {
+    this.errors.set(module, error);
+    this.message = this.buildErrorMessage();
+  }
+
+  hasErrors() {
+    return this.errors.size > 0;
+  }
+
+  private buildErrorMessage(): string {
+    return Array.from(this.errors.entries())
+      .map(([_module, error]) => error.message)
+      .join("\n");
+  }
+}
+
 class PyroServersFetchError extends Error {
   constructor(
     message: string,
     public readonly statusCode?: number,
     public readonly originalError?: Error,
+    public readonly module?: string,
   ) {
-    super(message);
+    let errorMessage = message;
+    let method = "GET";
+    let path = "";
+
+    if (originalError instanceof FetchError) {
+      const matches = message.match(/\[([A-Z]+)\]\s+"([^"]+)":/);
+      if (matches) {
+        method = matches[1];
+        path = matches[2].replace(/https?:\/\/[^/]+\/[^/]+\/v\d+\//, "");
+      }
+
+      const statusMessage = (() => {
+        if (!statusCode) return "Unknown Error";
+        switch (statusCode) {
+          case 400:
+            return "Bad Request";
+          case 401:
+            return "Unauthorized";
+          case 403:
+            return "Forbidden";
+          case 404:
+            return "Not Found";
+          case 408:
+            return "Request Timeout";
+          case 429:
+            return "Too Many Requests";
+          case 500:
+            return "Internal Server Error";
+          case 502:
+            return "Bad Gateway";
+          case 503:
+            return "Service Unavailable";
+          case 504:
+            return "Gateway Timeout";
+          default:
+            return `HTTP ${statusCode}`;
+        }
+      })();
+
+      errorMessage = `[${method}] ${statusMessage} (${statusCode}) while fetching ${path}${module ? ` in ${module}` : ""}`;
+    } else {
+      errorMessage = `${message}${statusCode ? ` (${statusCode})` : ""}${module ? ` in ${module}` : ""}`;
+    }
+
+    super(errorMessage);
     this.name = "PyroServersFetchError";
   }
 }
 
-async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promise<T> {
+async function PyroFetch<T>(
+  path: string,
+  options: PyroFetchOptions = {},
+  module?: string,
+): Promise<T> {
   const config = useRuntimeConfig();
   const auth = await useAuth();
   const authToken = auth.value?.token;
 
   if (!authToken) {
-    throw new PyroServersFetchError("Missing auth token", 401);
+    throw new PyroServersFetchError("Missing auth token", 401, undefined, module);
   }
 
   const {
@@ -48,7 +122,12 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
   );
 
   if (!base) {
-    throw new PyroServersFetchError("Configuration error: Missing PYRO_BASE_URL", 500);
+    throw new PyroServersFetchError(
+      "Configuration error: Missing PYRO_BASE_URL",
+      500,
+      undefined,
+      module,
+    );
   }
 
   const fullUrl = override?.url
@@ -93,7 +172,7 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
         const isRetryable = statusCode ? [408, 429, 500, 502, 503, 504].includes(statusCode) : true;
 
         if (!isRetryable || attempts >= maxAttempts) {
-          throw new PyroServersFetchError(`Request failed: ${error.message}`, statusCode, error);
+          throw new PyroServersFetchError(error.message, statusCode, error, module);
         }
 
         const delay = Math.min(1000 * Math.pow(2, attempts - 1) + Math.random() * 1000, 10000);
@@ -105,6 +184,7 @@ async function PyroFetch<T>(path: string, options: PyroFetchOptions = {}): Promi
         "Unexpected error during fetch operation",
         undefined,
         error as Error,
+        module,
       );
     }
   }
@@ -961,7 +1041,7 @@ const modules: any = {
   general: {
     get: async (serverId: string) => {
       try {
-        const data = await PyroFetch<General>(`servers/${serverId}`);
+        const data = await PyroFetch<General>(`servers/${serverId}`, {}, "general");
         if (data.upstream?.project_id) {
           const res = await $fetch(
             `https://api.modrinth.com/v2/project/${data.upstream.project_id}`,
@@ -997,7 +1077,7 @@ const modules: any = {
   content: {
     get: async (serverId: string) => {
       try {
-        const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`);
+        const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`, {}, "content");
         return {
           data:
             internalServerRefrence.value.error === undefined
@@ -1016,7 +1096,7 @@ const modules: any = {
   backups: {
     get: async (serverId: string) => {
       try {
-        return { data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`) };
+        return { data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`, {}, "backups") };
       } catch (error) {
         internalServerRefrence.value.setError(error);
         return undefined;
@@ -1035,7 +1115,13 @@ const modules: any = {
   network: {
     get: async (serverId: string) => {
       try {
-        return { allocations: await PyroFetch<Allocation[]>(`servers/${serverId}/allocations`) };
+        return {
+          allocations: await PyroFetch<Allocation[]>(
+            `servers/${serverId}/allocations`,
+            {},
+            "network",
+          ),
+        };
       } catch (error) {
         internalServerRefrence.value.setError(error);
         return undefined;
@@ -1050,7 +1136,7 @@ const modules: any = {
   startup: {
     get: async (serverId: string) => {
       try {
-        return await PyroFetch<Startup>(`servers/${serverId}/startup`);
+        return await PyroFetch<Startup>(`servers/${serverId}/startup`, {}, "startup");
       } catch (error) {
         internalServerRefrence.value.setError(error);
         return undefined;
@@ -1061,7 +1147,7 @@ const modules: any = {
   ws: {
     get: async (serverId: string) => {
       try {
-        return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`);
+        return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
       } catch (error) {
         internalServerRefrence.value.setError(error);
         return undefined;
@@ -1071,7 +1157,7 @@ const modules: any = {
   fs: {
     get: async (serverId: string) => {
       try {
-        return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`) };
+        return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`, {}, "fs") };
       } catch (error) {
         internalServerRefrence.value.setError(error);
         return undefined;
@@ -1436,6 +1522,8 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
       }
 
       const modulesToRefresh = [...new Set(refreshModules || includedModules)];
+      const serverError = new PyroServerError();
+
       const modulePromises = modulesToRefresh.map(async (module) => {
         try {
           const mods = modules[module];
@@ -1449,7 +1537,6 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
               ...server[module],
               ...data,
               image: server[module]?.image || data.image,
-              ...data,
               motd: server[module]?.motd || data.motd,
               status:
                 options.preserveInstallState && server[module]?.status === "installing"
@@ -1461,13 +1548,23 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
           }
         } catch (error) {
           console.error(`Failed to refresh module ${module}:`, error);
-          if (error instanceof PyroServersFetchError) {
-            server.setError(error);
+          if (error instanceof Error) {
+            serverError.addError(module, error);
           }
         }
       });
 
       await Promise.allSettled(modulePromises);
+
+      if (serverError.hasErrors()) {
+        if (server.error && server.error instanceof PyroServerError) {
+          serverError.errors.forEach((error, module) => {
+            (server.error as PyroServerError).addError(module, error);
+          });
+        } else {
+          server.setError(serverError);
+        }
+      }
     },
     loadModules: async (modulesToLoad: avaliableModules) => {
       const newModules = modulesToLoad.filter((module) => !server[module]);
@@ -1480,8 +1577,20 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
       await server.refresh(newModules);
     },
     setError: (error: Error) => {
-      server.error = error;
+      if (!server.error) {
+        server.error = error;
+      } else if (error instanceof PyroServerError) {
+        if (!(server.error instanceof PyroServerError)) {
+          const newError = new PyroServerError();
+          newError.addError("previous", server.error);
+          server.error = newError;
+        }
+        error.errors.forEach((err, module) => {
+          (server.error as PyroServerError).addError(module, err);
+        });
+      }
     },
+
     serverId,
   });
 
