@@ -988,7 +988,7 @@ definePageMeta({
 });
 </script>
 
-<style scoped>
+<style>
 @keyframes server-action-buttons-anim {
   0% {
     opacity: 0;
