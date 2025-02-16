@@ -286,11 +286,10 @@ const addNewAllocation = async () => {
 
   try {
     await props.server.network?.reserveAllocation(newAllocationName.value);
+    await props.server.refresh(["network"]);
 
     newAllocationModal.value?.hide();
     newAllocationName.value = "";
-
-    await props.server.refresh();
 
     addNotification({
       group: "serverOptions",
@@ -332,8 +331,8 @@ const confirmDeleteAllocation = async () => {
   if (allocationToDelete.value === null) return;
 
   await props.server.network?.deleteAllocation(allocationToDelete.value);
+  await props.server.refresh(["network"]);
 
-  await props.server.refresh();
   addNotification({
     group: "serverOptions",
     type: "success",
@@ -349,11 +348,10 @@ const editAllocation = async () => {
 
   try {
     await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value);
+    await props.server.refresh(["network"]);
 
     editAllocationModal.value?.hide();
     newAllocationName.value = "";
-
-    await props.server.refresh();
 
     addNotification({
       group: "serverOptions",

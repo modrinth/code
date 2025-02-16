@@ -228,7 +228,7 @@
             :show-loader-label="showLoaderLabel"
             :uptime-seconds="uptimeSeconds"
             :linked="true"
-            class="flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+            class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
           />
         </div>
       </div>
@@ -363,7 +363,6 @@
             </div>
           </div>
         </div>
-
         <NuxtPage
           :route="route"
           :is-connected="isConnected"
@@ -425,15 +424,14 @@ const createdAt = ref(
 const route = useNativeRoute();
 const router = useRouter();
 const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, [
-  "general",
-  "content",
-  "backups",
-  "network",
-  "startup",
-  "ws",
-  "fs",
-]);
+
+const server = await usePyroServer(serverId, ["general", "ws"]);
+
+const loadModulesPromise = Promise.resolve().then(() =>
+  server.loadModules(["content", "backups", "network", "startup", "fs"]),
+);
+
+provide("modulesLoaded", loadModulesPromise);
 
 watch(
   () => server.error,
@@ -454,7 +452,6 @@ const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const pyroConsole = usePyroConsole();
-console.log("||||||||||||||||||||||| console", pyroConsole.output);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
@@ -665,6 +662,26 @@ const newLoader = ref<string | null>(null);
 const newLoaderVersion = ref<string | null>(null);
 const newMCVersion = ref<string | null>(null);
 
+const onReinstall = (potentialArgs: any) => {
+  if (!serverData.value) return;
+
+  serverData.value.status = "installing";
+
+  if (potentialArgs?.loader) {
+    newLoader.value = potentialArgs.loader;
+  }
+  if (potentialArgs?.lVersion) {
+    newLoaderVersion.value = potentialArgs.lVersion;
+  }
+  if (potentialArgs?.mVersion) {
+    newMCVersion.value = potentialArgs.mVersion;
+  }
+
+  error.value = null;
+  errorTitle.value = "Error";
+  errorMessage.value = "An unexpected error occurred.";
+};
+
 const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   switch (data.result) {
     case "ok": {
@@ -736,26 +753,6 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
       break;
     }
   }
-};
-
-const onReinstall = (potentialArgs: any) => {
-  if (!serverData.value) return;
-
-  serverData.value.status = "installing";
-
-  if (potentialArgs?.loader) {
-    newLoader.value = potentialArgs.loader;
-  }
-  if (potentialArgs?.lVersion) {
-    newLoaderVersion.value = potentialArgs.lVersion;
-  }
-  if (potentialArgs?.mVersion) {
-    newMCVersion.value = potentialArgs.mVersion;
-  }
-
-  error.value = null;
-  errorTitle.value = "Error";
-  errorMessage.value = "An unexpected error occurred.";
 };
 
 const updateStats = (currentStats: Stats["current"]) => {
@@ -991,7 +988,7 @@ definePageMeta({
 });
 </script>
 
-<style scoped>
+<style>
 @keyframes server-action-buttons-anim {
   0% {
     opacity: 0;

@@ -297,33 +297,37 @@ const showbackupSettingsModal = () => {
   backupSettingsModal.value?.show();
 };
 
-const handleBackupCreated = (payload: { success: boolean; message: string }) => {
+const handleBackupCreated = async (payload: { success: boolean; message: string }) => {
   if (payload.success) {
     addNotification({ type: "success", text: payload.message });
+    await props.server.refresh(["backups"]);
   } else {
     addNotification({ type: "error", text: payload.message });
   }
 };
 
-const handleBackupRenamed = (payload: { success: boolean; message: string }) => {
+const handleBackupRenamed = async (payload: { success: boolean; message: string }) => {
   if (payload.success) {
     addNotification({ type: "success", text: payload.message });
+    await props.server.refresh(["backups"]);
   } else {
     addNotification({ type: "error", text: payload.message });
   }
 };
 
-const handleBackupRestored = (payload: { success: boolean; message: string }) => {
+const handleBackupRestored = async (payload: { success: boolean; message: string }) => {
   if (payload.success) {
     addNotification({ type: "success", text: payload.message });
+    await props.server.refresh(["backups"]);
   } else {
     addNotification({ type: "error", text: payload.message });
   }
 };
 
-const handleBackupDeleted = (payload: { success: boolean; message: string }) => {
+const handleBackupDeleted = async (payload: { success: boolean; message: string }) => {
   if (payload.success) {
     addNotification({ type: "success", text: payload.message });
+    await props.server.refresh(["backups"]);
   } else {
     addNotification({ type: "error", text: payload.message });
   }
@@ -387,8 +391,8 @@ onMounted(() => {
     }
 
     if (hasOngoingBackups) {
-      refreshInterval.value = setInterval(() => {
-        props.server.refresh(["backups"]);
+      refreshInterval.value = setInterval(async () => {
+        await props.server.refresh(["backups"]);
       }, 10000);
     }
   });

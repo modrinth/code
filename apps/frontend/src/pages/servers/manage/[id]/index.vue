@@ -169,7 +169,7 @@
       </div>
     </div>
   </div>
-  <div v-else-if="!isConnected && !isWsAuthIncorrect" />
+  <UiServersOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
   <div v-else-if="isWsAuthIncorrect" class="flex flex-col">
     <h2>Could not connect to the server.</h2>
     <p>
