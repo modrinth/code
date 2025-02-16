@@ -228,7 +228,7 @@
             :show-loader-label="showLoaderLabel"
             :uptime-seconds="uptimeSeconds"
             :linked="true"
-            class="flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+            class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
           />
         </div>
       </div>
