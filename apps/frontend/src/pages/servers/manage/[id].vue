@@ -47,7 +47,7 @@
             <div class="grid place-content-center rounded-full bg-bg-orange p-4">
               <LockIcon class="size-12 text-orange" />
             </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server Suspended</h1>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server suspended</h1>
           </div>
           <p class="text-lg text-secondary">
             {{
