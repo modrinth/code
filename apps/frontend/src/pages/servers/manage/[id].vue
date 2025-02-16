@@ -1001,8 +1001,7 @@ definePageMeta({
 }
 
 .server-action-buttons-anim {
-  animation: server-action-buttons-anim 0.2s both ease-out;
-  animation-delay: 0.2s;
+  animation: server-action-buttons-anim 0.2s ease-out;
 }
 
 .mobile-blurred-servericon::before {
