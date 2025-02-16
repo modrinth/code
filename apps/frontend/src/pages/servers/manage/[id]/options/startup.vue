@@ -109,13 +109,23 @@ const jdkBuildMap = [
   { value: "graal", label: "GraalVM" },
 ];
 
-const invocation = ref(startupSettings.value?.invocation);
-const jdkVersion = ref(
-  jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "",
+const invocation = ref("");
+const jdkVersion = ref("");
+const jdkBuild = ref("");
+
+watch(
+  startupSettings,
+  (newSettings) => {
+    if (newSettings) {
+      invocation.value = newSettings.invocation;
+      jdkVersion.value =
+        jdkVersionMap.find((v) => v.value === newSettings.jdk_version)?.label || "";
+      jdkBuild.value = jdkBuildMap.find((v) => v.value === newSettings.jdk_build)?.label || "";
+    }
+  },
+  { immediate: true },
 );
-const jdkBuild = ref(
-  jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build)?.label || "",
-);
+
 const isUpdating = ref(false);
 
 const compatibleJavaVersions = computed(() => {
@@ -155,14 +165,25 @@ const saveStartup = async () => {
     const jdkVersionKey = jdkVersionMap.find((v) => v.label === jdkVersion.value)?.value;
     const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value;
     await props.server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    await props.server.refresh(["startup"]);
+
+    if (props.server.startup) {
+      invocation.value = props.server.startup.invocation;
+      jdkVersion.value =
+        jdkVersionMap.find((v) => v.value === props.server.startup?.jdk_version)?.label || "";
+      jdkBuild.value =
+        jdkBuildMap.find((v) => v.value === props.server.startup?.jdk_build)?.label || "";
+    }
+
     addNotification({
       group: "serverOptions",
       type: "success",
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
     });
-    await props.server.refresh();
   } catch (error) {
     console.error(error);
     addNotification({
@@ -177,7 +198,7 @@ const saveStartup = async () => {
 };
 
 const resetStartup = () => {
-  invocation.value = startupSettings.value?.invocation;
+  invocation.value = startupSettings.value?.invocation ?? "";
   jdkVersion.value =
     jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "";
   jdkBuild.value =
@@ -185,7 +206,7 @@ const resetStartup = () => {
 };
 
 const resetToDefault = () => {
-  invocation.value = startupSettings.value?.original_invocation;
+  invocation.value = startupSettings.value?.original_invocation ?? "";
 };
 </script>
 
