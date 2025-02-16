@@ -260,7 +260,25 @@
     </div>
     <NewModal ref="viewLogModal" class="z-[9999]" header="Viewing selected logs">
       <div class="text-contrast">
-        <pre class="select-text overflow-x-auto whitespace-pre font-mono">{{ selectedLog }}</pre>
+        <pre
+          class="select-text overflow-x-auto whitespace-pre rounded-lg bg-bg font-mono"
+          v-html="processedLogWithLinks"
+        ></pre>
+        <div v-if="detectedLinks.length" class="border-contrast/20 mt-4 border-t pt-4">
+          <h2>Detected Links</h2>
+          <ul class="flex flex-col gap-2">
+            <li v-for="(link, index) in detectedLinks" :key="index">
+              <a
+                :href="link"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-sm text-blue hover:underline"
+              >
+                {{ link }}
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </NewModal>
   </div>
@@ -272,6 +290,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
+import DOMPurify from "dompurify";
 import { usePyroConsole } from "~/store/console.ts";
 
 const { $cosmetics } = useNuxtApp();
@@ -983,6 +1002,38 @@ const jumpToLine = (line: string, event?: MouseEvent) => {
     });
   });
 };
+
+const sanitizeUrl = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return "#";
+    }
+    return parsed.toString();
+  } catch {
+    return "#";
+  }
+};
+
+const detectedLinks = computed(() => {
+  const urlRegex = /(https?:\/\/[^\s,<]+(?=[,\s<]|$))/g;
+  const matches = [...selectedLog.value.matchAll(urlRegex)].map((match) => match[0]);
+  return matches.filter((url) => sanitizeUrl(url) !== "#");
+});
+
+const processedLogWithLinks = computed(() => {
+  const urlRegex = /(https?:\/\/[^\s,<]+(?=[,\s<]|$))/g;
+  const sanitizedLog = DOMPurify.sanitize(selectedLog.value, {
+    ALLOWED_TAGS: [],
+    ALLOWED_ATTR: [],
+  });
+
+  return sanitizedLog.replace(urlRegex, (url) => {
+    const safeUrl = sanitizeUrl(url);
+    if (safeUrl === "#") return url;
+    return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer nofollow" class="text-blue hover:underline">${url}</a>`;
+  });
+});
 
 watch(
   () => pyroConsole.filteredOutput.value,
