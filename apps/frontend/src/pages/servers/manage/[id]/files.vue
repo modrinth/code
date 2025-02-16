@@ -189,6 +189,8 @@ const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
+const modulesLoaded = inject<Promise<void>>("modulesLoaded");
+
 const route = useRoute();
 const router = useRouter();
 
@@ -245,6 +247,8 @@ useHead({
 });
 
 const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
+  await modulesLoaded;
+
   const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
   try {
     const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
