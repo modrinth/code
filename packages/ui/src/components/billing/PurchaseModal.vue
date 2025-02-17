@@ -127,7 +127,7 @@
             <div class="font-semibold text-nowrap"></div>
           </div>
           <div
-            v-if="customMatchingProduct && (existingPlan || !customOutOfStock)"
+            v-if="customMatchingProduct && !customOutOfStock"
             class="flex sm:flex-row flex-col gap-4 w-full"
           >
             <div class="flex flex-col w-full gap-2">
@@ -737,13 +737,20 @@ const updateCustomServerStock = async () => {
 
   updateCustomServerStockTimeout = setTimeout(async () => {
     if (props.fetchCapacityStatuses) {
-      const capacityStatus = await props.fetchCapacityStatuses(mutatedProduct.value)
-      if (capacityStatus.custom?.available === 0) {
-        customOutOfStock.value = true
+      if (props.existingSubscription) {
+        if (mutatedProduct.value) {
+          const capacityStatus = await props.fetchCapacityStatuses(
+            props.existingSubscription.metadata.id,
+            mutatedProduct.value,
+          )
+          customOutOfStock.value = capacityStatus.custom?.available === 0
+          console.log(capacityStatus)
+        }
       } else {
-        customOutOfStock.value = false
+        const capacityStatus = await props.fetchCapacityStatuses(mutatedProduct.value)
+        customOutOfStock.value = capacityStatus.custom?.available === 0
       }
-    } else if (!props.existingServer) {
+    } else {
       console.error('No fetchCapacityStatuses function provided.')
       customOutOfStock.value = true
     }
