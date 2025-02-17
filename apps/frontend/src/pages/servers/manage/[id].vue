@@ -10,10 +10,10 @@
             <div class="grid place-content-center rounded-full bg-bg-blue p-4">
               <TransferIcon class="size-12 text-blue" />
             </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server Upgrading</h1>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server upgrading</h1>
           </div>
           <p class="text-lg text-secondary">
-            Your server's hardware is currently being upgraded and will be back online shortly.
+            Your server's hardware is currently being upgraded and will be back online shortly!
           </p>
         </div>
       </div>
@@ -51,13 +51,14 @@
           </div>
           <p class="text-lg text-secondary">
             {{
-              serverData.suspension_reason
-                ? `Your server has been suspended: ${serverData.suspension_reason}`
-                : "Your server has been suspended."
+              serverData.suspension_reason === "cancelled"
+                ? "Your subscription has been cancelled."
+                : serverData.suspension_reason
+                  ? `Your server has been suspended: ${serverData.suspension_reason}`
+                  : "Your server has been suspended."
             }}
             <br />
-            This is most likely due to a billing issue. Please check your billing information and
-            contact Modrinth support if you believe this is an error.
+            Contact Modrinth support if you believe this is an error.
           </p>
         </div>
         <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
@@ -427,9 +428,12 @@ const serverId = route.params.id as string;
 
 const server = await usePyroServer(serverId, ["general", "ws"]);
 
-const loadModulesPromise = Promise.resolve().then(() =>
-  server.loadModules(["content", "backups", "network", "startup", "fs"]),
-);
+const loadModulesPromise = Promise.resolve().then(() => {
+  if (server.general?.status === "suspended") {
+    return;
+  }
+  return server.loadModules(["content", "backups", "network", "startup", "fs"]);
+});
 
 provide("modulesLoaded", loadModulesPromise);
 
@@ -921,6 +925,10 @@ const cleanup = () => {
 
 onMounted(() => {
   isMounted.value = true;
+  if (server.general?.status === "suspended") {
+    isLoading.value = false;
+    return;
+  }
   if (server.error) {
     if (!server.error.message.includes("Forbidden")) {
       startPolling();
