@@ -11,6 +11,18 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-02-16T19:10:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed spacing issue on confirmation modals.`,
+  },
+  {
+    date: `2025-02-16T19:10:00-08:00`,
+    product: 'servers',
+    body: `### Improvements
+- Check for availability before allowing a server upgrade.`,
+  },
+  {
     date: `2025-02-12T19:10:00-08:00`,
     product: 'web',
     body: `### Improvements
