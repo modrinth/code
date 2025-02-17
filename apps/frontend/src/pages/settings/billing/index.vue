@@ -996,7 +996,7 @@ async function fetchCapacityStatuses(serverId, product) {
   if (product) {
     try {
       return {
-        custom: await usePyroFetch(`${serverId}/upgrade-stock`, {
+        custom: await usePyroFetch(`servers/${serverId}/upgrade-stock`, {
           method: "POST",
           body: {
             cpu: product.metadata.cpu,
