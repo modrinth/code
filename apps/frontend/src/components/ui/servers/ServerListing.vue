@@ -69,11 +69,13 @@
     </div>
     <div
       v-else-if="status === 'suspended' && suspension_reason !== 'upgrading'"
-      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
+      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
     >
-      <UiServersIconsPanelErrorIcon class="!size-5" />
-      Your server has been suspended. Please update your billing information or contact Modrinth
-      Support for more information.
+      <div class="flex flex-row gap-2">
+        <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
+        update your billing information or contact Modrinth Support for more information.
+      </div>
+      <UiCopyCode :text="`${props.server_id}`" class="ml-auto" />
     </div>
   </NuxtLink>
 </template>
