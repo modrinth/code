@@ -314,13 +314,13 @@ import {
 import { Avatar, commonMessages, ConfirmModal, ShareModal } from "@modrinth/ui";
 
 import { isAdmin } from "@modrinth/utils";
-import WorldIcon from "assets/images/utils/world.svg";
-import UpToDate from "assets/images/illustrations/up_to_date.svg";
 import ContentPageHeader from "@modrinth/ui/src/components/base/ContentPageHeader.vue";
 import SimpleBadge from "@modrinth/ui/src/components/base/SimpleBadge.vue";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import OverflowMenu from "@modrinth/ui/src/components/base/OverflowMenu.vue";
 import CollectionEditModal from "@modrinth/ui/src/components/modal/CollectionEditModal.vue";
+import UpToDate from "assets/images/illustrations/up_to_date.svg";
+import WorldIcon from "assets/images/utils/world.svg";
 import { addNotification } from "~/composables/notifs.js";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
