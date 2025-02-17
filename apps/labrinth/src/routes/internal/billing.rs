@@ -938,6 +938,7 @@ pub async fn active_servers(
     struct ActiveServer {
         pub user_id: crate::models::ids::UserId,
         pub server_id: String,
+        pub price_id: crate::models::ids::ProductPriceId,
         pub interval: PriceDuration,
     }
 
@@ -948,6 +949,7 @@ pub async fn active_servers(
                 SubscriptionMetadata::Pyro { id } => ActiveServer {
                     user_id: x.user_id.into(),
                     server_id: id.clone(),
+                    price_id: x.price_id.into(),
                     interval: x.interval,
                 },
             })
