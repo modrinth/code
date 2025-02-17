@@ -382,6 +382,7 @@
             text: err.message ?? (err.data ? err.data.description : err),
           })
       "
+      :fetch-capacity-statuses="fetchCapacityStatuses"
       :customer="customer"
       :payment-methods="paymentMethods"
       :return-url="`${config.public.siteUrl}/servers/manage`"
@@ -566,6 +567,7 @@ definePageMeta({
   middleware: "auth",
 });
 
+const app = useNuxtApp();
 const auth = await useAuth();
 const baseId = useId();
 
@@ -989,6 +991,38 @@ const showPyroUpgradeModal = async (subscription) => {
 
   pyroPurchaseModal.value.show();
 };
+
+async function fetchCapacityStatuses(serverId, product) {
+  if (product) {
+    try {
+      return {
+        custom: await usePyroFetch(`servers/${serverId}/upgrade-stock`, {
+          method: "POST",
+          body: {
+            cpu: product.metadata.cpu,
+            memory_mb: product.metadata.ram,
+            swap_mb: product.metadata.swap,
+            storage_mb: product.metadata.storage,
+          },
+        }),
+      };
+    } catch (error) {
+      console.error("Error checking server capacities:", error);
+      app.$notify({
+        group: "main",
+        title: "Error checking server capacities",
+        text: error,
+        type: "error",
+      });
+      return {
+        custom: { available: 0 },
+        small: { available: 0 },
+        medium: { available: 0 },
+        large: { available: 0 },
+      };
+    }
+  }
+}
 
 const resubscribePyro = async (subscriptionId) => {
   try {

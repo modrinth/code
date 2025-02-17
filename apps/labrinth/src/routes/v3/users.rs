@@ -28,6 +28,7 @@ use crate::{
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("user", web::get().to(user_auth_get));
     cfg.route("users", web::get().to(users_get));
+    cfg.route("user_email", web::get().to(admin_user_email));
 
     cfg.service(
         web::scope("user")
@@ -42,6 +43,62 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{id}/notifications", web::get().to(user_notifications))
             .route("{id}/oauth_apps", web::get().to(get_user_clients)),
     );
+}
+
+#[derive(Deserialize)]
+pub struct UserEmailQuery {
+    pub email: String,
+}
+
+pub async fn admin_user_email(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    email: web::Query<UserEmailQuery>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::SESSION_ACCESS]),
+    )
+    .await
+    .map(|x| x.1)?;
+
+    if !user.role.is_admin() {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to get a user from their email!"
+                .to_string(),
+        ));
+    }
+
+    let user_id = sqlx::query!(
+        "
+        SELECT id FROM users
+        WHERE LOWER(email) = LOWER($1)
+        ",
+        email.email
+    )
+    .fetch_optional(&**pool)
+    .await?
+    .map(|x| x.id)
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "The email provided is not associated with a user!".to_string(),
+        )
+    })?;
+
+    let user =
+        User::get_id(crate::database::models::UserId(user_id), &**pool, &redis)
+            .await?;
+
+    if let Some(user) = user {
+        Ok(HttpResponse::Ok().json(user))
+    } else {
+        Err(ApiError::NotFound)
+    }
 }
 
 pub async fn projects_list(
