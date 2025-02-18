@@ -115,17 +115,35 @@ const invocation = ref("");
 const jdkVersion = ref("");
 const jdkBuild = ref("");
 
+const originalInvocation = ref("");
+const originalJdkVersion = ref("");
+const originalJdkBuild = ref("");
+
 watch(
   startupSettings,
   (newSettings) => {
     if (newSettings) {
       invocation.value = newSettings.invocation;
-      jdkVersion.value =
+      originalInvocation.value = newSettings.invocation;
+
+      const jdkVersionLabel =
         jdkVersionMap.find((v) => v.value === newSettings.jdk_version)?.label || "";
-      jdkBuild.value = jdkBuildMap.find((v) => v.value === newSettings.jdk_build)?.label || "";
+      jdkVersion.value = jdkVersionLabel;
+      originalJdkVersion.value = jdkVersionLabel;
+
+      const jdkBuildLabel = jdkBuildMap.find((v) => v.value === newSettings.jdk_build)?.label || "";
+      jdkBuild.value = jdkBuildLabel;
+      originalJdkBuild.value = jdkBuildLabel;
     }
   },
   { immediate: true },
+);
+
+const hasUnsavedChanges = computed(
+  () =>
+    invocation.value !== originalInvocation.value ||
+    jdkVersion.value !== originalJdkVersion.value ||
+    jdkBuild.value !== originalJdkBuild.value,
 );
 
 const isUpdating = ref(false);
@@ -150,15 +168,6 @@ const compatibleJavaVersions = computed(() => {
 const displayedJavaVersions = computed(() => {
   return showAllVersions.value ? jdkVersionMap.map((v) => v.label) : compatibleJavaVersions.value;
 });
-
-const hasUnsavedChanges = computed(
-  () =>
-    invocation.value !== startupSettings.value?.invocation ||
-    jdkVersion.value !==
-      (jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "") ||
-    jdkBuild.value !==
-      jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build || "")?.label,
-);
 
 const saveStartup = async () => {
   try {
@@ -200,11 +209,9 @@ const saveStartup = async () => {
 };
 
 const resetStartup = () => {
-  invocation.value = startupSettings.value?.invocation ?? "";
-  jdkVersion.value =
-    jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "";
-  jdkBuild.value =
-    jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build)?.label || "";
+  invocation.value = originalInvocation.value;
+  jdkVersion.value = originalJdkVersion.value;
+  jdkBuild.value = originalJdkBuild.value;
 };
 
 const resetToDefault = () => {

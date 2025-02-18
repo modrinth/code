@@ -118,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, inject } from "vue";
 import { EyeIcon, SearchIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
 import type { Server } from "~/composables/pyroServers";
@@ -134,7 +134,9 @@ const isUpdating = ref(false);
 const searchInput = ref("");
 
 const data = computed(() => props.server.general);
+const modulesLoaded = inject<Promise<void>>("modulesLoaded");
 const { data: propsData, status } = await useAsyncData("ServerProperties", async () => {
+  await modulesLoaded;
   const rawProps = await props.server.fs?.downloadFile("server.properties");
   if (!rawProps) return null;
 
