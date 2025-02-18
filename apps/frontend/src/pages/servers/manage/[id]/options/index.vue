@@ -88,20 +88,24 @@
               >
                 <EditIcon class="h-8 w-8 text-contrast" />
               </div>
-              <img
-                v-if="icon"
-                no-shadow
-                alt="Server Icon"
-                class="h-[6rem] w-[6rem] rounded-xl"
-                :src="icon"
-              />
-              <img
-                v-else
-                no-shadow
-                alt="Server Icon"
-                class="h-[6rem] w-[6rem] rounded-xl"
-                src="~/assets/images/servers/minecraft_server_icon.png"
-              />
+              <div
+                class="experimental-styles-within flex size-24 shrink-0 overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+              >
+                <client-only>
+                  <img
+                    v-if="icon"
+                    class="h-full w-full select-none object-fill"
+                    alt="Server Icon"
+                    :src="icon"
+                  />
+                  <img
+                    v-else
+                    class="h-full w-full select-none object-fill"
+                    alt="Server Icon"
+                    src="~/assets/images/servers/minecraft_server_icon.png"
+                  />
+                </client-only>
+              </div>
             </div>
             <ButtonStyled>
               <button v-tooltip="'Synchronize icon with installed modpack'" @click="resetIcon">

@@ -369,7 +369,6 @@ const constructServerProperties = (properties: any): string => {
 const processImage = async (iconUrl: string | undefined) => {
   const sharedImage = useState<string | undefined>(
     `server-icon-${internalServerRefrence.value.serverId}`,
-    () => undefined,
   );
 
   if (sharedImage.value) {
@@ -394,12 +393,13 @@ const processImage = async (iconUrl: string | undefined) => {
               canvas.width = 512;
               canvas.height = 512;
               ctx?.drawImage(img, 0, 0, 512, 512);
-              resolve(canvas.toDataURL("image/png"));
+              const dataURL = canvas.toDataURL("image/png");
+              sharedImage.value = dataURL;
+              resolve(dataURL);
               URL.revokeObjectURL(img.src);
             };
             img.src = URL.createObjectURL(fileData);
           });
-          sharedImage.value = dataURL;
           return dataURL;
         }
       }
@@ -438,12 +438,12 @@ const processImage = async (iconUrl: string | undefined) => {
                   }
                 }, "image/png");
                 const dataURL = canvas.toDataURL("image/png");
+                sharedImage.value = dataURL;
                 resolve(dataURL);
                 URL.revokeObjectURL(img.src);
               };
               img.src = URL.createObjectURL(file);
             });
-            sharedImage.value = dataURL;
             return dataURL;
           }
         } catch (error) {
@@ -455,6 +455,7 @@ const processImage = async (iconUrl: string | undefined) => {
     console.error("Failed to process server icon:", error);
   }
 
+  sharedImage.value = undefined;
   return undefined;
 };
 
