@@ -723,7 +723,22 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
   }
 };
 
+const initializeFileEdit = async () => {
+  if (!route.query.editing || !props.server.fs) return;
+
+  const filePath = route.query.editing as string;
+  await editFile({
+    name: filePath.split("/").pop() || "",
+    type: "file",
+    path: filePath,
+  });
+};
+
 onMounted(async () => {
+  await modulesLoaded;
+
+  await initializeFileEdit();
+
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/mode-yaml");
