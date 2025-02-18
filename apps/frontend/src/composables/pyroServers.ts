@@ -1606,9 +1606,7 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
   await server.refresh(initialModules);
 
   if (deferredModules.length > 0) {
-    nextTick(async () => {
-      await server.loadModules(deferredModules);
-    });
+    await server.loadModules(deferredModules);
   }
 
   return server as Server<typeof includedModules>;
