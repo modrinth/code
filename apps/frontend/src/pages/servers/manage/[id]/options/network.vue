@@ -155,7 +155,7 @@
                 </span>
               </div>
 
-              <ButtonStyled type="standard" color="brand" @click="showNewAllocationModal">
+              <ButtonStyled type="standard" @click="showNewAllocationModal">
                 <button class="!w-full sm:!w-auto">
                   <PlusIcon />
                   <span>New allocation</span>
