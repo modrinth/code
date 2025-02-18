@@ -169,7 +169,7 @@
       </div>
     </div>
   </div>
-  <div v-else-if="!isConnected && !isWsAuthIncorrect" />
+  <UiServersOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
   <div v-else-if="isWsAuthIncorrect" class="flex flex-col">
     <h2>Could not connect to the server.</h2>
     <p>
@@ -244,19 +244,31 @@ interface ErrorData {
 const inspectingError = ref<ErrorData | null>(null);
 
 const inspectError = async () => {
-  const log = await props.server.fs?.downloadFile("logs/latest.log");
-  // @ts-ignore
-  const analysis = (await $fetch(`https://api.mclo.gs/1/analyse`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      content: log,
-    }),
-  })) as ErrorData;
+  try {
+    const log = await props.server.fs?.downloadFile("logs/latest.log");
+    if (!log) return;
 
-  inspectingError.value = analysis;
+    // @ts-ignore
+    const response = await $fetch(`https://api.mclo.gs/1/analyse`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        content: log,
+      }),
+    });
+
+    // @ts-ignore
+    if (response && response.analysis && Array.isArray(response.analysis.problems)) {
+      inspectingError.value = response as ErrorData;
+    } else {
+      inspectingError.value = null;
+    }
+  } catch (error) {
+    console.error("Failed to analyze logs:", error);
+    inspectingError.value = null;
+  }
 };
 
 const clearError = () => {
@@ -266,7 +278,7 @@ const clearError = () => {
 watch(
   () => props.serverPowerState,
   (newVal) => {
-    if (newVal === "crashed") {
+    if (newVal === "crashed" && !props.powerStateDetails?.oom_killed) {
       inspectError();
     } else {
       clearError();
@@ -274,7 +286,7 @@ watch(
   },
 );
 
-if (props.serverPowerState === "crashed") {
+if (props.serverPowerState === "crashed" && !props.powerStateDetails?.oom_killed) {
   inspectError();
 }
 
