@@ -674,7 +674,7 @@
           :auth="auth"
           :tags="tags"
         />
-        <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="mb-4">
+        <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
           {{ project.title }} has been archived. {{ project.title }} will not receive any further
           updates unless the author decides to unarchive the project.
         </MessageBanner>
