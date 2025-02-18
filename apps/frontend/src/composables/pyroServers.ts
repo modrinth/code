@@ -38,7 +38,7 @@ class PyroServerError extends Error {
   }
 }
 
-class PyroServersFetchError extends Error {
+export class PyroServersFetchError extends Error {
   constructor(
     message: string,
     public readonly statusCode?: number,
@@ -1063,8 +1063,19 @@ const modules: any = {
         data.motd = motd;
         return data;
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof PyroServersFetchError
+            ? error
+            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          status: "error",
+          server_id: serverId,
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     updateName,
@@ -1080,14 +1091,21 @@ const modules: any = {
       try {
         const mods = await PyroFetch<Mod[]>(`servers/${serverId}/mods`, {}, "content");
         return {
-          data:
-            internalServerRefrence.value.error === undefined
-              ? mods.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? ""))
-              : [],
+          data: mods.sort((a, b) => (a?.name ?? "").localeCompare(b?.name ?? "")),
         };
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof PyroServersFetchError
+            ? error
+            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          data: [],
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     install: installContent,
@@ -1097,10 +1115,22 @@ const modules: any = {
   backups: {
     get: async (serverId: string) => {
       try {
-        return { data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`, {}, "backups") };
+        return {
+          data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`, {}, "backups"),
+        };
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof PyroServersFetchError
+            ? error
+            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          data: [],
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     create: createBackup,
@@ -1124,8 +1154,18 @@ const modules: any = {
           ),
         };
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof PyroServersFetchError
+            ? error
+            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          allocations: [],
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     reserveAllocation,
@@ -1139,8 +1179,17 @@ const modules: any = {
       try {
         return await PyroFetch<Startup>(`servers/${serverId}/startup`, {}, "startup");
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof PyroServersFetchError
+            ? error
+            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     update: updateStartupSettings,
@@ -1150,8 +1199,17 @@ const modules: any = {
       try {
         return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof PyroServersFetchError
+            ? error
+            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
   },
@@ -1160,8 +1218,18 @@ const modules: any = {
       try {
         return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`, {}, "fs") };
       } catch (error) {
-        internalServerRefrence.value.setError(error);
-        return undefined;
+        const fetchError =
+          error instanceof PyroServersFetchError
+            ? error
+            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+
+        return {
+          auth: undefined,
+          error: {
+            error: fetchError,
+            timestamp: Date.now(),
+          },
+        };
       }
     },
     listDirContents,
@@ -1469,12 +1537,44 @@ type FSFunctions = {
   downloadFile: (path: string, raw?: boolean) => Promise<any>;
 };
 
-type GeneralModule = General & GeneralFunctions;
-type ContentModule = { data: Mod[] } & ContentFunctions;
-type BackupsModule = { data: Backup[] } & BackupFunctions;
-type NetworkModule = { allocations: Allocation[] } & NetworkFunctions;
-type StartupModule = Startup & StartupFunctions;
-export type FSModule = { auth: JWTAuth } & FSFunctions;
+type ModuleError = {
+  error: PyroServersFetchError;
+  timestamp: number;
+};
+
+type GeneralModule = General &
+  GeneralFunctions & {
+    error?: ModuleError;
+  };
+
+type ContentModule = {
+  data: Mod[];
+  error?: ModuleError;
+} & ContentFunctions;
+
+type BackupsModule = {
+  data: Backup[];
+  error?: ModuleError;
+} & BackupFunctions;
+
+type NetworkModule = {
+  allocations: Allocation[];
+  error?: ModuleError;
+} & NetworkFunctions;
+
+type StartupModule = Startup &
+  StartupFunctions & {
+    error?: ModuleError;
+  };
+
+type WSModule = JWTAuth & {
+  error?: ModuleError;
+};
+
+type FSModule = {
+  auth: JWTAuth;
+  error?: ModuleError;
+} & FSFunctions;
 
 type ModulesMap = {
   general: GeneralModule;
@@ -1482,7 +1582,7 @@ type ModulesMap = {
   backups: BackupsModule;
   network: NetworkModule;
   startup: StartupModule;
-  ws: JWTAuth;
+  ws: WSModule;
   fs: FSModule;
 };
 

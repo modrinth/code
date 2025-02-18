@@ -67,7 +67,10 @@
       </div>
     </div>
     <div
-      v-else-if="server.error && server.error.message.includes('Forbidden')"
+      v-else-if="
+        server.general?.error?.error.statusCode === 403 ||
+        server.general?.error?.error.statusCode === 404
+      "
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -83,14 +86,15 @@
             this is an error, please contact Modrinth support.
           </p>
         </div>
-        <UiCopyCode :text="server.error ? String(server.error) : 'Unknown error'" />
+        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+
         <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
           <button class="mt-6 !w-full">Go back to all servers</button>
         </ButtonStyled>
       </div>
     </div>
     <div
-      v-else-if="server.error && server.error.message.includes('Service Unavailable')"
+      v-else-if="server.general?.error?.error.statusCode === 503"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -142,7 +146,7 @@
       </div>
     </div>
     <div
-      v-else-if="server.error"
+      v-else-if="server.general?.error"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -165,7 +169,7 @@
             temporary network issue. You'll be reconnected automatically.
           </p>
         </div>
-        <UiCopyCode :text="server.error ? String(server.error) : 'Unknown error'" />
+        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
         <ButtonStyled
           :disabled="formattedTime !== '00'"
           size="large"
@@ -438,10 +442,12 @@ const loadModulesPromise = Promise.resolve().then(() => {
 provide("modulesLoaded", loadModulesPromise);
 
 watch(
-  () => server.error,
-  (newError) => {
+  () => [server.general?.error, server.ws?.error],
+  ([generalError, wsError]) => {
     if (server.general?.status === "suspended") return;
-    if (newError && !newError.message.includes("Forbidden")) {
+
+    const error = generalError?.error || wsError?.error;
+    if (error && error.statusCode !== 403) {
       startPolling();
     }
   },
@@ -452,7 +458,6 @@ const errorMessage = ref("An unexpected error occurred.");
 const errorLog = ref("");
 const errorLogFile = ref("");
 const serverData = computed(() => server.general);
-const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const pyroConsole = usePyroConsole();
@@ -466,6 +471,7 @@ const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>();
 const uptimeSeconds = ref(0);
 const firstConnect = ref(true);
 const copied = ref(false);
+const error = ref<Error | null>(null);
 
 const initialConsoleMessage = [
   "   __________________________________________________",
