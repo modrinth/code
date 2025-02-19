@@ -521,6 +521,9 @@
   "report.not-for.bug-reports": {
     "message": "Bug reports"
   },
+  "report.not-for.bug-reports.description": {
+    "message": "You can report bugs to their <issues-link>issue tracker</issues-link>."
+  },
   "report.not-for.dmca": {
     "message": "DMCA takedowns"
   },
