@@ -476,79 +476,81 @@
       <div class="flex justify-center p-6 text-center text-sm font-medium">
         {{ formatMessage(footerMessages.legalDisclaimer) }}
       </div>
-      <div
-        class="footer-brand-background mx-auto grid max-w-screen-xl grid-cols-1 flex-col gap-4 rounded-t-[2.25rem] border-0 border-t-[1px] border-solid p-7 pb-24 text-primary sm:px-12 md:grid-cols-[1fr_2fr] md:py-12 lg:grid-cols-[auto_auto_auto_auto_auto]"
-      >
+      <div class="footer-brand-background border-0 border-t-[1px] border-solid">
         <div
-          class="flex flex-col items-center gap-3 md:items-start"
-          role="region"
-          aria-label="Modrinth information"
+          class="mx-auto grid max-w-screen-xl grid-cols-1 flex-col gap-4 p-7 pb-24 text-primary sm:px-12 md:grid-cols-[1fr_2fr] md:py-12 lg:grid-cols-[auto_auto_auto_auto_auto]"
         >
-          <BrandTextLogo
-            aria-hidden="true"
-            class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
-            @click="developerModeIncrement()"
-          />
-          <div class="flex flex-wrap justify-center gap-px sm:-mx-2">
-            <ButtonStyled
-              v-for="(social, index) in socialLinks"
-              :key="`footer-social-${index}`"
-              circular
-              type="transparent"
-            >
-              <a
-                v-tooltip="social.label"
-                :href="social.href"
-                target="_blank"
-                :rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
-              >
-                <component :is="social.icon" class="h-5 w-5" />
-              </a>
-            </ButtonStyled>
-          </div>
-          <div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
-            <p class="m-0">
-              <IntlFormatted :message-id="footerMessages.openSource">
-                <template #github-link="{ children }">
-                  <a
-                    href="https://github.com/modrinth/code"
-                    class="text-brand hover:underline"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    <component :is="() => children" />
-                  </a>
-                </template>
-              </IntlFormatted>
-            </p>
-            <p class="m-0">© 2024 Rinth, Inc.</p>
-          </div>
-        </div>
-        <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
           <div
-            v-for="group in footerLinks"
-            :key="group.label"
-            class="flex flex-col items-center gap-3 sm:items-start"
+            class="flex flex-col items-center gap-3 md:items-start"
+            role="region"
+            aria-label="Modrinth information"
           >
-            <h3 class="m-0 text-base text-contrast">{{ group.label }}</h3>
-            <template v-for="item in group.links" :key="item.label">
-              <nuxt-link
-                v-if="item.href.startsWith('/')"
-                :to="item.href"
-                class="w-fit hover:underline"
+            <BrandTextLogo
+              aria-hidden="true"
+              class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+              @click="developerModeIncrement()"
+            />
+            <div class="flex flex-wrap justify-center gap-px sm:-mx-2">
+              <ButtonStyled
+                v-for="(social, index) in socialLinks"
+                :key="`footer-social-${index}`"
+                circular
+                type="transparent"
               >
-                {{ item.label }}
-              </nuxt-link>
-              <a
-                v-else
-                :href="item.href"
-                class="w-fit hover:underline"
-                target="_blank"
-                rel="noopener"
-              >
-                {{ item.label }}
-              </a>
-            </template>
+                <a
+                  v-tooltip="social.label"
+                  :href="social.href"
+                  target="_blank"
+                  :rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
+                >
+                  <component :is="social.icon" class="h-5 w-5" />
+                </a>
+              </ButtonStyled>
+            </div>
+            <div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
+              <p class="m-0">
+                <IntlFormatted :message-id="footerMessages.openSource">
+                  <template #github-link="{ children }">
+                    <a
+                      href="https://github.com/modrinth/code"
+                      class="text-brand hover:underline"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      <component :is="() => children" />
+                    </a>
+                  </template>
+                </IntlFormatted>
+              </p>
+              <p class="m-0">© 2024 Rinth, Inc.</p>
+            </div>
+          </div>
+          <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
+            <div
+              v-for="group in footerLinks"
+              :key="group.label"
+              class="flex flex-col items-center gap-3 sm:items-start"
+            >
+              <h3 class="m-0 text-base text-contrast">{{ group.label }}</h3>
+              <template v-for="item in group.links" :key="item.label">
+                <nuxt-link
+                  v-if="item.href.startsWith('/')"
+                  :to="item.href"
+                  class="w-fit hover:underline"
+                >
+                  {{ item.label }}
+                </nuxt-link>
+                <a
+                  v-else
+                  :href="item.href"
+                  class="w-fit hover:underline"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {{ item.label }}
+                </a>
+              </template>
+            </div>
           </div>
         </div>
       </div>
