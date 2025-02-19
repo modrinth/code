@@ -38,17 +38,17 @@
 </template>
 
 <script lang="ts" setup>
-import { MarkdownEditor } from "@modrinth/ui";
 import { SaveIcon } from "@modrinth/assets";
+import { MarkdownEditor } from "@modrinth/ui";
 import { type Project, type TeamMember, TeamMemberPermission } from "@modrinth/utils";
-import { useImageUpload } from "~/composables/image-upload.ts";
 import { computed, ref } from "vue";
+import { useImageUpload } from "~/composables/image-upload.ts";
 
 const props = defineProps<{
   project: Project;
   allMembers: TeamMember[];
   currentMember: TeamMember | undefined;
-  patchProject: (payload: Object, quiet?: boolean) => Object;
+  patchProject: (payload: object, quiet?: boolean) => object;
 }>();
 
 const description = ref(props.project.body);
