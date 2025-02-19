@@ -1030,6 +1030,12 @@ const footerLinks = [
         ),
       },
       {
+        href: "/news/changelog",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.about.changelog", defaultMessage: "Changelog" }),
+        ),
+      },
+      {
         href: "https://status.modrinth.com",
         label: formatMessage(
           defineMessage({ id: "layout.footer.about.status", defaultMessage: "Status" }),
@@ -1135,6 +1141,15 @@ const footerLinks = [
           defineMessage({
             id: "layout.footer.legal.privacy-policy",
             defaultMessage: "Privacy Policy",
+          }),
+        ),
+      },
+      {
+        href: "/legal/security",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.legal.security-notice",
+            defaultMessage: "Security Notice",
           }),
         ),
       },
