@@ -300,8 +300,8 @@ import Chips from './Chips.vue'
 const props = withDefaults(
   defineProps<{
     modelValue: string
-    disabled: boolean
-    headingButtons: boolean
+    disabled?: boolean
+    headingButtons?: boolean
     /**
      * @param file The file to upload
      * @throws If the file is invalid or the upload fails
@@ -947,5 +947,9 @@ function openVideoModal() {
   opacity: 0.6;
   pointer-events: none;
   cursor: not-allowed;
+}
+
+:deep(.cm-content) {
+  overflow: auto;
 }
 </style>

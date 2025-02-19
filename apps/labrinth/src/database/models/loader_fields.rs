@@ -757,7 +757,7 @@ impl VersionField {
                     l.field_id.0,
                     l.version_id.0,
                     l.int_value,
-                    l.enum_value.as_ref().map(|e| e.0),
+                    l.enum_value.as_ref().map(|e| e.0).unwrap_or(-1),
                     l.string_value.clone(),
                 )
             })
@@ -772,7 +772,7 @@ impl VersionField {
                 &version_ids[..],
                 &int_values[..] as &[Option<i32>],
                 &string_values[..] as &[Option<String>],
-                &enum_values[..] as &[Option<i32>]
+                &enum_values[..] as &[i32]
             )
             .execute(&mut **transaction)
             .await?;

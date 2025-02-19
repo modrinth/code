@@ -29,6 +29,7 @@ async function copyText() {
 
 <style lang="scss" scoped>
 .code {
+  color: var(--color-text);
   display: inline-flex;
   grid-gap: 0.5rem;
   font-family: var(--mono-font);

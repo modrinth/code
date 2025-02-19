@@ -61,11 +61,6 @@ pub async fn project_search(
     let facets: Option<Vec<Vec<String>>> = if let Some(facets) = info.facets {
         let facets = serde_json::from_str::<Vec<Vec<String>>>(&facets)?;
 
-        // These loaders specifically used to be combined with 'mod' to be a plugin, but now
-        // they are their own loader type. We will convert 'mod' to 'mod' OR 'plugin'
-        // as it essentially was before.
-        let facets = v2_reroute::convert_plugin_loader_facets_v3(facets);
-
         Some(
             facets
                 .into_iter()

@@ -448,6 +448,9 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("PAYPAL_WEBHOOK_ID");
     failed |= check_var::<String>("PAYPAL_CLIENT_ID");
     failed |= check_var::<String>("PAYPAL_CLIENT_SECRET");
+    failed |= check_var::<String>("PAYPAL_NVP_USERNAME");
+    failed |= check_var::<String>("PAYPAL_NVP_PASSWORD");
+    failed |= check_var::<String>("PAYPAL_NVP_SIGNATURE");
 
     failed |= check_var::<String>("HCAPTCHA_SECRET");
 
@@ -482,9 +485,14 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("STRIPE_API_KEY");
     failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");
 
-    failed |= check_var::<u64>("ADITUDE_API_KEY");
+    failed |= check_var::<String>("ADITUDE_API_KEY");
 
     failed |= check_var::<String>("PYRO_API_KEY");
+
+    failed |= check_var::<String>("BREX_API_URL");
+    failed |= check_var::<String>("BREX_API_KEY");
+
+    failed |= check_var::<String>("DELPHI_URL");
 
     failed
 }

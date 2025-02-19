@@ -1,10 +1,17 @@
 <script setup>
-import { onUnmounted, ref, computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { SpinnerIcon, GameIcon, TimerIcon, StopCircleIcon, PlayIcon } from '@modrinth/assets'
-import { ButtonStyled, Avatar } from '@modrinth/ui'
+import {
+  DownloadIcon,
+  GameIcon,
+  PlayIcon,
+  SpinnerIcon,
+  StopCircleIcon,
+  TimerIcon,
+} from '@modrinth/assets'
+import { Avatar, ButtonStyled } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { kill, run } from '@/helpers/profile'
+import { finish_install, kill, run } from '@/helpers/profile'
 import { get_by_profile_path } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
 import { handleError } from '@/store/state.js'
@@ -12,11 +19,9 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { trackEvent } from '@/helpers/analytics'
 import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { formatCategory } from '@modrinth/utils'
 
-dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const props = defineProps({
@@ -37,12 +42,15 @@ const props = defineProps({
 })
 
 const playing = ref(false)
-
+const loading = ref(false)
 const modLoading = computed(
   () =>
-    currentEvent.value === 'installing' || (currentEvent.value === 'launched' && !playing.value),
+    loading.value ||
+    currentEvent.value === 'installing' ||
+    (currentEvent.value === 'launched' && !playing.value),
 )
-const installing = computed(() => props.instance.install_stage !== 'installed')
+const installing = computed(() => props.instance.install_stage.includes('installing'))
+const installed = computed(() => props.instance.install_stage === 'installed')
 
 const router = useRouter()
 
@@ -58,6 +66,7 @@ const checkProcess = async () => {
 
 const play = async (e, context) => {
   e?.stopPropagation()
+  loading.value = true
   await run(props.instance.path)
     .catch((err) => handleSevereError(err, { profilePath: props.instance.path }))
     .finally(() => {
@@ -67,6 +76,7 @@ const play = async (e, context) => {
         source: context,
       })
     })
+  loading.value = false
 }
 
 const stop = async (e, context) => {
@@ -80,6 +90,12 @@ const stop = async (e, context) => {
     game_version: props.instance.game_version,
     source: context,
   })
+}
+
+const repair = async (e) => {
+  e?.stopPropagation()
+
+  await finish_install(props.instance)
 }
 
 const openFolder = async () => {
@@ -120,7 +136,7 @@ onUnmounted(() => unlisten())
 <template>
   <template v-if="compact">
     <div
-      class="button-base card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer active:scale-[0.98] transition-transform"
+      class="card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer hover:brightness-90 transition-all"
       @click="seeInstance"
       @mouseenter="checkProcess"
     >
@@ -169,7 +185,7 @@ onUnmounted(() => unlisten())
     >
       <div class="relative flex items-center justify-center">
         <Avatar
-          size="96px"
+          size="48px"
           :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
           :tint-by="instance.path"
           alt="Mod card"
@@ -191,11 +207,21 @@ onUnmounted(() => unlisten())
             v-else-if="modLoading || installing"
             v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
             class="animate-spin w-8 h-8"
+            tabindex="-1"
           />
+          <ButtonStyled v-else-if="!installed" size="large" color="brand" circular>
+            <button
+              v-tooltip="'Repair'"
+              class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
+              @click="(e) => repair(e)"
+            >
+              <DownloadIcon />
+            </button>
+          </ButtonStyled>
           <ButtonStyled v-else size="large" color="brand" circular>
             <button
               v-tooltip="'Play'"
-              class="transition-all scale-75 group-hover:scale-100 origin-bottom opacity-0 group-hover:opacity-100 card-shadow"
+              class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
               @click="(e) => play(e, 'InstanceCard')"
               @mousehover="checkProcess"
             >
@@ -205,24 +231,13 @@ onUnmounted(() => unlisten())
         </div>
       </div>
       <div class="flex flex-col gap-1">
-        <p class="m-0 text-lg font-bold text-contrast leading-tight line-clamp-2">
+        <p class="m-0 text-md font-bold text-contrast leading-tight line-clamp-1">
           {{ instance.name }}
         </p>
         <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold mt-auto">
           <GameIcon class="shrink-0" />
           <span class="text-sm">
             {{ formatCategory(instance.loader) }} {{ instance.game_version }}
-          </span>
-        </div>
-        <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
-          <TimerIcon class="shrink-0" />
-          <span class="text-sm line-clamp-1">
-            Played for
-            {{
-              dayjs
-                .duration(instance.recent_time_played + instance.submitted_time_played, 'seconds')
-                .humanize()
-            }}
           </span>
         </div>
       </div>

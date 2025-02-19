@@ -1,7 +1,27 @@
 <template>
   <div class="relative h-full w-full select-none overflow-y-auto">
+    <div v-if="server.fs?.error" class="flex w-full flex-col items-center justify-center gap-4 p-4">
+      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+              <IssuesIcon class="size-12 text-orange" />
+            </div>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load properties</h1>
+          </div>
+          <p class="text-lg text-secondary">
+            We couldn't access your server's properties. Here's what we know:
+            <span class="break-all font-mono">{{ JSON.stringify(server.fs.error) }}</span>
+          </p>
+          <ButtonStyled size="large" color="brand" @click="() => server.refresh(['fs'])">
+            <button class="mt-6 !w-full">Retry</button>
+          </ButtonStyled>
+        </div>
+      </div>
+    </div>
+
     <div
-      v-if="propsData && status === 'success'"
+      v-else-if="propsData && status === 'success'"
       class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto"
     >
       <div class="card flex flex-col gap-4">
@@ -17,7 +37,7 @@
             >
               Minecraft Wiki
             </NuxtLink>
-            has more detailed information about each property.
+            has more detailed information.
           </div>
         </div>
         <div class="flex flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
@@ -118,8 +138,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
-import { EyeIcon, SearchIcon } from "@modrinth/assets";
+import { ref, watch, computed, inject } from "vue";
+import { EyeIcon, SearchIcon, IssuesIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
 import type { Server } from "~/composables/pyroServers";
 
@@ -134,10 +154,31 @@ const isUpdating = ref(false);
 const searchInput = ref("");
 
 const data = computed(() => props.server.general);
-const { data: propsData, status } = await useAsyncData(
-  "ServerProperties",
-  async () => await props.server.general?.fetchConfigFile("ServerProperties"),
-);
+const modulesLoaded = inject<Promise<void>>("modulesLoaded");
+const { data: propsData, status } = await useAsyncData("ServerProperties", async () => {
+  await modulesLoaded;
+  const rawProps = await props.server.fs?.downloadFile("server.properties");
+  if (!rawProps) return null;
+
+  const properties: Record<string, any> = {};
+  const lines = rawProps.split("\n");
+
+  for (const line of lines) {
+    if (line.startsWith("#") || !line.includes("=")) continue;
+    const [key, ...valueParts] = line.split("=");
+    let value = valueParts.join("=");
+
+    if (value.toLowerCase() === "true" || value.toLowerCase() === "false") {
+      value = value.toLowerCase() === "true";
+    } else if (!isNaN(value as any) && value !== "") {
+      value = Number(value);
+    }
+
+    properties[key.trim()] = value;
+  }
+
+  return properties;
+});
 
 const liveProperties = ref<Record<string, any>>({});
 const originalProperties = ref<Record<string, any>>({});

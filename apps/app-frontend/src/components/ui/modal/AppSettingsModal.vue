@@ -10,7 +10,7 @@ import {
   CoffeeIcon,
 } from '@modrinth/assets'
 import { TabbedModal } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useVIntl, defineMessage } from '@vintl/vintl'
 import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
 import JavaSettings from '@/components/ui/settings/JavaSettings.vue'
@@ -22,6 +22,7 @@ import { version as getOsVersion, platform as getOsPlatform } from '@tauri-apps/
 import { useTheming } from '@/store/state'
 import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { get, set } from '@/helpers/settings'
 
 const themeStore = useTheming()
 
@@ -99,6 +100,28 @@ defineExpose({ show, isOpen })
 const version = await getVersion()
 const osPlatform = getOsPlatform()
 const osVersion = getOsVersion()
+const settings = ref(await get())
+
+watch(
+  settings,
+  async () => {
+    await set(settings.value)
+  },
+  { deep: true },
+)
+
+function devModeCount() {
+  devModeCounter.value++
+  if (devModeCounter.value > 5) {
+    themeStore.devMode = !themeStore.devMode
+    settings.value.developer_mode = !!themeStore.devMode
+    devModeCounter.value = 0
+
+    if (!themeStore.devMode && tabs[modal.value.selectedTab].developerOnly) {
+      modal.value.setTab(0)
+    }
+  }
+}
 </script>
 <template>
   <ModalWrapper ref="modal">
@@ -118,19 +141,7 @@ const osVersion = getOsVersion()
             <button
               class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation"
               :class="{ 'text-brand': themeStore.devMode, 'text-secondary': !themeStore.devMode }"
-              @click="
-                () => {
-                  devModeCounter++
-                  if (devModeCounter > 5) {
-                    themeStore.devMode = !themeStore.devMode
-                    devModeCounter = 0
-
-                    if (!themeStore.devMode && tabs[modal.selectedTab].developerOnly) {
-                      modal.setTab(0)
-                    }
-                  }
-                }
-              "
+              @click="devModeCount"
             >
               <ModrinthIcon class="w-6 h-6" />
             </button>

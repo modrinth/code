@@ -1,5 +1,6 @@
 use actix_cors::Cors;
 
+// Updating this? Remember to update the ratelimit CORS too!
 pub fn default_cors() -> Cors {
     Cors::default()
         .allow_any_origin()

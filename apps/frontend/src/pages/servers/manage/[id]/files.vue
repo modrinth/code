@@ -25,113 +25,35 @@
       @delete="handleDeleteItem"
     />
 
-    <div
+    <FilesUploadDragAndDrop
       class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
-      @dragenter.prevent="handleDragEnter"
-      @dragover.prevent="handleDragOver"
-      @dragleave.prevent="handleDragLeave"
-      @drop.prevent="handleDrop"
+      @files-dropped="handleDroppedFiles"
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
         <div v-if="!isEditing" class="contents">
           <UiServersFilesBrowseNavbar
             :breadcrumb-segments="breadcrumbSegments"
             :search-query="searchQuery"
-            :sort-method="sortMethod"
+            :current-filter="viewFilter"
             @navigate="navigateToSegment"
-            @sort="sortFiles"
             @create="showCreateModal"
             @upload="initiateFileUpload"
+            @filter="handleFilter"
             @update:search-query="searchQuery = $event"
           />
-          <Transition
-            name="upload-status"
-            @enter="onUploadStatusEnter"
-            @leave="onUploadStatusLeave"
-          >
-            <div
-              v-if="isUploading"
-              ref="uploadStatusRef"
-              class="upload-status rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow text-contrast"
-            >
-              <div class="flex flex-col p-4 text-sm">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2 font-bold">
-                    <FolderOpenIcon class="size-4" />
-                    <span>
-                      File Uploads{{
-                        activeUploads.length > 0 ? ` - ${activeUploads.length} left` : ""
-                      }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="mt-2 space-y-2">
-                  <div
-                    v-for="item in uploadQueue"
-                    :key="item.file.name"
-                    class="flex h-6 items-center justify-between gap-2 text-xs"
-                  >
-                    <div class="flex flex-1 items-center gap-2 truncate">
-                      <transition-group name="status-icon" mode="out-in">
-                        <UiServersPanelSpinner
-                          v-show="item.status === 'uploading'"
-                          key="spinner"
-                          class="absolute !size-4"
-                        />
-                        <CheckCircleIcon
-                          v-show="item.status === 'completed'"
-                          key="check"
-                          class="absolute size-4 text-green"
-                        />
-                        <XCircleIcon
-                          v-show="item.status === 'error' || item.status === 'cancelled'"
-                          key="error"
-                          class="absolute size-4 text-red"
-                        />
-                      </transition-group>
-                      <span class="ml-6 truncate">{{ item.file.name }}</span>
-                      <span class="text-secondary">{{ item.size }}</span>
-                    </div>
-                    <div class="flex min-w-[80px] items-center justify-end gap-2">
-                      <template v-if="item.status === 'completed'">
-                        <span>Done</span>
-                      </template>
-                      <template v-else-if="item.status === 'error'">
-                        <span class="text-red">Failed - File already exists</span>
-                      </template>
-                      <template v-else>
-                        <template v-if="item.status === 'uploading'">
-                          <span>{{ item.progress }}%</span>
-                          <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
-                            <div
-                              class="h-full bg-contrast transition-all duration-200"
-                              :style="{ width: item.progress + '%' }"
-                            />
-                          </div>
-                          <ButtonStyled color="red" type="transparent" @click="cancelUpload(item)">
-                            <button>Cancel</button>
-                          </ButtonStyled>
-                        </template>
-                        <template v-else-if="item.status === 'cancelled'">
-                          <span class="text-red">Cancelled</span>
-                        </template>
-                        <template v-else>
-                          <span>{{ item.progress }}%</span>
-                          <div class="h-1 w-20 overflow-hidden rounded-full bg-bg">
-                            <div
-                              class="h-full bg-contrast transition-all duration-200"
-                              :style="{ width: item.progress + '%' }"
-                            />
-                          </div>
-                        </template>
-                      </template>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Transition>
+          <UiServersFilesLabelBar
+            :sort-field="sortMethod"
+            :sort-desc="sortDesc"
+            @sort="handleSort"
+          />
+          <FilesUploadDropdown
+            v-if="props.server.fs"
+            ref="uploadDropdownRef"
+            class="rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow"
+            :current-path="currentPath"
+            :fs="props.server.fs"
+            @upload-complete="refreshList()"
+          />
         </div>
 
         <UiServersFilesEditingNavbar
@@ -177,7 +99,6 @@
         </div>
 
         <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
-          <UiServersFilesLabelBar />
           <UiServersFileVirtualList
             :items="filteredItems"
             @delete="showDeleteModal"
@@ -220,7 +141,7 @@
           <p class="mt-2 text-xl">Drop files here to upload</p>
         </div>
       </div>
-    </div>
+    </FilesUploadDragAndDrop>
 
     <UiServersFilesContextMenu
       ref="contextMenu"
@@ -238,9 +159,10 @@
 
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
-import { UploadIcon, FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
+import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
+import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 
 interface BaseOperation {
   type: "move" | "rename";
@@ -263,17 +185,11 @@ interface RenameOperation extends BaseOperation {
 
 type Operation = MoveOperation | RenameOperation;
 
-interface UploadItem {
-  file: File;
-  progress: number;
-  status: "pending" | "uploading" | "completed" | "error" | "cancelled";
-  size: string;
-  uploader?: any;
-}
-
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
+
+const modulesLoaded = inject<Promise<void>>("modulesLoaded");
 
 const route = useRoute();
 const router = useRouter();
@@ -286,7 +202,8 @@ const operationHistory = ref<Operation[]>([]);
 const redoStack = ref<Operation[]>([]);
 
 const searchQuery = ref("");
-const sortMethod = ref("default");
+const sortMethod = ref("name");
+const sortDesc = ref(false);
 
 const maxResults = 100;
 const currentPage = ref(1);
@@ -312,54 +229,26 @@ const isEditingImage = ref(false);
 const imagePreview = ref();
 
 const isDragging = ref(false);
-const dragCounter = ref(0);
 
-const uploadStatusRef = ref<HTMLElement | null>(null);
-const isUploading = computed(() => uploadQueue.value.length > 0);
-const uploadQueue = ref<UploadItem[]>([]);
-
-const activeUploads = computed(() =>
-  uploadQueue.value.filter((item) => item.status === "pending" || item.status === "uploading"),
-);
-
-const onUploadStatusEnter = (el: Element) => {
-  const height = (el as HTMLElement).scrollHeight;
-  (el as HTMLElement).style.height = "0";
-  // eslint-disable-next-line no-void
-  void (el as HTMLElement).offsetHeight;
-  (el as HTMLElement).style.height = `${height}px`;
-};
-
-const onUploadStatusLeave = (el: Element) => {
-  const height = (el as HTMLElement).scrollHeight;
-  (el as HTMLElement).style.height = `${height}px`;
-  // eslint-disable-next-line no-void
-  void (el as HTMLElement).offsetHeight;
-  (el as HTMLElement).style.height = "0";
-};
-
-watch(
-  uploadQueue,
-  () => {
-    if (!uploadStatusRef.value) return;
-    const el = uploadStatusRef.value;
-    const itemsHeight = uploadQueue.value.length * 32;
-    const headerHeight = 12;
-    const gap = 8;
-    const padding = 32;
-    const totalHeight = padding + headerHeight + gap + itemsHeight;
-    el.style.height = `${totalHeight}px`;
-  },
-  { deep: true },
-);
+const uploadDropdownRef = ref();
 
 const data = computed(() => props.server.general);
+
+const viewFilter = ref("all");
+
+const handleFilter = (type: string) => {
+  viewFilter.value = type;
+  sortMethod.value = "name";
+  sortDesc.value = false;
+};
 
 useHead({
   title: computed(() => `Files - ${data.value?.name ?? "Server"} - Modrinth`),
 });
 
 const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
+  await modulesLoaded;
+
   const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
   try {
     const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
@@ -695,6 +584,51 @@ const applyDefaultSort = (items: DirectoryItem[]) => {
   });
 };
 
+const handleSort = (field: string) => {
+  if (sortMethod.value === field) {
+    sortDesc.value = !sortDesc.value;
+  } else {
+    sortMethod.value = field;
+    sortDesc.value = false;
+  }
+};
+
+const applySort = (items: DirectoryItem[]) => {
+  let result = [...items];
+
+  switch (viewFilter.value) {
+    case "filesOnly":
+      result = result.filter((item) => item.type !== "directory");
+      break;
+    case "foldersOnly":
+      result = result.filter((item) => item.type === "directory");
+      break;
+  }
+
+  const compareItems = (a: DirectoryItem, b: DirectoryItem) => {
+    if (viewFilter.value === "all") {
+      if (a.type === "directory" && b.type !== "directory") return -1;
+      if (a.type !== "directory" && b.type === "directory") return 1;
+    }
+
+    switch (sortMethod.value) {
+      case "modified":
+        return sortDesc.value
+          ? new Date(a.modified).getTime() - new Date(b.modified).getTime()
+          : new Date(b.modified).getTime() - new Date(a.modified).getTime();
+      case "created":
+        return sortDesc.value
+          ? new Date(a.created).getTime() - new Date(b.created).getTime()
+          : new Date(b.created).getTime() - new Date(a.created).getTime();
+      default:
+        return sortDesc.value ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name);
+    }
+  };
+
+  result.sort(compareItems);
+  return result;
+};
+
 const filteredItems = computed(() => {
   let result = [...items.value];
 
@@ -703,24 +637,7 @@ const filteredItems = computed(() => {
     result = result.filter((item) => item.name.toLowerCase().includes(query));
   }
 
-  switch (sortMethod.value) {
-    case "modified":
-      result.sort((a, b) => new Date(b.modified).getTime() - new Date(a.modified).getTime());
-      break;
-    case "created":
-      result.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
-      break;
-    case "filesOnly":
-      result = result.filter((item) => item.type !== "directory");
-      break;
-    case "foldersOnly":
-      result = result.filter((item) => item.type === "directory");
-      break;
-    default:
-      result = applyDefaultSort(result);
-  }
-
-  return result;
+  return applySort(result);
 });
 
 const { reset } = useInfiniteScroll(
@@ -784,10 +701,6 @@ const onAnywhereClicked = (e: MouseEvent) => {
   }
 };
 
-const sortFiles = (method: string) => {
-  sortMethod.value = method;
-};
-
 const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
 
 const editFile = async (item: { name: string; type: string; path: string }) => {
@@ -810,7 +723,22 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
   }
 };
 
+const initializeFileEdit = async () => {
+  if (!route.query.editing || !props.server.fs) return;
+
+  const filePath = route.query.editing as string;
+  await editFile({
+    name: filePath.split("/").pop() || "",
+    type: "file",
+    path: filePath,
+  });
+};
+
 onMounted(async () => {
+  await modulesLoaded;
+
+  await initializeFileEdit();
+
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/mode-yaml");
@@ -845,7 +773,9 @@ watch(
   async (newQuery) => {
     currentPage.value = 1;
     searchQuery.value = "";
-    sortMethod.value = "default";
+    viewFilter.value = "all";
+    sortMethod.value = "name";
+    sortDesc.value = false;
 
     currentPath.value = Array.isArray(newQuery.path)
       ? newQuery.path.join("")
@@ -917,135 +847,12 @@ const requestShareLink = async () => {
   }
 };
 
-const handleDragEnter = (event: DragEvent) => {
+const handleDroppedFiles = (files: File[]) => {
   if (isEditing.value) return;
-  event.preventDefault();
-  if (!event.dataTransfer?.types.includes("application/pyro-file-move")) {
-    dragCounter.value++;
-    isDragging.value = true;
-  }
-};
 
-const handleDragOver = (event: DragEvent) => {
-  if (isEditing.value) return;
-  event.preventDefault();
-};
-
-const handleDragLeave = (event: DragEvent) => {
-  if (isEditing.value) return;
-  event.preventDefault();
-  dragCounter.value--;
-  if (dragCounter.value === 0) {
-    isDragging.value = false;
-  }
-};
-
-// eslint-disable-next-line require-await
-const handleDrop = async (event: DragEvent) => {
-  if (isEditing.value) return;
-  event.preventDefault();
-  isDragging.value = false;
-  dragCounter.value = 0;
-
-  const isInternalMove = event.dataTransfer?.types.includes("application/pyro-file-move");
-  if (isInternalMove) return;
-
-  const files = event.dataTransfer?.files;
-  if (files) {
-    Array.from(files).forEach((file) => {
-      uploadFile(file);
-    });
-  }
-};
-
-const formatFileSize = (bytes: number): string => {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-};
-
-const cancelUpload = (item: UploadItem) => {
-  if (item.uploader && item.status === "uploading") {
-    item.uploader.cancel();
-    item.status = "cancelled";
-
-    setTimeout(async () => {
-      const index = uploadQueue.value.findIndex((qItem) => qItem.file.name === item.file.name);
-      if (index !== -1) {
-        uploadQueue.value.splice(index, 1);
-        await nextTick();
-      }
-    }, 5000);
-  }
-};
-
-const uploadFile = async (file: File) => {
-  const uploadItem: UploadItem = {
-    file,
-    progress: 0,
-    status: "pending",
-    size: formatFileSize(file.size),
-  };
-
-  uploadQueue.value.push(uploadItem);
-
-  try {
-    uploadItem.status = "uploading";
-    const filePath = `${currentPath.value}/${file.name}`.replace("//", "/");
-    const uploader = await props.server.fs?.uploadFile(filePath, file);
-    uploadItem.uploader = uploader;
-
-    if (uploader?.onProgress) {
-      uploader.onProgress(({ progress }: { progress: number }) => {
-        const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-        if (index !== -1) {
-          uploadQueue.value[index].progress = Math.round(progress);
-        }
-      });
-    }
-
-    await uploader?.promise;
-    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
-      uploadQueue.value[index].status = "completed";
-      uploadQueue.value[index].progress = 100;
-    }
-
-    await nextTick();
-
-    setTimeout(async () => {
-      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-      if (removeIndex !== -1) {
-        uploadQueue.value.splice(removeIndex, 1);
-        await nextTick();
-      }
-    }, 5000);
-
-    await refreshList();
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    const index = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-    if (index !== -1 && uploadQueue.value[index].status !== "cancelled") {
-      uploadQueue.value[index].status = "error";
-    }
-
-    setTimeout(async () => {
-      const removeIndex = uploadQueue.value.findIndex((item) => item.file.name === file.name);
-      if (removeIndex !== -1) {
-        uploadQueue.value.splice(removeIndex, 1);
-        await nextTick();
-      }
-    }, 5000);
-
-    if (error instanceof Error && error.message !== "Upload cancelled") {
-      addNotification({
-        group: "files",
-        title: "Upload failed",
-        text: `Failed to upload ${file.name}`,
-        type: "error",
-      });
-    }
-  }
+  files.forEach((file) => {
+    uploadDropdownRef.value?.uploadFile(file);
+  });
 };
 
 const initiateFileUpload = () => {
@@ -1055,7 +862,7 @@ const initiateFileUpload = () => {
   input.onchange = () => {
     if (input.files) {
       Array.from(input.files).forEach((file) => {
-        uploadFile(file);
+        uploadDropdownRef.value?.uploadFile(file);
       });
     }
   };

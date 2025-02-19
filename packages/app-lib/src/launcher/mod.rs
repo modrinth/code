@@ -7,11 +7,7 @@ use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
 };
 use crate::util::io;
-use crate::{
-    process,
-    state::{self as st},
-    State,
-};
+use crate::{process, state as st, State};
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{RuleAction, VersionInfo};
@@ -199,7 +195,7 @@ pub async fn install_minecraft(
     .await?;
 
     crate::api::profile::edit(&profile.path, |prof| {
-        prof.install_stage = ProfileInstallStage::Installing;
+        prof.install_stage = ProfileInstallStage::MinecraftInstalling;
 
         async { Ok(()) }
     })
@@ -431,7 +427,7 @@ pub async fn launch_minecraft(
     profile: &Profile,
 ) -> crate::Result<ProcessMetadata> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
-        || profile.install_stage == ProfileInstallStage::Installing
+        || profile.install_stage == ProfileInstallStage::MinecraftInstalling
     {
         return Err(crate::ErrorKind::LauncherError(
             "Profile is still installing".to_string(),

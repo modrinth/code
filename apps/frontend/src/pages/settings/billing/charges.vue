@@ -25,7 +25,7 @@
               </template>
             </span>
             ⋅
-            <span>{{ formatPrice(charge.amount, charge.currency_code) }}</span>
+            <span>{{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}</span>
           </div>
           <div class="flex items-center gap-1">
             <Badge :color="charge.status === 'succeeded' ? 'green' : 'red'" :type="charge.status" />
@@ -39,6 +39,7 @@
 </template>
 <script setup>
 import { Breadcrumbs, Badge } from "@modrinth/ui";
+import { formatPrice } from "@modrinth/utils";
 import { products } from "~/generated/state.json";
 
 definePageMeta({
@@ -66,19 +67,4 @@ const { data: charges } = await useAsyncData(
     },
   },
 );
-
-// TODO move to omorphia utils , duplicated from index
-function formatPrice(price, currency) {
-  const formatter = new Intl.NumberFormat(vintl.locale, {
-    style: "currency",
-    currency,
-  });
-
-  const maxDigits = formatter.resolvedOptions().maximumFractionDigits;
-
-  const convertedPrice = price / Math.pow(10, maxDigits);
-
-  return formatter.format(convertedPrice);
-}
-console.log(charges);
 </script>

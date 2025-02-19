@@ -9,7 +9,7 @@ use crate::pack::install_from::{
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, Credentials, JavaVersion, ProcessMetadata,
-    ProfileFile, ProjectType, SideType,
+    ProfileFile, ProfileInstallStage, ProjectType, SideType,
 };
 
 use crate::event::{emit::emit_profile, ProfilePayloadType};
@@ -225,7 +225,18 @@ pub async fn list() -> crate::Result<Vec<Profile>> {
 #[tracing::instrument]
 pub async fn install(path: &str, force: bool) -> crate::Result<()> {
     if let Some(profile) = get(path).await? {
-        crate::launcher::install_minecraft(&profile, None, force).await?;
+        let result =
+            crate::launcher::install_minecraft(&profile, None, force).await;
+        if result.is_err()
+            && profile.install_stage != ProfileInstallStage::Installed
+        {
+            edit(path, |prof| {
+                prof.install_stage = ProfileInstallStage::NotInstalled;
+                async { Ok(()) }
+            })
+            .await?;
+        }
+        result?;
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
             .as_error());

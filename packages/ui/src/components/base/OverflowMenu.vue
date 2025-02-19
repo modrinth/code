@@ -10,7 +10,7 @@
     <template #menu>
       <template v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)">
         <div
-          v-if="option.divider"
+          v-if="isDivider(option)"
           :key="`divider-${index}`"
           class="h-px mx-3 my-2 bg-button-bg"
         ></div>
@@ -25,15 +25,15 @@
           :v-close-popper="!option.remainOnClick"
           :action="
             option.action
-              ? (event) => {
-                  option.action(event)
+              ? (event: MouseEvent) => {
+                  option.action?.(event)
                   if (!option.remainOnClick) {
                     close()
                   }
                 }
-              : null
+              : undefined
           "
-          :link="option.link ? option.link : null"
+          :link="option.link ? option.link : undefined"
           :external="option.external ? option.external : false"
           :disabled="option.disabled"
           @click="
@@ -67,7 +67,7 @@ interface Divider extends BaseOption {
 
 interface Item extends BaseOption {
   id: string
-  action?: () => void
+  action?: (event?: MouseEvent) => void
   link?: string
   external?: boolean
   color?:
@@ -99,8 +99,8 @@ withDefaults(
   {
     options: () => [],
     disabled: false,
-    dropdownId: null,
-    tooltip: null,
+    dropdownId: undefined,
+    tooltip: undefined,
   },
 )
 
@@ -116,6 +116,10 @@ const close = () => {
 
 const open = () => {
   dropdown.value?.show()
+}
+
+function isDivider(option: BaseOption): option is Divider {
+  return 'divider' in option
 }
 
 defineExpose({ open, close })

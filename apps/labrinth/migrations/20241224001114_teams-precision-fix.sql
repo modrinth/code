@@ -1,0 +1,1 @@
+ALTER TABLE team_members ALTER payouts_split TYPE numeric(40, 20);

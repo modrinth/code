@@ -2,14 +2,14 @@ import { defineStore } from 'pinia'
 import {
   add_project_from_version,
   check_installed,
-  list,
   get,
   get_projects,
+  list,
   remove_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
-import { install as packInstall } from '@/helpers/pack.js'
+import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
 import { trackEvent } from '@/helpers/analytics.js'
 import dayjs from 'dayjs'
 

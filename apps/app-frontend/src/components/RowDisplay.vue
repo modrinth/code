@@ -25,6 +25,7 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { install as installVersion } from '@/store/install.js'
+import { openUrl } from '@tauri-apps/plugin-opener'
 
 const router = useRouter()
 
@@ -165,13 +166,7 @@ const handleOptionsClick = async (args) => {
       break
     }
     case 'open_link':
-      window.__TAURI_INVOKE__('tauri', {
-        __tauriModule: 'Shell',
-        message: {
-          cmd: 'open',
-          path: `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
-        },
-      })
+      openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
       break
     case 'copy_link':
       await navigator.clipboard.writeText(
@@ -207,13 +202,18 @@ const calculateCardsPerRow = () => {
   }
 }
 
+const rowContainer = ref(null)
+const resizeObserver = ref(null)
 onMounted(() => {
   calculateCardsPerRow()
+  resizeObserver.value = new ResizeObserver(calculateCardsPerRow)
+  resizeObserver.value.observe(rowContainer.value)
   window.addEventListener('resize', calculateCardsPerRow)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', calculateCardsPerRow)
+  resizeObserver.value.unobserve(rowContainer.value)
 })
 </script>
 
@@ -226,7 +226,7 @@ onUnmounted(() => {
     proceed-label="Delete"
     @proceed="deleteProfile"
   />
-  <div class="flex flex-col gap-4">
+  <div ref="rowContainer" class="flex flex-col gap-4">
     <div v-for="(row, rowIndex) in actualInstances" ref="rows" :key="row.label" class="row">
       <router-link
         class="flex mb-3 leading-none items-center gap-1 text-primary text-lg font-bold hover:underline group"

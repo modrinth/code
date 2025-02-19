@@ -18,7 +18,7 @@ use std::io::{Cursor, Read};
 use std::time::Duration;
 use zip::ZipArchive;
 
-const AUTOMOD_ID: i64 = 0;
+pub const AUTOMOD_ID: i64 = 0;
 
 pub struct ModerationMessages {
     pub messages: Vec<ModerationMessage>,

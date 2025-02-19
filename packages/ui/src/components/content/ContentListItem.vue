@@ -83,7 +83,7 @@ const model = defineModel<boolean>()
       </div>
       <div class="text-secondary text-xs line-clamp-1 break-all">{{ item.filename }}</div>
     </div>
-    <div class="flex justify-end gap-1">
+    <div class="flex justify-end gap-1 items-center">
       <slot name="actions" :item="item" />
     </div>
   </div>

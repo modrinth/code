@@ -180,9 +180,8 @@ pub async fn import_mmc(
     instance_folder: String, // instance folder in mmc_base_path
     profile_path: &str,      // path to profile
 ) -> crate::Result<()> {
-    let mmc_instance_path = mmc_base_path
-        .join("instances")
-        .join(instance_folder.clone());
+    let mmc_instance_path =
+        mmc_base_path.join("instances").join(instance_folder);
 
     let mmc_pack =
         io::read_to_string(&mmc_instance_path.join("mmc-pack.json")).await?;
@@ -209,9 +208,18 @@ pub async fn import_mmc(
         profile_path: profile_path.to_string(),
     };
 
-    // Managed pack
-    let backup_name = "Imported Modpack".to_string();
+    let mut minecraft_folder = mmc_instance_path.join("minecraft");
+    if !minecraft_folder.is_dir() {
+        minecraft_folder = mmc_instance_path.join(".minecraft");
+        if !minecraft_folder.is_dir() {
+            return Err(crate::ErrorKind::InputError(
+                "Instance is missing Minecraft directory".to_string(),
+            )
+            .into());
+        }
+    }
 
+    // Managed pack
     if instance_cfg.managed_pack.unwrap_or(false) {
         match instance_cfg.managed_pack_type {
             Some(MMCManagedPackType::Modrinth) => {
@@ -220,38 +228,26 @@ pub async fn import_mmc(
 
                 // Modrinth Managed Pack
                 // Kept separate as we may in the future want to add special handling for modrinth managed packs
-                let backup_name = "Imported Modrinth Modpack".to_string();
-                let minecraft_folder = mmc_base_path.join("instances").join(instance_folder).join(".minecraft");
-                import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack).await?;
+                import_mmc_unmanaged(profile_path, minecraft_folder, "Imported Modrinth Modpack".to_string(), description, mmc_pack).await?;
             }
             Some(MMCManagedPackType::Flame) | Some(MMCManagedPackType::ATLauncher) => {
                 // For flame/atlauncher managed packs
                 // Treat as unmanaged, but with 'minecraft' folder instead of '.minecraft'
-                let minecraft_folder = mmc_base_path.join("instances").join(instance_folder).join("minecraft");
-                import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack).await?;
+                import_mmc_unmanaged(profile_path, minecraft_folder, "Imported Modpack".to_string(), description, mmc_pack).await?;
             },
             Some(_) => {
                 // For managed packs that aren't modrinth, flame, atlauncher
                 // Treat as unmanaged
-                let backup_name = "ImportedModpack".to_string();
-                let minecraft_folder = mmc_base_path.join("instances").join(instance_folder).join(".minecraft");
-                import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack).await?;
+                import_mmc_unmanaged(profile_path, minecraft_folder, "ImportedModpack".to_string(), description, mmc_pack).await?;
             },
-            _ => return Err(crate::ErrorKind::InputError({
-                "Instance is managed, but managed pack type not specified in instance.cfg".to_string()
-            }).into())
+            _ => return Err(crate::ErrorKind::InputError("Instance is managed, but managed pack type not specified in instance.cfg".to_string()).into())
         }
     } else {
         // Direclty import unmanaged pack
-        let backup_name = "Imported Modpack".to_string();
-        let minecraft_folder = mmc_base_path
-            .join("instances")
-            .join(instance_folder)
-            .join(".minecraft");
         import_mmc_unmanaged(
             profile_path,
             minecraft_folder,
-            backup_name,
+            "Imported Modpack".to_string(),
             description,
             mmc_pack,
         )

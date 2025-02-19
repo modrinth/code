@@ -1,8 +1,9 @@
+export * from './billing'
+export * from './changelog'
 export * from './highlight'
+export * from './licenses'
 export * from './parse'
 export * from './projects'
+export * from './types'
 export * from './users'
 export * from './utils'
-export * from './billing'
-
-export * from './types'

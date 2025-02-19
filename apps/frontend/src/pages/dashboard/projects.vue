@@ -339,7 +339,6 @@ export default defineNuxtComponent({
     CopyCode,
     AscendingIcon,
     DescendingIcon,
-    commonMessages,
   },
   async setup() {
     const { formatMessage } = useVIntl();
@@ -374,6 +373,7 @@ export default defineNuxtComponent({
           clear: false,
         },
       },
+      commonMessages,
     };
   },
   head: {

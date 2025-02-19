@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated\n            FROM settings\n            ",
+  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar\n            FROM settings\n            ",
   "describe": {
     "columns": [
       {
@@ -127,6 +127,16 @@
         "name": "migrated",
         "ordinal": 24,
         "type_info": "Integer"
+      },
+      {
+        "name": "feature_flags",
+        "ordinal": 25,
+        "type_info": "Text"
+      },
+      {
+        "name": "toggle_sidebar",
+        "ordinal": 26,
+        "type_info": "Integer"
       }
     ],
     "parameters": {
@@ -157,8 +167,10 @@
       true,
       true,
       true,
+      false,
+      null,
       false
     ]
   },
-  "hash": "8e19c9cdb0aaa48509724e82f6e8f212c9cd2112fdba77cfeee206025af47761"
+  "hash": "d90a2f2f823fc546661a94af07249758c5ca82db396268bca5087bac88f733d9"
 }

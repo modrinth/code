@@ -41,13 +41,22 @@
       {
         "name": "display_claims!: serde_json::Value",
         "ordinal": 7,
-        "type_info": "Text"
+        "type_info": "Null"
       }
     ],
     "parameters": {
       "Right": 0
     },
-    "nullable": [false, false, false, false, false, false, false, null]
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
   },
   "hash": "6e3fa492c085ebb8e7280dd4d55cdcf73da199ea6ac05ee3ee798ece80d877cf"
 }

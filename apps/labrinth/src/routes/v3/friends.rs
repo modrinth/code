@@ -78,12 +78,13 @@ pub async fn add_friend(
             ) -> Result<(), ApiError> {
                 if let Some(pair) = sockets.auth_sockets.get(&user_id.into()) {
                     let (friend_status, _) = pair.value();
-                    if let Some(mut socket) =
-                        sockets.auth_sockets.get_mut(&friend_id.into())
+                    if let Some(socket) =
+                        sockets.auth_sockets.get(&friend_id.into())
                     {
-                        let (_, socket) = socket.value_mut();
+                        let (_, socket) = socket.value();
 
                         let _ = socket
+                            .clone()
                             .text(serde_json::to_string(
                                 &ServerToClientMessage::StatusUpdate {
                                     status: friend_status.clone(),
@@ -120,11 +121,11 @@ pub async fn add_friend(
             .insert(&mut transaction)
             .await?;
 
-            if let Some(mut socket) = db.auth_sockets.get_mut(&friend.id.into())
-            {
-                let (_, socket) = socket.value_mut();
+            if let Some(socket) = db.auth_sockets.get(&friend.id.into()) {
+                let (_, socket) = socket.value();
 
                 if socket
+                    .clone()
                     .text(serde_json::to_string(
                         &ServerToClientMessage::FriendRequest { from: user.id },
                     )?)
@@ -177,10 +178,11 @@ pub async fn remove_friend(
         )
         .await?;
 
-        if let Some(mut socket) = db.auth_sockets.get_mut(&friend.id.into()) {
-            let (_, socket) = socket.value_mut();
+        if let Some(socket) = db.auth_sockets.get(&friend.id.into()) {
+            let (_, socket) = socket.value();
 
             let _ = socket
+                .clone()
                 .text(serde_json::to_string(
                     &ServerToClientMessage::FriendRequestRejected {
                         from: user.id,

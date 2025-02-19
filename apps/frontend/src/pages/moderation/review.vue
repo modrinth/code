@@ -178,9 +178,9 @@ if (projects.value) {
 
     projects.value = projects.value.map((project) => {
       project.owner = members.value
-        .flat()
-        .find((x) => x.team_id === project.team_id && x.role === "Owner");
-      project.org = orgs.value.find((x) => x.id === project.organization);
+        ? members.value.flat().find((x) => x.team_id === project.team_id && x.role === "Owner")
+        : null;
+      project.org = orgs.value ? orgs.value.find((x) => x.id === project.organization) : null;
       project.age = project.queued ? now - app.$dayjs(project.queued) : Number.MAX_VALUE;
       project.age_warning = "";
       if (project.age > TIME_24H * 2) {

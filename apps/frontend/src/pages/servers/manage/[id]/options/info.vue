@@ -27,7 +27,7 @@
               {{ data?.sftp_host }}
             </span>
 
-            <span class="text-xs uppercase text-secondary">server address</span>
+            <span class="text-xs text-secondary">Server Address</span>
           </div>
 
           <ButtonStyled type="transparent">
@@ -41,9 +41,9 @@
         </div>
         <div class="-mt-2 flex flex-col gap-2 sm:mt-0 sm:flex-row">
           <div
-            class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
+            class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow px-4 py-2"
           >
-            <div class="flex items-center justify-between">
+            <div class="flex h-8 items-center justify-between">
               <span class="font-bold text-contrast">
                 {{ data?.sftp_username }}
               </span>
@@ -57,12 +57,12 @@
                 </button>
               </ButtonStyled>
             </div>
-            <span class="text-xs uppercase text-secondary">username</span>
+            <span class="text-xs text-secondary">Username</span>
           </div>
           <div
             class="flex w-full flex-col justify-center gap-2 rounded-xl bg-table-alternateRow p-4"
           >
-            <div class="flex items-center justify-between">
+            <div class="flex h-8 items-center justify-between">
               <span class="font-bold text-contrast">
                 {{
                   showPassword ? data?.sftp_password : "*".repeat(data?.sftp_password?.length ?? 0)
@@ -89,7 +89,7 @@
                 </ButtonStyled>
               </div>
             </div>
-            <span class="text-xs uppercase text-secondary">password</span>
+            <span class="text-xs text-secondary">Password</span>
           </div>
         </div>
       </div>

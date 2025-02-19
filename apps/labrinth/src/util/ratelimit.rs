@@ -168,6 +168,15 @@ where
                         wait_time.as_secs().into(),
                     );
 
+                    // TODO: Sentralize CORS in the CORS util.
+                    headers.insert(
+                        actix_web::http::header::HeaderName::from_str(
+                            "Access-Control-Allow-Origin",
+                        )
+                        .unwrap(),
+                        "*".parse().unwrap(),
+                    );
+
                     Box::pin(async {
                         Ok(req.into_response(response.map_into_right_body()))
                     })

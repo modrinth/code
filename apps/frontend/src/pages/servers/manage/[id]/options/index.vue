@@ -5,7 +5,7 @@
         <div class="card flex flex-col gap-4">
           <label for="server-name-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server name</span>
-            <span> Change your server's name. This name is only visible on Modrinth.</span>
+            <span> This name is only visible on Modrinth.</span>
           </label>
           <div class="flex flex-col gap-2">
             <input
@@ -64,10 +64,7 @@
         <div class="card flex flex-col gap-4">
           <label for="server-icon-field" class="flex flex-col gap-2">
             <span class="text-lg font-bold text-contrast">Server icon</span>
-            <span>
-              Change your server's icon. Changes will be visible on the Minecraft server list and on
-              Modrinth.
-            </span>
+            <span> This icon will be visible on the Minecraft server list and on Modrinth. </span>
           </label>
           <div class="flex gap-4">
             <div
@@ -91,20 +88,7 @@
               >
                 <EditIcon class="h-8 w-8 text-contrast" />
               </div>
-              <img
-                v-if="icon"
-                no-shadow
-                alt="Server Icon"
-                class="h-[6rem] w-[6rem] rounded-xl"
-                :src="icon"
-              />
-              <img
-                v-else
-                no-shadow
-                alt="Server Icon"
-                class="h-[6rem] w-[6rem] rounded-xl"
-                src="~/assets/images/servers/minecraft_server_icon.png"
-              />
+              <UiServersServerIcon :image="icon" />
             </div>
             <ButtonStyled>
               <button v-tooltip="'Synchronize icon with installed modpack'" @click="resetIcon">
@@ -116,7 +100,7 @@
         </div>
       </div>
     </div>
-    <UiServersPyroLoading v-else />
+    <div v-else />
     <UiServersSaveBanner
       :is-visible="!!hasUnsavedChanges && !!isValidServerName"
       :server="props.server"
@@ -234,67 +218,106 @@ const resetGeneral = () => {
 
 const uploadFile = async (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0];
-  // down scale the image to 64x64
+  if (!file) {
+    addNotification({
+      group: "serverOptions",
+      type: "error",
+      title: "No file selected",
+      text: "Please select a file to upload.",
+    });
+    return;
+  }
+
   const scaledFile = await new Promise<File>((resolve, reject) => {
-    if (!file) {
-      addNotification({
-        group: "serverOptions",
-        type: "error",
-        title: "No file selected",
-        text: "Please select a file to upload.",
-      });
-      reject(new Error("No file selected"));
-      return;
-    }
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     const img = new Image();
-    img.src = URL.createObjectURL(file);
     img.onload = () => {
       canvas.width = 64;
       canvas.height = 64;
       ctx?.drawImage(img, 0, 0, 64, 64);
-      // turn the downscaled image back to a png file
       canvas.toBlob((blob) => {
         if (blob) {
-          const data = new File([blob], "server-icon.png", { type: "image/png" });
-          resolve(data);
+          resolve(new File([blob], "server-icon.png", { type: "image/png" }));
         } else {
           reject(new Error("Canvas toBlob failed"));
         }
       }, "image/png");
+      URL.revokeObjectURL(img.src);
     };
     img.onerror = reject;
+    img.src = URL.createObjectURL(file);
   });
-  if (!file) return;
-  if (data.value?.image) {
-    await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
-    await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
-  }
-  await props.server.fs?.uploadFile("/server-icon.png", scaledFile);
-  await props.server.fs?.uploadFile("/server-icon-original.png", file);
-  await props.server.refresh();
 
-  addNotification({
-    group: "serverOptions",
-    type: "success",
-    title: "Server icon updated",
-    text: "Your server icon was successfully changed.",
-  });
+  try {
+    if (data.value?.image) {
+      await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
+      await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+    }
+
+    await props.server.fs?.uploadFile("/server-icon.png", scaledFile);
+    await props.server.fs?.uploadFile("/server-icon-original.png", file);
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    await new Promise<void>((resolve) => {
+      img.onload = () => {
+        canvas.width = 512;
+        canvas.height = 512;
+        ctx?.drawImage(img, 0, 0, 512, 512);
+        const dataURL = canvas.toDataURL("image/png");
+        useState(`server-icon-${props.server.serverId}`).value = dataURL;
+        if (data.value) data.value.image = dataURL;
+        resolve();
+        URL.revokeObjectURL(img.src);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    addNotification({
+      group: "serverOptions",
+      type: "success",
+      title: "Server icon updated",
+      text: "Your server icon was successfully changed.",
+    });
+  } catch (error) {
+    console.error("Error uploading icon:", error);
+    addNotification({
+      group: "serverOptions",
+      type: "error",
+      title: "Upload failed",
+      text: "Failed to upload server icon.",
+    });
+  }
 };
 
 const resetIcon = async () => {
   if (data.value?.image) {
-    await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
-    await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    await reloadNuxtApp();
-    addNotification({
-      group: "serverOptions",
-      type: "success",
-      title: "Server icon reset",
-      text: "Your server icon was successfully reset.",
-    });
+    try {
+      await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
+      await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+
+      useState(`server-icon-${props.server.serverId}`).value = undefined;
+      if (data.value) data.value.image = undefined;
+
+      await props.server.refresh(["general"]);
+
+      addNotification({
+        group: "serverOptions",
+        type: "success",
+        title: "Server icon reset",
+        text: "Your server icon was successfully reset.",
+      });
+    } catch (error) {
+      console.error("Error resetting icon:", error);
+      addNotification({
+        group: "serverOptions",
+        type: "error",
+        title: "Reset failed",
+        text: "Failed to reset server icon.",
+      });
+    }
   }
 };
 

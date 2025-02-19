@@ -1,11 +1,11 @@
-export interface Mod {
-  id: string;
-  filename: string;
-  modrinth_ids: {
-    project_id: string;
-    version_id: string;
-  };
-}
+// export interface Mod {
+//   id: string;
+//   filename: string;
+//   modrinth_ids: {
+//     project_id: string;
+//     version_id: string;
+//   };
+// }
 
 interface License {
   id: string;

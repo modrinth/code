@@ -22,10 +22,10 @@ import { ChevronRightIcon } from "@modrinth/assets";
 
 useHead({
   script: [
-    {
-      // Clean.io
-      src: "https://cadmus.script.ac/d14pdm1b7fi5kh/script.js",
-    },
+    // {
+    //   // Clean.io
+    //   src: "https://cadmus.script.ac/d14pdm1b7fi5kh/script.js",
+    // },
     {
       // Aditude
       src: "https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js",

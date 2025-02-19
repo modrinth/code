@@ -42,8 +42,11 @@
           Install content to server
         </h1>
       </template>
-      <ContentPageHeader v-else></ContentPageHeader>
-      <NavTabs v-if="!server" :links="selectableProjectTypes" class="hidden md:flex" />
+      <NavTabs
+        v-if="!server && !flags.projectTypesPrimaryNav"
+        :links="selectableProjectTypes"
+        class="hidden md:flex"
+      />
     </section>
     <aside
       :class="{
@@ -165,7 +168,7 @@
             name="Sort by"
             :options="sortTypes"
             :display-name="(option) => option?.display"
-            @change="updateSearchResults(1)"
+            @change="updateSearchResults()"
           >
             <span class="font-semibold text-primary">Sort by: </span>
             <span class="font-semibold text-secondary">{{ selected }}</span>
@@ -178,7 +181,7 @@
             :default-value="maxResults"
             :model-value="maxResults"
             class="!w-auto flex-grow md:flex-grow-0"
-            @change="updateSearchResults(1)"
+            @change="updateSearchResults()"
           >
             <span class="font-semibold text-primary">View: </span>
             <span class="font-semibold text-secondary">{{ selected }}</span>
@@ -203,7 +206,7 @@
             :page="currentPage"
             :count="pageCount"
             class="mx-auto sm:ml-auto sm:mr-0"
-            @switch-page="setPage"
+            @switch-page="updateSearchResults"
           />
         </div>
         <SearchFilterControl
@@ -255,7 +258,8 @@
                   <button
                     v-if="
                       result.installed ||
-                      server.content.data.find((x) => x.project_id === result.project_id) ||
+                      (server?.content?.data &&
+                        server.content.data.find((x) => x.project_id === result.project_id)) ||
                       server.general?.project?.id === result.project_id
                     "
                     disabled
@@ -293,7 +297,7 @@
             :page="currentPage"
             :count="pageCount"
             class="justify-end"
-            @switch-page="setPage"
+            @switch-page="updateSearchResults"
           />
         </div>
       </div>
@@ -312,7 +316,6 @@ import {
   ButtonStyled,
   NewProjectCard,
   SearchFilterControl,
-  ContentPageHeader,
 } from "@modrinth/ui";
 import { CheckIcon, DownloadIcon, GameIcon, LeftArrowIcon, XIcon } from "@modrinth/assets";
 import { computed } from "vue";
@@ -340,11 +343,21 @@ const tags = useTags();
 const flags = useFeatureFlags();
 const auth = await useAuth();
 
-const projectType = computed(() =>
-  tags.value.projectTypes.find(
+const projectType = ref();
+function setProjectType() {
+  const projType = tags.value.projectTypes.find(
     (x) => x.id === route.path.replaceAll(/^\/|s\/?$/g, ""), // Removes prefix `/` and suffixes `s` and `s/`
-  ),
-);
+  );
+
+  if (projType) {
+    projectType.value = projType;
+  }
+}
+setProjectType();
+router.afterEach(() => {
+  setProjectType();
+});
+
 const projectTypes = computed(() => [projectType.value.id]);
 
 const server = ref();
@@ -364,7 +377,9 @@ async function updateServerContext() {
     if (!auth.value.user) {
       router.push("/auth/sign-in?redirect=" + encodeURIComponent(route.fullPath));
     } else if (route.query.sid !== null) {
-      server.value = await usePyroServer(route.query.sid, ["general", "content"]);
+      server.value = await usePyroServer(route.query.sid, ["general", "content"], {
+        waitForModules: true,
+      });
     }
   }
 
@@ -483,8 +498,8 @@ async function serverInstall(project) {
       ) ?? versions[0];
 
     if (projectType.value.id === "modpack") {
-      await server.value.general?.reinstall(
-        route.query.sid,
+      await server.value.general.reinstall(
+        server.value.serverId,
         false,
         project.project_id,
         version.id,
@@ -492,7 +507,7 @@ async function serverInstall(project) {
         eraseDataOnInstall.value,
       );
       project.installed = true;
-      navigateTo(`/servers/manage/${route.query.sid}/options/loader`);
+      navigateTo(`/servers/manage/${server.value.serverId}/options/loader`);
     } else if (projectType.value.id === "mod") {
       await server.value.content.install("mod", version.project_id, version.id);
       await server.value.refresh(["content"]);
@@ -518,7 +533,7 @@ const {
     const config = useRuntimeConfig();
     const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
 
-    return `${base}/search${requestParams.value}`;
+    return `${base}search${requestParams.value}`;
   },
   {
     transform: (hits) => {
@@ -533,19 +548,13 @@ const pageCount = computed(() =>
   results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
 );
 
-function setPage(newPageNumber) {
-  currentPage.value = newPageNumber;
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  updateSearchResults();
-}
-
 function scrollToTop(behavior = "smooth") {
   window.scrollTo({ top: 0, behavior });
 }
 
-function updateSearchResults() {
+function updateSearchResults(pageNumber) {
+  currentPage.value = pageNumber || 1;
+  scrollToTop();
   noLoad.value = true;
 
   if (query.value === null) {
@@ -578,8 +587,8 @@ function updateSearchResults() {
   }
 }
 
-watch([currentFilters, requestParams], () => {
-  updateSearchResults();
+watch([currentFilters], () => {
+  updateSearchResults(1);
 });
 
 function cycleSearchDisplayMode() {

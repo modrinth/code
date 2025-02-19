@@ -83,12 +83,18 @@ pub async fn products(
     Ok(HttpResponse::Ok().json(products))
 }
 
+#[derive(Deserialize)]
+struct SubscriptionsQuery {
+    pub user_id: Option<crate::models::ids::UserId>,
+}
+
 #[get("subscriptions")]
 pub async fn subscriptions(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    query: web::Query<SubscriptionsQuery>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -102,7 +108,18 @@ pub async fn subscriptions(
 
     let subscriptions =
         user_subscription_item::UserSubscriptionItem::get_all_user(
-            user.id.into(),
+            if let Some(user_id) = query.user_id {
+                if user.role.is_admin() {
+                    user_id.into()
+                } else {
+                    return Err(ApiError::InvalidInput(
+                        "You cannot see the subscriptions of other users!"
+                            .to_string(),
+                    ));
+                }
+            } else {
+                user.id.into()
+            },
             &**pool,
         )
         .await?
@@ -394,11 +411,7 @@ pub async fn edit_subscription(
             }
 
             let interval = open_charge.due - Utc::now();
-            let duration = PriceDuration::iterator()
-                .min_by_key(|x| {
-                    (x.duration().num_seconds() - interval.num_seconds()).abs()
-                })
-                .unwrap_or(PriceDuration::Monthly);
+            let duration = PriceDuration::Monthly;
 
             let current_amount = match &current_price.prices {
                 Price::OneTime { price } => *price,
@@ -444,23 +457,6 @@ pub async fn edit_subscription(
                 }
 
                 let charge_id = generate_charge_id(&mut transaction).await?;
-                let mut charge = ChargeItem {
-                    id: charge_id,
-                    user_id: user.id.into(),
-                    price_id: product_price.id,
-                    amount: proration as i64,
-                    currency_code: current_price.currency_code.clone(),
-                    status: ChargeStatus::Processing,
-                    due: Utc::now(),
-                    last_attempt: None,
-                    type_: ChargeType::Proration,
-                    subscription_id: Some(subscription.id),
-                    subscription_interval: Some(duration),
-                    payment_platform: PaymentPlatform::Stripe,
-                    payment_platform_id: None,
-                    parent_charge_id: None,
-                    net: None,
-                };
 
                 let customer_id = get_or_create_customer(
                     user.id,
@@ -487,6 +483,30 @@ pub async fn edit_subscription(
                     "modrinth_user_id".to_string(),
                     to_base62(user.id.0),
                 );
+                metadata.insert(
+                    "modrinth_charge_id".to_string(),
+                    to_base62(charge_id.0 as u64),
+                );
+                metadata.insert(
+                    "modrinth_subscription_id".to_string(),
+                    to_base62(subscription.id.0 as u64),
+                );
+                metadata.insert(
+                    "modrinth_price_id".to_string(),
+                    to_base62(product_price.id.0 as u64),
+                );
+                metadata.insert(
+                    "modrinth_subscription_interval".to_string(),
+                    open_charge
+                        .subscription_interval
+                        .unwrap_or(PriceDuration::Monthly)
+                        .as_str()
+                        .to_string(),
+                );
+                metadata.insert(
+                    "modrinth_charge_type".to_string(),
+                    ChargeType::Proration.as_str().to_string(),
+                );
 
                 intent.customer = Some(customer_id);
                 intent.metadata = Some(metadata);
@@ -511,9 +531,6 @@ pub async fn edit_subscription(
                 let intent =
                     stripe::PaymentIntent::create(&stripe_client, intent)
                         .await?;
-
-                charge.payment_platform_id = Some(intent.id.to_string());
-                charge.upsert(&mut transaction).await?;
 
                 Some((proration, 0, intent))
             }
@@ -573,12 +590,18 @@ pub async fn user_customer(
     Ok(HttpResponse::Ok().json(customer))
 }
 
+#[derive(Deserialize)]
+pub struct ChargesQuery {
+    pub user_id: Option<crate::models::ids::UserId>,
+}
+
 #[get("payments")]
 pub async fn charges(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    query: web::Query<ChargesQuery>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -592,7 +615,18 @@ pub async fn charges(
 
     let charges =
         crate::database::models::charge_item::ChargeItem::get_from_user(
-            user.id.into(),
+            if let Some(user_id) = query.user_id {
+                if user.role.is_admin() {
+                    user_id.into()
+                } else {
+                    return Err(ApiError::InvalidInput(
+                        "You cannot see the subscriptions of other users!"
+                            .to_string(),
+                    ));
+                }
+            } else {
+                user.id.into()
+            },
             &**pool,
         )
         .await?;
@@ -604,7 +638,7 @@ pub async fn charges(
                 id: x.id.into(),
                 user_id: x.user_id.into(),
                 price_id: x.price_id.into(),
-                amount: x.amount as u64,
+                amount: x.amount,
                 currency_code: x.currency_code,
                 status: x.status,
                 due: x.due,
@@ -613,6 +647,8 @@ pub async fn charges(
                 subscription_id: x.subscription_id.map(|x| x.into()),
                 subscription_interval: x.subscription_interval,
                 platform: x.payment_platform,
+                parent_charge_id: x.parent_charge_id.map(|x| x.into()),
+                net: if user.role.is_admin() { x.net } else { None },
             })
             .collect::<Vec<_>>(),
     ))
@@ -880,11 +916,11 @@ pub async fn active_servers(
 ) -> Result<HttpResponse, ApiError> {
     let master_key = dotenvy::var("PYRO_API_KEY")?;
 
-    if !req
+    if req
         .head()
         .headers()
         .get("X-Master-Key")
-        .map_or(false, |it| it.as_bytes() == master_key.as_bytes())
+        .is_none_or(|it| it.as_bytes() != master_key.as_bytes())
     {
         return Err(ApiError::CustomAuthentication(
             "Invalid master key".to_string(),
@@ -902,6 +938,7 @@ pub async fn active_servers(
     struct ActiveServer {
         pub user_id: crate::models::ids::UserId,
         pub server_id: String,
+        pub price_id: crate::models::ids::ProductPriceId,
         pub interval: PriceDuration,
     }
 
@@ -912,6 +949,7 @@ pub async fn active_servers(
                 SubscriptionMetadata::Pyro { id } => ActiveServer {
                     user_id: x.user_id.into(),
                     server_id: id.clone(),
+                    price_id: x.price_id.into(),
                     interval: x.interval,
                 },
             })
@@ -1103,7 +1141,7 @@ pub async fn initiate_payment(
     let country = user_country.as_deref().unwrap_or("US");
     let recommended_currency_code = infer_currency_code(country);
 
-    let (price, currency_code, interval, price_id, charge_id) =
+    let (price, currency_code, interval, price_id, charge_id, charge_type) =
         match payment_request.charge {
             ChargeRequestType::Existing { id } => {
                 let charge =
@@ -1124,6 +1162,7 @@ pub async fn initiate_payment(
                     charge.subscription_interval,
                     charge.price_id,
                     Some(id),
+                    charge.type_,
                 )
             }
             ChargeRequestType::New {
@@ -1220,6 +1259,11 @@ pub async fn initiate_payment(
                     interval,
                     price_item.id,
                     None,
+                    if let Price::Recurring { .. } = price_item.prices {
+                        ChargeType::Subscription
+                    } else {
+                        ChargeType::OneTime
+                    },
                 )
             }
         };
@@ -1277,6 +1321,11 @@ pub async fn initiate_payment(
                 serde_json::to_string(&payment_metadata)?,
             );
         }
+
+        metadata.insert(
+            "modrinth_charge_type".to_string(),
+            charge_type.as_str().to_string(),
+        );
 
         if let Some(charge_id) = charge_id {
             metadata.insert(
@@ -1363,10 +1412,15 @@ pub async fn stripe_webhook(
             pub user_subscription_item:
                 Option<user_subscription_item::UserSubscriptionItem>,
             pub payment_metadata: Option<PaymentRequestMetadata>,
+            #[allow(dead_code)]
+            pub charge_type: ChargeType,
         }
 
+        #[allow(clippy::too_many_arguments)]
         async fn get_payment_intent_metadata(
             payment_intent_id: PaymentIntentId,
+            amount: i64,
+            currency: String,
             metadata: HashMap<String, String>,
             pool: &PgPool,
             redis: &RedisPool,
@@ -1405,6 +1459,15 @@ pub async fn stripe_webhook(
                     .map(|x| crate::database::models::ids::ChargeId(x as i64))
                 {
                     charge_id
+                } else {
+                    break 'metadata;
+                };
+
+                let charge_type = if let Some(charge_type) = metadata
+                    .get("modrinth_charge_type")
+                    .map(|x| ChargeType::from_string(x))
+                {
+                    charge_type
                 } else {
                     break 'metadata;
                 };
@@ -1513,8 +1576,8 @@ pub async fn stripe_webhook(
                         break 'metadata;
                     };
 
-                    let (amount, subscription) = match &price.prices {
-                        Price::OneTime { price } => (*price, None),
+                    let subscription = match &price.prices {
+                        Price::OneTime { .. } => None,
                         Price::Recurring { intervals } => {
                             let interval = if let Some(interval) = metadata
                                 .get("modrinth_subscription_interval")
@@ -1525,7 +1588,7 @@ pub async fn stripe_webhook(
                                 break 'metadata;
                             };
 
-                            if let Some(price) = intervals.get(&interval) {
+                            if intervals.get(&interval).is_some() {
                                 let subscription_id = if let Some(subscription_id) = metadata
                                     .get("modrinth_subscription_id")
                                     .and_then(|x| parse_base62(x).ok())
@@ -1537,21 +1600,29 @@ pub async fn stripe_webhook(
                                     break 'metadata;
                                 };
 
-                                let subscription = user_subscription_item::UserSubscriptionItem {
-                                    id: subscription_id,
-                                    user_id,
-                                    price_id,
-                                    interval,
-                                    created: Utc::now(),
-                                    status: SubscriptionStatus::Unprovisioned,
-                                    metadata: None,
+                                let subscription = if let Some(mut subscription) = user_subscription_item::UserSubscriptionItem::get(subscription_id, pool).await? {
+                                    subscription.status = SubscriptionStatus::Unprovisioned;
+                                    subscription.price_id = price_id;
+                                    subscription.interval = interval;
+
+                                    subscription
+                                } else {
+                                    user_subscription_item::UserSubscriptionItem {
+                                        id: subscription_id,
+                                        user_id,
+                                        price_id,
+                                        interval,
+                                        created: Utc::now(),
+                                        status: SubscriptionStatus::Unprovisioned,
+                                        metadata: None,
+                                    }
                                 };
 
                                 if charge_status != ChargeStatus::Failed {
                                     subscription.upsert(transaction).await?;
                                 }
 
-                                (*price, Some(subscription))
+                                Some(subscription)
                             } else {
                                 break 'metadata;
                             }
@@ -1562,16 +1633,12 @@ pub async fn stripe_webhook(
                         id: charge_id,
                         user_id,
                         price_id,
-                        amount: amount as i64,
-                        currency_code: price.currency_code.clone(),
+                        amount,
+                        currency_code: currency,
                         status: charge_status,
                         due: Utc::now(),
                         last_attempt: Some(Utc::now()),
-                        type_: if subscription.is_some() {
-                            ChargeType::Subscription
-                        } else {
-                            ChargeType::OneTime
-                        },
+                        type_: charge_type,
                         subscription_id: subscription.as_ref().map(|x| x.id),
                         subscription_interval: subscription
                             .as_ref()
@@ -1598,6 +1665,7 @@ pub async fn stripe_webhook(
                     charge_item: charge,
                     user_subscription_item: subscription,
                     payment_metadata,
+                    charge_type,
                 });
             }
 
@@ -1615,6 +1683,8 @@ pub async fn stripe_webhook(
 
                     let mut metadata = get_payment_intent_metadata(
                         payment_intent.id,
+                        payment_intent.amount,
+                        payment_intent.currency.to_string().to_uppercase(),
                         payment_intent.metadata,
                         &pool,
                         &redis,
@@ -1863,6 +1933,8 @@ pub async fn stripe_webhook(
                     let mut transaction = pool.begin().await?;
                     get_payment_intent_metadata(
                         payment_intent.id,
+                        payment_intent.amount,
+                        payment_intent.currency.to_string().to_uppercase(),
                         payment_intent.metadata,
                         &pool,
                         &redis,
@@ -1881,6 +1953,8 @@ pub async fn stripe_webhook(
 
                     let metadata = get_payment_intent_metadata(
                         payment_intent.id,
+                        payment_intent.amount,
+                        payment_intent.currency.to_string().to_uppercase(),
                         payment_intent.metadata,
                         &pool,
                         &redis,
@@ -2283,6 +2357,10 @@ pub async fn task(
                     metadata.insert(
                         "modrinth_charge_id".to_string(),
                         to_base62(charge.id.0 as u64),
+                    );
+                    metadata.insert(
+                        "modrinth_charge_type".to_string(),
+                        charge.type_.as_str().to_string(),
                     );
 
                     intent.metadata = Some(metadata);

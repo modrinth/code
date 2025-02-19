@@ -80,6 +80,7 @@ async function findLauncherDir() {
       description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
       :has-to-type="false"
       proceed-label="Purge cache"
+      :show-ad-on-close="false"
       @proceed="purgeCache"
     />
 

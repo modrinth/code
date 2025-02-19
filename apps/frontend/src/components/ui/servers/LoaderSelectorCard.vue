@@ -31,7 +31,7 @@
     </div>
 
     <ButtonStyled>
-      <button @click="onSelect">
+      <button :disabled="isInstalling" @click="onSelect">
         <DownloadIcon class="h-5 w-5" />
         {{ isCurrentLoader ? "Reinstall" : "Install" }}
       </button>
@@ -52,6 +52,7 @@ interface Props {
   loader: LoaderInfo;
   currentLoader: string | null;
   loaderVersion: string | null;
+  isInstalling?: boolean;
 }
 
 const props = defineProps<Props>();

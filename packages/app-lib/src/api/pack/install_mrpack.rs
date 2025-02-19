@@ -13,13 +13,13 @@ use crate::util::io;
 use crate::{profile, State};
 use async_zip::base::read::seek::ZipFileReader;
 
-use std::io::Cursor;
-use std::path::{Component, PathBuf};
-
 use super::install_from::{
     generate_pack_from_file, generate_pack_from_version_id, CreatePack,
     CreatePackLocation, PackFormat,
 };
+use crate::data::ProjectType;
+use std::io::Cursor;
+use std::path::{Component, PathBuf};
 
 /// Install a pack
 /// Wrapper around install_pack_files that generates a pack creation description, and
@@ -189,6 +189,7 @@ pub async fn install_zipped_mrpack_files(
                                 .hashes
                                 .get(&PackFileHash::Sha1)
                                 .map(|x| &**x),
+                            ProjectType::get_from_parent_folder(&path),
                             &state.pool,
                         )
                         .await?;
@@ -247,6 +248,7 @@ pub async fn install_zipped_mrpack_files(
                         &profile_path,
                         &new_path.to_string_lossy(),
                         None,
+                        ProjectType::get_from_parent_folder(&new_path),
                         &state.pool,
                     )
                     .await?;

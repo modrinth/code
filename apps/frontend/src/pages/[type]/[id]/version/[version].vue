@@ -381,6 +381,7 @@
         />
         <ButtonStyled v-if="isEditing">
           <button
+            class="raised-button"
             :disabled="primaryFile.hashes.sha1 === file.hashes.sha1"
             @click="
               () => {
@@ -820,6 +821,13 @@ export default defineNuxtComponent({
       }
       if (route.query.version) {
         versionList = versionList.filter((x) => x.game_versions.includes(route.query.version));
+      }
+      if (versionList.length === 0) {
+        throw createError({
+          fatal: true,
+          statusCode: 404,
+          message: "No version matches the filters",
+        });
       }
       version = versionList.reduce((a, b) => (a.date_published > b.date_published ? a : b));
     } else {

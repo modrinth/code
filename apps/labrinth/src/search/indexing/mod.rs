@@ -6,10 +6,9 @@ use crate::models::ids::base62_impl::to_base62;
 use crate::search::{SearchConfig, UploadSearchProject};
 use local_import::index_local;
 use log::info;
-use meilisearch_sdk::client::Client;
+use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
-use meilisearch_sdk::SwapIndexes;
 use sqlx::postgres::PgPool;
 use thiserror::Error;
 #[derive(Error, Debug)]
@@ -100,7 +99,7 @@ pub async fn swap_index(
     config: &SearchConfig,
     index_name: &str,
 ) -> Result<(), IndexingError> {
-    let client = config.make_client();
+    let client = config.make_client()?;
     let index_name_next = config.get_index_name(index_name, true);
     let index_name = config.get_index_name(index_name, false);
     let swap_indices = SwapIndexes {
@@ -119,7 +118,7 @@ pub async fn get_indexes_for_indexing(
     config: &SearchConfig,
     next: bool, // Get the 'next' one
 ) -> Result<Vec<Index>, meilisearch_sdk::errors::Error> {
-    let client = config.make_client();
+    let client = config.make_client()?;
     let project_name = config.get_index_name("projects", next);
     let project_filtered_name =
         config.get_index_name("projects_filtered", next);
@@ -285,7 +284,7 @@ pub async fn add_projects(
     additional_fields: Vec<String>,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
-    let client = config.make_client();
+    let client = config.make_client()?;
     for index in indices {
         update_and_add_to_index(&client, index, &projects, &additional_fields)
             .await?;
@@ -296,7 +295,7 @@ pub async fn add_projects(
 
 fn default_settings() -> Settings {
     Settings::new()
-        .with_distinct_attribute("project_id")
+        .with_distinct_attribute(Some("project_id"))
         .with_displayed_attributes(DEFAULT_DISPLAYED_ATTRIBUTES)
         .with_searchable_attributes(DEFAULT_SEARCHABLE_ATTRIBUTES)
         .with_sortable_attributes(DEFAULT_SORTABLE_ATTRIBUTES)

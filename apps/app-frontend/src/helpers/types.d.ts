@@ -32,7 +32,12 @@ type GameInstance = {
   hooks: Hooks
 }
 
-type InstallStage = 'installed' | 'installing' | 'pack_installing' | 'not_installed'
+type InstallStage =
+  | 'installed'
+  | 'minecraft_installing'
+  | 'pack_installed'
+  | 'pack_installing'
+  | 'not_installed'
 
 type LinkedData = {
   project_id: ModrinthId

@@ -41,7 +41,7 @@ defineExpose({ selectedTab, setTab })
 
       <slot name="footer" />
     </div>
-    <div class="w-[600px] h-[500px] overflow-y-auto pl-4">
+    <div class="w-[600px] h-[500px] overflow-y-auto px-4">
       <component :is="tabs[selectedTab].content" v-bind="tabs[selectedTab].props ?? {}" />
     </div>
   </div>

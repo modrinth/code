@@ -405,7 +405,7 @@ impl TeamMember {
         Ok(())
     }
 
-    pub async fn delete<'a, 'b>(
+    pub async fn delete(
         id: TeamId,
         user_id: UserId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,

@@ -1,4 +1,13 @@
 <template>
+  <ConfirmModal
+    v-if="currentMember"
+    ref="deleteVersionModal"
+    title="Are you sure you want to delete this version?"
+    description="This will remove this version forever (like really forever)."
+    :has-to-type="false"
+    proceed-label="Delete"
+    @proceed="deleteVersion()"
+  />
   <section class="experimental-styles-within overflow-visible">
     <div
       v-if="currentMember && isPermission(currentMember?.permissions, 1 << 0)"
@@ -41,7 +50,7 @@
             :href="getPrimaryFile(version).url"
             class="group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted"
             aria-label="Download"
-            @click="emits('onDownload')"
+            @click="emit('onDownload')"
           >
             <DownloadIcon aria-hidden="true" />
           </a>
@@ -57,7 +66,7 @@
                 hoverFilled: true,
                 link: getPrimaryFile(version).url,
                 action: () => {
-                  emits('onDownload');
+                  emit('onDownload');
                 },
               },
               {
@@ -101,8 +110,11 @@
                 id: 'delete',
                 color: 'red',
                 hoverFilled: true,
-                action: () => {},
-                shown: currentMember && false,
+                action: () => {
+                  selectedVersion = version.id;
+                  deleteVersionModal.show();
+                },
+                shown: currentMember,
               },
             ]"
             aria-label="More options"
@@ -144,7 +156,13 @@
 </template>
 
 <script setup>
-import { ButtonStyled, OverflowMenu, FileInput, ProjectPageVersions } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  OverflowMenu,
+  FileInput,
+  ProjectPageVersions,
+  ConfirmModal,
+} from "@modrinth/ui";
 import {
   DownloadIcon,
   MoreVerticalIcon,
@@ -185,7 +203,10 @@ const tags = useTags();
 const flags = useFeatureFlags();
 const auth = await useAuth();
 
-const emits = defineEmits(["onDownload"]);
+const deleteVersionModal = ref();
+const selectedVersion = ref(null);
+
+const emit = defineEmits(["onDownload", "deleteVersion"]);
 
 const router = useNativeRouter();
 
@@ -211,5 +232,10 @@ async function handleFiles(files) {
 
 async function copyToClipboard(text) {
   await navigator.clipboard.writeText(text);
+}
+
+function deleteVersion() {
+  emit("deleteVersion", selectedVersion.value);
+  selectedVersion.value = null;
 }
 </script>

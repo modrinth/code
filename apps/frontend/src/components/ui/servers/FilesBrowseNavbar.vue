@@ -2,7 +2,7 @@
   <div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
   <header
     :class="[
-      'duration-20 h-26 top-0 flex select-none flex-col justify-between gap-2 bg-table-alternateRow p-3 transition-[border-radius] sm:h-12 sm:flex-row',
+      'duration-20 top-0 flex select-none flex-col justify-between gap-2 bg-table-alternateRow p-3 transition-[border-radius] sm:h-12 sm:flex-row',
       !isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
     ]"
     data-pyro-files-state="browsing"
@@ -76,25 +76,23 @@
           <UiServersTeleportOverflowMenu
             position="bottom"
             direction="left"
-            aria-label="Sort files"
+            aria-label="Filter view"
             :options="[
-              { id: 'normal', action: () => $emit('sort', 'default') },
-              { id: 'modified', action: () => $emit('sort', 'modified') },
-              { id: 'created', action: () => $emit('sort', 'created') },
-              { id: 'filesOnly', action: () => $emit('sort', 'filesOnly') },
-              { id: 'foldersOnly', action: () => $emit('sort', 'foldersOnly') },
+              { id: 'all', action: () => $emit('filter', 'all') },
+              { id: 'filesOnly', action: () => $emit('filter', 'filesOnly') },
+              { id: 'foldersOnly', action: () => $emit('filter', 'foldersOnly') },
             ]"
           >
-            <span class="hidden whitespace-pre text-sm font-medium sm:block">
-              {{ sortMethodLabel }}
-            </span>
-            <SortAscendingIcon aria-hidden="true" />
+            <div class="flex items-center gap-1">
+              <FilterIcon aria-hidden="true" class="h-5 w-5" />
+              <span class="hidden text-sm font-medium sm:block">
+                {{ filterLabel }}
+              </span>
+            </div>
             <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-            <template #normal> Alphabetical </template>
-            <template #modified> Date modified </template>
-            <template #created> Date created </template>
-            <template #filesOnly> Files only </template>
-            <template #foldersOnly> Folders only </template>
+            <template #all>Show all</template>
+            <template #filesOnly>Files only</template>
+            <template #foldersOnly>Folders only</template>
           </UiServersTeleportOverflowMenu>
         </ButtonStyled>
         <div class="mx-1 w-full text-sm sm:w-48">
@@ -148,9 +146,9 @@ import {
   DropdownIcon,
   FolderOpenIcon,
   SearchIcon,
-  SortAscendingIcon,
   HomeIcon,
   ChevronRightIcon,
+  FilterIcon,
 } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed } from "vue";
@@ -159,15 +157,15 @@ import { useIntersectionObserver } from "@vueuse/core";
 const props = defineProps<{
   breadcrumbSegments: string[];
   searchQuery: string;
-  sortMethod: string;
+  currentFilter: string;
 }>();
 
 defineEmits<{
   (e: "navigate", index: number): void;
-  (e: "sort", method: string): void;
   (e: "create", type: "file" | "directory"): void;
   (e: "upload"): void;
   (e: "update:searchQuery", value: string): void;
+  (e: "filter", type: string): void;
 }>();
 
 const pyroFilesSentinel = ref<HTMLElement | null>(null);
@@ -181,18 +179,14 @@ useIntersectionObserver(
   { threshold: [0, 1] },
 );
 
-const sortMethodLabel = computed(() => {
-  switch (props.sortMethod) {
-    case "modified":
-      return "Date modified";
-    case "created":
-      return "Date created";
+const filterLabel = computed(() => {
+  switch (props.currentFilter) {
     case "filesOnly":
       return "Files only";
     case "foldersOnly":
       return "Folders only";
     default:
-      return "Alphabetical";
+      return "Show all";
   }
 });
 </script>

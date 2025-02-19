@@ -1,12 +1,14 @@
 <template>
   <ButtonStyled>
     <PopoutMenu
-      v-if="options.length > 1"
+      v-if="options.length > 1 || showAlways"
       v-bind="$attrs"
       :disabled="disabled"
       :position="position"
       :direction="direction"
       :dropdown-id="dropdownId"
+      :dropdown-class="dropdownClass"
+      :tooltip="tooltip"
       @open="
         () => {
           searchQuery = ''
@@ -87,6 +89,9 @@ const props = withDefaults(
     displayName?: (option: Option) => string
     search?: boolean
     dropdownId?: string
+    dropdownClass?: string
+    showAlways?: boolean
+    tooltip?: string
   }>(),
   {
     disabled: false,
@@ -94,7 +99,10 @@ const props = withDefaults(
     direction: 'auto',
     displayName: (option: Option) => option as string,
     search: false,
-    dropdownId: null,
+    dropdownId: '',
+    dropdownClass: '',
+    showAlways: false,
+    tooltip: '',
   },
 )
 

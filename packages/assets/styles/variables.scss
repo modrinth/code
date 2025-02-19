@@ -208,23 +208,6 @@ html {
 }
 
 .experimental-styles-within {
-  // Reset deprecated properties
-  --color-icon: initial !important;
-  --color-text: initial !important;
-  --color-text-inactive: initial !important;
-  --color-text-dark: initial !important;
-  --color-heading: initial !important;
-  --color-text-inverted: initial !important;
-  --color-bg-inverted: initial !important;
-
-  --color-brand: var(--color-green) !important;
-  --color-brand-inverted: initial !important;
-
-  --tab-underline-hovered: initial !important;
-
-  --color-grey-link: inherit !important;
-  --color-grey-link-hover: inherit !important; // DEPRECATED, use filters in future
-  --color-grey-link-active: inherit !important; // DEPRECATED, use filters in future
   --color-link: var(--color-blue) !important;
   --color-link-hover: var(--color-blue) !important; // DEPRECATED, use filters in future
   --color-link-active: var(--color-blue) !important; // DEPRECATED, use filters in future

@@ -92,6 +92,7 @@ async fn main() -> std::io::Result<()> {
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")
+        .exclude("/_internal/launcher_socket")
         .build()
         .expect("Failed to create prometheus metrics middleware");
 

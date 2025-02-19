@@ -34,8 +34,7 @@
           class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8 transition-transform duration-100 hover:scale-105 active:scale-100"
         >
           <div class="flex flex-row items-center gap-2">
-            <h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">0 Bytes</h2>
-            <h3 class="relative z-10 text-sm font-normal text-secondary">/ 0 Bytes</h3>
+            <h2 class="m-0 -ml-0.5 mt-1 text-3xl font-extrabold text-contrast">0 B</h2>
           </div>
           <h3 class="relative z-10 text-base font-normal text-secondary">Storage usage</h3>
           <FolderOpenIcon class="absolute right-10 top-10 size-8" />
@@ -50,8 +49,12 @@
             <h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
           </div>
         </div>
+        <div class="relative w-full">
+          <input type="text" placeholder="Search logs" class="h-12 !w-full !pl-10 !pr-48" />
+          <SearchIcon class="absolute left-4 top-1/2 -translate-y-1/2" />
+        </div>
         <div
-          class="console relative h-full min-h-[488px] w-full overflow-hidden rounded-xl bg-bg text-sm"
+          class="console relative h-full min-h-[516px] w-full overflow-hidden rounded-xl bg-bg text-sm"
         ></div>
       </div>
     </div>
@@ -59,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { CPUIcon, DBIcon, FolderOpenIcon } from "@modrinth/assets";
+import { CPUIcon, DBIcon, FolderOpenIcon, SearchIcon } from "@modrinth/assets";
 </script>
 
 <style scoped>

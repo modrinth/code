@@ -39,7 +39,7 @@ const props = defineProps<{
   save: () => void;
   reset: () => void;
   isVisible: boolean;
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
 const saveAndRestart = async () => {

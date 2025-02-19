@@ -15,8 +15,14 @@ const getInstances = async () => {
 
   recentInstances.value = profiles
     .sort((a, b) => {
-      const dateA = dayjs(a.created > a.last_played ? a.last_played : a.created)
-      const dateB = dayjs(b.created > b.last_played ? b.last_played : b.created)
+      const dateACreated = dayjs(a.created)
+      const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
+
+      const dateBCreated = dayjs(b.created)
+      const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
+
+      const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
+      const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
 
       if (dateA.isSame(dateB)) {
         return a.name.localeCompare(b.name)
@@ -29,8 +35,10 @@ const getInstances = async () => {
 
 await getInstances()
 
-const unlistenProfile = await profile_listener(async () => {
-  await getInstances()
+const unlistenProfile = await profile_listener(async (event) => {
+  if (event.event !== 'synced') {
+    await getInstances()
+  }
 })
 
 onUnmounted(() => {
@@ -42,21 +50,24 @@ onUnmounted(() => {
   <NavButton
     v-for="instance in recentInstances"
     :key="instance.id"
+    v-tooltip.right="instance.name"
     :to="`/instance/${encodeURIComponent(instance.path)}`"
+    class="relative"
   >
     <Avatar
       :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-      circle
+      size="28px"
+      :tint-by="instance.path"
       :class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
     />
     <div
       v-if="instance.install_stage !== 'installed'"
-      class="absolute inset-0 flex items-center justify-center"
+      class="absolute inset-0 flex items-center justify-center z-10"
     >
       <SpinnerIcon class="animate-spin w-4 h-4" />
     </div>
-    <template #label>{{ instance.name }}</template>
   </NavButton>
+  <div v-if="recentInstances.length > 0" class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
 </template>
 
 <style scoped lang="scss"></style>

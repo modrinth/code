@@ -25,7 +25,7 @@
       </form>
     </NewModal>
 
-    <NewModal ref="editAllocationModal" header="Edit Allocation">
+    <NewModal ref="editAllocationModal" header="Edit allocation">
       <form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="editAllocation">
         <label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
         <input
@@ -40,7 +40,7 @@
         <div class="mb-1 mt-4 flex justify-start gap-4">
           <ButtonStyled color="brand">
             <button :disabled="!newAllocationName" type="submit">
-              <SaveIcon /> Update Allocation
+              <SaveIcon /> Update allocation
             </button>
           </ButtonStyled>
           <ButtonStyled>
@@ -59,7 +59,29 @@
     />
 
     <div class="relative h-full w-full overflow-y-auto">
-      <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4">
+      <div
+        v-if="server.network?.error"
+        class="flex w-full flex-col items-center justify-center gap-4 p-4"
+      >
+        <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+          <div class="flex flex-col items-center text-center">
+            <div class="flex flex-col items-center gap-4">
+              <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+                <IssuesIcon class="size-12 text-orange" />
+              </div>
+              <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load network settings</h1>
+            </div>
+            <p class="text-lg text-secondary">
+              We couldn't load your server's network settings. Here's what we know:
+              <span class="break-all font-mono">{{ JSON.stringify(server.network.error) }}</span>
+            </p>
+            <ButtonStyled size="large" color="brand" @click="() => server.refresh(['network'])">
+              <button class="mt-6 !w-full">Retry</button>
+            </ButtonStyled>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="data" class="flex h-full w-full flex-col justify-between gap-4">
         <div class="flex h-full flex-col">
           <!-- Subdomain section -->
           <div class="card flex flex-col gap-4">
@@ -94,7 +116,7 @@
             />
 
             <div
-              class="flex max-w-full flex-none overflow-auto rounded-xl bg-table-alternateRow p-4"
+              class="flex max-w-full flex-none overflow-auto rounded-xl bg-table-alternateRow px-4 py-2"
             >
               <table
                 class="w-full flex-none border-collapse truncate rounded-lg border-2 border-gray-300"
@@ -108,7 +130,7 @@
                         >
                           {{ record.type }}
                         </span>
-                        <span class="text-xs uppercase text-secondary">type</span>
+                        <span class="text-xs text-secondary">Type</span>
                       </div>
                     </td>
                     <td class="w-2/6 py-3 md:w-1/3">
@@ -118,7 +140,7 @@
                         >
                           {{ record.name }}
                         </span>
-                        <span class="text-xs uppercase text-secondary">name</span>
+                        <span class="text-xs text-secondary">Name</span>
                       </div>
                     </td>
                     <td class="w-3/6 py-3 pl-4 md:w-5/12 lg:w-5/12">
@@ -128,7 +150,7 @@
                         >
                           {{ record.content }}
                         </span>
-                        <span class="text-xs uppercase text-secondary">content</span>
+                        <span class="text-xs text-secondary">Content</span>
                       </div>
                     </td>
                   </tr>
@@ -155,7 +177,7 @@
                 </span>
               </div>
 
-              <ButtonStyled type="standard" color="brand" @click="showNewAllocationModal">
+              <ButtonStyled type="standard" @click="showNewAllocationModal">
                 <button class="!w-full sm:!w-auto">
                   <PlusIcon />
                   <span>New allocation</span>
@@ -190,7 +212,7 @@
                       <span class="text-md font-bold tracking-wide text-contrast">
                         {{ allocation.name }}
                       </span>
-                      <span class="hidden text-xs uppercase text-secondary sm:block">name</span>
+                      <span class="hidden text-xs text-secondary sm:block">Name</span>
                     </div>
                     <div class="flex flex-col gap-1">
                       <span
@@ -198,7 +220,7 @@
                       >
                         {{ allocation.port }}
                       </span>
-                      <span class="hidden text-xs uppercase text-secondary sm:block">port</span>
+                      <span class="hidden text-xs text-secondary sm:block">Port</span>
                     </div>
                   </div>
                 </div>
@@ -247,6 +269,7 @@ import {
   SaveIcon,
   InfoIcon,
   UploadIcon,
+  IssuesIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
@@ -286,11 +309,10 @@ const addNewAllocation = async () => {
 
   try {
     await props.server.network?.reserveAllocation(newAllocationName.value);
+    await props.server.refresh(["network"]);
 
     newAllocationModal.value?.hide();
     newAllocationName.value = "";
-
-    await props.server.refresh();
 
     addNotification({
       group: "serverOptions",
@@ -332,8 +354,8 @@ const confirmDeleteAllocation = async () => {
   if (allocationToDelete.value === null) return;
 
   await props.server.network?.deleteAllocation(allocationToDelete.value);
+  await props.server.refresh(["network"]);
 
-  await props.server.refresh();
   addNotification({
     group: "serverOptions",
     type: "success",
@@ -349,11 +371,10 @@ const editAllocation = async () => {
 
   try {
     await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value);
+    await props.server.refresh(["network"]);
 
     editAllocationModal.value?.hide();
     newAllocationName.value = "";
-
-    await props.server.refresh();
 
     addNotification({
       group: "serverOptions",

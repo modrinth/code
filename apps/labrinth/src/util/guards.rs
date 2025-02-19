@@ -8,5 +8,5 @@ pub fn admin_key_guard(ctx: &GuardContext) -> bool {
     ctx.head()
         .headers()
         .get(ADMIN_KEY_HEADER)
-        .map_or(false, |it| it.as_bytes() == admin_key.as_bytes())
+        .is_some_and(|it| it.as_bytes() == admin_key.as_bytes())
 }

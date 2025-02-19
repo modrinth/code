@@ -60,7 +60,7 @@ const toTransparent = computed(() => {
 
 <template>
   <div
-    class="card-shadow button-base bg-bg-raised rounded-xl overflow-clip cursor-pointer active:scale-[0.98] transition-transform"
+    class="card-shadow bg-bg-raised rounded-xl overflow-clip cursor-pointer hover:brightness-90 transition-all"
     @click="router.push(`/project/${project.slug}`)"
   >
     <div
