@@ -992,6 +992,14 @@ const socialLinks = [
   },
   {
     label: formatMessage(
+      defineMessage({ id: "layout.footer.social.mastodon", defaultMessage: "Mastodon" }),
+    ),
+    href: "https://floss.social/@modrinth",
+    icon: MastodonIcon,
+    rel: "me",
+  },
+  {
+    label: formatMessage(
       defineMessage({ id: "layout.footer.social.tumblr", defaultMessage: "Tumblr" }),
     ),
     href: "https://tumblr.com/modrinth",
@@ -1001,14 +1009,6 @@ const socialLinks = [
     label: formatMessage(defineMessage({ id: "layout.footer.social.x", defaultMessage: "X" })),
     href: "https://x.com/modrinth",
     icon: TwitterIcon,
-  },
-  {
-    label: formatMessage(
-      defineMessage({ id: "layout.footer.social.mastodon", defaultMessage: "Mastodon" }),
-    ),
-    href: "https://floss.social/@modrinth",
-    icon: MastodonIcon,
-    rel: "me",
   },
   {
     label: formatMessage(
