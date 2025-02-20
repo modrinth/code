@@ -82,36 +82,16 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, HammerIcon, LockIcon } from "@modrinth/assets";
-import type { Project, Server } from "~/types/servers";
+import type { Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();
 
-if (props.server_id) {
-  await usePyroServer(props.server_id, ["general"]);
-}
+const pyroServer = await usePyroServer(props.server_id!, ["general"]);
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 
-let projectData: Ref<Project | null>;
-if (props.upstream) {
-  const { data } = await useAsyncData<Project>(
-    `server-project-${props.server_id}`,
-    async (): Promise<Project> => {
-      const result = await useBaseFetch(`project/${props.upstream?.project_id}`);
-      return result as Project;
-    },
-  );
-  projectData = data;
-} else {
-  projectData = ref(null);
-}
-
+const projectData = computed(() => pyroServer.general?.project || null);
 const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
-
-if (import.meta.server && projectData.value?.icon_url) {
-  await usePyroServer(props.server_id!, ["general"]);
-}
-
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 </script>

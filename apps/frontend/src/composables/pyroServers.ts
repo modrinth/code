@@ -366,6 +366,22 @@ const constructServerProperties = (properties: any): string => {
   return fileContent;
 };
 
+const projectCache = new Map<string, Project>();
+
+async function getProjectFromCache(projectId: string): Promise<Project | null> {
+  const cached = projectCache.get(projectId);
+  if (cached) return cached;
+
+  try {
+    const response = await $fetch<Project>(`https://api.modrinth.com/v2/project/${projectId}`);
+    projectCache.set(projectId, response);
+    return response;
+  } catch (error) {
+    console.error(`Failed to fetch project ${projectId}:`, error);
+    return null;
+  }
+}
+
 const processImage = async (iconUrl: string | undefined) => {
   const sharedImage = useState<string | undefined>(
     `server-icon-${internalServerRefrence.value.serverId}`,
@@ -1044,10 +1060,7 @@ const modules: any = {
       try {
         const data = await PyroFetch<General>(`servers/${serverId}`, {}, "general");
         if (data.upstream?.project_id) {
-          const res = await $fetch(
-            `https://api.modrinth.com/v2/project/${data.upstream.project_id}`,
-          );
-          data.project = res as Project;
+          data.project = (await getProjectFromCache(data.upstream.project_id)) ?? undefined;
         }
 
         if (import.meta.client) {
