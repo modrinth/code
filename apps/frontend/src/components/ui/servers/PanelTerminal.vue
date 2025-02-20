@@ -261,7 +261,7 @@
     <NewModal ref="viewLogModal" class="z-[9999]" header="Viewing selected logs">
       <div class="text-contrast">
         <pre
-          class="select-text overflow-x-auto whitespace-pre rounded-lg bg-bg font-mono"
+          class="w-full select-text whitespace-pre-wrap rounded-lg bg-bg font-mono"
           v-html="processedLogWithLinks"
         ></pre>
         <div v-if="detectedLinks.length" class="border-contrast/20 mt-4 border-t pt-4">
