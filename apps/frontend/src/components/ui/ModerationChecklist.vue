@@ -372,9 +372,8 @@ import {
   ExitIcon,
   ScaleIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, MarkdownEditor, OverflowMenu } from "@modrinth/ui";
+import { ButtonStyled, MarkdownEditor, OverflowMenu, Collapsible } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
-import Collapsible from "~/components/ui/Collapsible.vue";
 
 const props = defineProps({
   project: {
