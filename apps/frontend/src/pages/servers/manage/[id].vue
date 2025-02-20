@@ -184,13 +184,18 @@
     <div
       v-else-if="serverData"
       data-pyro-server-manager-root
-      class="experimental-styles-within mobile-blurred-servericon relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
-      :style="{
-        '--server-bg-image': serverData.image
-          ? `url(${serverData.image})`
-          : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
-      }"
+      class="experimental-styles-within relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
     >
+      <ClientOnly>
+        <div
+          class="mobile-blurred-servericon pointer-events-none absolute left-0 right-0 top-0 w-full"
+          :style="{
+            '--server-bg-image': serverData.image
+              ? `url(${serverData.image})`
+              : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
+          }"
+        ></div>
+      </ClientOnly>
       <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
         <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
         <div
