@@ -529,7 +529,7 @@
                   </template>
                 </IntlFormatted>
               </p>
-              <p class="m-0">© 2024 Rinth, Inc.</p>
+              <p class="m-0">© 2025 Rinth, Inc.</p>
             </div>
           </div>
           <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
