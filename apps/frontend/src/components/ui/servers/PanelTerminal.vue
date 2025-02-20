@@ -270,9 +270,24 @@
       </Transition>
     </div>
     <NewModal ref="viewLogModal" class="z-[9999]" header="Viewing selected logs">
+      <div class="flex items-center justify-between gap-2 rounded-2xl bg-bg p-4">
+        <label for="line-breaks" class="w-full text-xl font-bold text-contrast">
+          Wrap long lines
+        </label>
+        <input
+          id="line-breaks"
+          v-model="userPreferences.wrapLinesInConsoleLogModal"
+          type="checkbox"
+          class="switch stylized-toggle flex-none"
+        />
+      </div>
       <div class="text-contrast">
         <pre
-          class="w-full select-text whitespace-pre-wrap rounded-lg bg-bg font-mono text-sm leading-[190%]"
+          class="w-full select-text rounded-2xl bg-bg font-mono text-sm leading-[190%]"
+          :class="{
+            'whitespace-pre-wrap': userPreferences.wrapLinesInConsoleLogModal,
+            'whitespace-pre': !userPreferences.wrapLinesInConsoleLogModal,
+          }"
           v-html="processedLogWithLinks"
         ></pre>
         <div v-if="detectedLinks.length" class="border-contrast/20 mt-4 border-t pt-4">
@@ -298,7 +313,7 @@
 <script setup lang="ts">
 import { RightArrowIcon, CopyIcon, XIcon, SearchIcon, EyeIcon, CheckIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
-import { useDebounceFn } from "@vueuse/core";
+import { useDebounceFn, useStorage } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import DOMPurify from "dompurify";
@@ -1058,6 +1073,13 @@ const processedLogWithLinks = computed(() => {
     if (safeUrl === "#") return url;
     return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer nofollow" class="text-blue hover:underline">${url}</a>`;
   });
+});
+
+const route = useNativeRoute();
+const serverId = route.params.id;
+
+const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
+  wrapLinesInConsoleLogModal: true,
 });
 
 watch(
