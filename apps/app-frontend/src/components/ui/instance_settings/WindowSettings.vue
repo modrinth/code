@@ -111,7 +111,16 @@ const messages = defineMessages({
           {{ formatMessage(messages.fullscreenDescription) }}
         </p>
       </div>
-      <Toggle id="fullscreen" v-model="fullscreenSetting" :disabled="!overrideWindowSettings" />
+      <Toggle
+        id="fullscreen"
+        :model-value="overrideWindowSettings ? fullscreenSetting : globalSettings.force_fullscreen"
+        :disabled="!overrideWindowSettings"
+        @update:model-value="
+          (e) => {
+            fullscreenSetting = e
+          }
+        "
+      />
     </div>
 
     <div class="mt-4 flex items-center gap-4 justify-between">

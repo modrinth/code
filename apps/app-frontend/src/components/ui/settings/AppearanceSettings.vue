@@ -43,7 +43,16 @@ watch(
       </p>
     </div>
 
-    <Toggle id="advanced-rendering" v-model="themeStore.advancedRendering" />
+    <Toggle
+      id="advanced-rendering"
+      :model-value="themeStore.advancedRendering"
+      @update:model-value="
+        (e) => {
+          themeStore.advancedRendering = e
+          settings.advanced_rendering = themeStore.advancedRendering
+        }
+      "
+    />
   </div>
 
   <div v-if="os !== 'MacOS'" class="mt-4 flex items-center justify-between gap-4">
@@ -80,6 +89,15 @@ watch(
       <h2 class="m-0 text-lg font-extrabold text-contrast">Toggle sidebar</h2>
       <p class="m-0 mt-1">Enables the ability to toggle the sidebar.</p>
     </div>
-    <Toggle id="toggle-sidebar" v-model="settings.toggle_sidebar" />
+    <Toggle
+      id="toggle-sidebar"
+      :model-value="settings.toggle_sidebar"
+      @update:model-value="
+        (e) => {
+          settings.toggle_sidebar = e
+          themeStore.toggleSidebar = settings.toggle_sidebar
+        }
+      "
+    />
   </div>
 </template>
