@@ -763,7 +763,7 @@ pub async fn payment_methods(
 pub struct UserBalance {
     pub available: Decimal,
     pub pending: Decimal,
-    pub next_due: Vec<PendingInterval>,
+    pub pending_interval: Vec<PendingInterval>,
 }
 
 #[derive(Serialize)]
@@ -846,17 +846,18 @@ async fn get_user_balance(
         })
         .unwrap_or((Decimal::ZERO, Decimal::ZERO));
 
-    let next_due = {
+    let pending_interval = {
         let now = Utc::now().date_naive();
 
         let year = now.year();
         let month = now.month();
 
-        let mut next_due_dates = Vec::new();
+        let mut pending_interval_values = Vec::new();
 
         for i in (0..=2).rev() {
             let first_day_of_month = if month <= i {
-                Utc.with_ymd_and_hms(year - 1, 12 - (i - month), 1, 0, 0, 0).unwrap()
+                Utc.with_ymd_and_hms(year - 1, 12 - (i - month), 1, 0, 0, 0)
+                    .unwrap()
             } else {
                 Utc.with_ymd_and_hms(year, month - i, 1, 0, 0, 0).unwrap()
             };
@@ -870,12 +871,13 @@ async fn get_user_balance(
                     Utc.with_ymd_and_hms(year, month + 2, 1, 0, 0, 0).unwrap()
                 };
 
-                (first_day_of_subsequent_month + Duration::days(59)).date_naive()
+                (first_day_of_subsequent_month + Duration::days(59))
+                    .date_naive()
             } else {
                 end_of_net_60_period.date_naive()
             };
 
-            let next_due_value = sqlx::query!(
+            let interval_value = sqlx::query!(
                 "
                 SELECT SUM(amount)
                 FROM payouts_values
@@ -889,13 +891,13 @@ async fn get_user_balance(
             .map(|x| x.sum.unwrap_or(Decimal::ZERO))
             .unwrap_or(Decimal::ZERO);
 
-            next_due_dates.push(PendingInterval {
-                value: next_due_value,
+            pending_interval_values.push(PendingInterval {
+                value: interval_value,
                 date: next_due_date,
             });
         }
 
-        next_due_dates
+        pending_interval_values
     };
 
     Ok(UserBalance {
@@ -903,7 +905,7 @@ async fn get_user_balance(
             - withdrawn.round_dp(16)
             - fees.round_dp(16),
         pending,
-        next_due,
+        pending_interval,
     })
 }
 
