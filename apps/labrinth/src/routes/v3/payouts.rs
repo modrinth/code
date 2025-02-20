@@ -763,6 +763,13 @@ pub async fn payment_methods(
 pub struct UserBalance {
     pub available: Decimal,
     pub pending: Decimal,
+    pub next_due: Vec<PendingInterval>,
+}
+
+#[derive(Serialize)]
+pub struct PendingInterval {
+    pub value: Decimal,
+    pub date: chrono::NaiveDate,
 }
 
 #[get("balance")]
@@ -782,7 +789,7 @@ pub async fn get_balance(
     .await?
     .1;
 
-    let balance = get_user_balance(user.id.into(), &pool).await?;
+    let balance = get_user_balance(user.id, &pool).await?;
 
     Ok(HttpResponse::Ok().json(balance))
 }
@@ -839,11 +846,64 @@ async fn get_user_balance(
         })
         .unwrap_or((Decimal::ZERO, Decimal::ZERO));
 
+    let next_due = {
+        let now = Utc::now().date_naive();
+
+        let year = now.year();
+        let month = now.month();
+
+        let mut next_due_dates = Vec::new();
+
+        for i in (0..=2).rev() {
+            let first_day_of_month = if month <= i {
+                Utc.with_ymd_and_hms(year - 1, 12 - (i - month), 1, 0, 0, 0).unwrap()
+            } else {
+                Utc.with_ymd_and_hms(year, month - i, 1, 0, 0, 0).unwrap()
+            };
+
+            let end_of_net_60_period = first_day_of_month + Duration::days(59);
+
+            let next_due_date = if now == end_of_net_60_period.date_naive() {
+                let first_day_of_subsequent_month = if month == 11 {
+                    Utc.with_ymd_and_hms(year + 1, 1, 1, 0, 0, 0).unwrap()
+                } else {
+                    Utc.with_ymd_and_hms(year, month + 2, 1, 0, 0, 0).unwrap()
+                };
+
+                (first_day_of_subsequent_month + Duration::days(59)).date_naive()
+            } else {
+                end_of_net_60_period.date_naive()
+            };
+
+            let next_due_value = sqlx::query!(
+                "
+                SELECT SUM(amount)
+                FROM payouts_values
+                WHERE user_id = $1 AND date_available = $2
+                ",
+                user_id.0,
+                next_due_date
+            )
+            .fetch_optional(pool)
+            .await?
+            .map(|x| x.sum.unwrap_or(Decimal::ZERO))
+            .unwrap_or(Decimal::ZERO);
+
+            next_due_dates.push(PendingInterval {
+                value: next_due_value,
+                date: next_due_date,
+            });
+        }
+
+        next_due_dates
+    };
+
     Ok(UserBalance {
         available: available.round_dp(16)
             - withdrawn.round_dp(16)
             - fees.round_dp(16),
         pending,
+        next_due,
     })
 }
 
