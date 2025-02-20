@@ -54,7 +54,7 @@
           <SearchIcon class="absolute left-4 top-1/2 -translate-y-1/2" />
         </div>
         <div
-          class="console relative h-full min-h-[516px] w-full overflow-hidden rounded-xl bg-bg text-sm"
+          class="console relative h-full min-h-[516px] w-full overflow-hidden rounded-2xl text-sm"
         ></div>
       </div>
     </div>
