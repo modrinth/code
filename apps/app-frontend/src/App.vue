@@ -191,7 +191,6 @@ initialize_state()
       console.error(err)
       error.showError(err, null, false, 'state_init')
     })
-    error.showError(err, null, false, 'state_init')
   })
   .catch((err) => {
     stateFailed.value = true
