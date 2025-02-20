@@ -1555,36 +1555,36 @@ type ModuleError = {
   timestamp: number;
 };
 
-type GeneralModule = General &
+export type GeneralModule = General &
   GeneralFunctions & {
     error?: ModuleError;
   };
 
-type ContentModule = {
+export type ContentModule = {
   data: Mod[];
   error?: ModuleError;
 } & ContentFunctions;
 
-type BackupsModule = {
+export type BackupsModule = {
   data: Backup[];
   error?: ModuleError;
 } & BackupFunctions;
 
-type NetworkModule = {
+export type NetworkModule = {
   allocations: Allocation[];
   error?: ModuleError;
 } & NetworkFunctions;
 
-type StartupModule = Startup &
+export type StartupModule = Startup &
   StartupFunctions & {
     error?: ModuleError;
   };
 
-type WSModule = JWTAuth & {
+export type WSModule = JWTAuth & {
   error?: ModuleError;
 };
 
-type FSModule = {
+export type FSModule = {
   auth: JWTAuth;
   error?: ModuleError;
 } & FSFunctions;
