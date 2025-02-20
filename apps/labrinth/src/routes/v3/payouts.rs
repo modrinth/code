@@ -789,7 +789,7 @@ pub async fn get_balance(
     .await?
     .1;
 
-    let balance = get_user_balance(user.id, &pool).await?;
+    let balance = get_user_balance(user.id.into(), &pool).await?;
 
     Ok(HttpResponse::Ok().json(balance))
 }
@@ -884,7 +884,9 @@ async fn get_user_balance(
                 WHERE user_id = $1 AND date_available = $2
                 ",
                 user_id.0,
-                next_due_date
+                Utc.from_utc_datetime(
+                    &next_due_date.and_hms_opt(0, 0, 0).unwrap()
+                )
             )
             .fetch_optional(pool)
             .await?
