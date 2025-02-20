@@ -179,7 +179,6 @@
         <Toggle
           class="!mx-2"
           :model-value="!item.data.disabled"
-          :checked="!item.data.disabled"
           @update:model-value="toggleDisableMod(item.data)"
         />
         <ButtonStyled type="transparent" circular>
