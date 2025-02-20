@@ -294,12 +294,19 @@
           <template #moderation> <ModerationIcon aria-hidden="true" /> Moderation </template>
           <template #sign-out> <LogOutIcon aria-hidden="true" /> Sign out </template>
         </OverflowMenu>
-        <ButtonStyled v-else color="brand">
-          <nuxt-link to="/auth/sign-in">
-            <LogInIcon aria-hidden="true" />
-            Sign in
-          </nuxt-link>
-        </ButtonStyled>
+        <template v-else>
+          <ButtonStyled color="brand">
+            <nuxt-link to="/auth/sign-in">
+              <LogInIcon aria-hidden="true" />
+              Sign in
+            </nuxt-link>
+          </ButtonStyled>
+          <ButtonStyled circular>
+            <nuxt-link v-tooltip="'Settings'" to="/settings">
+              <SettingsIcon aria-label="Settings" />
+            </nuxt-link>
+          </ButtonStyled>
+        </template>
       </div>
     </header>
     <header class="mobile-navigation mobile-only">
