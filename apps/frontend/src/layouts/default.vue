@@ -473,7 +473,7 @@
         </button>
       </div>
     </header>
-    <main>
+    <main class="min-h-[calc(100vh-4.5rem-310.59px)]">
       <ModalCreation v-if="auth.user" ref="modal_creation" />
       <CollectionCreateModal ref="modal_collection_creation" />
       <OrganizationCreateModal ref="modal_organization_creation" />
