@@ -1,6 +1,6 @@
 <template>
   <div
-    class="parsed-log relative flex h-8 w-full items-center overflow-hidden rounded-lg px-6"
+    class="parsed-log relative flex h-8 w-full select-none items-center overflow-hidden rounded-lg px-6"
     @mouseenter="checkOverflow"
     @touchstart="checkOverflow"
   >

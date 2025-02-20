@@ -115,7 +115,7 @@
         <div
           ref="scrollContainer"
           data-pyro-terminal-root
-          class="scrollbar-none absolute left-0 top-0 h-full w-full select-text overflow-x-auto overflow-y-auto py-6 pb-[72px]"
+          class="scrollbar-none absolute left-0 top-0 h-full w-full select-none overflow-x-auto overflow-y-auto py-6 pb-[72px]"
           @scroll.passive="() => handleListScroll()"
         >
           <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
@@ -144,7 +144,7 @@
                     <div @mousedown.stop @click.stop>
                       <button
                         v-if="searchInput"
-                        class="jump-button mr-4 flex items-center gap-1 rounded-md bg-bg-blue px-2 py-1 text-xs text-blue transition-all hover:scale-105 active:scale-95"
+                        class="jump-button mr-4 flex select-none items-center gap-1 rounded-md bg-bg-blue px-2 py-1 text-xs text-blue transition-all hover:scale-105 active:scale-95"
                         @mousedown.stop
                         @click.stop="() => jumpToLine(item)"
                       >
@@ -160,7 +160,7 @@
                     shouldShowSeparator(visibleStartIndex + index, visibleStartIndex + index + 1)
                   "
                   data-pyro-terminal-separator
-                  class="flex h-8 select-none items-center justify-center opacity-50"
+                  class="flex h-8 !select-none items-center justify-center opacity-50"
                   aria-hidden="true"
                 >
                   <div class="h-[1px] w-full bg-contrast opacity-50"></div>
@@ -170,7 +170,9 @@
                       <div class="size-1 rounded-full bg-contrast opacity-70"></div>
                       <div class="size-1 rounded-full bg-contrast opacity-70"></div>
                     </div>
-                    <span class="select-none whitespace-pre text-xs text-contrast">
+                    <div
+                      class="pointer-events-none select-none whitespace-pre text-xs text-contrast"
+                    >
                       {{
                         shouldShowSeparator(
                           visibleStartIndex + index,
@@ -186,7 +188,7 @@
                           : "s"
                       }}
                       between
-                    </span>
+                    </div>
                   </div>
                   <div class="h-[1px] w-full bg-contrast opacity-50"></div>
                 </li>
