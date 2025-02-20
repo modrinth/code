@@ -21,6 +21,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
   developerMode: false,
   showVersionFilesInTable: false,
   showAdsWithPlus: false,
+  alwaysShowChecklistAsPopup: true,
 
   // Feature toggles
   projectTypesPrimaryNav: false,
