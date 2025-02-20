@@ -54,7 +54,8 @@ const locations = ref([
   { name: "New York", lat: 40.7128, lng: -74.006, active: true, clicked: false },
   { name: "Los Angeles", lat: 34.0522, lng: -118.2437, active: true, clicked: false },
   { name: "Miami", lat: 25.7617, lng: -80.1918, active: true, clicked: false },
-  { name: "Seattle", lat: 47.608013, lng: -122.3321, active: true, clicked: false },
+  { name: "Spokane", lat: 47.667309, lng: -117.411922, active: true, clicked: false },
+  { name: "Dallas", lat: 32.78372, lng: -96.7947, active: true, clicked: false },
   // Future Locations
   // { name: "London", lat: 51.5074, lng: -0.1278, active: false, clicked: false },
   // { name: "Frankfurt", lat: 50.1109, lng: 8.6821, active: false, clicked: false },
