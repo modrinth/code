@@ -1,6 +1,30 @@
 <template>
   <div class="contents">
-    <div v-if="data" class="contents">
+    <div
+      v-if="server.backups?.error"
+      class="flex w-full flex-col items-center justify-center gap-4 p-4"
+    >
+      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+              <IssuesIcon class="size-12 text-orange" />
+            </div>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load backups</h1>
+          </div>
+          <p class="text-lg text-secondary">
+            We couldn't load your server's backups. Here's what went wrong:
+          </p>
+          <p>
+            <span class="break-all font-mono">{{ JSON.stringify(server.backups.error) }}</span>
+          </p>
+          <ButtonStyled size="large" color="brand" @click="() => server.refresh(['backups'])">
+            <button class="mt-6 !w-full">Retry</button>
+          </ButtonStyled>
+        </div>
+      </div>
+    </div>
+    <div v-else-if="data" class="contents">
       <LazyUiServersBackupCreateModal
         ref="createBackupModal"
         :server="server"
@@ -241,6 +265,7 @@ import {
   BoxIcon,
   LockIcon,
   LockOpenIcon,
+  IssuesIcon,
 } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
@@ -297,33 +322,37 @@ const showbackupSettingsModal = () => {
   backupSettingsModal.value?.show();
 };
 
-const handleBackupCreated = (payload: { success: boolean; message: string }) => {
+const handleBackupCreated = async (payload: { success: boolean; message: string }) => {
   if (payload.success) {
     addNotification({ type: "success", text: payload.message });
+    await props.server.refresh(["backups"]);
   } else {
     addNotification({ type: "error", text: payload.message });
   }
 };
 
-const handleBackupRenamed = (payload: { success: boolean; message: string }) => {
+const handleBackupRenamed = async (payload: { success: boolean; message: string }) => {
   if (payload.success) {
     addNotification({ type: "success", text: payload.message });
+    await props.server.refresh(["backups"]);
   } else {
     addNotification({ type: "error", text: payload.message });
   }
 };
 
-const handleBackupRestored = (payload: { success: boolean; message: string }) => {
+const handleBackupRestored = async (payload: { success: boolean; message: string }) => {
   if (payload.success) {
     addNotification({ type: "success", text: payload.message });
+    await props.server.refresh(["backups"]);
   } else {
     addNotification({ type: "error", text: payload.message });
   }
 };
 
-const handleBackupDeleted = (payload: { success: boolean; message: string }) => {
+const handleBackupDeleted = async (payload: { success: boolean; message: string }) => {
   if (payload.success) {
     addNotification({ type: "success", text: payload.message });
+    await props.server.refresh(["backups"]);
   } else {
     addNotification({ type: "error", text: payload.message });
   }
@@ -387,8 +416,8 @@ onMounted(() => {
     }
 
     if (hasOngoingBackups) {
-      refreshInterval.value = setInterval(() => {
-        props.server.refresh(["backups"]);
+      refreshInterval.value = setInterval(async () => {
+        await props.server.refresh(["backups"]);
       }, 10000);
     }
   });

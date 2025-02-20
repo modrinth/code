@@ -10,10 +10,10 @@
             <div class="grid place-content-center rounded-full bg-bg-blue p-4">
               <TransferIcon class="size-12 text-blue" />
             </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server Upgrading</h1>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server upgrading</h1>
           </div>
           <p class="text-lg text-secondary">
-            Your server's hardware is currently being upgraded and will be back online shortly.
+            Your server's hardware is currently being upgraded and will be back online shortly!
           </p>
         </div>
       </div>
@@ -47,17 +47,18 @@
             <div class="grid place-content-center rounded-full bg-bg-orange p-4">
               <LockIcon class="size-12 text-orange" />
             </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server Suspended</h1>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server suspended</h1>
           </div>
           <p class="text-lg text-secondary">
             {{
-              serverData.suspension_reason
-                ? `Your server has been suspended: ${serverData.suspension_reason}`
-                : "Your server has been suspended."
+              serverData.suspension_reason === "cancelled"
+                ? "Your subscription has been cancelled."
+                : serverData.suspension_reason
+                  ? `Your server has been suspended: ${serverData.suspension_reason}`
+                  : "Your server has been suspended."
             }}
             <br />
-            This is most likely due to a billing issue. Please check your billing information and
-            contact Modrinth support if you believe this is an error.
+            Contact Modrinth support if you believe this is an error.
           </p>
         </div>
         <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
@@ -66,7 +67,10 @@
       </div>
     </div>
     <div
-      v-else-if="server.error && server.error.message.includes('Forbidden')"
+      v-else-if="
+        server.general?.error?.error.statusCode === 403 ||
+        server.general?.error?.error.statusCode === 404
+      "
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -82,14 +86,15 @@
             this is an error, please contact Modrinth support.
           </p>
         </div>
-        <UiCopyCode :text="server.error ? String(server.error) : 'Unknown error'" />
+        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+
         <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
           <button class="mt-6 !w-full">Go back to all servers</button>
         </ButtonStyled>
       </div>
     </div>
     <div
-      v-else-if="server.error && server.error.message.includes('Service Unavailable')"
+      v-else-if="server.general?.error?.error.statusCode === 503"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -141,7 +146,7 @@
       </div>
     </div>
     <div
-      v-else-if="server.error"
+      v-else-if="server.general?.error"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -164,7 +169,7 @@
             temporary network issue. You'll be reconnected automatically.
           </p>
         </div>
-        <UiCopyCode :text="server.error ? String(server.error) : 'Unknown error'" />
+        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
         <ButtonStyled
           :disabled="formattedTime !== '00'"
           size="large"
@@ -228,7 +233,7 @@
             :show-loader-label="showLoaderLabel"
             :uptime-seconds="uptimeSeconds"
             :linked="true"
-            class="flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+            class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
           />
         </div>
       </div>
@@ -363,7 +368,6 @@
             </div>
           </div>
         </div>
-
         <NuxtPage
           :route="route"
           :is-connected="isConnected"
@@ -425,21 +429,25 @@ const createdAt = ref(
 const route = useNativeRoute();
 const router = useRouter();
 const serverId = route.params.id as string;
-const server = await usePyroServer(serverId, [
-  "general",
-  "content",
-  "backups",
-  "network",
-  "startup",
-  "ws",
-  "fs",
-]);
+
+const server = await usePyroServer(serverId, ["general", "ws"]);
+
+const loadModulesPromise = Promise.resolve().then(() => {
+  if (server.general?.status === "suspended") {
+    return;
+  }
+  return server.loadModules(["content", "backups", "network", "startup", "fs"]);
+});
+
+provide("modulesLoaded", loadModulesPromise);
 
 watch(
-  () => server.error,
-  (newError) => {
+  () => [server.general?.error, server.ws?.error],
+  ([generalError, wsError]) => {
     if (server.general?.status === "suspended") return;
-    if (newError && !newError.message.includes("Forbidden")) {
+
+    const error = generalError?.error || wsError?.error;
+    if (error && error.statusCode !== 403) {
       startPolling();
     }
   },
@@ -450,11 +458,9 @@ const errorMessage = ref("An unexpected error occurred.");
 const errorLog = ref("");
 const errorLogFile = ref("");
 const serverData = computed(() => server.general);
-const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const pyroConsole = usePyroConsole();
-console.log("||||||||||||||||||||||| console", pyroConsole.output);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);
@@ -465,6 +471,7 @@ const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>();
 const uptimeSeconds = ref(0);
 const firstConnect = ref(true);
 const copied = ref(false);
+const error = ref<Error | null>(null);
 
 const initialConsoleMessage = [
   "   __________________________________________________",
@@ -665,6 +672,26 @@ const newLoader = ref<string | null>(null);
 const newLoaderVersion = ref<string | null>(null);
 const newMCVersion = ref<string | null>(null);
 
+const onReinstall = (potentialArgs: any) => {
+  if (!serverData.value) return;
+
+  serverData.value.status = "installing";
+
+  if (potentialArgs?.loader) {
+    newLoader.value = potentialArgs.loader;
+  }
+  if (potentialArgs?.lVersion) {
+    newLoaderVersion.value = potentialArgs.lVersion;
+  }
+  if (potentialArgs?.mVersion) {
+    newMCVersion.value = potentialArgs.mVersion;
+  }
+
+  error.value = null;
+  errorTitle.value = "Error";
+  errorMessage.value = "An unexpected error occurred.";
+};
+
 const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   switch (data.result) {
     case "ok": {
@@ -736,26 +763,6 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
       break;
     }
   }
-};
-
-const onReinstall = (potentialArgs: any) => {
-  if (!serverData.value) return;
-
-  serverData.value.status = "installing";
-
-  if (potentialArgs?.loader) {
-    newLoader.value = potentialArgs.loader;
-  }
-  if (potentialArgs?.lVersion) {
-    newLoaderVersion.value = potentialArgs.lVersion;
-  }
-  if (potentialArgs?.mVersion) {
-    newMCVersion.value = potentialArgs.mVersion;
-  }
-
-  error.value = null;
-  errorTitle.value = "Error";
-  errorMessage.value = "An unexpected error occurred.";
 };
 
 const updateStats = (currentStats: Stats["current"]) => {
@@ -924,6 +931,10 @@ const cleanup = () => {
 
 onMounted(() => {
   isMounted.value = true;
+  if (server.general?.status === "suspended") {
+    isLoading.value = false;
+    return;
+  }
   if (server.error) {
     if (!server.error.message.includes("Forbidden")) {
       startPolling();
@@ -991,7 +1002,7 @@ definePageMeta({
 });
 </script>
 
-<style scoped>
+<style>
 @keyframes server-action-buttons-anim {
   0% {
     opacity: 0;
