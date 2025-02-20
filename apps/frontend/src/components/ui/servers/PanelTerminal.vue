@@ -224,11 +224,22 @@
           <button
             data-pyro-copy
             label="Copy selected lines"
-            class="experimental-styles-within flex h-12 flex-row items-center justify-center gap-2 rounded-full border-[1px] border-solid border-button-border bg-bg-raised px-4 text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+            class="experimental-styles-within flex h-12 flex-row items-center justify-center rounded-full border-[1px] border-solid border-button-border bg-bg-raised text-contrast transition-all duration-200 hover:scale-110 active:scale-95"
+            :class="{ 'w-[100px] px-4': !isCopied, 'w-[130px] px-4': isCopied }"
             @click="copySelectedLines"
           >
-            <CopyIcon class="h-5 w-5" />
-            <span class="">Copy</span>
+            <div class="relative flex w-full items-center justify-center">
+              <Transition name="copy-state" mode="out-in">
+                <div v-if="isCopied" key="copied" class="flex items-center justify-center gap-2">
+                  <CheckIcon class="min-h-5 min-w-5 text-green" />
+                  <span>Copied!</span>
+                </div>
+                <div v-else key="copy" class="flex items-center justify-center gap-2">
+                  <CopyIcon class="min-h-5 min-w-5" />
+                  <span>Copy</span>
+                </div>
+              </Transition>
+            </div>
           </button>
           <Transition name="view-button">
             <button
@@ -285,7 +296,7 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon, CopyIcon, XIcon, SearchIcon, EyeIcon } from "@modrinth/assets";
+import { RightArrowIcon, CopyIcon, XIcon, SearchIcon, EyeIcon, CheckIcon } from "@modrinth/assets";
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
@@ -886,9 +897,10 @@ const handleCopy = (event: KeyboardEvent) => {
 
   navigator.clipboard.writeText(selectedLines.join("\n"));
 
-  selectionStart.value = null;
-  selectionEnd.value = null;
-  lastClickIndex.value = null;
+  isCopied.value = true;
+  setTimeout(() => {
+    isCopied.value = false;
+  }, 2000);
 };
 
 const hasSelection = computed(
@@ -905,6 +917,8 @@ const isSingleLineSelected = computed(
     selectionStart.value === selectionEnd.value,
 );
 
+const isCopied = ref(false);
+
 const copySelectedLines = () => {
   if (!hasSelection.value && !isSingleLineSelected.value) return;
 
@@ -920,10 +934,21 @@ const copySelectedLines = () => {
 
   navigator.clipboard.writeText(selectedLines.join("\n"));
 
-  selectionStart.value = null;
-  selectionEnd.value = null;
-  lastClickIndex.value = null;
+  isCopied.value = true;
+  setTimeout(() => {
+    isCopied.value = false;
+  }, 2000);
 };
+
+watch(
+  [selectionStart, selectionEnd],
+  () => {
+    if (isCopied.value) {
+      isCopied.value = false;
+    }
+  },
+  { immediate: true },
+);
 
 const getSelectionPosition = () => {
   if (!hasSelection.value || !scrollContainer.value) return { start: 0, end: 0 };
@@ -1394,5 +1419,27 @@ html.dark-mode .progressive-gradient {
 
 .group:hover .jump-button:hover {
   opacity: 1;
+}
+
+.copy-state-enter-active,
+.copy-state-leave-active {
+  transition: all 150ms ease;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.copy-state-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.copy-state-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+[data-pyro-copy] {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>
