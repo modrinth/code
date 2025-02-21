@@ -87,7 +87,8 @@
 
     <p>
       To understand when revenue becomes available, you can use this calculator to estimate when
-      revenue earned on a specific date will be available for withdrawal. Please be advised that all dates within this calculator are represented at 00:00 UTC.
+      revenue earned on a specific date will be available for withdrawal. Please be advised that all
+      dates within this calculator are represented at 00:00 UTC.
     </p>
 
     <table>
