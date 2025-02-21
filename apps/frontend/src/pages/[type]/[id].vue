@@ -805,7 +805,6 @@ import {
   ImageIcon as GalleryIcon,
   GameIcon,
   HeartIcon,
-  InfoIcon,
   LinkIcon as LinksIcon,
   MoreVerticalIcon,
   PlusIcon,
