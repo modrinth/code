@@ -19,7 +19,7 @@
       </div>
     </div>
     <div
-      v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'support'"
+      v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'support'"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -38,7 +38,7 @@
       </div>
     </div>
     <div
-      v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason !== 'upgrading'"
+      v-else-if="serverData?.status === 'suspended'"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -462,7 +462,7 @@ const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
 const errorLog = ref("");
 const errorLogFile = ref("");
-const serverData = computed(() => server.general);
+const serverData = computed<GeneralModule | undefined>(() => server.general);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const pyroConsole = usePyroConsole();
