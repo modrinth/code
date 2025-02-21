@@ -57,16 +57,7 @@ watch(
         </p>
       </div>
 
-      <Toggle
-        id="fullscreen"
-        :model-value="settings.force_fullscreen"
-        :checked="settings.force_fullscreen"
-        @update:model-value="
-          (e) => {
-            settings.force_fullscreen = e
-          }
-        "
-      />
+      <Toggle id="fullscreen" v-model="settings.force_fullscreen" />
     </div>
 
     <div class="flex items-center justify-between gap-4">
