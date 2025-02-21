@@ -51,7 +51,12 @@
         {{ formattedModifiedDate }}
       </span>
       <ButtonStyled circular type="transparent">
-        <UiServersTeleportOverflowMenu :options="menuOptions" direction="left" position="bottom">
+        <UiServersTeleportOverflowMenu
+          ref="dropdownMenuRef"
+          :options="menuOptions"
+          direction="left"
+          position="bottom"
+        >
           <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
           <template #rename><EditIcon /> Rename</template>
           <template #move><RightArrowIcon /> Move</template>
@@ -248,8 +253,11 @@ const formattedSize = computed(() => {
   return `${size} ${units[exponent]}`;
 });
 
+const dropdownMenuRef = ref();
+
 const openContextMenu = (event: MouseEvent) => {
   event.preventDefault();
+  dropdownMenuRef.value?.close();
   emit("contextmenu", event.clientX, event.clientY);
 };
 

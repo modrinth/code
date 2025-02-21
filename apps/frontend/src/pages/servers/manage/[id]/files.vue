@@ -125,23 +125,29 @@
       </div>
     </FilesUploadDragAndDrop>
 
-    <UiServersFilesContextMenu
-      ref="contextMenu"
-      :item="contextMenuInfo.item"
-      :x="contextMenuInfo.x"
-      :y="contextMenuInfo.y"
-      :is-at-bottom="isAtBottom"
-      @rename="showRenameModal"
-      @move="showMoveModal"
-      @download="downloadFile"
-      @delete="showDeleteModal"
-    />
+    <UiServersTeleportOverflowMenu
+      ref="contextMenuRef"
+      :options="contextMenuOptions"
+      :is-context-menu="true"
+    >
+      <template #rename><EditIcon /> Rename</template>
+      <template #move><RightArrowIcon /> Move</template>
+      <template #download><DownloadIcon /> Download</template>
+      <template #delete><TrashIcon /> Delete</template>
+    </UiServersTeleportOverflowMenu>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
-import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
+import {
+  UploadIcon,
+  FolderOpenIcon,
+  EditIcon,
+  DownloadIcon,
+  TrashIcon,
+  RightArrowIcon,
+} from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
@@ -180,7 +186,6 @@ const router = useRouter();
 const VAceEditor = ref();
 const mainContent = ref<HTMLElement | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
-const contextMenu = ref();
 const operationHistory = ref<Operation[]>([]);
 const redoStack = ref<Operation[]>([]);
 
@@ -193,7 +198,6 @@ const currentPage = ref(1);
 
 const currentPath = ref(typeof route.query.path === "string" ? route.query.path : "");
 
-const isAtBottom = ref(false);
 const contextMenuInfo = ref<any>({ item: null, x: 0, y: 0 });
 
 const createItemModal = ref();
@@ -668,14 +672,37 @@ const onInit = (editor: any) => {
   });
 };
 
+const contextMenuRef = ref();
+const contextMenuOptions = computed(() => {
+  if (!contextMenuInfo.value.item) return [];
+
+  return [
+    {
+      id: "rename",
+      action: () => showRenameModal(contextMenuInfo.value.item),
+    },
+    {
+      id: "move",
+      action: () => showMoveModal(contextMenuInfo.value.item),
+    },
+    {
+      id: "download",
+      action: () => downloadFile(contextMenuInfo.value.item),
+      shown: contextMenuInfo.value.item?.type !== "directory",
+    },
+    {
+      id: "delete",
+      action: () => showDeleteModal(contextMenuInfo.value.item),
+      color: "red" as const,
+    },
+  ];
+});
+
 const showContextMenu = async (item: any, x: number, y: number) => {
   contextMenuInfo.value = { item, x, y };
   selectedItem.value = item;
   await nextTick();
-  if (!contextMenu.value?.ctxRef) return false;
-  const screenHeight = window.innerHeight;
-  const ctxRect = contextMenu.value.ctxRef.getBoundingClientRect();
-  isAtBottom.value = ctxRect.bottom > screenHeight;
+  contextMenuRef.value?.openContextMenu(x, y);
 };
 
 const onAnywhereClicked = (e: MouseEvent) => {
