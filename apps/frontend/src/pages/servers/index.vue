@@ -456,9 +456,10 @@
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
               <p class="m-0 !leading-[190%]">
-                Currently, Modrinth Servers are located in New York, Los Angeles, Seattle, and
-                Miami. More regions are coming soon! Your server's location is currently chosen
-                algorithmically, but you will be able to choose a region in the future.
+                Currently, Modrinth Servers are located throughout the United States in New York,
+                Los Angelas, Dallas, Miami, and Spokane. More regions are coming soon! Your server's
+                location is currently chosen algorithmically, but you will be able to choose a
+                region in the future.
               </p>
             </details>
 
@@ -539,9 +540,9 @@
                 <p
                   class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
                 >
-                  With strategically placed servers in New York, Los Angeles, Seattle, and Miami, we
-                  ensure low latency connections for players across North America. Each location is
-                  equipped with high-performance hardware and DDoS protection.
+                  With strategically placed servers in New York, California, Texas, Florida, and
+                  Washington, we ensure low latency connections for players across North America.
+                  Each location is equipped with high-performance hardware and DDoS protection.
                 </p>
               </div>
 

@@ -32,6 +32,9 @@
   "button.upload-image": {
     "defaultMessage": "Upload image"
   },
+  "changelog.justNow": {
+    "defaultMessage": "Just now"
+  },
   "changelog.product.api": {
     "defaultMessage": "API"
   },
