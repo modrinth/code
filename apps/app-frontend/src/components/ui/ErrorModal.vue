@@ -1,7 +1,16 @@
 <script setup>
-import { XIcon, HammerIcon, LogInIcon, UpdatedIcon } from '@modrinth/assets'
+import {
+  CheckIcon,
+  DropdownIcon,
+  XIcon,
+  HammerIcon,
+  LogInIcon,
+  UpdatedIcon,
+  CopyIcon,
+} from '@modrinth/assets'
 import { ChatIcon } from '@/assets/icons'
-import { ref } from 'vue'
+import { ButtonStyled, Collapsible } from '@modrinth/ui'
+import { ref, computed } from 'vue'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleError } from '@/store/notifications.js'
 import { handleSevereError } from '@/store/error.js'
@@ -13,6 +22,7 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 const errorModal = ref()
 const error = ref()
 const closable = ref(true)
+const errorCollapsed = ref(false)
 
 const title = ref('An error occurred')
 const errorType = ref('unknown')
@@ -117,6 +127,26 @@ async function repairInstance() {
     handleSevereError(err)
   }
   loadingRepair.value = false
+}
+
+const hasDebugInfo = computed(
+  () =>
+    errorType.value === 'directory_move' ||
+    errorType.value === 'minecraft_auth' ||
+    errorType.value === 'state_init' ||
+    errorType.value === 'no_loader_version',
+)
+
+const debugInfo = computed(() => error.value.message ?? error.value ?? 'No error message.')
+
+const copied = ref(false)
+
+async function copyToClipboard(text) {
+  await navigator.clipboard.writeText(text)
+  copied.value = true
+  setTimeout(() => {
+    copied.value = false
+  }, 3000)
 }
 </script>
 
@@ -244,16 +274,9 @@ async function repairInstance() {
           </div>
         </template>
         <template v-else>
-          {{ error.message ?? error }}
+          {{ debugInfo }}
         </template>
-        <template
-          v-if="
-            errorType === 'directory_move' ||
-            errorType === 'minecraft_auth' ||
-            errorType === 'state_init' ||
-            errorType === 'no_loader_version'
-          "
-        >
+        <template v-if="hasDebugInfo">
           <hr />
           <p>
             If nothing is working and you need help, visit
@@ -261,16 +284,39 @@ async function repairInstance() {
             and start a chat using the widget in the bottom right and we will be more than happy to
             assist! Make sure to provide the following debug information to the agent:
           </p>
-          <details>
-            <summary>Debug information</summary>
-            {{ error.message ?? error }}
-          </details>
         </template>
       </div>
-      <div class="input-group push-right">
-        <a :href="supportLink" class="btn" @click="errorModal.hide()"><ChatIcon /> Get support</a>
-        <button v-if="closable" class="btn" @click="errorModal.hide()"><XIcon /> Close</button>
+      <div class="flex items-center gap-2">
+        <ButtonStyled>
+          <a :href="supportLink" @click="errorModal.hide()"><ChatIcon /> Get support</a>
+        </ButtonStyled>
+        <ButtonStyled v-if="closable">
+          <button @click="errorModal.hide()"><XIcon /> Close</button>
+        </ButtonStyled>
+        <ButtonStyled v-if="hasDebugInfo">
+          <button :disabled="copied" @click="copyToClipboard(debugInfo)">
+            <template v-if="copied"> <CheckIcon class="text-green" /> Copied! </template>
+            <template v-else> <CopyIcon /> Copy debug info </template>
+          </button>
+        </ButtonStyled>
       </div>
+      <template v-if="hasDebugInfo">
+        <div class="bg-button-bg rounded-xl mt-2 overflow-clip">
+          <button
+            class="flex items-center justify-between w-full bg-transparent border-0 px-4 py-3 cursor-pointer"
+            @click="errorCollapsed = !errorCollapsed"
+          >
+            <span class="text-contrast font-extrabold m-0">Debug information:</span>
+            <DropdownIcon
+              class="h-5 w-5 text-secondary transition-transform"
+              :class="{ 'rotate-180': !errorCollapsed }"
+            />
+          </button>
+          <Collapsible :collapsed="errorCollapsed">
+            <pre class="m-0 px-4 py-3 bg-bg rounded-none">{{ debugInfo }}</pre>
+          </Collapsible>
+        </div>
+      </template>
     </div>
   </ModalWrapper>
 </template>
