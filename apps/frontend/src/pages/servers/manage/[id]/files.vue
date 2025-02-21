@@ -189,6 +189,8 @@ const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
+const modulesLoaded = inject<Promise<void>>("modulesLoaded");
+
 const route = useRoute();
 const router = useRouter();
 
@@ -245,6 +247,8 @@ useHead({
 });
 
 const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
+  await modulesLoaded;
+
   const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
   try {
     const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
@@ -719,7 +723,22 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
   }
 };
 
+const initializeFileEdit = async () => {
+  if (!route.query.editing || !props.server.fs) return;
+
+  const filePath = route.query.editing as string;
+  await editFile({
+    name: filePath.split("/").pop() || "",
+    type: "file",
+    path: filePath,
+  });
+};
+
 onMounted(async () => {
+  await modulesLoaded;
+
+  await initializeFileEdit();
+
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/mode-yaml");
