@@ -49,7 +49,7 @@
           @share="requestShareLink"
         />
 
-        <div v-if="!isEditing">
+        <div v-if="!isEditing" class="relative z-0">
           <UiServersFilesLabelBar
             :sort-field="sortMethod"
             :sort-desc="sortDesc"
