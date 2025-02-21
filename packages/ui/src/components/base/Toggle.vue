@@ -1,8 +1,8 @@
 <template>
   <input
+    :id="id"
     type="checkbox"
     class="switch stylized-toggle"
-    :id="id"
     :disabled="disabled"
     :checked="checked"
     @change="checked = !checked"
