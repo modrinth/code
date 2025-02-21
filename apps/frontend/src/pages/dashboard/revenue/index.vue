@@ -262,12 +262,4 @@ strong {
     }
   }
 }
-
-//@media screen and (max-width: 1085px) {
-//  .available-soon-item {
-//    flex-direction: column;
-//    align-items: flex-start;
-//    margin-right: auto;
-//  }
-//}
 </style>
