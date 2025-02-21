@@ -1,12 +1,12 @@
 <template>
-  <div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
+  <div ref="sentinel" class="sentinel" data-pyro-files-sentinel />
   <header
     :class="[
       'duration-20 top-0 flex select-none flex-col justify-between gap-2 bg-table-alternateRow p-3 transition-[border-radius] sm:h-12 sm:flex-row',
       !isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
     ]"
-    data-pyro-files-state="browsing"
-    aria-label="File navigation"
+    :data-pyro-files-state="mode"
+    :aria-label="mode === 'editing' ? 'File editor navigation' : 'File navigation'"
   >
     <nav
       aria-label="Breadcrumb navigation"
@@ -19,7 +19,7 @@
               v-tooltip="'Back to home'"
               type="button"
               class="mr-2 grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-              @click="$emit('navigate', -1)"
+              @click="mode === 'editing' ? $emit('cancel') : $emit('navigate', -1)"
             >
               <span
                 class="grid size-8 place-content-center rounded-full bg-button-bg p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
@@ -58,19 +58,69 @@
                     </button>
                   </ButtonStyled>
                   <ChevronRightIcon
-                    v-if="index < breadcrumbSegments.length - 1"
+                    v-if="index < breadcrumbSegments.length - 1 || mode === 'editing'"
                     class="size-4 flex-shrink-0 text-secondary"
                     aria-hidden="true"
                   />
                 </div>
               </li>
             </TransitionGroup>
+            <li v-if="mode === 'editing'" class="flex items-center px-3 text-sm">
+              <span class="font-semibold !text-contrast" aria-current="location">{{
+                fileName
+              }}</span>
+            </li>
           </ol>
         </li>
       </ol>
     </nav>
 
-    <div class="flex flex-shrink-0 items-center gap-1">
+    <div v-if="mode === 'editing'" class="flex items-center gap-2">
+      <Button
+        v-if="isLogFile"
+        v-tooltip="'Share to mclo.gs'"
+        icon-only
+        transparent
+        aria-label="Share to mclo.gs"
+        @click="$emit('share')"
+      >
+        <ShareIcon />
+      </Button>
+      <ButtonStyled type="transparent">
+        <UiServersTeleportOverflowMenu
+          position="bottom"
+          direction="left"
+          aria-label="Save file"
+          :options="[
+            { id: 'save', action: () => $emit('save') },
+            { id: 'save-as', action: () => $emit('save-as') },
+            { id: 'save&restart', action: () => $emit('save-restart') },
+          ]"
+        >
+          <SaveIcon aria-hidden="true" />
+          <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+          <template #save> <SaveIcon aria-hidden="true" /> Save </template>
+          <template #save-as> <SaveIcon aria-hidden="true" /> Save as... </template>
+          <template #save&restart>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Save & restart
+          </template>
+        </UiServersTeleportOverflowMenu>
+      </ButtonStyled>
+    </div>
+
+    <div v-else class="flex flex-shrink-0 items-center gap-1">
       <div class="flex w-full flex-row-reverse sm:flex-row">
         <ButtonStyled type="transparent">
           <UiServersTeleportOverflowMenu
@@ -85,9 +135,7 @@
           >
             <div class="flex items-center gap-1">
               <FilterIcon aria-hidden="true" class="h-5 w-5" />
-              <span class="hidden text-sm font-medium sm:block">
-                {{ filterLabel }}
-              </span>
+              <span class="hidden text-sm font-medium sm:block">{{ filterLabel }}</span>
             </div>
             <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
             <template #all>Show all</template>
@@ -149,15 +197,20 @@ import {
   HomeIcon,
   ChevronRightIcon,
   FilterIcon,
+  ShareIcon,
+  SaveIcon,
 } from "@modrinth/assets";
-import { ButtonStyled } from "@modrinth/ui";
+import { Button, ButtonStyled } from "@modrinth/ui";
 import { ref, computed } from "vue";
 import { useIntersectionObserver } from "@vueuse/core";
 
 const props = defineProps<{
+  mode: "browsing" | "editing";
   breadcrumbSegments: string[];
-  searchQuery: string;
-  currentFilter: string;
+  searchQuery?: string;
+  currentFilter?: string;
+  fileName?: string;
+  filePath?: string;
 }>();
 
 defineEmits<{
@@ -166,13 +219,18 @@ defineEmits<{
   (e: "upload"): void;
   (e: "update:searchQuery", value: string): void;
   (e: "filter", type: string): void;
+  (e: "cancel"): void;
+  (e: "save"): void;
+  (e: "save-as"): void;
+  (e: "save-restart"): void;
+  (e: "share"): void;
 }>();
 
-const pyroFilesSentinel = ref<HTMLElement | null>(null);
+const sentinel = ref<HTMLElement | null>(null);
 const isStuck = ref(false);
 
 useIntersectionObserver(
-  pyroFilesSentinel,
+  sentinel,
   ([{ isIntersecting }]) => {
     isStuck.value = !isIntersecting;
   },
@@ -188,6 +246,10 @@ const filterLabel = computed(() => {
     default:
       return "Show all";
   }
+});
+
+const isLogFile = computed(() => {
+  return props.filePath?.startsWith("logs") || props.filePath?.endsWith(".log");
 });
 </script>
 

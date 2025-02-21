@@ -30,17 +30,26 @@
       @files-dropped="handleDroppedFiles"
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
-        <div v-if="!isEditing" class="contents">
-          <UiServersFilesBrowseNavbar
-            :breadcrumb-segments="breadcrumbSegments"
-            :search-query="searchQuery"
-            :current-filter="viewFilter"
-            @navigate="navigateToSegment"
-            @create="showCreateModal"
-            @upload="initiateFileUpload"
-            @filter="handleFilter"
-            @update:search-query="searchQuery = $event"
-          />
+        <FilesNavbar
+          :mode="isEditing ? 'editing' : 'browsing'"
+          :breadcrumb-segments="breadcrumbSegments"
+          :search-query="searchQuery"
+          :current-filter="viewFilter"
+          :file-name="editingFile?.name"
+          :file-path="editingFile?.path"
+          @navigate="navigateToSegment"
+          @create="showCreateModal"
+          @upload="initiateFileUpload"
+          @filter="handleFilter"
+          @update:search-query="searchQuery = $event"
+          @cancel="cancelEditing"
+          @save="() => saveFileContent(true)"
+          @save-as="saveFileContentAs"
+          @save-restart="saveFileContentRestart"
+          @share="requestShareLink"
+        />
+
+        <div v-if="!isEditing">
           <UiServersFilesLabelBar
             :sort-field="sortMethod"
             :sort-desc="sortDesc"
@@ -55,20 +64,6 @@
             @upload-complete="refreshList()"
           />
         </div>
-
-        <UiServersFilesEditingNavbar
-          v-else
-          :file-name="editingFile?.name"
-          :is-image="isEditingImage"
-          :file-path="editingFile?.path"
-          :breadcrumb-segments="breadcrumbSegments"
-          @cancel="cancelEditing"
-          @save="() => saveFileContent(true)"
-          @save-as="saveFileContentAs"
-          @save-restart="saveFileContentRestart"
-          @share="requestShareLink"
-          @navigate="navigateToSegment"
-        />
 
         <div v-if="isEditing" class="h-full w-full flex-grow">
           <component
@@ -150,6 +145,7 @@ import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
+import FilesNavbar from "~/components/ui/servers/FilesNavbar.vue";
 
 interface BaseOperation {
   type: "move" | "rename";
