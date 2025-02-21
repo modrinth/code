@@ -113,3 +113,16 @@ export type InstanceSettingsTabProps = {
   instance: GameInstance
   offline?: boolean
 }
+
+export type JavaVersion = {
+  major_version: number
+  version: string
+  architecture: string
+  path: string
+}
+
+export type ProcessMetadata = {
+  uuid: string
+  profile_path: string
+  start_time: Date
+}

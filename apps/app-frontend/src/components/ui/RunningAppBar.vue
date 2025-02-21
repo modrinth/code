@@ -106,7 +106,7 @@ import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
-import { get_many } from '@/helpers/profile.js'
+import { get_many } from '@/helpers/profile'
 import { trackEvent } from '@/helpers/analytics'
 
 const router = useRouter()

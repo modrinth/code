@@ -285,7 +285,7 @@ import {
   toggle_disable_project,
   update_all,
   update_project,
-} from '@/helpers/profile.js'
+} from '@/helpers/profile'
 import { handleError } from '@/store/notifications.js'
 import { trackEvent } from '@/helpers/analytics'
 import { highlightModInProfile } from '@/helpers/utils.js'

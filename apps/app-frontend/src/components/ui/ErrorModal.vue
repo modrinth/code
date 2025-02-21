@@ -6,7 +6,7 @@ import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleError } from '@/store/notifications.js'
 import { handleSevereError } from '@/store/error.js'
 import { cancel_directory_change } from '@/helpers/settings.js'
-import { install } from '@/helpers/profile.js'
+import { install } from '@/helpers/profile'
 import { trackEvent } from '@/helpers/analytics'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
