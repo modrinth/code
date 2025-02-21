@@ -11,6 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-02-20T18:15:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Revenue page has been updated to more clearly display pending revenue and when it will be available to withdraw. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3250))
+- Footer will now be forced to the bottom of the page on short pages.
+- Styling fixes to moderation checklist proof form.`,
+  },
+  {
     date: `2025-02-19T22:20:00-08:00`,
     product: 'web',
     body: `### Added
