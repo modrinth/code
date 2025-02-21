@@ -75,20 +75,7 @@
             :is="VAceEditor"
             v-if="!isEditingImage"
             v-model:value="fileContent"
-            :lang="
-              (() => {
-                const ext = editingFile?.name?.split('.')?.pop()?.toLowerCase() ?? '';
-                return ext === 'json'
-                  ? 'json'
-                  : ext === 'toml'
-                    ? 'toml'
-                    : ext === 'sh'
-                      ? 'sh'
-                      : ['yml', 'yaml'].includes(ext)
-                        ? 'yaml'
-                        : 'text';
-              })()
-            "
+            :lang="editorLanguage"
             theme="one_dark"
             :print-margin="false"
             style="height: 750px; font-size: 1rem"
@@ -949,6 +936,18 @@ const onScroll = () => {
     contextMenuInfo.value.y = Math.max(0, contextMenuInfo.value.y - window.scrollY);
   }
 };
+
+const editorLanguage = computed(() => {
+  const ext = editingFile.value?.name?.split(".")?.pop()?.toLowerCase() ?? "";
+  const languageMap: Record<string, string> = {
+    json: "json",
+    toml: "toml",
+    sh: "sh",
+    yml: "yaml",
+    yaml: "yaml",
+  };
+  return languageMap[ext] || "text";
+});
 </script>
 
 <style scoped>
