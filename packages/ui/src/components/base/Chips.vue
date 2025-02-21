@@ -2,7 +2,7 @@
   <div class="chips">
     <Button
       v-for="item in items"
-      :key="item"
+      :key="formatLabel(item)"
       class="btn"
       :class="{ selected: selected === item, capitalize: capitalize }"
       @click="toggleItem(item)"
@@ -13,31 +13,32 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 import { CheckIcon } from '@modrinth/assets'
 import Button from './Button.vue'
 
 const props = withDefaults(
   defineProps<{
-    items: string[]
-    neverEmpty: boolean
-    formatLabel: (item: string) => string
-    capitalize: boolean
+    items: T[]
+    formatLabel?: (item: T) => string
+    neverEmpty?: boolean
+    capitalize?: boolean
   }>(),
   {
     neverEmpty: true,
-    formatLabel: (item: string) => item,
+    // Intentional any type, as this default should only be used for primitives (string or number)
+    formatLabel: (item) => item.toString(),
     capitalize: true,
   },
 )
-const selected = defineModel<string | null>()
+const selected = defineModel<T | null>()
 
 // If one always has to be selected, default to the first one
 if (props.items.length > 0 && props.neverEmpty && !selected.value) {
   selected.value = props.items[0]
 }
 
-function toggleItem(item: string) {
+function toggleItem(item: T) {
   if (selected.value === item && !props.neverEmpty) {
     selected.value = null
   } else {

@@ -101,7 +101,7 @@
   </section>
 </template>
 <script setup>
-import Chips from "~/components/ui/Chips.vue";
+import { Chips } from "@modrinth/ui";
 import Avatar from "~/components/ui/Avatar.vue";
 import UnknownIcon from "~/assets/images/utils/unknown.svg?component";
 import EyeIcon from "~/assets/images/utils/eye.svg?component";
