@@ -49,7 +49,9 @@
         </div>
       </nuxt-link>
       <nuxt-link
-        v-for="collection in orderedCollections"
+        v-for="collection in orderedCollections.sort(
+          (a, b) => new Date(b.created) - new Date(a.created),
+        )"
         :key="collection.id"
         :to="`/collection/${collection.id}`"
         class="universal-card recessed collection"
