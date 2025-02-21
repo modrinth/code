@@ -460,6 +460,10 @@
       class="new-page sidebar"
       :class="{
         'alt-layout': cosmetics.leftContentLayout,
+        'ultimate-sidebar':
+          showModerationChecklist &&
+          !collapsedModerationChecklist &&
+          !flags.alwaysShowChecklistAsPopup,
       }"
     >
       <div class="normal-page__header relative my-4">
@@ -674,7 +678,7 @@
           :auth="auth"
           :tags="tags"
         />
-        <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="mb-4">
+        <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
           {{ project.title }} has been archived. {{ project.title }} will not receive any further
           updates unless the author decides to unarchive the project.
         </MessageBanner>
@@ -805,13 +809,18 @@
           @delete-version="deleteVersion"
         />
       </div>
+      <div class="normal-page__ultimate-sidebar">
+        <ModerationChecklist
+          v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+          :project="project"
+          :future-projects="futureProjects"
+          :reset-project="resetProject"
+          :collapsed="collapsedModerationChecklist"
+          @exit="showModerationChecklist = false"
+          @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
+        />
+      </div>
     </div>
-    <ModerationChecklist
-      v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-      :project="project"
-      :future-projects="futureProjects"
-      :reset-project="resetProject"
-    />
   </div>
 </template>
 <script setup>
@@ -1431,6 +1440,7 @@ async function copyId() {
 const collapsedChecklist = ref(false);
 
 const showModerationChecklist = ref(false);
+const collapsedModerationChecklist = ref(false);
 const futureProjects = ref([]);
 if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;

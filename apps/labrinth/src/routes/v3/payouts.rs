@@ -9,7 +9,7 @@ use crate::queue::payouts::{make_aditude_request, PayoutsQueue};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
-use chrono::{Datelike, Duration, TimeZone, Utc, Weekday};
+use chrono::{DateTime, Datelike, Duration, TimeZone, Utc, Weekday};
 use hex::ToHex;
 use hmac::{Hmac, Mac, NewMac};
 use reqwest::Method;
@@ -763,6 +763,7 @@ pub async fn payment_methods(
 pub struct UserBalance {
     pub available: Decimal,
     pub pending: Decimal,
+    pub dates: HashMap<DateTime<Utc>, Decimal>,
 }
 
 #[get("balance")]
@@ -791,27 +792,27 @@ async fn get_user_balance(
     user_id: crate::database::models::ids::UserId,
     pool: &PgPool,
 ) -> Result<UserBalance, sqlx::Error> {
-    let available = sqlx::query!(
+    let payouts = sqlx::query!(
         "
-        SELECT SUM(amount)
+        SELECT date_available, SUM(amount) sum
         FROM payouts_values
-        WHERE user_id = $1 AND date_available <= NOW()
+        WHERE user_id = $1
+        GROUP BY date_available
+        ORDER BY date_available DESC
         ",
         user_id.0
     )
-    .fetch_optional(pool)
+    .fetch_all(pool)
     .await?;
 
-    let pending = sqlx::query!(
-        "
-        SELECT SUM(amount)
-        FROM payouts_values
-        WHERE user_id = $1 AND date_available > NOW()
-        ",
-        user_id.0
-    )
-    .fetch_optional(pool)
-    .await?;
+    let available = payouts
+        .iter()
+        .filter(|x| x.date_available <= Utc::now())
+        .fold(Decimal::ZERO, |acc, x| acc + x.sum.unwrap_or(Decimal::ZERO));
+    let pending = payouts
+        .iter()
+        .filter(|x| x.date_available > Utc::now())
+        .fold(Decimal::ZERO, |acc, x| acc + x.sum.unwrap_or(Decimal::ZERO));
 
     let withdrawn = sqlx::query!(
         "
@@ -824,12 +825,6 @@ async fn get_user_balance(
     .fetch_optional(pool)
     .await?;
 
-    let available = available
-        .map(|x| x.sum.unwrap_or(Decimal::ZERO))
-        .unwrap_or(Decimal::ZERO);
-    let pending = pending
-        .map(|x| x.sum.unwrap_or(Decimal::ZERO))
-        .unwrap_or(Decimal::ZERO);
     let (withdrawn, fees) = withdrawn
         .map(|x| {
             (
@@ -844,6 +839,10 @@ async fn get_user_balance(
             - withdrawn.round_dp(16)
             - fees.round_dp(16),
         pending,
+        dates: payouts
+            .iter()
+            .map(|x| (x.date_available, x.sum.unwrap_or(Decimal::ZERO)))
+            .collect(),
     })
 }
 

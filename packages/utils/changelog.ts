@@ -11,6 +11,16 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-02-19T22:20:00-08:00`,
+    product: 'web',
+    body: `### Added
+- All-new site footer with more links, better organization, and a new aesthetic.
+
+### Improvements
+- Added Dallas location to Modrinth Servers landing page.
+- Updated staff moderation checklist to be more visually consistent and more dynamic.`,
+  },
+  {
     date: `2025-02-18T14:30:00-08:00`,
     product: 'servers',
     body: `### Added
