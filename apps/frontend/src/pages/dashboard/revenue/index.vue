@@ -10,9 +10,13 @@
           </div>
         </div>
         <div class="grid-display__item">
-          <div class="label">Total pending
-            <nuxt-link v-tooltip="`Click to read about how Modrinth handles your revenue.`"
-                       class="text-link align-middle" to="/legal/cmp-info#pending">
+          <div class="label">
+            Total pending
+            <nuxt-link
+              v-tooltip="`Click to read about how Modrinth handles your revenue.`"
+              class="align-middle text-link"
+              to="/legal/cmp-info#pending"
+            >
               <UnknownIcon />
             </nuxt-link>
           </div>
@@ -21,18 +25,25 @@
           </div>
         </div>
         <div class="grid-display__item available-soon">
-          <h3 class="label">Available soon
-            <nuxt-link v-tooltip="`Click to read about how Modrinth handles your revenue.`"
-                       class="text-link align-middle" to="/legal/cmp-info#pending">
+          <h3 class="label">
+            Available soon
+            <nuxt-link
+              v-tooltip="`Click to read about how Modrinth handles your revenue.`"
+              class="align-middle text-link"
+              to="/legal/cmp-info#pending"
+            >
               <UnknownIcon />
             </nuxt-link>
           </h3>
           <ul class="available-soon-list">
-            <li v-for="date in availableSoonDateKeys" :key="date"
-                class="available-soon-item">
+            <li
+v-for="date in availableSoonDateKeys" :key="date" class="available-soon-item">
               <span class="amount">
                 {{ $formatMoney(availableSoonDates[date]) }}
-                <small v-if="availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1">†</small>
+                <small
+                  v-if="availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1"
+                  >†</small
+                >
               </span>
               <span class="date">
                 {{ formatDate(dayjs(date)) }}
@@ -51,8 +62,8 @@
             class="iconified-button brand-button"
             to="/dashboard/revenue/withdraw"
           >
-          <TransferIcon /> Withdraw
-        </nuxt-link>
+            <TransferIcon /> Withdraw
+          </nuxt-link>
         </span>
         <NuxtLink class="iconified-button" to="/dashboard/revenue/transfers">
           <HistoryIcon />
@@ -61,15 +72,17 @@
       </div>
       <p>
         <small>
-          By uploading projects to Modrinth and withdrawing money from your account, you agree to the
-          <nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>.
-          For more information on how the rewards system works, see our information page
+          By uploading projects to Modrinth and withdrawing money from your account, you agree to
+          the
+          <nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>. For more
+          information on how the rewards system works, see our information page
           <nuxt-link class="text-link" to="/legal/cmp-info">here</nuxt-link>.
         </small>
       </p>
       <p>
         <small>
-          † Ongoing revenue period, subject to change. The finalized amount will be available to view on the last day of the current month.
+          † Ongoing revenue period, subject to change. The finalized amount will be available to
+          view on the last day of the current month.
         </small>
       </p>
     </section>
@@ -132,64 +145,65 @@ import {
 import { formatDate } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
-import { SpinnerIcon } from '@modrinth/assets'
 
-const auth = await useAuth()
-const minWithdraw = ref(0.01)
+const auth = await useAuth();
+const minWithdraw = ref(0.01);
 
 const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
-  useBaseFetch(`payout/balance`, { apiVersion: 3 })
-)
+  useBaseFetch(`payout/balance`, { apiVersion: 3 }),
+);
 
 const deadlineEnding = computed(() => {
-  let deadline = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')
-  if (deadline.isBefore(dayjs().startOf('day'))) {
-    deadline = dayjs().subtract(1, 'month').endOf('month').add(60, 'days')
+  let deadline = dayjs().subtract(2, "month").endOf("month").add(60, "days");
+  if (deadline.isBefore(dayjs().startOf("day"))) {
+    deadline = dayjs().subtract(1, "month").endOf("month").add(60, "days");
   }
-  return deadline
-})
+  return deadline;
+});
 
 const availableSoonDates = computed(() => {
   // Get the next 3 dates from userBalance.dates that are from now to the deadline + 4 months to make sure we get all the pending ones.
-  const dates = Object.keys(userBalance.value.dates).filter(date => {
-    const dateObj = dayjs(date)
-    return dateObj.isAfter(dayjs()) && dateObj.isBefore(dayjs(deadlineEnding.value).add(4, 'month'))
-  }).sort((a, b) => dayjs(a).diff(dayjs(b)))
+  const dates = Object.keys(userBalance.value.dates)
+    .filter((date) => {
+      const dateObj = dayjs(date);
+      return (
+        dateObj.isAfter(dayjs()) && dateObj.isBefore(dayjs(deadlineEnding.value).add(4, "month"))
+      );
+    })
+    .sort((a, b) => dayjs(a).diff(dayjs(b)));
 
   return dates.reduce((acc, date) => {
-    acc[date] = userBalance.value.dates[date]
-    return acc
-  }, {})
-})
+    acc[date] = userBalance.value.dates[date];
+    return acc;
+  }, {});
+});
 
-const availableSoonDateKeys = computed(() => Object.keys(availableSoonDates.value))
+const availableSoonDateKeys = computed(() => Object.keys(availableSoonDates.value));
 
 async function updateVenmo() {
-  startLoading()
+  startLoading();
   try {
     const data = {
-      venmo_handle: auth.value.user.payout_data.venmo_handle ?? null
-    }
+      venmo_handle: auth.value.user.payout_data.venmo_handle ?? null,
+    };
 
     await useBaseFetch(`user/${auth.value.user.id}`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: data,
-      apiVersion: 3
-    })
-    await useAuth(auth.value.token)
+      apiVersion: 3,
+    });
+    await useAuth(auth.value.token);
   } catch (err) {
-    const data = useNuxtApp()
+    const data = useNuxtApp();
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error'
-    })
+      type: "error",
+    });
   }
-  stopLoading()
+  stopLoading();
 }
-
-
 </script>
 <style lang="scss" scoped>
 strong {

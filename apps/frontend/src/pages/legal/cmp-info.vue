@@ -99,8 +99,8 @@
         <td>Revenue earned on</td>
         <td>
           <input id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
-          <noscript>(JavaScript must be enabled for the date picker to function, example date:
-            2024-07-15)
+          <noscript
+            >(JavaScript must be enabled for the date picker to function, example date: 2024-07-15)
           </noscript>
         </td>
       </tr>
@@ -135,45 +135,47 @@
         <th>Creator Revenue (75%)</th>
         <th>Modrinth's Cut (25%)</th>
       </tr>
-      <tr v-for="item in platformRevenueData">
+      <tr v-for="item in platformRevenueData" v-bind:key="dayjs.unix(item.time)">
         <td>{{ formatDate(dayjs.unix(item.time)) }}</td>
         <td>{{ formatMoney(item.revenue) }}</td>
         <td>{{ formatMoney(item.creator_revenue) }}</td>
         <td>{{ formatMoney(item.revenue - item.creator_revenue) }}</td>
       </tr>
     </table>
-    <small>Modrinth's total revenue in the previous 5 days, for the entire dataset, use the
-      aforementioned <a href="https://api.modrinth.com/v3/payout/platform_revenue">API
-        route</a>.</small>
+    <small
+      >Modrinth's total revenue in the previous 5 days, for the entire dataset, use the
+      aforementioned
+      <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>.</small
+    >
   </div>
 </template>
 
 <script lang="ts" setup>
-import dayjs from 'dayjs'
-import { computed, ref } from 'vue'
-import { formatDate, formatMoney } from '@modrinth/utils'
+import dayjs from "dayjs";
+import { computed, ref } from "vue";
+import { formatDate, formatMoney } from "@modrinth/utils";
 
 const description =
-  'Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.'
+  "Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.";
 
 useSeoMeta({
-  title: 'Rewards Program Information - Modrinth',
+  title: "Rewards Program Information - Modrinth",
   description,
-  ogTitle: 'Rewards Program Information',
-  ogDescription: description
-})
+  ogTitle: "Rewards Program Information",
+  ogDescription: description,
+});
 
-const rawSelectedDate = ref(dayjs().format('YYYY-MM-DD'))
-const selectedDate = computed(() => dayjs(rawSelectedDate.value))
-const endOfMonthDate = computed(() => selectedDate.value.endOf('month'))
-const withdrawalDate = computed(() => endOfMonthDate.value.add(60, 'days'))
+const rawSelectedDate = ref(dayjs().format("YYYY-MM-DD"));
+const selectedDate = computed(() => dayjs(rawSelectedDate.value));
+const endOfMonthDate = computed(() => selectedDate.value.endOf("month"));
+const withdrawalDate = computed(() => endOfMonthDate.value.add(60, "days"));
 
-const { data: transparencyInformation } = await useAsyncData('payout/platform_revenue', () =>
-  useBaseFetch('payout/platform_revenue', {
-    apiVersion: 3
-  })
-)
+const { data: transparencyInformation } = await useAsyncData("payout/platform_revenue", () =>
+  useBaseFetch("payout/platform_revenue", {
+    apiVersion: 3,
+  }),
+);
 
-const platformRevenue = transparencyInformation.value.all_time
-const platformRevenueData = transparencyInformation.value.data.slice(0, 5)
+const platformRevenue = transparencyInformation.value.all_time;
+const platformRevenueData = transparencyInformation.value.data.slice(0, 5);
 </script>
