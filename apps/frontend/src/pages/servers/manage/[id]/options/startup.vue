@@ -1,29 +1,13 @@
 <template>
   <div class="relative h-full w-full">
-    <div
+    <ErrorBoundary
       v-if="server.startup?.error"
-      class="flex w-full flex-col items-center justify-center gap-4 p-4"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <IssuesIcon class="size-12 text-orange" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load startup settings</h1>
-          </div>
-          <p class="text-lg text-secondary">
-            We couldn't load your server's startup settings. Here's what we know:
-          </p>
-          <p>
-            <span class="break-all font-mono">{{ JSON.stringify(server.startup.error) }}</span>
-          </p>
-          <ButtonStyled size="large" color="brand" @click="() => server.refresh(['startup'])">
-            <button class="mt-6 !w-full">Retry</button>
-          </ButtonStyled>
-        </div>
-      </div>
-    </div>
+      title="Failed to load startup settings"
+      message="We couldn't load your server's startup settings. Here's what we know:"
+      :error="server.startup.error"
+      @retry="() => server.refresh(['startup'])"
+    />
+
     <div v-else-if="data" class="flex h-full w-full flex-col gap-4">
       <div
         class="rounded-2xl border-[1px] border-solid border-orange bg-bg-orange p-4 text-contrast"
@@ -110,12 +94,13 @@
 </template>
 
 <script setup lang="ts">
-import { UpdatedIcon, IssuesIcon } from "@modrinth/assets";
+import { UpdatedIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
+import ErrorBoundary from "~/components/ErrorBoundary.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "startup"]>;
 }>();
 
 const data = computed(() => props.server.general);

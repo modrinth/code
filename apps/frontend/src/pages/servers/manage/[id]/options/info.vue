@@ -123,7 +123,7 @@ const route = useNativeRoute();
 const serverId = route.params.id as string;
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general"]>;
 }>();
 
 const data = computed(() => props.server.general);

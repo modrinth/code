@@ -10,28 +10,13 @@
     @change-version="changeModVersion($event)"
   />
 
-  <div
+  <ErrorBoundary
     v-if="server.content?.error"
-    class="flex w-full flex-col items-center justify-center gap-4 p-4"
-  >
-    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-      <div class="flex flex-col items-center text-center">
-        <div class="flex flex-col items-center gap-4">
-          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-            <IssuesIcon class="size-12 text-orange" />
-          </div>
-          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load content</h1>
-        </div>
-        <p class="text-lg text-secondary">
-          We couldn't load your server's {{ type.toLowerCase() }}s. Here's what we know:
-          <span class="break-all font-mono">{{ JSON.stringify(server.content.error) }}</span>
-        </p>
-        <ButtonStyled size="large" color="brand" @click="() => server.refresh(['content'])">
-          <button class="mt-6 !w-full">Retry</button>
-        </ButtonStyled>
-      </div>
-    </div>
-  </div>
+    :title="`Failed to load content`"
+    :message="`We couldn't load your server's ${type.toLowerCase()}s. Here's what we know:`"
+    :error="server.content.error"
+    @retry="() => server.refresh(['content'])"
+  />
 
   <div v-else-if="server.general && localMods" class="relative isolate flex h-full w-full flex-col">
     <div ref="pyroContentSentinel" class="sentinel" data-pyro-content-sentinel />
@@ -345,10 +330,10 @@ import {
   WrenchIcon,
   ListIcon,
   FileIcon,
-  IssuesIcon,
 } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import ErrorBoundary from "~/components/ErrorBoundary.vue";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import type { Server } from "~/composables/pyroServers";

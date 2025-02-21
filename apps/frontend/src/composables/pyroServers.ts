@@ -1190,7 +1190,7 @@ const modules: any = {
   startup: {
     get: async (serverId: string) => {
       try {
-        return await PyroFetch<Startup>(`servers/${serverId}/startup`, {}, "startup");
+        return await PyroFetch<Startup>(`servers/${serverId}/startupa`, {}, "startup");
       } catch (error) {
         const fetchError =
           error instanceof PyroServersFetchError

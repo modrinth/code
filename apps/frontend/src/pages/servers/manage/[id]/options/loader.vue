@@ -145,7 +145,7 @@ import type { Server } from "~/composables/pyroServers";
 import type { Loaders } from "~/types/servers";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general"]>;
 }>();
 
 const emit = defineEmits<{
