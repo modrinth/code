@@ -164,7 +164,7 @@ const {
   data: versions,
   error: versionsError,
   refresh: refreshVersions,
-} = await useAsyncData(
+} = await useLazyAsyncData(
   `content-loader-versions-${data.value?.upstream?.project_id}`,
   async () => {
     if (!data.value?.upstream?.project_id) return [];
@@ -183,7 +183,7 @@ const {
   data: currentVersion,
   error: currentVersionError,
   refresh: refreshCurrentVersion,
-} = await useAsyncData(
+} = await useLazyAsyncData(
   `content-loader-version-${data.value?.upstream?.version_id}`,
   async () => {
     if (!data.value?.upstream?.version_id) return null;
