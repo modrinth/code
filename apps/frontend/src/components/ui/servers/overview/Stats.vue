@@ -1,6 +1,6 @@
 <template>
   <div
-    data-pyro-server-stats
+    data-pyro-servers-component="overview-stats"
     style="font-variant-numeric: tabular-nums"
     class="flex select-none flex-col items-center gap-6 md:flex-row"
   >

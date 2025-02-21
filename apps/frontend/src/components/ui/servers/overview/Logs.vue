@@ -1,5 +1,5 @@
 <template>
-  <div class="contents">
+  <div data-pyro-servers-component="overview-logs" class="contents">
     <div class="flex items-center gap-4">
       <div class="relative w-full">
         <input
@@ -296,10 +296,10 @@
           }"
           v-html="processedLogWithLinks"
         ></pre>
-        <div v-if="detectedLinks.length" class="border-contrast/20 mt-4 border-t pt-4">
-          <h2>Detected Links</h2>
-          <ul class="flex flex-col gap-2">
-            <li v-for="(link, index) in detectedLinks" :key="index">
+        <div v-if="detectedLinks.length" class="flex flex-col gap-2 rounded-2xl bg-bg p-4">
+          <h2 class="m-0">Detected Links</h2>
+          <ul class="m-0 flex flex-col gap-2 p-0 pl-4">
+            <li v-for="(link, index) in detectedLinks" :key="index" class="p-0">
               <a
                 :href="link"
                 target="_blank"

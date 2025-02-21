@@ -1,5 +1,6 @@
 <template>
   <div
+    data-pyro-servers-component="overview-statuspill"
     :aria-label="`Server is ${getStatusText(state)}`"
     class="relative inline-flex select-none items-center"
     @mouseenter="isExpanded = true"
