@@ -209,8 +209,8 @@
           <div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
             <nuxt-link
               v-for="collection in collections.sort(
-              (a, b) => new Date(b.created) - new Date(a.created),
-            )"
+                (a, b) => new Date(b.created) - new Date(a.created),
+              )"
               :key="collection.id"
               :to="`/collection/${collection.id}`"
               class="card collection-item"
@@ -230,11 +230,11 @@
               </div>
               <div class="stat-bar">
                 <div class="stats">
-                <BoxIcon />
-                {{
-                  `${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? "s" : ""}`
-                }}
-              </div>
+                  <BoxIcon />
+                  {{
+                    `${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? "s" : ""}`
+                  }}
+                </div>
                 <div class="stats">
                   <template v-if="collection.status === 'listed'">
                     <WorldIcon />

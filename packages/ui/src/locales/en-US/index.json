@@ -65,8 +65,14 @@
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
-  "collection.label.private": {
-    "defaultMessage": "Private"
+  "collection.curator.title": {
+    "defaultMessage": "Curator"
+  },
+  "collection.description.title": {
+    "defaultMessage": "Description"
+  },
+  "collection.details.title": {
+    "defaultMessage": "Details"
   },
   "input.view.gallery": {
     "defaultMessage": "Gallery view"
@@ -110,6 +116,9 @@
   "label.password": {
     "defaultMessage": "Password"
   },
+  "label.private": {
+    "defaultMessage": "Private"
+  },
   "label.public": {
     "defaultMessage": "Public"
   },
@@ -127,6 +136,9 @@
   },
   "label.title": {
     "defaultMessage": "Title"
+  },
+  "label.unknown": {
+    "defaultMessage": "Unknown"
   },
   "label.unlisted": {
     "defaultMessage": "Unlisted"
@@ -452,26 +464,11 @@
   "project.visibility.draft": {
     "defaultMessage": "Draft"
   },
-  "project.visibility.private": {
-    "defaultMessage": "Private"
-  },
-  "project.visibility.public": {
-    "defaultMessage": "Public"
-  },
-  "project.visibility.rejected": {
-    "defaultMessage": "Rejected"
-  },
   "project.visibility.scheduled": {
     "defaultMessage": "Scheduled"
   },
   "project.visibility.under-review": {
     "defaultMessage": "Under review"
-  },
-  "project.visibility.unknown": {
-    "defaultMessage": "Unknown"
-  },
-  "project.visibility.unlisted": {
-    "defaultMessage": "Unlisted"
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Unlisted by staff"
@@ -922,6 +919,9 @@
   },
   "user.bio.default": {
     "defaultMessage": "A Modrinth user."
+  },
+  "user.collections.title": {
+    "defaultMessage": "Collections"
   },
   "user.organizations.title": {
     "defaultMessage": "Organizations"
