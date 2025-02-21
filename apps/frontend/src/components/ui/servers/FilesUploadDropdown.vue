@@ -53,7 +53,7 @@
                 <span>Done</span>
               </template>
               <template v-else-if="item.status === 'error'">
-                <span class="text-red">Failed - File already exists</span>
+                <span class="text-red">Failed to upload</span>
               </template>
               <template v-else-if="item.status === 'incorrect-type'">
                 <span class="text-red">Failed - Incorrect file type</span>
