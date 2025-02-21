@@ -87,11 +87,14 @@ export const formatNumber = (number, abbreviate = true) => {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
-export function formatDate(date: dayjs.Dayjs, options: Intl.DateTimeFormatOptions = {
-  month: 'long',
-  day: 'numeric',
-  year: 'numeric'
-}): string {
+export function formatDate(
+  date: dayjs.Dayjs,
+  options: Intl.DateTimeFormatOptions = {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  },
+): string {
   return date.toDate().toLocaleDateString(undefined, options)
 }
 

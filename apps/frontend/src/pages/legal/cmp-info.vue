@@ -129,18 +129,22 @@
       <strong>{{ formatMoney(platformRevenue) }}</strong> in revenue.
     </p>
     <table>
-      <tr>
-        <th>Date</th>
-        <th>Revenue</th>
-        <th>Creator Revenue (75%)</th>
-        <th>Modrinth's Cut (25%)</th>
-      </tr>
-      <tr v-for="item in platformRevenueData" v-bind:key="dayjs.unix(item.time)">
-        <td>{{ formatDate(dayjs.unix(item.time)) }}</td>
-        <td>{{ formatMoney(item.revenue) }}</td>
-        <td>{{ formatMoney(item.creator_revenue) }}</td>
-        <td>{{ formatMoney(item.revenue - item.creator_revenue) }}</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Revenue</th>
+          <th>Creator Revenue (75%)</th>
+          <th>Modrinth's Cut (25%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in platformRevenueData" :key="item.time">
+          <td>{{ formatDate(dayjs.unix(item.time)) }}</td>
+          <td>{{ formatMoney(item.revenue) }}</td>
+          <td>{{ formatMoney(item.creator_revenue) }}</td>
+          <td>{{ formatMoney(item.revenue - item.creator_revenue) }}</td>
+        </tr>
+      </tbody>
     </table>
     <small
       >Modrinth's total revenue in the previous 5 days, for the entire dataset, use the

@@ -36,8 +36,7 @@
             </nuxt-link>
           </h3>
           <ul class="available-soon-list">
-            <li
-v-for="date in availableSoonDateKeys" :key="date" class="available-soon-item">
+            <li v-for="date in availableSoonDateKeys" :key="date" class="available-soon-item">
               <span class="amount">
                 {{ $formatMoney(availableSoonDates[date]) }}
                 <small
@@ -140,11 +139,11 @@ import {
   SaveIcon,
   TransferIcon,
   UnknownIcon,
-  XIcon
-} from '@modrinth/assets'
-import { formatDate } from '@modrinth/utils'
-import dayjs from 'dayjs'
-import { computed } from 'vue'
+  XIcon,
+} from "@modrinth/assets";
+import { formatDate } from "@modrinth/utils";
+import dayjs from "dayjs";
+import { computed } from "vue";
 
 const auth = await useAuth();
 const minWithdraw = ref(0.01);
@@ -257,6 +256,14 @@ strong {
     &:last-child {
       border-bottom: none;
     }
+  }
+}
+
+@media screen and (max-width: 1085px) {
+  .available-soon-item {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: auto;
   }
 }
 </style>
