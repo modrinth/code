@@ -85,12 +85,6 @@
       from our ad providers, which is 60 days after the last day of each month.
     </p>
 
-    <p id="pending-in-transit-explanation">
-      <strong>Pending In Transit:</strong> This is an estimate of the total amount of pending
-      revenue that
-      you can expect to move into your current balance after the next NET 60 day period has passed. The next NET 60 day period ends on {{ formatDate(deadlineEnding) }}.
-    </p>
-
     <p>
       To understand when revenue becomes available, you can use this calculator to estimate when
       revenue earned on a specific date will be available for withdrawal.
@@ -104,7 +98,7 @@
       <tr>
         <td>Revenue earned on</td>
         <td>
-          <input id="revenue-date-picker" v-model="selectedDateValue" type="date" />
+          <input id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
           <noscript>(JavaScript must be enabled for the date picker to function, example date:
             2024-07-15)
           </noscript>
@@ -112,7 +106,7 @@
       </tr>
       <tr>
         <td>End of the month</td>
-        <td>{{ formatDate(endOfMonthDayjs) }}</td>
+        <td>{{ formatDate(endOfMonthDate) }}</td>
       </tr>
       <tr>
         <td>NET 60 policy applied</td>
@@ -120,7 +114,7 @@
       </tr>
       <tr class="final-result">
         <td>Available for withdrawal</td>
-        <td>{{ formatDate(withdrawalDateDayjs) }}</td>
+        <td>{{ formatDate(withdrawalDate) }}</td>
       </tr>
     </table>
     <h3>How do I know Modrinth is being transparent about revenue?</h3>
@@ -169,15 +163,10 @@ useSeoMeta({
   ogDescription: description
 })
 
-const selectedDateValue = ref(dayjs().format('YYYY-MM-DD'))
-const selectedDateDayjs = computed(() => dayjs(selectedDateValue.value))
-const endOfMonthDayjs = computed(() => selectedDateDayjs.value.endOf('month'))
-const withdrawalDateDayjs = computed(() => endOfMonthDayjs.value.add(60, 'days'))
-
-let deadlineEnding = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')
-if (deadlineEnding.isBefore(dayjs().startOf('day'))) {
-  deadlineEnding = dayjs().subtract(1, 'month').endOf('month').add(60, 'days')
-}
+const rawSelectedDate = ref(dayjs().format('YYYY-MM-DD'))
+const selectedDate = computed(() => dayjs(rawSelectedDate.value))
+const endOfMonthDate = computed(() => selectedDate.value.endOf('month'))
+const withdrawalDate = computed(() => endOfMonthDate.value.add(60, 'days'))
 
 const { data: transparencyInformation } = await useAsyncData('payout/platform_revenue', () =>
   useBaseFetch('payout/platform_revenue', {

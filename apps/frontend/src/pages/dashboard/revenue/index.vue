@@ -10,24 +10,19 @@
           </div>
         </div>
         <div class="grid-display__item">
-          <div class="label">Total Pending <nuxt-link v-tooltip="`Click to read about pending revenue.`" class="text-link align-middle" to="/legal/cmp-info#pending"><UnknownIcon /></nuxt-link></div>
+          <div class="label">Total Pending <nuxt-link v-tooltip="`Click to read about how Modrinth handles your revenue.`" class="text-link align-middle" to="/legal/cmp-info#pending"><UnknownIcon /></nuxt-link></div>
           <div class="value">
             {{ $formatMoney(userBalance.pending) }}
           </div>
         </div>
-        <div class="grid-display__item">
-            <div class="label">Pending In Transit <nuxt-link v-tooltip="`Click to read about pending revenue.`" class="text-link align-middle" to="/legal/cmp-info#pending"><UnknownIcon /></nuxt-link>
-          </div>
-          <div class="value">
-            ≈{{ $formatMoney(totalTwoMonthsAgo) }}
-          </div>
-          <span>
-              <span
-              >
-                accessible on {{ formatDate(deadlineEnding)}}
-              </span
-              ></span
-          >
+        <div class="grid-display__item available-soon">
+          <h3 class="label">Available Soon <nuxt-link v-tooltip="`Click to read about how Modrinth handles your revenue.`" class="text-link align-middle" to="/legal/cmp-info#pending"><UnknownIcon /></nuxt-link></h3>
+          <ul class="available-soon-list">
+            <li v-for="date in Object.keys(availableSoonDates)" :key="date" class="available-soon-item">
+              <span class="amount">{{ $formatMoney(availableSoonDates[date]) }}</span>
+              <span class="date">{{ formatDate(dayjs(date)) }}</span>
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -36,9 +31,6 @@
           You have funds available to withdraw.
         </p>
       </div>
-      <p v-else>
-        Your current balance is under the minimum of <strong>${{ minWithdraw }}</strong> to withdraw.
-      </p>
       <div class="input-group mt-4">
         <span :class="{ 'disabled-cursor-wrapper': userBalance.available < minWithdraw }">
           <nuxt-link
@@ -57,13 +49,14 @@
           View transfer history
         </NuxtLink>
       </div>
+      <p v-if="!(userBalance.available >= minWithdraw)">
+        Your current balance is under the minimum of <strong>${{ minWithdraw }}</strong> to withdraw.
+      </p>
       <p>
-        By uploading projects to Modrinth and withdrawing money from your account, you agree to the
-        <nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>
-        . For more
-        information on how the rewards system works, see our information page
-        <nuxt-link class="text-link" to="/legal/cmp-info">here</nuxt-link>
-        .
+       <small>By uploading projects to Modrinth and withdrawing money from your account, you agree to the
+         <nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>.
+         For more information on how the rewards system works, see our information page
+         <nuxt-link class="text-link" to="/legal/cmp-info">here</nuxt-link>.</small>
       </p>
     </section>
     <section class="universal-card">
@@ -114,9 +107,19 @@
   </div>
 </template>
 <script setup>
-import { HistoryIcon, PayPalIcon, SaveIcon, TransferIcon, XIcon, UnknownIcon } from '@modrinth/assets'
-import { formatDate } from "@modrinth/utils"
+import {
+  HistoryIcon,
+  PayPalIcon,
+  SaveIcon,
+  TransferIcon,
+  XIcon,
+  UnknownIcon,
+  DownloadIcon
+} from '@modrinth/assets'
+import { formatDate, formatMoney } from '@modrinth/utils'
 import dayjs from 'dayjs'
+import { computed } from 'vue'
+import { Button } from '@modrinth/ui'
 
 const auth = await useAuth()
 const minWithdraw = ref(0.01)
@@ -124,6 +127,27 @@ const minWithdraw = ref(0.01)
 const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
   useBaseFetch(`payout/balance`, { apiVersion: 3 })
 )
+
+const deadlineEnding = computed(() => {
+  let deadline = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')
+  if (deadline.isBefore(dayjs().startOf('day'))) {
+    deadline = dayjs().subtract(1, 'month').endOf('month').add(60, 'days')
+  }
+  return deadline
+});
+
+const availableSoonDates = computed(() => {
+  // Get the next 3 dates from userBalance.dates that are from now to the deadline + 4 months to make sure we get all the pending ones.
+  const dates = Object.keys(userBalance.value.dates).filter(date => {
+    const dateObj = dayjs(date)
+    return dateObj.isAfter(dayjs()) && dateObj.isBefore(dayjs(deadlineEnding.value).add(4, 'month'))
+  }).sort((a, b) => dayjs(a).diff(dayjs(b)));
+
+  return dates.reduce((acc, date) => {
+    acc[date] = userBalance.value.dates[date]
+    return acc
+  }, {})
+});
 
 async function updateVenmo() {
   startLoading()
@@ -150,26 +174,7 @@ async function updateVenmo() {
   stopLoading()
 }
 
-let targetDate = dayjs().subtract(2, 'month').startOf('month')
-if (targetDate.endOf('month').add(60, 'days').isBefore(dayjs().startOf('day'))) {
-  targetDate = dayjs().subtract(1, 'month').startOf('month');
-}
 
-const { data: pendingInTransit } = await useAsyncData('analytics/revenue', () =>
-  useBaseFetch('analytics/revenue', {
-    apiVersion: 3,
-    query: {
-      start_date: targetDate.toISOString(),
-      end_date: targetDate.endOf('month').toISOString(),
-      resolution_minutes: 1140
-    }
-  })
-)
-
-const deadlineEnding = targetDate.endOf('month').add(60, 'days')
-const totalTwoMonthsAgo = Object.values(pendingInTransit.value || {}).reduce((acc, project) => {
-    return acc + Object.values(project || {}).reduce((acc, value) => acc + parseFloat(value), 0)
-  }, 0)
 </script>
 <style lang="scss" scoped>
 strong {
@@ -183,5 +188,48 @@ strong {
 
 .disabled-link {
   pointer-events: none;
+}
+
+.grid-display__item {
+  .value {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.available-soon {
+  padding-top: 0;
+
+  .label {
+    margin: 0;
+  }
+
+  &-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.2rem 0 0;
+    border-bottom: 1px solid #eee;
+
+    .amount {
+      font-weight: 600;
+    }
+
+    .date {
+      color: #7f8c8d;
+      font-size: 0.9em;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
 }
 </style>
