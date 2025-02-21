@@ -58,14 +58,18 @@
                     </button>
                   </ButtonStyled>
                   <ChevronRightIcon
-                    v-if="index < breadcrumbSegments.length - 1 || mode === 'editing'"
+                    v-if="
+                      index < breadcrumbSegments.length - 1 ||
+                      mode === 'editing' ||
+                      mode === 'imageview'
+                    "
                     class="size-4 flex-shrink-0 text-secondary"
                     aria-hidden="true"
                   />
                 </div>
               </li>
             </TransitionGroup>
-            <li v-if="mode === 'editing'" class="flex items-center px-3 text-sm">
+            <li v-if="mode !== 'browsing'" class="flex items-center px-3 text-sm">
               <span class="font-semibold !text-contrast" aria-current="location">{{
                 fileName
               }}</span>
@@ -75,7 +79,7 @@
       </ol>
     </nav>
 
-    <div v-if="mode === 'editing'" class="flex items-center gap-2">
+    <div v-if="mode === 'editing' || mode === 'imageview'" class="flex items-center gap-2">
       <Button
         v-if="isLogFile"
         v-tooltip="'Share to mclo.gs'"
@@ -86,7 +90,7 @@
       >
         <ShareIcon />
       </Button>
-      <ButtonStyled type="transparent">
+      <ButtonStyled v-if="mode === 'editing'" type="transparent">
         <UiServersTeleportOverflowMenu
           position="bottom"
           direction="left"
@@ -205,7 +209,7 @@ import { ref, computed } from "vue";
 import { useIntersectionObserver } from "@vueuse/core";
 
 const props = defineProps<{
-  mode: "browsing" | "editing";
+  mode: "browsing" | "editing" | "imageview";
   breadcrumbSegments: string[];
   searchQuery?: string;
   currentFilter?: string;
