@@ -12,62 +12,38 @@
     </Button>
   </div>
 </template>
-<script setup>
+
+<script setup lang="ts">
 import { CheckIcon } from '@modrinth/assets'
-</script>
-<script>
-import { defineComponent } from 'vue'
 import Button from './Button.vue'
 
-export default defineComponent({
-  props: {
-    modelValue: {
-      required: true,
-      type: String,
-    },
-    items: {
-      required: true,
-      type: Array,
-    },
-    neverEmpty: {
-      default: true,
-      type: Boolean,
-    },
-    formatLabel: {
-      default: (x) => x,
-      type: Function,
-    },
-    capitalize: {
-      type: Boolean,
-      default: true,
-    },
+const props = withDefaults(
+  defineProps<{
+    items: string[]
+    neverEmpty: boolean
+    formatLabel: (item: string) => string
+    capitalize: boolean
+  }>(),
+  {
+    neverEmpty: true,
+    formatLabel: (item: string) => item,
+    capitalize: true,
   },
-  emits: ['update:modelValue'],
-  computed: {
-    selected: {
-      get() {
-        return this.modelValue
-      },
-      set(value) {
-        this.$emit('update:modelValue', value)
-      },
-    },
-  },
-  created() {
-    if (this.items.length > 0 && this.neverEmpty && !this.modelValue) {
-      this.selected = this.items[0]
-    }
-  },
-  methods: {
-    toggleItem(item) {
-      if (this.selected === item && !this.neverEmpty) {
-        this.selected = null
-      } else {
-        this.selected = item
-      }
-    },
-  },
-})
+)
+const selected = defineModel<string | null>()
+
+// If one always has to be selected, default to the first one
+if (props.items.length > 0 && props.neverEmpty && !selected.value) {
+  selected.value = props.items[0]
+}
+
+function toggleItem(item: string) {
+  if (selected.value === item && !props.neverEmpty) {
+    selected.value = null
+  } else {
+    selected.value = item
+  }
+}
 </script>
 
 <style lang="scss" scoped>
