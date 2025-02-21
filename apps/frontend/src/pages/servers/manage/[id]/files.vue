@@ -31,7 +31,7 @@
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
         <FilesNavbar
-          :mode="isEditing ? 'editing' : 'browsing'"
+          :mode="mode"
           :breadcrumb-segments="breadcrumbSegments"
           :search-query="searchQuery"
           :current-filter="viewFilter"
@@ -49,7 +49,22 @@
           @share="requestShareLink"
         />
 
-        <div v-if="!isEditing" class="relative z-0">
+        <div v-if="mode !== 'browsing'" class="h-full w-full flex-grow">
+          <component
+            :is="VAceEditor"
+            v-if="mode === 'editing'"
+            v-model:value="fileContent"
+            :lang="editorLanguage"
+            theme="one_dark"
+            :print-margin="false"
+            style="height: 750px; font-size: 1rem"
+            class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
+            @init="onInit"
+          />
+          <UiServersFilesImageViewer v-else-if="mode === 'imageview'" :image-blob="imagePreview" />
+        </div>
+
+        <div v-else class="relative z-0">
           <UiServersFilesLabelBar
             :sort-field="sortMethod"
             :sort-desc="sortDesc"
@@ -65,22 +80,10 @@
           />
         </div>
 
-        <div v-if="isEditing" class="h-full w-full flex-grow">
-          <component
-            :is="VAceEditor"
-            v-if="!isEditingImage"
-            v-model:value="fileContent"
-            :lang="editorLanguage"
-            theme="one_dark"
-            :print-margin="false"
-            style="height: 750px; font-size: 1rem"
-            class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
-            @init="onInit"
-          />
-          <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
-        </div>
-
-        <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
+        <div
+          v-if="mode === 'browsing' && items.length > 0"
+          class="h-full w-full overflow-hidden rounded-b-2xl"
+        >
           <UiServersFileVirtualList
             :items="filteredItems"
             @delete="showDeleteModal"
@@ -209,7 +212,7 @@ const newItemType = ref<"file" | "directory">("file");
 const selectedItem = ref<any>(null);
 const fileContent = ref("");
 
-const isEditing = ref(false);
+const mode = ref<"browsing" | "editing" | "imageview">("browsing");
 const editingFile = ref<any>(null);
 const closeEditor = ref(false);
 const isEditingImage = ref(false);
@@ -402,7 +405,7 @@ const handleRenameItem = async (newName: string) => {
 
     if (closeEditor.value) {
       await props.server.refresh();
-      isEditing.value = false;
+      mode.value = "browsing";
       editingFile.value = null;
       closeEditor.value = false;
       router.push({ query: { ...route.query, path: currentPath.value } });
@@ -721,11 +724,12 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
 
     fileContent.value = await content.text();
     editingFile.value = item;
-    isEditing.value = true;
     const extension = item.name.split(".").pop();
     if (item.type === "file" && extension && imageExtensions.includes(extension)) {
-      isEditingImage.value = true;
+      mode.value = "imageview";
       imagePreview.value = content;
+    } else {
+      mode.value = "editing";
     }
     router.push({ query: { ...route.query, path: currentPath.value, editing: item.path } });
   } catch (error) {
@@ -798,7 +802,7 @@ watch(
         path: newQuery.editing as string,
       });
     } else {
-      isEditing.value = false;
+      mode.value = "browsing";
       editingFile.value = null;
     }
 
@@ -818,8 +822,8 @@ const breadcrumbSegments = computed(() => {
 const navigateToSegment = (index: number) => {
   const newPath = breadcrumbSegments.value.slice(0, index + 1).join("/");
   router.push({ query: { ...route.query, path: newPath } });
-  if (isEditing.value) {
-    isEditing.value = false;
+  if (mode.value !== "browsing") {
+    mode.value = "browsing";
     editingFile.value = null;
     closeEditor.value = false;
 
@@ -858,7 +862,7 @@ const requestShareLink = async () => {
 };
 
 const handleDroppedFiles = (files: File[]) => {
-  if (isEditing.value) return;
+  if (mode.value !== "browsing") return;
 
   files.forEach((file) => {
     uploadDropdownRef.value?.uploadFile(file);
@@ -908,7 +912,7 @@ const saveFileContent = async (exit: boolean = true) => {
     await props.server.fs?.updateFile(editingFile.value.path, fileContent.value);
     if (exit) {
       await props.server.refresh();
-      isEditing.value = false;
+      mode.value = "browsing";
       editingFile.value = null;
       router.push({ query: { ...route.query, path: currentPath.value } });
     }
@@ -943,7 +947,7 @@ const saveFileContentAs = async () => {
 };
 
 const cancelEditing = () => {
-  isEditing.value = false;
+  mode.value = "browsing";
   editingFile.value = null;
   fileContent.value = "";
   isEditingImage.value = false;
