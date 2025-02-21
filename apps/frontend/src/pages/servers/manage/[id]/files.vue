@@ -25,7 +25,7 @@
       @delete="handleDeleteItem"
     />
 
-    <FilesUploadDragAndDrop
+    <UploadDragAndDrop
       class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
       @files-dropped="handleDroppedFiles"
     >
@@ -70,7 +70,7 @@
             :sort-desc="sortDesc"
             @sort="handleSort"
           />
-          <FilesUploadDropdown
+          <UploadDropdown
             v-if="props.server.fs"
             ref="uploadDropdownRef"
             class="rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow"
@@ -126,7 +126,7 @@
           <p class="mt-2 text-xl">Drop files here to upload</p>
         </div>
       </div>
-    </FilesUploadDragAndDrop>
+    </UploadDragAndDrop>
 
     <UiServersTeleportOverflowMenu
       ref="contextMenuRef"
@@ -152,8 +152,8 @@ import {
   RightArrowIcon,
 } from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
+import UploadDragAndDrop from "~/components/ui/servers/UploadDragAndDrop.vue";
+import UploadDropdown from "~/components/ui/servers/UploadDropdown.vue";
 import FilesNavbar from "~/components/ui/servers/FilesNavbar.vue";
 
 interface BaseOperation {

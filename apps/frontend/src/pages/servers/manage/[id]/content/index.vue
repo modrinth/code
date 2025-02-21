@@ -82,7 +82,7 @@
           </div>
         </div>
       </div>
-      <FilesUploadDropdown
+      <UploadDropdown
         v-if="props.server.fs"
         ref="uploadDropdownRef"
         class="rounded-xl bg-bg-raised"
@@ -93,7 +93,7 @@
         :accepted-types="acceptFileFromProjectType(type.toLocaleLowerCase()).split(',')"
         @upload-complete="() => props.server.refresh(['content'])"
       />
-      <FilesUploadDragAndDrop
+      <UploadDragAndDrop
         v-if="server.general && localMods"
         class="relative min-h-[50vh]"
         overlay-class="rounded-xl border-2 border-dashed border-secondary"
@@ -311,7 +311,7 @@
             </ButtonStyled>
           </div>
         </div>
-      </FilesUploadDragAndDrop>
+      </UploadDragAndDrop>
     </div>
   </div>
 </template>
@@ -334,8 +334,8 @@ import {
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import ErrorBoundary from "~/components/ErrorBoundary.vue";
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
+import UploadDragAndDrop from "~/components/ui/servers/UploadDragAndDrop.vue";
+import UploadDropdown from "~/components/ui/servers/UploadDropdown.vue";
 import type { Server } from "~/composables/pyroServers";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 
