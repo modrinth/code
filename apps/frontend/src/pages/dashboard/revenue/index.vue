@@ -218,6 +218,10 @@ strong {
   pointer-events: none;
 }
 
+.grid-display {
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
 .available-soon {
   padding-top: 0;
 
@@ -259,11 +263,11 @@ strong {
   }
 }
 
-@media screen and (max-width: 1085px) {
-  .available-soon-item {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-right: auto;
-  }
-}
+//@media screen and (max-width: 1085px) {
+//  .available-soon-item {
+//    flex-direction: column;
+//    align-items: flex-start;
+//    margin-right: auto;
+//  }
+//}
 </style>
