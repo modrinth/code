@@ -1,6 +1,7 @@
 <template>
   <div data-pyro-telepopover-wrapper class="relative">
     <button
+      v-if="!isContextMenu"
       ref="triggerRef"
       class="teleport-overflow-menu-trigger"
       :aria-expanded="isOpen"
@@ -112,15 +113,16 @@ interface Option {
   color?: "standard" | "brand" | "red" | "orange" | "green" | "blue" | "purple";
 }
 
-const props = withDefaults(
-  defineProps<{
-    options: Option[];
-    hoverable?: boolean;
-  }>(),
-  {
-    hoverable: false,
-  },
-);
+interface Props {
+  options: Option[];
+  hoverable?: boolean;
+  isContextMenu?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  hoverable: false,
+  isContextMenu: false,
+});
 
 const emit = defineEmits<{
   (e: "select", option: Option): void;
@@ -134,6 +136,7 @@ const isMouseDown = ref(false);
 const typeAheadBuffer = ref("");
 const typeAheadTimeout = ref<number | null>(null);
 const menuItemsRef = ref<HTMLElement[]>([]);
+const contextPosition = ref({ x: 0, y: 0 });
 
 const hoveringTrigger = useElementHover(triggerRef);
 const hoveringMenu = useElementHover(menuRef);
@@ -148,6 +151,34 @@ const menuStyle = ref({
 const filteredOptions = computed(() => props.options.filter((option) => option.shown !== false));
 
 const calculateMenuPosition = () => {
+  if (props.isContextMenu) {
+    const margin = 8;
+    let x = contextPosition.value.x;
+    let y = contextPosition.value.y;
+
+    if (menuRef.value) {
+      const menuRect = menuRef.value.getBoundingClientRect();
+      const menuWidth = menuRect.width;
+      const menuHeight = menuRect.height;
+
+      if (x + menuWidth > window.innerWidth) {
+        x = window.innerWidth - menuWidth - margin;
+      }
+
+      if (y + menuHeight > window.innerHeight) {
+        y = window.innerHeight - menuHeight - margin;
+      }
+
+      x = Math.max(margin, x);
+      y = Math.max(margin, y);
+    }
+
+    return {
+      top: `${y}px`,
+      left: `${x}px`,
+    };
+  }
+
   if (!triggerRef.value || !menuRef.value) return { top: "0px", left: "0px" };
 
   const triggerRect = triggerRef.value.getBoundingClientRect();
@@ -429,5 +460,21 @@ onClickOutside(menuRef, (event) => {
   if (!triggerRef.value?.contains(event.target as Node)) {
     closeMenu();
   }
+});
+
+const openContextMenu = (x: number, y: number) => {
+  contextPosition.value = { x, y };
+  isOpen.value = true;
+  disableBodyScroll();
+  nextTick(() => {
+    menuStyle.value = calculateMenuPosition();
+    document.addEventListener("mousemove", handleMouseMove);
+    focusFirstMenuItem();
+  });
+};
+
+defineExpose({
+  openContextMenu,
+  close: closeMenu,
 });
 </script>
