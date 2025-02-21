@@ -19,12 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import Convert from "ansi-to-html";
-import DOMPurify from "dompurify";
+import { ref } from "vue";
 
 const props = defineProps<{
   log: string;
+  sanitizedLog: string;
 }>();
 
 defineEmits<{
@@ -39,22 +38,6 @@ const checkOverflow = () => {
     isOverflowing.value = logContent.value.scrollWidth > logContent.value.clientWidth;
   }
 };
-
-const convert = new Convert({
-  fg: "#FFF",
-  bg: "#000",
-  newline: false,
-  escapeXML: true,
-  stream: false,
-});
-
-const sanitizedLog = computed(() =>
-  DOMPurify.sanitize(convert.toHtml(props.log), {
-    ALLOWED_TAGS: ["span"],
-    ALLOWED_ATTR: ["style"],
-    USE_PROFILES: { html: true },
-  }),
-);
 </script>
 
 <style scoped>

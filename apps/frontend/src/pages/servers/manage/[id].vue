@@ -404,7 +404,6 @@ import {
   TransferIcon,
   LockIcon,
 } from "@modrinth/assets";
-import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import { reloadNuxtApp, navigateTo } from "#app";
@@ -930,8 +929,6 @@ const cleanup = () => {
   isConnected.value = false;
   isReconnecting.value = false;
   isLoading.value = true;
-
-  DOMPurify.removeHook("afterSanitizeAttributes");
 };
 
 onMounted(() => {
@@ -968,19 +965,6 @@ onMounted(() => {
       console.warn("[PYROSERVERS][INTERCOM] mismatch");
     }
   }
-
-  DOMPurify.addHook(
-    "afterSanitizeAttributes",
-    (node: {
-      tagName: string;
-      getAttribute: (arg0: string) => any;
-      setAttribute: (arg0: string, arg1: string) => void;
-    }) => {
-      if (node.tagName === "A" && node.getAttribute("target")) {
-        node.setAttribute("rel", "noopener noreferrer");
-      }
-    },
-  );
 });
 
 onUnmounted(() => {

@@ -140,7 +140,11 @@
                   class="group"
                 >
                   <div class="flex items-center gap-2">
-                    <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
+                    <UiServersLogLine
+                      :log="item"
+                      :sanitized-log="convertAndSanitizeLog(item)"
+                      @show-full-log="showFullLogMessage"
+                    />
                     <div @mousedown.stop @click.stop>
                       <button
                         v-if="searchInput"
@@ -319,6 +323,7 @@ import { useDebounceFn, useStorage } from "@vueuse/core";
 import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import DOMPurify from "dompurify";
+import Convert from "ansi-to-html";
 import { usePyroConsole } from "~/store/console.ts";
 
 const { $cosmetics } = useNuxtApp();
@@ -1176,6 +1181,22 @@ onUnmounted(() => {
   window.removeEventListener("keydown", handleCopy);
   stopAutoScroll();
 });
+
+const convert = new Convert({
+  fg: "#FFF",
+  bg: "#000",
+  newline: false,
+  escapeXML: true,
+  stream: false,
+});
+
+const convertAndSanitizeLog = (log: string) => {
+  return DOMPurify.sanitize(convert.toHtml(log), {
+    ALLOWED_TAGS: ["span"],
+    ALLOWED_ATTR: ["style"],
+    USE_PROFILES: { html: true },
+  });
+};
 </script>
 
 <style scoped>
