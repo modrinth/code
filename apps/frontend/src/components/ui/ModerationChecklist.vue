@@ -46,10 +46,12 @@
         <div v-else-if="!modPackData[modPackIndex]">
           <p>All permission checks complete!</p>
           <div class="input-group modpack-buttons">
-            <button class="btn" @click="modPackIndex -= 1">
-              <LeftArrowIcon aria-hidden="true" />
-              Previous
-            </button>
+            <ButtonStyled>
+              <button @click="modPackIndex -= 1">
+                <LeftArrowIcon aria-hidden="true" />
+                Previous
+              </button>
+            </ButtonStyled>
           </div>
         </div>
         <div v-else>
@@ -68,8 +70,10 @@
                 {{ option.name }}
               </button>
             </div>
-            <template v-if="modPackData[modPackIndex].status !== 'unidentified'">
-              <div class="universal-labels"></div>
+            <div
+              v-if="modPackData[modPackIndex].status !== 'unidentified'"
+              class="flex flex-col gap-1"
+            >
               <label for="proof">
                 <span class="label__title">Proof</span>
               </label>
@@ -100,7 +104,7 @@
                 autocomplete="off"
                 placeholder="Enter title of project..."
               />
-            </template>
+            </div>
           </div>
           <div v-else-if="modPackData[modPackIndex].type === 'flame'">
             <p>
