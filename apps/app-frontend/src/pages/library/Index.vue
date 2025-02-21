@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { onUnmounted, ref, shallowRef } from 'vue'
-import { list } from '@/helpers/profile.js'
+import { list } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs.js'
 import { profile_listener } from '@/helpers/events.js'
@@ -10,6 +10,8 @@ import { PlusIcon } from '@modrinth/assets'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { NewInstanceImage } from '@/assets/icons'
 import NavTabs from '@/components/ui/NavTabs.vue'
+
+const installationModal = ref<InstanceType<typeof InstanceCreationModal>>()
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -46,7 +48,7 @@ onUnmounted(() => {
         { label: 'Saved', href: `/library/saved`, shown: false },
       ]"
     />
-    <template v-if="instances.length > 0">
+    <template v-if="instances && instances.length > 0">
       <RouterView :instances="instances" />
     </template>
     <div v-else class="no-instance">
@@ -54,7 +56,7 @@ onUnmounted(() => {
         <NewInstanceImage />
       </div>
       <h3>No instances found</h3>
-      <Button color="primary" :disabled="offline" @click="$refs.installationModal.show()">
+      <Button color="primary" :disabled="offline" @click="installationModal?.show()">
         <PlusIcon />
         Create new instance
       </Button>

@@ -1,12 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import GridDisplay from '@/components/GridDisplay.vue'
+import type { GameInstance } from '@/helpers/types'
 
-defineProps({
-  instances: {
-    type: Array,
-    required: true,
-  },
-})
+defineProps<{
+  instances: GameInstance[]
+}>()
 </script>
 <template>
   <GridDisplay
