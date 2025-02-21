@@ -146,7 +146,17 @@ const codeExtensions = Object.freeze([
   "go",
 ]);
 
-const textExtensions = Object.freeze(["txt", "md", "log", "cfg", "conf", "properties", "ini"]);
+const textExtensions = Object.freeze([
+  "txt",
+  "md",
+  "log",
+  "cfg",
+  "conf",
+  "properties",
+  "ini",
+  "sk",
+  "skript",
+]);
 const imageExtensions = Object.freeze(["png", "jpg", "jpeg", "gif", "svg", "webp"]);
 const units = Object.freeze(["B", "KB", "MB", "GB", "TB", "PB", "EB"]);
 
