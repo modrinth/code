@@ -640,7 +640,6 @@ import Badge from "~/components/ui/Badge.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";
-import Chips from "~/components/ui/Chips.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import FileInput from "~/components/ui/FileInput.vue";
 
@@ -663,6 +662,7 @@ import Modal from "~/components/ui/Modal.vue";
 import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
 
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+
 export default defineNuxtComponent({
   components: {
     MarkdownEditor,
@@ -670,7 +670,6 @@ export default defineNuxtComponent({
     FileInput,
     Checkbox,
     ChevronRightIcon,
-    Chips,
     Categories,
     DownloadIcon,
     EditIcon,
