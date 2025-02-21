@@ -44,19 +44,36 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
+interface FileItem {
+  path: string;
+  name: string;
+  type: "file" | "directory";
+  size?: number;
+  count?: number;
+  created: number;
+  modified: number;
+}
+
+interface MoveData {
+  name: string;
+  type: string;
+  path: string;
+  destination: string;
+}
+
 const props = defineProps<{
-  items: any[];
+  items: FileItem[];
 }>();
 
 const emit = defineEmits<{
-  (e: "delete", item: any): void;
-  (e: "rename", item: any): void;
-  (e: "download", item: any): void;
-  (e: "move", item: any): void;
-  (e: "edit", item: any): void;
-  (e: "contextmenu", item: any, x: number, y: number): void;
+  (e: "delete", item: FileItem): void;
+  (e: "rename", item: FileItem): void;
+  (e: "download", item: FileItem): void;
+  (e: "move", item: FileItem): void;
+  (e: "edit", item: FileItem): void;
+  (e: "contextmenu", item: FileItem, x: number, y: number): void;
   (e: "loadMore"): void;
-  (e: "moveDirectTo", item: any): void;
+  (e: "moveDirectTo", data: MoveData): void;
 }>();
 
 const ITEM_HEIGHT = 61;
