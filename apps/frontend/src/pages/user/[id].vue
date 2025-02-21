@@ -526,54 +526,6 @@ const sumDownloads = computed(() => {
   return sum;
 });
 
-const joinDate = computed(() => new Date(user.value.created));
-const MODRINTH_BETA_END_DATE = new Date("2022-02-27T08:00:00.000Z");
-const MODRINTH_ALPHA_END_DATE = new Date("2020-11-30T08:00:00.000Z");
-
-const badges = computed(() => {
-  const badges = [];
-
-  if (user.value.role === "admin") {
-    badges.push("staff");
-  }
-
-  if (user.value.role === "moderator") {
-    badges.push("mod");
-  }
-
-  if (isPermission(user.value.badges, 1 << 0)) {
-    badges.push("plus");
-  }
-
-  if (sumDownloads.value > 10000000) {
-    badges.push("10m-club");
-  }
-
-  if (
-    isPermission(user.value.badges, 1 << 1) ||
-    isPermission(user.value.badges, 1 << 2) ||
-    isPermission(user.value.badges, 1 << 3)
-  ) {
-    badges.push("early-adopter");
-  }
-
-  if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_ALPHA_END_DATE) {
-    badges.push("alpha-tester");
-  } else if (isPermission(user.value.badges, 1 << 4) || joinDate.value < MODRINTH_BETA_END_DATE) {
-    badges.push("beta-tester");
-  }
-
-  if (isPermission(user.value.badges, 1 << 5)) {
-    badges.push("contributor");
-  }
-
-  if (isPermission(user.value.badges, 1 << 6)) {
-    badges.push("translator");
-  }
-
-  return badges;
-});
-
 async function copyId() {
   await navigator.clipboard.writeText(user.value.id);
 }
