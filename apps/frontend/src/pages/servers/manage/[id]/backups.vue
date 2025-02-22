@@ -323,7 +323,10 @@ const unlockBackup = async (backupId: string) => {
 };
 
 const formatBackupDate = (date: string) => {
-  return new Date(date).toLocaleString("en-US", {
+  const utcDate = new Date(date);
+  const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
+
+  return localDate.toLocaleString("en-US", {
     month: "numeric",
     day: "numeric",
     year: "2-digit",
