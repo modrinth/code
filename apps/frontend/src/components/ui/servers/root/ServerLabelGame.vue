@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="game"
-    v-tooltip="'Change server version'"
+    v-tooltip="'Change game version'"
     class="min-w-0 flex-none flex-row items-center gap-2 first:!flex"
   >
     <GameIcon aria-hidden="true" class="size-5 shrink-0" />
