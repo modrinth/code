@@ -60,7 +60,7 @@
               </NuxtLink>
             </div>
           </div>
-          <UiServersTeleportDropdownMenu
+          <TeleportDropdownMenu
             v-model="selectedVersion"
             name="Project"
             :options="filteredVersions"
@@ -238,6 +238,7 @@ import { Admonition, ButtonStyled, NewModal } from "@modrinth/ui";
 import TagItem from "@modrinth/ui/src/components/base/TagItem.vue";
 import { ref, computed } from "vue";
 import { formatCategory, formatVersionsForDisplay, type Version } from "@modrinth/utils";
+import TeleportDropdownMenu from "./TeleportDropdownMenu.vue";
 import Accordion from "~/components/ui/Accordion.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import ContentVersionFilter, {

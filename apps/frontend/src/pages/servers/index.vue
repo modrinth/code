@@ -62,7 +62,7 @@
                 <BoxIcon aria-hidden="true" /> Manage your servers
               </nuxt-link>
             </ButtonStyled>
-            <UiServersPoweredByPyro class="mx-0 !mt-0" />
+            <PoweredByPyro class="mx-0 !mt-0" />
           </div>
         </div>
       </div>
@@ -823,6 +823,7 @@ import {
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import Globe from "~/components/ui/servers/Globe.vue";
+import PoweredByPyro from "~/components/ui/servers/PoweredByPyro.vue";
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 const pyroPlanProducts = pyroProducts.filter(

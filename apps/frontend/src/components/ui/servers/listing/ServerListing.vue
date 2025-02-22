@@ -16,7 +16,7 @@
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
     >
-      <UiServersServerIcon v-if="status !== 'suspended'" :image="image" />
+      <ServerIcon v-if="status !== 'suspended'" :image="image" />
       <div
         v-else
         class="bg-bg-secondary flex size-24 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
@@ -72,8 +72,8 @@
       class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
     >
       <div class="flex flex-row gap-2">
-        <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
-        update your billing information or contact Modrinth Support for more information.
+        <PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your
+        billing information or contact Modrinth Support for more information.
       </div>
       <UiCopyCode :text="`${props.server_id}`" class="ml-auto" />
     </div>
@@ -84,6 +84,8 @@
 import { ChevronRightIcon, HammerIcon, LockIcon } from "@modrinth/assets";
 import SpinnerIcon from "../icons/SpinnerIcon.vue";
 import ServerLabels from "../root/ServerLabels.vue";
+import ServerIcon from "../ServerIcon.vue";
+import PanelErrorIcon from "../icons/PanelErrorIcon.vue";
 import type { Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();

@@ -110,7 +110,7 @@
       </div>
     </template>
 
-    <UiServersPoweredByPyro />
+    <PoweredByPyro />
   </div>
 </template>
 
@@ -125,6 +125,7 @@ import type { Server } from "~/types/servers";
 import ServerListing from "~/components/ui/servers/listing/ServerListing.vue";
 import ServerListingSkeleton from "~/components/ui/servers/listing/ServerListingSkeleton.vue";
 import ServerListingEmpty from "~/components/ui/servers/listing/ServerListingEmpty.vue";
+import PoweredByPyro from "~/components/ui/servers/PoweredByPyro.vue";
 
 definePageMeta({
   middleware: "auth",

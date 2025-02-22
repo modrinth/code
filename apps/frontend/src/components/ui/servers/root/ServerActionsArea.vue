@@ -65,7 +65,7 @@
         <ButtonStyled type="standard" color="brand">
           <button :disabled="!canTakeAction" @click="handlePrimaryAction">
             <div v-if="isTransitionState" class="grid place-content-center">
-              <UiServersIconsLoadingIcon />
+              <LoadingIcon />
             </div>
             <component :is="isRunning ? UpdatedIcon : PlayIcon" v-else />
             <span>{{ primaryActionText }}</span>
@@ -73,7 +73,7 @@
         </ButtonStyled>
 
         <ButtonStyled circular type="transparent">
-          <UiServersTeleportOverflowMenu :options="[...menuOptions]">
+          <TeleportOverflowMenu :options="[...menuOptions]">
             <MoreVerticalIcon aria-hidden="true" />
             <template #kill>
               <SlashIcon class="h-5 w-5" />
@@ -87,7 +87,7 @@
               <InfoIcon class="h-5 w-5" />
               <span>Details</span>
             </template>
-          </UiServersTeleportOverflowMenu>
+          </TeleportOverflowMenu>
         </ButtonStyled>
       </template>
     </div>
@@ -112,6 +112,8 @@ import { useRouter } from "vue-router";
 import { useStorage } from "@vueuse/core";
 import SpinnerIcon from "../icons/SpinnerIcon.vue";
 import ServerLabels from "../root/ServerLabels.vue";
+import LoadingIcon from "../icons/LoadingIcon.vue";
+import TeleportOverflowMenu from "../TeleportOverflowMenu.vue";
 
 type ServerAction = "start" | "stop" | "restart" | "kill";
 type ServerState = "stopped" | "starting" | "running" | "stopping" | "restarting";
