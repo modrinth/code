@@ -106,7 +106,7 @@ import { ButtonStyled } from "@modrinth/ui";
 import { ref, onMounted, onUnmounted, watch, nextTick, computed } from "vue";
 import { onClickOutside, useElementHover } from "@vueuse/core";
 
-interface Option {
+export interface Option {
   id: string;
   action?: (() => void) | string;
   shown?: boolean;
