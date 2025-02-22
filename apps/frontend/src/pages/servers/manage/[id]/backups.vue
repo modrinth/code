@@ -1,5 +1,5 @@
 <template>
-  <div class="contents">
+  <div class="relative flex select-none flex-col" data-pyro-servers-page="backups">
     <ErrorBoundary
       v-if="server.backups?.error"
       title="Failed to load backups"
@@ -9,19 +9,19 @@
     />
 
     <div v-else-if="data" class="contents">
-      <LazyUiServersBackupCreateModal
+      <ModalCreateBackup
         ref="createBackupModal"
         :server="server"
         @backup-created="handleBackupCreated"
       />
-      <LazyUiServersBackupRenameModal
+      <ModalRenameBackup
         ref="renameBackupModal"
         :server="server"
         :current-backup-id="currentBackup"
         :backup-name="renameBackupName"
         @backup-renamed="handleBackupRenamed"
       />
-      <LazyUiServersBackupRestoreModal
+      <ModalRestoreBackup
         ref="restoreBackupModal"
         :server="server"
         :backup-id="currentBackup"
@@ -29,7 +29,7 @@
         :backup-created-at="currentBackupDetails?.created_at ?? ''"
         @backup-restored="handleBackupRestored"
       />
-      <LazyUiServersBackupDeleteModal
+      <ModalDeleteBackup
         ref="deleteBackupModal"
         :server="server"
         :backup-id="currentBackup"
@@ -38,7 +38,7 @@
         @backup-deleted="handleBackupDeleted"
       />
 
-      <LazyUiServersBackupSettingsModal ref="backupSettingsModal" :server="server" />
+      <ModalAutoBackupSettings ref="backupSettingsModal" :server="server" />
 
       <ul class="m-0 flex list-none flex-col gap-4 p-0">
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6 shadow-md">
@@ -253,6 +253,11 @@ import {
 import { ref, computed } from "vue";
 import ErrorBoundary from "~/components/ErrorBoundary.vue";
 import type { Server } from "~/composables/pyroServers";
+import ModalCreateBackup from "~/components/ui/servers/backups/ModalCreateBackup.vue";
+import ModalRenameBackup from "~/components/ui/servers/backups/ModalRenameBackup.vue";
+import ModalRestoreBackup from "~/components/ui/servers/backups/ModalRestoreBackup.vue";
+import ModalDeleteBackup from "~/components/ui/servers/backups/ModalDeleteBackup.vue";
+import ModalAutoBackupSettings from "~/components/ui/servers/backups/ModalAutoBackupSettings.vue";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
