@@ -92,12 +92,12 @@ import type { Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();
 
-const pyroServer = await usePyroServer(props.server_id!, ["general"]);
+const { pyroServer } = await useSharedPyroServer(props.server_id!, ["general"]);
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 
 const projectData = computed(() => pyroServer.general?.project || null);
-const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
+const image = computed(() => pyroServer.general?.image);
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 </script>

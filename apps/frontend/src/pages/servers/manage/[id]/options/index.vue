@@ -269,7 +269,6 @@ const uploadFile = async (e: Event) => {
         canvas.height = 512;
         ctx?.drawImage(img, 0, 0, 512, 512);
         const dataURL = canvas.toDataURL("image/png");
-        useState(`server-icon-${props.server.serverId}`).value = dataURL;
         if (data.value) data.value.image = dataURL;
         resolve();
         URL.revokeObjectURL(img.src);
@@ -297,12 +296,16 @@ const uploadFile = async (e: Event) => {
 const resetIcon = async () => {
   if (data.value?.image) {
     try {
-      await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
-      await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+      try {
+        await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
+        await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+      } catch (error) {
+        if (!(error instanceof PyroServersFetchError && error.statusCode === 404)) {
+          throw error;
+        }
+      }
 
-      useState(`server-icon-${props.server.serverId}`).value = undefined;
       if (data.value) data.value.image = undefined;
-
       await props.server.refresh(["general"]);
 
       addNotification({
