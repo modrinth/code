@@ -12,14 +12,14 @@
       <ModalCreateBackup
         ref="createBackupModal"
         :server="server"
-        @backup-created="handleBackupCreated"
+        @backup-created="handleBackupOperation"
       />
       <ModalRenameBackup
         ref="renameBackupModal"
         :server="server"
         :current-backup-id="currentBackup"
         :backup-name="renameBackupName"
-        @backup-renamed="handleBackupRenamed"
+        @backup-renamed="handleBackupOperation"
       />
       <ModalRestoreBackup
         ref="restoreBackupModal"
@@ -27,7 +27,7 @@
         :backup-id="currentBackup"
         :backup-name="currentBackupDetails?.name ?? ''"
         :backup-created-at="currentBackupDetails?.created_at ?? ''"
-        @backup-restored="handleBackupRestored"
+        @backup-restored="handleBackupOperation"
       />
       <ModalDeleteBackup
         ref="deleteBackupModal"
@@ -35,56 +35,29 @@
         :backup-id="currentBackup"
         :backup-name="currentBackupDetails?.name ?? ''"
         :backup-created-at="currentBackupDetails?.created_at ?? ''"
-        @backup-deleted="handleBackupDeleted"
+        @backup-deleted="handleBackupOperation"
       />
-
       <ModalAutoBackupSettings ref="backupSettingsModal" :server="server" />
 
       <ul class="m-0 flex list-none flex-col gap-4 p-0">
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6 shadow-md">
           <div class="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-0">
             <div class="flex flex-col items-baseline gap-2">
-              <div class="text-2xl font-bold text-contrast">
-                {{
-                  data.used_backup_quota === 0
-                    ? "No backups"
-                    : `You've created ${data.used_backup_quota} backup${data.used_backup_quota === 1 ? "" : "s"}`
-                }}
-              </div>
-              <div>
-                {{
-                  data.backup_quota - data.used_backup_quota === 0
-                    ? "You have reached your backup limit. Consider removing old backups to create new ones."
-                    : `You can create ${data.backup_quota - data.used_backup_quota} more backups for your server.`
-                }}
-              </div>
+              <div class="text-2xl font-bold text-contrast">{{ backupQuotaText }}</div>
+              <div>{{ backupQuotaRemainingText }}</div>
             </div>
             <div class="flex w-full flex-col gap-2 sm:w-fit sm:flex-row">
               <ButtonStyled type="standard">
-                <button
-                  :disabled="server.general?.status === 'installing'"
-                  @click="showbackupSettingsModal"
-                >
+                <button :disabled="isServerInstalling" @click="showBackupSettingsModal">
                   <SettingsIcon class="h-5 w-5" />
                   Auto backups
                 </button>
               </ButtonStyled>
               <ButtonStyled type="standard" color="brand">
                 <button
-                  v-tooltip="
-                    isServerRunning && !userPreferences.backupWhileRunning
-                      ? 'Cannot create backup while server is running. You can disable this from your server Options > Preferences.'
-                      : server.general?.status === 'installing'
-                        ? 'Cannot create backups while server is being installed'
-                        : ''
-                  "
+                  v-tooltip="createBackupTooltip"
                   class="w-full sm:w-fit"
-                  :disabled="
-                    (isServerRunning && !userPreferences.backupWhileRunning) ||
-                    data.used_backup_quota >= data.backup_quota ||
-                    backups.some((backup) => backup.ongoing) ||
-                    server.general?.status === 'installing'
-                  "
+                  :disabled="isCreateBackupDisabled"
                   @click="showCreateModel"
                 >
                   <PlusIcon class="h-5 w-5" />
@@ -96,12 +69,11 @@
         </div>
 
         <div
-          v-if="backups.some((backup) => backup.ongoing)"
+          v-if="hasOngoingBackups"
           data-pyro-server-backup-ongoing
           class="flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
         >
-          A backup is currently being created. This may take a few minutes. This page will
-          automatically refresh when the backup is complete.
+          A backup is currently being created.
         </div>
 
         <div class="flex w-full flex-col gap-2">
@@ -117,22 +89,19 @@
                     class="grid size-14 shrink-0 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border shadow-sm"
                     :class="backup.ongoing ? 'text-green [&&]:bg-bg-green' : 'bg-button-bg'"
                   >
-                    <UiServersIconsLoadingIcon
-                      v-if="backup.ongoing"
-                      v-tooltip="'Backup in progress'"
-                      class="size-6 animate-spin"
+                    <component
+                      :is="getBackupIcon(backup)"
+                      class="size-8"
+                      :class="{ 'animate-spin': backup.ongoing }"
                     />
-                    <LockIcon v-else-if="backup.locked" class="size-8" />
-                    <BoxIcon v-else class="size-8" />
                   </div>
                   <div class="flex min-w-0 flex-col gap-2">
                     <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
                       <div class="max-w-full truncate font-bold text-contrast">
                         {{ backup.name }}
                       </div>
-
                       <div
-                        v-if="index == 0"
+                        v-if="index === 0"
                         class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
                       >
                         <CheckIcon class="size-4" /> Latest
@@ -140,16 +109,7 @@
                     </div>
                     <div class="flex items-center gap-1 text-xs">
                       <CalendarIcon class="size-4" />
-                      {{
-                        new Date(backup.created_at).toLocaleString("en-US", {
-                          month: "numeric",
-                          day: "numeric",
-                          year: "2-digit",
-                          hour: "numeric",
-                          minute: "numeric",
-                          hour12: true,
-                        })
-                      }}
+                      {{ formatBackupDate(backup.created_at) }}
                     </div>
                   </div>
                 </div>
@@ -158,51 +118,18 @@
                     direction="left"
                     position="bottom"
                     class="bg-transparent"
-                    :disabled="backups.some((b) => b.ongoing)"
-                    :options="[
-                      {
-                        id: 'rename',
-                        action: () => {
-                          renameBackupName = backup.name;
-                          currentBackup = backup.id;
-                          renameBackupModal?.show();
-                        },
-                      },
-                      {
-                        id: 'restore',
-                        action: () => {
-                          currentBackup = backup.id;
-                          restoreBackupModal?.show();
-                        },
-                      },
-                      { id: 'download', action: () => initiateDownload(backup.id) },
-                      {
-                        id: 'lock',
-                        action: () => {
-                          if (backup.locked) {
-                            unlockBackup(backup.id);
-                          } else {
-                            lockBackup(backup.id);
-                          }
-                        },
-                      },
-                      {
-                        id: 'delete',
-                        action: () => {
-                          currentBackup = backup.id;
-                          deleteBackupModal?.show();
-                        },
-                        color: 'red',
-                      },
-                    ]"
+                    :disabled="hasOngoingBackups"
+                    :options="getBackupOptions(backup)"
                   >
                     <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-                    <template #rename> <EditIcon /> Rename </template>
-                    <template #restore> <ClipboardCopyIcon /> Restore </template>
-                    <template v-if="backup.locked" #lock> <LockOpenIcon /> Unlock </template>
-                    <template v-else #lock> <LockIcon /> Lock </template>
-                    <template #download> <DownloadIcon /> Download </template>
-                    <template #delete> <TrashIcon /> Delete </template>
+                    <template #rename><EditIcon /> Rename</template>
+                    <template #restore><ClipboardCopyIcon /> Restore</template>
+                    <template #lock>
+                      <component :is="backup.locked ? LockOpenIcon : LockIcon" />
+                      {{ backup.locked ? "Unlock" : "Lock" }}
+                    </template>
+                    <template #download><DownloadIcon /> Download</template>
+                    <template #delete><TrashIcon /> Delete</template>
                   </UiServersTeleportOverflowMenu>
                 </ButtonStyled>
               </div>
@@ -217,15 +144,13 @@
       >
         <div>
           <div
-            class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
-          ></div>
-          <div
-            class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
-          ></div>
-          <div
-            class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
+            v-for="i in 3"
+            :key="i"
+            :class="`animation-ring-${i}`"
+            class="flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
+            :style="{ opacity: i === 3 ? 0.4 : i === 2 ? 0.6 : 1 }"
           >
-            <DownloadIcon class="h-20 w-20 text-contrast" />
+            <DownloadIcon v-if="i === 1" class="h-20 w-20 text-contrast" />
           </div>
         </div>
       </div>
@@ -258,10 +183,16 @@ import ModalRenameBackup from "~/components/ui/servers/backups/ModalRenameBackup
 import ModalRestoreBackup from "~/components/ui/servers/backups/ModalRestoreBackup.vue";
 import ModalDeleteBackup from "~/components/ui/servers/backups/ModalDeleteBackup.vue";
 import ModalAutoBackupSettings from "~/components/ui/servers/backups/ModalAutoBackupSettings.vue";
+import LoadingIcon from "~/components/ui/servers/icons/LoadingIcon.vue";
+import type { Option } from "~/components/ui/servers/TeleportOverflowMenu.vue";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
   isServerRunning: boolean;
+}>();
+
+defineEmits<{
+  (e: "onDownload"): void;
 }>();
 
 const route = useNativeRoute();
@@ -271,19 +202,48 @@ const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
   backupWhileRunning: false,
 });
 
-defineEmits(["onDownload"]);
-
 const data = computed(() => props.server.general);
-const backups = computed(() => {
-  if (!props.server.backups?.data) return [];
+useHead({ title: `Backups - ${data.value?.name ?? "Server"} - Modrinth` });
 
-  return [...props.server.backups.data].sort((a, b) => {
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
+const backups = computed(
+  () =>
+    props.server.backups?.data
+      ?.slice()
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) ?? [],
+);
+const hasOngoingBackups = computed(() => backups.value.some((b) => b.ongoing));
+const isServerInstalling = computed(() => props.server.general?.status === "installing");
+const currentBackupDetails = computed(() =>
+  backups.value.find((b) => b.id === currentBackup.value),
+);
+const isCreateBackupDisabled = computed(
+  () =>
+    (props.isServerRunning && !userPreferences.value.backupWhileRunning) ||
+    (data.value?.used_backup_quota ?? 0) >= (data.value?.backup_quota ?? 0) ||
+    hasOngoingBackups.value ||
+    isServerInstalling.value,
+);
+
+const backupQuotaText = computed(() => {
+  const count = data.value?.used_backup_quota ?? 0;
+  return count === 0 ? "No backups" : `You've created ${count} backup${count === 1 ? "" : "s"}`;
 });
 
-useHead({
-  title: `Backups - ${data.value?.name ?? "Server"} - Modrinth`,
+const backupQuotaRemainingText = computed(() => {
+  const remaining = (data.value?.backup_quota ?? 0) - (data.value?.used_backup_quota ?? 0);
+  return remaining === 0
+    ? "You have reached your backup limit. Consider removing old backups to create new ones."
+    : `You can create ${remaining} more backups for your server.`;
+});
+
+const createBackupTooltip = computed(() => {
+  if (props.isServerRunning && !userPreferences.value.backupWhileRunning) {
+    return "Cannot create backup while server is running. You can disable this from your server Options > Preferences.";
+  }
+  if (isServerInstalling.value) {
+    return "Cannot create backups while server is being installed";
+  }
+  return "";
 });
 
 const overTheTopDownloadAnimation = ref();
@@ -299,51 +259,18 @@ const currentBackup = ref("");
 
 const refreshInterval = ref<ReturnType<typeof setInterval>>();
 
-const currentBackupDetails = computed(() => {
-  return backups.value.find((backup) => backup.id === currentBackup.value);
-});
-
 const showCreateModel = () => {
   createBackupModal.value?.show();
 };
 
-const showbackupSettingsModal = () => {
+const showBackupSettingsModal = () => {
   backupSettingsModal.value?.show();
 };
 
-const handleBackupCreated = async (payload: { success: boolean; message: string }) => {
-  if (payload.success) {
-    addNotification({ type: "success", text: payload.message });
-    await props.server.refresh(["backups"]);
-  } else {
-    addNotification({ type: "error", text: payload.message });
-  }
-};
-
-const handleBackupRenamed = async (payload: { success: boolean; message: string }) => {
-  if (payload.success) {
-    addNotification({ type: "success", text: payload.message });
-    await props.server.refresh(["backups"]);
-  } else {
-    addNotification({ type: "error", text: payload.message });
-  }
-};
-
-const handleBackupRestored = async (payload: { success: boolean; message: string }) => {
-  if (payload.success) {
-    addNotification({ type: "success", text: payload.message });
-    await props.server.refresh(["backups"]);
-  } else {
-    addNotification({ type: "error", text: payload.message });
-  }
-};
-
-const handleBackupDeleted = async (payload: { success: boolean; message: string }) => {
-  if (payload.success) {
-    addNotification({ type: "success", text: payload.message });
-    await props.server.refresh(["backups"]);
-  } else {
-    addNotification({ type: "error", text: payload.message });
+const handleBackupOperation = ({ success, message }: { success: boolean; message: string }) => {
+  addNotification({ type: success ? "success" : "error", text: message });
+  if (success) {
+    props.server.refresh(["backups"]);
   }
 };
 
@@ -395,27 +322,86 @@ const unlockBackup = async (backupId: string) => {
   }
 };
 
+const formatBackupDate = (date: string) => {
+  return new Date(date).toLocaleString("en-US", {
+    month: "numeric",
+    day: "numeric",
+    year: "2-digit",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+};
+
+const getBackupIcon = (backup: any) => {
+  if (backup.ongoing) return LoadingIcon;
+  if (backup.locked) return LockIcon;
+  return BoxIcon;
+};
+
+interface Backup {
+  id: string;
+  name: string;
+  created_at: string;
+  ongoing: boolean;
+  locked: boolean;
+}
+
+const getBackupOptions = (backup: Backup): Option[] => [
+  {
+    id: "rename",
+    action: () => {
+      renameBackupName.value = backup.name;
+      currentBackup.value = backup.id;
+      renameBackupModal.value?.show();
+    },
+  },
+  {
+    id: "restore",
+    action: () => {
+      currentBackup.value = backup.id;
+      restoreBackupModal.value?.show();
+    },
+  },
+  {
+    id: "download",
+    action: () => initiateDownload(backup.id),
+  },
+  {
+    id: "lock",
+    action: () => {
+      if (backup.locked) {
+        unlockBackup(backup.id);
+      } else {
+        lockBackup(backup.id);
+      }
+    },
+  },
+  {
+    id: "delete",
+    action: () => {
+      currentBackup.value = backup.id;
+      deleteBackupModal.value?.show();
+    },
+    color: "red" as const,
+  },
+];
+
 onMounted(() => {
   watchEffect(() => {
-    const hasOngoingBackups = backups.value.some((backup) => backup.ongoing);
-
     if (refreshInterval.value) {
       clearInterval(refreshInterval.value);
       refreshInterval.value = undefined;
     }
 
-    if (hasOngoingBackups) {
-      refreshInterval.value = setInterval(async () => {
-        await props.server.refresh(["backups"]);
-      }, 10000);
+    if (hasOngoingBackups.value) {
+      refreshInterval.value = setInterval(() => props.server.refresh(["backups"]), 10000);
     }
   });
 });
 
 onUnmounted(() => {
-  if (refreshInterval.value) {
-    clearInterval(refreshInterval.value);
-  }
+  if (refreshInterval.value) clearInterval(refreshInterval.value);
 });
 </script>
 
