@@ -913,16 +913,13 @@ const downloadFile = async (item: any) => {
     try {
       const path = `${currentPath.value}/${item.name}`.replace("//", "/");
       const fileData = await props.server.fs?.downloadFile(path);
-      if (fileData) {
-        const blob = new Blob([fileData], { type: "application/octet-stream" });
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        link.download = item.name;
-        link.click();
-        window.URL.revokeObjectURL(link.href);
-      } else {
-        throw new Error("File data is undefined");
-      }
+
+      const blob = new Blob([fileData || new Uint8Array()], { type: "application/octet-stream" });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = item.name;
+      link.click();
+      window.URL.revokeObjectURL(link.href);
     } catch (error) {
       console.error("Error downloading file:", error);
     }
