@@ -8,13 +8,13 @@
 
 <script setup lang="ts">
 defineProps<{
-  baseClass?: string;
-  collapsed: boolean;
-}>();
+  baseClass?: string
+  collapsed: boolean
+}>()
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 </script>
 <style scoped>
 .accordion-content {
