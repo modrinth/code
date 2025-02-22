@@ -140,7 +140,7 @@
                   class="group"
                 >
                   <div class="flex items-center gap-2">
-                    <UiServersLogLine
+                    <LogLine
                       :log="item"
                       :sanitized-log="convertAndSanitizeLog(item)"
                       @show-full-log="showFullLogMessage"
@@ -324,6 +324,7 @@ import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import DOMPurify from "dompurify";
 import Convert from "ansi-to-html";
+import LogLine from "./LogLine.vue";
 import { usePyroConsole } from "~/store/console.ts";
 
 const { $cosmetics } = useNuxtApp();
