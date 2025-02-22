@@ -1,5 +1,8 @@
 <template>
-  <div v-tooltip="'Change server loader'" class="flex min-w-0 flex-row items-center gap-4 truncate">
+  <div
+    v-tooltip="'Change server platform'"
+    class="flex min-w-0 flex-row items-center gap-4 truncate"
+  >
     <div v-if="!noSeparator" class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
     <div class="flex flex-row items-center gap-2">
       <LoaderIcon v-if="loader" :loader="loader" class="flex shrink-0 [&&]:size-5" />
