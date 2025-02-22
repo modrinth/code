@@ -412,6 +412,7 @@ import { usePyroConsole } from "~/store/console.ts";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
+const isConnecting = ref(false);
 const isLoading = ref(true);
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
 const isFirstMount = ref(true);
@@ -533,10 +534,17 @@ const navLinks = [
 ];
 
 const connectWebSocket = () => {
-  if (!isMounted.value) return;
+  if (!isMounted.value || isConnecting.value) return;
 
   try {
+    isConnecting.value = true;
     const wsAuth = computed(() => server.ws);
+
+    if (socket.value) {
+      socket.value.onclose = null;
+      socket.value.close();
+    }
+
     socket.value = new WebSocket(`wss://${wsAuth.value?.url}`);
 
     socket.value.onopen = () => {
@@ -550,6 +558,7 @@ const connectWebSocket = () => {
       isConnected.value = true;
       isReconnecting.value = false;
       isLoading.value = false;
+      isConnecting.value = false;
 
       if (firstConnect.value) {
         for (let i = 0; i < initialConsoleMessage.length; i++) {
@@ -560,9 +569,7 @@ const connectWebSocket = () => {
       firstConnect.value = false;
 
       if (reconnectInterval.value) {
-        if (reconnectInterval.value !== null) {
-          clearInterval(reconnectInterval.value);
-        }
+        clearInterval(reconnectInterval.value);
         reconnectInterval.value = null;
       }
     };
@@ -576,8 +583,9 @@ const connectWebSocket = () => {
 
     socket.value.onclose = () => {
       if (isMounted.value) {
-        pyroConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
+        isConnecting.value = false;
         isConnected.value = false;
+        pyroConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
         scheduleReconnect();
       }
     };
@@ -585,6 +593,7 @@ const connectWebSocket = () => {
     socket.value.onerror = (error) => {
       if (isMounted.value) {
         console.error("Failed to connect WebSocket:", error);
+        isConnecting.value = false;
         isConnected.value = false;
         scheduleReconnect();
       }
@@ -592,6 +601,7 @@ const connectWebSocket = () => {
   } catch (error) {
     if (isMounted.value) {
       console.error("Failed to connect WebSocket:", error);
+      isConnecting.value = false;
       isConnected.value = false;
       scheduleReconnect();
     }
@@ -599,15 +609,18 @@ const connectWebSocket = () => {
 };
 
 const scheduleReconnect = () => {
-  if (!isMounted.value) return;
+  if (!isMounted.value || isConnecting.value) return;
 
   if (!reconnectInterval.value) {
     isReconnecting.value = true;
     reconnectInterval.value = setInterval(() => {
-      if (isMounted.value) {
+      if (isMounted.value && !isConnecting.value) {
         console.log("Attempting to reconnect...");
         connectWebSocket();
-      } else {
+      } else if (!isMounted.value) {
+        if (reconnectInterval.value) {
+          clearInterval(reconnectInterval.value);
+        }
         reconnectInterval.value = null;
       }
     }, 5000);
@@ -926,6 +939,7 @@ const cleanup = () => {
     socket.value = null;
   }
 
+  isConnecting.value = false;
   isConnected.value = false;
   isReconnecting.value = false;
   isLoading.value = true;
