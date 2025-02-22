@@ -120,7 +120,6 @@
 
           <div class="flex flex-col gap-2">
             <CopyCode :text="'Server ID: ' + server.serverId" />
-            <CopyCode :text="'Node: ' + server.general?.datacenter" />
           </div>
         </div>
         <ButtonStyled
