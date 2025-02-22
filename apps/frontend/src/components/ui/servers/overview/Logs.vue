@@ -217,8 +217,8 @@
         :class="{ hidden: searchInput || hasSelection || isSingleLineSelected }"
         @click="toggleFullscreen"
       >
-        <LazyUiServersIconsMinimizeIconVue v-if="isFullScreen" />
-        <LazyUiServersIconsFullscreenIcon v-else />
+        <MinimizeIcon v-if="isFullScreen" />
+        <FullscreenIcon v-else />
       </button>
 
       <Transition name="fade">
@@ -324,6 +324,8 @@ import { NewModal } from "@modrinth/ui";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
 import DOMPurify from "dompurify";
 import Convert from "ansi-to-html";
+import MinimizeIcon from "../icons/MinimizeIcon.vue";
+import FullscreenIcon from "../icons/FullscreenIcon.vue";
 import LogLine from "./LogLine.vue";
 import { usePyroConsole } from "~/store/console.ts";
 

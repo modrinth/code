@@ -220,7 +220,7 @@
               data-pyro-server-action-buttons
               class="server-action-buttons-anim flex w-fit flex-shrink-0"
             >
-              <UiServersPanelServerActionButton
+              <ServerActionsArea
                 class="flex-shrink-0"
                 :is-online="isServerRunning"
                 :is-actioning="isActioning"
@@ -249,7 +249,7 @@
         data-pyro-navigation
         class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
       >
-        <UiNavTabs :links="navLinks" />
+        <NavTabs :links="navLinks" />
       </div>
 
       <div data-pyro-mount class="h-full w-full flex-1">
@@ -366,7 +366,7 @@
           data-pyro-server-installing
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
         >
-          <UiServersServerIcon :image="serverData.image" class="!h-10 !w-10" />
+          <ServerIcon :image="serverData.image" class="!h-10 !w-10" />
 
           <div class="flex flex-col gap-1">
             <span class="text-lg font-bold"> We're preparing your server! </span>
@@ -418,6 +418,8 @@ import CopyCode from "~/components/ui/CopyCode.vue";
 import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
 import ServerIcon from "~/components/ui/servers/ServerIcon.vue";
 import ServerLabels from "~/components/ui/servers/root/ServerLabels.vue";
+import ServerActionsArea from "~/components/ui/servers/root/ServerActionsArea.vue";
+import NavTabs from "~/components/ui/NavTabs.vue";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
