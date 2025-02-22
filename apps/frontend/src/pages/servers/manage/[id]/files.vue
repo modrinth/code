@@ -742,7 +742,7 @@ const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
 
 const editFile = async (item: { name: string; type: string; path: string }) => {
   try {
-    const path = `${currentPath.value}/${item.name}`.replace("//", "/");
+    const path = item.path;
     const content = (await props.server.fs?.downloadFile(path, true)) as any;
     window.scrollTo(0, 0);
 
@@ -755,7 +755,7 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
     } else {
       mode.value = "editing";
     }
-    router.push({ query: { ...route.query, path: currentPath.value, editing: item.path } });
+    router.push({ query: { ...route.query, path: currentPath.value, editing: path } });
   } catch (error) {
     console.error("Error fetching file content:", error);
   }
@@ -820,10 +820,11 @@ watch(
       : newQuery.path || "/";
 
     if (newQuery.editing) {
+      const editingPath = newQuery.editing as string;
       await editFile({
-        name: newQuery.editing as string,
+        name: editingPath.split("/").pop() || "",
         type: "file",
-        path: newQuery.editing as string,
+        path: editingPath,
       });
     } else {
       mode.value = "browsing";
