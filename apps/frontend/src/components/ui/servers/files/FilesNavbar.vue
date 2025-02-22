@@ -91,7 +91,7 @@
         <ShareIcon />
       </Button>
       <ButtonStyled v-if="mode === 'editing'" type="transparent">
-        <UiServersTeleportOverflowMenu
+        <TeleportOverflowMenu
           position="bottom"
           direction="left"
           aria-label="Save file"
@@ -120,14 +120,14 @@
             </svg>
             Save & restart
           </template>
-        </UiServersTeleportOverflowMenu>
+        </TeleportOverflowMenu>
       </ButtonStyled>
     </div>
 
     <div v-else class="flex flex-shrink-0 items-center gap-1">
       <div class="flex w-full flex-row-reverse sm:flex-row">
         <ButtonStyled type="transparent">
-          <UiServersTeleportOverflowMenu
+          <TeleportOverflowMenu
             position="bottom"
             direction="left"
             aria-label="Filter view"
@@ -145,7 +145,7 @@
             <template #all>Show all</template>
             <template #filesOnly>Files only</template>
             <template #foldersOnly>Folders only</template>
-          </UiServersTeleportOverflowMenu>
+          </TeleportOverflowMenu>
         </ButtonStyled>
         <div class="mx-1 w-full text-sm sm:w-48">
           <label for="search-folder" class="sr-only">Search folder</label>
@@ -169,7 +169,7 @@
       </div>
 
       <ButtonStyled type="transparent">
-        <UiServersTeleportOverflowMenu
+        <TeleportOverflowMenu
           position="bottom"
           direction="left"
           aria-label="Create new..."
@@ -184,7 +184,7 @@
           <template #file> <BoxIcon aria-hidden="true" /> New file </template>
           <template #directory> <FolderOpenIcon aria-hidden="true" /> New folder </template>
           <template #upload> <UploadIcon aria-hidden="true" /> Upload file </template>
-        </UiServersTeleportOverflowMenu>
+        </TeleportOverflowMenu>
       </ButtonStyled>
     </div>
   </header>
@@ -207,6 +207,7 @@ import {
 import { Button, ButtonStyled } from "@modrinth/ui";
 import { ref, computed } from "vue";
 import { useIntersectionObserver } from "@vueuse/core";
+import TeleportOverflowMenu from "../TeleportOverflowMenu.vue";
 
 const props = defineProps<{
   mode: "browsing" | "editing" | "imageview";

@@ -27,7 +27,7 @@
           </p>
         </div>
 
-        <UiServersTeleportDropdownMenu
+        <TeleportDropdownMenu
           :id="'interval-field'"
           v-model="backupIntervalsLabel"
           :disabled="!autoBackupEnabled || isSaving"
@@ -59,6 +59,7 @@
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { XIcon, SaveIcon } from "@modrinth/assets";
 import { ref, computed } from "vue";
+import TeleportDropdownMenu from "../TeleportDropdownMenu.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{

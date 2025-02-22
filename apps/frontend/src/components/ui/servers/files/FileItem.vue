@@ -51,7 +51,7 @@
         {{ formattedModifiedDate }}
       </span>
       <ButtonStyled circular type="transparent">
-        <UiServersTeleportOverflowMenu
+        <TeleportOverflowMenu
           ref="dropdownMenuRef"
           :options="menuOptions"
           direction="left"
@@ -62,7 +62,7 @@
           <template #move><RightArrowIcon /> Move</template>
           <template #download><DownloadIcon /> Download</template>
           <template #delete><TrashIcon /> Delete</template>
-        </UiServersTeleportOverflowMenu>
+        </TeleportOverflowMenu>
       </ButtonStyled>
     </div>
   </li>
@@ -82,6 +82,7 @@ import {
 import { computed, shallowRef, ref } from "vue";
 import { renderToString } from "vue/server-renderer";
 import { useRouter, useRoute } from "vue-router";
+import TeleportOverflowMenu from "../TeleportOverflowMenu.vue";
 import {
   UiServersIconsCogFolderIcon,
   UiServersIconsEarthIcon,

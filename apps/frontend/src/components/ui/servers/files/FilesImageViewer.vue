@@ -14,7 +14,7 @@
         v-if="state.hasError"
         class="flex h-full w-full flex-col items-center justify-center gap-8"
       >
-        <UiServersIconsPanelErrorIcon />
+        <PanelErrorIcon />
         <p class="m-0">{{ state.errorMessage || "Invalid or empty image file." }}</p>
       </div>
       <img
@@ -56,6 +56,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { ZoomInIcon, ZoomOutIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
+import PanelErrorIcon from "../icons/PanelErrorIcon.vue";
 
 const ZOOM_MIN = 0.1;
 const ZOOM_MAX = 5;
