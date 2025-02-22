@@ -30,7 +30,7 @@
           <div
             class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
           >
-            <UiServersIconsLoaderIcon class="size-10" :loader="selectedLoader" />
+            <LoaderIcon class="size-10" :loader="selectedLoader" />
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -56,7 +56,7 @@
 
         <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
           <div class="text-sm font-bold text-contrast">Minecraft version</div>
-          <UiServersTeleportDropdownMenu
+          <TeleportDropdownMenu
             v-model="selectedMCVersion"
             name="mcVersion"
             :options="mcVersions"
@@ -90,13 +90,13 @@
               <div
                 class="relative flex h-9 w-full items-center rounded-xl bg-button-bg px-4 opacity-50"
               >
-                <UiServersIconsLoadingIcon class="mr-2 animate-spin" />
+                <LoadingIcon class="mr-2 animate-spin" />
                 Loading versions...
                 <DropdownIcon class="absolute right-4" />
               </div>
             </template>
             <template v-else-if="selectedLoaderVersions.length > 0">
-              <UiServersTeleportDropdownMenu
+              <TeleportDropdownMenu
                 v-model="selectedLoaderVersion"
                 name="loaderVersion"
                 :options="selectedLoaderVersions"
@@ -192,6 +192,9 @@
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { RightArrowIcon, XIcon, ServerIcon, DropdownIcon } from "@modrinth/assets";
+import LoaderIcon from "../../icons/LoaderIcon.vue";
+import TeleportDropdownMenu from "../../TeleportDropdownMenu.vue";
+import LoadingIcon from "../../icons/LoadingIcon.vue";
 import type { Server } from "~/composables/pyroServers";
 import type { Loaders } from "~/types/servers";
 

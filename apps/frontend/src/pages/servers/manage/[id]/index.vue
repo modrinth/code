@@ -92,7 +92,7 @@
       </div>
     </div>
   </div>
-  <UiServersOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
+  <OverviewSkeleton v-else-if="!isConnected && !isWsAuthIncorrect" />
   <div v-else-if="isWsAuthIncorrect" class="flex flex-col">
     <h2>Could not connect to the server.</h2>
     <p>
@@ -117,6 +117,7 @@ import type { Server } from "~/composables/pyroServers";
 import Terminal from "~/components/ui/servers/overview/Terminal.vue";
 import Stats from "~/components/ui/servers/overview/Stats.vue";
 import StatusPill from "~/components/ui/servers/overview/StatusPill.vue";
+import OverviewSkeleton from "~/components/ui/servers/overview/OverviewSkeleton.vue";
 
 type ServerProps = {
   socket: WebSocket | null;

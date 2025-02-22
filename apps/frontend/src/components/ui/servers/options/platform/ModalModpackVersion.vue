@@ -17,7 +17,7 @@
       </div>
 
       <div class="flex w-full flex-col gap-4">
-        <UiServersTeleportDropdownMenu
+        <TeleportDropdownMenu
           v-if="props.versions?.length"
           v-model="selectedVersion"
           :options="versionOptions"
@@ -69,6 +69,7 @@
 <script setup lang="ts">
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { DownloadIcon, XIcon } from "@modrinth/assets";
+import TeleportDropdownMenu from "../../TeleportDropdownMenu.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{

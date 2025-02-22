@@ -49,7 +49,7 @@
             class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
             @init="onInit"
           />
-          <UiServersFilesImageViewer v-else-if="mode === 'imageview'" :image-blob="imagePreview" />
+          <FilesImageViewer v-else-if="mode === 'imageview'" :image-blob="imagePreview" />
         </div>
 
         <div v-else class="relative z-0">
@@ -112,7 +112,7 @@
       </div>
     </UploadDragAndDrop>
 
-    <UiServersTeleportOverflowMenu
+    <TeleportOverflowMenu
       ref="contextMenuRef"
       :options="contextMenuOptions"
       :is-context-menu="true"
@@ -121,7 +121,7 @@
       <template #move><RightArrowIcon /> Move</template>
       <template #download><DownloadIcon /> Download</template>
       <template #delete><TrashIcon /> Delete</template>
-    </UiServersTeleportOverflowMenu>
+    </TeleportOverflowMenu>
   </div>
 </template>
 
@@ -152,6 +152,8 @@ import FilesNavbarColumns from "~/components/ui/servers/files/FilesNavbarColumns
 import FilesList from "~/components/ui/servers/files/FilesList.vue";
 import FilesListError from "~/components/ui/servers/files/FilesListError.vue";
 import { addNotification } from "~/composables/notifs.js";
+import FilesImageViewer from "~/components/ui/servers/files/FilesImageViewer.vue";
+import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
 
 interface BaseOperation {
   type: "move" | "rename";

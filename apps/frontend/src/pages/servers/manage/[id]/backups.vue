@@ -114,7 +114,7 @@
                   </div>
                 </div>
                 <ButtonStyled v-if="!backup.ongoing" circular type="transparent">
-                  <UiServersTeleportOverflowMenu
+                  <TeleportOverflowMenu
                     direction="left"
                     position="bottom"
                     class="bg-transparent"
@@ -130,7 +130,7 @@
                     </template>
                     <template #download><DownloadIcon /> Download</template>
                     <template #delete><TrashIcon /> Delete</template>
-                  </UiServersTeleportOverflowMenu>
+                  </TeleportOverflowMenu>
                 </ButtonStyled>
               </div>
             </div>
@@ -185,6 +185,7 @@ import ModalDeleteBackup from "~/components/ui/servers/backups/ModalDeleteBackup
 import ModalAutoBackupSettings from "~/components/ui/servers/backups/ModalAutoBackupSettings.vue";
 import LoadingIcon from "~/components/ui/servers/icons/LoadingIcon.vue";
 import type { Option } from "~/components/ui/servers/TeleportOverflowMenu.vue";
+import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
