@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import TimerIcon from "./icons/TimerIcon.vue";
+import TimerIcon from "../icons/TimerIcon.vue";
 
 const props = defineProps<{
   uptimeSeconds: number;

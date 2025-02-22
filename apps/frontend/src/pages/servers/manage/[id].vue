@@ -86,7 +86,7 @@
             this is an error, please contact Modrinth support.
           </p>
         </div>
-        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+        <CopyCode :text="JSON.stringify(server.general?.error)" />
 
         <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
           <button class="mt-6 !w-full">Go back to all servers</button>
@@ -101,7 +101,7 @@
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
             <div class="grid place-content-center rounded-full bg-bg-red p-4">
-              <UiServersIconsPanelErrorIcon class="size-12 text-red" />
+              <PanelErrorIcon class="size-12 text-red" />
             </div>
             <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
           </div>
@@ -119,8 +119,8 @@
           </p>
 
           <div class="flex flex-col gap-2">
-            <UiCopyCode :text="'Server ID: ' + server.serverId" />
-            <UiCopyCode :text="'Node: ' + server.general?.datacenter" />
+            <CopyCode :text="'Server ID: ' + server.serverId" />
+            <CopyCode :text="'Node: ' + server.general?.datacenter" />
           </div>
         </div>
         <ButtonStyled
@@ -169,7 +169,7 @@
             temporary network issue. You'll be reconnected automatically.
           </p>
         </div>
-        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+        <CopyCode :text="JSON.stringify(server.general?.error)" />
         <ButtonStyled
           :disabled="formattedTime !== '00'"
           size="large"
@@ -199,7 +199,7 @@
         </ClientOnly>
       </div>
       <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-        <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
+        <ServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
         <div
           class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
         >
@@ -234,7 +234,7 @@
             </div>
           </div>
 
-          <UiServersServerInfoLabels
+          <ServerLabels
             :server-data="serverData"
             :show-game-label="showGameLabel"
             :show-loader-label="showLoaderLabel"
@@ -371,7 +371,7 @@
           <div class="flex flex-col gap-1">
             <span class="text-lg font-bold"> We're preparing your server! </span>
             <div class="flex flex-row items-center gap-2">
-              <SpinnerIcon class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
+              <SpinnerIcon class="!h-3 !w-3" /> <InstallingTicker />
             </div>
           </div>
         </div>
@@ -389,7 +389,7 @@
         />
       </div>
 
-      <UiServersPoweredByPyro />
+      <PoweredByPyro />
     </div>
   </div>
 </template>
@@ -412,6 +412,12 @@ import { reloadNuxtApp, navigateTo } from "#app";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
 import SpinnerIcon from "~/components/ui/servers/icons/SpinnerIcon.vue";
+import InstallingTicker from "~/components/ui/servers/root/InstallingTicker.vue";
+import PoweredByPyro from "~/components/ui/servers/PoweredByPyro.vue";
+import CopyCode from "~/components/ui/CopyCode.vue";
+import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
+import ServerIcon from "~/components/ui/servers/ServerIcon.vue";
+import ServerLabels from "~/components/ui/servers/root/ServerLabels.vue";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);

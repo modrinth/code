@@ -43,7 +43,7 @@
         </div>
         <div v-else class="min-h-[20px]"></div>
 
-        <UiServersServerInfoLabels
+        <ServerLabels
           :server-data="{ game, mc_version, loader, loader_version, net }"
           :show-game-label="showGameLabel"
           :show-loader-label="showLoaderLabel"
@@ -83,6 +83,7 @@
 <script setup lang="ts">
 import { ChevronRightIcon, HammerIcon, LockIcon } from "@modrinth/assets";
 import SpinnerIcon from "../icons/SpinnerIcon.vue";
+import ServerLabels from "../root/ServerLabels.vue";
 import type { Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();

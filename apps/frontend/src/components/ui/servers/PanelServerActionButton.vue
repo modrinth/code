@@ -34,7 +34,7 @@
       :header="`All of ${serverName || 'Server'} info`"
       @close="closeDetailsModal"
     >
-      <UiServersServerInfoLabels
+      <ServerLabels
         :server-data="serverData"
         :show-game-label="true"
         :show-loader-label="true"
@@ -111,6 +111,7 @@ import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { useRouter } from "vue-router";
 import { useStorage } from "@vueuse/core";
 import SpinnerIcon from "./icons/SpinnerIcon.vue";
+import ServerLabels from "./root/ServerLabels.vue";
 
 type ServerAction = "start" | "stop" | "restart" | "kill";
 type ServerState = "stopped" | "starting" | "running" | "stopping" | "restarting";

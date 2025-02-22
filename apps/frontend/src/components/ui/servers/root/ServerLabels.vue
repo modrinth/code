@@ -1,24 +1,24 @@
 <template>
   <div>
-    <UiServersServerGameLabel
+    <ServerLabelGame
       v-if="showGameLabel"
       :game="serverData.game"
       :mc-version="serverData.mc_version ?? ''"
       :is-link="linked"
     />
-    <UiServersServerLoaderLabel
+    <ServerLabelPlatform
       :loader="serverData.loader"
       :loader-version="serverData.loader_version ?? ''"
       :no-separator="column"
       :is-link="linked"
     />
-    <UiServersServerSubdomainLabel
+    <ServerLabelUrl
       v-if="serverData.net?.domain"
       :subdomain="serverData.net.domain"
       :no-separator="column"
       :is-link="linked"
     />
-    <UiServersServerUptimeLabel
+    <ServerLabelUptime
       v-if="uptimeSeconds"
       :uptime-seconds="uptimeSeconds"
       :no-separator="column"
@@ -27,7 +27,12 @@
 </template>
 
 <script setup lang="ts">
-interface ServerInfoLabelsProps {
+import ServerLabelGame from "./ServerLabelGame.vue";
+import ServerLabelPlatform from "./ServerLabelPlatform.vue";
+import ServerLabelUptime from "./ServerLabelUptime.vue";
+import ServerLabelUrl from "./ServerLabelUrl.vue";
+
+interface ServerLabelsProps {
   serverData: Record<string, any>;
   showGameLabel: boolean;
   showLoaderLabel: boolean;
@@ -36,5 +41,5 @@ interface ServerInfoLabelsProps {
   linked?: boolean;
 }
 
-defineProps<ServerInfoLabelsProps>();
+defineProps<ServerLabelsProps>();
 </script>
