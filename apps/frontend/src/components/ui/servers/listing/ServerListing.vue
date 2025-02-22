@@ -33,7 +33,7 @@
           v-if="projectData?.title"
           class="m-0 flex flex-row items-center gap-2 text-sm font-medium text-secondary"
         >
-          <UiAvatar
+          <Avatar
             :src="iconUrl"
             no-shadow
             style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
@@ -75,7 +75,7 @@
         <PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your
         billing information or contact Modrinth Support for more information.
       </div>
-      <UiCopyCode :text="`${props.server_id}`" class="ml-auto" />
+      <CopyCode :text="`${props.server_id}`" class="ml-auto" />
     </div>
   </NuxtLink>
 </template>
@@ -86,6 +86,8 @@ import SpinnerIcon from "../icons/SpinnerIcon.vue";
 import ServerLabels from "../root/ServerLabels.vue";
 import ServerIcon from "../ServerIcon.vue";
 import PanelErrorIcon from "../icons/PanelErrorIcon.vue";
+import Avatar from "../../Avatar.vue";
+import CopyCode from "../../CopyCode.vue";
 import type { Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();

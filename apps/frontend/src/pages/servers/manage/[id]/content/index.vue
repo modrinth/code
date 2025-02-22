@@ -1,5 +1,5 @@
 <template>
-  <UiServersContentVersionEditModal
+  <ModalEditContentVersion
     v-if="!invalidModal"
     ref="versionEditModal"
     :type="type"
@@ -42,7 +42,7 @@
               />
             </div>
             <ButtonStyled>
-              <UiServersTeleportOverflowMenu
+              <TeleportOverflowMenu
                 position="bottom"
                 direction="left"
                 :aria-label="`Filter ${type}s`"
@@ -60,7 +60,7 @@
                 <template #all> All {{ type.toLocaleLowerCase() }}s </template>
                 <template #enabled> Only enabled </template>
                 <template #disabled> Only disabled </template>
-              </UiServersTeleportOverflowMenu>
+              </TeleportOverflowMenu>
             </ButtonStyled>
           </div>
           <div v-if="hasMods" class="flex w-full items-center gap-2 sm:w-fit">
@@ -119,7 +119,7 @@
                       class="flex min-w-0 flex-1 items-center gap-2 rounded-xl p-2"
                       draggable="false"
                     >
-                      <UiAvatar
+                      <Avatar
                         :src="mod.icon_url"
                         size="sm"
                         alt="Server Icon"
@@ -179,7 +179,7 @@
                           @click="showVersionModal(mod)"
                         >
                           <template v-if="mod.changing">
-                            <UiServersIconsLoadingIcon class="animate-spin" />
+                            <LoadingIcon class="animate-spin" />
                           </template>
                           <template v-else>
                             <EditIcon />
@@ -189,13 +189,13 @@
 
                       <!-- Dropdown for mobile -->
                       <div class="mr-2 flex items-center sm:hidden">
-                        <UiServersIconsLoadingIcon
+                        <LoadingIcon
                           v-if="mod.changing"
                           class="mr-2 h-5 w-5 animate-spin"
                           style="color: var(--color-base)"
                         />
                         <ButtonStyled v-else circular type="transparent">
-                          <UiServersTeleportOverflowMenu
+                          <TeleportOverflowMenu
                             :options="[
                               {
                                 id: 'edit',
@@ -217,7 +217,7 @@
                               <TrashIcon class="h-5 w-5" />
                               <span>Delete</span>
                             </template>
-                          </UiServersTeleportOverflowMenu>
+                          </TeleportOverflowMenu>
                         </ButtonStyled>
                       </div>
 
@@ -289,7 +289,7 @@
           </div>
         </div>
         <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
-          <UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
+          <LoaderIcon loader="Vanilla" class="size-24" />
           <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
           <p class="m-0">
             Add content to your server by installing a modpack or choosing a different platform that
@@ -334,6 +334,11 @@ import {
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import ErrorBoundary from "~/components/ErrorBoundary.vue";
+import Avatar from "~/components/ui/Avatar.vue";
+import ModalEditContentVersion from "~/components/ui/servers/content/ModalEditContentVersion.vue";
+import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
+import LoadingIcon from "~/components/ui/servers/icons/LoadingIcon.vue";
+import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
 import UploadDragAndDrop from "~/components/ui/servers/UploadDragAndDrop.vue";
 import UploadDropdown from "~/components/ui/servers/UploadDropdown.vue";
 import type { Server } from "~/composables/pyroServers";

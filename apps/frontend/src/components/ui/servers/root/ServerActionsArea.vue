@@ -6,7 +6,7 @@
           Are you sure you want to <span class="lowercase">{{ confirmActionText }}</span> the
           server?
         </p>
-        <UiCheckbox
+        <Checkbox
           v-model="dontAskAgain"
           label="Don't ask me again"
           class="text-sm"
@@ -114,6 +114,7 @@ import SpinnerIcon from "../icons/SpinnerIcon.vue";
 import ServerLabels from "../root/ServerLabels.vue";
 import LoadingIcon from "../icons/LoadingIcon.vue";
 import TeleportOverflowMenu from "../TeleportOverflowMenu.vue";
+import Checkbox from "../../Checkbox.vue";
 
 type ServerAction = "start" | "stop" | "restart" | "kill";
 type ServerState = "stopped" | "starting" | "running" | "stopping" | "restarting";

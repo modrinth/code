@@ -2,7 +2,7 @@
   <NewModal ref="modModal" :header="`Editing ${type.toLocaleLowerCase()} version`">
     <template #title>
       <div class="flex min-w-full items-center gap-2 md:w-[calc(420px-5.5rem)]">
-        <UiAvatar :src="modDetails?.icon_url" size="48px" :alt="`${modDetails?.name} Icon`" />
+        <Avatar :src="modDetails?.icon_url" size="48px" :alt="`${modDetails?.name} Icon`" />
         <span class="truncate text-xl font-extrabold text-contrast">{{ modDetails?.name }}</span>
       </div>
     </template>
@@ -183,7 +183,7 @@
             Something went wrong trying to load versions for this {{ type.toLocaleLowerCase() }}.
             Please try again later or contact support if the issue persists.
           </span>
-          <LazyUiCopyCode class="!mt-2 !break-all" :text="versionsError" />
+          <CopyCode class="!mt-2 !break-all" :text="versionsError" />
         </div>
       </Admonition>
 
@@ -238,13 +238,15 @@ import { Admonition, ButtonStyled, NewModal } from "@modrinth/ui";
 import TagItem from "@modrinth/ui/src/components/base/TagItem.vue";
 import { ref, computed } from "vue";
 import { formatCategory, formatVersionsForDisplay, type Version } from "@modrinth/utils";
-import TeleportDropdownMenu from "./TeleportDropdownMenu.vue";
+import TeleportDropdownMenu from "../TeleportDropdownMenu.vue";
+import Avatar from "../../Avatar.vue";
+import CopyCode from "../../CopyCode.vue";
 import Accordion from "~/components/ui/Accordion.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import ContentVersionFilter, {
   type ListedGameVersion,
   type ListedPlatform,
-} from "~/components/ui/servers/ContentVersionFilter.vue";
+} from "~/components/ui/servers/content/ContentVersionFilter.vue";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 
 const props = defineProps<{

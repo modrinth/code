@@ -35,7 +35,7 @@
 
             <li v-if="fetchError" class="text-red">
               <p>Error details:</p>
-              <UiCopyCode
+              <CopyCode
                 :text="(fetchError as PyroFetchError).message || 'Unknown error'"
                 :copyable="false"
                 :selectable="false"
@@ -126,6 +126,7 @@ import ServerListing from "~/components/ui/servers/listing/ServerListing.vue";
 import ServerListingSkeleton from "~/components/ui/servers/listing/ServerListingSkeleton.vue";
 import ServerListingEmpty from "~/components/ui/servers/listing/ServerListingEmpty.vue";
 import PoweredByPyro from "~/components/ui/servers/PoweredByPyro.vue";
+import CopyCode from "~/components/ui/CopyCode.vue";
 
 definePageMeta({
   middleware: "auth",
