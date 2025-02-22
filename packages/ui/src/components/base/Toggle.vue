@@ -3,33 +3,17 @@
     :id="id"
     type="checkbox"
     class="switch stylized-toggle"
+    :disabled="disabled"
     :checked="checked"
-    @change="toggle"
+    @change="checked = !checked"
   />
 </template>
 
-<script>
-export default {
-  props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    modelValue: {
-      type: Boolean,
-    },
-    checked: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    toggle() {
-      if (!this.disabled) {
-        this.$emit('update:modelValue', !this.modelValue)
-      }
-    },
-  },
-}
+<script setup lang="ts">
+defineProps<{
+  id?: string
+  disabled?: boolean
+}>()
+
+const checked = defineModel<boolean>()
 </script>

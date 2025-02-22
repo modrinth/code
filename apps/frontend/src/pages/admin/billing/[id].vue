@@ -40,12 +40,7 @@
           </span>
           <span> Whether or not the subscription should be unprovisioned on refund. </span>
         </label>
-        <Toggle
-          id="unprovision"
-          :model-value="unprovision"
-          :checked="unprovision"
-          @update:model-value="() => (unprovision = !unprovision)"
-        />
+        <Toggle id="unprovision" v-model="unprovision" />
       </div>
       <div class="flex gap-2">
         <ButtonStyled color="brand">
@@ -114,7 +109,7 @@
   </div>
 </template>
 <script setup>
-import { Badge, NewModal, ButtonStyled, DropdownSelect, Toggle } from "@modrinth/ui";
+import { Badge, ButtonStyled, DropdownSelect, NewModal, Toggle } from "@modrinth/ui";
 import { formatPrice } from "@modrinth/utils";
 import { CheckIcon, XIcon } from "@modrinth/assets";
 import { products } from "~/generated/state.json";

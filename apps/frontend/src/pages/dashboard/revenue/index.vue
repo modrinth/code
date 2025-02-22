@@ -223,8 +223,6 @@ strong {
 }
 
 .available-soon {
-  padding-top: 0;
-
   .label {
     margin: 0;
   }
