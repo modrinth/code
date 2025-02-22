@@ -56,7 +56,7 @@
       v-if="status === 'suspended' && suspension_reason === 'upgrading'"
       class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-blue p-4 text-sm font-bold text-contrast"
     >
-      <UiServersPanelSpinner />
+      <SpinnerIcon />
       Your server's hardware is currently being upgraded and will be back online shortly!
     </div>
     <div
@@ -82,6 +82,7 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, HammerIcon, LockIcon } from "@modrinth/assets";
+import SpinnerIcon from "../icons/SpinnerIcon.vue";
 import type { Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();

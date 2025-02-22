@@ -53,7 +53,7 @@
       </div>
     </div>
 
-    <LazyUiServersServerManageEmptyState
+    <ServerListingEmpty
       v-else-if="serverList.length === 0 && !isPollingForNewServers && !hasError"
     />
 
@@ -90,7 +90,7 @@
       </div>
 
       <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
-        <UiServersServerListing
+        <ServerListing
           v-for="server in filteredData"
           :key="server.server_id"
           :server_id="server.server_id"
@@ -103,7 +103,7 @@
           :upstream="server.upstream"
           :net="server.net"
         />
-        <LazyUiServersServerListingSkeleton v-if="isPollingForNewServers" />
+        <ServerListingSkeleton v-if="isPollingForNewServers" />
       </ul>
       <div v-else class="flex h-full items-center justify-center">
         <p class="text-contrast">No servers found.</p>
@@ -122,6 +122,9 @@ import { ButtonStyled } from "@modrinth/ui";
 import { reloadNuxtApp } from "#app";
 import type { PyroFetchError } from "~/composables/pyroFetch";
 import type { Server } from "~/types/servers";
+import ServerListing from "~/components/ui/servers/listing/ServerListing.vue";
+import ServerListingSkeleton from "~/components/ui/servers/listing/ServerListingSkeleton.vue";
+import ServerListingEmpty from "~/components/ui/servers/listing/ServerListingEmpty.vue";
 
 definePageMeta({
   middleware: "auth",

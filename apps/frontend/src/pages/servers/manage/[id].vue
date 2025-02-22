@@ -357,7 +357,7 @@
           data-pyro-server-ws-reconnecting
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
         >
-          <UiServersPanelSpinner />
+          <SpinnerIcon />
           Hang on, we're reconnecting to your server.
         </div>
 
@@ -371,7 +371,7 @@
           <div class="flex flex-col gap-1">
             <span class="text-lg font-bold"> We're preparing your server! </span>
             <div class="flex flex-row items-center gap-2">
-              <UiServersPanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
+              <SpinnerIcon class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
             </div>
           </div>
         </div>
@@ -411,6 +411,7 @@ import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import { reloadNuxtApp, navigateTo } from "#app";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
+import SpinnerIcon from "~/components/ui/servers/icons/SpinnerIcon.vue";
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);

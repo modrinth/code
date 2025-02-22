@@ -25,7 +25,7 @@
           >
             <div class="flex flex-1 items-center gap-2 truncate">
               <transition-group name="status-icon" mode="out-in">
-                <UiServersPanelSpinner
+                <SpinnerIcon
                   v-show="item.status === 'uploading'"
                   key="spinner"
                   class="absolute !size-4"
@@ -96,6 +96,7 @@
 import { FolderOpenIcon, CheckCircleIcon, XCircleIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, nextTick } from "vue";
+import SpinnerIcon from "./icons/SpinnerIcon.vue";
 
 interface UploadItem {
   file: File;

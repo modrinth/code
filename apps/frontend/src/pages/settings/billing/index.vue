@@ -164,7 +164,7 @@
           <div class="flex flex-col gap-4">
             <LazyUiServersModrinthServersIcon class="flex h-8 w-fit" />
             <div class="flex flex-col gap-2">
-              <UiServersServerListing
+              <ServerListing
                 v-if="subscription.serverInfo"
                 :server_id="subscription.serverInfo.server_id"
                 :name="subscription.serverInfo.name"
@@ -562,6 +562,7 @@ import {
 import { calculateSavings, formatPrice, createStripeElements, getCurrency } from "@modrinth/utils";
 import { ref, computed } from "vue";
 import { products } from "~/generated/state.json";
+import ServerListing from "~/components/ui/servers/listing/ServerListing.vue";
 
 definePageMeta({
   middleware: "auth",

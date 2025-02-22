@@ -49,9 +49,7 @@
 
     <div class="flex flex-row items-center gap-2 rounded-lg">
       <ButtonStyled v-if="isInstalling" type="standard" color="brand">
-        <button disabled class="flex-shrink-0">
-          <UiServersPanelSpinner class="size-5" /> Installing...
-        </button>
+        <button disabled class="flex-shrink-0"><SpinnerIcon class="size-5" /> Installing...</button>
       </ButtonStyled>
 
       <template v-else>
@@ -112,6 +110,7 @@ import {
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { useRouter } from "vue-router";
 import { useStorage } from "@vueuse/core";
+import SpinnerIcon from "./icons/SpinnerIcon.vue";
 
 type ServerAction = "start" | "stop" | "restart" | "kill";
 type ServerState = "stopped" | "starting" | "running" | "stopping" | "restarting";
