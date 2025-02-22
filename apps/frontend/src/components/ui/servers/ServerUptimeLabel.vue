@@ -8,7 +8,7 @@
     <div v-if="!noSeparator" class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
 
     <div class="flex gap-2">
-      <UiServersIconsTimer class="flex size-5 shrink-0" />
+      <TimerIcon class="flex size-5 shrink-0" />
       <time class="truncate text-sm font-semibold" :aria-label="verboseUptime">
         {{ formattedUptime }}
       </time>
@@ -18,6 +18,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import TimerIcon from "./icons/TimerIcon.vue";
 
 const props = defineProps<{
   uptimeSeconds: number;
