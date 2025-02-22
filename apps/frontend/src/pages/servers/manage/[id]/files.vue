@@ -135,7 +135,12 @@ import {
   TrashIcon,
   RightArrowIcon,
 } from "@modrinth/assets";
-import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
+import {
+  type DirectoryResponse,
+  type DirectoryItem,
+  type Server,
+  PyroServersFetchError,
+} from "~/composables/pyroServers.ts";
 import UploadDragAndDrop from "~/components/ui/servers/UploadDragAndDrop.vue";
 import UploadDropdown from "~/components/ui/servers/UploadDropdown.vue";
 import FilesNavbar from "~/components/ui/servers/files/FilesNavbar.vue";
@@ -146,6 +151,7 @@ import ModalDeleteItem from "~/components/ui/servers/files/ModalDeleteItem.vue";
 import FilesNavbarColumns from "~/components/ui/servers/files/FilesNavbarColumns.vue";
 import FilesList from "~/components/ui/servers/files/FilesList.vue";
 import FilesListError from "~/components/ui/servers/files/FilesListError.vue";
+import { addNotification } from "~/composables/notifs.js";
 
 interface BaseOperation {
   type: "move" | "rename";
@@ -251,7 +257,7 @@ const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
     };
   } catch (error) {
     console.error("Error fetching directory contents:", error);
-    if (error instanceof PyroFetchError && error.statusCode === 400) {
+    if (error instanceof PyroServersFetchError && error.statusCode === 400) {
       return directoryData.value || { items: [], total: 0 };
     }
     throw error;
@@ -410,7 +416,7 @@ const handleRenameItem = async (newName: string) => {
     });
   } catch (error) {
     console.error("Error renaming item:", error);
-    if (error instanceof PyroFetchError) {
+    if (error instanceof PyroServersFetchError) {
       if (error.statusCode === 400) {
         addNotification({
           group: "files",
@@ -459,6 +465,12 @@ const handleMoveItem = async (destination: string) => {
     });
   } catch (error) {
     console.error("Error moving item:", error);
+    addNotification({
+      group: "files",
+      title: "Could not move item",
+      text: "An unexpected error occurred while moving the item",
+      type: "error",
+    });
   }
 };
 
@@ -492,6 +504,12 @@ const handleDirectMove = async (moveData: {
     });
   } catch (error) {
     console.error("Error moving item:", error);
+    addNotification({
+      group: "files",
+      title: "Could not move item",
+      text: "An unexpected error occurred while moving the item",
+      type: "error",
+    });
   }
 };
 
@@ -509,6 +527,12 @@ const handleDeleteItem = async () => {
     });
   } catch (error) {
     console.error("Error deleting item:", error);
+    addNotification({
+      group: "files",
+      title: "Error deleting item",
+      text: "An unexpected error occurred while deleting the item",
+      type: "error",
+    });
   }
 };
 
@@ -537,12 +561,12 @@ const showDeleteModal = (item: any) => {
 
 const handleCreateError = (error: any) => {
   console.error("Error creating item:", error);
-  if (error instanceof PyroFetchError) {
+  if (error instanceof PyroServersFetchError) {
     if (error.statusCode === 400) {
       addNotification({
         group: "files",
         title: "Error creating item",
-        text: "Invalid file",
+        text: "An item with this name already exists",
         type: "error",
       });
     } else if (error.statusCode === 500) {
@@ -550,6 +574,13 @@ const handleCreateError = (error: any) => {
         group: "files",
         title: "Error creating item",
         text: "Something went wrong. The file may already exist.",
+        type: "error",
+      });
+    } else {
+      addNotification({
+        group: "files",
+        title: "Error creating item",
+        text: "An unexpected error occurred",
         type: "error",
       });
     }
