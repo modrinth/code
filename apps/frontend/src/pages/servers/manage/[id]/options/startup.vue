@@ -96,7 +96,7 @@
 <script setup lang="ts">
 import { UpdatedIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import ErrorBoundary from "~/components/ErrorBoundary.vue";
+import ErrorBoundary from "~/components/ui/servers/ErrorBoundary.vue";
 import SaveBanner from "~/components/ui/servers/SaveBanner.vue";
 import TeleportDropdownMenu from "~/components/ui/servers/TeleportDropdownMenu.vue";
 import type { Server } from "~/composables/pyroServers";

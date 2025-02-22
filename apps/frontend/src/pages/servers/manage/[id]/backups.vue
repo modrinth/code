@@ -176,7 +176,7 @@ import {
   LockOpenIcon,
 } from "@modrinth/assets";
 import { ref, computed } from "vue";
-import ErrorBoundary from "~/components/ErrorBoundary.vue";
+import ErrorBoundary from "~/components/ui/servers/ErrorBoundary.vue";
 import type { Server } from "~/composables/pyroServers";
 import ModalCreateBackup from "~/components/ui/servers/backups/ModalCreateBackup.vue";
 import ModalRenameBackup from "~/components/ui/servers/backups/ModalRenameBackup.vue";

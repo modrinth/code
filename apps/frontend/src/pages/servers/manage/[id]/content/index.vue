@@ -333,7 +333,7 @@ import {
 } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import ErrorBoundary from "~/components/ErrorBoundary.vue";
+import ErrorBoundary from "~/components/ui/servers/ErrorBoundary.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import ModalEditContentVersion from "~/components/ui/servers/content/ModalEditContentVersion.vue";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";

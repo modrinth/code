@@ -129,7 +129,7 @@
 import { ref, watch, computed, inject } from "vue";
 import { EyeIcon, SearchIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
-import ErrorBoundary from "~/components/ErrorBoundary.vue";
+import ErrorBoundary from "~/components/ui/servers/ErrorBoundary.vue";
 import type { Server } from "~/composables/pyroServers";
 import TeleportDropdownMenu from "~/components/ui/servers/TeleportDropdownMenu.vue";
 import SaveBanner from "~/components/ui/servers/SaveBanner.vue";

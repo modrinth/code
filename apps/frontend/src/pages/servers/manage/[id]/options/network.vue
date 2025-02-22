@@ -257,7 +257,7 @@ import {
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
-import ErrorBoundary from "~/components/ErrorBoundary.vue";
+import ErrorBoundary from "~/components/ui/servers/ErrorBoundary.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import SaveBanner from "~/components/ui/servers/SaveBanner.vue";
 import type { Server } from "~/composables/pyroServers";
