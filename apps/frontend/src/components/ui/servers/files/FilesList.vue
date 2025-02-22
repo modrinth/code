@@ -18,7 +18,7 @@
         }"
         data-pyro-files-virtual-list
       >
-        <UiServersFileItem
+        <FileItemComponent
           v-for="item in visibleItems"
           :key="item.path"
           :count="item.count"
@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import FileItemComponent from "./FileItem.vue";
 
 interface FileItem {
   path: string;

@@ -1,29 +1,17 @@
 <template>
-  <div data-pyro-file-manager-root class="contents">
-    <LazyUiServersFilesCreateItemModal
-      ref="createItemModal"
-      :type="newItemType"
-      @create="handleCreateNewItem"
-    />
+  <div class="contents" data-pyro-servers-page="files">
+    <ModalCreateItem ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 
-    <LazyUiServersFilesRenameItemModal
-      ref="renameItemModal"
-      :item="selectedItem"
-      @rename="handleRenameItem"
-    />
+    <ModalRenameItem ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
 
-    <LazyUiServersFilesMoveItemModal
+    <ModalMoveItem
       ref="moveItemModal"
       :item="selectedItem"
       :current-path="currentPath"
       @move="handleMoveItem"
     />
 
-    <LazyUiServersFilesDeleteItemModal
-      ref="deleteItemModal"
-      :item="selectedItem"
-      @delete="handleDeleteItem"
-    />
+    <ModalDeleteItem ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 
     <UploadDragAndDrop
       class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
@@ -65,11 +53,7 @@
         </div>
 
         <div v-else class="relative z-0">
-          <UiServersFilesLabelBar
-            :sort-field="sortMethod"
-            :sort-desc="sortDesc"
-            @sort="handleSort"
-          />
+          <FilesNavbarColumns :sort-field="sortMethod" :sort-desc="sortDesc" @sort="handleSort" />
           <UploadDropdown
             v-if="props.server.fs"
             ref="uploadDropdownRef"
@@ -84,7 +68,7 @@
           v-if="mode === 'browsing' && items.length > 0"
           class="h-full w-full overflow-hidden rounded-b-2xl"
         >
-          <UiServersFileVirtualList
+          <FilesList
             :items="filteredItems"
             @delete="showDeleteModal"
             @rename="showRenameModal"
@@ -108,7 +92,7 @@
           </div>
         </div>
 
-        <LazyUiServersFileManagerError
+        <FilesListError
           v-else-if="loadError"
           title="Unable to load files"
           message="The folder may not exist."
@@ -154,7 +138,14 @@ import {
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
 import UploadDragAndDrop from "~/components/ui/servers/UploadDragAndDrop.vue";
 import UploadDropdown from "~/components/ui/servers/UploadDropdown.vue";
-import FilesNavbar from "~/components/ui/servers/FilesNavbar.vue";
+import FilesNavbar from "~/components/ui/servers/files/FilesNavbar.vue";
+import ModalCreateItem from "~/components/ui/servers/files/ModalCreateItem.vue";
+import ModalRenameItem from "~/components/ui/servers/files/ModalRenameItem.vue";
+import ModalMoveItem from "~/components/ui/servers/files/ModalMoveItem.vue";
+import ModalDeleteItem from "~/components/ui/servers/files/ModalDeleteItem.vue";
+import FilesNavbarColumns from "~/components/ui/servers/files/FilesNavbarColumns.vue";
+import FilesList from "~/components/ui/servers/files/FilesList.vue";
+import FilesListError from "~/components/ui/servers/files/FilesListError.vue";
 
 interface BaseOperation {
   type: "move" | "rename";

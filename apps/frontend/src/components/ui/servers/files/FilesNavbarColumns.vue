@@ -51,8 +51,8 @@
 </template>
 
 <script setup lang="ts">
-import ChevronDownIcon from "./icons/ChevronDownIcon.vue";
-import ChevronUpIcon from "./icons/ChevronUpIcon.vue";
+import ChevronDownIcon from "../icons/ChevronDownIcon.vue";
+import ChevronUpIcon from "../icons/ChevronUpIcon.vue";
 
 defineProps<{
   sortField: string;
