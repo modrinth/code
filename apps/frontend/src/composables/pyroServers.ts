@@ -1140,7 +1140,7 @@ const modules: any = {
     get: async (serverId: string) => {
       try {
         return {
-          data: await PyroFetch<Backup[]>(`servers/${serverId}/backuaps`, {}, "backups"),
+          data: await PyroFetch<Backup[]>(`servers/${serverId}/backups`, {}, "backups"),
         };
       } catch (error) {
         const fetchError =
