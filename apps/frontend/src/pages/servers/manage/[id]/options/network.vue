@@ -177,7 +177,7 @@
                   Primary allocation
                 </span>
 
-                <UiCopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
+                <CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
               </div>
             </div>
 
@@ -211,7 +211,7 @@
                 </div>
 
                 <div class="flex w-full flex-row items-center gap-2 sm:w-auto">
-                  <UiCopyCode :text="`${serverIP}:${allocation.port}`" />
+                  <CopyCode :text="`${serverIP}:${allocation.port}`" />
                   <ButtonStyled icon-only>
                     <button
                       class="!w-full sm:!w-auto"
@@ -234,7 +234,7 @@
           </div>
         </div>
       </div>
-      <UiServersSaveBanner
+      <SaveBanner
         :is-visible="!!hasUnsavedChanges && !!isValidSubdomain"
         :server="props.server"
         :is-updating="isUpdating"
@@ -258,6 +258,8 @@ import {
 import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
 import ErrorBoundary from "~/components/ErrorBoundary.vue";
+import CopyCode from "~/components/ui/CopyCode.vue";
+import SaveBanner from "~/components/ui/servers/SaveBanner.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{

@@ -60,7 +60,7 @@
               v-if="overrides[index] && overrides[index].type === 'dropdown'"
               class="mt-2 flex w-full sm:w-[320px] sm:justify-end"
             >
-              <UiServersTeleportDropdownMenu
+              <TeleportDropdownMenu
                 :id="`server-property-${index}`"
                 v-model="liveProperties[index]"
                 :name="formatPropertyName(index)"
@@ -114,7 +114,7 @@
       </p>
     </div>
 
-    <UiServersSaveBanner
+    <SaveBanner
       :is-visible="hasUnsavedChanges"
       :server="props.server"
       :is-updating="isUpdating"
@@ -131,6 +131,8 @@ import { EyeIcon, SearchIcon } from "@modrinth/assets";
 import Fuse from "fuse.js";
 import ErrorBoundary from "~/components/ErrorBoundary.vue";
 import type { Server } from "~/composables/pyroServers";
+import TeleportDropdownMenu from "~/components/ui/servers/TeleportDropdownMenu.vue";
+import SaveBanner from "~/components/ui/servers/SaveBanner.vue";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;

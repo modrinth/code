@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <UiServersSaveBanner
+    <SaveBanner
       :is-visible="hasUnsavedChanges"
       :server="props.server"
       :is-updating="false"
@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
+import SaveBanner from "~/components/ui/servers/SaveBanner.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();

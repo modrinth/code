@@ -104,7 +104,7 @@
             <tr v-for="property in properties" :key="property.name">
               <td v-if="property.value !== 'Unknown'" class="py-3">{{ property.name }}</td>
               <td v-if="property.value !== 'Unknown'" class="px-4">
-                <UiCopyCode :text="property.value" />
+                <CopyCode :text="property.value" />
               </td>
             </tr>
           </tbody>
@@ -118,6 +118,7 @@
 import { ButtonStyled } from "@modrinth/ui";
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
+import CopyCode from "~/components/ui/CopyCode.vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;

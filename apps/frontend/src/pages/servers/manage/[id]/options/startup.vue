@@ -59,7 +59,7 @@
               />
               <label for="show-all-versions" class="text-sm">Show all Java versions</label>
             </div>
-            <UiServersTeleportDropdownMenu
+            <TeleportDropdownMenu
               :id="'java-version-field'"
               v-model="jdkVersion"
               name="java-version"
@@ -72,7 +72,7 @@
               <span class="text-lg font-bold text-contrast">Runtime</span>
               <span> The Java runtime your server will use. </span>
             </div>
-            <UiServersTeleportDropdownMenu
+            <TeleportDropdownMenu
               :id="'runtime-field'"
               v-model="jdkBuild"
               name="runtime"
@@ -83,7 +83,7 @@
         </div>
       </div>
     </div>
-    <UiServersSaveBanner
+    <SaveBanner
       :is-visible="!!hasUnsavedChanges"
       :server="props.server"
       :is-updating="isUpdating"
@@ -97,6 +97,8 @@
 import { UpdatedIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import ErrorBoundary from "~/components/ErrorBoundary.vue";
+import SaveBanner from "~/components/ui/servers/SaveBanner.vue";
+import TeleportDropdownMenu from "~/components/ui/servers/TeleportDropdownMenu.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{
