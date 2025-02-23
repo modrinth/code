@@ -293,6 +293,9 @@
   "layout.footer.about.blog": {
     "message": "Blog"
   },
+  "layout.footer.about.careers": {
+    "message": "Careers"
+  },
   "layout.footer.about.changelog": {
     "message": "Changelog"
   },
