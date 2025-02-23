@@ -1035,9 +1035,9 @@ const footerLinks = [
     label: formatMessage(defineMessage({ id: "layout.footer.about", defaultMessage: "About" })),
     links: [
       {
-        href: "https://blog.modrinth.com",
+        href: "/news",
         label: formatMessage(
-          defineMessage({ id: "layout.footer.about.blog", defaultMessage: "Blog" }),
+          defineMessage({ id: "layout.footer.about.blog", defaultMessage: "News" }),
         ),
       },
       {
