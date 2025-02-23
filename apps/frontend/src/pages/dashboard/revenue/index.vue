@@ -44,7 +44,7 @@
               <span
                 v-tooltip="
                   availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1
-                    ? `Revenue period is ongoing; this amount is not finalized.`
+                    ? `Revenue period is ongoing. \nThis amount is not yet finalized.`
                     : null
                 "
                 :class="{
