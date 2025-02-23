@@ -240,7 +240,6 @@ const isLoading = ref(false);
 const loadError = ref<Error | null>(null);
 
 const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
-  await props.server.refresh(["fs"]);
   await modulesLoaded;
 
   const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
@@ -780,6 +779,7 @@ const initializeFileEdit = async () => {
 
 onMounted(async () => {
   await modulesLoaded;
+  await props.server.refresh(["fs"]);
   await refreshData();
 
   await initializeFileEdit();
