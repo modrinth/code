@@ -65,7 +65,7 @@
         </div>
 
         <div
-          v-if="mode === 'browsing' && items.length > 0"
+          v-if="mode === 'browsing' && filteredItems.length > 0"
           class="h-full w-full overflow-hidden rounded-b-2xl"
         >
           <FilesList
@@ -82,7 +82,7 @@
         </div>
 
         <div
-          v-else-if="!isLoading && items.length === 0 && !loadError"
+          v-else-if="!isLoading && filteredItems.length === 0 && !loadError"
           class="flex h-full w-full items-center justify-center p-20"
         >
           <div class="flex flex-col items-center gap-4 text-center">
@@ -235,11 +235,17 @@ useHead({
   title: computed(() => `Files - ${data.value?.name ?? "Server"} - Modrinth`),
 });
 
+const directoryData = ref<DirectoryResponse>({ items: [], total: 0 });
+const isLoading = ref(false);
+const loadError = ref<Error | null>(null);
+
 const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
   await modulesLoaded;
 
   const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
   try {
+    isLoading.value = true;
+    loadError.value = null;
     const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
 
     if (!data || !data.items) {
@@ -260,26 +266,23 @@ const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
   } catch (error) {
     console.error("Error fetching directory contents:", error);
     if (error instanceof PyroServersFetchError && error.statusCode === 400) {
-      return directoryData.value || { items: [], total: 0 };
+      return directoryData.value;
     }
+    loadError.value = error as Error;
     throw error;
+  } finally {
+    isLoading.value = false;
   }
 };
 
-const {
-  data: directoryData,
-  refresh: refreshData,
-  status,
-  error: loadError,
-} = useLazyAsyncData(() => fetchDirectoryContents(), {
-  watch: [],
-  default: () => ({ items: [], total: 0 }),
-  immediate: true,
-});
-
-const isLoading = computed(() => status.value === "pending");
-
-const items = computed(() => directoryData.value?.items || []);
+const refreshData = async () => {
+  try {
+    const data = await fetchDirectoryContents();
+    directoryData.value = data;
+  } catch (error) {
+    console.error("Error refreshing data:", error);
+  }
+};
 
 const refreshList = () => {
   currentPage.value = 1;
@@ -643,6 +646,8 @@ const applySort = (items: DirectoryItem[]) => {
   return result;
 };
 
+const items = computed(() => directoryData.value?.items || []);
+
 const filteredItems = computed(() => {
   let result = [...items.value];
 
@@ -657,7 +662,7 @@ const filteredItems = computed(() => {
 const { reset } = useInfiniteScroll(
   scrollContainer,
   async () => {
-    if (status.value === "pending") return;
+    if (isLoading.value) return;
 
     try {
       const totalPages = directoryData.value?.total || 0;
@@ -681,7 +686,7 @@ const { reset } = useInfiniteScroll(
 );
 
 const handleLoadMore = async () => {
-  if (status.value === "pending") return;
+  if (isLoading.value) return;
 
   const totalPages = directoryData.value?.total || 0;
 
@@ -774,6 +779,7 @@ const initializeFileEdit = async () => {
 
 onMounted(async () => {
   await modulesLoaded;
+  await refreshData();
 
   await initializeFileEdit();
 
