@@ -368,19 +368,30 @@ const constructServerProperties = (properties: any): string => {
 };
 
 const projectCache = new Map<string, Project>();
+const projectPromiseCache = new Map<string, Promise<Project | null>>();
 
-async function getProjectFromCache(projectId: string): Promise<Project | null> {
+function getProjectFromCache(projectId: string): Promise<Project | null> {
   const cached = projectCache.get(projectId);
-  if (cached) return cached;
+  if (cached) return Promise.resolve(cached);
 
-  try {
-    const response = await $fetch<Project>(`https://api.modrinth.com/v2/project/${projectId}`);
-    projectCache.set(projectId, response);
-    return response;
-  } catch (error) {
-    console.error(`Failed to fetch project ${projectId}:`, error);
-    return null;
-  }
+  const promiseCached = projectPromiseCache.get(projectId);
+  if (promiseCached) return promiseCached;
+
+  const fetchPromise = $fetch<Project>(`https://api.modrinth.com/v2/project/${projectId}`)
+    .then((response) => {
+      projectCache.set(projectId, response);
+      return response;
+    })
+    .catch((error) => {
+      console.error(`Failed to fetch project ${projectId}:`, error);
+      return null;
+    })
+    .finally(() => {
+      projectPromiseCache.delete(projectId);
+    });
+
+  projectPromiseCache.set(projectId, fetchPromise);
+  return fetchPromise;
 }
 
 const processImage = async (iconUrl: string | undefined) => {
