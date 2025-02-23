@@ -91,13 +91,25 @@ import CopyCode from "../../CopyCode.vue";
 import type { Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();
+const imageData = ref<string>();
 
-const { pyroServer } = await useSharedPyroServer(props.server_id!, ["general"]);
+const { pyroServer } = await useSharedPyroServer(props.server_id!, ["general", "fs"]);
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 
 const projectData = computed(() => pyroServer.general?.project || null);
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
-const imageData = computed(() => pyroServer.general?.image);
+
+watch(
+  () => pyroServer.general?.project?.icon_url,
+  async (newIconUrl) => {
+    if (newIconUrl && !pyroServer.general?.image) {
+      imageData.value = await processImage(props.server_id!, newIconUrl);
+    } else {
+      imageData.value = pyroServer.general?.image;
+    }
+  },
+  { immediate: true },
+);
 </script>
