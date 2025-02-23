@@ -233,10 +233,13 @@ const updateAvailable = computed(() => {
   return latestVersion.id !== currentVersion.value.id;
 });
 
+const moduleLoadStatus = inject<Promise<void> | undefined>("modulesLoaded");
+
 watch(
   () => props.server.general?.status,
   async (newStatus, oldStatus) => {
     if (oldStatus === "installing" && newStatus === "available") {
+      await moduleLoadStatus;
       await Promise.all([
         refreshVersions(),
         refreshCurrentVersion(),

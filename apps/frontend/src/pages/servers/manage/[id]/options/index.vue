@@ -293,9 +293,12 @@ const uploadFile = async (e: Event) => {
   }
 };
 
+const moduleLoadStatus = inject<Promise<void> | undefined>("modulesLoaded");
+
 const resetIcon = async () => {
   if (data.value?.image) {
     try {
+      await moduleLoadStatus;
       try {
         await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
         await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
