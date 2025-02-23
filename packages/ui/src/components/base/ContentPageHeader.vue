@@ -4,7 +4,7 @@
   >
     <div class="flex gap-4">
       <slot name="icon" />
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-1 justify-center">
         <div class="flex flex-wrap items-center gap-2">
           <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
             <slot name="title" />
