@@ -890,16 +890,50 @@ const updateStartupSettings = async (
 // ------------------ FS ------------------ //
 
 const retryWithAuth = async (requestFn: () => Promise<any>) => {
-  try {
-    return await requestFn();
-  } catch (error) {
-    if (error instanceof PyroServersFetchError && error.statusCode === 401) {
-      await internalServerRefrence.value.refresh(["fs"]);
+  const attemptRequest = async () => {
+    try {
       return await requestFn();
+    } catch (error) {
+      if (error instanceof PyroServersFetchError && error.statusCode === 401) {
+        const freshAuth = await PyroFetch<JWTAuth>(
+          `servers/${internalServerRefrence.value.serverId}/fs`,
+          {},
+          "fs",
+        );
+        if (internalServerRefrence.value.fs) {
+          internalServerRefrence.value.fs.auth = freshAuth;
+          return await requestFn();
+        }
+      }
+      throw error;
     }
+  };
 
-    throw error;
+  if (internalServerRefrence.value.fs && !internalServerRefrence.value.fs.auth) {
+    try {
+      const freshAuth = await PyroFetch<JWTAuth>(
+        `servers/${internalServerRefrence.value.serverId}/fs`,
+        {},
+        "fs",
+      );
+      internalServerRefrence.value.fs.auth = freshAuth;
+    } catch (error) {
+      console.error("Failed to refresh fs auth:", error);
+      throw new Error("Could not init fs");
+    }
   }
+
+  if (!internalServerRefrence.value.fs) {
+    try {
+      internalServerRefrence.value.fs = modules.fs;
+      await internalServerRefrence.value.refresh(["fs"]);
+    } catch (error) {
+      console.error("Failed to initialize fs module:", error);
+      throw new Error("Could not init fs");
+    }
+  }
+
+  return attemptRequest();
 };
 
 const listDirContents = (path: string, page: number, pageSize: number) => {
@@ -1649,7 +1683,16 @@ const serverCache = new Map<string, Server<any>>();
 export const usePyroServer = async (serverId: string, includedModules: avaliableModules) => {
   const cached = serverCache.get(serverId);
   if (cached) {
-    await cached.loadModules(includedModules);
+    if (includedModules.includes("fs") || includedModules.includes("ws")) {
+      if (!cached.fs?.auth) {
+        await cached.refresh(["fs", "ws"]);
+      }
+    }
+
+    const missingModules = includedModules.filter((module) => !cached[module]);
+    if (missingModules.length > 0) {
+      await cached.loadModules(missingModules);
+    }
     return cached as Server<typeof includedModules>;
   }
 
@@ -1663,6 +1706,13 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
     ) => {
       if (server.general?.status === "installing" && !refreshModules) {
         return;
+      }
+
+      if (refreshModules?.some((m) => ["fs", "ws"].includes(m))) {
+        await refreshAuthTokens(server);
+        if (refreshModules?.every((m) => ["fs", "ws"].includes(m))) {
+          return;
+        }
       }
 
       const modulesToRefresh = [...new Set(refreshModules || includedModules)];
@@ -1754,6 +1804,22 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
 
   serverCache.set(serverId, server);
   return server as Server<typeof includedModules>;
+};
+
+const refreshAuthTokens = async (server: Server<any>) => {
+  try {
+    if (server.fs) {
+      const freshFsAuth = await PyroFetch<JWTAuth>(`servers/${server.serverId}/fs`, {}, "fs");
+      server.fs.auth = freshFsAuth;
+    }
+    if (server.ws) {
+      const freshWsAuth = await PyroFetch<JWTAuth>(`servers/${server.serverId}/ws`, {}, "ws");
+      Object.assign(server.ws, freshWsAuth);
+    }
+  } catch (error) {
+    console.error("Failed to refresh auth tokens:", error);
+    throw error;
+  }
 };
 
 export const useSharedPyroServer = async (serverId: string, includedModules: avaliableModules) => {
