@@ -191,49 +191,31 @@ export const formatProjectType = (name) => {
   return capitalizeString(name);
 };
 
-export const formatCategory = (name) => {
-  if (name === "modloader") {
-    return "Risugami's ModLoader";
-  } else if (name === "bungeecord") {
-    return "BungeeCord";
-  } else if (name === "liteloader") {
-    return "LiteLoader";
-  } else if (name === "neoforge") {
-    return "NeoForge";
-  } else if (name === "game-mechanics") {
-    return "Game Mechanics";
-  } else if (name === "worldgen") {
-    return "World Generation";
-  } else if (name === "core-shaders") {
-    return "Core Shaders";
-  } else if (name === "gui") {
-    return "GUI";
-  } else if (name === "8x-") {
-    return "8x or lower";
-  } else if (name === "512x+") {
-    return "512x or higher";
-  } else if (name === "kitchen-sink") {
-    return "Kitchen Sink";
-  } else if (name === "path-tracing") {
-    return "Path Tracing";
-  } else if (name === "pbr") {
-    return "PBR";
-  } else if (name === "datapack") {
-    return "Data Pack";
-  } else if (name === "colored-lighting") {
-    return "Colored Lighting";
-  } else if (name === "optifine") {
-    return "OptiFine";
-  } else if (name === "mrpack") {
-    return "Modpack";
-  } else if (name === "minecraft") {
-    return "Resource Pack";
-  } else if (name === "vanilla") {
-    return "Vanilla Shader";
-  }
+const categoryMap = {
+  "modloader": "Risugami’s ModLoader",
+  "bungeecord": "BungeeCord",
+  "liteloader": "LiteLoader",
+  "neoforge": "NeoForge",
+  "game-mechanics": "Game Mechanics",
+  "worldgen": "World Generation",
+  "core-shaders": "Core Shaders",
+  "gui": "GUI",
+  "8x-": "8x or lower",
+  "512x+": "512x or higher",
+  "kitchen-sink": "Kitchen Sink",
+  "path-tracing": "Path Tracing",
+  "pbr": "PBR",
+  "datapack": "Data Pack",
+  "colored-lighting": "Colored Lighting",
+  "optifine": "OptiFine",
+  "mrpack": "Modpack",
+  "minecraft": "Resource Pack",
+  "vanilla": "Vanilla Shader"
+}
 
-  return capitalizeString(name);
-};
+export const formatCategory = name => {
+  return categoryMap[name] ?? capitalizeString(name);
+}
 
 export const formatCategoryHeader = (name) => {
   return capitalizeString(name);
