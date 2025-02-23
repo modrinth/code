@@ -1053,6 +1053,12 @@ const footerLinks = [
         ),
       },
       {
+        href: "https://careers.modrinth.com",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.about.careers", defaultMessage: "Careers" }),
+        ),
+      },
+      {
         href: "/legal/cmp-info",
         label: formatMessage(
           defineMessage({
