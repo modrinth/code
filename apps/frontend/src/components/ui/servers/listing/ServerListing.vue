@@ -16,7 +16,7 @@
       data-pyro-server-listing
       :data-pyro-server-listing-id="server_id"
     >
-      <ServerIcon v-if="status !== 'suspended'" :image="image" />
+      <ServerIcon v-if="status !== 'suspended'" :image="imageData" />
       <div
         v-else
         class="bg-bg-secondary flex size-24 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
@@ -98,6 +98,6 @@ const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 
 const projectData = computed(() => pyroServer.general?.project || null);
-const image = computed(() => pyroServer.general?.image);
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
+const imageData = computed(() => pyroServer.general?.image);
 </script>

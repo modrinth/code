@@ -252,30 +252,29 @@ const uploadFile = async (e: Event) => {
   });
 
   try {
-    if (data.value?.image) {
-      await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
-      await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+    await props.server.fs?.deleteFileOrFolder("server-icon.png", false).catch(() => {});
+    await props.server.fs?.deleteFileOrFolder("server-icon-original.png", false).catch(() => {});
+    await props.server.fs?.uploadFile("server-icon.png", scaledFile);
+    await props.server.fs?.uploadFile("server-icon-original.png", file);
+
+    if (data.value) {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise<void>((resolve) => {
+        img.onload = () => {
+          canvas.width = 512;
+          canvas.height = 512;
+          ctx?.drawImage(img, 0, 0, 512, 512);
+          data.value!.image = canvas.toDataURL("image/png");
+          URL.revokeObjectURL(img.src);
+          resolve();
+        };
+      });
     }
 
-    await props.server.fs?.uploadFile("/server-icon.png", scaledFile);
-    await props.server.fs?.uploadFile("/server-icon-original.png", file);
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    await new Promise<void>((resolve) => {
-      img.onload = () => {
-        canvas.width = 512;
-        canvas.height = 512;
-        ctx?.drawImage(img, 0, 0, 512, 512);
-        const dataURL = canvas.toDataURL("image/png");
-        if (data.value) data.value.image = dataURL;
-        resolve();
-        URL.revokeObjectURL(img.src);
-      };
-      img.src = URL.createObjectURL(file);
-    });
-
+    await props.server.refresh(["general"]);
     addNotification({
       group: "serverOptions",
       type: "success",
@@ -299,16 +298,9 @@ const resetIcon = async () => {
   if (data.value?.image) {
     try {
       await moduleLoadStatus;
-      try {
-        await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
-        await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
-      } catch (error) {
-        if (!(error instanceof PyroServersFetchError && error.statusCode === 404)) {
-          throw error;
-        }
-      }
-
-      if (data.value) data.value.image = undefined;
+      await props.server.fs?.deleteFileOrFolder("server-icon.png", false).catch(() => {});
+      await props.server.fs?.deleteFileOrFolder("server-icon-original.png", false).catch(() => {});
+      data.value.image = undefined;
       await props.server.refresh(["general"]);
 
       addNotification({
