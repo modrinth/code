@@ -1696,11 +1696,13 @@ export type StartupModule = Startup &
 
 export type WSModule = JWTAuth & {
   error?: ModuleError;
+  refreshAuth: () => Promise<WSModule>;
 };
 
 export type FSModule = {
   auth: JWTAuth;
   error?: ModuleError;
+  refreshAuth: () => Promise<JWTAuth>;
 } & FSFunctions;
 
 type ModulesMap = {
@@ -1773,11 +1775,14 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
         return;
       }
 
-      if (refreshModules?.some((m) => ["fs", "ws"].includes(m))) {
-        await refreshAuthTokens(server);
-        if (refreshModules?.every((m) => ["fs", "ws"].includes(m))) {
-          return;
-        }
+      if (refreshModules?.includes("fs")) {
+        await server.fs?.refreshAuth();
+      }
+      if (refreshModules?.includes("ws")) {
+        await server.ws?.refreshAuth();
+      }
+      if (refreshModules?.every((m) => ["fs", "ws"].includes(m))) {
+        return;
       }
 
       const modulesToRefresh = [...new Set(refreshModules || includedModules)];
@@ -1894,20 +1899,6 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
 
   serverCache.set(serverId, server);
   return server as Server<typeof includedModules>;
-};
-
-const refreshAuthTokens = async (server: Server<any>) => {
-  try {
-    if (server.fs) {
-      await server.fs.refreshAuth();
-    }
-    if (server.ws) {
-      await server.ws.refreshAuth();
-    }
-  } catch (error) {
-    console.error("Failed to refresh auth tokens:", error);
-    throw error;
-  }
 };
 
 export const useSharedPyroServer = async (serverId: string, includedModules: avaliableModules) => {
