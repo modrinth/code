@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, shallowRef } from "vue";
+import { ref, computed } from "vue";
 import { FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 import { useStorage } from "@vueuse/core";
 import type { Stats } from "~/types/servers";
@@ -73,7 +73,7 @@ const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 
 const props = defineProps<{ data: Stats }>();
 
-const stats = shallowRef(props.data.current);
+const stats = computed(() => props.data.current);
 
 const formatBytes = (bytes: number) => {
   const units = ["B", "KB", "MB", "GB"];
@@ -171,13 +171,6 @@ const getChartOptions = (hasWarning: string | null) => ({
     enabled: false,
   },
 });
-
-watch(
-  () => props.data.current,
-  (newStats) => {
-    stats.value = newStats;
-  },
-);
 </script>
 
 <style scoped>

@@ -382,7 +382,7 @@
           :stats="stats"
           :server-power-state="serverPowerState"
           :power-state-details="powerStateDetails"
-          :socket="socket"
+          :socket="socketMap.get(serverId)"
           :server="server"
           @reinstall="onReinstall"
         />
@@ -420,7 +420,10 @@ import ServerLabels from "~/components/ui/servers/root/ServerLabels.vue";
 import ServerActionsArea from "~/components/ui/servers/root/ServerActionsArea.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 
-const socket = ref<WebSocket | null>(null);
+const socketMap = new Map<string, WebSocket>();
+const statsMap = ref(new Map<string, Stats>());
+const uptimeMap = new Map<string, number>();
+
 const isReconnecting = ref(false);
 const isConnecting = ref(false);
 const isLoading = ref(true);
@@ -476,14 +479,15 @@ const serverData = computed<GeneralModule | undefined>(() => server.general);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const pyroConsole = usePyroConsole();
-const cpuData = ref<number[]>([]);
-const ramData = ref<number[]>([]);
 const isActioning = ref(false);
 const isServerRunning = computed(() => serverPowerState.value === "running");
 const serverPowerState = ref<ServerState>("stopped");
 const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>();
 
-const uptimeSeconds = ref(0);
+const uptimeSeconds = computed({
+  get: () => uptimeMap.get(serverId) || 0,
+  set: (value) => uptimeMap.set(serverId, value),
+});
 const firstConnect = ref(true);
 const copied = ref(false);
 const error = ref<Error | null>(null);
@@ -503,26 +507,29 @@ const initialConsoleMessage = [
   "\x1B[32m   ~~  ~~  ~~\x1B[37m",
 ];
 
-const stats = ref<Stats>({
-  current: {
-    cpu_percent: 0,
-    ram_usage_bytes: 0,
-    ram_total_bytes: 1,
-    storage_usage_bytes: 0,
-    storage_total_bytes: 0,
-  },
-  past: {
-    cpu_percent: 0,
-    ram_usage_bytes: 0,
-    ram_total_bytes: 1,
-    storage_usage_bytes: 0,
-    storage_total_bytes: 0,
-  },
-  graph: {
-    cpu: [],
-    ram: [],
-  },
-});
+const stats = computed<Stats>(
+  () =>
+    statsMap.value.get(serverId) || {
+      current: {
+        cpu_percent: 0,
+        ram_usage_bytes: 0,
+        ram_total_bytes: 1,
+        storage_usage_bytes: 0,
+        storage_total_bytes: 0,
+      },
+      past: {
+        cpu_percent: 0,
+        ram_usage_bytes: 0,
+        ram_total_bytes: 1,
+        storage_usage_bytes: 0,
+        storage_total_bytes: 0,
+      },
+      graph: {
+        cpu: [],
+        ram: [],
+      },
+    },
+);
 
 const showGameLabel = computed(() => !!serverData.value?.game);
 const showLoaderLabel = computed(() => !!serverData.value?.loader);
@@ -544,27 +551,31 @@ const navLinks = [
 ];
 
 const connectWebSocket = () => {
-  if (!isMounted.value || isConnecting.value) return;
+  if (!isMounted.value || isConnecting.value || !server.ws?.url) return;
 
   try {
     isConnecting.value = true;
     const wsAuth = computed(() => server.ws);
 
-    if (socket.value) {
-      socket.value.onclose = null;
-      socket.value.close();
+    const existingSocket = socketMap.get(serverId);
+    if (existingSocket) {
+      existingSocket.onclose = null;
+      existingSocket.close();
+      socketMap.delete(serverId);
     }
 
-    socket.value = new WebSocket(`wss://${wsAuth.value?.url}`);
+    const newSocket = new WebSocket(`wss://${wsAuth.value?.url}`);
+    socketMap.set(serverId, newSocket);
 
-    socket.value.onopen = () => {
-      if (!isMounted.value) {
-        socket.value?.close();
+    newSocket.onopen = () => {
+      if (!isMounted.value || !wsAuth.value?.token) {
+        newSocket.close();
+        socketMap.delete(serverId);
         return;
       }
 
       pyroConsole.clear();
-      socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+      newSocket.send(JSON.stringify({ event: "auth", jwt: wsAuth.value.token }));
       isConnected.value = true;
       isReconnecting.value = false;
       isLoading.value = false;
@@ -584,27 +595,29 @@ const connectWebSocket = () => {
       }
     };
 
-    socket.value.onmessage = (event) => {
+    newSocket.onmessage = (event) => {
       if (isMounted.value) {
         const data: WSEvent = JSON.parse(event.data);
         handleWebSocketMessage(data);
       }
     };
 
-    socket.value.onclose = () => {
+    newSocket.onclose = () => {
       if (isMounted.value) {
         isConnecting.value = false;
         isConnected.value = false;
+        socketMap.delete(serverId);
         pyroConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
         scheduleReconnect();
       }
     };
 
-    socket.value.onerror = (error) => {
+    newSocket.onerror = (error) => {
       if (isMounted.value) {
         console.error("Failed to connect WebSocket:", error);
         isConnecting.value = false;
         isConnected.value = false;
+        socketMap.delete(serverId);
         scheduleReconnect();
       }
     };
@@ -654,14 +667,38 @@ const stopUptimeUpdates = () => {
 
 const handleWebSocketMessage = (data: WSEvent) => {
   switch (data.event) {
-    case "log":
-      // eslint-disable-next-line no-case-declarations
+    case "log": {
       const log = data.message.split("\n").filter((l) => l.trim());
       pyroConsole.addLines(log);
       break;
-    case "stats":
-      updateStats(data);
+    }
+    case "stats": {
+      const currentStats = {
+        cpu_percent: data.cpu_percent,
+        ram_usage_bytes: data.ram_usage_bytes,
+        ram_total_bytes: data.ram_total_bytes,
+        storage_usage_bytes: data.storage_usage_bytes,
+        storage_total_bytes: data.storage_total_bytes,
+      };
+
+      const newStats = {
+        current: currentStats,
+        past: statsMap.value.get(serverId)?.current || currentStats,
+        graph: {
+          cpu: updateGraphData(
+            statsMap.value.get(serverId)?.graph.cpu || [],
+            currentStats.cpu_percent,
+          ),
+          ram: updateGraphData(
+            statsMap.value.get(serverId)?.graph.ram || [],
+            Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100),
+          ),
+        },
+      };
+
+      statsMap.value = new Map(statsMap.value).set(serverId, newStats);
       break;
+    }
     case "auth-expiring":
     case "auth-incorrect":
       reauthenticate();
@@ -792,21 +829,6 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   }
 };
 
-const updateStats = (currentStats: Stats["current"]) => {
-  isConnected.value = true;
-  stats.value = {
-    current: currentStats,
-    past: { ...stats.value.current },
-    graph: {
-      cpu: updateGraphData(cpuData.value, currentStats.cpu_percent),
-      ram: updateGraphData(
-        ramData.value,
-        Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100),
-      ),
-    },
-  };
-};
-
 const updatePowerState = (
   state: ServerState,
   details?: { oom_killed?: boolean; exit_code?: number },
@@ -835,7 +857,8 @@ const reauthenticate = async () => {
   try {
     await server.refresh();
     const wsAuth = computed(() => server.ws);
-    socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+    const socket = socketMap.get(serverId);
+    socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
   } catch (error) {
     console.error("Reauthentication failed:", error);
     isWSAuthIncorrect.value = true;
@@ -929,25 +952,27 @@ const cleanup = () => {
 
   stopPolling();
   stopUptimeUpdates();
+
   if (reconnectInterval.value) {
     clearInterval(reconnectInterval.value);
     reconnectInterval.value = null;
   }
 
-  if (socket.value) {
-    socket.value.onopen = null;
-    socket.value.onmessage = null;
-    socket.value.onclose = null;
-    socket.value.onerror = null;
+  const socket = socketMap.get(serverId);
+  if (socket) {
+    socket.onopen = null;
+    socket.onmessage = null;
+    socket.onclose = null;
+    socket.onerror = null;
 
-    if (
-      socket.value.readyState === WebSocket.OPEN ||
-      socket.value.readyState === WebSocket.CONNECTING
-    ) {
-      socket.value.close();
+    if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
+      socket.close();
     }
-    socket.value = null;
+    socketMap.delete(serverId);
   }
+
+  statsMap.value.delete(serverId);
+  uptimeMap.delete(serverId);
 
   isConnecting.value = false;
   isConnected.value = false;

@@ -945,166 +945,6 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
   return attemptRequest();
 };
 
-const listDirContents = (path: string, page: number, pageSize: number) => {
-  return retryWithAuth(async () => {
-    const encodedPath = encodeURIComponent(path);
-    return await PyroFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
-      override: internalServerReference.value.fs.auth,
-      retry: false,
-    });
-  });
-};
-
-const createFileOrFolder = (path: string, type: "file" | "directory") => {
-  return retryWithAuth(async () => {
-    const encodedPath = encodeURIComponent(path);
-    return await PyroFetch(`/create?path=${encodedPath}&type=${type}`, {
-      method: "POST",
-      contentType: "application/octet-stream",
-      override: internalServerReference.value.fs.auth,
-    });
-  });
-};
-
-const uploadFile = (path: string, file: File) => {
-  // eslint-disable-next-line require-await
-  return retryWithAuth(async () => {
-    const encodedPath = encodeURIComponent(path);
-    const progressSubject = new EventTarget();
-    const abortController = new AbortController();
-
-    const uploadPromise = new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-
-      xhr.upload.addEventListener("progress", (e) => {
-        if (e.lengthComputable) {
-          const progress = (e.loaded / e.total) * 100;
-          progressSubject.dispatchEvent(
-            new CustomEvent("progress", {
-              detail: {
-                loaded: e.loaded,
-                total: e.total,
-                progress,
-              },
-            }),
-          );
-        }
-      });
-
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(xhr.response);
-        } else {
-          reject(new Error(`Upload failed with status ${xhr.status}`));
-        }
-      };
-
-      xhr.onerror = () => reject(new Error("Upload failed"));
-      xhr.onabort = () => reject(new Error("Upload cancelled"));
-
-      xhr.open(
-        "POST",
-        `https://${internalServerReference.value.fs.auth.url}/create?path=${encodedPath}&type=file`,
-      );
-      xhr.setRequestHeader(
-        "Authorization",
-        `Bearer ${internalServerReference.value.fs.auth.token}`,
-      );
-      xhr.setRequestHeader("Content-Type", "application/octet-stream");
-      xhr.send(file);
-
-      abortController.signal.addEventListener("abort", () => {
-        xhr.abort();
-      });
-    });
-
-    return {
-      promise: uploadPromise,
-      onProgress: (
-        callback: (progress: { loaded: number; total: number; progress: number }) => void,
-      ) => {
-        progressSubject.addEventListener("progress", ((e: CustomEvent) => {
-          callback(e.detail);
-        }) as EventListener);
-      },
-      cancel: () => {
-        abortController.abort();
-      },
-    };
-  });
-};
-
-const renameFileOrFolder = (path: string, name: string) => {
-  const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
-  return retryWithAuth(async () => {
-    await PyroFetch(`/move`, {
-      method: "POST",
-      override: internalServerReference.value.fs.auth,
-      body: {
-        source: path,
-        destination: pathName,
-      },
-    });
-    return true;
-  });
-};
-
-const updateFile = (path: string, content: string) => {
-  const octetStream = new Blob([content], { type: "application/octet-stream" });
-  return retryWithAuth(async () => {
-    return await PyroFetch(`/update?path=${path}`, {
-      method: "PUT",
-      contentType: "application/octet-stream",
-      body: octetStream,
-      override: internalServerReference.value.fs.auth,
-    });
-  });
-};
-
-const createMissingFolders = async (path: string) => {
-  if (path.startsWith("/")) {
-    path = path.substring(1);
-  }
-  const folders = path.split("/");
-  console.log(folders);
-  let currentPath = "";
-
-  for (const folder of folders) {
-    currentPath += "/" + folder;
-    try {
-      await createFileOrFolder(currentPath, "directory");
-    } catch {}
-  }
-};
-
-const moveFileOrFolder = (path: string, newPath: string) => {
-  return retryWithAuth(async () => {
-    console.log(path);
-    console.log(newPath);
-    console.log(newPath.substring(0, newPath.lastIndexOf("/")));
-    await createMissingFolders(newPath.substring(0, newPath.lastIndexOf("/")));
-
-    return await PyroFetch(`/move`, {
-      method: "POST",
-      override: internalServerReference.value.fs.auth,
-      body: {
-        source: path,
-        destination: newPath,
-      },
-    });
-  });
-};
-
-const deleteFileOrFolder = (path: string, recursive: boolean) => {
-  const encodedPath = encodeURIComponent(path);
-  return retryWithAuth(async () => {
-    return await PyroFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
-      method: "DELETE",
-      override: internalServerReference.value.fs.auth,
-    });
-  });
-};
-
 const downloadFile = (path: string, raw?: boolean) => {
   return retryWithAuth(async () => {
     const encodedPath = encodeURIComponent(path);
@@ -1274,53 +1114,6 @@ const modules: any = {
       }
     },
     update: updateStartupSettings,
-  },
-  ws: {
-    get: async (serverId: string) => {
-      try {
-        return await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
-      } catch (error) {
-        const fetchError =
-          error instanceof PyroServersFetchError
-            ? error
-            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
-
-        return {
-          error: {
-            error: fetchError,
-            timestamp: Date.now(),
-          },
-        };
-      }
-    },
-  },
-  fs: {
-    get: async (serverId: string) => {
-      try {
-        return { auth: await PyroFetch<JWTAuth>(`servers/${serverId}/fs`, {}, "fs") };
-      } catch (error) {
-        const fetchError =
-          error instanceof PyroServersFetchError
-            ? error
-            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
-
-        return {
-          auth: undefined,
-          error: {
-            error: fetchError,
-            timestamp: Date.now(),
-          },
-        };
-      }
-    },
-    listDirContents,
-    createFileOrFolder,
-    uploadFile,
-    renameFileOrFolder,
-    updateFile,
-    moveFileOrFolder,
-    deleteFileOrFolder,
-    downloadFile,
   },
 };
 
@@ -1669,6 +1462,261 @@ type ModulesMap = {
 
 type avaliableModules = ("general" | "content" | "backups" | "network" | "startup" | "ws" | "fs")[];
 
+const createWSModule = (serverId: string) => {
+  const wsModule = {
+    url: "",
+    token: "",
+    error: undefined as ModuleError | undefined,
+    get: async () => {
+      try {
+        const wsAuth = await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
+        wsModule.url = wsAuth.url;
+        wsModule.token = wsAuth.token;
+        wsModule.error = undefined;
+        return wsModule;
+      } catch (error) {
+        const fetchError =
+          error instanceof PyroServersFetchError
+            ? error
+            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+        wsModule.url = "";
+        wsModule.token = "";
+        wsModule.error = {
+          error: fetchError,
+          timestamp: Date.now(),
+        };
+        return wsModule;
+      }
+    },
+  };
+  return wsModule;
+};
+
+const createFSModule = (serverId: string) => {
+  const retryWithServerAuth = async (requestFn: () => Promise<any>) => {
+    const attemptRequest = async (_auth: JWTAuth) => {
+      try {
+        return await requestFn();
+      } catch (error) {
+        if (error instanceof PyroServersFetchError && error.statusCode === 401) {
+          const freshAuth = await PyroFetch<JWTAuth>(`servers/${serverId}/fs`, {}, "fs");
+          if (serverCache.get(serverId)?.fs) {
+            serverCache.get(serverId)!.fs!.auth = freshAuth;
+          }
+          return await attemptRequest(freshAuth);
+        }
+        throw error;
+      }
+    };
+
+    const server = serverCache.get(serverId);
+    if (!server?.fs?.auth) {
+      const freshAuth = await PyroFetch<JWTAuth>(`servers/${serverId}/fs`, {}, "fs");
+      if (server?.fs) {
+        server.fs.auth = freshAuth;
+      }
+      return attemptRequest(freshAuth);
+    }
+
+    return attemptRequest(server.fs.auth);
+  };
+
+  const serverListDirContents = (path: string, page: number, pageSize: number) => {
+    return retryWithServerAuth(async () => {
+      const encodedPath = encodeURIComponent(path);
+      const fsAuth = serverCache.get(serverId)?.fs?.auth;
+      if (!fsAuth) throw new Error("No FS auth available");
+
+      return await PyroFetch(`/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`, {
+        override: fsAuth,
+        retry: false,
+      });
+    });
+  };
+
+  const serverCreateFileOrFolder = (path: string, type: "file" | "directory") => {
+    return retryWithServerAuth(async () => {
+      const encodedPath = encodeURIComponent(path);
+      const fsAuth = serverCache.get(serverId)?.fs?.auth;
+      if (!fsAuth) throw new Error("No FS auth available");
+
+      return await PyroFetch(`/create?path=${encodedPath}&type=${type}`, {
+        method: "POST",
+        contentType: "application/octet-stream",
+        override: fsAuth,
+      });
+    });
+  };
+
+  const serverUploadFile = (path: string, file: File) => {
+    // eslint-disable-next-line require-await
+    return retryWithServerAuth(async () => {
+      const encodedPath = encodeURIComponent(path);
+      const fsAuth = serverCache.get(serverId)?.fs?.auth;
+      if (!fsAuth) throw new Error("No FS auth available");
+
+      const progressSubject = new EventTarget();
+      const abortController = new AbortController();
+
+      const uploadPromise = new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener("progress", (e) => {
+          if (e.lengthComputable) {
+            progressSubject.dispatchEvent(
+              new CustomEvent("progress", {
+                detail: {
+                  loaded: e.loaded,
+                  total: e.total,
+                  progress: (e.loaded / e.total) * 100,
+                },
+              }),
+            );
+          }
+        });
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(xhr.response);
+          } else {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        };
+
+        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.onabort = () => reject(new Error("Upload cancelled"));
+
+        xhr.open("POST", `https://${fsAuth.url}/create?path=${encodedPath}&type=file`);
+        xhr.setRequestHeader("Authorization", `Bearer ${fsAuth.token}`);
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        xhr.send(file);
+
+        abortController.signal.addEventListener("abort", () => xhr.abort());
+      });
+
+      return {
+        promise: uploadPromise,
+        onProgress: (
+          callback: (progress: { loaded: number; total: number; progress: number }) => void,
+        ) => {
+          progressSubject.addEventListener("progress", ((e: CustomEvent) =>
+            callback(e.detail)) as EventListener);
+        },
+        cancel: () => abortController.abort(),
+      };
+    });
+  };
+
+  // eslint-disable-next-line require-await
+  const serverRenameFileOrFolder = async (path: string, name: string) => {
+    const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
+    return retryWithServerAuth(async () => {
+      const fsAuth = serverCache.get(serverId)?.fs?.auth;
+      if (!fsAuth) throw new Error("No FS auth available");
+
+      await PyroFetch(`/move`, {
+        method: "POST",
+        override: fsAuth,
+        body: { source: path, destination: pathName },
+      });
+      return true;
+    });
+  };
+
+  const serverUpdateFile = (path: string, content: string) => {
+    return retryWithServerAuth(async () => {
+      const fsAuth = serverCache.get(serverId)?.fs?.auth;
+      if (!fsAuth) throw new Error("No FS auth available");
+
+      const octetStream = new Blob([content], { type: "application/octet-stream" });
+      return await PyroFetch(`/update?path=${path}`, {
+        method: "PUT",
+        contentType: "application/octet-stream",
+        body: octetStream,
+        override: fsAuth,
+      });
+    });
+  };
+
+  const serverMoveFileOrFolder = (path: string, newPath: string) => {
+    return retryWithServerAuth(async () => {
+      const fsAuth = serverCache.get(serverId)?.fs?.auth;
+      if (!fsAuth) throw new Error("No FS auth available");
+
+      const folderPath = newPath.substring(0, newPath.lastIndexOf("/"));
+      if (folderPath) {
+        const folders = folderPath.split("/").filter(Boolean);
+        let currentPath = "";
+        for (const folder of folders) {
+          currentPath += "/" + folder;
+          try {
+            await serverCreateFileOrFolder(currentPath, "directory");
+          } catch {}
+        }
+      }
+
+      return await PyroFetch(`/move`, {
+        method: "POST",
+        override: fsAuth,
+        body: { source: path, destination: newPath },
+      });
+    });
+  };
+
+  const serverDeleteFileOrFolder = (path: string, recursive: boolean) => {
+    return retryWithServerAuth(async () => {
+      const encodedPath = encodeURIComponent(path);
+      const fsAuth = serverCache.get(serverId)?.fs?.auth;
+      if (!fsAuth) throw new Error("No FS auth available");
+
+      return await PyroFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
+        method: "DELETE",
+        override: fsAuth,
+      });
+    });
+  };
+
+  const serverDownloadFile = (path: string, raw?: boolean) => {
+    return retryWithServerAuth(async () => {
+      const encodedPath = encodeURIComponent(path);
+      const fsAuth = serverCache.get(serverId)?.fs?.auth;
+      if (!fsAuth) throw new Error("No FS auth available");
+
+      const fileData = await PyroFetch(`/download?path=${encodedPath}`, {
+        override: fsAuth,
+      });
+
+      if (fileData instanceof Blob) {
+        return raw ? fileData : await fileData.text();
+      }
+    });
+  };
+
+  return {
+    auth: { url: "", token: "" } as JWTAuth,
+    error: undefined as ModuleError | undefined,
+    get: async () => {
+      try {
+        return await PyroFetch<JWTAuth>(`servers/${serverId}/fs`, {}, "fs");
+      } catch (error) {
+        const fetchError =
+          error instanceof PyroServersFetchError
+            ? error
+            : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+        throw fetchError;
+      }
+    },
+    listDirContents: serverListDirContents,
+    createFileOrFolder: serverCreateFileOrFolder,
+    uploadFile: serverUploadFile,
+    renameFileOrFolder: serverRenameFileOrFolder,
+    updateFile: serverUpdateFile,
+    moveFileOrFolder: serverMoveFileOrFolder,
+    deleteFileOrFolder: serverDeleteFileOrFolder,
+    downloadFile: serverDownloadFile,
+  };
+};
+
 export type Server<T extends avaliableModules> = {
   [K in T[number]]?: ModulesMap[K];
 } & {
@@ -1695,10 +1743,17 @@ const serverCache = new Map<string, Server<any>>();
 export const usePyroServer = async (serverId: string, includedModules: avaliableModules) => {
   const cached = serverCache.get(serverId);
   if (cached) {
-    if (includedModules.includes("fs") || includedModules.includes("ws")) {
-      if (!cached.fs?.auth) {
-        await cached.refresh(["fs", "ws"]);
+    if (includedModules.includes("ws") && (!cached.ws?.url || !cached.ws?.token)) {
+      const wsAuth = await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
+      if (!cached.ws) {
+        cached.ws = createWSModule(serverId);
       }
+      cached.ws.url = wsAuth.url;
+      cached.ws.token = wsAuth.token;
+    }
+
+    if (includedModules.includes("fs") && !cached.fs?.auth) {
+      await cached.refresh(["fs"]);
     }
 
     const missingModules = includedModules.filter((module) => !cached[module]);
@@ -1804,14 +1859,39 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
   const deferredModules = includedModules.filter((module) => !["general", "ws"].includes(module));
 
   initialModules.forEach((module) => {
-    server[module] = modules[module];
+    if (module === "fs") {
+      server[module] = createFSModule(serverId);
+    } else if (module === "ws") {
+      server[module] = createWSModule(serverId);
+    } else {
+      server[module] = modules[module];
+    }
   });
 
   internalServerReference.value = server;
-  await server.refresh(initialModules);
+
+  if (includedModules.includes("ws")) {
+    const wsAuth = await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
+    if (!server.ws) {
+      server.ws = createWSModule(serverId);
+    }
+    server.ws.url = wsAuth.url;
+    server.ws.token = wsAuth.token;
+  }
+
+  await server.refresh(initialModules.filter((m) => m !== "ws"));
 
   if (deferredModules.length > 0) {
-    await server.loadModules(deferredModules);
+    deferredModules.forEach((module) => {
+      if (module === "fs") {
+        server[module] = createFSModule(serverId);
+      } else if (module === "ws") {
+        server[module] = createWSModule(serverId);
+      } else {
+        server[module] = modules[module];
+      }
+    });
+    await server.refresh(deferredModules);
   }
 
   serverCache.set(serverId, server);
@@ -1826,7 +1906,9 @@ const refreshAuthTokens = async (server: Server<any>) => {
     }
     if (server.ws) {
       const freshWsAuth = await PyroFetch<JWTAuth>(`servers/${server.serverId}/ws`, {}, "ws");
-      Object.assign(server.ws, freshWsAuth);
+      server.ws.url = freshWsAuth.url;
+      server.ws.token = freshWsAuth.token;
+      server.ws.error = undefined;
     }
   } catch (error) {
     console.error("Failed to refresh auth tokens:", error);
