@@ -367,32 +367,21 @@ const constructServerProperties = (properties: any): string => {
   return fileContent;
 };
 
-const projectCache = new Map<string, Project>();
-const projectPromiseCache = new Map<string, Promise<Project | null>>();
+const projectCache = new Map<string, Promise<Project | null>>();
 
-function getProjectFromCache(projectId: string): Promise<Project | null> {
-  const cached = projectCache.get(projectId);
-  if (cached) return Promise.resolve(cached);
-
-  const promiseCached = projectPromiseCache.get(projectId);
-  if (promiseCached) return promiseCached;
-
+const getProjectFromCache = (projectId: string): Promise<Project | null> => {
+  if (projectCache.has(projectId)) {
+    return projectCache.get(projectId)!;
+  }
   const fetchPromise = $fetch<Project>(`https://api.modrinth.com/v2/project/${projectId}`)
-    .then((response) => {
-      projectCache.set(projectId, response);
-      return response;
-    })
+    .then((response) => response)
     .catch((error) => {
       console.error(`Failed to fetch project ${projectId}:`, error);
       return null;
-    })
-    .finally(() => {
-      projectPromiseCache.delete(projectId);
     });
-
-  projectPromiseCache.set(projectId, fetchPromise);
+  projectCache.set(projectId, fetchPromise);
   return fetchPromise;
-}
+};
 
 export const processImage = async (
   serverId: string,
@@ -1120,8 +1109,7 @@ interface CachedAuth {
   expiresAt: number;
 }
 
-const wsAuthCache = new Map<string, CachedAuth>();
-const fsAuthCache = new Map<string, CachedAuth>();
+const authCache = new Map<string, { ws?: CachedAuth; fs?: CachedAuth }>();
 
 const AUTH_TTL = 5 * 60 * 1000;
 const AUTH_REFRESH_THRESHOLD = 30 * 1000;
@@ -1131,8 +1119,8 @@ const getOrFetchAuth = async (
   type: "ws" | "fs",
   force: boolean = false,
 ): Promise<JWTAuth> => {
-  const cache = type === "ws" ? wsAuthCache : fsAuthCache;
-  const cached = cache.get(serverId);
+  const entry = authCache.get(serverId) || ({} as { ws?: CachedAuth; fs?: CachedAuth });
+  const cached = entry[type];
   const now = Date.now();
 
   if (!force && cached && now < cached.expiresAt - AUTH_REFRESH_THRESHOLD) {
@@ -1141,18 +1129,11 @@ const getOrFetchAuth = async (
 
   try {
     const auth = await PyroFetch<JWTAuth>(`servers/${serverId}/${type}`, {}, type);
-
-    cache.set(serverId, {
-      auth,
-      timestamp: now,
-      expiresAt: now + AUTH_TTL,
-    });
-
+    entry[type] = { auth, timestamp: now, expiresAt: now + AUTH_TTL };
+    authCache.set(serverId, entry);
     return auth;
   } catch (error) {
-    if (cached) {
-      return cached.auth;
-    }
+    if (cached) return cached.auth;
     throw error;
   }
 };
