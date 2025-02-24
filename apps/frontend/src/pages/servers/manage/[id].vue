@@ -855,7 +855,7 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
 
 const reauthenticate = async () => {
   try {
-    await server.refresh();
+    await server.refresh(["ws"]);
     const wsAuth = computed(() => server.ws);
     const socket = socketMap.get(serverId);
     if (socket && socket.readyState === WebSocket.OPEN) {
