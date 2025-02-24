@@ -1106,13 +1106,9 @@ interface ModuleError {
 interface CachedAuth {
   auth: JWTAuth;
   timestamp: number;
-  expiresAt: number;
 }
 
 const authCache = new Map<string, { ws?: CachedAuth; fs?: CachedAuth }>();
-
-const AUTH_TTL = 5 * 60 * 1000;
-const AUTH_REFRESH_THRESHOLD = 30 * 1000;
 
 const getOrFetchAuth = async (
   serverId: string,
@@ -1121,15 +1117,14 @@ const getOrFetchAuth = async (
 ): Promise<JWTAuth> => {
   const entry = authCache.get(serverId) || ({} as { ws?: CachedAuth; fs?: CachedAuth });
   const cached = entry[type];
-  const now = Date.now();
 
-  if (!force && cached && now < cached.expiresAt - AUTH_REFRESH_THRESHOLD) {
+  if (!force && cached) {
     return cached.auth;
   }
 
   try {
     const auth = await PyroFetch<JWTAuth>(`servers/${serverId}/${type}`, {}, type);
-    entry[type] = { auth, timestamp: now, expiresAt: now + AUTH_TTL };
+    entry[type] = { auth, timestamp: Date.now() };
     authCache.set(serverId, entry);
     return auth;
   } catch (error) {
