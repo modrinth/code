@@ -203,7 +203,7 @@ const colorVariables = computed(() => {
 
   svg:first-child {
     color: var(--_icon, var(--_text));
-    transition: color 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out;
   }
 
   &[disabled],

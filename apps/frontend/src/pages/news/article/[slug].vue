@@ -65,7 +65,7 @@ We can't wait for you to try out [Modrinth Servers](https://modrinth.gg) and sha
 **From the teams at Modrinth and Pyro, with <3**`,
 };
 
-const articleUrl = encodeURIComponent(`https://modrinth.com/news/article/${article.slug}`);
+const articleUrl = computed(() => `https://modrinth.com/news/article/${article.slug}`);
 
 const copied = ref(false);
 
@@ -105,7 +105,7 @@ async function copyToClipboard(text: string) {
         <ButtonStyled circular>
           <a
             v-tooltip="`Share on Bluesky`"
-            :href="`https://bsky.app/intent/compose?text=${articleUrl}`"
+            :href="`https://bsky.app/intent/compose?text=${encodeURIComponent(articleUrl)}`"
             target="_blank"
           >
             <BlueskyIcon />
@@ -114,7 +114,7 @@ async function copyToClipboard(text: string) {
         <ButtonStyled circular>
           <a
             v-tooltip="`Share on Mastodon`"
-            :href="`https://tootpick.org/#text=${articleUrl}`"
+            :href="`https://tootpick.org/#text=${encodeURIComponent(articleUrl)}`"
             target="_blank"
           >
             <MastodonIcon />
@@ -123,7 +123,7 @@ async function copyToClipboard(text: string) {
         <ButtonStyled circular>
           <a
             v-tooltip="`Share on X`"
-            :href="`https://www.x.com/intent/post?url=${articleUrl}`"
+            :href="`https://www.x.com/intent/post?url=${encodeURIComponent(articleUrl)}`"
             target="_blank"
           >
             <TwitterIcon />
@@ -132,7 +132,7 @@ async function copyToClipboard(text: string) {
         <ButtonStyled circular>
           <a
             v-tooltip="`Share via email`"
-            :href="`mailto:?subject=${encodeURIComponent(article.title)}&body=${articleUrl}`"
+            :href="`mailto:?subject=${encodeURIComponent(article.title)}&body=${encodeURIComponent(articleUrl)}`"
             target="_blank"
           >
             <MailIcon />
@@ -142,10 +142,17 @@ async function copyToClipboard(text: string) {
           <button
             v-tooltip="copied ? `Copied to clipboard` : `Copy link`"
             :disabled="copied"
+            class="relative grid place-items-center overflow-hidden"
             @click="copyToClipboard(articleUrl)"
           >
-            <CheckIcon v-if="copied" />
-            <LinkIcon v-else />
+            <CheckIcon
+              class="absolute transition-all ease-in-out"
+              :class="copied ? 'translate-y-0' : 'translate-y-7'"
+            />
+            <LinkIcon
+              class="absolute transition-all ease-in-out"
+              :class="copied ? '-translate-y-7' : 'translate-y-0'"
+            />
           </button>
         </ButtonStyled>
       </div>
