@@ -223,7 +223,9 @@
         </div>
         <div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
           <nuxt-link
-            v-for="collection in collections"
+            v-for="collection in collections.sort(
+              (a, b) => new Date(b.created) - new Date(a.created),
+            )"
             :key="collection.id"
             :to="`/collection/${collection.id}`"
             class="card collection-item"
@@ -242,7 +244,12 @@
               {{ collection.description }}
             </div>
             <div class="stat-bar">
-              <div class="stats"><BoxIcon /> {{ collection.projects?.length || 0 }} projects</div>
+              <div class="stats">
+                <BoxIcon />
+                {{
+                  `${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? "s" : ""}`
+                }}
+              </div>
               <div class="stats">
                 <template v-if="collection.status === 'listed'">
                   <WorldIcon />
@@ -638,12 +645,13 @@ export default defineNuxtComponent({
     grid-template-columns: repeat(1, 1fr);
   }
 
-  gap: var(--gap-lg);
+  gap: var(--gap-md);
 
   .collection-item {
     display: flex;
     flex-direction: column;
     gap: var(--gap-md);
+    margin-bottom: 0px;
   }
 
   .description {
@@ -692,7 +700,7 @@ export default defineNuxtComponent({
 
       .title {
         color: var(--color-contrast);
-        font-weight: 600;
+        font-weight: 700;
         font-size: var(--font-size-lg);
         margin: 0;
       }

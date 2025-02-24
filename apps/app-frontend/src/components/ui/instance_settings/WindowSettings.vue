@@ -5,7 +5,7 @@ import { handleError } from '@/store/notifications'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { get } from '@/helpers/settings'
 import { edit } from '@/helpers/profile'
-import type { InstanceSettingsTabProps, AppSettings } from '../../../helpers/types'
+import type { AppSettings, InstanceSettingsTabProps } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 
@@ -114,7 +114,6 @@ const messages = defineMessages({
       <Toggle
         id="fullscreen"
         :model-value="overrideWindowSettings ? fullscreenSetting : globalSettings.force_fullscreen"
-        :checked="fullscreenSetting"
         :disabled="!overrideWindowSettings"
         @update:model-value="
           (e) => {
