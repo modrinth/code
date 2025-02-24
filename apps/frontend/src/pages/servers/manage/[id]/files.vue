@@ -777,7 +777,7 @@ const initializeFileEdit = async () => {
 
 onMounted(async () => {
   await modulesLoaded;
-  await props.server.refresh(["fs"]);
+  // await props.server.refresh(["fs"]);
   await refreshData();
 
   await initializeFileEdit();
