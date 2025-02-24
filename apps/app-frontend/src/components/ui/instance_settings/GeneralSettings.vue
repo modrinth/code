@@ -10,7 +10,8 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useRouter } from 'vue-router'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
-import type { InstanceSettingsTabProps, GameInstance } from '../../../helpers/types'
+import type { InstanceSettingsTabProps } from '../../../helpers/types'
+import type { Profile } from '@/helpers/lib-types'
 
 const { formatMessage } = useVIntl()
 const router = useRouter()
@@ -35,7 +36,7 @@ async function duplicateProfile() {
   })
 }
 
-const allInstances = ref((await list()) as GameInstance[])
+const allInstances = ref((await list()) as Profile[])
 const availableGroups = computed(() => [
   ...new Set([...allInstances.value.flatMap((instance) => instance.groups), ...groups.value]),
 ])

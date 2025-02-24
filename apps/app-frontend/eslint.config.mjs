@@ -19,4 +19,6 @@ export default createConfigForNuxt().append([
       'vue/multi-word-component-names': 'off',
     },
   },
-])
+], {
+  ignores: ["src/helpers/*-types.d.ts"]
+})

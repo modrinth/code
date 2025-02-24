@@ -51,6 +51,8 @@ opener = { version = "0.7.2", features = ["reveal", "dbus-vendored"] }
 
 native-dialog = "0.7.0"
 
+ts-rs = { version = "10.1", features = [ "chrono-impl", "uuid-impl" ] }
+
 [target.'cfg(not(target_os = "linux"))'.dependencies]
 window-shadows = "0.2.1"
 
@@ -70,3 +72,6 @@ default = ["custom-protocol"]
 # DO NOT remove this
 custom-protocol = ["tauri/custom-protocol"]
 updater = []
+
+[env]
+TS_RS_EXPORT_DIR = { value = "../../app-frontend/src/helpers/", relative = true }

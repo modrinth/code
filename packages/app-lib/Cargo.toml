@@ -62,9 +62,14 @@ base64 = "0.22.0"
 
 sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
 
+ts-rs = { version = "10.1", features = [ "chrono-impl", "uuid-impl" ] }
+
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52.0"
 
 [features]
 tauri = ["dep:tauri"]
 cli = ["dep:indicatif"]
+
+[env]
+TS_RS_EXPORT_DIR = { value = "../../../apps/app-frontend/src/helpers/", relative = false }

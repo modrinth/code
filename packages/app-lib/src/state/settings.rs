@@ -2,6 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use ts_rs::TS;
 
 // Types
 /// Global Theseus settings
@@ -234,17 +235,29 @@ impl Theme {
 }
 
 /// Minecraft memory settings
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 pub struct MemorySettings {
     pub maximum: u32,
 }
 
 /// Game window size
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 pub struct WindowSize(pub u16, pub u16);
 
 /// Game initialization hooks
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 pub struct Hooks {
     pub pre_launch: Option<String>,
     pub wrapper: Option<String>,

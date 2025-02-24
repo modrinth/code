@@ -6,7 +6,8 @@
 import { invoke } from '@tauri-apps/api/core'
 import { install_to_existing_profile } from '@/helpers/pack.js'
 import { handleError } from '@/store/notifications.js'
-import type { ProcessMetadata, JavaVersion, GameInstance, InstanceLoader } from './types'
+import type { CacheBehaviour, JavaVersion, ModLoader, ProcessMetadata, Profile } from './lib-types'
+import type { EditProfile } from './api-types'
 
 /// Add instance
 /*
@@ -33,7 +34,7 @@ import type { ProcessMetadata, JavaVersion, GameInstance, InstanceLoader } from 
 export async function create(
   name: string,
   gameVersion: string,
-  modLoader: InstanceLoader,
+  modLoader: ModLoader,
   loaderVersion?: string,
   iconPath?: string,
   skipInstall?: boolean,
@@ -63,20 +64,14 @@ export async function remove(path: string): Promise<void> {
 // Get a profile by path
 // Returns a Profile
 export async function get(path: string) {
-  const res = await invoke<GameInstance | undefined>('plugin:profile|profile_get', { path })
+  const res = await invoke<Profile | undefined>('plugin:profile|profile_get', { path })
   console.log('PROFILE GET', res)
   return res
 }
 
 export async function get_many(paths: string[]) {
-  return await invoke<GameInstance[]>('plugin:profile|profile_get_many', { paths })
+  return await invoke<Profile[]>('plugin:profile|profile_get_many', { paths })
 }
-
-type CacheBehaviour =
-  | 'stale_while_revalidate_skip_offline'
-  | 'stale_while_revalidate'
-  | 'must_revalidate'
-  | 'bypass'
 
 // Get a profile's projects
 // Returns a map of a path to profile file
@@ -106,7 +101,7 @@ export async function get_optimal_jre_key(path: string) {
 
 // Get a copy of the profile set
 // Returns hashmap of path -> Profile
-export async function list(): Promise<GameInstance[]> {
+export async function list(): Promise<Profile[]> {
   return await invoke('plugin:profile|profile_list')
 }
 
@@ -225,27 +220,8 @@ export async function kill(path: string): Promise<void> {
   return await invoke('plugin:profile|profile_kill', { path })
 }
 
-type EditProfile = Partial<
-  Pick<
-    GameInstance,
-    | 'name'
-    | 'game_version'
-    | 'loader'
-    | 'loader_version'
-    | 'groups'
-    | 'linked_data'
-    | 'java_path'
-    | 'extra_launch_args'
-    | 'custom_env_vars'
-    | 'memory'
-    | 'force_fullscreen'
-    | 'game_resolution'
-    | 'hooks'
-  >
->
-
 // Edits a profile
-export async function edit(path: string, editProfile: EditProfile): Promise<void> {
+export async function edit(path: string, editProfile: Partial<EditProfile>): Promise<void> {
   return await invoke('plugin:profile|profile_edit', { path, editProfile })
 }
 
@@ -254,7 +230,7 @@ export async function edit_icon(path: string, iconPath?: string): Promise<void> 
   return await invoke('plugin:profile|profile_edit_icon', { path, iconPath })
 }
 
-export async function finish_install(instance: GameInstance): Promise<void> {
+export async function finish_install(instance: Profile): Promise<void> {
   if (instance.install_stage !== 'pack_installed') {
     const linkedData = instance.linked_data
     if (!linkedData) {

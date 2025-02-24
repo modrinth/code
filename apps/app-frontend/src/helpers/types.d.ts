@@ -1,36 +1,5 @@
 import type { ModrinthId } from '@modrinth/utils'
-
-type GameInstance = {
-  path: string
-  install_stage: InstallStage
-
-  name: string
-  icon_path?: string
-
-  game_version: string
-  loader: InstanceLoader
-  loader_version?: string
-
-  groups: string[]
-
-  linked_data?: LinkedData
-
-  created: Date
-  modified: Date
-  last_played?: Date
-
-  submitted_time_played: number
-  recent_time_played: number
-
-  java_path?: string
-  extra_launch_args?: string[]
-  custom_env_vars?: [string, string][]
-
-  memory?: MemorySettings
-  force_fullscreen?: boolean
-  game_resolution?: [number, number]
-  hooks: Hooks
-}
+import type { Profile } from './lib-types'
 
 type InstallStage =
   | 'installed'
@@ -110,19 +79,6 @@ type AppSettings = {
 }
 
 export type InstanceSettingsTabProps = {
-  instance: GameInstance
+  instance: Profile
   offline?: boolean
-}
-
-export type JavaVersion = {
-  major_version: number
-  version: string
-  architecture: string
-  path: string
-}
-
-export type ProcessMetadata = {
-  uuid: string
-  profile_path: string
-  start_time: Date
 }
