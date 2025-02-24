@@ -1,8 +1,5 @@
 <template>
-  <NuxtLink
-    class="contents"
-    :to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
-  >
+  <NuxtLink class="contents" :to="`/servers/manage/${props.server_id}`">
     <div
       v-tooltip="
         status === 'suspended'

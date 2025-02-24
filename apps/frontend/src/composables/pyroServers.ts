@@ -170,7 +170,7 @@ async function PyroFetch<T>(
 
       if (error instanceof FetchError) {
         const statusCode = error.response?.status;
-        const isRetryable = statusCode ? [408, 429, 500, 502, 503, 504].includes(statusCode) : true;
+        const isRetryable = statusCode ? [408, 429, 500, 502, 504].includes(statusCode) : true;
 
         if (!isRetryable || attempts >= maxAttempts) {
           throw new PyroServersFetchError(error.message, statusCode, error, module);
@@ -1743,22 +1743,33 @@ const serverCache = new Map<string, Server<any>>();
 export const usePyroServer = async (serverId: string, includedModules: avaliableModules) => {
   const cached = serverCache.get(serverId);
   if (cached) {
+    const has503Error = cached.general?.error?.error?.statusCode === 503;
+    if (has503Error) {
+      return cached as Server<typeof includedModules>;
+    }
+
     if (includedModules.includes("ws") && (!cached.ws?.url || !cached.ws?.token)) {
-      const wsAuth = await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
-      if (!cached.ws) {
-        cached.ws = createWSModule(serverId);
+      try {
+        const wsAuth = await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
+        if (!cached.ws) {
+          cached.ws = createWSModule(serverId);
+        }
+        cached.ws.url = wsAuth.url;
+        cached.ws.token = wsAuth.token;
+      } catch (error) {
+        console.error("Failed to load WS auth:", error);
       }
-      cached.ws.url = wsAuth.url;
-      cached.ws.token = wsAuth.token;
     }
 
-    if (includedModules.includes("fs") && !cached.fs?.auth) {
-      await cached.refresh(["fs"]);
-    }
+    if (!cached.general?.status?.startsWith("suspended")) {
+      if (includedModules.includes("fs") && !cached.fs?.auth) {
+        await cached.refresh(["fs"]);
+      }
 
-    const missingModules = includedModules.filter((module) => !cached[module]);
-    if (missingModules.length > 0) {
-      await cached.loadModules(missingModules);
+      const missingModules = includedModules.filter((module) => !cached[module] && module !== "ws");
+      if (missingModules.length > 0) {
+        await cached.loadModules(missingModules);
+      }
     }
     return cached as Server<typeof includedModules>;
   }
@@ -1786,47 +1797,89 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
       }
 
       const modulesToRefresh = [...new Set(refreshModules || includedModules)];
-      const serverError = new PyroServerError();
 
-      const modulePromises = modulesToRefresh.map(async (module) => {
+      if (modulesToRefresh.includes("general")) {
         try {
-          const mods = modules[module];
-          if (!mods?.get) return;
+          const generalData = await modules.general.get(serverId);
 
-          const data = await mods.get(serverId);
-          if (!data) return;
-
-          if (module === "general" && options?.preserveConnection) {
-            server[module] = {
-              ...server[module],
-              ...data,
-              image: server[module]?.image || data.image,
-              motd: server[module]?.motd || data.motd,
+          if (options?.preserveConnection) {
+            server.general = {
+              ...server.general,
+              ...generalData,
+              ...modules.general,
+              image: server.general?.image || generalData.image,
+              motd: server.general?.motd || generalData.motd,
               status:
-                options.preserveInstallState && server[module]?.status === "installing"
+                options.preserveInstallState && server.general?.status === "installing"
                   ? "installing"
-                  : data.status,
+                  : generalData.status,
             };
           } else {
-            server[module] = { ...server[module], ...data };
+            server.general = {
+              ...generalData,
+              ...modules.general,
+            };
+          }
+
+          if (generalData.error) {
+            return;
           }
         } catch (error) {
-          console.error(`Failed to refresh module ${module}:`, error);
-          if (error instanceof Error) {
-            serverError.addError(module, error);
-          }
+          console.error("Failed to refresh general module:", error);
+          const fetchError =
+            error instanceof PyroServersFetchError
+              ? error
+              : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+
+          server.general = {
+            status: "error",
+            server_id: serverId,
+            error: {
+              error: fetchError,
+              timestamp: Date.now(),
+            },
+          } as any;
+          return;
         }
-      });
+      }
 
-      await Promise.allSettled(modulePromises);
+      const remainingModules = modulesToRefresh.filter((m) => m !== "general");
+      if (remainingModules.length > 0 && !server.general?.error) {
+        const serverError = new PyroServerError();
+        const modulePromises = remainingModules.map(async (module) => {
+          try {
+            const mods = modules[module];
+            if (!mods?.get) return;
 
-      if (serverError.hasErrors()) {
-        if (server.error && server.error instanceof PyroServerError) {
-          serverError.errors.forEach((error, module) => {
-            (server.error as PyroServerError).addError(module, error);
-          });
-        } else {
-          server.setError(serverError);
+            const data = await mods.get(serverId);
+            if (!data) return;
+
+            if (options?.preserveConnection) {
+              server[module] = {
+                ...server[module],
+                ...data,
+              };
+            } else {
+              server[module] = { ...server[module], ...data };
+            }
+          } catch (error) {
+            console.error(`Failed to refresh module ${module}:`, error);
+            if (error instanceof Error) {
+              serverError.addError(module, error);
+            }
+          }
+        });
+
+        await Promise.allSettled(modulePromises);
+
+        if (serverError.hasErrors()) {
+          if (server.error && server.error instanceof PyroServerError) {
+            serverError.errors.forEach((error, module) => {
+              (server.error as PyroServerError).addError(module, error);
+            });
+          } else {
+            server.setError(serverError);
+          }
         }
       }
     },
@@ -1835,7 +1888,7 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
       if (newModules.length === 0) return;
 
       newModules.forEach((module) => {
-        server[module] = modules[module];
+        (server as any)[module] = modules[module];
       });
 
       await server.refresh(newModules);
@@ -1858,43 +1911,65 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
     serverId,
   });
 
-  const initialModules = includedModules.filter((module) => ["general", "ws"].includes(module));
-  const deferredModules = includedModules.filter((module) => !["general", "ws"].includes(module));
-
-  initialModules.forEach((module) => {
-    if (module === "fs") {
-      server[module] = createFSModule(serverId);
-    } else if (module === "ws") {
-      server[module] = createWSModule(serverId);
-    } else {
-      server[module] = modules[module];
-    }
-  });
+  const wsModule = includedModules.includes("ws") ? createWSModule(serverId) : undefined;
+  if (wsModule) {
+    server.ws = wsModule;
+  }
+  server.general = modules.general;
 
   internalServerReference.value = server;
 
-  if (includedModules.includes("ws")) {
-    const wsAuth = await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
-    if (!server.ws) {
-      server.ws = createWSModule(serverId);
+  try {
+    await server.refresh(["general"]);
+
+    if (server.general?.error?.error?.statusCode === 503) {
+      serverCache.set(serverId, server);
+      return server as Server<typeof includedModules>;
     }
-    server.ws.url = wsAuth.url;
-    server.ws.token = wsAuth.token;
-  }
 
-  await server.refresh(initialModules.filter((m) => m !== "ws"));
-
-  if (deferredModules.length > 0) {
-    deferredModules.forEach((module) => {
-      if (module === "fs") {
-        server[module] = createFSModule(serverId);
-      } else if (module === "ws") {
-        server[module] = createWSModule(serverId);
-      } else {
-        server[module] = modules[module];
+    if (!server.general?.status?.startsWith("suspended")) {
+      if (includedModules.includes("ws")) {
+        try {
+          const wsAuth = await PyroFetch<JWTAuth>(`servers/${serverId}/ws`, {}, "ws");
+          server.ws = createWSModule(serverId);
+          if (server.ws) {
+            server.ws.url = wsAuth.url;
+            server.ws.token = wsAuth.token;
+          }
+        } catch (error) {
+          console.error("Failed to load WS auth:", error);
+        }
       }
-    });
-    await server.refresh(deferredModules);
+
+      const remainingModules = includedModules.filter(
+        (module) => !["general", "ws"].includes(module),
+      );
+      if (remainingModules.length > 0) {
+        remainingModules.forEach((module) => {
+          if (module === "fs") {
+            server[module] = createFSModule(serverId);
+          } else {
+            server[module] = modules[module];
+          }
+        });
+        await server.refresh(remainingModules);
+      }
+    }
+  } catch (error) {
+    console.error("Error initializing server:", error);
+    const fetchError =
+      error instanceof PyroServersFetchError
+        ? error
+        : new PyroServersFetchError("Unknown error occurred", undefined, error as Error);
+
+    server.general = {
+      status: "error",
+      server_id: serverId,
+      error: {
+        error: fetchError,
+        timestamp: Date.now(),
+      },
+    } as any;
   }
 
   serverCache.set(serverId, server);

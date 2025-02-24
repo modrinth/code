@@ -1,28 +1,30 @@
 <template>
   <div>
-    <ServerLabelGame
-      v-if="showGameLabel"
-      :game="serverData.game"
-      :mc-version="serverData.mc_version ?? ''"
-      :is-link="linked"
-    />
-    <ServerLabelPlatform
-      :loader="serverData.loader"
-      :loader-version="serverData.loader_version ?? ''"
-      :no-separator="column"
-      :is-link="linked"
-    />
-    <ServerLabelUrl
-      v-if="serverData.net?.domain"
-      :subdomain="serverData.net.domain"
-      :no-separator="column"
-      :is-link="linked"
-    />
-    <ServerLabelUptime
-      v-if="uptimeSeconds"
-      :uptime-seconds="uptimeSeconds"
-      :no-separator="column"
-    />
+    <template v-if="serverData.status !== 'suspended'">
+      <ServerLabelGame
+        v-if="showGameLabel"
+        :game="serverData.game"
+        :mc-version="serverData.mc_version ?? ''"
+        :is-link="linked"
+      />
+      <ServerLabelPlatform
+        :loader="serverData.loader"
+        :loader-version="serverData.loader_version ?? ''"
+        :no-separator="column"
+        :is-link="linked"
+      />
+      <ServerLabelUrl
+        v-if="serverData.net?.domain"
+        :subdomain="serverData.net.domain"
+        :no-separator="column"
+        :is-link="linked"
+      />
+      <ServerLabelUptime
+        v-if="uptimeSeconds"
+        :uptime-seconds="uptimeSeconds"
+        :no-separator="column"
+      />
+    </template>
   </div>
 </template>
 
