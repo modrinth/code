@@ -93,7 +93,10 @@ import type { Server } from "~/types/servers";
 const props = defineProps<Partial<Server>>();
 const imageData = ref<string>();
 
-const { pyroServer } = await useSharedPyroServer(props.server_id!, ["general", "fs"]);
+const { pyroServer } = await useSharedPyroServer(props.server_id!, [
+  "general",
+  ...(props.status !== "suspended" ? ["fs" as const] : []),
+]);
 
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
