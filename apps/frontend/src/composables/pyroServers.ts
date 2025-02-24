@@ -904,11 +904,7 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
       return await requestFn();
     } catch (error) {
       if (error instanceof PyroServersFetchError && error.statusCode === 401) {
-        const freshAuth = await PyroFetch<JWTAuth>(
-          `servers/${internalServerReference.value.serverId}/fs`,
-          {},
-          "fs",
-        );
+        const freshAuth = await getOrFetchAuth(internalServerReference.value.serverId, "fs", true);
         if (internalServerReference.value.fs) {
           internalServerReference.value.fs.auth = freshAuth;
           return await requestFn();
@@ -920,11 +916,7 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
 
   if (internalServerReference.value.fs && !internalServerReference.value.fs.auth) {
     try {
-      const freshAuth = await PyroFetch<JWTAuth>(
-        `servers/${internalServerReference.value.serverId}/fs`,
-        {},
-        "fs",
-      );
+      const freshAuth = await getOrFetchAuth(internalServerReference.value.serverId, "fs", true);
       internalServerReference.value.fs.auth = freshAuth;
     } catch (error) {
       console.error("Failed to refresh fs auth:", error);
@@ -934,7 +926,7 @@ const retryWithAuth = async (requestFn: () => Promise<any>) => {
 
   if (!internalServerReference.value.fs) {
     try {
-      internalServerReference.value.fs = modules.fs;
+      internalServerReference.value.fs = createFSModule(internalServerReference.value.serverId);
       await internalServerReference.value.refresh(["fs"]);
     } catch (error) {
       console.error("Failed to initialize fs module:", error);
