@@ -858,7 +858,11 @@ const reauthenticate = async () => {
     await server.refresh();
     const wsAuth = computed(() => server.ws);
     const socket = socketMap.get(serverId);
-    socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+    } else {
+      connectWebSocket();
+    }
   } catch (error) {
     console.error("Reauthentication failed:", error);
     isWSAuthIncorrect.value = true;
