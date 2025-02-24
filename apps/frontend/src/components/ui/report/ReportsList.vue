@@ -1,5 +1,4 @@
 <template>
-  <Chips v-if="false" v-model="viewMode" :items="['open', 'archived']" />
   <ReportInfo
     v-for="report in reports.filter(
       (x) =>
@@ -17,7 +16,6 @@
   <p v-if="reports.length === 0">You don't have any active reports.</p>
 </template>
 <script setup>
-import Chips from "~/components/ui/Chips.vue";
 import ReportInfo from "~/components/ui/report/ReportInfo.vue";
 import { addReportMessage } from "~/helpers/threads.js";
 

@@ -80,14 +80,19 @@
     <div class="flex flex-col-reverse gap-6 md:flex-col">
       <UiServersServerStats :data="stats" />
       <div
-        class="relative flex h-[600px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
+        class="relative flex h-[700px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
+
             <UiServersPanelServerStatus :state="serverPowerState" />
           </div>
         </div>
+        <!-- <div class="flex flex-row items-center gap-2 text-sm font-medium">
+          <InfoIcon class="hidden sm:block" />
+          Click and drag to select lines, then CMD+C to copy
+        </div> -->
         <UiServersPanelTerminal :full-screen="fullScreen">
           <div class="relative w-full px-4 pt-4">
             <ul
@@ -164,7 +169,7 @@
       </div>
     </div>
   </div>
-  <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
+  <UiServersOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
   <div v-else-if="isWsAuthIncorrect" class="flex flex-col">
     <h2>Could not connect to the server.</h2>
     <p>
@@ -239,19 +244,31 @@ interface ErrorData {
 const inspectingError = ref<ErrorData | null>(null);
 
 const inspectError = async () => {
-  const log = await props.server.fs?.downloadFile("logs/latest.log");
-  // @ts-ignore
-  const analysis = (await $fetch(`https://api.mclo.gs/1/analyse`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      content: log,
-    }),
-  })) as ErrorData;
+  try {
+    const log = await props.server.fs?.downloadFile("logs/latest.log");
+    if (!log) return;
 
-  inspectingError.value = analysis;
+    // @ts-ignore
+    const response = await $fetch(`https://api.mclo.gs/1/analyse`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        content: log,
+      }),
+    });
+
+    // @ts-ignore
+    if (response && response.analysis && Array.isArray(response.analysis.problems)) {
+      inspectingError.value = response as ErrorData;
+    } else {
+      inspectingError.value = null;
+    }
+  } catch (error) {
+    console.error("Failed to analyze logs:", error);
+    inspectingError.value = null;
+  }
 };
 
 const clearError = () => {
@@ -261,7 +278,7 @@ const clearError = () => {
 watch(
   () => props.serverPowerState,
   (newVal) => {
-    if (newVal === "crashed") {
+    if (newVal === "crashed" && !props.powerStateDetails?.oom_killed) {
       inspectError();
     } else {
       clearError();
@@ -269,7 +286,7 @@ watch(
   },
 );
 
-if (props.serverPowerState === "crashed") {
+if (props.serverPowerState === "crashed" && !props.powerStateDetails?.oom_killed) {
   inspectError();
 }
 

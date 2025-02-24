@@ -1,5 +1,6 @@
 // Base content
 export { default as Accordion } from './base/Accordion.vue'
+export { default as Admonition } from './base/Admonition.vue'
 export { default as AutoLink } from './base/AutoLink.vue'
 export { default as Avatar } from './base/Avatar.vue'
 export { default as Badge } from './base/Badge.vue'
@@ -8,6 +9,7 @@ export { default as ButtonStyled } from './base/ButtonStyled.vue'
 export { default as Card } from './base/Card.vue'
 export { default as Checkbox } from './base/Checkbox.vue'
 export { default as Chips } from './base/Chips.vue'
+export { default as Collapsible } from './base/Collapsible.vue'
 export { default as ContentPageHeader } from './base/ContentPageHeader.vue'
 export { default as CopyCode } from './base/CopyCode.vue'
 export { default as DoubleIcon } from './base/DoubleIcon.vue'
@@ -38,6 +40,9 @@ export { default as Toggle } from './base/Toggle.vue'
 // Branding
 export { default as AnimatedLogo } from './brand/AnimatedLogo.vue'
 export { default as TextLogo } from './brand/TextLogo.vue'
+
+// Changelog
+export { default as ChangelogEntry } from './changelog/ChangelogEntry.vue'
 
 // Charts
 export { default as Chart } from './chart/Chart.vue'

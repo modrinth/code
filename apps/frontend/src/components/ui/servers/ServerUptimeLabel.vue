@@ -2,13 +2,13 @@
   <div
     v-if="uptimeSeconds || uptimeSeconds !== 0"
     v-tooltip="`Online for ${verboseUptime}`"
-    class="flex min-w-0 flex-row items-center gap-4"
+    class="server-action-buttons-anim flex min-w-0 flex-row items-center gap-4"
     data-pyro-uptime
   >
     <div v-if="!noSeparator" class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
 
     <div class="flex gap-2">
-      <UiServersTimer class="flex size-5 shrink-0" />
+      <UiServersIconsTimer class="flex size-5 shrink-0" />
       <time class="truncate text-sm font-semibold" :aria-label="verboseUptime">
         {{ formattedUptime }}
       </time>

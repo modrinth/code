@@ -2,7 +2,7 @@
   <div class="chips">
     <Button
       v-for="item in items"
-      :key="item"
+      :key="formatLabel(item)"
       class="btn"
       :class="{ selected: selected === item, capitalize: capitalize }"
       @click="toggleItem(item)"
@@ -12,62 +12,39 @@
     </Button>
   </div>
 </template>
-<script setup>
+
+<script setup lang="ts" generic="T">
 import { CheckIcon } from '@modrinth/assets'
-</script>
-<script>
-import { defineComponent } from 'vue'
 import Button from './Button.vue'
 
-export default defineComponent({
-  props: {
-    modelValue: {
-      required: true,
-      type: String,
-    },
-    items: {
-      required: true,
-      type: Array,
-    },
-    neverEmpty: {
-      default: true,
-      type: Boolean,
-    },
-    formatLabel: {
-      default: (x) => x,
-      type: Function,
-    },
-    capitalize: {
-      type: Boolean,
-      default: true,
-    },
+const props = withDefaults(
+  defineProps<{
+    items: T[]
+    formatLabel?: (item: T) => string
+    neverEmpty?: boolean
+    capitalize?: boolean
+  }>(),
+  {
+    neverEmpty: true,
+    // Intentional any type, as this default should only be used for primitives (string or number)
+    formatLabel: (item) => item.toString(),
+    capitalize: true,
   },
-  emits: ['update:modelValue'],
-  computed: {
-    selected: {
-      get() {
-        return this.modelValue
-      },
-      set(value) {
-        this.$emit('update:modelValue', value)
-      },
-    },
-  },
-  created() {
-    if (this.items.length > 0 && this.neverEmpty && !this.modelValue) {
-      this.selected = this.items[0]
-    }
-  },
-  methods: {
-    toggleItem(item) {
-      if (this.selected === item && !this.neverEmpty) {
-        this.selected = null
-      } else {
-        this.selected = item
-      }
-    },
-  },
-})
+)
+const selected = defineModel<T | null>()
+
+// If one always has to be selected, default to the first one
+if (props.items.length > 0 && props.neverEmpty && !selected.value) {
+  selected.value = props.items[0]
+}
+
+function toggleItem(item: T) {
+  if (selected.value === item && !props.neverEmpty) {
+    selected.value = null
+  } else {
+    selected.value = item
+  }
+}
 </script>
 
 <style lang="scss" scoped>

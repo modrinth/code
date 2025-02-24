@@ -19,10 +19,7 @@
       </div>
       <div class="flex flex-col gap-2">
         <label for="additional-information" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast">
-            Summary
-            <span class="text-brand-red">*</span>
-          </span>
+          <span class="text-lg font-semibold text-contrast"> Summary </span>
           <span>A sentence or two that describes your collection.</span>
         </label>
         <div class="textarea-wrapper">
@@ -52,8 +49,8 @@
   </NewModal>
 </template>
 <script setup>
-import { XIcon, PlusIcon } from "@modrinth/assets";
-import { NewModal, ButtonStyled } from "@modrinth/ui";
+import { PlusIcon, XIcon } from "@modrinth/assets";
+import { ButtonStyled, NewModal } from "@modrinth/ui";
 
 const router = useNativeRouter();
 
@@ -78,7 +75,7 @@ async function create() {
       method: "POST",
       body: {
         name: name.value.trim(),
-        description: description.value.trim(),
+        description: description.value.trim() || undefined,
         projects: props.projectIds,
       },
       apiVersion: 3,
