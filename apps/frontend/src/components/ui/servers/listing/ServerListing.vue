@@ -104,6 +104,11 @@ const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 watch(
   () => pyroServer.general?.project?.icon_url,
   async (newIconUrl) => {
+    if (props.status === "suspended") {
+      imageData.value = undefined;
+      return;
+    }
+
     if (newIconUrl && !pyroServer.general?.image) {
       imageData.value = await processImage(props.server_id!, newIconUrl);
     } else {
