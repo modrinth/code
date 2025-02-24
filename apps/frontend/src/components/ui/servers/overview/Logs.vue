@@ -291,8 +291,9 @@
         <pre
           class="w-full select-text rounded-2xl bg-bg font-mono text-sm leading-[190%]"
           :class="{
-            'whitespace-pre-wrap': userPreferences.wrapLinesInConsoleLogModal,
-            'whitespace-pre': !userPreferences.wrapLinesInConsoleLogModal,
+            'overflow-hidden whitespace-break-spaces break-all':
+              userPreferences.wrapLinesInConsoleLogModal,
+            'overflow-x-auto whitespace-pre': !userPreferences.wrapLinesInConsoleLogModal,
           }"
           v-html="processedLogWithLinks"
         ></pre>
