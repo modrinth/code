@@ -365,29 +365,29 @@
 
 <script setup>
 import {
+  BoxIcon,
   CalendarIcon,
   EditIcon,
-  XIcon,
-  SaveIcon,
-  UploadIcon,
-  TrashIcon,
-  LinkIcon,
-  LockIcon,
   GridIcon,
   ImageIcon,
-  ListIcon,
-  UpdatedIcon,
   LibraryIcon,
-  BoxIcon,
+  LinkIcon,
+  ListIcon,
+  LockIcon,
+  SaveIcon,
+  TrashIcon,
+  UpdatedIcon,
+  UploadIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
-  PopoutMenu,
-  FileInput,
-  DropdownSelect,
   Avatar,
   Button,
   commonMessages,
   ConfirmModal,
+  DropdownSelect,
+  FileInput,
+  PopoutMenu,
 } from "@modrinth/ui";
 
 import { isAdmin } from "@modrinth/utils";
@@ -651,7 +651,7 @@ async function saveChanges() {
       method: "PATCH",
       body: {
         name: name.value,
-        description: summary.value,
+        description: summary.value || null,
         status: visibility.value,
         new_projects: newProjectIds,
       },
