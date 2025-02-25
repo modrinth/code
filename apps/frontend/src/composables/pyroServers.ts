@@ -1176,6 +1176,32 @@ const createFSModule = (serverId: string) => {
     auth: { url: "", token: "" } as JWTAuth,
     error: undefined as ModuleError | undefined,
 
+    retryWithFSAuth: async <T>(requestFn: () => Promise<T>): Promise<T> => {
+      const attemptRequest = async (): Promise<T> => {
+        try {
+          return await requestFn();
+        } catch (error) {
+          if (error instanceof PyroServersFetchError && error.statusCode === 401) {
+            const freshAuth = await getOrFetchAuth(serverId, "fs", true);
+            fsModule.auth = freshAuth;
+            return await requestFn();
+          }
+          throw error;
+        }
+      };
+
+      if (!fsModule.auth?.token) {
+        try {
+          const freshAuth = await getOrFetchAuth(serverId, "fs", true);
+          fsModule.auth = freshAuth;
+        } catch (error) {
+          console.error("Failed to refresh fs auth:", error);
+          throw new Error("Could not init fs");
+        }
+      }
+      return attemptRequest();
+    },
+
     get: async () => {
       try {
         fsModule.auth = await getOrFetchAuth(serverId, "fs");
@@ -1195,9 +1221,9 @@ const createFSModule = (serverId: string) => {
     },
 
     listDirContents: (path: string, page: number, pageSize: number) => {
-      return retryWithAuth(async () => {
+      return fsModule.retryWithFSAuth(async () => {
         const encodedPath = encodeURIComponent(path);
-        const fileData = await PyroFetch(
+        const fileData = await PyroFetch<DirectoryResponse>(
           `/list?path=${encodedPath}&page=${page}&page_size=${pageSize}`,
           {
             override: fsModule.auth,
@@ -1209,7 +1235,7 @@ const createFSModule = (serverId: string) => {
     },
 
     createFileOrFolder: (path: string, type: "file" | "directory") => {
-      return retryWithAuth(async () => {
+      return fsModule.retryWithFSAuth(async () => {
         const encodedPath = encodeURIComponent(path);
         return await PyroFetch(`/create?path=${encodedPath}&type=${type}`, {
           method: "POST",
@@ -1221,7 +1247,7 @@ const createFSModule = (serverId: string) => {
 
     uploadFile: (path: string, file: File) => {
       // eslint-disable-next-line require-await
-      return retryWithAuth(async () => {
+      return fsModule.retryWithFSAuth(async () => {
         const encodedPath = encodeURIComponent(path);
         if (!fsModule.auth) throw new Error("No FS auth available");
 
@@ -1280,7 +1306,7 @@ const createFSModule = (serverId: string) => {
     // eslint-disable-next-line require-await
     renameFileOrFolder: async (path: string, name: string) => {
       const pathName = path.split("/").slice(0, -1).join("/") + "/" + name;
-      return retryWithAuth(async () => {
+      return fsModule.retryWithFSAuth(async () => {
         await PyroFetch(`/move`, {
           method: "POST",
           override: fsModule.auth,
@@ -1291,7 +1317,7 @@ const createFSModule = (serverId: string) => {
     },
 
     updateFile: (path: string, content: string) => {
-      return retryWithAuth(async () => {
+      return fsModule.retryWithFSAuth(async () => {
         const octetStream = new Blob([content], { type: "application/octet-stream" });
         return await PyroFetch(`/update?path=${path}`, {
           method: "PUT",
@@ -1303,7 +1329,7 @@ const createFSModule = (serverId: string) => {
     },
 
     moveFileOrFolder: (path: string, newPath: string) => {
-      return retryWithAuth(async () => {
+      return fsModule.retryWithFSAuth(async () => {
         const folderPath = newPath.substring(0, newPath.lastIndexOf("/"));
         if (folderPath) {
           const folders = folderPath.split("/").filter(Boolean);
@@ -1315,7 +1341,6 @@ const createFSModule = (serverId: string) => {
             } catch {}
           }
         }
-
         return await PyroFetch(`/move`, {
           method: "POST",
           override: fsModule.auth,
@@ -1325,7 +1350,7 @@ const createFSModule = (serverId: string) => {
     },
 
     deleteFileOrFolder: (path: string, recursive: boolean) => {
-      return retryWithAuth(async () => {
+      return fsModule.retryWithFSAuth(async () => {
         const encodedPath = encodeURIComponent(path);
         return await PyroFetch(`/delete?path=${encodedPath}&recursive=${recursive}`, {
           method: "DELETE",
@@ -1335,7 +1360,7 @@ const createFSModule = (serverId: string) => {
     },
 
     downloadFile: (path: string, raw?: boolean) => {
-      return retryWithAuth(async () => {
+      return fsModule.retryWithFSAuth(async () => {
         const encodedPath = encodeURIComponent(path);
         const fileData = await PyroFetch(`/download?path=${encodedPath}`, {
           override: fsModule.auth,
