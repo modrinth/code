@@ -1940,12 +1940,14 @@ export const usePyroServer = async (serverId: string, includedModules: avaliable
       if (remainingModules.length > 0) {
         remainingModules.forEach((module) => {
           if (module === "fs") {
-            server[module] = createFSModule(serverId);
+            if (!server.fs) {
+              server.fs = createFSModule(serverId);
+            }
           } else {
             server[module] = modules[module];
           }
         });
-        await server.refresh(remainingModules);
+        await server.refresh(remainingModules.filter((m) => m !== "fs"));
       }
     }
   } catch (error) {
