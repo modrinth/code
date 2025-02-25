@@ -1,7 +1,7 @@
 <template>
   <div
     aria-hidden="true"
-    class="sticky top-12 z-20 flex h-8 w-full select-none flex-row items-center border-0 border-b border-solid border-bg-raised bg-bg px-3 text-xs font-bold uppercase"
+    class="sticky top-12 z-20 flex h-8 w-full select-none flex-row items-center border-0 border-b border-solid border-bg-raised bg-table-alternateRow px-3 text-xs font-bold uppercase"
   >
     <div class="min-w-[48px]"></div>
     <button
