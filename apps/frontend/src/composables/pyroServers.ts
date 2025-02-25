@@ -401,23 +401,16 @@ export const processImage = async (
       });
 
       if (fileData instanceof Blob && import.meta.client) {
-        const dataURL = await new Promise<string>((resolve) => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          const img = new Image();
-          img.onload = () => {
-            canvas.width = 512;
-            canvas.height = 512;
-            ctx?.drawImage(img, 0, 0, 512, 512);
-            const dataURL = canvas.toDataURL("image/png");
-            if (server.general) {
-              server.general.image = dataURL;
-            }
-            resolve(dataURL);
-            URL.revokeObjectURL(img.src);
-          };
-          img.src = URL.createObjectURL(fileData);
-        });
+        const imgBitmap = await createImageBitmap(fileData);
+        const canvas = document.createElement("canvas");
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(imgBitmap, 0, 0, 512, 512);
+        const dataURL = canvas.toDataURL("image/png");
+        if (server.general) {
+          server.general.image = dataURL;
+        }
         return dataURL;
       }
     } catch (error) {
@@ -437,40 +430,39 @@ export const processImage = async (
           });
 
           if (import.meta.client) {
-            const dataURL = await new Promise<string>((resolve) => {
-              const canvas = document.createElement("canvas");
-              const ctx = canvas.getContext("2d");
-              const img = new Image();
-              img.onload = () => {
-                canvas.width = 64;
-                canvas.height = 64;
-                ctx?.drawImage(img, 0, 0, 64, 64);
-                canvas.toBlob(async (blob) => {
-                  if (blob) {
-                    const scaledFile = new File([blob], "server-icon.png", { type: "image/png" });
-                    await PyroFetch(`/create?path=/server-icon.png&type=file`, {
-                      method: "POST",
-                      contentType: "application/octet-stream",
-                      body: scaledFile,
-                      override: auth,
-                    });
-                    await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
-                      method: "POST",
-                      contentType: "application/octet-stream",
-                      body: originalFile,
-                      override: auth,
-                    });
-                  }
-                }, "image/png");
-                const dataURL = canvas.toDataURL("image/png");
-                if (server.general) {
-                  server.general.image = dataURL;
+            const imgBitmap = await createImageBitmap(file);
+            const canvas = document.createElement("canvas");
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext("2d");
+            ctx?.drawImage(imgBitmap, 0, 0, 64, 64);
+
+            const scaledBlob: Blob = await new Promise((resolve, reject) => {
+              canvas.toBlob((blob) => {
+                if (blob) {
+                  resolve(blob);
+                } else {
+                  reject(new Error("Canvas toBlob failed"));
                 }
-                resolve(dataURL);
-                URL.revokeObjectURL(img.src);
-              };
-              img.src = URL.createObjectURL(file);
+              }, "image/png");
             });
+            const scaledFile = new File([scaledBlob], "server-icon.png", { type: "image/png" });
+            await PyroFetch(`/create?path=/server-icon.png&type=file`, {
+              method: "POST",
+              contentType: "application/octet-stream",
+              body: scaledFile,
+              override: auth,
+            });
+            await PyroFetch(`/create?path=/server-icon-original.png&type=file`, {
+              method: "POST",
+              contentType: "application/octet-stream",
+              body: originalFile,
+              override: auth,
+            });
+            const dataURL = canvas.toDataURL("image/png");
+            if (server.general) {
+              server.general.image = dataURL;
+            }
             return dataURL;
           }
         } catch (error) {
