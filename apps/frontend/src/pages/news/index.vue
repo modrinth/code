@@ -68,7 +68,7 @@ const featuredArticle = articles[0];
     </div>
     <div class="full-width-bg brand-gradient-bg mt-6 border-0 border-y-[1px] border-solid py-4">
       <nuxt-link
-        :to="`/news/article/${featuredArticle.slug}`"
+        :to="`/news/article/${featuredArticle.slug}/`"
         class="active:scale-[0.99]! group flex transition-all ease-in-out hover:brightness-125"
       >
         <article class="grid grid-cols-[4fr_3fr] gap-4">
@@ -98,7 +98,7 @@ const featuredArticle = articles[0];
         <nuxt-link
           v-for="article in articles.slice(1)"
           :key="`post-${article.slug}`"
-          :to="`/news/article/${article.slug}`"
+          :to="`/news/article/${article.slug}/`"
           class="active:scale-[0.99]! group flex flex-col gap-2 transition-all ease-in-out hover:brightness-125"
         >
           <article class="flex grow flex-col gap-4">
