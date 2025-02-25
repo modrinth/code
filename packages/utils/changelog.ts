@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-02-25T10:20:00-08:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed server upgrades being allowed when out of stock, despite warning.`,
+  },
+  {
+    date: `2025-02-25T10:20:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Moved Minecraft brand disclaimer to bottom of footer.
+- Improved clarity of the ongoing revenue period footnote on the Revenue page.
+- Fixed collections without a summary being unable to be edited.`,
+  },
+  {
     date: `2025-02-21T13:30:00-08:00`,
     product: 'web',
     body: `### Improvements
