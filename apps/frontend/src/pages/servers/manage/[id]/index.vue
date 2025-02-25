@@ -91,8 +91,8 @@
                   Check your server's content
                 </div>
                 <div class="text-sm">
-                  Disable any mods or plugins that you don't need, or any that are only needed on
-                  the client.
+                  Disable any mods or plugins that you don't need, or mods that only need to be
+                  installed on your computer.
                 </div>
                 <ButtonStyled>
                   <NuxtLink
