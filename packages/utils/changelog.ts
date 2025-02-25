@@ -11,6 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-02-21T13:30:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Collections are now sorted by creation date. (Contributed by [worldwidepixel](https://github.com/modrinth/code/pull/3286))
+- Collections are no longer required to have summaries. (Contributed by [Erb3](https://github.com/modrinth/code/pull/3281))
+- Fixed padding issue on revenue page.
+- Fixed last modified date on Rewards Program Info page. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3287))`,
+  },
+  {
     date: `2025-02-20T18:15:00-08:00`,
     product: 'web',
     body: `### Improvements
