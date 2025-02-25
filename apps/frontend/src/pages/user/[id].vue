@@ -2,6 +2,57 @@
   <div v-if="user" class="experimental-styles-within">
     <ModalCreation ref="modal_creation" />
     <CollectionCreateModal ref="modal_collection_creation" />
+    <NewModal v-if="auth.user && isStaff(auth.user)" ref="userDetailsModal" header="User details">
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary">Email</span>
+          <div>
+            <span
+              v-tooltip="user.email_verified ? 'Email verified' : 'Email not verified'"
+              class="flex w-fit items-center gap-1"
+            >
+              <span>{{ user.email }}</span>
+              <CheckIcon v-if="user.email_verified" class="h-4 w-4 text-brand" />
+              <XIcon v-else class="h-4 w-4 text-red" />
+            </span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Auth providers </span>
+          <span>{{ user.auth_providers.join(", ") }}</span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Payment methods</span>
+          <span>
+            <template v-if="user.payout_data?.paypal_address">
+              Paypal ({{ user.payout_data.paypal_address }} - {{ user.payout_data.paypal_country }})
+            </template>
+            <template v-if="user.payout_data?.paypal_address && user.payout_data?.venmo_address">
+              ,
+            </template>
+            <template v-if="user.payout_data?.venmo_address">
+              Venmo ({{ user.payout_data.venmo_address }})
+            </template>
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Has password </span>
+          <span>
+            {{ user.has_password ? "Yes" : "No" }}
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Has TOTP </span>
+          <span>
+            {{ user.has_totp ? "Yes" : "No" }}
+          </span>
+        </div>
+      </div>
+    </NewModal>
     <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
       <div class="normal-page__header py-4">
         <ContentPageHeader>
@@ -74,6 +125,16 @@
                     shown: auth.user?.id !== user.id,
                   },
                   { id: 'copy-id', action: () => copyId() },
+                  {
+                    id: 'open-billing',
+                    action: () => navigateTo(`/admin/billing/${user.id}`),
+                    shown: auth.user && isStaff(auth.user),
+                  },
+                  {
+                    id: 'open-info',
+                    action: () => $refs.userDetailsModal.show(),
+                    shown: auth.user && isStaff(auth.user),
+                  },
                 ]"
                 aria-label="More options"
               >
@@ -89,6 +150,14 @@
                 <template #copy-id>
                   <ClipboardCopyIcon aria-hidden="true" />
                   {{ formatMessage(commonMessages.copyIdButton) }}
+                </template>
+                <template #open-billing>
+                  <CurrencyIcon aria-hidden="true" />
+                  {{ formatMessage(messages.billingButton) }}
+                </template>
+                <template #open-info>
+                  <InfoIcon aria-hidden="true" />
+                  {{ formatMessage(messages.infoButton) }}
                 </template>
               </OverflowMenu>
             </ButtonStyled>
@@ -154,7 +223,9 @@
         </div>
         <div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
           <nuxt-link
-            v-for="collection in collections"
+            v-for="collection in collections.sort(
+              (a, b) => new Date(b.created) - new Date(a.created),
+            )"
             :key="collection.id"
             :to="`/collection/${collection.id}`"
             class="card collection-item"
@@ -173,7 +244,12 @@
               {{ collection.description }}
             </div>
             <div class="stat-bar">
-              <div class="stats"><BoxIcon /> {{ collection.projects?.length || 0 }} projects</div>
+              <div class="stats">
+                <BoxIcon />
+                {{
+                  `${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? "s" : ""}`
+                }}
+              </div>
               <div class="stats">
                 <template v-if="collection.status === 'listed'">
                   <WorldIcon />
@@ -264,8 +340,18 @@ import {
   DownloadIcon,
   ClipboardCopyIcon,
   MoreVerticalIcon,
+  CurrencyIcon,
+  InfoIcon,
+  CheckIcon,
 } from "@modrinth/assets";
-import { OverflowMenu, ButtonStyled, ContentPageHeader, commonMessages } from "@modrinth/ui";
+import {
+  OverflowMenu,
+  ButtonStyled,
+  ContentPageHeader,
+  commonMessages,
+  NewModal,
+} from "@modrinth/ui";
+import { isStaff } from "~/helpers/users.js";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import { reportUser } from "~/utils/report-helpers.ts";
@@ -366,6 +452,14 @@ const messages = defineMessages({
     id: "profile.label.no-collections-auth",
     defaultMessage:
       "You don't have any collections.\nWould you like to <create-link>create one</create-link>?",
+  },
+  billingButton: {
+    id: "profile.button.billing",
+    defaultMessage: "Manage user billing",
+  },
+  infoButton: {
+    id: "profile.button.info",
+    defaultMessage: "View user details",
   },
   userNotFoundError: {
     id: "profile.error.not-found",
@@ -551,12 +645,13 @@ export default defineNuxtComponent({
     grid-template-columns: repeat(1, 1fr);
   }
 
-  gap: var(--gap-lg);
+  gap: var(--gap-md);
 
   .collection-item {
     display: flex;
     flex-direction: column;
     gap: var(--gap-md);
+    margin-bottom: 0px;
   }
 
   .description {
@@ -605,7 +700,7 @@ export default defineNuxtComponent({
 
       .title {
         color: var(--color-contrast);
-        font-weight: 600;
+        font-weight: 700;
         font-size: var(--font-size-lg);
         margin: 0;
       }

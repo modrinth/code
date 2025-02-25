@@ -9,7 +9,7 @@
       @mouseleave="stopPan"
       @wheel.prevent="handleWheel"
     >
-      <UiServersPyroLoading v-if="state.isLoading" />
+      <div v-if="state.isLoading" />
       <div
         v-if="state.hasError"
         class="flex h-full w-full flex-col items-center justify-center gap-8"

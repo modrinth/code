@@ -8,21 +8,25 @@
           <span class="label__subdescription">
             The description must clearly and honestly describe the purpose and function of the
             project. See section 2.1 of the
-            <nuxt-link to="/legal/rules" class="text-link" target="_blank">Content Rules</nuxt-link>
+            <nuxt-link class="text-link" target="_blank" to="/legal/rules">Content Rules</nuxt-link>
             for the full requirements.
           </span>
         </span>
       </div>
       <MarkdownEditor
         v-model="description"
+        :disabled="
+          !currentMember ||
+          (currentMember.permissions & TeamMemberPermission.EDIT_BODY) !==
+            TeamMemberPermission.EDIT_BODY
+        "
         :on-image-upload="onUploadHandler"
-        :disabled="(currentMember.permissions & EDIT_BODY) !== EDIT_BODY"
       />
       <div class="input-group markdown-disclaimer">
         <button
-          type="button"
-          class="iconified-button brand-button"
           :disabled="!hasChanges"
+          class="iconified-button brand-button"
+          type="button"
           @click="saveChanges()"
         >
           <SaveIcon />
@@ -33,91 +37,50 @@
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { SaveIcon } from "@modrinth/assets";
 import { MarkdownEditor } from "@modrinth/ui";
-import Chips from "~/components/ui/Chips.vue";
-import SaveIcon from "~/assets/images/utils/save.svg?component";
-import { renderHighlightedString } from "~/helpers/highlight.js";
+import { type Project, type TeamMember, TeamMemberPermission } from "@modrinth/utils";
+import { computed, ref } from "vue";
 import { useImageUpload } from "~/composables/image-upload.ts";
 
-export default defineNuxtComponent({
-  components: {
-    Chips,
-    SaveIcon,
-    MarkdownEditor,
-  },
-  props: {
-    project: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
-    allMembers: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-    currentMember: {
-      type: Object,
-      default() {
-        return null;
-      },
-    },
-    patchProject: {
-      type: Function,
-      default() {
-        return () => {
-          this.$notify({
-            group: "main",
-            title: "An error occurred",
-            text: "Patch project function not found",
-            type: "error",
-          });
-        };
-      },
-    },
-  },
-  data() {
-    return {
-      description: this.project.body,
-      bodyViewMode: "source",
-    };
-  },
-  computed: {
-    patchData() {
-      const data = {};
+const props = defineProps<{
+  project: Project;
+  allMembers: TeamMember[];
+  currentMember: TeamMember | undefined;
+  patchProject: (payload: object, quiet?: boolean) => object;
+}>();
 
-      if (this.description !== this.project.body) {
-        data.body = this.description;
-      }
+const description = ref(props.project.body);
 
-      return data;
-    },
-    hasChanges() {
-      return Object.keys(this.patchData).length > 0;
-    },
-  },
-  created() {
-    this.EDIT_BODY = 1 << 3;
-  },
-  methods: {
-    renderHighlightedString,
-    saveChanges() {
-      if (this.hasChanges) {
-        this.patchProject(this.patchData);
-      }
-    },
-    async onUploadHandler(file) {
-      const response = await useImageUpload(file, {
-        context: "project",
-        projectID: this.project.id,
-      });
-      return response.url;
-    },
-  },
+const patchRequestPayload = computed(() => {
+  const payload: {
+    body?: string;
+  } = {};
+
+  if (description.value !== props.project.body) {
+    payload.body = description.value;
+  }
+
+  return payload;
 });
+
+const hasChanges = computed(() => {
+  return Object.keys(patchRequestPayload.value).length > 0;
+});
+
+function saveChanges() {
+  props.patchProject(patchRequestPayload.value);
+}
+
+async function onUploadHandler(file: File) {
+  const response = await useImageUpload(file, {
+    context: "project",
+    projectID: props.project.id,
+  });
+
+  return response.url;
+}
 </script>
 
 <style scoped>

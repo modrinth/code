@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-wrap gap-2">
     <button
-      v-for="item in items"
-      :key="item"
+      v-for="(item, index) in items"
+      :key="`radio-button-${index}`"
       class="p-0 py-2 px-2 border-0 flex gap-2 transition-all items-center cursor-pointer active:scale-95 hover:bg-button-bg rounded-xl"
       :class="{
         'text-contrast font-medium bg-button-bg': selected === item,
@@ -20,10 +20,16 @@
 import { RadioButtonIcon, RadioButtonChecked } from '@modrinth/assets'
 import { computed } from 'vue'
 
-const props = defineProps<{
-  modelValue: string
-  items: T[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue: T
+    items: T[]
+    forceSelection?: boolean
+  }>(),
+  {
+    forceSelection: false,
+  },
+)
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -36,7 +42,7 @@ const selected = computed({
   },
 })
 
-if (props.items.length > 0 && props.neverEmpty && !props.modelValue) {
+if (props.items.length > 0 && props.forceSelection && !props.modelValue) {
   selected.value = props.items[0]
 }
 </script>

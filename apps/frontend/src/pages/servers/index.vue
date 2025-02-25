@@ -456,9 +456,10 @@
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
               <p class="m-0 !leading-[190%]">
-                Currently, Modrinth Servers are located in New York, Los Angeles, and Miami. More
-                regions are coming soon! Your server's location is currently chosen algorithmically,
-                but you will be able to choose a region in the future.
+                Currently, Modrinth Servers are located throughout the United States in New York,
+                Los Angelas, Dallas, Miami, and Spokane. More regions are coming soon! Your server's
+                location is currently chosen algorithmically, but you will be able to choose a
+                region in the future.
               </p>
             </details>
 
@@ -495,6 +496,97 @@
     </section>
 
     <section
+      class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
+    >
+      <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
+      <div class="mx-auto flex w-full max-w-7xl flex-col gap-8">
+        <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+          <div class="flex flex-col gap-8">
+            <div class="flex flex-col gap-4">
+              <div
+                class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+              >
+                Server Locations
+              </div>
+              <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
+                Coast-to-Coast Coverage
+              </h1>
+            </div>
+
+            <div class="flex flex-col gap-8">
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="grid size-8 place-content-center rounded-full bg-highlight-green">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-brand"
+                    >
+                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                  </div>
+                  <h2 class="relative m-0 text-xl font-medium leading-[155%] md:text-2xl">
+                    US Coverage
+                  </h2>
+                </div>
+                <p
+                  class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+                >
+                  With strategically placed servers in New York, California, Texas, Florida, and
+                  Washington, we ensure low latency connections for players across North America.
+                  Each location is equipped with high-performance hardware and DDoS protection.
+                </p>
+              </div>
+
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="grid size-8 place-content-center rounded-full bg-highlight-blue">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-blue"
+                    >
+                      <path d="M12 2a10 10 0 1 0 10 10" />
+                      <path d="M18 13a6 6 0 0 0-6-6" />
+                      <path d="M13 2.05a10 10 0 0 1 2 2" />
+                      <path d="M19.5 8.5a10 10 0 0 1 2 2" />
+                    </svg>
+                  </div>
+                  <h2 class="relative m-0 text-xl font-medium leading-[155%] md:text-2xl">
+                    Global Expansion
+                  </h2>
+                </div>
+                <p
+                  class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+                >
+                  We're expanding to Europe and Asia-Pacific regions soon, bringing Modrinth's
+                  seamless hosting experience worldwide. Join our Discord to stay updated on new
+                  region launches.
+                </p>
+              </div>
+            </div>
+          </div>
+          <Globe />
+        </div>
+      </div>
+    </section>
+
+    <section
       id="plan"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
@@ -511,156 +603,189 @@
               ? "We are currently at capacity. Please try again later."
               : "There's a plan for everyone! Choose the one that fits your needs."
           }}
-          <span class="font-bold">
-            Servers are currently US only, in New York, Los Angeles, and Miami. More regions coming
-            soon!</span
-          >
         </h2>
 
-        <ul class="m-0 flex w-full flex-col gap-8 p-0 lg:flex-row">
-          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3">
-            <div class="flex flex-row items-center justify-between">
-              <h1 class="m-0">Small</h1>
-              <div
-                class="grid size-8 place-content-center rounded-full bg-highlight-blue text-xs font-bold text-blue"
-              >
-                S
+        <ul class="m-0 mt-8 flex w-full flex-col gap-8 p-0 lg:flex-row">
+          <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
+            <div
+              v-if="isSmallLowStock"
+              class="absolute left-0 right-0 top-[-2px] rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
+            >
+              Only {{ capacityStatuses?.small?.available }} left in stock!
+            </div>
+            <div
+              class="flex w-full flex-col justify-between gap-4 rounded-2xl bg-bg p-8 text-left"
+              :class="{ '!rounded-t-none': isSmallLowStock }"
+            >
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-row items-center justify-between">
+                  <h1 class="m-0">Small</h1>
+                  <div
+                    class="grid size-8 place-content-center rounded-full bg-highlight-blue text-xs font-bold text-blue"
+                  >
+                    S
+                  </div>
+                </div>
+                <p class="m-0">
+                  Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding.
+                </p>
+                <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
+                  <p class="m-0">4 GB RAM</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">4 vCPUs</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">32 GB Storage</p>
+                </div>
+                <h2 class="m-0 text-3xl text-contrast">
+                  $12<span class="text-sm font-normal text-secondary">/month</span>
+                </h2>
               </div>
+              <ButtonStyled color="blue" size="large">
+                <a
+                  v-if="!loggedOut && isSmallAtCapacity"
+                  :href="outOfStockUrl"
+                  target="_blank"
+                  class="flex items-center gap-2 !bg-highlight-blue !font-medium !text-blue"
+                >
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
+                </a>
+                <button
+                  v-else
+                  class="!bg-highlight-blue !font-medium !text-blue"
+                  @click="selectProduct('small')"
+                >
+                  Get Started
+                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
+                </button>
+              </ButtonStyled>
             </div>
-            <p class="m-0">
-              Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding.
-            </p>
-            <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
-              <p class="m-0">4 GB RAM</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">32 GB Storage</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">2 vCPUs</p>
-            </div>
-            <h2 class="m-0 text-3xl text-contrast">
-              $12<span class="text-sm font-normal text-secondary">/month</span>
-            </h2>
-            <ButtonStyled color="blue" size="large">
-              <NuxtLink
-                v-if="!loggedOut && isSmallAtCapacity"
-                :to="outOfStockUrl"
-                target="_blank"
-                class="!bg-highlight-blue !font-medium !text-blue"
-              >
-                Out of Stock
-                <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
-              </NuxtLink>
-              <button
-                v-else
-                class="!bg-highlight-blue !font-medium !text-blue"
-                @click="selectProduct('small')"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
-              </button>
-            </ButtonStyled>
           </li>
 
-          <li
-            style="
-              background: radial-gradient(
-                86.12% 101.64% at 95.97% 94.07%,
-                rgba(27, 217, 106, 0.23) 0%,
-                rgba(14, 115, 56, 0.2) 100%
-              );
-              border: 1px solid rgba(12, 107, 52, 0.55);
-              box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
-            "
-            class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3"
-          >
-            <div class="flex flex-row items-center justify-between">
-              <h1 class="m-0">Medium</h1>
-              <div
-                class="grid size-8 place-content-center rounded-full bg-highlight-green text-xs font-bold text-brand"
-              >
-                M
+          <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
+            <div
+              v-if="isMediumLowStock"
+              class="absolute left-0 right-0 top-[-2px] rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
+            >
+              Only {{ capacityStatuses?.medium?.available }} left in stock!
+            </div>
+            <div
+              style="
+                background: radial-gradient(
+                  86.12% 101.64% at 95.97% 94.07%,
+                  rgba(27, 217, 106, 0.23) 0%,
+                  rgba(14, 115, 56, 0.2) 100%
+                );
+                border: 1px solid rgba(12, 107, 52, 0.55);
+                box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
+              "
+              class="flex w-full flex-col justify-between gap-4 rounded-2xl p-8 text-left"
+              :class="{ '!rounded-t-none': isMediumLowStock }"
+            >
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-row items-center justify-between">
+                  <h1 class="m-0">Medium</h1>
+                  <div
+                    class="grid size-8 place-content-center rounded-full bg-highlight-green text-xs font-bold text-brand"
+                  >
+                    M
+                  </div>
+                </div>
+                <p class="m-0">Great for modded multiplayer and small communities.</p>
+                <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
+                  <p class="m-0">6 GB RAM</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">6 vCPUs</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">48 GB Storage</p>
+                </div>
+                <h2 class="m-0 text-3xl text-contrast">
+                  $18<span class="text-sm font-normal text-secondary">/month</span>
+                </h2>
               </div>
+              <ButtonStyled color="brand" size="large">
+                <a
+                  v-if="!loggedOut && isMediumAtCapacity"
+                  :href="outOfStockUrl"
+                  target="_blank"
+                  class="flex items-center gap-2 !bg-highlight-green !font-medium !text-green"
+                >
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
+                </a>
+                <button
+                  v-else
+                  class="!bg-highlight-green !font-medium !text-green"
+                  @click="selectProduct('medium')"
+                >
+                  Get Started
+                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-green" />
+                </button>
+              </ButtonStyled>
             </div>
-            <p class="m-0">Great for modded multiplayer and small communities.</p>
-            <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
-              <p class="m-0">6 GB RAM</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">48 GB Storage</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">3 vCPUs</p>
-            </div>
-            <h2 class="m-0 text-3xl text-contrast">
-              $18<span class="text-sm font-normal text-secondary">/month</span>
-            </h2>
-            <ButtonStyled color="brand" size="large">
-              <NuxtLink
-                v-if="!loggedOut && isMediumAtCapacity"
-                :to="outOfStockUrl"
-                target="_blank"
-                class="!bg-highlight-green !font-medium !text-green"
-              >
-                Out of Stock
-                <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
-              </NuxtLink>
-              <button
-                v-else
-                class="!bg-highlight-green !font-medium !text-green"
-                @click="selectProduct('medium')"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4 !text-green" />
-              </button>
-            </ButtonStyled>
           </li>
 
-          <li class="flex w-full flex-col gap-4 rounded-2xl bg-bg p-8 text-left lg:w-1/3">
-            <div class="flex flex-row items-center justify-between">
-              <h1 class="m-0">Large</h1>
-              <div
-                class="grid size-8 place-content-center rounded-full bg-highlight-purple text-xs font-bold text-purple"
-              >
-                L
+          <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
+            <div
+              v-if="isLargeLowStock"
+              class="absolute left-0 right-0 top-[-2px] rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
+            >
+              Only {{ capacityStatuses?.large?.available }} left in stock!
+            </div>
+            <div
+              class="flex w-full flex-col justify-between gap-4 rounded-2xl bg-bg p-8 text-left"
+              :class="{ '!rounded-t-none': isLargeLowStock }"
+            >
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-row items-center justify-between">
+                  <h1 class="m-0">Large</h1>
+                  <div
+                    class="grid size-8 place-content-center rounded-full bg-highlight-purple text-xs font-bold text-purple"
+                  >
+                    L
+                  </div>
+                </div>
+                <p class="m-0">Ideal for larger communities, modpacks, and heavy modding.</p>
+                <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
+                  <p class="m-0">8 GB RAM</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">8 vCPUs</p>
+                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
+                  <p class="m-0">64 GB Storage</p>
+                </div>
+                <h2 class="m-0 text-3xl text-contrast">
+                  $24<span class="text-sm font-normal text-secondary">/month</span>
+                </h2>
               </div>
+              <ButtonStyled color="brand" size="large">
+                <a
+                  v-if="!loggedOut && isLargeAtCapacity"
+                  :href="outOfStockUrl"
+                  target="_blank"
+                  class="flex items-center gap-2 !bg-highlight-purple !font-medium !text-purple"
+                >
+                  Out of Stock
+                  <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
+                </a>
+                <button
+                  v-else
+                  class="!bg-highlight-purple !font-medium !text-purple"
+                  @click="selectProduct('large')"
+                >
+                  Get Started
+                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
+                </button>
+              </ButtonStyled>
             </div>
-            <p class="m-0">Ideal for larger communities, modpacks, and heavy modding.</p>
-            <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
-              <p class="m-0">8 GB RAM</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">64 GB Storage</p>
-              <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-              <p class="m-0">4 vCPUs</p>
-            </div>
-            <h2 class="m-0 text-3xl text-contrast">
-              $24<span class="text-sm font-normal text-secondary">/month</span>
-            </h2>
-            <ButtonStyled color="brand" size="large">
-              <NuxtLink
-                v-if="!loggedOut && isLargeAtCapacity"
-                :to="outOfStockUrl"
-                target="_blank"
-                class="!bg-highlight-purple !font-medium !text-purple"
-              >
-                Out of Stock
-                <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
-              </NuxtLink>
-              <button
-                v-else
-                class="!bg-highlight-purple !font-medium !text-purple"
-                @click="selectProduct('large')"
-              >
-                Get Started
-                <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
-              </button>
-            </ButtonStyled>
           </li>
         </ul>
 
         <div
-          class="flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left md:flex-row md:gap-0"
+          class="flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
         >
           <div class="flex flex-col gap-4">
             <h1 class="m-0">Build your own</h1>
-            <h2 class="m-0 text-base font-normal">
+            <h2 class="m-0 text-base font-normal text-primary">
               If you're a more technical server administrator, you can pick your own RAM and storage
               options.
             </h2>
@@ -697,6 +822,7 @@ import {
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
+import Globe from "~/components/ui/servers/Globe.vue";
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 const pyroPlanProducts = pyroProducts.filter(
@@ -746,7 +872,7 @@ const deletingSpeed = 25;
 const pauseTime = 2000;
 
 const loggedOut = computed(() => !auth.value.user);
-const outOfStockUrl = "https://support.modrinth.com";
+const outOfStockUrl = "https://discord.modrinth.com";
 
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
   try {
@@ -760,9 +886,16 @@ const { data: hasServers } = await useAsyncData("ServerListCountCheck", async ()
 
 async function fetchCapacityStatuses(customProduct = null) {
   try {
-    const productsToCheck = customProduct?.metadata ? [customProduct] : pyroPlanProducts;
+    const productsToCheck = customProduct?.metadata
+      ? [customProduct]
+      : [
+          ...pyroPlanProducts,
+          pyroProducts.reduce((min, product) =>
+            product.metadata.ram < min.metadata.ram ? product : min,
+          ),
+        ];
     const capacityChecks = productsToCheck.map((product) =>
-      usePyroFetch("capacity", {
+      usePyroFetch("stock", {
         method: "POST",
         body: {
           cpu: product.metadata.cpu,
@@ -774,6 +907,7 @@ async function fetchCapacityStatuses(customProduct = null) {
     );
 
     const results = await Promise.all(capacityChecks);
+
     if (customProduct?.metadata) {
       return {
         custom: results[0],
@@ -783,6 +917,7 @@ async function fetchCapacityStatuses(customProduct = null) {
         small: results[0],
         medium: results[1],
         large: results[2],
+        custom: results[3],
       };
     }
   } catch (error) {
@@ -804,6 +939,22 @@ const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0);
 const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0);
 const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0);
+const isCustomAtCapacity = computed(() => capacityStatuses.value?.custom?.available === 0);
+
+const isSmallLowStock = computed(() => {
+  const available = capacityStatuses.value?.small?.available;
+  return available !== undefined && available > 0 && available < 8;
+});
+
+const isMediumLowStock = computed(() => {
+  const available = capacityStatuses.value?.medium?.available;
+  return available !== undefined && available > 0 && available < 8;
+});
+
+const isLargeLowStock = computed(() => {
+  const available = capacityStatuses.value?.large?.available;
+  return available !== undefined && available > 0 && available < 8;
+});
 
 const startTyping = () => {
   const currentWord = words[currentWordIndex.value];
@@ -907,7 +1058,9 @@ const selectProduct = async (product) => {
   }
 
   await refreshCapacity();
-  if (isAtCapacity.value) {
+  console.log(capacityStatuses.value);
+
+  if ((product === "custom" && isCustomAtCapacity.value) || isAtCapacity.value) {
     addNotification({
       group: "main",
       title: "Server Capacity Full",

@@ -47,7 +47,6 @@
           :server-data="{ game, mc_version, loader, loader_version, net }"
           :show-game-label="showGameLabel"
           :show-loader-label="showLoaderLabel"
-          :show-subdomain-label="showSubdomainLabel"
           :linked="false"
           class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
         />
@@ -70,11 +69,13 @@
     </div>
     <div
       v-else-if="status === 'suspended' && suspension_reason !== 'upgrading'"
-      class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
+      class="relative -mt-4 flex w-full flex-col gap-2 rounded-b-3xl bg-bg-red p-4 text-sm font-bold text-contrast"
     >
-      <UiServersIconsPanelErrorIcon class="!size-5" />
-      Your server has been suspended due to a billing issue. Please visit your billing settings or
-      contact Modrinth Support for more information.
+      <div class="flex flex-row gap-2">
+        <UiServersIconsPanelErrorIcon class="!size-5" /> Your server has been suspended. Please
+        update your billing information or contact Modrinth Support for more information.
+      </div>
+      <UiCopyCode :text="`${props.server_id}`" class="ml-auto" />
     </div>
   </NuxtLink>
 </template>
@@ -85,9 +86,12 @@ import type { Project, Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();
 
+if (props.server_id) {
+  await usePyroServer(props.server_id, ["general"]);
+}
+
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
-const showSubdomainLabel = computed(() => !!props.net?.domain);
 
 let projectData: Ref<Project | null>;
 if (props.upstream) {
@@ -103,39 +107,11 @@ if (props.upstream) {
   projectData = ref(null);
 }
 
-const image = ref<string | undefined>();
+const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined);
 
-onMounted(async () => {
-  const auth = (await usePyroFetch(`servers/${props.server_id}/fs`)) as any;
-  try {
-    const fileData = await usePyroFetch(`/download?path=/server-icon-original.png`, {
-      override: auth,
-    });
-
-    if (fileData instanceof Blob) {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
-      img.src = URL.createObjectURL(fileData);
-      await new Promise<void>((resolve) => {
-        img.onload = () => {
-          canvas.width = 512;
-          canvas.height = 512;
-          ctx?.drawImage(img, 0, 0, 512, 512);
-          const dataURL = canvas.toDataURL("image/png");
-          image.value = dataURL;
-          resolve();
-        };
-      });
-    }
-  } catch (error) {
-    if (error instanceof PyroFetchError && error.statusCode === 404) {
-      image.value = undefined;
-    } else {
-      console.error(error);
-    }
-  }
-});
+if (import.meta.server && projectData.value?.icon_url) {
+  await usePyroServer(props.server_id!, ["general"]);
+}
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 </script>

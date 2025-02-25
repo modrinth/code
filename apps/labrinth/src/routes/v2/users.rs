@@ -85,11 +85,13 @@ pub async fn users_get(
 
 #[get("{id}")]
 pub async fn user_get(
+    req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::users::user_get(info, pool, redis)
+    let response = v3::users::user_get(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)?;
 

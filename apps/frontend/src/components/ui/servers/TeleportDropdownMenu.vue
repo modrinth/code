@@ -1,28 +1,23 @@
 <template>
-  <div
-    ref="dropdown"
-    data-pyro-dropdown
-    tabindex="0"
-    role="combobox"
-    :aria-expanded="dropdownVisible"
-    class="relative inline-block h-9 w-full max-w-80"
-    @focus="onFocus"
-    @blur="onBlur"
-    @mousedown.prevent
-    @keydown="handleKeyDown"
-  >
-    <div
-      data-pyro-dropdown-trigger
-      class="duration-50 flex h-full w-full cursor-pointer select-none items-center justify-between gap-4 rounded-xl bg-button-bg px-4 py-2 shadow-sm transition-all ease-in-out"
+  <div class="relative inline-block h-9 w-full max-w-80">
+    <button
+      ref="triggerRef"
+      type="button"
+      aria-haspopup="listbox"
+      :aria-expanded="dropdownVisible"
+      :aria-controls="listboxId"
+      :aria-labelledby="listboxId"
+      class="duration-50 flex h-full w-full cursor-pointer select-none appearance-none items-center justify-between gap-4 rounded-xl border-none bg-button-bg px-4 py-2 shadow-sm !outline-none transition-all ease-in-out"
       :class="triggerClasses"
       @click="toggleDropdown"
+      @keydown="handleTriggerKeyDown"
     >
       <span>{{ selectedOption }}</span>
       <DropdownIcon
         class="transition-transform duration-200 ease-in-out"
         :class="{ 'rotate-180': dropdownVisible }"
       />
-    </div>
+    </button>
 
     <Teleport to="#teleports">
       <transition
@@ -35,27 +30,28 @@
       >
         <div
           v-if="dropdownVisible"
+          :id="listboxId"
           ref="optionsContainer"
-          data-pyro-dropdown-options
-          class="experimental-styles-within fixed z-50 bg-button-bg shadow-lg"
+          role="listbox"
+          tabindex="-1"
+          :aria-activedescendant="activeDescendant"
+          class="experimental-styles-within fixed z-50 bg-button-bg shadow-lg outline-none"
           :class="{
             'rounded-b-xl': !isRenderingUp,
             'rounded-t-xl': isRenderingUp,
           }"
           :style="positionStyle"
-          @keydown.stop="handleDropdownKeyDown"
+          @keydown="handleListboxKeyDown"
         >
           <div
             class="overflow-y-auto"
             :style="{ height: `${virtualListHeight}px` }"
-            data-pyro-dropdown-options-virtual-scroller
             @scroll="handleScroll"
           >
             <div :style="{ height: `${totalHeight}px`, position: 'relative' }">
               <div
                 v-for="item in visibleOptions"
                 :key="item.index"
-                data-pyro-dropdown-option
                 :style="{
                   position: 'absolute',
                   top: 0,
@@ -65,32 +61,20 @@
                 }"
               >
                 <div
-                  :ref="(el) => handleOptionRef(el as HTMLElement, item.index)"
+                  :id="`${listboxId}-option-${item.index}`"
                   role="option"
-                  :tabindex="focusedOptionIndex === item.index ? 0 : -1"
-                  class="hover:brightness-85 flex h-full cursor-pointer select-none items-center px-4 transition-colors duration-150 ease-in-out focus:border-none focus:outline-none"
+                  :aria-selected="selectedValue === item.option"
+                  class="hover:brightness-85 flex h-full cursor-pointer select-none items-center px-4 transition-colors duration-150 ease-in-out"
                   :class="{
                     'bg-brand font-bold text-brand-inverted': selectedValue === item.option,
                     'bg-bg-raised': focusedOptionIndex === item.index,
                     'rounded-b-xl': item.index === props.options.length - 1 && !isRenderingUp,
                     'rounded-t-xl': item.index === 0 && isRenderingUp,
                   }"
-                  :aria-selected="selectedValue === item.option"
                   @click="selectOption(item.option, item.index)"
-                  @mouseover="focusedOptionIndex = item.index"
-                  @focus="focusedOptionIndex = item.index"
+                  @mousemove="focusedOptionIndex = item.index"
                 >
-                  <input
-                    :id="`${name}-${item.index}`"
-                    v-model="radioValue"
-                    type="radio"
-                    :value="item.option"
-                    :name="name"
-                    class="hidden"
-                  />
-                  <label :for="`${name}-${item.index}`" class="w-full cursor-pointer">
-                    {{ displayName(item.option) }}
-                  </label>
+                  {{ displayName(item.option) }}
                 </div>
               </div>
             </div>
@@ -140,13 +124,14 @@ const emit = defineEmits<{
 const dropdownVisible = ref(false);
 const selectedValue = ref<OptionValue | null>(props.modelValue || props.defaultValue);
 const focusedOptionIndex = ref<number | null>(null);
-const focusedOptionRef = ref<HTMLElement | null>(null);
-const dropdown = ref<HTMLElement | null>(null);
 const optionsContainer = ref<HTMLElement | null>(null);
 const scrollTop = ref(0);
 const isRenderingUp = ref(false);
 const virtualListHeight = ref(300);
-const lastFocusedElement = ref<HTMLElement | null>(null);
+const isOpen = ref(false);
+const openDropdownCount = ref(0);
+const listboxId = `pyro-listbox-${Math.random().toString(36).substring(2, 11)}`;
+const triggerRef = ref<HTMLButtonElement | null>(null);
 
 const positionStyle = ref<CSSProperties>({
   position: "fixed",
@@ -155,41 +140,6 @@ const positionStyle = ref<CSSProperties>({
   width: "0px",
   zIndex: 999,
 });
-
-const handleOptionRef = (el: HTMLElement | null, index: number) => {
-  if (focusedOptionIndex.value === index) {
-    focusedOptionRef.value = el;
-  }
-};
-
-const onFocus = async () => {
-  if (!props.disabled) {
-    focusedOptionIndex.value = props.options.findIndex((option) => option === selectedValue.value);
-    lastFocusedElement.value = document.activeElement as HTMLElement;
-    dropdownVisible.value = true;
-    await updatePosition();
-    nextTick(() => {
-      dropdown.value?.focus();
-    });
-  }
-};
-
-const onBlur = (event: FocusEvent) => {
-  if (!isChildOfDropdown(event.relatedTarget as HTMLElement | null)) {
-    closeDropdown();
-  }
-};
-
-const isChildOfDropdown = (element: HTMLElement | null): boolean => {
-  let currentNode: HTMLElement | null = element;
-  while (currentNode) {
-    if (currentNode === dropdown.value || currentNode === optionsContainer.value) {
-      return true;
-    }
-    currentNode = currentNode.parentElement;
-  }
-  return false;
-};
 
 const totalHeight = computed(() => props.options.length * ITEM_HEIGHT);
 
@@ -227,16 +177,16 @@ const radioValue = computed<OptionValue>({
 });
 
 const triggerClasses = computed(() => ({
-  "cursor-not-allowed opacity-50 grayscale": props.disabled,
+  "!cursor-not-allowed opacity-50 grayscale": props.disabled,
   "rounded-b-none": dropdownVisible.value && !isRenderingUp.value && !props.disabled,
   "rounded-t-none": dropdownVisible.value && isRenderingUp.value && !props.disabled,
 }));
 
 const updatePosition = async () => {
-  if (!dropdown.value) return;
+  if (!triggerRef.value) return;
 
   await nextTick();
-  const triggerRect = dropdown.value.getBoundingClientRect();
+  const triggerRect = triggerRef.value.getBoundingClientRect();
   const viewportHeight = window.innerHeight;
   const margin = 8;
 
@@ -263,20 +213,6 @@ const updatePosition = async () => {
   };
 };
 
-const openDropdown = async () => {
-  if (!props.disabled) {
-    closeAllDropdowns();
-    dropdownVisible.value = true;
-    focusedOptionIndex.value = props.options.findIndex((option) => option === selectedValue.value);
-    lastFocusedElement.value = document.activeElement as HTMLElement;
-    await updatePosition();
-
-    requestAnimationFrame(() => {
-      updatePosition();
-    });
-  }
-};
-
 const toggleDropdown = () => {
   if (!props.disabled) {
     if (dropdownVisible.value) {
@@ -300,61 +236,6 @@ const handleScroll = (event: Event) => {
   scrollTop.value = target.scrollTop;
 };
 
-const handleKeyDown = (event: KeyboardEvent) => {
-  if (!dropdownVisible.value) {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      lastFocusedElement.value = document.activeElement as HTMLElement;
-      toggleDropdown();
-    }
-  } else {
-    handleDropdownKeyDown(event);
-  }
-};
-
-const handleDropdownKeyDown = (event: KeyboardEvent) => {
-  event.stopPropagation();
-
-  switch (event.key) {
-    case "ArrowDown":
-      event.preventDefault();
-      focusNextOption();
-      break;
-    case "ArrowUp":
-      event.preventDefault();
-      focusPreviousOption();
-      break;
-    case "Enter":
-      event.preventDefault();
-      if (focusedOptionIndex.value !== null) {
-        selectOption(props.options[focusedOptionIndex.value], focusedOptionIndex.value);
-      }
-      break;
-    case "Escape":
-      event.preventDefault();
-      event.stopPropagation();
-      closeDropdown();
-      break;
-    case "Tab":
-      event.preventDefault();
-      if (event.shiftKey) {
-        focusPreviousOption();
-      } else {
-        focusNextOption();
-      }
-      break;
-  }
-};
-
-const closeDropdown = () => {
-  dropdownVisible.value = false;
-  focusedOptionIndex.value = null;
-  if (lastFocusedElement.value) {
-    lastFocusedElement.value.focus();
-    lastFocusedElement.value = null;
-  }
-};
-
 const closeAllDropdowns = () => {
   const event = new CustomEvent("close-all-dropdowns");
   window.dispatchEvent(event);
@@ -373,9 +254,6 @@ const focusNextOption = () => {
     focusedOptionIndex.value = (focusedOptionIndex.value + 1) % props.options.length;
   }
   scrollToFocused();
-  nextTick(() => {
-    focusedOptionRef.value?.focus();
-  });
 };
 
 const focusPreviousOption = () => {
@@ -386,9 +264,6 @@ const focusPreviousOption = () => {
       (focusedOptionIndex.value - 1 + props.options.length) % props.options.length;
   }
   scrollToFocused();
-  nextTick(() => {
-    focusedOptionRef.value?.focus();
-  });
 };
 
 const scrollToFocused = () => {
@@ -407,6 +282,119 @@ const scrollToFocused = () => {
   }
 };
 
+const openDropdown = async () => {
+  if (!props.disabled) {
+    closeAllDropdowns();
+    dropdownVisible.value = true;
+    isOpen.value = true;
+    openDropdownCount.value++;
+    document.body.style.overflow = "hidden";
+    await updatePosition();
+
+    nextTick(() => {
+      optionsContainer.value?.focus();
+    });
+  }
+};
+
+const closeDropdown = () => {
+  if (isOpen.value) {
+    dropdownVisible.value = false;
+    isOpen.value = false;
+    openDropdownCount.value--;
+    if (openDropdownCount.value === 0) {
+      document.body.style.overflow = "";
+    }
+    focusedOptionIndex.value = null;
+    triggerRef.value?.focus();
+  }
+};
+
+const handleTriggerKeyDown = (event: KeyboardEvent) => {
+  switch (event.key) {
+    case "ArrowDown":
+    case "ArrowUp":
+      event.preventDefault();
+      if (!dropdownVisible.value) {
+        openDropdown();
+        focusedOptionIndex.value = event.key === "ArrowUp" ? props.options.length - 1 : 0;
+      } else if (event.key === "ArrowDown") {
+        focusNextOption();
+      } else {
+        focusPreviousOption();
+      }
+      break;
+    case "Enter":
+    case " ":
+      event.preventDefault();
+      if (!dropdownVisible.value) {
+        openDropdown();
+        focusedOptionIndex.value = 0;
+      } else if (focusedOptionIndex.value !== null) {
+        selectOption(props.options[focusedOptionIndex.value], focusedOptionIndex.value);
+      }
+      break;
+    case "Escape":
+      event.preventDefault();
+      closeDropdown();
+      break;
+    case "Tab":
+      if (dropdownVisible.value) {
+        event.preventDefault();
+      }
+      break;
+  }
+};
+
+const handleListboxKeyDown = (event: KeyboardEvent) => {
+  switch (event.key) {
+    case "Enter":
+    case " ":
+      event.preventDefault();
+      if (focusedOptionIndex.value !== null) {
+        selectOption(props.options[focusedOptionIndex.value], focusedOptionIndex.value);
+      }
+      break;
+    case "ArrowDown":
+      event.preventDefault();
+      focusNextOption();
+      break;
+    case "ArrowUp":
+      event.preventDefault();
+      focusPreviousOption();
+      break;
+    case "Escape":
+      event.preventDefault();
+      closeDropdown();
+      break;
+    case "Tab":
+      event.preventDefault();
+      break;
+    case "Home":
+      event.preventDefault();
+      focusedOptionIndex.value = 0;
+      scrollToFocused();
+      break;
+    case "End":
+      event.preventDefault();
+      focusedOptionIndex.value = props.options.length - 1;
+      scrollToFocused();
+      break;
+    default:
+      if (event.key.length === 1) {
+        const char = event.key.toLowerCase();
+        const index = props.options.findIndex((option) =>
+          props.displayName(option).toLowerCase().startsWith(char),
+        );
+        if (index !== -1) {
+          focusedOptionIndex.value = index;
+          scrollToFocused();
+        }
+      }
+      break;
+  }
+};
+
 onMounted(() => {
   window.addEventListener("resize", handleResize);
   window.addEventListener("scroll", handleResize, true);
@@ -416,6 +404,10 @@ onMounted(() => {
     }
   });
   window.addEventListener("close-all-dropdowns", closeDropdown);
+
+  if (selectedValue.value) {
+    focusedOptionIndex.value = props.options.findIndex((option) => option === selectedValue.value);
+  }
 });
 
 onUnmounted(() => {
@@ -427,7 +419,13 @@ onUnmounted(() => {
     }
   });
   window.removeEventListener("close-all-dropdowns", closeDropdown);
-  lastFocusedElement.value = null;
+
+  if (isOpen.value) {
+    openDropdownCount.value--;
+    if (openDropdownCount.value === 0) {
+      document.body.style.overflow = "";
+    }
+  }
 });
 
 watch(
@@ -443,4 +441,19 @@ watch(dropdownVisible, async (newValue) => {
     scrollTop.value = 0;
   }
 });
+
+const activeDescendant = computed(() =>
+  focusedOptionIndex.value !== null ? `${listboxId}-option-${focusedOptionIndex.value}` : undefined,
+);
+
+const isChildOfDropdown = (element: HTMLElement | null): boolean => {
+  let currentNode: HTMLElement | null = element;
+  while (currentNode) {
+    if (currentNode === triggerRef.value || currentNode === optionsContainer.value) {
+      return true;
+    }
+    currentNode = currentNode.parentElement;
+  }
+  return false;
+};
 </script>

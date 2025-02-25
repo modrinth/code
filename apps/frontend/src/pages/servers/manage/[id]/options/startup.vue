@@ -1,7 +1,33 @@
 <template>
   <div class="relative h-full w-full">
-    <div v-if="data" class="flex h-full w-full flex-col gap-4">
-      <div class="rounded-2xl border-solid border-orange bg-bg-orange p-4 text-contrast">
+    <div
+      v-if="server.startup?.error"
+      class="flex w-full flex-col items-center justify-center gap-4 p-4"
+    >
+      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+              <IssuesIcon class="size-12 text-orange" />
+            </div>
+            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load startup settings</h1>
+          </div>
+          <p class="text-lg text-secondary">
+            We couldn't load your server's startup settings. Here's what we know:
+          </p>
+          <p>
+            <span class="break-all font-mono">{{ JSON.stringify(server.startup.error) }}</span>
+          </p>
+          <ButtonStyled size="large" color="brand" @click="() => server.refresh(['startup'])">
+            <button class="mt-6 !w-full">Retry</button>
+          </ButtonStyled>
+        </div>
+      </div>
+    </div>
+    <div v-else-if="data" class="flex h-full w-full flex-col gap-4">
+      <div
+        class="rounded-2xl border-[1px] border-solid border-orange bg-bg-orange p-4 text-contrast"
+      >
         These settings are for advanced users. Changing them can break your server.
       </div>
 
@@ -35,10 +61,9 @@
             <div class="flex flex-col gap-2">
               <span class="text-lg font-bold text-contrast">Java version</span>
               <span>
-                The version of Java that your server will run on. Your server is running Minecraft
-                {{ data.mc_version }}. By default, only the Java versions compatible with this
-                version of Minecraft are shown. Some mods or modpacks may require a specific Java
-                version.
+                The version of Java that your server will run on. By default, only the Java versions
+                compatible with this version of Minecraft are shown. Some mods may require a
+                different Java version to work properly.
               </span>
             </div>
             <div class="flex items-center gap-2">
@@ -85,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { UpdatedIcon } from "@modrinth/assets";
+import { UpdatedIcon, IssuesIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
 
@@ -110,13 +135,41 @@ const jdkBuildMap = [
   { value: "graal", label: "GraalVM" },
 ];
 
-const invocation = ref(startupSettings.value?.invocation);
-const jdkVersion = ref(
-  jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "",
+const invocation = ref("");
+const jdkVersion = ref("");
+const jdkBuild = ref("");
+
+const originalInvocation = ref("");
+const originalJdkVersion = ref("");
+const originalJdkBuild = ref("");
+
+watch(
+  startupSettings,
+  (newSettings) => {
+    if (newSettings) {
+      invocation.value = newSettings.invocation;
+      originalInvocation.value = newSettings.invocation;
+
+      const jdkVersionLabel =
+        jdkVersionMap.find((v) => v.value === newSettings.jdk_version)?.label || "";
+      jdkVersion.value = jdkVersionLabel;
+      originalJdkVersion.value = jdkVersionLabel;
+
+      const jdkBuildLabel = jdkBuildMap.find((v) => v.value === newSettings.jdk_build)?.label || "";
+      jdkBuild.value = jdkBuildLabel;
+      originalJdkBuild.value = jdkBuildLabel;
+    }
+  },
+  { immediate: true },
 );
-const jdkBuild = ref(
-  jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build)?.label || "",
+
+const hasUnsavedChanges = computed(
+  () =>
+    invocation.value !== originalInvocation.value ||
+    jdkVersion.value !== originalJdkVersion.value ||
+    jdkBuild.value !== originalJdkBuild.value,
 );
+
 const isUpdating = ref(false);
 
 const compatibleJavaVersions = computed(() => {
@@ -140,15 +193,6 @@ const displayedJavaVersions = computed(() => {
   return showAllVersions.value ? jdkVersionMap.map((v) => v.label) : compatibleJavaVersions.value;
 });
 
-const hasUnsavedChanges = computed(
-  () =>
-    invocation.value !== startupSettings.value?.invocation ||
-    jdkVersion.value !==
-      (jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "") ||
-    jdkBuild.value !==
-      jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build || "")?.label,
-);
-
 const saveStartup = async () => {
   try {
     isUpdating.value = true;
@@ -156,14 +200,25 @@ const saveStartup = async () => {
     const jdkVersionKey = jdkVersionMap.find((v) => v.label === jdkVersion.value)?.value;
     const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value;
     await props.server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    await props.server.refresh(["startup"]);
+
+    if (props.server.startup) {
+      invocation.value = props.server.startup.invocation;
+      jdkVersion.value =
+        jdkVersionMap.find((v) => v.value === props.server.startup?.jdk_version)?.label || "";
+      jdkBuild.value =
+        jdkBuildMap.find((v) => v.value === props.server.startup?.jdk_build)?.label || "";
+    }
+
     addNotification({
       group: "serverOptions",
       type: "success",
       title: "Server settings updated",
       text: "Your server settings were successfully changed.",
     });
-    await props.server.refresh();
   } catch (error) {
     console.error(error);
     addNotification({
@@ -178,15 +233,13 @@ const saveStartup = async () => {
 };
 
 const resetStartup = () => {
-  invocation.value = startupSettings.value?.invocation;
-  jdkVersion.value =
-    jdkVersionMap.find((v) => v.value === startupSettings.value?.jdk_version)?.label || "";
-  jdkBuild.value =
-    jdkBuildMap.find((v) => v.value === startupSettings.value?.jdk_build)?.label || "";
+  invocation.value = originalInvocation.value;
+  jdkVersion.value = originalJdkVersion.value;
+  jdkBuild.value = originalJdkBuild.value;
 };
 
 const resetToDefault = () => {
-  invocation.value = startupSettings.value?.original_invocation;
+  invocation.value = startupSettings.value?.original_invocation ?? "";
 };
 </script>
 
