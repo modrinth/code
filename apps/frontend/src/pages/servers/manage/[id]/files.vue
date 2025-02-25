@@ -777,11 +777,8 @@ const initializeFileEdit = async () => {
 
 onMounted(async () => {
   await modulesLoaded;
-  // await props.server.refresh(["fs"]);
-  await refreshData();
 
   await initializeFileEdit();
-
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/mode-yaml");
