@@ -12,7 +12,7 @@ pub enum SerializationError {
 }
 
 macro_rules! message_serialization {
-    ($message_enum:ty, $($binary_pattern:pat_param),*) => {
+    ($message_enum:ty $(,$binary_pattern:pat_param)* $(,)?) => {
         impl $message_enum {
             pub fn is_binary(&self) -> bool {
                 match self {
@@ -48,9 +48,9 @@ macro_rules! message_serialization {
 
 message_serialization!(
     ClientToServerMessage,
-    ClientToServerMessage::SocketSend { .. }
+    ClientToServerMessage::SocketSend { .. },
 );
 message_serialization!(
     ServerToClientMessage,
-    ServerToClientMessage::SocketData { .. }
+    ServerToClientMessage::SocketData { .. },
 );
