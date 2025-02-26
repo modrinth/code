@@ -12,17 +12,24 @@ pub enum SerializationError {
 }
 
 macro_rules! message_serialization {
-    ($message_enum:ty, $binary_pattern:pat) => {
+    ($message_enum:ty, $($binary_pattern:pat_param),*) => {
         impl $message_enum {
             pub fn is_binary(&self) -> bool {
-                matches!(self, $binary_pattern)
+                match self {
+                    $(
+                        $binary_pattern => true,
+                    )*
+                    _ => false,
+                }
             }
 
             pub fn serialize(
                 &self,
             ) -> Result<Either<String, Vec<u8>>, SerializationError> {
                 Ok(match self {
-                    $binary_pattern => Either::Right(serde_cbor::to_vec(self)?),
+                    $(
+                        $binary_pattern => Either::Right(serde_cbor::to_vec(self)?),
+                    )*
                     _ => Either::Left(serde_json::to_string(self)?),
                 })
             }
