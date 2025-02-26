@@ -374,28 +374,6 @@ impl FriendsSocket {
         self.create_tunnel_socket(socket_id, socket)
     }
 
-    pub async fn connect_to_socket(
-        &self,
-        to_socket: Uuid,
-        stream: TcpStream,
-    ) -> crate::Result<TunnelSocket> {
-        let socket_id = Uuid::new_v4();
-        let (read, write) = stream.into_split();
-        let socket = self.tunnel_sockets.entry(socket_id).insert(Arc::new(
-            InternalTunnelSocket::Connected(Mutex::new(write)),
-        ));
-        Self::send_message(
-            &self.write,
-            ClientToServerMessage::SocketConnect {
-                from_socket: socket_id,
-                to_socket,
-            },
-        )
-        .await?;
-        Self::socket_read_loop(self.write.clone(), read, socket_id);
-        self.create_tunnel_socket(socket_id, socket)
-    }
-
     pub async fn is_connected(&self) -> bool {
         self.write.read().await.is_some()
     }

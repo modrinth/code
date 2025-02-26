@@ -13,10 +13,6 @@ pub enum ClientToServerMessage {
     SocketListen {
         socket: Uuid,
     },
-    SocketConnect {
-        from_socket: Uuid,
-        to_socket: Uuid,
-    },
     SocketClose {
         socket: Uuid,
     },

@@ -201,81 +201,33 @@ pub async fn ws_init(
                     }
                 }
 
-                ClientToServerMessage::SocketListen { socket } => {
-                    let Some(active_socket) = db.sockets.get(&socket_id) else {
-                        return;
-                    };
-                    let Vacant(entry) = db.tunnel_sockets.entry(socket) else {
-                        continue;
-                    };
-                    entry.insert(TunnelSocket::new(
-                        socket_id,
-                        TunnelSocketType::Listening,
-                    ));
-                    active_socket.owned_tunnel_sockets.insert(socket);
-                    let _ = broadcast_friends(
-                        user.id,
-                        ServerToClientMessage::FriendSocketListening {
-                            user: user.id,
-                            socket,
-                        },
-                        &pool,
-                        &db,
-                        None,
-                    )
-                    .await;
-                }
-                ClientToServerMessage::SocketConnect {
-                    from_socket,
-                    to_socket,
-                } => {
-                    let Some(active_socket) = db.sockets.get(&socket_id) else {
-                        return;
-                    };
-                    let Vacant(entry) = db.tunnel_sockets.entry(from_socket)
-                    else {
-                        continue;
-                    };
-                    let Some(other_tunnel) = db.tunnel_sockets.get(&to_socket)
-                    else {
-                        continue;
-                    };
-                    if !matches!(
-                        other_tunnel.socket_type,
-                        TunnelSocketType::Listening
-                    ) {
-                        continue;
-                    }
-                    let Some(other_user) = db.sockets.get(&other_tunnel.owner)
-                    else {
-                        continue;
-                    };
-                    let new_socket_id = Uuid::new_v4();
-                    entry.insert(TunnelSocket::new(
-                        socket_id,
-                        TunnelSocketType::Connected {
-                            connected_to: new_socket_id,
-                        },
-                    ));
-                    active_socket.owned_tunnel_sockets.insert(from_socket);
-                    db.tunnel_sockets.insert(
-                        new_socket_id,
-                        TunnelSocket::new(
-                            *other_user.key(),
-                            TunnelSocketType::Connected {
-                                connected_to: from_socket,
-                            },
-                        ),
-                    );
-                    other_user.owned_tunnel_sockets.insert(new_socket_id);
-                    let _ = send_message(
-                        &other_user,
-                        &ServerToClientMessage::SocketConnected {
-                            to_socket,
-                            new_socket: new_socket_id,
-                        },
-                    )
-                    .await;
+                ClientToServerMessage::SocketListen { .. } => {
+                    // TODO: Listen to socket
+                    // The code below probably won't need changes, but there's no way to connect to
+                    // a tunnel socket yet, so we shouldn't be storing them
+
+                    // let Some(active_socket) = db.sockets.get(&socket_id) else {
+                    //     return;
+                    // };
+                    // let Vacant(entry) = db.tunnel_sockets.entry(socket) else {
+                    //     continue;
+                    // };
+                    // entry.insert(TunnelSocket::new(
+                    //     socket_id,
+                    //     TunnelSocketType::Listening,
+                    // ));
+                    // active_socket.owned_tunnel_sockets.insert(socket);
+                    // let _ = broadcast_friends(
+                    //     user.id,
+                    //     ServerToClientMessage::FriendSocketListening {
+                    //         user: user.id,
+                    //         socket,
+                    //     },
+                    //     &pool,
+                    //     &db,
+                    //     None,
+                    // )
+                    // .await;
                 }
                 ClientToServerMessage::SocketClose { socket } => {
                     let Some(active_socket) = db.sockets.get(&socket_id) else {
