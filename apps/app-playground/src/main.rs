@@ -3,13 +3,9 @@
     windows_subsystem = "windows"
 )]
 
-use std::env::args;
-use std::net::SocketAddr;
 use std::time::Duration;
 use theseus::prelude::*;
-use tokio::net::TcpListener;
 use tokio::signal::ctrl_c;
-use uuid::Uuid;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)

@@ -11,21 +11,18 @@ use crate::models::pats::Scopes;
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::{
-    ActiveSocket, ActiveSockets, SocketId, TunnelSocket, TunnelSocketType,
+    ActiveSocket, ActiveSockets, SocketId, TunnelSocketType,
 };
 use crate::routes::ApiError;
 use actix_web::web::{Data, Payload};
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use actix_ws::Message;
 use chrono::Utc;
-use dashmap::mapref::entry::Entry;
 use either::Either;
 use futures_util::{StreamExt, TryStreamExt};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::sync::atomic::Ordering;
-use uuid::Uuid;
-use Entry::Vacant;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(ws_init);
