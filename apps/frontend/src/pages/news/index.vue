@@ -32,9 +32,9 @@ useSeoMeta({
           <button><NewspaperIcon /> Sign up for our newsletter</button>
         </ButtonStyled>
         <ButtonStyled circular>
-          <button v-tooltip="`RSS feed`" aria-label="RSS feed">
+          <a v-tooltip="`RSS feed`" aria-label="RSS feed" href="/news/feed/rss" target="_blank">
             <RssIcon />
-          </button>
+          </a>
         </ButtonStyled>
       </div>
     </div>
