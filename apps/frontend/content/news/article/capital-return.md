@@ -6,6 +6,7 @@ short_summary: Our capital return and what’s next.
 thumbnail: ./thumbnail.webp
 date: 2024-04-04T12:00:00-08:00
 ---
+
 Over three years ago, I started Modrinth: a new Minecraft modding platform built on community principles, a fully open-source codebase, and a focus on creators.
 
 What started as a hobby project quickly grew into something much bigger, with over twelve thousand creators and millions of players modding their game with Modrinth! Running Modrinth quickly evolved into a full-time job as we worked to scale the platform, develop new features, and fix bugs.
@@ -25,6 +26,7 @@ This decision was not an easy one, as without this funding, we would be unable t
 I also owe a huge debt of gratitude to everyone on the team affected by all of this–Emma, Wyatt, Maya, Coolbot, Jade, Carter, and Prospector–for everything they have done to help make Modrinth what it is today.
 
 I want to take a moment to highlight each of their contributions:
+
 - Emma was our lead moderator, social media manager, overall marketing lead, blog post writer, documentation maintainer, Minotaur maintainer, and support manager since joining the team in April 2021
 - Wyatt was a full-time backend developer that worked on our authentication system, analytics, collections, organizations, and tons of work on API v3, and more, since joining the team in February 2023
 - Maya was our first exclusive moderator hire, and despite a rough onboarding due to a lack of internal documentation and procedures on our side, had reviewed thousands of projects since joining the team in April 2023

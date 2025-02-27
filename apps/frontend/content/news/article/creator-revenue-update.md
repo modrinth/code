@@ -6,9 +6,11 @@ short_summary: Announcing 5x creator revenue and updates to the monetization pro
 thumbnail: ./thumbnail.webp
 date: 2024-09-13T12:00:00-08:00
 ---
+
 Just over 3 weeks ago, we [launched](/news/article/introducing-modrinth-refreshed-site-look-new-advertising-system) our new ads powered by [Aditude](https://www.aditude.com/). These ads have allowed us to improve creator revenue drastically and become sustainable. Read on for more info!
 
 ## Creator Revenue
+
 We’re excited to share we have been able to increase creator revenue by 5-8x what it was before!
 
 There’s a couple changes to how revenue is distributed out to creators coming with this increase.
@@ -20,6 +22,7 @@ Second, the revenue split between Modrinth and Creators has changed. See the nex
 ![Some creators have wondered if the new revenue is a bug because it’s gone up so much!](./abnormally-high-revenue.webp)
 
 ## Becoming Sustainable
+
 We have updated the Modrinth creator revenue split from 90/10 to 75/25. However, all of the increases listed above are with the new rate included, so while the percentage is lower, the overall revenue is much, much higher.
 
 While 90% is a more remarkable figure, we changed it in order to ensure we can keep running Modrinth and continue to grow creator revenue without having to worry about losing money on operational costs.

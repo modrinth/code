@@ -11,7 +11,7 @@ import {
   MailIcon,
 } from "@modrinth/assets";
 import dayjs from "dayjs";
-import { ref } from "vue";
+import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
 
 const route = useRoute();
 const { data: article } = await useAsyncData(route.path, () => {
@@ -26,23 +26,26 @@ if (!article) {
   });
 }
 
+const articleTitle = computed(() => article.value?.title);
 const articleUrl = computed(() => `https://modrinth.com/news/article/${route.params.slug}`);
 
-const dayjsDate = computed(() => dayjs(article.date));
+const dayjsDate = computed(() => dayjs(article.value?.date));
 
-const copied = ref(false);
+const config = useRuntimeConfig();
 
-async function copyToClipboard(text: string) {
-  await navigator.clipboard.writeText(text);
-  copied.value = true;
-  setTimeout(() => {
-    copied.value = false;
-  }, 3000);
-}
+useSeoMeta({
+  title: `${articleTitle.value} - Modrinth News`,
+  ogTitle: articleTitle.value,
+  description: article.value?.summary,
+  ogDescription: article.value?.summary,
+  ogType: "article",
+  ogImage: `${config.public.siteUrl}${article.value?.path}/${article.value?.thumbnail}`,
+  articlePublishedTime: dayjsDate.value.toISOString(),
+});
 </script>
 
 <template>
-  <div class="page experimental-styles-within">
+  <div v-if="article" class="page experimental-styles-within">
     <div
       class="flex items-center justify-between gap-6 border-0 border-b-[1px] border-solid border-divider pb-6"
     >
@@ -64,70 +67,19 @@ async function copyToClipboard(text: string) {
       <h2 class="m-0 text-4xl font-extrabold">{{ article.title }}</h2>
       <p class="m-0 text-lg leading-tight">{{ article.summary }}</p>
       <div class="mt-auto text-secondary">Posted on {{ dayjsDate.format("MMMM D, YYYY") }}</div>
-      <div class="flex gap-2">
-        <ButtonStyled circular>
-          <a
-            v-tooltip="`Share on Bluesky`"
-            :href="`https://bsky.app/intent/compose?text=${encodeURIComponent(articleUrl)}`"
-            target="_blank"
-          >
-            <BlueskyIcon />
-          </a>
-        </ButtonStyled>
-        <ButtonStyled circular>
-          <a
-            v-tooltip="`Share on Mastodon`"
-            :href="`https://tootpick.org/#text=${encodeURIComponent(articleUrl)}`"
-            target="_blank"
-          >
-            <MastodonIcon />
-          </a>
-        </ButtonStyled>
-        <ButtonStyled circular>
-          <a
-            v-tooltip="`Share on X`"
-            :href="`https://www.x.com/intent/post?url=${encodeURIComponent(articleUrl)}`"
-            target="_blank"
-          >
-            <TwitterIcon />
-          </a>
-        </ButtonStyled>
-        <ButtonStyled circular>
-          <a
-            v-tooltip="`Share via email`"
-            :href="`mailto:?subject=${encodeURIComponent(article.title)}&body=${encodeURIComponent(articleUrl)}`"
-            target="_blank"
-          >
-            <MailIcon />
-          </a>
-        </ButtonStyled>
-        <ButtonStyled circular>
-          <button
-            v-tooltip="copied ? `Copied to clipboard` : `Copy link`"
-            :disabled="copied"
-            class="relative grid place-items-center overflow-hidden"
-            @click="copyToClipboard(articleUrl)"
-          >
-            <CheckIcon
-              class="absolute transition-all ease-in-out"
-              :class="copied ? 'translate-y-0' : 'translate-y-7'"
-            />
-            <LinkIcon
-              class="absolute transition-all ease-in-out"
-              :class="copied ? '-translate-y-7' : 'translate-y-0'"
-            />
-          </button>
-        </ButtonStyled>
-      </div>
+      <ShareArticleButtons :title="article.title" :url="articleUrl" />
       <img
         :src="article.thumbnail"
         class="aspect-video w-full rounded-2xl border-[1px] border-solid border-button-border object-cover"
         :alt="article.title"
       />
-      <!--      <div v-html="renderHighlightedString(article.body)" />-->
-
-      <ContentRenderer v-if="article" class="markdown-body" :value="article" />
-      <div v-else>Article body could not be found.</div>
+      <ContentRenderer class="markdown-body" :value="article" />
+      <h3
+        class="mb-0 mt-4 border-0 border-t-[1px] border-solid border-divider pt-4 text-lg font-extrabold"
+      >
+        Share this article
+      </h3>
+      <ShareArticleButtons :title="article.title" :url="articleUrl" />
     </article>
   </div>
 </template>
@@ -146,10 +98,6 @@ async function copyToClipboard(text: string) {
 }
 
 :deep(.markdown-body) {
-  > *:not(img, :has(img:first-child:last-child)) {
-    margin-inline: 2rem;
-  }
-
   h1,
   h2 {
     border-bottom: none;
@@ -163,6 +111,7 @@ async function copyToClipboard(text: string) {
   ul {
     strong {
       color: var(--color-contrast);
+      font-weight: 600;
     }
   }
 
@@ -186,13 +135,19 @@ async function copyToClipboard(text: string) {
   }
 
   h1,
+  h2 {
+    a {
+      font-weight: 800;
+    }
+  }
+
+  h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
     a {
-      font-weight: 800;
       color: var(--color-contrast);
     }
   }
