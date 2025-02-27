@@ -479,13 +479,12 @@
       <OrganizationCreateModal ref="modal_organization_creation" />
       <slot id="main" />
     </main>
-    <footer class="experimental-styles-within">
-      <div class="flex justify-center p-6 text-center text-sm font-medium">
-        {{ formatMessage(footerMessages.legalDisclaimer) }}
-      </div>
-      <div class="footer-brand-background border-0 border-t-[1px] border-solid">
+    <footer
+      class="footer-brand-background experimental-styles-within mt-6 border-0 border-t-[1px] border-solid"
+    >
+      <div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-12 sm:px-12 md:py-12">
         <div
-          class="mx-auto grid max-w-screen-xl grid-cols-1 flex-col gap-4 p-7 pb-24 text-primary sm:px-12 md:grid-cols-[1fr_2fr] md:py-12 lg:grid-cols-[auto_auto_auto_auto_auto]"
+          class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
         >
           <div
             class="flex flex-col items-center gap-3 md:items-start"
@@ -559,6 +558,9 @@
               </template>
             </div>
           </div>
+        </div>
+        <div class="flex justify-center text-center text-xs font-medium text-secondary opacity-50">
+          {{ formatMessage(footerMessages.legalDisclaimer) }}
         </div>
       </div>
     </footer>
@@ -1048,6 +1050,12 @@ const footerLinks = [
         href: "https://status.modrinth.com",
         label: formatMessage(
           defineMessage({ id: "layout.footer.about.status", defaultMessage: "Status" }),
+        ),
+      },
+      {
+        href: "https://careers.modrinth.com",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.about.careers", defaultMessage: "Careers" }),
         ),
       },
       {

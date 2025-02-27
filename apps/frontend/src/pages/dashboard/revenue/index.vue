@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="experimental-styles-within">
     <section class="universal-card">
       <h2 class="text-2xl">Revenue</h2>
       <div class="grid-display">
@@ -24,8 +24,8 @@
             {{ $formatMoney(userBalance.pending) }}
           </div>
         </div>
-        <div class="grid-display__item available-soon">
-          <h3 class="label">
+        <div class="grid-display__item">
+          <h3 class="label m-0">
             Available soon
             <nuxt-link
               v-tooltip="`Click to read about how Modrinth handles your revenue.`"
@@ -35,16 +35,32 @@
               <UnknownIcon />
             </nuxt-link>
           </h3>
-          <ul class="available-soon-list">
-            <li v-for="date in availableSoonDateKeys" :key="date" class="available-soon-item">
-              <span class="amount">
+          <ul class="m-0 list-none p-0">
+            <li
+              v-for="date in availableSoonDateKeys"
+              :key="date"
+              class="flex items-center justify-between border-0 border-solid border-b-divider p-0 [&:not(:last-child)]:mb-1 [&:not(:last-child)]:border-b-[1px] [&:not(:last-child)]:pb-1"
+            >
+              <span
+                v-tooltip="
+                  availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1
+                    ? `Revenue period is ongoing. \nThis amount is not yet finalized.`
+                    : null
+                "
+                :class="{
+                  'cursor-help':
+                    availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1,
+                }"
+                class="inline-flex items-center gap-1 font-bold"
+              >
                 {{ $formatMoney(availableSoonDates[date]) }}
-                <small
+                <template
                   v-if="availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1"
-                  >†</small
                 >
+                  <InProgressIcon />
+                </template>
               </span>
-              <span class="date">
+              <span class="text-sm text-secondary">
                 {{ formatDate(dayjs(date)) }}
               </span>
             </li>
@@ -69,20 +85,11 @@
           View transfer history
         </NuxtLink>
       </div>
-      <p>
-        <small>
-          By uploading projects to Modrinth and withdrawing money from your account, you agree to
-          the
-          <nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>. For more
-          information on how the rewards system works, see our information page
-          <nuxt-link class="text-link" to="/legal/cmp-info">here</nuxt-link>.
-        </small>
-      </p>
-      <p>
-        <small>
-          † Ongoing revenue period, subject to change. The finalized amount will be available to
-          view on the last day of the current month.
-        </small>
+      <p class="text-sm text-secondary">
+        By uploading projects to Modrinth and withdrawing money from your account, you agree to the
+        <nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>. For more
+        information on how the rewards system works, see our information page
+        <nuxt-link class="text-link" to="/legal/cmp-info">here</nuxt-link>.
       </p>
     </section>
     <section class="universal-card">
@@ -135,6 +142,7 @@
 <script setup>
 import {
   HistoryIcon,
+  InProgressIcon,
   PayPalIcon,
   SaveIcon,
   TransferIcon,
@@ -220,44 +228,5 @@ strong {
 
 .grid-display {
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-}
-
-.available-soon {
-  .label {
-    margin: 0;
-  }
-
-  &-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  &-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.2rem 0 0;
-    border-bottom: 1px solid var(--color-divider);
-
-    .amount {
-      font-weight: 600;
-
-      small {
-        vertical-align: top;
-        margin: 0;
-        padding: 0;
-      }
-    }
-
-    .date {
-      color: var(--color-text-secondary);
-      font-size: 0.9em;
-    }
-
-    &:last-child {
-      border-bottom: none;
-    }
-  }
 }
 </style>
