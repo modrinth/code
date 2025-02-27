@@ -406,6 +406,9 @@ export default defineNuxtConfig({
   },
   nitro: {
     moduleSideEffects: ["@vintl/compact-number/locale-data"],
+    prerender: {
+      routes: ["/news/feed/rss", "/news/feed/atom", "/news/feed/json"],
+    },
   },
   devtools: {
     enabled: true,
