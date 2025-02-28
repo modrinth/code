@@ -69,8 +69,8 @@
               name: x.author,
               type: 'user',
               id: x.author,
-              link: 'https://modrinth.com/user/' + x.author,
-              linkProps: { target: '_blank' },
+              link: { path: `/user/${x.author}`, query: { i: props.instance.path } },
+              linkProps: {},
             }
           }
 

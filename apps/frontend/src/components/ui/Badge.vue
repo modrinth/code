@@ -1,7 +1,7 @@
 <template>
   <span
     :class="
-      'badge flex items-center gap-1 font-semibold text-secondary ' + color + ' type--' + type
+      'badges flex items-center gap-1 font-semibold text-secondary ' + color + ' type--' + type
     "
   >
     <template v-if="color"> <span class="circle" /> {{ capitalizeString(type) }}</template>

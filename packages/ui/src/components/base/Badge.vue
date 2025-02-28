@@ -1,5 +1,5 @@
 <template>
-  <span :class="'version-badge ' + color + ' type--' + type">
+  <span :class="'version-badges ' + color + ' type--' + type">
     <template v-if="color"> <span class="circle" /> {{ capitalizeString(type) }}</template>
 
     <!-- User roles -->
@@ -94,79 +94,79 @@ import { useVIntl, defineMessages } from '@vintl/vintl'
 
 const messages = defineMessages({
   acceptedLabel: {
-    id: 'omorphia.component.badge.label.accepted',
+    id: 'omorphia.component.badges.label.accepted',
     defaultMessage: 'Accepted',
   },
   approvedLabel: {
-    id: 'omorphia.component.badge.label.approved',
+    id: 'omorphia.component.badges.label.approved',
     defaultMessage: 'Approved',
   },
   archivedLabel: {
-    id: 'omorphia.component.badge.label.archived',
+    id: 'omorphia.component.badges.label.archived',
     defaultMessage: 'Archived',
   },
   closedLabel: {
-    id: 'omorphia.component.badge.label.closed',
+    id: 'omorphia.component.badges.label.closed',
     defaultMessage: 'Closed',
   },
   creatorLabel: {
-    id: 'omorphia.component.badge.label.creator',
+    id: 'omorphia.component.badges.label.creator',
     defaultMessage: 'Creator',
   },
   draftLabel: {
-    id: 'omorphia.component.badge.label.draft',
+    id: 'omorphia.component.badges.label.draft',
     defaultMessage: 'Draft',
   },
   failedLabel: {
-    id: 'omorphia.component.badge.label.failed',
+    id: 'omorphia.component.badges.label.failed',
     defaultMessage: 'Failed',
   },
   listedLabel: {
-    id: 'omorphia.component.badge.label.listed',
+    id: 'omorphia.component.badges.label.listed',
     defaultMessage: 'Listed',
   },
   moderatorLabel: {
-    id: 'omorphia.component.badge.label.moderator',
+    id: 'omorphia.component.badges.label.moderator',
     defaultMessage: 'Moderator',
   },
   modrinthTeamLabel: {
-    id: 'omorphia.component.badge.label.modrinth-team',
+    id: 'omorphia.component.badges.label.modrinth-team',
     defaultMessage: 'Modrinth Team',
   },
   pendingLabel: {
-    id: 'omorphia.component.badge.label.pending',
+    id: 'omorphia.component.badges.label.pending',
     defaultMessage: 'Pending',
   },
   privateLabel: {
-    id: 'omorphia.component.badge.label.private',
+    id: 'omorphia.component.badges.label.private',
     defaultMessage: 'Private',
   },
   processedLabel: {
-    id: 'omorphia.component.badge.label.processed',
+    id: 'omorphia.component.badges.label.processed',
     defaultMessage: 'Processed',
   },
   rejectedLabel: {
-    id: 'omorphia.component.badge.label.rejected',
+    id: 'omorphia.component.badges.label.rejected',
     defaultMessage: 'Rejected',
   },
   returnedLabel: {
-    id: 'omorphia.component.badge.label.returned',
+    id: 'omorphia.component.badges.label.returned',
     defaultMessage: 'Returned',
   },
   scheduledLabel: {
-    id: 'omorphia.component.badge.label.scheduled',
+    id: 'omorphia.component.badges.label.scheduled',
     defaultMessage: 'Scheduled',
   },
   underReviewLabel: {
-    id: 'omorphia.component.badge.label.under-review',
+    id: 'omorphia.component.badges.label.under-review',
     defaultMessage: 'Under review',
   },
   unlistedLabel: {
-    id: 'omorphia.component.badge.label.unlisted',
+    id: 'omorphia.component.badges.label.unlisted',
     defaultMessage: 'Unlisted',
   },
   withheldLabel: {
-    id: 'omorphia.component.badge.label.withheld',
+    id: 'omorphia.component.badges.label.withheld',
     defaultMessage: 'Withheld',
   },
 })

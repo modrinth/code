@@ -49,7 +49,7 @@ export type FilterValue = {
   negative?: boolean
 }
 
-export interface GameVersion {
+export interface GameVersionTag {
   version: string
   version_type: 'release' | 'snapshot' | 'alpha' | 'beta'
   date: string
@@ -67,7 +67,7 @@ const ALL_PROJECT_TYPES: ProjectType[] = [
   'plugin',
 ]
 
-export interface Platform {
+export interface PlatformTag {
   name: string
   icon: string
   supported_project_types: ProjectType[]
@@ -75,7 +75,7 @@ export interface Platform {
   formatted_name: string
 }
 
-export interface Category {
+export interface CategoryTag {
   icon: string
   name: string
   project_type: ProjectType
@@ -83,9 +83,9 @@ export interface Category {
 }
 
 export interface Tags {
-  gameVersions: GameVersion[]
-  loaders: Platform[]
-  categories: Category[]
+  gameVersions: GameVersionTag[]
+  loaders: PlatformTag[]
+  categories: CategoryTag[]
 }
 
 export interface SortType {
