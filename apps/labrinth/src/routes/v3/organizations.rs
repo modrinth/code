@@ -3,13 +3,13 @@ use std::sync::Arc;
 
 use super::ApiError;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::common::ids::base62_impl::parse_base62;
 use crate::database::models::team_item::TeamMember;
 use crate::database::models::{
     generate_organization_id, team_item, Organization,
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::base62_impl::parse_base62;
 use crate::models::ids::UserId;
 use crate::models::organizations::OrganizationId;
 use crate::models::pats::Scopes;
@@ -786,7 +786,7 @@ pub async fn organization_projects_add(
 
         let organization_owner_user_id = sqlx::query!(
             "
-            SELECT u.id 
+            SELECT u.id
             FROM team_members
             INNER JOIN users u ON u.id = team_members.user_id
             WHERE team_id = $1 AND is_owner = TRUE
@@ -969,7 +969,7 @@ pub async fn organization_projects_remove(
         sqlx::query!(
             "
             UPDATE team_members
-            SET 
+            SET
                 is_owner = TRUE,
                 accepted = TRUE,
                 permissions = $2,

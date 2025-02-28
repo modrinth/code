@@ -1,4 +1,5 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
+use crate::common::ids::base62_impl::parse_base62;
 use crate::database;
 use crate::database::models::image_item;
 use crate::database::models::thread_item::{
@@ -6,9 +7,7 @@ use crate::database::models::thread_item::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
-use crate::models::ids::{
-    base62_impl::parse_base62, ProjectId, UserId, VersionId,
-};
+use crate::models::ids::{ProjectId, UserId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::reports::{ItemType, Report};

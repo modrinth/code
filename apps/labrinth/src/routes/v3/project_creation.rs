@@ -1,5 +1,6 @@
 use super::version_creation::{try_create_version_fields, InitialVersionData};
 use crate::auth::{get_user_from_headers, AuthenticationError};
+use crate::common::ids::base62_impl::to_base62;
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
@@ -8,7 +9,6 @@ use crate::database::models::{self, image_item, User};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
-use crate::models::ids::base62_impl::to_base62;
 use crate::models::ids::{ImageId, OrganizationId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;

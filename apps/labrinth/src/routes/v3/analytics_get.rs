@@ -1,4 +1,5 @@
 use super::ApiError;
+use crate::common::ids::base62_impl::to_base62;
 use crate::database;
 use crate::database::redis::RedisPool;
 use crate::models::teams::ProjectPermissions;
@@ -6,7 +7,7 @@ use crate::{
     auth::get_user_from_headers,
     database::models::user_item,
     models::{
-        ids::{base62_impl::to_base62, ProjectId, VersionId},
+        ids::{ProjectId, VersionId},
         pats::Scopes,
     },
     queue::session::AuthQueue,

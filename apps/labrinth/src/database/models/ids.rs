@@ -1,6 +1,6 @@
 use super::DatabaseError;
-use crate::models::ids::base62_impl::to_base62;
-use crate::models::ids::{random_base62_rng, random_base62_rng_range};
+use crate::common::ids::base62_impl::to_base62;
+use crate::common::ids::{random_base62_rng, random_base62_rng_range};
 use censor::Censor;
 use rand::SeedableRng;
 use rand_chacha::ChaCha20Rng;

@@ -1,6 +1,5 @@
-use crate::{
-    database::redis::RedisPool, models::ids::base62_impl::parse_base62,
-};
+use crate::common::ids::base62_impl::parse_base62;
+use crate::database::redis::RedisPool;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use std::fmt::{Debug, Display};

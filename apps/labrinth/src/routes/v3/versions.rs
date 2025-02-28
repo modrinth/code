@@ -5,6 +5,7 @@ use crate::auth::checks::{
     filter_visible_versions, is_visible_project, is_visible_version,
 };
 use crate::auth::get_user_from_headers;
+use crate::common::ids::base62_impl::parse_base62;
 use crate::database;
 use crate::database::models::loader_fields::{
     self, LoaderField, LoaderFieldEnumValue, VersionField,
@@ -13,7 +14,6 @@ use crate::database::models::version_item::{DependencyBuilder, LoaderVersion};
 use crate::database::models::{image_item, Organization};
 use crate::database::redis::RedisPool;
 use crate::models;
-use crate::models::ids::base62_impl::parse_base62;
 use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
@@ -444,7 +444,7 @@ pub async fn version_edit_helper(
                     .collect::<Vec<i32>>();
                 sqlx::query!(
                     "
-                    DELETE FROM version_fields 
+                    DELETE FROM version_fields
                     WHERE version_id = $1
                     AND field_id = ANY($2)
                     ",
