@@ -17,7 +17,9 @@ useSeoMeta({
   description: "Keep up-to-date on the latest news from Modrinth.",
   ogDescription: "Keep up-to-date on the latest news from Modrinth.",
   ogType: "website",
-  ogImage: `${config.public.siteUrl}/news/thumbnail.jpg`,
+  ogImage: () => `${config.public.siteUrl}/news/thumbnail.jpg`,
+  twitterCard: "summary_large_image",
+  twitterImage: () => `${config.public.siteUrl}/news/thumbnail.jpg`,
 });
 </script>
 

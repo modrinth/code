@@ -34,13 +34,15 @@ const dayjsDate = computed(() => dayjs(article.value?.date));
 const config = useRuntimeConfig();
 
 useSeoMeta({
-  title: `${articleTitle.value} - Modrinth News`,
-  ogTitle: articleTitle.value,
-  description: article.value?.summary,
-  ogDescription: article.value?.summary,
+  title: () => `${articleTitle.value} - Modrinth News`,
+  ogTitle: () => articleTitle.value,
+  description: () => article.value?.summary,
+  ogDescription: () => article.value?.summary,
   ogType: "article",
-  ogImage: `${config.public.siteUrl}${article.value?.path}/${article.value?.thumbnail}`,
-  articlePublishedTime: dayjsDate.value.toISOString(),
+  ogImage: () => `${config.public.siteUrl}${article.value?.path}/${article.value?.thumbnail}`,
+  articlePublishedTime: () => dayjsDate.value.toISOString(),
+  twitterCard: "summary_large_image",
+  twitterImage: () => `${config.public.siteUrl}/news/thumbnail.jpg`,
 });
 </script>
 
