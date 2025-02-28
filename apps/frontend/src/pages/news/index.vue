@@ -4,7 +4,11 @@ import { ChevronRightIcon, RssIcon, NewspaperIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 
 const { data: articles } = await useAsyncData("news", () => {
-  return queryCollection("news").order("date", "DESC").limit(7).all();
+  return queryCollection("news")
+    .order("date", "DESC")
+    .limit(7)
+    .select("path", "thumbnail", "title", "summary", "date")
+    .all();
 });
 
 const featuredArticle = computed(() => articles.value?.[0]);

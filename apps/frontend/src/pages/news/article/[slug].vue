@@ -1,21 +1,15 @@
 <script setup lang="ts">
 import { ButtonStyled } from "@modrinth/ui";
-import {
-  CheckIcon,
-  RssIcon,
-  NewspaperIcon,
-  BlueskyIcon,
-  TwitterIcon,
-  MastodonIcon,
-  LinkIcon,
-  MailIcon,
-} from "@modrinth/assets";
+import { RssIcon, NewspaperIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import ShareArticleButtons from "~/components/ui/ShareArticleButtons.vue";
 
 const route = useRoute();
 const { data: article } = await useAsyncData(route.path, () => {
-  return queryCollection("news").path(`/news/article/${route.params.slug}`).first();
+  return queryCollection("news")
+    .path(`/news/article/${route.params.slug}`)
+    .select("path", "thumbnail", "title", "summary", "date", "body")
+    .first();
 });
 
 if (!article) {
