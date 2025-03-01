@@ -1,9 +1,9 @@
 use super::ids::{ProjectId, UserId};
 use super::{CollectionId, ReportId, ThreadId};
+use crate::common::ids::base62_impl::{parse_base62, to_base62};
 use crate::database::models;
 use crate::database::models::{DatabaseError, OrganizationId};
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::users::Badges;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;

@@ -34,6 +34,9 @@ pub use self::cache::*;
 mod friends;
 pub use self::friends::*;
 
+mod tunnel;
+pub use self::tunnel::*;
+
 pub mod db;
 pub mod fs_watcher;
 mod mr_auth;

@@ -18,7 +18,7 @@ use common::environment::{
     with_test_environment, with_test_environment_all, TestEnvironment,
 };
 use common::{database::*, scopes::ScopeTest};
-use labrinth::models::ids::base62_impl::parse_base62;
+use labrinth::common::ids::base62_impl::parse_base62;
 use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectId;
 use labrinth::models::users::UserId;

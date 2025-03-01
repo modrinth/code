@@ -1,4 +1,6 @@
 //! Functions for fetching infromation from the Internet
+use super::io::{self, IOError};
+use crate::config::{MODRINTH_API_URL, MODRINTH_API_URL_V3};
 use crate::event::emit::emit_loading;
 use crate::event::LoadingBarId;
 use bytes::Bytes;
@@ -10,8 +12,6 @@ use std::path::{Path, PathBuf};
 use std::time::{self};
 use tokio::sync::Semaphore;
 use tokio::{fs::File, io::AsyncWriteExt};
-
-use super::io::{self, IOError};
 
 #[derive(Debug)]
 pub struct IoSemaphore(pub Semaphore);
@@ -87,7 +87,8 @@ pub async fn fetch_advanced(
         .map(|x| &*x.0.to_lowercase() == "authorization")
         .unwrap_or(false)
         && (url.starts_with("https://cdn.modrinth.com")
-            || url.starts_with("https://api.modrinth.com"))
+            || url.starts_with(MODRINTH_API_URL)
+            || url.starts_with(MODRINTH_API_URL_V3))
     {
         crate::state::ModrinthCredentials::get_active(exec).await?
     } else {

@@ -1,4 +1,5 @@
-use crate::state::{FriendsSocket, UserFriend, UserStatus};
+use crate::state::{FriendsSocket, UserFriend};
+use labrinth::common::users::UserStatus;
 
 #[tracing::instrument]
 pub async fn friends() -> crate::Result<Vec<UserFriend>> {
