@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Avatar, ButtonStyled, OverflowMenu } from '@modrinth/ui'
+import { Avatar, ButtonStyled, commonMessages, OverflowMenu } from '@modrinth/ui'
 import {
   UserPlusIcon,
   MoreVerticalIcon,
@@ -17,6 +17,10 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { format } from 'pathe'
+
+const { formatMessage } = useVIntl()
 
 const props = defineProps<{
   credentials: unknown | null
@@ -157,6 +161,13 @@ const unlisten = await friend_listener(() => loadFriends())
 onUnmounted(() => {
   unlisten()
 })
+
+const messages = defineMessages({
+  title: {
+    id: 'app.sidebar.friends.title',
+    defaultMessage: 'Friends',
+  },
+})
 </script>
 
 <template>
@@ -183,7 +194,7 @@ onUnmounted(() => {
           <ButtonStyled>
             <button @click="removeFriend(friend)">
               <XIcon />
-              Remove
+              {{ formatMessage(commonMessages.removeButton)}}
             </button>
           </ButtonStyled>
         </div>
@@ -249,7 +260,7 @@ onUnmounted(() => {
     </ButtonStyled>
   </ModalWrapper>
   <div class="flex justify-between items-center">
-    <h3 class="text-lg m-0">Friends</h3>
+    <h3 class="text-lg m-0">{{ formatMessage(messages.title) }}</h3>
     <ButtonStyled v-if="userCredentials" type="transparent" circular>
       <OverflowMenu
         :options="[
@@ -311,7 +322,7 @@ onUnmounted(() => {
     <template v-else-if="acceptedFriends.length === 0">
       <div class="text-sm">
         <div v-if="!userCredentials">
-          <span class="text-link cursor-pointer" @click="signIn">Sign in</span> to add friends!
+          <span class="text-link cursor-pointer" role="button" @click="signIn">Sign in</span> to add friends!
         </div>
         <div v-else>
           <span class="text-link cursor-pointer" @click="addFriendModal.show()">Add friends</span>
