@@ -9,7 +9,7 @@ After six months of work, Modrinth enters Beta, helping modders host their mods 
 
 Six months ago, in order to fill a void in the modding community, the project that would eventually become Modrinth was founded. Modrinth was created to bring change to an otherwise stagnant landscape of hosts. Today, Modrinth enters Beta, a huge step forward for Modrinth!
 
-![Modrinth's brand new design, rolling out with the launch of Beta](./new-design.png)
+![Modrinth's brand new design, rolling out with the launch of Beta](./new-design.jpg)
 
 > Modrinth's brand new design, rolling out with the launch of Beta
 
