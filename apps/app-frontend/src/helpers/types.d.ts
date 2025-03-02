@@ -32,6 +32,18 @@ type GameInstance = {
   hooks: Hooks
 }
 
+type InstanceContent = {
+  hash: string
+  file_name: string
+  size: number
+  metadata?: {
+    project_id: ModrinthId,
+    version_id: ModrinthId
+  }
+  update_version_id: string
+  project_type: 'mod' | 'resourcepack' | 'datapack' | 'shaderpack'
+}
+
 type InstallStage =
   | 'installed'
   | 'minecraft_installing'

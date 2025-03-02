@@ -1,5 +1,5 @@
 <script setup>
-import { Avatar, TagItem } from '@modrinth/ui'
+import { Avatar, SmartClickable, TagItem } from '@modrinth/ui'
 import { DownloadIcon, HeartIcon, TagIcon } from '@modrinth/assets'
 import { formatNumber, formatCategory } from '@modrinth/utils'
 import { computed } from 'vue'
@@ -8,8 +8,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRouter } from 'vue-router'
 
 dayjs.extend(relativeTime)
-
-const router = useRouter()
 
 const props = defineProps({
   project: {
@@ -40,29 +38,18 @@ const toColor = computed(() => {
   const r = (color >>> 16) & 0xff
   return 'rgba(' + [r, g, b, 1].join(',') + ')'
 })
-
-const toTransparent = computed(() => {
-  let color = props.project.color
-
-  color >>>= 0
-  const b = color & 0xff
-  const g = (color >>> 8) & 0xff
-  const r = (color >>> 16) & 0xff
-  return (
-    'linear-gradient(rgba(' +
-    [r, g, b, 0.03].join(',') +
-    '), 65%, rgba(' +
-    [r, g, b, 0.3].join(',') +
-    '))'
-  )
-})
 </script>
 
 <template>
-  <div
+  <SmartClickable
     class="card-shadow bg-bg-raised rounded-xl overflow-clip cursor-pointer hover:brightness-90 transition-all"
-    @click="router.push(`/project/${project.slug}`)"
   >
+    <template #clickable>
+      <router-link
+        class="no-click-animation"
+        :to="`/project/${project.slug}`"
+      />
+    </template>
     <div
       class="w-full aspect-[2/1] bg-cover bg-center bg-no-repeat"
       :style="{
@@ -74,20 +61,11 @@ const toTransparent = computed(() => {
         })`,
       }"
     >
-      <div
-        class="badges-wrapper"
-        :class="{
-          'no-image': !project.featured_gallery && !project.gallery[0],
-        }"
-        :style="{
-          background: !project.featured_gallery && !project.gallery[0] ? toTransparent : null,
-        }"
-      ></div>
     </div>
     <div class="flex flex-col justify-center gap-2 px-4 py-3">
       <div class="flex gap-2 items-center">
         <Avatar size="48px" :src="project.icon_url" />
-        <div class="h-full flex items-center font-bold text-contrast leading-normal">
+        <div class="h-full flex items-center font-bold text-contrast leading-normal smart-clickable:underline-on-hover">
           <span class="line-clamp-2">{{ project.title }}</span>
         </div>
       </div>
@@ -115,7 +93,7 @@ const toTransparent = computed(() => {
         </div>
       </div>
     </div>
-  </div>
+  </SmartClickable>
 </template>
 
 <style scoped lang="scss"></style>
