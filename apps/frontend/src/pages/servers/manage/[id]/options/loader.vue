@@ -1,18 +1,18 @@
 <template>
-  <LazyUiServersPlatformVersionSelectModal
+  <ModalPlatform
     ref="versionSelectModal"
     :server="props.server"
     :current-loader="data?.loader as Loaders"
     @reinstall="emit('reinstall', $event)"
   />
 
-  <LazyUiServersPlatformMrpackModal
+  <ModalMrpackUpload
     ref="mrpackModal"
     :server="props.server"
     @reinstall="emit('reinstall', $event)"
   />
 
-  <LazyUiServersPlatformChangeModpackVersionModal
+  <ModalModpackVersion
     ref="modpackVersionModal"
     :server="props.server"
     :project="data?.project"
@@ -125,7 +125,7 @@
           }"
           :tabindex="props.server.general?.status === 'installing' ? -1 : 0"
         >
-          <UiServersLoaderSelector
+          <PlatformSelector
             :data="data"
             :is-installing="isInstalling"
             @select-loader="selectLoader"
@@ -143,9 +143,13 @@ import { ButtonStyled, NewProjectCard } from "@modrinth/ui";
 import { TransferIcon, UploadIcon, InfoIcon, CompassIcon, SettingsIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 import type { Loaders } from "~/types/servers";
+import ModalModpackVersion from "~/components/ui/servers/options/platform/ModalModpackVersion.vue";
+import ModalPlatform from "~/components/ui/servers/options/platform/ModalPlatform.vue";
+import ModalMrpackUpload from "~/components/ui/servers/options/platform/ModalMrpackUpload.vue";
+import PlatformSelector from "~/components/ui/servers/options/platform/PlatformSelector.vue";
 
 const props = defineProps<{
-  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general"]>;
 }>();
 
 const emit = defineEmits<{
@@ -164,7 +168,7 @@ const {
   data: versions,
   error: versionsError,
   refresh: refreshVersions,
-} = await useAsyncData(
+} = await useLazyAsyncData(
   `content-loader-versions-${data.value?.upstream?.project_id}`,
   async () => {
     if (!data.value?.upstream?.project_id) return [];
@@ -183,7 +187,7 @@ const {
   data: currentVersion,
   error: currentVersionError,
   refresh: refreshCurrentVersion,
-} = await useAsyncData(
+} = await useLazyAsyncData(
   `content-loader-version-${data.value?.upstream?.version_id}`,
   async () => {
     if (!data.value?.upstream?.version_id) return null;
@@ -229,10 +233,13 @@ const updateAvailable = computed(() => {
   return latestVersion.id !== currentVersion.value.id;
 });
 
+const moduleLoadStatus = inject<Promise<void> | undefined>("modulesLoaded");
+
 watch(
   () => props.server.general?.status,
   async (newStatus, oldStatus) => {
     if (oldStatus === "installing" && newStatus === "available") {
+      await moduleLoadStatus;
       await Promise.all([
         refreshVersions(),
         refreshCurrentVersion(),

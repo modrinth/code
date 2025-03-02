@@ -1,5 +1,5 @@
 <template>
-  <UiServersServerSidebar :route="route" :nav-links="navLinks" :server="props.server" />
+  <ServerSidebar :route="route" :nav-links="navLinks" :server="props.server" />
 </template>
 
 <script setup lang="ts">
@@ -13,6 +13,7 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@modrinth/assets";
+import ServerSidebar from "~/components/ui/servers/ServerSidebar.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useRoute();

@@ -59,28 +59,13 @@
     />
 
     <div class="relative h-full w-full overflow-y-auto">
-      <div
+      <ErrorBoundary
         v-if="server.network?.error"
-        class="flex w-full flex-col items-center justify-center gap-4 p-4"
-      >
-        <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-          <div class="flex flex-col items-center text-center">
-            <div class="flex flex-col items-center gap-4">
-              <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-                <IssuesIcon class="size-12 text-orange" />
-              </div>
-              <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load network settings</h1>
-            </div>
-            <p class="text-lg text-secondary">
-              We couldn't load your server's network settings. Here's what we know:
-              <span class="break-all font-mono">{{ JSON.stringify(server.network.error) }}</span>
-            </p>
-            <ButtonStyled size="large" color="brand" @click="() => server.refresh(['network'])">
-              <button class="mt-6 !w-full">Retry</button>
-            </ButtonStyled>
-          </div>
-        </div>
-      </div>
+        title="Failed to load network settings"
+        message="We couldn't load your server's network settings. Here's what we know:"
+        :error="server.network.error"
+        @retry="() => server.refresh(['network'])"
+      />
       <div v-else-if="data" class="flex h-full w-full flex-col justify-between gap-4">
         <div class="flex h-full flex-col">
           <!-- Subdomain section -->
@@ -192,7 +177,7 @@
                   Primary allocation
                 </span>
 
-                <UiCopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
+                <CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
               </div>
             </div>
 
@@ -226,7 +211,7 @@
                 </div>
 
                 <div class="flex w-full flex-row items-center gap-2 sm:w-auto">
-                  <UiCopyCode :text="`${serverIP}:${allocation.port}`" />
+                  <CopyCode :text="`${serverIP}:${allocation.port}`" />
                   <ButtonStyled icon-only>
                     <button
                       class="!w-full sm:!w-auto"
@@ -249,7 +234,7 @@
           </div>
         </div>
       </div>
-      <UiServersSaveBanner
+      <SaveBanner
         :is-visible="!!hasUnsavedChanges && !!isValidSubdomain"
         :server="props.server"
         :is-updating="isUpdating"
@@ -269,10 +254,12 @@ import {
   SaveIcon,
   InfoIcon,
   UploadIcon,
-  IssuesIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
+import ErrorBoundary from "~/components/ui/servers/ErrorBoundary.vue";
+import CopyCode from "~/components/ui/CopyCode.vue";
+import SaveBanner from "~/components/ui/servers/SaveBanner.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const props = defineProps<{

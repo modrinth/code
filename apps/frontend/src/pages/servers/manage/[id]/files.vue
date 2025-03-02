@@ -1,52 +1,60 @@
 <template>
-  <div data-pyro-file-manager-root class="contents">
-    <LazyUiServersFilesCreateItemModal
-      ref="createItemModal"
-      :type="newItemType"
-      @create="handleCreateNewItem"
-    />
+  <div class="contents" data-pyro-servers-page="files">
+    <ModalCreateItem ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 
-    <LazyUiServersFilesRenameItemModal
-      ref="renameItemModal"
-      :item="selectedItem"
-      @rename="handleRenameItem"
-    />
+    <ModalRenameItem ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
 
-    <LazyUiServersFilesMoveItemModal
+    <ModalMoveItem
       ref="moveItemModal"
       :item="selectedItem"
       :current-path="currentPath"
       @move="handleMoveItem"
     />
 
-    <LazyUiServersFilesDeleteItemModal
-      ref="deleteItemModal"
-      :item="selectedItem"
-      @delete="handleDeleteItem"
-    />
+    <ModalDeleteItem ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 
-    <FilesUploadDragAndDrop
+    <UploadDragAndDrop
       class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
       @files-dropped="handleDroppedFiles"
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
-        <div v-if="!isEditing" class="contents">
-          <UiServersFilesBrowseNavbar
-            :breadcrumb-segments="breadcrumbSegments"
-            :search-query="searchQuery"
-            :current-filter="viewFilter"
-            @navigate="navigateToSegment"
-            @create="showCreateModal"
-            @upload="initiateFileUpload"
-            @filter="handleFilter"
-            @update:search-query="searchQuery = $event"
+        <FilesNavbar
+          :mode="mode"
+          :breadcrumb-segments="breadcrumbSegments"
+          :search-query="searchQuery"
+          :current-filter="viewFilter"
+          :file-name="editingFile?.name"
+          :file-path="editingFile?.path"
+          @navigate="navigateToSegment"
+          @create="showCreateModal"
+          @upload="initiateFileUpload"
+          @filter="handleFilter"
+          @update:search-query="searchQuery = $event"
+          @cancel="cancelEditing"
+          @save="() => saveFileContent(true)"
+          @save-as="saveFileContentAs"
+          @save-restart="saveFileContentRestart"
+          @share="requestShareLink"
+        />
+
+        <div v-if="mode !== 'browsing'" class="h-full w-full flex-grow">
+          <component
+            :is="VAceEditor"
+            v-if="mode === 'editing'"
+            v-model:value="fileContent"
+            :lang="editorLanguage"
+            theme="one_dark"
+            :print-margin="false"
+            style="height: 750px; font-size: 1rem"
+            class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
+            @init="onInit"
           />
-          <UiServersFilesLabelBar
-            :sort-field="sortMethod"
-            :sort-desc="sortDesc"
-            @sort="handleSort"
-          />
-          <FilesUploadDropdown
+          <FilesImageViewer v-else-if="mode === 'imageview'" :image-blob="imagePreview" />
+        </div>
+
+        <div v-else class="relative z-0">
+          <FilesNavbarColumns :sort-field="sortMethod" :sort-desc="sortDesc" @sort="handleSort" />
+          <UploadDropdown
             v-if="props.server.fs"
             ref="uploadDropdownRef"
             class="rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow"
@@ -56,50 +64,11 @@
           />
         </div>
 
-        <UiServersFilesEditingNavbar
-          v-else
-          :file-name="editingFile?.name"
-          :is-image="isEditingImage"
-          :file-path="editingFile?.path"
-          :breadcrumb-segments="breadcrumbSegments"
-          @cancel="cancelEditing"
-          @save="() => saveFileContent(true)"
-          @save-as="saveFileContentAs"
-          @save-restart="saveFileContentRestart"
-          @share="requestShareLink"
-          @navigate="navigateToSegment"
-        />
-
-        <div v-if="isEditing" class="h-full w-full flex-grow">
-          <component
-            :is="VAceEditor"
-            v-if="!isEditingImage"
-            v-model:value="fileContent"
-            :lang="
-              (() => {
-                const ext = editingFile?.name?.split('.')?.pop()?.toLowerCase() ?? '';
-                return ext === 'json'
-                  ? 'json'
-                  : ext === 'toml'
-                    ? 'toml'
-                    : ext === 'sh'
-                      ? 'sh'
-                      : ['yml', 'yaml'].includes(ext)
-                        ? 'yaml'
-                        : 'text';
-              })()
-            "
-            theme="one_dark"
-            :print-margin="false"
-            style="height: 750px; font-size: 1rem"
-            class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
-            @init="onInit"
-          />
-          <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
-        </div>
-
-        <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
-          <UiServersFileVirtualList
+        <div
+          v-if="mode === 'browsing' && filteredItems.length > 0"
+          class="h-full w-full overflow-hidden rounded-b-2xl"
+        >
+          <FilesList
             :items="filteredItems"
             @delete="showDeleteModal"
             @rename="showRenameModal"
@@ -113,7 +82,7 @@
         </div>
 
         <div
-          v-else-if="!isLoading && items.length === 0 && !loadError"
+          v-else-if="!isLoading && filteredItems.length === 0 && !loadError"
           class="flex h-full w-full items-center justify-center p-20"
         >
           <div class="flex flex-col items-center gap-4 text-center">
@@ -123,7 +92,7 @@
           </div>
         </div>
 
-        <LazyUiServersFileManagerError
+        <FilesListError
           v-else-if="loadError"
           title="Unable to load files"
           message="The folder may not exist."
@@ -141,28 +110,50 @@
           <p class="mt-2 text-xl">Drop files here to upload</p>
         </div>
       </div>
-    </FilesUploadDragAndDrop>
+    </UploadDragAndDrop>
 
-    <UiServersFilesContextMenu
-      ref="contextMenu"
-      :item="contextMenuInfo.item"
-      :x="contextMenuInfo.x"
-      :y="contextMenuInfo.y"
-      :is-at-bottom="isAtBottom"
-      @rename="showRenameModal"
-      @move="showMoveModal"
-      @download="downloadFile"
-      @delete="showDeleteModal"
-    />
+    <TeleportOverflowMenu
+      ref="contextMenuRef"
+      :options="contextMenuOptions"
+      :is-context-menu="true"
+    >
+      <template #rename><EditIcon /> Rename</template>
+      <template #move><RightArrowIcon /> Move</template>
+      <template #download><DownloadIcon /> Download</template>
+      <template #delete><TrashIcon /> Delete</template>
+    </TeleportOverflowMenu>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
-import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
-import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
+import {
+  UploadIcon,
+  FolderOpenIcon,
+  EditIcon,
+  DownloadIcon,
+  TrashIcon,
+  RightArrowIcon,
+} from "@modrinth/assets";
+import {
+  type DirectoryResponse,
+  type DirectoryItem,
+  type Server,
+  PyroServersFetchError,
+} from "~/composables/pyroServers.ts";
+import UploadDragAndDrop from "~/components/ui/servers/UploadDragAndDrop.vue";
+import UploadDropdown from "~/components/ui/servers/UploadDropdown.vue";
+import FilesNavbar from "~/components/ui/servers/files/FilesNavbar.vue";
+import ModalCreateItem from "~/components/ui/servers/files/ModalCreateItem.vue";
+import ModalRenameItem from "~/components/ui/servers/files/ModalRenameItem.vue";
+import ModalMoveItem from "~/components/ui/servers/files/ModalMoveItem.vue";
+import ModalDeleteItem from "~/components/ui/servers/files/ModalDeleteItem.vue";
+import FilesNavbarColumns from "~/components/ui/servers/files/FilesNavbarColumns.vue";
+import FilesList from "~/components/ui/servers/files/FilesList.vue";
+import FilesListError from "~/components/ui/servers/files/FilesListError.vue";
+import { addNotification } from "~/composables/notifs.js";
+import FilesImageViewer from "~/components/ui/servers/files/FilesImageViewer.vue";
+import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
 
 interface BaseOperation {
   type: "move" | "rename";
@@ -197,7 +188,6 @@ const router = useRouter();
 const VAceEditor = ref();
 const mainContent = ref<HTMLElement | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
-const contextMenu = ref();
 const operationHistory = ref<Operation[]>([]);
 const redoStack = ref<Operation[]>([]);
 
@@ -210,7 +200,6 @@ const currentPage = ref(1);
 
 const currentPath = ref(typeof route.query.path === "string" ? route.query.path : "");
 
-const isAtBottom = ref(false);
 const contextMenuInfo = ref<any>({ item: null, x: 0, y: 0 });
 
 const createItemModal = ref();
@@ -222,7 +211,7 @@ const newItemType = ref<"file" | "directory">("file");
 const selectedItem = ref<any>(null);
 const fileContent = ref("");
 
-const isEditing = ref(false);
+const mode = ref<"browsing" | "editing" | "imageview">("browsing");
 const editingFile = ref<any>(null);
 const closeEditor = ref(false);
 const isEditingImage = ref(false);
@@ -246,11 +235,15 @@ useHead({
   title: computed(() => `Files - ${data.value?.name ?? "Server"} - Modrinth`),
 });
 
-const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
-  await modulesLoaded;
+const directoryData = ref<DirectoryResponse>({ items: [], total: 0 });
+const isLoading = ref(false);
+const loadError = ref<Error | null>(null);
 
+const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
   const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
   try {
+    isLoading.value = true;
+    loadError.value = null;
     const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
 
     if (!data || !data.items) {
@@ -270,27 +263,24 @@ const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
     };
   } catch (error) {
     console.error("Error fetching directory contents:", error);
-    if (error instanceof PyroFetchError && error.statusCode === 400) {
-      return directoryData.value || { items: [], total: 0 };
+    if (error instanceof PyroServersFetchError && error.statusCode === 400) {
+      return directoryData.value;
     }
+    loadError.value = error as Error;
     throw error;
+  } finally {
+    isLoading.value = false;
   }
 };
 
-const {
-  data: directoryData,
-  refresh: refreshData,
-  status,
-  error: loadError,
-} = useLazyAsyncData(() => fetchDirectoryContents(), {
-  watch: [],
-  default: () => ({ items: [], total: 0 }),
-  immediate: true,
-});
-
-const isLoading = computed(() => status.value === "pending");
-
-const items = computed(() => directoryData.value?.items || []);
+const refreshData = async () => {
+  try {
+    const data = await fetchDirectoryContents();
+    directoryData.value = data;
+  } catch (error) {
+    console.error("Error refreshing data:", error);
+  }
+};
 
 const refreshList = () => {
   currentPage.value = 1;
@@ -415,7 +405,7 @@ const handleRenameItem = async (newName: string) => {
 
     if (closeEditor.value) {
       await props.server.refresh();
-      isEditing.value = false;
+      mode.value = "browsing";
       editingFile.value = null;
       closeEditor.value = false;
       router.push({ query: { ...route.query, path: currentPath.value } });
@@ -429,7 +419,7 @@ const handleRenameItem = async (newName: string) => {
     });
   } catch (error) {
     console.error("Error renaming item:", error);
-    if (error instanceof PyroFetchError) {
+    if (error instanceof PyroServersFetchError) {
       if (error.statusCode === 400) {
         addNotification({
           group: "files",
@@ -478,6 +468,12 @@ const handleMoveItem = async (destination: string) => {
     });
   } catch (error) {
     console.error("Error moving item:", error);
+    addNotification({
+      group: "files",
+      title: "Could not move item",
+      text: "An unexpected error occurred while moving the item",
+      type: "error",
+    });
   }
 };
 
@@ -511,6 +507,12 @@ const handleDirectMove = async (moveData: {
     });
   } catch (error) {
     console.error("Error moving item:", error);
+    addNotification({
+      group: "files",
+      title: "Could not move item",
+      text: "An unexpected error occurred while moving the item",
+      type: "error",
+    });
   }
 };
 
@@ -528,6 +530,12 @@ const handleDeleteItem = async () => {
     });
   } catch (error) {
     console.error("Error deleting item:", error);
+    addNotification({
+      group: "files",
+      title: "Error deleting item",
+      text: "An unexpected error occurred while deleting the item",
+      type: "error",
+    });
   }
 };
 
@@ -556,12 +564,12 @@ const showDeleteModal = (item: any) => {
 
 const handleCreateError = (error: any) => {
   console.error("Error creating item:", error);
-  if (error instanceof PyroFetchError) {
+  if (error instanceof PyroServersFetchError) {
     if (error.statusCode === 400) {
       addNotification({
         group: "files",
         title: "Error creating item",
-        text: "Invalid file",
+        text: "An item with this name already exists",
         type: "error",
       });
     } else if (error.statusCode === 500) {
@@ -569,6 +577,13 @@ const handleCreateError = (error: any) => {
         group: "files",
         title: "Error creating item",
         text: "Something went wrong. The file may already exist.",
+        type: "error",
+      });
+    } else {
+      addNotification({
+        group: "files",
+        title: "Error creating item",
+        text: "An unexpected error occurred",
         type: "error",
       });
     }
@@ -629,6 +644,8 @@ const applySort = (items: DirectoryItem[]) => {
   return result;
 };
 
+const items = computed(() => directoryData.value?.items || []);
+
 const filteredItems = computed(() => {
   let result = [...items.value];
 
@@ -643,7 +660,7 @@ const filteredItems = computed(() => {
 const { reset } = useInfiniteScroll(
   scrollContainer,
   async () => {
-    if (status.value === "pending") return;
+    if (isLoading.value) return;
 
     try {
       const totalPages = directoryData.value?.total || 0;
@@ -667,7 +684,7 @@ const { reset } = useInfiniteScroll(
 );
 
 const handleLoadMore = async () => {
-  if (status.value === "pending") return;
+  if (isLoading.value) return;
 
   const totalPages = directoryData.value?.total || 0;
 
@@ -685,14 +702,37 @@ const onInit = (editor: any) => {
   });
 };
 
+const contextMenuRef = ref();
+const contextMenuOptions = computed(() => {
+  if (!contextMenuInfo.value.item) return [];
+
+  return [
+    {
+      id: "rename",
+      action: () => showRenameModal(contextMenuInfo.value.item),
+    },
+    {
+      id: "move",
+      action: () => showMoveModal(contextMenuInfo.value.item),
+    },
+    {
+      id: "download",
+      action: () => downloadFile(contextMenuInfo.value.item),
+      shown: contextMenuInfo.value.item?.type !== "directory",
+    },
+    {
+      id: "delete",
+      action: () => showDeleteModal(contextMenuInfo.value.item),
+      color: "red" as const,
+    },
+  ];
+});
+
 const showContextMenu = async (item: any, x: number, y: number) => {
   contextMenuInfo.value = { item, x, y };
   selectedItem.value = item;
   await nextTick();
-  if (!contextMenu.value?.ctxRef) return false;
-  const screenHeight = window.innerHeight;
-  const ctxRect = contextMenu.value.ctxRef.getBoundingClientRect();
-  isAtBottom.value = ctxRect.bottom > screenHeight;
+  contextMenuRef.value?.openContextMenu(x, y);
 };
 
 const onAnywhereClicked = (e: MouseEvent) => {
@@ -705,19 +745,20 @@ const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
 
 const editFile = async (item: { name: string; type: string; path: string }) => {
   try {
-    const path = `${currentPath.value}/${item.name}`.replace("//", "/");
+    const path = item.path;
     const content = (await props.server.fs?.downloadFile(path, true)) as any;
     window.scrollTo(0, 0);
 
     fileContent.value = await content.text();
     editingFile.value = item;
-    isEditing.value = true;
     const extension = item.name.split(".").pop();
     if (item.type === "file" && extension && imageExtensions.includes(extension)) {
-      isEditingImage.value = true;
+      mode.value = "imageview";
       imagePreview.value = content;
+    } else {
+      mode.value = "editing";
     }
-    router.push({ query: { ...route.query, path: currentPath.value, editing: item.path } });
+    router.push({ query: { ...route.query, path: currentPath.value, editing: path } });
   } catch (error) {
     console.error("Error fetching file content:", error);
   }
@@ -738,7 +779,6 @@ onMounted(async () => {
   await modulesLoaded;
 
   await initializeFileEdit();
-
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/mode-yaml");
@@ -782,13 +822,14 @@ watch(
       : newQuery.path || "/";
 
     if (newQuery.editing) {
+      const editingPath = newQuery.editing as string;
       await editFile({
-        name: newQuery.editing as string,
+        name: editingPath.split("/").pop() || "",
         type: "file",
-        path: newQuery.editing as string,
+        path: editingPath,
       });
     } else {
-      isEditing.value = false;
+      mode.value = "browsing";
       editingFile.value = null;
     }
 
@@ -808,8 +849,8 @@ const breadcrumbSegments = computed(() => {
 const navigateToSegment = (index: number) => {
   const newPath = breadcrumbSegments.value.slice(0, index + 1).join("/");
   router.push({ query: { ...route.query, path: newPath } });
-  if (isEditing.value) {
-    isEditing.value = false;
+  if (mode.value !== "browsing") {
+    mode.value = "browsing";
     editingFile.value = null;
     closeEditor.value = false;
 
@@ -848,7 +889,7 @@ const requestShareLink = async () => {
 };
 
 const handleDroppedFiles = (files: File[]) => {
-  if (isEditing.value) return;
+  if (mode.value !== "browsing") return;
 
   files.forEach((file) => {
     uploadDropdownRef.value?.uploadFile(file);
@@ -874,16 +915,13 @@ const downloadFile = async (item: any) => {
     try {
       const path = `${currentPath.value}/${item.name}`.replace("//", "/");
       const fileData = await props.server.fs?.downloadFile(path);
-      if (fileData) {
-        const blob = new Blob([fileData], { type: "application/octet-stream" });
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        link.download = item.name;
-        link.click();
-        window.URL.revokeObjectURL(link.href);
-      } else {
-        throw new Error("File data is undefined");
-      }
+
+      const blob = new Blob([fileData || new Uint8Array()], { type: "application/octet-stream" });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = item.name;
+      link.click();
+      window.URL.revokeObjectURL(link.href);
     } catch (error) {
       console.error("Error downloading file:", error);
     }
@@ -898,7 +936,7 @@ const saveFileContent = async (exit: boolean = true) => {
     await props.server.fs?.updateFile(editingFile.value.path, fileContent.value);
     if (exit) {
       await props.server.refresh();
-      isEditing.value = false;
+      mode.value = "browsing";
       editingFile.value = null;
       router.push({ query: { ...route.query, path: currentPath.value } });
     }
@@ -933,7 +971,7 @@ const saveFileContentAs = async () => {
 };
 
 const cancelEditing = () => {
-  isEditing.value = false;
+  mode.value = "browsing";
   editingFile.value = null;
   fileContent.value = "";
   isEditingImage.value = false;
@@ -949,6 +987,18 @@ const onScroll = () => {
     contextMenuInfo.value.y = Math.max(0, contextMenuInfo.value.y - window.scrollY);
   }
 };
+
+const editorLanguage = computed(() => {
+  const ext = editingFile.value?.name?.split(".")?.pop()?.toLowerCase() ?? "";
+  const languageMap: Record<string, string> = {
+    json: "json",
+    toml: "toml",
+    sh: "sh",
+    yml: "yaml",
+    yaml: "yaml",
+  };
+  return languageMap[ext] || "text";
+});
 </script>
 
 <style scoped>

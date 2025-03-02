@@ -1,0 +1,62 @@
+<template>
+  <div
+    class="parsed-log relative flex h-8 w-full select-none items-center overflow-hidden rounded-lg px-6"
+    @mouseenter="checkOverflow"
+    @touchstart="checkOverflow"
+  >
+    <div ref="logContent" class="log-content flex-1 truncate whitespace-pre">
+      <span v-html="sanitizedLog"></span>
+    </div>
+    <button
+      v-if="isOverflowing"
+      class="ml-2 flex h-6 items-center rounded-md bg-bg px-2 text-xs text-contrast opacity-50 transition-opacity hover:opacity-100"
+      type="button"
+      @click.stop="$emit('show-full-log', props.log)"
+    >
+      ...
+    </button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+
+const props = defineProps<{
+  log: string;
+  sanitizedLog: string;
+}>();
+
+defineEmits<{
+  "show-full-log": [log: string];
+}>();
+
+const logContent = ref<HTMLElement | null>(null);
+const isOverflowing = ref(false);
+
+const checkOverflow = () => {
+  if (logContent.value && !isOverflowing.value) {
+    isOverflowing.value = logContent.value.scrollWidth > logContent.value.clientWidth;
+  }
+};
+</script>
+
+<style scoped>
+.parsed-log {
+  background: transparent;
+  transition: background-color 0.1s;
+}
+
+.parsed-log:hover {
+  background: rgba(128, 128, 128, 0.25);
+  transition: 0s;
+}
+
+.log-content > span {
+  user-select: none;
+  white-space: pre;
+}
+
+.log-content {
+  white-space: pre;
+}
+</style>

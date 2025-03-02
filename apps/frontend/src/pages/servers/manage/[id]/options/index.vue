@@ -88,7 +88,7 @@
               >
                 <EditIcon class="h-8 w-8 text-contrast" />
               </div>
-              <UiServersServerIcon :image="icon" />
+              <ServerIcon :image="icon" />
             </div>
             <ButtonStyled>
               <button v-tooltip="'Synchronize icon with installed modpack'" @click="resetIcon">
@@ -101,7 +101,7 @@
       </div>
     </div>
     <div v-else />
-    <UiServersSaveBanner
+    <SaveBanner
       :is-visible="!!hasUnsavedChanges && !!isValidServerName"
       :server="props.server"
       :is-updating="isUpdating"
@@ -114,6 +114,8 @@
 <script setup lang="ts">
 import { EditIcon, TransferIcon } from "@modrinth/assets";
 import ButtonStyled from "@modrinth/ui/src/components/base/ButtonStyled.vue";
+import SaveBanner from "~/components/ui/servers/SaveBanner.vue";
+import ServerIcon from "~/components/ui/servers/ServerIcon.vue";
 
 import type { Server } from "~/composables/pyroServers";
 
@@ -250,31 +252,29 @@ const uploadFile = async (e: Event) => {
   });
 
   try {
-    if (data.value?.image) {
-      await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
-      await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
+    await props.server.fs?.deleteFileOrFolder("server-icon.png", false).catch(() => {});
+    await props.server.fs?.deleteFileOrFolder("server-icon-original.png", false).catch(() => {});
+    await props.server.fs?.uploadFile("server-icon.png", scaledFile);
+    await props.server.fs?.uploadFile("server-icon-original.png", file);
+
+    if (data.value) {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise<void>((resolve) => {
+        img.onload = () => {
+          canvas.width = 512;
+          canvas.height = 512;
+          ctx?.drawImage(img, 0, 0, 512, 512);
+          data.value!.image = canvas.toDataURL("image/png");
+          URL.revokeObjectURL(img.src);
+          resolve();
+        };
+      });
     }
 
-    await props.server.fs?.uploadFile("/server-icon.png", scaledFile);
-    await props.server.fs?.uploadFile("/server-icon-original.png", file);
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    await new Promise<void>((resolve) => {
-      img.onload = () => {
-        canvas.width = 512;
-        canvas.height = 512;
-        ctx?.drawImage(img, 0, 0, 512, 512);
-        const dataURL = canvas.toDataURL("image/png");
-        useState(`server-icon-${props.server.serverId}`).value = dataURL;
-        if (data.value) data.value.image = dataURL;
-        resolve();
-        URL.revokeObjectURL(img.src);
-      };
-      img.src = URL.createObjectURL(file);
-    });
-
+    await props.server.refresh(["general"]);
     addNotification({
       group: "serverOptions",
       type: "success",
@@ -292,15 +292,15 @@ const uploadFile = async (e: Event) => {
   }
 };
 
+const moduleLoadStatus = inject<Promise<void> | undefined>("modulesLoaded");
+
 const resetIcon = async () => {
   if (data.value?.image) {
     try {
-      await props.server.fs?.deleteFileOrFolder("/server-icon.png", false);
-      await props.server.fs?.deleteFileOrFolder("/server-icon-original.png", false);
-
-      useState(`server-icon-${props.server.serverId}`).value = undefined;
-      if (data.value) data.value.image = undefined;
-
+      await moduleLoadStatus;
+      await props.server.fs?.deleteFileOrFolder("server-icon.png", false).catch(() => {});
+      await props.server.fs?.deleteFileOrFolder("server-icon-original.png", false).catch(() => {});
+      data.value.image = undefined;
       await props.server.refresh(["general"]);
 
       addNotification({

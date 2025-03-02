@@ -2,13 +2,18 @@
   <div
     v-if="isConnected && !isWsAuthIncorrect"
     class="relative flex select-none flex-col gap-6"
-    data-pyro-server-manager-root
+    data-pyro-servers-page="overview"
   >
     <div
       v-if="inspectingError"
       data-pyro-servers-inspecting-error
-      class="flex justify-between rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+      class="relative flex justify-between rounded-3xl bg-bg-red p-4"
     >
+      <ButtonStyled type="transparent" circular @click="clearError">
+        <button class="absolute right-4 top-4">
+          <XIcon />
+        </button>
+      </ButtonStyled>
       <div class="flex w-full justify-between gap-2">
         <div v-if="inspectingError.analysis.problems.length" class="flex flex-row gap-4">
           <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
@@ -35,28 +40,144 @@
             </li>
           </div>
         </div>
-        <div v-else-if="props.serverPowerState === 'crashed'" class="flex flex-row gap-4">
-          <IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
 
-          <div class="flex flex-col gap-2">
-            <div class="font-semibold">{{ serverData?.name }} shut down unexpectedly.</div>
-            <div class="font-normal">
-              <template v-if="props.powerStateDetails?.oom_killed">
-                The server stopped because it ran out of memory. There may be a memory leak caused
-                by a mod or plugin, or you may need to upgrade your Modrinth Server.
-              </template>
-              <template v-else-if="props.powerStateDetails?.exit_code !== undefined">
-                We could not automatically determine the specific cause of the crash, but your
-                server exited with code
-                {{ props.powerStateDetails.exit_code }}.
-                {{
-                  props.powerStateDetails.exit_code === 1
-                    ? "There may be a mod or plugin causing the issue, or an issue with your server configuration."
-                    : ""
-                }}
-              </template>
-              <template v-else> We could not determine the specific cause of the crash. </template>
-              <div class="mt-2">You can try restarting the server.</div>
+        <div v-else-if="props.serverPowerState === 'crashed'" class="flex w-full flex-row gap-4">
+          <div class="flex w-full flex-col gap-4">
+            <div class="flex flex-row gap-4">
+              <IssuesIcon class="hidden min-h-8 min-w-8 text-red sm:block" />
+
+              <div class="flex flex-col gap-2">
+                <div class="text-xl font-semibold text-contrast">
+                  {{ serverData?.name }} shut down unexpectedly
+                </div>
+                <template v-if="props.powerStateDetails?.oom_killed">
+                  The server stopped because it ran out of memory. There may be a memory leak caused
+                  by a mod or plugin, or you may need to upgrade your Modrinth Server.
+                </template>
+                <template v-else-if="props.powerStateDetails?.exit_code !== undefined">
+                  <div class="w-full">
+                    <div class="leading-[190%]">
+                      The server crashed with exit code {{ props.powerStateDetails.exit_code }}.
+                      We've gathered some steps to help you troubleshoot the issue.
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  We could not determine the specific cause of the crash.
+                </template>
+              </div>
+            </div>
+            <div class="flex w-full flex-col gap-4 lg:flex-row">
+              <div class="flex w-full flex-col gap-2 rounded-2xl bg-bg p-4">
+                <div class="flex flex-row items-center gap-2 font-semibold text-contrast">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-shapes"
+                  >
+                    <path
+                      d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"
+                    />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <circle cx="17.5" cy="17.5" r="3.5" />
+                  </svg>
+                  Check your server's content
+                </div>
+                <div class="text-sm">
+                  Disable any mods or plugins that you don't need, or mods that only need to be
+                  installed on your computer.
+                </div>
+                <ButtonStyled>
+                  <NuxtLink
+                    class="mt-2 !w-full whitespace-pre"
+                    :to="`/servers/manage/${props.server.serverId}/content`"
+                  >
+                    Manage server content
+                  </NuxtLink>
+                </ButtonStyled>
+              </div>
+              <div class="flex w-full flex-col gap-2 rounded-2xl bg-bg p-4">
+                <div class="flex flex-row items-center gap-2 font-semibold text-contrast">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-logs"
+                  >
+                    <path d="M13 12h8" />
+                    <path d="M13 18h8" />
+                    <path d="M13 6h8" />
+                    <path d="M3 12h1" />
+                    <path d="M3 18h1" />
+                    <path d="M3 6h1" />
+                    <path d="M8 12h1" />
+                    <path d="M8 18h1" />
+                    <path d="M8 6h1" />
+                  </svg>
+                  Read your server's logs
+                </div>
+                <div class="text-sm">
+                  Check the logs for errors or warnings. Consider any recent changes made to your
+                  server's configuration.
+                </div>
+                <ButtonStyled @click="fullScreen = !fullScreen">
+                  <button class="mt-2 !w-full whitespace-pre">View logs</button>
+                </ButtonStyled>
+              </div>
+              <div class="flex w-full flex-col gap-2 rounded-2xl bg-bg p-4">
+                <div class="flex flex-row items-center gap-2 font-semibold text-contrast">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-megaphone"
+                  >
+                    <path d="m3 11 18-5v12L3 14v-3z" />
+                    <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+                  </svg>
+                  Report the issue
+                </div>
+                <div class="text-sm">
+                  Your server may be configured incorrectly. Report the issue to the mod or plugin's
+                  creators.
+                </div>
+                <template v-if="props.server.general?.project">
+                  <ButtonStyled>
+                    <a
+                      class="mt-2 !w-full whitespace-pre"
+                      :href="`https://modrinth.com/modpack/${props.server.general.project.id}`"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Report to {{ props.server.general.project.title }}
+                    </a>
+                  </ButtonStyled>
+                </template>
+              </div>
+            </div>
+            <div class="flex flex-row gap-2">
+              <InfoIcon />
+              If you believe this is an issue with the Modrinth Servers platform, please contact
+              support using the chat bubble in the bottom right.
             </div>
           </div>
         </div>
@@ -70,106 +191,24 @@
             </div>
           </div>
         </div>
-        <ButtonStyled color="red" @click="clearError">
-          <button>
-            <XIcon />
-          </button>
-        </ButtonStyled>
       </div>
     </div>
     <div class="flex flex-col-reverse gap-6 md:flex-col">
-      <UiServersServerStats :data="stats" />
+      <Stats :data="stats" />
       <div
         class="relative flex h-[700px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
-
-            <UiServersPanelServerStatus :state="serverPowerState" />
+            <StatusPill :state="serverPowerState" />
           </div>
         </div>
-        <!-- <div class="flex flex-row items-center gap-2 text-sm font-medium">
-          <InfoIcon class="hidden sm:block" />
-          Click and drag to select lines, then CMD+C to copy
-        </div> -->
-        <UiServersPanelTerminal :full-screen="fullScreen">
-          <div class="relative w-full px-4 pt-4">
-            <ul
-              v-if="suggestions.length"
-              id="command-suggestions"
-              ref="suggestionsList"
-              class="mt-1 max-h-60 w-full list-none overflow-auto rounded-md border border-divider bg-bg-raised p-0 shadow-lg"
-              role="listbox"
-            >
-              <li
-                v-for="(suggestion, index) in suggestions"
-                :id="'suggestion-' + index"
-                :key="index"
-                role="option"
-                :aria-selected="index === selectedSuggestionIndex"
-                :class="[
-                  'cursor-pointer px-4 py-2',
-                  index === selectedSuggestionIndex ? 'bg-bg-raised' : 'bg-bg',
-                ]"
-                @click="selectSuggestion(index)"
-                @mousemove="() => (selectedSuggestionIndex = index)"
-              >
-                {{ suggestion }}
-              </li>
-            </ul>
-            <div class="relative flex items-center">
-              <span
-                v-if="bestSuggestion"
-                class="pointer-events-none absolute left-[26px] transform select-none text-gray-400"
-              >
-                <span class="ml-[23.5px] whitespace-pre">{{
-                  " ".repeat(commandInput.length - 1)
-                }}</span>
-                <span> {{ bestSuggestion }} </span>
-                <button
-                  class="text pointer-events-auto ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-none dark:bg-highlight"
-                  aria-label="Accept suggestion"
-                  style="transform: translateY(-1px)"
-                  @click="acceptSuggestion"
-                >
-                  TAB
-                </button>
-              </span>
-              <div
-                class="pointer-events-none absolute left-0 top-0 flex h-full w-full items-center"
-              >
-                <TerminalSquareIcon class="ml-3 h-5 w-5" />
-              </div>
-              <input
-                v-if="isServerRunning"
-                v-model="commandInput"
-                type="text"
-                placeholder="Send a command"
-                class="w-full rounded-md !pl-10 pt-4 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
-                aria-autocomplete="list"
-                aria-controls="command-suggestions"
-                spellcheck="false"
-                :aria-activedescendant="'suggestion-' + selectedSuggestionIndex"
-                @keydown.tab.prevent="acceptSuggestion"
-                @keydown.down.prevent="selectNextSuggestion"
-                @keydown.up.prevent="selectPrevSuggestion"
-                @keydown.enter.prevent="sendCommand"
-              />
-              <input
-                v-else
-                disabled
-                type="text"
-                placeholder="Send a command"
-                class="w-full rounded-md !pl-10 focus:border-none [&&]:border-[1px] [&&]:border-solid [&&]:border-bg-raised [&&]:bg-bg"
-              />
-            </div>
-          </div>
-        </UiServersPanelTerminal>
+        <Terminal :socket="socket" :is-server-running="isServerRunning" :full-screen="fullScreen" />
       </div>
     </div>
   </div>
-  <UiServersOverviewLoading v-else-if="!isConnected && !isWsAuthIncorrect" />
+  <OverviewSkeleton v-else-if="!isConnected && !isWsAuthIncorrect" />
   <div v-else-if="isWsAuthIncorrect" class="flex flex-col">
     <h2>Could not connect to the server.</h2>
     <p>
@@ -187,16 +226,20 @@
 </template>
 
 <script setup lang="ts">
-import { TerminalSquareIcon, XIcon, IssuesIcon } from "@modrinth/assets";
+import { InfoIcon, IssuesIcon, XIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import type { ServerState, Stats } from "~/types/servers";
+import type { ServerState, Stats as StatsType } from "~/types/servers";
 import type { Server } from "~/composables/pyroServers";
+import Terminal from "~/components/ui/servers/overview/Terminal.vue";
+import Stats from "~/components/ui/servers/overview/Stats.vue";
+import StatusPill from "~/components/ui/servers/overview/StatusPill.vue";
+import OverviewSkeleton from "~/components/ui/servers/overview/OverviewSkeleton.vue";
 
 type ServerProps = {
   socket: WebSocket | null;
   isConnected: boolean;
   isWsAuthIncorrect: boolean;
-  stats: Stats;
+  stats: StatsType;
   serverPowerState: ServerState;
   powerStateDetails?: {
     oom_killed?: boolean;
@@ -296,447 +339,11 @@ watch(props, (newAttrs) => {
   socket.value = newAttrs.socket;
 });
 
-const DYNAMIC_ARG = Symbol("DYNAMIC_ARG");
-
-const commandTree: any = {
-  advancement: {
-    grant: {
-      [DYNAMIC_ARG]: {
-        everything: null,
-        only: {
-          [DYNAMIC_ARG]: null,
-        },
-        from: {
-          [DYNAMIC_ARG]: null,
-        },
-        through: {
-          [DYNAMIC_ARG]: null,
-        },
-        until: {
-          [DYNAMIC_ARG]: null,
-        },
-      },
-    },
-    revoke: {
-      [DYNAMIC_ARG]: {
-        everything: null,
-        only: {
-          [DYNAMIC_ARG]: null,
-        },
-        from: {
-          [DYNAMIC_ARG]: null,
-        },
-        through: {
-          [DYNAMIC_ARG]: null,
-        },
-        until: {
-          [DYNAMIC_ARG]: null,
-        },
-      },
-    },
-  },
-  ban: {
-    [DYNAMIC_ARG]: {
-      [DYNAMIC_ARG]: null,
-      duration: {
-        [DYNAMIC_ARG]: null,
-      },
-    },
-  },
-  ban_ip: null,
-  banlist: {
-    ips: null,
-    players: null,
-    all: null,
-  },
-  bossbar: {
-    add: null,
-    get: null,
-    list: null,
-    remove: null,
-    set: null,
-  },
-  clear: {
-    [DYNAMIC_ARG]: {
-      [DYNAMIC_ARG]: {
-        [DYNAMIC_ARG]: null,
-        reason: null,
-      },
-    },
-  },
-  clone: null,
-  data: {
-    get: null,
-    merge: null,
-    modify: null,
-    remove: null,
-  },
-  datapack: {
-    disable: null,
-    enable: null,
-    list: null,
-    reload: null,
-  },
-  debug: {
-    start: null,
-    stop: null,
-    function: null,
-    memory: null,
-  },
-  defaultgamemode: {
-    survival: null,
-    creative: null,
-    adventure: null,
-    spectator: null,
-  },
-  deop: null,
-  difficulty: {
-    peaceful: null,
-    easy: null,
-    normal: null,
-    hard: null,
-  },
-  effect: {
-    give: {
-      [DYNAMIC_ARG]: {
-        [DYNAMIC_ARG]: {
-          [DYNAMIC_ARG]: {
-            [DYNAMIC_ARG]: {
-              true: null,
-              false: null,
-            },
-          },
-        },
-      },
-    },
-    clear: {
-      [DYNAMIC_ARG]: {
-        [DYNAMIC_ARG]: null,
-      },
-    },
-  },
-  enchant: null,
-  execute: null,
-  experience: {
-    add: null,
-    set: null,
-    query: null,
-  },
-  fill: null,
-  forceload: {
-    add: null,
-    remove: null,
-    query: null,
-  },
-  function: null,
-  gamemode: {
-    survival: {
-      [DYNAMIC_ARG]: null,
-    },
-    creative: {
-      [DYNAMIC_ARG]: null,
-    },
-    adventure: {
-      [DYNAMIC_ARG]: null,
-    },
-    spectator: {
-      [DYNAMIC_ARG]: null,
-    },
-  },
-  gamerule: null,
-  give: {
-    [DYNAMIC_ARG]: {
-      [DYNAMIC_ARG]: {
-        [DYNAMIC_ARG]: null,
-      },
-    },
-  },
-  help: null,
-  kick: null,
-  kill: {
-    [DYNAMIC_ARG]: null,
-  },
-  list: null,
-  locate: {
-    biome: null,
-    poi: null,
-    structure: null,
-  },
-  loot: {
-    give: null,
-    insert: null,
-    replace: null,
-    spawn: null,
-  },
-  me: null,
-  msg: null,
-  op: null,
-  pardon: null,
-  pardon_ip: null,
-  particle: null,
-  playsound: null,
-  recipe: {
-    give: null,
-    take: null,
-  },
-  reload: null,
-  say: null,
-  schedule: {
-    function: null,
-    clear: null,
-  },
-  scoreboard: {
-    objectives: {
-      add: null,
-      remove: null,
-      setdisplay: null,
-      list: null,
-      modify: null,
-    },
-    players: {
-      add: null,
-      remove: null,
-      set: null,
-      get: null,
-      list: null,
-      enable: null,
-      operation: null,
-      reset: null,
-    },
-  },
-  seed: null,
-  setblock: null,
-  setidletimeout: null,
-  setworldspawn: null,
-  spawnpoint: null,
-  spectate: null,
-  spreadplayers: null,
-  stop: null,
-  stopsound: null,
-  summon: null,
-  tag: {
-    add: null,
-    list: null,
-    remove: null,
-  },
-  team: {
-    add: null,
-    empty: null,
-    join: null,
-    leave: null,
-    list: null,
-    modify: null,
-    remove: null,
-  },
-  teleport: {
-    [DYNAMIC_ARG]: {
-      [DYNAMIC_ARG]: {
-        [DYNAMIC_ARG]: {
-          [DYNAMIC_ARG]: null,
-        },
-      },
-    },
-  },
-  tp: {
-    [DYNAMIC_ARG]: {
-      [DYNAMIC_ARG]: {
-        [DYNAMIC_ARG]: null,
-      },
-    },
-  },
-  trigger: null,
-  weather: {
-    clear: {
-      [DYNAMIC_ARG]: null,
-    },
-    rain: {
-      [DYNAMIC_ARG]: null,
-    },
-    thunder: {
-      [DYNAMIC_ARG]: null,
-    },
-  },
-  whitelist: {
-    add: null,
-    list: null,
-    off: null,
-    on: null,
-    reload: null,
-    remove: null,
-  },
-  worldborder: {
-    add: null,
-    center: null,
-    damage: {
-      amount: null,
-      buffer: null,
-    },
-    get: null,
-    set: null,
-    warning: {
-      distance: null,
-      time: null,
-    },
-  },
-  xp: null,
-};
-
 const fullScreen = ref(false);
-const commandInput = ref("");
-const suggestions = ref<string[]>([]);
-const selectedSuggestionIndex = ref(0);
 
 const serverData = computed(() => props.server.general);
-// const serverIP = computed(() => serverData.value?.net.ip ?? "");
-// const serverPort = computed(() => serverData.value?.net.port ?? 0);
-// const serverDomain = computed(() => serverData.value?.net.domain ?? "");
-
-const suggestionsList = ref<HTMLUListElement | null>(null);
 
 useHead({
   title: `Overview - ${serverData.value?.name ?? "Server"} - Modrinth`,
 });
-
-const bestSuggestion = computed(() => {
-  if (!suggestions.value.length) return "";
-  const inputTokens = commandInput.value.trim().split(/\s+/);
-  let lastInputToken = inputTokens[inputTokens.length - 1] || "";
-  if (inputTokens.length - 1 === 0 && lastInputToken.startsWith("/")) {
-    lastInputToken = lastInputToken.slice(1);
-  }
-  const selectedSuggestion = suggestions.value[selectedSuggestionIndex.value];
-  const suggestionTokens = selectedSuggestion.split(/\s+/);
-  const lastSuggestionToken = suggestionTokens[suggestionTokens.length - 1] || "";
-  if (lastSuggestionToken.toLowerCase().startsWith(lastInputToken.toLowerCase())) {
-    return lastSuggestionToken.slice(lastInputToken.length);
-  }
-  return "";
-});
-
-const getSuggestions = (input: string): string[] => {
-  const trimmedInput = input.trim();
-  const inputWithoutSlash = trimmedInput.startsWith("/") ? trimmedInput.slice(1) : trimmedInput;
-  const tokens = inputWithoutSlash.split(/\s+/);
-  let currentLevel: any = commandTree;
-
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i].toLowerCase();
-    if (currentLevel?.[token]) {
-      currentLevel = currentLevel[token] as any;
-    } else if (currentLevel?.[DYNAMIC_ARG]) {
-      currentLevel = currentLevel[DYNAMIC_ARG] as any;
-    } else {
-      if (i === tokens.length - 1) {
-        break;
-      }
-      currentLevel = null;
-      break;
-    }
-  }
-
-  if (currentLevel) {
-    const lastToken = tokens[tokens.length - 1]?.toLowerCase() || "";
-    const possibleKeys = Object.keys(currentLevel);
-    if (currentLevel[DYNAMIC_ARG]) {
-      possibleKeys.push("<arg>");
-    }
-    return possibleKeys
-      .filter((key) => key === "<arg>" || key.toLowerCase().startsWith(lastToken))
-      .filter((k) => k !== lastToken.trim())
-      .map((key) => {
-        if (key === "<arg>") {
-          return [...tokens.slice(0, -1), "<arg>"].join(" ");
-        }
-        const newTokens = [...tokens.slice(0, -1), key];
-        return newTokens.join(" ");
-      });
-  }
-
-  return [];
-};
-
-const sendCommand = () => {
-  const cmd = commandInput.value.trim();
-  if (!socket || !cmd) return;
-  try {
-    sendConsoleCommand(cmd);
-    commandInput.value = "";
-    suggestions.value = [];
-    selectedSuggestionIndex.value = 0;
-  } catch (error) {
-    console.error("Error sending command:", error);
-  }
-};
-
-const sendConsoleCommand = (cmd: string) => {
-  try {
-    socket.value?.send(JSON.stringify({ event: "command", cmd }));
-  } catch (error) {
-    console.error("Error sending command:", error);
-  }
-};
-
-watch(
-  () => selectedSuggestionIndex.value,
-  (newVal) => {
-    if (suggestionsList.value) {
-      const selectedSuggestion = suggestionsList.value.querySelector(`#suggestion-${newVal}`);
-      if (selectedSuggestion) {
-        selectedSuggestion.scrollIntoView({ block: "nearest" });
-      }
-    }
-  },
-);
-
-watch(
-  () => commandInput.value,
-  (newVal) => {
-    const trimmed = newVal.trim();
-    if (!trimmed) {
-      suggestions.value = [];
-      return;
-    }
-    suggestions.value = getSuggestions(newVal);
-    selectedSuggestionIndex.value = 0;
-  },
-);
-
-const selectNextSuggestion = () => {
-  if (suggestions.value.length === 0) return;
-  selectedSuggestionIndex.value = (selectedSuggestionIndex.value + 1) % suggestions.value.length;
-};
-
-const selectPrevSuggestion = () => {
-  if (suggestions.value.length === 0) return;
-  selectedSuggestionIndex.value =
-    (selectedSuggestionIndex.value - 1 + suggestions.value.length) % suggestions.value.length;
-};
-
-const acceptSuggestion = () => {
-  if (suggestions.value.filter((s) => s !== "<arg>").length === 0) return;
-  const selected = suggestions.value[selectedSuggestionIndex.value];
-  const currentTokens = commandInput.value.trim().split(" ");
-  const suggestionTokens = selected.split(/\s+/).filter(Boolean);
-
-  // check if last current token is in command tree if so just add to the end
-  if (currentTokens[currentTokens.length - 1].toLowerCase() === suggestionTokens[0].toLowerCase()) {
-    /* empty */
-  } else {
-    const offset =
-      currentTokens.length - 1 === 0 && currentTokens[0].trim().startsWith("/") ? 1 : 0;
-    commandInput.value =
-      commandInput.value +
-      suggestionTokens[suggestionTokens.length - 1].substring(
-        currentTokens[currentTokens.length - 1].length - offset,
-      ) +
-      " ";
-    suggestions.value = getSuggestions(commandInput.value);
-    selectedSuggestionIndex.value = 0;
-  }
-};
-
-const selectSuggestion = (index: number) => {
-  selectedSuggestionIndex.value = index;
-  acceptSuggestion();
-};
 </script>

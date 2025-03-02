@@ -1,6 +1,7 @@
 <template>
   <div data-pyro-telepopover-wrapper class="relative">
     <button
+      v-if="!isContextMenu"
       ref="triggerRef"
       class="teleport-overflow-menu-trigger"
       :aria-expanded="isOpen"
@@ -105,22 +106,23 @@ import { ButtonStyled } from "@modrinth/ui";
 import { ref, onMounted, onUnmounted, watch, nextTick, computed } from "vue";
 import { onClickOutside, useElementHover } from "@vueuse/core";
 
-interface Option {
+export interface Option {
   id: string;
   action?: (() => void) | string;
   shown?: boolean;
   color?: "standard" | "brand" | "red" | "orange" | "green" | "blue" | "purple";
 }
 
-const props = withDefaults(
-  defineProps<{
-    options: Option[];
-    hoverable?: boolean;
-  }>(),
-  {
-    hoverable: false,
-  },
-);
+interface Props {
+  options: Option[];
+  hoverable?: boolean;
+  isContextMenu?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  hoverable: false,
+  isContextMenu: false,
+});
 
 const emit = defineEmits<{
   (e: "select", option: Option): void;
@@ -134,6 +136,7 @@ const isMouseDown = ref(false);
 const typeAheadBuffer = ref("");
 const typeAheadTimeout = ref<number | null>(null);
 const menuItemsRef = ref<HTMLElement[]>([]);
+const contextPosition = ref({ x: 0, y: 0 });
 
 const hoveringTrigger = useElementHover(triggerRef);
 const hoveringMenu = useElementHover(menuRef);
@@ -145,16 +148,49 @@ const menuStyle = ref({
   left: "0px",
 });
 
+const menuDimensions = ref({ width: 0, height: 0 });
+const initialRender = ref(true);
+
 const filteredOptions = computed(() => props.options.filter((option) => option.shown !== false));
 
 const calculateMenuPosition = () => {
+  const margin = 8;
+  const safeMargin = margin * 2;
+
+  if (props.isContextMenu) {
+    let x = contextPosition.value.x;
+    let y = contextPosition.value.y;
+
+    const menuWidth = initialRender.value
+      ? menuDimensions.value.width
+      : menuRef.value?.getBoundingClientRect().width ?? 0;
+    const menuHeight = initialRender.value
+      ? menuDimensions.value.height
+      : menuRef.value?.getBoundingClientRect().height ?? 0;
+
+    if (x + menuWidth > window.innerWidth - margin) {
+      x = Math.max(margin, window.innerWidth - menuWidth - safeMargin);
+    }
+
+    if (y + menuHeight > window.innerHeight - margin) {
+      y = Math.max(margin, window.innerHeight - menuHeight - safeMargin);
+    }
+
+    x = Math.min(Math.max(margin, x), window.innerWidth - menuWidth - safeMargin);
+    y = Math.min(Math.max(margin, y), window.innerHeight - menuHeight - safeMargin);
+
+    return {
+      top: `${y}px`,
+      left: `${x}px`,
+    };
+  }
+
   if (!triggerRef.value || !menuRef.value) return { top: "0px", left: "0px" };
 
   const triggerRect = triggerRef.value.getBoundingClientRect();
   const menuRect = menuRef.value.getBoundingClientRect();
   const menuWidth = menuRect.width;
   const menuHeight = menuRect.height;
-  const margin = 8;
 
   let top: number;
   let left: number;
@@ -162,21 +198,21 @@ const calculateMenuPosition = () => {
   // okay gang lets calculate this shit
   // from the top now yall
   // y
-  if (triggerRect.bottom + menuHeight + margin <= window.innerHeight) {
+  // now with even better calcs
+  if (triggerRect.bottom + menuHeight <= window.innerHeight - margin) {
     top = triggerRect.bottom + margin;
-  } else if (triggerRect.top - menuHeight - margin >= 0) {
+  } else if (triggerRect.top - menuHeight >= margin) {
     top = triggerRect.top - menuHeight - margin;
   } else {
-    top = Math.max(margin, window.innerHeight - menuHeight - margin);
+    top = Math.max(margin, Math.min(window.innerHeight - menuHeight - margin, triggerRect.top));
   }
 
-  // x
-  if (triggerRect.left + menuWidth + margin <= window.innerWidth) {
+  if (triggerRect.left + menuWidth <= window.innerWidth - margin) {
     left = triggerRect.left;
-  } else if (triggerRect.right - menuWidth - margin >= 0) {
+  } else if (triggerRect.right - menuWidth >= margin) {
     left = triggerRect.right - menuWidth;
   } else {
-    left = Math.max(margin, window.innerWidth - menuWidth - margin);
+    left = Math.max(margin, Math.min(window.innerWidth - menuWidth - margin, triggerRect.left));
   }
 
   return {
@@ -425,9 +461,54 @@ watch(isOpen, (newValue) => {
   }
 });
 
+watch(
+  filteredOptions,
+  () => {
+    if (menuRef.value && isOpen.value) {
+      const rect = menuRef.value.getBoundingClientRect();
+      menuDimensions.value = {
+        width: rect.width,
+        height: rect.height,
+      };
+      menuStyle.value = calculateMenuPosition();
+    }
+  },
+  { deep: true },
+);
+
 onClickOutside(menuRef, (event) => {
   if (!triggerRef.value?.contains(event.target as Node)) {
     closeMenu();
   }
+});
+
+const openContextMenu = (x: number, y: number) => {
+  contextPosition.value = { x, y };
+  initialRender.value = true;
+  isOpen.value = true;
+  disableBodyScroll();
+
+  nextTick(() => {
+    if (menuRef.value) {
+      const rect = menuRef.value.getBoundingClientRect();
+      menuDimensions.value = {
+        width: rect.width,
+        height: rect.height,
+      };
+      menuStyle.value = calculateMenuPosition();
+
+      setTimeout(() => {
+        initialRender.value = false;
+        menuStyle.value = calculateMenuPosition();
+      }, 150);
+    }
+    document.addEventListener("mousemove", handleMouseMove);
+    focusFirstMenuItem();
+  });
+};
+
+defineExpose({
+  openContextMenu,
+  close: closeMenu,
 });
 </script>

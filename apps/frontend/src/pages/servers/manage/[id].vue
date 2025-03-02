@@ -19,7 +19,7 @@
       </div>
     </div>
     <div
-      v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'support'"
+      v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'support'"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -38,7 +38,7 @@
       </div>
     </div>
     <div
-      v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason !== 'upgrading'"
+      v-else-if="serverData?.status === 'suspended'"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
       <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -86,7 +86,7 @@
             this is an error, please contact Modrinth support.
           </p>
         </div>
-        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+        <CopyCode :text="JSON.stringify(server.general?.error)" />
 
         <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
           <button class="mt-6 !w-full">Go back to all servers</button>
@@ -101,7 +101,7 @@
         <div class="flex flex-col items-center text-center">
           <div class="flex flex-col items-center gap-4">
             <div class="grid place-content-center rounded-full bg-bg-red p-4">
-              <UiServersIconsPanelErrorIcon class="size-12 text-red" />
+              <PanelErrorIcon class="size-12 text-red" />
             </div>
             <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
           </div>
@@ -119,8 +119,7 @@
           </p>
 
           <div class="flex flex-col gap-2">
-            <UiCopyCode :text="'Server ID: ' + server.serverId" />
-            <UiCopyCode :text="'Node: ' + server.general?.datacenter" />
+            <CopyCode :text="'Server ID: ' + server.serverId" />
           </div>
         </div>
         <ButtonStyled
@@ -169,7 +168,7 @@
             temporary network issue. You'll be reconnected automatically.
           </p>
         </div>
-        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+        <CopyCode :text="JSON.stringify(server.general?.error)" />
         <ButtonStyled
           :disabled="formattedTime !== '00'"
           size="large"
@@ -184,15 +183,22 @@
     <div
       v-else-if="serverData"
       data-pyro-server-manager-root
-      class="experimental-styles-within mobile-blurred-servericon relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
-      :style="{
-        '--server-bg-image': serverData.image
-          ? `url(${serverData.image})`
-          : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
-      }"
+      class="experimental-styles-within relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
     >
+      <div class="absolute left-0 right-0 top-0 w-full">
+        <ClientOnly>
+          <div
+            class="mobile-blurred-servericon pointer-events-none absolute left-0 right-0 top-0 w-full"
+            :style="{
+              '--server-bg-image': serverData.image
+                ? `url(${serverData.image})`
+                : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
+            }"
+          ></div>
+        </ClientOnly>
+      </div>
       <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-        <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
+        <ServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
         <div
           class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
         >
@@ -213,7 +219,7 @@
               data-pyro-server-action-buttons
               class="server-action-buttons-anim flex w-fit flex-shrink-0"
             >
-              <UiServersPanelServerActionButton
+              <ServerActionsArea
                 class="flex-shrink-0"
                 :is-online="isServerRunning"
                 :is-actioning="isActioning"
@@ -227,7 +233,7 @@
             </div>
           </div>
 
-          <UiServersServerInfoLabels
+          <ServerLabels
             :server-data="serverData"
             :show-game-label="showGameLabel"
             :show-loader-label="showLoaderLabel"
@@ -242,7 +248,7 @@
         data-pyro-navigation
         class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
       >
-        <UiNavTabs :links="navLinks" />
+        <NavTabs :links="navLinks" />
       </div>
 
       <div data-pyro-mount class="h-full w-full flex-1">
@@ -350,7 +356,7 @@
           data-pyro-server-ws-reconnecting
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
         >
-          <UiServersPanelSpinner />
+          <SpinnerIcon />
           Hang on, we're reconnecting to your server.
         </div>
 
@@ -359,12 +365,12 @@
           data-pyro-server-installing
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
         >
-          <UiServersServerIcon :image="serverData.image" class="!h-10 !w-10" />
+          <ServerIcon :image="serverData.image" class="!h-10 !w-10" />
 
           <div class="flex flex-col gap-1">
             <span class="text-lg font-bold"> We're preparing your server! </span>
             <div class="flex flex-row items-center gap-2">
-              <UiServersPanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
+              <SpinnerIcon class="!h-3 !w-3" /> <InstallingTicker />
             </div>
           </div>
         </div>
@@ -376,13 +382,13 @@
           :stats="stats"
           :server-power-state="serverPowerState"
           :power-state-details="powerStateDetails"
-          :socket="socket"
+          :socket="socketMap.get(serverId)"
           :server="server"
           @reinstall="onReinstall"
         />
       </div>
 
-      <UiServersPoweredByPyro />
+      <PoweredByPyro />
     </div>
   </div>
 </template>
@@ -399,15 +405,27 @@ import {
   TransferIcon,
   LockIcon,
 } from "@modrinth/assets";
-import DOMPurify from "dompurify";
 import { ButtonStyled } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import { reloadNuxtApp, navigateTo } from "#app";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
+import SpinnerIcon from "~/components/ui/servers/icons/SpinnerIcon.vue";
+import InstallingTicker from "~/components/ui/servers/root/InstallingTicker.vue";
+import PoweredByPyro from "~/components/ui/servers/PoweredByPyro.vue";
+import CopyCode from "~/components/ui/CopyCode.vue";
+import PanelErrorIcon from "~/components/ui/servers/icons/PanelErrorIcon.vue";
+import ServerIcon from "~/components/ui/servers/ServerIcon.vue";
+import ServerLabels from "~/components/ui/servers/root/ServerLabels.vue";
+import ServerActionsArea from "~/components/ui/servers/root/ServerActionsArea.vue";
+import NavTabs from "~/components/ui/NavTabs.vue";
 
-const socket = ref<WebSocket | null>(null);
+const socketMap = new Map<string, WebSocket>();
+const statsMap = ref(new Map<string, Stats>());
+const uptimeMap = new Map<string, number>();
+
 const isReconnecting = ref(false);
+const isConnecting = ref(false);
 const isLoading = ref(true);
 const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null);
 const isFirstMount = ref(true);
@@ -457,18 +475,19 @@ const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
 const errorLog = ref("");
 const errorLogFile = ref("");
-const serverData = computed(() => server.general);
+const serverData = computed<GeneralModule | undefined>(() => server.general);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const pyroConsole = usePyroConsole();
-const cpuData = ref<number[]>([]);
-const ramData = ref<number[]>([]);
 const isActioning = ref(false);
 const isServerRunning = computed(() => serverPowerState.value === "running");
 const serverPowerState = ref<ServerState>("stopped");
 const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>();
 
-const uptimeSeconds = ref(0);
+const uptimeSeconds = computed({
+  get: () => uptimeMap.get(serverId) || 0,
+  set: (value) => uptimeMap.set(serverId, value),
+});
 const firstConnect = ref(true);
 const copied = ref(false);
 const error = ref<Error | null>(null);
@@ -488,26 +507,29 @@ const initialConsoleMessage = [
   "\x1B[32m   ~~  ~~  ~~\x1B[37m",
 ];
 
-const stats = ref<Stats>({
-  current: {
-    cpu_percent: 0,
-    ram_usage_bytes: 0,
-    ram_total_bytes: 1,
-    storage_usage_bytes: 0,
-    storage_total_bytes: 0,
-  },
-  past: {
-    cpu_percent: 0,
-    ram_usage_bytes: 0,
-    ram_total_bytes: 1,
-    storage_usage_bytes: 0,
-    storage_total_bytes: 0,
-  },
-  graph: {
-    cpu: [],
-    ram: [],
-  },
-});
+const stats = computed<Stats>(
+  () =>
+    statsMap.value.get(serverId) || {
+      current: {
+        cpu_percent: 0,
+        ram_usage_bytes: 0,
+        ram_total_bytes: 1,
+        storage_usage_bytes: 0,
+        storage_total_bytes: 0,
+      },
+      past: {
+        cpu_percent: 0,
+        ram_usage_bytes: 0,
+        ram_total_bytes: 1,
+        storage_usage_bytes: 0,
+        storage_total_bytes: 0,
+      },
+      graph: {
+        cpu: [],
+        ram: [],
+      },
+    },
+);
 
 const showGameLabel = computed(() => !!serverData.value?.game);
 const showLoaderLabel = computed(() => !!serverData.value?.loader);
@@ -529,23 +551,35 @@ const navLinks = [
 ];
 
 const connectWebSocket = () => {
-  if (!isMounted.value) return;
+  if (!isMounted.value || isConnecting.value || !server.ws?.url) return;
 
   try {
+    isConnecting.value = true;
     const wsAuth = computed(() => server.ws);
-    socket.value = new WebSocket(`wss://${wsAuth.value?.url}`);
 
-    socket.value.onopen = () => {
-      if (!isMounted.value) {
-        socket.value?.close();
+    const existingSocket = socketMap.get(serverId);
+    if (existingSocket) {
+      existingSocket.onclose = null;
+      existingSocket.close();
+      socketMap.delete(serverId);
+    }
+
+    const newSocket = new WebSocket(`wss://${wsAuth.value?.url}`);
+    socketMap.set(serverId, newSocket);
+
+    newSocket.onopen = () => {
+      if (!isMounted.value || !wsAuth.value?.token) {
+        newSocket.close();
+        socketMap.delete(serverId);
         return;
       }
 
       pyroConsole.clear();
-      socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+      newSocket.send(JSON.stringify({ event: "auth", jwt: wsAuth.value.token }));
       isConnected.value = true;
       isReconnecting.value = false;
       isLoading.value = false;
+      isConnecting.value = false;
 
       if (firstConnect.value) {
         for (let i = 0; i < initialConsoleMessage.length; i++) {
@@ -556,38 +590,41 @@ const connectWebSocket = () => {
       firstConnect.value = false;
 
       if (reconnectInterval.value) {
-        if (reconnectInterval.value !== null) {
-          clearInterval(reconnectInterval.value);
-        }
+        clearInterval(reconnectInterval.value);
         reconnectInterval.value = null;
       }
     };
 
-    socket.value.onmessage = (event) => {
+    newSocket.onmessage = (event) => {
       if (isMounted.value) {
         const data: WSEvent = JSON.parse(event.data);
         handleWebSocketMessage(data);
       }
     };
 
-    socket.value.onclose = () => {
+    newSocket.onclose = () => {
       if (isMounted.value) {
-        pyroConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
+        isConnecting.value = false;
         isConnected.value = false;
+        socketMap.delete(serverId);
+        pyroConsole.addLine("\nSomething went wrong with the connection, we're reconnecting...");
         scheduleReconnect();
       }
     };
 
-    socket.value.onerror = (error) => {
+    newSocket.onerror = (error) => {
       if (isMounted.value) {
         console.error("Failed to connect WebSocket:", error);
+        isConnecting.value = false;
         isConnected.value = false;
+        socketMap.delete(serverId);
         scheduleReconnect();
       }
     };
   } catch (error) {
     if (isMounted.value) {
       console.error("Failed to connect WebSocket:", error);
+      isConnecting.value = false;
       isConnected.value = false;
       scheduleReconnect();
     }
@@ -595,15 +632,18 @@ const connectWebSocket = () => {
 };
 
 const scheduleReconnect = () => {
-  if (!isMounted.value) return;
+  if (!isMounted.value || isConnecting.value) return;
 
   if (!reconnectInterval.value) {
     isReconnecting.value = true;
     reconnectInterval.value = setInterval(() => {
-      if (isMounted.value) {
+      if (isMounted.value && !isConnecting.value) {
         console.log("Attempting to reconnect...");
         connectWebSocket();
-      } else {
+      } else if (!isMounted.value) {
+        if (reconnectInterval.value) {
+          clearInterval(reconnectInterval.value);
+        }
         reconnectInterval.value = null;
       }
     }, 5000);
@@ -627,14 +667,38 @@ const stopUptimeUpdates = () => {
 
 const handleWebSocketMessage = (data: WSEvent) => {
   switch (data.event) {
-    case "log":
-      // eslint-disable-next-line no-case-declarations
+    case "log": {
       const log = data.message.split("\n").filter((l) => l.trim());
       pyroConsole.addLines(log);
       break;
-    case "stats":
-      updateStats(data);
+    }
+    case "stats": {
+      const currentStats = {
+        cpu_percent: data.cpu_percent,
+        ram_usage_bytes: data.ram_usage_bytes,
+        ram_total_bytes: data.ram_total_bytes,
+        storage_usage_bytes: data.storage_usage_bytes,
+        storage_total_bytes: data.storage_total_bytes,
+      };
+
+      const newStats = {
+        current: currentStats,
+        past: statsMap.value.get(serverId)?.current || currentStats,
+        graph: {
+          cpu: updateGraphData(
+            statsMap.value.get(serverId)?.graph.cpu || [],
+            currentStats.cpu_percent,
+          ),
+          ram: updateGraphData(
+            statsMap.value.get(serverId)?.graph.ram || [],
+            Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100),
+          ),
+        },
+      };
+
+      statsMap.value = new Map(statsMap.value).set(serverId, newStats);
       break;
+    }
     case "auth-expiring":
     case "auth-incorrect":
       reauthenticate();
@@ -765,21 +829,6 @@ const handleInstallationResult = async (data: WSInstallationResultEvent) => {
   }
 };
 
-const updateStats = (currentStats: Stats["current"]) => {
-  isConnected.value = true;
-  stats.value = {
-    current: currentStats,
-    past: { ...stats.value.current },
-    graph: {
-      cpu: updateGraphData(cpuData.value, currentStats.cpu_percent),
-      ram: updateGraphData(
-        ramData.value,
-        Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100),
-      ),
-    },
-  };
-};
-
 const updatePowerState = (
   state: ServerState,
   details?: { oom_killed?: boolean; exit_code?: number },
@@ -806,9 +855,14 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
 
 const reauthenticate = async () => {
   try {
-    await server.refresh();
+    await server.refresh(["ws"]);
     const wsAuth = computed(() => server.ws);
-    socket.value?.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+    const socket = socketMap.get(serverId);
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ event: "auth", jwt: wsAuth.value?.token }));
+    } else {
+      connectWebSocket();
+    }
   } catch (error) {
     console.error("Reauthentication failed:", error);
     isWSAuthIncorrect.value = true;
@@ -902,31 +956,32 @@ const cleanup = () => {
 
   stopPolling();
   stopUptimeUpdates();
+
   if (reconnectInterval.value) {
     clearInterval(reconnectInterval.value);
     reconnectInterval.value = null;
   }
 
-  if (socket.value) {
-    socket.value.onopen = null;
-    socket.value.onmessage = null;
-    socket.value.onclose = null;
-    socket.value.onerror = null;
+  const socket = socketMap.get(serverId);
+  if (socket) {
+    socket.onopen = null;
+    socket.onmessage = null;
+    socket.onclose = null;
+    socket.onerror = null;
 
-    if (
-      socket.value.readyState === WebSocket.OPEN ||
-      socket.value.readyState === WebSocket.CONNECTING
-    ) {
-      socket.value.close();
+    if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
+      socket.close();
     }
-    socket.value = null;
+    socketMap.delete(serverId);
   }
 
+  statsMap.value.delete(serverId);
+  uptimeMap.delete(serverId);
+
+  isConnecting.value = false;
   isConnected.value = false;
   isReconnecting.value = false;
   isLoading.value = true;
-
-  DOMPurify.removeHook("afterSanitizeAttributes");
 };
 
 onMounted(() => {
@@ -963,19 +1018,6 @@ onMounted(() => {
       console.warn("[PYROSERVERS][INTERCOM] mismatch");
     }
   }
-
-  DOMPurify.addHook(
-    "afterSanitizeAttributes",
-    (node: {
-      tagName: string;
-      getAttribute: (arg0: string) => any;
-      setAttribute: (arg0: string, arg1: string) => void;
-    }) => {
-      if (node.tagName === "A" && node.getAttribute("target")) {
-        node.setAttribute("rel", "noopener noreferrer");
-      }
-    },
-  );
 });
 
 onUnmounted(() => {

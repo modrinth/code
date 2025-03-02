@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <UiServersSaveBanner
+    <SaveBanner
       :is-visible="hasUnsavedChanges"
       :server="props.server"
       :is-updating="false"
@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
+import SaveBanner from "~/components/ui/servers/SaveBanner.vue";
 import type { Server } from "~/composables/pyroServers";
 
 const route = useNativeRoute();
@@ -79,6 +80,11 @@ const preferences = {
     description: "When enabled, backups will be created even if the server is running.",
     implemented: true,
   },
+  wrapLinesInConsoleLogModal: {
+    displayName: "Wrap lines in console log viewer",
+    description: "When enabled, long lines will be wrapped in the console log viewer modal.",
+    implemented: true,
+  },
 } as const;
 
 type PreferenceKeys = keyof typeof preferences;
@@ -93,6 +99,7 @@ const defaultPreferences: UserPreferences = {
   autoRestart: false,
   powerDontAskAgain: false,
   backupWhileRunning: false,
+  wrapLinesInConsoleLogModal: true,
 };
 
 const userPreferences = useStorage<UserPreferences>(
