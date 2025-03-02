@@ -21,7 +21,7 @@ importers:
         version: 2.2.3
       vue:
         specifier: ^3.5.13
-        version: 3.5.13(typescript@5.5.4)
+        version: 3.5.13(typescript@5.8.2)
 
   apps/app:
     dependencies:
@@ -79,7 +79,7 @@ importers:
         version: 1.11.11
       floating-vue:
         specifier: ^5.2.2
-        version: 5.2.2(@nuxt/kit@3.14.1592(magicast@0.3.5)(rollup@4.34.9))(vue@3.5.13(typescript@5.5.4))
+        version: 5.2.2(@nuxt/kit@3.14.1592(magicast@0.3.5))(vue@3.5.13(typescript@5.5.4))
       ofetch:
         specifier: ^1.3.4
         version: 1.4.1
@@ -166,25 +166,25 @@ importers:
     dependencies:
       '@astrojs/check':
         specifier: ^0.9.4
-        version: 0.9.4(prettier@3.3.2)(typescript@5.5.4)
+        version: 0.9.4(prettier@3.3.2)(typescript@5.8.2)
       '@astrojs/starlight':
         specifier: ^0.32.2
-        version: 0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1))
+        version: 0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1))
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets
       astro:
         specifier: ^5.4.1
-        version: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1)
+        version: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1)
       sharp:
         specifier: ^0.32.5
         version: 0.32.6
       starlight-openapi:
-        specifier: ^0.7.0
-        version: 0.7.0(@astrojs/markdown-remark@6.2.0)(@astrojs/starlight@0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1)))(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1))(openapi-types@12.1.3)
+        specifier: ^0.13.0
+        version: 0.13.0(@astrojs/markdown-remark@6.2.0)(@astrojs/starlight@0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1)))(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1))(openapi-types@12.1.3)
       typescript:
-        specifier: ^5.5.4
-        version: 5.5.4
+        specifier: ^5.8.2
+        version: 5.8.2
 
   apps/frontend:
     dependencies:
@@ -354,7 +354,7 @@ importers:
         version: link:../tsconfig
       vue:
         specifier: ^3.5.13
-        version: 3.5.13(typescript@5.5.4)
+        version: 3.5.13(typescript@5.8.2)
 
   packages/daedalus: {}
 
@@ -6714,13 +6714,13 @@ packages:
   standard-as-callback@2.1.0:
     resolution: {integrity: sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A==}
 
-  starlight-openapi@0.7.0:
-    resolution: {integrity: sha512-+aqVVqmoFZTb3ibXM6mfl3nmKY/bCZOn5+FTRzOGulEOtG4R8Y8NGwj9HN+6vxLZSPlAPfKwb3ipcAdDbVBuCg==}
-    engines: {node: '>=18.14.1'}
+  starlight-openapi@0.13.0:
+    resolution: {integrity: sha512-X2QrMFaNuLiURABwSVdU/XgpQgXE1lBKLpci16aJywkYpgcUHDJwVVIQIEMYDWsApxd8ElVsv3AtzTVlWbNOlA==}
+    engines: {node: '>=18.17.1'}
     peerDependencies:
-      '@astrojs/markdown-remark': '>=4.2.0'
-      '@astrojs/starlight': '>=0.26.0'
-      astro: '>=4.8.6'
+      '@astrojs/markdown-remark': '>=6.0.1'
+      '@astrojs/starlight': '>=0.30.0'
+      astro: '>=5.1.5'
 
   statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
@@ -7099,6 +7099,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@5.8.2:
+    resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   uc.micro@1.0.6:
     resolution: {integrity: sha512-8Y75pvTYkLJW2hWQHXxoqRgV7qb9B+9vFEtidML+7koHUFapnVJAZ6cKs+Qjz5Aw3aZWHMC6u0wJE3At+nSGwA==}
 
@@ -7320,6 +7325,10 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
+
+  url-template@3.1.1:
+    resolution: {integrity: sha512-4oszoaEKE/mQOtAmdMWqIRHmkxWkUZMnXFnjQ5i01CuRSK3uluxcH1MRVVVWmhlnzT1SCDfKxxficm2G37qzCA==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   urlpattern-polyfill@8.0.2:
     resolution: {integrity: sha512-Qp95D4TPJl1kC9SKigDcqgyM2VDVO4RiJc2d4qe5GrYm+zbIQCWWKAFaJNQ4BhdFeDGwBmAxqJBwWSJDb9T3BQ==}
@@ -7918,12 +7927,12 @@ snapshots:
 
   '@apidevtools/swagger-methods@3.0.2': {}
 
-  '@astrojs/check@0.9.4(prettier@3.3.2)(typescript@5.5.4)':
+  '@astrojs/check@0.9.4(prettier@3.3.2)(typescript@5.8.2)':
     dependencies:
-      '@astrojs/language-server': 2.15.4(prettier@3.3.2)(typescript@5.5.4)
+      '@astrojs/language-server': 2.15.4(prettier@3.3.2)(typescript@5.8.2)
       chokidar: 4.0.1
       kleur: 4.1.5
-      typescript: 5.5.4
+      typescript: 5.8.2
       yargs: 17.7.2
     transitivePeerDependencies:
       - prettier
@@ -7935,12 +7944,12 @@ snapshots:
 
   '@astrojs/internal-helpers@0.6.0': {}
 
-  '@astrojs/language-server@2.15.4(prettier@3.3.2)(typescript@5.5.4)':
+  '@astrojs/language-server@2.15.4(prettier@3.3.2)(typescript@5.8.2)':
     dependencies:
       '@astrojs/compiler': 2.10.3
       '@astrojs/yaml2ts': 0.2.2
       '@jridgewell/sourcemap-codec': 1.5.0
-      '@volar/kit': 2.4.11(typescript@5.5.4)
+      '@volar/kit': 2.4.11(typescript@5.8.2)
       '@volar/language-core': 2.4.11
       '@volar/language-server': 2.4.11
       '@volar/language-service': 2.4.11
@@ -7986,12 +7995,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@4.1.0(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1))':
+  '@astrojs/mdx@4.1.0(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1))':
     dependencies:
       '@astrojs/markdown-remark': 6.2.0
       '@mdx-js/mdx': 3.1.0(acorn@8.14.0)
       acorn: 8.14.0
-      astro: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1)
+      astro: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1)
       es-module-lexer: 1.6.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -8015,16 +8024,16 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 3.23.8
 
-  '@astrojs/starlight@0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1))':
+  '@astrojs/starlight@0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1))':
     dependencies:
-      '@astrojs/mdx': 4.1.0(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1))
+      '@astrojs/mdx': 4.1.0(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1))
       '@astrojs/sitemap': 3.2.1
       '@pagefind/default-ui': 1.3.0
       '@types/hast': 3.0.4
       '@types/js-yaml': 4.0.9
       '@types/mdast': 4.0.4
-      astro: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1)
-      astro-expressive-code: 0.40.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1))
+      astro: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1)
+      astro-expressive-code: 0.40.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1))
       bcp-47: 2.1.0
       hast-util-from-html: 2.0.2
       hast-util-select: 6.0.2
@@ -8776,7 +8785,7 @@ snapshots:
       json-stable-stringify: 1.1.1
       loud-rejection: 2.2.0
       tslib: 2.6.3
-      typescript: 5.5.4
+      typescript: 5.8.2
     optionalDependencies:
       '@vue/compiler-core': 3.5.13
       vue: 3.5.13(typescript@5.5.4)
@@ -8853,7 +8862,7 @@ snapshots:
       chalk: 4.1.2
       json-stable-stringify: 1.1.1
       tslib: 2.6.3
-      typescript: 5.5.4
+      typescript: 5.8.2
 
   '@humanfs/core@0.19.0': {}
 
@@ -9206,6 +9215,34 @@ snapshots:
       - supports-color
       - typescript
 
+  '@nuxt/kit@3.14.1592(magicast@0.3.5)':
+    dependencies:
+      '@nuxt/schema': 3.14.1592(magicast@0.3.5)
+      c12: 2.0.1(magicast@0.3.5)
+      consola: 3.2.3
+      defu: 6.1.4
+      destr: 2.0.3
+      globby: 14.0.2
+      hash-sum: 2.0.0
+      ignore: 6.0.2
+      jiti: 2.4.1
+      klona: 2.0.6
+      knitwork: 1.1.0
+      mlly: 1.7.3
+      pathe: 1.1.2
+      pkg-types: 1.2.1
+      scule: 1.3.0
+      semver: 7.6.3
+      ufo: 1.5.4
+      unctx: 2.3.1
+      unimport: 3.14.4
+      untyped: 1.5.1
+    transitivePeerDependencies:
+      - magicast
+      - rollup
+      - supports-color
+    optional: true
+
   '@nuxt/kit@3.14.1592(magicast@0.3.5)(rollup@3.29.4)':
     dependencies:
       '@nuxt/schema': 3.14.1592(magicast@0.3.5)(rollup@3.29.4)
@@ -9261,27 +9298,20 @@ snapshots:
       - rollup
       - supports-color
 
-  '@nuxt/kit@3.14.1592(magicast@0.3.5)(rollup@4.34.9)':
+  '@nuxt/schema@3.14.1592(magicast@0.3.5)':
     dependencies:
-      '@nuxt/schema': 3.14.1592(magicast@0.3.5)(rollup@4.34.9)
       c12: 2.0.1(magicast@0.3.5)
+      compatx: 0.1.8
       consola: 3.2.3
       defu: 6.1.4
-      destr: 2.0.3
-      globby: 14.0.2
-      hash-sum: 2.0.0
-      ignore: 6.0.2
-      jiti: 2.4.1
-      klona: 2.0.6
-      knitwork: 1.1.0
-      mlly: 1.7.3
+      hookable: 5.5.3
       pathe: 1.1.2
       pkg-types: 1.2.1
       scule: 1.3.0
-      semver: 7.6.3
+      std-env: 3.8.0
       ufo: 1.5.4
-      unctx: 2.3.1
-      unimport: 3.14.4(rollup@4.34.9)
+      uncrypto: 0.1.3
+      unimport: 3.14.4
       untyped: 1.5.1
     transitivePeerDependencies:
       - magicast
@@ -9329,27 +9359,6 @@ snapshots:
       - magicast
       - rollup
       - supports-color
-
-  '@nuxt/schema@3.14.1592(magicast@0.3.5)(rollup@4.34.9)':
-    dependencies:
-      c12: 2.0.1(magicast@0.3.5)
-      compatx: 0.1.8
-      consola: 3.2.3
-      defu: 6.1.4
-      hookable: 5.5.3
-      pathe: 1.1.2
-      pkg-types: 1.2.1
-      scule: 1.3.0
-      std-env: 3.8.0
-      ufo: 1.5.4
-      uncrypto: 0.1.3
-      unimport: 3.14.4(rollup@4.34.9)
-      untyped: 1.5.1
-    transitivePeerDependencies:
-      - magicast
-      - rollup
-      - supports-color
-    optional: true
 
   '@nuxt/telemetry@2.6.0(magicast@0.3.5)(rollup@4.28.1)':
     dependencies:
@@ -9692,15 +9701,6 @@ snapshots:
       picomatch: 4.0.2
     optionalDependencies:
       rollup: 4.28.1
-
-  '@rollup/pluginutils@5.1.3(rollup@4.34.9)':
-    dependencies:
-      '@types/estree': 1.0.6
-      estree-walker: 2.0.2
-      picomatch: 4.0.2
-    optionalDependencies:
-      rollup: 4.34.9
-    optional: true
 
   '@rollup/pluginutils@5.1.4(rollup@4.34.9)':
     dependencies:
@@ -10534,12 +10534,12 @@ snapshots:
       vite: 5.4.11(@types/node@22.4.1)(sass@1.77.6)(terser@5.31.6)
       vue: 3.5.13(typescript@5.5.4)
 
-  '@volar/kit@2.4.11(typescript@5.5.4)':
+  '@volar/kit@2.4.11(typescript@5.8.2)':
     dependencies:
       '@volar/language-service': 2.4.11
       '@volar/typescript': 2.4.11
       typesafe-path: 0.2.2
-      typescript: 5.5.4
+      typescript: 5.8.2
       vscode-languageserver-textdocument: 1.0.12
       vscode-uri: 3.0.8
 
@@ -10748,6 +10748,12 @@ snapshots:
       '@vue/compiler-ssr': 3.5.13
       '@vue/shared': 3.5.13
       vue: 3.5.13(typescript@5.5.4)
+
+  '@vue/server-renderer@3.5.13(vue@3.5.13(typescript@5.8.2))':
+    dependencies:
+      '@vue/compiler-ssr': 3.5.13
+      '@vue/shared': 3.5.13
+      vue: 3.5.13(typescript@5.8.2)
 
   '@vue/shared@3.5.13': {}
 
@@ -11087,12 +11093,12 @@ snapshots:
 
   astring@1.8.6: {}
 
-  astro-expressive-code@0.40.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1)):
+  astro-expressive-code@0.40.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1)):
     dependencies:
-      astro: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1)
+      astro: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1)
       rehype-expressive-code: 0.40.2
 
-  astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1):
+  astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1):
     dependencies:
       '@astrojs/compiler': 2.10.4
       '@astrojs/internal-helpers': 0.6.0
@@ -11139,7 +11145,7 @@ snapshots:
       shiki: 1.29.2
       tinyexec: 0.3.2
       tinyglobby: 0.2.12
-      tsconfck: 3.1.5(typescript@5.5.4)
+      tsconfck: 3.1.5(typescript@5.8.2)
       ultrahtml: 1.5.3
       unist-util-visit: 5.0.0
       unstorage: 1.15.0(db0@0.2.1)
@@ -11152,7 +11158,7 @@ snapshots:
       yocto-spinner: 0.2.1
       zod: 3.24.2
       zod-to-json-schema: 3.24.3(zod@3.24.2)
-      zod-to-ts: 1.2.0(typescript@5.5.4)(zod@3.24.2)
+      zod-to-ts: 1.2.0(typescript@5.8.2)(zod@3.24.2)
     optionalDependencies:
       sharp: 0.33.5
     transitivePeerDependencies:
@@ -12687,13 +12693,13 @@ snapshots:
     optionalDependencies:
       '@nuxt/kit': 3.14.1592(magicast@0.3.5)(rollup@4.28.1)
 
-  floating-vue@5.2.2(@nuxt/kit@3.14.1592(magicast@0.3.5)(rollup@4.34.9))(vue@3.5.13(typescript@5.5.4)):
+  floating-vue@5.2.2(@nuxt/kit@3.14.1592(magicast@0.3.5))(vue@3.5.13(typescript@5.5.4)):
     dependencies:
       '@floating-ui/dom': 1.1.1
       vue: 3.5.13(typescript@5.5.4)
       vue-resize: 2.0.0-alpha.1(vue@3.5.13(typescript@5.5.4))
     optionalDependencies:
-      '@nuxt/kit': 3.14.1592(magicast@0.3.5)(rollup@4.34.9)
+      '@nuxt/kit': 3.14.1592(magicast@0.3.5)
 
   for-each@0.3.3:
     dependencies:
@@ -15733,13 +15739,14 @@ snapshots:
 
   standard-as-callback@2.1.0: {}
 
-  starlight-openapi@0.7.0(@astrojs/markdown-remark@6.2.0)(@astrojs/starlight@0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1)))(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1))(openapi-types@12.1.3):
+  starlight-openapi@0.13.0(@astrojs/markdown-remark@6.2.0)(@astrojs/starlight@0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1)))(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1))(openapi-types@12.1.3):
     dependencies:
       '@astrojs/markdown-remark': 6.2.0
-      '@astrojs/starlight': 0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1))
+      '@astrojs/starlight': 0.32.2(astro@5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1))
       '@readme/openapi-parser': 2.5.0(openapi-types@12.1.3)
-      astro: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.5.4)(yaml@2.6.1)
+      astro: 5.4.1(@types/node@22.4.1)(db0@0.2.1)(jiti@2.4.1)(rollup@4.34.9)(sass@1.77.6)(terser@5.31.6)(typescript@5.8.2)(yaml@2.6.1)
       github-slugger: 2.0.0
+      url-template: 3.1.1
     transitivePeerDependencies:
       - openapi-types
 
@@ -16060,9 +16067,9 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-  tsconfck@3.1.5(typescript@5.5.4):
+  tsconfck@3.1.5(typescript@5.8.2):
     optionalDependencies:
-      typescript: 5.5.4
+      typescript: 5.8.2
 
   tsconfig-paths@3.15.0:
     dependencies:
@@ -16158,6 +16165,8 @@ snapshots:
 
   typescript@5.5.4: {}
 
+  typescript@5.8.2: {}
+
   uc.micro@1.0.6: {}
 
   uc.micro@2.1.0: {}
@@ -16214,6 +16223,26 @@ snapshots:
       trough: 2.2.0
       vfile: 6.0.3
 
+  unimport@3.14.4:
+    dependencies:
+      '@rollup/pluginutils': 5.1.3(rollup@4.28.1)
+      acorn: 8.14.0
+      escape-string-regexp: 5.0.0
+      estree-walker: 3.0.3
+      local-pkg: 0.5.1
+      magic-string: 0.30.14
+      mlly: 1.7.3
+      pathe: 1.1.2
+      picomatch: 4.0.2
+      pkg-types: 1.2.1
+      scule: 1.3.0
+      strip-literal: 2.1.1
+      tinyglobby: 0.2.10
+      unplugin: 1.16.0
+    transitivePeerDependencies:
+      - rollup
+    optional: true
+
   unimport@3.14.4(rollup@3.29.4):
     dependencies:
       '@rollup/pluginutils': 5.1.3(rollup@3.29.4)
@@ -16252,26 +16281,6 @@ snapshots:
       unplugin: 1.16.0
     transitivePeerDependencies:
       - rollup
-
-  unimport@3.14.4(rollup@4.34.9):
-    dependencies:
-      '@rollup/pluginutils': 5.1.3(rollup@4.34.9)
-      acorn: 8.14.0
-      escape-string-regexp: 5.0.0
-      estree-walker: 3.0.3
-      local-pkg: 0.5.1
-      magic-string: 0.30.14
-      mlly: 1.7.3
-      pathe: 1.1.2
-      picomatch: 4.0.2
-      pkg-types: 1.2.1
-      scule: 1.3.0
-      strip-literal: 2.1.1
-      tinyglobby: 0.2.10
-      unplugin: 1.16.0
-    transitivePeerDependencies:
-      - rollup
-    optional: true
 
   unist-util-find-after@5.0.0:
     dependencies:
@@ -16422,6 +16431,8 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
+  url-template@3.1.1: {}
+
   urlpattern-polyfill@8.0.2: {}
 
   util-deprecate@1.0.2: {}
@@ -16532,7 +16543,7 @@ snapshots:
   vite@4.5.3(@types/node@22.4.1)(sass@1.77.6)(terser@5.31.6):
     dependencies:
       esbuild: 0.18.20
-      postcss: 8.4.49
+      postcss: 8.5.3
       rollup: 3.29.4
     optionalDependencies:
       '@types/node': 22.4.1
@@ -16790,6 +16801,16 @@ snapshots:
     optionalDependencies:
       typescript: 5.5.4
 
+  vue@3.5.13(typescript@5.8.2):
+    dependencies:
+      '@vue/compiler-dom': 3.5.13
+      '@vue/compiler-sfc': 3.5.13
+      '@vue/runtime-dom': 3.5.13
+      '@vue/server-renderer': 3.5.13(vue@3.5.13(typescript@5.8.2))
+      '@vue/shared': 3.5.13
+    optionalDependencies:
+      typescript: 5.8.2
+
   w3c-keyname@2.2.8: {}
 
   watchpack@2.4.2:
@@ -16821,7 +16842,7 @@ snapshots:
       browserslist: 4.24.2
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.17.1
-      es-module-lexer: 1.5.4
+      es-module-lexer: 1.6.0
       eslint-scope: 5.1.1
       events: 3.3.0
       glob-to-regexp: 0.4.1
@@ -16978,9 +16999,9 @@ snapshots:
     dependencies:
       zod: 3.24.2
 
-  zod-to-ts@1.2.0(typescript@5.5.4)(zod@3.24.2):
+  zod-to-ts@1.2.0(typescript@5.8.2)(zod@3.24.2):
     dependencies:
-      typescript: 5.5.4
+      typescript: 5.8.2
       zod: 3.24.2
 
   zod@3.23.8: {}
