@@ -427,7 +427,7 @@ export default defineNuxtConfig({
         "Critical-CH": "Sec-CH-Prefers-Color-Scheme",
       },
     },
-    "/news/article/**": {
+    "/news/article/**/": {
       prerender: true,
     },
   },
