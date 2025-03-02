@@ -6,6 +6,7 @@ short_summary: Power up your experience.
 date: 2023-04-01T00:00:00-08:00
 thumbnail: ./thumbnail.jpg
 ---
+
 **Update 04/02: Due to a number of (ridiculous) complaints we received such as “not being able to use the site on mobile” and “the ads are a bit much”, we have decided to halt the rollout of the beta site. Happy April 1st, everyone.**
 
 ---

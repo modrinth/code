@@ -75,12 +75,13 @@ useSeoMeta({
         </nuxt-link>
       </div>
       <div class="mt-6">
-        <a class="group flex w-fit items-center gap-1" href="https://blog.modrinth.com">
-          <h2 class="m-0 text-xl font-extrabold group-hover:underline">Older articles</h2>
+        <div class="group flex w-fit items-center gap-1">
+          <h2 class="m-0 text-xl font-extrabold">More articles</h2>
           <ChevronRightIcon
+            v-if="false"
             class="ml-0 h-6 w-6 transition-all group-hover:ml-1 group-hover:text-brand"
           />
-        </a>
+        </div>
         <div class="mt-4 grid grid-cols-3 gap-4">
           <nuxt-link
             v-for="article in articles?.slice(1)"

@@ -4,6 +4,7 @@ short_title: Correcting Inflated Download Counts
 summary: A rate limiting issue caused inflated download counts in certain countries.
 date: 2023-11-10T12:00:00-08:00
 ---
+
 While working on the upcoming analytics update for Modrinth, our team found an issue leading to higher download counts from specific countries. This was caused by an oversight with regards to rate limiting, or in other words, certain files being downloaded over and over again. **Importantly, this did not affect creator payouts**; only our analytics. Approximately 15.4% of Modrinth downloads were found to be over-counted. These duplicates have been identified and are being removed from project download counts and analytics. Read on to learn about the cause of this error and how we fixed it.
 
 A graph of many Modrinth projects and their download counts, showing a disproportionate amount of downloads from China.

@@ -10,6 +10,7 @@ thumbnail: ./thumbnail.jpg
 December may be over, but that doesn’t mean we’re done giving gifts here at Modrinth. Over the past few months, we’ve been cooking up a whole bunch of new features for everyone to enjoy. Now seems like as good of a time as ever to bring you our Creator Update! Buckle up, because this is a big one.
 
 The headlining features include:
+
 - **Analytics** - Allowing Modrinth creators to see statistics from their projects.
 - **Organizations** - Better tools to manage shared ownership over multiple projects.
 - **Collections** - A system for putting together shared sets of projects, similar to Spotify playlists.
@@ -18,6 +19,7 @@ The headlining features include:
 - **OAuth integrations** - Our own implementation of the OAuth specification, allowing external applications to “log in with Modrinth”.
 
 ## Analytics
+
 The long-awaited addition of **analytics** is here for creators! You can view analytics over time for your projects, including downloads, page views, and revenue, all in an effortlessly easy-to-use dashboard.
 
 ![The analytics for a project, showing downloads, page views, and revenue, with a breakdown by country.](./project-analytics.jpg)
@@ -29,6 +31,7 @@ The data for analytics have been collected over the course of many months. In fa
 You can view the analytics for an individual project by going to the settings and clicking “Analytics”. You can view analytics for all of your projects in [the analytics dashboard](/dashboard/analytics).
 
 ## Organizations
+
 Isn’t managing permissions across a bunch of different projects pretty tedious? We sure thought so. Just like on GitHub, you can now create organizations on Modrinth to manage permissions across multiple projects.
 
 ![A screenshot of the organizations section of the Modrinth dashboard.](./organizations.jpg)
