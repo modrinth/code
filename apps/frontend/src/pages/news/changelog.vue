@@ -5,7 +5,6 @@
     <NuxtPage />
   </div>
 </template>
-
 <style lang="scss" scoped>
 .page {
   padding: 1rem;
