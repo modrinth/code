@@ -61,4 +61,4 @@ While new features are great, we've also been working on a bunch of bugfixes. Be
 
 These fixes should have been automatically pulled in, assuming you're using Minotaur `2.+`. If not, you should be upgrading to `2.0.2`.
 
-Need a guide to migrate from Minotaur v1 to v2? Check the migration guide on the [redesign post](/news/article/redesign/#minotaur).
+Need a guide to migrate from Minotaur v1 to v2? Check the migration guide on the [redesign post](../redesign/#minotaur).

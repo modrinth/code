@@ -4,13 +4,13 @@ summary: Our fundraiser and the future of Modrinth!
 date: 2023-02-01T12:00:00-08:00
 ---
 
-**Update: On [April 4, 2024](/news/article/capital-return/) we announced that we had returned the remaining $800k in investor capital back to our investors to take a different path. [Read that announcement here](/news/article/capital-return/). This article remains here for archival purposes.**
+**Update: On [April 4, 2024](/news/article/capital-return) we announced that we had returned the remaining $800k in investor capital back to our investors to take a different path. [Read that announcement here](/news/article/capital-return). This article remains here for archival purposes.**
 
 ---
 
 There are over 3 billion gamers worldwide, but only a small fraction ever go further and mod the games they play. Modrinth is here to bring modding to every player on the planet—all the while allowing mod creators to make a living off of it.
 
-Since our founding in 2020 and up until a few months ago, Modrinth has been a purely volunteer project. In the past couple months, the Modrinth team has been more productive than ever. We've released the [Anniversary Update](/news/article/two-years-of-modrinth/), we're actively working on the launcher once more, and we're laying out plans for how to multiply Modrinth creator payouts.
+Since our founding in 2020 and up until a few months ago, Modrinth has been a purely volunteer project. In the past couple months, the Modrinth team has been more productive than ever. We've released the [Anniversary Update](../two-years-of-modrinth), we're actively working on the launcher once more, and we're laying out plans for how to multiply Modrinth creator payouts.
 
 The vision we have for the future of Modrinth is great, and right alongside that is the need for an amazing team to build out this vision. That's why we [recently announced](https://x.com/modrinth/status/1615416957905342472) that [we're hiring](https://careers.modrinth.com)—we've already come so far on just volunteer work, but for Modrinth to be sustainable and for its growth to be sustainable, we need to pick up the pace.
 
