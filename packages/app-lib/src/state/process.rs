@@ -8,6 +8,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use std::process::ExitStatus;
 use tokio::process::{Child, Command};
+use ts_rs::TS;
 use uuid::Uuid;
 
 pub struct ProcessManager {
@@ -107,7 +108,11 @@ impl ProcessManager {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 pub struct ProcessMetadata {
     pub uuid: Uuid,
     pub profile_path: String,

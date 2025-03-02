@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use std::hash::Hash;
 use std::path::{Path, PathBuf};
+use ts_rs::TS;
 
 // 1 day
 const DEFAULT_ID: &str = "0";
@@ -520,7 +521,11 @@ impl CacheValue {
     }
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Eq, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, PartialEq, Eq, Debug, Copy, Clone, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 #[serde(rename_all = "snake_case")]
 pub enum CacheBehaviour {
     /// Serve expired data. If fetch fails / launcher is offline, errors are ignored
