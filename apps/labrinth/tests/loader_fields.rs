@@ -9,13 +9,11 @@ use labrinth::database::models::legacy_loader_fields::MinecraftGameVersion;
 use labrinth::models::v3;
 use serde_json::json;
 
-use crate::common::api_common::{ApiProject, ApiVersion};
-use crate::common::api_v3::request_data::get_public_project_creation_data;
-use crate::common::database::*;
+use ariadne::api_common::{ApiProject, ApiVersion};
+use ariadne::api_v3::request_data::get_public_project_creation_data;
+use ariadne::database::*;
 
-use crate::common::dummy_data::{
-    DummyProjectAlpha, DummyProjectBeta, TestFile,
-};
+use ariadne::dummy_data::{DummyProjectAlpha, DummyProjectBeta, TestFile};
 
 // importing common module.
 mod common;

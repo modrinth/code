@@ -3,7 +3,6 @@ use std::sync::Arc;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
-use crate::common::ids::base62_impl::parse_base62;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{GalleryItem, ModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
@@ -30,6 +29,7 @@ use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use futures::TryStreamExt;
 use itertools::Itertools;

@@ -1,9 +1,9 @@
 use super::ValidatedRedirectUri;
 use crate::auth::AuthenticationError;
-use crate::common::ids::DecodingError;
 use crate::models::error::ApiError;
 use actix_web::http::{header::LOCATION, StatusCode};
 use actix_web::HttpResponse;
+use ariadne::ids::DecodingError;
 
 #[derive(thiserror::Error, Debug)]
 #[error("{}", .error_type)]

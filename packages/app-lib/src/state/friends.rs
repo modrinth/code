@@ -5,6 +5,10 @@ use crate::event::FriendPayload;
 use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, Profile, TunnelSocket};
 use crate::util::fetch::{fetch_advanced, fetch_json, FetchSemaphore};
+use ariadne::networking::message::{
+    ClientToServerMessage, ServerToClientMessage,
+};
+use ariadne::users::{UserId, UserStatus};
 use async_tungstenite::tokio::{connect_async, ConnectStream};
 use async_tungstenite::tungstenite::client::IntoClientRequest;
 use async_tungstenite::tungstenite::Message;
@@ -14,10 +18,6 @@ use dashmap::DashMap;
 use either::Either;
 use futures::stream::SplitSink;
 use futures::{SinkExt, StreamExt};
-use labrinth::common::networking::message::{
-    ClientToServerMessage, ServerToClientMessage,
-};
-use labrinth::common::users::{UserId, UserStatus};
 use reqwest::header::HeaderValue;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};

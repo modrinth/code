@@ -1,5 +1,4 @@
 use super::ApiError;
-use crate::common::ids::base62_impl::to_base62;
 use crate::database;
 use crate::database::redis::RedisPool;
 use crate::models::teams::ProjectPermissions;
@@ -13,6 +12,7 @@ use crate::{
     queue::session::AuthQueue,
 };
 use actix_web::{web, HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::types::PgInterval;

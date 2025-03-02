@@ -5,7 +5,6 @@ use crate::auth::checks::{
     filter_visible_versions, is_visible_project, is_visible_version,
 };
 use crate::auth::get_user_from_headers;
-use crate::common::ids::base62_impl::parse_base62;
 use crate::database;
 use crate::database::models::loader_fields::{
     self, LoaderField, LoaderFieldEnumValue, VersionField,
@@ -28,6 +27,7 @@ use crate::search::SearchConfig;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;

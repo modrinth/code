@@ -1,5 +1,4 @@
 use crate::auth::get_user_from_headers;
-use crate::common::networking::message::ServerToClientMessage;
 use crate::database::models::UserId;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
@@ -9,6 +8,7 @@ use crate::queue::socket::ActiveSockets;
 use crate::routes::internal::statuses::send_message_to_user;
 use crate::routes::ApiError;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
 use sqlx::PgPool;
 

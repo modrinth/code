@@ -4,12 +4,12 @@ use common::api_v3::ApiV3;
 use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
 
+use ariadne::ids::base62_impl::parse_base62;
 use common::environment::{
     with_test_environment, with_test_environment_all, TestEnvironment,
 };
 use common::permissions::{PermissionsTest, PermissionsTestContext};
 use futures::StreamExt;
-use labrinth::common::ids::base62_impl::parse_base62;
 use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
 };
@@ -18,10 +18,10 @@ use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 
-use crate::common::api_common::models::CommonProject;
-use crate::common::api_common::request_data::ProjectCreationRequestData;
-use crate::common::api_common::{ApiProject, ApiTeams, ApiVersion};
-use crate::common::dummy_data::{
+use ariadne::api_common::models::CommonProject;
+use ariadne::api_common::request_data::ProjectCreationRequestData;
+use ariadne::api_common::{ApiProject, ApiTeams, ApiVersion};
+use ariadne::dummy_data::{
     DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta,
     TestFile,
 };

@@ -25,8 +25,6 @@ use crate::{
     util::env::{parse_strings_from_var, parse_var},
 };
 
-pub mod common;
-
 pub mod auth;
 pub mod clickhouse;
 pub mod database;
@@ -299,10 +297,8 @@ pub fn app_setup(
     }
 
     let ip_salt = Pepper {
-        pepper: crate::common::ids::Base62Id(
-            crate::common::ids::random_base62(11),
-        )
-        .to_string(),
+        pepper: ariadne::ids::Base62Id(ariadne::ids::random_base62(11))
+            .to_string(),
     };
 
     let payouts_queue = web::Data::new(PayoutsQueue::new());

@@ -21,7 +21,7 @@ pub mod data {
         Project, ProjectType, SearchResult, SearchResults, Settings,
         TeamMember, Theme, User, UserFriend, Version, WindowSize,
     };
-    pub use labrinth::common::users::UserStatus;
+    pub use ariadne::users::UserStatus;
 }
 
 pub mod prelude {
