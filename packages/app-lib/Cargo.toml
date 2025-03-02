@@ -63,8 +63,6 @@ base64 = "0.22.0"
 
 sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
 
-labrinth = { path = "../../apps/labrinth" }
-
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52.0"
 

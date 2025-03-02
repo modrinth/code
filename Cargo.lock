@@ -8932,7 +8932,6 @@ dependencies = [
  "flate2",
  "futures 0.3.30",
  "indicatif",
- "labrinth",
  "lazy_static",
  "notify",
  "notify-debouncer-mini",
