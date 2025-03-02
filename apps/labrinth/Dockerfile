@@ -3,7 +3,7 @@ ENV PKG_CONFIG_ALLOW_CROSS=1
 
 WORKDIR /usr/src/labrinth
 COPY . .
-RUN cargo build --release
+RUN cargo build --release --package labrinth
 
 
 FROM debian:bookworm-slim
