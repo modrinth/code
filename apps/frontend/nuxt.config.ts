@@ -407,7 +407,8 @@ export default defineNuxtConfig({
   nitro: {
     moduleSideEffects: ["@vintl/compact-number/locale-data"],
     prerender: {
-      routes: ["/news/feed/rss", "/news/feed/atom", "/news/feed/json", "/news"],
+      crawlLinks: true,
+      routes: ["/news/feed/rss", "/news/feed/atom", "/news/feed/json", "/news", "/news/article/**"],
     },
   },
   devtools: {
@@ -426,9 +427,6 @@ export default defineNuxtConfig({
         "Accept-CH": "Sec-CH-Prefers-Color-Scheme",
         "Critical-CH": "Sec-CH-Prefers-Color-Scheme",
       },
-    },
-    "/news/article/**/": {
-      prerender: true,
     },
   },
   compatibilityDate: "2024-07-03",
