@@ -407,8 +407,7 @@ export default defineNuxtConfig({
   nitro: {
     moduleSideEffects: ["@vintl/compact-number/locale-data"],
     prerender: {
-      crawlLinks: true,
-      routes: ["/news/feed/rss", "/news/feed/atom", "/news/feed/json", "/news", "/news/article/**"],
+      routes: ["/news/feed/rss", "/news/feed/atom", "/news/feed/json"],
     },
   },
   devtools: {
