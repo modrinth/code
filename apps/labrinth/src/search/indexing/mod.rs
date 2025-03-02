@@ -2,8 +2,8 @@
 pub mod local_import;
 
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::to_base62;
 use crate::search::{SearchConfig, UploadSearchProject};
+use ariadne::ids::base62_impl::to_base62;
 use local_import::index_local;
 use log::info;
 use meilisearch_sdk::client::{Client, SwapIndexes};

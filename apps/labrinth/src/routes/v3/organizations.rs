@@ -9,7 +9,6 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::base62_impl::parse_base62;
 use crate::models::ids::UserId;
 use crate::models::organizations::OrganizationId;
 use crate::models::pats::Scopes;
@@ -21,6 +20,7 @@ use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::{web, HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::parse_base62;
 use futures::TryStreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -786,7 +786,7 @@ pub async fn organization_projects_add(
 
         let organization_owner_user_id = sqlx::query!(
             "
-            SELECT u.id 
+            SELECT u.id
             FROM team_members
             INNER JOIN users u ON u.id = team_members.user_id
             WHERE team_id = $1 AND is_owner = TRUE
@@ -969,7 +969,7 @@ pub async fn organization_projects_remove(
         sqlx::query!(
             "
             UPDATE team_members
-            SET 
+            SET
                 is_owner = TRUE,
                 accepted = TRUE,
                 permissions = $2,

@@ -709,7 +709,7 @@ const customNotAllowedToContinue = computed(
     (!customMatchingProduct.value || customLoading.value || customOutOfStock.value),
 )
 const upgradeNotAllowedToContinue = computed(
-  () => props.existingSubscription && (!hasUpgradeCapacityForConfig.value || customLoading.value),
+  () => props.existingSubscription && (customOutOfStock.value || customLoading.value),
 )
 
 const customServerConfig = reactive({
@@ -1008,11 +1008,6 @@ async function submitPayment() {
   }
   paymentLoading.value = false
 }
-
-const hasUpgradeCapacityForConfig = computed(() => {
-  // TODO: Check for upgrade capacity here when Pyro provides route
-  return props.existingPlan
-})
 
 defineExpose({
   show: () => {

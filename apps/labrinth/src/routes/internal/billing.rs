@@ -10,12 +10,12 @@ use crate::models::billing::{
     Product, ProductMetadata, ProductPrice, SubscriptionMetadata,
     SubscriptionStatus, UserSubscription,
 };
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::pats::Scopes;
 use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::Utc;
 use log::{info, warn};
 use rust_decimal::prelude::ToPrimitive;

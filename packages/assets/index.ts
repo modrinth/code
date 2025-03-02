@@ -93,6 +93,7 @@ import _HeartHandshakeIcon from './icons/heart-handshake.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
 import _ImageIcon from './icons/image.svg?component'
+import _InProgressIcon from './icons/in-progress.svg?component'
 import _InfoIcon from './icons/info.svg?component'
 import _IssuesIcon from './icons/issues.svg?component'
 import _KeyIcon from './icons/key.svg?component'
@@ -290,6 +291,7 @@ export const HeartHandshakeIcon = _HeartHandshakeIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon
 export const ImageIcon = _ImageIcon
+export const InProgressIcon = _InProgressIcon
 export const InfoIcon = _InfoIcon
 export const IssuesIcon = _IssuesIcon
 export const KeyIcon = _KeyIcon

@@ -1,5 +1,5 @@
 use super::models::DatabaseError;
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
+use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};

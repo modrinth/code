@@ -13,7 +13,6 @@ use crate::database::models::version_item::{DependencyBuilder, LoaderVersion};
 use crate::database::models::{image_item, Organization};
 use crate::database::redis::RedisPool;
 use crate::models;
-use crate::models::ids::base62_impl::parse_base62;
 use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
@@ -28,6 +27,7 @@ use crate::search::SearchConfig;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -444,7 +444,7 @@ pub async fn version_edit_helper(
                     .collect::<Vec<i32>>();
                 sqlx::query!(
                     "
-                    DELETE FROM version_fields 
+                    DELETE FROM version_fields
                     WHERE version_id = $1
                     AND field_id = ANY($2)
                     ",
