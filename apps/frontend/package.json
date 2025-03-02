@@ -41,6 +41,7 @@
     "@modrinth/utils": "workspace:*",
     "@nuxt/content": "^3.2.2",
     "@pinia/nuxt": "^0.5.1",
+    "@unhead/vue": "^1.11.20",
     "@vintl/vintl": "^4.4.1",
     "@vueuse/core": "^11.1.0",
     "ace-builds": "^1.36.2",
