@@ -8916,6 +8916,7 @@ dependencies = [
 name = "theseus"
 version = "0.9.3"
 dependencies = [
+ "ariadne",
  "async-recursion",
  "async-tungstenite",
  "async_zip",

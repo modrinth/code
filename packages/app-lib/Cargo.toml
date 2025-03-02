@@ -63,6 +63,8 @@ base64 = "0.22.0"
 
 sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
 
+ariadne = { path = "../ariadne" }
+
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52.0"
 
