@@ -206,6 +206,9 @@ importers:
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      '@nuxt/content':
+        specifier: ^3.2.2
+        version: 3.2.2(magicast@0.3.5)(typescript@5.5.4)
       '@pinia/nuxt':
         specifier: ^0.5.1
         version: 0.5.1(magicast@0.3.5)(rollup@4.28.1)(typescript@5.5.4)(vue@3.5.13(typescript@5.5.4))
@@ -288,9 +291,6 @@ importers:
       '@formatjs/cli':
         specifier: ^6.2.12
         version: 6.2.12(@vue/compiler-core@3.5.13)(vue@3.5.13(typescript@5.5.4))
-      '@nuxt/content':
-        specifier: ^3.2.2
-        version: 3.2.2(magicast@0.3.5)(typescript@5.5.4)
       '@nuxt/devtools':
         specifier: ^1.3.3
         version: 1.6.3(rollup@4.28.1)(vite@5.4.11(@types/node@20.14.11)(sass@1.77.6)(terser@5.31.6))(vue@3.5.13(typescript@5.5.4))
