@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import GridDisplay from '@/components/GridDisplay.vue'
-import type { Profile } from '@/helpers/lib-types';
+import type { Profile } from '@/helpers/lib-types'
 
 defineProps<{
   instances: Profile[]
