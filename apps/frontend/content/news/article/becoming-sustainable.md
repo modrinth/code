@@ -7,7 +7,7 @@ thumbnail: ./thumbnail.webp
 date: 2024-09-13T12:00:00-08:00
 ---
 
-Just over 3 weeks ago, we [launched](/news/article/introducing-modrinth-refreshed-site-look-new-advertising-system) our new ads powered by [Aditude](https://www.aditude.com/). These ads have allowed us to improve creator revenue drastically and become sustainable. Read on for more info!
+Just over 3 weeks ago, we [launched](/news/article/design-refresh/) our new ads powered by [Aditude](https://www.aditude.com/). These ads have allowed us to improve creator revenue drastically and become sustainable. Read on for more info!
 
 ## Creator Revenue
 
