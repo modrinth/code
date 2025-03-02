@@ -1,9 +1,6 @@
 ---
 title: A Sustainable Path Forward for Modrinth
-short_title: A Sustainable Path Forward for Modrinth
 summary: Our capital return and what’s next.
-short_summary: Our capital return and what’s next.
-thumbnail: ./thumbnail.webp
 date: 2024-04-04T12:00:00-08:00
 ---
 

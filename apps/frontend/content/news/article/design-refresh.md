@@ -2,7 +2,7 @@
 title: Introducing Modrinth+, a refreshed site look, and a new advertising system!
 short_title: Modrinth+ and New Ads
 summary: Learn about this major update to Modrinth.
-short_summary: Introducing a new advertising system, a subscription to remove ads, and a redesign of the website!
+short_summary: Introducing a new ad system, a subscription to remove ads, and a redesign of the website!
 thumbnail: ./thumbnail.webp
 date: 2024-08-21T12:00:00-08:00
 ---

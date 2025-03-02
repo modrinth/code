@@ -17,6 +17,8 @@ export default defineEventHandler(async (event) => {
 
   const latestDate = dayjs(articles?.[0].date);
 
+  const useShort = event?.context?.query?.short;
+
   const author = {
     name: "Modrinth Team",
     link: baseUrl,
@@ -42,10 +44,10 @@ export default defineEventHandler(async (event) => {
 
   articles?.forEach((article) => {
     feed.addItem({
-      title: article.title,
+      title: useShort ? article.short_title ?? article.title : article.title,
       id: findSlug(article.path),
       link: `${baseUrl}${article.path}/`,
-      description: article.summary,
+      description: useShort ? article.short_summary ?? article.summary : article.summary,
       author: [author],
       date: dayjs(article.date).toDate(),
       image: `${baseUrl}${article.path}/${article.thumbnail}`,

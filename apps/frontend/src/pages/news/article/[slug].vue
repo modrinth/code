@@ -23,6 +23,12 @@ if (!article) {
 const articleTitle = computed(() => article.value?.title);
 const articleUrl = computed(() => `https://modrinth.com/news/article/${route.params.slug}`);
 
+const thumbnailPath = computed(() =>
+  article.value?.thumbnail
+    ? `${config.public.siteUrl}${article.value?.path}/${article.value?.thumbnail}`
+    : `${config.public.siteUrl}/news/default.jpg`,
+);
+
 const dayjsDate = computed(() => dayjs(article.value?.date));
 
 const config = useRuntimeConfig();
@@ -33,10 +39,10 @@ useSeoMeta({
   description: () => article.value?.summary,
   ogDescription: () => article.value?.summary,
   ogType: "article",
-  ogImage: () => `${config.public.siteUrl}${article.value?.path}/${article.value?.thumbnail}`,
+  ogImage: () => thumbnailPath.value,
   articlePublishedTime: () => dayjsDate.value.toISOString(),
   twitterCard: "summary_large_image",
-  twitterImage: () => `${config.public.siteUrl}/news/thumbnail.jpg`,
+  twitterImage: () => thumbnailPath.value,
 });
 </script>
 
@@ -65,7 +71,7 @@ useSeoMeta({
       <div class="mt-auto text-secondary">Posted on {{ dayjsDate.format("MMMM D, YYYY") }}</div>
       <ShareArticleButtons :title="article.title" :url="articleUrl" />
       <img
-        :src="article.thumbnail"
+        :src="article.thumbnail ?? '/news/default.jpg'"
         class="aspect-video w-full rounded-2xl border-[1px] border-solid border-button-border object-cover"
         :alt="article.title"
       />

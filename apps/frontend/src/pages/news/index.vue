@@ -6,7 +6,6 @@ import dayjs from "dayjs";
 const { data: articles } = await useAsyncData("news", () => {
   return queryCollection("news")
     .order("date", "DESC")
-    .limit(7)
     .select("path", "thumbnail", "title", "summary", "date")
     .all();
 });
@@ -44,59 +43,75 @@ useSeoMeta({
         </ButtonStyled>
       </div>
     </div>
-    <div class="full-width-bg brand-gradient-bg mt-6 border-0 border-y-[1px] border-solid py-4">
-      <nuxt-link
-        :to="`${featuredArticle?.path}/`"
-        class="active:scale-[0.99]! group flex transition-all ease-in-out hover:brightness-125"
+    <template v-if="articles">
+      <div
+        v-if="featuredArticle"
+        class="full-width-bg brand-gradient-bg mt-6 border-0 border-y-[1px] border-solid py-4"
       >
-        <article class="grid grid-cols-[4fr_3fr] gap-4">
-          <img
-            :src="`${featuredArticle?.path}/${featuredArticle?.thumbnail}`"
-            class="aspect-video w-full rounded-2xl border-[1px] border-solid border-button-border object-cover"
-          />
-          <div class="flex flex-col gap-2">
-            <p class="m-0 font-bold">Featured article</p>
-            <h3 class="m-0 text-3xl leading-tight group-hover:underline">
-              {{ featuredArticle?.title }}
-            </h3>
-            <p class="m-0 text-lg leading-tight">{{ featuredArticle?.summary }}</p>
-            <div class="mt-auto text-secondary">
-              {{ dayjs(featuredArticle?.date).format("MMMM D, YYYY") }}
-            </div>
-          </div>
-        </article>
-      </nuxt-link>
-    </div>
-    <div class="mt-6">
-      <a class="group flex w-fit items-center gap-1" href="https://blog.modrinth.com">
-        <h2 class="m-0 text-xl font-extrabold group-hover:underline">Older articles</h2>
-        <ChevronRightIcon
-          class="ml-0 h-6 w-6 transition-all group-hover:ml-1 group-hover:text-brand"
-        />
-      </a>
-      <div class="mt-4 grid grid-cols-3 gap-4">
         <nuxt-link
-          v-for="article in articles?.slice(1)"
-          :key="`post-${article.path}`"
-          :to="`${article.path}/`"
-          class="active:scale-[0.99]! group flex flex-col gap-2 transition-all ease-in-out hover:brightness-125"
+          :to="`${featuredArticle.path}/`"
+          class="active:scale-[0.99]! group flex transition-all ease-in-out hover:brightness-125"
         >
-          <article class="flex grow flex-col gap-4">
+          <article class="grid grid-cols-[4fr_3fr] gap-4">
             <img
-              :src="`${article.path}/${article.thumbnail}`"
-              class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover"
+              :src="
+                featuredArticle.thumbnail
+                  ? `${featuredArticle.path}/${featuredArticle.thumbnail}`
+                  : `/news/default.jpg`
+              "
+              class="aspect-video w-full rounded-2xl border-[1px] border-solid border-button-border object-cover"
             />
-            <div class="flex grow flex-col gap-2">
-              <h3 class="m-0 text-base leading-tight group-hover:underline">{{ article.title }}</h3>
-              <p v-if="article.summary" class="m-0 text-sm leading-tight">{{ article.summary }}</p>
-              <div class="mt-auto text-sm text-secondary">
-                {{ dayjs(article.date).format("MMMM D, YYYY") }}
+            <div class="flex flex-col gap-2">
+              <p class="m-0 font-bold">Featured article</p>
+              <h3 class="m-0 text-3xl leading-tight group-hover:underline">
+                {{ featuredArticle?.title }}
+              </h3>
+              <p class="m-0 text-lg leading-tight">{{ featuredArticle?.summary }}</p>
+              <div class="mt-auto text-secondary">
+                {{ dayjs(featuredArticle?.date).format("MMMM D, YYYY") }}
               </div>
             </div>
           </article>
         </nuxt-link>
       </div>
-    </div>
+      <div class="mt-6">
+        <a class="group flex w-fit items-center gap-1" href="https://blog.modrinth.com">
+          <h2 class="m-0 text-xl font-extrabold group-hover:underline">Older articles</h2>
+          <ChevronRightIcon
+            class="ml-0 h-6 w-6 transition-all group-hover:ml-1 group-hover:text-brand"
+          />
+        </a>
+        <div class="mt-4 grid grid-cols-3 gap-4">
+          <nuxt-link
+            v-for="article in articles?.slice(1)"
+            :key="`post-${article.path}`"
+            :to="`${article.path}/`"
+            class="active:scale-[0.99]! group flex flex-col gap-2 transition-all ease-in-out hover:brightness-125"
+          >
+            <article class="flex grow flex-col gap-4">
+              <img
+                :src="
+                  article.thumbnail ? `${article.path}/${article.thumbnail}` : `/news/default.jpg`
+                "
+                class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover"
+              />
+              <div class="flex grow flex-col gap-2">
+                <h3 class="m-0 text-base leading-tight group-hover:underline">
+                  {{ article.title }}
+                </h3>
+                <p v-if="article.summary" class="m-0 text-sm leading-tight">
+                  {{ article.summary }}
+                </p>
+                <div class="mt-auto text-sm text-secondary">
+                  {{ dayjs(article.date).format("MMMM D, YYYY") }}
+                </div>
+              </div>
+            </article>
+          </nuxt-link>
+        </div>
+      </div>
+    </template>
+    <div v-else class="pt-4">Error: Articles could not be loaded.</div>
   </div>
 </template>
 <style lang="scss" scoped>
