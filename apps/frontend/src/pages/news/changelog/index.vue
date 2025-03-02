@@ -26,6 +26,19 @@ watch(
 const changelogEntries = computed(() =>
   allChangelogEntries.value.filter((x) => !filter.value || x.product === filter.value),
 );
+
+const config = useRuntimeConfig();
+
+useSeoMeta({
+  title: "Modrinth Changelog",
+  ogTitle: "Modrinth Changelog",
+  description: "Keep up-to-date on what's new with Modrinth.",
+  ogDescription: "Keep up-to-date on what's new with Modrinth.",
+  ogType: "website",
+  ogImage: () => `${config.public.siteUrl}/news/changelog.jpg`,
+  twitterCard: "summary_large_image",
+  twitterImage: () => `${config.public.siteUrl}/news/changelog.jpg`,
+});
 </script>
 
 <template>
