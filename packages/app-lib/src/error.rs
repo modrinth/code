@@ -15,7 +15,7 @@ pub enum ErrorKind {
 
     #[error("Serialization error (websocket): {0}")]
     WebsocketSerializationError(
-        #[from] labrinth::common::networking::serialization::SerializationError,
+        #[from] ariadne::networking::serialization::SerializationError,
     ),
 
     #[error("Error parsing UUID: {0}")]

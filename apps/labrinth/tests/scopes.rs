@@ -1,13 +1,12 @@
 use std::collections::HashMap;
 
-use crate::common::api_common::{
-    ApiProject, ApiTeams, ApiUser, ApiVersion, AppendsOptionalPat,
-};
-use crate::common::dummy_data::{
-    DummyImage, DummyProjectAlpha, DummyProjectBeta,
-};
 use actix_http::StatusCode;
 use actix_web::test;
+use ariadne::api_common::{
+    ApiProject, ApiTeams, ApiUser, ApiVersion, AppendsOptionalPat,
+};
+use ariadne::dummy_data::{DummyImage, DummyProjectAlpha, DummyProjectBeta};
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::{Duration, Utc};
 use common::api_common::models::CommonItemType;
 use common::api_common::Api;
@@ -18,7 +17,6 @@ use common::environment::{
     with_test_environment, with_test_environment_all, TestEnvironment,
 };
 use common::{database::*, scopes::ScopeTest};
-use labrinth::common::ids::base62_impl::parse_base62;
 use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectId;
 use labrinth::models::users::UserId;

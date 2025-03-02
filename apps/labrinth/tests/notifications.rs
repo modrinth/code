@@ -3,7 +3,7 @@ use common::{
     environment::with_test_environment_all,
 };
 
-use crate::common::api_common::ApiTeams;
+use ariadne::api_common::ApiTeams;
 
 mod common;
 

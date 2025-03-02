@@ -94,9 +94,7 @@ macro_rules! impl_base62_display {
     ($struct:ty) => {
         impl std::fmt::Display for $struct {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str(&$crate::common::ids::base62_impl::to_base62(
-                    self.0,
-                ))
+                f.write_str(&$crate::ids::base62_impl::to_base62(self.0))
             }
         }
     };
@@ -106,8 +104,8 @@ impl_base62_display!(Base62Id);
 #[macro_export]
 macro_rules! base62_id_impl {
     ($struct:ty, $cons:expr) => {
-        $crate::common::ids::from_base62id!($struct, $cons;);
-        $crate::common::ids::impl_base62_display!($struct);
+        $crate::ids::from_base62id!($struct, $cons;);
+        $crate::ids::impl_base62_display!($struct);
     }
 }
 base62_id_impl!(UserId, UserId);

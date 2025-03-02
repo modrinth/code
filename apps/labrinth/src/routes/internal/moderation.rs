@@ -1,5 +1,4 @@
 use super::ApiError;
-use crate::common::ids::random_base62;
 use crate::database;
 use crate::database::redis::RedisPool;
 use crate::models::projects::ProjectStatus;
@@ -7,6 +6,7 @@ use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
 use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
 use actix_web::{web, HttpRequest, HttpResponse};
+use ariadne::ids::random_base62;
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;

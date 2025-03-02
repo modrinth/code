@@ -427,6 +427,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "ariadne"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "either",
+ "rand 0.8.5",
+ "serde",
+ "serde_bytes",
+ "serde_cbor",
+ "serde_json",
+ "thiserror 1.0.64",
+ "uuid 1.12.0",
+]
+
+[[package]]
 name = "arrayvec"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4238,6 +4253,7 @@ dependencies = [
  "actix-web-prom",
  "actix-ws",
  "argon2",
+ "ariadne",
  "async-stripe",
  "async-trait",
  "base64 0.21.7",
