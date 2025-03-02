@@ -38,6 +38,8 @@ jobs:
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
+        env:
+          SQLX_OFFLINE: true
         with:
           file: ./apps/labrinth/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}

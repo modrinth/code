@@ -3,6 +3,7 @@ ENV PKG_CONFIG_ALLOW_CROSS=1
 
 WORKDIR /usr/src/labrinth
 COPY . .
+ENV SQLX_OFFLINE=true
 COPY apps/labrinth/.sqlx/ .sqlx/
 RUN cargo build --release --package labrinth
 
