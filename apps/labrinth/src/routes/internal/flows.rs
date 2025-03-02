@@ -1,11 +1,11 @@
 use crate::auth::email::send_email;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{get_user_from_headers, AuthProvider, AuthenticationError};
+use crate::common::ids::base62_impl::{parse_base62, to_base62};
+use crate::common::ids::random_base62_rng;
 use crate::database::models::flow_item::Flow;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
-use crate::models::ids::random_base62_rng;
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
 use crate::queue::session::AuthQueue;

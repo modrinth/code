@@ -13,8 +13,8 @@ use common::asserts::assert_common_version_ids;
 use common::database::USER_USER_PAT;
 use common::environment::{with_test_environment, with_test_environment_all};
 use futures::StreamExt;
+use labrinth::common::ids::base62_impl::parse_base62;
 use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
-use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::projects::{
     Dependency, DependencyType, VersionId, VersionStatus, VersionType,
 };
