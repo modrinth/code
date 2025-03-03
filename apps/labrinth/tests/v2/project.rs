@@ -16,14 +16,12 @@ use crate::{
 };
 use actix_http::StatusCode;
 use actix_web::test;
+use ariadne::ids::base62_impl::parse_base62;
 use futures::StreamExt;
 use itertools::Itertools;
 use labrinth::{
     database::models::project_item::PROJECTS_SLUGS_NAMESPACE,
-    models::{
-        ids::base62_impl::parse_base62, projects::ProjectId,
-        teams::ProjectPermissions,
-    },
+    models::{projects::ProjectId, teams::ProjectPermissions},
     util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData},
 };
 use serde_json::json;

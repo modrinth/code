@@ -297,7 +297,7 @@ pub fn app_setup(
     }
 
     let ip_salt = Pepper {
-        pepper: models::ids::Base62Id(models::ids::random_base62(11))
+        pepper: ariadne::ids::Base62Id(ariadne::ids::random_base62(11))
             .to_string(),
     };
 

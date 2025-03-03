@@ -13,6 +13,11 @@ pub enum ErrorKind {
     #[error("Serialization error (JSON): {0}")]
     JSONError(#[from] serde_json::Error),
 
+    #[error("Serialization error (websocket): {0}")]
+    WebsocketSerializationError(
+        #[from] ariadne::networking::serialization::SerializationError,
+    ),
+
     #[error("Error parsing UUID: {0}")]
     UUIDError(#[from] uuid::Error),
 

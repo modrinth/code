@@ -427,6 +427,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "ariadne"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "either",
+ "rand 0.8.5",
+ "serde",
+ "serde_bytes",
+ "serde_cbor",
+ "serde_json",
+ "thiserror 1.0.64",
+ "uuid 1.12.0",
+]
+
+[[package]]
 name = "arrayvec"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1204,7 +1219,7 @@ checksum = "d38f2da7a0a2c4ccf0065be06397cc26a81f4e528be095826eee9d4adbb8c60f"
 dependencies = [
  "byteorder",
  "fnv",
- "uuid 1.10.0",
+ "uuid 1.12.0",
 ]
 
 [[package]]
@@ -1291,7 +1306,7 @@ dependencies = [
  "time",
  "tokio 1.42.0",
  "url",
- "uuid 1.10.0",
+ "uuid 1.12.0",
 ]
 
 [[package]]
@@ -1995,7 +2010,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef552e6f588e446098f6ba40d89ac146c8c7b64aade83c051ee00bb5d2bc18d"
 dependencies = [
  "serde",
- "uuid 1.10.0",
+ "uuid 1.12.0",
 ]
 
 [[package]]
@@ -2511,7 +2526,7 @@ checksum = "887d93f60543e9a9362ef8a21beedd0a833c5d9610e18c67abe15a5963dcb1a4"
 dependencies = [
  "bit_field",
  "flume",
- "half",
+ "half 2.4.1",
  "lebe",
  "miniz_oxide 0.7.4",
  "rayon-core",
@@ -3241,6 +3256,12 @@ dependencies = [
  "tokio-util",
  "tracing",
 ]
+
+[[package]]
+name = "half"
+version = "1.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b43ede17f21864e81be2fa654110bf1e793774238d86ef8555c37e6519c0403"
 
 [[package]]
 name = "half"
@@ -4232,6 +4253,7 @@ dependencies = [
  "actix-web-prom",
  "actix-ws",
  "argon2",
+ "ariadne",
  "async-stripe",
  "async-trait",
  "base64 0.21.7",
@@ -4245,6 +4267,7 @@ dependencies = [
  "deadpool-redis",
  "derive-new",
  "dotenvy",
+ "either",
  "env_logger",
  "flate2",
  "futures 0.3.30",
@@ -4277,6 +4300,8 @@ dependencies = [
  "sentry",
  "sentry-actix",
  "serde",
+ "serde_bytes",
+ "serde_cbor",
  "serde_json",
  "serde_with",
  "sha1 0.6.1",
@@ -4290,7 +4315,7 @@ dependencies = [
  "totp-rs",
  "url",
  "urlencoding",
- "uuid 1.10.0",
+ "uuid 1.12.0",
  "validator",
  "webp",
  "woothee",
@@ -4657,7 +4682,7 @@ dependencies = [
  "serde_json",
  "thiserror 1.0.64",
  "time",
- "uuid 1.10.0",
+ "uuid 1.12.0",
  "wasm-bindgen-futures",
  "web-sys",
  "yaup",
@@ -6724,7 +6749,7 @@ dependencies = [
  "rkyv_derive",
  "seahash",
  "tinyvec",
- "uuid 1.10.0",
+ "uuid 1.12.0",
 ]
 
 [[package]]
@@ -7108,7 +7133,7 @@ dependencies = [
  "serde",
  "serde_json",
  "url",
- "uuid 1.10.0",
+ "uuid 1.12.0",
 ]
 
 [[package]]
@@ -7361,7 +7386,7 @@ dependencies = [
  "thiserror 1.0.64",
  "time",
  "url",
- "uuid 1.10.0",
+ "uuid 1.12.0",
 ]
 
 [[package]]
@@ -7394,6 +7419,25 @@ dependencies = [
  "serde",
  "thiserror 1.0.64",
  "xml-rs",
+]
+
+[[package]]
+name = "serde_bytes"
+version = "0.11.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "387cc504cb06bb40a96c8e04e951fe01854cf6bc921053c954e4a606d9675c6a"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "serde_cbor"
+version = "0.11.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2bef2ebfde456fb76bbcf9f59315333decc4fda0b2b44b420243c11e0f5ec1f5"
+dependencies = [
+ "half 1.8.3",
+ "serde",
 ]
 
 [[package]]
@@ -8536,7 +8580,7 @@ dependencies = [
  "thiserror 2.0.7",
  "time",
  "url",
- "uuid 1.10.0",
+ "uuid 1.12.0",
  "walkdir",
 ]
 
@@ -8629,7 +8673,7 @@ dependencies = [
  "thiserror 2.0.7",
  "toml 0.8.19",
  "url",
- "uuid 1.10.0",
+ "uuid 1.12.0",
 ]
 
 [[package]]
@@ -8810,7 +8854,7 @@ dependencies = [
  "toml 0.8.19",
  "url",
  "urlpattern",
- "uuid 1.10.0",
+ "uuid 1.12.0",
  "walkdir",
 ]
 
@@ -8872,6 +8916,7 @@ dependencies = [
 name = "theseus"
 version = "0.9.3"
 dependencies = [
+ "ariadne",
  "async-recursion",
  "async-tungstenite",
  "async_zip",
@@ -8884,6 +8929,7 @@ dependencies = [
  "dirs 5.0.1",
  "discord-rich-presence",
  "dunce",
+ "either",
  "flate2",
  "futures 0.3.30",
  "indicatif",
@@ -8913,7 +8959,7 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "urlencoding",
- "uuid 1.10.0",
+ "uuid 1.12.0",
  "whoami",
  "winreg 0.52.0",
  "zip 0.6.6",
@@ -8955,7 +9001,7 @@ dependencies = [
  "tracing",
  "tracing-error",
  "url",
- "uuid 1.10.0",
+ "uuid 1.12.0",
  "window-shadows",
 ]
 
@@ -8974,7 +9020,7 @@ dependencies = [
  "tracing-error",
  "tracing-subscriber",
  "url",
- "uuid 1.10.0",
+ "uuid 1.12.0",
  "webbrowser",
 ]
 
@@ -9819,9 +9865,9 @@ dependencies = [
 
 [[package]]
 name = "uuid"
-version = "1.10.0"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81dfa00651efa65069b0b6b651f4aaa31ba9e3c3ce0137aaad053604ee7e0314"
+checksum = "744018581f9a3454a9e15beb8a33b017183f1e7c0cd170232a2d1453b23a51c4"
 dependencies = [
  "getrandom 0.2.15",
  "rand 0.8.5",
