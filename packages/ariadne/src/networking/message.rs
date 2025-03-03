@@ -1,5 +1,5 @@
-use crate::common::ids::UserId;
-use crate::common::users::UserStatus;
+use crate::ids::UserId;
+use crate::users::UserStatus;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
