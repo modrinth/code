@@ -1,6 +1,6 @@
 use super::ApiV2;
+use crate::common::api_common::{Api, ApiUser, AppendsOptionalPat};
 use actix_web::{dev::ServiceResponse, test};
-use ariadne::api_common::{Api, ApiUser, AppendsOptionalPat};
 use async_trait::async_trait;
 
 #[async_trait(?Send)]
