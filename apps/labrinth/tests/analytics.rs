@@ -1,3 +1,4 @@
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Duration, Utc};
 use common::permissions::PermissionsTest;
 use common::permissions::PermissionsTestContext;
@@ -7,7 +8,6 @@ use common::{
     environment::{with_test_environment, TestEnvironment},
 };
 use itertools::Itertools;
-use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::queue::payouts;
 use rust_decimal::{prelude::ToPrimitive, Decimal};

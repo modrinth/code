@@ -2,38 +2,30 @@ use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::AuthenticationError;
 use crate::database::models::friend_item::FriendItem;
 use crate::database::redis::RedisPool;
-use crate::models::ids::UserId;
 use crate::models::pats::Scopes;
-use crate::models::users::{User, UserStatus};
+use crate::models::users::User;
 use crate::queue::session::AuthQueue;
-use crate::queue::socket::ActiveSockets;
+use crate::queue::socket::{
+    ActiveSocket, ActiveSockets, SocketId, TunnelSocketType,
+};
 use crate::routes::ApiError;
 use actix_web::web::{Data, Payload};
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use actix_ws::Message;
+use ariadne::ids::UserId;
+use ariadne::networking::message::{
+    ClientToServerMessage, ServerToClientMessage,
+};
+use ariadne::users::UserStatus;
 use chrono::Utc;
+use either::Either;
 use futures_util::{StreamExt, TryStreamExt};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use sqlx::PgPool;
+use std::sync::atomic::Ordering;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(ws_init);
-}
-
-#[derive(Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum ClientToServerMessage {
-    StatusUpdate { profile_name: Option<String> },
-}
-
-#[derive(Serialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum ServerToClientMessage {
-    StatusUpdate { status: UserStatus },
-    UserOffline { id: UserId },
-    FriendStatuses { statuses: Vec<UserStatus> },
-    FriendRequest { from: UserId },
-    FriendRequestRejected { from: UserId },
 }
 
 #[derive(Deserialize)]
@@ -71,10 +63,6 @@ pub async fn ws_init(
 
     let user = User::from_full(db_user);
 
-    if let Some((_, (_, session))) = db.auth_sockets.remove(&user.id) {
-        let _ = session.close(None).await;
-    }
-
     let (res, mut session, msg_stream) = match actix_ws::handle(&req, body) {
         Ok(x) => x,
         Err(e) => return Ok(e.error_response()),
@@ -94,8 +82,8 @@ pub async fn ws_init(
         friends
             .iter()
             .filter_map(|x| {
-                db.auth_sockets.get(
-                    &if x.user_id == user.id.into() {
+                db.get_status(
+                    if x.user_id == user.id.into() {
                         x.friend_id
                     } else {
                         x.user_id
@@ -103,7 +91,6 @@ pub async fn ws_init(
                     .into(),
                 )
             })
-            .map(|x| x.value().0.clone())
             .collect::<Vec<_>>()
     } else {
         Vec::new()
@@ -117,7 +104,17 @@ pub async fn ws_init(
         )?)
         .await;
 
-    db.auth_sockets.insert(user.id, (status.clone(), session));
+    let db = db.clone();
+    let socket_id = db.next_socket_id.fetch_add(1, Ordering::Relaxed);
+    db.sockets
+        .insert(socket_id, ActiveSocket::new(status.clone(), session));
+    db.sockets_by_user_id
+        .entry(user.id)
+        .or_default()
+        .insert(socket_id);
+
+    #[cfg(debug_assertions)]
+    log::info!("Connection {socket_id} opened by {}", user.id);
 
     broadcast_friends(
         user.id,
@@ -133,68 +130,182 @@ pub async fn ws_init(
     actix_web::rt::spawn(async move {
         // receive messages from websocket
         while let Some(msg) = stream.next().await {
-            match msg {
+            let message = match msg {
                 Ok(Message::Text(text)) => {
-                    if let Ok(message) =
-                        serde_json::from_str::<ClientToServerMessage>(&text)
-                    {
-                        match message {
-                            ClientToServerMessage::StatusUpdate {
-                                profile_name,
-                            } => {
-                                if let Some(mut pair) =
-                                    db.auth_sockets.get_mut(&user.id)
-                                {
-                                    let (status, _) = pair.value_mut();
+                    ClientToServerMessage::deserialize(Either::Left(&text))
+                }
 
-                                    if status
-                                        .profile_name
-                                        .as_ref()
-                                        .map(|x| x.len() > 64)
-                                        .unwrap_or(false)
-                                    {
-                                        continue;
-                                    }
-
-                                    status.profile_name = profile_name;
-                                    status.last_update = Utc::now();
-
-                                    let user_status = status.clone();
-                                    // We drop the pair to avoid holding the lock for too long
-                                    drop(pair);
-
-                                    let _ = broadcast_friends(
-                                        user.id,
-                                        ServerToClientMessage::StatusUpdate {
-                                            status: user_status,
-                                        },
-                                        &pool,
-                                        &db,
-                                        None,
-                                    )
-                                    .await;
-                                }
-                            }
-                        }
-                    }
+                Ok(Message::Binary(bytes)) => {
+                    ClientToServerMessage::deserialize(Either::Right(&bytes))
                 }
 
                 Ok(Message::Close(_)) => {
-                    let _ = close_socket(user.id, &pool, &db).await;
+                    let _ = close_socket(socket_id, &pool, &db).await;
+                    continue;
                 }
 
                 Ok(Message::Ping(msg)) => {
-                    if let Some(socket) = db.auth_sockets.get(&user.id) {
-                        let (_, socket) = socket.value();
-                        let _ = socket.clone().pong(&msg).await;
+                    if let Some(socket) = db.sockets.get(&socket_id) {
+                        let _ = socket.socket.clone().pong(&msg).await;
+                    }
+                    continue;
+                }
+
+                _ => continue,
+            };
+
+            if message.is_err() {
+                continue;
+            }
+            let message = message.unwrap();
+
+            #[cfg(debug_assertions)]
+            if !message.is_binary() {
+                log::info!("Received message from {socket_id}: {:?}", message);
+            }
+
+            match message {
+                ClientToServerMessage::StatusUpdate { profile_name } => {
+                    if let Some(mut pair) = db.sockets.get_mut(&socket_id) {
+                        let ActiveSocket { status, .. } = pair.value_mut();
+
+                        if status
+                            .profile_name
+                            .as_ref()
+                            .map(|x| x.len() > 64)
+                            .unwrap_or(false)
+                        {
+                            return;
+                        }
+
+                        status.profile_name = profile_name;
+                        status.last_update = Utc::now();
+
+                        let user_status = status.clone();
+                        // We drop the pair to avoid holding the lock for too long
+                        drop(pair);
+
+                        let _ = broadcast_friends(
+                            user.id,
+                            ServerToClientMessage::StatusUpdate {
+                                status: user_status,
+                            },
+                            &pool,
+                            &db,
+                            None,
+                        )
+                        .await;
                     }
                 }
 
-                _ => {}
+                ClientToServerMessage::SocketListen { .. } => {
+                    // TODO: Listen to socket
+                    // The code below probably won't need changes, but there's no way to connect to
+                    // a tunnel socket yet, so we shouldn't be storing them
+
+                    // let Some(active_socket) = db.sockets.get(&socket_id) else {
+                    //     return;
+                    // };
+                    // let Vacant(entry) = db.tunnel_sockets.entry(socket) else {
+                    //     continue;
+                    // };
+                    // entry.insert(TunnelSocket::new(
+                    //     socket_id,
+                    //     TunnelSocketType::Listening,
+                    // ));
+                    // active_socket.owned_tunnel_sockets.insert(socket);
+                    // let _ = broadcast_friends(
+                    //     user.id,
+                    //     ServerToClientMessage::FriendSocketListening {
+                    //         user: user.id,
+                    //         socket,
+                    //     },
+                    //     &pool,
+                    //     &db,
+                    //     None,
+                    // )
+                    // .await;
+                }
+                ClientToServerMessage::SocketClose { socket } => {
+                    let Some(active_socket) = db.sockets.get(&socket_id) else {
+                        return;
+                    };
+                    if active_socket
+                        .owned_tunnel_sockets
+                        .remove(&socket)
+                        .is_none()
+                    {
+                        continue;
+                    }
+                    let Some((_, tunnel_socket)) =
+                        db.tunnel_sockets.remove(&socket)
+                    else {
+                        continue;
+                    };
+                    match tunnel_socket.socket_type {
+                        TunnelSocketType::Listening => {
+                            let _ = broadcast_friends(
+                                user.id,
+                                ServerToClientMessage::FriendSocketStoppedListening { user: user.id },
+                                &pool,
+                                &db,
+                                None,
+                            )
+                            .await;
+                        }
+                        TunnelSocketType::Connected { connected_to } => {
+                            let Some((_, other)) =
+                                db.tunnel_sockets.remove(&connected_to)
+                            else {
+                                continue;
+                            };
+                            let Some(other_user) = db.sockets.get(&other.owner)
+                            else {
+                                continue;
+                            };
+                            let _ = send_message(
+                                &other_user,
+                                &ServerToClientMessage::SocketClosed { socket },
+                            )
+                            .await;
+                        }
+                    }
+                }
+                ClientToServerMessage::SocketSend { socket, data } => {
+                    let Some(tunnel_socket) = db.tunnel_sockets.get(&socket)
+                    else {
+                        continue;
+                    };
+                    if tunnel_socket.owner != socket_id {
+                        continue;
+                    }
+                    let TunnelSocketType::Connected { connected_to } =
+                        tunnel_socket.socket_type
+                    else {
+                        continue;
+                    };
+                    let Some(other_tunnel) =
+                        db.tunnel_sockets.get(&connected_to)
+                    else {
+                        continue;
+                    };
+                    let Some(other_user) = db.sockets.get(&other_tunnel.owner)
+                    else {
+                        continue;
+                    };
+                    let _ = send_message(
+                        &other_user,
+                        &ServerToClientMessage::SocketData {
+                            socket: connected_to,
+                            data,
+                        },
+                    )
+                    .await;
+                }
             }
         }
 
-        let _ = close_socket(user.id, &pool, &db).await;
+        let _ = close_socket(socket_id, &pool, &db).await;
     });
 
     Ok(res)
@@ -207,6 +318,7 @@ pub async fn broadcast_friends(
     sockets: &ActiveSockets,
     friends: Option<Vec<FriendItem>>,
 ) -> Result<(), crate::database::models::DatabaseError> {
+    // FIXME Probably shouldn't be using database errors for this. Maybe ApiError?
     let friends = if let Some(friends) = friends {
         friends
     } else {
@@ -221,11 +333,46 @@ pub async fn broadcast_friends(
         };
 
         if friend.accepted {
-            if let Some(socket) = sockets.auth_sockets.get(&friend_id.into()) {
-                let (_, socket) = socket.value();
+            if let Some(socket_ids) =
+                sockets.sockets_by_user_id.get(&friend_id.into())
+            {
+                for socket_id in socket_ids.iter() {
+                    if let Some(socket) = sockets.sockets.get(&socket_id) {
+                        let _ = send_message(socket.value(), &message).await;
+                    }
+                }
+            }
+        }
+    }
 
-                let _ =
-                    socket.clone().text(serde_json::to_string(&message)?).await;
+    Ok(())
+}
+
+pub async fn send_message(
+    socket: &ActiveSocket,
+    message: &ServerToClientMessage,
+) -> Result<(), crate::database::models::DatabaseError> {
+    let mut socket = socket.socket.clone();
+
+    // FIXME Probably shouldn't swallow sending errors
+    let _ = match message.serialize() {
+        Ok(Either::Left(text)) => socket.text(text).await,
+        Ok(Either::Right(bytes)) => socket.binary(bytes).await,
+        Err(_) => Ok(()), // TODO: Maybe should log these? Though it is the backend
+    };
+
+    Ok(())
+}
+
+pub async fn send_message_to_user(
+    db: &ActiveSockets,
+    user: UserId,
+    message: &ServerToClientMessage,
+) -> Result<(), crate::database::models::DatabaseError> {
+    if let Some(socket_ids) = db.sockets_by_user_id.get(&user) {
+        for socket_id in socket_ids.iter() {
+            if let Some(socket) = db.sockets.get(&socket_id) {
+                send_message(&socket, message).await?;
             }
         }
     }
@@ -234,21 +381,66 @@ pub async fn broadcast_friends(
 }
 
 pub async fn close_socket(
-    id: UserId,
+    id: SocketId,
     pool: &PgPool,
-    sockets: &ActiveSockets,
+    db: &ActiveSockets,
 ) -> Result<(), crate::database::models::DatabaseError> {
-    if let Some((_, (_, socket))) = sockets.auth_sockets.remove(&id) {
-        let _ = socket.close(None).await;
+    if let Some((_, socket)) = db.sockets.remove(&id) {
+        let user_id = socket.status.user_id;
+        db.sockets_by_user_id.remove_if(&user_id, |_, sockets| {
+            sockets.remove(&id);
+            sockets.is_empty()
+        });
+
+        let _ = socket.socket.close(None).await;
 
         broadcast_friends(
-            id,
-            ServerToClientMessage::UserOffline { id },
+            user_id,
+            ServerToClientMessage::UserOffline { id: user_id },
             pool,
-            sockets,
+            db,
             None,
         )
         .await?;
+
+        for owned_socket in socket.owned_tunnel_sockets {
+            let Some((_, tunnel_socket)) =
+                db.tunnel_sockets.remove(&owned_socket)
+            else {
+                continue;
+            };
+            match tunnel_socket.socket_type {
+                TunnelSocketType::Listening => {
+                    let _ = broadcast_friends(
+                        user_id,
+                        ServerToClientMessage::SocketClosed {
+                            socket: owned_socket,
+                        },
+                        pool,
+                        db,
+                        None,
+                    )
+                    .await;
+                }
+                TunnelSocketType::Connected { connected_to } => {
+                    let Some((_, other)) =
+                        db.tunnel_sockets.remove(&connected_to)
+                    else {
+                        continue;
+                    };
+                    let Some(other_user) = db.sockets.get(&other.owner) else {
+                        continue;
+                    };
+                    let _ = send_message(
+                        &other_user,
+                        &ServerToClientMessage::SocketClosed {
+                            socket: connected_to,
+                        },
+                    )
+                    .await;
+                }
+            }
+        }
     }
 
     Ok(())

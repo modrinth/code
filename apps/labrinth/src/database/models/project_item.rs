@@ -6,8 +6,8 @@ use super::{ids::*, User};
 use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::parse_base62;
 use crate::models::projects::{MonetizationStatus, ProjectStatus};
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
@@ -300,7 +300,7 @@ impl Project {
                 slug, color, monetization_status, organization_id
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, 
+                $1, $2, $3, $4, $5, $6,
                 $7, $8, $9, $10, $11,
                 $12, $13,
                 LOWER($14), $15, $16, $17

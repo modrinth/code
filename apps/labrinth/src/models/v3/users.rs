@@ -1,13 +1,8 @@
-use super::ids::Base62Id;
 use crate::{auth::AuthProvider, bitflags_serde_impl};
+pub use ariadne::users::{UserId, UserStatus};
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug, Hash)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct UserId(pub u64);
 
 pub const DELETED_USER: UserId = UserId(127155982985829);
 
@@ -210,11 +205,4 @@ impl UserFriend {
             created: data.created,
         }
     }
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct UserStatus {
-    pub user_id: UserId,
-    pub profile_name: Option<String>,
-    pub last_update: DateTime<Utc>,
 }

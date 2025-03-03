@@ -164,7 +164,7 @@ async fn find_version(
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<Option<QueryVersion>, ApiError> {
-    let id_option = crate::models::ids::base62_impl::parse_base62(vcoords)
+    let id_option = ariadne::ids::base62_impl::parse_base62(vcoords)
         .ok()
         .map(|x| x as i64);
 
