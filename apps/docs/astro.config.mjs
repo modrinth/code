@@ -34,18 +34,18 @@ export default defineConfig({
         starlightOpenAPI([
           {
             base: 'api',
-            label: 'Modrinth API',
+            label: 'Labyrinth (Modrinth API)',
             schema: './public/openapi.yaml',
           },
         ]),
       ],
       sidebar: [
+        // Add the generated sidebar group to the sidebar.
+        ...openAPISidebarGroups,
         {
           label: 'Contributing to Modrinth',
           autogenerate: { directory: 'contributing' },
         },
-        // Add the generated sidebar group to the sidebar.
-        ...openAPISidebarGroups,
       ],
     }),
   ],
