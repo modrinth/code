@@ -1,6 +1,6 @@
 use crate::state::friends::{TunnelSockets, WriteSocket};
 use crate::state::FriendsSocket;
-use labrinth::common::networking::message::ClientToServerMessage;
+use ariadne::networking::message::ClientToServerMessage;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::io::AsyncWriteExt;

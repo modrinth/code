@@ -3,11 +3,11 @@ use super::loader_fields::{
     VersionField,
 };
 use super::{ids::*, User};
-use crate::common::ids::base62_impl::parse_base62;
 use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::projects::{MonetizationStatus, ProjectStatus};
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;

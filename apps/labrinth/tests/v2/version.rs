@@ -9,13 +9,13 @@ use labrinth::{
 use serde_json::json;
 
 use crate::assert_status;
-use crate::common::api_common::{ApiProject, ApiVersion};
-use crate::common::api_v2::ApiV2;
+use ariadne::api_common::{ApiProject, ApiVersion};
+use ariadne::api_v2::ApiV2;
 
-use crate::common::api_v2::request_data::get_public_project_creation_data;
-use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta};
-use crate::common::environment::{with_test_environment, TestEnvironment};
-use crate::common::{
+use ariadne::api_v2::request_data::get_public_project_creation_data;
+use ariadne::dummy_data::{DummyProjectAlpha, DummyProjectBeta};
+use ariadne::environment::{with_test_environment, TestEnvironment};
+use ariadne::{
     database::{ENEMY_USER_PAT, USER_USER_PAT},
     dummy_data::TestFile,
 };

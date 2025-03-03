@@ -1,7 +1,6 @@
 use std::{collections::HashSet, fmt::Display, sync::Arc};
 
 use super::ApiError;
-use crate::common::ids::base62_impl::parse_base62;
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
     database::{
@@ -31,6 +30,7 @@ use actix_web::{
     web::{self, scope},
     HttpRequest, HttpResponse,
 };
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use itertools::Itertools;
 use rand::{distributions::Alphanumeric, Rng, SeedableRng};

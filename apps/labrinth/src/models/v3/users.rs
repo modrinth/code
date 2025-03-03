@@ -1,5 +1,5 @@
-pub use crate::common::users::{UserId, UserStatus};
 use crate::{auth::AuthProvider, bitflags_serde_impl};
+pub use ariadne::users::{UserId, UserStatus};
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};

@@ -3,7 +3,7 @@ use labrinth::routes::v2::tags::DonationPlatformQueryData;
 
 use std::collections::HashSet;
 
-use crate::common::{
+use ariadne::{
     api_v2::ApiV2,
     environment::{with_test_environment, TestEnvironment},
 };

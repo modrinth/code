@@ -1,6 +1,5 @@
 use super::version_creation::{try_create_version_fields, InitialVersionData};
 use crate::auth::{get_user_from_headers, AuthenticationError};
-use crate::common::ids::base62_impl::to_base62;
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
@@ -28,6 +27,7 @@ use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::stream::StreamExt;
 use image::ImageError;

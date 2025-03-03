@@ -1,10 +1,5 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::AuthenticationError;
-use crate::common::ids::UserId;
-use crate::common::networking::message::{
-    ClientToServerMessage, ServerToClientMessage,
-};
-use crate::common::users::UserStatus;
 use crate::database::models::friend_item::FriendItem;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
@@ -17,6 +12,11 @@ use crate::routes::ApiError;
 use actix_web::web::{Data, Payload};
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use actix_ws::Message;
+use ariadne::ids::UserId;
+use ariadne::networking::message::{
+    ClientToServerMessage, ServerToClientMessage,
+};
+use ariadne::users::UserStatus;
 use chrono::Utc;
 use either::Either;
 use futures_util::{StreamExt, TryStreamExt};
