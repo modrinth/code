@@ -12,7 +12,7 @@ export type VersionEntry = {
 const VERSIONS: VersionEntry[] = [
   {
     date: `2025-03-02T18:45:00-08:00`,
-    product: 'website',
+    product: 'web',
     body: `### Improvements
 - Added option to copy version IDs from the version list for project members and developer mode.
 - Fixed the staff moderation checklist going off the screen.`,
