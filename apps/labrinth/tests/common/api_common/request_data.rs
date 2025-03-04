@@ -3,7 +3,7 @@
 
 use labrinth::util::actix::MultipartSegment;
 
-use ariadne::dummy_data::TestFile;
+use crate::common::dummy_data::TestFile;
 
 #[allow(dead_code)]
 pub struct ProjectCreationRequestData {

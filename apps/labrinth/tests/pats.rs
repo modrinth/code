@@ -6,7 +6,7 @@ use common::{database::*, environment::with_test_environment_all};
 use labrinth::models::pats::Scopes;
 use serde_json::json;
 
-use ariadne::api_common::AppendsOptionalPat;
+use crate::common::api_common::AppendsOptionalPat;
 
 mod common;
 

@@ -5,6 +5,27 @@
   <div class="pointer-events-none absolute inset-0 z-[-1]">
     <div id="absolute-background-teleport" class="relative"></div>
   </div>
+  <div class="pointer-events-none absolute inset-0 z-50">
+    <div
+      class="over-the-top-random-animation"
+      :style="{ '--_r-count': rCount }"
+      :class="{ threshold: rCount > 20, 'rings-expand': rCount >= 40 }"
+    >
+      <div>
+        <div
+          class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+        ></div>
+        <div
+          class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+        ></div>
+        <div
+          class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast"
+        >
+          ?
+        </div>
+      </div>
+    </div>
+  </div>
   <div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
     <div
       v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
@@ -666,6 +687,7 @@ const flags = useFeatureFlags();
 
 const config = useRuntimeConfig();
 const route = useNativeRoute();
+const router = useNativeRouter();
 const link = config.public.siteUrl + route.path.replace(/\/+$/, "");
 
 const basePopoutId = useId();
@@ -927,12 +949,61 @@ const isDiscoveringSubpage = computed(
   () => route.name && route.name.startsWith("type-id") && !route.query.sid,
 );
 
+const rCount = ref(0);
+
+const randomProjects = ref([]);
+const disableRandomProjects = ref(false);
+
+const disableRandomProjectsForRoute = computed(
+  () =>
+    route.name.startsWith("servers") ||
+    route.name.includes("settings") ||
+    route.name.includes("admin"),
+);
+
+async function onKeyDown(event) {
+  if (disableRandomProjects.value || disableRandomProjectsForRoute.value) {
+    return;
+  }
+
+  if (!event.repeat) {
+    rCount.value = 0;
+  }
+
+  if (event.key === "r") {
+    rCount.value++;
+
+    if (randomProjects.value.length < 3) {
+      randomProjects.value = await useBaseFetch("projects_random?count=50").catch((err) => {
+        console.error(err);
+        return [];
+      });
+    }
+  }
+
+  if (rCount.value >= 40) {
+    rCount.value = 0;
+    const randomProject = randomProjects.value[0];
+    await router.push(`/project/${randomProject.slug}`);
+    randomProjects.value.splice(0, 1);
+  }
+}
+
+function onKeyUp(event) {
+  if (event.key === "r") {
+    rCount.value = 0;
+  }
+}
+
 onMounted(() => {
   if (window && import.meta.client) {
     window.history.scrollRestoration = "auto";
   }
 
   runAnalytics();
+
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
 });
 
 watch(
@@ -1518,6 +1589,116 @@ const footerLinks = [
 .footer-brand-background {
   background: var(--brand-gradient-strong-bg);
   border-color: var(--brand-gradient-border);
+}
+
+.over-the-top-random-animation {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  scale: 0.5;
+  transition: all 0.5s ease-out;
+  opacity: 0;
+  animation:
+    tilt-shaking calc(0.2s / (max((var(--_r-count) - 20), 1) / 20)) linear infinite,
+    translate-x-shaking calc(0.3s / (max((var(--_r-count) - 20), 1) / 20)) linear infinite,
+    translate-y-shaking calc(0.25s / (max((var(--_r-count) - 20), 1) / 20)) linear infinite;
+
+  &.threshold {
+    opacity: 1;
+  }
+
+  &.rings-expand {
+    scale: 0.8;
+    opacity: 0;
+
+    .animation-ring-1 {
+      width: 25rem;
+      height: 25rem;
+    }
+    .animation-ring-2 {
+      width: 50rem;
+      height: 50rem;
+    }
+    .animation-ring-3 {
+      width: 100rem;
+      height: 100rem;
+    }
+  }
+
+  > div {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    height: fit-content;
+
+    > * {
+      position: absolute;
+      scale: calc(1 + max((var(--_r-count) - 20), 0) * 0.1);
+      transition: all 0.2s ease-out;
+      width: 20rem;
+      height: 20rem;
+    }
+  }
+}
+
+@keyframes tilt-shaking {
+  0% {
+    rotate: 0deg;
+  }
+  25% {
+    rotate: calc(1deg * (var(--_r-count) - 20));
+  }
+  50% {
+    rotate: 0deg;
+  }
+  75% {
+    rotate: calc(-1deg * (var(--_r-count) - 20));
+  }
+  100% {
+    rotate: 0deg;
+  }
+}
+
+@keyframes translate-x-shaking {
+  0% {
+    translate: 0;
+  }
+  25% {
+    translate: calc(2px * (var(--_r-count) - 20));
+  }
+  50% {
+    translate: 0;
+  }
+  75% {
+    translate: calc(-2px * (var(--_r-count) - 20));
+  }
+  100% {
+    translate: 0;
+  }
+}
+
+@keyframes translate-y-shaking {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(calc(2px * (var(--_r-count) - 20)));
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(calc(-2px * (var(--_r-count) - 20)));
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
