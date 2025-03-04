@@ -24,7 +24,7 @@ use labrinth::{
 };
 use serde_json::json;
 
-use ariadne::database::MOD_USER_PAT;
+use crate::common::database::MOD_USER_PAT;
 
 use super::{
     request_data::{self, get_public_project_creation_data},

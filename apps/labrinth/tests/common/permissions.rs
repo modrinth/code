@@ -6,7 +6,7 @@ use itertools::Itertools;
 use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
 use serde_json::json;
 
-use ariadne::{
+use crate::common::{
     api_common::ApiTeams,
     database::{generate_random_name, ADMIN_USER_PAT},
 };

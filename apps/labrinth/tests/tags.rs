@@ -7,7 +7,7 @@ use common::{
     },
 };
 
-use ariadne::api_common::ApiTags;
+use crate::common::api_common::ApiTags;
 
 mod common;
 
