@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { type Product, getChangelog } from "@modrinth/utils";
 import { ChangelogEntry } from "@modrinth/ui";
+import Timeline from "@modrinth/ui/src/components/base/Timeline.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 
 const route = useRoute();
@@ -51,10 +52,7 @@ const changelogEntries = computed(() =>
     query="filter"
     class="mb-4"
   />
-  <div class="relative flex flex-col gap-4 pb-6">
-    <div class="absolute flex h-full w-4 justify-center">
-      <div class="timeline-indicator" />
-    </div>
+  <Timeline fade-out-end>
     <ChangelogEntry
       v-for="(entry, index) in changelogEntries"
       :key="entry.date"
@@ -62,25 +60,6 @@ const changelogEntries = computed(() =>
       :first="index === 0"
       :show-type="filter === undefined"
       has-link
-      class="relative z-[1]"
     />
-  </div>
+  </Timeline>
 </template>
-
-<style lang="scss" scoped>
-.timeline-indicator {
-  background-image: linear-gradient(
-    to bottom,
-    var(--color-raised-bg) 66%,
-    rgba(255, 255, 255, 0) 0%
-  );
-  background-size: 100% 30px;
-  background-repeat: repeat-y;
-  margin-top: 1rem;
-
-  height: calc(100% - 1rem);
-  width: 4px;
-
-  mask-image: linear-gradient(to bottom, black calc(100% - 15rem), transparent 100%);
-}
-</style>

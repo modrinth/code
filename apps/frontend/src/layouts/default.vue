@@ -227,7 +227,6 @@
               <template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
             </TeleportOverflowMenu>
           </ButtonStyled>
-
           <ButtonStyled
             type="transparent"
             :highlighted="
@@ -252,14 +251,52 @@
           </ButtonStyled>
         </template>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1">
+        <ButtonStyled type="transparent">
+          <OverflowMenu
+            v-if="auth.user && isStaff(auth.user)"
+            class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+            position="bottom"
+            direction="left"
+            :dropdown-id="`${basePopoutId}-staff`"
+            aria-label="Create new..."
+            :options="[
+              {
+                id: 'review-projects',
+                color: 'orange',
+                link: '/moderation/review',
+              },
+              {
+                id: 'review-reports',
+                color: 'orange',
+                link: '/moderation/reports',
+              },
+              {
+                divider: true,
+                shown: isAdmin(auth.user),
+              },
+              {
+                id: 'user-lookup',
+                color: 'primary',
+                link: '/admin/user_email',
+                shown: isAdmin(auth.user),
+              },
+            ]"
+          >
+            <ModrinthIcon aria-hidden="true" />
+            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+            <template #review-projects> <ScaleIcon aria-hidden="true" /> Review projects </template>
+            <template #review-reports> <ReportIcon aria-hidden="true" /> Reports </template>
+            <template #user-lookup> <UserIcon aria-hidden="true" /> Lookup by email </template>
+          </OverflowMenu>
+        </ButtonStyled>
         <ButtonStyled type="transparent">
           <OverflowMenu
             v-if="auth.user"
             class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
             position="bottom"
             direction="left"
-            :dropdown-id="createPopoutId"
+            :dropdown-id="`${basePopoutId}-create`"
             aria-label="Create new..."
             :options="[
               {
@@ -291,7 +328,7 @@
         </ButtonStyled>
         <OverflowMenu
           v-if="auth.user"
-          :dropdown-id="userPopoutId"
+          :dropdown-id="`${basePopoutId}-user`"
           class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
           :options="userMenuOptions"
         >
@@ -312,7 +349,7 @@
           </template>
           <template #revenue> <CurrencyIcon aria-hidden="true" /> Revenue </template>
           <template #analytics> <ChartIcon aria-hidden="true" /> Analytics </template>
-          <template #moderation> <ModerationIcon aria-hidden="true" /> Moderation </template>
+          <template #moderation> <ScaleIcon aria-hidden="true" /> Moderation </template>
           <template #sign-out> <LogOutIcon aria-hidden="true" /> Sign out </template>
         </OverflowMenu>
         <template v-else>
@@ -399,7 +436,7 @@
               class="iconified-button"
               to="/moderation"
             >
-              <ModerationIcon aria-hidden="true" />
+              <ScaleIcon aria-hidden="true" />
               {{ formatMessage(commonMessages.moderationLabel) }}
             </NuxtLink>
             <NuxtLink v-if="flags.developerMode" class="iconified-button" to="/flags">
@@ -460,7 +497,7 @@
               }
             "
           >
-            <NotificationIcon aria-hidden="true" />
+            <BellIcon aria-hidden="true" />
           </NuxtLink>
           <NuxtLink
             to="/dashboard"
@@ -479,7 +516,7 @@
         >
           <template v-if="!auth.user">
             <HamburgerIcon v-if="!isMobileMenuOpen" aria-hidden="true" />
-            <CrossIcon v-else aria-hidden="true" />
+            <XIcon v-else aria-hidden="true" />
           </template>
           <template v-else>
             <Avatar
@@ -589,6 +626,7 @@
 </template>
 <script setup>
 import {
+  ModrinthIcon,
   ArrowBigUpDashIcon,
   BookmarkIcon,
   ServerIcon,
@@ -626,17 +664,17 @@ import {
   TwitterIcon,
   MastodonIcon,
   GitHubIcon,
-  XIcon as CrossIcon,
-  ScaleIcon as ModerationIcon,
-  BellIcon as NotificationIcon,
+  ScaleIcon,
 } from "@modrinth/assets";
 import { Button, ButtonStyled, OverflowMenu, Avatar, commonMessages } from "@modrinth/ui";
 
+import { isAdmin, isStaff } from "@modrinth/utils";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
 import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
+import Report from "~/pages/report.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -652,8 +690,7 @@ const route = useNativeRoute();
 const router = useNativeRouter();
 const link = config.public.siteUrl + route.path.replace(/\/+$/, "");
 
-const createPopoutId = useId();
-const userPopoutId = useId();
+const basePopoutId = useId();
 
 const verifyEmailBannerMessages = defineMessages({
   title: {
