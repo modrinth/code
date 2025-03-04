@@ -674,7 +674,6 @@ import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
 import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
-import Report from "~/pages/report.vue";
 
 const { formatMessage } = useVIntl();
 
