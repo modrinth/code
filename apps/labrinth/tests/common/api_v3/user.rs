@@ -1,7 +1,7 @@
 use actix_web::{dev::ServiceResponse, test};
 use async_trait::async_trait;
 
-use ariadne::api_common::{Api, ApiUser, AppendsOptionalPat};
+use crate::common::api_common::{Api, ApiUser, AppendsOptionalPat};
 
 use super::ApiV3;
 

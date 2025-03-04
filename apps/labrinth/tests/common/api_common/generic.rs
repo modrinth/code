@@ -7,7 +7,7 @@ use labrinth::models::{
     teams::{OrganizationPermissions, ProjectPermissions},
 };
 
-use ariadne::{api_v2::ApiV2, api_v3::ApiV3, dummy_data::TestFile};
+use crate::common::{api_v2::ApiV2, api_v3::ApiV3, dummy_data::TestFile};
 
 use super::{
     models::{CommonProject, CommonVersion},
@@ -81,7 +81,7 @@ delegate_api_variant!(
         [add_gallery_item, ServiceResponse, id_or_slug: &str, image: ImageData,  featured: bool, title: Option<String>, description: Option<String>, ordering: Option<i32>, pat: Option<&str>],
         [remove_gallery_item, ServiceResponse, id_or_slug: &str, image_url: &str, pat: Option<&str>],
         [edit_gallery_item, ServiceResponse, id_or_slug: &str, image_url: &str, patch: HashMap<String, String>, pat: Option<&str>],
-        [create_report, ServiceResponse, report_type: &str, id: &str, item_type: ariadne::api_common::models::CommonItemType, body: &str, pat: Option<&str>],
+        [create_report, ServiceResponse, report_type: &str, id: &str, item_type: crate::common::api_common::models::CommonItemType, body: &str, pat: Option<&str>],
         [get_report, ServiceResponse, id: &str, pat: Option<&str>],
         [get_reports, ServiceResponse, ids: &[&str], pat: Option<&str>],
         [get_user_reports, ServiceResponse, pat: Option<&str>],
@@ -100,9 +100,9 @@ delegate_api_variant!(
     #[async_trait(?Send)]
     impl ApiTags for GenericApi {
         [get_loaders, ServiceResponse,],
-        [get_loaders_deserialized_common, Vec<ariadne::api_common::models::CommonLoaderData>,],
+        [get_loaders_deserialized_common, Vec<crate::common::api_common::models::CommonLoaderData>,],
         [get_categories, ServiceResponse,],
-        [get_categories_deserialized_common, Vec<ariadne::api_common::models::CommonCategoryData>,],
+        [get_categories_deserialized_common, Vec<crate::common::api_common::models::CommonCategoryData>,],
     }
 );
 
@@ -110,18 +110,18 @@ delegate_api_variant!(
     #[async_trait(?Send)]
     impl ApiTeams for GenericApi {
         [get_team_members, ServiceResponse, team_id: &str, pat: Option<&str>],
-        [get_team_members_deserialized_common, Vec<ariadne::api_common::models::CommonTeamMember>, team_id: &str, pat: Option<&str>],
+        [get_team_members_deserialized_common, Vec<crate::common::api_common::models::CommonTeamMember>, team_id: &str, pat: Option<&str>],
         [get_teams_members, ServiceResponse, ids: &[&str], pat: Option<&str>],
         [get_project_members, ServiceResponse, id_or_slug: &str, pat: Option<&str>],
-        [get_project_members_deserialized_common, Vec<ariadne::api_common::models::CommonTeamMember>, id_or_slug: &str, pat: Option<&str>],
+        [get_project_members_deserialized_common, Vec<crate::common::api_common::models::CommonTeamMember>, id_or_slug: &str, pat: Option<&str>],
         [get_organization_members, ServiceResponse, id_or_title: &str, pat: Option<&str>],
-        [get_organization_members_deserialized_common, Vec<ariadne::api_common::models::CommonTeamMember>, id_or_title: &str, pat: Option<&str>],
+        [get_organization_members_deserialized_common, Vec<crate::common::api_common::models::CommonTeamMember>, id_or_title: &str, pat: Option<&str>],
         [join_team, ServiceResponse, team_id: &str, pat: Option<&str>],
         [remove_from_team, ServiceResponse, team_id: &str, user_id: &str, pat: Option<&str>],
         [edit_team_member, ServiceResponse, team_id: &str, user_id: &str, patch: serde_json::Value, pat: Option<&str>],
         [transfer_team_ownership, ServiceResponse, team_id: &str, user_id: &str, pat: Option<&str>],
         [get_user_notifications, ServiceResponse, user_id: &str, pat: Option<&str>],
-        [get_user_notifications_deserialized_common, Vec<ariadne::api_common::models::CommonNotification>, user_id: &str, pat: Option<&str>],
+        [get_user_notifications_deserialized_common, Vec<crate::common::api_common::models::CommonNotification>, user_id: &str, pat: Option<&str>],
         [get_notification, ServiceResponse, notification_id: &str, pat: Option<&str>],
         [get_notifications, ServiceResponse, ids: &[&str], pat: Option<&str>],
         [mark_notification_read, ServiceResponse, notification_id: &str, pat: Option<&str>],
