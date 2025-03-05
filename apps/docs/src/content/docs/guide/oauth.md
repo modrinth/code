@@ -66,7 +66,7 @@ If the request succeeds, you should receive a JSON payload with these fields:
 | `token_type`   | Currently only `Bearer`                              |
 | `expires_in`   | The amount of seconds until the access token expires |
 
-To use this access token, you attach it to API requests in the `Authorization` header prefixed by `Bearer`. For example `Authorization: Bearer mro_somesecretcharacters`.
+To use this access token, you attach it to API requests in the `Authorization` header prefixed by `Bearer`. For example `Authorization: Bearer mro_somesecretcharacters`. To get basic information about the authorizer, you can use the [`/user` endpoint], which automatically gets the user from the header.
 
 ## FAQ
 
@@ -91,6 +91,8 @@ To use this access token, you attach it to API requests in the `Authorization` h
 [CSRF]: https://en.wikipedia.org/wiki/Cross-site_request_forgery
 
 [Clickjacking]: https://en.wikipedia.org/wiki/Clickjacking
+
+[`/user` endpoint]: https://docs.modrinth.com/api/operations/getuserfromauth/
 
 [Discord guild]: https://discord.modrinth.com
 
