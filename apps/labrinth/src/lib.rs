@@ -473,6 +473,7 @@ pub fn check_env_vars() -> bool {
         failed |= true;
     }
 
+    failed |= check_var::<bool>("CLICKHOUSE_REPLICATED");
     failed |= check_var::<String>("CLICKHOUSE_URL");
     failed |= check_var::<String>("CLICKHOUSE_USER");
     failed |= check_var::<String>("CLICKHOUSE_PASSWORD");
