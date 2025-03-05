@@ -74,11 +74,10 @@ pub async fn count_download(
     let project_id: crate::database::models::ids::ProjectId =
         download_body.project_id.into();
 
-    let id_option = crate::models::ids::base62_impl::parse_base62(
-        &download_body.version_name,
-    )
-    .ok()
-    .map(|x| x as i64);
+    let id_option =
+        ariadne::ids::base62_impl::parse_base62(&download_body.version_name)
+            .ok()
+            .map(|x| x as i64);
 
     let (version_id, project_id) = if let Some(version) = sqlx::query!(
         "

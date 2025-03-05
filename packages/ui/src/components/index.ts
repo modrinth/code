@@ -35,6 +35,7 @@ export { default as Slider } from './base/Slider.vue'
 export { default as StatItem } from './base/StatItem.vue'
 export { default as TagItem } from './base/TagItem.vue'
 export { default as TeleportDropdownMenu } from './base/TeleportDropdownMenu.vue'
+export { default as Timeline } from './base/Timeline.vue'
 export { default as Toggle } from './base/Toggle.vue'
 
 // Branding

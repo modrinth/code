@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getChangelog } from "@modrinth/utils";
-import { ChangelogEntry } from "@modrinth/ui";
+import { ChangelogEntry, Timeline } from "@modrinth/ui";
 import { ChevronLeftIcon } from "@modrinth/assets";
 
 const route = useRoute();
@@ -39,41 +39,13 @@ if (!changelogEntry.value) {
     >
       <ChevronLeftIcon /> View full changelog
     </nuxt-link>
-    <div class="relative flex flex-col gap-4 pb-6">
-      <div class="absolute flex h-full w-4 justify-center">
-        <div class="timeline-indicator" :class="{ first: isFirst }" />
-      </div>
-      <ChangelogEntry :entry="changelogEntry" :first="isFirst" show-type class="relative z-[1]" />
-    </div>
+    <Timeline fade-out-end :fade-out-start="!isFirst" :class="{ '-mt-8': !isFirst }">
+      <ChangelogEntry
+        :entry="changelogEntry"
+        :first="isFirst"
+        show-type
+        :class="{ 'mt-8': !isFirst }"
+      />
+    </Timeline>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.timeline-indicator {
-  background-image: linear-gradient(
-    to bottom,
-    var(--color-raised-bg) 66%,
-    rgba(255, 255, 255, 0) 0%
-  );
-  background-size: 100% 30px;
-  background-repeat: repeat-y;
-
-  height: calc(100% + 2rem);
-  width: 4px;
-  margin-top: -2rem;
-
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    black 8rem,
-    black calc(100% - 8rem),
-    transparent 100%
-  );
-
-  &.first {
-    margin-top: 1rem;
-
-    mask-image: linear-gradient(black calc(100% - 15rem), transparent 100%);
-  }
-}
-</style>

@@ -90,7 +90,7 @@ function addBodyPadding() {
 }
 
 function show(event?: MouseEvent) {
-  props.onShow()
+  props.onShow?.()
   open.value = true
 
   addBodyPadding()

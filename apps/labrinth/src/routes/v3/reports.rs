@@ -6,9 +6,7 @@ use crate::database::models::thread_item::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
-use crate::models::ids::{
-    base62_impl::parse_base62, ProjectId, UserId, VersionId,
-};
+use crate::models::ids::{ProjectId, UserId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::reports::{ItemType, Report};
@@ -17,6 +15,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img;
 use actix_web::{web, HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use futures::StreamExt;
 use serde::Deserialize;

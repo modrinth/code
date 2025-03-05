@@ -1,7 +1,7 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::parse_base62;
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};

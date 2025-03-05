@@ -4,6 +4,7 @@ use common::api_v3::ApiV3;
 use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
 
+use ariadne::ids::base62_impl::parse_base62;
 use common::environment::{
     with_test_environment, with_test_environment_all, TestEnvironment,
 };
@@ -12,7 +13,6 @@ use futures::StreamExt;
 use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
 };
-use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::projects::ProjectId;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
