@@ -15,9 +15,9 @@ LABEL org.opencontainers.image.description="Modrinth API"
 LABEL org.opencontainers.image.licenses=AGPL-3.0
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates openssl \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+  && apt-get install -y --no-install-recommends ca-certificates openssl dumb-init \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN update-ca-certificates
 
@@ -26,4 +26,5 @@ COPY --from=build /usr/src/labrinth/apps/labrinth/migrations/* /labrinth/migrati
 COPY --from=build /usr/src/labrinth/apps/labrinth/assets /labrinth/assets
 WORKDIR /labrinth
 
-CMD /labrinth/labrinth
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["/labrinth/labrinth"]
