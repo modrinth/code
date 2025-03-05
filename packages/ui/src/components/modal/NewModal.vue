@@ -109,7 +109,7 @@ function show(event?: MouseEvent) {
 }
 
 function hide() {
-  props.onHide()
+  props.onHide?.()
   visible.value = false
   document.body.style.overflow = ''
   document.body.style.paddingRight = ''

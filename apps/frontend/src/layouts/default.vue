@@ -965,10 +965,6 @@ async function onKeyDown(event) {
     return;
   }
 
-  if (!event.repeat) {
-    rCount.value = 0;
-  }
-
   if (event.key === "r") {
     rCount.value++;
 
