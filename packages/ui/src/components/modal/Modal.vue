@@ -67,7 +67,7 @@ function show() {
 }
 
 function hide() {
-  props.onHide()
+  props.onHide?.()
   actuallyShown.value = false
   setTimeout(() => {
     shown.value = false
