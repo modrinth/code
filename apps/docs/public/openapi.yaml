@@ -51,35 +51,7 @@ info:
     Please note that certain scopes and requests cannot be completed with a personal access token or using OAuth.
     For example, deleting a user account can only be done through Modrinth's frontend.
 
-    ### OAuth2
-    Applications interacting with an authenticated API should create an OAuth2 application.
-    You can do this in [the developer settings](https://modrinth.com/settings/applications).
-
-    Make sure to save your application secret, as you will not be able to access it after you leave the page.
-
-    Once you have created a client, use the following URL to have a user authorize your client:
-    ```
-    https://modrinth.com/auth/authorize?client_id=<CLIENT_ID>&redirect_uri=<CALLBACK_URL>&scope=<SCOPE_ONE>+<SCOPE_TWO>+<SCOPE_THREE>
-    ```
-    > You can get a list of all scope names [here](https://github.com/modrinth/code/tree/main/apps/labrinth/src/models/v3/pats.rs).
-
-    Then, send a `POST` request to the following URL to get the token:
-
-    ```
-    https://api.modrinth.com/_internal/oauth/token
-    ```
-
-    > Note that you will need to provide your application's secret under the Authorization header.
-
-    In the body of your request, make sure to include the following:
-    - `code`: The code generated when authorizing your client
-    - `client_id`: Your client ID (found in developer settings)
-    - `redirect_uri`: A valid redirect URI provided in your application's settings
-    - `grant_type`: This will need to be `authorization_code`.
-
-    If your token request fails for any reason, you will need to get another code from the authorization process.
-
-    This route will be changed in the future to move the `_internal` part to `v3`.
+    A highly detailed guide on OAuth has been published in [Modrinth's technical documentation](https://docs.modrinth.com/guide/oauth).
 
     ### Personal access tokens
     Personal access tokens (PATs) can be generated in from [the user settings](https://modrinth.com/settings/account).
@@ -197,7 +169,7 @@ components:
       description: The ID or slug of the project
       schema:
         type: string
-        example: [AABBCCDD, my_project]
+        example: [ AABBCCDD, my_project ]
     MultipleProjectIdentifier:
       in: query
       name: ids
@@ -213,7 +185,7 @@ components:
       description: The ID or username of the user
       schema:
         type: string
-        example: [EEFFGGHH, my_user]
+        example: [ EEFFGGHH, my_user ]
     VersionIdentifier:
       name: id
       in: path
@@ -221,7 +193,7 @@ components:
       description: The ID of the version
       schema:
         type: string
-        example: [IIJJKKLL]
+        example: [ IIJJKKLL ]
     TeamIdentifier:
       name: id
       in: path
@@ -229,7 +201,7 @@ components:
       description: The ID of the team
       schema:
         type: string
-        example: [MMNNOOPP]
+        example: [ MMNNOOPP ]
     ReportIdentifier:
       name: id
       in: path
@@ -237,7 +209,7 @@ components:
       description: The ID of the report
       schema:
         type: string
-        example: [RRSSTTUU]
+        example: [ RRSSTTUU ]
     ThreadIdentifier:
       name: id
       in: path
@@ -245,7 +217,7 @@ components:
       description: The ID of the thread
       schema:
         type: string
-        example: [QQRRSSTT]
+        example: [ QQRRSSTT ]
     NotificationIdentifier:
       name: id
       in: path
@@ -253,7 +225,7 @@ components:
       description: The ID of the notification
       schema:
         type: string
-        example: [NNOOPPQQ]
+        example: [ NNOOPPQQ ]
     AlgorithmIdentifier:
       name: algorithm
       in: query
@@ -261,7 +233,7 @@ components:
       description: The algorithm of the hash
       schema:
         type: string
-        enum: [sha1, sha512]
+        enum: [ sha1, sha512 ]
         example: sha512
         default: sha1
     MultipleHashQueryIdentifier:
@@ -343,29 +315,29 @@ components:
           items:
             type: string
           description: A list of versions of Minecraft that this version supports
-          example: ['1.16.5', '1.17.1']
+          example: [ '1.16.5', '1.17.1' ]
         version_type:
           type: string
           description: The release channel for this version
-          enum: [release, beta, alpha]
+          enum: [ release, beta, alpha ]
           example: release
         loaders:
           type: array
           items:
             type: string
           description: The mod loaders that this version supports. In case of resource packs, use "minecraft"
-          example: ['fabric', 'forge', 'minecraft']
+          example: [ 'fabric', 'forge', 'minecraft' ]
         featured:
           type: boolean
           description: Whether the version is featured or not
           example: true
         status:
           type: string
-          enum: [listed, archived, draft, unlisted, scheduled, unknown]
+          enum: [ listed, archived, draft, unlisted, scheduled, unknown ]
           example: listed
         requested_status:
           type: string
-          enum: [listed, archived, draft, unlisted]
+          enum: [ listed, archived, draft, unlisted ]
           nullable: true
     VersionDependency:
       type: object
@@ -387,7 +359,7 @@ components:
           nullable: true
         dependency_type:
           type: string
-          enum: [required, optional, incompatible, embedded]
+          enum: [ required, optional, incompatible, embedded ]
           description: The type of dependency that this version has
           example: required
       required:
@@ -403,7 +375,7 @@ components:
               type: array
               items:
                 type: string
-              example: [sha1, aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj]
+              example: [ sha1, aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj ]
               description: The hash format and the hash of the new primary file
             file_types:
               type: array
@@ -423,7 +395,7 @@ components:
           example: aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj
         file_type:
           type: string
-          enum: [required-resource-pack, optional-resource-pack]
+          enum: [ required-resource-pack, optional-resource-pack ]
           description: The hash algorithm of the file you're editing
           example: required-resource-pack
           nullable: true
@@ -464,7 +436,7 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/CreatableVersion'
-      required: [data]
+      required: [ data ]
     Version:
       allOf:
         - $ref: '#/components/schemas/BaseVersion'
@@ -535,7 +507,7 @@ components:
           description: The size of the file in bytes
         file_type:
           type: string
-          enum: [required-resource-pack, optional-resource-pack]
+          enum: [ required-resource-pack, optional-resource-pack ]
           description: The type of the additional file, used mainly for adding resource packs to datapacks
           example: required-resource-pack
           nullable: true
@@ -562,12 +534,12 @@ components:
           type: array
           items:
             type: string
-            example: [fabric]
+            example: [ fabric ]
         game_versions:
           type: array
           items:
             type: string
-          example: ['1.18', 1.18.1]
+          example: [ '1.18', 1.18.1 ]
       required:
         - loaders
         - game_versions
@@ -591,7 +563,7 @@ components:
             ]
         algorithm:
           type: string
-          enum: [sha1, sha512]
+          enum: [ sha1, sha512 ]
           example: sha512
       required:
         - hashes
@@ -605,12 +577,12 @@ components:
               type: array
               items:
                 type: string
-              example: [fabric]
+              example: [ fabric ]
             game_versions:
               type: array
               items:
                 type: string
-              example: ['1.18', 1.18.1]
+              example: [ '1.18', 1.18.1 ]
           required:
             - loaders
             - game_versions
@@ -635,16 +607,16 @@ components:
           type: array
           items:
             type: string
-          example: [technology, adventure, fabric]
+          example: [ technology, adventure, fabric ]
           description: A list of the categories that the project has
         client_side:
           type: string
-          enum: [required, optional, unsupported, unknown]
+          enum: [ required, optional, unsupported, unknown ]
           description: The client side support of the project
           example: required
         server_side:
           type: string
-          enum: [required, optional, unsupported, unknown]
+          enum: [ required, optional, unsupported, unknown ]
           description: The server side support of the project
           example: optional
     # Fields added to search results and direct project lookups that cannot be edited.
@@ -655,7 +627,7 @@ components:
           properties:
             project_type:
               type: string
-              enum: [mod, modpack, resourcepack, shader]
+              enum: [ mod, modpack, resourcepack, shader ]
               description: The project type of the project
               example: mod
             downloads:
@@ -677,7 +649,7 @@ components:
               description: The ID of the moderation thread associated with this project
             monetization_status:
               type: string
-              enum: [monetized, demonetized, force-demonetized]
+              enum: [ monetized, demonetized, force-demonetized ]
           required:
             - project_type
             - downloads
@@ -700,13 +672,13 @@ components:
               items:
                 type: string
               description: A list of the categories that the project has which are not secondary
-              example: ['technology', 'fabric']
+              example: [ 'technology', 'fabric' ]
             versions:
               type: array
               items:
                 type: string
               description: A list of the minecraft versions supported by the project
-              example: ['1.8', '1.8.9']
+              example: [ '1.8', '1.8.9' ]
             follows:
               type: integer
               description: The total number of users following the project
@@ -782,7 +754,7 @@ components:
               example: approved
             requested_status:
               type: string
-              enum: [approved, archived, unlisted, private, draft]
+              enum: [ approved, archived, unlisted, private, draft ]
               description: The requested status when submitting for review or scheduling the project for release
               nullable: true
             additional_categories:
@@ -790,7 +762,7 @@ components:
               items:
                 type: string
               description: A list of categories which are searchable but non-primary
-              example: [technology, adventure, fabric]
+              example: [ technology, adventure, fabric ]
             issues_url:
               type: string
               description: An optional link to where to submit bugs or issues with the project
@@ -867,7 +839,7 @@ components:
           properties:
             project_type:
               type: string
-              enum: [mod, modpack]
+              enum: [ mod, modpack ]
               example: modpack
             initial_versions:
               type: array
@@ -971,19 +943,19 @@ components:
               type: array
               items:
                 type: string
-              example: [IIJJKKLL, QQRRSSTT]
+              example: [ IIJJKKLL, QQRRSSTT ]
               description: A list of the version IDs of the project (will never be empty unless `draft` status)
             game_versions:
               type: array
               items:
                 type: string
-              example: ['1.19', '1.19.1', '1.19.2', '1.19.3']
+              example: [ '1.19', '1.19.1', '1.19.2', '1.19.3' ]
               description: A list of all of the game versions supported by the project
             loaders:
               type: array
               items:
                 type: string
-              example: ['forge', 'fabric', 'quilt']
+              example: [ 'forge', 'fabric', 'quilt' ]
               description: A list of all of the loaders supported by the project
             gallery:
               type: array
@@ -1157,9 +1129,9 @@ components:
         icon:
           type: string
           format: binary
-          enum: ['*.png', '*.jpg', '*.jpeg', '*.bmp', '*.gif', '*.webp', '*.svg', '*.svgz', '*.rgb']
+          enum: [ '*.png', '*.jpg', '*.jpeg', '*.bmp', '*.gif', '*.webp', '*.svg', '*.svgz', '*.rgb' ]
           description: Project icon file
-      required: [data]
+      required: [ data ]
     ProjectIdentifier:
       type: object
       properties:
@@ -1175,7 +1147,7 @@ components:
           example: '2023-02-05T19:39:55.551839Z'
         requested_status:
           type: string
-          enum: [approved, archived, unlisted, private, draft]
+          enum: [ approved, archived, unlisted, private, draft ]
           description: The requested status when scheduling the project for release
       required:
         - time
@@ -1250,12 +1222,12 @@ components:
           example: 10.11223344556677889900
         payout_wallet:
           type: string
-          enum: [paypal, venmo]
+          enum: [ paypal, venmo ]
           description: The wallet that the user has selected
           example: paypal
         payout_wallet_type:
           type: string
-          enum: [email, phone, user_handle]
+          enum: [ email, phone, user_handle ]
           description: The type of the user's wallet
           example: email
         payout_address:
@@ -1281,7 +1253,7 @@ components:
               description: The time at which the user was created
             role:
               type: string
-              enum: [admin, moderator, developer]
+              enum: [ admin, moderator, developer ]
               description: The user's role
               example: developer
             badges:
@@ -1303,7 +1275,7 @@ components:
               type: array
               items:
                 type: string
-              example: [github, gitlab, steam, microsoft, google, discord]
+              example: [ github, gitlab, steam, microsoft, google, discord ]
               description: A list of authentication providers you have signed up for (only displayed if requesting your own account)
               nullable: true
             email_verified:
@@ -1374,7 +1346,7 @@ components:
           example: EEFFGGHH
         type:
           type: string
-          enum: [project_update, team_invite, status_change, moderator_message]
+          enum: [ project_update, team_invite, status_change, moderator_message ]
           description: The type of notification
           example: project_update
           nullable: true
@@ -1425,7 +1397,7 @@ components:
           items:
             type: string
           description: The HTTP code and path to request in order to perform this action.
-          example: [POST, 'team/{id}/join']
+          example: [ POST, 'team/{id}/join' ]
     # Reports
     CreatableReport:
       type: object
@@ -1440,7 +1412,7 @@ components:
           example: EEFFGGHH
         item_type:
           type: string
-          enum: [project, user, version]
+          enum: [ project, user, version ]
           description: The type of the item being reported
           example: project
         body:
@@ -1492,7 +1464,7 @@ components:
           description: The ID of the thread
         type:
           type: string
-          enum: [project, report, direct_message]
+          enum: [ project, report, direct_message ]
         project_id:
           type: string
           nullable: true
@@ -1542,7 +1514,7 @@ components:
       properties:
         type:
           type: string
-          enum: [status_change, text, thread_closure, deleted]
+          enum: [ status_change, text, thread_closure, deleted ]
           description: The type of message
           example: status_change
         body:
@@ -1685,7 +1657,7 @@ components:
             type: string
             description: The project type
           description: The project types that this loader is applicable to
-          example: [mod, modpack]
+          example: [ mod, modpack ]
       required:
         - icon
         - name
@@ -1699,7 +1671,7 @@ components:
           example: 1.18.1
         version_type:
           type: string
-          enum: [release, snapshot, alpha, beta]
+          enum: [ release, snapshot, alpha, beta ]
           description: The type of the game version
           example: release
         date:
@@ -2054,7 +2026,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       requestBody:
         description: 'Modified project fields'
         content:
@@ -2078,7 +2050,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['PROJECT_DELETE']
+        - TokenAuth: [ 'PROJECT_DELETE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -2117,7 +2089,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       requestBody:
         description: Fields to edit on all projects specified
         content:
@@ -2177,7 +2149,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['PROJECT_CREATE']
+        - TokenAuth: [ 'PROJECT_CREATE' ]
       requestBody:
         description: 'New project'
         content:
@@ -2219,11 +2191,11 @@ paths:
           required: true
           schema:
             type: string
-            enum: [png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb]
+            enum: [ png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb ]
       requestBody:
         $ref: '#/components/requestBodies/Image'
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -2239,7 +2211,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -2282,7 +2254,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       parameters:
         - description: Image extension
           in: query
@@ -2290,7 +2262,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb]
+            enum: [ png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb ]
         - description: Whether an image is featured
           in: query
           name: featured
@@ -2337,7 +2309,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       parameters:
         - description: URL link of the image to modify
           in: query
@@ -2383,7 +2355,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       parameters:
         - description: URL link of the image to delete
           in: query
@@ -2433,7 +2405,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['USER_WRITE']
+        - TokenAuth: [ 'USER_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -2455,7 +2427,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['USER_WRITE']
+        - TokenAuth: [ 'USER_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -2480,7 +2452,7 @@ paths:
       tags:
         - projects
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       requestBody:
         description: Information about date and requested status
         content:
@@ -2566,7 +2538,7 @@ paths:
       tags:
         - versions
       security:
-        - TokenAuth: ['VERSION_WRITE']
+        - TokenAuth: [ 'VERSION_WRITE' ]
       requestBody:
         description: 'Modified version fields'
         content:
@@ -2590,7 +2562,7 @@ paths:
       tags:
         - versions
       security:
-        - TokenAuth: ['VERSION_DELETE']
+        - TokenAuth: [ 'VERSION_DELETE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -2611,7 +2583,7 @@ paths:
         description: The version ID or version number
         schema:
           type: string
-          example: [IIJJKKLL]
+          example: [ IIJJKKLL ]
     get:
       summary: Get a version given a version number or ID
       description: Please note that, if the version number provided matches multiple versions, only the **oldest matching version** will be returned.
@@ -2640,7 +2612,7 @@ paths:
       tags:
         - versions
       security:
-        - TokenAuth: ['VERSION_CREATE']
+        - TokenAuth: [ 'VERSION_CREATE' ]
       requestBody:
         description: 'New version'
         content:
@@ -2675,7 +2647,7 @@ paths:
       tags:
         - versions
       security:
-        - TokenAuth: ['VERSION_WRITE']
+        - TokenAuth: [ 'VERSION_WRITE' ]
       requestBody:
         description: Information about date and requested status
         content:
@@ -2730,7 +2702,7 @@ paths:
       tags:
         - versions
       security:
-        - TokenAuth: ['VERSION_WRITE']
+        - TokenAuth: [ 'VERSION_WRITE' ]
       requestBody:
         description: 'New version files'
         content:
@@ -2741,7 +2713,7 @@ paths:
                 data:
                   type: object
                   enum:
-                    - {}
+                    - { }
       responses:
         '204':
           description: Expected response to a valid request
@@ -2780,7 +2752,7 @@ paths:
       tags:
         - version-files
       security:
-        - TokenAuth: ['VERSION_WRITE']
+        - TokenAuth: [ 'VERSION_WRITE' ]
       parameters:
         - description: Version ID to delete the version from, if multiple files of the same hash exist
           required: false
@@ -2788,7 +2760,7 @@ paths:
           name: version_id
           schema:
             type: string
-            example: [IIJJKKLL]
+            example: [ IIJJKKLL ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -2932,7 +2904,7 @@ paths:
       tags:
         - users
       security:
-        - TokenAuth: ['USER_WRITE']
+        - TokenAuth: [ 'USER_WRITE' ]
       requestBody:
         description: 'Modified user fields'
         content:
@@ -2957,7 +2929,7 @@ paths:
       tags:
         - users
       security:
-        - TokenAuth: ['USER_READ']
+        - TokenAuth: [ 'USER_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3006,7 +2978,7 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/Image'
       security:
-        - TokenAuth: ['USER_WRITE']
+        - TokenAuth: [ 'USER_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -3046,7 +3018,7 @@ paths:
       tags:
         - users
       security:
-        - TokenAuth: ['USER_READ']
+        - TokenAuth: [ 'USER_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3073,7 +3045,7 @@ paths:
       tags:
         - users
       security:
-        - TokenAuth: ['PAYOUTS_READ']
+        - TokenAuth: [ 'PAYOUTS_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3096,7 +3068,7 @@ paths:
       tags:
         - users
       security:
-        - TokenAuth: ['PAYOUTS_WRITE']
+        - TokenAuth: [ 'PAYOUTS_WRITE' ]
       parameters:
         - name: amount
           in: query
@@ -3125,7 +3097,7 @@ paths:
       tags:
         - notifications
       security:
-        - TokenAuth: ['NOTIFICATION_READ']
+        - TokenAuth: [ 'NOTIFICATION_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3152,7 +3124,7 @@ paths:
       tags:
         - notifications
       security:
-        - TokenAuth: ['NOTIFICATION_READ']
+        - TokenAuth: [ 'NOTIFICATION_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3174,7 +3146,7 @@ paths:
       tags:
         - notifications
       security:
-        - TokenAuth: ['NOTIFICATION_WRITE']
+        - TokenAuth: [ 'NOTIFICATION_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -3192,7 +3164,7 @@ paths:
       tags:
         - notifications
       security:
-        - TokenAuth: ['NOTIFICATION_WRITE']
+        - TokenAuth: [ 'NOTIFICATION_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -3219,7 +3191,7 @@ paths:
       tags:
         - notifications
       security:
-        - TokenAuth: ['NOTIFICATION_READ']
+        - TokenAuth: [ 'NOTIFICATION_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3243,7 +3215,7 @@ paths:
       tags:
         - notifications
       security:
-        - TokenAuth: ['NOTIFICATION_WRITE']
+        - TokenAuth: [ 'NOTIFICATION_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -3261,7 +3233,7 @@ paths:
       tags:
         - notifications
       security:
-        - TokenAuth: ['NOTIFICATION_WRITE']
+        - TokenAuth: [ 'NOTIFICATION_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -3282,7 +3254,7 @@ paths:
       tags:
         - threads
       security:
-        - TokenAuth: ['REPORT_CREATE']
+        - TokenAuth: [ 'REPORT_CREATE' ]
       requestBody:
         description: The report to be sent
         content:
@@ -3314,7 +3286,7 @@ paths:
       tags:
         - threads
       security:
-        - TokenAuth: ['REPORT_READ']
+        - TokenAuth: [ 'REPORT_READ' ]
       parameters:
         - in: query
           name: count
@@ -3347,7 +3319,7 @@ paths:
       tags:
         - threads
       security:
-        - TokenAuth: ['REPORT_READ']
+        - TokenAuth: [ 'REPORT_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3369,7 +3341,7 @@ paths:
       tags:
         - threads
       security:
-        - TokenAuth: ['REPORT_WRITE']
+        - TokenAuth: [ 'REPORT_WRITE' ]
       requestBody:
         description: What to modify about the report
         content:
@@ -3416,7 +3388,7 @@ paths:
       tags:
         - threads
       security:
-        - TokenAuth: ['REPORT_READ']
+        - TokenAuth: [ 'REPORT_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3443,7 +3415,7 @@ paths:
       tags:
         - threads
       security:
-        - TokenAuth: ['THREAD_READ']
+        - TokenAuth: [ 'THREAD_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3459,7 +3431,7 @@ paths:
       tags:
         - threads
       security:
-        - TokenAuth: ['THREAD_WRITE']
+        - TokenAuth: [ 'THREAD_WRITE' ]
       requestBody:
         description: The message to be sent. Note that you only need the fields applicable for the `text` type.
         content:
@@ -3496,7 +3468,7 @@ paths:
       tags:
         - threads
       security:
-        - TokenAuth: ['THREAD_READ']
+        - TokenAuth: [ 'THREAD_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3516,14 +3488,14 @@ paths:
         description: The ID of the message
         schema:
           type: string
-          example: [IIJJKKLL]
+          example: [ IIJJKKLL ]
     delete:
       summary: Delete a thread message
       operationId: deleteThreadMessage
       tags:
         - threads
       security:
-        - TokenAuth: ['THREAD_WRITE']
+        - TokenAuth: [ 'THREAD_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -3565,7 +3537,7 @@ paths:
       tags:
         - teams
       security:
-        - TokenAuth: ['PROJECT_READ']
+        - TokenAuth: [ 'PROJECT_READ' ]
       responses:
         '200':
           description: Expected response to a valid request
@@ -3582,7 +3554,7 @@ paths:
       tags:
         - teams
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       requestBody:
         description: User to be added (must be the ID, usernames cannot be used here)
         content:
@@ -3634,7 +3606,7 @@ paths:
       tags:
         - teams
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -3656,7 +3628,7 @@ paths:
       tags:
         - teams
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       requestBody:
         description: Contents to be modified
         content:
@@ -3680,7 +3652,7 @@ paths:
       tags:
         - teams
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       responses:
         '204':
           description: Expected response to a valid request
@@ -3701,7 +3673,7 @@ paths:
       tags:
         - teams
       security:
-        - TokenAuth: ['PROJECT_WRITE']
+        - TokenAuth: [ 'PROJECT_WRITE' ]
       requestBody:
         description: New owner's ID
         content:
@@ -3793,7 +3765,7 @@ paths:
         description: The license ID to get the text of
         schema:
           type: string
-          example: [LGPL-3.0-or-later]
+          example: [ LGPL-3.0-or-later ]
     get:
       summary: Get the text and title of a license
       operationId: licenseText
@@ -3844,7 +3816,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: [spam, copyright, inappropriate, malicious, name-squatting, other]
+                example: [ spam, copyright, inappropriate, malicious, name-squatting, other ]
   /tag/project_type:
     get:
       summary: Get a list of project types
@@ -3861,7 +3833,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: [mod, modpack, resourcepack, shader]
+                example: [ mod, modpack, resourcepack, shader ]
   /tag/side_type:
     get:
       summary: Get a list of side types
@@ -3878,7 +3850,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: [required, optional, unsupported, unknown]
+                example: [ required, optional, unsupported, unknown ]
   # Miscellaneous
   /updates/{id|slug}/forge_updates.json:
     parameters:
