@@ -1,0 +1,37 @@
+---
+title: Docs
+description: Docs contributing guide
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Modrinth Docs is the site you are looking at right now. It's here to help us work with Modrinth's projects and provide various information.
+
+The Docs are built using [Astro](https://astro.build) a content focused framework and the [Starlight](https://starlight.astro.build) integration specifically designed for documentation sites. Pages are written using [Markdown](https://www.markdownguide.org/basic-syntax) and [MDX](https://mdxjs.com) and are stored in the `/src/content/docs` directory.
+
+
+The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code). You can find it in the [/apps/docs](https://github.com/modrinth/code/tree/main/apps/docs) directory.
+
+## Setup
+
+<Steps>
+
+1. Follow [Gettin started](/contributing/getting-started#installation) guide
+
+2. Start the development server from the root of the monorepo by running
+    ```bash
+    pnpm run docs:dev
+    ```
+    
+    or inside the directory by running
+    ```bash
+    pnpm run dev
+    ```
+
+2. Open you browser at [http://localhost:4321](http://localhost:4321)
+
+</Steps>
+
+## Ready to open a PR?
+
+While there is no linting requirement on the Docs, we do ask that you quickly check your code before opening a pull request.
