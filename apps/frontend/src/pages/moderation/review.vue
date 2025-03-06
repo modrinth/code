@@ -164,7 +164,7 @@ const projectTypes = computed(() => {
   return [...set];
 });
 
-function segmentData(data, segmentSize = 100) {
+function segmentData(data, segmentSize = 450) {
   return data.reduce((acc, curr, index) => {
     const segment = Math.floor(index / segmentSize);
 
@@ -176,10 +176,10 @@ function segmentData(data, segmentSize = 100) {
   }, []);
 }
 
-function fetchSegmented(data, createUrl, options = {}, segmentSize = 100) {
-  return Promise.all(
-    segmentData(data, segmentSize).map((ids) => useBaseFetch(createUrl(ids), options)),
-  ).then((results) => results.flat());
+function fetchSegmented(data, createUrl, options = {}) {
+  return Promise.all(segmentData(data).map((ids) => useBaseFetch(createUrl(ids), options))).then(
+    (results) => results.flat(),
+  );
 }
 
 function asEncodedJsonArray(data) {
