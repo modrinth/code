@@ -593,12 +593,12 @@
       <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
       <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
         <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
-          {{ true ? "We'll be back soon!" : "Start your server on Modrinth" }}
+          {{ TEMP_MAINTENANCE ? "We'll be back soon!" : "Start your server on Modrinth" }}
         </h1>
         <h2
           class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          <template v-if="isAtCapacity && true">
+          <template v-if="isAtCapacity && TEMP_MAINTENANCE">
             We're out of stock at the moment and new orders are paused. Keep an eye out for
             announcements in our
             <a
@@ -832,7 +832,6 @@ import {
   RightArrowIcon,
   SearchIcon,
   SortAscendingIcon,
-  ExternalIcon,
   TerminalSquareIcon,
   TransferIcon,
   VersionIcon,
@@ -847,6 +846,8 @@ const pyroPlanProducts = pyroProducts.filter(
   (p) => p.metadata.ram === 4096 || p.metadata.ram === 6144 || p.metadata.ram === 8192,
 );
 pyroPlanProducts.sort((a, b) => a.metadata.ram - b.metadata.ram);
+
+const TEMP_MAINTENANCE = ref(true);
 
 const title = "Modrinth Servers";
 const description =
