@@ -593,16 +593,29 @@
       <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
       <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
         <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
-          Start your server on Modrinth
+          {{ true ? "We'll be back soon!" : "Start your server on Modrinth" }}
         </h1>
         <h2
           class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          {{
-            isAtCapacity && !loggedOut
-              ? "We are currently at capacity. Please try again later."
-              : "There's a plan for everyone! Choose the one that fits your needs."
-          }}
+          <template v-if="isAtCapacity && true">
+            We're out of stock at the moment and new orders are paused. Keep an eye out for
+            announcements in our
+            <a
+              href="https://discord.modrinth.com"
+              target="_blank"
+              class="text-green hover:underline"
+            >
+              Discord server</a
+            >.
+          </template>
+          <template v-else>
+            {{
+              isAtCapacity
+                ? "We are currently at capacity. Please try again later."
+                : "There's a plan for everyone! Choose the one that fits your needs."
+            }}
+          </template>
         </h2>
 
         <ul class="m-0 mt-8 flex w-full flex-col gap-8 p-0 lg:flex-row">
@@ -641,15 +654,13 @@
                 </h2>
               </div>
               <ButtonStyled color="blue" size="large">
-                <a
-                  v-if="!loggedOut && isSmallAtCapacity"
-                  :href="outOfStockUrl"
-                  target="_blank"
-                  class="flex items-center gap-2 !bg-highlight-blue !font-medium !text-blue"
+                <div
+                  v-if="isSmallAtCapacity"
+                  v-tooltip="`Currently unavailable due to high demand.`"
+                  class="button-like disabled flex items-center gap-2 !bg-highlight-blue !font-medium !text-blue"
                 >
                   Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </a>
+                </div>
                 <button
                   v-else
                   class="!bg-highlight-blue !font-medium !text-blue"
@@ -704,15 +715,13 @@
                 </h2>
               </div>
               <ButtonStyled color="brand" size="large">
-                <a
-                  v-if="!loggedOut && isMediumAtCapacity"
-                  :href="outOfStockUrl"
-                  target="_blank"
-                  class="flex items-center gap-2 !bg-highlight-green !font-medium !text-green"
+                <div
+                  v-if="isMediumAtCapacity"
+                  v-tooltip="`Currently unavailable due to high demand.`"
+                  class="disabled button-like flex items-center gap-2 !bg-highlight-green !font-medium !text-green"
                 >
                   Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
-                </a>
+                </div>
                 <button
                   v-else
                   class="!bg-highlight-green !font-medium !text-green"
@@ -758,15 +767,13 @@
                 </h2>
               </div>
               <ButtonStyled color="brand" size="large">
-                <a
-                  v-if="!loggedOut && isLargeAtCapacity"
-                  :href="outOfStockUrl"
-                  target="_blank"
-                  class="flex items-center gap-2 !bg-highlight-purple !font-medium !text-purple"
+                <div
+                  v-if="isLargeAtCapacity"
+                  v-tooltip="`Currently unavailable due to high demand.`"
+                  class="disabled button-like flex items-center gap-2 !bg-highlight-purple !font-medium !text-purple"
                 >
                   Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </a>
+                </div>
                 <button
                   v-else
                   class="!bg-highlight-purple !font-medium !text-purple"
@@ -793,7 +800,18 @@
 
           <div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
             <ButtonStyled color="standard" size="large">
-              <button class="w-full md:w-fit" @click="selectProduct('custom')">
+              <div
+                v-if="isCustomAtCapacity"
+                v-tooltip="`Currently unavailable due to high demand.`"
+                class="disabled button-like flex w-full items-center gap-2 !font-medium md:w-fit"
+              >
+                <div>Out of Stock</div>
+              </div>
+              <button
+                v-else
+                class="flex w-full items-center gap-2 !font-medium md:w-fit"
+                @click="selectProduct('custom')"
+              >
                 Build your own
                 <RightArrowIcon class="!min-h-4 !min-w-4" />
               </button>
