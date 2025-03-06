@@ -176,7 +176,7 @@ function segmentData(data, segmentSize = 100) {
   }, []);
 }
 
-function fetchSegmented(data, createUrl, options = {}, segmentSize = 50) {
+function fetchSegmented(data, createUrl, options = {}, segmentSize = 100) {
   return Promise.all(
     segmentData(data, segmentSize).map((ids) => useBaseFetch(createUrl(ids), options)),
   ).then((results) => results.flat());
