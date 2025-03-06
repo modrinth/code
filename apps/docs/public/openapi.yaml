@@ -51,7 +51,7 @@ info:
     Please note that certain scopes and requests cannot be completed with a personal access token or using OAuth.
     For example, deleting a user account can only be done through Modrinth's frontend.
 
-    A highly detailed guide on OAuth has been published in [Modrinth's technical documentation](https://docs.modrinth.com/guide/oauth).
+    A detailed guide on OAuth has been published in [Modrinth's technical documentation](https://docs.modrinth.com/guide/oauth).
 
     ### Personal access tokens
     Personal access tokens (PATs) can be generated in from [the user settings](https://modrinth.com/settings/account).

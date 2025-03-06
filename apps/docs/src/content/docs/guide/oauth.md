@@ -12,25 +12,31 @@ If you're familiar with OAuth 2, these are the URLs you will need:
 | Authorization page | `https://modrinth.com/auth/authorize`            |
 | Token exchange     | `https://api.modrinth.com/_internal/oauth/token` |
 
+The flow will generally look like this:
+
+1. User is redirected to Modrinth to authorize your application
+2. User is redirected back to your site after authorizing, with an authorization code
+3. Your backend exchanges this code for an access token
+
 ## Register your application
 
 To start off, you need to [register an application] in Modrinth's systems. The settings chosen here can always be changed later. You need to select what permissions you need, called scopes. For security reasons you will want to select only the scopes you need. See the [principle of least privilege].
 
 In addition to name and scopes, you will also need to add one or more redirect URIs. These are the URIs that the user can be redirected to after they authorize your application.
 
-After you've registered your application, it is important that you take note of the client secret somewhere safe. If the client secret is to ever leak, it is important that you regenerate it to ensure the security of your authorized users. If your client secret is found exposed in the wild, your application may be disabled without prior notice.
+After you've registered your application, it is important that you take note of the client secret somewhere safe. If the client secret is to ever leak, it is important that you regenerate it to ensure the security of your authorized users. If your client secret or access tokens are found exposed in the wild, your application may be disabled without prior notice.
 
 ## Getting authorization
 
 Once the user is ready to authorize your application, you need to construct a URL to redirect them to. The authorization URL for Modrinth is `https://api.modrinth.com/_internal/oauth/token`. Supply the following query parameters:
 
-| Query parameter | Description                                                                      |
-|-----------------|----------------------------------------------------------------------------------|
-| `response_type` | In Modrinth this always needs to be `code`, since only code grants are supported |
-| `client_id`     | The application identifier found in the settings                                 |
-| `scope`         | The permissions you need access to in the user's account                         |
-| `state`         | A mechanism to prevent certain attacks. Explained further below                  |
-| `redirect_uri`  | The URI the user is redirect to after finishing authorization.                   |
+| Query parameter | Description                                                                               |
+|-----------------|-------------------------------------------------------------------------------------------|
+| `response_type` | In Modrinth this always needs to be `code`, since only code grants are supported          |
+| `client_id`     | The application identifier found in the settings                                          |
+| `scope`         | The permissions you need access to                                                        |
+| `state`         | A mechanism to prevent certain attacks. Explained further below. Recommended but optional |
+| `redirect_uri`  | The URI the user is redirect to after finishing authorization                             |
 
 The scope identifiers are currently best found in the backend source code located at [`apps/labrinth/src/models/v3/pats.rs`]. The scope parameter is an array of scope identifiers, seperated by a plus sign (`+`).
 
