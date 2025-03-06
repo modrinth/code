@@ -19,13 +19,21 @@
       </nuxt-link>
     </div>
     <div v-else-if="report.item_type === 'user'" class="item-info">
-      <nuxt-link :to="`/user/${report.user.username}`" class="iconified-stacked-link">
+      <nuxt-link
+        v-if="report.user"
+        :to="`/user/${report.user.username}`"
+        class="iconified-stacked-link"
+      >
         <Avatar :src="report.user.avatar_url" circle size="xs" no-shadow :raised="raised" />
         <div class="stacked">
           <span class="title">{{ report.user.username }}</span>
           <span>User</span>
         </div>
       </nuxt-link>
+      <div v-else class="item-info">
+        <div class="backed-svg" :class="{ raised: raised }"><UnknownIcon /></div>
+        <span>Reported user not found: <CopyCode :text="report.item_id" /> </span>
+      </div>
     </div>
     <div v-else-if="report.item_type === 'version'" class="item-info">
       <nuxt-link
@@ -50,7 +58,7 @@
     </div>
     <div v-else class="item-info">
       <div class="backed-svg" :class="{ raised: raised }"><UnknownIcon /></div>
-      <span>Unknown report type</span>
+      <span>Unknown report type: {{ report.item_type }}</span>
     </div>
     <div class="report-type">
       <Badge v-if="report.closed" type="closed" />
