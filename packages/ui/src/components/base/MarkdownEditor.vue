@@ -6,7 +6,7 @@
       </label>
       <div class="iconified-input">
         <AlignLeftIcon />
-        <input id="insert-link-label" v-model="linkText" type="text" placeholder="Enter label..." />
+        <input id="insert-link-label" v-model="linkText" placeholder="Enter label..." type="text" />
         <Button class="r-btn" @click="() => (linkText = '')">
           <XIcon />
         </Button>
@@ -19,8 +19,8 @@
         <input
           id="insert-link-url"
           v-model="linkUrl"
-          type="text"
           placeholder="Enter the link's URL..."
+          type="text"
           @input="validateURL"
         />
         <Button class="r-btn" @click="() => (linkUrl = '')">
@@ -39,24 +39,29 @@
       </span>
       <div class="markdown-body-wrapper">
         <div
-          style="width: 100%"
           class="markdown-body"
+          style="width: 100%"
           v-html="renderHighlightedString(linkMarkdown)"
         />
       </div>
       <div class="input-group push-right">
-        <Button :action="() => linkModal?.hide()"><XIcon /> Cancel</Button>
+        <Button :action="() => linkModal?.hide()">
+          <XIcon />
+          Cancel
+        </Button>
         <Button
-          color="primary"
-          :disabled="linkValidationErrorMessage || !linkUrl"
           :action="
             () => {
               if (editor) markdownCommands.replaceSelection(editor, linkMarkdown)
               linkModal?.hide()
             }
           "
-          ><PlusIcon /> Insert</Button
+          :disabled="linkValidationErrorMessage || !linkUrl"
+          color="primary"
         >
+          <PlusIcon />
+          Insert
+        </Button>
       </div>
     </div>
   </Modal>
@@ -73,8 +78,8 @@
         <input
           id="insert-image-alt"
           v-model="linkText"
-          type="text"
           placeholder="Describe the image..."
+          type="text"
         />
         <Button class="r-btn" @click="() => (linkText = '')">
           <XIcon />
@@ -92,13 +97,14 @@
       >
         <FileInput
           accept="image/png,image/jpeg,image/gif,image/webp"
-          prompt="Drag and drop to upload or click to select file"
-          long-style
-          should-always-reset
           class="file-input"
+          long-style
+          prompt="Drag and drop to upload or click to select file"
+          should-always-reset
           @change="handleImageUpload"
         >
-          <UploadIcon />
+          <UploadIcon v-if="!showSpinner" />
+          <SpinnerIcon v-else class="animate-spin" />
         </FileInput>
       </div>
       <div v-if="!props.onImageUpload || imageUploadOption === 'link'" class="iconified-input">
@@ -106,8 +112,8 @@
         <input
           id="insert-link-url"
           v-model="linkUrl"
-          type="text"
           placeholder="Enter the image URL..."
+          type="text"
           @input="validateURL"
         />
         <Button class="r-btn" @click="() => (linkUrl = '')">
@@ -122,28 +128,31 @@
       </template>
       <span class="label">
         <span class="label__title">Preview</span>
-        <span class="label__description"></span>
       </span>
       <div class="markdown-body-wrapper">
         <div
-          style="width: 100%"
           class="markdown-body"
+          style="width: 100%"
           v-html="renderHighlightedString(imageMarkdown)"
         />
       </div>
       <div class="input-group push-right">
-        <Button :action="() => imageModal?.hide()"><XIcon /> Cancel</Button>
+        <Button :action="() => imageModal?.hide()">
+          <XIcon />
+          Cancel
+        </Button>
         <Button
-          color="primary"
-          :disabled="!canInsertImage"
           :action="
             () => {
               if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
               imageModal?.hide()
             }
           "
+          :disabled="!canInsertImage"
+          color="primary"
         >
-          <PlusIcon /> Insert
+          <PlusIcon />
+          Insert
         </Button>
       </div>
     </div>
@@ -159,8 +168,8 @@
         <input
           id="insert-video-url"
           v-model="linkUrl"
-          type="text"
           placeholder="Enter YouTube video URL"
+          type="text"
           @input="validateURL"
         />
         <Button class="r-btn" @click="() => (linkUrl = '')">
@@ -180,24 +189,28 @@
 
       <div class="markdown-body-wrapper">
         <div
-          style="width: 100%"
           class="markdown-body"
+          style="width: 100%"
           v-html="renderHighlightedString(videoMarkdown)"
         />
       </div>
       <div class="input-group push-right">
-        <Button :action="() => videoModal?.hide()"><XIcon /> Cancel</Button>
+        <Button :action="() => videoModal?.hide()">
+          <XIcon />
+          Cancel
+        </Button>
         <Button
-          color="primary"
-          :disabled="linkValidationErrorMessage || !linkUrl"
           :action="
             () => {
               if (editor) markdownCommands.replaceSelection(editor, videoMarkdown)
               videoModal?.hide()
             }
           "
+          :disabled="linkValidationErrorMessage || !linkUrl"
+          color="primary"
         >
-          <PlusIcon /> Insert
+          <PlusIcon />
+          Insert
         </Button>
       </div>
     </div>
@@ -213,11 +226,11 @@
           <template v-for="button in buttonGroup.buttons" :key="button.label">
             <Button
               v-tooltip="button.label"
-              icon-only
+              :action="() => button.action(editor)"
               :aria-label="button.label"
               :class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
-              :action="() => button.action(editor)"
               :disabled="previewMode || disabled"
+              icon-only
             >
               <component :is="button.icon" />
             </Button>
@@ -253,8 +266,8 @@
     <div v-else>
       <div class="markdown-body-wrapper">
         <div
-          style="width: 100%"
           class="markdown-body"
+          style="width: 100%"
           v-html="renderHighlightedString(currentValue ?? '')"
         />
       </div>
@@ -262,7 +275,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
@@ -283,6 +296,7 @@ import {
   ListOrderedIcon,
   PlusIcon,
   ScanEyeIcon,
+  SpinnerIcon,
   StrikethroughIcon,
   TextQuoteIcon,
   UploadIcon,
@@ -326,6 +340,7 @@ const editorRef = ref<HTMLDivElement>()
 let editor: EditorView | null = null
 let isDisabledCompartment: Compartment | null = null
 let editorThemeCompartment: Compartment | null = null
+let showSpinner = ref(false)
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -698,8 +713,7 @@ const uploadImagesFromList = async (files: FileList): Promise<string> => {
   }
   if (file) {
     try {
-      const url = await props.onImageUpload(file)
-      return url
+      return await props.onImageUpload(file)
     } catch (error) {
       if (error instanceof Error) {
         console.error('Unable to upload image using handler.', error.message)
@@ -713,7 +727,9 @@ const uploadImagesFromList = async (files: FileList): Promise<string> => {
 const handleImageUpload = async (files: FileList) => {
   if (props.onImageUpload) {
     try {
+      showSpinner.value = true
       const uploadedURL = await uploadImagesFromList(files)
+      showSpinner.value = false
       linkUrl.value = uploadedURL
       validateURL()
     } catch (error) {
