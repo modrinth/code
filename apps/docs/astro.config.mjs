@@ -13,11 +13,12 @@ export default defineConfig({
         baseUrl: 'https://github.com/modrinth/code/edit/main/apps/docs/',
       },
       social: {
+        blueSky: 'https://bsky.app/profile/modrinth.com',
         github: 'https://github.com/modrinth/code',
         discord: 'https://discord.modrinth.com',
-        'x.com': 'https://x.com/modrinth',
         mastodon: 'https://floss.social/@modrinth',
         threads: 'https://threads.net/@modrinth',
+        'x.com': 'https://x.com/modrinth'
       },
       logo: {
         light: './src/assets/light-logo.svg',
