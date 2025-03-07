@@ -1,0 +1,67 @@
+---
+title: Theseus (Modrinth App)
+description: Theseus contributing guide
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+[Theseus](https://modrinth.com/app) is Modrinth's Minecraft launcher that lets users play with any projects like mods, shaders and modpacks aviable on [Modrinth](https://modrinth.com/).
+
+It's a [Tauri](https://v2.tauri.app/) app which uses [Rust](https://rust-lang.org) as the backend and [Vue.js](https://vuejs.org/) on the frontend.
+
+The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code). You can find it in the [/apps/app](https://github.com/modrinth/code/tree/main/apps/app) directory.
+
+## Setup
+
+<Steps>
+
+1. Follow [Getting started](/contributing/getting-started#installation) guide
+
+2. Install [Rust](https://www.rust-lang.org/) and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
+
+3. Start the development server from the root of the monorepo by running
+    ```bash
+    pnpm run app:dev
+    ```
+    
+    or inside the directory after running the respective build scripts for `@modrinth/app-frontend`, `@modrinth/app-lib` and `@modrinth/daedalus` which Theseus use as internal packages
+    
+    ```bash
+    pnpm run dev
+    ```
+
+</Steps>
+
+Nuxt supports hot-reloading: any changes you make to the code will automatically shown in the window.
+
+You can also use `pnpm run lint` to find any eslint problems, and `pnpm run fix` to try automatically fixing them.
+
+## Architecture
+
+Theseus is split up into three parts:
+
+- `apps/app`: The Tauri-based Rust app. This primarily wraps around the library with some additional logic for Tauri.
+- `apps/app-frontend`: The Vue.JS frontend for the app
+- `packages/app-lib`: The library holding all the core logic for the desktop app
+
+The app's internal database is stored in SQLite. For production builds, this is found at `<APPDIR>/app.db`.
+
+When running SQLX commands, be sure to set the `DATABASE_URL` environment variable to the path of the database.
+
+You can edit the app's data directory using the `THESEUS_CONFIG_DIR` environment variable.
+
+## Ready to open a PR?
+
+<Steps>
+
+1. Run `pnpm run fix` to address any fixable issues automatically
+
+2. Run `cargo fmt` to format rust code
+
+3. Run `cargo clippy` to validate rust code
+
+4. Run `cargo sqlx prepare --package theseus` if you've changed any SQL code to validate statements
+
+5. Open a pull request on the [monorepo repository](https://github.com/modrinth/code)
+
+</Steps>
