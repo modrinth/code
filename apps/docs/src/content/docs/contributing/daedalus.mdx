@@ -1,0 +1,25 @@
+---
+title: Daedalus (Metadata service)
+description: Daedalus contributing guide
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+[Daedalus](https://github.com/modrinth/code/tree/main/packages/daedalus) is a library providing model structs and methods for requesting and parsing things from Minecraft and other mod loaders meta APIs.
+
+The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code).
+
+## Architecture
+
+Daedalus is split up into two parts:
+
+- [`packages/daedalus`](https://github.com/modrinth/code/tree/main/apps/daedalus_client): The library holding all the core logic for the service
+- [`apps/daedalus_client`](https://github.com/modrinth/code/tree/main/apps/daedalus_client): The service worker that runs in the background and handles requests
+
+## Ready to open a PR?
+
+<Steps>
+
+1. Open a pull request on the [monorepo repository](https://github.com/modrinth/code)
+
+</Steps>
