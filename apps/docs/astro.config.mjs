@@ -41,6 +41,7 @@ export default defineConfig({
         ]),
       ],
       sidebar: [
+        { slug: 'overview' },
         // Add the generated sidebar group to the sidebar.
         ...openAPISidebarGroups,
         {
