@@ -1,0 +1,32 @@
+---
+title: Minotaur (Gradle plugin)
+description: Minotaur contributing guide
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+[Minotaur][minotaur] is the [Gradle](https://gradle.org/) plugin used to automatically publish artifacts to Modrinth.
+
+The codebase is kept at [Minotaur](https://github.com/modrinth/minotaur).
+
+## Setup
+
+Run a copy of the plugin in a project
+
+<Steps>
+
+1. Publish it to your local Maven with `./gradlew publishToMavenLocal` and add `mavenLocal()` to your buildscript.
+
+</Steps>
+
+Minotaur contains two test environments within it - one with [ForgeGradle](https://github.com/MinecraftForge/ForgeGradle) and one with [Fabric Loom](https://github.com/FabricMC/fabric-loom), you may want to tweak these environments. 
+
+## Ready to open a PR?
+
+<Steps>
+
+1. Make sure that the `modrinth` task within each test environments still functions properly. GitHub Actions will validate this on pull requests, you can use [`act pull_request`](https://github.com/nektos/act) to test them locally.
+
+2. Open a pull request on the [Minotaur](https://github.com/modrinth/minotaur) repository.
+
+</Steps>
