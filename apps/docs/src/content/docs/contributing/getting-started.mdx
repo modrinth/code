@@ -1,0 +1,43 @@
+---
+title: Getting started
+description: Setup your environment to contribute to Modrinth
+sidebar:
+  order: 1
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Most of Modrinth's code is in our [monorepo](https://github.com/modrinth/code) which is powered by [Turborepo](https://turborepo.org).
+Modrinth projects are written using languages like [Rust](https://www.rust-lang.org), [Java](https://www.java.com) and frameworks like [Nuxt](https://nuxtjs.org) and [Astro](https://astro.build).
+
+## Prerequisites
+- [Node](https://nodejs.org) installed on your machine
+- [Pnpm](https://pnpm.io) installed on your machine
+
+Some projects may require additional tools and will be specified in their respective pages.
+
+## Installation
+
+<Steps>
+
+1. Fork Modrinth's [monorepo](https://github.com/modrinth/code) from GitHub
+
+2. Open the monorepo with your preferred code editor
+
+2. Install the dependencies by running
+    ```bash
+    pnpm install
+    ```
+
+</Steps>
+
+## Projects
+
+Project-specific documentation pages:
+
+- [Daedalus (Metadata service)](/contributing/daedalus)
+- [Docs](/contributing/docs)
+- [Knossos (Frontend)](/contributing/knossos)
+- [Labrinth (API)](/contributing/labrinth)
+- [Minotaur (Gradle plugin)](/contributing/minotaur)
+- [Theseus (Modrinth App)](/contributing/theseus)
