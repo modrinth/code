@@ -1,0 +1,57 @@
+---
+title: Knossos (Frontend)
+description: Knossos contributing guide
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+[Knossos](https://github.com/modrinth/code/tree/main/apps/frontend) is Modrinth's [website](https://modrinth.com) frontend built using [Nuxt](https://nuxtjs.org) a framework for building [Vue](https://vuejs.org) applications and [Tailwind](https://tailwindcss.com) for styling.
+
+Nuxt supports hot-reloading: any changes you make to the code will automatically shown in the browser.
+
+The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code). You can find it in the [/apps/frontend](https://github.com/modrinth/code/tree/main/apps/frontend) directory.
+
+## Setup
+
+<Steps>
+
+1. Follow [Getting started](/contributing/getting-started#installation) guide
+
+2. Start the development server from the root of the monorepo by running
+    ```bash
+    pnpm run web:dev
+    ```
+    
+    or inside the directory after running the respective build scripts for `@modrinth/assets`, `@modrinth/ui` and `@modrinth/utils` which Knossos use as internal packages
+    
+    ```bash
+    pnpm run dev
+    ```
+
+3. Open you browser at [http://localhost:3000](http://localhost:3000)
+
+</Steps>
+
+You can compile the project to test a production server by running `pnpm run build` and `pnpm run preview` to open it in the browser.
+
+You can also use `pnpm run lint` to find any eslint problems, and `pnpm run fix` to try automatically fixing them.
+
+### Environment variables
+
+| Env variable | Description | Default value |
+| --- | --- | --- |
+| `BASE_URL` | The base URL for the API | `https://staging-api.modrinth.com/v2/` |
+| `BROWSER_BASE_URL` | The base URL for the API used in the browser | `https://staging-api.modrinth.com/v2/` |
+| `SITE_URL` | The URL of the site needed for auth redirects | `http://localhost:3000` | 
+
+## Ready to open a PR?
+
+<Steps>
+
+1. Run `pnpm run lint` to check problems and lint the code.
+
+2. Run `pnpm run fix` to fix problems and make sure no errors are found.
+
+3. Open a pull request on the [monorepo repository](https://github.com/modrinth/code).
+
+</Steps>
