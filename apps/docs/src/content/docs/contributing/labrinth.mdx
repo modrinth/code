@@ -1,0 +1,133 @@
+---
+title: Labrinth (API)
+description: Labyrinth contributing guide
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+[Labrinth](https://github.com/modrinth/code/tree/main/apps/labyrinth) is the [Rust](https://www.rust-lang.org/)-based backend serving Modrinth's API with the help of the [Actix](https://actix.rs) framework.
+
+The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code). You can find it in the [/apps/labyrinth](https://github.com/modrinth/code/tree/main/apps/labrinth) directory.
+
+## Setup
+
+<Steps>
+
+1. Follow [Getting started](/contributing/getting-started#installation) guide
+
+2. Install [Docker](https://www.docker.com/) (it will also install docker-compose)
+3. Install [Rust](https://www.rust-lang.org/)
+4. Prepare the environment by running `docker compose up` to deploy a [PostgreSQL](https://www.postgresql.org/) database on port `5432` and a [MeiliSearch](https://www.meilisearch.com/) instance on port `7700`
+
+5. Run `cargo run` to start the API on port `8000`
+
+6. Install the [sqlx CLI](https://crates.io/crates/sqlx-cli/0.5.2) by running
+    ```bash
+    cargo install --git https://github.com/launchbadge/sqlx sqlx-cli --no-default-features --features postgres,rustls
+    ```
+
+7. Create all the necessary tables and perform all migrations by running
+    ```bash
+    sqlx database setup
+    ```
+
+8. If on Linux, you will need the OpenSSL library. On Debian-based systems, this involves the `pkg-config` and `libssl-dev` packages.
+
+</Steps>
+
+
+To enable labrinth to create a project, you need to add two things.
+
+1. An entry in the `loaders` table.
+2. An entry in the `loaders_project_types` table.
+
+A minimal setup can be done from the command line with [psql](https://www.postgresql.org/docs/current/app-psql.html):
+
+```bash
+psql --host=localhost --port=5432 -U <username, default is labrinth> -W
+```
+
+The default password for the database is `labrinth`. Once you've connected, run
+
+```sql
+INSERT INTO loaders VALUES (0, 'placeholder_loader');
+INSERT INTO loaders_project_types VALUES (0, 1); -- modloader id, supported type id
+INSERT INTO categories VALUES (0, 'placeholder_category', 1); -- category id, category, project type id
+```
+
+This will initialize your database with a modloader called 'placeholder_loader', with id 0, and marked as supporting mods only.
+It will also create a category called 'placeholder_category' that is marked as supporting mods only.
+If you would like 'placeholder_loader' to be marked as supporting modpacks too, run
+
+```sql
+INSERT INTO loaders_project_types VALUES (0, 2); -- modloader id, supported type id
+```
+
+If you would like 'placeholder_category' to be marked as supporting modpacks too, run
+
+```sql
+INSERT INTO categories VALUES (0, 'placeholder_category', 2); -- modloader id, supported type id
+```
+
+Additionally, there are three command line options that can be used to specify to MeiliSearch what you want to do.
+
+- `--skip-first-index`: Skips indexing the local database on startup. This is useful to prevent doing unnecessary work when frequently restarting.  
+- `--reconfigure-indices`: Resets the MeiliSearch settings for the search indices and exits.  
+- `--reset-indices`: Resets the MeiliSearch indices and exits; this clears all previously indexed mods.
+
+### Environment variables
+
+The majority of configuration is done at runtime using [dotenvy](https://crates.io/crates/dotenvy) and the `.env` file.
+
+| Env variable | Description | Default value |
+| --- | --- | --- |
+| `DEBUG` | Whether debugging tools should be enabled  | `false` |
+| `RUST_LOG` | Specifies what information to log, from rust's [`env-logger`](https://github.com/env-logger-rs/env_logger). A reasonable default is `info,sqlx::query=warn`  | `info,sqlx::query=warn` |
+| `SITE_URL` | The main URL to be used for CORS  | `https://modrinth.com` |
+| `CDN_URL` | The publicly accessible base URL for files uploaded to the CDN  | `https://staging-cdn.modrinth.com` |
+| `MODERATION_DISCORD_WEBHOOK` | The URL for a Discord webhook where projects pending approval will be sent  | |
+| `CLOUDFLARE_INTEGRATION` | Whether labrinth should integrate with Cloudflare's spam protection  | `false` |
+| `DATABASE_URL` | The URL for the PostgreSQL database  | `postgresql://labrinth:labrinth@localhost/labrinth` |
+| `DATABASE_MIN_CONNECTIONS` | The minimum number of concurrent connections allowed to the database at the same time  | `0` |
+| `DATABASE_MAX_CONNECTIONS` | The maximum number of concurrent connections allowed to the database at the same time  | `16` |
+| `MEILISEARCH_ADDR` | The URL for the MeiliSearch instance used for search  | `http://localhost:7700` |
+| `MEILISEARCH_KEY` | The name that MeiliSearch is given  | `modrinth` |
+| `BIND_ADDR` | The bind address for the server. Supports both IPv4 and IPv6  | `127.0.0.1:8000` |
+| `MOCK_FILE_PATH` | The path used to store uploaded files; this has no default value and will panic if unspecified | `/tmp/modrinth` |
+
+#### CDN options
+
+`STORAGE_BACKEND`: Controls what storage backend is used. This can be either `local`, `backblaze`, or `s3`, but defaults to `local`
+
+The Backblaze and S3 configuration options are fairly self-explanatory in name, so here's simply their names:  
+`BACKBLAZE_KEY_ID`, `BACKBLAZE_KEY`, `BACKBLAZE_BUCKET_ID`  
+`S3_ACCESS_TOKEN`, `S3_SECRET`, `S3_URL`, `S3_REGION`, `S3_BUCKET_NAME`
+
+#### Search, OAuth, and miscellaneous options
+
+`LOCAL_INDEX_INTERVAL`: The interval, in seconds, at which the local database is reindexed for searching. Defaults to `3600` seconds (1 hour).  
+`VERSION_INDEX_INTERVAL`: The interval, in seconds, at which versions are reindexed for searching. Defaults to `1800` seconds (30 minutes).
+
+The OAuth configuration options are fairly self-explanatory. For help setting up authentication, please contact us on [Discord].
+
+`RATE_LIMIT_IGNORE_IPS`: An array of IPs that should have a lower rate limit factor. This can be useful for allowing the front-end to have a lower rate limit to prevent accidental timeouts.
+
+## Ready to open a PR?
+
+<Steps>
+
+1. Run `cargo fmt` to format the code
+
+2. Run `cargo clippy` to log found errors in the codebase
+
+3. Run `cargo check` to try to compile the package to ensure everything works as expected
+
+4. Run `cargo sqlx prepare` to prepare the database
+
+5. Open a pull request on the [monorepo repository](https://github.com/modrinth/code)
+
+</Steps>
+
+:::note
+If you encounter issues with `sqlx` saying `no queries found` after running `cargo sqlx prepare`, you may need to ensure the installed version of `sqlx-cli` matches the current version of `sqlx` used [in labrinth](https://github.com/modrinth/labrinth/blob/master/Cargo.toml).
+:::
