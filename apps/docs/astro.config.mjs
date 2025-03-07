@@ -34,7 +34,7 @@ export default defineConfig({
         starlightOpenAPI([
           {
             base: 'api',
-            label: 'Labyrinth (Modrinth API)',
+            label: 'Labrinth (API)',
             schema: './public/openapi.yaml',
           },
         ]),

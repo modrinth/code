@@ -5,7 +5,7 @@ sidebar:
   order: 0
 ---
 
-Every public-facing aspect of Modrinth, including everything from our [API (Labyrinth)](https://github.com/modrinth/code/tree/main/apps/labrinth) and [Frontend (Knossos)](https://github.com/modrinth/code/tree/main/apps/frontend) to our [Minotaur (Gradle plugin)](https://github.com/modrinth/minotaur) and [Theseus (Modrinth App)](https://github.com/modrinth/theseus), is released under free and open source licenses on [GitHub](https://github.com/modrinth). As such, we love contributions from community members! Before proceeding to do so, though, there are a number of things you'll want to keep in mind throughout the process, as well as some details specific to certain projects.
+Every public-facing aspect of Modrinth, including everything from our [API (Labyrinth)](https://github.com/modrinth/code/tree/main/apps/labrinth) and [Frontend (Knossos)](https://github.com/modrinth/code/tree/main/apps/frontend) to [Minotaur (Gradle plugin)](https://github.com/modrinth/minotaur) and [Theseus (Modrinth App)](https://github.com/modrinth/theseus), is released under free and open source licenses on [GitHub](https://github.com/modrinth). As such, we love contributions from community members! Before proceeding to do so, though, there are a number of things you'll want to keep in mind throughout the process, as well as some details specific to certain projects.
 
 ## Things to keep in mind
 

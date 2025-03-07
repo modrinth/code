@@ -9,6 +9,10 @@ import { Steps } from '@astrojs/starlight/components';
 
 The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code). You can find it in the [/apps/labyrinth](https://github.com/modrinth/code/tree/main/apps/labrinth) directory.
 
+:::note
+If were looking for the Labrinth endpoints documentation you can find it [here](https://docs.modrinth.com/api).
+:::
+
 ## Setup
 
 <Steps>
@@ -16,7 +20,9 @@ The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code).
 1. Follow [Getting started](/contributing/getting-started#installation) guide
 
 2. Install [Docker](https://www.docker.com/) (it will also install docker-compose)
+
 3. Install [Rust](https://www.rust-lang.org/)
+
 4. Prepare the environment by running `docker compose up` to deploy a [PostgreSQL](https://www.postgresql.org/) database on port `5432` and a [MeiliSearch](https://www.meilisearch.com/) instance on port `7700`
 
 5. Run `cargo run` to start the API on port `8000`
@@ -116,9 +122,9 @@ The OAuth configuration options are fairly self-explanatory. For help setting up
 
 <Steps>
 
-1. Run `cargo fmt` to format the code
+1. Run `cargo fmt` to format rust code
 
-2. Run `cargo clippy` to log found errors in the codebase
+2. Run `cargo clippy` to validate rust code
 
 3. Run `cargo check` to try to compile the package to ensure everything works as expected
 
