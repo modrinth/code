@@ -5,7 +5,7 @@
       <p class="mb-4">
         <IntlFormatted :message-id="messages.description">
           <template #docs-link="{ children }">
-            <a href="https://docs.modrinth.com/" target="_blank" class="text-link">
+            <a class="text-link" href="https://docs.modrinth.com/" target="_blank">
               <component :is="() => children" />
             </a>
           </template>
@@ -16,22 +16,19 @@
       </label>
       <div class="avatar-changer">
         <Avatar
-          :src="previewImage ? previewImage : avatarUrl"
-          size="md"
-          circle
           :alt="auth.user.username"
+          :src="previewImage ? previewImage : avatarUrl"
+          circle
+          size="md"
         />
         <div class="input-stack">
           <FileInput
+            :callback="showPreviewImage"
             :max-size="262144"
-            :show-icon="true"
-            class="btn"
             :prompt="formatMessage(commonMessages.uploadImageButton)"
             accept="image/png,image/jpeg,image/gif,image/webp"
-            @change="showPreviewImage"
-          >
-            <UploadIcon />
-          </FileInput>
+            class="btn"
+          />
           <Button
             v-if="previewImage"
             :action="
@@ -61,15 +58,17 @@
       </label>
       <textarea id="bio-field" v-model="bio" type="text" />
       <div v-if="hasUnsavedChanges" class="input-group">
-        <Button color="primary" :action="() => saveChanges()">
-          <SaveIcon /> {{ formatMessage(commonMessages.saveChangesButton) }}
+        <Button :action="() => saveChanges()" color="primary">
+          <SaveIcon />
+          {{ formatMessage(commonMessages.saveChangesButton) }}
         </Button>
         <Button :action="() => cancel()">
-          <XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
+          <XIcon />
+          {{ formatMessage(commonMessages.cancelButton) }}
         </Button>
       </div>
       <div v-else class="input-group">
-        <Button disabled color="primary" :action="() => saveChanges()">
+        <Button :action="() => saveChanges()" color="primary" disabled>
           <SaveIcon />
           {{
             saved
@@ -78,7 +77,8 @@
           }}
         </Button>
         <Button :link="`/user/${auth.user.username}`">
-          <UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
+          <UserIcon />
+          {{ formatMessage(commonMessages.visitYourProfile) }}
         </Button>
       </div>
     </section>
@@ -86,8 +86,8 @@
 </template>
 
 <script setup>
-import { UserIcon, SaveIcon, UploadIcon, UndoIcon, XIcon } from "@modrinth/assets";
-import { Avatar, FileInput, Button, commonMessages } from "@modrinth/ui";
+import { SaveIcon, UndoIcon, UserIcon, XIcon } from "@modrinth/assets";
+import { Avatar, Button, commonMessages, FileInput } from "@modrinth/ui";
 
 useHead({
   title: "Profile settings - Modrinth",

@@ -2,10 +2,10 @@
   <ConfirmModal
     v-if="currentMember"
     ref="deleteVersionModal"
-    title="Are you sure you want to delete this version?"
-    description="This will remove this version forever (like really forever)."
     :has-to-type="false"
+    description="This will remove this version forever (like really forever)."
     proceed-label="Delete"
+    title="Are you sure you want to delete this version?"
     @proceed="deleteVersion()"
   />
   <section class="experimental-styles-within overflow-visible">
@@ -14,42 +14,40 @@
       class="card flex items-center gap-4"
     >
       <FileInput
-        :max-size="524288000"
         :accept="acceptFileFromProjectType(project.project_type)"
-        prompt="Upload a version"
-        class="btn btn-primary"
+        :callback="handleFiles"
+        :max-size="524288000"
         aria-label="Upload a version"
-        @change="handleFiles"
-      >
-        <UploadIcon aria-hidden="true" />
-      </FileInput>
+        class="btn btn-primary"
+        prompt="Upload a version"
+      />
       <span class="flex items-center gap-2">
         <InfoIcon aria-hidden="true" /> Click to choose a file or drag one onto this page
       </span>
       <DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
     </div>
     <ProjectPageVersions
-      :project="project"
-      :versions="versions"
-      :show-files="flags.showVersionFilesInTable"
-      :current-member="!!currentMember"
-      :loaders="tags.loaders"
-      :game-versions="tags.gameVersions"
       :base-id="baseDropdownId"
+      :current-member="!!currentMember"
+      :game-versions="tags.gameVersions"
+      :loaders="tags.loaders"
+      :project="project"
+      :show-files="flags.showVersionFilesInTable"
       :version-link="
         (version) =>
           `/${project.project_type}/${
             project.slug ? project.slug : project.id
           }/version/${encodeURI(version.displayUrlEnding)}`
       "
+      :versions="versions"
     >
       <template #actions="{ version }">
         <ButtonStyled circular type="transparent">
           <a
             v-tooltip="`Download`"
             :href="getPrimaryFile(version).url"
-            class="group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted"
             aria-label="Download"
+            class="group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted"
             @click="emit('onDownload')"
           >
             <DownloadIcon aria-hidden="true" />
@@ -57,7 +55,6 @@
         </ButtonStyled>
         <ButtonStyled circular type="transparent">
           <OverflowMenu
-            class="group-hover:!bg-button-bg"
             :dropdown-id="`${baseDropdownId}-${version.id}`"
             :options="[
               {
@@ -126,6 +123,7 @@
               },
             ]"
             aria-label="More options"
+            class="group-hover:!bg-button-bg"
           >
             <MoreVerticalIcon aria-hidden="true" />
             <template #download>
@@ -170,23 +168,22 @@
 <script setup>
 import {
   ButtonStyled,
-  OverflowMenu,
-  FileInput,
-  ProjectPageVersions,
   ConfirmModal,
+  FileInput,
+  OverflowMenu,
+  ProjectPageVersions,
 } from "@modrinth/ui";
 import {
-  DownloadIcon,
-  MoreVerticalIcon,
-  TrashIcon,
-  ExternalIcon,
-  LinkIcon,
-  ShareIcon,
-  EditIcon,
-  ReportIcon,
-  UploadIcon,
-  InfoIcon,
   ClipboardCopyIcon,
+  DownloadIcon,
+  EditIcon,
+  ExternalIcon,
+  InfoIcon,
+  LinkIcon,
+  MoreVerticalIcon,
+  ReportIcon,
+  ShareIcon,
+  TrashIcon,
 } from "@modrinth/assets";
 import DropArea from "~/components/ui/DropArea.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";

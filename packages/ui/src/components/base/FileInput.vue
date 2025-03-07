@@ -1,96 +1,107 @@
 <template>
-  <label :class="{ 'long-style': longStyle }" @drop.prevent="handleDrop" @dragover.prevent>
-    <slot />
-    {{ prompt }}
+  <label
+    :class="{ 'long-style': longStyle, 'too-large': hasError }"
+    @drop.prevent="handleDrop"
+    @dragover.prevent
+  >
+    <slot v-if="!isProcessingFile">
+      <UploadIcon aria-hidden="true" />
+    </slot>
+    <SpinnerIcon v-else aria-hidden="true" class="animate-spin" />
+    {{ hasError ? 'Error: Too large file' : prompt }}
     <input
-      type="file"
-      :multiple="multiple"
       :accept="accept"
       :disabled="disabled"
+      :multiple="multiple"
+      type="file"
       @change="handleChange"
     />
   </label>
 </template>
 
-<script>
-import { fileIsValid } from '@modrinth/utils'
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
+import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
+import { ref } from 'vue'
 
-export default defineComponent({
-  props: {
-    prompt: {
-      type: String,
-      default: 'Select file',
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
-    },
-    accept: {
-      type: String,
-      default: null,
-    },
+const props = withDefaults(
+  defineProps<{
+    prompt: string
+    multiple?: boolean
+    accept: string
     /**
-     * The max file size in bytes
+     * The max file size in bytes. Defaults to 1MB.
      */
-    maxSize: {
-      type: Number,
-      default: null,
-    },
-    showIcon: {
-      type: Boolean,
-      default: true,
-    },
-    shouldAlwaysReset: {
-      type: Boolean,
-      default: false,
-    },
-    longStyle: {
-      type: Boolean,
-      default: false,
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
+    maxSize?: number
+    longStyle?: boolean
+    disabled?: boolean
+    callback: (files: File[]) => Promise<void>
+  }>(),
+  {
+    maxSize: 1024 * 1024,
+    multiple: false,
+    longStyle: false,
+    disabled: false,
   },
-  emits: ['change'],
-  data() {
-    return {
-      files: [],
+)
+
+const files = ref<File[]>([])
+const isProcessingFile = ref<boolean>(false)
+const hasError = ref<boolean>(false)
+
+async function addFiles(newFiles: File[]) {
+  if (newFiles.length === 0) return
+
+  files.value.push(...newFiles)
+
+  // If only one file can be selected, replace the previous file with the new one
+  if (!props.multiple) {
+    if (files.value.length !== 0) {
+      files.value = [files.value.at(-1)!]
     }
-  },
-  methods: {
-    addFiles(files, shouldNotReset) {
-      if (!shouldNotReset || this.shouldAlwaysReset) {
-        this.files = files
-      }
-      const validationOptions = { maxSize: this.maxSize, alertOnInvalid: true }
-      this.files = [...this.files].filter((file) => fileIsValid(file, validationOptions))
-      if (this.files.length > 0) {
-        this.$emit('change', this.files)
-      }
-    },
-    handleDrop(e) {
-      this.addFiles(e.dataTransfer.files)
-    },
-    handleChange(e) {
-      this.addFiles(e.target.files)
-    },
-  },
-})
+  }
+
+  hasError.value = false
+  files.value = files.value.filter((v) => {
+    if (v.size > props.maxSize) {
+      hasError.value = true
+      return false
+    }
+
+    return true
+  })
+
+  isProcessingFile.value = true
+  await props.callback(files.value)
+  isProcessingFile.value = false
+}
+
+function handleDrop(e: DragEvent) {
+  if (e.dataTransfer?.files) {
+    addFiles(Array.from(e.dataTransfer.files))
+  }
+}
+
+function handleChange(e: Event) {
+  const target = e.target as HTMLInputElement
+  if (target.files) {
+    addFiles(Array.from(target.files))
+  }
+}
 </script>
 
 <style lang="scss" scoped>
 label {
   flex-direction: unset;
   max-height: unset;
+
   svg {
     height: 1rem;
   }
+
   input {
     display: none;
   }
+
   &.long-style {
     display: flex;
     padding: 1.5rem 2rem;
@@ -102,6 +113,10 @@ label {
     border: dashed 0.3rem var(--color-contrast);
     cursor: pointer;
     color: var(--color-contrast);
+
+    &.too-large {
+      border: dashed 0.3rem var(--color-red);
+    }
   }
 }
 </style>

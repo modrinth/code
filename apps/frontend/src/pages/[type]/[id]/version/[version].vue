@@ -3,10 +3,10 @@
     <ConfirmModal
       v-if="currentMember"
       ref="modal_confirm"
-      title="Are you sure you want to delete this version?"
-      description="This will remove this version forever (like really forever)."
       :has-to-type="false"
+      description="This will remove this version forever (like really forever)."
       proceed-label="Delete"
+      title="Are you sure you want to delete this version?"
       @proceed="deleteVersion()"
     />
     <Modal v-if="auth.user && currentMember" ref="modal_package_mod" header="Package data pack">
@@ -27,14 +27,14 @@
         <multiselect
           id="package-mod-loaders"
           v-model="packageLoaders"
-          :options="['fabric', 'forge', 'quilt', 'neoforge']"
           :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
           :multiple="true"
+          :options="['fabric', 'forge', 'quilt', 'neoforge']"
           :searchable="false"
-          :show-no-results="false"
           :show-labels="false"
-          placeholder="Choose loaders..."
+          :show-no-results="false"
           open-direction="top"
+          placeholder="Choose loaders..."
         />
         <div class="button-group">
           <ButtonStyled>
@@ -66,9 +66,9 @@
         <template v-if="isEditing">
           <input
             v-model="version.name"
-            type="text"
-            placeholder="Enter a version title..."
             maxlength="256"
+            placeholder="Enter a version title..."
+            type="text"
           />
         </template>
         <h2 :class="{ 'sr-only': isEditing }">
@@ -131,10 +131,10 @@
         <ButtonStyled>
           <nuxt-link
             v-if="currentMember"
-            class="action"
             :to="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/version/${encodeURI(version.displayUrlEnding)}`"
+            class="action"
           >
             <CrossIcon aria-hidden="true" />
             Discard changes
@@ -167,10 +167,10 @@
         <ButtonStyled>
           <nuxt-link
             v-if="currentMember"
-            class="action"
             :to="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/version/${encodeURI(version.displayUrlEnding)}/edit`"
+            class="action"
           >
             <EditIcon aria-hidden="true" />
             Edit
@@ -219,8 +219,8 @@
       <div
         v-for="(dependency, index) in deps.filter((x) => !x.file_name)"
         :key="index"
-        class="dependency"
         :class="{ 'button-transparent': !isEditing }"
+        class="dependency"
         @click="!isEditing ? $router.push(dependency.link) : {}"
       >
         <Avatar
@@ -232,11 +232,11 @@
           <span class="project-title">
             {{ dependency.project ? dependency.project.title : "Unknown Project" }}
           </span>
-          <span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
+          <span v-if="dependency.version" :class="dependency.dependency_type" class="dep-type">
             Version {{ dependency.version.version_number }} is
             {{ dependency.dependency_type }}
           </span>
-          <span v-else class="dep-type" :class="dependency.dependency_type">
+          <span v-else :class="dependency.dependency_type" class="dep-type">
             {{ dependency.dependency_type }}
           </span>
         </nuxt-link>
@@ -244,11 +244,11 @@
           <span class="project-title">
             {{ dependency.project ? dependency.project.title : "Unknown Project" }}
           </span>
-          <span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
+          <span v-if="dependency.version" :class="dependency.dependency_type" class="dep-type">
             Version {{ dependency.version.version_number }} is
             {{ dependency.dependency_type }}
           </span>
-          <span v-else class="dep-type" :class="dependency.dependency_type">
+          <span v-else :class="dependency.dependency_type" class="dep-type">
             {{ dependency.dependency_type }}
           </span>
         </div>
@@ -269,7 +269,7 @@
           <span class="project-title">
             {{ dependency.file_name }}
           </span>
-          <span class="dep-type" :class="dependency.dependency_type">Added via overrides</span>
+          <span :class="dependency.dependency_type" class="dep-type">Added via overrides</span>
         </div>
       </div>
       <div v-if="isEditing && project.project_type !== 'modpack'" class="add-dependency">
@@ -277,31 +277,31 @@
         <div class="input-group">
           <Multiselect
             v-model="dependencyAddMode"
-            class="input"
-            :options="['project', 'version']"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-            :searchable="false"
-            :close-on-select="true"
-            :show-labels="false"
             :allow-empty="false"
+            :close-on-select="true"
+            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :options="['project', 'version']"
+            :searchable="false"
+            :show-labels="false"
+            class="input"
           />
           <input
             v-model="newDependencyId"
-            type="text"
             :placeholder="`Enter the ${dependencyAddMode} ID${
               dependencyAddMode === 'project' ? '/slug' : ''
             }`"
+            type="text"
             @keyup.enter="addDependency(dependencyAddMode, newDependencyId, newDependencyType)"
           />
           <Multiselect
             v-model="newDependencyType"
-            class="input"
-            :options="['required', 'optional', 'incompatible', 'embedded']"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-            :searchable="false"
-            :close-on-select="true"
-            :show-labels="false"
             :allow-empty="true"
+            :close-on-select="true"
+            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :options="['required', 'optional', 'incompatible', 'embedded']"
+            :searchable="false"
+            :show-labels="false"
+            class="input"
           />
         </div>
         <div class="input-group">
@@ -323,13 +323,12 @@
           <span class="file-size">({{ $formatBytes(replaceFile.size) }})</span>
         </span>
         <FileInput
+          :accept="acceptFileFromProjectType(project.project_type)"
+          :callback="(x) => (replaceFile = x[0])"
+          :max-size="524288000"
+          aria-label="Replace"
           class="iconified-button raised-button"
           prompt="Replace"
-          aria-label="Replace"
-          :accept="acceptFileFromProjectType(project.project_type)"
-          :max-size="524288000"
-          should-always-reset
-          @change="(x) => (replaceFile = x[0])"
         >
           <TransferIcon aria-hidden="true" />
         </FileInput>
@@ -369,20 +368,20 @@
             primaryFile.hashes.sha1 !== file.hashes.sha1
           "
           v-model="oldFileTypes[index]"
-          class="raised-multiselect"
-          placeholder="Select file type"
-          :options="fileTypes"
-          track-by="value"
-          label="display"
-          :searchable="false"
-          :close-on-select="true"
-          :show-labels="false"
           :allow-empty="false"
+          :close-on-select="true"
+          :options="fileTypes"
+          :searchable="false"
+          :show-labels="false"
+          class="raised-multiselect"
+          label="display"
+          placeholder="Select file type"
+          track-by="value"
         />
         <ButtonStyled v-if="isEditing">
           <button
-            class="raised-button"
             :disabled="primaryFile.hashes.sha1 === file.hashes.sha1"
+            class="raised-button"
             @click="
               () => {
                 deleteFiles.push(file.hashes.sha1);
@@ -398,8 +397,8 @@
         <ButtonStyled v-else>
           <a
             :href="file.url"
-            class="raised-button"
             :title="`Download ${file.filename}`"
+            class="raised-button"
             tabindex="0"
           >
             <DownloadIcon aria-hidden="true" />
@@ -417,15 +416,15 @@
           <multiselect
             v-if="version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))"
             v-model="newFileTypes[index]"
-            class="raised-multiselect"
-            placeholder="Select file type"
-            :options="fileTypes"
-            track-by="value"
-            label="display"
-            :searchable="false"
-            :close-on-select="true"
-            :show-labels="false"
             :allow-empty="false"
+            :close-on-select="true"
+            :options="fileTypes"
+            :searchable="false"
+            :show-labels="false"
+            class="raised-multiselect"
+            label="display"
+            placeholder="Select file type"
+            track-by="value"
           />
           <ButtonStyled>
             <button
@@ -449,22 +448,20 @@
           </span>
           <span v-else>Used for files such as sources or Javadocs.</span>
           <FileInput
-            prompt="Drag and drop to upload or click to select"
-            aria-label="Upload additional file"
-            multiple
-            long-style
             :accept="acceptFileFromProjectType(project.project_type)"
-            :max-size="524288000"
-            @change="
+            :callback="
               (x) =>
                 x.forEach((y) => {
                   newFiles.push(y);
                   newFileTypes.push(null);
                 })
             "
-          >
-            <UploadIcon aria-hidden="true" />
-          </FileInput>
+            :max-size="524288000"
+            aria-label="Upload additional file"
+            long-style
+            multiple
+            prompt="Drag and drop to upload or click to select"
+          />
         </div>
       </template>
     </div>
@@ -476,33 +473,33 @@
           <Multiselect
             v-if="isEditing"
             v-model="version.version_type"
+            :allow-empty="false"
+            :close-on-select="true"
+            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :options="['release', 'beta', 'alpha']"
+            :searchable="false"
+            :show-labels="false"
             class="input"
             placeholder="Select one"
-            :options="['release', 'beta', 'alpha']"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-            :searchable="false"
-            :close-on-select="true"
-            :show-labels="false"
-            :allow-empty="false"
           />
           <template v-else>
             <Badge
               v-if="version.version_type === 'release'"
               class="value"
-              type="release"
               color="green"
+              type="release"
             />
             <Badge
               v-else-if="version.version_type === 'beta'"
               class="value"
-              type="beta"
               color="orange"
+              type="beta"
             />
             <Badge
               v-else-if="version.version_type === 'alpha'"
               class="value"
-              type="alpha"
               color="red"
+              type="alpha"
             />
           </template>
         </div>
@@ -514,9 +511,9 @@
             <input
               id="version-number"
               v-model="version.version_number"
-              type="text"
               autocomplete="off"
               maxlength="54"
+              type="text"
             />
           </div>
           <span v-else>{{ version.version_number }}</span>
@@ -526,6 +523,13 @@
           <Multiselect
             v-if="isEditing"
             v-model="version.loaders"
+            :clear-on-select="false"
+            :close-on-select="false"
+            :custom-label="(value) => $formatCategory(value)"
+            :hide-selected="true"
+            :limit="6"
+            :loading="tags.loaders.length === 0"
+            :multiple="true"
             :options="
               tags.loaders
                 .filter((x) =>
@@ -533,16 +537,9 @@
                 )
                 .map((it) => it.name)
             "
-            :custom-label="(value) => $formatCategory(value)"
-            :loading="tags.loaders.length === 0"
-            :multiple="true"
             :searchable="true"
-            :show-no-results="false"
-            :close-on-select="false"
-            :clear-on-select="false"
             :show-labels="false"
-            :limit="6"
-            :hide-selected="true"
+            :show-no-results="false"
             placeholder="Choose loaders..."
           />
           <Categories v-else :categories="version.loaders" :type="project.actualProjectType" />
@@ -552,6 +549,13 @@
           <template v-if="isEditing">
             <multiselect
               v-model="version.game_versions"
+              :clear-on-select="false"
+              :close-on-select="false"
+              :custom-label="(version) => version"
+              :hide-selected="true"
+              :limit="6"
+              :loading="tags.gameVersions.length === 0"
+              :multiple="true"
               :options="
                 showSnapshots
                   ? tags.gameVersions.map((x) => x.version)
@@ -559,24 +563,17 @@
                       .filter((it) => it.version_type === 'release')
                       .map((x) => x.version)
               "
-              :loading="tags.gameVersions.length === 0"
-              :multiple="true"
               :searchable="true"
-              :show-no-results="false"
-              :close-on-select="false"
-              :clear-on-select="false"
               :show-labels="false"
-              :limit="6"
-              :hide-selected="true"
-              :custom-label="(version) => version"
+              :show-no-results="false"
               placeholder="Choose versions..."
             />
             <Checkbox
               v-model="showSnapshots"
-              label="Show all versions"
-              description="Show all versions"
-              style="margin-top: 0.5rem"
               :border="false"
+              description="Show all versions"
+              label="Show all versions"
+              style="margin-top: 0.5rem"
             />
           </template>
           <span v-else>{{ $formatVersion(version.game_versions) }}</span>
@@ -598,10 +595,10 @@
             @click="$router.push('/user/' + version.author.user.username)"
           >
             <Avatar
-              :src="version.author.avatar_url"
               :alt="version.author.user.username"
-              size="sm"
+              :src="version.author.avatar_url"
               circle
+              size="sm"
             />
 
             <div class="member-info">
@@ -626,7 +623,7 @@
   </div>
 </template>
 <script>
-import { ButtonStyled, ConfirmModal, MarkdownEditor } from "@modrinth/ui";
+import { ButtonStyled, ConfirmModal, FileInput, MarkdownEditor } from "@modrinth/ui";
 import { Multiselect } from "vue-multiselect";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 import { inferVersionInfo } from "~/helpers/infer.js";
@@ -641,7 +638,6 @@ import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
-import FileInput from "~/components/ui/FileInput.vue";
 
 import FileIcon from "~/assets/images/utils/file.svg?component";
 import TrashIcon from "~/assets/images/utils/trash.svg?component";

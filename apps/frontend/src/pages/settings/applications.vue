@@ -2,9 +2,9 @@
   <div class="universal-card">
     <ConfirmModal
       ref="modal_confirm"
-      title="Are you sure you want to delete this application?"
       description="This will permanently delete this application and revoke all access tokens. (forever!)"
       proceed-label="Delete this application"
+      title="Are you sure you want to delete this application?"
       @proceed="removeApp(editingId)"
     />
     <Modal ref="appModal" header="Application information">
@@ -13,23 +13,21 @@
         <input
           id="app-name"
           v-model="name"
-          maxlength="2048"
-          type="text"
           autocomplete="off"
+          maxlength="2048"
           placeholder="Enter the application's name..."
+          type="text"
         />
         <label v-if="editingId" for="app-icon"><span class="label__title">Icon</span> </label>
         <div v-if="editingId" class="icon-submission">
-          <Avatar size="md" :src="icon" />
+          <Avatar :src="icon" size="md" />
           <FileInput
+            :callback="onImageSelection"
             :max-size="262144"
+            accept="image/png,image/jpeg,image/gif,image/webp"
             class="btn"
             prompt="Upload icon"
-            accept="image/png,image/jpeg,image/gif,image/webp"
-            @change="onImageSelection"
-          >
-            <UploadIcon />
-          </FileInput>
+          />
         </div>
         <label v-if="editingId" for="app-url">
           <span class="label__title">URL</span>
@@ -38,10 +36,10 @@
           v-if="editingId"
           id="app-url"
           v-model="url"
-          maxlength="255"
-          type="url"
           autocomplete="off"
+          maxlength="255"
           placeholder="https://example.com"
+          type="url"
         />
         <label v-if="editingId" for="app-description">
           <span class="label__title">Description</span>
@@ -50,11 +48,11 @@
           v-if="editingId"
           id="app-description"
           v-model="description"
+          autocomplete="off"
           class="description-textarea"
           maxlength="255"
-          type="text"
-          autocomplete="off"
           placeholder="Enter the application's description..."
+          type="text"
         />
         <label for="app-scopes"><span class="label__title">Scopes</span> </label>
         <div id="app-scopes" class="checkboxes">
@@ -72,10 +70,10 @@
             <div class="input-group url-input-group-fixes">
               <input
                 v-model="redirectUris[index]"
-                maxlength="2048"
-                type="url"
                 autocomplete="off"
+                maxlength="2048"
                 placeholder="https://example.com/auth/callback"
+                type="url"
               />
               <Button v-if="index !== 0" icon-only @click="() => redirectUris.splice(index, 1)">
                 <TrashIcon />
@@ -86,13 +84,15 @@
                 icon-only
                 @click="() => redirectUris.push('')"
               >
-                <PlusIcon /> Add more
+                <PlusIcon />
+                Add more
               </Button>
             </div>
           </div>
           <div v-if="redirectUris.length <= 0">
             <Button color="primary" icon-only @click="() => redirectUris.push('')">
-              <PlusIcon /> Add a redirect uri
+              <PlusIcon />
+              Add a redirect uri
             </Button>
           </div>
         </div>
@@ -105,8 +105,8 @@
           <button
             v-if="editingId"
             :disabled="!canSubmit"
-            type="button"
             class="iconified-button brand-button"
+            type="button"
             @click="editApp"
           >
             <SaveIcon />
@@ -115,8 +115,8 @@
           <button
             v-else
             :disabled="!canSubmit"
-            type="button"
             class="iconified-button brand-button"
+            type="button"
             @click="createApp"
           >
             <PlusIcon />
@@ -144,7 +144,8 @@
           }
         "
       >
-        <PlusIcon /> New Application
+        <PlusIcon />
+        New Application
       </button>
     </div>
     <p>
@@ -155,7 +156,7 @@
     <div v-for="app in usersApps" :key="app.id" class="universal-card recessed token mt-4">
       <div class="token-info">
         <div class="token-icon">
-          <Avatar size="sm" :src="app.icon_url" />
+          <Avatar :src="app.icon_url" size="sm" />
           <div>
             <h2 class="token-title">{{ app.name }}</h2>
             <div>Created on {{ new Date(app.created).toLocaleDateString() }}</div>
@@ -172,7 +173,8 @@
             </div>
             <div v-if="!!clientCreatedInState(app.id)">
               <div>
-                Client Secret <CopyCode :text="clientCreatedInState(app.id)?.client_secret" />
+                Client Secret
+                <CopyCode :text="clientCreatedInState(app.id)?.client_secret" />
               </div>
               <div class="secret_disclaimer">
                 <i> Save your secret now, it will be hidden after you leave this page! </i>
@@ -215,24 +217,24 @@
   </div>
 </template>
 <script setup>
-import { UploadIcon, PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from "@modrinth/assets";
+import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from "@modrinth/assets";
 import {
-  CopyCode,
-  ConfirmModal,
+  Avatar,
   Button,
   Checkbox,
-  Avatar,
-  FileInput,
   commonSettingsMessages,
+  ConfirmModal,
+  CopyCode,
+  FileInput,
 } from "@modrinth/ui";
 import Modal from "~/components/ui/Modal.vue";
 
 import {
-  scopeList,
+  getScopeValue,
   hasScope,
+  scopeList,
   toggleScope,
   useScopes,
-  getScopeValue,
 } from "~/composables/auth/scopes.ts";
 
 const { formatMessage } = useVIntl();
@@ -486,13 +488,16 @@ async function removeApp() {
 .secret_disclaimer {
   font-size: var(--font-size-sm);
 }
+
 .submit-row {
   padding-top: var(--gap-lg);
 }
+
 .uri-input-list {
   display: grid;
   row-gap: 0.5rem;
 }
+
 .url-input-group-fixes {
   width: 100%;
 
@@ -501,6 +506,7 @@ async function removeApp() {
     flex-basis: 24rem !important;
   }
 }
+
 .checkboxes {
   display: grid;
   column-gap: 0.5rem;
