@@ -9,7 +9,16 @@ import { Steps } from '@astrojs/starlight/components';
 
 It's a [Tauri](https://v2.tauri.app/) app which uses [Rust](https://rust-lang.org) as the backend and [Vue.js](https://vuejs.org/) on the frontend.
 
-The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code). You can find it in the [/apps/app](https://github.com/modrinth/code/tree/main/apps/app) directory.
+The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code).
+
+## Architecture
+
+Theseus is split up into three parts:
+
+- [`apps/app`](https://github.com/modrinth/code/tree/main/apps/app): The Tauri-based Rust app. This primarily wraps around the library with some additional logic for Tauri.
+- [`apps/app-frontend`](https://github.com/modrinth/code/tree/main/apps/app-frontend): The Vue.JS frontend for the app
+- [`packages/app-lib`](https://github.com/modrinth/code/tree/main/packages/app-lib): The library holding all the core logic for the desktop app
+
 
 ## Setup
 
@@ -35,14 +44,6 @@ The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code).
 Nuxt supports hot-reloading: any changes you make to the code will automatically shown in the window.
 
 You can also use `pnpm run lint` to find any eslint problems, and `pnpm run fix` to try automatically fixing them.
-
-## Architecture
-
-Theseus is split up into three parts:
-
-- `apps/app`: The Tauri-based Rust app. This primarily wraps around the library with some additional logic for Tauri.
-- `apps/app-frontend`: The Vue.JS frontend for the app
-- `packages/app-lib`: The library holding all the core logic for the desktop app
 
 The app's internal database is stored in SQLite. For production builds, this is found at `<APPDIR>/app.db`.
 
