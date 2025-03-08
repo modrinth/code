@@ -186,7 +186,7 @@ import {
   TrashIcon,
 } from "@modrinth/assets";
 import DropArea from "~/components/ui/DropArea.vue";
-import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
+import { acceptFileFromProjectType } from "@modrinth/utils";
 
 const props = defineProps({
   project: {

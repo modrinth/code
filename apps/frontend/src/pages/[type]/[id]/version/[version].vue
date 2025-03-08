@@ -624,8 +624,8 @@
 </template>
 <script>
 import { ButtonStyled, ConfirmModal, FileInput, MarkdownEditor } from "@modrinth/ui";
+import { acceptFileFromProjectType } from "@modrinth/utils";
 import { Multiselect } from "vue-multiselect";
-import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 import { inferVersionInfo } from "~/helpers/infer.js";
 import { createDataPackVersion } from "~/helpers/package.js";
 import { renderHighlightedString } from "~/helpers/highlight.js";
