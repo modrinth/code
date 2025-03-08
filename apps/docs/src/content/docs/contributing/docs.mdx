@@ -7,7 +7,7 @@ import { Steps } from '@astrojs/starlight/components';
 
 Modrinth Docs is the site you are looking at right now. It's here to help us work with Modrinth's projects and provide various information.
 
-The Docs are built using [Astro](https://astro.build) a content focused framework and the [Starlight](https://starlight.astro.build) integration specifically designed for documentation sites. Pages are written using [Markdown](https://www.markdownguide.org/basic-syntax) and [MDX](https://mdxjs.com) and are stored in the `/src/content/docs` directory.
+The Docs are built using [Astro](https://astro.build) a content focused framework and the [Starlight](https://starlight.astro.build) integration specifically designed for documentation sites.
 
 The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code). You can find it in the [`/apps/docs`](https://github.com/modrinth/code/tree/main/apps/docs) directory.
 
@@ -31,11 +31,15 @@ The codebase is kept in Modrinth's [monorepo](https://github.com/modrinth/code).
 
 </Steps>
 
+Pages are written using [Markdown](https://www.markdownguide.org/basic-syntax) and [MDX](https://mdxjs.com) and are stored in the `/src/content/docs` directory.
+The [Labrinth API docs](/api) are auto generated with [starlight-openapi](https://github.com/HiDeoo/starlight-openapi) from the `/public/openapi.yaml` file.
+
+
 ## Ready to open a PR?
 
-While there is no linting requirement, we do ask that you quickly check your code before opening a pull request.
-
 <Steps>
+
+1. While there is no linting requirement, we do ask that you quickly check your code before opening a pull request.
 
 1. Open a pull request on the [monorepo repository](https://github.com/modrinth/code)
 
