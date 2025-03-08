@@ -23,6 +23,7 @@ import _OpenCollectiveIcon from './external/opencollective.svg?component'
 import _PatreonIcon from './external/patreon.svg?component'
 import _PayPalIcon from './external/paypal.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
+import _ThreadsIcon from './external/threads.svg?component'
 import _TumblrIcon from './external/tumblr.svg?component'
 import _TwitterIcon from './external/twitter.svg?component'
 import _WindowsIcon from './external/windows.svg?component'
@@ -356,6 +357,7 @@ export const SunriseIcon = _SunriseIcon
 export const TagIcon = _TagIcon
 export const TagsIcon = _TagsIcon
 export const TerminalSquareIcon = _TerminalSquareIcon
+export const ThreadsIcon = _ThreadsIcon
 export const TransferIcon = _TransferIcon
 export const TrashIcon = _TrashIcon
 export const UndoIcon = _UndoIcon
