@@ -51,16 +51,15 @@ const hasError = ref<boolean>(false)
 async function addFiles(newFiles: File[]) {
   if (newFiles.length === 0) return
 
-  files.value.push(...newFiles)
+  // We replace the old files with the new ones.
+  // If you're selecting multiple, you probably also want a delete button
+  //  on each of the chosen files.
+  // As such, we want the page to keep track of files, not the file picker.
+  files.value = newFiles
 
-  // If only one file can be selected, replace the previous file with the new one
-  if (!props.multiple) {
-    if (files.value.length !== 0) {
-      files.value = [files.value.at(-1)!]
-    }
-  }
-
+  // Remove errors on uploading new files
   hasError.value = false
+
   files.value = files.value.filter((v) => {
     if (v.size > props.maxSize) {
       hasError.value = true
