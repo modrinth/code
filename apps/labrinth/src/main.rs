@@ -99,6 +99,14 @@ async fn main() -> std::io::Result<()> {
         .build()
         .expect("Failed to create prometheus metrics middleware");
 
+    database::register_and_set_metrics(&pool, &prometheus.registry)
+        .await
+        .expect("Failed to register database metrics");
+    redis_pool
+        .register_and_set_metrics(&prometheus.registry)
+        .await
+        .expect("Failed to register redis metrics");
+
     let search_config = search::SearchConfig::new(None);
 
     let labrinth_config = labrinth::app_setup(
