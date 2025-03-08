@@ -92,32 +92,38 @@
     </p>
 
     <table>
-      <tr>
-        <th>Timeline</th>
-        <th>Date</th>
-      </tr>
-      <tr>
-        <td>Revenue earned on</td>
-        <td>
-          <input id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
-          <noscript
-            >(JavaScript must be enabled for the date picker to function, example date: 2024-07-15)
-          </noscript>
-        </td>
-      </tr>
-      <tr>
-        <td>End of the month</td>
-        <td>{{ formatDate(endOfMonthDate) }}</td>
-      </tr>
-      <tr>
-        <td>NET 60 policy applied</td>
-        <td>+ 60 days</td>
-      </tr>
-      <tr class="final-result">
-        <td>Available for withdrawal</td>
-        <td>{{ formatDate(withdrawalDate) }}</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Timeline</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Revenue earned on</td>
+          <td>
+            <input id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
+            <noscript
+              >(JavaScript must be enabled for the date picker to function, example date:
+              2024-07-15)
+            </noscript>
+          </td>
+        </tr>
+        <tr>
+          <td>End of the month</td>
+          <td>{{ formatDate(endOfMonthDate) }}</td>
+        </tr>
+        <tr>
+          <td>NET 60 policy applied</td>
+          <td>+ 60 days</td>
+        </tr>
+        <tr class="final-result">
+          <td>Available for withdrawal</td>
+          <td>{{ formatDate(withdrawalDate) }}</td>
+        </tr>
+      </tbody>
     </table>
+
     <h3>How do I know Modrinth is being transparent about revenue?</h3>
     <p>
       We aim to be as transparent as possible with creator revenue. All of our code is open source,
