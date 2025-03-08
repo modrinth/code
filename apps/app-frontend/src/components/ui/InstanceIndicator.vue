@@ -3,23 +3,15 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { formatCategory } from '@modrinth/utils'
 import { GameIcon, LeftArrowIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled } from '@modrinth/ui'
-
-type Instance = {
-  game_version: string
-  loader: string
-  path: string
-  install_stage: string
-  icon_path?: string
-  name: string
-}
+import type { GameInstance } from '@/helpers/types'
 
 defineProps<{
-  instance: Instance
+  instance?: GameInstance
 }>()
 </script>
 
 <template>
-  <div class="flex justify-between items-center border-0 border-b border-solid border-divider pb-4">
+  <div v-if="instance" class="flex justify-between items-center border-0 border-b border-solid border-divider pb-4">
     <router-link
       :to="`/instance/${encodeURIComponent(instance.path)}`"
       tabindex="-1"
@@ -49,5 +41,3 @@ defineProps<{
     </ButtonStyled>
   </div>
 </template>
-
-<style scoped lang="scss"></style>

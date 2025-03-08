@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
+  UserIcon,
   ArrowBigUpDashIcon,
   CompassIcon,
   DownloadIcon,
@@ -233,6 +234,9 @@ async function fetchCredentials() {
   credentials.value = creds
 }
 
+const profileMenu = ref()
+const isProfileMenuOpen = computed(() => profileMenu.value?.isOpen)
+
 async function signIn() {
   await login().catch(handleError)
   await fetchCredentials()
@@ -410,26 +414,34 @@ function handleAuxClick(e) {
       <NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
         <SettingsIcon />
       </NavButton>
-      <ButtonStyled v-if="credentials" type="transparent" circular>
-        <OverflowMenu
-          :options="[
-            {
-              id: 'sign-out',
-              action: () => logOut(),
-              color: 'danger',
-            },
-          ]"
-          direction="left"
-        >
-          <Avatar
-            :src="credentials.user.avatar_url"
-            :alt="credentials.user.username"
-            size="32px"
-            circle
-          />
-          <template #sign-out> <LogOutIcon /> Sign out </template>
-        </OverflowMenu>
-      </ButtonStyled>
+      <OverflowMenu
+        v-if="credentials"
+        ref="profileMenu"
+        placement="right-end"
+        class="w-12 h-12 border-none cursor-pointer rounded-full flex items-center justify-center text-2xl transition-all button-animation"
+        :class="isProfileMenuOpen ? 'bg-button-bg' : 'bg-transparent hover:bg-button-bg'"
+        :options="[
+          {
+            id: 'profile',
+            action: () => router.push(`/user/${credentials.user.id}`),
+          },
+          {
+            id: 'sign-out',
+            action: () => logOut(),
+            color: 'danger',
+          },
+        ]"
+        direction="left"
+      >
+        <Avatar
+          :src="credentials.user.avatar_url"
+          :alt="credentials.user.username"
+          size="32px"
+          circle
+        />
+        <template #profile> <UserIcon /> Profile </template>
+        <template #sign-out> <LogOutIcon /> Sign out </template>
+      </OverflowMenu>
       <NavButton v-else v-tooltip.right="'Sign in'" :to="() => signIn()">
         <LogInIcon />
         <template #label>Sign in</template>
@@ -694,6 +706,9 @@ function handleAuxClick(e) {
 
 .app-grid-navbar {
   grid-area: nav;
+
+  // Fixes SVG scaling issues
+  filter: brightness(1.00001);
 }
 
 .app-grid-statusbar {
@@ -769,6 +784,7 @@ function handleAuxClick(e) {
   height: 100%;
   overflow: auto;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
 }
 
 .app-contents::before {
