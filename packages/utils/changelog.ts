@@ -11,6 +11,28 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-03-05T17:40:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed moderation-end pages failing under edge cases.`,
+  },
+  {
+    date: `2025-03-05T12:40:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed various errors with modals for some users.
+- Fixed hold R button not working on some systems.`,
+  },
+  {
+    date: `2025-03-03T22:30:00-08:00`,
+    product: 'web',
+    body: `### Added
+- Hold R for a random project :D
+
+### Improvements
+- Improved admin navigation and admin panels.`,
+  },
+  {
     date: `2025-03-02T18:45:00-08:00`,
     product: 'web',
     body: `### Improvements

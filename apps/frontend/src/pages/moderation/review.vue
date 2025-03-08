@@ -164,17 +164,45 @@ const projectTypes = computed(() => {
   return [...set];
 });
 
+function segmentData(data, segmentSize = 900) {
+  return data.reduce((acc, curr, index) => {
+    const segment = Math.floor(index / segmentSize);
+
+    if (!acc[segment]) {
+      acc[segment] = [];
+    }
+    acc[segment].push(curr);
+    return acc;
+  }, []);
+}
+
+function fetchSegmented(data, createUrl, options = {}) {
+  return Promise.all(segmentData(data).map((ids) => useBaseFetch(createUrl(ids), options))).then(
+    (results) => results.flat(),
+  );
+}
+
+function asEncodedJsonArray(data) {
+  return encodeURIComponent(JSON.stringify(data));
+}
+
 if (projects.value) {
   const teamIds = projects.value.map((x) => x.team_id);
-  const organizationIds = projects.value.filter((x) => x.organization).map((x) => x.organization);
+  const orgIds = projects.value.filter((x) => x.organization).map((x) => x.organization);
 
-  const url = `teams?ids=${encodeURIComponent(JSON.stringify(teamIds))}`;
-  const orgUrl = `organizations?ids=${encodeURIComponent(JSON.stringify(organizationIds))}`;
-  const { data: result } = await useAsyncData(url, () => useBaseFetch(url));
-  const { data: orgs } = await useAsyncData(orgUrl, () => useBaseFetch(orgUrl, { apiVersion: 3 }));
+  const [{ data: teams }, { data: orgs }] = await Promise.all([
+    useAsyncData(`teams?ids=${asEncodedJsonArray(teamIds)}`, () =>
+      fetchSegmented(teamIds, (ids) => `teams?ids=${asEncodedJsonArray(ids)}`),
+    ),
+    useAsyncData(`organizations?ids=${asEncodedJsonArray(orgIds)}`, () =>
+      fetchSegmented(orgIds, (ids) => `organizations?ids=${asEncodedJsonArray(ids)}`, {
+        apiVersion: 3,
+      }),
+    ),
+  ]);
 
-  if (result.value) {
-    members.value = result.value;
+  if (teams.value) {
+    members.value = teams.value;
 
     projects.value = projects.value.map((project) => {
       project.owner = members.value

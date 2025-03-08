@@ -124,9 +124,20 @@ async fn main() -> std::io::Result<()> {
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")
+        .exclude_regex(r"^/api/v1/.*$")
+        .exclude_regex(r"^/maven/.*$")
         .exclude("/_internal/launcher_socket")
+        .mask_unmatched_patterns("UNKNOWN")
         .build()
         .expect("Failed to create prometheus metrics middleware");
+
+    database::register_and_set_metrics(&pool, &prometheus.registry)
+        .await
+        .expect("Failed to register database metrics");
+    redis_pool
+        .register_and_set_metrics(&prometheus.registry)
+        .await
+        .expect("Failed to register redis metrics");
 
     let labrinth_config = labrinth::app_setup(
         pool.clone(),

@@ -43,7 +43,7 @@ function onModalHide() {
   if (props.showAdOnClose) {
     show_ads_window()
   }
-  props.onHide()
+  props.onHide?.()
 }
 </script>
 
