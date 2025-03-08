@@ -21,6 +21,7 @@ use crate::background_task::update_versions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::KeyedRateLimiter;
+use sync::friends::handle_pubsub;
 
 pub mod auth;
 pub mod background_task;
@@ -32,6 +33,7 @@ pub mod queue;
 pub mod routes;
 pub mod scheduler;
 pub mod search;
+pub mod sync;
 pub mod util;
 pub mod validate;
 
@@ -268,6 +270,16 @@ pub fn app_setup(
 
     let payouts_queue = web::Data::new(PayoutsQueue::new());
     let active_sockets = web::Data::new(ActiveSockets::default());
+
+    {
+        let pool = pool.clone();
+        let redis_client = redis::Client::open(redis_pool.url.clone()).unwrap();
+        let sockets = active_sockets.clone();
+        actix_rt::spawn(async move {
+            let pubsub = redis_client.get_async_pubsub().await.unwrap();
+            handle_pubsub(pubsub, pool, sockets).await;
+        });
+    }
 
     LabrinthConfig {
         pool,
