@@ -660,6 +660,7 @@ import {
   PackageOpenIcon,
   DiscordIcon,
   BlueskyIcon,
+  ThreadsIcon,
   TumblrIcon,
   TwitterIcon,
   MastodonIcon,
@@ -1111,6 +1112,13 @@ const socialLinks = [
     href: "https://floss.social/@modrinth",
     icon: MastodonIcon,
     rel: "me",
+  },
+  {
+    label: formatMessage(
+      defineMessage({ id: "layout.footer.social.threads", defaultMessage: "Threads" }),
+    ),
+    href: "https://www.threads.net/@modrinth",
+    icon: ThreadsIcon,
   },
   {
     label: formatMessage(
