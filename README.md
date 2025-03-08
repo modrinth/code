@@ -9,22 +9,13 @@
 
 ## Modrinth Monorepo
 
-Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and app. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
+Welcome to the Modrinth Monorepo, the primary codebase for Modrinth projects. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
 
 If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com) and download the latest release of the app [here](https://modrinth.com/app).
 
-## Development
+## Development and contributing
 
-This repository contains two primary packages. For detailed development information, please refer to their respective READMEs:
-
-- [Web Interface](apps/frontend/README.md)
-- [Desktop App](apps/app/README.md)
-
-## Contributing
-
-We welcome contributions! Before submitting any contributions, please read our [contributing guidelines](https://docs.modrinth.com/contributing/getting-started/).
-
-If you plan to fork this repository for your own purposes, please review our [copying guidelines](COPYING.md).
+You can read more about the codebase and how to contribute to it on the [contributing documentation page](https://docs.modrinth.com/contributing/modrinth/). 
 
 ## Security
 
