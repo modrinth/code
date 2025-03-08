@@ -130,6 +130,8 @@ json-patch = "*"
 
 ariadne = { path = "../../packages/ariadne" }
 
+clap = { version = "4.5", features = ["derive"] }
+
 [dev-dependencies]
 actix-http = "3.4.0"
 

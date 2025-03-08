@@ -17,15 +17,14 @@ use governor::middleware::StateInformationMiddleware;
 use governor::{Quota, RateLimiter};
 use util::cors::default_cors;
 
+use crate::background_task::update_versions;
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::KeyedRateLimiter;
-use crate::{
-    queue::payouts::process_payout,
-    search::indexing::index_projects,
-    util::env::{parse_strings_from_var, parse_var},
-};
+use sync::friends::handle_pubsub;
 
 pub mod auth;
+pub mod background_task;
 pub mod clickhouse;
 pub mod database;
 pub mod file_hosting;
@@ -34,6 +33,7 @@ pub mod queue;
 pub mod routes;
 pub mod scheduler;
 pub mod search;
+pub mod sync;
 pub mod util;
 pub mod validate;
 
@@ -61,6 +61,7 @@ pub struct LabrinthConfig {
     pub stripe_client: stripe::Client,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn app_setup(
     pool: sqlx::Pool<Postgres>,
     redis_pool: RedisPool,
@@ -68,6 +69,8 @@ pub fn app_setup(
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     maxmind: Arc<queue::maxmind::MaxMindIndexer>,
+    stripe_client: stripe::Client,
+    enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!(
         "Starting Labrinth on {}",
@@ -109,88 +112,97 @@ pub fn app_setup(
         async move {}
     });
 
-    // The interval in seconds at which the local database is indexed
-    // for searching.  Defaults to 1 hour if unset.
-    let local_index_interval = std::time::Duration::from_secs(
-        parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600),
-    );
-
-    let pool_ref = pool.clone();
-    let search_config_ref = search_config.clone();
-    let redis_pool_ref = redis_pool.clone();
-    scheduler.run(local_index_interval, move || {
-        let pool_ref = pool_ref.clone();
-        let redis_pool_ref = redis_pool_ref.clone();
-        let search_config_ref = search_config_ref.clone();
-        async move {
-            info!("Indexing local database");
-            let result = index_projects(
-                pool_ref,
-                redis_pool_ref.clone(),
-                &search_config_ref,
-            )
-            .await;
-            if let Err(e) = result {
-                warn!("Local project indexing failed: {:?}", e);
+    if enable_background_tasks {
+        // The interval in seconds at which the local database is indexed
+        // for searching.  Defaults to 1 hour if unset.
+        let local_index_interval = Duration::from_secs(
+            parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600),
+        );
+        let pool_ref = pool.clone();
+        let search_config_ref = search_config.clone();
+        let redis_pool_ref = redis_pool.clone();
+        scheduler.run(local_index_interval, move || {
+            let pool_ref = pool_ref.clone();
+            let redis_pool_ref = redis_pool_ref.clone();
+            let search_config_ref = search_config_ref.clone();
+            async move {
+                background_task::index_search(
+                    pool_ref,
+                    redis_pool_ref,
+                    search_config_ref,
+                )
+                .await;
             }
-            info!("Done indexing local database");
-        }
-    });
+        });
 
-    // Changes statuses of scheduled projects/versions
-    let pool_ref = pool.clone();
-    // TODO: Clear cache when these are run
-    scheduler.run(std::time::Duration::from_secs(60 * 5), move || {
-        let pool_ref = pool_ref.clone();
-        info!("Releasing scheduled versions/projects!");
-
-        async move {
-            let projects_results = sqlx::query!(
-                "
-                UPDATE mods
-                SET status = requested_status
-                WHERE status = $1 AND approved < CURRENT_DATE AND requested_status IS NOT NULL
-                ",
-                crate::models::projects::ProjectStatus::Scheduled.as_str(),
-            )
-            .execute(&pool_ref)
-            .await;
-
-            if let Err(e) = projects_results {
-                warn!("Syncing scheduled releases for projects failed: {:?}", e);
+        // Changes statuses of scheduled projects/versions
+        let pool_ref = pool.clone();
+        // TODO: Clear cache when these are run
+        scheduler.run(Duration::from_secs(60 * 5), move || {
+            let pool_ref = pool_ref.clone();
+            async move {
+                background_task::release_scheduled(pool_ref).await;
             }
+        });
 
-            let versions_results = sqlx::query!(
-                "
-                UPDATE versions
-                SET status = requested_status
-                WHERE status = $1 AND date_published < CURRENT_DATE AND requested_status IS NOT NULL
-                ",
-                crate::models::projects::VersionStatus::Scheduled.as_str(),
-            )
-            .execute(&pool_ref)
-            .await;
-
-            if let Err(e) = versions_results {
-                warn!("Syncing scheduled releases for versions failed: {:?}", e);
+        let version_index_interval = Duration::from_secs(
+            parse_var("VERSION_INDEX_INTERVAL").unwrap_or(1800),
+        );
+        let pool_ref = pool.clone();
+        let redis_pool_ref = redis_pool.clone();
+        scheduler.run(version_index_interval, move || {
+            let pool_ref = pool_ref.clone();
+            let redis = redis_pool_ref.clone();
+            async move {
+                update_versions(pool_ref, redis).await;
             }
+        });
 
-            info!("Finished releasing scheduled versions/projects");
-        }
-    });
+        let pool_ref = pool.clone();
+        let client_ref = clickhouse.clone();
+        scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
+            let pool_ref = pool_ref.clone();
+            let client_ref = client_ref.clone();
+            async move {
+                background_task::payouts(pool_ref, client_ref).await;
+            }
+        });
 
-    scheduler::schedule_versions(
-        &mut scheduler,
-        pool.clone(),
-        redis_pool.clone(),
-    );
+        let pool_ref = pool.clone();
+        let redis_ref = redis_pool.clone();
+        let stripe_client_ref = stripe_client.clone();
+        actix_rt::spawn(async move {
+            loop {
+                routes::internal::billing::index_billing(
+                    stripe_client_ref.clone(),
+                    pool_ref.clone(),
+                    redis_ref.clone(),
+                )
+                .await;
+                tokio::time::sleep(Duration::from_secs(60 * 5)).await;
+            }
+        });
+
+        let pool_ref = pool.clone();
+        let redis_ref = redis_pool.clone();
+        actix_rt::spawn(async move {
+            loop {
+                routes::internal::billing::index_subscriptions(
+                    pool_ref.clone(),
+                    redis_ref.clone(),
+                )
+                .await;
+                tokio::time::sleep(Duration::from_secs(60 * 5)).await;
+            }
+        });
+    }
 
     let session_queue = web::Data::new(AuthQueue::new());
 
     let pool_ref = pool.clone();
     let redis_ref = redis_pool.clone();
     let session_queue_ref = session_queue.clone();
-    scheduler.run(std::time::Duration::from_secs(60 * 30), move || {
+    scheduler.run(Duration::from_secs(60 * 30), move || {
         let pool_ref = pool_ref.clone();
         let redis_ref = redis_ref.clone();
         let session_queue_ref = session_queue_ref.clone();
@@ -208,7 +220,7 @@ pub fn app_setup(
     let reader = maxmind.clone();
     {
         let reader_ref = reader;
-        scheduler.run(std::time::Duration::from_secs(60 * 60 * 24), move || {
+        scheduler.run(Duration::from_secs(60 * 60 * 24), move || {
             let reader_ref = reader_ref.clone();
 
             async move {
@@ -232,7 +244,7 @@ pub fn app_setup(
         let analytics_queue_ref = analytics_queue.clone();
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
-        scheduler.run(std::time::Duration::from_secs(15), move || {
+        scheduler.run(Duration::from_secs(15), move || {
             let client_ref = client_ref.clone();
             let analytics_queue_ref = analytics_queue_ref.clone();
             let pool_ref = pool_ref.clone();
@@ -251,51 +263,6 @@ pub fn app_setup(
         });
     }
 
-    {
-        let pool_ref = pool.clone();
-        let client_ref = clickhouse.clone();
-        scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
-            let pool_ref = pool_ref.clone();
-            let client_ref = client_ref.clone();
-
-            async move {
-                info!("Started running payouts");
-                let result = process_payout(&pool_ref, &client_ref).await;
-                if let Err(e) = result {
-                    warn!("Payouts run failed: {:?}", e);
-                }
-                info!("Done running payouts");
-            }
-        });
-    }
-
-    let stripe_client =
-        stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
-    {
-        let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
-        let stripe_client_ref = stripe_client.clone();
-
-        actix_rt::spawn(async move {
-            routes::internal::billing::task(
-                stripe_client_ref,
-                pool_ref,
-                redis_ref,
-            )
-            .await;
-        });
-    }
-
-    {
-        let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
-
-        actix_rt::spawn(async move {
-            routes::internal::billing::subscription_task(pool_ref, redis_ref)
-                .await;
-        });
-    }
-
     let ip_salt = Pepper {
         pepper: ariadne::ids::Base62Id(ariadne::ids::random_base62(11))
             .to_string(),
@@ -303,6 +270,16 @@ pub fn app_setup(
 
     let payouts_queue = web::Data::new(PayoutsQueue::new());
     let active_sockets = web::Data::new(ActiveSockets::default());
+
+    {
+        let pool = pool.clone();
+        let redis_client = redis::Client::open(redis_pool.url.clone()).unwrap();
+        let sockets = active_sockets.clone();
+        actix_rt::spawn(async move {
+            let pubsub = redis_client.get_async_pubsub().await.unwrap();
+            handle_pubsub(pubsub, pool, sockets).await;
+        });
+    }
 
     LabrinthConfig {
         pool,
