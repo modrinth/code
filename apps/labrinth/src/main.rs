@@ -5,7 +5,6 @@ use env_logger::Env;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;
-use labrinth::routes::internal::statuses::close_socket;
 use labrinth::search;
 use labrinth::util::ratelimit::RateLimit;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};

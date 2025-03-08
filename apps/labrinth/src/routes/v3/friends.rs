@@ -87,7 +87,7 @@ pub async fn add_friend(
                     get_user_status(user_id.into(), sockets, redis).await
                 {
                     broadcast_friends_message(
-                        &redis,
+                        redis,
                         RedisFriendsMessage::DirectStatusUpdate {
                             to_user: friend_id.into(),
                             status: friend_status,
