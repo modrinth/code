@@ -17,6 +17,7 @@ actix-multipart = "0.6.1"
 actix-cors = "0.7.0"
 actix-ws = "0.3.0"
 actix-files = "0.6.5"
+prometheus = "0.13.4"
 actix-web-prom = { version = "0.9.0", features = ["process"] }
 governor = "0.6.3"
 

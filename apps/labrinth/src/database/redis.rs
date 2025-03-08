@@ -3,6 +3,7 @@ use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
+use prometheus::{IntGauge, Registry};
 use redis::{cmd, Cmd, ExistenceCheck, SetExpiry, SetOptions};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -38,7 +39,7 @@ impl RedisPool {
         .builder()
         .expect("Error building Redis pool")
         .max_size(
-            dotenvy::var("DATABASE_MAX_CONNECTIONS")
+            dotenvy::var("REDIS_MAX_CONNECTIONS")
                 .ok()
                 .and_then(|x| x.parse().ok())
                 .unwrap_or(10000),
@@ -51,6 +52,48 @@ impl RedisPool {
             pool: redis_pool,
             meta_namespace: meta_namespace.unwrap_or("".to_string()),
         }
+    }
+
+    pub async fn register_and_set_metrics(
+        &self,
+        registry: &Registry,
+    ) -> Result<(), prometheus::Error> {
+        let redis_max_size = IntGauge::new(
+            "labrinth_redis_pool_max_size",
+            "Maximum size of Redis pool",
+        )?;
+        let redis_size = IntGauge::new(
+            "labrinth_redis_pool_size",
+            "Current size of Redis pool",
+        )?;
+        let redis_available = IntGauge::new(
+            "labrinth_redis_pool_available",
+            "Available connections in Redis pool",
+        )?;
+        let redis_waiting = IntGauge::new(
+            "labrinth_redis_pool_waiting",
+            "Number of futures waiting for a Redis connection",
+        )?;
+
+        registry.register(Box::new(redis_max_size.clone()))?;
+        registry.register(Box::new(redis_size.clone()))?;
+        registry.register(Box::new(redis_available.clone()))?;
+        registry.register(Box::new(redis_waiting.clone()))?;
+
+        let redis_pool_ref = self.pool.clone();
+        tokio::spawn(async move {
+            loop {
+                let status = redis_pool_ref.status();
+                redis_max_size.set(status.max_size as i64);
+                redis_size.set(status.size as i64);
+                redis_available.set(status.available as i64);
+                redis_waiting.set(status.waiting as i64);
+
+                tokio::time::sleep(Duration::from_secs(5)).await;
+            }
+        });
+
+        Ok(())
     }
 
     pub async fn connect(&self) -> Result<RedisConnection, DatabaseError> {

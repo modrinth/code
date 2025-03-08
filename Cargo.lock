@@ -4288,6 +4288,7 @@ dependencies = [
  "maxminddb",
  "meilisearch-sdk",
  "murmur2",
+ "prometheus",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "redis",
@@ -6133,8 +6134,15 @@ dependencies = [
  "memchr",
  "parking_lot 0.12.3",
  "procfs",
+ "protobuf",
  "thiserror 1.0.64",
 ]
+
+[[package]]
+name = "protobuf"
+version = "2.28.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
 
 [[package]]
 name = "psm"
