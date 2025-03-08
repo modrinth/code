@@ -1,6 +1,6 @@
 <script setup>
-import { Button, FileInput, Avatar, ConfirmModal } from "@modrinth/ui";
-import { UploadIcon, SaveIcon, TrashIcon } from "@modrinth/assets";
+import { Avatar, Button, ConfirmModal, FileInput } from "@modrinth/ui";
+import { SaveIcon, TrashIcon } from "@modrinth/assets";
 
 const {
   organization,
@@ -102,11 +102,11 @@ const onDeleteOrganization = useClientTry(async () => {
   <div class="normal-page__content">
     <ConfirmModal
       ref="modal_deletion"
+      :confirmation-text="organization.name"
+      :has-to-type="true"
       :title="`Are you sure you want to delete ${organization.name}?`"
       description="This will delete this organization forever (like *forever* ever)."
-      :has-to-type="true"
       proceed-label="Delete"
-      :confirmation-text="organization.name"
       @proceed="onDeleteOrganization"
     />
     <div class="universal-card">
@@ -120,24 +120,21 @@ const onDeleteOrganization = useClientTry(async () => {
       </label>
       <div class="input-group">
         <Avatar
-          :src="deletedIcon ? null : previewImage ? previewImage : organization.icon_url"
           :alt="organization.name"
-          size="md"
+          :src="deletedIcon ? null : previewImage ? previewImage : organization.icon_url"
           class="project__icon"
+          size="md"
         />
         <div class="input-stack">
           <FileInput
             id="project-icon"
+            :callback="showPreviewImage"
+            :disabled="!hasPermission"
             :max-size="262144"
-            :show-icon="true"
             accept="image/png,image/jpeg,image/gif,image/webp"
             class="btn"
             prompt="Upload icon"
-            :disabled="!hasPermission"
-            @change="showPreviewImage"
-          >
-            <UploadIcon />
-          </FileInput>
+          />
           <Button
             v-if="!deletedIcon && (previewImage || organization.icon_url)"
             :disabled="!hasPermission"
@@ -155,9 +152,9 @@ const onDeleteOrganization = useClientTry(async () => {
       <input
         id="project-name"
         v-model="name"
+        :disabled="!hasPermission"
         maxlength="2048"
         type="text"
-        :disabled="!hasPermission"
       />
 
       <label for="project-slug">
@@ -168,10 +165,10 @@ const onDeleteOrganization = useClientTry(async () => {
         <input
           id="project-slug"
           v-model="slug"
-          type="text"
-          maxlength="64"
-          autocomplete="off"
           :disabled="!hasPermission"
+          autocomplete="off"
+          maxlength="64"
+          type="text"
         />
       </div>
 
@@ -182,12 +179,12 @@ const onDeleteOrganization = useClientTry(async () => {
         <textarea
           id="project-summary"
           v-model="summary"
-          maxlength="256"
           :disabled="!hasPermission"
+          maxlength="256"
         />
       </div>
       <div class="button-group">
-        <Button color="primary" :disabled="!hasChanges" @click="onSaveChanges">
+        <Button :disabled="!hasChanges" color="primary" @click="onSaveChanges">
           <SaveIcon />
           Save changes
         </Button>
@@ -211,7 +208,7 @@ const onDeleteOrganization = useClientTry(async () => {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .summary-input {
   min-height: 8rem;
   max-width: 24rem;
