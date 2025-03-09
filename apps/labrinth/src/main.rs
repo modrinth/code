@@ -1,13 +1,16 @@
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
-use env_logger::Env;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;
 use labrinth::search;
 use labrinth::util::ratelimit::RateLimit;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
-use log::{error, info};
 use std::sync::Arc;
+use tracing::{error, info};
+use tracing_actix_web::TracingLogger;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::{fmt, EnvFilter};
 
 #[cfg(feature = "jemalloc")]
 #[global_allocator]
@@ -21,8 +24,7 @@ pub struct Pepper {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
-    env_logger::Builder::from_env(Env::default().default_filter_or("info"))
-        .init();
+    console_subscriber::init();
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
@@ -123,6 +125,7 @@ async fn main() -> std::io::Result<()> {
     // Init App
     HttpServer::new(move || {
         App::new()
+            .wrap(TracingLogger::default())
             .wrap(prometheus.clone())
             .wrap(RateLimit(Arc::clone(&labrinth_config.rate_limiter)))
             .wrap(actix_web::middleware::Compress::default())

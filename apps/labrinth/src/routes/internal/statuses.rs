@@ -114,7 +114,7 @@ pub async fn ws_init(
         .insert(socket_id);
 
     #[cfg(debug_assertions)]
-    log::info!("Connection {socket_id} opened by {}", user.id);
+    tracing::info!("Connection {socket_id} opened by {}", user.id);
 
     broadcast_friends(
         user.id,
@@ -161,7 +161,10 @@ pub async fn ws_init(
 
             #[cfg(debug_assertions)]
             if !message.is_binary() {
-                log::info!("Received message from {socket_id}: {:?}", message);
+                tracing::info!(
+                    "Received message from {socket_id}: {:?}",
+                    message
+                );
             }
 
             match message {

@@ -5,12 +5,12 @@ use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
 use ariadne::ids::base62_impl::to_base62;
 use local_import::index_local;
-use log::info;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
+use tracing::info;
 #[derive(Error, Debug)]
 pub enum IndexingError {
     #[error("Error while connecting to the MeiliSearch database")]
