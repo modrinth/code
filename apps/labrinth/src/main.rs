@@ -9,9 +9,14 @@ use std::sync::Arc;
 use tracing::{error, info};
 use tracing_actix_web::TracingLogger;
 
-#[cfg(feature = "jemalloc")]
+#[cfg(not(target_env = "msvc"))]
 #[global_allocator]
-static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
+#[allow(non_upper_case_globals)]
+#[export_name = "malloc_conf"]
+pub static malloc_conf: &[u8] =
+    b"prof:true,prof_active:true,lg_prof_sample:19\0";
 
 #[derive(Clone)]
 pub struct Pepper {
@@ -105,6 +110,8 @@ async fn main() -> std::io::Result<()> {
         .register_and_set_metrics(&prometheus.registry)
         .await
         .expect("Failed to register redis metrics");
+    labrinth::routes::debug::jemalloc_mmeory_stats(&prometheus.registry)
+        .expect("Failed to register jemalloc metrics");
 
     let search_config = search::SearchConfig::new(None);
 

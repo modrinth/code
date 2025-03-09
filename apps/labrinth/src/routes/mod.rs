@@ -12,6 +12,8 @@ pub mod internal;
 pub mod v2;
 pub mod v3;
 
+pub mod debug;
+
 pub mod v2_reroute;
 
 mod analytics;
