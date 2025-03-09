@@ -8,9 +8,6 @@ use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::sync::Arc;
 use tracing::{error, info};
 use tracing_actix_web::TracingLogger;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{fmt, EnvFilter};
 
 #[cfg(feature = "jemalloc")]
 #[global_allocator]
