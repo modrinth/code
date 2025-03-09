@@ -5,12 +5,12 @@ use labrinth::file_hosting::S3Host;
 use labrinth::search;
 use labrinth::util::ratelimit::RateLimit;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
-use tracing::{error, info};
 use std::sync::Arc;
+use tracing::{error, info};
 use tracing_actix_web::TracingLogger;
-use tracing_subscriber::{fmt, EnvFilter};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::{fmt, EnvFilter};
 
 #[cfg(feature = "jemalloc")]
 #[global_allocator]

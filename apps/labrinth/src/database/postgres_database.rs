@@ -1,9 +1,9 @@
-use tracing::info;
 use prometheus::{IntGauge, Registry};
 use sqlx::migrate::MigrateDatabase;
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use sqlx::{Connection, PgConnection, Postgres};
 use std::time::Duration;
+use tracing::info;
 
 pub async fn connect() -> Result<PgPool, sqlx::Error> {
     info!("Initializing database connection");
