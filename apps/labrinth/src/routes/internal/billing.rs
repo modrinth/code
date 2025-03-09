@@ -17,7 +17,7 @@ use crate::routes::ApiError;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::Utc;
-use log::{info, warn};
+use tracing::{info, warn};
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
 use serde::Serialize;

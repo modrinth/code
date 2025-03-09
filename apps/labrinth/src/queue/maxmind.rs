@@ -1,5 +1,5 @@
 use flate2::read::GzDecoder;
-use log::warn;
+use tracing::warn;
 use maxminddb::geoip2::Country;
 use std::io::{Cursor, Read};
 use std::net::Ipv6Addr;

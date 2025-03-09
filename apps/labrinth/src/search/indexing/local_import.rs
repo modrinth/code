@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
-use log::info;
+use tracing::info;
 use std::collections::HashMap;
 
 use super::IndexingError;

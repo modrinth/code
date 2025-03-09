@@ -1,4 +1,4 @@
-use log::info;
+use tracing::info;
 use prometheus::{IntGauge, Registry};
 use sqlx::migrate::MigrateDatabase;
 use sqlx::postgres::{PgPool, PgPoolOptions};

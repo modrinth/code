@@ -36,7 +36,7 @@ impl Drop for Scheduler {
     }
 }
 
-use log::{info, warn};
+use tracing::{info, warn};
 
 pub fn schedule_versions(
     scheduler: &mut Scheduler,

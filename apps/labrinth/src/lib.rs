@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use actix_web::web;
 use database::redis::RedisPool;
-use log::{info, warn};
+use tracing::{info, warn};
 use queue::{
     analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
     socket::ActiveSockets,
