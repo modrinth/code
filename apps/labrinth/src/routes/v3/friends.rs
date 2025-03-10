@@ -14,7 +14,6 @@ use crate::sync::status::get_user_status;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
-use redis::AsyncCommands;
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

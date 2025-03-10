@@ -1,7 +1,6 @@
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
-use env_logger::Env;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;

@@ -3,8 +3,8 @@ use crate::queue::payouts::process_payout;
 use crate::search;
 use crate::search::indexing::index_projects;
 use clap::ValueEnum;
-use log::{info, warn};
 use sqlx::Postgres;
+use tracing::{info, warn};
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
 #[clap(rename_all = "kebab_case")]
@@ -127,10 +127,10 @@ mod version_updater {
     use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
     use crate::database::redis::RedisPool;
     use chrono::{DateTime, Utc};
-    use log::warn;
     use serde::Deserialize;
     use sqlx::Postgres;
     use thiserror::Error;
+    use tracing::warn;
 
     #[derive(Deserialize)]
     struct InputFormat<'a> {
