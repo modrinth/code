@@ -285,6 +285,14 @@ onMounted(() => {
   install.setIncompatibilityWarningModal(incompatibilityWarningModal)
   install.setInstallConfirmModal(installConfirmModal)
   install.setModInstallModal(modInstallModal)
+
+  new MutationObserver(() =>
+    document.querySelectorAll("img").forEach((img) => {
+      img.onload = () => {
+        if (img.naturalWidth < 32 || img.naturalHeight < 32) img.style.imageRendering = "pixelated";
+      };
+    }),
+  ).observe(document.body, { childList: true, subtree: true });
 })
 
 const accounts = ref(null)
