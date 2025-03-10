@@ -352,7 +352,13 @@ pub fn app_config(
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
-    .configure(routes::debug::config)
+    .configure(
+        #[allow(unused_variables)]
+        |cfg| {
+            #[cfg(not(target_env = "msvc"))]
+            routes::debug::config(cfg)
+        },
+    )
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)

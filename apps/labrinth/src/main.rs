@@ -110,6 +110,8 @@ async fn main() -> std::io::Result<()> {
         .register_and_set_metrics(&prometheus.registry)
         .await
         .expect("Failed to register redis metrics");
+
+    #[cfg(not(target_env = "msvc"))]
     labrinth::routes::debug::jemalloc_mmeory_stats(&prometheus.registry)
         .expect("Failed to register jemalloc metrics");
 
