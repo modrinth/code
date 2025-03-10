@@ -247,6 +247,10 @@ pub async fn delphi_result_ingest(
                 path
             ));
         }
+
+        if trace.is_empty() {
+            thread_header.push_str(&format!("\n\n- issue {issue} found",));
+        }
     }
 
     let mut transaction = pool.begin().await?;
