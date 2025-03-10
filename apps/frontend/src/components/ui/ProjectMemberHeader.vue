@@ -336,6 +336,7 @@ const nags = computed(() => [
     },
   },
   {
+    hide: props.project.stats === "draft",
     condition: props.tags.rejectedStatuses.includes(props.project.status),
     title: "Resubmit for review",
     id: "resubmit-for-review",
