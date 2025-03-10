@@ -4,12 +4,12 @@ use std::time::Duration;
 
 use actix_web::web;
 use database::redis::RedisPool;
-use log::{info, warn};
 use queue::{
     analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
     socket::ActiveSockets,
 };
 use sqlx::Postgres;
+use tracing::{info, warn};
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
@@ -329,6 +329,13 @@ pub fn app_config(
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
+    .configure(
+        #[allow(unused_variables)]
+        |cfg| {
+            #[cfg(not(target_env = "msvc"))]
+            routes::debug::config(cfg)
+        },
+    )
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)

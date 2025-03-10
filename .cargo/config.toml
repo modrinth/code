@@ -1,3 +1,6 @@
 # Windows has stack overflows when calling from Tauri, so we increase compiler size
 [target.'cfg(windows)']
 rustflags = ["-C", "link-args=/STACK:16777220"]
+
+[build]
+rustflags = ["--cfg", "tokio_unstable"]

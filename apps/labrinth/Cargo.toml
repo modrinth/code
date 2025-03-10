@@ -21,6 +21,11 @@ prometheus = "0.13.4"
 actix-web-prom = { version = "0.9.0", features = ["process"] }
 governor = "0.6.3"
 
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"
+tracing-actix-web = "0.7.16"
+console-subscriber = "0.4.1"
+
 tokio = { version = "1.35.1", features = ["sync"] }
 tokio-stream = "0.1.14"
 
@@ -74,8 +79,6 @@ censor = "0.3.0"
 spdx = { version = "0.10.3", features = ["text"] }
 
 dotenvy = "0.15.7"
-log = "0.4.20"
-env_logger = "0.10.1"
 thiserror = "1.0.56"
 either = "1.13"
 
@@ -122,8 +125,6 @@ lettre = "0.11.3"
 derive-new = "0.6.0"
 rust_iso3166 = "0.1.11"
 
-jemallocator = { version = "0.5.4", optional = true }
-
 async-stripe = { version = "0.39.1", features = ["runtime-tokio-hyper-rustls"] }
 rusty-money = "0.4.1"
 json-patch = "*"
@@ -132,8 +133,10 @@ ariadne = { path = "../../packages/ariadne" }
 
 clap = { version = "4.5", features = ["derive"] }
 
+[target.'cfg(not(target_env = "msvc"))'.dependencies]
+tikv-jemallocator = { version = "0.6.0", features = ["profiling", "unprefixed_malloc_on_supported_platforms"] }
+tikv-jemalloc-ctl = { version = "0.6.0", features = ["stats"] }
+jemalloc_pprof = { version = "0.7.0", features = ["flamegraph"] }
+
 [dev-dependencies]
 actix-http = "3.4.0"
-
-[features]
-jemalloc = ["jemallocator"]

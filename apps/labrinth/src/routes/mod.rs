@@ -12,6 +12,9 @@ pub mod internal;
 pub mod v2;
 pub mod v3;
 
+#[cfg(not(target_env = "msvc"))]
+pub mod debug;
+
 pub mod v2_reroute;
 
 mod analytics;
