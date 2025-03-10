@@ -12,9 +12,14 @@ use sqlx::SqlitePool;
 use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::path::Path;
+use ts_rs::TS;
 
 // Represent a Minecraft instance.
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 pub struct Profile {
     pub path: String,
     pub install_stage: ProfileInstallStage,
@@ -47,7 +52,11 @@ pub struct Profile {
     pub hooks: Hooks,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 #[serde(rename_all = "snake_case")]
 pub enum ProfileInstallStage {
     /// Profile is installed
@@ -86,7 +95,11 @@ impl ProfileInstallStage {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 pub struct LinkedData {
     pub project_id: String,
     pub version_id: String,
@@ -94,7 +107,11 @@ pub struct LinkedData {
     pub locked: bool,
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 #[serde(rename_all = "lowercase")]
 pub enum ModLoader {
     Vanilla,
@@ -137,7 +154,11 @@ impl ModLoader {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 pub struct ProfileFile {
     pub hash: String,
     pub file_name: String,
@@ -147,13 +168,21 @@ pub struct ProfileFile {
     pub project_type: ProjectType,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 pub struct FileMetadata {
     pub project_id: String,
     pub version_id: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectType {
     Mod,
