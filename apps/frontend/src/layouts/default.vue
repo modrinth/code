@@ -540,7 +540,7 @@
     <footer
       class="footer-brand-background experimental-styles-within mt-6 border-0 border-t-[1px] border-solid"
     >
-      <div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-12 sm:px-12 md:py-12">
+      <div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
         <div
           class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
         >
