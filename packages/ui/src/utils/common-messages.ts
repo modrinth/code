@@ -97,6 +97,10 @@ export const commonMessages = defineMessages({
     id: 'label.rejected',
     defaultMessage: 'Rejected',
   },
+  removeButton: {
+    id: 'button.remove',
+    defaultMessage: 'Remove',
+  },
   reportButton: {
     id: 'button.report',
     defaultMessage: 'Report',
