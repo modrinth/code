@@ -2,7 +2,14 @@
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { Ref } from 'vue'
 import { SearchIcon, XIcon, ClipboardCopyIcon, GlobeIcon, ExternalIcon } from '@modrinth/assets'
-import type { Category, GameVersion, Platform, ProjectType, SortType, Tags } from '@modrinth/ui'
+import type {
+  CategoryTag,
+  GameVersionTag,
+  PlatformTag,
+  ProjectType,
+  SortType,
+  Tags,
+} from '@modrinth/ui'
 import {
   SearchFilterControl,
   SearchSidebarFilter,
@@ -22,11 +29,13 @@ import SearchCard from '@/components/ui/SearchCard.vue'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_search_results } from '@/helpers/cache.js'
 import NavTabs from '@/components/ui/NavTabs.vue'
-import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import type { GameInstance } from '@/helpers/types'
+import { InstanceContentMap, useInstanceContext } from '@/composables/instance-context.ts'
+import type { SearchResult } from '@modrinth/utils'
 
 const { formatMessage } = useVIntl()
 
@@ -38,62 +47,45 @@ const projectTypes = computed(() => {
 })
 
 const [categories, loaders, availableGameVersions] = await Promise.all([
-  get_categories().catch(handleError).then(ref),
-  get_loaders().catch(handleError).then(ref),
-  get_game_versions().catch(handleError).then(ref),
+  get_categories()
+    .catch(handleError)
+    .then((x: CategoryTag[]) => ref(x)),
+  get_loaders()
+    .catch(handleError)
+    .then((x: PlatformTag[]) => ref(x)),
+  get_game_versions()
+    .catch(handleError)
+    .then((x: GameVersionTag[]) => ref(x)),
 ])
 
 const tags: Ref<Tags> = computed(() => ({
-  gameVersions: availableGameVersions.value as GameVersion[],
-  loaders: loaders.value as Platform[],
-  categories: categories.value as Category[],
+  gameVersions: availableGameVersions.value as GameVersionTag[],
+  loaders: loaders.value as PlatformTag[],
+  categories: categories.value as CategoryTag[],
 }))
 
-type Instance = {
-  game_version: string
-  loader: string
-  path: string
-  install_stage: string
-  icon_path?: string
-  name: string
-}
-
-type InstanceProject = {
-  metadata: {
-    project_id: string
-  }
-}
-
-const instance: Ref<Instance | null> = ref(null)
-const instanceProjects: Ref<InstanceProject[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
-const newlyInstalled = ref([])
+const newlyInstalled: Ref<string[]> = ref([])
+
+const { instance, instanceContent } = await useInstanceContext()
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
-await updateInstanceContext()
+await checkHideInstalledQuery()
 
-watch(route, () => {
-  updateInstanceContext()
+watch(instance, () => {
+  checkHideInstalledQuery()
 })
 
-async function updateInstanceContext() {
-  if (route.query.i) {
-    ;[instance.value, instanceProjects.value] = await Promise.all([
-      getInstance(route.query.i).catch(handleError),
-      getInstanceProjects(route.query.i).catch(handleError),
-    ])
-    newlyInstalled.value = []
-  }
-
+async function checkHideInstalledQuery() {
   if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === 'modpack')) {
     instanceHideInstalled.value = route.query.ai === 'true'
   }
 
-  if (instance.value && instance.value.path !== route.query.i && route.path.startsWith('/browse')) {
-    instance.value = null
-    instanceHideInstalled.value = false
-  }
+  // if (instance.value && instance.value.path !== route.query.i && route.path.startsWith('/browse')) {
+  //   instance.value = undefined
+  //   instanceHideInstalled.value = false
+  // }
 }
 
 const instanceFilters = computed(() => {
@@ -119,10 +111,10 @@ const instanceFilters = computed(() => {
       })
     }
 
-    if (instanceHideInstalled.value && instanceProjects.value) {
-      const installedMods = Object.values(instanceProjects.value)
+    if (instanceHideInstalled.value && instanceContent.value) {
+      const installedMods: string[] = Object.values(instanceContent.value)
         .filter((x) => x.metadata)
-        .map((x) => x.metadata.project_id)
+        .map((x) => x.metadata!.project_id)
 
       installedMods.push(...newlyInstalled.value)
 
@@ -173,23 +165,27 @@ breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: rout
 
 const loading = ref(true)
 
-const projectType = ref(route.params.projectType)
+const projectType: Ref<ProjectType | undefined> = ref(
+  typeof route.params.projectType === 'string'
+    ? (route.params.projectType as ProjectType)
+    : undefined,
+)
 
 watch(projectType, () => {
   loading.value = true
 })
 
-type SearchResult = {
-  project_id: string
+type ExtendedSearchResult = SearchResult & {
+  installed?: boolean
 }
 
 type SearchResults = {
   total_hits: number
   limit: number
-  hits: SearchResult[]
+  hits: ExtendedSearchResult[]
 }
 
-const results: Ref<SearchResults | null> = shallowRef(null)
+const results: Ref<SearchResults | undefined> = shallowRef()
 const pageCount = computed(() =>
   results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
 )
@@ -200,7 +196,7 @@ watch(requestParams, () => {
 })
 
 async function refreshSearch() {
-  let rawResults = await get_search_results(requestParams.value)
+  let rawResults = (await get_search_results(requestParams.value)) as { result: SearchResults }
   if (!rawResults) {
     rawResults = {
       result: {
@@ -211,13 +207,15 @@ async function refreshSearch() {
     }
   }
   if (instance.value) {
-    for (const val of rawResults.result.hits) {
-      val.installed =
-        newlyInstalled.value.includes(val.project_id) ||
-        Object.values(instanceProjects.value).some(
-          (x) => x.metadata && x.metadata.project_id === val.project_id,
-        )
-    }
+    rawResults.result.hits.map((x) => ({
+      ...x,
+      installed:
+        newlyInstalled.value.includes(x.project_id) ||
+        (instanceContent.value &&
+          Object.values(instanceContent.value).some(
+            (content) => content.metadata && content.metadata.project_id === x.project_id,
+          )),
+    }))
   }
   results.value = rawResults.result
 
@@ -271,9 +269,9 @@ watch(
   () => route.params.projectType,
   async (newType) => {
     // Check if the newType is not the same as the current value
-    if (!newType || newType === projectType.value) return
+    if (!newType || newType === projectType.value || typeof newType !== 'string') return
 
-    projectType.value = newType
+    projectType.value = newType as ProjectType
 
     currentSortType.value = { display: 'Relevance', name: 'relevance' }
     query.value = ''
@@ -287,7 +285,7 @@ const selectableProjectTypes = computed(() => {
 
   if (instance.value) {
     if (
-      availableGameVersions.value.findIndex((x) => x.version === instance.value.game_version) <=
+      availableGameVersions.value.findIndex((x) => x.version === instance.value?.game_version) <=
       availableGameVersions.value.findIndex((x) => x.version === '1.13')
     ) {
       dataPacks = true
@@ -353,9 +351,10 @@ const messages = defineMessages({
   },
 })
 
-const options = ref(null)
-const handleRightClick = (event, result) => {
-  options.value.showMenu(event, result, [
+const options: Ref<InstanceType<typeof ContextMenu> | null> = ref(null)
+
+const handleRightClick = (event: MouseEvent, result: ExtendedSearchResult) => {
+  options.value?.showMenu(event, result, [
     {
       name: 'open_link',
     },
@@ -364,7 +363,7 @@ const handleRightClick = (event, result) => {
     },
   ])
 }
-const handleOptionsClick = (args) => {
+const handleOptionsClick = (args: { item: ExtendedSearchResult; option: string }) => {
   switch (args.option) {
     case 'open_link':
       openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
@@ -477,33 +476,26 @@ await refreshSearch()
       <section v-if="loading" class="offline">
         <LoadingIndicator />
       </section>
-      <section v-else-if="offline && results.total_hits === 0" class="offline">
+      <section v-else-if="offline && (!results || results.total_hits === 0)" class="offline">
         You are currently offline. Connect to the internet to browse Modrinth!
       </section>
-      <section v-else class="project-list display-mode--list instance-results" role="list">
+      <section
+        v-else-if="results"
+        class="project-list display-mode--list instance-results"
+        role="list"
+      >
         <SearchCard
           v-for="result in results.hits"
           :key="result?.project_id"
           :project="result"
           :instance="instance"
-          :categories="[
-            ...categories.filter(
-              (cat) =>
-                result?.display_categories.includes(cat.name) && cat.project_type === projectType,
-            ),
-            ...loaders.filter(
-              (loader) =>
-                result?.display_categories.includes(loader.name) &&
-                loader.supported_project_types?.includes(projectType),
-            ),
-          ]"
           :installed="result.installed || newlyInstalled.includes(result.project_id)"
           @install="
             (id) => {
               newlyInstalled.push(id)
             }
           "
-          @contextmenu.prevent.stop="(event) => handleRightClick(event, result)"
+          @contextmenu.prevent.stop="(event: MouseEvent) => handleRightClick(event, result)"
         />
         <ContextMenu ref="options" @option-clicked="handleOptionsClick">
           <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
