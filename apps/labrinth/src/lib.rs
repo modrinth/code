@@ -4,12 +4,12 @@ use std::time::Duration;
 
 use actix_web::web;
 use database::redis::RedisPool;
-use log::{info, warn};
 use queue::{
     analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
     socket::ActiveSockets,
 };
 use sqlx::Postgres;
+use tracing::{info, warn};
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
@@ -297,7 +297,7 @@ pub fn app_setup(
     }
 
     let ip_salt = Pepper {
-        pepper: models::ids::Base62Id(models::ids::random_base62(11))
+        pepper: ariadne::ids::Base62Id(ariadne::ids::random_base62(11))
             .to_string(),
     };
 
@@ -352,6 +352,13 @@ pub fn app_config(
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
+    .configure(
+        #[allow(unused_variables)]
+        |cfg| {
+            #[cfg(not(target_env = "msvc"))]
+            routes::debug::config(cfg)
+        },
+    )
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)
@@ -473,6 +480,7 @@ pub fn check_env_vars() -> bool {
         failed |= true;
     }
 
+    failed |= check_var::<bool>("CLICKHOUSE_REPLICATED");
     failed |= check_var::<String>("CLICKHOUSE_URL");
     failed |= check_var::<String>("CLICKHOUSE_USER");
     failed |= check_var::<String>("CLICKHOUSE_PASSWORD");
@@ -493,6 +501,8 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("BREX_API_KEY");
 
     failed |= check_var::<String>("DELPHI_URL");
+
+    failed |= check_var::<String>("ARCHON_URL");
 
     failed
 }

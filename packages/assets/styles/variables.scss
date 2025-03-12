@@ -56,6 +56,11 @@
     rgba(68, 182, 138, 0.175) 0%,
     rgba(58, 250, 112, 0.125) 100%
   );
+  --brand-gradient-strong-bg: linear-gradient(
+    270deg,
+    rgba(68, 182, 138, 0.175) 0%,
+    rgba(36, 225, 91, 0.12) 100%
+  );
   --brand-gradient-button: rgba(255, 255, 255, 0.5);
   --brand-gradient-border: rgba(32, 64, 32, 0.15);
   --brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(213, 235, 224, 0), #d0ece0 70%);
@@ -167,6 +172,7 @@ html {
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
 
   --brand-gradient-bg: linear-gradient(0deg, rgba(14, 35, 19, 0.2) 0%, rgba(55, 137, 73, 0.1) 100%);
+  --brand-gradient-strong-bg: linear-gradient(270deg, #09110d 10%, #131f17 100%);
   --brand-gradient-button: rgba(255, 255, 255, 0.08);
   --brand-gradient-border: rgba(155, 255, 160, 0.08);
   --brand-gradient-fade-out-color: linear-gradient(to bottom, rgba(24, 30, 31, 0), #171d1e 80%);
@@ -205,6 +211,15 @@ html {
     rgba(22, 66, 51, 0.15) 0%,
     rgba(55, 137, 73, 0.1) 100%
   );
+  --brand-gradient-strong-bg: linear-gradient(
+    270deg,
+    rgba(9, 18, 14, 0.6) 10%,
+    rgba(19, 31, 23, 0.5) 100%
+  );
+}
+
+.retro-mode {
+  --brand-gradient-strong-bg: #3a3b38;
 }
 
 .experimental-styles-within {

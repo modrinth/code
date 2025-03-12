@@ -31,11 +31,11 @@ use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use itertools::Itertools;
-use log::error;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use tracing::error;
 use validator::Validate;
 
 fn default_requested_status() -> VersionStatus {
@@ -985,7 +985,7 @@ pub async fn upload_file(
 
     let client = reqwest::Client::new();
     let delphi_url = dotenvy::var("DELPHI_URL")?;
-    let res = client
+    match client
         .post(delphi_url)
         .json(&serde_json::json!({
             "url": url,
@@ -993,10 +993,16 @@ pub async fn upload_file(
             "version_id": version_id,
         }))
         .send()
-        .await?;
-
-    if !res.status().is_success() {
-        error!("Failed to upload file to Delphi: {url}");
+        .await
+    {
+        Ok(res) => {
+            if !res.status().is_success() {
+                error!("Failed to upload file to Delphi: {url}");
+            }
+        }
+        Err(e) => {
+            error!("Failed to upload file to Delphi: {url}: {e}");
+        }
     }
 
     version_files.push(VersionFileBuilder {

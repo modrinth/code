@@ -12,6 +12,9 @@ pub mod internal;
 pub mod v2;
 pub mod v3;
 
+#[cfg(not(target_env = "msvc"))]
+pub mod debug;
+
 pub mod v2_reroute;
 
 mod analytics;
@@ -117,7 +120,7 @@ pub enum ApiError {
     #[error("Captcha Error. Try resubmitting the form.")]
     Turnstile,
     #[error("Error while decoding Base62: {0}")]
-    Decoding(#[from] crate::models::ids::DecodingError),
+    Decoding(#[from] ariadne::ids::DecodingError),
     #[error("Image Parsing Error: {0}")]
     ImageParse(#[from] image::ImageError),
     #[error("Password Hashing Error: {0}")]

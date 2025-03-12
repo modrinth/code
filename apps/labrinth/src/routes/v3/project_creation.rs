@@ -8,7 +8,6 @@ use crate::database::models::{self, image_item, User};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
-use crate::models::ids::base62_impl::to_base62;
 use crate::models::ids::{ImageId, OrganizationId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
@@ -28,6 +27,7 @@ use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::stream::StreamExt;
 use image::ImageError;
@@ -86,8 +86,6 @@ pub enum CreateError {
     CustomAuthenticationError(String),
     #[error("Image Parsing Error: {0}")]
     ImageError(#[from] ImageError),
-    #[error("Reroute Error: {0}")]
-    RerouteError(#[from] reqwest::Error),
 }
 
 impl actix_web::ResponseError for CreateError {
@@ -119,7 +117,6 @@ impl actix_web::ResponseError for CreateError {
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
-            CreateError::RerouteError(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -146,7 +143,6 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::ValidationError(..) => "invalid_input",
                 CreateError::FileValidationError(..) => "invalid_input",
                 CreateError::ImageError(..) => "invalid_image",
-                CreateError::RerouteError(..) => "reroute_error",
             },
             description: self.to_string(),
         })

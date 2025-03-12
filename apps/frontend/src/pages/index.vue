@@ -65,7 +65,7 @@
       <div class="users-section">
         <div class="section-header">
           <div class="section-label green">For Players</div>
-          <h2 class="section-tagline">Discover over 10,000 creations</h2>
+          <h2 class="section-tagline">Discover over 50,000 creations</h2>
           <p class="section-description">
             From magical biomes to cursed dungeons, you can be sure to find content to bring your
             gameplay to the next level.

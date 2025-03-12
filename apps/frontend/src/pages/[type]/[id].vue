@@ -460,6 +460,10 @@
       class="new-page sidebar"
       :class="{
         'alt-layout': cosmetics.leftContentLayout,
+        'ultimate-sidebar':
+          showModerationChecklist &&
+          !collapsedModerationChecklist &&
+          !flags.alwaysShowChecklistAsPopup,
       }"
     >
       <div class="normal-page__header relative my-4">
@@ -631,7 +635,7 @@
                       auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
                     color: 'red',
                     hoverOnly: true,
-                    shown: !currentMember,
+                    shown: !isMember,
                   },
                   { id: 'copy-id', action: () => copyId() },
                 ]"
@@ -674,7 +678,7 @@
           :auth="auth"
           :tags="tags"
         />
-        <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="mb-4">
+        <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
           {{ project.title }} has been archived. {{ project.title }} will not receive any further
           updates unless the author decides to unarchive the project.
         </MessageBanner>
@@ -802,15 +806,21 @@
           :reset-members="resetMembers"
           :route="route"
           @on-download="triggerDownloadAnimation"
+          @delete-version="deleteVersion"
+        />
+      </div>
+      <div class="normal-page__ultimate-sidebar">
+        <ModerationChecklist
+          v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+          :project="project"
+          :future-projects="futureProjects"
+          :reset-project="resetProject"
+          :collapsed="collapsedModerationChecklist"
+          @exit="showModerationChecklist = false"
+          @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
         />
       </div>
     </div>
-    <ModerationChecklist
-      v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-      :project="project"
-      :future-projects="futureProjects"
-      :reset-project="resetProject"
-    />
   </div>
 </template>
 <script setup>
@@ -1203,6 +1213,10 @@ const members = computed(() => {
   return owner ? [owner, ...rest] : rest;
 });
 
+const isMember = computed(
+  () => auth.value.user && allMembers.value.some((x) => x.user.id === auth.value.user.id),
+);
+
 const currentMember = computed(() => {
   let val = auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null;
 
@@ -1426,6 +1440,7 @@ async function copyId() {
 const collapsedChecklist = ref(false);
 
 const showModerationChecklist = ref(false);
+const collapsedModerationChecklist = ref(false);
 const futureProjects = ref([]);
 if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;
@@ -1449,6 +1464,20 @@ function onDownload(event) {
   setTimeout(() => {
     closeDownloadModal(event);
   }, 400);
+}
+
+async function deleteVersion(id) {
+  if (!id) return;
+
+  startLoading();
+
+  await useBaseFetch(`version/${id}`, {
+    method: "DELETE",
+  });
+
+  versions.value = versions.value.filter((x) => x.id !== id);
+
+  stopLoading();
 }
 
 const navLinks = computed(() => {

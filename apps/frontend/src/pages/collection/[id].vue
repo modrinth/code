@@ -1,7 +1,7 @@
 <template>
   <div>
-    <ModalConfirm
-      v-if="auth.user && auth.user.id === creator.id"
+    <ConfirmModal
+      v-if="canEdit"
       ref="deleteModal"
       :title="formatMessage(messages.deleteModalTitle)"
       :description="formatMessage(messages.deleteModalDescription)"
@@ -365,34 +365,35 @@
 
 <script setup>
 import {
+  BoxIcon,
   CalendarIcon,
   EditIcon,
-  XIcon,
-  SaveIcon,
-  UploadIcon,
-  TrashIcon,
-  LinkIcon,
-  LockIcon,
   GridIcon,
   ImageIcon,
-  ListIcon,
-  UpdatedIcon,
   LibraryIcon,
-  BoxIcon,
+  LinkIcon,
+  ListIcon,
+  LockIcon,
+  SaveIcon,
+  TrashIcon,
+  UpdatedIcon,
+  UploadIcon,
+  XIcon,
 } from "@modrinth/assets";
 import {
-  PopoutMenu,
-  FileInput,
-  DropdownSelect,
   Avatar,
   Button,
   commonMessages,
+  ConfirmModal,
+  DropdownSelect,
+  FileInput,
+  PopoutMenu,
 } from "@modrinth/ui";
 
+import { isAdmin } from "@modrinth/utils";
 import WorldIcon from "assets/images/utils/world.svg";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
 import { addNotification } from "~/composables/notifs.js";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
@@ -596,7 +597,7 @@ useSeoMeta({
 const canEdit = computed(
   () =>
     auth.value.user &&
-    auth.value.user.id === collection.value.user &&
+    (auth.value.user.id === collection.value.user || isAdmin(auth.value.user)) &&
     collection.value.id !== "following",
 );
 
@@ -650,7 +651,7 @@ async function saveChanges() {
       method: "PATCH",
       body: {
         name: name.value,
-        description: summary.value,
+        description: summary.value || null,
         status: visibility.value,
         new_projects: newProjectIds,
       },
@@ -685,7 +686,11 @@ async function deleteCollection() {
       method: "DELETE",
       apiVersion: 3,
     });
-    await navigateTo("/dashboard/collections");
+    if (auth.value.user.id === collection.value.user) {
+      await navigateTo("/dashboard/collections");
+    } else {
+      await navigateTo(`/user/${collection.value.user}/collections`);
+    }
   } catch (err) {
     addNotification({
       group: "main",

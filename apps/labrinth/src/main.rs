@@ -1,17 +1,22 @@
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
-use env_logger::Env;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;
 use labrinth::search;
 use labrinth::util::ratelimit::RateLimit;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
-use log::{error, info};
 use std::sync::Arc;
+use tracing::{error, info};
+use tracing_actix_web::TracingLogger;
 
-#[cfg(feature = "jemalloc")]
+#[cfg(not(target_env = "msvc"))]
 #[global_allocator]
-static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
+#[allow(non_upper_case_globals)]
+#[export_name = "malloc_conf"]
+pub static malloc_conf: &[u8] =
+    b"prof:true,prof_active:true,lg_prof_sample:19\0";
 
 #[derive(Clone)]
 pub struct Pepper {
@@ -21,8 +26,7 @@ pub struct Pepper {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
-    env_logger::Builder::from_env(Env::default().default_filter_or("info"))
-        .init();
+    console_subscriber::init();
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
@@ -92,9 +96,24 @@ async fn main() -> std::io::Result<()> {
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")
+        .exclude_regex(r"^/api/v1/.*$")
+        .exclude_regex(r"^/maven/.*$")
         .exclude("/_internal/launcher_socket")
+        .mask_unmatched_patterns("UNKNOWN")
         .build()
         .expect("Failed to create prometheus metrics middleware");
+
+    database::register_and_set_metrics(&pool, &prometheus.registry)
+        .await
+        .expect("Failed to register database metrics");
+    redis_pool
+        .register_and_set_metrics(&prometheus.registry)
+        .await
+        .expect("Failed to register redis metrics");
+
+    #[cfg(not(target_env = "msvc"))]
+    labrinth::routes::debug::jemalloc_mmeory_stats(&prometheus.registry)
+        .expect("Failed to register jemalloc metrics");
 
     let search_config = search::SearchConfig::new(None);
 
@@ -112,6 +131,7 @@ async fn main() -> std::io::Result<()> {
     // Init App
     HttpServer::new(move || {
         App::new()
+            .wrap(TracingLogger::default())
             .wrap(prometheus.clone())
             .wrap(RateLimit(Arc::clone(&labrinth_config.rate_limiter)))
             .wrap(actix_web::middleware::Compress::default())

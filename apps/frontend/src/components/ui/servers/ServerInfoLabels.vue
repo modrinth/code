@@ -2,19 +2,18 @@
   <div>
     <UiServersServerGameLabel
       v-if="showGameLabel"
-      :game="serverData.game!"
+      :game="serverData.game"
       :mc-version="serverData.mc_version ?? ''"
       :is-link="linked"
     />
     <UiServersServerLoaderLabel
-      v-if="showLoaderLabel"
-      :loader="serverData.loader!"
+      :loader="serverData.loader"
       :loader-version="serverData.loader_version ?? ''"
       :no-separator="column"
       :is-link="linked"
     />
     <UiServersServerSubdomainLabel
-      v-if="serverData.net.domain"
+      v-if="serverData.net?.domain"
       :subdomain="serverData.net.domain"
       :no-separator="column"
       :is-link="linked"

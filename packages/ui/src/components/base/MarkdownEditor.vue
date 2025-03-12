@@ -225,7 +225,7 @@
         </template>
       </div>
       <div class="preview">
-        <Toggle id="preview" v-model="previewMode" :checked="previewMode" />
+        <Toggle id="preview" v-model="previewMode" />
         <label class="label" for="preview"> Preview </label>
       </div>
     </div>
@@ -263,31 +263,31 @@
 </template>
 
 <script setup lang="ts">
-import { type Component, computed, ref, onMounted, onBeforeUnmount, toRef, watch } from 'vue'
+import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
 import { markdown } from '@codemirror/lang-markdown'
-import { indentWithTab, historyKeymap, history } from '@codemirror/commands'
+import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import {
+  AlignLeftIcon,
+  BoldIcon,
+  CodeIcon,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
-  BoldIcon,
+  ImageIcon,
+  InfoIcon,
   ItalicIcon,
-  ScanEyeIcon,
-  StrikethroughIcon,
-  CodeIcon,
+  LinkIcon,
   ListBulletedIcon,
   ListOrderedIcon,
-  TextQuoteIcon,
-  LinkIcon,
-  ImageIcon,
-  YouTubeIcon,
-  AlignLeftIcon,
   PlusIcon,
-  XIcon,
+  ScanEyeIcon,
+  StrikethroughIcon,
+  TextQuoteIcon,
   UploadIcon,
-  InfoIcon,
+  XIcon,
+  YouTubeIcon,
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlight'
@@ -300,8 +300,8 @@ import Chips from './Chips.vue'
 const props = withDefaults(
   defineProps<{
     modelValue: string
-    disabled: boolean
-    headingButtons: boolean
+    disabled?: boolean
+    headingButtons?: boolean
     /**
      * @param file The file to upload
      * @throws If the file is invalid or the upload fails
@@ -947,5 +947,9 @@ function openVideoModal() {
   opacity: 0.6;
   pointer-events: none;
   cursor: not-allowed;
+}
+
+:deep(.cm-content) {
+  overflow: auto;
 }
 </style>
