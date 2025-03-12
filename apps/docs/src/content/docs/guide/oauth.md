@@ -3,7 +3,7 @@ title: The hitchhiker's guide to OAuth
 description: Guide for using Modrinth OAuth to interact with the API on users' behalf.
 ---
 
-Modrinth allows developers to create applications which, once authorized by a Modrinth user, let the developer interact with the API on their behalf. The flow used to get an API token is based on the OAuth 2 protocol. It is recommended that most people use an existing OAuth library to handle the authentication. If you want to implement it from scratch, you will need to look into [RFC 6749].
+Modrinth allows developers to create applications which, once authorized by a Modrinth user, let the developer interact with the API on their behalf. The flow used to get an API token is based on the OAuth 2 protocol. It is recommended that most people use an existing OAuth library to handle the authentication. If you want to implement it from scratch, you will need to look into [RFC 6749]. If the only user of the application is yourself, a personal access token (PAT) may be a better fit.
 
 If you're familiar with OAuth 2, these are the URLs you will need:
 
