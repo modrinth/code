@@ -1420,7 +1420,8 @@ impl CachedEntry {
 
         sqlx::query!(
             "
-            INSERT INTO cache (id, data_type, alias, data, expires)
+            MERGE INTO cache AS target
+            USING (
                 SELECT
                     json_extract(value, '$.id') AS id,
                     json_extract(value, '$.data_type') AS data_type,
@@ -1430,15 +1431,44 @@ impl CachedEntry {
                 FROM
                     json_each($1)
                 WHERE TRUE
-            ON CONFLICT (id, data_type) DO UPDATE SET
-                alias = excluded.alias,
-                data = excluded.data,
-                expires = excluded.expires
+            ) as items
+            ON target.data_type = items.data_type AND target.alias = items.alias
+            WHEN MATCHED THEN
+                UPDATE SET id = items.id,
+                           data_type = items.data_type,
+                           alias = items.alias,
+                           data = items.data,
+                           expires = items.expires
+            WHEN NOT MATCHED THEN
+                INSERT (id, data_type, alias, data, expires)
+                VALUES (items.id, items.data_type, items.alias, items.data, items.expires)
             ",
-            items,
+            items
         )
-        .execute(exec)
-        .await?;
+            .execute(exec)
+            .await?;
+
+        // sqlx::query!(
+        //     "
+        //     INSERT INTO cache (id, data_type, alias, data, expires)
+        //         SELECT
+        //             json_extract(value, '$.id') AS id,
+        //             json_extract(value, '$.data_type') AS data_type,
+        //             json_extract(value, '$.alias') AS alias,
+        //             json_extract(value, '$.data') AS data,
+        //             json_extract(value, '$.expires') AS expires
+        //         FROM
+        //             json_each($1)
+        //         WHERE TRUE
+        //     ON CONFLICT (id, data_type) DO UPDATE SET
+        //         alias = excluded.alias,
+        //         data = excluded.data,
+        //         expires = excluded.expires
+        //     ",
+        //     items,
+        // )
+        // .execute(exec)
+        // .await?;
 
         Ok(())
     }
