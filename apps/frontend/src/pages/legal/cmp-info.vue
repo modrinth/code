@@ -125,9 +125,9 @@
       <a href="https://github.com/modrinth/code/blob/main/apps/labrinth/src/queue/payouts.rs#L598">
         revenue distribution system</a
       >. We also have an
-      <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a> that allows users
-      to query exact daily revenue for the site - so far, Modrinth has generated
-      <strong>{{ formatMoney(platformRevenue) }}</strong> in revenue.
+      <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>
+      to query the exact daily advertising revenue for the site - so far, creators on Modrinth have
+      earned a total of <strong>{{ formatMoney(platformRevenue) }}</strong> in ad revenue.
     </p>
     <table>
       <thead>
@@ -148,7 +148,7 @@
       </tbody>
     </table>
     <small
-      >Modrinth's total revenue in the previous 5 days, for the entire dataset, use the
+      >Modrinth's total ad revenue in the previous 5 days, for the entire dataset, use the
       aforementioned
       <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>.</small
     >
