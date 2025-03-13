@@ -28,13 +28,15 @@
             :disabled="!submissionConfirmation"
             @click="resubmit()"
           >
-            <ModerationIcon aria-hidden="true" /> Resubmit for review
+            <ScaleIcon aria-hidden="true" />
+            Resubmit for review
           </button>
         </div>
       </div>
     </Modal>
     <div v-if="flags.developerMode" class="thread-id">
-      Thread ID: <CopyCode :text="thread.id" />
+      Thread ID:
+      <CopyCode :text="thread.id" />
     </div>
     <div v-if="sortedMessages.length > 0" class="messages universal-card recessed">
       <ThreadMessage
@@ -52,7 +54,8 @@
     <template v-if="report && report.closed">
       <p>This thread is closed and new messages cannot be sent to it.</p>
       <button v-if="isStaff(auth.user)" class="iconified-button" @click="reopenReport()">
-        <CloseIcon aria-hidden="true" /> Reopen thread
+        <CheckCircleIcon aria-hidden="true" />
+        Reopen thread
       </button>
     </template>
     <template v-else-if="!report || !report.closed">
@@ -70,10 +73,12 @@
           :disabled="!replyBody"
           @click="sendReply()"
         >
-          <ReplyIcon aria-hidden="true" /> Reply
+          <ReplyIcon aria-hidden="true" />
+          Reply
         </button>
         <button v-else class="btn btn-primary" :disabled="!replyBody" @click="sendReply()">
-          <SendIcon aria-hidden="true" /> Send
+          <SendIcon aria-hidden="true" />
+          Send
         </button>
         <button
           v-if="isStaff(auth.user)"
@@ -81,7 +86,8 @@
           :disabled="!replyBody"
           @click="sendReply(null, true)"
         >
-          <ModerationIcon aria-hidden="true" /> Add private note
+          <ScaleIcon aria-hidden="true" />
+          Add private note
         </button>
         <template v-if="currentMember && !isStaff(auth.user)">
           <template v-if="isRejected(project)">
@@ -90,14 +96,16 @@
               class="iconified-button moderation-button"
               @click="openResubmitModal(true)"
             >
-              <ModerationIcon aria-hidden="true" /> Resubmit for review with reply
+              <ScaleIcon aria-hidden="true" />
+              Resubmit for review with reply
             </button>
             <button
               v-else
               class="iconified-button moderation-button"
               @click="openResubmitModal(false)"
             >
-              <ModerationIcon aria-hidden="true" /> Resubmit for review
+              <ScaleIcon aria-hidden="true" />
+              Resubmit for review
             </button>
           </template>
         </template>
@@ -110,10 +118,12 @@
                 class="iconified-button danger-button"
                 @click="closeReport(true)"
               >
-                <CloseIcon aria-hidden="true" /> Close with reply
+                <CheckCircleIcon aria-hidden="true" />
+                Close with reply
               </button>
               <button v-else class="iconified-button danger-button" @click="closeReport()">
-                <CloseIcon aria-hidden="true" /> Close thread
+                <CheckCircleIcon aria-hidden="true" />
+                Close thread
               </button>
             </template>
           </template>
@@ -125,7 +135,8 @@
                 :disabled="isApproved(project)"
                 @click="sendReply(requestedStatus)"
               >
-                <CheckIcon aria-hidden="true" /> Approve with reply
+                <CheckIcon aria-hidden="true" />
+                Approve with reply
               </button>
               <button
                 v-else
@@ -133,7 +144,8 @@
                 :disabled="isApproved(project)"
                 @click="setStatus(requestedStatus)"
               >
-                <CheckIcon aria-hidden="true" /> Approve
+                <CheckIcon aria-hidden="true" />
+                Approve
               </button>
               <div class="joined-buttons">
                 <button
@@ -142,7 +154,8 @@
                   :disabled="project.status === 'rejected'"
                   @click="sendReply('rejected')"
                 >
-                  <CrossIcon aria-hidden="true" /> Reject with reply
+                  <XIcon aria-hidden="true" />
+                  Reject with reply
                 </button>
                 <button
                   v-else
@@ -150,7 +163,8 @@
                   :disabled="project.status === 'rejected'"
                   @click="setStatus('rejected')"
                 >
-                  <CrossIcon aria-hidden="true" /> Reject
+                  <XIcon aria-hidden="true" />
+                  Reject
                 </button>
                 <OverflowMenu
                   class="btn btn-danger btn-dropdown-animation icon-only"
@@ -182,9 +196,13 @@
                 >
                   <DropdownIcon style="rotate: 180deg" aria-hidden="true" />
                   <template #withhold-reply>
-                    <EyeOffIcon aria-hidden="true" /> Withhold with reply
+                    <EyeOffIcon aria-hidden="true" />
+                    Withhold with reply
                   </template>
-                  <template #withhold> <EyeOffIcon aria-hidden="true" /> Withhold </template>
+                  <template #withhold>
+                    <EyeOffIcon aria-hidden="true" />
+                    Withhold
+                  </template>
                 </OverflowMenu>
               </div>
             </template>
@@ -197,16 +215,18 @@
 
 <script setup>
 import { OverflowMenu, MarkdownEditor } from "@modrinth/ui";
-import { DropdownIcon } from "@modrinth/assets";
+import {
+  DropdownIcon,
+  ReplyIcon,
+  SendIcon,
+  CheckCircleIcon,
+  XIcon,
+  EyeOffIcon,
+  CheckIcon,
+  ScaleIcon,
+} from "@modrinth/assets";
 import { useImageUpload } from "~/composables/image-upload.ts";
 import CopyCode from "~/components/ui/CopyCode.vue";
-import ReplyIcon from "~/assets/images/utils/reply.svg?component";
-import SendIcon from "~/assets/images/utils/send.svg?component";
-import CloseIcon from "~/assets/images/utils/check-circle.svg?component";
-import CrossIcon from "~/assets/images/utils/x.svg?component";
-import EyeOffIcon from "~/assets/images/utils/eye-off.svg?component";
-import CheckIcon from "~/assets/images/utils/check.svg?component";
-import ModerationIcon from "~/assets/images/sidebar/admin.svg?component";
 import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
 import { isStaff } from "~/helpers/users.js";
 import { isApproved, isRejected } from "~/helpers/projects.js";
