@@ -116,6 +116,9 @@ pub enum ErrorKind {
 
     #[error("Move directory error: {0}")]
     DirectoryMoveError(String),
+
+    #[error("Error pinging Minecraft server: {0}")]
+    ServerPingError(#[from] craftping::Error),
 }
 
 #[derive(Debug)]

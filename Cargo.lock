@@ -1811,6 +1811,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "craftping"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "784e06d6f55295683967f1a32b62cc2ab7eb4c0c07723a8b6493a476bfddaea2"
+dependencies = [
+ "base64 0.21.7",
+ "serde",
+ "serde_json",
+ "tokio 1.42.0",
+]
+
+[[package]]
 name = "crc"
 version = "3.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2751,6 +2763,18 @@ checksum = "b95f7c0680e4142284cf8b22c14a476e87d61b004a3a0861872b32ef7ead40a2"
 dependencies = [
  "bit-set",
  "regex",
+]
+
+[[package]]
+name = "fastnbt"
+version = "2.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d4a73a95dc65551ccd98e1ecd1adb5d1ba5361146963b31f481ca42fc0520a3"
+dependencies = [
+ "byteorder",
+ "cesu8",
+ "serde",
+ "serde_bytes",
 ]
 
 [[package]]
@@ -9319,12 +9343,14 @@ dependencies = [
  "byteorder",
  "bytes 1.7.2",
  "chrono",
+ "craftping",
  "daedalus",
  "dashmap 6.1.0",
  "dirs 5.0.1",
  "discord-rich-presence",
  "dunce",
  "either",
+ "fastnbt",
  "flate2",
  "futures 0.3.30",
  "indicatif",

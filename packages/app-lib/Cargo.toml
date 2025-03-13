@@ -63,6 +63,9 @@ base64 = "0.22.0"
 
 sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
 
+fastnbt = "2.5"
+craftping = { version = "0.5", default-features = false, features = ["async-tokio"] }
+
 ariadne = { path = "../ariadne" }
 
 [target.'cfg(windows)'.dependencies]
