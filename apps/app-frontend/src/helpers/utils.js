@@ -1,5 +1,5 @@
 import { get_full_path, get_mod_full_path } from '@/helpers/profile'
-import { invoke } from '@tauri-apps/api/core'
+import {convertFileSrc, invoke} from '@tauri-apps/api/core'
 
 export async function isDev() {
   return await invoke('is_dev')
@@ -35,6 +35,14 @@ export async function highlightModInProfile(profilePath, projectPath) {
 
 export async function restartApp() {
   return await invoke('restart_app')
+}
+
+export function sanitizePotentialFileUrl(url) {
+  const parsed = URL.parse(url);
+  if (parsed.protocol === 'file:') {
+    return convertFileSrc(decodeURIComponent(parsed.pathname));
+  }
+  return url;
 }
 
 export const releaseColor = (releaseType) => {

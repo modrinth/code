@@ -1,17 +1,24 @@
 use crate::util::io;
 use crate::{Error, ErrorKind, Result};
-use chrono::{DateTime, Utc};
+use base64::engine::general_purpose::STANDARD;
+use base64::Engine;
+use chrono::{DateTime, TimeZone, Utc};
 use craftping::{Chat, Player};
+use flate2::read::GzDecoder;
+use hickory_resolver::error::ResolveErrorKind;
 use serde::{Deserialize, Serialize};
+use std::cmp::max;
+use std::collections::HashMap;
+use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::PathBuf;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
 use url::Url;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct World {
     pub name: String,
-    pub last_played: DateTime<Utc>,
+    pub last_played: Option<DateTime<Utc>>,
     pub icon: Option<Url>,
     pub pinned: bool,
     #[serde(flatten)]
@@ -38,12 +45,18 @@ pub enum SingleplayerGameMode {
     Survival,
     Adventure,
     Spectator,
+    Unknown,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ServerStatus {
-    #[serde(flatten)]
-    pub ping_response: craftping::Response,
+    pub version: String,
+    pub enforces_secure_chat: bool,
+    pub max_players: usize,
+    pub online_players: usize,
+    pub sample: Vec<Player>,
+    pub motd: Chat,
+    pub favicon: Option<Url>,
     pub ping: Option<i64>,
 }
 
@@ -60,29 +73,180 @@ async fn get_singleplayer_worlds(
     worlds: &mut Vec<World>,
 ) -> Result<()> {
     let mut saves_dir = io::read_dir(instance_dir.join("saves")).await?;
-    while let Some(world_dir) = saves_dir.next_entry().await? {}
+    while let Some(world_dir) = saves_dir.next_entry().await? {
+        let world_path = world_dir.path();
+        let level_dat_path = world_path.join("level.dat");
+        if !level_dat_path.exists() {
+            continue;
+        }
+        if let Ok(world) = read_singleplayer_world(world_path).await {
+            worlds.push(world);
+        }
+    }
 
     Ok(())
+}
+
+async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
+    #[derive(Deserialize, Debug)]
+    #[serde(rename_all = "PascalCase")]
+    struct LevelDataRoot {
+        data: LevelData,
+    }
+
+    #[derive(Deserialize, Debug)]
+    #[serde(rename_all = "PascalCase")]
+    struct LevelData {
+        level_name: String,
+        last_played: i64,
+        game_type: i32,
+        #[serde(rename = "hardcore")]
+        hardcore: bool,
+    }
+
+    let level_data = io::read(world_path.join("level.dat")).await?;
+    let level_data = GzDecoder::new(&level_data[..]);
+    let level_data: LevelDataRoot = fastnbt::from_reader(level_data)?;
+    let level_data = level_data.data;
+
+    let icon_path = world_path.join("icon.png");
+    let icon = if icon_path.exists() {
+        Url::from_file_path(icon_path).ok()
+    } else {
+        None
+    };
+
+    let game_mode = match level_data.game_type {
+        0 => SingleplayerGameMode::Survival,
+        1 => SingleplayerGameMode::Creative,
+        2 => SingleplayerGameMode::Adventure,
+        3 => SingleplayerGameMode::Spectator,
+        _ => SingleplayerGameMode::Unknown,
+    };
+
+    Ok(World {
+        name: level_data.level_name,
+        last_played: Utc.timestamp_millis_opt(level_data.last_played).single(),
+        icon,
+        pinned: false, // TODO
+        details: WorldDetails::Singleplayer {
+            path: world_path,
+            game_mode,
+            hardcore: level_data.hardcore,
+        },
+    })
 }
 
 async fn get_server_worlds(
     instance_dir: &PathBuf,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
+    #[derive(Deserialize, Debug)]
+    struct ServersData {
+        servers: Vec<ServerData>,
+    }
+
+    #[derive(Deserialize, Debug)]
+    struct ServerData {
+        hidden: bool,
+        icon: String,
+        ip: String,
+        name: String,
+    }
+
+    let servers_dat_path = instance_dir.join("servers.dat");
+    if !servers_dat_path.exists() {
+        return Ok(());
+    }
+    let servers_data = io::read(servers_dat_path).await?;
+    let servers_data: ServersData = fastnbt::from_bytes(&servers_data)?;
+
+    let join_log = parse_join_log(instance_dir).await.ok();
+
+    for server in servers_data.servers {
+        if server.hidden {
+            // TODO: Figure out whether we want to hide or show direct connect servers
+            continue;
+        }
+        let icon =
+            Url::parse(&format!("data:image/png;base64,{}", server.icon)).ok();
+        let last_played = join_log
+            .as_ref()
+            .and_then(|log| {
+                let address = parse_server_address(&server.ip).ok()?;
+                log.get(&(address.0.to_owned(), address.1))
+            })
+            .and_then(|time| Utc.timestamp_millis_opt(*time).single());
+        let world = World {
+            name: server.name,
+            last_played,
+            icon,
+            pinned: false, // TODO
+            details: WorldDetails::Server { address: server.ip },
+        };
+        worlds.push(world);
+    }
+
     Ok(())
 }
 
+async fn parse_join_log(
+    instance_dir: &PathBuf,
+) -> Result<HashMap<(String, u16), i64>> {
+    let mut result = HashMap::new();
+    let join_log_path = instance_dir.join("logs/server_join_log.txt");
+    if !join_log_path.exists() {
+        return Ok(result);
+    }
+
+    let reader = io::open_file(&join_log_path).await?;
+    let reader = BufReader::new(reader);
+    let mut lines = reader.lines();
+    while let Some(line) = lines.next_line().await? {
+        let mut parts = line.split_whitespace();
+        let Some(time) = parts.next().and_then(|s| s.parse::<i64>().ok())
+        else {
+            continue;
+        };
+        let Some(host) = parts.nth(2).filter(|s| s.ends_with(',')) else {
+            continue;
+        };
+        let Some(port) = parts.next().and_then(|s| s.parse::<u16>().ok())
+        else {
+            continue;
+        };
+        result
+            .entry((host[..host.len() - 1].to_owned(), port))
+            .and_modify(|old| *old = max(*old, time))
+            .or_insert(time);
+    }
+
+    Ok(result)
+}
+
 pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
-    let (hostname, port) = match parse_server_address(address) {
-        Ok(x) => x,
+    let (host, port) = match parse_server_address(address) {
+        Ok((host, port)) => resolve_server_address(host, port).await?,
         Err(e) => return Err(Error::from(ErrorKind::InputError(e))),
     };
-    let mut stream = TcpStream::connect((hostname, port)).await?;
+    let mut stream = TcpStream::connect((&host as &str, port)).await?;
     let ping_response =
-        craftping::tokio::ping(&mut stream, &hostname, port).await?;
+        craftping::tokio::ping(&mut stream, &host, port).await?;
     let ping = ping_server(&mut stream).await.ok();
+
     Ok(ServerStatus {
-        ping_response,
+        version: ping_response.version,
+        enforces_secure_chat: ping_response
+            .enforces_secure_chat
+            .unwrap_or(false),
+        max_players: ping_response.max_players,
+        online_players: ping_response.online_players,
+        sample: ping_response.sample.unwrap_or_else(Vec::new),
+        motd: ping_response.description,
+        favicon: ping_response.favicon.as_ref().and_then(|x| {
+            Url::parse(&format!("data:image/png;base64,{}", STANDARD.encode(x)))
+                .ok()
+        }),
         ping,
     })
 }
@@ -137,6 +301,33 @@ fn parse_server_address(
     }
 
     Ok((host, port.unwrap_or(25565)))
+}
+
+async fn resolve_server_address(
+    host: &str,
+    port: u16,
+) -> Result<(String, u16)> {
+    if host.parse::<Ipv4Addr>().is_ok() || host.parse::<Ipv6Addr>().is_ok() {
+        return Ok((host.to_owned(), port));
+    }
+    let resolver =
+        hickory_resolver::TokioAsyncResolver::tokio_from_system_conf()?;
+    Ok(match resolver
+        .srv_lookup(format!("_minecraft._tcp.{}", host))
+        .await
+    {
+        Err(e)
+            if matches!(e.kind(), ResolveErrorKind::NoRecordsFound { .. }) =>
+        {
+            None
+        }
+        Err(e) => return Err(e.into()),
+        Ok(lookup) => lookup
+            .into_iter()
+            .next()
+            .map(|r| (r.target().to_string(), port)),
+    }
+    .unwrap_or_else(|| (host.to_owned(), port)))
 }
 
 async fn ping_server(stream: &mut TcpStream) -> Result<i64> {

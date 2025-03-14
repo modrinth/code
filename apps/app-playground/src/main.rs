@@ -5,6 +5,7 @@
 
 use std::time::Duration;
 use theseus::prelude::*;
+use theseus::worlds::{get_profile_worlds, get_server_status};
 use tokio::signal::ctrl_c;
 
 // A simple Rust implementation of the authentication run
@@ -41,21 +42,18 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
-    loop {
-        if State::get().await?.friends_socket.is_connected().await {
-            break;
-        }
-        tokio::time::sleep(Duration::from_millis(500)).await;
-    }
+    // let state = State::get().await?;
+    // let instance_path = state.directories
+    //     .profiles_dir()
+    //     .join("Logging Test")
+    //     .display()
+    //     .to_string();
+    // for world in get_profile_worlds(&instance_path).await? {
+    //     tracing::info!("{}", serde_json::to_string_pretty(&world)?);
+    // }
 
-    tracing::info!("Starting host");
-
-    let socket = State::get().await?.friends_socket.open_port(25565).await?;
-    tracing::info!("Running host on socket {}", socket.socket_id());
-
-    ctrl_c().await?;
-    tracing::info!("Stopping host");
-    socket.shutdown().await?;
+    let ping_result = get_server_status("51.81.48.199:25754").await?;
+    tracing::info!("{}", serde_json::to_string_pretty(&ping_result)?);
 
     Ok(())
 }
