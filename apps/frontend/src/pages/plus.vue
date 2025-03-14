@@ -99,7 +99,7 @@ import { products } from "~/generated/state.json";
 
 const title = "Subscribe to Modrinth Plus!";
 const description =
-  "Subscribe to Modrinth Plus to go ad-free, support Modrinth's development, and get an exclusive profile badge! Half your subscription goes directly to Modrinth creators.";
+  "Subscribe to Modrinth Plus to go ad-free, support Modrinth's development, and get an exclusive profile badges! Half your subscription goes directly to Modrinth creators.";
 
 useSeoMeta({
   title,

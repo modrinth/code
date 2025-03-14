@@ -17,11 +17,11 @@
         <div
           class="flex items-center gap-2 font-semibold transform capitalize border-0 border-solid border-divider pr-4 md:border-r"
         >
-          <GameIcon class="h-6 w-6 text-secondary" />
+          <GameIcon class="h-5 w-5 text-secondary" />
           {{ instance.loader }} {{ instance.game_version }}
         </div>
         <div class="flex items-center gap-2 font-semibold">
-          <TimerIcon class="h-6 w-6 text-secondary" />
+          <TimerIcon class="h-5 w-5 text-secondary" />
           <template v-if="timePlayed > 0">
             {{ timePlayedHumanized }}
           </template>
