@@ -3,10 +3,10 @@
     <ConfirmModal
       v-if="canEdit"
       ref="deleteModal"
-      :title="formatMessage(messages.deleteModalTitle)"
       :description="formatMessage(messages.deleteModalDescription)"
       :has-to-type="false"
       :proceed-label="formatMessage(commonMessages.deleteLabel)"
+      :title="formatMessage(messages.deleteModalTitle)"
       @proceed="deleteCollection()"
     />
     <div class="normal-page">
@@ -25,22 +25,20 @@
             </template>
             <template v-else-if="canEdit && isEditing === true">
               <PopoutMenu class="btn">
-                <EditIcon aria-hidden="true" /> {{ formatMessage(messages.editIconButton) }}
+                <EditIcon aria-hidden="true" />
+                {{ formatMessage(messages.editIconButton) }}
                 <template #menu>
                   <span class="icon-edit-menu">
                     <FileInput
                       id="project-icon"
+                      :callback="showPreviewImage"
                       :max-size="262144"
-                      :show-icon="true"
+                      :prompt="formatMessage(messages.uploadIconButton)"
                       accept="image/png,image/jpeg,image/gif,image/webp"
-                      class="btn btn-transparent upload"
-                      style="white-space: nowrap"
                       aria-label="Upload icon"
-                      @change="showPreviewImage"
-                    >
-                      <UploadIcon aria-hidden="true" />
-                      {{ formatMessage(messages.uploadIconButton) }}
-                    </FileInput>
+                      class="btn btn-transparent upload whitespace-nowrap"
+                    />
+
                     <Button
                       v-if="!deletedIcon && (previewImage || collection.icon_url)"
                       style="white-space: nowrap"
@@ -65,8 +63,8 @@
             <div class="inputs universal-labels">
               <div class="avatar-section">
                 <Avatar
-                  size="md"
                   :src="deletedIcon ? null : previewImage ? previewImage : collection.icon_url"
+                  size="md"
                 />
               </div>
               <label for="collection-title">
@@ -89,15 +87,15 @@
               <DropdownSelect
                 id="visibility"
                 v-model="visibility"
-                :options="['listed', 'unlisted', 'private']"
                 :disabled="visibility === 'rejected'"
-                :multiple="false"
                 :display-name="
                   (s) => {
                     if (s === 'listed') return formatMessage(commonMessages.publicLabel);
                     return formatMessage(commonMessages[`${s}Label`]);
                   }
                 "
+                :multiple="false"
+                :options="['listed', 'unlisted', 'private']"
                 :searchable="false"
               />
             </div>
@@ -115,7 +113,7 @@
           <!-- Content -->
           <template v-if="!isEditing">
             <div class="page-header__icon">
-              <Avatar size="md" :src="collection.icon_url" />
+              <Avatar :src="collection.icon_url" size="md" />
             </div>
             <div class="page-header__text">
               <h1 class="title">{{ collection.name }}</h1>
@@ -135,25 +133,25 @@
 
                 <div v-if="canEdit" class="primary-stat">
                   <template v-if="collection.status === 'listed'">
-                    <WorldIcon class="primary-stat__icon" aria-hidden="true" />
+                    <WorldIcon aria-hidden="true" class="primary-stat__icon" />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.publicLabel) }} </strong>
                     </div>
                   </template>
                   <template v-else-if="collection.status === 'unlisted'">
-                    <LinkIcon class="primary-stat__icon" aria-hidden="true" />
+                    <LinkIcon aria-hidden="true" class="primary-stat__icon" />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.unlistedLabel) }} </strong>
                     </div>
                   </template>
                   <template v-else-if="collection.status === 'private'">
-                    <LockIcon class="primary-stat__icon" aria-hidden="true" />
+                    <LockIcon aria-hidden="true" class="primary-stat__icon" />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.privateLabel) }} </strong>
                     </div>
                   </template>
                   <template v-else-if="collection.status === 'rejected'">
-                    <XIcon class="primary-stat__icon" aria-hidden="true" />
+                    <XIcon aria-hidden="true" class="primary-stat__icon" />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.rejectedLabel) }} </strong>
                     </div>
@@ -162,7 +160,7 @@
               </div>
 
               <div class="primary-stat">
-                <LibraryIcon class="primary-stat__icon" aria-hidden="true" />
+                <LibraryIcon aria-hidden="true" class="primary-stat__icon" />
                 <div v-if="projects" class="primary-stat__text">
                   <IntlFormatted
                     :message-id="messages.projectsCountLabel"
@@ -226,10 +224,10 @@
               <h2 class="card-header">{{ formatMessage(messages.curatedByLabel) }}</h2>
               <div class="metadata-item">
                 <nuxt-link
-                  class="team-member columns button-transparent"
                   :to="'/user/' + creator.username"
+                  class="team-member columns button-transparent"
                 >
-                  <Avatar :src="creator.avatar_url" :alt="creator.username" size="sm" circle />
+                  <Avatar :alt="creator.username" :src="creator.avatar_url" circle size="sm" />
 
                   <div class="member-info">
                     <p class="name">{{ creator.username }}</p>
@@ -306,21 +304,21 @@
               .sort((a, b) => b.downloads - a.downloads)"
             :id="project.id"
             :key="project.id"
-            :type="project.project_type"
             :categories="project.categories"
+            :client-side="project.client_side"
+            :color="project.color"
             :created-at="project.published"
-            :updated-at="project.updated"
             :description="project.description"
             :downloads="project.downloads ? project.downloads.toString() : '0'"
-            :follows="project.followers ? project.followers.toString() : '0'"
             :featured-image="project.gallery.find((element) => element.featured)?.url"
+            :follows="project.followers ? project.followers.toString() : '0'"
             :icon-url="project.icon_url"
             :name="project.title"
-            :client-side="project.client_side"
             :server-side="project.server_side"
-            :color="project.color"
-            :show-updated-date="!canEdit && collection.id !== 'following'"
             :show-created-date="!canEdit && collection.id !== 'following'"
+            :show-updated-date="!canEdit && collection.id !== 'following'"
+            :type="project.project_type"
+            :updated-at="project.updated"
           >
             <button
               v-if="canEdit"
@@ -346,7 +344,8 @@
           </ProjectCard>
         </div>
         <div v-else class="error">
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === creator.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.noProjectsAuthLabel">
               <template #create-link="{ children }">
@@ -377,7 +376,6 @@ import {
   SaveIcon,
   TrashIcon,
   UpdatedIcon,
-  UploadIcon,
   XIcon,
 } from "@modrinth/assets";
 import {
@@ -714,7 +712,7 @@ function showPreviewImage(files) {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .animated-dropdown {
   // Omorphia's dropdowns are harcoded in width, so we need to override that
   width: 100% !important;

@@ -2,11 +2,11 @@
   <UiServersContentVersionEditModal
     v-if="!invalidModal"
     ref="versionEditModal"
-    :type="type"
-    :mod-pack="Boolean(props.server.general?.upstream)"
     :game-version="props.server.general?.mc_version ?? ''"
     :loader="props.server.general?.loader?.toLowerCase() ?? ''"
+    :mod-pack="Boolean(props.server.general?.upstream)"
     :server-id="props.server.serverId"
+    :type="type"
     @change-version="changeModVersion($event)"
   />
 
@@ -26,7 +26,7 @@
           We couldn't load your server's {{ type.toLowerCase() }}s. Here's what we know:
           <span class="break-all font-mono">{{ JSON.stringify(server.content.error) }}</span>
         </p>
-        <ButtonStyled size="large" color="brand" @click="() => server.refresh(['content'])">
+        <ButtonStyled color="brand" size="large" @click="() => server.refresh(['content'])">
           <button class="mt-6 !w-full">Retry</button>
         </ButtonStyled>
       </div>
@@ -42,39 +42,39 @@
             <div class="relative flex-1 text-sm">
               <label class="sr-only" for="search">Search</label>
               <SearchIcon
-                class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
                 aria-hidden="true"
+                class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
               />
               <input
                 id="search"
                 v-model="searchInput"
-                class="!h-9 !min-h-0 w-full border-[1px] border-solid border-button-border pl-9"
-                type="search"
-                name="search"
-                autocomplete="off"
                 :placeholder="`Search ${localMods.length} ${type.toLocaleLowerCase()}s...`"
+                autocomplete="off"
+                class="!h-9 !min-h-0 w-full border-[1px] border-solid border-button-border pl-9"
+                name="search"
+                type="search"
                 @input="debouncedSearch"
               />
             </div>
             <ButtonStyled>
               <UiServersTeleportOverflowMenu
-                position="bottom"
-                direction="left"
                 :aria-label="`Filter ${type}s`"
                 :options="[
                   { id: 'all', action: () => (filterMethod = 'all') },
                   { id: 'enabled', action: () => (filterMethod = 'enabled') },
                   { id: 'disabled', action: () => (filterMethod = 'disabled') },
                 ]"
+                direction="left"
+                position="bottom"
               >
                 <span class="hidden whitespace-pre sm:block">
                   {{ filterMethodLabel }}
                 </span>
                 <FilterIcon aria-hidden="true" />
                 <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-                <template #all> All {{ type.toLocaleLowerCase() }}s </template>
-                <template #enabled> Only enabled </template>
-                <template #disabled> Only disabled </template>
+                <template #all> All {{ type.toLocaleLowerCase() }}s</template>
+                <template #enabled> Only enabled</template>
+                <template #disabled> Only disabled</template>
               </UiServersTeleportOverflowMenu>
             </ButtonStyled>
           </div>
@@ -87,8 +87,8 @@
             </ButtonStyled>
             <ButtonStyled color="brand">
               <nuxt-link
-                class="w-full text-nowrap sm:w-fit"
                 :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
+                class="w-full text-nowrap sm:w-fit"
               >
                 <PlusIcon />
                 Add {{ type.toLocaleLowerCase() }}
@@ -100,19 +100,19 @@
       <FilesUploadDropdown
         v-if="props.server.fs"
         ref="uploadDropdownRef"
-        class="rounded-xl bg-bg-raised"
-        :margin-bottom="16"
-        :file-type="type"
-        :current-path="`/${type.toLocaleLowerCase()}s`"
-        :fs="props.server.fs"
         :accepted-types="acceptFileFromProjectType(type.toLocaleLowerCase()).split(',')"
+        :current-path="`/${type.toLocaleLowerCase()}s`"
+        :file-type="type"
+        :fs="props.server.fs"
+        :margin-bottom="16"
+        class="rounded-xl bg-bg-raised"
         @upload-complete="() => props.server.refresh(['content'])"
       />
       <FilesUploadDragAndDrop
         v-if="server.general && localMods"
+        :type="type"
         class="relative min-h-[50vh]"
         overlay-class="rounded-xl border-2 border-dashed border-secondary"
-        :type="type"
         @files-dropped="handleDroppedFiles"
       >
         <div v-if="hasFilteredMods" class="flex flex-col gap-2 transition-all">
@@ -121,8 +121,8 @@
               <div :style="{ position: 'absolute', top: `${visibleTop}px`, width: '100%' }">
                 <template v-for="mod in visibleItems.items" :key="mod.filename">
                   <div
-                    class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised"
                     :class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
+                    class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised"
                     style="height: 64px"
                   >
                     <NuxtLink
@@ -135,10 +135,10 @@
                       draggable="false"
                     >
                       <UiAvatar
-                        :src="mod.icon_url"
-                        size="sm"
-                        alt="Server Icon"
                         :class="mod.disabled ? 'opacity-75 grayscale' : ''"
+                        :src="mod.icon_url"
+                        alt="Server Icon"
+                        size="sm"
                       />
                       <div class="flex min-w-0 flex-col gap-1">
                         <span class="text-md flex min-w-0 items-center gap-2 font-bold">
@@ -293,8 +293,8 @@
               </ButtonStyled>
               <ButtonStyled color="brand">
                 <nuxt-link
-                  class="w-full text-nowrap sm:w-fit"
                   :to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
+                  class="w-full text-nowrap sm:w-fit"
                 >
                   <PlusIcon />
                   Add {{ type.toLocaleLowerCase() }}
@@ -304,7 +304,7 @@
           </div>
         </div>
         <div v-else class="mt-4 flex h-full flex-col items-center justify-center gap-4 text-center">
-          <UiServersIconsLoaderIcon loader="Vanilla" class="size-24" />
+          <UiServersIconsLoaderIcon class="size-24" loader="Vanilla" />
           <p class="m-0 pt-3 font-bold text-contrast">Your server is running Vanilla Minecraft</p>
           <p class="m-0">
             Add content to your server by installing a modpack or choosing a different platform that
@@ -331,28 +331,28 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
-  SearchIcon,
-  EditIcon,
-  TrashIcon,
-  PackageClosedIcon,
-  FilterIcon,
-  DropdownIcon,
-  PlusIcon,
-  MoreVerticalIcon,
   CompassIcon,
-  WrenchIcon,
-  ListIcon,
+  DropdownIcon,
+  EditIcon,
   FileIcon,
+  FilterIcon,
   IssuesIcon,
+  ListIcon,
+  MoreVerticalIcon,
+  PackageClosedIcon,
+  PlusIcon,
+  SearchIcon,
+  TrashIcon,
+  WrenchIcon,
 } from "@modrinth/assets";
+import { acceptFileFromProjectType } from "@modrinth/utils";
 import { ButtonStyled } from "@modrinth/ui";
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
 import type { Server } from "~/composables/pyroServers";
-import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
@@ -387,6 +387,7 @@ const currentEditMod = ref<ContentItem | null>(null);
 const invalidModal = computed(
   () => !props.server.general?.mc_version || !props.server.general?.loader,
 );
+
 async function changeModVersion(event: string) {
   const mod = currentEditMod.value;
 
