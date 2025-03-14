@@ -38,6 +38,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{user_id}/organizations", web::get().to(orgs_list))
             .route("{id}", web::patch().to(user_edit))
             .route("{id}/icon", web::patch().to(user_icon_edit))
+            .route("{id}/icon", web::delete().to(user_icon_delete))
             .route("{id}", web::delete().to(user_delete))
             .route("{id}/follows", web::get().to(user_follows))
             .route("{id}/notifications", web::get().to(user_notifications))
@@ -615,6 +616,59 @@ pub async fn user_icon_edit(
         )
         .execute(&**pool)
         .await?;
+        User::clear_caches(&[(actual_user.id, None)], &redis).await?;
+
+        Ok(HttpResponse::NoContent().body(""))
+    } else {
+        Err(ApiError::NotFound)
+    }
+}
+
+pub async fn user_icon_delete(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::USER_WRITE]),
+    )
+    .await?
+    .1;
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+
+    if let Some(actual_user) = id_option {
+        if user.id != actual_user.id.into() && !user.role.is_mod() {
+            return Err(ApiError::CustomAuthentication(
+                "You don't have permission to edit this user's icon."
+                    .to_string(),
+            ));
+        }
+
+        delete_old_images(
+            actual_user.avatar_url,
+            actual_user.raw_avatar_url,
+            &***file_host,
+        )
+        .await?;
+
+        sqlx::query!(
+            "
+            UPDATE users
+            SET avatar_url = NULL, raw_avatar_url = NULL
+            WHERE (id = $1)
+            ",
+            actual_user.id as crate::database::models::ids::UserId,
+        )
+        .execute(&**pool)
+        .await?;
+
         User::clear_caches(&[(actual_user.id, None)], &redis).await?;
 
         Ok(HttpResponse::NoContent().body(""))
