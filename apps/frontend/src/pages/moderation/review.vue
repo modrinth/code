@@ -164,7 +164,7 @@ const projectTypes = computed(() => {
   return [...set];
 });
 
-function segmentData(data, segmentSize = 900) {
+function segmentData(data, segmentSize = 800) {
   return data.reduce((acc, curr, index) => {
     const segment = Math.floor(index / segmentSize);
 
