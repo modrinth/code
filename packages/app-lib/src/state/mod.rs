@@ -37,8 +37,6 @@ pub use self::friends::*;
 mod tunnel;
 pub use self::tunnel::*;
 
-pub use crate::api::worlds::*;
-
 pub mod db;
 pub mod fs_watcher;
 mod mr_auth;

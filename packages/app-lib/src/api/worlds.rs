@@ -3,7 +3,7 @@ use crate::{Error, ErrorKind, Result};
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use chrono::{DateTime, TimeZone, Utc};
-use craftping::{Chat, Player};
+use craftping::Player;
 use flate2::read::GzDecoder;
 use hickory_resolver::error::ResolveErrorKind;
 use serde::{Deserialize, Serialize};
@@ -11,7 +11,7 @@ use serde_json::value::{to_raw_value, RawValue};
 use std::cmp::max;
 use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
 use url::Url;
@@ -58,7 +58,7 @@ pub struct ServerStatus {
     pub max_players: usize,
     pub online_players: usize,
     pub sample: Vec<Player>,
-    pub motd: Box<RawValue>,
+    pub description: Box<RawValue>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub favicon: Option<Url>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,7 +74,7 @@ pub async fn get_profile_worlds(path: &str) -> Result<Vec<World>> {
 }
 
 async fn get_singleplayer_worlds(
-    instance_dir: &PathBuf,
+    instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
     let mut saves_dir = io::read_dir(instance_dir.join("saves")).await?;
@@ -143,7 +143,7 @@ async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
 }
 
 async fn get_server_worlds(
-    instance_dir: &PathBuf,
+    instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
     #[derive(Deserialize, Debug)]
@@ -196,7 +196,7 @@ async fn get_server_worlds(
 }
 
 async fn parse_join_log(
-    instance_dir: &PathBuf,
+    instance_dir: &Path,
 ) -> Result<HashMap<(String, u16), i64>> {
     let mut result = HashMap::new();
     let join_log_path = instance_dir.join("logs/server_join_log.txt");
@@ -245,13 +245,15 @@ pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
     let ping = ping_server(&mut stream).await.ok();
 
     Ok(ServerStatus {
-        motd: serde_json::from_slice::<MotdOnlyResponse>(&ping_response.raw())
-            .ok()
-            .and_then(|x| x.description)
-            // We can only reach the default value if this is a legacy server that only responds in plain text
-            .unwrap_or_else(|| {
-                to_raw_value(&ping_response.description.text).unwrap()
-            }),
+        description: serde_json::from_slice::<MotdOnlyResponse>(
+            ping_response.raw(),
+        )
+        .ok()
+        .and_then(|x| x.description)
+        // We can only reach the default value if this is a legacy server that only responds in plain text
+        .unwrap_or_else(|| {
+            to_raw_value(&ping_response.description.text).unwrap()
+        }),
         version: ping_response.version,
         enforces_secure_chat: ping_response
             .enforces_secure_chat
@@ -283,7 +285,9 @@ fn parse_server_address(
         if close_bracket_index + 1 == address.len() {
             (host, "")
         } else {
-            if address.bytes().nth(close_bracket_index) != Some(b':') {
+            if address.as_bytes().get(close_bracket_index).copied()
+                != Some(b':')
+            {
                 return Err(format!(
                     "Only a colon may follow a close bracket: {address}"
                 ));
