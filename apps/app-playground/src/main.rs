@@ -52,7 +52,7 @@ async fn main() -> theseus::Result<()> {
     //     tracing::info!("{}", serde_json::to_string_pretty(&world)?);
     // }
 
-    let ping_result = get_server_status("51.81.48.199:25754").await?;
+    let ping_result = get_server_status("hypixel.net").await?;
     tracing::info!("{}", serde_json::to_string_pretty(&ping_result)?);
 
     Ok(())

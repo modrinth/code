@@ -7,6 +7,7 @@ use craftping::{Chat, Player};
 use flate2::read::GzDecoder;
 use hickory_resolver::error::ResolveErrorKind;
 use serde::{Deserialize, Serialize};
+use serde_json::value::{to_raw_value, RawValue};
 use std::cmp::max;
 use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
@@ -18,7 +19,9 @@ use url::Url;
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct World {
     pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub last_played: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<Url>,
     pub pinned: bool,
     #[serde(flatten)]
@@ -55,8 +58,10 @@ pub struct ServerStatus {
     pub max_players: usize,
     pub online_players: usize,
     pub sample: Vec<Player>,
-    pub motd: Chat,
+    pub motd: Box<RawValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub favicon: Option<Url>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub ping: Option<i64>,
 }
 
@@ -225,6 +230,11 @@ async fn parse_join_log(
 }
 
 pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
+    #[derive(Deserialize, Debug)]
+    struct MotdOnlyResponse {
+        description: Option<Box<RawValue>>,
+    }
+
     let (host, port) = match parse_server_address(address) {
         Ok((host, port)) => resolve_server_address(host, port).await?,
         Err(e) => return Err(Error::from(ErrorKind::InputError(e))),
@@ -235,6 +245,13 @@ pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
     let ping = ping_server(&mut stream).await.ok();
 
     Ok(ServerStatus {
+        motd: serde_json::from_slice::<MotdOnlyResponse>(&ping_response.raw())
+            .ok()
+            .and_then(|x| x.description)
+            // We can only reach the default value if this is a legacy server that only responds in plain text
+            .unwrap_or_else(|| {
+                to_raw_value(&ping_response.description.text).unwrap()
+            }),
         version: ping_response.version,
         enforces_secure_chat: ping_response
             .enforces_secure_chat
@@ -242,7 +259,6 @@ pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
         max_players: ping_response.max_players,
         online_players: ping_response.online_players,
         sample: ping_response.sample.unwrap_or_else(Vec::new),
-        motd: ping_response.description,
         favicon: ping_response.favicon.as_ref().and_then(|x| {
             Url::parse(&format!("data:image/png;base64,{}", STANDARD.encode(x)))
                 .ok()
