@@ -21,7 +21,8 @@
             class="goto-link"
             to="/dashboard/notifications"
           >
-            See all <ChevronRightIcon />
+            See all
+            <ChevronRightIcon />
           </nuxt-link>
         </div>
         <template v-if="notifications.length > 0">
@@ -48,7 +49,8 @@
         <div v-else class="universal-body">
           <p>You have no unread notifications.</p>
           <nuxt-link class="iconified-button !mt-4" to="/dashboard/notifications/history">
-            <HistoryIcon /> View notification history
+            <HistoryIcon />
+            View notification history
           </nuxt-link>
         </div>
       </section>
@@ -94,8 +96,7 @@
   </div>
 </template>
 <script setup>
-import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
-import HistoryIcon from "~/assets/images/utils/history.svg?component";
+import { ChevronRightIcon, HistoryIcon } from "@modrinth/assets";
 import Avatar from "~/components/ui/Avatar.vue";
 import NotificationItem from "~/components/ui/NotificationItem.vue";
 import { fetchExtraNotificationData, groupNotifications } from "~/helpers/notifications.js";

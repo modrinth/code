@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
+import { ChevronRightIcon } from "@modrinth/assets";
 
 defineProps({
   linkStack: {

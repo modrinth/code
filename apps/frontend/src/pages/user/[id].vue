@@ -209,7 +209,8 @@
           </div>
         </div>
         <div v-else-if="route.params.projectType !== 'collections'" class="error">
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.profileNoProjectsAuthLabel">
               <template #create-link="{ children }">
@@ -252,7 +253,7 @@
               </div>
               <div class="stats">
                 <template v-if="collection.status === 'listed'">
-                  <WorldIcon />
+                  <GlobeIcon />
                   <span> Public </span>
                 </template>
                 <template v-else-if="collection.status === 'unlisted'">
@@ -275,7 +276,8 @@
           v-if="route.params.projectType === 'collections' && collections.length === 0"
           class="error"
         >
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
               <template #create-link="{ children }">
@@ -343,6 +345,9 @@ import {
   CurrencyIcon,
   InfoIcon,
   CheckIcon,
+  ReportIcon,
+  EditIcon,
+  GlobeIcon,
 } from "@modrinth/assets";
 import {
   OverflowMenu,
@@ -364,10 +369,7 @@ import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?componen
 import AlphaTesterBadge from "~/assets/images/badges/alpha-tester.svg?component";
 import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
 
-import ReportIcon from "~/assets/images/utils/report.svg?component";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
-import EditIcon from "~/assets/images/utils/edit.svg?component";
-import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";

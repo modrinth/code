@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
+import { ChevronRightIcon } from "@modrinth/assets";
 
 export default {
   components: {

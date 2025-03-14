@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
+import { ChevronRightIcon } from "@modrinth/assets";
 import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
 
 const props = defineProps({

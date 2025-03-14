@@ -25,7 +25,8 @@
             </template>
             <template v-else-if="canEdit && isEditing === true">
               <PopoutMenu class="btn">
-                <EditIcon aria-hidden="true" /> {{ formatMessage(messages.editIconButton) }}
+                <EditIcon aria-hidden="true" />
+                {{ formatMessage(messages.editIconButton) }}
                 <template #menu>
                   <span class="icon-edit-menu">
                     <FileInput
@@ -135,7 +136,7 @@
 
                 <div v-if="canEdit" class="primary-stat">
                   <template v-if="collection.status === 'listed'">
-                    <WorldIcon class="primary-stat__icon" aria-hidden="true" />
+                    <GlobeIcon class="primary-stat__icon" aria-hidden="true" />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.publicLabel) }} </strong>
                     </div>
@@ -346,7 +347,8 @@
           </ProjectCard>
         </div>
         <div v-else class="error">
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === creator.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.noProjectsAuthLabel">
               <template #create-link="{ children }">
@@ -379,6 +381,7 @@ import {
   UpdatedIcon,
   UploadIcon,
   XIcon,
+  GlobeIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -391,7 +394,6 @@ import {
 } from "@modrinth/ui";
 
 import { isAdmin } from "@modrinth/utils";
-import WorldIcon from "assets/images/utils/world.svg";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
 import { addNotification } from "~/composables/notifs.js";
 import NavRow from "~/components/ui/NavRow.vue";

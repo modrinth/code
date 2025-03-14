@@ -17,7 +17,7 @@
           </div>
           <h3 class="flex items-center gap-2 text-base font-normal text-secondary">
             {{ metric.title }}
-            <WarningIcon
+            <IssuesIcon
               v-if="metric.warning"
               v-tooltip="metric.warning"
               class="size-5"
@@ -58,10 +58,9 @@
 
 <script setup lang="ts">
 import { ref, computed, shallowRef } from "vue";
-import { FolderOpenIcon, CPUIcon, DBIcon } from "@modrinth/assets";
+import { FolderOpenIcon, CPUIcon, DBIcon, IssuesIcon } from "@modrinth/assets";
 import { useStorage } from "@vueuse/core";
 import type { Stats } from "~/types/servers";
-import WarningIcon from "~/assets/images/utils/issues.svg?component";
 
 const route = useNativeRoute();
 const serverId = route.params.id;

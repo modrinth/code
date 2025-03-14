@@ -7,8 +7,7 @@
 </template>
 
 <script>
-import CheckIcon from "~/assets/images/utils/check.svg?component";
-import ClipboardCopyIcon from "~/assets/images/utils/clipboard-copy.svg?component";
+import { CheckIcon, ClipboardCopyIcon } from "@modrinth/assets";
 
 export default {
   components: {

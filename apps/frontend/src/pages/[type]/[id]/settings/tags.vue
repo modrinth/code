@@ -113,9 +113,8 @@
 </template>
 
 <script>
+import { StarIcon, SaveIcon } from "@modrinth/assets";
 import Checkbox from "~/components/ui/Checkbox.vue";
-import StarIcon from "~/assets/images/utils/star.svg?component";
-import SaveIcon from "~/assets/images/utils/save.svg?component";
 
 export default defineNuxtComponent({
   components: {
@@ -271,11 +270,14 @@ export default defineNuxtComponent({
 
   :deep(.category-selector) {
     margin-bottom: 0.5rem;
+
     .category-selector__label {
       display: flex;
       align-items: center;
+
       .icon {
         height: 1rem;
+
         svg {
           margin-right: 0.25rem;
           width: 1rem;
@@ -283,6 +285,7 @@ export default defineNuxtComponent({
         }
       }
     }
+
     span {
       user-select: none;
     }

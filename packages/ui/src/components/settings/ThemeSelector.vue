@@ -1,5 +1,5 @@
 <script setup>
-import { MoonIcon, RadioButtonChecked, RadioButtonIcon, SunIcon } from '@modrinth/assets'
+import { MoonIcon, RadioButtonCheckedIcon, RadioButtonIcon, SunIcon } from '@modrinth/assets'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 
 const { formatMessage } = useVIntl()
@@ -80,7 +80,7 @@ const colorTheme = defineMessages({
         </div>
       </div>
       <div class="label">
-        <RadioButtonChecked v-if="currentTheme === option" class="radio" />
+        <RadioButtonCheckedIcon v-if="currentTheme === option" class="radio" />
         <RadioButtonIcon v-else class="radio" />
         {{ colorTheme[option] ? formatMessage(colorTheme[option]) : option }}
         <SunIcon

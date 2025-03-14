@@ -131,7 +131,7 @@ import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
-import _RadioButtonChecked from './icons/radio-button-checked.svg?component'
+import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
@@ -329,7 +329,7 @@ export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
 export const RadioButtonIcon = _RadioButtonIcon
-export const RadioButtonChecked = _RadioButtonChecked
+export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
 export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon

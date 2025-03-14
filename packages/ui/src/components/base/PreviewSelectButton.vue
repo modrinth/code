@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RadioButtonIcon, RadioButtonChecked } from '@modrinth/assets'
+import { RadioButtonIcon, RadioButtonCheckedIcon } from '@modrinth/assets'
 
 withDefaults(
   defineProps<{
@@ -15,7 +15,7 @@ withDefaults(
     <slot name="preview" />
     <div>
       <RadioButtonIcon v-if="!checked" class="w-4 h-4" />
-      <RadioButtonChecked v-else class="w-4 h-4" />
+      <RadioButtonCheckedIcon v-else class="w-4 h-4" />
       <slot />
     </div>
   </div>

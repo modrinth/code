@@ -850,6 +850,7 @@ import {
   UsersIcon,
   VersionIcon,
   WrenchIcon,
+  ModrinthIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -870,7 +871,6 @@ import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.v
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
 import { navigateTo } from "#app";
 import dayjs from "dayjs";
-import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
@@ -1605,10 +1605,12 @@ const navLinks = computed(() => {
       width: 25rem;
       height: 25rem;
     }
+
     .animation-ring-2 {
       width: 50rem;
       height: 50rem;
     }
+
     .animation-ring-3 {
       width: 100rem;
       height: 100rem;

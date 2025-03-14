@@ -21,7 +21,7 @@
       </div>
       <div class="button-group">
         <button class="iconified-button" @click="cancel">
-          <CrossIcon />
+          <XIcon />
           Cancel
         </button>
         <button class="iconified-button danger-button" :disabled="action_disabled" @click="proceed">
@@ -35,13 +35,12 @@
 
 <script>
 import { renderString } from "@modrinth/utils";
-import CrossIcon from "~/assets/images/utils/x.svg?component";
-import TrashIcon from "~/assets/images/utils/trash.svg?component";
+import { TrashIcon, XIcon } from "@modrinth/assets";
 import Modal from "~/components/ui/Modal.vue";
 
 export default {
   components: {
-    CrossIcon,
+    XIcon,
     TrashIcon,
     Modal,
   },
