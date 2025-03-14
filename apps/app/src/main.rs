@@ -268,6 +268,7 @@ fn main() {
         .plugin(api::cache::init())
         .plugin(api::ads::init())
         .plugin(api::friends::init())
+        .plugin(api::skin_manager::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
