@@ -40,7 +40,7 @@ export async function restartApp() {
 export function sanitizePotentialFileUrl(url) {
   const parsed = URL.parse(url);
   if (parsed.protocol === 'file:') {
-    return convertFileSrc(decodeURIComponent(parsed.pathname));
+    return convertFileSrc(decodeURIComponent(parsed.pathname.substring(1)));
   }
   return url;
 }
