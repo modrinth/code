@@ -204,7 +204,8 @@ pub async fn ws_init(
             #[cfg(debug_assertions)]
             if !message.is_binary() {
                 tracing::info!(
-                    "Received message from {socket_id}: {message:?}");
+                    "Received message from {socket_id}: {message:?}"
+                );
             }
 
             match message {

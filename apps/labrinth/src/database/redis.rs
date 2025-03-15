@@ -39,7 +39,7 @@ impl RedisPool {
             .builder()
             .expect("Error building Redis pool")
             .max_size(
-            dotenvy::var("REDIS_MAX_CONNECTIONS")
+                dotenvy::var("REDIS_MAX_CONNECTIONS")
                     .ok()
                     .and_then(|x| x.parse().ok())
                     .unwrap_or(10000),
