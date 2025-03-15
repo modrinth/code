@@ -4522,6 +4522,7 @@ dependencies = [
  "bytes 1.7.2",
  "censor",
  "chrono",
+ "clap",
  "clickhouse",
  "color-thief",
  "console-subscriber",

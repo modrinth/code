@@ -131,6 +131,8 @@ json-patch = "*"
 
 ariadne = { path = "../../packages/ariadne" }
 
+clap = { version = "4.5", features = ["derive"] }
+
 [target.'cfg(not(target_env = "msvc"))'.dependencies]
 tikv-jemallocator = { version = "0.6.0", features = ["profiling", "unprefixed_malloc_on_supported_platforms"] }
 tikv-jemalloc-ctl = { version = "0.6.0", features = ["stats"] }

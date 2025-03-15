@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE versions\n        SET status = requested_status\n        WHERE status = $1 AND date_published < CURRENT_DATE AND requested_status IS NOT NULL\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "41ec8301348dc912d0e5a16def1179cc9c02b1c0364319e76454dff713abdd45"
+}
