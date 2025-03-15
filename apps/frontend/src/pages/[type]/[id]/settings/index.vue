@@ -2,11 +2,11 @@
   <div>
     <ModalConfirm
       ref="modal_confirm"
-      title="Are you sure you want to delete this project?"
-      description="If you proceed, all versions and any attached data will be removed from our servers. This may break other projects, so be careful."
-      :has-to-type="true"
       :confirmation-text="project.title"
+      :has-to-type="true"
+      description="If you proceed, all versions and any attached data will be removed from our servers. This may break other projects, so be careful."
       proceed-label="Delete"
+      title="Are you sure you want to delete this project?"
       @proceed="deleteProject"
     />
     <section class="universal-card">
@@ -20,29 +20,27 @@
       </label>
       <div class="input-group">
         <Avatar
-          :src="deletedIcon ? null : previewImage ? previewImage : project.icon_url"
           :alt="project.title"
-          size="md"
+          :src="deletedIcon ? null : previewImage ? previewImage : project.icon_url"
           class="project__icon"
+          size="md"
         />
         <div class="input-stack">
           <FileInput
             id="project-icon"
+            :callback="showPreviewImage"
+            :disabled="!hasPermission"
             :max-size="262144"
             :show-icon="true"
             accept="image/png,image/jpeg,image/gif,image/webp"
+            aria-label="Upload icon"
             class="choose-image iconified-button"
             prompt="Upload icon"
-            aria-label="Upload icon"
-            :disabled="!hasPermission"
-            @change="showPreviewImage"
-          >
-            <UploadIcon aria-hidden="true" />
-          </FileInput>
+          />
           <button
             v-if="!deletedIcon && (previewImage || project.icon_url)"
-            class="iconified-button"
             :disabled="!hasPermission"
+            class="iconified-button"
             @click="markIconForDeletion"
           >
             <TrashIcon aria-hidden="true" />
@@ -57,9 +55,9 @@
       <input
         id="project-name"
         v-model="name"
+        :disabled="!hasPermission"
         maxlength="2048"
         type="text"
-        :disabled="!hasPermission"
       />
 
       <label for="project-slug">
@@ -72,10 +70,10 @@
         <input
           id="project-slug"
           v-model="slug"
-          type="text"
-          maxlength="64"
-          autocomplete="off"
           :disabled="!hasPermission"
+          autocomplete="off"
+          maxlength="64"
+          type="text"
         />
       </div>
 
@@ -86,8 +84,8 @@
         <textarea
           id="project-summary"
           v-model="summary"
-          maxlength="256"
           :disabled="!hasPermission"
+          maxlength="256"
         />
       </div>
       <template
@@ -112,15 +110,15 @@
           <Multiselect
             id="project-env-client"
             v-model="clientSide"
+            :allow-empty="false"
+            :close-on-select="true"
+            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :disabled="!hasPermission"
+            :options="sideTypes"
+            :searchable="false"
+            :show-labels="false"
             class="small-multiselect"
             placeholder="Select one"
-            :options="sideTypes"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-            :searchable="false"
-            :close-on-select="true"
-            :show-labels="false"
-            :allow-empty="false"
-            :disabled="!hasPermission"
           />
         </div>
         <div class="adjacent-input">
@@ -136,15 +134,15 @@
           <Multiselect
             id="project-env-server"
             v-model="serverSide"
+            :allow-empty="false"
+            :close-on-select="true"
+            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
+            :disabled="!hasPermission"
+            :options="sideTypes"
+            :searchable="false"
+            :show-labels="false"
             class="small-multiselect"
             placeholder="Select one"
-            :options="sideTypes"
-            :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-            :searchable="false"
-            :close-on-select="true"
-            :show-labels="false"
-            :allow-empty="false"
-            :disabled="!hasPermission"
           />
         </div>
       </template>
@@ -194,22 +192,22 @@
         <Multiselect
           id="project-visibility"
           v-model="visibility"
+          :allow-empty="false"
+          :close-on-select="true"
+          :custom-label="(value) => formatProjectStatus(value)"
+          :disabled="!hasPermission"
+          :options="tags.approvedStatuses"
+          :searchable="false"
+          :show-labels="false"
           class="small-multiselect"
           placeholder="Select one"
-          :options="tags.approvedStatuses"
-          :custom-label="(value) => formatProjectStatus(value)"
-          :searchable="false"
-          :close-on-select="true"
-          :show-labels="false"
-          :allow-empty="false"
-          :disabled="!hasPermission"
         />
       </div>
       <div class="button-group">
         <button
-          type="button"
-          class="iconified-button brand-button"
           :disabled="!hasChanges"
+          class="iconified-button brand-button"
+          type="button"
           @click="saveChanges()"
         >
           <SaveIcon aria-hidden="true" />
@@ -229,9 +227,9 @@
         project, so be extra careful!
       </p>
       <button
-        type="button"
-        class="iconified-button danger-button"
         :disabled="!hasDeletePermission"
+        class="iconified-button danger-button"
+        type="button"
         @click="$refs.modal_confirm.show()"
       >
         <TrashIcon aria-hidden="true" />
@@ -247,9 +245,7 @@ import { Multiselect } from "vue-multiselect";
 import { formatProjectStatus } from "@modrinth/utils";
 import Avatar from "~/components/ui/Avatar.vue";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
-import FileInput from "~/components/ui/FileInput.vue";
-
-import UploadIcon from "~/assets/images/utils/upload.svg?component";
+import { FileInput } from "@modrinth/ui";
 import SaveIcon from "~/assets/images/utils/save.svg?component";
 import TrashIcon from "~/assets/images/utils/trash.svg?component";
 import ExitIcon from "~/assets/images/utils/x.svg?component";

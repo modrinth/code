@@ -12,18 +12,17 @@
             <strong>{{ editFile ? editFile.name : "Current image" }}</strong>
             <FileInput
               v-if="editIndex === -1"
-              class="iconified-button raised-button"
-              prompt="Replace"
               :accept="acceptFileTypes"
-              :max-size="524288000"
-              should-always-reset
-              aria-label="Replace image"
-              @change="
+              :callback="
                 (x) => {
                   editFile = x[0];
                   showPreviewImage();
                 }
               "
+              :max-size="524288000"
+              aria-label="Replace image"
+              class="iconified-button raised-button"
+              prompt="Replace"
             >
               <TransferIcon aria-hidden="true" />
             </FileInput>
@@ -45,9 +44,9 @@
         <input
           id="gallery-image-title"
           v-model="editTitle"
-          type="text"
           maxlength="64"
           placeholder="Enter title..."
+          type="text"
         />
         <label for="gallery-image-desc">
           <span class="label__title">Description</span>
@@ -66,8 +65,8 @@
         <input
           id="gallery-image-ordering"
           v-model="editOrder"
-          type="number"
           placeholder="Enter order index..."
+          type="number"
         />
         <label for="gallery-image-featured">
           <span class="label__title">Featured</span>
@@ -91,7 +90,7 @@
           class="iconified-button"
           @click="editFeatured = false"
         >
-          <StarIcon fill="currentColor" aria-hidden="true" />
+          <StarIcon aria-hidden="true" fill="currentColor" />
           Unfeature image
         </button>
         <div class="button-group">
@@ -101,8 +100,8 @@
           </button>
           <button
             v-if="editIndex === -1"
-            class="iconified-button brand-button"
             :disabled="shouldPreventActions"
+            class="iconified-button brand-button"
             @click="createGalleryItem"
           >
             <PlusIcon aria-hidden="true" />
@@ -110,8 +109,8 @@
           </button>
           <button
             v-else
-            class="iconified-button brand-button"
             :disabled="shouldPreventActions"
+            class="iconified-button brand-button"
             @click="editGalleryItem"
           >
             <SaveIcon aria-hidden="true" />
@@ -123,10 +122,10 @@
     <ConfirmModal
       v-if="currentMember"
       ref="modal_confirm"
-      title="Are you sure you want to delete this gallery image?"
-      description="This will remove this gallery image forever (like really forever)."
       :has-to-type="false"
+      description="This will remove this gallery image forever (like really forever)."
       proceed-label="Delete"
+      title="Are you sure you want to delete this gallery image?"
       @proceed="deleteGalleryImage"
     />
     <div
@@ -136,14 +135,14 @@
     >
       <div class="content">
         <img
-          class="image"
+          :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
           :class="{ 'zoomed-in': zoomedIn }"
           :src="
             expandedGalleryItem.raw_url
               ? expandedGalleryItem.raw_url
               : 'https://cdn.modrinth.com/placeholder-banner.svg'
           "
-          :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
+          class="image"
           @click.stop
         />
 
@@ -162,13 +161,13 @@
                 <XIcon aria-hidden="true" />
               </button>
               <a
-                class="open circle-button"
-                target="_blank"
                 :href="
                   expandedGalleryItem.raw_url
                     ? expandedGalleryItem.raw_url
                     : 'https://cdn.modrinth.com/placeholder-banner.svg'
                 "
+                class="open circle-button"
+                target="_blank"
               >
                 <ExternalIcon aria-hidden="true" />
               </a>
@@ -197,16 +196,14 @@
     </div>
     <div v-if="currentMember" class="card header-buttons">
       <FileInput
-        :max-size="524288000"
         :accept="acceptFileTypes"
-        prompt="Upload an image"
+        :callback="handleFiles"
+        :disabled="!isPermission(currentMember?.permissions, 1 << 2)"
+        :max-size="524288000"
         aria-label="Upload an image"
         class="iconified-button brand-button"
-        :disabled="!isPermission(currentMember?.permissions, 1 << 2)"
-        @change="handleFiles"
-      >
-        <UploadIcon aria-hidden="true" />
-      </FileInput>
+        prompt="Upload an image"
+      />
       <span class="indicator">
         <InfoIcon aria-hidden="true" /> Click to choose an image or drag one onto this page
       </span>
@@ -220,8 +217,8 @@
       <div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
         <a class="gallery-thumbnail" @click="expandImage(item, index)">
           <img
-            :src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
             :alt="item.title ? item.title : 'gallery-image'"
+            :src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
           />
         </a>
         <div class="gallery-body">
@@ -278,25 +275,23 @@
 
 <script setup>
 import {
-  PlusIcon,
   CalendarIcon,
+  ContractIcon,
   EditIcon,
-  TrashIcon,
+  ExpandIcon,
+  ExternalIcon,
+  ImageIcon,
+  InfoIcon,
+  LeftArrowIcon,
+  PlusIcon,
+  RightArrowIcon,
   SaveIcon,
   StarIcon,
-  XIcon,
-  RightArrowIcon,
-  LeftArrowIcon,
-  ExternalIcon,
-  ExpandIcon,
-  ContractIcon,
-  UploadIcon,
-  InfoIcon,
-  ImageIcon,
   TransferIcon,
+  TrashIcon,
+  XIcon,
 } from "@modrinth/assets";
-import { ConfirmModal } from "@modrinth/ui";
-import FileInput from "~/components/ui/FileInput.vue";
+import { ConfirmModal, FileInput } from "@modrinth/ui";
 import DropArea from "~/components/ui/DropArea.vue";
 import Modal from "~/components/ui/Modal.vue";
 
@@ -611,6 +606,7 @@ export default defineNuxtComponent({
         max-width: calc(100vw - 2 * var(--spacing-card-lg));
       }
     }
+
     .floating {
       position: absolute;
       left: 50%;
@@ -626,10 +622,12 @@ export default defineNuxtComponent({
 
       &:not(&:hover) {
         opacity: 0.4;
+
         .text {
           transform: translateY(2.5rem) scale(0.8);
           opacity: 0;
         }
+
         .controls {
           transform: translateY(0.25rem) scale(0.9);
         }
@@ -658,6 +656,7 @@ export default defineNuxtComponent({
           margin: 0;
         }
       }
+
       .controls {
         background-color: var(--color-raised-bg);
         padding: var(--spacing-card-md);
@@ -777,6 +776,7 @@ export default defineNuxtComponent({
       svg {
         min-width: 1rem;
       }
+
       strong {
         word-wrap: anywhere;
       }
