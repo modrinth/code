@@ -1,7 +1,7 @@
 <template>
   <div v-for="world in worlds" :key="world.name">
     <div class="flex items-center gap-2 p-3 bg-bg-raised rounded-xl mb-2">
-      <Avatar :src="world.icon" size="48px" />
+      <Avatar :src="sanitizePotentialFileUrl(world.icon)" size="48px" />
       <div class="flex flex-col justify-between">
         <div class="flex items-center gap-2">
           <div class="text-lg text-contrast font-bold">{{ world.name }}</div>
@@ -32,6 +32,7 @@ import { UserIcon, NoSignalIcon, SignalIcon } from '@modrinth/assets'
 import { get_profile_worlds } from '@/helpers/worlds.ts'
 import type { World } from '@/helpers/worlds.ts'
 import { handleError } from '@/store/notifications'
+import { sanitizePotentialFileUrl } from '@/helpers/utils'
 
 const props = defineProps< {
   instance: GameInstance,
