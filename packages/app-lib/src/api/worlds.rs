@@ -4,6 +4,7 @@ use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use chrono::{DateTime, TimeZone, Utc};
 use craftping::Player;
+use either::Either;
 use flate2::read::GzDecoder;
 use hickory_resolver::error::ResolveErrorKind;
 use serde::{Deserialize, Serialize};
@@ -21,8 +22,11 @@ pub struct World {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_played: Option<DateTime<Utc>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub icon: Option<Url>,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        with = "either::serde_untagged_optional"
+    )]
+    pub icon: Option<Either<PathBuf, Url>>,
     pub pinned: bool,
     #[serde(flatten)]
     pub details: WorldDetails,
@@ -113,12 +117,7 @@ async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
     let level_data: LevelDataRoot = fastnbt::from_reader(level_data)?;
     let level_data = level_data.data;
 
-    let icon_path = world_path.join("icon.png");
-    let icon = if icon_path.exists() {
-        Url::from_file_path(icon_path).ok()
-    } else {
-        None
-    };
+    let icon = Some(world_path.join("icon.png")).filter(|i| i.exists());
 
     let game_mode = match level_data.game_type {
         0 => SingleplayerGameMode::Survival,
@@ -131,7 +130,7 @@ async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
     Ok(World {
         name: level_data.level_name,
         last_played: Utc.timestamp_millis_opt(level_data.last_played).single(),
-        icon,
+        icon: icon.map(Either::Left),
         pinned: false, // TODO
         details: WorldDetails::Singleplayer {
             path: world_path,
@@ -184,7 +183,7 @@ async fn get_server_worlds(
         let world = World {
             name: server.name,
             last_played,
-            icon,
+            icon: icon.map(Either::Right),
             pinned: false, // TODO
             details: WorldDetails::Server { address: server.ip },
         };

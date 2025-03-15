@@ -1,4 +1,5 @@
 use crate::api::Result;
+use either::Either;
 use theseus::worlds::{ServerStatus, World};
 use theseus::{worlds, State};
 
@@ -15,7 +16,26 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 pub async fn get_profile_worlds(path: &str) -> Result<Vec<World>> {
     let state = State::get().await?;
     let path = state.directories.profiles_dir().join(path);
-    Ok(worlds::get_profile_worlds(&path).await?)
+    let mut result = worlds::get_profile_worlds(&path).await?;
+    for world in result.iter_mut() {
+        if let Some(icon) = &world.icon {
+            if let Either::Left(icon_path) = &icon {
+                if let Ok(new_url) =
+                    super::utils::tauri_convert_file_src(&icon_path)
+                {
+                    world.icon = Some(Either::Right(new_url));
+                } else {
+                    tracing::warn!(
+                        "Encountered invalid icon path for world {}: {}",
+                        world.name,
+                        icon_path.display()
+                    );
+                    world.icon = None;
+                }
+            }
+        }
+    }
+    Ok(result)
 }
 
 #[tauri::command]

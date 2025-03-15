@@ -31,10 +31,12 @@ thiserror = "1.0"
 futures = "0.3"
 daedalus = { path = "../../packages/daedalus" }
 chrono = "0.4.26"
+either = "1.15"
 
 dirs = "5.0.1"
 
 url = "2.2"
+urlencoding = "2.1"
 uuid = { version = "1.1", features = ["serde", "v4"] }
 os_info = "3.7.0"
 

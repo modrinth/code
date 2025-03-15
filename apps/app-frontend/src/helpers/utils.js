@@ -1,5 +1,5 @@
 import { get_full_path, get_mod_full_path } from '@/helpers/profile'
-import {convertFileSrc, invoke} from '@tauri-apps/api/core'
+import { invoke } from '@tauri-apps/api/core'
 
 export async function isDev() {
   return await invoke('is_dev')
@@ -37,11 +37,10 @@ export async function restartApp() {
   return await invoke('restart_app')
 }
 
+/**
+ * @deprecated This method is no longer needed, and just returns its parameter
+ */
 export function sanitizePotentialFileUrl(url) {
-  const parsed = URL.parse(url);
-  if (parsed.protocol === 'file:') {
-    return convertFileSrc(decodeURIComponent(parsed.pathname).substring(1));
-  }
   return url;
 }
 
