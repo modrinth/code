@@ -8,7 +8,7 @@
       circle: circle,
       'no-shadow': noShadow,
       raised: raised,
-      pixelated: raised,
+      pixelated: pixelated,
     }"
     :src="src"
     :alt="alt"
@@ -96,7 +96,7 @@ const LEGACY_PRESETS = {
 const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
 
 function updatePixelated() {
-  if (img.value && img.value.naturalWidth && img.value.naturalWidth <= 96) {
+  if (img.value && img.value.naturalWidth && img.value.naturalWidth < 32) {
     pixelated.value = true
   } else {
     pixelated.value = false
