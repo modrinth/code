@@ -269,6 +269,12 @@
   "layout.banner.add-email.title": {
     "message": "For security purposes, please enter your email on Modrinth."
   },
+  "layout.banner.build-fail.description": {
+    "message": "This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Error generating state from API when building."
+  },
   "layout.banner.staging.description": {
     "message": "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
   },
