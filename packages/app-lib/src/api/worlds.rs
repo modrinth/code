@@ -65,11 +65,10 @@ pub struct ServerStatus {
     pub ping: Option<i64>,
 }
 
-pub async fn get_profile_worlds(path: &str) -> Result<Vec<World>> {
+pub async fn get_profile_worlds(profile_path: &Path) -> Result<Vec<World>> {
     let mut result = vec![];
-    let path = PathBuf::from(path);
-    get_singleplayer_worlds(&path, &mut result).await?;
-    get_server_worlds(&path, &mut result).await?;
+    get_singleplayer_worlds(profile_path, &mut result).await?;
+    get_server_worlds(profile_path, &mut result).await?;
     Ok(result)
 }
 

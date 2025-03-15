@@ -1,6 +1,6 @@
 use crate::api::Result;
-use theseus::worlds;
 use theseus::worlds::{ServerStatus, World};
+use theseus::{worlds, State};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("worlds")
@@ -13,7 +13,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 
 #[tauri::command]
 pub async fn get_profile_worlds(path: &str) -> Result<Vec<World>> {
-    Ok(worlds::get_profile_worlds(path).await?)
+    let state = State::get().await?;
+    let path = state.directories.profiles_dir().join(path);
+    Ok(worlds::get_profile_worlds(&path).await?)
 }
 
 #[tauri::command]
