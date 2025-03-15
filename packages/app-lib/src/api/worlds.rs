@@ -58,7 +58,7 @@ pub struct ServerStatus {
     pub max_players: usize,
     pub online_players: usize,
     pub sample: Vec<Player>,
-    pub description: Box<RawValue>,
+    pub description: Option<Box<RawValue>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub favicon: Option<Url>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -249,9 +249,10 @@ pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
         )
         .ok()
         .and_then(|x| x.description)
-        // We can only reach the default value if this is a legacy server that only responds in plain text
-        .unwrap_or_else(|| {
-            to_raw_value(&ping_response.description.text).unwrap()
+        .or_else(|| {
+            ping_response
+                .description
+                .and_then(|x| to_raw_value(&x.text).ok())
         }),
         version: ping_response.version,
         enforces_secure_chat: ping_response

@@ -142,7 +142,7 @@ type ServerStatus = {
   online_players: number
   sample: { name: string, id: string }[]
   // https://minecraft.wiki/w/Text_component_format
-  description: any,
+  description?: any,
   favicon?: string
   ping?: number
 }
