@@ -240,6 +240,17 @@ fn main() {
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
+            )
+            .plugin(
+                "worlds",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "get_profile_worlds",
+                        "get_server_status",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
             ),
     )
     .expect("Failed to run tauri-build");

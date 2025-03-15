@@ -253,14 +253,24 @@ watch(
   },
 )
 
+const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id)}`)
+
 const tabs = computed(() => [
   {
+    label: 'Overview',
+    href: `${basePath.value}`,
+  },
+  {
+    label: 'Worlds',
+    href: `${basePath.value}/worlds`,
+  },
+  {
     label: 'Content',
-    href: `/instance/${encodeURIComponent(route.params.id)}`,
+    href: `${basePath.value}/content`,
   },
   {
     label: 'Logs',
-    href: `/instance/${encodeURIComponent(route.params.id)}/logs`,
+    href: `${basePath.value}/logs`,
   },
 ])
 

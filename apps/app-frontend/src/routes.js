@@ -108,11 +108,29 @@ export default new createRouter({
       children: [
         {
           path: '',
+          name: 'Overview',
+          component: Instance.Overview,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance' }],
+          },
+        },
+        {
+          path: 'worlds',
+          name: 'Worlds',
+          component: Instance.Worlds,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Worlds' }],
+          },
+        },
+        {
+          path: 'content',
           name: 'Mods',
           component: Instance.Mods,
           meta: {
             useRootContext: true,
-            breadcrumb: [{ name: '?Instance' }],
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Content' }],
           },
         },
         {
@@ -121,7 +139,7 @@ export default new createRouter({
           component: Instance.Mods,
           meta: {
             useRootContext: true,
-            breadcrumb: [{ name: '?Instance' }],
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Content' }],
           },
         },
         {

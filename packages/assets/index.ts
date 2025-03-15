@@ -121,6 +121,7 @@ import _MoonIcon from './icons/moon.svg?component'
 import _MoreHorizontalIcon from './icons/more-horizontal.svg?component'
 import _MoreVerticalIcon from './icons/more-vertical.svg?component'
 import _NewspaperIcon from './icons/newspaper.svg?component'
+import _NoSignalIcon from './icons/no-signal.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
 import _PackageIcon from './icons/package.svg?component'
@@ -146,6 +147,7 @@ import _ServerIcon from './icons/server.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
 import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
+import _SignalIcon from './icons/signal.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
 import _SortAscendingIcon from './icons/sort-asc.svg?component'
 import _SortDescendingIcon from './icons/sort-desc.svg?component'
@@ -319,6 +321,7 @@ export const MoonIcon = _MoonIcon
 export const MoreHorizontalIcon = _MoreHorizontalIcon
 export const MoreVerticalIcon = _MoreVerticalIcon
 export const NewspaperIcon = _NewspaperIcon
+export const NoSignalIcon = _NoSignalIcon
 export const OmorphiaIcon = _OmorphiaIcon
 export const OrganizationIcon = _OrganizationIcon
 export const PackageIcon = _PackageIcon
@@ -344,6 +347,7 @@ export const ServerIcon = _ServerIcon
 export const SettingsIcon = _SettingsIcon
 export const ShareIcon = _ShareIcon
 export const ShieldIcon = _ShieldIcon
+export const SignalIcon = _SignalIcon
 export const SlashIcon = _SlashIcon
 export const SortAscendingIcon = _SortAscendingIcon
 export const SortDescendingIcon = _SortDescendingIcon
