@@ -8,11 +8,10 @@
       />
       <ProjectSidebarLinks link-target="_blank" :project="data" class="project-sidebar-section" />
       <ProjectSidebarCreators
-        :organization="null"
+        :organization="organization"
         :members="members"
-        :org-link="(slug) => `https://modrinth.com/organization/${slug}`"
-        :user-link="(username) => `https://modrinth.com/user/${username}`"
-        link-target="_blank"
+        :org-link="(org) => `/organization/${org.id}${instance ? '?i=' + instance.path : ''}`"
+        :user-link="(user) => `/user/${user.id}${instance ? '?i=' + instance.path : ''}`"
         class="project-sidebar-section"
       />
       <ProjectSidebarDetails
@@ -23,7 +22,7 @@
       />
     </Teleport>
     <div class="flex flex-col gap-4 p-6">
-      <InstanceIndicator v-if="instance" :instance="instance" />
+      <InstanceIndicator :instance="instance" />
       <template v-if="data">
         <Teleport
           v-if="themeStore.featureFlags.project_background"
@@ -93,17 +92,17 @@
               href: `/project/${$route.params.id}`,
             },
             {
+              label: 'Gallery',
+              href: `/project/${$route.params.id}/gallery`,
+              shown: data.gallery.length > 0,
+            },
+            {
               label: 'Versions',
               href: {
                 path: `/project/${$route.params.id}/versions`,
                 query: { l: instance?.loader, g: instance?.game_version },
               },
               subpages: ['version'],
-            },
-            {
-              label: 'Gallery',
-              href: `/project/${$route.params.id}/gallery`,
-              shown: data.gallery.length > 0,
             },
           ]"
         />
@@ -166,6 +165,7 @@ import NavTabs from '@/components/ui/NavTabs.vue'
 import { useTheming } from '@/store/state.js'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import { useFetch } from '@/helpers/fetch.js'
 
 dayjs.extend(relativeTime)
 
@@ -177,6 +177,7 @@ const installing = ref(false)
 const data = shallowRef(null)
 const versions = shallowRef([])
 const members = shallowRef([])
+const organization = shallowRef(null)
 const categories = shallowRef([])
 const instance = ref(null)
 const instanceProjects = ref(null)
@@ -202,6 +203,10 @@ async function fetchProjectData() {
       route.query.i ? getInstanceProjects(route.query.i).catch(handleError) : Promise.resolve(),
     ])
 
+  if (project.organization) {
+    organization.value = await useFetch(`https://api.modrinth.com/v3/organization/${project.organization}`).catch(handleError)
+  }
+
   versions.value = versions.value.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 
   if (instanceProjects.value) {
@@ -213,6 +218,7 @@ async function fetchProjectData() {
       installedVersion.value = installedFile.metadata.version_id
     }
   }
+
   breadcrumbs.setName('Project', data.value.title)
 }
 
@@ -437,6 +443,10 @@ const handleOptionsClick = (args) => {
 }
 
 .project-sidebar-section {
-  @apply p-4 flex flex-col gap-2 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid;
+  @apply p-4 flex flex-col gap-2 border-0 border-[--brand-gradient-border] border-solid;
+}
+
+.project-sidebar-section:not(:last-child) {
+  @apply border-b-[1px];
 }
 </style>

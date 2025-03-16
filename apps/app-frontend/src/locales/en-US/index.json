@@ -308,6 +308,18 @@
   "instance.settings.title": {
     "message": "Settings"
   },
+  "project.card.actions.installed.tooltip": {
+    "message": "This project is already installed"
+  },
+  "project.card.actions.installing.tooltip": {
+    "message": "This project is being installed"
+  },
+  "project.card.actions.view-gallery": {
+    "message": "View gallery"
+  },
+  "project.card.actions.view-versions": {
+    "message": "View versions"
+  },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"
   },

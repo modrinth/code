@@ -3,10 +3,12 @@
     ref="dropdown"
     no-auto-focus
     :aria-id="dropdownId || null"
-    placement="bottom-end"
+    :placement="placement"
     :class="dropdownClass"
     @apply-hide="focusTrigger"
     @apply-show="focusMenuChild"
+    @show="open = true"
+    @hide="open = false"
   >
     <button ref="trigger" v-bind="$attrs" v-tooltip="tooltip">
       <slot></slot>
@@ -23,7 +25,7 @@
 
 <script setup>
 import { Dropdown } from 'floating-vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const trigger = ref()
 const menu = ref()
@@ -43,6 +45,11 @@ defineProps({
   tooltip: {
     type: String,
     default: null,
+    required: false,
+  },
+  placement: {
+    type: String,
+    default: 'bottom-end',
     required: false,
   },
 })
@@ -76,9 +83,14 @@ function show() {
   dropdown.value.show()
 }
 
+const open = ref(false)
+
+const isOpen = computed(() => open.value)
+
 defineExpose({
   show,
   hide,
+  isOpen,
 })
 </script>
 <style scoped>

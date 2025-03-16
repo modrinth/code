@@ -1,4 +1,3 @@
-export const isPermission = (perms?: number, bitflag?: number) => {
-  if (!perms || !bitflag) return false;
-  return (perms & bitflag) === bitflag;
-};
+import { isPermission as _isPermission } from "@modrinth/utils";
+
+export const isPermission = _isPermission;
