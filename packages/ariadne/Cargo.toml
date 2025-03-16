@@ -13,3 +13,4 @@ rand = "0.8.5"
 either = "1.13"
 chrono = { version = "0.4.26", features = ["serde"] }
 serde_cbor = "0.11"
+lazy_static = "1.5"

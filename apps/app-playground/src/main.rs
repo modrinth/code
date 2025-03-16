@@ -3,10 +3,8 @@
     windows_subsystem = "windows"
 )]
 
-use std::time::Duration;
 use theseus::prelude::*;
-use theseus::worlds::{get_profile_worlds, get_server_status};
-use tokio::signal::ctrl_c;
+use theseus::profile::QuickPlayType;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -42,18 +40,11 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
-    // let state = State::get().await?;
-    // let instance_path = state.directories
-    //     .profiles_dir()
-    //     .join("Logging Test")
-    //     .display()
-    //     .to_string();
-    // for world in get_profile_worlds(&instance_path).await? {
-    //     tracing::info!("{}", serde_json::to_string_pretty(&world)?);
-    // }
-
-    let ping_result = get_server_status("hypixel.net").await?;
-    tracing::info!("{}", serde_json::to_string_pretty(&ping_result)?);
+    profile::run(
+        "Logging Test",
+        &QuickPlayType::Server("hypixel.net".to_string(), 25565),
+    )
+    .await?;
 
     Ok(())
 }

@@ -247,6 +247,8 @@ fn main() {
                     .commands(&[
                         "get_profile_worlds",
                         "get_server_status",
+                        "start_join_singleplayer_world",
+                        "start_join_server",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

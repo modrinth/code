@@ -88,3 +88,11 @@ export async function get_profile_worlds(path: string): Promise<World[]> {
 export async function get_server_status(address: string): Promise<CraftPingResponse> {
   return await invoke('plugin:worlds|get_server_status', { address })
 }
+
+export async function start_join_singleplayer_world(path: string, world: string): Promise<any> {
+  return await invoke('plugin:worlds|start_join_singleplayer_world', { path, world })
+}
+
+export async function start_join_server(path: string, address: string): Promise<any> {
+  return await invoke('plugin:worlds|start_join_server', { path, address })
+}

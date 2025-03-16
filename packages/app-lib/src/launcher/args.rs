@@ -1,5 +1,6 @@
 //! Minecraft CLI argument logic
 use crate::launcher::parse_rules;
+use crate::profile::QuickPlayType;
 use crate::state::Credentials;
 use crate::{
     state::{MemorySettings, WindowSize},
@@ -30,7 +31,12 @@ pub fn get_class_paths(
         .iter()
         .filter_map(|library| {
             if let Some(rules) = &library.rules {
-                if !parse_rules(rules, java_arch, minecraft_updated) {
+                if !parse_rules(
+                    rules,
+                    java_arch,
+                    &QuickPlayType::None,
+                    minecraft_updated,
+                ) {
                     return None;
                 }
             }
@@ -109,6 +115,7 @@ pub fn get_jvm_arguments(
     memory: MemorySettings,
     custom_args: Vec<String>,
     java_arch: &str,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
@@ -127,6 +134,7 @@ pub fn get_jvm_arguments(
                 )
             },
             java_arch,
+            quick_play_type,
         )?;
     } else {
         parsed_arguments.push(format!(
@@ -205,6 +213,7 @@ pub fn get_minecraft_arguments(
     version_type: &VersionType,
     resolution: WindowSize,
     java_arch: &str,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<Vec<String>> {
     if let Some(arguments) = arguments {
         let mut parsed_arguments = Vec::new();
@@ -224,9 +233,11 @@ pub fn get_minecraft_arguments(
                     assets_directory,
                     version_type,
                     resolution,
+                    quick_play_type,
                 )
             },
             java_arch,
+            quick_play_type,
         )?;
 
         Ok(parsed_arguments)
@@ -244,6 +255,7 @@ pub fn get_minecraft_arguments(
                 assets_directory,
                 version_type,
                 resolution,
+                quick_play_type,
             )?);
         }
         Ok(parsed_arguments)
@@ -264,6 +276,7 @@ fn parse_minecraft_argument(
     assets_directory: &Path,
     version_type: &VersionType,
     resolution: WindowSize,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<String> {
     Ok(argument
         .replace("${accessToken}", access_token)
@@ -317,7 +330,21 @@ fn parse_minecraft_argument(
         )
         .replace("${version_type}", version_type.as_str())
         .replace("${resolution_width}", &resolution.0.to_string())
-        .replace("${resolution_height}", &resolution.1.to_string()))
+        .replace("${resolution_height}", &resolution.1.to_string())
+        .replace(
+            "${quickPlaySingleplayer}",
+            match quick_play_type {
+                QuickPlayType::Singleplayer(world) => world,
+                _ => "",
+            },
+        )
+        .replace(
+            "${quickPlayMultiplayer}",
+            &match quick_play_type {
+                QuickPlayType::Server(host, ip) => format!("{host}:{ip}"),
+                _ => "".to_string(),
+            },
+        ))
 }
 
 fn parse_arguments<F>(
@@ -325,6 +352,7 @@ fn parse_arguments<F>(
     parsed_arguments: &mut Vec<String>,
     parse_function: F,
     java_arch: &str,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<()>
 where
     F: Fn(&str) -> crate::Result<String>,
@@ -339,7 +367,7 @@ where
                 }
             }
             Argument::Ruled { rules, value } => {
-                if parse_rules(rules, java_arch, true) {
+                if parse_rules(rules, java_arch, quick_play_type, true) {
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(

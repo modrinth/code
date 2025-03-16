@@ -235,7 +235,7 @@ pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
 
     let (host, port) = match parse_server_address(address) {
         Ok((host, port)) => resolve_server_address(host, port).await?,
-        Err(e) => return Err(Error::from(ErrorKind::InputError(e))),
+        Err(e) => return Err(e),
     };
     let mut stream = TcpStream::connect((&host as &str, port)).await?;
     let ping_response =
@@ -268,8 +268,13 @@ pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
     })
 }
 
+pub fn parse_server_address(address: &str) -> Result<(&str, u16)> {
+    parse_server_address_inner(address)
+        .map_err(|e| Error::from(ErrorKind::InputError(e)))
+}
+
 // Reimplementation of Guava's HostAndPort#fromString with a default port of 25565
-fn parse_server_address(
+fn parse_server_address_inner(
     address: &str,
 ) -> std::result::Result<(&str, u16), String> {
     let (host, port_str) = if address.starts_with("[") {
@@ -369,5 +374,3 @@ async fn ping_server(stream: &mut TcpStream) -> Result<i64> {
     let response_time = Utc::now();
     Ok((response_time - start_time).num_milliseconds())
 }
-
-pub async fn join_singleplayer_world() {}

@@ -3,6 +3,7 @@ use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::launcher::io::IOError;
+use crate::profile::QuickPlayType;
 use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
 };
@@ -27,11 +28,14 @@ pub mod download;
 pub fn parse_rules(
     rules: &[d::minecraft::Rule],
     java_version: &str,
+    quick_play_type: &QuickPlayType,
     minecraft_updated: bool,
 ) -> bool {
     let mut x = rules
         .iter()
-        .map(|x| parse_rule(x, java_version, minecraft_updated))
+        .map(|x| {
+            parse_rule(x, java_version, quick_play_type, minecraft_updated)
+        })
         .collect::<Vec<Option<bool>>>();
 
     if rules
@@ -52,6 +56,7 @@ pub fn parse_rules(
 pub fn parse_rule(
     rule: &d::minecraft::Rule,
     java_version: &str,
+    quick_play_type: &QuickPlayType,
     minecraft_updated: bool,
 ) -> Option<bool> {
     use d::minecraft::{Rule, RuleAction};
@@ -69,9 +74,14 @@ pub fn parse_rule(
             !features.is_demo_user.unwrap_or(true)
                 || features.has_custom_resolution.unwrap_or(false)
                 || !features.has_quick_plays_support.unwrap_or(true)
-                || !features.is_quick_play_multiplayer.unwrap_or(true)
+                || (features.is_quick_play_singleplayer.unwrap_or(false)
+                    && matches!(
+                        quick_play_type,
+                        QuickPlayType::Singleplayer(_)
+                    ))
+                || (features.is_quick_play_multiplayer.unwrap_or(false)
+                    && matches!(quick_play_type, QuickPlayType::Server(..)))
                 || !features.is_quick_play_realms.unwrap_or(true)
-                || !features.is_quick_play_singleplayer.unwrap_or(true)
         }
         _ => return Some(true),
     };
@@ -425,6 +435,7 @@ pub async fn launch_minecraft(
     credentials: &Credentials,
     post_exit_hook: Option<String>,
     profile: &Profile,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
         || profile.install_stage == ProfileInstallStage::MinecraftInstalling
@@ -559,6 +570,7 @@ pub async fn launch_minecraft(
                 *memory,
                 Vec::from(java_args),
                 &java_version.architecture,
+                quick_play_type,
             )?
             .into_iter()
             .collect::<Vec<_>>(),
@@ -577,6 +589,7 @@ pub async fn launch_minecraft(
                 &version.type_,
                 *resolution,
                 &java_version.architecture,
+                quick_play_type,
             )?
             .into_iter()
             .collect::<Vec<_>>(),
