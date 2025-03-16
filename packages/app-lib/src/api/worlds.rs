@@ -369,3 +369,5 @@ async fn ping_server(stream: &mut TcpStream) -> Result<i64> {
     let response_time = Utc::now();
     Ok((response_time - start_time).num_milliseconds())
 }
+
+pub async fn join_singleplayer_world() {}
