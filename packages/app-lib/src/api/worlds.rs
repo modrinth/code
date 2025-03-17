@@ -152,7 +152,7 @@ async fn get_server_worlds(
     #[derive(Deserialize, Debug)]
     struct ServerData {
         hidden: bool,
-        icon: String,
+        icon: Option<String>,
         ip: String,
         name: String,
     }
@@ -171,8 +171,9 @@ async fn get_server_worlds(
             // TODO: Figure out whether we want to hide or show direct connect servers
             continue;
         }
-        let icon =
-            Url::parse(&format!("data:image/png;base64,{}", server.icon)).ok();
+        let icon = server.icon.and_then(|icon| {
+            Url::parse(&format!("data:image/png;base64,{}", icon)).ok()
+        });
         let last_played = join_log
             .as_ref()
             .and_then(|log| {
