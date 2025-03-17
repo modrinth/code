@@ -27,6 +27,7 @@ pub struct ServerStatus {
 pub struct ServerPlayers {
     pub max: i32,
     pub online: i32,
+    #[serde(default)]
     pub sample: Vec<ServerGameProfile>,
 }
 
