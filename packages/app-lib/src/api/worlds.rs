@@ -64,7 +64,11 @@ async fn get_singleplayer_worlds(
     instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
-    let mut saves_dir = io::read_dir(instance_dir.join("saves")).await?;
+    let saves_dir = instance_dir.join("saves");
+    if !saves_dir.exists() {
+        return Ok(());
+    }
+    let mut saves_dir = io::read_dir(saves_dir).await?;
     while let Some(world_dir) = saves_dir.next_entry().await? {
         let world_path = world_dir.path();
         let level_dat_path = world_path.join("level.dat");
@@ -135,6 +139,7 @@ async fn get_server_worlds(
 
     #[derive(Deserialize, Debug)]
     struct ServerData {
+        #[serde(default)]
         hidden: bool,
         icon: Option<String>,
         ip: String,
