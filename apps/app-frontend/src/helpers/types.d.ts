@@ -136,13 +136,18 @@ type ServerWorld = BaseWorld & {
 type World = SingleplayerWorld | ServerWorld
 
 type ServerStatus = {
-  version: string
-  enforces_secure_chat: boolean
-  max_players: number
-  online_players: number
-  sample: { name: string, id: string }[]
   // https://minecraft.wiki/w/Text_component_format
-  description?: any,
+  description?: any
+  players?: {
+    max: number
+    online: number
+    sample: { name: string, id: string }[]
+  }
+  version?: {
+    name: string
+    protocol: number
+  }
   favicon?: string
+  enforces_secure_chat: boolean
   ping?: number
 }

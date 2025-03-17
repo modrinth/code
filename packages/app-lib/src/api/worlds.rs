@@ -1,20 +1,18 @@
-use crate::util::io;
+pub use crate::util::server_ping::{
+    ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
+};
+use crate::util::{io, server_ping};
 use crate::{Error, ErrorKind, Result};
-use base64::engine::general_purpose::STANDARD;
-use base64::Engine;
 use chrono::{DateTime, TimeZone, Utc};
-use craftping::Player;
 use either::Either;
 use flate2::read::GzDecoder;
 use hickory_resolver::error::ResolveErrorKind;
 use serde::{Deserialize, Serialize};
-use serde_json::value::{to_raw_value, RawValue};
 use std::cmp::max;
 use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
-use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
-use tokio::net::TcpStream;
+use tokio::io::{AsyncBufReadExt, AsyncReadExt, BufReader};
 use url::Url;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -53,20 +51,6 @@ pub enum SingleplayerGameMode {
     Adventure,
     Spectator,
     Unknown,
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct ServerStatus {
-    pub version: String,
-    pub enforces_secure_chat: bool,
-    pub max_players: usize,
-    pub online_players: usize,
-    pub sample: Vec<Player>,
-    pub description: Option<Box<RawValue>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub favicon: Option<Url>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub ping: Option<i64>,
 }
 
 pub async fn get_profile_worlds(profile_path: &Path) -> Result<Vec<World>> {
@@ -229,44 +213,14 @@ async fn parse_join_log(
 }
 
 pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
-    #[derive(Deserialize, Debug)]
-    struct MotdOnlyResponse {
-        description: Option<Box<RawValue>>,
-    }
-
-    let (host, port) = match parse_server_address(address) {
-        Ok((host, port)) => resolve_server_address(host, port).await?,
-        Err(e) => return Err(e),
-    };
-    let mut stream = TcpStream::connect((&host as &str, port)).await?;
-    let ping_response =
-        craftping::tokio::ping(&mut stream, &host, port).await?;
-    let ping = ping_server(&mut stream).await.ok();
-
-    Ok(ServerStatus {
-        description: serde_json::from_slice::<MotdOnlyResponse>(
-            ping_response.raw(),
-        )
-        .ok()
-        .and_then(|x| x.description)
-        .or_else(|| {
-            ping_response
-                .description
-                .and_then(|x| to_raw_value(&x.text).ok())
-        }),
-        version: ping_response.version,
-        enforces_secure_chat: ping_response
-            .enforces_secure_chat
-            .unwrap_or(false),
-        max_players: ping_response.max_players,
-        online_players: ping_response.online_players,
-        sample: ping_response.sample.unwrap_or_else(Vec::new),
-        favicon: ping_response.favicon.as_ref().and_then(|x| {
-            Url::parse(&format!("data:image/png;base64,{}", STANDARD.encode(x)))
-                .ok()
-        }),
-        ping,
-    })
+    let (original_host, original_port) = parse_server_address(address)?;
+    let (host, port) =
+        resolve_server_address(original_host, original_port).await?;
+    Ok(server_ping::get_server_status(
+        (original_host, original_port),
+        &(&host as &str, port),
+    )
+    .await?)
 }
 
 pub fn parse_server_address(address: &str) -> Result<(&str, u16)> {
@@ -353,25 +307,4 @@ async fn resolve_server_address(
             .map(|r| (r.target().to_string(), port)),
     }
     .unwrap_or_else(|| (host.to_owned(), port)))
-}
-
-async fn ping_server(stream: &mut TcpStream) -> Result<i64> {
-    let start_time = Utc::now();
-    let ping_magic = start_time.timestamp_millis();
-
-    stream.write_all(&[0x09, 0x01]).await?;
-    stream.write_i64(ping_magic).await?;
-    stream.flush().await?;
-
-    let mut response_prefix = [0_u8; 2];
-    stream.read_exact(&mut response_prefix).await?;
-    let response_magic = stream.read_i64().await?;
-    if response_prefix != [0x09, 0x01] || response_magic != ping_magic {
-        return Err(Error::from(ErrorKind::InputError(
-            "Unexpected ping response".to_string(),
-        )));
-    }
-
-    let response_time = Utc::now();
-    Ok((response_time - start_time).num_milliseconds())
 }

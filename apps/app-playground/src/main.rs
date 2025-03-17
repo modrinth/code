@@ -4,7 +4,7 @@
 )]
 
 use theseus::prelude::*;
-use theseus::profile::QuickPlayType;
+use theseus::worlds::get_server_status;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -40,11 +40,8 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
-    profile::run(
-        "Logging Test",
-        &QuickPlayType::Server("hypixel.net".to_string(), 25565),
-    )
-    .await?;
+    let ping = get_server_status("localhost").await?;
+    println!("Ping: {:?}", ping);
 
     Ok(())
 }

@@ -120,9 +120,6 @@ pub enum ErrorKind {
     #[error("Move directory error: {0}")]
     DirectoryMoveError(String),
 
-    #[error("Error pinging Minecraft server: {0}")]
-    ServerPingError(#[from] craftping::Error),
-
     #[error("Error resolving DNS: {0}")]
     DNSError(#[from] hickory_resolver::error::ResolveError),
 }
