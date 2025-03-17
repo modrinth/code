@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-2">
+  <div v-if="worlds.length > 0" class="flex flex-col gap-2">
     <div>
       <ButtonStyled>
         <button :disabled="refreshing" @click="refreshWorlds">
@@ -24,7 +24,7 @@
               v-if="world.type === 'singleplayer'"
               class="text-sm text-secondary flex items-center gap-1 font-semibold"
             >
-              <UserIcon class="h-4 w-4 text-secondary" stroke-width="3px" />
+              <UserIcon class="h-4 w-4 text-secondary shrink-0" stroke-width="3px" />
               Singleplayer
             </div>
             <div
@@ -32,7 +32,7 @@
               class="text-sm text-secondary flex items-center gap-1 font-semibold"
             >
               <template v-if="serverStatus[world.address]">
-                <SpinnerIcon v-if="refreshing" class="animate-spin" />
+                <SpinnerIcon v-if="refreshingServers.includes(world.address)" class="animate-spin shrink-0" />
                 <SignalIcon
                   v-else
                   v-tooltip="
@@ -40,10 +40,11 @@
                   "
                   :style="`--_signal-${getPingLevel(serverStatus[world.address].ping || 0)}: var(--color-green)`"
                   stroke-width="3px"
+                  class="shrink-0"
                 />
-                {{ formatNumber(serverStatus[world.address].online_players, false) }} online
+                {{ formatNumber(serverStatus[world.address].players?.online, false) }} online
               </template>
-              <template v-else> <NoSignalIcon stroke-width="3px" /> Offline </template>
+              <template v-else> <NoSignalIcon stroke-width="3px" class="shrink-0" /> Offline </template>
             </div>
           </div>
           <div class="text-sm text-secondary">
@@ -55,7 +56,7 @@
         </div>
         <div>
           <template v-if="world.type==='server'">
-            <div v-if="refreshing" class="flex items-center text-secondary font-semibold gap-1 px-12 py-3 w-fit rounded-xl">
+            <div v-if="refreshingServers.includes(world.address)" class="flex items-center text-secondary font-semibold gap-1 px-12 py-3 w-fit rounded-xl">
               <SpinnerIcon class="animate-spin" /> Loading...
             </div>
             <div v-else-if="renderedMotds[world.address]" class="motd">
@@ -83,13 +84,45 @@
       </div>
     </div>
   </div>
+  <div v-else class="w-full max-w-[48rem] mx-auto flex flex-col mt-6">
+    <RadialHeader class="">
+      <div class="flex items-center gap-6 w-[32rem] mx-auto">
+        <img src="@/assets/sad-modrinth-bot.webp" class="h-24" />
+        <span class="text-contrast font-bold text-xl"
+        >
+          You don't have any worlds yet.
+        </span
+        >
+      </div>
+    </RadialHeader>
+    <div class="flex gap-2 mt-4 mx-auto">
+      <ButtonStyled>
+        <button>
+          <PlusIcon />
+          Add a server
+        </button>
+      </ButtonStyled>
+      <ButtonStyled>
+        <button :disabled="refreshing" @click="refreshWorlds">
+          <template v-if="refreshing">
+            <SpinnerIcon class="animate-spin" />
+            Refreshing...
+          </template>
+          <template v-else>
+            <UpdatedIcon />
+            Refresh
+          </template>
+        </button>
+      </ButtonStyled>
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { GameInstance } from '@/helpers/types'
 import dayjs from 'dayjs'
-import { Avatar, ButtonStyled } from '@modrinth/ui'
-import { PlayIcon, UserIcon, NoSignalIcon, SpinnerIcon, SignalIcon, UpdatedIcon } from '@modrinth/assets'
+import { Avatar, ButtonStyled, RadialHeader } from '@modrinth/ui'
+import { PlusIcon, PlayIcon, UserIcon, NoSignalIcon, SpinnerIcon, SignalIcon, UpdatedIcon } from '@modrinth/assets'
 import { get_profile_worlds, get_server_status, start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import type { World } from '@/helpers/worlds.ts'
 import { handleError } from '@/store/notifications'
@@ -107,29 +140,52 @@ const refreshing = ref(false)
 const worlds = ref<World[]>([])
 const serverStatus = ref<Record<string, ServerStatus>>({})
 const renderedMotds = ref<Record<string, string>>({})
+const refreshingServers = ref<string[]>([])
+const hadNoWorlds = ref(true);
 
-await refreshWorlds()
+refreshWorlds()
+
+function onError(err: any, addr: string | null = null) {
+  handleError(err)
+  refreshing.value = false
+  if (addr) {
+    refreshingServers.value = refreshingServers.value.filter((s) => s !== addr)
+  }
+}
 
 async function refreshWorlds() {
-  worlds.value = (await get_profile_worlds(props.instance.path).catch(handleError)) ?? []
+  refreshing.value = true
+
+  worlds.value = (await get_profile_worlds(props.instance.path).catch(onError)) ?? []
   worlds.value.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
 
-  refreshing.value = true
+  const servers = worlds.value.filter((w) => w.type === 'server')
+  refreshingServers.value = servers.map((server) => server.address)
+
   await Promise.all(
-    worlds.value
-      .filter((w) => w.type === 'server')
-      .map((server) =>
+    servers.map((server) =>
         get_server_status(server.address)
           .then((status) => {
             serverStatus.value[server.address] = status
             if (status.description) {
               renderedMotds.value[server.address] = autoToHTML(status.description)
             }
+            refreshingServers.value = refreshingServers.value.filter((s) => s !== server.address)
           })
-          .catch(handleError),
+          .catch((error) => onError(error, server.address)),
       ),
   )
-  refreshing.value = false
+  const hasNoWorlds = worlds.value.length === 0
+
+  if (hadNoWorlds.value && hasNoWorlds) {
+    setTimeout(() => {
+      refreshing.value = false
+    }, 1000)
+  } else {
+    refreshing.value = false
+  }
+
+  hadNoWorlds.value = hasNoWorlds
 }
 
 function getPingLevel(ping: number) {
