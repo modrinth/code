@@ -53,6 +53,9 @@ importers:
       '@sentry/vue':
         specifier: ^8.27.0
         version: 8.27.0(vue@3.5.13(typescript@5.5.4))
+      '@sfirew/minecraft-motd-parser':
+        specifier: ^1.1.3
+        version: 1.1.3
       '@tauri-apps/api':
         specifier: ^2.1.1
         version: 2.1.1
@@ -2300,6 +2303,9 @@ packages:
     engines: {node: '>=14.18'}
     peerDependencies:
       vue: 2.x || 3.x
+
+  '@sfirew/minecraft-motd-parser@1.1.3':
+    resolution: {integrity: sha512-wbuZsZ5dlSwOXLGa5thZbP7t1iiQTvyD8KJwWMrrYE4xqzmzHMwoE7mdhZYrEpDKS37sWiOjuxyx6Jf56YbBwg==}
 
   '@shikijs/core@1.29.2':
     resolution: {integrity: sha512-vju0lY9r27jJfOY4Z7+Rt/nIOjzJpZ3y+nYpqtUZInVoXQ/TJZcfGnNOGnKjFdVZb8qexiCuSlZRKcGfhhTTZQ==}
@@ -9348,7 +9354,7 @@ snapshots:
 
   '@nuxtjs/eslint-config-typescript@12.1.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4)':
     dependencies:
-      '@nuxtjs/eslint-config': 12.0.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))
+      '@nuxtjs/eslint-config': 12.0.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))
       '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4)
       '@typescript-eslint/parser': 6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4)
       eslint: 9.13.0(jiti@2.4.1)
@@ -9361,10 +9367,10 @@ snapshots:
       - supports-color
       - typescript
 
-  '@nuxtjs/eslint-config@12.0.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))':
+  '@nuxtjs/eslint-config@12.0.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))':
     dependencies:
       eslint: 9.13.0(jiti@2.4.1)
-      eslint-config-standard: 17.1.0(eslint-plugin-import@2.29.1)(eslint-plugin-n@15.7.0(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-promise@6.4.0(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))
+      eslint-config-standard: 17.1.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-n@15.7.0(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-promise@6.4.0(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-n: 15.7.0(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-node: 11.1.0(eslint@9.13.0(jiti@2.4.1))
@@ -9780,6 +9786,8 @@ snapshots:
       '@sentry/types': 8.27.0
       '@sentry/utils': 8.27.0
       vue: 3.5.13(typescript@5.5.4)
+
+  '@sfirew/minecraft-motd-parser@1.1.3': {}
 
   '@shikijs/core@1.29.2':
     dependencies:
@@ -11926,10 +11934,10 @@ snapshots:
     dependencies:
       eslint: 9.13.0(jiti@2.4.1)
 
-  eslint-config-standard@17.1.0(eslint-plugin-import@2.29.1)(eslint-plugin-n@15.7.0(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-promise@6.4.0(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1)):
+  eslint-config-standard@17.1.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-n@15.7.0(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-promise@6.4.0(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1)):
     dependencies:
       eslint: 9.13.0(jiti@2.4.1)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.16.1(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint@9.13.0(jiti@2.4.1))
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-n: 15.7.0(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-promise: 6.4.0(eslint@9.13.0(jiti@2.4.1))
 
@@ -11955,7 +11963,7 @@ snapshots:
       debug: 4.4.0(supports-color@9.4.0)
       enhanced-resolve: 5.17.1
       eslint: 9.13.0(jiti@2.4.1)
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.16.1(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint@9.13.0(jiti@2.4.1))
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
@@ -11967,7 +11975,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1)):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:

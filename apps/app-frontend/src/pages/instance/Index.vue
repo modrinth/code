@@ -238,6 +238,10 @@ async function fetchInstance() {
       })
   }
 
+  await updatePlayState()
+}
+
+async function updatePlayState() {
   const runningProcesses = await get_by_profile_path(route.params.id).catch(handleError)
 
   playing.value = runningProcesses.length > 0
