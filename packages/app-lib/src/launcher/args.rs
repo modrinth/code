@@ -5,6 +5,7 @@ use crate::{
     state::{MemorySettings, WindowSize},
     util::{io::IOError, platform::classpath_separator},
 };
+use daedalus::minecraft::LoggingConfiguration;
 use daedalus::{
     get_path_from_artifact,
     minecraft::{Argument, ArgumentValue, Library, VersionType},
@@ -104,11 +105,13 @@ pub fn get_jvm_arguments(
     arguments: Option<&[Argument]>,
     natives_path: &Path,
     libraries_path: &Path,
+    log_configs_path: &Path,
     class_paths: &str,
     version_name: &str,
     memory: MemorySettings,
     custom_args: Vec<String>,
     java_arch: &str,
+    log_config: Option<&LoggingConfiguration>,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
@@ -143,6 +146,14 @@ pub fn get_jvm_arguments(
         parsed_arguments.push(class_paths.to_string());
     }
     parsed_arguments.push(format!("-Xmx{}M", memory.maximum));
+    if let Some(LoggingConfiguration::Log4j2Xml { argument, file }) = log_config
+    {
+        let full_path = log_configs_path.join(&file.id);
+        let full_path = full_path.to_string_lossy();
+        let arg = argument.replace("${path}", &full_path);
+        tracing::info!("Using log arg: {arg}");
+        parsed_arguments.push(arg);
+    }
     for arg in custom_args {
         if !arg.is_empty() {
             parsed_arguments.push(arg);
