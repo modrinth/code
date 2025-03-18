@@ -92,18 +92,18 @@
         </div>
         <div class="font-semibold flex items-center gap-1 justify-center text-center" :class="world.type === 'singleplayer' && world.hardcore ? `text-red` : 'text-secondary'">
           <template v-if="world.type === 'server'">
-            <template v-if="refreshingServers.includes(world.address)" class="font-semibold text-secondary">
+            <template v-if="refreshingServers.includes(world.address)">
               <SpinnerIcon class="animate-spin" /> Loading...
             </template>
             <div
               v-else-if="renderedMotds[world.address]"
-              class="font-minecraft line-clamp-2 text-secondary"
+              class="font-normal font-minecraft line-clamp-2 text-secondary"
               v-html="renderedMotds[world.address]"
             />
-            <div v-else-if="!serverStatus[world.address]" class="font-minecraft text-red">
+            <div v-else-if="!serverStatus[world.address]" class="font-normal font-minecraft text-red">
               Can't connect to server
             </div>
-            <div v-else class="font-minecraft text-secondary">A Minecraft Server</div>
+            <div v-else class="font-normal font-minecraft text-secondary">A Minecraft Server</div>
           </template>
           <template
             v-else-if="world.type === 'singleplayer'"
