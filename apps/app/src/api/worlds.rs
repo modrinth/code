@@ -3,7 +3,7 @@ use either::Either;
 use serde::de::DeserializeOwned;
 use tauri::{AppHandle, Manager, Runtime};
 use theseus::prelude::ProcessMetadata;
-use theseus::profile::QuickPlayType;
+use theseus::profile::{get_full_path, QuickPlayType};
 use theseus::worlds::{ServerStatus, World};
 use theseus::{profile, worlds, State};
 
@@ -24,8 +24,7 @@ pub async fn get_profile_worlds<R: Runtime>(
     app_handle: AppHandle<R>,
     path: &str,
 ) -> Result<Vec<World>> {
-    let state = State::get().await?;
-    let path = state.directories.profiles_dir().join(path);
+    let path = get_full_path(path).await?;
     let mut result = worlds::get_profile_worlds(&path).await?;
     for world in result.iter_mut() {
         if let Some(icon) = &world.icon {
