@@ -31,10 +31,12 @@
               v-else-if="world.type === 'server'"
               class="text-sm text-secondary flex items-center gap-1 font-semibold"
             >
-              <template v-if="serverStatus[world.address]">
-                <SpinnerIcon v-if="refreshingServers.includes(world.address)" class="animate-spin shrink-0" />
+              <template v-if="refreshingServers.includes(world.address)">
+                <SpinnerIcon class="animate-spin shrink-0" />
+                Loading...
+              </template>
+              <template v-else-if="serverStatus[world.address]">
                 <SignalIcon
-                  v-else
                   v-tooltip="
                     serverStatus[world.address] ? `${serverStatus[world.address].ping}ms` : null
                   "
@@ -56,7 +58,7 @@
         </div>
         <div>
           <template v-if="world.type==='server'">
-            <div v-if="refreshingServers.includes(world.address)" class="flex items-center text-secondary font-semibold gap-1 px-12 py-3 w-fit rounded-xl">
+            <div v-if="refreshingServers.includes(world.address)">
               <SpinnerIcon class="animate-spin" /> Loading...
             </div>
             <div v-else-if="renderedMotds[world.address]" class="motd">
