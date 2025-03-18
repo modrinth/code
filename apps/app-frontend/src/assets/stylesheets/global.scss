@@ -7,6 +7,10 @@
   src: URL('@/font/minecraft_font.ttf') format('truetype');
 }
 
+.font-minecraft {
+  font-family: 'Minecraft';
+}
+
 :root {
   font-family: var(--font-standard);
   color-scheme: dark;

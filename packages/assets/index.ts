@@ -37,6 +37,7 @@ import _AsteriskIcon from './icons/asterisk.svg?component'
 import _BanIcon from './icons/ban.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
+import _BlocksIcon from './icons/blocks.svg?component'
 import _BookIcon from './icons/book.svg?component'
 import _BookTextIcon from './icons/book-text.svg?component'
 import _BookmarkIcon from './icons/bookmark.svg?component'
@@ -128,6 +129,7 @@ import _PackageIcon from './icons/package.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PaintBrushIcon from './icons/paintbrush.svg?component'
+import _PickaxeIcon from './icons/pickaxe.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
@@ -148,6 +150,7 @@ import _SettingsIcon from './icons/settings.svg?component'
 import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
 import _SignalIcon from './icons/signal.svg?component'
+import _SkullIcon from './icons/skull.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
 import _SortAscendingIcon from './icons/sort-asc.svg?component'
 import _SortDescendingIcon from './icons/sort-desc.svg?component'
@@ -237,6 +240,7 @@ export const AsteriskIcon = _AsteriskIcon
 export const BanIcon = _BanIcon
 export const BellIcon = _BellIcon
 export const BellRingIcon = _BellRingIcon
+export const BlocksIcon = _BlocksIcon
 export const BookIcon = _BookIcon
 export const BookTextIcon = _BookTextIcon
 export const BookmarkIcon = _BookmarkIcon
@@ -328,6 +332,7 @@ export const PackageIcon = _PackageIcon
 export const PackageOpenIcon = _PackageOpenIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PaintBrushIcon = _PaintBrushIcon
+export const PickaxeIcon = _PickaxeIcon
 export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
@@ -348,6 +353,7 @@ export const SettingsIcon = _SettingsIcon
 export const ShareIcon = _ShareIcon
 export const ShieldIcon = _ShieldIcon
 export const SignalIcon = _SignalIcon
+export const SkullIcon = _SkullIcon
 export const SlashIcon = _SlashIcon
 export const SortAscendingIcon = _SortAscendingIcon
 export const SortDescendingIcon = _SortDescendingIcon
