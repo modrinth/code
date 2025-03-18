@@ -262,7 +262,7 @@ struct ProfileQueryResult {
     override_hook_pre_launch: Option<String>,
     override_hook_wrapper: Option<String>,
     override_hook_post_exit: Option<String>,
-    protocol_version: Option<i32>,
+    protocol_version: Option<i64>,
 }
 
 impl TryFrom<ProfileQueryResult> for Profile {
@@ -275,7 +275,7 @@ impl TryFrom<ProfileQueryResult> for Profile {
             name: x.name,
             icon_path: x.icon_path,
             game_version: x.game_version,
-            protocol_version: x.protocol_version,
+            protocol_version: x.protocol_version.map(|x| x as i32),
             loader: ModLoader::from_string(&x.mod_loader),
             loader_version: x.mod_loader_version,
             groups: serde_json::from_value(x.groups).unwrap_or_default(),
