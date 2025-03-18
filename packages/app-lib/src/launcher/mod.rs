@@ -13,8 +13,10 @@ use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{RuleAction, VersionInfo};
 use daedalus::modded::LoaderVersion;
+use serde::Deserialize;
 use st::Profile;
 use std::collections::HashMap;
+use std::path::PathBuf;
 use tokio::process::Command;
 
 mod args;
@@ -314,12 +316,11 @@ pub async fn install_minecraft(
     )
     .await?;
 
+    let client_path = state
+        .directories
+        .version_dir(&version_jar)
+        .join(format!("{version_jar}.jar"));
     if let Some(processors) = &version_info.processors {
-        let client_path = state
-            .directories
-            .version_dir(&version_jar)
-            .join(format!("{version_jar}.jar"));
-
         let libraries_dir = state.directories.libraries_dir();
 
         if let Some(ref mut data) = version_info.data {
@@ -412,8 +413,11 @@ pub async fn install_minecraft(
         }
     }
 
+    let protocol_version = read_protocol_version_from_jar(client_path).await?;
+
     crate::api::profile::edit(&profile.path, |prof| {
         prof.install_stage = ProfileInstallStage::Installed;
+        prof.protocol_version = protocol_version;
 
         async { Ok(()) }
     })
@@ -421,6 +425,34 @@ pub async fn install_minecraft(
     emit_loading(&loading_bar, 1.0, Some("Finished installing"))?;
 
     Ok(())
+}
+
+pub async fn read_protocol_version_from_jar(
+    path: PathBuf,
+) -> crate::Result<Option<i32>> {
+    let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
+    let Some(entry_index) = zip
+        .file()
+        .entries()
+        .iter()
+        .position(|x| matches!(x.filename().as_str(), Ok("version.json")))
+    else {
+        return Ok(None);
+    };
+
+    #[derive(Deserialize, Debug)]
+    struct VersionData {
+        protocol_version: Option<i32>,
+    }
+
+    let mut data = vec![];
+    zip.reader_with_entry(entry_index)
+        .await?
+        .read_to_end_checked(&mut data)
+        .await?;
+    let data: VersionData = serde_json::from_slice(&data)?;
+
+    Ok(data.protocol_version)
 }
 
 #[tracing::instrument(skip_all)]

@@ -5,7 +5,7 @@ pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::util::{io, server_ping};
-use crate::{Error, ErrorKind, Result, State};
+use crate::{launcher, Error, ErrorKind, Result, State};
 use chrono::{DateTime, TimeZone, Utc};
 use either::Either;
 use flate2::read::GzDecoder;
@@ -224,7 +224,7 @@ async fn parse_join_log(
 pub async fn get_profile_protocol_version(
     profile: &str,
 ) -> Result<Option<i32>> {
-    let profile = super::profile::get(profile).await?.ok_or_else(|| {
+    let mut profile = super::profile::get(profile).await?.ok_or_else(|| {
         ErrorKind::UnmanagedProfileError(format!(
             "Could not find profile {}",
             profile
@@ -232,6 +232,10 @@ pub async fn get_profile_protocol_version(
     })?;
     if profile.install_stage != ProfileInstallStage::Installed {
         return Ok(None);
+    }
+
+    if let Some(protocol_version) = profile.protocol_version {
+        return Ok(Some(protocol_version));
     }
 
     let minecraft = crate::api::metadata::get_minecraft_versions().await?;
@@ -269,33 +273,13 @@ pub async fn get_profile_protocol_version(
     if !client_path.exists() {
         return Ok(None);
     }
-    Ok(read_protocol_version_from_jar(client_path).await?)
-}
 
-async fn read_protocol_version_from_jar(path: PathBuf) -> Result<Option<i32>> {
-    let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
-    let Some(entry_index) = zip
-        .file()
-        .entries()
-        .iter()
-        .position(|x| matches!(x.filename().as_str(), Ok("version.json")))
-    else {
-        return Ok(None);
-    };
-
-    #[derive(Deserialize, Debug)]
-    struct VersionData {
-        protocol_version: Option<i32>,
+    let version = launcher::read_protocol_version_from_jar(client_path).await?;
+    if version.is_some() {
+        profile.protocol_version = version;
+        profile.upsert(&state.pool).await?;
     }
-
-    let mut data = vec![];
-    zip.reader_with_entry(entry_index)
-        .await?
-        .read_to_end_checked(&mut data)
-        .await?;
-    let data: VersionData = serde_json::from_slice(&data)?;
-
-    Ok(data.protocol_version)
+    Ok(version)
 }
 
 pub async fn get_server_status(
