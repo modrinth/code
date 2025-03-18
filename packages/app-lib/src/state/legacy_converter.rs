@@ -320,6 +320,7 @@ where
                     name: profile.metadata.name,
                     icon_path: profile.metadata.icon,
                     game_version: profile.metadata.game_version,
+                    protocol_version: None,
                     loader: profile.metadata.loader.into(),
                     loader_version: profile
                         .metadata
