@@ -1,8 +1,11 @@
+use crate::data::ModLoader;
+use crate::launcher::get_loader_version_from_profile;
+use crate::state::ProfileInstallStage;
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::util::{io, server_ping};
-use crate::{Error, ErrorKind, Result};
+use crate::{Error, ErrorKind, Result, State};
 use chrono::{DateTime, TimeZone, Utc};
 use either::Either;
 use flate2::read::GzDecoder;
@@ -12,7 +15,8 @@ use std::cmp::max;
 use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
-use tokio::io::{AsyncBufReadExt, AsyncReadExt, BufReader};
+use tokio::io::AsyncReadExt;
+use tokio::io::{AsyncBufReadExt, BufReader};
 use url::Url;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -217,13 +221,94 @@ async fn parse_join_log(
     Ok(result)
 }
 
-pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
+pub async fn get_profile_protocol_version(
+    profile: &str,
+) -> Result<Option<i32>> {
+    let profile = super::profile::get(profile).await?.ok_or_else(|| {
+        ErrorKind::UnmanagedProfileError(format!(
+            "Could not find profile {}",
+            profile
+        ))
+    })?;
+    if profile.install_stage != ProfileInstallStage::Installed {
+        return Ok(None);
+    }
+
+    let minecraft = crate::api::metadata::get_minecraft_versions().await?;
+    let version_index = minecraft
+        .versions
+        .iter()
+        .position(|it| it.id == profile.game_version)
+        .ok_or(crate::ErrorKind::LauncherError(format!(
+            "Invalid game version: {}",
+            profile.game_version
+        )))?;
+    let version = &minecraft.versions[version_index];
+
+    let loader_version = get_loader_version_from_profile(
+        &profile.game_version,
+        profile.loader,
+        profile.loader_version.as_deref(),
+    )
+    .await?;
+    if profile.loader != ModLoader::Vanilla && loader_version.is_none() {
+        return Ok(None);
+    }
+
+    let version_jar =
+        loader_version.as_ref().map_or(version.id.clone(), |it| {
+            format!("{}-{}", version.id.clone(), it.id.clone())
+        });
+
+    let state = State::get().await?;
+    let client_path = state
+        .directories
+        .version_dir(&version_jar)
+        .join(format!("{version_jar}.jar"));
+
+    if !client_path.exists() {
+        return Ok(None);
+    }
+    Ok(read_protocol_version_from_jar(client_path).await?)
+}
+
+async fn read_protocol_version_from_jar(path: PathBuf) -> Result<Option<i32>> {
+    let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
+    let Some(entry_index) = zip
+        .file()
+        .entries()
+        .iter()
+        .position(|x| matches!(x.filename().as_str(), Ok("version.json")))
+    else {
+        return Ok(None);
+    };
+
+    #[derive(Deserialize, Debug)]
+    struct VersionData {
+        protocol_version: Option<i32>,
+    }
+
+    let mut data = vec![];
+    zip.reader_with_entry(entry_index)
+        .await?
+        .read_to_end_checked(&mut data)
+        .await?;
+    let data: VersionData = serde_json::from_slice(&data)?;
+
+    Ok(data.protocol_version)
+}
+
+pub async fn get_server_status(
+    address: &str,
+    protocol_version: Option<i32>,
+) -> Result<ServerStatus> {
     let (original_host, original_port) = parse_server_address(address)?;
     let (host, port) =
         resolve_server_address(original_host, original_port).await?;
     Ok(server_ping::get_server_status(
-        (original_host, original_port),
         &(&host as &str, port),
+        (original_host, original_port),
+        protocol_version,
     )
     .await?)
 }

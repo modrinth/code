@@ -44,14 +44,16 @@ pub struct ServerVersion {
 }
 
 pub async fn get_server_status(
-    original_address: (&str, u16),
     address: &impl ToSocketAddrs,
+    original_address: (&str, u16),
+    protocol_version: Option<i32>,
 ) -> Result<ServerStatus> {
-    let result = modern::status(original_address, address).await;
+    let result =
+        modern::status(address, original_address, protocol_version).await;
     if result.is_ok() {
         return result;
     }
-    let legacy = legacy::status(original_address, address).await;
+    let legacy = legacy::status(address, original_address).await;
     if legacy.is_ok() {
         return legacy;
     }
@@ -66,11 +68,12 @@ mod modern {
     use tokio::net::{TcpStream, ToSocketAddrs};
 
     pub async fn status(
-        original_address: (&str, u16),
         address: &impl ToSocketAddrs,
+        original_address: (&str, u16),
+        protocol_version: Option<i32>,
     ) -> crate::Result<ServerStatus> {
         let mut stream = TcpStream::connect(address).await?;
-        handshake(&mut stream, original_address).await?;
+        handshake(&mut stream, original_address, protocol_version).await?;
         let mut result = status_body(&mut stream).await?;
         result.ping = ping(&mut stream).await.ok();
         Ok(result)
@@ -79,15 +82,16 @@ mod modern {
     async fn handshake(
         stream: &mut TcpStream,
         original_address: (&str, u16),
+        protocol_version: Option<i32>,
     ) -> crate::Result<()> {
         let (host, port) = original_address;
+        let protocol_version = protocol_version.unwrap_or(-1);
 
         const PACKET_ID: i32 = 0;
-        const PROTOCOL_VERSION: i32 = -1;
         const NEXT_STATE: i32 = 1;
 
         let packet_size = varint::get_byte_size(PACKET_ID)
-            + varint::get_byte_size(PROTOCOL_VERSION)
+            + varint::get_byte_size(protocol_version)
             + varint::get_byte_size(host.len() as i32)
             + host.len()
             + size_of::<u16>()
@@ -99,7 +103,7 @@ mod modern {
 
         varint::write(&mut packet_buffer, packet_size as i32);
         varint::write(&mut packet_buffer, PACKET_ID);
-        varint::write(&mut packet_buffer, PROTOCOL_VERSION);
+        varint::write(&mut packet_buffer, protocol_version);
         varint::write(&mut packet_buffer, host.len() as i32);
         packet_buffer.extend_from_slice(host.as_bytes());
         packet_buffer.extend_from_slice(&port.to_be_bytes());
@@ -226,8 +230,8 @@ mod legacy {
     use tokio::net::{TcpStream, ToSocketAddrs};
 
     pub async fn status(
-        original_address: (&str, u16),
         address: &impl ToSocketAddrs,
+        original_address: (&str, u16),
     ) -> crate::Result<ServerStatus> {
         let mut packet = vec![0xfe, 0x01, 0xfa];
         write_legacy(&mut packet, "MC|PingHost");

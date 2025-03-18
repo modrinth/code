@@ -246,6 +246,7 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "get_profile_worlds",
+                        "get_profile_protocol_version",
                         "get_server_status",
                         "start_join_singleplayer_world",
                         "start_join_server",

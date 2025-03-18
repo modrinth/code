@@ -4,7 +4,7 @@
 )]
 
 use theseus::prelude::*;
-use theseus::worlds::get_server_status;
+use theseus::worlds::get_profile_protocol_version;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -40,8 +40,8 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
-    let ping = get_server_status("localhost").await?;
-    println!("Ping: {:?}", ping);
+    let protocol_version = get_profile_protocol_version("Logging Test").await?;
+    println!("Protocol version: {:?}", protocol_version);
 
     Ok(())
 }

@@ -25,8 +25,12 @@ export async function get_profile_worlds(path: string): Promise<World[]> {
   return await invoke('plugin:worlds|get_profile_worlds', { path })
 }
 
-export async function get_server_status(address: string): Promise<ServerStatus> {
-  return await invoke('plugin:worlds|get_server_status', { address })
+export async function get_profile_protocol_version(path: string): Promise<number | null> {
+  return await invoke('plugin:worlds|get_profile_protocol_version', { path })
+}
+
+export async function get_server_status(address: string, protocol_version: number | null = null): Promise<ServerStatus> {
+  return await invoke('plugin:worlds|get_server_status', { address, protocol_version })
 }
 
 export async function start_join_singleplayer_world(path: string, world: string): Promise<any> {

@@ -11,6 +11,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("worlds")
         .invoke_handler(tauri::generate_handler![
             get_profile_worlds,
+            get_profile_protocol_version,
             get_server_status,
             start_join_singleplayer_world,
             start_join_server,
@@ -58,8 +59,16 @@ pub async fn get_profile_worlds<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn get_server_status(address: &str) -> Result<ServerStatus> {
-    Ok(worlds::get_server_status(address).await?)
+pub async fn get_profile_protocol_version(path: &str) -> Result<Option<i32>> {
+    Ok(worlds::get_profile_protocol_version(path).await?)
+}
+
+#[tauri::command]
+pub async fn get_server_status(
+    address: &str,
+    protocol_version: Option<i32>,
+) -> Result<ServerStatus> {
+    Ok(worlds::get_server_status(address, protocol_version).await?)
 }
 
 #[tauri::command]
