@@ -398,7 +398,7 @@ async function updateServerContext() {
 
 const serverFilters = computed(() => {
   const filters = [];
-  if (server.value) {
+  if (server.value && projectType.value.id !== "modpack") {
     const gameVersion = server.value.general?.mc_version;
     if (gameVersion) {
       filters.push({
@@ -414,6 +414,15 @@ const serverFilters = computed(() => {
     if (platform && modLoaders.includes(platform)) {
       filters.push({
         type: "mod_loader",
+        option: platform,
+      });
+    }
+
+    const pluginLoaders = ["paper", "purpur"];
+
+    if (platform && pluginLoaders.includes(platform)) {
+      filters.push({
+        type: "plugin_loader",
         option: platform,
       });
     }
