@@ -101,10 +101,8 @@ pub async fn start_join_server(
     path: &str,
     address: &str,
 ) -> Result<ProcessMetadata> {
-    let (host, port) = worlds::parse_server_address(address)?;
     let process =
-        profile::run(path, &QuickPlayType::Server(host.to_owned(), port))
-            .await?;
+        profile::run(path, &QuickPlayType::Server(address.to_owned())).await?;
 
     Ok(process)
 }

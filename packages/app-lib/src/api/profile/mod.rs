@@ -40,7 +40,7 @@ pub mod update;
 pub enum QuickPlayType {
     None,
     Singleplayer(String),
-    Server(String, u16),
+    Server(String),
 }
 
 /// Remove a profile
