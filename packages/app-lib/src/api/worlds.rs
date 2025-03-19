@@ -36,7 +36,7 @@ pub struct World {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WorldDetails {
     Singleplayer {
-        path: PathBuf,
+        path: String,
         game_mode: SingleplayerGameMode,
         hardcore: bool,
     },
@@ -138,7 +138,11 @@ async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
         last_played: Utc.timestamp_millis_opt(level_data.last_played).single(),
         icon: icon.map(Either::Left),
         details: WorldDetails::Singleplayer {
-            path: world_path,
+            path: world_path
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .to_string(),
             game_mode,
             hardcore: level_data.hardcore,
         },
