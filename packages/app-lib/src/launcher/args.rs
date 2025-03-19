@@ -340,7 +340,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${quickPlayMultiplayer}",
-            &match quick_play_type {
+            match quick_play_type {
                 QuickPlayType::Server(address) => address,
                 _ => "",
             },

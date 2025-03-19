@@ -17,8 +17,8 @@ use std::collections::HashMap;
 use std::io::Cursor;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
+use tokio::io::AsyncWriteExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use url::Url;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -218,7 +218,7 @@ pub async fn rename_world(
         &mut Cursor::new(level_data),
         quartz_nbt::io::Flavor::GzCompressed,
     )?;
-    let mut data = root_data.get_mut::<_, &mut NbtCompound>("Data")?;
+    let data = root_data.get_mut::<_, &mut NbtCompound>("Data")?;
 
     data.insert(
         "LevelName",
@@ -253,7 +253,7 @@ async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {
         .truncate(false)
         .open(&lock_path)
         .await?;
-    file.write("☃".as_bytes()).await?;
+    file.write_all("☃".as_bytes()).await?;
     let locked = file.try_lock_exclusive()?;
     locked.then_some(file).ok_or_else(|| {
         io::IOError::IOPathError {
@@ -270,7 +270,7 @@ async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {
 async fn try_get_world_session_lock(
     world: &Path,
 ) -> Result<Option<tokio::fs::File>> {
-    let mut file = tokio::fs::File::options()
+    let file = tokio::fs::File::options()
         .create(true)
         .write(true)
         .truncate(false)
@@ -305,7 +305,7 @@ pub async fn add_server_to_profile(
             icon: None,
         },
     );
-    servers_data::write(&profile_path, &servers).await?;
+    servers_data::write(profile_path, &servers).await?;
     Ok(())
 }
 
@@ -472,12 +472,12 @@ pub async fn get_server_status(
     let (original_host, original_port) = parse_server_address(address)?;
     let (host, port) =
         resolve_server_address(original_host, original_port).await?;
-    Ok(server_ping::get_server_status(
+    server_ping::get_server_status(
         &(&host as &str, port),
         (original_host, original_port),
         protocol_version,
     )
-    .await?)
+    .await
 }
 
 pub fn parse_server_address(address: &str) -> Result<(&str, u16)> {
