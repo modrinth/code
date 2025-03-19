@@ -114,27 +114,6 @@ export type InstanceSettingsTabProps = {
   offline?: boolean
 }
 
-type BaseWorld = {
-  name: string
-  last_played?: string
-  icon?: string
-  pinned: boolean
-}
-
-type SingleplayerWorld = BaseWorld & {
-  type: 'singleplayer'
-  path: string
-  game_mode: 'creative' | 'survival' | 'adventure' | 'spectator' | 'unknown'
-  hardware: boolean
-}
-
-type ServerWorld = BaseWorld & {
-  type: 'server'
-  address: string
-}
-
-type World = SingleplayerWorld | ServerWorld
-
 type ServerStatus = {
   // https://minecraft.wiki/w/Text_component_format
   description?: string | Chat

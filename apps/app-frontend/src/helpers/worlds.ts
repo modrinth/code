@@ -5,21 +5,22 @@ export type World = {
   name: string
   last_played: string
   icon?: string
-  pinned: boolean
 } & (
   | {
       type: 'singleplayer'
       path: string
-      game_mode: GameMode
+      game_mode: SingleplayerGameMode
       hardcore: boolean
     }
   | {
       type: 'server'
       address: string
+      pack_status: ServerPackStatus
     }
 )
 
-export type GameMode = 'creative' | 'survival' | 'adventure' | 'spectator'
+export type SingleplayerGameMode = 'survival' | 'creative' | 'adventure' | 'spectator'
+export type ServerPackStatus = 'enabled' | 'disabled' | 'prompt'
 
 export async function get_profile_worlds(path: string): Promise<World[]> {
   return await invoke('plugin:worlds|get_profile_worlds', { path })

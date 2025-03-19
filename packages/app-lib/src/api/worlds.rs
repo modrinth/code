@@ -29,7 +29,6 @@ pub struct World {
         with = "either::serde_untagged_optional"
     )]
     pub icon: Option<Either<PathBuf, Url>>,
-    pub pinned: bool,
     #[serde(flatten)]
     pub details: WorldDetails,
 }
@@ -44,17 +43,27 @@ pub enum WorldDetails {
     },
     Server {
         address: String,
+        pack_status: ServerPackStatus,
     },
 }
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum SingleplayerGameMode {
-    Creative,
+    #[default]
     Survival,
+    Creative,
     Adventure,
     Spectator,
-    Unknown,
+}
+
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum ServerPackStatus {
+    Enabled,
+    Disabled,
+    #[default]
+    Prompt,
 }
 
 pub async fn get_profile_worlds(profile_path: &Path) -> Result<Vec<World>> {
@@ -97,10 +106,13 @@ async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
     #[derive(Deserialize, Debug)]
     #[serde(rename_all = "PascalCase")]
     struct LevelData {
+        #[serde(default)]
         level_name: String,
+        #[serde(default)]
         last_played: i64,
+        #[serde(default)]
         game_type: i32,
-        #[serde(rename = "hardcore")]
+        #[serde(default, rename = "hardcore")]
         hardcore: bool,
     }
 
@@ -116,14 +128,13 @@ async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
         1 => SingleplayerGameMode::Creative,
         2 => SingleplayerGameMode::Adventure,
         3 => SingleplayerGameMode::Spectator,
-        _ => SingleplayerGameMode::Unknown,
+        _ => SingleplayerGameMode::Survival,
     };
 
     Ok(World {
         name: level_data.level_name,
         last_played: Utc.timestamp_millis_opt(level_data.last_played).single(),
         icon: icon.map(Either::Left),
-        pinned: false, // TODO
         details: WorldDetails::Singleplayer {
             path: world_path,
             game_mode,
@@ -138,16 +149,21 @@ async fn get_server_worlds(
 ) -> Result<()> {
     #[derive(Deserialize, Debug)]
     struct ServersData {
+        #[serde(default)]
         servers: Vec<ServerData>,
     }
 
     #[derive(Deserialize, Debug)]
+    #[serde(rename_all = "camelCase")]
     struct ServerData {
         #[serde(default)]
         hidden: bool,
         icon: Option<String>,
+        #[serde(default)]
         ip: String,
+        #[serde(default)]
         name: String,
+        accept_textures: Option<bool>,
     }
 
     let servers_dat_path = instance_dir.join("servers.dat");
@@ -178,8 +194,14 @@ async fn get_server_worlds(
             name: server.name,
             last_played,
             icon: icon.map(Either::Right),
-            pinned: false, // TODO
-            details: WorldDetails::Server { address: server.ip },
+            details: WorldDetails::Server {
+                address: server.ip,
+                pack_status: match server.accept_textures {
+                    Some(true) => ServerPackStatus::Enabled,
+                    Some(false) => ServerPackStatus::Disabled,
+                    None => ServerPackStatus::Prompt,
+                },
+            },
         };
         worlds.push(world);
     }
