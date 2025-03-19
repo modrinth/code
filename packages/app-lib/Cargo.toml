@@ -45,6 +45,7 @@ futures = "0.3"
 reqwest = { version = "0.12.3", features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls", "charset", "http2", "macos-system-configuration"], default-features = false }
 tokio = { version = "1", features = ["full"] }
 async-recursion = "1.0.4"
+fs4 = { version = "0.13", features = ["tokio"] }
 
 notify = { version = "6.1.1", default-features = false }
 notify-debouncer-mini = { version = "0.4.1", default-features = false }

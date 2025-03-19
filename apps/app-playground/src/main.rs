@@ -5,7 +5,7 @@
 
 use theseus::prelude::*;
 use theseus::profile::get_full_path;
-use theseus::worlds::{add_server_to_profile, ServerPackStatus};
+use theseus::worlds::{add_server_to_profile, rename_world, ServerPackStatus};
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -42,13 +42,7 @@ async fn main() -> theseus::Result<()> {
     State::init().await?;
 
     let path = get_full_path("Logging Test").await?;
-    add_server_to_profile(
-        &path,
-        "Test Server".to_string(),
-        "hoplite.gg".to_string(),
-        ServerPackStatus::Enabled,
-    )
-    .await?;
+    rename_world(&path, "New World", "Renamed World!").await?;
 
     Ok(())
 }

@@ -8,14 +8,17 @@ use crate::util::{io, server_ping};
 use crate::{launcher, Error, ErrorKind, Result, State};
 use chrono::{DateTime, TimeZone, Utc};
 use either::Either;
+use fs4::tokio::AsyncFileExt;
 use hickory_resolver::error::ResolveErrorKind;
+use quartz_nbt::{NbtCompound, NbtTag};
 use serde::{Deserialize, Serialize};
 use std::cmp::max;
 use std::collections::HashMap;
+use std::io::Cursor;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
-use tokio::io::AsyncReadExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use url::Url;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -41,6 +44,7 @@ pub enum WorldDetails {
         hardcore: bool,
     },
     Server {
+        index: usize,
         address: String,
         pack_status: ServerPackStatus,
     },
@@ -87,8 +91,10 @@ async fn get_singleplayer_worlds(
         if !level_dat_path.exists() {
             continue;
         }
-        if let Ok(world) = read_singleplayer_world(world_path).await {
-            worlds.push(world);
+        if let Some(_lock) = try_get_world_session_lock(&world_path).await? {
+            if let Ok(world) = read_singleplayer_world(world_path).await {
+                worlds.push(world);
+            }
         }
     }
 
@@ -160,7 +166,7 @@ async fn get_server_worlds(
 
     let join_log = parse_join_log(instance_dir).await.ok();
 
-    for server in servers {
+    for (index, server) in servers.into_iter().enumerate() {
         if server.hidden {
             // TODO: Figure out whether we want to hide or show direct connect servers
             continue;
@@ -180,6 +186,7 @@ async fn get_server_worlds(
             last_played,
             icon: icon.map(Either::Right),
             details: WorldDetails::Server {
+                index,
                 address: server.ip,
                 pack_status: match server.accept_textures {
                     Some(true) => ServerPackStatus::Enabled,
@@ -192,6 +199,85 @@ async fn get_server_worlds(
     }
 
     Ok(())
+}
+
+pub async fn rename_world(
+    instance: &Path,
+    world: &str,
+    new_name: &str,
+) -> Result<()> {
+    let world = instance.join("saves").join(world);
+    let level_dat_path = world.join("level.dat");
+    if !level_dat_path.exists() {
+        return Ok(());
+    }
+    let _lock = get_world_session_lock(&world).await?;
+
+    let level_data = io::read(&level_dat_path).await?;
+    let (mut root_data, _) = quartz_nbt::io::read_nbt(
+        &mut Cursor::new(level_data),
+        quartz_nbt::io::Flavor::GzCompressed,
+    )?;
+    let mut data = root_data.get_mut::<_, &mut NbtCompound>("Data")?;
+
+    data.insert(
+        "LevelName",
+        NbtTag::String(new_name.trim_ascii().to_string()),
+    );
+
+    let mut level_data = vec![];
+    quartz_nbt::io::write_nbt(
+        &mut level_data,
+        None,
+        &root_data,
+        quartz_nbt::io::Flavor::GzCompressed,
+    )?;
+    io::write(level_dat_path, level_data).await?;
+    Ok(())
+}
+
+pub async fn reset_world_icon(instance: &Path, world: &str) -> Result<()> {
+    let world = instance.join("saves").join(world);
+    let icon = world.join("icon.png");
+    if let Some(_lock) = try_get_world_session_lock(&world).await? {
+        let _ = io::remove_file(icon).await;
+    }
+    Ok(())
+}
+
+async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {
+    let lock_path = world.join("session.lock");
+    let mut file = tokio::fs::File::options()
+        .create(true)
+        .write(true)
+        .truncate(false)
+        .open(&lock_path)
+        .await?;
+    file.write("☃".as_bytes()).await?;
+    let locked = file.try_lock_exclusive()?;
+    locked.then_some(file).ok_or_else(|| {
+        io::IOError::IOPathError {
+            source: std::io::Error::new(
+                std::io::ErrorKind::ResourceBusy,
+                "already locked by Minecraft",
+            ),
+            path: lock_path.to_string_lossy().into_owned(),
+        }
+        .into()
+    })
+}
+
+async fn try_get_world_session_lock(
+    world: &Path,
+) -> Result<Option<tokio::fs::File>> {
+    let mut file = tokio::fs::File::options()
+        .create(true)
+        .write(true)
+        .truncate(false)
+        .open(world.join("session.lock"))
+        .await?;
+    let locked = file.try_lock_exclusive()?;
+    Ok(locked.then_some(file))
 }
 
 pub async fn add_server_to_profile(

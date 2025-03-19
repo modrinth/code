@@ -13,6 +13,7 @@ export type World = {
     }
   | {
       type: 'server'
+      index: number,
       address: string
       pack_status: ServerPackStatus
     }
@@ -51,6 +52,14 @@ export interface Chat {
 
 export async function get_profile_worlds(path: string): Promise<World[]> {
   return await invoke('plugin:worlds|get_profile_worlds', { path })
+}
+
+export async function rename_world(instance: string, world: string, new_name: string): Promise<void> {
+  return await invoke('plugin:worlds|rename_world', { instance, world, new_name })
+}
+
+export async function reset_world_icon(instance: string, world: string): Promise<void> {
+  return await invoke('plugin:worlds|reset_world_icon', { instance, world })
 }
 
 export async function add_server_to_profile(path: string, name: string, address: string, pack_status: ServerPackStatus): Promise<void> {

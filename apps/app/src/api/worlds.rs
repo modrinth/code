@@ -11,6 +11,8 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("worlds")
         .invoke_handler(tauri::generate_handler![
             get_profile_worlds,
+            rename_world,
+            reset_world_icon,
             add_server_to_profile,
             get_profile_protocol_version,
             get_server_status,
@@ -56,6 +58,24 @@ pub async fn get_profile_worlds<R: Runtime>(
         }
     }
     Ok(result)
+}
+
+#[tauri::command]
+pub async fn rename_world(
+    instance: &str,
+    world: &str,
+    new_name: &str,
+) -> Result<()> {
+    let instance = get_full_path(instance).await?;
+    worlds::rename_world(&instance, world, new_name).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn reset_world_icon(instance: &str, world: &str) -> Result<()> {
+    let instance = get_full_path(instance).await?;
+    worlds::reset_world_icon(&instance, world).await?;
+    Ok(())
 }
 
 #[tauri::command]

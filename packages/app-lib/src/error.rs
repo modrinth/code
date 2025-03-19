@@ -16,6 +16,9 @@ pub enum ErrorKind {
     #[error("Serialization error (NBT): {0}")]
     NBTError(#[from] quartz_nbt::io::NbtIoError),
 
+    #[error("NBT data structure error: {0}")]
+    NBTReprError(#[from] quartz_nbt::NbtReprError),
+
     #[error("Serialization error (websocket): {0}")]
     WebsocketSerializationError(
         #[from] ariadne::networking::serialization::SerializationError,

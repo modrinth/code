@@ -246,6 +246,8 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "get_profile_worlds",
+                        "rename_world",
+                        "reset_world_icon",
                         "add_server_to_profile",
                         "get_profile_protocol_version",
                         "get_server_status",
