@@ -14,7 +14,7 @@ pub enum ErrorKind {
     JSONError(#[from] serde_json::Error),
 
     #[error("Serialization error (NBT): {0}")]
-    NBTError(#[from] fastnbt::error::Error),
+    NBTError(#[from] quartz_nbt::io::NbtIoError),
 
     #[error("Serialization error (websocket): {0}")]
     WebsocketSerializationError(

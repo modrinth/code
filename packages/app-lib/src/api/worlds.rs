@@ -8,7 +8,6 @@ use crate::util::{io, server_ping};
 use crate::{launcher, Error, ErrorKind, Result, State};
 use chrono::{DateTime, TimeZone, Utc};
 use either::Either;
-use flate2::read::GzDecoder;
 use hickory_resolver::error::ResolveErrorKind;
 use serde::{Deserialize, Serialize};
 use std::cmp::max;
@@ -117,8 +116,11 @@ async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
     }
 
     let level_data = io::read(world_path.join("level.dat")).await?;
-    let level_data = GzDecoder::new(&level_data[..]);
-    let level_data: LevelDataRoot = fastnbt::from_reader(level_data)?;
+    let level_data: LevelDataRoot = quartz_nbt::serde::deserialize(
+        &level_data,
+        quartz_nbt::io::Flavor::GzCompressed,
+    )?
+    .0;
     let level_data = level_data.data;
 
     let icon = Some(world_path.join("icon.png")).filter(|i| i.exists());
@@ -147,35 +149,14 @@ async fn get_server_worlds(
     instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
-    #[derive(Deserialize, Debug)]
-    struct ServersData {
-        #[serde(default)]
-        servers: Vec<ServerData>,
-    }
-
-    #[derive(Deserialize, Debug)]
-    #[serde(rename_all = "camelCase")]
-    struct ServerData {
-        #[serde(default)]
-        hidden: bool,
-        icon: Option<String>,
-        #[serde(default)]
-        ip: String,
-        #[serde(default)]
-        name: String,
-        accept_textures: Option<bool>,
-    }
-
-    let servers_dat_path = instance_dir.join("servers.dat");
-    if !servers_dat_path.exists() {
+    let servers = servers_data::read(instance_dir).await?;
+    if servers.is_empty() {
         return Ok(());
     }
-    let servers_data = io::read(servers_dat_path).await?;
-    let servers_data: ServersData = fastnbt::from_bytes(&servers_data)?;
 
     let join_log = parse_join_log(instance_dir).await.ok();
 
-    for server in servers_data.servers {
+    for server in servers {
         if server.hidden {
             // TODO: Figure out whether we want to hide or show direct connect servers
             continue;
@@ -207,6 +188,96 @@ async fn get_server_worlds(
     }
 
     Ok(())
+}
+
+pub async fn add_server_to_profile(
+    profile_path: &Path,
+    name: String,
+    address: String,
+    pack_status: ServerPackStatus,
+) -> Result<()> {
+    let mut servers = servers_data::read(profile_path).await?;
+    let first_hidden = servers
+        .iter()
+        .position(|x| x.hidden)
+        .unwrap_or(servers.len());
+    servers.insert(
+        first_hidden,
+        servers_data::ServerData {
+            name,
+            ip: address,
+            accept_textures: match pack_status {
+                ServerPackStatus::Enabled => Some(true),
+                ServerPackStatus::Disabled => Some(false),
+                ServerPackStatus::Prompt => None,
+            },
+            hidden: false,
+            icon: None,
+        },
+    );
+    servers_data::write(&profile_path, &servers).await?;
+    Ok(())
+}
+
+mod servers_data {
+    use crate::util::io;
+    use crate::Result;
+    use serde::{Deserialize, Serialize};
+    use std::path::Path;
+
+    #[derive(Serialize, Deserialize, Debug, Clone)]
+    #[serde(rename_all = "camelCase")]
+    pub struct ServerData {
+        #[serde(default)]
+        pub hidden: bool,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub icon: Option<String>,
+        #[serde(default)]
+        pub ip: String,
+        #[serde(default)]
+        pub name: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub accept_textures: Option<bool>,
+    }
+
+    pub async fn read(instance_dir: &Path) -> Result<Vec<ServerData>> {
+        #[derive(Deserialize, Debug)]
+        struct ServersData {
+            #[serde(default)]
+            servers: Vec<ServerData>,
+        }
+
+        let servers_dat_path = instance_dir.join("servers.dat");
+        if !servers_dat_path.exists() {
+            return Ok(vec![]);
+        }
+        let servers_data = io::read(servers_dat_path).await?;
+        let servers_data: ServersData = quartz_nbt::serde::deserialize(
+            &servers_data,
+            quartz_nbt::io::Flavor::Uncompressed,
+        )?
+        .0;
+        Ok(servers_data.servers)
+    }
+
+    pub async fn write(
+        instance_dir: &Path,
+        servers: &[ServerData],
+    ) -> Result<()> {
+        #[derive(Serialize, Debug)]
+        struct ServersData<'a> {
+            servers: &'a [ServerData],
+        }
+
+        let servers_dat_path = instance_dir.join("servers.dat");
+        let data = quartz_nbt::serde::serialize(
+            &ServersData { servers },
+            None,
+            quartz_nbt::io::Flavor::Uncompressed,
+        )?;
+        io::write(servers_dat_path, data).await?;
+        Ok(())
+    }
 }
 
 async fn parse_join_log(

@@ -4,13 +4,14 @@ use serde::de::DeserializeOwned;
 use tauri::{AppHandle, Manager, Runtime};
 use theseus::prelude::ProcessMetadata;
 use theseus::profile::{get_full_path, QuickPlayType};
-use theseus::worlds::{ServerStatus, World};
+use theseus::worlds::{ServerPackStatus, ServerStatus, World};
 use theseus::{profile, worlds, State};
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("worlds")
         .invoke_handler(tauri::generate_handler![
             get_profile_worlds,
+            add_server_to_profile,
             get_profile_protocol_version,
             get_server_status,
             start_join_singleplayer_world,
@@ -55,6 +56,20 @@ pub async fn get_profile_worlds<R: Runtime>(
         }
     }
     Ok(result)
+}
+
+#[tauri::command]
+pub async fn add_server_to_profile(
+    path: &str,
+    name: String,
+    address: String,
+    pack_status: ServerPackStatus,
+) -> Result<()> {
+    let path = get_full_path(path).await?;
+    Ok(
+        worlds::add_server_to_profile(&path, name, address, pack_status)
+            .await?,
+    )
 }
 
 #[tauri::command]

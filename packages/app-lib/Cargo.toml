@@ -63,7 +63,7 @@ base64 = "0.22.0"
 
 sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
 
-fastnbt = "2.5"
+quartz_nbt = { version = "0.2", features = ["serde"] }
 hickory-resolver = "0.24"
 
 ariadne = { path = "../ariadne" }

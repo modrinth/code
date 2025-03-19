@@ -53,6 +53,10 @@ export async function get_profile_worlds(path: string): Promise<World[]> {
   return await invoke('plugin:worlds|get_profile_worlds', { path })
 }
 
+export async function add_server_to_profile(path: string, name: string, address: string, pack_status: ServerPackStatus): Promise<void> {
+  return await invoke('plugin:worlds|add_server_to_profile', { path, name, address, pack_status })
+}
+
 export async function get_profile_protocol_version(path: string): Promise<number | null> {
   return await invoke('plugin:worlds|get_profile_protocol_version', { path })
 }
