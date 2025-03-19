@@ -113,31 +113,3 @@ export type InstanceSettingsTabProps = {
   instance: GameInstance
   offline?: boolean
 }
-
-type ServerStatus = {
-  // https://minecraft.wiki/w/Text_component_format
-  description?: string | Chat
-  players?: {
-    max: number
-    online: number
-    sample: { name: string, id: string }[]
-  }
-  version?: {
-    name: string
-    protocol: number
-  }
-  favicon?: string
-  enforces_secure_chat: boolean
-  ping?: number
-}
-
-export interface Chat {
-  text: string
-  bold: boolean
-  italic: boolean
-  underlined: boolean
-  strikethrough: boolean
-  obfuscated: boolean
-  color?: string
-  extra: Chat[]
-}

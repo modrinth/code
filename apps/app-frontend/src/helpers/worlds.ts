@@ -1,5 +1,4 @@
 import { invoke } from '@tauri-apps/api/core'
-import type { ServerStatus } from '@/helpers/types'
 
 export type World = {
   name: string
@@ -21,6 +20,34 @@ export type World = {
 
 export type SingleplayerGameMode = 'survival' | 'creative' | 'adventure' | 'spectator'
 export type ServerPackStatus = 'enabled' | 'disabled' | 'prompt'
+
+export type ServerStatus = {
+  // https://minecraft.wiki/w/Text_component_format
+  description?: string | Chat
+  players?: {
+    max: number
+    online: number
+    sample: { name: string, id: string }[]
+  }
+  version?: {
+    name: string
+    protocol: number
+  }
+  favicon?: string
+  enforces_secure_chat: boolean
+  ping?: number
+}
+
+export interface Chat {
+  text: string
+  bold: boolean
+  italic: boolean
+  underlined: boolean
+  strikethrough: boolean
+  obfuscated: boolean
+  color?: string
+  extra: Chat[]
+}
 
 export async function get_profile_worlds(path: string): Promise<World[]> {
   return await invoke('plugin:worlds|get_profile_worlds', { path })
