@@ -39,7 +39,7 @@
       </div>
     </div>
     <div class="users-section-outer">
-      <div class="projects-showcase">
+      <div v-if="rows" class="projects-showcase">
         <div v-for="(row, index) in rows" :key="index" class="row">
           <div v-for="n in 2" :key="n" class="row__content" :class="{ offset: index % 2 }">
             <nuxt-link
@@ -60,6 +60,9 @@
             </nuxt-link>
           </div>
         </div>
+      </div>
+      <div v-else class="relative z-[10] w-full text-center text-xl font-bold text-contrast">
+        Failed to load random projects :(
       </div>
       <div class="projects-transition" />
       <div class="users-section">
@@ -535,23 +538,27 @@ const sortType = ref("relevance");
 const auth = await useAuth();
 const tags = useTags();
 
-const newProjects = homePageProjects.slice(0, 40);
-const val = Math.ceil(newProjects.length / 3);
-const rows = ref([
-  newProjects.slice(0, val),
-  newProjects.slice(val, val * 2),
-  newProjects.slice(val * 2, val * 3),
-]);
+const newProjects = homePageProjects?.slice(0, 40);
+const val = Math.ceil(newProjects?.length / 3);
+const rows = ref(
+  newProjects.length > 0
+    ? [
+        newProjects.slice(0, val),
+        newProjects.slice(val, val * 2),
+        newProjects.slice(val * 2, val * 3),
+      ]
+    : undefined,
+);
 
-const notifications = ref(homePageNotifs.hits ?? []);
-const searchProjects = ref(homePageSearch.hits ?? []);
+const notifications = ref(homePageNotifs?.hits ?? []);
+const searchProjects = ref(homePageSearch?.hits ?? []);
 
 async function updateSearchProjects() {
   const res = await useBaseFetch(
     `search?limit=3&query=${searchQuery.value}&index=${sortType.value}`,
   );
 
-  searchProjects.value = res.hits ?? [];
+  searchProjects.value = res?.hits ?? [];
 }
 </script>
 

@@ -1105,14 +1105,19 @@ let project,
   featuredVersions,
   versions,
   organization,
-  resetOrganization;
+  resetOrganization,
+  projectError,
+  membersError,
+  dependenciesError,
+  featuredVersionsError,
+  versionsError;
 try {
   [
-    { data: project, refresh: resetProject },
-    { data: allMembers, refresh: resetMembers },
-    { data: dependencies },
-    { data: featuredVersions },
-    { data: versions },
+    { data: project, error: projectError, refresh: resetProject },
+    { data: allMembers, error: membersError, refresh: resetMembers },
+    { data: dependencies, error: dependenciesError },
+    { data: featuredVersions, error: featuredVersionsError },
+    { data: versions, error: versionsError },
     { data: organization, refresh: resetOrganization },
   ] = await Promise.all([
     useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
@@ -1159,13 +1164,29 @@ try {
 
   versions = shallowRef(toRaw(versions));
   featuredVersions = shallowRef(toRaw(featuredVersions));
-} catch {
+} catch (err) {
   throw createError({
     fatal: true,
-    statusCode: 404,
-    message: "Project not found",
+    statusCode: err.statusCode ?? 500,
+    message: "Error loading project data" + (err.message ? `: ${err.message}` : ""),
   });
 }
+
+function handleError(err, project = false) {
+  if (err.value && err.value.statusCode) {
+    throw createError({
+      fatal: true,
+      statusCode: err.value.statusCode,
+      message: err.value.statusCode === 404 && project ? "Project not found" : err.value.message,
+    });
+  }
+}
+
+handleError(projectError, true);
+handleError(membersError);
+handleError(dependenciesError);
+handleError(featuredVersionsError);
+handleError(versionsError);
 
 if (!project.value) {
   throw createError({
