@@ -1,8 +1,11 @@
 use crate::error::Result;
+use crate::ErrorKind;
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
+use std::time::Duration;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::ToSocketAddrs;
+use tokio::select;
 use url::Url;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -48,21 +51,17 @@ pub async fn get_server_status(
     original_address: (&str, u16),
     protocol_version: Option<i32>,
 ) -> Result<ServerStatus> {
-    let result =
-        modern::status(address, original_address, protocol_version).await;
-    if result.is_ok() {
-        return result;
+    select! {
+        res = modern::status(address, original_address, protocol_version) => res,
+        _ = tokio::time::sleep(Duration::from_secs(30)) => Err(ErrorKind::OtherError(
+            format!("Ping of {}:{} timed out", original_address.0, original_address.1)
+        ).into())
     }
-    let legacy = legacy::status(address, original_address).await;
-    if legacy.is_ok() {
-        return legacy;
-    }
-    result // If the legacy ping fails, return the original failure
 }
 
 mod modern {
     use super::ServerStatus;
-    use crate::{Error, ErrorKind};
+    use crate::ErrorKind;
     use chrono::Utc;
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
     use tokio::net::{TcpStream, ToSocketAddrs};
@@ -123,17 +122,19 @@ mod modern {
 
         let packet_length = varint::read(stream).await?;
         if packet_length < 0 {
-            return Err(Error::from(ErrorKind::InputError(
+            return Err(ErrorKind::InputError(
                 "Invalid status response packet length".to_string(),
-            )));
+            )
+            .into());
         }
 
         let mut packet_stream = stream.take(packet_length as u64);
         let packet_id = varint::read(&mut packet_stream).await?;
         if packet_id != 0x00 {
-            return Err(Error::from(ErrorKind::InputError(
+            return Err(ErrorKind::InputError(
                 "Unexpected status response".to_string(),
-            )));
+            )
+            .into());
         }
         let response_length = varint::read(&mut packet_stream).await?;
         let mut json_response = vec![0_u8; response_length as usize];
@@ -158,9 +159,10 @@ mod modern {
         stream.read_exact(&mut response_prefix).await?;
         let response_magic = stream.read_i64().await?;
         if response_prefix != [0x09, 0x01] || response_magic != ping_magic {
-            return Err(Error::from(ErrorKind::InputError(
+            return Err(ErrorKind::InputError(
                 "Unexpected ping response".to_string(),
-            )));
+            )
+            .into());
         }
 
         let response_time = Utc::now();
@@ -218,92 +220,5 @@ mod modern {
                 }
             }
         }
-    }
-}
-
-mod legacy {
-    use super::ServerStatus;
-    use crate::worlds::{ServerPlayers, ServerVersion};
-    use crate::{Error, ErrorKind};
-    use serde_json::value::to_raw_value;
-    use tokio::io::{AsyncReadExt, AsyncWriteExt};
-    use tokio::net::{TcpStream, ToSocketAddrs};
-
-    pub async fn status(
-        address: &impl ToSocketAddrs,
-        original_address: (&str, u16),
-    ) -> crate::Result<ServerStatus> {
-        let mut packet = vec![0xfe, 0x01, 0xfa];
-        write_legacy(&mut packet, "MC|PingHost");
-
-        let (host, port) = original_address;
-        let len_index = packet.len();
-        packet.push(0x4a);
-        write_legacy(&mut packet, host);
-        packet.extend_from_slice(&(port as u32).to_be_bytes());
-        packet.splice(
-            len_index..len_index,
-            ((packet.len() - len_index) as u16).to_be_bytes(),
-        );
-
-        let mut stream = TcpStream::connect(address).await?;
-        stream.write_all(&packet).await?;
-        stream.flush().await?;
-
-        let packet_id = stream.read_u8().await?;
-        if packet_id != 0xff {
-            return Err(Error::from(ErrorKind::InputError(
-                "Unexpected legacy status response".to_string(),
-            )));
-        }
-
-        let data_length = stream.read_u16().await?;
-        let mut data = vec![0u8; data_length as usize * 2];
-        stream.read_exact(&mut data).await?;
-
-        drop(stream);
-
-        let data = String::from_utf16_lossy(
-            &data
-                .chunks_exact(2)
-                .into_iter()
-                .map(|a| u16::from_be_bytes([a[0], a[1]]))
-                .collect::<Vec<u16>>(),
-        );
-        let mut parts = data.split('\0');
-        if parts.next() != Some("§1") {
-            return Err(Error::from(ErrorKind::InputError(
-                "Legacy response status too old".to_string(),
-            )));
-        }
-
-        Ok(ServerStatus {
-            version: Some(ServerVersion {
-                protocol: parts
-                    .next()
-                    .and_then(|x| x.parse().ok())
-                    .unwrap_or(0),
-                name: parts.next().unwrap_or("").to_owned(),
-            }),
-            description: parts.next().and_then(|x| to_raw_value(x).ok()),
-            players: Some(ServerPlayers {
-                online: parts.next().and_then(|x| x.parse().ok()).unwrap_or(-1),
-                max: parts.next().and_then(|x| x.parse().ok()).unwrap_or(-1),
-                sample: vec![],
-            }),
-            favicon: None,
-            enforces_secure_chat: false,
-            ping: None,
-        })
-    }
-
-    fn write_legacy(out: &mut Vec<u8>, text: &str) {
-        let encoded = text.encode_utf16().collect::<Vec<_>>();
-        out.extend_from_slice(&(encoded.len() as u16).to_be_bytes());
-        encoded
-            .into_iter()
-            .map(|x| x.to_be_bytes())
-            .flatten()
-            .for_each(|x| out.push(x));
     }
 }
