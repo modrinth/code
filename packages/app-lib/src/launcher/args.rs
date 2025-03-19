@@ -150,9 +150,7 @@ pub fn get_jvm_arguments(
     {
         let full_path = log_configs_path.join(&file.id);
         let full_path = full_path.to_string_lossy();
-        let arg = argument.replace("${path}", &full_path);
-        tracing::info!("Using log arg: {arg}");
-        parsed_arguments.push(arg);
+        parsed_arguments.push(argument.replace("${path}", &full_path));
     }
     for arg in custom_args {
         if !arg.is_empty() {
