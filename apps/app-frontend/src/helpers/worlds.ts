@@ -54,8 +54,8 @@ export async function get_profile_worlds(path: string): Promise<World[]> {
   return await invoke('plugin:worlds|get_profile_worlds', { path })
 }
 
-export async function rename_world(instance: string, world: string, new_name: string): Promise<void> {
-  return await invoke('plugin:worlds|rename_world', { instance, world, new_name })
+export async function rename_world(instance: string, world: string, newName: string): Promise<void> {
+  return await invoke('plugin:worlds|rename_world', { instance, world, newName })
 }
 
 export async function reset_world_icon(instance: string, world: string): Promise<void> {
