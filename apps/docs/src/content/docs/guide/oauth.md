@@ -38,6 +38,8 @@ Once the user is ready to authorize your application, you need to construct a UR
 | `state`         | A mechanism to prevent certain attacks. Explained further below. Recommended but optional |
 | `redirect_uri`  | The URI the user is redirect to after finishing authorization                             |
 
+You might have noticed the `state` parameter. [CSRF] (Cross-site request forgery), and [clickjacking] are security vulnerabilities that you're recommended to protect against. In OAuth2 this is usually done with the `state` parameter. When the user initiates a request to start authorization, you include a `state` which is unique to this request. This can, for example, be saved in localStorge or a cookie. When the redirect URI is called, you verify that the `state` parameter is the same. Using `state` is optional, but recommended.
+
 The scope identifiers are currently best found in the backend source code located at [`apps/labrinth/src/models/v3/pats.rs`]. The scope parameter is an array of scope identifiers, seperated by a plus sign (`+`).
 
 The redirect URI is the endpoint on your server that will receive the code which can eventually be used to act on the user's behalf. For security reasons the redirect URI used has to be allowlisted in your application settings. The redirect will contain the following query parameters:
@@ -48,8 +50,6 @@ The redirect URI is the endpoint on your server that will receive the code which
 | `client_id`     | Your client id                                     |
 | `redirect_uri`  | The redirect URI which was used                    |
 | `grant_type`    | Always `authorization_code` in Modrinth            |
-
-In the next chapter we will exchange the authorization code for an access token, but before that we have to discuss this `state` parameter. [CSRF] (Cross-site request forgery), and [clickjacking] are security vulnerabilities that you're recommended to protect against. In OAuth2 this is usually done with the `state` parameter. When the user initiates a request to start authorization, you include a `state` which is unique to this request. This can, for example, be saved in localStorge or a cookie. When the redirect URI is called, you verify that the `state` is the same. Using `state` is optional, but recommended.
 
 ## Exchanging tokens
 
@@ -72,19 +72,9 @@ If the request succeeds, you should receive a JSON payload with these fields:
 | `token_type`   | Currently only `Bearer`                              |
 | `expires_in`   | The amount of seconds until the access token expires |
 
-To use this access token, you attach it to API requests in the `Authorization` header prefixed by `Bearer`. For example `Authorization: Bearer mro_somesecretcharacters`. To get basic information about the authorizer, you can use the [`/user` endpoint], which automatically gets the user from the header.
+To use this access token, you attach it to API requests in the `Authorization` header. To get basic information about the authorizer, you can use the [`/user` endpoint], which automatically gets the user from the header.
 
-## FAQ
-
-**Does Modrinth support implicit authorization grant?** No, Modrinth doesn't currently support implicit authorization grants. Only code grants are supported. Implicit authorization is an alternative way of receiving access rights for users, without the need for a backend server.
-
-**Does Modrinth use JWTs?** No, Modrinth doesn't use JSON Web Tokens for authentication. Instead, tokens starting with `mra_` (standard session), `mrp_` (personal access token) and `mro_` (application) are used.
-
-**Is Modrinth compatible with OpenId Connect?** No, Modrinth doesn't implement the OpenId Connect protocol. The key differences between OAuth and OpenId Connect are usage of JSON and JWTs.
-
-**Is there a token revocation endpoint?** Modrinth's API does currently not have an endpoint for the application to deauthorize itself.
-
-**I have a question!** Questions are very much welcome, and we encourage you to ask in #api-development in the [Discord guild], or create an issue on [GitHub].
+If you have any questions, you're welcome to ask in #api-development in the [Discord guild], or create an issue on [GitHub].
 
 [RFC 6749]: https://datatracker.ietf.org/doc/html/rfc6749
 
