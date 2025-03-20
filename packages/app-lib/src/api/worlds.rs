@@ -85,9 +85,9 @@ impl From<Option<bool>> for ServerPackStatus {
     }
 }
 
-impl Into<Option<bool>> for ServerPackStatus {
-    fn into(self) -> Option<bool> {
-        match self {
+impl From<ServerPackStatus> for Option<bool> {
+    fn from(val: ServerPackStatus) -> Self {
+        match val {
             ServerPackStatus::Enabled => Some(true),
             ServerPackStatus::Disabled => Some(false),
             ServerPackStatus::Prompt => None,
@@ -336,7 +336,7 @@ fn find_available_name(dir: &Path, file_name: &str, extension: &str) -> String {
     }
 
     let mut file_name = file_name.replace(
-        &[
+        [
             '/', '\n', '\r', '\t', '\0', '\x0c', '`', '?', '*', '\\', '<', '>',
             '|', '"', ':', '.', '/', '"',
         ],
@@ -484,7 +484,7 @@ pub async fn edit_server_in_profile(
     pack_status: ServerPackStatus,
 ) -> Result<()> {
     let mut servers = servers_data::read(profile_path).await?;
-    let mut server =
+    let server =
         servers
             .get_mut(index)
             .filter(|x| !x.hidden)
@@ -492,7 +492,7 @@ pub async fn edit_server_in_profile(
                 ErrorKind::InputError(format!(
                     "No editable server at index {index}"
                 ))
-                .into()
+                .as_error()
             })?;
     server.name = name;
     server.ip = address;

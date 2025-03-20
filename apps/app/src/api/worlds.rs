@@ -106,6 +106,7 @@ pub async fn add_server_to_profile(
     )
 }
 
+#[tauri::command]
 pub async fn edit_server_in_profile(
     path: &str,
     index: usize,
@@ -119,6 +120,7 @@ pub async fn edit_server_in_profile(
     Ok(())
 }
 
+#[tauri::command]
 pub async fn remove_server_from_profile(
     path: &str,
     index: usize,
