@@ -66,10 +66,10 @@
 
           if (x.author) {
             item.creator = {
-              name: x.author,
-              type: 'user',
-              id: x.author,
-              link: 'https://modrinth.com/user/' + x.author,
+              name: x.author.name,
+              type: x.author.type,
+              id: x.author.slug,
+              link: `https://modrinth.com/${x.author.type}/${x.author.slug}`,
               linkProps: { target: '_blank' },
             }
           }
@@ -329,6 +329,28 @@ const props = defineProps({
   },
 })
 
+type ProjectListEntryAuthor = {
+  name: string
+  slug: string
+  type: 'user' | 'organization'
+}
+
+type ProjectListEntry = {
+  path: string
+  name: string
+  slug?: string
+  author: ProjectListEntryAuthor | null
+  version: string | null
+  file_name: string
+  icon: string | null
+  disabled: boolean
+  updateVersion?: string
+  outdated: boolean
+  updated: dayjs.Dayjs
+  project_type: string
+  id?: string
+}
+
 const isPackLocked = computed(() => {
   return props.instance.linked_data && props.instance.linked_data.locked
 })
@@ -338,7 +360,7 @@ const canUpdatePack = computed(() => {
 })
 const exportModal = ref(null)
 
-const projects = ref([])
+const projects = ref<ProjectListEntry[]>([])
 const selectedFiles = ref([])
 const selectedProjects = computed(() =>
   projects.value.filter((x) => selectedFiles.value.includes(x.file_name)),
@@ -347,7 +369,7 @@ const selectedProjects = computed(() =>
 const selectionMap = ref(new Map())
 
 const initProjects = async (cacheBehaviour?) => {
-  const newProjects = []
+  const newProjects: ProjectListEntry[] = []
 
   const profileProjects = await get_projects(props.instance.path, cacheBehaviour)
   const fetchProjects = []
@@ -384,21 +406,29 @@ const initProjects = async (cacheBehaviour?) => {
 
         const team = modrinthTeams.find((x) => x[0].team_id === project.team)
 
-        let owner
-
+        let author: ProjectListEntryAuthor | null
         if (org) {
-          owner = org.name
+          author = {
+            name: org.name,
+            slug: org.slug,
+            type: 'organization',
+          }
         } else if (team) {
-          owner = team.find((x) => x.is_owner).user.username
+          const teamMember = team.find((x) => x.is_owner)
+          author = {
+            name: teamMember.user.username,
+            slug: teamMember.user.username,
+            type: 'user',
+          }
         } else {
-          owner = null
+          author = null
         }
 
         newProjects.push({
           path,
           name: project.title,
           slug: project.slug,
-          author: owner,
+          author,
           version: version.version_number,
           file_name: file.file_name,
           icon: project.icon_url,
@@ -417,7 +447,7 @@ const initProjects = async (cacheBehaviour?) => {
     newProjects.push({
       path,
       name: file.file_name.replace('.disabled', ''),
-      author: '',
+      author: null,
       version: null,
       file_name: file.file_name,
       icon: null,
