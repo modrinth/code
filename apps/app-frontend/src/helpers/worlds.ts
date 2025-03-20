@@ -65,8 +65,12 @@ export async function reset_world_icon(instance: string, world: string): Promise
   return await invoke('plugin:worlds|reset_world_icon', { instance, world })
 }
 
-export async function add_server_to_profile(path: string, name: string, address: string, pack_status: ServerPackStatus): Promise<void> {
-  return await invoke('plugin:worlds|add_server_to_profile', { path, name, address, packStatus: pack_status })
+export async function backup_world(instance: string, world: string): Promise<number> {
+  return await invoke('plugin:worlds|backup_world', { instance, world })
+}
+
+export async function add_server_to_profile(path: string, name: string, address: string, packStatus: ServerPackStatus): Promise<void> {
+  return await invoke('plugin:worlds|add_server_to_profile', { path, name, address, packStatus })
 }
 
 export async function get_profile_protocol_version(path: string): Promise<number | null> {

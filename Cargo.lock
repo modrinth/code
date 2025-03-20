@@ -763,6 +763,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-walkdir"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37672978ae0febce7516ae0a85b53e6185159a9a28787391eb63fc44ec36037d"
+dependencies = [
+ "async-fs",
+ "futures-lite 2.3.0",
+ "thiserror 2.0.7",
+]
+
+[[package]]
 name = "async_zip"
 version = "0.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9448,6 +9459,7 @@ dependencies = [
  "ariadne",
  "async-recursion",
  "async-tungstenite",
+ "async-walkdir",
  "async_zip",
  "base64 0.22.1",
  "byteorder",
@@ -9485,6 +9497,7 @@ dependencies = [
  "tempfile",
  "thiserror 1.0.64",
  "tokio 1.44.1",
+ "tokio-util",
  "toml 0.8.19",
  "tracing",
  "tracing-error",

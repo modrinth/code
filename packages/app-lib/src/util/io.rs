@@ -270,3 +270,16 @@ pub async fn remove_file(
             path: path.to_string_lossy().to_string(),
         })
 }
+
+// metadata
+pub async fn metadata(
+    path: impl AsRef<std::path::Path>,
+) -> Result<std::fs::Metadata, IOError> {
+    let path = path.as_ref();
+    tokio::fs::metadata(path)
+        .await
+        .map_err(|e| IOError::IOPathError {
+            source: e,
+            path: path.to_string_lossy().to_string(),
+        })
+}

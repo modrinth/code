@@ -6,11 +6,16 @@ pub use crate::util::server_ping::{
 };
 use crate::util::{io, server_ping};
 use crate::{launcher, Error, ErrorKind, Result, State};
-use chrono::{DateTime, TimeZone, Utc};
+use async_walkdir::WalkDir;
+use async_zip::{Compression, ZipEntryBuilder};
+use chrono::{DateTime, Local, TimeZone, Utc};
 use either::Either;
 use fs4::tokio::AsyncFileExt;
+use futures::StreamExt;
 use hickory_resolver::error::ResolveErrorKind;
+use lazy_static::lazy_static;
 use quartz_nbt::{NbtCompound, NbtTag};
+use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
 use std::cmp::max;
 use std::collections::HashMap;
@@ -19,6 +24,7 @@ use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncWriteExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio_util::compat::FuturesAsyncWriteCompatExt;
 use url::Url;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -243,6 +249,123 @@ pub async fn reset_world_icon(instance: &Path, world: &str) -> Result<()> {
         let _ = io::remove_file(icon).await;
     }
     Ok(())
+}
+
+pub async fn backup_world(instance: &Path, world: &str) -> Result<u64> {
+    let world_dir = instance.join("saves").join(world);
+    let _lock = get_world_session_lock(&world_dir).await?;
+    let backups_dir = instance.join("backups");
+
+    io::create_dir_all(&backups_dir).await?;
+
+    let name_base = {
+        let now = Local::now();
+        let formatted_time = now.format("%Y-%m-%d_%H-%M-%S");
+        format!("{}_{}", formatted_time, world)
+    };
+    let output_path =
+        backups_dir.join(find_available_name(&backups_dir, &name_base, ".zip"));
+
+    let writer = tokio::fs::File::create(&output_path).await?;
+    let mut writer = async_zip::tokio::write::ZipFileWriter::with_tokio(writer);
+
+    let mut walker = WalkDir::new(&world_dir);
+    while let Some(entry) = walker.next().await {
+        let entry = entry.map_err(|e| io::IOError::IOPathError {
+            path: e.path().unwrap().to_string_lossy().to_string(),
+            source: e.into_io().unwrap(),
+        })?;
+        if !entry.file_type().await?.is_file() {
+            continue;
+        }
+        if entry.file_name() == "session.lock" {
+            continue;
+        }
+        let zip_filename = format!(
+            "{world}/{}",
+            entry
+                .path()
+                .strip_prefix(&world_dir)?
+                .display()
+                .to_string()
+                .replace('\\', "/")
+        );
+        let stream = writer
+            .write_entry_stream(
+                ZipEntryBuilder::new(zip_filename.into(), Compression::Deflate)
+                    .build(),
+            )
+            .await?;
+        let mut source = tokio::fs::File::open(entry.path()).await?;
+        tokio::io::copy(&mut source, &mut stream.compat_write()).await?;
+    }
+
+    writer.close().await?;
+    Ok(io::metadata(output_path).await?.len())
+}
+
+fn find_available_name(dir: &Path, file_name: &str, extension: &str) -> String {
+    lazy_static! {
+        static ref RESERVED_WINDOWS_FILENAMES: Regex = RegexBuilder::new(r#"^.*\.|(?:COM|CLOCK\$|CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\..*)?$"#)
+            .case_insensitive(true)
+            .build()
+            .unwrap();
+        static ref COPY_COUNTER_PATTERN: Regex = RegexBuilder::new(r#"^(?<name>.*) \((?<count>\d*)\)$"#)
+            .case_insensitive(true)
+            .unicode(true)
+            .build()
+            .unwrap();
+    }
+
+    let mut file_name = file_name.replace(
+        &[
+            '/', '\n', '\r', '\t', '\0', '\x0c', '`', '?', '*', '\\', '<', '>',
+            '|', '"', ':', '.', '/', '"',
+        ],
+        "_",
+    );
+    if RESERVED_WINDOWS_FILENAMES.is_match(&file_name) {
+        file_name.insert(0, '_');
+        file_name.push('_');
+    }
+
+    let mut count = 0;
+    if let Some(find) = COPY_COUNTER_PATTERN.captures(&file_name) {
+        count = find
+            .name("count")
+            .unwrap()
+            .as_str()
+            .parse::<i32>()
+            .unwrap_or(0);
+        let end = find.name("name").unwrap().end();
+        drop(find);
+        file_name.truncate(end);
+    }
+
+    if file_name.len() > 255 - extension.len() {
+        file_name.truncate(255 - extension.len());
+    }
+
+    let mut current_attempt = file_name.clone();
+    loop {
+        if count != 0 {
+            let with_count = format!(" ({count})");
+            if file_name.len() > 255 - with_count.len() {
+                current_attempt.truncate(255 - with_count.len());
+            }
+            current_attempt.push_str(&with_count);
+        }
+
+        current_attempt.push_str(extension);
+
+        let result = dir.join(&current_attempt);
+        if !result.exists() {
+            return current_attempt;
+        }
+
+        count += 1;
+        current_attempt.replace_range(..current_attempt.len(), &file_name);
+    }
 }
 
 async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {

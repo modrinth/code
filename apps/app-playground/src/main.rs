@@ -5,7 +5,7 @@
 
 use theseus::prelude::*;
 use theseus::profile::get_full_path;
-use theseus::worlds::{add_server_to_profile, rename_world, ServerPackStatus};
+use theseus::worlds::backup_world;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -42,7 +42,8 @@ async fn main() -> theseus::Result<()> {
     State::init().await?;
 
     let path = get_full_path("Logging Test").await?;
-    rename_world(&path, "New World", "Renamed World!").await?;
+    let backup_size = backup_world(&path, "New World").await?;
+    println!("Backed up: {backup_size} bytes");
 
     Ok(())
 }

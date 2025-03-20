@@ -248,6 +248,7 @@ fn main() {
                         "get_profile_worlds",
                         "rename_world",
                         "reset_world_icon",
+                        "backup_world",
                         "add_server_to_profile",
                         "get_profile_protocol_version",
                         "get_server_status",
