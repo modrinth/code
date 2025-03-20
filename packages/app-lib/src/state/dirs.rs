@@ -106,6 +106,12 @@ impl DirectoryInfo {
         self.objects_dir().join(&hash[..2]).join(hash)
     }
 
+    /// Get the Minecraft log config's directory
+    #[inline]
+    pub fn log_configs_dir(&self) -> PathBuf {
+        self.metadata_dir().join("log_configs")
+    }
+
     /// Get the Minecraft legacy assets metadata directory
     #[inline]
     pub fn legacy_assets_dir(&self) -> PathBuf {
