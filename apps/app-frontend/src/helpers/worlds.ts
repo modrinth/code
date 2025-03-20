@@ -1,23 +1,26 @@
 import { invoke } from '@tauri-apps/api/core'
 
-export type World = {
+type BaseWorld = {
   name: string
-  last_played: string
+  last_played?: string
   icon?: string
-} & (
-  | {
-      type: 'singleplayer'
-      path: string
-      game_mode: SingleplayerGameMode
-      hardcore: boolean
-    }
-  | {
-      type: 'server'
-      index: number,
-      address: string
-      pack_status: ServerPackStatus
-    }
-)
+}
+
+export type SingleplayerWorld = BaseWorld & {
+  type: 'singleplayer'
+  path: string
+  game_mode: SingleplayerGameMode
+  hardcore: boolean
+}
+
+export type ServerWorld = BaseWorld & {
+  type: 'server'
+  index: number
+  address: string
+  pack_status: ServerPackStatus
+}
+
+export type World = SingleplayerWorld | ServerWorld
 
 export type SingleplayerGameMode = 'survival' | 'creative' | 'adventure' | 'spectator'
 export type ServerPackStatus = 'enabled' | 'disabled' | 'prompt'
@@ -63,7 +66,7 @@ export async function reset_world_icon(instance: string, world: string): Promise
 }
 
 export async function add_server_to_profile(path: string, name: string, address: string, pack_status: ServerPackStatus): Promise<void> {
-  return await invoke('plugin:worlds|add_server_to_profile', { path, name, address, pack_status })
+  return await invoke('plugin:worlds|add_server_to_profile', { path, name, address, packStatus: pack_status })
 }
 
 export async function get_profile_protocol_version(path: string): Promise<number | null> {

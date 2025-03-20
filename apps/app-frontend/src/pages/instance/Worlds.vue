@@ -1,15 +1,17 @@
 <template>
+  <AddServerModal ref="addServerModal" :instance="instance" :edit="false" @add-server="addServer" />
   <div v-if="worlds.length > 0" class="flex flex-col gap-4">
     <div class="flex flex-wrap gap-2 items-center">
       <div class="iconified-input flex-grow">
         <SearchIcon />
         <input
+          v-model="searchFilter"
           type="text"
           :placeholder="`Search worlds...`"
           class="text-input search-input"
           autocomplete="off"
         />
-        <Button class="r-btn" @click="() => {}">
+        <Button class="r-btn" @click="() => (searchFilter = '')">
           <XIcon />
         </Button>
       </div>
@@ -26,7 +28,7 @@
         </button>
       </ButtonStyled>
       <ButtonStyled>
-        <button>
+        <button @click="addServerModal.show()">
           <PlusIcon />
           Add a server
         </button>
@@ -34,12 +36,20 @@
     </div>
     <FilterBar v-model="filters" :options="filterOptions" />
     <div
-      class="flex flex-col w-full supports-[grid-template-columns:subgrid]:grid supportst-[grid-template-columns:subgrid]:grid-cols-[auto_3fr_4fr_auto] gap-2"
+      class="flex flex-col w-full supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] gap-2"
     >
       <div
-        v-for="world in worlds"
+        v-for="world in worlds.filter((x) => {
+          const availableFilter = filters.includes('available')
+          const typeFilter = filters.includes('server') || filters.includes('world')
+
+          return (
+            (!typeFilter || filters.includes(x.type)) &&
+            (!availableFilter || x.type !== 'server' || serverStatus[x.address]) && !searchFilter || x.name.toLowerCase().includes(searchFilter.toLowerCase())
+          )
+        })"
         :key="world.name"
-        class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised rounded-xl stupports-[grid-template-columns:subgrid]:col-span-full supportst-[grid-template-columns:subgrid]:!grid-cols-subgrid"
+        class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised rounded-xl supports-[grid-template-columns:subgrid]:col-span-full supports-[grid-template-columns:subgrid]:!grid-cols-subgrid"
       >
         <Avatar
           :src="
@@ -83,14 +93,23 @@
               </template>
             </div>
           </div>
-          <div v-tooltip="world.last_played ? dayjs(world.last_played).format('MMMM D, YYYY [at] h:mm A') : null" class="text-sm text-secondary w-fit" :class=" { 'cursor-help': world.last_played }">
+          <div
+            v-tooltip="
+              world.last_played ? dayjs(world.last_played).format('MMMM D, YYYY [at] h:mm A') : null
+            "
+            class="text-sm text-secondary w-fit"
+            :class="{ 'cursor-help': world.last_played }"
+          >
             <template v-if="world.last_played">
               Played {{ dayjs(world.last_played).fromNow() }}
             </template>
             <template v-else> Not played yet </template>
           </div>
         </div>
-        <div class="font-semibold flex items-center gap-1 justify-center text-center" :class="world.type === 'singleplayer' && world.hardcore ? `text-red` : 'text-secondary'">
+        <div
+          class="font-semibold flex items-center gap-1 justify-center text-center"
+          :class="world.type === 'singleplayer' && world.hardcore ? `text-red` : 'text-secondary'"
+        >
           <template v-if="world.type === 'server'">
             <template v-if="refreshingServers.includes(world.address)">
               <SpinnerIcon class="animate-spin" /> Loading...
@@ -100,14 +119,15 @@
               class="font-normal font-minecraft line-clamp-2 text-secondary"
               v-html="renderedMotds[world.address]"
             />
-            <div v-else-if="!serverStatus[world.address]" class="font-normal font-minecraft text-red">
+            <div
+              v-else-if="!serverStatus[world.address]"
+              class="font-normal font-minecraft text-red"
+            >
               Can't connect to server
             </div>
             <div v-else class="font-normal font-minecraft text-secondary">A Minecraft Server</div>
           </template>
-          <template
-            v-else-if="world.type === 'singleplayer'"
-          >
+          <template v-else-if="world.type === 'singleplayer'">
             <template v-if="world.hardcore">
               <SkullIcon class="h-4 w-4 shrink-0" />
               Hardcore mode
@@ -126,9 +146,47 @@
             </button>
           </ButtonStyled>
           <ButtonStyled circular type="transparent">
-            <button>
+            <OverflowMenu
+              :options="[
+                {
+                  id: 'refresh',
+                  shown: world.type === 'server',
+                  action: () => refreshServer(world.address),
+                },
+                {
+                  id: 'copy-address',
+                  shown: world.type === 'server',
+                  action: () => copyToClipboard(world.address),
+                },
+                {
+                  id: 'edit',
+                  action: () => {},
+                },
+                {
+                  id: 'open-folder',
+                  shown: world.type === 'singleplayer',
+                  action: () => {},
+                },
+                {
+                  divider: true,
+                },
+                {
+                  id: 'delete',
+                  color: 'red',
+                  hoverFilled: true,
+                  action: () => {},
+                },
+              ]"
+            >
               <MoreVerticalIcon />
-            </button>
+              <template #edit> <EditIcon /> Edit </template>
+              <template #open-folder> <FolderOpenIcon /> Open folder </template>
+              <template #copy-address> <ClipboardCopyIcon /> Copy address </template>
+              <template #refresh> <UpdatedIcon /> Refresh </template>
+              <template #delete>
+                <TrashIcon /> {{ world.type === 'server' ? 'Remove' : 'Delete' }}
+              </template>
+            </OverflowMenu>
           </ButtonStyled>
         </div>
       </div>
@@ -143,7 +201,7 @@
     </RadialHeader>
     <div class="flex gap-2 mt-4 mx-auto">
       <ButtonStyled>
-        <button>
+        <button @click="addServerModal.show()">
           <PlusIcon />
           Add a server
         </button>
@@ -167,8 +225,17 @@
 import { ref, computed } from 'vue'
 import type { GameInstance } from '@/helpers/types'
 import dayjs from 'dayjs'
-import { Avatar, Button, ButtonStyled, RadialHeader, FilterBar, type FilterBarOption } from '@modrinth/ui'
 import {
+  Avatar,
+  Button,
+  ButtonStyled,
+  RadialHeader,
+  FilterBar,
+  type FilterBarOption,
+  OverflowMenu,
+} from '@modrinth/ui'
+import {
+  ClipboardCopyIcon,
   MoreVerticalIcon,
   PlusIcon,
   PlayIcon,
@@ -177,14 +244,17 @@ import {
   SpinnerIcon,
   SignalIcon,
   UpdatedIcon,
-  FilterIcon,
   SearchIcon,
   XIcon,
   SkullIcon,
   PickaxeIcon,
   BlocksIcon,
   CompassIcon,
-  EyeIcon, UnknownIcon
+  EyeIcon,
+  UnknownIcon,
+  EditIcon,
+  FolderOpenIcon,
+  TrashIcon,
 } from '@modrinth/assets'
 import {
   get_profile_worlds,
@@ -193,12 +263,14 @@ import {
   start_join_singleplayer_world,
 } from '@/helpers/worlds.ts'
 import type { ServerStatus, World } from '@/helpers/worlds.ts'
-import { handleError } from '@/store/notifications'
-import { formatDate, formatNumber } from '@modrinth/utils'
+import { formatNumber } from '@modrinth/utils'
 import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { defineMessage, defineMessages, useVIntl } from '@vintl/vintl'
+import AddServerModal from '@/components/ui/modal/AddServerModal.vue'
 
 const { formatMessage } = useVIntl()
+
+const addServerModal = ref()
 
 const props = defineProps<{
   instance: GameInstance
@@ -207,6 +279,7 @@ const props = defineProps<{
 
 const refreshing = ref(false)
 const filters = ref<string[]>([])
+const searchFilter = ref('')
 
 const worlds = ref<World[]>([])
 const serverStatus = ref<Record<string, ServerStatus>>({})
@@ -288,7 +361,14 @@ const filterOptions = computed(() => {
     })
 
     // add available filter if there's any offline ("unavailable") servers
-    if (worlds.value.some((x) => x.type === 'server' && !serverStatus.value[x.address] && !refreshingServers.value.includes(x.address))) {
+    if (
+      worlds.value.some(
+        (x) =>
+          x.type === 'server' &&
+          !serverStatus.value[x.address] &&
+          !refreshingServers.value.includes(x.address),
+      )
+    ) {
       options.push({
         id: 'available',
         message: messages.available,
@@ -302,35 +382,44 @@ const filterOptions = computed(() => {
 refreshWorlds()
 
 function onError(err: any, addr: string | null = null) {
-  handleError(err)
+  console.error(err)
   refreshing.value = false
   if (addr) {
     refreshingServers.value = refreshingServers.value.filter((s) => s !== addr)
   }
 }
 
+function sortWorlds() {
+  worlds.value.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
+}
+
+async function refreshServer(address: string) {
+  refreshingServers.value.push(address)
+  await refreshServerPromise(address)
+}
+
+function refreshServerPromise(address: string): Promise<void> {
+  return get_server_status(address)
+    .then((status) => {
+      serverStatus.value[address] = status
+      if (status.description) {
+        renderedMotds.value[address] = autoToHTML(status.description)
+      }
+      refreshingServers.value = refreshingServers.value.filter((s) => s !== address)
+    })
+    .catch((error) => onError(error, address))
+}
+
 async function refreshWorlds() {
   refreshing.value = true
 
   worlds.value = (await get_profile_worlds(props.instance.path).catch(onError)) ?? []
-  worlds.value.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
+  sortWorlds()
 
   const servers = worlds.value.filter((w) => w.type === 'server')
   refreshingServers.value = servers.map((server) => server.address)
 
-  await Promise.all(
-    servers.map((server) =>
-      get_server_status(server.address)
-        .then((status) => {
-          serverStatus.value[server.address] = status
-          if (status.description) {
-            renderedMotds.value[server.address] = autoToHTML(status.description)
-          }
-          refreshingServers.value = refreshingServers.value.filter((s) => s !== server.address)
-        })
-        .catch((error) => onError(error, server.address)),
-    ),
-  )
+  await Promise.all(refreshingServers.value.map(refreshServerPromise))
   const hasNoWorlds = worlds.value.length === 0
 
   if (hadNoWorlds.value && hasNoWorlds) {
@@ -342,6 +431,12 @@ async function refreshWorlds() {
   }
 
   hadNoWorlds.value = hasNoWorlds
+}
+
+async function addServer(server: ServerWorld) {
+  worlds.value.push(server)
+  sortWorlds()
+  await refreshServer(server.address)
 }
 
 function getPingLevel(ping: number) {
@@ -366,55 +461,7 @@ async function joinWorld(world: World) {
   }
 }
 
-// const worlds = ref<World[]>([
-//   {
-//     name: 'Hello World',
-//     last_played: '2025-03-12T12:00:00-08:00',
-//     icon: 'https://cdn.modrinth.com/data/mOgUt4GM/1bfe2006b38340e9d064700e41adf84a8abb1bd4_96.webp',
-//     pinned: false,
-//
-//     type: 'singleplayer',
-//     path: props.instance.path,
-//     game_mode: 'survival',
-//     hardcore: false,
-//   },
-//   {
-//     name: 'Hello Server',
-//     last_played: '2025-03-12T12:00:00-08:00',
-//     icon: 'https://cdn.modrinth.com/data/mOgUt4GM/1bfe2006b38340e9d064700e41adf84a8abb1bd4_96.webp',
-//     pinned: false,
-//
-//     type: 'server',
-//     address: '127.0.0.1',
-//   }
-// ])
-//
-
-// const worlds = ref<World[]>([
-//   {
-//     name: 'Hello World',
-//     last_played: '2025-03-12T12:00:00-08:00',
-//     icon: 'https://cdn.modrinth.com/data/mOgUt4GM/1bfe2006b38340e9d064700e41adf84a8abb1bd4_96.webp',
-//     pinned: false,
-//
-//     path: props.instance.path,
-//     game_mode: 'survival',
-//     hardcore: false,
-//     type: 'singleplayer',
-//   },
-//   {
-//     name: 'Hello Server',
-//     last_played: '2025-03-12T12:00:00-08:00',
-//     icon: 'https://cdn.modrinth.com/data/1bokaNcj/354080f65407e49f486fcf9c4580e82c45ae63b8_96.webp',
-//     pinned: false,
-//
-//     online: false,
-//     address: '127.0.0.1',
-//     order: 0,
-//     online_players: 3,
-//     ping: 240,
-//     motd: `This is a server's MOTD`,
-//     type: 'server',
-//   }
-// ]);
+async function copyToClipboard(text) {
+  await navigator.clipboard.writeText(text)
+}
 </script>
