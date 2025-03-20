@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE users\n            SET avatar_url = NULL, raw_avatar_url = NULL\n            WHERE (id = $1)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "483cb875ba81c7563a2f7220158cfcb9e6a117a4efc070438606e4c94103a9a4"
+}

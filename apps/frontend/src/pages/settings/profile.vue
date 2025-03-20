@@ -32,6 +32,10 @@
           >
             <UploadIcon />
           </FileInput>
+          <Button v-if="avatarUrl !== null" :action="removePreviewImage">
+            <TrashIcon />
+            {{ formatMessage(commonMessages.removeImageButton) }}
+          </Button>
           <Button
             v-if="previewImage"
             :action="
@@ -86,7 +90,7 @@
 </template>
 
 <script setup>
-import { UserIcon, SaveIcon, UploadIcon, UndoIcon, XIcon } from "@modrinth/assets";
+import { UserIcon, SaveIcon, UploadIcon, UndoIcon, XIcon, TrashIcon } from "@modrinth/assets";
 import { Avatar, FileInput, Button, commonMessages } from "@modrinth/ui";
 
 useHead({
@@ -142,6 +146,7 @@ const bio = ref(auth.value.user.bio);
 const avatarUrl = ref(auth.value.user.avatar_url);
 const icon = shallowRef(null);
 const previewImage = shallowRef(null);
+const pendingAvatarDeletion = ref(false);
 const saved = ref(false);
 
 const hasUnsavedChanges = computed(
@@ -160,9 +165,15 @@ function showPreviewImage(files) {
   };
 }
 
+function removePreviewImage() {
+  pendingAvatarDeletion.value = true;
+  previewImage.value = "https://cdn.modrinth.com/placeholder.png";
+}
+
 function cancel() {
   icon.value = null;
   previewImage.value = null;
+  pendingAvatarDeletion.value = false;
   username.value = auth.value.user.username;
   bio.value = auth.value.user.bio;
 }
@@ -170,6 +181,14 @@ function cancel() {
 async function saveChanges() {
   startLoading();
   try {
+    if (pendingAvatarDeletion.value) {
+      await useBaseFetch(`user/${auth.value.user.id}/icon`, {
+        method: "DELETE",
+      });
+      pendingAvatarDeletion.value = false;
+      previewImage.value = null;
+    }
+
     if (icon.value) {
       await useBaseFetch(
         `user/${auth.value.user.id}/icon?ext=${
