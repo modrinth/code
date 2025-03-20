@@ -2,6 +2,7 @@
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
+use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
 use crate::profile::QuickPlayType;
 use crate::state::{
@@ -11,7 +12,7 @@ use crate::util::io;
 use crate::{process, state as st, State};
 use chrono::Utc;
 use daedalus as d;
-use daedalus::minecraft::{RuleAction, VersionInfo};
+use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::LoaderVersion;
 use serde::Deserialize;
 use st::Profile;
@@ -524,7 +525,7 @@ pub async fn launch_minecraft(
             format!("{}-{}", version.id.clone(), it.id.clone())
         });
 
-    let version_info = download::download_version_info(
+    let mut version_info = download::download_version_info(
         &state,
         version,
         loader_version.as_ref(),
@@ -532,6 +533,26 @@ pub async fn launch_minecraft(
         None,
     )
     .await?;
+    if version_info.logging.is_none() {
+        let requires_logging_info = version_index
+            <= minecraft
+                .versions
+                .iter()
+                .position(|x| x.id == "13w39a")
+                .unwrap_or(0);
+        if requires_logging_info {
+            version_info = download::download_version_info(
+                &state,
+                version,
+                loader_version.as_ref(),
+                Some(true),
+                None,
+            )
+            .await?;
+        }
+    }
+
+    download_log_config(&state, &version_info, None, false).await?;
 
     let java_version = get_java_version_from_profile(profile, &version_info)
         .await?
@@ -591,6 +612,7 @@ pub async fn launch_minecraft(
                     .map(|x| x.as_slice()),
                 &natives_dir,
                 &state.directories.libraries_dir(),
+                &state.directories.log_configs_dir(),
                 &args::get_class_paths(
                     &state.directories.libraries_dir(),
                     version_info.libraries.as_slice(),
@@ -603,6 +625,10 @@ pub async fn launch_minecraft(
                 Vec::from(java_args),
                 &java_version.architecture,
                 quick_play_type,
+                version_info
+                    .logging
+                    .as_ref()
+                    .and_then(|x| x.get(&LoggingSide::Client)),
             )?
             .into_iter()
             .collect::<Vec<_>>(),

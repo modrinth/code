@@ -39,14 +39,14 @@ defineProps({
 })
 
 const typeClasses = {
-  info: 'border-blue bg-bg-blue',
-  warning: 'border-orange bg-bg-orange',
+  info: 'border-brand-blue bg-bg-blue',
+  warning: 'border-brand-orange bg-bg-orange',
   critical: 'border-brand-red bg-bg-red',
 }
 
 const iconClasses = {
-  info: 'text-blue',
-  warning: 'text-orange',
+  info: 'text-brand-blue',
+  warning: 'text-brand-orange',
   critical: 'text-brand-red',
 }
 

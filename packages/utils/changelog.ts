@@ -11,6 +11,22 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-03-13T19:30:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Updated Modrinth Servers marketing page, removing Pyro branding.`,
+  },
+  {
+    date: `2025-03-12T10:15:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed low-res icons being pixelated.
+- Fixed mobile navbar hiding bottom of footer.
+- Updated CMP info page to correct some incorrect information.
+- Updated CCPA notice with updated information since Modrinth Servers and Modrinth+.
+- Fixed review page failing under edge case.`,
+  },
+  {
     date: `2025-03-05T17:40:00-08:00`,
     product: 'web',
     body: `### Improvements
