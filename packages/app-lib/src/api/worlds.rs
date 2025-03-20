@@ -212,7 +212,7 @@ pub async fn rename_world(
     world: &str,
     new_name: &str,
 ) -> Result<()> {
-    let world = instance.join("saves").join(world);
+    let world = get_world_dir(instance, world);
     let level_dat_path = world.join("level.dat");
     if !level_dat_path.exists() {
         return Ok(());
@@ -243,7 +243,7 @@ pub async fn rename_world(
 }
 
 pub async fn reset_world_icon(instance: &Path, world: &str) -> Result<()> {
-    let world = instance.join("saves").join(world);
+    let world = get_world_dir(instance, world);
     let icon = world.join("icon.png");
     if let Some(_lock) = try_get_world_session_lock(&world).await? {
         let _ = io::remove_file(icon).await;
@@ -252,7 +252,7 @@ pub async fn reset_world_icon(instance: &Path, world: &str) -> Result<()> {
 }
 
 pub async fn backup_world(instance: &Path, world: &str) -> Result<u64> {
-    let world_dir = instance.join("saves").join(world);
+    let world_dir = get_world_dir(instance, world);
     let _lock = get_world_session_lock(&world_dir).await?;
     let backups_dir = instance.join("backups");
 
@@ -370,6 +370,34 @@ fn find_available_name(dir: &Path, file_name: &str, extension: &str) -> String {
     }
 }
 
+pub async fn delete_world(instance: &Path, world: &str) -> Result<()> {
+    let world = get_world_dir(instance, world);
+    let lock = get_world_session_lock(&world).await?;
+    let lock_path = world.join("session.lock");
+
+    let mut dir = io::read_dir(&world).await?;
+    while let Some(entry) = dir.next_entry().await? {
+        let path = entry.path();
+        if entry.file_type().await?.is_dir() {
+            io::remove_dir_all(path).await?;
+            continue;
+        }
+        if path != lock_path {
+            io::remove_file(path).await?;
+        }
+    }
+
+    drop(lock);
+    io::remove_file(lock_path).await?;
+    io::remove_dir(world).await?;
+
+    Ok(())
+}
+
+fn get_world_dir(instance: &Path, world: &str) -> PathBuf {
+    instance.join("saves").join(world)
+}
+
 async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {
     let lock_path = world.join("session.lock");
     let mut file = tokio::fs::File::options()
@@ -379,6 +407,7 @@ async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {
         .open(&lock_path)
         .await?;
     file.write_all("☃".as_bytes()).await?;
+    file.sync_all().await?;
     let locked = file.try_lock_exclusive()?;
     locked.then_some(file).ok_or_else(|| {
         io::IOError::IOPathError {
@@ -401,6 +430,7 @@ async fn try_get_world_session_lock(
         .truncate(false)
         .open(world.join("session.lock"))
         .await?;
+    file.sync_all().await?;
     let locked = file.try_lock_exclusive()?;
     Ok(locked.then_some(file))
 }

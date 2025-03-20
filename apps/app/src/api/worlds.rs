@@ -13,6 +13,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             rename_world,
             reset_world_icon,
             backup_world,
+            delete_world,
             add_server_to_profile,
             get_profile_protocol_version,
             get_server_status,
@@ -80,6 +81,13 @@ pub async fn reset_world_icon(instance: &str, world: &str) -> Result<()> {
 pub async fn backup_world(instance: &str, world: &str) -> Result<u64> {
     let instance = get_full_path(instance).await?;
     Ok(worlds::backup_world(&instance, world).await?)
+}
+
+#[tauri::command]
+pub async fn delete_world(instance: &str, world: &str) -> Result<()> {
+    let instance = get_full_path(instance).await?;
+    worlds::delete_world(&instance, world).await?;
+    Ok(())
 }
 
 #[tauri::command]

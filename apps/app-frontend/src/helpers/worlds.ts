@@ -69,6 +69,10 @@ export async function backup_world(instance: string, world: string): Promise<num
   return await invoke('plugin:worlds|backup_world', { instance, world })
 }
 
+export async function delete_world(instance: string, world: string): Promise<void> {
+  return await invoke('plugin:worlds|delete_world', { instance, world })
+}
+
 export async function add_server_to_profile(path: string, name: string, address: string, packStatus: ServerPackStatus): Promise<number> {
   return await invoke('plugin:worlds|add_server_to_profile', { path, name, address, packStatus })
 }

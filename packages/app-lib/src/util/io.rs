@@ -271,6 +271,19 @@ pub async fn remove_file(
         })
 }
 
+// remove dir
+pub async fn remove_dir(
+    path: impl AsRef<std::path::Path>,
+) -> Result<(), IOError> {
+    let path = path.as_ref();
+    tokio::fs::remove_dir(path)
+        .await
+        .map_err(|e| IOError::IOPathError {
+            source: e,
+            path: path.to_string_lossy().to_string(),
+        })
+}
+
 // metadata
 pub async fn metadata(
     path: impl AsRef<std::path::Path>,
