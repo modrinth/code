@@ -262,7 +262,7 @@ import {
   start_join_server,
   start_join_singleplayer_world,
 } from '@/helpers/worlds.ts'
-import type { ServerStatus, World } from '@/helpers/worlds.ts'
+import type { ServerStatus, World, ServerWorld } from '@/helpers/worlds.ts'
 import { formatNumber } from '@modrinth/utils'
 import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { defineMessage, defineMessages, useVIntl } from '@vintl/vintl'

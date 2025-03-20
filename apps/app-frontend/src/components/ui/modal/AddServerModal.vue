@@ -59,10 +59,11 @@ const resourcePackOption = ref(resourcePackOptions.value[0])
 async function addServer() {
   const serverName = name.value ? name.value : address.value
   const status = resourcePackOption.value.id
-  await add_server_to_profile(props.instance.path, serverName, address.value, status).catch(handleError)
+  const index = await add_server_to_profile(props.instance.path, serverName, address.value, status).catch(handleError)
   emit('add-server', {
     name: serverName,
     type: 'server',
+    index,
     address: address.value,
     pack_status: status,
   })

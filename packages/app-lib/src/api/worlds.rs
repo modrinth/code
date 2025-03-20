@@ -408,14 +408,14 @@ pub async fn add_server_to_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
-) -> Result<()> {
+) -> Result<usize> {
     let mut servers = servers_data::read(profile_path).await?;
-    let first_hidden = servers
+    let insert_index = servers
         .iter()
         .position(|x| x.hidden)
         .unwrap_or(servers.len());
     servers.insert(
-        first_hidden,
+        insert_index,
         servers_data::ServerData {
             name,
             ip: address,
@@ -429,7 +429,7 @@ pub async fn add_server_to_profile(
         },
     );
     servers_data::write(profile_path, &servers).await?;
-    Ok(())
+    Ok(insert_index)
 }
 
 mod servers_data {
