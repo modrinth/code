@@ -15,6 +15,8 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             backup_world,
             delete_world,
             add_server_to_profile,
+            edit_server_in_profile,
+            remove_server_from_profile,
             get_profile_protocol_version,
             get_server_status,
             start_join_singleplayer_world,
@@ -102,6 +104,28 @@ pub async fn add_server_to_profile(
         worlds::add_server_to_profile(&path, name, address, pack_status)
             .await?,
     )
+}
+
+pub async fn edit_server_in_profile(
+    path: &str,
+    index: usize,
+    name: String,
+    address: String,
+    pack_status: ServerPackStatus,
+) -> Result<()> {
+    let path = get_full_path(path).await?;
+    worlds::edit_server_in_profile(&path, index, name, address, pack_status)
+        .await?;
+    Ok(())
+}
+
+pub async fn remove_server_from_profile(
+    path: &str,
+    index: usize,
+) -> Result<()> {
+    let path = get_full_path(path).await?;
+    worlds::remove_server_from_profile(&path, index).await?;
+    Ok(())
 }
 
 #[tauri::command]

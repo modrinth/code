@@ -77,6 +77,14 @@ export async function add_server_to_profile(path: string, name: string, address:
   return await invoke('plugin:worlds|add_server_to_profile', { path, name, address, packStatus })
 }
 
+export async function edit_server_in_profile(path: string, index: number, name: string, address: string, packStatus: ServerPackStatus): Promise<void> {
+  return await invoke('plugin:worlds|edit_server_in_profile', { path, index, name, address, packStatus })
+}
+
+export async function remove_server_from_profile(path: string, index: number): Promise<void> {
+  return await invoke('plugin:worlds|remove_server_from_profile', { path, index })
+}
+
 export async function get_profile_protocol_version(path: string): Promise<number | null> {
   return await invoke('plugin:worlds|get_profile_protocol_version', { path })
 }

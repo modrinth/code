@@ -75,6 +75,26 @@ pub enum ServerPackStatus {
     Prompt,
 }
 
+impl From<Option<bool>> for ServerPackStatus {
+    fn from(value: Option<bool>) -> Self {
+        match value {
+            Some(true) => ServerPackStatus::Enabled,
+            Some(false) => ServerPackStatus::Disabled,
+            None => ServerPackStatus::Prompt,
+        }
+    }
+}
+
+impl Into<Option<bool>> for ServerPackStatus {
+    fn into(self) -> Option<bool> {
+        match self {
+            ServerPackStatus::Enabled => Some(true),
+            ServerPackStatus::Disabled => Some(false),
+            ServerPackStatus::Prompt => None,
+        }
+    }
+}
+
 pub async fn get_profile_worlds(profile_path: &Path) -> Result<Vec<World>> {
     let mut result = vec![];
     get_singleplayer_worlds(profile_path, &mut result).await?;
@@ -194,11 +214,7 @@ async fn get_server_worlds(
             details: WorldDetails::Server {
                 index,
                 address: server.ip,
-                pack_status: match server.accept_textures {
-                    Some(true) => ServerPackStatus::Enabled,
-                    Some(false) => ServerPackStatus::Disabled,
-                    None => ServerPackStatus::Prompt,
-                },
+                pack_status: server.accept_textures.into(),
             },
         };
         worlds.push(world);
@@ -451,17 +467,54 @@ pub async fn add_server_to_profile(
         servers_data::ServerData {
             name,
             ip: address,
-            accept_textures: match pack_status {
-                ServerPackStatus::Enabled => Some(true),
-                ServerPackStatus::Disabled => Some(false),
-                ServerPackStatus::Prompt => None,
-            },
+            accept_textures: pack_status.into(),
             hidden: false,
             icon: None,
         },
     );
     servers_data::write(profile_path, &servers).await?;
     Ok(insert_index)
+}
+
+pub async fn edit_server_in_profile(
+    profile_path: &Path,
+    index: usize,
+    name: String,
+    address: String,
+    pack_status: ServerPackStatus,
+) -> Result<()> {
+    let mut servers = servers_data::read(profile_path).await?;
+    let mut server =
+        servers
+            .get_mut(index)
+            .filter(|x| !x.hidden)
+            .ok_or_else(|| {
+                ErrorKind::InputError(format!(
+                    "No editable server at index {index}"
+                ))
+                .into()
+            })?;
+    server.name = name;
+    server.ip = address;
+    server.accept_textures = pack_status.into();
+    servers_data::write(profile_path, &servers).await?;
+    Ok(())
+}
+
+pub async fn remove_server_from_profile(
+    profile_path: &Path,
+    index: usize,
+) -> Result<()> {
+    let mut servers = servers_data::read(profile_path).await?;
+    if servers.get(index).filter(|x| !x.hidden).is_none() {
+        return Err(ErrorKind::InputError(format!(
+            "No removable server at index {index}"
+        ))
+        .into());
+    }
+    servers.remove(index);
+    servers_data::write(profile_path, &servers).await?;
+    Ok(())
 }
 
 mod servers_data {

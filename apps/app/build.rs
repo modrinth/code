@@ -251,6 +251,8 @@ fn main() {
                         "backup_world",
                         "delete_world",
                         "add_server_to_profile",
+                        "edit_server_in_profile",
+                        "remove_server_from_profile",
                         "get_profile_protocol_version",
                         "get_server_status",
                         "start_join_singleplayer_world",
