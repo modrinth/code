@@ -1,11 +1,10 @@
 use crate::api::Result;
 use either::Either;
-use serde::de::DeserializeOwned;
 use tauri::{AppHandle, Manager, Runtime};
 use theseus::prelude::ProcessMetadata;
 use theseus::profile::{get_full_path, QuickPlayType};
 use theseus::worlds::{ServerPackStatus, ServerStatus, World};
-use theseus::{profile, worlds, State};
+use theseus::{profile, worlds};
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("worlds")
@@ -31,30 +30,28 @@ pub async fn get_profile_worlds<R: Runtime>(
     let path = get_full_path(path).await?;
     let mut result = worlds::get_profile_worlds(&path).await?;
     for world in result.iter_mut() {
-        if let Some(icon) = &world.icon {
-            if let Either::Left(icon_path) = &icon {
-                let icon_path = icon_path.clone();
-                if let Ok(new_url) =
-                    super::utils::tauri_convert_file_src(&icon_path)
+        if let Some(Either::Left(icon_path)) = &world.icon {
+            let icon_path = icon_path.clone();
+            if let Ok(new_url) =
+                super::utils::tauri_convert_file_src(&icon_path)
+            {
+                world.icon = Some(Either::Right(new_url));
+                if let Err(e) =
+                    app_handle.asset_protocol_scope().allow_file(&icon_path)
                 {
-                    world.icon = Some(Either::Right(new_url));
-                    if let Err(e) =
-                        app_handle.asset_protocol_scope().allow_file(&icon_path)
-                    {
-                        tracing::warn!(
-                            "Failed to allow file access for icon {}: {}",
-                            icon_path.display(),
-                            e
-                        );
-                    }
-                } else {
                     tracing::warn!(
-                        "Encountered invalid icon path for world {}: {}",
-                        world.name,
-                        icon_path.display()
+                        "Failed to allow file access for icon {}: {}",
+                        icon_path.display(),
+                        e
                     );
-                    world.icon = None;
                 }
+            } else {
+                tracing::warn!(
+                    "Encountered invalid icon path for world {}: {}",
+                    world.name,
+                    icon_path.display()
+                );
+                world.icon = None;
             }
         }
     }
