@@ -290,14 +290,16 @@ pub async fn backup_world(instance: &Path, world: &str) -> Result<u64> {
                 .to_string()
                 .replace('\\', "/")
         );
-        let stream = writer
+        let mut stream = writer
             .write_entry_stream(
                 ZipEntryBuilder::new(zip_filename.into(), Compression::Deflate)
                     .build(),
             )
-            .await?;
+            .await?
+            .compat_write();
         let mut source = tokio::fs::File::open(entry.path()).await?;
-        tokio::io::copy(&mut source, &mut stream.compat_write()).await?;
+        tokio::io::copy(&mut source, &mut stream).await?;
+        stream.into_inner().close().await?;
     }
 
     writer.close().await?;
