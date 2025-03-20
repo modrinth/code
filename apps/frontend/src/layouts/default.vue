@@ -80,6 +80,23 @@
         /></Button>
       </div>
     </div>
+    <div
+      v-if="generatedStateErrors && generatedStateErrors.length > 0"
+      class="site-banner site-banner--warning [&>*]:z-[6]"
+    >
+      <div class="site-banner__title">
+        <IssuesIcon aria-hidden="true" />
+        <span>{{ formatMessage(failedToBuildBannerMessages.title) }}</span>
+      </div>
+      <div class="site-banner__description">
+        {{
+          formatMessage(failedToBuildBannerMessages.description, {
+            errors: generatedStateErrors,
+            url: config.public.apiBaseUrl,
+          })
+        }}
+      </div>
+    </div>
     <header
       class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
     >
@@ -538,7 +555,7 @@
       <slot id="main" />
     </main>
     <footer
-      class="footer-brand-background experimental-styles-within mt-6 border-0 border-t-[1px] border-solid"
+      class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid"
     >
       <div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
         <div
@@ -667,8 +684,9 @@ import {
   ScaleIcon,
 } from "@modrinth/assets";
 import { Button, ButtonStyled, OverflowMenu, Avatar, commonMessages } from "@modrinth/ui";
-
 import { isAdmin, isStaff } from "@modrinth/utils";
+import { errors as generatedStateErrors } from "~/generated/state.json";
+
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
@@ -734,6 +752,18 @@ const stagingBannerMessages = defineMessages({
     id: "layout.banner.staging.description",
     defaultMessage:
       "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.",
+  },
+});
+
+const failedToBuildBannerMessages = defineMessages({
+  title: {
+    id: "layout.banner.build-fail.title",
+    defaultMessage: "Error generating state from API when building.",
+  },
+  description: {
+    id: "layout.banner.build-fail.description",
+    defaultMessage:
+      "This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}",
   },
 });
 
