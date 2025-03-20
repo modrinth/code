@@ -39,7 +39,7 @@
         <div class="button-group">
           <ButtonStyled>
             <button @click="$refs.modal_package_mod.hide()">
-              <CrossIcon aria-hidden="true" />
+              <XIcon aria-hidden="true" />
               Cancel
             </button>
           </ButtonStyled>
@@ -109,7 +109,7 @@
             v-if="auth.user"
             :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
           >
-            <CrossIcon aria-hidden="true" />
+            <XIcon aria-hidden="true" />
             Cancel
           </nuxt-link>
         </ButtonStyled>
@@ -136,7 +136,7 @@
               project.slug ? project.slug : project.id
             }/version/${encodeURI(version.displayUrlEnding)}`"
           >
-            <CrossIcon aria-hidden="true" />
+            <XIcon aria-hidden="true" />
             Discard changes
           </nuxt-link>
         </ButtonStyled>
@@ -627,6 +627,23 @@
 </template>
 <script>
 import { ButtonStyled, ConfirmModal, MarkdownEditor } from "@modrinth/ui";
+import {
+  FileIcon,
+  TrashIcon,
+  EditIcon,
+  DownloadIcon,
+  StarIcon,
+  ReportIcon,
+  SaveIcon,
+  XIcon,
+  HashIcon,
+  PlusIcon,
+  TransferIcon,
+  UploadIcon,
+  BoxIcon,
+  RightArrowIcon,
+  ChevronRightIcon,
+} from "@modrinth/assets";
 import { Multiselect } from "vue-multiselect";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 import { inferVersionInfo } from "~/helpers/infer.js";
@@ -636,32 +653,14 @@ import { reportVersion } from "~/utils/report-helpers.ts";
 import { useImageUpload } from "~/composables/image-upload.ts";
 
 import Avatar from "~/components/ui/Avatar.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import Badge from "~/components/ui/Badge.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import FileInput from "~/components/ui/FileInput.vue";
-
-import FileIcon from "~/assets/images/utils/file.svg?component";
-import TrashIcon from "~/assets/images/utils/trash.svg?component";
-import EditIcon from "~/assets/images/utils/edit.svg?component";
-import DownloadIcon from "~/assets/images/utils/download.svg?component";
-import StarIcon from "~/assets/images/utils/star.svg?component";
-import ReportIcon from "~/assets/images/utils/report.svg?component";
-import SaveIcon from "~/assets/images/utils/save.svg?component";
-import CrossIcon from "~/assets/images/utils/x.svg?component";
-import HashIcon from "~/assets/images/utils/hash.svg?component";
-import PlusIcon from "~/assets/images/utils/plus.svg?component";
-import TransferIcon from "~/assets/images/utils/transfer.svg?component";
-import UploadIcon from "~/assets/images/utils/upload.svg?component";
-import BackIcon from "~/assets/images/utils/left-arrow.svg?component";
-import BoxIcon from "~/assets/images/utils/box.svg?component";
-import RightArrowIcon from "~/assets/images/utils/right-arrow.svg?component";
 import Modal from "~/components/ui/Modal.vue";
-import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
-
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 export default defineNuxtComponent({
   components: {
@@ -678,12 +677,11 @@ export default defineNuxtComponent({
     FileIcon,
     ReportIcon,
     SaveIcon,
-    CrossIcon,
+    XIcon,
     HashIcon,
     PlusIcon,
     TransferIcon,
     UploadIcon,
-    BackIcon,
     Avatar,
     Badge,
     Breadcrumbs,
