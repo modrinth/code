@@ -119,6 +119,7 @@ pub fn get_jvm_arguments(
     java_arch: &str,
     quick_play_type: &QuickPlayType,
     log_config: Option<&LoggingConfiguration>,
+    supplementary_log_config_path: &Path,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
@@ -158,7 +159,14 @@ pub fn get_jvm_arguments(
     {
         let full_path = log_configs_path.join(&file.id);
         let full_path = full_path.to_string_lossy();
-        parsed_arguments.push(argument.replace("${path}", &full_path));
+        let supplementary_path =
+            supplementary_log_config_path.to_string_lossy();
+        parsed_arguments.push(
+            argument.replace(
+                "${path}",
+                &format!("{full_path},{supplementary_path}"),
+            ),
+        );
     }
     for arg in custom_args {
         if !arg.is_empty() {
