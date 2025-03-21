@@ -148,7 +148,7 @@
           <template v-else-if="world.type === 'singleplayer'">
             <template v-if="world.hardcore">
               <SkullIcon class="h-4 w-4 shrink-0" />
-              {{ formatMessage(messages.hardcoreMode) }}
+              {{ formatMessage(messages.hardcore) }}
             </template>
             <template v-else>
               <component :is="gameModes[world.game_mode].icon" class="h-4 w-4 shrink-0" />
@@ -169,12 +169,12 @@
                 {
                   id: 'refresh',
                   shown: world.type === 'server',
-                  action: () => refreshServer(world.address),
+                  action: () => refreshServer((world as ServerWorld).address),
                 },
                 {
                   id: 'copy-address',
                   shown: world.type === 'server',
-                  action: () => copyToClipboard(world.address),
+                  action: () => copyToClipboard((world as ServerWorld).address),
                 },
                 {
                   id: 'edit',
@@ -321,8 +321,7 @@ const refreshing = ref(false)
 const filters = ref<string[]>([])
 const searchFilter = ref('')
 
-const protocolVersion = ref(null)
-
+const protocolVersion = ref<number | null>(null)
 protocolVersion.value = await get_profile_protocol_version(props.instance.path)
 
 const worlds = ref<World[]>([])
@@ -433,7 +432,7 @@ const filterOptions = computed(() => {
 
 refreshWorlds()
 
-function onError(err: any, addr: string | null = null) {
+function onError(err: unknown, addr: string | null = null) {
   console.error(err)
   refreshing.value = false
   if (addr) {
@@ -529,19 +528,27 @@ async function promptToRemoveWorld(world: World) {
 }
 
 async function removeServer() {
+  if (!serverToRemove.value) {
+    handleError(`Error removing server, no server marked for removal.`)
+    return;
+  }
   await remove_server_from_profile(props.instance.path, serverToRemove.value.index).catch(
     handleError,
   )
   worlds.value = worlds.value.filter(
-    (s) => s.type !== 'server' || s.index !== serverToRemove.value.index,
+    (s) => s.type !== 'server' || s.index !== serverToRemove.value?.index,
   )
   serverToRemove.value = undefined
 }
 
 async function deleteWorld() {
+  if (!worldToRemove.value) {
+    handleError(`Error deleting world, no world marked for removal.`)
+    return;
+  }
   await delete_world(props.instance.path, worldToRemove.value.path).catch(handleError)
   worlds.value = worlds.value.filter(
-    (s) => s.type !== 'singleplayer' || s.path !== worldToRemove.value.path,
+    (s) => s.type !== 'singleplayer' || s.path !== worldToRemove.value?.path,
   )
   worldToRemove.value = undefined
 }
@@ -568,7 +575,7 @@ async function joinWorld(world: World) {
   }
 }
 
-async function copyToClipboard(text) {
+async function copyToClipboard(text: string) {
   await navigator.clipboard.writeText(text)
 }
 </script>
