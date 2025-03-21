@@ -6,7 +6,10 @@
       </slot>
     </template>
     <div>
-      <div class="markdown-body max-w-[35rem]" v-html="renderString(description)" />
+      <div v-if="markdown" class="markdown-body max-w-[35rem]" v-html="renderString(description)" />
+      <p v-else class="max-w-[35rem] m-0">
+        {{ description}}
+      </p>
       <label v-if="hasToType" for="confirmation" class="confirmation-label">
         <span>
           <strong>To verify, type</strong>
@@ -89,6 +92,10 @@ const props = defineProps({
     default() {
       return () => {}
     },
+  },
+  markdown: {
+    type: Boolean,
+    default: true,
   },
 })
 

@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import { PlusIcon, XIcon } from '@modrinth/assets'
+import { SaveIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages } from '@modrinth/ui'
 import { ref } from 'vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import type { GameInstance } from '@/helpers/types'
-import InstanceModalTitlePrefix from '@/components/ui/modal/InstanceModalTitlePrefix.vue'
-import { add_server_to_profile, type ServerWorld } from '@/helpers/worlds'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import { edit_server_in_profile, type ServerWorld } from '@/helpers/worlds'
+import { defineMessage, defineMessages, useVIntl } from '@vintl/vintl'
 import { handleError } from '@/store/notifications'
 import ServerModalBody from '@/components/ui/modal/ServerModalBody.vue'
 
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
-  'submit': [server: ServerWorld]
+  submit: [server: ServerWorld]
 }>()
 
 const props = defineProps<{
@@ -25,12 +24,14 @@ const modal = ref()
 const name = ref()
 const address = ref()
 const resourcePack = ref('enabled')
+const index = ref()
 
-async function addServer() {
+async function saveServer() {
   const serverName = name.value ? name.value : address.value
   const resourcePackStatus = resourcePack.value
-  const index = await add_server_to_profile(
+  await edit_server_in_profile(
     props.instance.path,
+    index.value,
     serverName,
     address.value,
     resourcePackStatus,
@@ -38,17 +39,18 @@ async function addServer() {
   emit('submit', {
     name: serverName,
     type: 'server',
-    index,
+    index: index.value,
     address: address.value,
     pack_status: resourcePackStatus,
   })
   hide()
 }
 
-function show() {
-  name.value = ''
-  address.value = ''
-  resourcePack.value = 'enabled'
+function show(server: ServerWorld) {
+  name.value = server.name
+  address.value = server.address
+  resourcePack.value = server.pack_status
+  index.value = server.index
   modal.value.show()
 }
 
@@ -56,26 +58,17 @@ function hide() {
   modal.value.hide()
 }
 
-const messages = defineMessages({
-  title: {
-    id: 'instance.add-server.title',
-    defaultMessage: 'Add a server',
-  },
-  addServer: {
-    id: 'instance.add-server.add-server',
-    defaultMessage: 'Add server',
-  },
-})
+defineExpose({ show })
 
-defineExpose({ show, hide })
+const titleMessage = defineMessage({
+  id: 'instance.edit-server.title',
+  defaultMessage: 'Edit server',
+})
 </script>
 <template>
   <ModalWrapper ref="modal">
     <template #title>
-      <span class="flex items-center gap-2 text-lg font-semibold text-primary">
-        <InstanceModalTitlePrefix :instance="instance" />
-        <span class="font-extrabold text-contrast">{{ formatMessage(messages.title) }}</span>
-      </span>
+      <span class="font-extrabold text-lg text-contrast">{{ formatMessage(titleMessage) }}</span>
     </template>
     <ServerModalBody
       v-model:name="name"
@@ -84,9 +77,9 @@ defineExpose({ show, hide })
     />
     <div class="flex gap-2 mt-4">
       <ButtonStyled color="brand">
-        <button :disabled="!address" @click="addServer">
-          <PlusIcon />
-          {{ formatMessage(messages.addServer) }}
+        <button :disabled="!address" @click="saveServer">
+          <SaveIcon />
+          {{ formatMessage(commonMessages.saveChangesButton) }}
         </button>
       </ButtonStyled>
       <ButtonStyled>

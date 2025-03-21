@@ -1,5 +1,20 @@
 <template>
-  <AddServerModal ref="addServerModal" :instance="instance" :edit="false" @add-server="addServer" />
+  <AddServerModal ref="addServerModal" :instance="instance" @submit="addServer" />
+  <EditServerModal ref="editServerModal" :instance="instance" @submit="editServer" />
+  <EditWorldModal ref="editWorldModal" :instance="instance" @submit="editWorld" />
+  <ConfirmModalWrapper
+    ref="removeServerModal"
+    :title="`Are you sure you want to remove this server?`"
+    :description="`'${serverToRemove?.name}'${serverToRemove?.address === serverToRemove?.name ? ' ' : ` (${serverToRemove?.address})`} will be removed from your list, including in-game, and there will be no way to recover it.`"
+    :markdown="false"
+    @proceed="removeServer"
+  />
+  <ConfirmModalWrapper
+    ref="deleteWorldModal"
+    :title="`Are you sure you want to permanently delete this world?`"
+    :description="`'${worldToRemove?.name}' will be **permanently deleted**, and there will be no way to recover it.`"
+    @proceed="deleteWorld"
+  />
   <div v-if="worlds.length > 0" class="flex flex-col gap-4">
     <div class="flex flex-wrap gap-2 items-center">
       <div class="iconified-input flex-grow">
@@ -41,11 +56,12 @@
       <div
         v-for="world in worlds.filter((x) => {
           const availableFilter = filters.includes('available')
-          const typeFilter = filters.includes('server') || filters.includes('world')
+          const typeFilter = filters.includes('server') || filters.includes('singleplayer')
 
           return (
             (!typeFilter || filters.includes(x.type)) &&
-            (!availableFilter || x.type !== 'server' || serverStatus[x.address]) && !searchFilter || x.name.toLowerCase().includes(searchFilter.toLowerCase())
+            (!availableFilter || x.type !== 'server' || serverStatus[x.address]) &&
+            (!searchFilter || x.name.toLowerCase().includes(searchFilter.toLowerCase()))
           )
         })"
         :key="world.name"
@@ -67,7 +83,7 @@
               class="text-sm text-secondary flex items-center gap-1 font-semibold"
             >
               <UserIcon class="h-4 w-4 text-secondary shrink-0" stroke-width="3px" />
-              Singleplayer
+              {{ formatMessage(messages.singleplayer) }}
             </div>
             <div
               v-else-if="world.type === 'server'"
@@ -123,14 +139,16 @@
               v-else-if="!serverStatus[world.address]"
               class="font-normal font-minecraft text-red"
             >
-              Can't connect to server
+              {{ formatMessage(messages.cantConnect) }}
             </div>
-            <div v-else class="font-normal font-minecraft text-secondary">A Minecraft Server</div>
+            <div v-else class="font-normal font-minecraft text-secondary">
+              {{ formatMessage(messages.aMinecraftServer) }}
+            </div>
           </template>
           <template v-else-if="world.type === 'singleplayer'">
             <template v-if="world.hardcore">
               <SkullIcon class="h-4 w-4 shrink-0" />
-              Hardcore mode
+              {{ formatMessage(messages.hardcoreMode) }}
             </template>
             <template v-else>
               <component :is="gameModes[world.game_mode].icon" class="h-4 w-4 shrink-0" />
@@ -160,7 +178,13 @@
                 },
                 {
                   id: 'edit',
-                  action: () => {},
+                  action: () => {
+                    if (world.type === 'server') {
+                      editServerModal.show(world)
+                    } else {
+                      editWorldModal.show(world)
+                    }
+                  },
                 },
                 {
                   id: 'open-folder',
@@ -174,7 +198,9 @@
                   id: 'delete',
                   color: 'red',
                   hoverFilled: true,
-                  action: () => {},
+                  action: () => {
+                    promptToRemoveWorld(world)
+                  },
                 },
               ]"
             >
@@ -257,20 +283,34 @@ import {
   TrashIcon,
 } from '@modrinth/assets'
 import {
+  delete_world,
+  get_profile_protocol_version,
   get_profile_worlds,
   get_server_status,
+  remove_server_from_profile,
   start_join_server,
   start_join_singleplayer_world,
 } from '@/helpers/worlds.ts'
-import type { ServerStatus, World, ServerWorld } from '@/helpers/worlds.ts'
+import type { ServerStatus, World, ServerWorld, SingleplayerWorld } from '@/helpers/worlds.ts'
 import { formatNumber } from '@modrinth/utils'
 import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { defineMessage, defineMessages, useVIntl } from '@vintl/vintl'
 import AddServerModal from '@/components/ui/modal/AddServerModal.vue'
+import EditServerModal from '@/components/ui/modal/EditServerModal.vue'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import { handleError } from '@/store/notifications'
+import EditWorldModal from '@/components/ui/modal/EditSingleplayerWorldModal.vue'
 
 const { formatMessage } = useVIntl()
 
 const addServerModal = ref()
+const editServerModal = ref()
+const editWorldModal = ref()
+const removeServerModal = ref()
+const deleteWorldModal = ref()
+
+const serverToRemove = ref<ServerWorld>()
+const worldToRemove = ref<SingleplayerWorld>()
 
 const props = defineProps<{
   instance: GameInstance
@@ -280,6 +320,10 @@ const props = defineProps<{
 const refreshing = ref(false)
 const filters = ref<string[]>([])
 const searchFilter = ref('')
+
+const protocolVersion = ref(null)
+
+protocolVersion.value = await get_profile_protocol_version(props.instance.path)
 
 const worlds = ref<World[]>([])
 const serverStatus = ref<Record<string, ServerStatus>>({})
@@ -303,6 +347,14 @@ const messages = defineMessages({
   hardcore: {
     id: 'instance.worlds.hardcore',
     defaultMessage: 'Hardcore mode',
+  },
+  cantConnect: {
+    id: 'instance.worlds.cant_connect',
+    defaultMessage: "Can't connect to server",
+  },
+  aMinecraftServer: {
+    id: 'instance.worlds.a_minecraft_server',
+    defaultMessage: 'A Minecraft Server',
   },
 })
 
@@ -399,7 +451,7 @@ async function refreshServer(address: string) {
 }
 
 function refreshServerPromise(address: string): Promise<void> {
-  return get_server_status(address)
+  return get_server_status(address, protocolVersion.value)
     .then((status) => {
       serverStatus.value[address] = status
       if (status.description) {
@@ -437,6 +489,61 @@ async function addServer(server: ServerWorld) {
   worlds.value.push(server)
   sortWorlds()
   await refreshServer(server.address)
+}
+
+async function editServer(server: ServerWorld) {
+  const index = worlds.value.findIndex(
+    (w) => w.type === "server" && w.index === server.index
+  )
+  if (index !== -1) {
+    worlds.value[index] = server
+    sortWorlds()
+    await refreshServer(server.address)
+  } else {
+    handleError(`Error refreshing server, refreshing all worlds`)
+    await refreshWorlds()
+  }
+}
+async function editWorld(path: string, name: string, removeIcon: boolean) {
+  const world = worlds.value.find((world) => world.type === 'singleplayer' && world.path === path);
+  if (world) {
+    world.name = name
+    if (removeIcon) {
+      world.icon = undefined
+    }
+    sortWorlds()
+  } else {
+    handleError(`Error finding world in list, refreshing all worlds`)
+    await refreshWorlds()
+  }
+}
+
+async function promptToRemoveWorld(world: World) {
+  if (world.type === 'server') {
+    serverToRemove.value = world
+    removeServerModal.value.show()
+  } else {
+    worldToRemove.value = world
+    deleteWorldModal.value.show()
+  }
+}
+
+async function removeServer() {
+  await remove_server_from_profile(props.instance.path, serverToRemove.value.index).catch(
+    handleError,
+  )
+  worlds.value = worlds.value.filter(
+    (s) => s.type !== 'server' || s.index !== serverToRemove.value.index,
+  )
+  serverToRemove.value = undefined
+}
+
+async function deleteWorld() {
+  await delete_world(props.instance.path, worldToRemove.value.path).catch(handleError)
+  worlds.value = worlds.value.filter(
+    (s) => s.type !== 'singleplayer' || s.path !== worldToRemove.value.path,
+  )
+  worldToRemove.value = undefined
 }
 
 function getPingLevel(ping: number) {
