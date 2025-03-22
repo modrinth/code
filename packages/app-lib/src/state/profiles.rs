@@ -12,12 +12,13 @@ use sqlx::SqlitePool;
 use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::path::Path;
+use uuid::Uuid;
 
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
     pub path: String,
-    pub uuid: UUid
+    pub uuid: Uuid,
     pub install_stage: ProfileInstallStage,
 
     pub name: String,
