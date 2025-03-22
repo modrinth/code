@@ -2,6 +2,7 @@ import type { ModrinthId } from '@modrinth/utils'
 
 type GameInstance = {
   path: string
+  uuid: string
   install_stage: InstallStage
 
   name: string

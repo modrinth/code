@@ -17,6 +17,7 @@ use std::path::Path;
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
     pub path: String,
+    pub uuid: UUid
     pub install_stage: ProfileInstallStage,
 
     pub name: String,
