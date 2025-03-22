@@ -27,7 +27,6 @@ import _TumblrIcon from './external/tumblr.svg?component'
 import _TwitterIcon from './external/twitter.svg?component'
 import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
-import _PyroIcon from './external/pyro.svg?component'
 
 // Icons
 import _AlignLeftIcon from './icons/align-left.svg?component'
@@ -227,7 +226,6 @@ export const MastodonIcon = _MastodonIcon
 export const OpenCollectiveIcon = _OpenCollectiveIcon
 export const PatreonIcon = _PatreonIcon
 export const PayPalIcon = _PayPalIcon
-export const PyroIcon = _PyroIcon
 export const RedditIcon = _RedditIcon
 export const TumblrIcon = _TumblrIcon
 export const TwitterIcon = _TwitterIcon
