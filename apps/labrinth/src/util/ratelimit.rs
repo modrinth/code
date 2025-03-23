@@ -177,6 +177,22 @@ where
                         "*".parse().unwrap(),
                     );
 
+                    headers.insert(
+                        actix_web::http::header::HeaderName::from_str(
+                            "Access-Control-Allow-Methods",
+                        )
+                        .unwrap(),
+                        "*".parse().unwrap(),
+                    );
+
+                    headers.insert(
+                        actix_web::http::header::HeaderName::from_str(
+                            "Access-Control-Expose-Headers",
+                        )
+                        .unwrap(),
+                        "X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset".parse().unwrap(),
+                    );
+
                     Box::pin(async {
                         Ok(req.into_response(response.map_into_right_body()))
                     })
