@@ -359,7 +359,7 @@ function handleAuxClick(e) {
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
   <div id="teleports"></div>
-  <div v-if="stateInitialized" class="app-grid-layout relative">
+  <div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
     <Suspense>
       <AppSettingsModal ref="settingsModal" />
     </Suspense>
