@@ -82,7 +82,11 @@
               v-if="world.type === 'singleplayer'"
               class="text-sm text-secondary flex items-center gap-1 font-semibold"
             >
-              <UserIcon class="h-4 w-4 text-secondary shrink-0" stroke-width="3px" />
+              <UserIcon
+                aria-label="true"
+                class="h-4 w-4 text-secondary shrink-0"
+                stroke-width="3px"
+              />
               {{ formatMessage(messages.singleplayer) }}
             </div>
             <div
@@ -90,7 +94,7 @@
               class="text-sm text-secondary flex items-center gap-1 font-semibold flex-nowrap whitespace-nowrap"
             >
               <template v-if="refreshingServers.includes(world.address)">
-                <SpinnerIcon class="animate-spin shrink-0" />
+                <SpinnerIcon aria-label="true" class="animate-spin shrink-0" />
                 Loading...
               </template>
               <template v-else-if="serverStatus[world.address]">
@@ -98,6 +102,7 @@
                   v-tooltip="
                     serverStatus[world.address] ? `${serverStatus[world.address].ping}ms` : null
                   "
+                  aria-label="true"
                   :style="`--_signal-${getPingLevel(serverStatus[world.address].ping || 0)}: var(--color-green)`"
                   stroke-width="3px"
                   class="shrink-0"
@@ -105,7 +110,7 @@
                 {{ formatNumber(serverStatus[world.address].players?.online, false) }} online
               </template>
               <template v-else>
-                <NoSignalIcon stroke-width="3px" class="shrink-0" /> Offline
+                <NoSignalIcon aria-label="true" stroke-width="3px" class="shrink-0" /> Offline
               </template>
             </div>
           </div>
@@ -128,7 +133,7 @@
         >
           <template v-if="world.type === 'server'">
             <template v-if="refreshingServers.includes(world.address)">
-              <SpinnerIcon class="animate-spin" /> Loading...
+              <SpinnerIcon aria-label="true" class="animate-spin" /> Loading...
             </template>
             <div
               v-else-if="renderedMotds[world.address]"
@@ -147,20 +152,38 @@
           </template>
           <template v-else-if="world.type === 'singleplayer'">
             <template v-if="world.hardcore">
-              <SkullIcon class="h-4 w-4 shrink-0" />
+              <SkullIcon aria-label="true" class="h-4 w-4 shrink-0" />
               {{ formatMessage(messages.hardcore) }}
             </template>
             <template v-else>
-              <component :is="gameModes[world.game_mode].icon" class="h-4 w-4 shrink-0" />
+              <component
+                :is="gameModes[world.game_mode].icon"
+                aria-label="true"
+                class="h-4 w-4 shrink-0"
+              />
               {{ formatMessage(gameModes[world.game_mode].message) }}
             </template>
           </template>
         </div>
-        <div class="flex gap-1">
-          <ButtonStyled>
-            <button @click="joinWorld(world)">
-              <PlayIcon />
-              Play
+        <div class="flex gap-1 justify-end">
+          <ButtonStyled
+            v-if="world.type === 'singleplayer' || serverStatus[world.address]"
+            :color="worldsMatch(world, worldPlaying) ? 'red' : 'standard'"
+          >
+            <button
+              v-tooltip="
+                !supportsQuickPlay
+                  ? 'You can only jump straight into worlds on Minecraft 1.20+'
+                  : playing && !worldsMatch(world, worldPlaying)
+                    ? 'Instance is already open'
+                    : null
+              "
+              :disabled="!supportsQuickPlay || (playing && !worldsMatch(world, worldPlaying))"
+              @click="joinWorld(world)"
+            >
+              <StopCircleIcon v-if="worldsMatch(world, worldPlaying)" aria-label="true" />
+              <PlayIcon v-else aria-label="true" />
+              {{ worldsMatch(world, worldPlaying) ? 'Stop' : 'Play' }}
             </button>
           </ButtonStyled>
           <ButtonStyled circular type="transparent">
@@ -204,13 +227,15 @@
                 },
               ]"
             >
-              <MoreVerticalIcon />
-              <template #edit> <EditIcon /> Edit </template>
-              <template #open-folder> <FolderOpenIcon /> Open folder </template>
-              <template #copy-address> <ClipboardCopyIcon /> Copy address </template>
-              <template #refresh> <UpdatedIcon /> Refresh </template>
+              <MoreVerticalIcon aria-label="true" />
+              <template #edit> <EditIcon aria-label="true" /> Edit </template>
+              <template #open-folder> <FolderOpenIcon aria-label="true" /> Open folder </template>
+              <template #copy-address>
+                <ClipboardCopyIcon aria-label="true" /> Copy address
+              </template>
+              <template #refresh> <UpdatedIcon aria-label="true" /> Refresh </template>
               <template #delete>
-                <TrashIcon /> {{ world.type === 'server' ? 'Remove' : 'Delete' }}
+                <TrashIcon aria-label="true" /> {{ world.type === 'server' ? 'Remove' : 'Delete' }}
               </template>
             </OverflowMenu>
           </ButtonStyled>
@@ -221,25 +246,25 @@
   <div v-else class="w-full max-w-[48rem] mx-auto flex flex-col mt-6">
     <RadialHeader class="">
       <div class="flex items-center gap-6 w-[32rem] mx-auto">
-        <img src="@/assets/sad-modrinth-bot.webp" class="h-24" />
+        <img src="@/assets/sad-modrinth-bot.webp" alt aria-hidden="true" class="h-24" />
         <span class="text-contrast font-bold text-xl"> You don't have any worlds yet. </span>
       </div>
     </RadialHeader>
     <div class="flex gap-2 mt-4 mx-auto">
       <ButtonStyled>
         <button @click="addServerModal.show()">
-          <PlusIcon />
+          <PlusIcon aria-label="true" />
           Add a server
         </button>
       </ButtonStyled>
       <ButtonStyled>
         <button :disabled="refreshing" @click="refreshWorlds">
           <template v-if="refreshing">
-            <SpinnerIcon class="animate-spin" />
+            <SpinnerIcon aria-label="true" class="animate-spin" />
             Refreshing...
           </template>
           <template v-else>
-            <UpdatedIcon />
+            <UpdatedIcon aria-label="true" />
             Refresh
           </template>
         </button>
@@ -248,7 +273,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { watch, ref, computed } from 'vue'
 import type { GameInstance } from '@/helpers/types'
 import dayjs from 'dayjs'
 import {
@@ -261,6 +286,7 @@ import {
   OverflowMenu,
 } from '@modrinth/ui'
 import {
+  StopCircleIcon,
   ClipboardCopyIcon,
   MoreVerticalIcon,
   PlusIcon,
@@ -300,6 +326,7 @@ import EditServerModal from '@/components/ui/modal/EditServerModal.vue'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { handleError } from '@/store/notifications'
 import EditWorldModal from '@/components/ui/modal/EditSingleplayerWorldModal.vue'
+import { get_game_versions } from '@/helpers/tags'
 
 const { formatMessage } = useVIntl()
 
@@ -311,10 +338,17 @@ const deleteWorldModal = ref()
 
 const serverToRemove = ref<ServerWorld>()
 const worldToRemove = ref<SingleplayerWorld>()
+const worldPlaying = ref<World>()
+
+const emit = defineEmits<{
+  (event: 'play', world: World): void
+  (event: 'stop'): void
+}>()
 
 const props = defineProps<{
   instance: GameInstance
   offline: boolean
+  playing: boolean
 }>()
 
 const refreshing = ref(false)
@@ -566,14 +600,53 @@ function getPingLevel(ping: number) {
 }
 
 async function joinWorld(world: World) {
+  if (props.playing) {
+    emit('stop')
+  }
+
   if (world.type === 'server') {
     await start_join_server(props.instance.path, world.address)
   } else if (world.type === 'singleplayer') {
     await start_join_singleplayer_world(props.instance.path, world.path)
   }
+  worldPlaying.value = world
+  emit('play', world)
+}
+
+watch(
+  () => props.playing,
+  (playing) => {
+    if (!playing) {
+      worldPlaying.value = undefined
+    }
+  },
+)
+
+function worldsMatch(world: World, other: World | undefined) {
+  if (world.type === 'server' && other?.type === 'server') {
+    return world.address === other.address
+  } else if (world.type === 'singleplayer' && other?.type === 'singleplayer') {
+    return world.path === other.path
+  }
+  return false
 }
 
 async function copyToClipboard(text: string) {
   await navigator.clipboard.writeText(text)
 }
+
+const gameVersions = ref(await get_game_versions().catch(() => []))
+
+const supportsQuickPlay = computed(() => {
+  if (!gameVersions.value.length) {
+    return false
+  }
+
+  const versionIndex = gameVersions.value.findIndex(v => v.version === props.instance.game_version);
+  const targetIndex = gameVersions.value.findIndex(v => v.version === '23w14a');
+
+  console.log(versionIndex, targetIndex);
+
+  return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex;
+})
 </script>

@@ -118,6 +118,7 @@
             :playing="playing"
             :versions="modrinthVersions"
             :installed="instance.install_stage !== 'installed'"
+            @play="updatePlayState"
           ></component>
           <template #fallback>
             <LoadingIndicator />
@@ -261,16 +262,12 @@ const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id)
 
 const tabs = computed(() => [
   {
-    label: 'Overview',
+    label: 'Content',
     href: `${basePath.value}`,
   },
   {
     label: 'Worlds',
     href: `${basePath.value}/worlds`,
-  },
-  {
-    label: 'Content',
-    href: `${basePath.value}/content`,
   },
   {
     label: 'Logs',

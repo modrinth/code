@@ -106,15 +106,15 @@ export default new createRouter({
       component: Instance.Index,
       props: true,
       children: [
-        {
-          path: '',
-          name: 'Overview',
-          component: Instance.Overview,
-          meta: {
-            useRootContext: true,
-            breadcrumb: [{ name: '?Instance' }],
-          },
-        },
+        // {
+        //   path: '',
+        //   name: 'Overview',
+        //   component: Instance.Overview,
+        //   meta: {
+        //     useRootContext: true,
+        //     breadcrumb: [{ name: '?Instance' }],
+        //   },
+        // },
         {
           path: 'worlds',
           name: 'Worlds',
@@ -125,7 +125,7 @@ export default new createRouter({
           },
         },
         {
-          path: 'content',
+          path: '',
           name: 'Mods',
           component: Instance.Mods,
           meta: {
