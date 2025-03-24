@@ -491,9 +491,7 @@ async function addServer(server: ServerWorld) {
 }
 
 async function editServer(server: ServerWorld) {
-  const index = worlds.value.findIndex(
-    (w) => w.type === "server" && w.index === server.index
-  )
+  const index = worlds.value.findIndex((w) => w.type === 'server' && w.index === server.index)
   if (index !== -1) {
     worlds.value[index] = server
     sortWorlds()
@@ -504,7 +502,7 @@ async function editServer(server: ServerWorld) {
   }
 }
 async function editWorld(path: string, name: string, removeIcon: boolean) {
-  const world = worlds.value.find((world) => world.type === 'singleplayer' && world.path === path);
+  const world = worlds.value.find((world) => world.type === 'singleplayer' && world.path === path)
   if (world) {
     world.name = name
     if (removeIcon) {
@@ -530,7 +528,7 @@ async function promptToRemoveWorld(world: World) {
 async function removeServer() {
   if (!serverToRemove.value) {
     handleError(`Error removing server, no server marked for removal.`)
-    return;
+    return
   }
   await remove_server_from_profile(props.instance.path, serverToRemove.value.index).catch(
     handleError,
@@ -544,7 +542,7 @@ async function removeServer() {
 async function deleteWorld() {
   if (!worldToRemove.value) {
     handleError(`Error deleting world, no world marked for removal.`)
-    return;
+    return
   }
   await delete_world(props.instance.path, worldToRemove.value.path).catch(handleError)
   worlds.value = worlds.value.filter(

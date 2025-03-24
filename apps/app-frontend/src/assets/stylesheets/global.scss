@@ -4,15 +4,17 @@
 
 @font-face {
   font-family: 'Minecraft';
-  src: URL('https://cdn.modrinth.com/fonts/monocraft/Monocraft.ttf') format('truetype');
+  src:
+    url('https://cdn.modrinth.com/fonts/minecraft/minecraft.woff2') format('woff2'),
+    url('https://cdn.modrinth.com/fonts/minecraft/minecraft.woff') format('woff');
 }
 
 .font-minecraft {
-  font-family: 'Minecraft';
+  font-family: 'Minecraft', monospace;
 }
 
 :root {
-  font-family: var(--font-standard);
+  font-family: var(--font-standard, sans-serif), sans-serif;
   color-scheme: dark;
   --view-width: calc(100% - 5rem);
   --expanded-view-width: calc(100% - 13rem);
