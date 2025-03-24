@@ -350,6 +350,9 @@ pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
             prof.name = name;
         }
         if let Some(game_version) = edit_profile.game_version.clone() {
+            if game_version != prof.game_version {
+                prof.protocol_version = None;
+            }
             prof.game_version = game_version;
         }
         if let Some(loader) = edit_profile.loader {
