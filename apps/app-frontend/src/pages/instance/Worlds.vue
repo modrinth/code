@@ -132,16 +132,16 @@
             </template>
             <div
               v-else-if="renderedMotds[world.address]"
-              class="font-normal font-minecraft line-clamp-2 text-secondary"
+              class="font-normal font-minecraft line-clamp-2 text-secondary leading-5"
               v-html="renderedMotds[world.address]"
             />
             <div
               v-else-if="!serverStatus[world.address]"
-              class="font-normal font-minecraft text-red"
+              class="font-normal font-minecraft text-red leading-5"
             >
               {{ formatMessage(messages.cantConnect) }}
             </div>
-            <div v-else class="font-normal font-minecraft text-secondary">
+            <div v-else class="font-normal font-minecraft text-secondary leading-5">
               {{ formatMessage(messages.aMinecraftServer) }}
             </div>
           </template>
