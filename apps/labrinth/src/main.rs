@@ -1,3 +1,4 @@
+use actix_web::middleware::from_fn;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
@@ -5,7 +6,7 @@ use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;
 use labrinth::search;
-use labrinth::util::ratelimit::RateLimit;
+use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::sync::Arc;
 use tracing::{error, info};
@@ -32,6 +33,10 @@ struct Args {
     /// manually with --run-background-task.
     #[arg(long)]
     no_background_tasks: bool,
+
+    /// Don't automatically run migrations. This means the migrations should be run via --run-background-task.
+    #[arg(long)]
+    no_migrations: bool,
 
     /// Run a single background task and then exit. Perfect for cron jobs.
     #[arg(long, value_enum, id = "task")]
@@ -67,9 +72,11 @@ async fn main() -> std::io::Result<()> {
             dotenvy::var("BIND_ADDR").unwrap()
         );
 
-        database::check_for_migrations()
-            .await
-            .expect("An error occurred while running migrations.");
+        if !args.no_migrations {
+            database::check_for_migrations()
+                .await
+                .expect("An error occurred while running migrations.");
+        }
     }
 
     // Database Connector
@@ -164,7 +171,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(TracingLogger::default())
             .wrap(prometheus.clone())
-            .wrap(RateLimit(Arc::clone(&labrinth_config.rate_limiter)))
+            .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
             .wrap(sentry_actix::Sentry::new())
             .configure(|cfg| labrinth::app_config(cfg, labrinth_config.clone()))
