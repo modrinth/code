@@ -131,6 +131,7 @@ json-patch = "*"
 ariadne = { path = "../../packages/ariadne" }
 
 clap = { version = "4.5", features = ["derive"] }
+iana-time-zone = "0.1.61"
 
 [target.'cfg(not(target_env = "msvc"))'.dependencies]
 tikv-jemallocator = { version = "0.6.0", features = ["profiling", "unprefixed_malloc_on_supported_platforms"] }
@@ -139,3 +140,8 @@ jemalloc_pprof = { version = "0.7.0", features = ["flamegraph"] }
 
 [dev-dependencies]
 actix-http = "3.4.0"
+
+[build-dependencies]
+dotenv-build = "0.1.1"
+chrono = "0.4.38"
+iana-time-zone = "0.1.60"

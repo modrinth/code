@@ -2470,6 +2470,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dotenv-build"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f4547f16c17f6051a12cdb8c62b803f94bee6807c74aa7c530b30b737df981fc"
+
+[[package]]
 name = "dotenvy"
 version = "0.15.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4509,6 +4515,7 @@ dependencies = [
  "dashmap 5.5.3",
  "deadpool-redis",
  "derive-new",
+ "dotenv-build",
  "dotenvy",
  "either",
  "flate2",
@@ -4519,6 +4526,7 @@ dependencies = [
  "hmac 0.11.0",
  "hyper 0.14.31",
  "hyper-tls 0.5.0",
+ "iana-time-zone",
  "image 0.24.9",
  "itertools 0.12.1",
  "jemalloc_pprof",
