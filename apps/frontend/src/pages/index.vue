@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="landing-hero">
-      <ModrinthIcon class="modrinth-icon" />
+      <ModrinthIcon class="modrinth-icon text-brand" />
       <h1 class="main-header">
         The place for Minecraft
         <div class="animate-strong">
@@ -228,7 +228,11 @@
                 >
                   <PrismLauncherLogo aria-hidden="true" />
                 </a>
-                <nuxt-link to="/app" class="graphic gradient-border" aria-label="Modrinth App">
+                <nuxt-link
+                  to="/app"
+                  class="graphic gradient-border text-brand"
+                  aria-label="Modrinth App"
+                >
                   <ModrinthIcon aria-hidden="true" />
                 </nuxt-link>
                 <a
