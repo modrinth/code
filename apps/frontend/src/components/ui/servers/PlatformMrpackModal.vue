@@ -105,10 +105,12 @@
           <button
             :disabled="isLoading"
             @click="
-              if (isMrpackModalSecondPhase) {
-                isMrpackModalSecondPhase = false;
-              } else {
-                hide();
+              () => {
+                if (isMrpackModalSecondPhase) {
+                  isMrpackModalSecondPhase = false;
+                } else {
+                  hide();
+                }
               }
             "
           >

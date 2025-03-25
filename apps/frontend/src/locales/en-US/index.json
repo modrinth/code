@@ -239,6 +239,87 @@
   "dashboard.collections.long-title": {
     "message": "Your collections"
   },
+  "error.collection.404.list_item.1": {
+    "message": "You may have mistyped the collection's URL."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "The collection may be private."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "The collection may have been taken down by Modrinth's moderation team for violating our <tou-link>Terms of Use</tou-link>."
+  },
+  "error.collection.404.list_title": {
+    "message": "Why?"
+  },
+  "error.collection.404.title": {
+    "message": "Collection not found"
+  },
+  "error.generic.404.subtitle": {
+    "message": "The page you were looking for doesn't seem to exist."
+  },
+  "error.generic.404.title": {
+    "message": "Page not found"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Check if Modrinth is down on our <status-link>Status page</status-link>."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "If this keeps happening, you may want to let the Modrinth Team know by joining our <discord-link>Discord server</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "Please try again in a few minutes."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Something went wrong."
+  },
+  "error.generic.default.title": {
+    "message": "Uh oh!"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "You may have mistyped the organization's URL."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "The organization's owner may have changed the URL or deleted it."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "The organization may have been removed by Modrinth's moderation team for violating our <tou-link>Terms of Use</tou-link>."
+  },
+  "error.organization.404.list_title": {
+    "message": "Why?"
+  },
+  "error.organization.404.title": {
+    "message": "Organization not found"
+  },
+  "error.project.404.list_item.1": {
+    "message": "You may have mistyped the project's URL."
+  },
+  "error.project.404.list_item.2": {
+    "message": "The project's owner may have changed the URL, made the project private, or deleted it."
+  },
+  "error.project.404.list_item.3": {
+    "message": "The project may have been taken down by Modrinth's moderation team for violating our <tou-link>Terms of Use</tou-link>."
+  },
+  "error.project.404.list_title": {
+    "message": "Why?"
+  },
+  "error.project.404.title": {
+    "message": "Project not found"
+  },
+  "error.user.404.list_item.1": {
+    "message": "You may have mistyped the user's username."
+  },
+  "error.user.404.list_item.2": {
+    "message": "The user may have changed their username or deleted their account."
+  },
+  "error.user.404.list_item.3": {
+    "message": "The user's account may have been terminated for violating Modrinth's <tou-link>Terms of Use</tou-link>."
+  },
+  "error.user.404.list_title": {
+    "message": "Why?"
+  },
+  "error.user.404.title": {
+    "message": "User not found"
+  },
   "frog": {
     "message": "You've been frogged! 🐸"
   },

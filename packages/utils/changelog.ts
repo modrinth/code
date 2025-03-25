@@ -12,6 +12,12 @@ export type VersionEntry = {
 const VERSIONS: VersionEntry[] = [
   {
     date: `2025-03-24T22:30:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed error with links on error pages.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-08:00`,
     product: 'servers',
     body: `### Improvements
 - Fixed server plugin loaders not being populated when browsing for plugins
