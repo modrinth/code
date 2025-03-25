@@ -111,8 +111,14 @@ pub async fn init_ads_window<R: Runtime>(
                 )
                     .initialization_script(LINK_SCRIPT)
                     // .initialization_script_for_main_only(LINK_SCRIPT, false)
-                    .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
-                    .zoom_hotkeys_enabled(false)
+                .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Modrinth")
+                .with_request_interceptor(|request| {
+                    request.headers_mut().insert(
+                        "Accept-Encoding",
+                        HeaderValue::from_static("gzip, deflate, br"),
+                    );
+                })    
+                .zoom_hotkeys_enabled(false)
                     .transparent(true),
                 if state.shown {
                     position
