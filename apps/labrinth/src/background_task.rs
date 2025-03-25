@@ -1,7 +1,7 @@
 use crate::database::redis::RedisPool;
 use crate::queue::payouts::process_payout;
-use crate::search;
 use crate::search::indexing::index_projects;
+use crate::{database, search};
 use clap::ValueEnum;
 use sqlx::Postgres;
 use tracing::{info, warn};
@@ -15,6 +15,7 @@ pub enum BackgroundTask {
     Payouts,
     IndexBilling,
     IndexSubscriptions,
+    Migrations,
 }
 
 impl BackgroundTask {
@@ -28,6 +29,7 @@ impl BackgroundTask {
     ) {
         use BackgroundTask::*;
         match self {
+            Migrations => run_migrations().await,
             IndexSearch => index_search(pool, redis_pool, search_config).await,
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
@@ -48,6 +50,12 @@ impl BackgroundTask {
             }
         }
     }
+}
+
+pub async fn run_migrations() {
+    database::check_for_migrations()
+        .await
+        .expect("An error occurred while running migrations.");
 }
 
 pub async fn index_search(

@@ -173,10 +173,12 @@
           <button
             :disabled="isLoading"
             @click="
-              if (isSecondPhase) {
-                isSecondPhase = false;
-              } else {
-                hide();
+              () => {
+                if (isSecondPhase) {
+                  isSecondPhase = false;
+                } else {
+                  hide();
+                }
               }
             "
           >

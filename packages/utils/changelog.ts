@@ -11,6 +11,25 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-03-24T22:30:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed error with links on error pages.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-08:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed server plugin loaders not being populated when browsing for plugins
+- Fixed modpack search being filtered by Minecraft version when browsing for modpacks.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Improved error handling, especially when the Modrinth API is down.`,
+  },
+  {
     date: `2025-03-13T19:30:00-08:00`,
     product: 'web',
     body: `### Improvements

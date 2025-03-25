@@ -91,30 +91,30 @@ pub async fn ws_init(
     let friend_statuses = if !friends.is_empty() {
         let db = db.clone();
         let redis = redis.clone();
-        tokio_stream::iter(friends.iter())
+
+        let statuses = tokio_stream::iter(friends.iter())
             .map(|x| {
                 let db = db.clone();
                 let redis = redis.clone();
                 async move {
-                    async move {
-                        get_user_status(
-                            if x.user_id == user_id.into() {
-                                x.friend_id
-                            } else {
-                                x.user_id
-                            }
-                            .into(),
-                            &db,
-                            &redis,
-                        )
-                        .await
-                    }
+                    get_user_status(
+                        if x.user_id == user_id.into() {
+                            x.friend_id
+                        } else {
+                            x.user_id
+                        }
+                        .into(),
+                        &db,
+                        &redis,
+                    )
+                    .await
                 }
             })
             .buffer_unordered(16)
-            .filter_map(|x| x)
             .collect::<Vec<_>>()
-            .await
+            .await;
+
+        statuses.into_iter().flatten().collect()
     } else {
         Vec::new()
     };
