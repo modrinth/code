@@ -516,7 +516,7 @@
               v-model="version.version_number"
               type="text"
               autocomplete="off"
-              maxlength="54"
+              maxlength="32"
             />
           </div>
           <span v-else>{{ version.version_number }}</span>
