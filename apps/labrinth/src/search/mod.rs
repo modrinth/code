@@ -209,8 +209,9 @@ pub async fn search_for_project(
     let mut filter_string = String::new();
 
     // Convert offset and limit to page and hits_per_page
-    let hits_per_page = limit;
-    let page = offset / limit + 1;
+    let hits_per_page = if limit == 0 { 1 } else { limit };
+
+    let page = offset / hits_per_page + 1;
 
     let results = {
         let mut query = meilisearch_index.search();

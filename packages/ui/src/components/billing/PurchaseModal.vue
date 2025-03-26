@@ -185,7 +185,7 @@
             class="flex cursor-pointer items-center gap-2"
             @click="selectedPlan = interval"
           >
-            <RadioButtonChecked v-if="selectedPlan === interval" class="h-8 w-8 text-brand" />
+            <RadioButtonCheckedIcon v-if="selectedPlan === interval" class="h-8 w-8 text-brand" />
             <RadioButtonIcon v-else class="h-8 w-8 text-secondary" />
             <span
               class="text-lg capitalize"
@@ -483,11 +483,13 @@
           :disabled="paymentLoading || !eulaAccepted"
           @click="submitPayment"
         >
-          <CheckCircleIcon /> Subscribe
+          <CheckCircleIcon />
+          Subscribe
         </button>
         <!-- Default Subscribe Button, so M+ still works -->
         <button v-else class="btn btn-primary" :disabled="paymentLoading" @click="submitPayment">
-          <CheckCircleIcon /> Subscribe
+          <CheckCircleIcon />
+          Subscribe
         </button>
       </template>
     </div>
@@ -507,7 +509,7 @@ import {
   IssuesIcon,
   PayPalIcon,
   PlusIcon,
-  RadioButtonChecked,
+  RadioButtonCheckedIcon,
   RadioButtonIcon,
   RightArrowIcon,
   XIcon,
