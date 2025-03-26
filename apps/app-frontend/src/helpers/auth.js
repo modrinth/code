@@ -51,8 +51,13 @@ export async function remove_user(user) {
 
 /**
  * Returns a list of users
- * @returns {Promise<Credential[]>}
+ * @returns {Promise<MinecraftCredentials[]>}
  */
 export async function users() {
   return await invoke('plugin:auth|get_users')
+}
+
+// Refreshes a credential by UUID
+export async function refresh(user) {
+  return await invoke('plugin:auth|auth_refresh', { user })
 }
