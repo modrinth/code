@@ -8,33 +8,38 @@ use crate::{
     util::io,
 };
 
-/// Handles external functions (such as through URL deep linkage)
-/// Link is extracted value (link) in somewhat URL format, such as
-/// subdomain1/subdomain2
-/// (Does not include modrinth://)
 pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
-    Ok(match sublink.split_once('/') {
-        // /mod/{id}   -    Installs a mod of mod id
-        Some(("mod", id)) => CommandPayload::InstallMod { id: id.to_string() },
-        // /version/{id}   -    Installs a specific version of id
-        Some(("version", id)) => {
-            CommandPayload::InstallVersion { id: id.to_string() }
-        }
-        // /modpack/{id}   -    Installs a modpack of modpack id
-        Some(("modpack", id)) => {
-            CommandPayload::InstallModpack { id: id.to_string() }
-        }
+    let parts: Vec<&str> = sublink.split('/').filter(|s| !s.is_empty()).collect();
+
+    if parts.is_empty() {
+        emit_warning(&format!("Invalid command, unrecognized path: {sublink}")).await?;
+        return Err(crate::ErrorKind::InputError(format!(
+            "Invalid command, unrecognized path: {sublink}"
+        ))
+            .into());
+    }
+
+    match parts.as_slice() {
+        // /mod/{id} - Installs a mod of mod id
+        ["mod", id] => Ok(CommandPayload::InstallMod { id: id.to_string() }),
+        // /version/{id} - Installs a specific version of id
+        ["version", id] => Ok(CommandPayload::InstallVersion { id: id.to_string() }),
+        // /modpack/{id} - Installs a modpack of modpack id
+        ["modpack", id] => Ok(CommandPayload::InstallModpack { id: id.to_string() }),
+        // /instance/{uuid}/{action_type} - Performs a specific action on a specific instance.
+        // {action_type} is of "play" | "edit"
+        ["instance", id, action_type] => Ok(CommandPayload::ManageInstance { id: id.to_string(), action_type: action_type.to_string() }),
         _ => {
             emit_warning(&format!(
                 "Invalid command, unrecognized path: {sublink}"
             ))
-            .await?;
-            return Err(crate::ErrorKind::InputError(format!(
+                .await?;
+            Err(crate::ErrorKind::InputError(format!(
                 "Invalid command, unrecognized path: {sublink}"
             ))
-            .into());
+                .into())
         }
-    })
+    }
 }
 
 pub async fn parse_command(
@@ -59,12 +64,12 @@ pub async fn parse_command(
             "Invalid command, unrecognized filetype: {}",
             path.display()
         ))
-        .await?;
+            .await?;
         Err(crate::ErrorKind::InputError(format!(
             "Invalid command, unrecognized filetype: {}",
             path.display()
         ))
-        .into())
+            .into())
     }
 }
 

@@ -303,6 +303,7 @@ async function handleCommand(e) {
     }
   } else {
     // Other commands are URL-based (deep linking)
+    console.log(e.event)
     urlModal.value.show(e)
   }
 }

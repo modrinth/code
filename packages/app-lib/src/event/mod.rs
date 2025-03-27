@@ -211,6 +211,10 @@ pub enum CommandPayload {
     InstallModpack {
         id: String,
     },
+    ManageInstance {
+        id: String,
+        action_type: String
+    },
     RunMRPack {
         // run or install .mrpack
         path: PathBuf,
