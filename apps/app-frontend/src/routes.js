@@ -19,6 +19,14 @@ export default new createRouter({
       },
     },
     {
+      path: '/worlds',
+      name: 'Worlds',
+      component: Pages.Worlds,
+      meta: {
+        breadcrumb: [{ name: 'Worlds' }],
+      },
+    },
+    {
       path: '/browse/:projectType',
       name: 'Discover content',
       component: Pages.Browse,
@@ -117,7 +125,7 @@ export default new createRouter({
         // },
         {
           path: 'worlds',
-          name: 'Worlds',
+          name: 'InstanceWorlds',
           component: Instance.Worlds,
           meta: {
             useRootContext: true,

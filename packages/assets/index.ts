@@ -179,6 +179,7 @@ import _UsersIcon from './icons/users.svg?component'
 import _VersionIcon from './icons/version.svg?component'
 import _WikiIcon from './icons/wiki.svg?component'
 import _WindowIcon from './icons/window.svg?component'
+import _WorldIcon from './icons/world.svg?component'
 import _WrenchIcon from './icons/wrench.svg?component'
 import _XIcon from './icons/x.svg?component'
 import _XCircleIcon from './icons/x-circle.svg?component'
@@ -381,6 +382,7 @@ export const UsersIcon = _UsersIcon
 export const VersionIcon = _VersionIcon
 export const WikiIcon = _WikiIcon
 export const WindowIcon = _WindowIcon
+export const WorldIcon = _WorldIcon
 export const WrenchIcon = _WrenchIcon
 export const XIcon = _XIcon
 export const XCircleIcon = _XCircleIcon

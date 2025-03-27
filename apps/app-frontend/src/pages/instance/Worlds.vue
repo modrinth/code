@@ -53,7 +53,7 @@
     <div
       class="flex flex-col w-full supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] gap-2"
     >
-      <div
+      <WorldItem
         v-for="world in worlds.filter((x) => {
           const availableFilter = filters.includes('available')
           const typeFilter = filters.includes('server') || filters.includes('singleplayer')
@@ -65,182 +65,25 @@
           )
         })"
         :key="world.name"
-        class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised rounded-xl supports-[grid-template-columns:subgrid]:col-span-full supports-[grid-template-columns:subgrid]:!grid-cols-subgrid"
-      >
-        <Avatar
-          :src="
-            world.type === 'server' && serverStatus[world.address]
-              ? serverStatus[world.address].favicon
-              : world.icon
-          "
-          size="48px"
-        />
-        <div class="flex flex-col justify-between h-full">
-          <div class="flex items-center gap-2">
-            <div class="text-lg text-contrast font-bold truncate">{{ world.name }}</div>
-            <div
-              v-if="world.type === 'singleplayer'"
-              class="text-sm text-secondary flex items-center gap-1 font-semibold"
-            >
-              <UserIcon
-                aria-label="true"
-                class="h-4 w-4 text-secondary shrink-0"
-                stroke-width="3px"
-              />
-              {{ formatMessage(messages.singleplayer) }}
-            </div>
-            <div
-              v-else-if="world.type === 'server'"
-              class="text-sm text-secondary flex items-center gap-1 font-semibold flex-nowrap whitespace-nowrap"
-            >
-              <template v-if="refreshingServers.includes(world.address)">
-                <SpinnerIcon aria-label="true" class="animate-spin shrink-0" />
-                Loading...
-              </template>
-              <template v-else-if="serverStatus[world.address]">
-                <SignalIcon
-                  v-tooltip="
-                    serverStatus[world.address] ? `${serverStatus[world.address].ping}ms` : null
-                  "
-                  aria-label="true"
-                  :style="`--_signal-${getPingLevel(serverStatus[world.address].ping || 0)}: var(--color-green)`"
-                  stroke-width="3px"
-                  class="shrink-0"
-                />
-                {{ formatNumber(serverStatus[world.address].players?.online, false) }} online
-              </template>
-              <template v-else>
-                <NoSignalIcon aria-label="true" stroke-width="3px" class="shrink-0" /> Offline
-              </template>
-            </div>
-          </div>
-          <div
-            v-tooltip="
-              world.last_played ? dayjs(world.last_played).format('MMMM D, YYYY [at] h:mm A') : null
-            "
-            class="text-sm text-secondary w-fit"
-            :class="{ 'cursor-help': world.last_played }"
-          >
-            <template v-if="world.last_played">
-              Played {{ dayjs(world.last_played).fromNow() }}
-            </template>
-            <template v-else> Not played yet </template>
-          </div>
-        </div>
-        <div
-          class="font-semibold flex items-center gap-1 justify-center text-center"
-          :class="world.type === 'singleplayer' && world.hardcore ? `text-red` : 'text-secondary'"
-        >
-          <template v-if="world.type === 'server'">
-            <template v-if="refreshingServers.includes(world.address)">
-              <SpinnerIcon aria-label="true" class="animate-spin" /> Loading...
-            </template>
-            <div
-              v-else-if="renderedMotds[world.address]"
-              class="font-normal font-minecraft line-clamp-2 text-secondary leading-5"
-              v-html="renderedMotds[world.address]"
-            />
-            <div
-              v-else-if="!serverStatus[world.address]"
-              class="font-normal font-minecraft text-red leading-5"
-            >
-              {{ formatMessage(messages.cantConnect) }}
-            </div>
-            <div v-else class="font-normal font-minecraft text-secondary leading-5">
-              {{ formatMessage(messages.aMinecraftServer) }}
-            </div>
-          </template>
-          <template v-else-if="world.type === 'singleplayer'">
-            <template v-if="world.hardcore">
-              <SkullIcon aria-label="true" class="h-4 w-4 shrink-0" />
-              {{ formatMessage(messages.hardcore) }}
-            </template>
-            <template v-else>
-              <component
-                :is="gameModes[world.game_mode].icon"
-                aria-label="true"
-                class="h-4 w-4 shrink-0"
-              />
-              {{ formatMessage(gameModes[world.game_mode].message) }}
-            </template>
-          </template>
-        </div>
-        <div class="flex gap-1 justify-end">
-          <ButtonStyled
-            v-if="world.type === 'singleplayer' || serverStatus[world.address]"
-            :color="worldsMatch(world, worldPlaying) ? 'red' : 'standard'"
-          >
-            <button
-              v-tooltip="
-                !supportsQuickPlay
-                  ? 'You can only jump straight into worlds on Minecraft 1.20+'
-                  : playing && !worldsMatch(world, worldPlaying)
-                    ? 'Instance is already open'
-                    : null
-              "
-              :disabled="!supportsQuickPlay || (playing && !worldsMatch(world, worldPlaying))"
-              @click="joinWorld(world)"
-            >
-              <StopCircleIcon v-if="worldsMatch(world, worldPlaying)" aria-label="true" />
-              <PlayIcon v-else aria-label="true" />
-              {{ worldsMatch(world, worldPlaying) ? 'Stop' : 'Play' }}
-            </button>
-          </ButtonStyled>
-          <ButtonStyled circular type="transparent">
-            <OverflowMenu
-              :options="[
-                {
-                  id: 'refresh',
-                  shown: world.type === 'server',
-                  action: () => refreshServer((world as ServerWorld).address),
-                },
-                {
-                  id: 'copy-address',
-                  shown: world.type === 'server',
-                  action: () => copyToClipboard((world as ServerWorld).address),
-                },
-                {
-                  id: 'edit',
-                  action: () => {
-                    if (world.type === 'server') {
-                      editServerModal.show(world)
-                    } else {
-                      editWorldModal.show(world)
-                    }
-                  },
-                },
-                {
-                  id: 'open-folder',
-                  shown: world.type === 'singleplayer',
-                  action: () => {},
-                },
-                {
-                  divider: true,
-                },
-                {
-                  id: 'delete',
-                  color: 'red',
-                  hoverFilled: true,
-                  action: () => {
-                    promptToRemoveWorld(world)
-                  },
-                },
-              ]"
-            >
-              <MoreVerticalIcon aria-label="true" />
-              <template #edit> <EditIcon aria-label="true" /> Edit </template>
-              <template #open-folder> <FolderOpenIcon aria-label="true" /> Open folder </template>
-              <template #copy-address>
-                <ClipboardCopyIcon aria-label="true" /> Copy address
-              </template>
-              <template #refresh> <UpdatedIcon aria-label="true" /> Refresh </template>
-              <template #delete>
-                <TrashIcon aria-label="true" /> {{ world.type === 'server' ? 'Remove' : 'Delete' }}
-              </template>
-            </OverflowMenu>
-          </ButtonStyled>
-        </div>
-      </div>
+        :world="world"
+        :supports-quick-play="supportsQuickPlay"
+        :playing-instance="playing"
+        :playing-world="worldsMatch(world, worldPlaying)"
+        :starting-instance="startingInstance"
+        :refreshing="
+          world.type === 'server' ? refreshingServers.includes(world.address) : undefined
+        "
+        :server-status="world.type === 'server' ? serverStatus[world.address] : undefined"
+        :rendered-motd="world.type === 'server' ? renderedMotds[world.address] : undefined"
+        :game-mode="world.type === 'singleplayer' ? gameModes[world.game_mode] : undefined"
+        @play="() => joinWorld(world)"
+        @stop="() => emit('stop')"
+        @refresh="() => refreshServer((world as ServerWorld).address)"
+        @edit="
+          () => (world.type === 'server' ? editServerModal.show(world) : editWorldModal.show(world))
+        "
+        @delete="() => promptToRemoveWorld(world)"
+      />
     </div>
   </div>
   <div v-else class="w-full max-w-[48rem] mx-auto flex flex-col mt-6">
@@ -253,18 +96,18 @@
     <div class="flex gap-2 mt-4 mx-auto">
       <ButtonStyled>
         <button @click="addServerModal.show()">
-          <PlusIcon aria-label="true" />
+          <PlusIcon aria-hidden="true" />
           Add a server
         </button>
       </ButtonStyled>
       <ButtonStyled>
         <button :disabled="refreshing" @click="refreshWorlds">
           <template v-if="refreshing">
-            <SpinnerIcon aria-label="true" class="animate-spin" />
+            <SpinnerIcon aria-hidden="true" class="animate-spin" />
             Refreshing...
           </template>
           <template v-else>
-            <UpdatedIcon aria-label="true" />
+            <UpdatedIcon aria-hidden="true" />
             Refresh
           </template>
         </button>
@@ -327,6 +170,7 @@ import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { handleError } from '@/store/notifications'
 import EditWorldModal from '@/components/ui/modal/EditSingleplayerWorldModal.vue'
 import { get_game_versions } from '@/helpers/tags'
+import WorldItem from '@/components/ui/world/WorldItem.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -336,6 +180,7 @@ const editWorldModal = ref()
 const removeServerModal = ref()
 const deleteWorldModal = ref()
 
+const startingInstance = ref(false)
 const serverToRemove = ref<ServerWorld>()
 const worldToRemove = ref<SingleplayerWorld>()
 const worldPlaying = ref<World>()
@@ -466,8 +311,8 @@ const filterOptions = computed(() => {
 
 refreshWorlds()
 
-function onError(err: unknown, addr: string | null = null) {
-  console.error(err)
+function onRefreshError(err: unknown, addr: string | null = null) {
+  console.error(`Refreshing addr: ${addr}`, err)
   refreshing.value = false
   if (addr) {
     refreshingServers.value = refreshingServers.value.filter((s) => s !== addr)
@@ -484,7 +329,7 @@ async function refreshServer(address: string) {
 }
 
 function refreshServerPromise(address: string): Promise<void> {
-  return get_server_status(address, protocolVersion.value)
+  return get_server_status(address)
     .then((status) => {
       serverStatus.value[address] = status
       if (status.description) {
@@ -492,13 +337,13 @@ function refreshServerPromise(address: string): Promise<void> {
       }
       refreshingServers.value = refreshingServers.value.filter((s) => s !== address)
     })
-    .catch((error) => onError(error, address))
+    .catch((error) => onRefreshError(error, address))
 }
 
 async function refreshWorlds() {
   refreshing.value = true
 
-  worlds.value = (await get_profile_worlds(props.instance.path).catch(onError)) ?? []
+  worlds.value = (await get_profile_worlds(props.instance.path).catch(onRefreshError)) ?? []
   sortWorlds()
 
   const servers = worlds.value.filter((w) => w.type === 'server')
@@ -599,18 +444,22 @@ function getPingLevel(ping: number) {
   }
 }
 
-async function joinWorld(world: World) {
-  if (props.playing) {
-    emit('stop')
-  }
+function handleJoinError(err: unknown) {
+  handleError(err)
+  startingInstance.value = false
+  worldPlaying.value = null
+}
 
-  if (world.type === 'server') {
-    await start_join_server(props.instance.path, world.address)
-  } else if (world.type === 'singleplayer') {
-    await start_join_singleplayer_world(props.instance.path, world.path)
-  }
+async function joinWorld(world: World) {
+  startingInstance.value = true
   worldPlaying.value = world
+  if (world.type === 'server') {
+    await start_join_server(props.instance.path, world.address).catch(handleJoinError)
+  } else if (world.type === 'singleplayer') {
+    await start_join_singleplayer_world(props.instance.path, world.path).catch(handleJoinError)
+  }
   emit('play', world)
+  startingInstance.value = false
 }
 
 watch(
@@ -642,11 +491,13 @@ const supportsQuickPlay = computed(() => {
     return false
   }
 
-  const versionIndex = gameVersions.value.findIndex(v => v.version === props.instance.game_version);
-  const targetIndex = gameVersions.value.findIndex(v => v.version === '23w14a');
+  const versionIndex = gameVersions.value.findIndex(
+    (v) => v.version === props.instance.game_version,
+  )
+  const targetIndex = gameVersions.value.findIndex((v) => v.version === '23w14a')
 
-  console.log(versionIndex, targetIndex);
+  console.log(versionIndex, targetIndex)
 
-  return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex;
+  return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex
 })
 </script>

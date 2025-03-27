@@ -16,6 +16,7 @@ import {
   RestoreIcon,
   RightArrowIcon,
   SettingsIcon,
+  WorldIcon,
   XIcon,
 } from '@modrinth/assets'
 import { Avatar, Button, ButtonStyled, Notifications, OverflowMenu } from '@modrinth/ui'
@@ -371,6 +372,9 @@ function handleAuxClick(e) {
     >
       <NavButton v-tooltip.right="'Home'" to="/">
         <HomeIcon />
+      </NavButton>
+      <NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
+        <WorldIcon />
       </NavButton>
       <NavButton
         v-tooltip.right="'Discover content'"

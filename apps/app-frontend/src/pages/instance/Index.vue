@@ -119,6 +119,7 @@
             :versions="modrinthVersions"
             :installed="instance.install_stage !== 'installed'"
             @play="updatePlayState"
+            @stop="() => stopInstance('InstanceSubpage')"
           ></component>
           <template #fallback>
             <LoadingIndicator />

@@ -1,4 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
+import { get_full_path } from '@/helpers/profile'
+import { openPath } from '@/helpers/utils'
 
 type BaseWorld = {
   name: string
@@ -99,4 +101,9 @@ export async function start_join_singleplayer_world(path: string, world: string)
 
 export async function start_join_server(path: string, address: string): Promise<any> {
   return await invoke('plugin:worlds|start_join_server', { path, address })
+}
+
+export async function showProfileInFolder(path) {
+  const fullPath = await get_full_path(path)
+  return await openPath(fullPath)
 }

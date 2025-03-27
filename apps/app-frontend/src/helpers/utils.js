@@ -56,3 +56,7 @@ export const releaseColor = (releaseType) => {
       return ''
   }
 }
+
+export async function copyToClipboard(text) {
+  await navigator.clipboard.writeText(text)
+}
