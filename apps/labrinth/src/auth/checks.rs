@@ -328,7 +328,8 @@ pub async fn is_visible_collection(
     collection_data: &Collection,
     user_option: &Option<User>,
 ) -> Result<bool, ApiError> {
-    let mut authorized = !collection_data.status.is_hidden();
+    let mut authorized = !collection_data.status.is_hidden()
+        && !collection_data.projects.is_empty();
     if let Some(user) = &user_option {
         if !authorized
             && (user.role.is_mod() || user.id == collection_data.user_id.into())
