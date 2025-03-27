@@ -329,7 +329,7 @@ async function refreshServer(address: string) {
 }
 
 function refreshServerPromise(address: string): Promise<void> {
-  return get_server_status(address)
+  return get_server_status(address, protocolVersion.value)
     .then((status) => {
       serverStatus.value[address] = status
       if (status.description) {

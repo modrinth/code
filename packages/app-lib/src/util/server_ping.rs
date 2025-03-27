@@ -190,8 +190,8 @@ mod modern {
 
         pub fn write(out: &mut Vec<u8>, value: i32) {
             let mut value = value as u32;
-            while (value & CONT_BIT_MASK_U32) != 0 {
-                out.push((value & DATA_BITS_MASK) as u8 | CONT_BIT_MASK_U8);
+            while value >= CONT_BIT_MASK_U32 {
+                out.push(((value & DATA_BITS_MASK) | CONT_BIT_MASK_U32) as u8);
                 value >>= DATA_BITS_PER_BYTE;
             }
             out.push(value as u8);
