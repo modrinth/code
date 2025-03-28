@@ -16,7 +16,7 @@
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
     "@sentry/vue": "^8.27.0",
-    "@sfirew/minecraft-motd-parser": "^1.1.3",
+    "@modrinth/minecraft-motd-parser": "^1.1.4",
     "@tauri-apps/api": "^2.1.1",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-os": "^2.2.0",
