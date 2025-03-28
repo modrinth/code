@@ -37,9 +37,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                         let mut found = false;
                         for component in e.path.components() {
                             if found {
-                                profile_path = Some(
-                                    component.as_os_str().to_string_lossy(),
-                                );
+                                profile_path = Some(component.as_os_str());
                                 break;
                             }
 
@@ -51,26 +49,58 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                         }
 
                         if let Some(profile_path) = profile_path {
-                            if e.path
+                            let profile_path_str =
+                                profile_path.to_string_lossy().to_string();
+                            let first_file_name = e
+                                .path
                                 .components()
-                                .any(|x| x.as_os_str() == "crash-reports")
+                                .skip_while(|x| x.as_os_str() != profile_path)
+                                .nth(1)
+                                .map(|x| x.as_os_str());
+                            if first_file_name
+                                .filter(|x| *x == "crash-reports")
+                                .is_some()
                                 && e.path
                                     .extension()
-                                    .map(|x| x == "txt")
-                                    .unwrap_or(false)
+                                    .filter(|x| *x == "txt")
+                                    .is_some()
                             {
-                                crash_task(profile_path.to_string());
+                                crash_task(profile_path_str);
                             } else if !visited_profiles.contains(&profile_path)
                             {
-                                let path = profile_path.to_string();
-                                tokio::spawn(async move {
-                                    let _ = emit_profile(
-                                        &path,
-                                        ProfilePayloadType::Synced,
-                                    )
-                                    .await;
-                                });
-                                visited_profiles.push(profile_path);
+                                let event = if first_file_name
+                                    .filter(|x| {
+                                        *x == "servers.dat"
+                                            || (*x == "saves"
+                                                && e.path
+                                                    .file_name()
+                                                    .filter(|x| {
+                                                        *x == "level.dat"
+                                                    })
+                                                    .is_some())
+                                            || *x == "logs"
+                                    })
+                                    .is_some()
+                                {
+                                    Some(ProfilePayloadType::WorldsUpdated)
+                                } else if first_file_name
+                                    .filter(|x| *x == "saves")
+                                    .is_none()
+                                {
+                                    Some(ProfilePayloadType::Synced)
+                                } else {
+                                    None
+                                };
+                                if let Some(event) = event {
+                                    tokio::spawn(async move {
+                                        let _ = emit_profile(
+                                            &profile_path_str,
+                                            event,
+                                        )
+                                        .await;
+                                    });
+                                    visited_profiles.push(profile_path);
+                                }
                             }
                         }
                     });
@@ -111,10 +141,12 @@ pub(crate) async fn watch_profile(
     let profile_path = dirs.profiles_dir().join(profile_path);
 
     if profile_path.exists() && profile_path.is_dir() {
-        for folder in ProjectType::iterator()
-            .map(|x| x.get_folder())
-            .chain(["crash-reports"])
-        {
+        for folder in ProjectType::iterator().map(|x| x.get_folder()).chain([
+            "crash-reports",
+            "saves",
+            "servers.dat",
+            "logs/server_join_log.txt",
+        ]) {
             let path = profile_path.join(folder);
 
             if !path.exists() && !path.is_symlink() {
