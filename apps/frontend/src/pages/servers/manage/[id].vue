@@ -393,6 +393,7 @@
           :power-state-details="powerStateDetails"
           :socket="socket"
           :server="server"
+          :backupTasks="runningBackupTasks"
           @reinstall="onReinstall"
         />
       </div>

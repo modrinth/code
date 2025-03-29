@@ -283,6 +283,7 @@ import type { Server } from "~/composables/pyroServers";
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
   isServerRunning: boolean;
+  backupTasks: Map<string, string>;
 }>();
 
 const route = useNativeRoute();
@@ -374,6 +375,12 @@ function triggerDownloadAnimation() {
 }
 
 const initiateDownload = async (backupId: string) => {
+  // If another backup is preparing, do not allow another download, or a backup task of type "file" is already in progress
+  if (backups.value.some((backup) => backup.creating_download) || [...props.backupTasks.values()].some((task) => task.includes("file"))) {
+    addNotification({ type: "error", text: "A backup is already preparing for download." });
+    return;
+  }
+
   addNotification({ type: "success", title: 'Preparing download', text: 'We are preparing your download. Your download will start automatically once ready.' });
 
   try {
@@ -413,7 +420,6 @@ const onPrepareComplete = (id: string) => {
     text: "Your backup is ready for download. Your download will start momentarily.",
   })
 
-
 }
 
 const lockBackup = async (backupId: string) => {
@@ -436,7 +442,7 @@ const unlockBackup = async (backupId: string) => {
 
 onMounted(() => {
   watchEffect(() => {
-    const hasOngoingBackups = backups.value.some((backup) => backup.ongoing);
+    const hasOngoingBackups = backups.value.some((backup) => backup.creating);
 
     if (refreshInterval.value) {
       clearInterval(refreshInterval.value);
@@ -449,6 +455,21 @@ onMounted(() => {
       }, 10000);
     }
   });
+
+  // Watch the backup tasks for changes
+  watch(
+    () => props.backupTasks,
+    (oldTasks, newTasks) => {
+      // Check if a task has completed (deleted) from the map
+      if (oldTasks.size > newTasks.size) {
+        // Grab the first task that was removed with type file in the string
+        const completedTask = [...oldTasks].find(([key, value]) => !newTasks.has(key) && value.includes("file"));
+        if (completedTask) {
+          onPrepareComplete(completedTask[0]);
+        }
+      }
+    }
+  );
 });
 
 onUnmounted(() => {
