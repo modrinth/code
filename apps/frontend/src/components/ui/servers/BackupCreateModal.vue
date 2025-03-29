@@ -83,7 +83,7 @@ const createBackup = async () => {
     await props.server.backups?.create(backupName.value);
     await props.server.refresh();
     hideModal();
-    emit("backupCreated", { success: true, message: "Backup created successfully" });
+    emit("backupCreated", { success: true, message: "Backup creation queued." });
   } catch (error) {
     if (error instanceof PyroFetchError && error.statusCode === 429) {
       isRateLimited.value = true;

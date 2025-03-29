@@ -487,6 +487,9 @@ const firstConnect = ref(true);
 const copied = ref(false);
 const error = ref<Error | null>(null);
 
+// Create a HashMap of running backup tasks. Should include the Backup ID and the task type.
+const runningBackupTasks = ref<Map<string, string>>(new Map());
+
 const initialConsoleMessage = [
   "   __________________________________________________",
   " /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\",
@@ -770,6 +773,54 @@ const handleWebSocketMessage = (data: WSEvent) => {
       uptimeSeconds.value = data.uptime;
       startUptimeUpdates();
       break;
+    case "backup-progress":
+      // Update a backup's state
+      let curBackup = server.backups?.data.find(
+        (backup) => backup.id === data.id,
+      );
+
+      if(!curBackup) {
+        console.warn(`A backup with ID ${data.id} sent a progress update, but it was not found in the current backups.`);
+      } else {
+        console.log(`Handling backup progress for ${curBackup.name} (${data.id}) task: ${data.task} state: ${data.state} progress: ${data.progress}`);
+
+        // If the intial state is done (we don't have it in our running tasks), ignore the event
+        if (data.state === "done" && !runningBackupTasks.value.has(data.id)) {
+          console.warn(`A backup with ID ${data.id} sent a progress update, but it was not found in the current running tasks and it's already done. Ignoring...`);
+          return;
+        }
+
+        curBackup.restoring = data.state === 'ongoing' && data.task === 'restore'
+        curBackup.creating = data.state === 'ongoing' && data.task === 'create';
+        curBackup.creating_download = data.state === 'ongoing' && data.task === 'file';
+
+        // If the task is done, remove it from our running tasks and pop a notification
+        if (data.state === 'done') {
+          runningBackupTasks.value.delete(data.id);
+          addNotification({
+            title: `Success!`,
+            text: `Your backup ${curBackup.name} has finished ${taskToFriendlyName(data.task).toLocaleLowerCase()} successfully.`,
+            type: "success",
+          });
+
+          // Refresh the backups list
+          server.refresh(["backups"]);
+        } else if (data.state === 'failed') {
+          runningBackupTasks.value.delete(data.id);
+          addNotification({
+            title: `Error`,
+            text: `Your backup ${curBackup.name} has failed ${taskToFriendlyName(data.task).toLocaleLowerCase()}.`,
+            type: "error",
+          });
+        }
+
+        // If the task is ongoing, add it to our running tasks
+        if (data.state === 'ongoing') {
+          runningBackupTasks.value.set(data.id, data.task);
+        }
+      }
+
+      break;
     default:
       console.warn("Unhandled WebSocket event:", data);
   }
@@ -933,6 +984,19 @@ const toAdverb = (word: string) => {
     return word.slice(0, -2) + "ying";
   }
   return word + "ing";
+};
+
+const taskToFriendlyName = (task: string) => {
+  switch (task) {
+    case "create":
+      return "Creating";
+    case "restore":
+      return "Restoring";
+    case "file":
+      return "Downloading";
+    default:
+      return task.charAt(0).toUpperCase() + task.slice(1);
+  }
 };
 
 const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {

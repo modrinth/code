@@ -321,8 +321,11 @@ interface Backup {
   id: string;
   name: string;
   created_at: string;
-  ongoing: boolean;
+  creating: boolean;
+  creating_download: boolean;
+  restoring: boolean;
   locked: boolean;
+  progress: number;
 }
 
 interface AutoBackupSettings {
@@ -721,6 +724,18 @@ const downloadBackup = async (backupId: string) => {
     throw error;
   }
 };
+
+const prepareBackup = async (backupId: string) => {
+  try {
+    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}/prepare-download`, {
+      method: "POST",
+    });
+    await internalServerRefrence.value.refresh(["backups"]);
+  } catch (error) {
+    console.error("Error preparing backup:", error);
+    throw error;
+  }
+}
 
 const updateAutoBackup = async (autoBackup: "enable" | "disable", interval: number) => {
   try {
@@ -1140,6 +1155,7 @@ const modules: any = {
     delete: deleteBackup,
     restore: restoreBackup,
     download: downloadBackup,
+    prepare: prepareBackup,
     updateAutoBackup,
     getAutoBackup,
     lock: lockBackup,
@@ -1383,6 +1399,12 @@ type BackupFunctions = {
    * @param backupId - The ID of the backup.
    */
   download: (backupId: string) => Promise<void>;
+
+  /**
+   * Prepare a backup for the server.
+   * @param backupId - The ID of the backup.
+   */
+  prepare: (backupId: string) => Promise<void>;
 
   /**
    * Updates the auto backup settings of the server.
