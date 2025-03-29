@@ -66,7 +66,7 @@ const restoreBackup = async () => {
   try {
     await props.server.backups?.restore(props.backupId);
     hideModal();
-    emit("backupRestored", { success: true, message: "Backup restored successfully" });
+    emit("backupRestored", { success: true, message: "Backup restore queued" });
   } catch (error) {
     backupError.value = error instanceof Error ? error.message : String(error);
     emit("backupRestored", { success: false, message: backupError.value });

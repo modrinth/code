@@ -111,15 +111,6 @@
           </div>
         </div>
 
-        <div
-          v-if="backups.some((backup) => backup.ongoing)"
-          data-pyro-server-backup-ongoing
-          class="flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-contrast"
-        >
-          A backup is currently being created. This may take a few minutes. This page will
-          automatically refresh when the backup is complete.
-        </div>
-
         <div class="flex w-full flex-col gap-2">
           <li
             v-for="(backup, index) in backups"
@@ -129,20 +120,15 @@
             <div class="flex flex-col gap-4">
               <div class="flex items-center justify-between">
                 <div class="flex min-w-0 flex-row items-center gap-4">
-                  <div
-                    class="grid size-14 shrink-0 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border shadow-sm"
-                    :class="backup.ongoing ? 'text-green [&&]:bg-bg-green' : 'bg-button-bg'"
-                  >
-                    <UiServersIconsLoadingIcon
-                      v-if="backup.ongoing"
-                      v-tooltip="'Backup in progress'"
-                      class="size-6 animate-spin"
-                    />
-                    <LockIcon v-else-if="backup.locked" class="size-8" />
-                    <BoxIcon v-else class="size-8" />
-                  </div>
                   <div class="flex min-w-0 flex-col gap-2">
                     <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+                      <div
+                        class="grid size-14 shrink-0 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border shadow-sm"
+                      >
+                        <LockIcon v-if="backup.locked" class="size-8" />
+                        <BoxIcon v-else class="size-8" />
+                      </div>
+
                       <div class="max-w-full truncate font-bold text-contrast">
                         {{ backup.name }}
                       </div>
@@ -152,6 +138,30 @@
                         class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
                       >
                         <CheckIcon class="size-4" /> Latest
+                      </div>
+
+                      <div
+                        v-if="backup.creating"
+                        class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
+                      >
+                        <UiServersIconsLoadingIcon class="size-4 animate-spin" />
+                        Creating
+                      </div>
+
+                      <div
+                        v-if="backup.restoring"
+                        class="flex items-center gap-1 rounded-full bg-bg-orange p-1 px-1.5 text-xs font-semibold text-contrast"
+                      >
+                        <UiServersIconsLoadingIcon class="size-4 animate-spin" />
+                        Restoring
+                      </div>
+
+                      <div
+                        v-if="backup.creating_download"
+                        class="flex items-center gap-1 rounded-full bg-bg-orange p-1 px-1.5 text-xs font-semibold text-contrast"
+                      >
+                        <UiServersIconsLoadingIcon class="size-4 animate-spin" />
+                        Preparing download
                       </div>
                     </div>
                     <div class="flex items-center gap-1 text-xs">
@@ -364,29 +374,47 @@ function triggerDownloadAnimation() {
 }
 
 const initiateDownload = async (backupId: string) => {
-  triggerDownloadAnimation();
+  addNotification({ type: "success", title: 'Preparing download', text: 'We are preparing your download. Your download will start automatically once ready.' });
 
   try {
-    const downloadurl: any = await props.server.backups?.download(backupId);
-    if (!downloadurl || !downloadurl.download_url) {
-      throw new Error("Invalid download URL.");
-    }
-
-    let finalDownloadUrl: string = downloadurl.download_url;
-
-    if (!/^https?:\/\//i.test(finalDownloadUrl)) {
-      finalDownloadUrl = `https://${finalDownloadUrl.startsWith("/") ? finalDownloadUrl.substring(1) : finalDownloadUrl}`;
-    }
-
-    const a = document.createElement("a");
-    a.href = finalDownloadUrl;
-    a.setAttribute("download", "");
-    a.click();
-    a.remove();
+    await props.server.backups?.prepare(backupId);
   } catch (error) {
-    console.error("Download failed:", error);
+    console.error("Failed to prepare download:", error);
+    addNotification({ type: "error", text: "Failed to prepare download." });
+    return;
   }
+
+  // try {
+  //   const downloadurl: any = await props.server.backups?.download(backupId);
+  //   if (!downloadurl || !downloadurl.download_url) {
+  //     throw new Error("Invalid download URL.");
+  //   }
+  //
+  //   let finalDownloadUrl: string = downloadurl.download_url;
+  //
+  //   if (!/^https?:\/\//i.test(finalDownloadUrl)) {
+  //     finalDownloadUrl = `https://${finalDownloadUrl.startsWith("/") ? finalDownloadUrl.substring(1) : finalDownloadUrl}`;
+  //   }
+  //
+  //   const a = document.createElement("a");
+  //   a.href = finalDownloadUrl;
+  //   a.setAttribute("download", "");
+  //   a.click();
+  //   a.remove();
+  // } catch (error) {
+  //   console.error("Download failed:", error);
+  // }
 };
+
+const onPrepareComplete = (id: string) => {
+  addNotification({
+    type: "success",
+    title: "Prepare complete",
+    text: "Your backup is ready for download. Your download will start momentarily.",
+  })
+
+
+}
 
 const lockBackup = async (backupId: string) => {
   try {
