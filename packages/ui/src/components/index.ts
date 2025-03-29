@@ -19,6 +19,7 @@ export { default as EnvironmentIndicator } from './base/EnvironmentIndicator.vue
 export { default as FileInput } from './base/FileInput.vue'
 export { default as FilterBar } from './base/FilterBar.vue'
 export type { FilterBarOption } from './base/FilterBar.vue'
+export { default as HeadingLink } from './base/HeadingLink.vue'
 export { default as LoadingIndicator } from './base/LoadingIndicator.vue'
 export { default as ManySelect } from './base/ManySelect.vue'
 export { default as MarkdownEditor } from './base/MarkdownEditor.vue'

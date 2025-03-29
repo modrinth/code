@@ -26,6 +26,7 @@ import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { install as installVersion } from '@/store/install.js'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import { HeadingLink } from '@modrinth/ui'
 
 const router = useRouter()
 
@@ -44,7 +45,7 @@ const props = defineProps({
 })
 
 const actualInstances = computed(() =>
-  props.instances.filter((x) => x && x.instances && x.instances[0]),
+  props.instances.filter((x) => x && x.instances && x.instances[0] && x.show === undefined || x.show),
 )
 
 const modsRow = ref(null)
@@ -236,17 +237,13 @@ onUnmounted(() => {
     @proceed="deleteProfile"
   />
   <div ref="rowContainer" class="flex flex-col gap-4">
-    <div v-for="(row, rowIndex) in actualInstances" ref="rows" :key="row.label" class="row">
-      <router-link
-        class="flex mb-3 leading-none items-center gap-1 text-primary text-lg font-bold hover:underline group"
-        :class="{ 'mt-1': rowIndex > 0 }"
+    <div v-for="(row) in actualInstances" ref="rows" :key="row.label" class="row">
+      <HeadingLink
+        class="mt-1"
         :to="row.route"
       >
         {{ row.label }}
-        <ChevronRightIcon
-          class="h-5 w-5 stroke-[3px] group-hover:translate-x-1 transition-transform group-hover:text-brand"
-        />
-      </router-link>
+      </HeadingLink>
       <section
         v-if="row.instance"
         ref="modsRow"

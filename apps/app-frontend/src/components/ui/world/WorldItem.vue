@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import type { ServerStatus, ServerWorld, World } from '@/helpers/worlds.ts'
 import { formatNumber } from '@modrinth/utils'
 import {
+  EyeIcon,
   ClipboardCopyIcon,
   EditIcon,
   FolderOpenIcon,
@@ -23,8 +24,12 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 import { copyToClipboard } from '@/helpers/utils'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { useRouter } from 'vue-router'
 
 const { formatMessage } = useVIntl()
+
+const router = useRouter()
 
 const emit = defineEmits<{
   (e: 'play' | 'stop' | 'refresh' | 'edit' | 'delete'): void
@@ -48,6 +53,11 @@ const props = withDefaults(
       icon: Component
       message: MessageDescriptor
     }
+
+    // Instance
+    instancePath?: string
+    instanceName?: string
+    instanceIcon?: string
   }>(),
   {
     playingInstance: false,
@@ -60,6 +70,10 @@ const props = withDefaults(
     renderedMotd: undefined,
 
     gameMode: undefined,
+
+    instancePath: undefined,
+    instanceName: undefined,
+    instanceIcon: undefined,
   },
 )
 
@@ -103,6 +117,10 @@ const messages = defineMessages({
   copyAddress: {
     id: 'instance.worlds.copy_address',
     defaultMessage: 'Copy address',
+  },
+  viewInstance: {
+    id: 'instance.worlds.view_instance',
+    defaultMessage: 'View instance',
   },
 })
 </script>
@@ -149,19 +167,28 @@ const messages = defineMessages({
           </template>
         </div>
       </div>
-      <div
-        v-tooltip="
+      <div class="flex items-center gap-2 text-sm text-secondary">
+        <div
+          v-tooltip="
           world.last_played ? dayjs(world.last_played).format('MMMM D, YYYY [at] h:mm A') : null
         "
-        class="text-sm text-secondary w-fit"
-        :class="{ 'cursor-help': world.last_played }"
-      >
-        <template v-if="world.last_played">
-          {{
-            formatMessage(commonMessages.playedLabel, { time: dayjs(world.last_played).fromNow() })
-          }}
+          class="w-fit shrink-0"
+          :class="{ 'cursor-help': world.last_played }"
+        >
+          <template v-if="world.last_played">
+            {{
+              formatMessage(commonMessages.playedLabel, { time: dayjs(world.last_played).fromNow() })
+            }}
+          </template>
+          <template v-else> Not played yet </template>
+        </div>
+        <template v-if="instancePath">
+          •
+          <router-link class="flex items-center gap-1 truncate hover:underline text-secondary" :to="`/instance/${instancePath}`">
+            <Avatar :src="instanceIcon ? convertFileSrc(instanceIcon) : undefined" size="16px" class="shrink-0" />
+            <span class="truncate">{{ instanceName }}</span>
+          </router-link>
         </template>
-        <template v-else> Not played yet </template>
       </div>
     </div>
     <div
@@ -185,7 +212,7 @@ const messages = defineMessages({
           {{ formatMessage(messages.aMinecraftServer) }}
         </div>
       </template>
-      <template v-else-if="world.type === 'singleplayer'">
+      <template v-else-if="world.type === 'singleplayer' && gameMode">
         <template v-if="world.hardcore">
           <SkullIcon aria-hidden="true" class="h-4 w-4 shrink-0" />
           {{ formatMessage(messages.hardcore) }}
@@ -214,7 +241,7 @@ const messages = defineMessages({
                   : null
             "
             :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
-            @click="emit('play', world)"
+            @click="emit('play')"
           >
             <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
             <PlayIcon v-else aria-hidden="true" />
@@ -226,9 +253,14 @@ const messages = defineMessages({
         <OverflowMenu
           :options="[
             {
+              id: 'open-instance',
+              shown: !!instancePath,
+              action: () => router.push(encodeURI(`/instance/${instancePath}/worlds`)),
+            },
+            {
               id: 'refresh',
               shown: world.type === 'server',
-              action: () => emit('refresh', world as ServerWorld),
+              action: () => emit('refresh'),
             },
             {
               id: 'copy-address',
@@ -237,7 +269,8 @@ const messages = defineMessages({
             },
             {
               id: 'edit',
-              action: () => emit('edit', world),
+              action: () => emit('edit'),
+              shown: !instancePath,
             },
             {
               id: 'open-folder',
@@ -246,16 +279,22 @@ const messages = defineMessages({
             },
             {
               divider: true,
+              shown: !instancePath,
             },
             {
               id: 'delete',
               color: 'red',
               hoverFilled: true,
-              action: () => emit('delete', world),
+              action: () => emit('delete'),
+              shown: !instancePath,
             },
           ]"
         >
           <MoreVerticalIcon aria-hidden="true" />
+          <template #open-instance>
+            <EyeIcon aria-hidden="true" />
+            {{ formatMessage(messages.viewInstance) }}
+          </template>
           <template #edit>
             <EditIcon aria-hidden="true" /> {{ formatMessage(commonMessages.editButton) }}
           </template>

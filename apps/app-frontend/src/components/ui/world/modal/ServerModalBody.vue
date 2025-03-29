@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { TeleportDropdownMenu } from '@modrinth/ui'
-import type { ServerPackStatus } from '@/helpers/worlds'
+import type { ServerPackStatus } from '@/helpers/worlds.ts'
 import { type MessageDescriptor, defineMessages, useVIntl } from '@vintl/vintl'
 
 const { formatMessage } = useVIntl()

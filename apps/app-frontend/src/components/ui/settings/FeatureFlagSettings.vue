@@ -7,7 +7,7 @@ import { get, set } from '@/helpers/settings'
 const themeStore = useTheming()
 
 const settings = ref(await get())
-const options = ref(['project_background', 'page_path', 'worlds_tab', 'worlds_in_home'])
+const options = ref(['project_background', 'page_path', 'worlds_tab'])
 
 function getStoreValue(key: string) {
   return themeStore.featureFlags[key] ?? false
