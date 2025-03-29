@@ -162,7 +162,7 @@ import {
 } from '@/helpers/worlds.ts'
 import type { ServerStatus, World, ServerWorld, SingleplayerWorld } from '@/helpers/worlds.ts'
 import { formatNumber } from '@modrinth/utils'
-import { autoToHTML } from '@modrinth/minecraft-motd-parser'
+import { autoToHTML } from '@geometrically/minecraft-motd-parser'
 import { defineMessage, defineMessages, useVIntl } from '@vintl/vintl'
 import AddServerModal from '@/components/ui/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/modal/EditServerModal.vue'

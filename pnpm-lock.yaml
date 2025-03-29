@@ -41,12 +41,12 @@ importers:
 
   apps/app-frontend:
     dependencies:
+      '@geometrically/minecraft-motd-parser':
+        specifier: ^1.1.4
+        version: 1.1.4
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets
-      '@modrinth/minecraft-motd-parser':
-        specifier: ^1.1.4
-        version: 1.1.4
       '@modrinth/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -1557,6 +1557,9 @@ packages:
       ts-jest:
         optional: true
 
+  '@geometrically/minecraft-motd-parser@1.1.4':
+    resolution: {integrity: sha512-iW4mddbyLu2j2CUB8ODAuAEVpyf0ryzkDNmHQl3YbUL9s6jzKCBYWkfTqr61Yhse+nfA98JARc2Cw2R/rZebog==}
+
   '@humanfs/core@0.19.0':
     resolution: {integrity: sha512-2cbWIHbZVEweE853g8jymffCA+NCMiuqeECeBBLm8dg2oFdjuGJhgN4UAbI+6v0CKbbhvtXA4qV8YR5Ji86nmw==}
     engines: {node: '>=18.18.0'}
@@ -1761,9 +1764,6 @@ packages:
 
   '@mdx-js/mdx@3.1.0':
     resolution: {integrity: sha512-/QxEhPAvGwbQmy1Px8F899L5Uc2KZ6JtXwlCgJmjSTBedwOZkByYcBG4GceIGPXRDsmfxhHazuS+hlOShRLeDw==}
-
-  '@modrinth/minecraft-motd-parser@1.1.4':
-    resolution: {integrity: sha512-77Zpr14TkhsKDbpmZsudbfLrxSK34gX7NJVHda7zppJKiQ003wTlBmY9udmY1ULDRwl7mRYLtA4nzb/xdh7N9Q==, tarball: https://npm.pkg.github.com/download/@modrinth/minecraft-motd-parser/1.1.4/ed9b9a86e2a816aa5c0896bf846f7053a4709d24}
 
   '@netlify/functions@2.8.2':
     resolution: {integrity: sha512-DeoAQh8LuNPvBE4qsKlezjKj0PyXDryOFJfJKo3Z1qZLKzQ21sT314KQKPVjfvw6knqijj+IO+0kHXy/TJiqNA==}
@@ -8772,6 +8772,8 @@ snapshots:
       tslib: 2.6.3
       typescript: 5.8.2
 
+  '@geometrically/minecraft-motd-parser@1.1.4': {}
+
   '@humanfs/core@0.19.0': {}
 
   '@humanfs/node@0.16.5':
@@ -8994,8 +8996,6 @@ snapshots:
     transitivePeerDependencies:
       - acorn
       - supports-color
-
-  '@modrinth/minecraft-motd-parser@1.1.4': {}
 
   '@netlify/functions@2.8.2':
     dependencies:
