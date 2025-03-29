@@ -8,7 +8,7 @@
     <div>
       <div v-if="markdown" class="markdown-body max-w-[35rem]" v-html="renderString(description)" />
       <p v-else class="max-w-[35rem] m-0">
-        {{ description}}
+        {{ description }}
       </p>
       <label v-if="hasToType" for="confirmation" class="confirmation-label">
         <span>
