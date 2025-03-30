@@ -10,9 +10,11 @@
         >
           <Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
           <div class="flex flex-col flex-nowrap justify-center">
-            <span class="group-hover:underline">
-              {{ organization.name }}
-            </span>
+            <UserHoverCard :user-id="organization.id">
+              <span class="group-hover:underline">
+                {{ organization.name }}
+              </span>
+            </UserHoverCard>
             <span class="text-secondary text-sm font-medium flex items-center gap-1"
               ><OrganizationIcon /> Organization</span
             >
@@ -29,15 +31,17 @@
       >
         <Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
         <div class="flex flex-col">
-          <span class="flex flex-row flex-nowrap items-center gap-1 group-hover:underline">
-            {{ member.user.username }}
-            <CrownIcon
-              v-if="member.is_owner"
-              v-tooltip="formatMessage(messages.owner)"
-              class="text-brand-orange"
-            />
-            <ExternalIcon v-if="linkTarget === '_blank'" />
-          </span>
+          <UserHoverCard :user-id="member.user.id">
+            <span class="flex flex-row flex-nowrap items-center gap-1 group-hover:underline">
+              {{ member.user.username }}
+              <CrownIcon
+                v-if="member.is_owner"
+                v-tooltip="formatMessage(messages.owner)"
+                class="text-brand-orange"
+              />
+              <ExternalIcon v-if="linkTarget === '_blank'" />
+            </span>
+          </UserHoverCard>
           <span class="text-secondary text-sm font-medium">{{ member.role }}</span>
         </div>
       </AutoLink>
@@ -49,6 +53,7 @@ import { CrownIcon, ExternalIcon, OrganizationIcon } from '@modrinth/assets'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import Avatar from '../base/Avatar.vue'
 import AutoLink from '../base/AutoLink.vue'
+import UserHoverCard from '@modrinth/frontend/src/components/ui/user/UserHoverCard.vue'
 import { computed } from 'vue'
 
 const { formatMessage } = useVIntl()

@@ -201,9 +201,10 @@ function hideCard() {
 
   a {
     text-decoration: none;
+    transition: color 0.2s ease;
     
     &:hover {
-      text-decoration: underline;
+      color: var(--color-link);
     }
   }
 }
@@ -214,23 +215,10 @@ function hideCard() {
   background: var(--color-raised-bg);
   border: 1px solid var(--color-divider);
   border-radius: var(--size-rounded-lg);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-floating);
   overflow-y: auto;
   pointer-events: auto;
-}
-
-.loading-spinner {
-  display: inline-block;
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 2px solid var(--color-text-secondary);
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+  width: 320px;
 }
 
 .user-info {
@@ -244,14 +232,20 @@ function hideCard() {
     gap: var(--spacing-card-sm);
     color: inherit;
     text-decoration: none;
+    transition: opacity 0.2s ease;
     
-    &:hover h3 {
-      color: var(--color-link);
-      text-decoration: underline;
+    &:hover {
+      opacity: 0.8;
+
+      h3 {
+        color: var(--color-link);
+      }
     }
 
     h3 {
       margin: 0;
+      font-size: var(--font-size-lg);
+      font-weight: 600;
       line-height: 1.2;
       transition: color 0.2s ease;
     }
@@ -262,9 +256,11 @@ function hideCard() {
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  box-shadow: var(--shadow-sm);
 }
 
 .user-joined {
+  margin-top: 2px;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
@@ -272,83 +268,90 @@ function hideCard() {
 .user-bio {
   margin-top: var(--spacing-card-sm);
   font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--color-text);
 }
 
 .user-stats {
   margin-top: var(--spacing-card-sm);
+  padding-top: var(--spacing-card-sm);
+  border-top: 1px solid var(--color-divider);
   display: flex;
   gap: var(--spacing-card-md);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 
   .stat-value {
-    font-weight: bold;
+    font-weight: 600;
     color: var(--color-text);
   }
 }
 
-.loading {
-  padding: var(--spacing-card-md);
-}
-
 .user-projects {
-  margin-top: var(--spacing-card-md);
+  margin-top: var(--spacing-card-sm);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-card-sm);
+  gap: var(--spacing-card-xs);
 }
 
 .project-preview {
   display: flex;
   align-items: center;
   gap: var(--spacing-card-sm);
-  padding: var(--spacing-card-sm);
-  border-radius: var(--size-rounded-sm);
+  padding: var(--spacing-card-xs);
+  border-radius: var(--size-rounded-md);
   background: var(--color-button-bg);
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
 
   &:hover {
     background: var(--color-button-bg-hover);
+    transform: translateY(-1px);
+    
+    .project-title {
+      color: var(--color-link);
+    }
   }
 }
 
 .project-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--size-rounded-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 .project-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .project-title {
   display: block;
   font-weight: 500;
+  font-size: var(--font-size-base);
   color: var(--color-text);
   text-decoration: none;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  &:hover {
-    color: var(--color-link);
-  }
+  transition: color 0.2s ease;
 }
 
 .project-stats {
   font-size: var(--font-size-sm);
-  color: var (--color-text-secondary);
+  color: var(--color-text-secondary);
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  transform: translateY(-4px);
 }
 </style>

@@ -37,9 +37,11 @@
               </h2>
               <span v-if="version.author">
                 by
-                <nuxt-link class="text-link" :to="'/user/' + version.author.user.username">{{
-                  version.author.user.username
-                }}</nuxt-link>
+                <UserHoverCard :user-id="version.author.user.id">
+                  <nuxt-link class="text-link" :to="'/user/' + version.author.user.username">
+                    {{ version.author.user.username }}
+                  </nuxt-link>
+                </UserHoverCard>
               </span>
               <span>
                 on
@@ -75,6 +77,7 @@
 <script setup>
 import { Pagination } from "@modrinth/ui";
 import { DownloadIcon } from "@modrinth/assets";
+import UserHoverCard from "~/components/ui/user/UserHoverCard.vue";
 
 import VersionFilterControl from "@modrinth/ui/src/components/version/VersionFilterControl.vue";
 import { renderHighlightedString } from "~/helpers/highlight.js";
