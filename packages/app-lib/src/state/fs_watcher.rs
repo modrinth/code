@@ -149,7 +149,7 @@ pub(crate) async fn watch_profile(
         ]) {
             let path = profile_path.join(folder);
 
-            if !path.exists() && !path.is_symlink() {
+            if !path.exists() && !path.is_symlink() && !folder.contains(".") {
                 if let Err(e) = crate::util::io::create_dir_all(&path).await {
                     tracing::error!(
                         "Failed to create directory for watcher {path:?}: {e}"
