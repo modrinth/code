@@ -7,7 +7,13 @@
         :link-stack="breadcrumbsStack"
       />
       <h2>Report details</h2>
-      <ReportInfo :report="report" :show-thread="false" :show-message="false" :auth="auth" />
+      <ReportInfo :report="report" :show-thread="false" :show-message="false" :auth="auth">
+        <template #reporter>
+          <UserHoverCard :user-id="report.reporter">
+            <span>{{ report.reporterUser.username }}</span>
+          </UserHoverCard>
+        </template>
+      </ReportInfo>
     </section>
     <section class="universal-card">
       <h2>Messages</h2>
@@ -24,6 +30,7 @@
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import ConversationThread from "~/components/ui/thread/ConversationThread.vue";
 import ReportInfo from "~/components/ui/report/ReportInfo.vue";
+import UserHoverCard from "~/components/ui/user/UserHoverCard.vue";
 import { addReportMessage } from "~/helpers/threads.js";
 
 const props = defineProps({

@@ -25,9 +25,11 @@
       </nuxt-link>
       <p v-if="author" class="author">
         by
-        <nuxt-link class="title-link" :to="'/user/' + author">
-          {{ author }}
-        </nuxt-link>
+        <UserHoverCard :user-id="typeof author === 'object' ? author.id : author">
+          <nuxt-link :to="`/user/${typeof author === 'object' ? author.username : author}`">
+            {{ typeof author === 'object' ? author.username : author }}
+          </nuxt-link>
+        </UserHoverCard>
       </p>
       <Badge v-if="status && status !== 'approved'" :type="status" class="status" />
     </div>
@@ -95,6 +97,7 @@ import Categories from "~/components/ui/search/Categories.vue";
 import Badge from "~/components/ui/Badge.vue";
 import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
 import Avatar from "~/components/ui/Avatar.vue";
+import UserHoverCard from "~/components/ui/user/UserHoverCard.vue";
 
 export default {
   components: {
@@ -106,6 +109,7 @@ export default {
     UpdatedIcon,
     DownloadIcon,
     HeartIcon,
+    UserHoverCard,
   },
   props: {
     id: {
@@ -121,7 +125,7 @@ export default {
       default: "Project Name",
     },
     author: {
-      type: String,
+      type: [String, Object],
       default: null,
     },
     description: {
@@ -519,6 +523,22 @@ export default {
       .stat-label {
         display: none !important;
       }
+    }
+  }
+}
+
+.author {
+  font-size: 0.9em;
+  color: var(--color-text-secondary);
+  font-weight: normal;
+  
+  a {
+    color: var(--color-link);
+    text-decoration: none;
+    
+    &:hover {
+      color: var(--color-link-hover);
+      text-decoration: underline;
     }
   }
 }
