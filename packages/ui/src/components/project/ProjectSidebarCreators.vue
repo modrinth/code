@@ -53,7 +53,7 @@ import { CrownIcon, ExternalIcon, OrganizationIcon } from '@modrinth/assets'
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import Avatar from '../base/Avatar.vue'
 import AutoLink from '../base/AutoLink.vue'
-import UserHoverCard from '@modrinth/frontend/src/components/ui/user/UserHoverCard.vue'
+import UserHoverCard from '../user/UserHoverCard.vue'
 import { computed } from 'vue'
 
 const { formatMessage } = useVIntl()
