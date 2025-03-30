@@ -1,18 +1,18 @@
 <template>
-  <span 
-    ref="triggerEl" 
-    class="user-hover-card-trigger" 
-    @mouseenter="startHover" 
+  <span
+    ref="triggerEl"
+    class="user-hover-card-trigger"
+    @mouseenter="startHover"
     @mouseleave="handleLeave"
   >
     <slot />
   </span>
   <Teleport to="body">
     <Transition name="fade">
-      <div 
-        v-if="shown && userData?.username" 
+      <div
+        v-if="shown && userData?.username"
         ref="cardEl"
-        class="hover-content" 
+        class="hover-content"
         :style="cardStyle"
         @mouseenter="keepCard"
         @mouseleave="handleLeave"
@@ -45,8 +45,8 @@
             <div v-for="project in projects" :key="project.id" class="project-preview">
               <img :src="project.icon_url" :alt="`${project.title} icon`" class="project-icon" />
               <div class="project-info">
-                <nuxt-link 
-                  :to="`/${$getProjectTypeForUrl(project.project_type || project.type, project.categories)}/${project.slug || project.id}`" 
+                <nuxt-link
+                  :to="`/${$getProjectTypeForUrl(project.project_type || project.type, project.categories)}/${project.slug || project.id}`"
                   class="project-title"
                 >
                   {{ project.title }}
@@ -64,133 +64,132 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
 
 // Remove router import since we don't need it anymore
 
 const props = defineProps({
-  userId: { type: String, required: true }
-})
+  userId: { type: String, required: true },
+});
 
-const shown = ref(false)
-const userData = ref(null)
-const projects = ref([])
-const triggerEl = ref(null)
-const cardEl = ref(null)
-const cardStyle = ref({})
+const shown = ref(false);
+const userData = ref(null);
+const projects = ref([]);
+const triggerEl = ref(null);
+const cardEl = ref(null);
+const cardStyle = ref({});
 
-let hoverTimeout = null
-let isHovering = false
-let isHoveringCard = false
+let hoverTimeout = null;
+let isHovering = false;
+let isHoveringCard = false;
 
 // Add delay before hiding to allow mouse movement to card
-let hideTimeout = null
+let hideTimeout = null;
 
 // Increase hide delay constant
-const HIDE_DELAY = 500
+const HIDE_DELAY = 500;
 
 function updatePosition() {
-  if (!triggerEl.value || !shown.value) return
-  
-  const rect = triggerEl.value.getBoundingClientRect()
-  const viewportHeight = window.innerHeight
-  const showAbove = rect.bottom > viewportHeight - 300 && rect.top > 300
+  if (!triggerEl.value || !shown.value) return;
+
+  const rect = triggerEl.value.getBoundingClientRect();
+  const viewportHeight = window.innerHeight;
+  const showAbove = rect.bottom > viewportHeight - 300 && rect.top > 300;
 
   const style = {
-    position: 'fixed',
+    position: "fixed",
     left: `${rect.left}px`,
-    ...(showAbove 
+    ...(showAbove
       ? { bottom: `${viewportHeight - rect.top + 8}px` }
       : { top: `${rect.bottom + 8}px` }),
-    minWidth: '300px',
-    maxWidth: '400px',
-    maxHeight: '300px'
-  }
-  
-  Object.assign(cardStyle.value, style)
+    minWidth: "300px",
+    maxWidth: "400px",
+    maxHeight: "300px",
+  };
+
+  Object.assign(cardStyle.value, style);
 }
 
 function handleScroll() {
   // Immediate hide on scroll
-  hideCard()
+  hideCard();
 }
 
 function startHideCard() {
   hideTimeout = setTimeout(() => {
     if (!isHoveringCard && !isHovering) {
-      hideCard()
+      hideCard();
     }
-  }, HIDE_DELAY)
+  }, HIDE_DELAY);
 }
 
 function keepCard() {
-  isHoveringCard = true
+  isHoveringCard = true;
   if (hideTimeout) {
-    clearTimeout(hideTimeout)
+    clearTimeout(hideTimeout);
   }
 }
 
 function handleLeave() {
-  isHoveringCard = false
-  isHovering = false
-  startHideCard()
+  isHoveringCard = false;
+  isHovering = false;
+  startHideCard();
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll, { passive: true })
-  window.addEventListener('resize', handleScroll, { passive: true })
-})
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  window.addEventListener("resize", handleScroll, { passive: true });
+});
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('resize', handleScroll)
-  clearTimeout(hoverTimeout)
+  window.removeEventListener("scroll", handleScroll);
+  window.removeEventListener("resize", handleScroll);
+  clearTimeout(hoverTimeout);
   if (hideTimeout) {
-    clearTimeout(hideTimeout)
+    clearTimeout(hideTimeout);
   }
-})
+});
 
 async function startHover() {
-  if (hoverTimeout) return
-  
-  isHovering = true
+  if (hoverTimeout) return;
+
+  isHovering = true;
   hoverTimeout = setTimeout(async () => {
-    if (!isHovering) return
+    if (!isHovering) return;
 
     if (!userData.value) {
       try {
-        const userResp = await useBaseFetch(`user/${props.userId}`)
-        const projectsResp = await useBaseFetch(`user/${props.userId}/projects`)
-        
-        userData.value = userResp || null
-        projects.value = (projectsResp || []).slice(0, 3)
-        
+        const userResp = await useBaseFetch(`user/${props.userId}`);
+        const projectsResp = await useBaseFetch(`user/${props.userId}/projects`);
+
+        userData.value = userResp || null;
+        projects.value = (projectsResp || []).slice(0, 3);
+
         if (userData.value) {
-          userData.value.projects_count = projectsResp?.length || 0
+          userData.value.projects_count = projectsResp?.length || 0;
         }
       } catch (err) {
-        console.error('Failed to load user data:', err)
-        return
+        console.error("Failed to load user data:", err);
+        return;
       }
     }
 
     if (isHovering) {
-      shown.value = true
+      shown.value = true;
       nextTick(() => {
-        updatePosition()
-      })
+        updatePosition();
+      });
     }
-  }, 150) // 150ms delay before loading
+  }, 150); // 150ms delay before loading
 }
 
 function hideCard() {
-  shown.value = false
+  shown.value = false;
   if (hoverTimeout) {
-    clearTimeout(hoverTimeout)
-    hoverTimeout = null
+    clearTimeout(hoverTimeout);
+    hoverTimeout = null;
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -202,7 +201,7 @@ function hideCard() {
   a {
     text-decoration: none;
     transition: color 0.2s ease;
-    
+
     &:hover {
       color: var(--color-link);
     }
@@ -233,7 +232,7 @@ function hideCard() {
     color: inherit;
     text-decoration: none;
     transition: opacity 0.2s ease;
-    
+
     &:hover {
       opacity: 0.8;
 
@@ -306,7 +305,7 @@ function hideCard() {
   &:hover {
     background: var(--color-button-bg-hover);
     transform: translateY(-1px);
-    
+
     .project-title {
       color: var(--color-link);
     }

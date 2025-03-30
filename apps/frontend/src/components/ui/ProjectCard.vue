@@ -27,7 +27,7 @@
         by
         <UserHoverCard :user-id="typeof author === 'object' ? author.id : author">
           <nuxt-link :to="`/user/${typeof author === 'object' ? author.username : author}`">
-            {{ typeof author === 'object' ? author.username : author }}
+            {{ typeof author === "object" ? author.username : author }}
           </nuxt-link>
         </UserHoverCard>
       </p>
@@ -531,11 +531,11 @@ export default {
   font-size: 0.9em;
   color: var(--color-text-secondary);
   font-weight: normal;
-  
+
   a {
     color: var(--color-link);
     text-decoration: none;
-    
+
     &:hover {
       color: var(--color-link-hover);
       text-decoration: underline;

@@ -1,8 +1,8 @@
 <template>
-  <div 
-    class="markdown-body" 
+  <div
+    class="markdown-body"
     @click="handleLinkClick"
-    v-html="renderHighlightedString(description ?? '')" 
+    v-html="renderHighlightedString(description ?? '')"
   />
   <ExternalLinkModal ref="externalLinkModal" />
 </template>

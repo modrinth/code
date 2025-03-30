@@ -12,7 +12,9 @@
         {{ formatMessage(messages.warning) }}
       </Admonition>
 
-      <div class="flex items-center gap-2 p-3 rounded-lg bg-bg text-contrast font-mono text-sm break-all">
+      <div
+        class="flex items-center gap-2 p-3 rounded-lg bg-bg text-contrast font-mono text-sm break-all"
+      >
         <GlobeIcon class="flex-shrink-0 size-4" />
         {{ targetUrl }}
       </div>
@@ -45,12 +47,13 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
   title: {
-    id: 'modal.external_link.title', 
+    id: 'modal.external_link.title',
     defaultMessage: 'Leaving Modrinth',
   },
   warning: {
     id: 'modal.external_link.warning',
-    defaultMessage: 'You are about to visit an external website. Please verify the link is from a trusted source before proceeding.',
+    defaultMessage:
+      'You are about to visit an external website. Please verify the link is from a trusted source before proceeding.',
   },
   proceed: {
     id: 'modal.external_link.proceed',
@@ -100,7 +103,7 @@ defineExpose({ show })
   flex-direction: column;
   gap: var(--spacing-card-md);
   padding: var(--spacing-card-lg);
-  
+
   .link-display {
     padding: var(--spacing-card-sm);
     background: var(--color-button-bg);
