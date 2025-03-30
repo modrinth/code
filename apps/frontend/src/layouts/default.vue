@@ -548,6 +548,8 @@
         </button>
       </div>
     </header>
+    <AppHeader />
+    <CommandPrompt ref="commandPrompt" />
     <main class="min-h-[calc(100vh-4.5rem-310.59px)]">
       <ModalCreation v-if="auth.user" ref="modal_creation" />
       <CollectionCreateModal ref="modal_collection_creation" />
@@ -692,6 +694,7 @@ import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
 import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
+import CommandPrompt from '~/components/ui/CommandPrompt.vue'
 
 const { formatMessage } = useVIntl();
 
