@@ -64,9 +64,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
-
-// Remove router import since we don't need it anymore
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
 
 const props = defineProps({
   userId: { type: String, required: true },
@@ -82,11 +80,8 @@ const cardStyle = ref({});
 let hoverTimeout = null;
 let isHovering = false;
 let isHoveringCard = false;
-
-// Add delay before hiding to allow mouse movement to card
 let hideTimeout = null;
 
-// Increase hide delay constant
 const HIDE_DELAY = 500;
 
 function updatePosition() {
@@ -110,8 +105,8 @@ function updatePosition() {
   Object.assign(cardStyle.value, style);
 }
 
+// hide the hover card on scroll cuz we dont want it stuck on a users screen!
 function handleScroll() {
-  // Immediate hide on scroll
   hideCard();
 }
 
@@ -180,7 +175,7 @@ async function startHover() {
         updatePosition();
       });
     }
-  }, 150); // 150ms delay before loading
+  }, 150);
 }
 
 function hideCard() {
