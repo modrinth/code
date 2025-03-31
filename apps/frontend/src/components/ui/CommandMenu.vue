@@ -15,7 +15,7 @@
             @keydown.arrow-up.prevent="selectPrevious"
             @keydown.arrow-down.prevent="selectNext"
           />
-          <div class="shortcuts" :class="{ 'mac': isMac }">
+          <div class="shortcuts" :class="{ mac: isMac }">
             <kbd v-if="isMac">⌘</kbd><kbd v-else>Ctrl</kbd><kbd>K</kbd>
           </div>
         </div>
@@ -26,7 +26,12 @@
               <SearchIcon class="section-icon" aria-hidden="true" />
               {{ formatMessage(messages.searchResults) }}
             </div>
-            <div v-if="results.length" ref="resultsContainer" class="command-menu-results" role="listbox">
+            <div
+              v-if="results.length"
+              ref="resultsContainer"
+              class="command-menu-results"
+              role="listbox"
+            >
               <button
                 v-for="(result, index) in results"
                 :key="result.id"
@@ -36,7 +41,12 @@
                 @click="selectResult(result)"
                 @mouseenter="selectedIndex = index"
               >
-                <img :src="result.icon_url" :alt="result.title" class="project-icon" loading="lazy" />
+                <img
+                  :src="result.icon_url"
+                  :alt="result.title"
+                  class="project-icon"
+                  loading="lazy"
+                />
                 <div class="project-info">
                   <span class="project-title">{{ result.title }}</span>
                   <span class="project-description">{{ result.description }}</span>
@@ -66,155 +76,154 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
-import { SearchIcon, CompassIcon } from '@modrinth/assets'
-import { useRouter } from 'vue-router'
-import { defineMessage, defineMessages } from '@vintl/vintl'
-import { useVIntl } from '#imports'
-import { useBaseFetch } from '~/composables/fetch'
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from "vue";
+import { SearchIcon, CompassIcon } from "@modrinth/assets";
+import { useRouter } from "vue-router";
+import { useVIntl } from "#imports";
+import { useBaseFetch } from "~/composables/fetch.js";
 
 const messages = defineMessages({
   searchPlaceholder: {
-    id: 'command-menu.search.placeholder',
-    defaultMessage: 'Search projects, mods, users...',
+    id: "command-menu.search.placeholder",
+    defaultMessage: "Search projects, mods, users...",
   },
   searchResults: {
-    id: 'command-menu.search.results',
-    defaultMessage: 'Search Results',
+    id: "command-menu.search.results",
+    defaultMessage: "Search Results",
   },
   quickActions: {
-    id: 'command-menu.quick-actions',
-    defaultMessage: 'Quick Actions',
+    id: "command-menu.quick-actions",
+    defaultMessage: "Quick Actions",
   },
   noResults: {
-    id: 'command-menu.search.no-results',
-    defaultMessage: 'No matching results found',
+    id: "command-menu.search.no-results",
+    defaultMessage: "No matching results found",
   },
   startTyping: {
-    id: 'command-menu.search.start-typing',
-    defaultMessage: 'Start typing to search across Modrinth...',
+    id: "command-menu.search.start-typing",
+    defaultMessage: "Start typing to search across Modrinth...",
   },
   searchHint: {
-    id: 'command-menu.search.hint',
-    defaultMessage: 'Search for projects, mods, plugins, and more',
+    id: "command-menu.search.hint",
+    defaultMessage: "Search for projects, mods, plugins, and more",
   },
   navigationHint: {
-    id: 'command-menu.search.navigation-hint',
-    defaultMessage: 'Use ↑↓ to navigate, enter to select',
-  }
-})
+    id: "command-menu.search.navigation-hint",
+    defaultMessage: "Use ↑↓ to navigate, enter to select",
+  },
+});
 
-const { formatMessage } = useVIntl()
-const router = useRouter()
+const { formatMessage } = useVIntl();
+const router = useRouter();
 
-const show = ref(false)
-const query = ref('')
-const results = ref([])
-const selectedIndex = ref(0)
-const searchInput = ref(null)
-const resultsContainer = ref(null)
+const show = ref(false);
+const query = ref("");
+const results = ref([]);
+const selectedIndex = ref(0);
+const searchInput = ref(null);
+const resultsContainer = ref(null);
 
-const isMac = ref(false)
+const isMac = ref(false);
 onMounted(() => {
-  isMac.value = navigator?.platform?.toLowerCase().includes('mac') ?? false
-})
+  isMac.value = navigator?.platform?.toLowerCase().includes("mac") ?? false;
+});
 
 const searchProjects = async (searchQuery) => {
   if (!searchQuery) {
-    results.value = []
-    return
+    results.value = [];
+    return;
   }
 
   try {
-    const response = await useBaseFetch(`search?query=${encodeURIComponent(searchQuery)}&limit=10`)
-    results.value = response.hits
+    const response = await useBaseFetch(`search?query=${encodeURIComponent(searchQuery)}&limit=10`);
+    results.value = response.hits;
   } catch (error) {
-    console.error('Search error:', error)
-    results.value = []
+    console.error("Search error:", error);
+    results.value = [];
   }
-}
+};
 
 watch(query, (newQuery) => {
-  selectedIndex.value = 0
-  searchProjects(newQuery)
-})
+  selectedIndex.value = 0;
+  searchProjects(newQuery);
+});
 
 const selectResult = (result) => {
-  router.push(`/project/${result.slug}`)
-  close()
-}
+  router.push(`/project/${result.slug}`);
+  close();
+};
 
 const handleEnter = () => {
   if (results.value[selectedIndex.value]) {
-    selectResult(results.value[selectedIndex.value])
+    selectResult(results.value[selectedIndex.value]);
   }
-}
+};
 
 const selectNext = () => {
-  selectedIndex.value = (selectedIndex.value + 1) % results.value.length
-  scrollSelectedIntoView()
-}
+  selectedIndex.value = (selectedIndex.value + 1) % results.value.length;
+  scrollSelectedIntoView();
+};
 
 const selectPrevious = () => {
-  selectedIndex.value = (selectedIndex.value - 1 + results.value.length) % results.value.length
-  scrollSelectedIntoView()
-}
+  selectedIndex.value = (selectedIndex.value - 1 + results.value.length) % results.value.length;
+  scrollSelectedIntoView();
+};
 
 const scrollSelectedIntoView = () => {
   if (resultsContainer.value) {
-    const activeItem = resultsContainer.value.children[selectedIndex.value]
+    const activeItem = resultsContainer.value.children[selectedIndex.value];
     if (activeItem) {
-      activeItem.scrollIntoView({ block: 'nearest' })
+      activeItem.scrollIntoView({ block: "nearest" });
     }
   }
-}
+};
 
 const props = defineProps({
   onStateChange: {
     type: Function,
     default: async () => {},
-  }
-})
+  },
+});
 
 const open = async () => {
-  show.value = true
-  await props.onStateChange(true)
+  show.value = true;
+  await props.onStateChange(true);
   nextTick(() => {
-    searchInput.value?.focus()
-  })
-}
+    searchInput.value?.focus();
+  });
+};
 
 const close = async () => {
-  show.value = false
-  await props.onStateChange(false)
-  query.value = ''
-  results.value = []
-  selectedIndex.value = 0
-}
+  show.value = false;
+  await props.onStateChange(false);
+  query.value = "";
+  results.value = [];
+  selectedIndex.value = 0;
+};
 
 const handleKeydown = (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-    e.preventDefault()
+  if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+    e.preventDefault();
     if (show.value) {
-      close()
+      close();
     } else {
-      open()
+      open();
     }
   }
-}
+};
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeydown)
-})
+  window.addEventListener("keydown", handleKeydown);
+});
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleKeydown)
-})
+  window.removeEventListener("keydown", handleKeydown);
+});
 
 defineExpose({
   open,
   close,
-})
+});
 </script>
 
 <style lang="scss" scoped>
@@ -234,7 +243,7 @@ defineExpose({
   background: var(--color-raised-bg);
   border: 1px solid var(--color-divider);
   border-radius: 12px;
-  box-shadow: 
+  box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.1),
     0 8px 32px rgba(0, 0, 0, 0.4);
   overflow: hidden;
@@ -274,7 +283,7 @@ defineExpose({
   font-size: 14px;
   padding: 0 8px;
   color: var(--color-text);
-  
+
   &::placeholder {
     color: var(--color-text-secondary);
   }
@@ -287,7 +296,7 @@ defineExpose({
   background: var(--color-button-bg);
   border-radius: 6px;
   margin-left: 4px;
-  
+
   kbd {
     padding: 1px 4px;
     font-size: 11px;
@@ -313,7 +322,7 @@ defineExpose({
     color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    
+
     .section-icon {
       width: 14px;
       height: 14px;
@@ -349,7 +358,7 @@ defineExpose({
   &:hover,
   &.active {
     background: var(--color-button-bg);
-    
+
     .project-title {
       color: var(--color-brand);
     }

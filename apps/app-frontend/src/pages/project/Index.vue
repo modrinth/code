@@ -192,7 +192,7 @@ const [allLoaders, allGameVersions] = await Promise.all([
 async function loadVersionsInBatches(versionIds) {
   const batchSize = 200
   const batches = []
-  
+
   for (let i = 0; i < versionIds.length; i += batchSize) {
     const batch = versionIds.slice(i, i + batchSize)
     batches.push(get_version_many(batch, 'must_revalidate').catch(handleError))
