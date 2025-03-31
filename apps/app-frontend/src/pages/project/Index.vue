@@ -189,13 +189,26 @@ const [allLoaders, allGameVersions] = await Promise.all([
   get_game_versions().catch(handleError).then(ref),
 ])
 
+async function loadVersionsInBatches(versionIds) {
+  const batchSize = 200
+  const batches = []
+  
+  for (let i = 0; i < versionIds.length; i += batchSize) {
+    const batch = versionIds.slice(i, i + batchSize)
+    batches.push(get_version_many(batch, 'must_revalidate').catch(handleError))
+  }
+
+  const batchResults = await Promise.all(batches)
+  return batchResults.flat()
+}
+
 async function fetchProjectData() {
   const project = await get_project(route.params.id, 'must_revalidate').catch(handleError)
 
   data.value = project
   ;[versions.value, members.value, categories.value, instance.value, instanceProjects.value] =
     await Promise.all([
-      get_version_many(project.versions, 'must_revalidate').catch(handleError),
+      loadVersionsInBatches(project.versions).catch(handleError),
       get_team(project.team).catch(handleError),
       get_categories().catch(handleError),
       route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),
