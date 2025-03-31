@@ -775,6 +775,7 @@ pub async fn launch_minecraft(
             command,
             post_exit_hook,
             state.directories.profile_logs_dir(&profile.path),
+            version_info.logging.is_some(),
         )
         .await
 }

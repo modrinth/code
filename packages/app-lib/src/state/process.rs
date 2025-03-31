@@ -8,15 +8,12 @@ use quick_xml::events::Event;
 use quick_xml::Reader;
 use serde::Deserialize;
 use serde::Serialize;
-use std::fs::{File, OpenOptions};
-use std::io::Cursor;
+use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
-use std::sync::Arc;
-use tokio::io::{AsyncBufReadExt, AsyncReadExt, BufReader};
+use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
-use tokio::sync::mpsc;
 use uuid::Uuid;
 
 const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
@@ -44,6 +41,7 @@ impl ProcessManager {
         mut mc_command: Command,
         post_exit_command: Option<String>,
         logs_folder: PathBuf,
+        xml_logging: bool,
     ) -> crate::Result<ProcessMetadata> {
         mc_command.stdout(std::process::Stdio::piped());
         mc_command.stderr(std::process::Stdio::piped());
@@ -90,15 +88,15 @@ impl ProcessManager {
             .map_err(|e| IOError::with_path(e, &log_path))?;
             writeln!(log_file, "# Profile: {} \n", profile_path)
                 .map_err(|e| IOError::with_path(e, &log_path))?;
-            writeln!(log_file, "")
-                .map_err(|e| IOError::with_path(e, &log_path))?;
+            writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
         }
 
         if let Some(stdout) = stdout {
             let log_path_clone = log_path.clone();
 
             tokio::spawn(async move {
-                Process::process_output(stdout, log_path_clone).await;
+                Process::process_output(stdout, log_path_clone, xml_logging)
+                    .await;
             });
         }
 
@@ -106,7 +104,8 @@ impl ProcessManager {
             let log_path_clone = log_path.clone();
 
             tokio::spawn(async move {
-                Process::process_output(stderr, log_path_clone).await;
+                Process::process_output(stderr, log_path_clone, xml_logging)
+                    .await;
             });
         }
 
@@ -194,44 +193,48 @@ struct Log4jEvent {
 }
 
 impl Process {
-    async fn process_output<R>(reader: R, log_path: impl AsRef<Path>)
-    where
+    async fn process_output<R>(
+        reader: R,
+        log_path: impl AsRef<Path>,
+        xml_logging: bool,
+    ) where
         R: tokio::io::AsyncRead + Unpin,
     {
-        let buf_reader = BufReader::new(reader);
-        let mut reader = Reader::from_reader(buf_reader);
-        reader.config_mut().trim_text(true);
+        let mut buf_reader = BufReader::new(reader);
 
-        let mut buf = Vec::new();
-        let mut current_event = Log4jEvent::default();
-        let mut in_message = false;
-        let mut in_throwable = false;
-        let mut current_content = String::new();
+        if xml_logging {
+            let mut reader = Reader::from_reader(buf_reader);
+            reader.config_mut().trim_text(true);
 
-        loop {
-            match reader.read_event_into_async(&mut buf).await {
-                Err(e) => {
-                    tracing::error!(
-                        "Error at position {}: {:?}",
-                        reader.buffer_position(),
-                        e
-                    );
-                    break;
-                }
-                // exits the loop when reaching end of file
-                Ok(Event::Eof) => break,
+            let mut buf = Vec::new();
+            let mut current_event = Log4jEvent::default();
+            let mut in_message = false;
+            let mut in_throwable = false;
+            let mut current_content = String::new();
 
-                Ok(Event::Start(e)) => {
-                    match e.name().as_ref() {
-                        b"log4j:Event" => {
-                            // Reset for new event
-                            current_event = Log4jEvent::default();
+            loop {
+                match reader.read_event_into_async(&mut buf).await {
+                    Err(e) => {
+                        tracing::error!(
+                            "Error at position {}: {:?}",
+                            reader.buffer_position(),
+                            e
+                        );
+                        break;
+                    }
+                    // exits the loop when reaching end of file
+                    Ok(Event::Eof) => break,
 
-                            // Extract attributes
-                            for attr_result in e.attributes() {
-                                if let Ok(attr) = attr_result {
+                    Ok(Event::Start(e)) => {
+                        match e.name().as_ref() {
+                            b"log4j:Event" => {
+                                // Reset for new event
+                                current_event = Log4jEvent::default();
+
+                                // Extract attributes
+                                for attr in e.attributes().flatten() {
                                     let key = String::from_utf8_lossy(
-                                        &attr.key.into_inner(),
+                                        attr.key.into_inner(),
                                     )
                                     .to_string();
                                     let value =
@@ -256,78 +259,27 @@ impl Process {
                                     }
                                 }
                             }
-                        }
-                        b"log4j:Message" => {
-                            in_message = true;
-                            current_content = String::new();
-                        }
-                        b"log4j:Throwable" => {
-                            in_throwable = true;
-                            current_content = String::new();
-                        }
-                        _ => {}
-                    }
-                }
-                Ok(Event::End(e)) => {
-                    match e.name().as_ref() {
-                        b"log4j:Message" => {
-                            in_message = false;
-                            current_event.message =
-                                Some(current_content.clone());
-                        }
-                        b"log4j:Throwable" => {
-                            in_throwable = false;
-                            // Process and write the log entry
-                            let thread =
-                                current_event.thread.as_deref().unwrap_or("");
-                            let level =
-                                current_event.level.as_deref().unwrap_or("");
-                            let logger =
-                                current_event.logger.as_deref().unwrap_or("");
-
-                            if let Some(message) = &current_event.message {
-                                let formatted_time = Process::format_timestamp(
-                                    current_event.timestamp.as_deref(),
-                                );
-                                let formatted_log = format!(
-                                    "{} [{}] [{}{}]: {}\n",
-                                    formatted_time,
-                                    thread,
-                                    if !logger.is_empty() {
-                                        format!("{}/", logger)
-                                    } else {
-                                        String::new()
-                                    },
-                                    level,
-                                    message.trim()
-                                );
-
-                                // Write the log message
-                                if let Err(e) = Process::append_to_log_file(
-                                    &log_path,
-                                    &formatted_log,
-                                ) {
-                                    tracing::error!(
-                                        "Failed to write to log file: {}",
-                                        e
-                                    );
-                                }
-
-                                // Write the throwable if present
-                                if !current_content.is_empty() {
-                                    if let Err(e) = Process::append_to_log_file(
-                                        &log_path,
-                                        &current_content,
-                                    ) {
-                                        tracing::error!("Failed to write throwable to log file: {}", e);
-                                    }
-                                }
+                            b"log4j:Message" => {
+                                in_message = true;
+                                current_content = String::new();
                             }
+                            b"log4j:Throwable" => {
+                                in_throwable = true;
+                                current_content = String::new();
+                            }
+                            _ => {}
                         }
-                        b"log4j:Event" => {
-                            // If no throwable was present, write the log entry at the end of the event
-                            if current_event.message.is_some() && !in_throwable
-                            {
+                    }
+                    Ok(Event::End(e)) => {
+                        match e.name().as_ref() {
+                            b"log4j:Message" => {
+                                in_message = false;
+                                current_event.message =
+                                    Some(current_content.clone());
+                            }
+                            b"log4j:Throwable" => {
+                                in_throwable = false;
+                                // Process and write the log entry
                                 let thread = current_event
                                     .thread
                                     .as_deref()
@@ -341,60 +293,138 @@ impl Process {
                                     .as_deref()
                                     .unwrap_or("");
 
-                                let formatted_time = Process::format_timestamp(
-                                    current_event.timestamp.as_deref(),
-                                );
-                                let formatted_log = format!(
-                                    "{} [{}] [{}{}]: {}\n",
-                                    formatted_time,
-                                    thread,
-                                    if !logger.is_empty() {
-                                        format!("{}/", logger)
-                                    } else {
-                                        String::new()
-                                    },
-                                    level,
-                                    current_event
-                                        .message
-                                        .as_deref()
-                                        .unwrap_or("")
-                                        .trim()
-                                );
-
-                                // Write the log message
-                                if let Err(e) = Process::append_to_log_file(
-                                    &log_path,
-                                    &formatted_log,
-                                ) {
-                                    tracing::error!(
-                                        "Failed to write to log file: {}",
-                                        e
+                                if let Some(message) = &current_event.message {
+                                    let formatted_time =
+                                        Process::format_timestamp(
+                                            current_event.timestamp.as_deref(),
+                                        );
+                                    let formatted_log = format!(
+                                        "{} [{}] [{}{}]: {}\n",
+                                        formatted_time,
+                                        thread,
+                                        if !logger.is_empty() {
+                                            format!("{}/", logger)
+                                        } else {
+                                            String::new()
+                                        },
+                                        level,
+                                        message.trim()
                                     );
+
+                                    // Write the log message
+                                    if let Err(e) = Process::append_to_log_file(
+                                        &log_path,
+                                        &formatted_log,
+                                    ) {
+                                        tracing::error!(
+                                            "Failed to write to log file: {}",
+                                            e
+                                        );
+                                    }
+
+                                    // Write the throwable if present
+                                    if !current_content.is_empty() {
+                                        if let Err(e) =
+                                            Process::append_to_log_file(
+                                                &log_path,
+                                                &current_content,
+                                            )
+                                        {
+                                            tracing::error!("Failed to write throwable to log file: {}", e);
+                                        }
+                                    }
                                 }
                             }
-                        }
-                        _ => {}
-                    }
-                }
-                Ok(Event::Text(e)) => {
-                    if in_message || in_throwable {
-                        if let Ok(text) = e.unescape() {
-                            current_content.push_str(&text);
-                        }
-                    }
-                }
-                Ok(Event::CData(e)) => {
-                    if in_message || in_throwable {
-                        if let Ok(text) = e.escape() {
-                            current_content
-                                .push_str(&String::from_utf8_lossy(&text));
-                        }
-                    }
-                }
-                _ => (),
-            }
+                            b"log4j:Event" => {
+                                // If no throwable was present, write the log entry at the end of the event
+                                if current_event.message.is_some()
+                                    && !in_throwable
+                                {
+                                    let thread = current_event
+                                        .thread
+                                        .as_deref()
+                                        .unwrap_or("");
+                                    let level = current_event
+                                        .level
+                                        .as_deref()
+                                        .unwrap_or("");
+                                    let logger = current_event
+                                        .logger
+                                        .as_deref()
+                                        .unwrap_or("");
 
-            buf.clear();
+                                    let formatted_time =
+                                        Process::format_timestamp(
+                                            current_event.timestamp.as_deref(),
+                                        );
+                                    let formatted_log = format!(
+                                        "{} [{}] [{}{}]: {}\n",
+                                        formatted_time,
+                                        thread,
+                                        if !logger.is_empty() {
+                                            format!("{}/", logger)
+                                        } else {
+                                            String::new()
+                                        },
+                                        level,
+                                        current_event
+                                            .message
+                                            .as_deref()
+                                            .unwrap_or("")
+                                            .trim()
+                                    );
+
+                                    // Write the log message
+                                    if let Err(e) = Process::append_to_log_file(
+                                        &log_path,
+                                        &formatted_log,
+                                    ) {
+                                        tracing::error!(
+                                            "Failed to write to log file: {}",
+                                            e
+                                        );
+                                    }
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                    Ok(Event::Text(e)) => {
+                        if in_message || in_throwable {
+                            if let Ok(text) = e.unescape() {
+                                current_content.push_str(&text);
+                            }
+                        }
+                    }
+                    Ok(Event::CData(e)) => {
+                        if in_message || in_throwable {
+                            if let Ok(text) = e.escape() {
+                                current_content
+                                    .push_str(&String::from_utf8_lossy(&text));
+                            }
+                        }
+                    }
+                    _ => (),
+                }
+
+                buf.clear();
+            }
+        } else {
+            let mut line = String::new();
+
+            while let Ok(bytes_read) = buf_reader.read_line(&mut line).await {
+                if bytes_read == 0 {
+                    break; // End of stream
+                }
+
+                if !line.is_empty() {
+                    if let Err(e) = Self::append_to_log_file(&log_path, &line) {
+                        tracing::warn!("Failed to write to log file: {}", e);
+                    }
+                }
+
+                line.clear();
+            }
         }
     }
 
