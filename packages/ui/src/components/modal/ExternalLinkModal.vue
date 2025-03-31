@@ -40,7 +40,9 @@
 <script setup>
 import { ref } from 'vue'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-import { NewModal, ButtonStyled, Admonition } from '@modrinth/ui'
+import NewModal from './NewModal.vue'
+import Admonition from '../base/Admonition.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 import { ExternalIcon, XIcon, GlobeIcon } from '@modrinth/assets'
 
 const { formatMessage } = useVIntl()
