@@ -119,7 +119,7 @@ const init = () => {
   const material = new THREE.ShaderMaterial({
     uniforms: {
       outlineTexture: { value: outlineTexture },
-      globeColor: { value: new THREE.Color("#60fbb5") },
+      globeColor: { value: new THREE.Color("#ffc69e") },
     },
     vertexShader: `
       varying vec2 vUv;
@@ -151,7 +151,7 @@ const init = () => {
     transparent: true,
     side: THREE.BackSide,
     uniforms: {
-      color: { value: new THREE.Color("#56f690") },
+      color: { value: new THREE.Color("#fabc89") },
       viewVector: { value: camera.position },
     },
     vertexShader: `
@@ -262,13 +262,13 @@ onUnmounted(() => {
 <style scoped>
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(27, 217, 106, 0.3);
+    box-shadow: 0 0 0 0 rgba(217, 84, 27, 0.3);
   }
   70% {
-    box-shadow: 0 0 0 4px rgba(27, 217, 106, 0);
+    box-shadow: 0 0 0 4px rgba(217, 78, 27, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(27, 217, 106, 0);
+    box-shadow: 0 0 0 0 rgba(217, 84, 27, 0);
   }
 }
 
