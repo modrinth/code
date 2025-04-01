@@ -827,7 +827,7 @@ a,
     background: var(--color-tooltip-bg) !important;
     color: var(--color-tooltip-text) !important;
     padding: 0.5rem 0.5rem !important;
-    border-radius: var(--radius-sm) !important;
+    border-radius: 0 !important;
     filter: drop-shadow(5px 5px 0.8rem rgba(0, 0, 0, 0.35));
     font-size: 0.9rem;
     font-weight: bold;
@@ -1211,7 +1211,7 @@ select {
     border: 1px solid var(--color-button-bg) !important;
     padding: var(--gap-sm) !important;
     width: fit-content !important;
-    border-radius: var(--radius-md) !important;
+    border-radius: 0 !important;
     background-color: var(--color-raised-bg) !important;
     box-shadow: var(--shadow-floating) !important;
   }

@@ -134,7 +134,7 @@ function hash(str) {
   position: relative;
 
   &.circle {
-    border-radius: 50%;
+    border-radius: 50%!important;
   }
 
   &:not(.no-shadow) {

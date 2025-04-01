@@ -33,7 +33,7 @@
       <div class="z-[5] flex w-full flex-col gap-8">
         <div class="flex flex-col gap-4">
           <div
-            class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+            class="relative h-fit w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
           >
             Beta Release
           </div>
@@ -105,7 +105,7 @@
       <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
       <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
-          class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+          class="relative w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
         >
           Why Modrinth Servers?
         </div>
@@ -121,7 +121,7 @@
         <img
           src="https://cdn.modrinth.com/servers/excitement.webp"
           alt=""
-          class="absolute right-14 top-0 hidden max-w-[360px] lg:block"
+          class="absolute right-14 top-0 hidden max-w-[360px] hue-rotate-[280deg] lg:block"
         />
         <div class="relative grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
           <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
@@ -234,7 +234,7 @@
       <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
       <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
-          class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+          class="relative w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
         >
           Included with your server
         </div>
@@ -250,7 +250,7 @@
         <img
           src="https://cdn.modrinth.com/servers/waving.webp"
           alt=""
-          class="absolute right-8 top-40 hidden max-w-[480px] lg:block"
+          class="absolute right-8 top-40 hidden max-w-[480px] hue-rotate-[280deg] lg:block"
         />
         <div class="grid grid-cols-1 gap-9 lg:grid-cols-2">
           <div class="grid w-full grid-cols-1 gap-8">
@@ -311,11 +311,11 @@
             style="
               background: radial-gradient(
                 86.12% 101.64% at 95.97% 94.07%,
-                rgba(27, 217, 106, 0.23) 0%,
-                rgba(14, 115, 56, 0.2) 100%
+                rgba(217, 106, 27, 0.23) 0%,
+                rgba(115, 49, 14, 0.2) 100%
               );
-              border: 1px solid rgba(12, 107, 52, 0.55);
-              box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
+              border: 1px solid rgba(107, 48, 12, 0.55);
+              box-shadow: 0px 12px 38.1px rgba(217, 78, 27, 0.13);
             "
             class="relative flex flex-col gap-4 overflow-hidden rounded-2xl p-6 text-left sm:backdrop-blur-xl md:p-12"
           >
@@ -494,7 +494,7 @@
           <div class="flex flex-col gap-8">
             <div class="flex flex-col gap-4">
               <div
-                class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+                class="relative w-fit rounded-full bg-brand-highlight px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
               >
                 Server Locations
               </div>
@@ -506,7 +506,7 @@
             <div class="flex flex-col gap-8">
               <div class="flex flex-col gap-4">
                 <div class="flex items-center gap-3">
-                  <div class="grid size-8 place-content-center rounded-full bg-highlight-green">
+                  <div class="grid size-8 place-content-center rounded-full bg-brand-highlight">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -676,7 +676,7 @@
                 <div class="flex flex-row items-center justify-between">
                   <h1 class="m-0">Medium</h1>
                   <div
-                    class="grid size-8 place-content-center rounded-full bg-highlight-green text-xs font-bold text-brand"
+                    class="grid size-8 place-content-center rounded-full bg-highlight-green text-xs font-bold text-green"
                   >
                     M
                   </div>
