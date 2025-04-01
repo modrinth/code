@@ -865,7 +865,7 @@ useSeoMeta({
       defaultMessage: "Discover and publish Minecraft content!",
     }),
   ogType: "website",
-  ogImage: "https://cdn.modrinth.com/modrinth-newer.png",
+  ogImage: "https://cdn.modrinth.com/modrinth-newer.png?discordcache",
   ogUrl: link,
 
   // Twitter
