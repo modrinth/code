@@ -191,6 +191,7 @@ const modrinthTeamMembers = [
   "Jade",
   "Jasmine",
   "Michael",
+  "Frobert",
 ];
 
 const isPreapring = ref(false);
@@ -235,7 +236,7 @@ function orderPizza() {
       });
 
       setTimeout(() => {
-        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        window.location.href = "https://modrinth.com/pizza/failure";
       }, 2000);
       return;
     }
@@ -264,7 +265,7 @@ function orderPizza() {
 
       // Redirect to funny video :)
       setTimeout(() => {
-        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        window.location.href = "https://modrinth.com/pizza/delivery";
       }, 2000);
     }
   }, 1000);
