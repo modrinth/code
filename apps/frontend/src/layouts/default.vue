@@ -266,13 +266,6 @@
               <span class="contents md:hidden">Modrinth App</span>
             </nuxt-link>
           </ButtonStyled>
-          <ButtonStyled type="transparent" :highlighted="route.name === 'app'">
-            <nuxt-link to="/pizza">
-              <ArrowBigUpDashIcon aria-hidden="true" />
-              <span class="hidden md:contents">Modrinth Pizza</span>
-              <span class="contents md:hidden">Modrinth Pizza</span>
-            </nuxt-link>
-          </ButtonStyled>
         </template>
       </div>
       <div class="flex items-center gap-1">
