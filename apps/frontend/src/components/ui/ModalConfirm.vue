@@ -5,7 +5,7 @@
       <label v-if="hasToType" for="confirmation" class="confirmation-label">
         <span>
           <strong>To verify, type</strong>
-          <em class="confirmation-text">{{ confirmationText }}</em>
+          <em class="confirmation-text"> {{ confirmationText }} </em>
           <strong>below:</strong>
         </span>
       </label>
