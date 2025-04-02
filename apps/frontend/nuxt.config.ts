@@ -18,8 +18,8 @@ const preloadedFonts = [
 ];
 
 const favicons = {
-  "(prefers-color-scheme:no-preference)": "/favicon.ico",
-  "(prefers-color-scheme:light)": "/favicon.ico",
+  "(prefers-color-scheme:no-preference)": "/favicon-light.ico",
+  "(prefers-color-scheme:light)": "/favicon-light.ico",
   "(prefers-color-scheme:dark)": "/favicon.ico",
 };
 
