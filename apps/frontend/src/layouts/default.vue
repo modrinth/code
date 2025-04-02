@@ -266,7 +266,7 @@
               <span class="contents md:hidden">Modrinth App</span>
             </nuxt-link>
           </ButtonStyled>
-          <ButtonStyled type="transparent" :highlighted="route.name === 'pizza'">
+          <ButtonStyled type="transparent" :highlighted="route.name === 'app'">
             <nuxt-link to="/pizza">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
