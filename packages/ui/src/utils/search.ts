@@ -211,10 +211,7 @@ export function useSearch(
         searchable: true,
         options: tags.value.gameVersions.map((gameVersion) => ({
           id: gameVersion.version,
-          toggle_group:
-            (gameVersion.version_type !== 'release' && !gameVersion.version.includes('craftmine'))
-              ? 'all_versions'
-              : undefined,
+          toggle_group: gameVersion.version_type !== 'release' ? 'all_versions' : undefined,
           value: `versions:${gameVersion.version}`,
           query_value: gameVersion.version,
           method: 'or',

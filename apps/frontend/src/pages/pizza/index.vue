@@ -191,7 +191,6 @@ const modrinthTeamMembers = [
   "Jade",
   "Jasmine",
   "Michael",
-  "Frobert",
 ];
 
 const isPreapring = ref(false);
