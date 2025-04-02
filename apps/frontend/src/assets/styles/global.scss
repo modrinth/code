@@ -56,9 +56,9 @@ html {
   --color-text-inverted: var(--color-bg);
   --color-bg-inverted: var(--color-text);
 
-  --color-brand: #F16436;
-  --color-brand-highlight: rgba(242, 101, 53, 0.25);
-  --color-brand-shadow: rgba(242, 101, 53, 0.7);
+  --color-brand: var(--color-green);
+  --color-brand-highlight: rgba(0, 175, 92, 0.25);
+  --color-brand-shadow: rgba(0, 175, 92, 0.7);
   --color-brand-inverted: #ffffff;
 
   --tab-underline-hovered: #e2e8f0;
@@ -139,10 +139,10 @@ html {
   );
   --landing-border-gradient: linear-gradient(
     to bottom right,
-    rgba(175, 150, 129, 0.75) 0%,
-    rgba(97, 66, 66, 0.34) 100%
+    rgba(129, 137, 175, 0.75) 0%,
+    rgba(66, 71, 97, 0.34) 100%
   );
-  --landing-border-color: rgba(175, 134, 129, 0.55);
+  --landing-border-color: rgba(129, 137, 175, 0.55);
   --landing-creator-gradient: linear-gradient(180deg, #f8f8f8 0%, #f8f8f8 63.19%);
 
   --landing-blob-gradient: radial-gradient(
@@ -158,8 +158,8 @@ html {
 
   --landing-blue-label: #0098ba;
   --landing-blue-label-bg: rgba(0, 177, 216, 0.15);
-  --landing-green-label: #dd5b0b;
-  --landing-green-label-bg: rgba(221, 67, 21, 0.15);
+  --landing-green-label: #00a936;
+  --landing-green-label-bg: rgba(0, 216, 69, 0.15);
 
   --landing-raw-bg: #fff;
 }
@@ -174,22 +174,22 @@ html {
   --color-text-inactive: #929aa3;
   --color-text-dark: var(--dark-color-text-dark);
   --color-heading: #c4cfdd;
-  --color-bg: #0D0D0D;
-  --color-raised-bg: #202020;
+  --color-bg: #16181c;
+  --color-raised-bg: #26292f;
   --color-divider: #474b54;
   --color-divider-dark: #646c75;
 
   --color-text-inverted: var(--color-bg);
   --color-bg-inverted: var(--color-text);
 
-  --color-brand: #F16436;
-  --color-brand-highlight: rgba(242, 101, 53, 0.25);
-  --color-brand-shadow: rgba(242, 101, 53, 0.7);
+  --color-brand: var(--color-green);
+  --color-brand-highlight: rgba(27, 217, 106, 0.25);
+  --color-brand-shadow: rgba(27, 217, 106, 0.7);
   --color-brand-inverted: #000;
 
   --tab-underline-hovered: #414146;
 
-  --color-button-bg: #333333;
+  --color-button-bg: hsl(222, 13%, 30%);
   --color-button-text: var(--color-text);
   --color-button-bg-hover: #494f58;
   --color-button-text-hover: #ffffff;
@@ -245,42 +245,42 @@ html {
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
 
   --landing-maze-bg: url("https://cdn.modrinth.com/landing-new/landing.webp");
-  --landing-maze-gradient-bg: linear-gradient(0deg, #371f17 0%, rgba(8, 14, 55, 0) 100%),
+  --landing-maze-gradient-bg: linear-gradient(0deg, #31375f 0%, rgba(8, 14, 55, 0) 100%),
     url("https://cdn.modrinth.com/landing-new/landing-lower.webp");
   --landing-maze-outer-bg: linear-gradient(180deg, #06060d 0%, #000000 100%);
 
   --landing-color-heading: #fff;
-  --landing-color-subheading: #beb4af;
+  --landing-color-subheading: #afb6be;
 
-  --landing-transition-gradient-start: rgba(32, 26, 14, 0);
-  --landing-transition-gradient-end: #1c0b06;
+  --landing-transition-gradient-start: rgba(14, 16, 32, 0);
+  --landing-transition-gradient-end: #060a1c;
   --landing-hover-card-gradient: radial-gradient(
     50% 50% at 50% 50%,
-    #4f342c 0%,
-    rgba(50, 33, 32, 0.77) 100%
+    #2c304f 0%,
+    rgba(32, 35, 50, 0.77) 100%
   );
   --landing-border-gradient: linear-gradient(
     to bottom right,
-    rgba(221, 184, 168, 0.75) 0%,
-    rgba(221, 187, 168, 0.18) 100%
+    rgba(168, 177, 221, 0.75) 0%,
+    rgba(168, 177, 221, 0.18) 100%
   );
-  --landing-border-color: rgba(221, 174, 168, 0.55);
-  --landing-creator-gradient: linear-gradient(180deg, #000000 0%, #1d130e 100%);
+  --landing-border-color: rgba(168, 177, 221, 0.55);
+  --landing-creator-gradient: linear-gradient(180deg, #000000 0%, #0e101d 100%);
 
   --landing-blob-gradient: radial-gradient(
     50% 50% at 50% 50%,
-    rgba(79, 53, 44, 0.35) 0%,
-    rgba(50, 35, 32, 0.27) 100%
+    rgba(44, 48, 79, 0.35) 0%,
+    rgba(32, 35, 50, 0.2695) 100%
   );
-  --landing-blob-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16), inset 2px 2px 64px rgba(94, 71, 57, 0.45);
+  --landing-blob-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16), inset 2px 2px 64px rgba(57, 61, 94, 0.45);
 
-  --landing-card-bg: rgba(85, 69, 59, 0.15);
+  --landing-card-bg: rgba(59, 63, 85, 0.15);
   --landing-card-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16);
 
   --landing-blue-label: #10c0e7;
   --landing-blue-label-bg: rgba(0, 177, 216, 0.15);
-  --landing-green-label: #ec6105;
-  --landing-green-label-bg: rgba(223, 83, 7, 0.15);
+  --landing-green-label: #00d845;
+  --landing-green-label-bg: rgba(0, 216, 69, 0.15);
 
   --landing-raw-bg: #000;
 
