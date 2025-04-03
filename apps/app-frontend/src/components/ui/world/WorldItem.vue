@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import type { ServerStatus, ServerWorld, World } from '@/helpers/worlds.ts'
+import { showWorldInFolder } from '@/helpers/worlds.ts'
 import { formatNumber } from '@modrinth/utils'
 import {
+  IssuesIcon,
   EyeIcon,
   ClipboardCopyIcon,
   EditIcon,
@@ -18,7 +20,7 @@ import {
   UpdatedIcon,
   UserIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, commonMessages, OverflowMenu } from '@modrinth/ui'
+import { Avatar, ButtonStyled, commonMessages, OverflowMenu, SmartClickable } from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import type { Component } from 'vue'
@@ -26,6 +28,7 @@ import { computed } from 'vue'
 import { copyToClipboard } from '@/helpers/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { useRouter } from 'vue-router'
+import { Tooltip } from 'floating-vue'
 
 const { formatMessage } = useVIntl()
 
@@ -42,6 +45,7 @@ const props = withDefaults(
     playingWorld?: boolean
     startingInstance?: boolean
     supportsQuickPlay?: boolean
+    currentProtocol: number | null
 
     // Server only
     refreshing?: boolean
@@ -78,6 +82,16 @@ const props = withDefaults(
 )
 
 const playingOtherWorld = computed(() => props.playingInstance && !props.playingWorld)
+const hasPlayersTooltip = computed(
+  () => !!props.serverStatus?.players?.sample && props.serverStatus.players?.sample?.length > 0,
+)
+const serverIncompatible = computed(
+  () =>
+    !!props.serverStatus &&
+    !!props.serverStatus.version?.protocol &&
+    !!props.currentProtocol &&
+    props.serverStatus.version.protocol !== props.currentProtocol,
+)
 
 function getPingLevel(ping: number) {
   if (ping < 150) {
@@ -122,136 +136,191 @@ const messages = defineMessages({
     id: 'instance.worlds.view_instance',
     defaultMessage: 'View instance',
   },
+  playAnyway: {
+    id: 'instance.worlds.play-anyway',
+    defaultMessage: 'Play anyway',
+  },
 })
 </script>
 <template>
-  <div
-    class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised rounded-xl supports-[grid-template-columns:subgrid]:col-span-full supports-[grid-template-columns:subgrid]:!grid-cols-subgrid"
-  >
-    <Avatar
-      :src="
+  <SmartClickable>
+    <template v-if="instancePath" #clickable>
+      <router-link class="no-click-animation" :to="`/instance/${encodeURIComponent(instancePath)}/worlds`" />
+    </template>
+    <div
+      class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised rounded-xl"
+    >
+      <Avatar
+        :src="
         world.type === 'server' && serverStatus ? serverStatus.favicon ?? world.icon : world.icon
       "
-      size="48px"
-    />
-    <div class="flex flex-col justify-between h-full">
-      <div class="flex items-center gap-2">
-        <div class="text-lg text-contrast font-bold truncate">{{ world.name }}</div>
-        <div
-          v-if="world.type === 'singleplayer'"
-          class="text-sm text-secondary flex items-center gap-1 font-semibold"
-        >
-          <UserIcon aria-hidden="true" class="h-4 w-4 text-secondary shrink-0" stroke-width="3px" />
-          {{ formatMessage(commonMessages.singleplayerLabel) }}
+        size="48px"
+      />
+      <div class="flex flex-col justify-between h-full">
+        <div class="flex items-center gap-2">
+          <div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">{{ world.name }}</div>
+          <div
+            v-if="world.type === 'singleplayer'"
+            class="text-sm text-secondary flex items-center gap-1 font-semibold"
+          >
+            <UserIcon aria-hidden="true" class="h-4 w-4 text-secondary shrink-0" stroke-width="3px" />
+            {{ formatMessage(commonMessages.singleplayerLabel) }}
+          </div>
+          <div
+            v-else-if="world.type === 'server'"
+            class="text-sm text-secondary flex items-center gap-1 font-semibold flex-nowrap whitespace-nowrap"
+          >
+            <template v-if="refreshing">
+              <SpinnerIcon aria-hidden="true" class="animate-spin shrink-0" />
+              Loading...
+            </template>
+            <template v-else-if="serverStatus">
+              <template v-if="serverIncompatible">
+                <IssuesIcon class="shrink-0 text-orange" aria-hidden="true" />
+                <span class="text-orange"> Server requires {{ serverStatus.version?.name }} </span>
+              </template>
+              <template v-else>
+                <SignalIcon
+                  v-tooltip="serverStatus ? `${serverStatus.ping}ms` : null"
+                  aria-hidden="true"
+                  :style="`--_signal-${getPingLevel(serverStatus.ping || 0)}: var(--color-green)`"
+                  stroke-width="3px"
+                  class="shrink-0"
+                  :class="{
+                    'smart-clickable:allow-pointer-events': serverStatus,
+                  }"
+                />
+                <Tooltip :disabled="!hasPlayersTooltip">
+                <span :class="{ 'cursor-help': hasPlayersTooltip }">
+                  {{ formatNumber(serverStatus.players?.online, false) }} online
+                </span>
+                  <template #popper>
+                    <div class="flex flex-col gap-1">
+                    <span v-for="player in serverStatus.players?.sample" :key="player.name">
+                      {{ player.name }}
+                    </span>
+                    </div>
+                  </template>
+                </Tooltip>
+              </template>
+            </template>
+            <template v-else>
+              <NoSignalIcon aria-hidden="true" stroke-width="3px" class="shrink-0" /> Offline
+            </template>
+          </div>
         </div>
-        <div
-          v-else-if="world.type === 'server'"
-          class="text-sm text-secondary flex items-center gap-1 font-semibold flex-nowrap whitespace-nowrap"
-        >
-          <template v-if="refreshing">
-            <SpinnerIcon aria-hidden="true" class="animate-spin shrink-0" />
-            Loading...
+        <div class="flex items-center gap-2 text-sm text-secondary">
+          <div
+            v-tooltip="
+            world.last_played ? dayjs(world.last_played).format('MMMM D, YYYY [at] h:mm A') : null
+          "
+            class="w-fit shrink-0"
+            :class="{ 'cursor-help smart-clickable:allow-pointer-events': world.last_played }"
+          >
+            <template v-if="world.last_played">
+              {{
+                formatMessage(commonMessages.playedLabel, {
+                  time: dayjs(world.last_played).fromNow(),
+                })
+              }}
+            </template>
+            <template v-else> Not played yet </template>
+          </div>
+          <template v-if="instancePath">
+            •
+            <router-link
+              class="flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
+              :to="`/instance/${instancePath}`"
+            >
+              <Avatar
+                :src="instanceIcon ? convertFileSrc(instanceIcon) : undefined"
+                size="16px"
+                :tint-by="instancePath"
+                class="shrink-0"
+              />
+              <span class="truncate">{{ instanceName }}</span>
+            </router-link>
           </template>
-          <template v-else-if="serverStatus">
-            <SignalIcon
-              v-tooltip="serverStatus ? `${serverStatus.ping}ms` : null"
-              aria-hidden="true"
-              :style="`--_signal-${getPingLevel(serverStatus.ping || 0)}: var(--color-green)`"
-              stroke-width="3px"
-              class="shrink-0"
-            />
-            {{ formatNumber(serverStatus.players?.online, false) }} online
+        </div>
+      </div>
+      <div
+        class="font-semibold flex items-center gap-1 justify-center text-center"
+        :class="world.type === 'singleplayer' && world.hardcore ? `text-red` : 'text-secondary'"
+      >
+        <template v-if="world.type === 'server'">
+          <template v-if="refreshing">
+            <SpinnerIcon aria-hidden="true" class="animate-spin" />
+            {{ formatMessage(commonMessages.loadingLabel) }}
+          </template>
+          <div
+            v-else-if="renderedMotd"
+            class="font-normal font-minecraft line-clamp-2 text-secondary leading-5"
+            v-html="renderedMotd"
+          />
+          <div v-else-if="!serverStatus" class="font-normal font-minecraft text-red leading-5">
+            {{ formatMessage(messages.cantConnect) }}
+          </div>
+          <div v-else class="font-normal font-minecraft text-secondary leading-5">
+            {{ formatMessage(messages.aMinecraftServer) }}
+          </div>
+        </template>
+        <template v-else-if="world.type === 'singleplayer' && gameMode">
+          <template v-if="world.hardcore">
+            <SkullIcon aria-hidden="true" class="h-4 w-4 shrink-0" />
+            {{ formatMessage(messages.hardcore) }}
           </template>
           <template v-else>
-            <NoSignalIcon aria-hidden="true" stroke-width="3px" class="shrink-0" /> Offline
+            <component :is="gameMode.icon" aria-hidden="true" class="h-4 w-4 shrink-0" />
+            {{ formatMessage(gameMode.message) }}
           </template>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 text-sm text-secondary">
-        <div
-          v-tooltip="
-          world.last_played ? dayjs(world.last_played).format('MMMM D, YYYY [at] h:mm A') : null
-        "
-          class="w-fit shrink-0"
-          :class="{ 'cursor-help': world.last_played }"
-        >
-          <template v-if="world.last_played">
-            {{
-              formatMessage(commonMessages.playedLabel, { time: dayjs(world.last_played).fromNow() })
-            }}
-          </template>
-          <template v-else> Not played yet </template>
-        </div>
-        <template v-if="instancePath">
-          •
-          <router-link class="flex items-center gap-1 truncate hover:underline text-secondary" :to="`/instance/${instancePath}`">
-            <Avatar :src="instanceIcon ? convertFileSrc(instanceIcon) : undefined" size="16px" class="shrink-0" />
-            <span class="truncate">{{ instanceName }}</span>
-          </router-link>
         </template>
       </div>
-    </div>
-    <div
-      class="font-semibold flex items-center gap-1 justify-center text-center"
-      :class="world.type === 'singleplayer' && world.hardcore ? `text-red` : 'text-secondary'"
-    >
-      <template v-if="world.type === 'server'">
-        <template v-if="refreshing">
-          <SpinnerIcon aria-hidden="true" class="animate-spin" />
-          {{ formatMessage(commonMessages.loadingLabel) }}
-        </template>
-        <div
-          v-else-if="renderedMotd"
-          class="font-normal font-minecraft line-clamp-2 text-secondary leading-5"
-          v-html="renderedMotd"
-        />
-        <div v-else-if="!serverStatus" class="font-normal font-minecraft text-red leading-5">
-          {{ formatMessage(messages.cantConnect) }}
-        </div>
-        <div v-else class="font-normal font-minecraft text-secondary leading-5">
-          {{ formatMessage(messages.aMinecraftServer) }}
-        </div>
-      </template>
-      <template v-else-if="world.type === 'singleplayer' && gameMode">
-        <template v-if="world.hardcore">
-          <SkullIcon aria-hidden="true" class="h-4 w-4 shrink-0" />
-          {{ formatMessage(messages.hardcore) }}
-        </template>
-        <template v-else>
-          <component :is="gameMode.icon" aria-hidden="true" class="h-4 w-4 shrink-0" />
-          {{ formatMessage(gameMode.message) }}
-        </template>
-      </template>
-    </div>
-    <div class="flex gap-1 justify-end">
-      <template v-if="world.type === 'singleplayer' || serverStatus">
-        <ButtonStyled v-if="playingWorld && !startingInstance" color="red">
-          <button @click="emit('stop')">
-            <StopCircleIcon aria-hidden="true" />
-            {{ formatMessage(commonMessages.stopButton) }}
-          </button>
-        </ButtonStyled>
-        <ButtonStyled v-else>
-          <button
-            v-tooltip="
+      <div class="flex gap-1 justify-end smart-clickable:allow-pointer-events" >
+        <template v-if="world.type === 'singleplayer' || serverStatus">
+          <ButtonStyled v-if="playingWorld && !startingInstance" color="red">
+            <button @click="emit('stop')">
+              <StopCircleIcon aria-hidden="true" />
+              {{ formatMessage(commonMessages.stopButton) }}
+            </button>
+          </ButtonStyled>
+          <ButtonStyled v-else-if="!serverIncompatible">
+            <button
+              v-tooltip="
               !supportsQuickPlay
                 ? formatMessage(messages.noQuickPlay)
                 : playingOtherWorld
                   ? formatMessage(messages.gameAlreadyOpen)
                   : null
             "
-            :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
-            @click="emit('play')"
-          >
-            <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
-            <PlayIcon v-else aria-hidden="true" />
+              :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
+              @click="emit('play')"
+            >
+              <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
+              <PlayIcon v-else aria-hidden="true" />
+              {{ formatMessage(commonMessages.playButton) }}
+            </button>
+          </ButtonStyled>
+          <ButtonStyled v-else>
+            <button class="invisible">
+              <PlayIcon aria-hidden="true" />
+              {{ formatMessage(commonMessages.playButton) }}
+            </button>
+          </ButtonStyled>
+        </template>
+        <ButtonStyled v-else>
+          <button class="invisible">
+            <PlayIcon aria-hidden="true" />
             {{ formatMessage(commonMessages.playButton) }}
           </button>
         </ButtonStyled>
-      </template>
-      <ButtonStyled circular type="transparent">
-        <OverflowMenu
-          :options="[
+        <ButtonStyled circular type="transparent">
+          <OverflowMenu
+            :options="[
+            {
+              id: 'play-anyway',
+              shown: serverIncompatible && !playingInstance && supportsQuickPlay,
+              action: () => emit('play'),
+            },
             {
               id: 'open-instance',
               shown: !!instancePath,
@@ -275,7 +344,8 @@ const messages = defineMessages({
             {
               id: 'open-folder',
               shown: world.type === 'singleplayer',
-              action: () => {},
+              action: () =>
+                world.type === 'singleplayer' ? showWorldInFolder(instancePath, world.path) : {},
             },
             {
               divider: true,
@@ -289,35 +359,40 @@ const messages = defineMessages({
               shown: !instancePath,
             },
           ]"
-        >
-          <MoreVerticalIcon aria-hidden="true" />
-          <template #open-instance>
-            <EyeIcon aria-hidden="true" />
-            {{ formatMessage(messages.viewInstance) }}
-          </template>
-          <template #edit>
-            <EditIcon aria-hidden="true" /> {{ formatMessage(commonMessages.editButton) }}
-          </template>
-          <template #open-folder>
-            <FolderOpenIcon aria-hidden="true" />
-            {{ formatMessage(commonMessages.openFolderButton) }}
-          </template>
-          <template #copy-address>
-            <ClipboardCopyIcon aria-hidden="true" /> {{ formatMessage(messages.copyAddress) }}
-          </template>
-          <template #refresh>
-            <UpdatedIcon aria-hidden="true" /> {{ formatMessage(commonMessages.refreshButton) }}
-          </template>
-          <template #delete>
-            <TrashIcon aria-hidden="true" />
-            {{
-              formatMessage(
-                world.type === 'server' ? commonMessages.removeButton : commonMessages.deleteLabel,
-              )
-            }}
-          </template>
-        </OverflowMenu>
-      </ButtonStyled>
+          >
+            <MoreVerticalIcon aria-hidden="true" />
+            <template #play-anyway>
+              <PlayIcon aria-hidden="true" />
+              {{ formatMessage(messages.playAnyway) }}
+            </template>
+            <template #open-instance>
+              <EyeIcon aria-hidden="true" />
+              {{ formatMessage(messages.viewInstance) }}
+            </template>
+            <template #edit>
+              <EditIcon aria-hidden="true" /> {{ formatMessage(commonMessages.editButton) }}
+            </template>
+            <template #open-folder>
+              <FolderOpenIcon aria-hidden="true" />
+              {{ formatMessage(commonMessages.openFolderButton) }}
+            </template>
+            <template #copy-address>
+              <ClipboardCopyIcon aria-hidden="true" /> {{ formatMessage(messages.copyAddress) }}
+            </template>
+            <template #refresh>
+              <UpdatedIcon aria-hidden="true" /> {{ formatMessage(commonMessages.refreshButton) }}
+            </template>
+            <template #delete>
+              <TrashIcon aria-hidden="true" />
+              {{
+                formatMessage(
+                  world.type === 'server' ? commonMessages.removeButton : commonMessages.deleteLabel,
+                )
+              }}
+            </template>
+          </OverflowMenu>
+        </ButtonStyled>
+      </div>
     </div>
-  </div>
+  </SmartClickable>
 </template>

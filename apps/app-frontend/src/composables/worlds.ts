@@ -1,6 +1,7 @@
 import type { GameInstance } from '@/helpers/types'
-import type { Ref } from 'vue'
-import { nextTick, computed, ref, watch } from 'vue'
+import type { Ref } from 'vue';
+import { onUnmounted , nextTick, computed, ref, watch } from 'vue'
+import { profile_listener } from '@/helpers/events'
 import {
   type SingleplayerWorld,
   type ServerStatus,
@@ -10,7 +11,7 @@ import {
   remove_server_from_profile,
   type ServerWorld,
   start_join_server,
-  start_join_singleplayer_world,
+  start_join_singleplayer_world, getWorldIdentifier
 } from '@/helpers/worlds.ts'
 import { get_profile_protocol_version, get_profile_worlds } from '@/helpers/worlds.ts'
 import dayjs from 'dayjs'
@@ -22,7 +23,16 @@ import { handleError } from '@/store/notifications'
 import { get_game_versions } from '@/helpers/tags'
 
 function sortWorlds(worlds: World[]) {
-  worlds.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
+  worlds.sort((a, b) => {
+    if (!a.last_played) {
+      return 1
+    }
+    if (!b.last_played) {
+      return -1
+    }
+    return dayjs(b.last_played).diff(dayjs(a.last_played))
+  })
+
 }
 
 const messages = defineMessages({
@@ -98,6 +108,16 @@ export async function useWorlds(
 
   const protocolVersion = ref<number | null>(null)
   protocolVersion.value = await get_profile_protocol_version(instance.value.path)
+
+  const unlistenProfile = await profile_listener(async (e: { event: string}) => {
+    if (e.event === 'worlds_updated') {
+      await refreshWorlds()
+    }
+  })
+
+  onUnmounted(() => {
+    unlistenProfile()
+  })
 
   const filterOptions = computed(() => {
     const options: FilterBarOption[] = []
@@ -233,6 +253,7 @@ export async function useWorlds(
   }
 
   async function joinWorld(world: World) {
+    console.log(`Joining world ${getWorldIdentifier(world)}`)
     startingInstance.value = true
     worldPlaying.value = world
     if (world.type === 'server') {
@@ -289,6 +310,7 @@ export async function useWorlds(
     filterOptions,
     supportsQuickPlay,
     worldPlaying,
+    protocolVersion,
     worldsMatch,
     addServer,
     editServer,
@@ -298,70 +320,5 @@ export async function useWorlds(
     joinWorld,
     refreshWorlds,
     refreshServer,
-  }
-}
-
-export type InstanceWorld = World & {
-  instancePath: string
-  instanceName: string
-  instanceIcon?: string
-  supportsQuickPlay: boolean
-  refresh: (address: string) => void
-  play: (world: World) => void
-}
-
-export async function useWorldsMultiInstance(
-  instances: Ref<GameInstance[]>,
-  play: (world: World) => void,
-  condition: (world: World) => boolean,
-) {
-  const worlds = ref<InstanceWorld[]>([])
-  const serverMetadata = ref<
-    Record<
-      string,
-      {
-        status: Ref<Record<string, ServerStatus>>
-        motd: Ref<Record<string, string>>
-        refreshing: Ref<string[]>
-      }
-    >
-  >({})
-
-  nextTick().then(async () => {
-    for (const instance of instances.value) {
-      const instanceRef = ref(instance)
-      const playing = ref(false)
-
-      await useWorlds(instanceRef, playing, play).then((instanceWorldsData) => {
-        worlds.value.push(
-          ...instanceWorldsData.worlds.value.filter(condition).map((world) => ({
-            ...world,
-            supportsQuickPlay: instanceWorldsData.supportsQuickPlay.value,
-            instancePath: instanceRef.value.path,
-            instanceName: instanceRef.value.name,
-            instanceIcon: instanceRef.value.icon_path,
-            play: instanceWorldsData.joinWorld,
-            refresh: instanceWorldsData.refreshServer,
-          })),
-        )
-        worlds.value = worlds.value.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
-        serverMetadata.value[instanceRef.value.path] = {
-          status: instanceWorldsData.serverStatus,
-          motd: instanceWorldsData.renderedMotds,
-          refreshing: instanceWorldsData.refreshingServers,
-        }
-      })
-
-      console.log(worlds.value)
-
-      if (worlds.value.length >= 6) {
-        break
-      }
-    }
-  })
-
-  return {
-    worlds,
-    serverMetadata,
   }
 }

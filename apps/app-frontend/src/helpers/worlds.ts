@@ -103,7 +103,11 @@ export async function start_join_server(path: string, address: string): Promise<
   return await invoke('plugin:worlds|start_join_server', { path, address })
 }
 
-export async function showProfileInFolder(path) {
-  const fullPath = await get_full_path(path)
-  return await openPath(fullPath)
+export async function showWorldInFolder(instancePath: string, worldPath: string) {
+  const fullPath = await get_full_path(instancePath)
+  return await openPath(fullPath + '/saves/' + worldPath)
+}
+
+export function getWorldIdentifier(world: World) {
+  return world.type === 'singleplayer' ? world.path : world.address
 }

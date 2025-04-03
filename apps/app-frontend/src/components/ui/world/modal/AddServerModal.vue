@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { PlusIcon, XIcon } from '@modrinth/assets'
+import {PlayIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages } from '@modrinth/ui'
 import { ref } from 'vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import type { GameInstance } from '@/helpers/types'
 import InstanceModalTitlePrefix from '@/components/ui/modal/InstanceModalTitlePrefix.vue'
-import { add_server_to_profile, type ServerWorld } from '@/helpers/worlds.ts'
+import { add_server_to_profile, type ServerPackStatus, type ServerWorld } from '@/helpers/worlds.ts'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { handleError } from '@/store/notifications'
 import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
@@ -13,7 +13,7 @@ import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
-  'submit': [server: ServerWorld]
+  'submit': [server: ServerWorld, play: boolean]
 }>()
 
 const props = defineProps<{
@@ -24,9 +24,9 @@ const modal = ref()
 
 const name = ref()
 const address = ref()
-const resourcePack = ref('enabled')
+const resourcePack = ref<ServerPackStatus>('enabled')
 
-async function addServer() {
+async function addServer(play: boolean) {
   const serverName = name.value ? name.value : address.value
   const resourcePackStatus = resourcePack.value
   const index = await add_server_to_profile(
@@ -34,14 +34,14 @@ async function addServer() {
     serverName,
     address.value,
     resourcePackStatus,
-  ).catch(handleError)
+  ).catch(handleError) ?? 0;
   emit('submit', {
     name: serverName,
     type: 'server',
     index,
     address: address.value,
     pack_status: resourcePackStatus,
-  })
+  }, play)
   hide()
 }
 
@@ -65,6 +65,10 @@ const messages = defineMessages({
     id: 'instance.add-server.add-server',
     defaultMessage: 'Add server',
   },
+  addAndPlay: {
+    id: 'instance.add-server.add-and-play',
+    defaultMessage: 'Add and play',
+  },
 })
 
 defineExpose({ show, hide })
@@ -84,7 +88,13 @@ defineExpose({ show, hide })
     />
     <div class="flex gap-2 mt-4">
       <ButtonStyled color="brand">
-        <button :disabled="!address" @click="addServer">
+        <button :disabled="!address" @click="addServer(true)">
+          <PlayIcon />
+          {{ formatMessage(messages.addAndPlay) }}
+        </button>
+      </ButtonStyled>
+      <ButtonStyled>
+        <button :disabled="!address" @click="addServer(false)">
           <PlusIcon />
           {{ formatMessage(messages.addServer) }}
         </button>

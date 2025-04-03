@@ -1,5 +1,16 @@
 <template>
-  <AddServerModal ref="addServerModal" :instance="instance" @submit="addServer" />
+  <AddServerModal
+    ref="addServerModal"
+    :instance="instance"
+    @submit="
+      (server, start) => {
+        addServer(server)
+        if (start) {
+          joinWorld(server)
+        }
+      }
+    "
+  />
   <EditServerModal ref="editServerModal" :instance="instance" @submit="editServer" />
   <EditWorldModal ref="editWorldModal" :instance="instance" @submit="editWorld" />
   <ConfirmModalWrapper
@@ -51,7 +62,7 @@
     </div>
     <FilterBar v-model="filters" :options="filterOptions" />
     <div
-      class="flex flex-col w-full supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] gap-2"
+      class="flex flex-col w-full gap-2"
     >
       <WorldItem
         v-for="world in worlds.filter((x) => {
@@ -64,9 +75,10 @@
             (!searchFilter || x.name.toLowerCase().includes(searchFilter.toLowerCase()))
           )
         })"
-        :key="world.name"
+        :key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : world.address}`"
         :world="world"
         :supports-quick-play="supportsQuickPlay"
+        :current-protocol="protocolVersion"
         :playing-instance="playing"
         :playing-world="worldsMatch(world, worldPlaying)"
         :starting-instance="startingInstance"
@@ -170,6 +182,7 @@ const {
   filterOptions,
   supportsQuickPlay,
   worldPlaying,
+  protocolVersion,
   worldsMatch,
   addServer,
   editServer,

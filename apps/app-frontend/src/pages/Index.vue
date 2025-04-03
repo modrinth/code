@@ -1,17 +1,21 @@
 <script setup>
-import { ref, onUnmounted, computed } from 'vue'
+import { ref, onUnmounted, computed, nextTick, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
-import { list } from '@/helpers/profile.js'
-import { profile_listener } from '@/helpers/events'
+import { kill, list } from '@/helpers/profile.js'
+import { process_listener, profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
 import { get_search_results } from '@/helpers/cache.js'
 import { useTheming } from '@/store/state.js'
 import { HeadingLink } from '@modrinth/ui'
-import { GAME_MODES, useWorldsMultiInstance } from '@/composables/worlds.ts'
+import { GAME_MODES, useWorlds } from '@/composables/worlds.ts'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
+import InstanceItem from '@/components/ui/world/InstanceItem.vue'
+import { getWorldIdentifier } from '@/helpers/worlds.ts'
+import { get_all, get_by_profile_path } from '@/helpers/process.js'
+import { trackEvent } from '@/helpers/analytics.js'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -101,12 +105,6 @@ const total = computed(() => {
   )
 })
 
-const TWO_WEEKS_AGO = dayjs().subtract(14, 'day')
-
-function worldCondition(world) {
-  return world.last_played && dayjs(world.last_played).isAfter(TWO_WEEKS_AGO)
-}
-
 const worldInstances = computed(() => {
   return instances.value
     .filter((instance) => instance.last_played)
@@ -114,14 +112,107 @@ const worldInstances = computed(() => {
     .sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
 })
 
-const { worlds, serverMetadata } = await useWorldsMultiInstance(
-  worldInstances,
-  () => {},
-  worldCondition,
-)
+const jumpBackInItems = ref([])
+const serverMetadata = ref({})
+
+const MIN_JUMP_BACK_IN = 3
+const MAX_JUMP_BACK_IN = 6
+const TWO_WEEKS_AGO = dayjs().subtract(14, 'day')
+
+populateJumpBackIn()
+
+function populateJumpBackIn() {
+  nextTick().then(async () => {
+    for (const instance of worldInstances.value.map(ref)) {
+      const playing = ref(false)
+
+      if (jumpBackInItems.value.length >= MAX_JUMP_BACK_IN) {
+        break
+      }
+
+      await useWorlds(instance, playing, () => {}).then((instanceWorldsData) => {
+        if (
+          instanceWorldsData.worlds.value.length === 0 &&
+          jumpBackInItems.value.length < MAX_JUMP_BACK_IN
+        ) {
+          jumpBackInItems.value.push({
+            type: 'instance',
+            instance: instance.value,
+            last_played: instance.value.last_played,
+          })
+        } else {
+          instanceWorldsData.worlds.value
+            .filter((world) => world.last_played)
+            .forEach((world) => {
+              if (jumpBackInItems.value.length < MAX_JUMP_BACK_IN) {
+                if (instanceWorldsData.supportsQuickPlay.value) {
+                  jumpBackInItems.value.push({
+                    type: 'world',
+                    instance: instance.value,
+                    last_played: world.last_played,
+                    world: world,
+                    protocolVersion: instanceWorldsData.protocolVersion.value || undefined,
+                    play: instanceWorldsData.joinWorld,
+                    refresh: instanceWorldsData.refreshServer,
+                  })
+                } else if (
+                  !jumpBackInItems.value.some(
+                    (item) =>
+                      item.type === 'instance' && item.instance.path === instance.value.path,
+                  )
+                ) {
+                  jumpBackInItems.value.push({
+                    type: 'instance',
+                    last_played: instance.value.last_played,
+                    instance: instance.value,
+                  })
+                }
+              }
+            })
+          serverMetadata.value[instance.value.path] = {
+            status: instanceWorldsData.serverStatus,
+            motd: instanceWorldsData.renderedMotds,
+            refreshing: instanceWorldsData.refreshingServers,
+          }
+        }
+      })
+    }
+
+    // Always show the first 3, but only show additional if they're less than two weeks old
+    const firstThree = jumpBackInItems.value.slice(0, MIN_JUMP_BACK_IN)
+    const rest = jumpBackInItems.value
+      .slice(MIN_JUMP_BACK_IN)
+      .filter((item) => dayjs(item.last_played).isAfter(TWO_WEEKS_AGO))
+    jumpBackInItems.value = [...firstThree, ...rest]
+  })
+}
+
+const unlistenProcesses = await process_listener(async () => {
+  await checkProcesses()
+})
+
+const runningInstances = ref([])
+
+const checkProcesses = async () => {
+  const runningProcesses = await get_all().catch(handleError)
+
+  runningInstances.value = runningProcesses.map((x) => x.profile_path)
+}
+
+const stopInstance = async (path) => {
+  await kill(path).catch(handleError)
+  trackEvent('InstanceStop', {
+    source: 'HomePage',
+  })
+}
+
+onMounted(() => {
+  checkProcesses()
+})
 
 onUnmounted(() => {
   unlistenProfile()
+  unlistenProcesses()
 })
 </script>
 
@@ -129,7 +220,7 @@ onUnmounted(() => {
   <div class="p-6 flex flex-col gap-2">
     <h1 v-if="recentInstances" class="m-0 text-2xl">Welcome back!</h1>
     <h1 v-else class="m-0 text-2xl">Welcome to Modrinth App!</h1>
-    <div class="flex flex-col gap-2">
+    <div v-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
       <HeadingLink v-if="theme.featureFlags['worlds_tab']" to="/worlds" class="mt-1">
         Jump back in
       </HeadingLink>
@@ -140,35 +231,48 @@ onUnmounted(() => {
         Jump back in
       </span>
       <div
-        class="flex flex-col w-full supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] gap-2"
+        class="flex flex-col w-full gap-2"
       >
-        <WorldItem
-          v-for="world in worlds.filter((x) => x.last_played)"
-          :key="world.instancePath + (world.type === 'singleplayer' ? world.path : world.address)"
-          :world="world"
-          :refreshing="
-            world.type === 'server'
-              ? serverMetadata[world.instancePath].refreshing.includes(world.address)
-              : undefined
-          "
-          :supports-quick-play="world.supportsQuickPlay"
-          :server-status="
-            world.type === 'server'
-              ? serverMetadata[world.instancePath].status[world.address]
-              : undefined
-          "
-          :rendered-motd="
-            world.type === 'server'
-              ? serverMetadata[world.instancePath].motd[world.address]
-              : undefined
-          "
-          :game-mode="world.type === 'singleplayer' ? GAME_MODES[world.game_mode] : undefined"
-          :instance-path="world.instancePath"
-          :instance-name="world.instanceName"
-          :instance-icon="world.instanceIcon"
-          @refresh="() => (world.type === 'server' ? world.refresh(world.address) : {})"
-          @play="() => world.play(world)"
-        />
+        <template
+          v-for="item in jumpBackInItems"
+          :key="`${item.instance.path}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
+        >
+          <WorldItem
+            v-if="item.type === 'world'"
+            :world="item.world"
+            :playing-instance="runningInstances.includes(item.instance.path)"
+            :playing-world="runningInstances.includes(item.instance.path)"
+            :refreshing="
+              item.world.type === 'server'
+                ? serverMetadata[item.instance.path].refreshing.includes(item.world.address)
+                : undefined
+            "
+            supports-quick-play
+            :server-status="
+              item.world.type === 'server'
+                ? serverMetadata[item.instance.path].status[item.world.address]
+                : undefined
+            "
+            :rendered-motd="
+              item.world.type === 'server'
+                ? serverMetadata[item.instance.path].motd[item.world.address]
+                : undefined
+            "
+            :current-protocol="item.protocolVersion"
+            :game-mode="
+              item.world.type === 'singleplayer' ? GAME_MODES[item.world.game_mode] : undefined
+            "
+            :instance-path="item.instance.path"
+            :instance-name="item.instance.name"
+            :instance-icon="item.instance.icon_path"
+            @refresh="() => (item.world.type === 'server' ? item.refresh(item.world.address) : {})"
+            @play="() => {
+              item.play(item.world)
+            }"
+            @stop="() => stopInstance(item.instance.path)"
+          />
+          <InstanceItem v-else :instance="item.instance" />
+        </template>
       </div>
     </div>
     <RowDisplay
