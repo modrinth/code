@@ -218,7 +218,7 @@ impl ChargeItem {
                     (status = 'open' AND due < NOW()) OR
                     (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')
                 )
-            FOR UPDATE SKIP LOCKED
+            -- FOR UPDATE SKIP LOCKED
             "#,
             charge_type
         )

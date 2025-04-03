@@ -2302,8 +2302,6 @@ pub async fn index_billing(
         )
         .await?;
 
-        let mut transaction = pool.begin().await?;
-
         for mut charge in charges_to_do {
             let product_price = if let Some(price) =
                 prices.iter().find(|x| x.id == charge.price_id)
