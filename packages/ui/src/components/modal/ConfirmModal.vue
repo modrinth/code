@@ -6,19 +6,20 @@
       </slot>
     </template>
     <div>
-      <div class="markdown-body max-w-[35rem]" v-html="renderString(description)" />
-      <label v-if="hasToType" for="confirmation" class="confirmation-label">
+      <div class="max-w-[35rem] mb-4" v-html="renderString(description)" />
+      <label v-if="hasToType" for="confirmation">
         <span>
           <strong>To verify, type</strong>
-          <em class="confirmation-text"> {{ confirmationText }} </em>
+          <em class="mx-1">{{ confirmationText }}</em>
           <strong>below:</strong>
         </span>
       </label>
-      <div class="confirmation-input">
+      <div class="mt-2">
         <input
           v-if="hasToType"
           id="confirmation"
           v-model="confirmation_typed"
+          class="w-80 max-w-full"
           type="text"
           placeholder="Type here..."
           @input="type"
