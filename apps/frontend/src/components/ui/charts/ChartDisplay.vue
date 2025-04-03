@@ -86,8 +86,8 @@
                 <UpdatedIcon />
               </Button>
               <DropdownSelect
-                v-model="selectedRange"
                 class="range-dropdown"
+                v-model="selectedRange"
                 :options="ranges"
                 name="Time range"
                 :display-name="
@@ -812,10 +812,10 @@ const defaultRanges: RangeObject[] = [
 
 .chart-button-base__selected {
   color: var(--color-contrast);
-  background-color: var(--color-brand-highlight) !important;
+  background-color: var(--color-brand-highlight);
   box-shadow:
     inset 0 0 0 transparent,
-    0 0 0 2px var(--color-brand) !important;
+    0 0 0 2px var(--color-brand);
 
   &:hover {
     background-color: var(--color-brand-highlight);
