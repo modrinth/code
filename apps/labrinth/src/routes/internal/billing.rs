@@ -2271,9 +2271,11 @@ pub async fn index_billing(
     info!("Indexing billing queue");
     let res = async {
         // If a charge is open and due or has been attempted more than two days ago, it should be processed
+        let mut transaction = pool.begin().await?;
+
         let charges_to_do =
-            crate::database::models::charge_item::ChargeItem::get_chargeable(
-                &pool,
+            crate::database::models::charge_item::ChargeItem::get_chargeable_lock(
+                &mut transaction,
             )
             .await?;
 
@@ -2396,8 +2398,11 @@ pub async fn index_billing(
 
                     charge.status = ChargeStatus::Processing;
 
-                    stripe::PaymentIntent::create(&stripe_client, intent)
-                        .await?;
+                    if let Err(e) = stripe::PaymentIntent::create(&stripe_client, intent).await {
+                        tracing::error!("Failed to create payment intent: {:?}", e);
+                        charge.status = ChargeStatus::Failed;
+                        charge.last_attempt = Some(Utc::now());
+                    }
                 } else {
                     charge.status = ChargeStatus::Failed;
                     charge.last_attempt = Some(Utc::now());

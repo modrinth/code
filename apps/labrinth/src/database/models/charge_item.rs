@@ -206,8 +206,8 @@ impl ChargeItem {
         Ok(res.and_then(|r| r.try_into().ok()))
     }
 
-    pub async fn get_chargeable(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    pub async fn get_chargeable_lock(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Vec<ChargeItem>, DatabaseError> {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
@@ -218,10 +218,11 @@ impl ChargeItem {
                     (status = 'open' AND due < NOW()) OR
                     (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')
                 )
+            FOR UPDATE SKIP LOCKED
             "#,
             charge_type
         )
-            .fetch_all(exec)
+            .fetch_all(&mut **transaction)
             .await?;
 
         Ok(res
