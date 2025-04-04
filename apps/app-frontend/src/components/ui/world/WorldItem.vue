@@ -107,7 +107,7 @@ function getPingLevel(ping: number) {
   }
 }
 
-const locked = computed(() => props.world.type !== 'singleplayer' || props.world.locked)
+const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
 
 const messages = defineMessages({
   hardcore: {
