@@ -16,7 +16,7 @@ import { Button, DropdownSelect } from '@modrinth/ui'
 import { formatCategoryHeader } from '@modrinth/utils'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import dayjs from 'dayjs'
-import { duplicate, remove } from '@/helpers/profile.js'
+import { duplicate, remove } from '@/helpers/profile'
 import { handleError } from '@/store/notifications.js'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 

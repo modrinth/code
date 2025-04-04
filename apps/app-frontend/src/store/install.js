@@ -6,7 +6,7 @@ import {
   get_projects,
   list,
   remove_project,
-} from '@/helpers/profile.js'
+} from '@/helpers/profile'
 import { handleError } from '@/store/notifications.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import { create_profile_and_install as packInstall } from '@/helpers/pack.js'
