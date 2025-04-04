@@ -13,6 +13,7 @@ export type SingleplayerWorld = BaseWorld & {
   path: string
   game_mode: SingleplayerGameMode
   hardcore: boolean
+  locked: boolean
 }
 
 export type ServerWorld = BaseWorld & {

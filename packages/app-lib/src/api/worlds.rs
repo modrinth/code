@@ -48,6 +48,7 @@ pub enum WorldDetails {
         path: String,
         game_mode: SingleplayerGameMode,
         hardcore: bool,
+        locked: bool,
     },
     Server {
         index: usize,
@@ -117,17 +118,26 @@ async fn get_singleplayer_worlds(
         if !level_dat_path.exists() {
             continue;
         }
-        if let Some(_lock) = try_get_world_session_lock(&world_path).await? {
-            if let Ok(world) = read_singleplayer_world(world_path).await {
-                worlds.push(world);
-            }
+        let world = if let Some(_lock) =
+            try_get_world_session_lock(&world_path).await?
+        {
+            read_singleplayer_world(world_path, false).await
+        } else {
+            read_singleplayer_world(world_path, true).await
+        };
+        if let Ok(world) = world {
+            tracing::info!("Read world: {world:?}");
+            worlds.push(world);
         }
     }
 
     Ok(())
 }
 
-async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
+async fn read_singleplayer_world(
+    world_path: PathBuf,
+    locked: bool,
+) -> Result<World> {
     #[derive(Deserialize, Debug)]
     #[serde(rename_all = "PascalCase")]
     struct LevelDataRoot {
@@ -177,6 +187,7 @@ async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
                 .to_string(),
             game_mode,
             hardcore: level_data.hardcore,
+            locked,
         },
     })
 }
