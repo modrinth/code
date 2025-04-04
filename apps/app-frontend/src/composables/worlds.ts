@@ -109,8 +109,8 @@ export async function useWorlds(
   const protocolVersion = ref<number | null>(null)
   protocolVersion.value = await get_profile_protocol_version(instance.value.path)
 
-  const unlistenProfile = await profile_listener(async (e: { event: string}) => {
-    if (e.event === 'worlds_updated') {
+  const unlistenProfile = await profile_listener(async (e: { event: string, world?: string }) => {
+    if (e.event === 'servers_updated' || e.event === 'world_updated') {
       await refreshWorlds()
     }
   })

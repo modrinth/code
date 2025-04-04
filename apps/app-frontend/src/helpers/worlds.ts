@@ -60,6 +60,10 @@ export async function get_profile_worlds(path: string): Promise<World[]> {
   return await invoke('plugin:worlds|get_profile_worlds', { path })
 }
 
+export async function get_singleplayer_world(instance: string, world: string): Promise<World> {
+  return await invoke('plugin:worlds|get_singleplayer_world', { instance, world })
+}
+
 export async function rename_world(instance: string, world: string, newName: string): Promise<void> {
   return await invoke('plugin:worlds|rename_world', { instance, world, newName })
 }

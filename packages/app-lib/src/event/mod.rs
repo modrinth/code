@@ -241,7 +241,8 @@ pub struct ProfilePayload {
 pub enum ProfilePayloadType {
     Created,
     Synced,
-    WorldsUpdated,
+    ServersUpdated,
+    WorldUpdated { world: String },
     Edited,
     Removed,
 }

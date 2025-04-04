@@ -70,19 +70,31 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                             {
                                 let event = if first_file_name
                                     .filter(|x| {
-                                        *x == "servers.dat"
-                                            || (*x == "saves"
-                                                && e.path
-                                                    .file_name()
-                                                    .filter(|x| {
-                                                        *x == "level.dat"
-                                                    })
-                                                    .is_some())
-                                            || *x == "logs"
+                                        *x == "servers.dat" || *x == "logs"
                                     })
                                     .is_some()
                                 {
-                                    Some(ProfilePayloadType::WorldsUpdated)
+                                    Some(ProfilePayloadType::ServersUpdated)
+                                } else if first_file_name
+                                    .filter(|x| {
+                                        *x == "saves"
+                                            && e.path
+                                                .file_name()
+                                                .filter(|x| *x == "level.dat")
+                                                .is_some()
+                                    })
+                                    .is_some()
+                                {
+                                    Some(ProfilePayloadType::WorldUpdated {
+                                        world: e
+                                            .path
+                                            .parent()
+                                            .unwrap()
+                                            .file_name()
+                                            .unwrap()
+                                            .to_string_lossy()
+                                            .to_string(),
+                                    })
                                 } else if first_file_name
                                     .filter(|x| *x == "saves")
                                     .is_none()

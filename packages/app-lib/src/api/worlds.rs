@@ -118,15 +118,7 @@ async fn get_singleplayer_worlds(
         if !level_dat_path.exists() {
             continue;
         }
-        let world = if let Some(_lock) =
-            try_get_world_session_lock(&world_path).await?
-        {
-            read_singleplayer_world(world_path, false).await
-        } else {
-            read_singleplayer_world(world_path, true).await
-        };
-        if let Ok(world) = world {
-            tracing::info!("Read world: {world:?}");
+        if let Ok(world) = read_singleplayer_world(world_path).await {
             worlds.push(world);
         }
     }
@@ -134,7 +126,22 @@ async fn get_singleplayer_worlds(
     Ok(())
 }
 
-async fn read_singleplayer_world(
+pub async fn get_singleplayer_world(
+    profile_path: &Path,
+    world: &str,
+) -> Result<World> {
+    read_singleplayer_world(get_world_dir(profile_path, world))
+}
+
+async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
+    if let Some(_lock) = try_get_world_session_lock(&world_path).await? {
+        read_singleplayer_world_maybe_locked(world_path, false).await
+    } else {
+        read_singleplayer_world_maybe_locked(world_path, true).await
+    }
+}
+
+async fn read_singleplayer_world_maybe_locked(
     world_path: PathBuf,
     locked: bool,
 ) -> Result<World> {

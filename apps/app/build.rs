@@ -246,6 +246,7 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "get_profile_worlds",
+                        "get_singleplayer_world",
                         "rename_world",
                         "reset_world_icon",
                         "backup_world",

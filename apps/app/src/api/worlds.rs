@@ -10,6 +10,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("worlds")
         .invoke_handler(tauri::generate_handler![
             get_profile_worlds,
+            get_singleplayer_world,
             rename_world,
             reset_world_icon,
             backup_world,
@@ -33,32 +34,46 @@ pub async fn get_profile_worlds<R: Runtime>(
     let path = get_full_path(path).await?;
     let mut result = worlds::get_profile_worlds(&path).await?;
     for world in result.iter_mut() {
-        if let Some(Either::Left(icon_path)) = &world.icon {
-            let icon_path = icon_path.clone();
-            if let Ok(new_url) =
-                super::utils::tauri_convert_file_src(&icon_path)
-            {
-                world.icon = Some(Either::Right(new_url));
-                if let Err(e) =
-                    app_handle.asset_protocol_scope().allow_file(&icon_path)
-                {
-                    tracing::warn!(
-                        "Failed to allow file access for icon {}: {}",
-                        icon_path.display(),
-                        e
-                    );
-                }
-            } else {
-                tracing::warn!(
-                    "Encountered invalid icon path for world {}: {}",
-                    world.name,
-                    icon_path.display()
-                );
-                world.icon = None;
-            }
-        }
+        adapt_world_icon(&app_handle, world);
     }
     Ok(result)
+}
+
+#[tauri::command]
+pub async fn get_singleplayer_world<R: Runtime>(
+    app_handle: AppHandle<R>,
+    instance: &str,
+    world: &str,
+) -> Result<World> {
+    let instance = get_full_path(instance).await?;
+    let mut world = worlds::get_singleplayer_world(&instance, world).await?;
+    adapt_world_icon(&app_handle, &mut world);
+    Ok(world)
+}
+
+fn adapt_world_icon<R: Runtime>(app_handle: &AppHandle<R>, world: &mut World) {
+    if let Some(Either::Left(icon_path)) = &world.icon {
+        let icon_path = icon_path.clone();
+        if let Ok(new_url) = super::utils::tauri_convert_file_src(&icon_path) {
+            world.icon = Some(Either::Right(new_url));
+            if let Err(e) =
+                app_handle.asset_protocol_scope().allow_file(&icon_path)
+            {
+                tracing::warn!(
+                    "Failed to allow file access for icon {}: {}",
+                    icon_path.display(),
+                    e
+                );
+            }
+        } else {
+            tracing::warn!(
+                "Encountered invalid icon path for world {}: {}",
+                world.name,
+                icon_path.display()
+            );
+            world.icon = None;
+        }
+    }
 }
 
 #[tauri::command]
