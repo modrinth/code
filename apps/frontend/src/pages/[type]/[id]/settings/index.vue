@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ModalConfirm
+    <ConfirmModal
       ref="modal_confirm"
       title="Are you sure you want to delete this project?"
       description="If you proceed, all versions and any attached data will be removed from our servers. This may break other projects, so be careful."
@@ -242,8 +242,8 @@
 import { formatProjectStatus } from "@modrinth/utils";
 import { UploadIcon, SaveIcon, TrashIcon, XIcon, IssuesIcon, CheckIcon } from "@modrinth/assets";
 import { Multiselect } from "vue-multiselect";
+import { ConfirmModal } from "@modrinth/ui";
 import Avatar from "~/components/ui/Avatar.vue";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import FileInput from "~/components/ui/FileInput.vue";
 
 const props = defineProps({

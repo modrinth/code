@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ModalConfirm
+    <ConfirmModal
       ref="modal_remove"
       title="Are you sure you want to remove this project from the organization?"
       description="If you proceed, this project will no longer be managed by the organization."
@@ -530,8 +530,7 @@ import {
   OrganizationIcon,
   CrownIcon,
 } from "@modrinth/assets";
-import { Avatar, Badge, Card, Checkbox } from "@modrinth/ui";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
+import { Avatar, Badge, Card, Checkbox, ConfirmModal } from "@modrinth/ui";
 import { removeSelfFromTeam } from "~/helpers/teams.js";
 
 const props = defineProps({
