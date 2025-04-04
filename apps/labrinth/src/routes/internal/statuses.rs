@@ -96,25 +96,25 @@ pub async fn ws_init(
                 let db = db.clone();
                 let redis = redis.clone();
                 async move {
-                    async move {
-                        get_user_status(
-                            if x.user_id == user_id.into() {
-                                x.friend_id
-                            } else {
-                                x.user_id
-                            }
-                            .into(),
-                            &db,
-                            &redis,
-                        )
-                        .await
-                    }
+                    get_user_status(
+                        if x.user_id == user_id.into() {
+                            x.friend_id
+                        } else {
+                            x.user_id
+                        }
+                        .into(),
+                        &db,
+                        &redis,
+                    )
+                    .await
                 }
             })
             .buffer_unordered(16)
-            .filter_map(|x| x)
             .collect::<Vec<_>>()
             .await
+            .into_iter()
+            .flatten()
+            .collect()
     } else {
         Vec::new()
     };

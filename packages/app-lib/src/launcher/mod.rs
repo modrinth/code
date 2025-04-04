@@ -770,6 +770,12 @@ pub async fn launch_minecraft(
     // This also spawns the process and prepares the subsequent processes
     state
         .process_manager
-        .insert_new_process(&profile.path, command, post_exit_hook)
+        .insert_new_process(
+            &profile.path,
+            command,
+            post_exit_hook,
+            state.directories.profile_logs_dir(&profile.path),
+            version_info.logging.is_some(),
+        )
         .await
 }
