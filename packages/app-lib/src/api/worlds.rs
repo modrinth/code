@@ -130,7 +130,7 @@ pub async fn get_singleplayer_world(
     profile_path: &Path,
     world: &str,
 ) -> Result<World> {
-    read_singleplayer_world(get_world_dir(profile_path, world))
+    read_singleplayer_world(get_world_dir(profile_path, world)).await
 }
 
 async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
