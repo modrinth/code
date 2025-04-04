@@ -787,7 +787,7 @@ async fn resolve_server_address(
         Ok(lookup) => lookup
             .into_iter()
             .next()
-            .map(|r| (r.target().to_string(), port)),
+            .map(|r| (r.target().to_string(), r.port())),
     }
     .unwrap_or_else(|| (host.to_owned(), port)))
 }
