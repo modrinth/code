@@ -107,6 +107,8 @@ function getPingLevel(ping: number) {
   }
 }
 
+const locked = computed(() => props.world.type !== 'singleplayer' || props.world.locked)
+
 const messages = defineMessages({
   hardcore: {
     id: 'instance.worlds.hardcore',
@@ -137,33 +139,46 @@ const messages = defineMessages({
     defaultMessage: 'View instance',
   },
   playAnyway: {
-    id: 'instance.worlds.play-anyway',
+    id: 'instance.worlds.play_anyway',
     defaultMessage: 'Play anyway',
+  },
+  worldInUse: {
+    id: 'instance.worlds.world_in_use',
+    defaultMessage: 'World is in use',
   },
 })
 </script>
 <template>
   <SmartClickable>
     <template v-if="instancePath" #clickable>
-      <router-link class="no-click-animation" :to="`/instance/${encodeURIComponent(instancePath)}/worlds`" />
+      <router-link
+        class="no-click-animation"
+        :to="`/instance/${encodeURIComponent(instancePath)}/worlds`"
+      />
     </template>
     <div
       class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised rounded-xl"
     >
       <Avatar
         :src="
-        world.type === 'server' && serverStatus ? serverStatus.favicon ?? world.icon : world.icon
-      "
+          world.type === 'server' && serverStatus ? serverStatus.favicon ?? world.icon : world.icon
+        "
         size="48px"
       />
       <div class="flex flex-col justify-between h-full">
         <div class="flex items-center gap-2">
-          <div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">{{ world.name }}</div>
+          <div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">
+            {{ world.name }}
+          </div>
           <div
             v-if="world.type === 'singleplayer'"
             class="text-sm text-secondary flex items-center gap-1 font-semibold"
           >
-            <UserIcon aria-hidden="true" class="h-4 w-4 text-secondary shrink-0" stroke-width="3px" />
+            <UserIcon
+              aria-hidden="true"
+              class="h-4 w-4 text-secondary shrink-0"
+              stroke-width="3px"
+            />
             {{ formatMessage(commonMessages.singleplayerLabel) }}
           </div>
           <div
@@ -191,14 +206,14 @@ const messages = defineMessages({
                   }"
                 />
                 <Tooltip :disabled="!hasPlayersTooltip">
-                <span :class="{ 'cursor-help': hasPlayersTooltip }">
-                  {{ formatNumber(serverStatus.players?.online, false) }} online
-                </span>
+                  <span :class="{ 'cursor-help': hasPlayersTooltip }">
+                    {{ formatNumber(serverStatus.players?.online, false) }} online
+                  </span>
                   <template #popper>
                     <div class="flex flex-col gap-1">
-                    <span v-for="player in serverStatus.players?.sample" :key="player.name">
-                      {{ player.name }}
-                    </span>
+                      <span v-for="player in serverStatus.players?.sample" :key="player.name">
+                        {{ player.name }}
+                      </span>
                     </div>
                   </template>
                 </Tooltip>
@@ -212,8 +227,8 @@ const messages = defineMessages({
         <div class="flex items-center gap-2 text-sm text-secondary">
           <div
             v-tooltip="
-            world.last_played ? dayjs(world.last_played).format('MMMM D, YYYY [at] h:mm A') : null
-          "
+              world.last_played ? dayjs(world.last_played).format('MMMM D, YYYY [at] h:mm A') : null
+            "
             class="w-fit shrink-0"
             :class="{ 'cursor-help smart-clickable:allow-pointer-events': world.last_played }"
           >
@@ -275,7 +290,7 @@ const messages = defineMessages({
           </template>
         </template>
       </div>
-      <div class="flex gap-1 justify-end smart-clickable:allow-pointer-events" >
+      <div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
         <template v-if="world.type === 'singleplayer' || serverStatus">
           <ButtonStyled v-if="playingWorld && !startingInstance" color="red">
             <button @click="emit('stop')">
@@ -286,12 +301,12 @@ const messages = defineMessages({
           <ButtonStyled v-else-if="!serverIncompatible">
             <button
               v-tooltip="
-              !supportsQuickPlay
-                ? formatMessage(messages.noQuickPlay)
-                : playingOtherWorld
-                  ? formatMessage(messages.gameAlreadyOpen)
-                  : null
-            "
+                !supportsQuickPlay
+                  ? formatMessage(messages.noQuickPlay)
+                  : playingOtherWorld || locked
+                    ? formatMessage(messages.gameAlreadyOpen)
+                    : null
+              "
               :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
               @click="emit('play')"
             >
@@ -316,49 +331,53 @@ const messages = defineMessages({
         <ButtonStyled circular type="transparent">
           <OverflowMenu
             :options="[
-            {
-              id: 'play-anyway',
-              shown: serverIncompatible && !playingInstance && supportsQuickPlay,
-              action: () => emit('play'),
-            },
-            {
-              id: 'open-instance',
-              shown: !!instancePath,
-              action: () => router.push(encodeURI(`/instance/${instancePath}/worlds`)),
-            },
-            {
-              id: 'refresh',
-              shown: world.type === 'server',
-              action: () => emit('refresh'),
-            },
-            {
-              id: 'copy-address',
-              shown: world.type === 'server',
-              action: () => copyToClipboard((world as ServerWorld).address),
-            },
-            {
-              id: 'edit',
-              action: () => emit('edit'),
-              shown: !instancePath,
-            },
-            {
-              id: 'open-folder',
-              shown: world.type === 'singleplayer',
-              action: () =>
-                world.type === 'singleplayer' ? showWorldInFolder(instancePath, world.path) : {},
-            },
-            {
-              divider: true,
-              shown: !instancePath,
-            },
-            {
-              id: 'delete',
-              color: 'red',
-              hoverFilled: true,
-              action: () => emit('delete'),
-              shown: !instancePath,
-            },
-          ]"
+              {
+                id: 'play-anyway',
+                shown: serverIncompatible && !playingInstance && supportsQuickPlay,
+                action: () => emit('play'),
+              },
+              {
+                id: 'open-instance',
+                shown: !!instancePath,
+                action: () => router.push(encodeURI(`/instance/${instancePath}/worlds`)),
+              },
+              {
+                id: 'refresh',
+                shown: world.type === 'server',
+                action: () => emit('refresh'),
+              },
+              {
+                id: 'copy-address',
+                shown: world.type === 'server',
+                action: () => copyToClipboard((world as ServerWorld).address),
+              },
+              {
+                id: 'edit',
+                action: () => emit('edit'),
+                shown: !instancePath,
+                disabled: locked,
+                tooltip: locked ? formatMessage(messages.worldInUse) : undefined,
+              },
+              {
+                id: 'open-folder',
+                shown: world.type === 'singleplayer',
+                action: () =>
+                  world.type === 'singleplayer' ? showWorldInFolder(instancePath, world.path) : {},
+              },
+              {
+                divider: true,
+                shown: !instancePath,
+              },
+              {
+                id: 'delete',
+                color: 'red',
+                hoverFilled: true,
+                action: () => emit('delete'),
+                shown: !instancePath,
+                disabled: locked,
+                tooltip: locked ? formatMessage(messages.worldInUse) : undefined,
+              },
+            ]"
           >
             <MoreVerticalIcon aria-hidden="true" />
             <template #play-anyway>
@@ -386,7 +405,9 @@ const messages = defineMessages({
               <TrashIcon aria-hidden="true" />
               {{
                 formatMessage(
-                  world.type === 'server' ? commonMessages.removeButton : commonMessages.deleteLabel,
+                  world.type === 'server'
+                    ? commonMessages.removeButton
+                    : commonMessages.deleteLabel,
                 )
               }}
             </template>
