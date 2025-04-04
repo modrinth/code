@@ -1,3 +1,21 @@
 {
-  "recommendations": ["esbenp.prettier-vscode", "Vue.volar", "rust-lang.rust-analyzer"]
+  "recommendations": [
+    // Code style enforcers
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    // Vue + Nuxt development
+    "Vue.volar",
+    "Nuxtr.nuxtr-vscode",
+    "antfu.goto-alias",
+    // Rust development
+    "rust-lang.rust-analyzer",
+    "tombi-toml.tombi",
+    "tauri-apps.tauri-vscode"
+  ],
+  "unwantedRecommendations": [
+    // Even Better TOML has a memory leak and is unmaintained.
+    // It is replaced by Tombi.
+    "tamasfe.even-better-toml"
+  ]
 }
