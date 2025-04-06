@@ -50,7 +50,7 @@ pub struct CollectionCreateData {
     #[validate(length(min = 3, max = 255))]
     /// A short description of the collection.
     pub description: Option<String>,
-    #[validate(length(max = 32))]
+    #[validate(length(max = 1024))]
     #[serde(default = "Vec::new")]
     /// A list of initial projects to use with the created collection
     pub projects: Vec<String>,
