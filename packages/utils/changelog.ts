@@ -11,13 +11,58 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
-    date: `2025-03-13T19:30:00-08:00`,
+    date: `2025-04-01T21:15:00-07:00`,
+    product: 'web',
+    body: `### Added
+- Reverted Modrinth Pizza due to issues in pizza processing leading to users being redirected to [this page](https://modrinth.com/pizza/error).
+- Fixed bug causing theme color to turn orange and corners turn sharp.`,
+  },
+  {
+    date: `2025-04-01T12:00:00`,
+    product: 'web',
+    body: `### Added
+- Added Modrinth Pizza.`,
+  },
+  {
+    date: `2025-04-01T00:00:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed project version field accepting more than 32 characters.`,
+  },
+  {
+    date: `2025-03-25T18:25:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed random 'displayName' error on search pages on some browsers such as Firefox.
+- Fixed 'Resubmit' icon in publishing checklist showing up when it hasn't been submitted before.`,
+  },
+  {
+    date: `2025-03-25T10:40:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed error with links on error pages.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed server plugin loaders not being populated when browsing for plugins
+- Fixed modpack search being filtered by Minecraft version when browsing for modpacks.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Improved error handling, especially when the Modrinth API is down.`,
+  },
+  {
+    date: `2025-03-13T19:30:00-07:00`,
     product: 'web',
     body: `### Improvements
 - Updated Modrinth Servers marketing page, removing Pyro branding.`,
   },
   {
-    date: `2025-03-12T10:15:00-08:00`,
+    date: `2025-03-12T10:15:00-07:00`,
     product: 'web',
     body: `### Improvements
 - Fixed low-res icons being pixelated.

@@ -17,7 +17,8 @@
         </Button>
       </div>
       <Button color="primary" @click="(event) => $refs.modal_creation.show(event)">
-        <PlusIcon aria-hidden="true" /> {{ formatMessage(messages.createNewButton) }}
+        <PlusIcon aria-hidden="true" />
+        {{ formatMessage(messages.createNewButton) }}
       </Button>
     </div>
     <div class="collections-grid">
@@ -73,7 +74,7 @@
             </div>
             <div class="stats">
               <template v-if="collection.status === 'listed'">
-                <WorldIcon aria-hidden="true" />
+                <GlobeIcon aria-hidden="true" />
                 <span> {{ formatMessage(commonMessages.publicLabel) }} </span>
               </template>
               <template v-else-if="collection.status === 'unlisted'">
@@ -96,9 +97,16 @@
   </div>
 </template>
 <script setup>
-import { BoxIcon, SearchIcon, XIcon, PlusIcon, LinkIcon, LockIcon } from "@modrinth/assets";
+import {
+  BoxIcon,
+  SearchIcon,
+  XIcon,
+  PlusIcon,
+  LinkIcon,
+  LockIcon,
+  GlobeIcon,
+} from "@modrinth/assets";
 import { Avatar, Button, commonMessages } from "@modrinth/ui";
-import WorldIcon from "~/assets/images/utils/world.svg?component";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 
 const { formatMessage } = useVIntl();

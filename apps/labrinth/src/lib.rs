@@ -1,4 +1,3 @@
-use std::num::NonZeroU32;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -13,14 +12,12 @@ use tracing::{info, warn};
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
-use governor::middleware::StateInformationMiddleware;
-use governor::{Quota, RateLimiter};
 use util::cors::default_cors;
 
 use crate::background_task::update_versions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::env::{parse_strings_from_var, parse_var};
-use crate::util::ratelimit::KeyedRateLimiter;
+use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
 
 pub mod auth;
@@ -57,7 +54,7 @@ pub struct LabrinthConfig {
     pub analytics_queue: Arc<AnalyticsQueue>,
     pub active_sockets: web::Data<ActiveSockets>,
     pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
-    pub rate_limiter: KeyedRateLimiter,
+    pub rate_limiter: web::Data<AsyncRateLimiter>,
     pub stripe_client: stripe::Client,
 }
 
@@ -93,24 +90,10 @@ pub fn app_setup(
 
     let mut scheduler = scheduler::Scheduler::new();
 
-    let limiter: KeyedRateLimiter = Arc::new(
-        RateLimiter::keyed(Quota::per_minute(NonZeroU32::new(300).unwrap()))
-            .with_middleware::<StateInformationMiddleware>(),
-    );
-    let limiter_clone = Arc::clone(&limiter);
-    scheduler.run(Duration::from_secs(60), move || {
-        info!(
-            "Clearing ratelimiter, storage size: {}",
-            limiter_clone.len()
-        );
-        limiter_clone.retain_recent();
-        info!(
-            "Done clearing ratelimiter, storage size: {}",
-            limiter_clone.len()
-        );
-
-        async move {}
-    });
+    let limiter = web::Data::new(AsyncRateLimiter::new(
+        redis_pool.clone(),
+        GCRAParameters::new(300, 300),
+    ));
 
     if enable_background_tasks {
         // The interval in seconds at which the local database is indexed
@@ -329,6 +312,7 @@ pub fn app_config(
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
+    .app_data(labrinth_config.rate_limiter.clone())
     .configure(
         #[allow(unused_variables)]
         |cfg| {

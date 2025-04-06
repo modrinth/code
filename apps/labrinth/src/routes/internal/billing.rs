@@ -2300,8 +2300,6 @@ pub async fn index_billing(
         )
         .await?;
 
-        let mut transaction = pool.begin().await?;
-
         for mut charge in charges_to_do {
             let product_price = if let Some(price) =
                 prices.iter().find(|x| x.id == charge.price_id)
@@ -2396,18 +2394,27 @@ pub async fn index_billing(
 
                     charge.status = ChargeStatus::Processing;
 
-                    stripe::PaymentIntent::create(&stripe_client, intent)
-                        .await?;
+                    if let Err(e) =
+                        stripe::PaymentIntent::create(&stripe_client, intent)
+                            .await
+                    {
+                        tracing::error!(
+                            "Failed to create payment intent: {:?}",
+                            e
+                        );
+                        charge.status = ChargeStatus::Failed;
+                        charge.last_attempt = Some(Utc::now());
+                    }
                 } else {
                     charge.status = ChargeStatus::Failed;
                     charge.last_attempt = Some(Utc::now());
                 }
 
+                let mut transaction = pool.begin().await?;
                 charge.upsert(&mut transaction).await?;
+                transaction.commit().await?;
             }
         }
-
-        transaction.commit().await?;
 
         Ok::<(), ApiError>(())
     }
