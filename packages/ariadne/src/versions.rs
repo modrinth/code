@@ -20,7 +20,7 @@ pub fn is_feature_supported_in(
     first_release: &str,
     first_snapshot: &str,
 ) -> bool {
-    let version = SPECIAL_PARENTS.get(version).map(|x| *x).unwrap_or(version);
+    let version = SPECIAL_PARENTS.get(version).copied().unwrap_or(version);
     if version.contains('w') && version.len() == 6 {
         return version >= first_snapshot;
     }
