@@ -119,6 +119,8 @@ const MIN_JUMP_BACK_IN = 3
 const MAX_JUMP_BACK_IN = 6
 const TWO_WEEKS_AGO = dayjs().subtract(14, 'day')
 
+const unlisteners = []
+
 populateJumpBackIn()
 
 function populateJumpBackIn() {
@@ -131,6 +133,7 @@ function populateJumpBackIn() {
       }
 
       await useWorlds(instance, playing, () => {}).then((instanceWorldsData) => {
+        unlisteners.push(instanceWorldsData.unlistenWorldsListener)
         if (
           instanceWorldsData.worlds.value.length === 0 &&
           jumpBackInItems.value.length < MAX_JUMP_BACK_IN
@@ -187,6 +190,11 @@ function populateJumpBackIn() {
   })
 }
 
+onUnmounted(() => {
+  console.log('Unmounting home')
+  unlisteners.forEach((unlisten) => unlisten())
+})
+
 const unlistenProcesses = await process_listener(async () => {
   await checkProcesses()
 })
@@ -230,9 +238,7 @@ onUnmounted(() => {
       >
         Jump back in
       </span>
-      <div
-        class="flex flex-col w-full gap-2"
-      >
+      <div class="flex flex-col w-full gap-2">
         <template
           v-for="item in jumpBackInItems"
           :key="`${item.instance.path}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
@@ -266,9 +272,11 @@ onUnmounted(() => {
             :instance-name="item.instance.name"
             :instance-icon="item.instance.icon_path"
             @refresh="() => (item.world.type === 'server' ? item.refresh(item.world.address) : {})"
-            @play="() => {
-              item.play(item.world)
-            }"
+            @play="
+              () => {
+                item.play(item.world)
+              }
+            "
             @stop="() => stopInstance(item.instance.path)"
           />
           <InstanceItem v-else :instance="item.instance" />

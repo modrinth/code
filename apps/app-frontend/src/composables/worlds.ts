@@ -110,6 +110,7 @@ export async function useWorlds(
   const protocolVersion = ref<number | null>(null)
   protocolVersion.value = await get_profile_protocol_version(instance.value.path)
 
+  console.log("Initializing new worlds listener")
   const unlistenProfile = await profile_listener(async (e: { event: string; world?: string }) => {
     if (e.event === 'servers_updated') {
       await refreshWorlds()
@@ -124,9 +125,10 @@ export async function useWorlds(
     }
   })
 
-  onUnmounted(() => {
+  function unlistenWorldsListener() {
+    console.log("Unlistening worlds listener")
     unlistenProfile()
-  })
+  }
 
   const filterOptions = computed(() => {
     const options: FilterBarOption[] = []
@@ -345,5 +347,6 @@ export async function useWorlds(
     joinWorld,
     refreshWorlds,
     refreshServer,
+    unlistenWorldsListener,
   }
 }

@@ -129,7 +129,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import type { GameInstance } from '@/helpers/types'
 import { Button, ButtonStyled, RadialHeader, FilterBar } from '@modrinth/ui'
 import { PlusIcon, SpinnerIcon, UpdatedIcon, SearchIcon, XIcon } from '@modrinth/assets'
@@ -192,6 +192,7 @@ const {
   joinWorld,
   refreshWorlds,
   refreshServer,
+  unlistenWorldsListener,
 } = await useWorlds(instance, playing, play)
 
 function promptToRemoveWorld(world: World): boolean {
@@ -223,4 +224,9 @@ async function proceedDeleteWorld() {
   await deleteWorld(worldToDelete.value)
   worldToDelete.value = undefined
 }
+
+onUnmounted(() => {
+  console.log("Unlistening worlds listener in instance")
+  unlistenWorldsListener()
+})
 </script>
