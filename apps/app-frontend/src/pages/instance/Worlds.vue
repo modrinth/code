@@ -61,22 +61,12 @@
       </ButtonStyled>
     </div>
     <FilterBar v-model="filters" :options="filterOptions" />
-    <div
-      class="flex flex-col w-full gap-2"
-    >
+    <div class="flex flex-col w-full gap-2">
       <WorldItem
-        v-for="world in worlds.filter((x) => {
-          const availableFilter = filters.includes('available')
-          const typeFilter = filters.includes('server') || filters.includes('singleplayer')
-
-          return (
-            (!typeFilter || filters.includes(x.type)) &&
-            (!availableFilter || x.type !== 'server' || serverStatus[x.address]) &&
-            (!searchFilter || x.name.toLowerCase().includes(searchFilter.toLowerCase()))
-          )
-        })"
+        v-for="world in filteredWorlds"
         :key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : world.address}`"
         :world="world"
+        :highlighted="highlightedWorld === getWorldIdentifier(world)"
         :supports-quick-play="supportsQuickPlay"
         :current-protocol="protocolVersion"
         :playing-instance="playing"
@@ -130,10 +120,12 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import type { GameInstance } from '@/helpers/types'
 import { Button, ButtonStyled, RadialHeader, FilterBar } from '@modrinth/ui'
 import { PlusIcon, SpinnerIcon, UpdatedIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import type { World, ServerWorld, SingleplayerWorld } from '@/helpers/worlds.ts'
+import { getWorldIdentifier } from '@/helpers/worlds.ts'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
@@ -142,6 +134,8 @@ import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { GAME_MODES, useWorlds } from '@/composables/worlds.ts'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { handleError } from '@/store/notifications'
+
+const route = useRoute()
 
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()
 const editServerModal = ref<InstanceType<typeof EditServerModal>>()
@@ -195,6 +189,21 @@ const {
   unlistenWorldsListener,
 } = await useWorlds(instance, playing, play)
 
+const filteredWorlds = computed(() =>
+  worlds.value.filter((x) => {
+    const availableFilter = filters.value.includes('available')
+    const typeFilter = filters.value.includes('server') || filters.value.includes('singleplayer')
+
+    return (
+      (!typeFilter || filters.value.includes(x.type)) &&
+      (!availableFilter || x.type !== 'server' || serverStatus.value[x.address]) &&
+      (!searchFilter.value || x.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
+    )
+  }),
+)
+
+const highlightedWorld = ref(route.query.highlight)
+
 function promptToRemoveWorld(world: World): boolean {
   if (world.type === 'server') {
     serverToRemove.value = world
@@ -226,7 +235,7 @@ async function proceedDeleteWorld() {
 }
 
 onUnmounted(() => {
-  console.log("Unlistening worlds listener in instance")
+  console.log('Unlistening worlds listener in instance')
   unlistenWorldsListener()
 })
 </script>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import type { ServerStatus, ServerWorld, World } from '@/helpers/worlds.ts'
-import { showWorldInFolder } from '@/helpers/worlds.ts'
+import { getWorldIdentifier, showWorldInFolder } from '@/helpers/worlds.ts'
 import { formatNumber } from '@modrinth/utils'
 import {
   IssuesIcon,
@@ -46,6 +46,7 @@ const props = withDefaults(
     startingInstance?: boolean
     supportsQuickPlay?: boolean
     currentProtocol: number | null
+    highlighted?: boolean
 
     // Server only
     refreshing?: boolean
@@ -153,11 +154,14 @@ const messages = defineMessages({
     <template v-if="instancePath" #clickable>
       <router-link
         class="no-click-animation"
-        :to="`/instance/${encodeURIComponent(instancePath)}/worlds`"
+        :to="`/instance/${encodeURIComponent(instancePath)}/worlds?highlight=${encodeURIComponent(getWorldIdentifier(world))}`"
       />
     </template>
     <div
       class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised smart-clickable:highlight-on-hover rounded-xl"
+      :class="{
+        'world-item-highlighted': highlighted,
+      }"
     >
       <Avatar
         :src="
@@ -417,3 +421,45 @@ const messages = defineMessages({
     </div>
   </SmartClickable>
 </template>
+<style scoped lang="scss">
+.world-item-highlighted {
+  position: relative;
+  animation: fade-highlight 4s ease-out;
+  filter: brightness(1);
+
+  &::before {
+    @apply rounded-xl inset-0 absolute;
+
+    animation: fade-opacity 4s ease-out;
+
+    content: '';
+    box-shadow: 0 0 8px 2px var(--color-brand);
+    border: 1.5px solid var(--color-brand);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-highlight {
+  0% {
+    filter: brightness(1.25);
+  }
+  75% {
+    filter: brightness(1.25);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@keyframes fade-opacity {
+  0% {
+    opacity: 0.5;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+</style>
