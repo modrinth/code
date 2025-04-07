@@ -1,6 +1,6 @@
 import type { GameInstance } from '@/helpers/types'
-import type { Ref } from 'vue';
-import { onUnmounted , nextTick, computed, ref, watch } from 'vue'
+import type { Ref } from 'vue'
+import { onUnmounted, nextTick, computed, ref, watch } from 'vue'
 import { profile_listener } from '@/helpers/events'
 import {
   type SingleplayerWorld,
@@ -11,7 +11,9 @@ import {
   remove_server_from_profile,
   type ServerWorld,
   start_join_server,
-  start_join_singleplayer_world, getWorldIdentifier
+  start_join_singleplayer_world,
+  getWorldIdentifier,
+  get_singleplayer_world,
 } from '@/helpers/worlds.ts'
 import { get_profile_protocol_version, get_profile_worlds } from '@/helpers/worlds.ts'
 import dayjs from 'dayjs'
@@ -32,7 +34,6 @@ function sortWorlds(worlds: World[]) {
     }
     return dayjs(b.last_played).diff(dayjs(a.last_played))
   })
-
 }
 
 const messages = defineMessages({
@@ -109,9 +110,17 @@ export async function useWorlds(
   const protocolVersion = ref<number | null>(null)
   protocolVersion.value = await get_profile_protocol_version(instance.value.path)
 
-  const unlistenProfile = await profile_listener(async (e: { event: string, world?: string }) => {
-    if (e.event === 'servers_updated' || e.event === 'world_updated') {
+  const unlistenProfile = await profile_listener(async (e: { event: string; world?: string }) => {
+    if (e.event === 'servers_updated') {
       await refreshWorlds()
+    }
+
+    if (e.event === 'world_updated') {
+      if (e.world) {
+        await updateWorld(e.world)
+      } else {
+        await refreshWorlds()
+      }
     }
   })
 
@@ -179,6 +188,17 @@ export async function useWorlds(
         refreshingServers.value = refreshingServers.value.filter((s) => s !== address)
       })
       .catch((error) => onRefreshError(error, address))
+  }
+
+  async function updateWorld(worldPath: string) {
+    const newWorld = await get_singleplayer_world(instance.value.path, worldPath)
+
+    console.log(`Updating world: ${worldPath}`)
+
+    worlds.value = worlds.value.map((w) =>
+      w.type === 'singleplayer' && w.path === worldPath ? newWorld : w,
+    )
+    sortWorlds(worlds.value)
   }
 
   async function refreshWorlds() {

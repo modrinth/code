@@ -15,7 +15,7 @@
   <EditWorldModal ref="editWorldModal" :instance="instance" @submit="editWorld" />
   <ConfirmModalWrapper
     ref="removeServerModal"
-    :title="() => `Are you sure you want to remove this server?`"
+    :title="`Are you sure you want to remove ${serverToRemove?.name ?? 'this server'}?`"
     :description="`'${serverToRemove?.name}'${serverToRemove?.address === serverToRemove?.name ? ' ' : ` (${serverToRemove?.address})`} will be removed from your list, including in-game, and there will be no way to recover it.`"
     :markdown="false"
     @proceed="proceedRemoveServer"

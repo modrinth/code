@@ -48,6 +48,11 @@ defineOptions({
     :deep(.smart-clickable\:underline-on-hover) {
       text-decoration: underline;
     }
+
+    // Utility classes for contents
+    :deep(.smart-clickable\:highlight-on-hover) {
+      filter: brightness(1.25);
+    }
   }
 
   // When clickable is being clicked, give contents an effect
