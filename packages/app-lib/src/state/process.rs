@@ -204,10 +204,11 @@ impl Process {
 
         if xml_logging {
             let mut reader = Reader::from_reader(buf_reader);
-            reader.config_mut().trim_text(true);
+            reader.config_mut().enable_all_checks(false);
 
             let mut buf = Vec::new();
             let mut current_event = Log4jEvent::default();
+            let mut in_event = false;
             let mut in_message = false;
             let mut in_throwable = false;
             let mut current_content = String::new();
@@ -230,6 +231,7 @@ impl Process {
                             b"log4j:Event" => {
                                 // Reset for new event
                                 current_event = Log4jEvent::default();
+                                in_event = true;
 
                                 // Extract attributes
                                 for attr in e.attributes().flatten() {
@@ -336,6 +338,7 @@ impl Process {
                                 }
                             }
                             b"log4j:Event" => {
+                                in_event = false;
                                 // If no throwable was present, write the log entry at the end of the event
                                 if current_event.message.is_some()
                                     && !in_throwable
@@ -389,18 +392,36 @@ impl Process {
                             _ => {}
                         }
                     }
-                    Ok(Event::Text(e)) => {
+                    Ok(Event::Text(mut e)) => {
                         if in_message || in_throwable {
                             if let Ok(text) = e.unescape() {
                                 current_content.push_str(&text);
+                            }
+                        } else if !in_event
+                            && !e.inplace_trim_end()
+                            && !e.inplace_trim_start()
+                        {
+                            if let Ok(text) = e.unescape() {
+                                if let Err(e) = Process::append_to_log_file(
+                                    &log_path,
+                                    &format!("{text}\n"),
+                                ) {
+                                    tracing::error!(
+                                        "Failed to write to log file: {}",
+                                        e
+                                    );
+                                }
                             }
                         }
                     }
                     Ok(Event::CData(e)) => {
                         if in_message || in_throwable {
-                            if let Ok(text) = e.escape() {
-                                current_content
-                                    .push_str(&String::from_utf8_lossy(&text));
+                            if let Ok(text) = e
+                                .escape()
+                                .map_err(|x| x.into())
+                                .and_then(|x| x.unescape())
+                            {
+                                current_content.push_str(&text);
                             }
                         }
                     }
