@@ -85,6 +85,10 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     })
                                     .is_some()
                                 {
+                                    tracing::info!(
+                                        "World updated: {}",
+                                        e.path.display()
+                                    );
                                     Some(ProfilePayloadType::WorldUpdated {
                                         world: e
                                             .path
