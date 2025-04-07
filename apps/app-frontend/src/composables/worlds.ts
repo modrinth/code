@@ -193,7 +193,7 @@ export async function useWorlds(
   async function updateWorld(worldPath: string) {
     const newWorld = await get_singleplayer_world(instance.value.path, worldPath)
 
-    console.log(`Updating world: ${worldPath}`)
+    console.log(`Updated world is locked? ${newWorld.locked}`)
 
     worlds.value = worlds.value.map((w) =>
       w.type === 'singleplayer' && w.path === worldPath ? newWorld : w,
@@ -202,6 +202,11 @@ export async function useWorlds(
   }
 
   async function refreshWorlds() {
+    if (refreshing.value) {
+      console.log(`Already refreshing, cancelling refresh.`)
+      return
+    }
+
     refreshing.value = true
 
     worlds.value = (await get_profile_worlds(instance.value.path).catch(onRefreshError)) ?? []
