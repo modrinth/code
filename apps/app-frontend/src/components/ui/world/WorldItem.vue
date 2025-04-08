@@ -196,7 +196,9 @@ const messages = defineMessages({
             <template v-else-if="serverStatus">
               <template v-if="serverIncompatible">
                 <IssuesIcon class="shrink-0 text-orange" aria-hidden="true" />
-                <span class="text-orange"> Incompatible version {{ serverStatus.version?.name }} </span>
+                <span class="text-orange">
+                  Incompatible version {{ serverStatus.version?.name }}
+                </span>
               </template>
               <template v-else>
                 <SignalIcon
@@ -296,32 +298,28 @@ const messages = defineMessages({
       </div>
       <div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
         <template v-if="world.type === 'singleplayer' || serverStatus">
-          <ButtonStyled v-if="playingWorld && !startingInstance" color="red">
+          <ButtonStyled v-if="(playingWorld || locked && playingInstance) && !startingInstance" color="red">
             <button @click="emit('stop')">
               <StopCircleIcon aria-hidden="true" />
               {{ formatMessage(commonMessages.stopButton) }}
             </button>
           </ButtonStyled>
-          <ButtonStyled v-else-if="!serverIncompatible">
+          <ButtonStyled v-else>
             <button
               v-tooltip="
-                !supportsQuickPlay
-                  ? formatMessage(messages.noQuickPlay)
-                  : playingOtherWorld || locked
-                    ? formatMessage(messages.gameAlreadyOpen)
-                    : null
+                serverIncompatible
+                  ? 'Server is incompatible'
+                  : !supportsQuickPlay
+                    ? formatMessage(messages.noQuickPlay)
+                    : playingOtherWorld || locked
+                      ? formatMessage(messages.gameAlreadyOpen)
+                      : null
               "
               :disabled="!supportsQuickPlay || playingOtherWorld || startingInstance"
               @click="emit('play')"
             >
               <SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
               <PlayIcon v-else aria-hidden="true" />
-              {{ formatMessage(commonMessages.playButton) }}
-            </button>
-          </ButtonStyled>
-          <ButtonStyled v-else>
-            <button class="invisible">
-              <PlayIcon aria-hidden="true" />
               {{ formatMessage(commonMessages.playButton) }}
             </button>
           </ButtonStyled>

@@ -295,6 +295,14 @@ export async function useWorlds(
     (playing) => {
       if (!playing) {
         worldPlaying.value = undefined
+
+        setTimeout(async () => {
+          for (const world of worlds.value) {
+            if (world.type === 'singleplayer' && world.locked) {
+              await updateWorld(world.path);
+            }
+          }
+        }, 1000);
       }
     },
   )

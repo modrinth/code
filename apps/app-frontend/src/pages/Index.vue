@@ -195,7 +195,10 @@ onUnmounted(() => {
   unlisteners.forEach((unlisten) => unlisten())
 })
 
-const unlistenProcesses = await process_listener(async () => {
+const currentProfile = ref()
+const currentWorld = ref()
+
+const unlistenProcesses = await process_listener(async (e) => {
   await checkProcesses()
 })
 
@@ -204,7 +207,15 @@ const runningInstances = ref([])
 const checkProcesses = async () => {
   const runningProcesses = await get_all().catch(handleError)
 
-  runningInstances.value = runningProcesses.map((x) => x.profile_path)
+  const runningPaths = runningProcesses.map((x) => x.profile_path)
+
+  const stoppedInstances = runningInstances.value.filter((x) => !runningPaths.includes(x))
+  if (stoppedInstances.includes(currentProfile.value)) {
+    currentProfile.value = null
+    currentWorld.value = null
+  }
+
+  runningInstances.value = runningPaths
 }
 
 const stopInstance = async (path) => {
@@ -247,7 +258,10 @@ onUnmounted(() => {
             v-if="item.type === 'world'"
             :world="item.world"
             :playing-instance="runningInstances.includes(item.instance.path)"
-            :playing-world="runningInstances.includes(item.instance.path)"
+            :playing-world="
+              currentProfile === item.instance.path &&
+              currentWorld === getWorldIdentifier(item.world)
+            "
             :refreshing="
               item.world.type === 'server'
                 ? serverMetadata[item.instance.path].refreshing.includes(item.world.address)
@@ -274,6 +288,8 @@ onUnmounted(() => {
             @refresh="() => (item.world.type === 'server' ? item.refresh(item.world.address) : {})"
             @play="
               () => {
+                currentProfile = item.instance.path
+                currentWorld = getWorldIdentifier(item.world)
                 item.play(item.world)
               }
             "
