@@ -16,7 +16,6 @@ use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::LoaderVersion;
 use serde::Deserialize;
 use st::Profile;
-use std::collections::HashMap;
 use std::path::PathBuf;
 use tokio::process::Command;
 
@@ -693,31 +692,6 @@ pub async fn launch_minecraft(
         async { Ok(()) }
     })
     .await?;
-
-    let mut censor_strings = HashMap::new();
-    let username = whoami::username();
-    censor_strings
-        .insert(format!("/{username}/"), "/{COMPUTER_USERNAME}/".to_string());
-    censor_strings.insert(
-        format!("\\{username}\\"),
-        "\\{COMPUTER_USERNAME}\\".to_string(),
-    );
-    censor_strings.insert(
-        credentials.access_token.clone(),
-        "{MINECRAFT_ACCESS_TOKEN}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.username.clone(),
-        "{MINECRAFT_USERNAME}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_simple().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_hyphenated().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
 
     // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
     #[cfg(feature = "tauri")]
