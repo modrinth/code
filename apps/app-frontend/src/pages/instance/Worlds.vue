@@ -235,7 +235,6 @@ async function proceedDeleteWorld() {
 }
 
 onUnmounted(() => {
-  console.log('Unlistening worlds listener in instance')
   unlistenWorldsListener()
 })
 </script>

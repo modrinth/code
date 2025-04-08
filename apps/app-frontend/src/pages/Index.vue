@@ -191,7 +191,6 @@ function populateJumpBackIn() {
 }
 
 onUnmounted(() => {
-  console.log('Unmounting home')
   unlisteners.forEach((unlisten) => unlisten())
 })
 
