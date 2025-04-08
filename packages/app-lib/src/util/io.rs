@@ -124,18 +124,6 @@ pub async fn read(
         })
 }
 
-pub async fn open_file(
-    path: impl AsRef<Path>,
-) -> Result<tokio::fs::File, IOError> {
-    let path = path.as_ref();
-    tokio::fs::File::open(path)
-        .await
-        .map_err(|e| IOError::IOPathError {
-            source: e,
-            path: path.to_string_lossy().to_string(),
-        })
-}
-
 // write
 pub async fn write(
     path: impl AsRef<std::path::Path>,

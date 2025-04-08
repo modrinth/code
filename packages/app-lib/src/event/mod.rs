@@ -1,5 +1,6 @@
 //! Theseus state management system
 use ariadne::users::{UserId, UserStatus};
+use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
@@ -243,7 +244,14 @@ pub enum ProfilePayloadType {
     Created,
     Synced,
     ServersUpdated,
-    WorldUpdated { world: String },
+    WorldUpdated {
+        world: String,
+    },
+    ServerJoined {
+        host: String,
+        port: u16,
+        timestamp: DateTime<Utc>,
+    },
     Edited,
     Removed,
 }

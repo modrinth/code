@@ -605,22 +605,6 @@ pub async fn launch_minecraft(
         io::create_dir_all(&natives_dir).await?;
     }
 
-    let supplementary_log_config = state
-        .directories
-        .settings_dir
-        .join("modrinth-supplementary-log.xml");
-    if !io::metadata(&supplementary_log_config)
-        .await
-        .map(|x| x.is_file())
-        .unwrap_or(false)
-    {
-        io::write(
-            &supplementary_log_config,
-            include_bytes!("modrinth-supplementary-log.xml"),
-        )
-        .await?;
-    }
-
     command
         .args(
             args::get_jvm_arguments(
@@ -645,7 +629,6 @@ pub async fn launch_minecraft(
                     .logging
                     .as_ref()
                     .and_then(|x| x.get(&LoggingSide::Client)),
-                &supplementary_log_config,
             )?
             .into_iter()
             .collect::<Vec<_>>(),

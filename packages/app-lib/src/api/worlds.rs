@@ -1,6 +1,7 @@
 use crate::data::ModLoader;
 use crate::launcher::get_loader_version_from_profile;
-use crate::state::ProfileInstallStage;
+use crate::profile::get_full_path;
+use crate::state::{server_join_log, ProfileInstallStage};
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
@@ -17,13 +18,10 @@ use lazy_static::lazy_static;
 use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
-use std::cmp::max;
-use std::collections::HashMap;
 use std::io::Cursor;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncWriteExt;
-use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 use url::Url;
 
@@ -96,10 +94,11 @@ impl From<ServerPackStatus> for Option<bool> {
     }
 }
 
-pub async fn get_profile_worlds(profile_path: &Path) -> Result<Vec<World>> {
+pub async fn get_profile_worlds(profile_path: &str) -> Result<Vec<World>> {
+    let profile_dir = get_full_path(profile_path).await?;
     let mut result = vec![];
-    get_singleplayer_worlds(profile_path, &mut result).await?;
-    get_server_worlds(profile_path, &mut result).await?;
+    get_singleplayer_worlds(&profile_dir, &mut result).await?;
+    get_server_worlds(profile_path, &profile_dir, &mut result).await?;
     Ok(result)
 }
 
@@ -200,6 +199,7 @@ async fn read_singleplayer_world_maybe_locked(
 }
 
 async fn get_server_worlds(
+    profile_path: &str,
     instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
@@ -208,7 +208,10 @@ async fn get_server_worlds(
         return Ok(());
     }
 
-    let join_log = parse_join_log(instance_dir).await.ok();
+    let state = State::get().await?;
+    let join_log = server_join_log::get_joins(profile_path, &state.pool)
+        .await
+        .ok();
 
     for (index, server) in servers.into_iter().enumerate() {
         if server.hidden {
@@ -224,7 +227,7 @@ async fn get_server_worlds(
                 let address = parse_server_address(&server.ip).ok()?;
                 log.get(&(address.0.to_owned(), address.1))
             })
-            .and_then(|time| Utc.timestamp_millis_opt(*time).single());
+            .copied();
         let world = World {
             name: server.name,
             last_played,
@@ -594,40 +597,6 @@ mod servers_data {
         io::write(servers_dat_path, data).await?;
         Ok(())
     }
-}
-
-async fn parse_join_log(
-    instance_dir: &Path,
-) -> Result<HashMap<(String, u16), i64>> {
-    let mut result = HashMap::new();
-    let join_log_path = instance_dir.join("logs/server_join_log.txt");
-    if !join_log_path.exists() {
-        return Ok(result);
-    }
-
-    let reader = io::open_file(&join_log_path).await?;
-    let reader = BufReader::new(reader);
-    let mut lines = reader.lines();
-    while let Some(line) = lines.next_line().await? {
-        let mut parts = line.split_whitespace();
-        let Some(time) = parts.next().and_then(|s| s.parse::<i64>().ok())
-        else {
-            continue;
-        };
-        let Some(host) = parts.nth(2).filter(|s| s.ends_with(',')) else {
-            continue;
-        };
-        let Some(port) = parts.next().and_then(|s| s.parse::<u16>().ok())
-        else {
-            continue;
-        };
-        result
-            .entry((host[..host.len() - 1].to_owned(), port))
-            .and_modify(|old| *old = max(*old, time))
-            .or_insert(time);
-    }
-
-    Ok(result)
 }
 
 pub async fn get_profile_protocol_version(

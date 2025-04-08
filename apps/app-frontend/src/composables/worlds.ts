@@ -110,16 +110,31 @@ export async function useWorlds(
   const protocolVersion = ref<number | null>(null)
   protocolVersion.value = await get_profile_protocol_version(instance.value.path)
 
-  const unlistenProfile = await profile_listener(async (e: { event: string; world?: string }) => {
+  type ProfileEvent = {
+    event: 'servers_updated'
+  } | {
+    event: 'world_updated'
+    world: string
+  } | {
+    event: 'server_joined'
+    host: string
+    port: number
+    timestamp: string
+  };
+  const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
     if (e.event === 'servers_updated') {
       await refreshWorlds()
     }
 
     if (e.event === 'world_updated') {
-      if (e.world) {
-        await updateWorld(e.world)
-      } else {
-        await refreshWorlds()
+      await updateWorld(e.world)
+    }
+
+    if (e.event === 'server_joined') {
+      const world = worlds.value.find((w) => w.type === 'server' && (w.address === `${e.host}:${e.port}` || (e.port == 25565 && w.address == e.host)))
+      if (world) {
+        world.last_played = e.timestamp
+        sortWorlds(worlds.value)
       }
     }
   })

@@ -69,9 +69,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                             } else if !visited_profiles.contains(&profile_path)
                             {
                                 let event = if first_file_name
-                                    .filter(|x| {
-                                        *x == "servers.dat" || *x == "logs"
-                                    })
+                                    .filter(|x| *x == "servers.dat")
                                     .is_some()
                                 {
                                     Some(ProfilePayloadType::ServersUpdated)
@@ -161,7 +159,6 @@ pub(crate) async fn watch_profile(
             "crash-reports",
             "saves",
             "servers.dat",
-            "logs/server_join_log.txt",
         ]) {
             let path = profile_path.join(folder);
 

@@ -1,8 +1,8 @@
-use crate::event::emit::emit_process;
-use crate::event::ProcessPayloadType;
+use crate::event::emit::{emit_process, emit_profile};
+use crate::event::{ProcessPayloadType, ProfilePayloadType};
 use crate::profile;
 use crate::util::io::IOError;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use quick_xml::events::Event;
 use quick_xml::Reader;
@@ -94,18 +94,30 @@ impl ProcessManager {
         if let Some(stdout) = stdout {
             let log_path_clone = log_path.clone();
 
+            let profile_path = metadata.profile_path.clone();
             tokio::spawn(async move {
-                Process::process_output(stdout, log_path_clone, xml_logging)
-                    .await;
+                Process::process_output(
+                    &profile_path,
+                    stdout,
+                    log_path_clone,
+                    xml_logging,
+                )
+                .await;
             });
         }
 
         if let Some(stderr) = stderr {
             let log_path_clone = log_path.clone();
 
+            let profile_path = metadata.profile_path.clone();
             tokio::spawn(async move {
-                Process::process_output(stderr, log_path_clone, xml_logging)
-                    .await;
+                Process::process_output(
+                    &profile_path,
+                    stderr,
+                    log_path_clone,
+                    xml_logging,
+                )
+                .await;
             });
         }
 
@@ -194,6 +206,7 @@ struct Log4jEvent {
 
 impl Process {
     async fn process_output<R>(
+        profile_path: &str,
         reader: R,
         log_path: impl AsRef<Path>,
         xml_logging: bool,
@@ -355,6 +368,11 @@ impl Process {
                                         .logger
                                         .as_deref()
                                         .unwrap_or("");
+                                    let message = current_event
+                                        .message
+                                        .as_deref()
+                                        .unwrap_or("")
+                                        .trim();
 
                                     let formatted_time =
                                         Process::format_timestamp(
@@ -370,11 +388,7 @@ impl Process {
                                             String::new()
                                         },
                                         level,
-                                        current_event
-                                            .message
-                                            .as_deref()
-                                            .unwrap_or("")
-                                            .trim()
+                                        message
                                     );
 
                                     // Write the log message
@@ -386,6 +400,18 @@ impl Process {
                                             "Failed to write to log file: {}",
                                             e
                                         );
+                                    }
+
+                                    if let Some(timestamp) =
+                                        current_event.timestamp.as_deref()
+                                    {
+                                        if let Err(e) = Self::maybe_handle_server_join_logging(
+                                            profile_path,
+                                            timestamp,
+                                            message
+                                        ).await {
+                                            tracing::error!("Failed to handle server join logging: {e}");
+                                        }
                                     }
                                 }
                             }
@@ -481,6 +507,66 @@ impl Process {
             OpenOptions::new().append(true).create(true).open(path)?;
 
         file.write_all(line.as_bytes())?;
+        Ok(())
+    }
+
+    async fn maybe_handle_server_join_logging(
+        profile_path: &str,
+        timestamp: &str,
+        message: &str,
+    ) -> crate::Result<()> {
+        let Some(host_port_string) = message.strip_prefix("Connecting to ")
+        else {
+            return Ok(());
+        };
+        let Some((host, port_string)) = host_port_string.rsplit_once(", ")
+        else {
+            return Ok(());
+        };
+        let Some(port) = port_string.parse::<u16>().ok() else {
+            return Ok(());
+        };
+        let timestamp = timestamp
+            .parse::<i64>()
+            .map(|x| x / 1000)
+            .map_err(|x| {
+                crate::ErrorKind::OtherError(format!(
+                    "Failed to parse timestamp: {x}"
+                ))
+            })
+            .and_then(|x| {
+                Utc.timestamp_opt(x, 0).single().ok_or_else(|| {
+                    crate::ErrorKind::OtherError(
+                        "Failed to convert timestamp to DateTime".to_string(),
+                    )
+                })
+            })?;
+
+        let state = crate::State::get().await?;
+        crate::state::server_join_log::JoinLogEntry {
+            profile_path: profile_path.to_owned(),
+            host: host.to_string(),
+            port,
+            join_time: timestamp,
+        }
+        .upsert(&state.pool)
+        .await?;
+        {
+            let profile_path = profile_path.to_owned();
+            let host = host.to_owned();
+            tokio::spawn(async move {
+                let _ = emit_profile(
+                    &profile_path,
+                    ProfilePayloadType::ServerJoined {
+                        host,
+                        port,
+                        timestamp,
+                    },
+                )
+                .await;
+            });
+        }
+
         Ok(())
     }
 

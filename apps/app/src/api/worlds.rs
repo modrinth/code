@@ -31,8 +31,7 @@ pub async fn get_profile_worlds<R: Runtime>(
     app_handle: AppHandle<R>,
     path: &str,
 ) -> Result<Vec<World>> {
-    let path = get_full_path(path).await?;
-    let mut result = worlds::get_profile_worlds(&path).await?;
+    let mut result = worlds::get_profile_worlds(path).await?;
     for world in result.iter_mut() {
         adapt_world_icon(&app_handle, world);
     }
