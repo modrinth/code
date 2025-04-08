@@ -196,7 +196,7 @@ const messages = defineMessages({
             <template v-else-if="serverStatus">
               <template v-if="serverIncompatible">
                 <IssuesIcon class="shrink-0 text-orange" aria-hidden="true" />
-                <span class="text-orange"> Server requires {{ serverStatus.version?.name }} </span>
+                <span class="text-orange"> Incompatible version {{ serverStatus.version?.name }} </span>
               </template>
               <template v-else>
                 <SignalIcon
