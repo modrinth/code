@@ -393,7 +393,7 @@
           :power-state-details="powerStateDetails"
           :socket="socket"
           :server="server"
-          :backupTasks="runningBackupTasks"
+          :backup-tasks="runningBackupTasks"
           @reinstall="onReinstall"
         />
       </div>
@@ -776,27 +776,31 @@ const handleWebSocketMessage = (data: WSEvent) => {
       break;
     case "backup-progress":
       // Update a backup's state
-      let curBackup = server.backups?.data.find(
-        (backup) => backup.id === data.id,
-      );
+      const curBackup = server.backups?.data.find((backup) => backup.id === data.id);
 
-      if(!curBackup) {
-        console.warn(`A backup with ID ${data.id} sent a progress update, but it was not found in the current backups.`);
+      if (!curBackup) {
+        console.warn(
+          `A backup with ID ${data.id} sent a progress update, but it was not found in the current backups.`,
+        );
       } else {
-        console.log(`Handling backup progress for ${curBackup.name} (${data.id}) task: ${data.task} state: ${data.state} progress: ${data.progress}`);
+        console.log(
+          `Handling backup progress for ${curBackup.name} (${data.id}) task: ${data.task} state: ${data.state} progress: ${data.progress}`,
+        );
 
         // If the intial state is done (we don't have it in our running tasks), ignore the event
         if (data.state === "done" && !runningBackupTasks.value.has(data.id)) {
-          console.warn(`A backup with ID ${data.id} sent a progress update, but it was not found in the current running tasks and it's already done. Ignoring...`);
+          console.warn(
+            `A backup with ID ${data.id} sent a progress update, but it was not found in the current running tasks and it's already done. Ignoring...`,
+          );
           return;
         }
 
-        curBackup.restoring = data.state === 'ongoing' && data.task === 'restore'
-        curBackup.creating = data.state === 'ongoing' && data.task === 'create';
-        curBackup.creating_download = data.state === 'ongoing' && data.task === 'file';
+        curBackup.restoring = data.state === "ongoing" && data.task === "restore";
+        curBackup.creating = data.state === "ongoing" && data.task === "create";
+        curBackup.creating_download = data.state === "ongoing" && data.task === "file";
 
         // If the task is done, remove it from our running tasks and pop a notification
-        if (data.state === 'done') {
+        if (data.state === "done") {
           runningBackupTasks.value.delete(data.id);
           addNotification({
             title: `Success!`,
@@ -806,7 +810,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
 
           // Refresh the backups list
           server.refresh(["backups"]);
-        } else if (data.state === 'failed') {
+        } else if (data.state === "failed") {
           runningBackupTasks.value.delete(data.id);
           addNotification({
             title: `Error`,
@@ -816,7 +820,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
         }
 
         // If the task is ongoing, add it to our running tasks
-        if (data.state === 'ongoing') {
+        if (data.state === "ongoing") {
           runningBackupTasks.value.set(data.id, data.task);
         }
       }

@@ -376,19 +376,25 @@ function triggerDownloadAnimation() {
 
 const initiateDownload = async (backupId: string) => {
   // If another backup is preparing, do not allow another download, or a backup task of type "file" is already in progress
-  if (backups.value.some((backup) => backup.creating_download) || [...props.backupTasks.values()].some((task) => task.includes("file"))) {
+  if (
+    backups.value.some((backup) => backup.creating_download) ||
+    [...props.backupTasks.values()].some((task) => task.includes("file"))
+  ) {
     addNotification({ type: "error", text: "A backup is already preparing for download." });
     return;
   }
 
-  addNotification({ type: "success", title: 'Preparing download', text: 'We are preparing your download. Your download will start automatically once ready.' });
+  addNotification({
+    type: "success",
+    title: "Preparing download",
+    text: "We are preparing your download. Your download will start automatically once ready.",
+  });
 
   try {
     await props.server.backups?.prepare(backupId);
   } catch (error) {
     console.error("Failed to prepare download:", error);
     addNotification({ type: "error", text: "Failed to prepare download." });
-    return;
   }
 
   // try {
@@ -418,9 +424,8 @@ const onPrepareComplete = (id: string) => {
     type: "success",
     title: "Prepare complete",
     text: "Your backup is ready for download. Your download will start momentarily.",
-  })
-
-}
+  });
+};
 
 const lockBackup = async (backupId: string) => {
   try {
@@ -463,12 +468,14 @@ onMounted(() => {
       // Check if a task has completed (deleted) from the map
       if (oldTasks.size > newTasks.size) {
         // Grab the first task that was removed with type file in the string
-        const completedTask = [...oldTasks].find(([key, value]) => !newTasks.has(key) && value.includes("file"));
+        const completedTask = [...oldTasks].find(
+          ([key, value]) => !newTasks.has(key) && value.includes("file"),
+        );
         if (completedTask) {
           onPrepareComplete(completedTask[0]);
         }
       }
-    }
+    },
   );
 });
 

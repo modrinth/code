@@ -727,15 +727,18 @@ const downloadBackup = async (backupId: string) => {
 
 const prepareBackup = async (backupId: string) => {
   try {
-    await PyroFetch(`servers/${internalServerRefrence.value.serverId}/backups/${backupId}/prepare-download`, {
-      method: "POST",
-    });
+    await PyroFetch(
+      `servers/${internalServerRefrence.value.serverId}/backups/${backupId}/prepare-download`,
+      {
+        method: "POST",
+      },
+    );
     await internalServerRefrence.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error preparing backup:", error);
     throw error;
   }
-}
+};
 
 const updateAutoBackup = async (autoBackup: "enable" | "disable", interval: number) => {
   try {
