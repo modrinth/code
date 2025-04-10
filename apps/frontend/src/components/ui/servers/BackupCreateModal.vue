@@ -13,7 +13,7 @@
         :placeholder="`Backup #${newBackupAmount}`"
         maxlength="48"
       />
-      <div v-if="nameExists" class="flex items-center gap-1">
+      <div v-if="nameExists && !isCreating" class="flex items-center gap-1">
         <IssuesIcon class="hidden text-orange sm:block" />
         <span class="text-sm text-orange">
           You already have a backup named '<span class="font-semibold">{{ trimmedName }}</span
@@ -76,9 +76,14 @@ const focusInput = () => {
   });
 };
 
+function show() {
+  backupName.value = "";
+  isCreating.value = false;
+  modal.value?.show();
+}
+
 const hideModal = () => {
   modal.value?.hide();
-  backupName.value = "";
 };
 
 const createBackup = async () => {
@@ -110,7 +115,7 @@ const createBackup = async () => {
 };
 
 defineExpose({
-  show: () => modal.value?.show(),
+  show,
   hide: hideModal,
 });
 </script>
