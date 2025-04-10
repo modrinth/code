@@ -1,5 +1,6 @@
 // usePyroServer is a composable that interfaces with the REDACTED API to get data and control the users server
 import { $fetch, FetchError } from "ofetch";
+import type { WSBackupState, WSBackupTask } from "~/types/servers.ts";
 import type { ServerNotice } from "@modrinth/utils";
 
 interface PyroFetchOptions {
@@ -317,15 +318,20 @@ export interface Mod {
   installing: boolean;
 }
 
-interface Backup {
+export interface Backup {
   id: string;
   name: string;
   created_at: string;
-  creating: boolean;
-  creating_download: boolean;
-  restoring: boolean;
   locked: boolean;
-  progress: number;
+  automated: boolean;
+  interrupted: boolean;
+  ongoing: boolean;
+  task: {
+    [K in WSBackupTask]?: {
+      progress: number;
+      state: WSBackupState;
+    };
+  };
 }
 
 interface AutoBackupSettings {

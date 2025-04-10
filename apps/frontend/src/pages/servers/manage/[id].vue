@@ -1,402 +1,390 @@
 <template>
-  <div class="contents">
-    <div
-      v-if="filteredNotices.length > 0"
-      class="experimental-styles-within relative mx-auto flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
-    >
-      <ServerNotice
-        v-for="notice in filteredNotices"
-        :key="`notice-${notice.id}`"
-        :level="notice.level"
-        :message="notice.message"
-        :dismissable="notice.dismissable"
-        :title="notice.title"
-        class="w-full"
-        @dismiss="() => dismissNotice(notice.id)"
-      />
-    </div>
-    <div
-      v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-blue p-4">
-              <TransferIcon class="size-12 text-blue" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server upgrading</h1>
+  <div
+    v-if="filteredNotices.length > 0"
+    class="experimental-styles-within relative mx-auto flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
+  >
+    <ServerNotice
+      v-for="notice in filteredNotices"
+      :key="`notice-${notice.id}`"
+      :level="notice.level"
+      :message="notice.message"
+      :dismissable="notice.dismissable"
+      :title="notice.title"
+      class="w-full"
+      @dismiss="() => dismissNotice(notice.id)"
+    />
+  </div>
+  <div
+    v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="flex flex-col items-center gap-4">
+          <div class="grid place-content-center rounded-full bg-bg-blue p-4">
+            <TransferIcon class="size-12 text-blue" />
           </div>
-          <p class="text-lg text-secondary">
-            Your server's hardware is currently being upgraded and will be back online shortly!
-          </p>
+          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server upgrading</h1>
         </div>
+        <p class="text-lg text-secondary">
+          Your server's hardware is currently being upgraded and will be back online shortly!
+        </p>
       </div>
     </div>
-    <div
-      v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'support'"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-blue p-4">
-              <TransferIcon class="size-12 text-blue" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">We're working on your server</h1>
+  </div>
+  <div
+    v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'support'"
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="flex flex-col items-center gap-4">
+          <div class="grid place-content-center rounded-full bg-bg-blue p-4">
+            <TransferIcon class="size-12 text-blue" />
           </div>
-          <p class="text-lg text-secondary">
-            You recently contacted Modrinth Support, and we're actively working on your server. It
-            will be back online shortly.
-          </p>
+          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">We're working on your server</h1>
         </div>
+        <p class="text-lg text-secondary">
+          You recently contacted Modrinth Support, and we're actively working on your server. It
+          will be back online shortly.
+        </p>
       </div>
     </div>
-    <div
-      v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason !== 'upgrading'"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <LockIcon class="size-12 text-orange" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server suspended</h1>
+  </div>
+  <div
+    v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason !== 'upgrading'"
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="flex flex-col items-center gap-4">
+          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+            <LockIcon class="size-12 text-orange" />
           </div>
-          <p class="text-lg text-secondary">
+          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server suspended</h1>
+        </div>
+        <p class="text-lg text-secondary">
+          {{
+            serverData.suspension_reason === "cancelled"
+              ? "Your subscription has been cancelled."
+              : serverData.suspension_reason
+                ? `Your server has been suspended: ${serverData.suspension_reason}`
+                : "Your server has been suspended."
+          }}
+          <br />
+          Contact Modrinth support if you believe this is an error.
+        </p>
+      </div>
+      <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
+        <button class="mt-6 !w-full">Go to billing settings</button>
+      </ButtonStyled>
+    </div>
+  </div>
+  <div
+    v-else-if="
+      server.general?.error?.error.statusCode === 403 ||
+      server.general?.error?.error.statusCode === 404
+    "
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="flex flex-col items-center gap-4">
+          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+            <TransferIcon class="size-12 text-orange" />
+          </div>
+          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server not found</h1>
+        </div>
+        <p class="text-lg text-secondary">
+          You don't have permission to view this server or it no longer exists. If you believe this
+          is an error, please contact Modrinth support.
+        </p>
+      </div>
+      <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+
+      <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
+        <button class="mt-6 !w-full">Go back to all servers</button>
+      </ButtonStyled>
+    </div>
+  </div>
+  <div
+    v-else-if="server.general?.error?.error.statusCode === 503"
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="flex flex-col items-center gap-4">
+          <div class="grid place-content-center rounded-full bg-bg-red p-4">
+            <UiServersIconsPanelErrorIcon class="size-12 text-red" />
+          </div>
+          <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
+        </div>
+        <p class="m-0 mb-4 leading-[170%] text-secondary">
+          Your server's node, where your Modrinth Server is physically hosted, is experiencing
+          issues. We are working with our datacenter to resolve the issue as quickly as possible.
+        </p>
+        <p class="m-0 mb-4 leading-[170%] text-secondary">
+          Your data is safe and will not be lost, and your server will be back online as soon as the
+          issue is resolved.
+        </p>
+        <p class="m-0 mb-4 leading-[170%] text-secondary">
+          For updates, please join the Modrinth Discord or contact Modrinth Support via the chat
+          bubble in the bottom right corner and we'll be happy to help.
+        </p>
+
+        <div class="flex flex-col gap-2">
+          <UiCopyCode :text="'Server ID: ' + server.serverId" />
+          <UiCopyCode :text="'Node: ' + server.general?.datacenter" />
+        </div>
+      </div>
+      <ButtonStyled
+        size="large"
+        color="standard"
+        @click="
+          () =>
+            navigateTo('https://discord.modrinth.com', {
+              external: true,
+            })
+        "
+      >
+        <button class="mt-6 !w-full">Join Modrinth Discord</button>
+      </ButtonStyled>
+      <ButtonStyled
+        :disabled="formattedTime !== '00'"
+        size="large"
+        color="standard"
+        @click="() => reloadNuxtApp()"
+      >
+        <button class="mt-3 !w-full">Reload</button>
+      </ButtonStyled>
+    </div>
+  </div>
+  <div
+    v-else-if="server.general?.error"
+    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+  >
+    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="flex flex-col items-center gap-4">
+          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+            <TransferIcon class="size-12 text-orange" />
+          </div>
+          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Connection lost</h1>
+          <div class="text-center text-secondary">
             {{
-              serverData.suspension_reason === "cancelled"
-                ? "Your subscription has been cancelled."
-                : serverData.suspension_reason
-                  ? `Your server has been suspended: ${serverData.suspension_reason}`
-                  : "Your server has been suspended."
+              formattedTime == "00" ? "Reconnecting..." : `Retrying in ${formattedTime} seconds...`
             }}
-            <br />
-            Contact Modrinth support if you believe this is an error.
-          </p>
-        </div>
-        <ButtonStyled size="large" color="brand" @click="() => router.push('/settings/billing')">
-          <button class="mt-6 !w-full">Go to billing settings</button>
-        </ButtonStyled>
-      </div>
-    </div>
-    <div
-      v-else-if="
-        server.general?.error?.error.statusCode === 403 ||
-        server.general?.error?.error.statusCode === 404
-      "
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <TransferIcon class="size-12 text-orange" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Server not found</h1>
           </div>
-          <p class="text-lg text-secondary">
-            You don't have permission to view this server or it no longer exists. If you believe
-            this is an error, please contact Modrinth support.
-          </p>
         </div>
-        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+        <p class="text-lg text-secondary">
+          Something went wrong, and we couldn't connect to your server. This is likely due to a
+          temporary network issue. You'll be reconnected automatically.
+        </p>
+      </div>
+      <UiCopyCode :text="JSON.stringify(server.general?.error)" />
+      <ButtonStyled
+        :disabled="formattedTime !== '00'"
+        size="large"
+        color="brand"
+        @click="() => reloadNuxtApp()"
+      >
+        <button class="mt-6 !w-full">Reload</button>
+      </ButtonStyled>
+    </div>
+  </div>
+  <!-- SERVER START -->
+  <div
+    v-else-if="serverData"
+    data-pyro-server-manager-root
+    class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-6 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
+    :style="{
+      '--server-bg-image': serverData.image
+        ? `url(${serverData.image})`
+        : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
+    }"
+  >
+    <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
+      <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
+      <div
+        class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
+      >
+        <div class="hidden shrink-0 flex-row items-center gap-1 sm:flex">
+          <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
+            <LeftArrowIcon />
+            All servers
+          </NuxtLink>
+        </div>
+        <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
+          <h1
+            class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
+          >
+            {{ serverData.name }}
+          </h1>
+          <div
+            v-if="isConnected"
+            data-pyro-server-action-buttons
+            class="server-action-buttons-anim flex w-fit flex-shrink-0"
+          >
+            <UiServersPanelServerActionButton
+              class="flex-shrink-0"
+              :is-online="isServerRunning"
+              :is-actioning="isActioning"
+              :is-installing="serverData.status === 'installing'"
+              :disabled="isActioning || !!error"
+              :server-name="serverData.name"
+              :server-data="serverData"
+              :uptime-seconds="uptimeSeconds"
+              @action="sendPowerAction"
+            />
+          </div>
+        </div>
 
-        <ButtonStyled size="large" color="brand" @click="() => router.push('/servers/manage')">
-          <button class="mt-6 !w-full">Go back to all servers</button>
-        </ButtonStyled>
+        <UiServersServerInfoLabels
+          :server-data="serverData"
+          :show-game-label="showGameLabel"
+          :show-loader-label="showLoaderLabel"
+          :uptime-seconds="uptimeSeconds"
+          :linked="true"
+          class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+        />
       </div>
     </div>
-    <div
-      v-else-if="server.general?.error?.error.statusCode === 503"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-red p-4">
-              <UiServersIconsPanelErrorIcon class="size-12 text-red" />
-            </div>
-            <h1 class="m-0 mb-4 w-fit text-4xl font-bold">Server Node Unavailable</h1>
-          </div>
-          <p class="m-0 mb-4 leading-[170%] text-secondary">
-            Your server's node, where your Modrinth Server is physically hosted, is experiencing
-            issues. We are working with our datacenter to resolve the issue as quickly as possible.
-          </p>
-          <p class="m-0 mb-4 leading-[170%] text-secondary">
-            Your data is safe and will not be lost, and your server will be back online as soon as
-            the issue is resolved.
-          </p>
-          <p class="m-0 mb-4 leading-[170%] text-secondary">
-            For updates, please join the Modrinth Discord or contact Modrinth Support via the chat
-            bubble in the bottom right corner and we'll be happy to help.
-          </p>
 
-          <div class="flex flex-col gap-2">
-            <UiCopyCode :text="'Server ID: ' + server.serverId" />
-            <UiCopyCode :text="'Node: ' + server.general?.datacenter" />
-          </div>
-        </div>
-        <ButtonStyled
-          size="large"
-          color="standard"
-          @click="
-            () =>
-              navigateTo('https://discord.modrinth.com', {
-                external: true,
-              })
-          "
-        >
-          <button class="mt-6 !w-full">Join Modrinth Discord</button>
-        </ButtonStyled>
-        <ButtonStyled
-          :disabled="formattedTime !== '00'"
-          size="large"
-          color="standard"
-          @click="() => reloadNuxtApp()"
-        >
-          <button class="mt-3 !w-full">Reload</button>
-        </ButtonStyled>
-      </div>
-    </div>
     <div
-      v-else-if="server.general?.error"
-      class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+      data-pyro-navigation
+      class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
     >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <TransferIcon class="size-12 text-orange" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Connection lost</h1>
-            <div class="text-center text-secondary">
-              {{
-                formattedTime == "00"
-                  ? "Reconnecting..."
-                  : `Retrying in ${formattedTime} seconds...`
-              }}
-            </div>
-          </div>
-          <p class="text-lg text-secondary">
-            Something went wrong, and we couldn't connect to your server. This is likely due to a
-            temporary network issue. You'll be reconnected automatically.
-          </p>
-        </div>
-        <UiCopyCode :text="JSON.stringify(server.general?.error)" />
-        <ButtonStyled
-          :disabled="formattedTime !== '00'"
-          size="large"
-          color="brand"
-          @click="() => reloadNuxtApp()"
-        >
-          <button class="mt-6 !w-full">Reload</button>
-        </ButtonStyled>
-      </div>
+      <UiNavTabs :links="navLinks" />
     </div>
-    <!-- SERVER START -->
-    <div
-      v-else-if="serverData"
-      data-pyro-server-manager-root
-      class="experimental-styles-within mobile-blurred-servericon relative mx-auto box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
-      :style="{
-        '--server-bg-image': serverData.image
-          ? `url(${serverData.image})`
-          : `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
-      }"
-    >
-      <div class="flex w-full min-w-0 select-none flex-col items-center gap-6 pt-4 sm:flex-row">
-        <UiServersServerIcon :image="serverData.image" class="drop-shadow-lg sm:drop-shadow-none" />
-        <div
-          class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
-        >
-          <div class="hidden shrink-0 flex-row items-center gap-1 sm:flex">
-            <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
-              <LeftArrowIcon />
-              All servers
-            </NuxtLink>
-          </div>
-          <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
-            <h1
-              class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-4xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
-            >
-              {{ serverData.name }}
-            </h1>
-            <div
-              v-if="isConnected"
-              data-pyro-server-action-buttons
-              class="server-action-buttons-anim flex w-fit flex-shrink-0"
-            >
-              <UiServersPanelServerActionButton
-                class="flex-shrink-0"
-                :is-online="isServerRunning"
-                :is-actioning="isActioning"
-                :is-installing="serverData.status === 'installing'"
-                :disabled="isActioning || !!error"
-                :server-name="serverData.name"
-                :server-data="serverData"
-                :uptime-seconds="uptimeSeconds"
-                @action="sendPowerAction"
-              />
-            </div>
-          </div>
 
-          <UiServersServerInfoLabels
-            :server-data="serverData"
-            :show-game-label="showGameLabel"
-            :show-loader-label="showLoaderLabel"
-            :uptime-seconds="uptimeSeconds"
-            :linked="true"
-            class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
-          />
+    <div data-pyro-mount class="h-full w-full flex-1">
+      <div
+        v-if="error"
+        class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+      >
+        <div class="flex flex-row gap-4">
+          <IssuesIcon class="hidden h-8 w-8 shrink-0 text-red sm:block" />
+          <div class="flex flex-col gap-2 leading-[150%]">
+            <div class="flex items-center gap-3">
+              <IssuesIcon class="flex h-8 w-8 shrink-0 text-red sm:hidden" />
+              <div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
+            </div>
+
+            <div v-if="errorTitle.toLocaleLowerCase() === 'installation error'" class="font-normal">
+              <div
+                v-if="errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'"
+              >
+                An invalid loader or Minecraft version was specified and could not be installed.
+                <ul class="m-0 mt-4 p-0 pl-4">
+                  <li>
+                    If this version of Minecraft was released recently, please check if Modrinth
+                    Servers supports it.
+                  </li>
+                  <li>
+                    If you've installed a modpack, it may have been packaged incorrectly or may not
+                    be compatible with the loader.
+                  </li>
+                  <li>
+                    Your server may need to be reinstalled with a valid mod loader and version. You
+                    can change the loader by clicking the "Change Loader" button.
+                  </li>
+                  <li>
+                    If you're stuck, please contact Modrinth support with the information below:
+                  </li>
+                </ul>
+                <ButtonStyled>
+                  <button class="mt-2" @click="copyServerDebugInfo">
+                    <CopyIcon v-if="!copied" />
+                    <CheckIcon v-else />
+                    Copy Debug Info
+                  </button>
+                </ButtonStyled>
+              </div>
+              <div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
+                An internal error occurred while installing your server. Don't fret — try
+                reinstalling your server, and if the problem persists, please contact Modrinth
+                support with your server's debug information.
+              </div>
+              <div v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'">
+                An error occurred while installing your server because Modrinth Servers does not
+                support the version of Minecraft or the loader you specified. Try reinstalling your
+                server with a different version or loader, and if the problem persists, please
+                contact Modrinth support with your server's debug information.
+              </div>
+
+              <div
+                v-if="errorTitle === 'Installation error'"
+                class="mt-2 flex flex-col gap-4 sm:flex-row"
+              >
+                <ButtonStyled v-if="errorLog">
+                  <button @click="openInstallLog"><FileIcon />Open Installation Log</button>
+                </ButtonStyled>
+                <ButtonStyled>
+                  <button @click="copyServerDebugInfo">
+                    <CopyIcon v-if="!copied" />
+                    <CheckIcon v-else />
+                    Copy Debug Info
+                  </button>
+                </ButtonStyled>
+                <ButtonStyled color="red" type="standard">
+                  <NuxtLink
+                    class="whitespace-pre"
+                    :to="`/servers/manage/${serverId}/options/loader`"
+                  >
+                    <RightArrowIcon />
+                    Change Loader
+                  </NuxtLink>
+                </ButtonStyled>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div
-        data-pyro-navigation
-        class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
+        v-if="!isConnected && !isReconnecting && !isLoading"
+        data-pyro-server-ws-error
+        class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
       >
-        <UiNavTabs :links="navLinks" />
+        <IssuesIcon class="size-5 text-red" />
+        Something went wrong...
       </div>
 
-      <div data-pyro-mount class="h-full w-full flex-1">
-        <div
-          v-if="error"
-          class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
-        >
-          <div class="flex flex-row gap-4">
-            <IssuesIcon class="hidden h-8 w-8 shrink-0 text-red sm:block" />
-            <div class="flex flex-col gap-2 leading-[150%]">
-              <div class="flex items-center gap-3">
-                <IssuesIcon class="flex h-8 w-8 shrink-0 text-red sm:hidden" />
-                <div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
-              </div>
-
-              <div
-                v-if="errorTitle.toLocaleLowerCase() === 'installation error'"
-                class="font-normal"
-              >
-                <div
-                  v-if="
-                    errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
-                  "
-                >
-                  An invalid loader or Minecraft version was specified and could not be installed.
-                  <ul class="m-0 mt-4 p-0 pl-4">
-                    <li>
-                      If this version of Minecraft was released recently, please check if Modrinth
-                      Servers supports it.
-                    </li>
-                    <li>
-                      If you've installed a modpack, it may have been packaged incorrectly or may
-                      not be compatible with the loader.
-                    </li>
-                    <li>
-                      Your server may need to be reinstalled with a valid mod loader and version.
-                      You can change the loader by clicking the "Change Loader" button.
-                    </li>
-                    <li>
-                      If you're stuck, please contact Modrinth support with the information below:
-                    </li>
-                  </ul>
-                  <ButtonStyled>
-                    <button class="mt-2" @click="copyServerDebugInfo">
-                      <CopyIcon v-if="!copied" />
-                      <CheckIcon v-else />
-                      Copy Debug Info
-                    </button>
-                  </ButtonStyled>
-                </div>
-                <div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
-                  An internal error occurred while installing your server. Don't fret — try
-                  reinstalling your server, and if the problem persists, please contact Modrinth
-                  support with your server's debug information.
-                </div>
-                <div
-                  v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
-                >
-                  An error occurred while installing your server because Modrinth Servers does not
-                  support the version of Minecraft or the loader you specified. Try reinstalling
-                  your server with a different version or loader, and if the problem persists,
-                  please contact Modrinth support with your server's debug information.
-                </div>
-
-                <div
-                  v-if="errorTitle === 'Installation error'"
-                  class="mt-2 flex flex-col gap-4 sm:flex-row"
-                >
-                  <ButtonStyled v-if="errorLog">
-                    <button @click="openInstallLog"><FileIcon />Open Installation Log</button>
-                  </ButtonStyled>
-                  <ButtonStyled>
-                    <button @click="copyServerDebugInfo">
-                      <CopyIcon v-if="!copied" />
-                      <CheckIcon v-else />
-                      Copy Debug Info
-                    </button>
-                  </ButtonStyled>
-                  <ButtonStyled color="red" type="standard">
-                    <NuxtLink
-                      class="whitespace-pre"
-                      :to="`/servers/manage/${serverId}/options/loader`"
-                    >
-                      <RightArrowIcon />
-                      Change Loader
-                    </NuxtLink>
-                  </ButtonStyled>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          v-if="!isConnected && !isReconnecting && !isLoading"
-          data-pyro-server-ws-error
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
-        >
-          <IssuesIcon class="size-5 text-red" />
-          Something went wrong...
-        </div>
-
-        <div
-          v-if="isReconnecting"
-          data-pyro-server-ws-reconnecting
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
-        >
-          <UiServersPanelSpinner />
-          Hang on, we're reconnecting to your server.
-        </div>
-
-        <div
-          v-if="serverData.status === 'installing'"
-          data-pyro-server-installing
-          class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
-        >
-          <UiServersServerIcon :image="serverData.image" class="!h-10 !w-10" />
-
-          <div class="flex flex-col gap-1">
-            <span class="text-lg font-bold"> We're preparing your server! </span>
-            <div class="flex flex-row items-center gap-2">
-              <UiServersPanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
-            </div>
-          </div>
-        </div>
-        <NuxtPage
-          :route="route"
-          :is-connected="isConnected"
-          :is-ws-auth-incorrect="isWSAuthIncorrect"
-          :is-server-running="isServerRunning"
-          :stats="stats"
-          :server-power-state="serverPowerState"
-          :power-state-details="powerStateDetails"
-          :socket="socket"
-          :server="server"
-          :backup-tasks="runningBackupTasks"
-          @reinstall="onReinstall"
-        />
+      <div
+        v-if="isReconnecting"
+        data-pyro-server-ws-reconnecting
+        class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
+      >
+        <UiServersPanelSpinner />
+        Hang on, we're reconnecting to your server.
       </div>
+
+      <div
+        v-if="serverData.status === 'installing'"
+        data-pyro-server-installing
+        class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
+      >
+        <UiServersServerIcon :image="serverData.image" class="!h-10 !w-10" />
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold"> We're preparing your server! </span>
+          <div class="flex flex-row items-center gap-2">
+            <UiServersPanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
+          </div>
+        </div>
+      </div>
+      <NuxtPage
+        :route="route"
+        :is-connected="isConnected"
+        :is-ws-auth-incorrect="isWSAuthIncorrect"
+        :is-server-running="isServerRunning"
+        :stats="stats"
+        :server-power-state="serverPowerState"
+        :power-state-details="powerStateDetails"
+        :socket="socket"
+        :server="server"
+        @reinstall="onReinstall"
+      />
     </div>
   </div>
 </template>
@@ -487,9 +475,6 @@ const uptimeSeconds = ref(0);
 const firstConnect = ref(true);
 const copied = ref(false);
 const error = ref<Error | null>(null);
-
-// Create a HashMap of running backup tasks. Should include the Backup ID and the task type.
-const runningBackupTasks = ref<Map<string, string>>(new Map());
 
 const initialConsoleMessage = [
   "   __________________________________________________",
@@ -779,50 +764,20 @@ const handleWebSocketMessage = (data: WSEvent) => {
       const curBackup = server.backups?.data.find((backup) => backup.id === data.id);
 
       if (!curBackup) {
-        console.warn(
-          `A backup with ID ${data.id} sent a progress update, but it was not found in the current backups.`,
-        );
+        console.log(`Ignoring backup-progress event for unknown backup: ${data.id}`);
       } else {
         console.log(
           `Handling backup progress for ${curBackup.name} (${data.id}) task: ${data.task} state: ${data.state} progress: ${data.progress}`,
         );
 
-        // If the intial state is done (we don't have it in our running tasks), ignore the event
-        if (data.state === "done" && !runningBackupTasks.value.has(data.id)) {
-          console.warn(
-            `A backup with ID ${data.id} sent a progress update, but it was not found in the current running tasks and it's already done. Ignoring...`,
-          );
-          return;
+        if (!curBackup.task) {
+          curBackup.task = {};
         }
 
-        curBackup.restoring = data.state === "ongoing" && data.task === "restore";
-        curBackup.creating = data.state === "ongoing" && data.task === "create";
-        curBackup.creating_download = data.state === "ongoing" && data.task === "file";
-
-        // If the task is done, remove it from our running tasks and pop a notification
-        if (data.state === "done") {
-          runningBackupTasks.value.delete(data.id);
-          addNotification({
-            title: `Success!`,
-            text: `Your backup ${curBackup.name} has finished ${taskToFriendlyName(data.task).toLocaleLowerCase()} successfully.`,
-            type: "success",
-          });
-
-          // Refresh the backups list
-          server.refresh(["backups"]);
-        } else if (data.state === "failed") {
-          runningBackupTasks.value.delete(data.id);
-          addNotification({
-            title: `Error`,
-            text: `Your backup ${curBackup.name} has failed ${taskToFriendlyName(data.task).toLocaleLowerCase()}.`,
-            type: "error",
-          });
-        }
-
-        // If the task is ongoing, add it to our running tasks
-        if (data.state === "ongoing") {
-          runningBackupTasks.value.set(data.id, data.task);
-        }
+        curBackup.task[data.task] = {
+          progress: data.progress,
+          state: data.state,
+        };
       }
 
       break;

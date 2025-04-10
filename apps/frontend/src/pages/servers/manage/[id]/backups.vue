@@ -1,258 +1,130 @@
 <template>
-  <div class="contents">
-    <div
-      v-if="server.backups?.error"
-      class="flex w-full flex-col items-center justify-center gap-4 p-4"
-    >
-      <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-        <div class="flex flex-col items-center text-center">
-          <div class="flex flex-col items-center gap-4">
-            <div class="grid place-content-center rounded-full bg-bg-orange p-4">
-              <IssuesIcon class="size-12 text-orange" />
-            </div>
-            <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load backups</h1>
+  <div
+    v-if="server.backups?.error"
+    class="flex w-full flex-col items-center justify-center gap-4 p-4"
+  >
+    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="flex flex-col items-center gap-4">
+          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+            <IssuesIcon class="size-12 text-orange" />
           </div>
-          <p class="text-lg text-secondary">
-            We couldn't load your server's backups. Here's what went wrong:
-          </p>
-          <p>
-            <span class="break-all font-mono">{{ JSON.stringify(server.backups.error) }}</span>
-          </p>
-          <ButtonStyled size="large" color="brand" @click="() => server.refresh(['backups'])">
-            <button class="mt-6 !w-full">Retry</button>
-          </ButtonStyled>
+          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load backups</h1>
         </div>
+        <p class="text-lg text-secondary">
+          We couldn't load your server's backups. Here's what went wrong:
+        </p>
+        <p>
+          <span class="break-all font-mono">{{ JSON.stringify(server.backups.error) }}</span>
+        </p>
+        <ButtonStyled size="large" color="brand" @click="() => server.refresh(['backups'])">
+          <button class="mt-6 !w-full">Retry</button>
+        </ButtonStyled>
       </div>
     </div>
-    <div v-else-if="data" class="contents">
-      <LazyUiServersBackupCreateModal
-        ref="createBackupModal"
-        :server="server"
-        @backup-created="handleBackupCreated"
-      />
-      <LazyUiServersBackupRenameModal
-        ref="renameBackupModal"
-        :server="server"
-        :current-backup-id="currentBackup"
-        :backup-name="renameBackupName"
-        @backup-renamed="handleBackupRenamed"
-      />
-      <LazyUiServersBackupRestoreModal
-        ref="restoreBackupModal"
-        :server="server"
-        :backup-id="currentBackup"
-        :backup-name="currentBackupDetails?.name ?? ''"
-        :backup-created-at="currentBackupDetails?.created_at ?? ''"
-        @backup-restored="handleBackupRestored"
-      />
-      <LazyUiServersBackupDeleteModal
-        ref="deleteBackupModal"
-        :server="server"
-        :backup-id="currentBackup"
-        :backup-name="currentBackupDetails?.name ?? ''"
-        :backup-created-at="currentBackupDetails?.created_at ?? ''"
-        @backup-deleted="handleBackupDeleted"
-      />
+  </div>
+  <div v-else-if="data" class="contents">
+    <BackupCreateModal ref="createBackupModal" :server="server" />
+    <BackupRenameModal ref="renameBackupModal" :server="server" />
+    <BackupRestoreModal ref="restoreBackupModal" :server="server" />
+    <BackupDeleteModal ref="deleteBackupModal" :server="server" @delete="deleteBackup" />
+    <BackupSettingsModal ref="backupSettingsModal" :server="server" />
 
-      <LazyUiServersBackupSettingsModal ref="backupSettingsModal" :server="server" />
-
-      <ul class="m-0 flex list-none flex-col gap-4 p-0">
-        <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6 shadow-md">
-          <div class="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-0">
-            <div class="flex flex-col items-baseline gap-2">
-              <div class="text-2xl font-bold text-contrast">
-                {{
-                  data.used_backup_quota === 0
-                    ? "No backups"
-                    : `You've created ${data.used_backup_quota} backup${data.used_backup_quota === 1 ? "" : "s"}`
-                }}
-              </div>
-              <div>
-                {{
-                  data.backup_quota - data.used_backup_quota === 0
-                    ? "You have reached your backup limit. Consider removing old backups to create new ones."
-                    : `You can create ${data.backup_quota - data.used_backup_quota} more backups for your server.`
-                }}
-              </div>
-            </div>
-            <div class="flex w-full flex-col gap-2 sm:w-fit sm:flex-row">
-              <ButtonStyled type="standard">
-                <button
-                  :disabled="server.general?.status === 'installing'"
-                  @click="showbackupSettingsModal"
-                >
-                  <SettingsIcon class="h-5 w-5" />
-                  Auto backups
-                </button>
-              </ButtonStyled>
-              <ButtonStyled type="standard" color="brand">
-                <button
-                  v-tooltip="
-                    isServerRunning && !userPreferences.backupWhileRunning
-                      ? 'Cannot create backup while server is running. You can disable this from your server Options > Preferences.'
-                      : server.general?.status === 'installing'
-                        ? 'Cannot create backups while server is being installed'
-                        : ''
-                  "
-                  class="w-full sm:w-fit"
-                  :disabled="
-                    (isServerRunning && !userPreferences.backupWhileRunning) ||
-                    data.used_backup_quota >= data.backup_quota ||
-                    backups.some((backup) => backup.ongoing) ||
-                    server.general?.status === 'installing'
-                  "
-                  @click="showCreateModel"
-                >
-                  <PlusIcon class="h-5 w-5" />
-                  Create backup
-                </button>
-              </ButtonStyled>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex w-full flex-col gap-2">
-          <li
-            v-for="(backup, index) in backups"
-            :key="backup.id"
-            class="relative m-0 w-full list-none rounded-2xl bg-bg-raised p-2 shadow-md"
+    <div class="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <h1 class="m-0 text-2xl font-extrabold text-contrast">Backups</h1>
+          <TagItem
+            v-tooltip="`${data.backup_quota - data.used_backup_quota} backup slots remaining`"
+            class="cursor-help"
+            :style="{
+              '--_color':
+                data.backup_quota <= data.used_backup_quota
+                  ? 'var(--color-red)'
+                  : data.backup_quota - data.used_backup_quota <= 3
+                    ? 'var(--color-orange)'
+                    : undefined,
+              '--_bg-color':
+                data.backup_quota <= data.used_backup_quota
+                  ? 'var(--color-red-bg)'
+                  : data.backup_quota - data.used_backup_quota <= 3
+                    ? 'var(--color-orange-bg)'
+                    : undefined,
+            }"
           >
-            <div class="flex flex-col gap-4">
-              <div class="flex items-center justify-between">
-                <div class="flex min-w-0 flex-row items-center gap-4">
-                  <div class="flex min-w-0 flex-col gap-2">
-                    <div class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
-                      <div
-                        class="grid size-14 shrink-0 place-content-center overflow-hidden rounded-xl border-[1px] border-solid border-button-border shadow-sm"
-                      >
-                        <LockIcon v-if="backup.locked" class="size-8" />
-                        <BoxIcon v-else class="size-8" />
-                      </div>
-
-                      <div class="max-w-full truncate font-bold text-contrast">
-                        {{ backup.name }}
-                      </div>
-
-                      <div
-                        v-if="index == 0"
-                        class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
-                      >
-                        <CheckIcon class="size-4" /> Latest
-                      </div>
-
-                      <div
-                        v-if="backup.creating"
-                        class="hidden items-center gap-1 rounded-full bg-bg-green p-1 px-1.5 text-xs font-semibold text-brand sm:flex"
-                      >
-                        <UiServersIconsLoadingIcon class="size-4 animate-spin" />
-                        Creating
-                      </div>
-
-                      <div
-                        v-if="backup.restoring"
-                        class="flex items-center gap-1 rounded-full bg-bg-orange p-1 px-1.5 text-xs font-semibold text-contrast"
-                      >
-                        <UiServersIconsLoadingIcon class="size-4 animate-spin" />
-                        Restoring
-                      </div>
-
-                      <div
-                        v-if="backup.creating_download"
-                        class="flex items-center gap-1 rounded-full bg-bg-orange p-1 px-1.5 text-xs font-semibold text-contrast"
-                      >
-                        <UiServersIconsLoadingIcon class="size-4 animate-spin" />
-                        Preparing download
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-1 text-xs">
-                      <CalendarIcon class="size-4" />
-                      {{
-                        new Date(backup.created_at).toLocaleString("en-US", {
-                          month: "numeric",
-                          day: "numeric",
-                          year: "2-digit",
-                          hour: "numeric",
-                          minute: "numeric",
-                          hour12: true,
-                        })
-                      }}
-                    </div>
-                  </div>
-                </div>
-                <ButtonStyled v-if="!backup.ongoing" circular type="transparent">
-                  <UiServersTeleportOverflowMenu
-                    direction="left"
-                    position="bottom"
-                    class="bg-transparent"
-                    :disabled="backups.some((b) => b.ongoing)"
-                    :options="[
-                      {
-                        id: 'rename',
-                        action: () => {
-                          renameBackupName = backup.name;
-                          currentBackup = backup.id;
-                          renameBackupModal?.show();
-                        },
-                      },
-                      {
-                        id: 'restore',
-                        action: () => {
-                          currentBackup = backup.id;
-                          restoreBackupModal?.show();
-                        },
-                      },
-                      { id: 'download', action: () => initiateDownload(backup.id) },
-                      {
-                        id: 'lock',
-                        action: () => {
-                          if (backup.locked) {
-                            unlockBackup(backup.id);
-                          } else {
-                            lockBackup(backup.id);
-                          }
-                        },
-                      },
-                      {
-                        id: 'delete',
-                        action: () => {
-                          currentBackup = backup.id;
-                          deleteBackupModal?.show();
-                        },
-                        color: 'red',
-                      },
-                    ]"
-                  >
-                    <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-                    <template #rename> <EditIcon /> Rename </template>
-                    <template #restore> <ClipboardCopyIcon /> Restore </template>
-                    <template v-if="backup.locked" #lock> <LockOpenIcon /> Unlock </template>
-                    <template v-else #lock> <LockIcon /> Lock </template>
-                    <template #download> <DownloadIcon /> Download </template>
-                    <template #delete> <TrashIcon /> Delete </template>
-                  </UiServersTeleportOverflowMenu>
-                </ButtonStyled>
-              </div>
-            </div>
-          </li>
+            {{ data.used_backup_quota }} / {{ data.backup_quota }}
+          </TagItem>
         </div>
-      </ul>
-
+        <p class="m-0">
+          You can have up to {{ data.backup_quota }} backups at once, securely off-site with
+          Backblaze.
+        </p>
+      </div>
       <div
-        class="over-the-top-download-animation"
-        :class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
+        class="grid w-full grid-cols-[repeat(auto-fit,_minmax(180px,1fr))] gap-2 sm:flex sm:w-fit sm:flex-row"
       >
-        <div>
-          <div
-            class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
-          ></div>
-          <div
-            class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
-          ></div>
-          <div
-            class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
+        <ButtonStyled type="standard">
+          <button
+            :disabled="server.general?.status === 'installing'"
+            @click="showbackupSettingsModal"
           >
-            <DownloadIcon class="h-20 w-20 text-contrast" />
-          </div>
+            <SettingsIcon class="h-5 w-5" />
+            Auto backups
+          </button>
+        </ButtonStyled>
+        <ButtonStyled type="standard" color="brand">
+          <button
+            v-tooltip="backupCreationDisabled"
+            class="w-full sm:w-fit"
+            :disabled="!!backupCreationDisabled"
+            @click="showCreateModel"
+          >
+            <PlusIcon class="h-5 w-5" />
+            Create backup
+          </button>
+        </ButtonStyled>
+      </div>
+    </div>
+
+    <div class="flex w-full flex-col gap-2">
+      <BackupItem
+        v-for="backup in backups"
+        :key="`backup-${backup.id}`"
+        :backup="backup"
+        @download="() => initiateDownload(backup.id)"
+        @rename="() => renameBackupModal?.show(backup)"
+        @restore="() => restoreBackupModal?.show(backup)"
+        @lock="
+          () => {
+            if (backup.locked) {
+              unlockBackup(backup.id);
+            } else {
+              lockBackup(backup.id);
+            }
+          }
+        "
+        @delete="
+          (skipConfirmation?: boolean) =>
+            !skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
+        "
+      />
+    </div>
+
+    <div
+      class="over-the-top-download-animation"
+      :class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
+    >
+      <div>
+        <div
+          class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+        ></div>
+        <div
+          class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+        ></div>
+        <div
+          class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
+        >
+          <DownloadIcon class="h-20 w-20 text-contrast" />
         </div>
       </div>
     </div>
@@ -260,30 +132,21 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { ButtonStyled, TagItem } from "@modrinth/ui";
 import { useStorage } from "@vueuse/core";
-import {
-  PlusIcon,
-  CheckIcon,
-  CalendarIcon,
-  MoreHorizontalIcon,
-  EditIcon,
-  ClipboardCopyIcon,
-  DownloadIcon,
-  TrashIcon,
-  SettingsIcon,
-  BoxIcon,
-  LockIcon,
-  LockOpenIcon,
-  IssuesIcon,
-} from "@modrinth/assets";
+import { PlusIcon, DownloadIcon, SettingsIcon, IssuesIcon } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
+import BackupItem from "~/components/ui/servers/BackupItem.vue";
+import BackupRenameModal from "~/components/ui/servers/BackupRenameModal.vue";
+import BackupCreateModal from "~/components/ui/servers/BackupCreateModal.vue";
+import BackupRestoreModal from "~/components/ui/servers/BackupRestoreModal.vue";
+import BackupDeleteModal from "~/components/ui/servers/BackupDeleteModal.vue";
+import BackupSettingsModal from "~/components/ui/servers/BackupSettingsModal.vue";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
   isServerRunning: boolean;
-  backupTasks: Map<string, string>;
 }>();
 
 const route = useNativeRoute();
@@ -310,19 +173,30 @@ useHead({
 
 const overTheTopDownloadAnimation = ref();
 
-const createBackupModal = ref<typeof NewModal>();
-const renameBackupModal = ref<typeof NewModal>();
-const restoreBackupModal = ref<typeof NewModal>();
-const deleteBackupModal = ref<typeof NewModal>();
-const backupSettingsModal = ref<typeof NewModal>();
+const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>();
+const renameBackupModal = ref<InstanceType<typeof BackupRenameModal>>();
+const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>();
+const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>();
+const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>();
 
-const renameBackupName = ref("");
-const currentBackup = ref("");
-
-const refreshInterval = ref<ReturnType<typeof setInterval>>();
-
-const currentBackupDetails = computed(() => {
-  return backups.value.find((backup) => backup.id === currentBackup.value);
+const backupCreationDisabled = computed(() => {
+  if (props.isServerRunning && !userPreferences.value.backupWhileRunning) {
+    return "Cannot create backup while server is running";
+  }
+  if (
+    data.value?.used_backup_quota !== undefined &&
+    data.value?.backup_quota !== undefined &&
+    data.value?.used_backup_quota >= data.value?.backup_quota
+  ) {
+    return `All ${data.value.backup_quota} of your backup slots are in use`;
+  }
+  if (backups.value.some((backup) => backup.task?.create?.state === "ongoing")) {
+    return "A backup is already in progress";
+  }
+  if (props.server.general?.status === "installing") {
+    return "Cannot create backup while server is installing";
+  }
+  return undefined;
 });
 
 const showCreateModel = () => {
@@ -333,57 +207,12 @@ const showbackupSettingsModal = () => {
   backupSettingsModal.value?.show();
 };
 
-const handleBackupCreated = async (payload: { success: boolean; message: string }) => {
-  if (payload.success) {
-    addNotification({ type: "success", text: payload.message });
-    await props.server.refresh(["backups"]);
-  } else {
-    addNotification({ type: "error", text: payload.message });
-  }
-};
-
-const handleBackupRenamed = async (payload: { success: boolean; message: string }) => {
-  if (payload.success) {
-    addNotification({ type: "success", text: payload.message });
-    await props.server.refresh(["backups"]);
-  } else {
-    addNotification({ type: "error", text: payload.message });
-  }
-};
-
-const handleBackupRestored = async (payload: { success: boolean; message: string }) => {
-  if (payload.success) {
-    addNotification({ type: "success", text: payload.message });
-    await props.server.refresh(["backups"]);
-  } else {
-    addNotification({ type: "error", text: payload.message });
-  }
-};
-
-const handleBackupDeleted = async (payload: { success: boolean; message: string }) => {
-  if (payload.success) {
-    addNotification({ type: "success", text: payload.message });
-    await props.server.refresh(["backups"]);
-  } else {
-    addNotification({ type: "error", text: payload.message });
-  }
-};
-
 function triggerDownloadAnimation() {
   overTheTopDownloadAnimation.value = true;
   setTimeout(() => (overTheTopDownloadAnimation.value = false), 500);
 }
 
 const initiateDownload = async (backupId: string) => {
-  // If another backup is preparing, do not allow another download, or a backup task of type "file" is already in progress
-  if (
-    backups.value.some((backup) => backup.creating_download) ||
-    [...props.backupTasks.values()].some((task) => task.includes("file"))
-  ) {
-    addNotification({ type: "error", text: "A backup is already preparing for download." });
-    return;
-  }
-
   addNotification({
     type: "success",
     title: "Preparing download",
@@ -419,14 +248,6 @@ const initiateDownload = async (backupId: string) => {
   // }
 };
 
-const onPrepareComplete = (id: string) => {
-  addNotification({
-    type: "success",
-    title: "Prepare complete",
-    text: "Your backup is ready for download. Your download will start momentarily.",
-  });
-};
-
 const lockBackup = async (backupId: string) => {
   try {
     await props.server.backups?.lock(backupId);
@@ -445,45 +266,28 @@ const unlockBackup = async (backupId: string) => {
   }
 };
 
-onMounted(() => {
-  watchEffect(() => {
-    const hasOngoingBackups = backups.value.some((backup) => backup.creating);
-
-    if (refreshInterval.value) {
-      clearInterval(refreshInterval.value);
-      refreshInterval.value = undefined;
-    }
-
-    if (hasOngoingBackups) {
-      refreshInterval.value = setInterval(async () => {
-        await props.server.refresh(["backups"]);
-      }, 10000);
-    }
-  });
-
-  // Watch the backup tasks for changes
-  watch(
-    () => props.backupTasks,
-    (oldTasks, newTasks) => {
-      // Check if a task has completed (deleted) from the map
-      if (oldTasks.size > newTasks.size) {
-        // Grab the first task that was removed with type file in the string
-        const completedTask = [...oldTasks].find(
-          ([key, value]) => !newTasks.has(key) && value.includes("file"),
-        );
-        if (completedTask) {
-          onPrepareComplete(completedTask[0]);
-        }
-      }
-    },
-  );
-});
-
-onUnmounted(() => {
-  if (refreshInterval.value) {
-    clearInterval(refreshInterval.value);
+async function deleteBackup(backup?: Backup) {
+  if (!backup) {
+    addNotification({
+      type: "error",
+      title: "Error deleting backup",
+      text: "Backup is null",
+    });
+    return;
   }
-});
+
+  try {
+    await props.server.backups?.delete(backup.id);
+    await props.server.refresh();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    addNotification({
+      type: "error",
+      title: "Error deleting backup",
+      text: message,
+    });
+  }
+}
 </script>
 
 <style scoped>

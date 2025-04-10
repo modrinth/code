@@ -212,12 +212,15 @@ export interface WSNewModEvent {
   event: "new-mod";
 }
 
+export type WSBackupTask = "file" | "create" | "restore";
+export type WSBackupState = "ongoing" | "done" | "failed" | "cancelled" | "unchanged";
+
 export interface WSBackupProgressEvent {
   event: "backup-progress";
-  task: "file" | "create" | "restore";
+  task: WSBackupTask;
   id: string;
   progress: number; // percentage
-  state: "done" | "pending" | "ongoing" | "failed";
+  state: WSBackupState;
   ready: boolean;
 }
 
