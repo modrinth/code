@@ -37,7 +37,9 @@ const props = withDefaults(
 );
 
 const backupQueued = computed(
-  () => props.backup.task?.create?.progress === 0 || props.backup.ongoing,
+  () =>
+    props.backup.task?.create?.progress === 0 ||
+    (props.backup.ongoing && !props.backup.task?.create),
 );
 const automated = computed(() => props.backup.automated);
 const failedToCreate = computed(() => props.backup.interrupted);

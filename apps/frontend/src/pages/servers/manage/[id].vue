@@ -778,6 +778,8 @@ const handleWebSocketMessage = (data: WSEvent) => {
           progress: data.progress,
           state: data.state,
         };
+
+        curBackup.ongoing = data.task === "create" && data.state === "ongoing";
       }
 
       break;
