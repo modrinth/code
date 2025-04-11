@@ -23,7 +23,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone, Copy)]
 pub enum MinecraftAuthStep {
     GetDeviceToken,
-    SisuAuthenicate,
+    SisuAuthenticate,
     GetOAuthToken,
     RefreshOAuthToken,
     SisuAuthorize,
@@ -639,7 +639,7 @@ async fn sisu_authenticate(
           "TitleId": "1794566092",
         }),
         key,
-        MinecraftAuthStep::SisuAuthenicate,
+        MinecraftAuthStep::SisuAuthenticate,
         current_date,
     )
     .await?;
@@ -967,7 +967,7 @@ async fn minecraft_entitlements(
             .bearer_auth(token)
             .send()
     })
-        .await.map_err(|source| MinecraftAuthenticationError::Request { source, step: MinecraftAuthStep::MinecraftEntitlements })?;
+    .await.map_err(|source| MinecraftAuthenticationError::Request { source, step: MinecraftAuthStep::MinecraftEntitlements })?;
 
     let status = res.status();
     let text = res.text().await.map_err(|source| {
