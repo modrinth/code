@@ -655,7 +655,7 @@ pub async fn launch_minecraft(
     if std::env::var("CARGO").is_ok() {
         command.env_remove("DYLD_FALLBACK_LIBRARY_PATH");
     }
-    // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwites them)
+    // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwrites them)
     command.env_remove("_JAVA_OPTIONS");
 
     command.envs(env_args);
