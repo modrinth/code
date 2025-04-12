@@ -78,7 +78,7 @@ pub async fn import_curseforge(
         let icon_bytes =
             fetch(&thumbnail_url, None, &state.fetch_semaphore, &state.pool)
                 .await?;
-        let filename = thumbnail_url.rsplit('/').last();
+        let filename = thumbnail_url.rsplit('/').next_back();
         if let Some(filename) = filename {
             icon = Some(
                 write_cached_icon(
