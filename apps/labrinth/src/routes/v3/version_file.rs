@@ -155,7 +155,7 @@ pub async fn get_update_from_hash(
             database::models::Project::get_id(file.project_id, &**pool, &redis)
                 .await?
         {
-            let versions = database::models::Version::get_many(
+            let mut versions = database::models::Version::get_many(
                 &project.versions,
                 &**pool,
                 &redis,
@@ -191,7 +191,7 @@ pub async fn get_update_from_hash(
             })
             .sorted();
 
-            if let Some(first) = versions.last() {
+            if let Some(first) = versions.next_back() {
                 if !is_visible_version(
                     &first.inner,
                     &user_option,
@@ -523,7 +523,7 @@ pub async fn update_individual_files(
                             bool
                         })
                         .sorted()
-                        .last();
+                        .next_back();
 
                     if let Some(version) = version {
                         if is_visible_version(
