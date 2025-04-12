@@ -19,6 +19,8 @@ use std::path::PathBuf;
 use tokio::sync::Semaphore;
 use uuid::Uuid;
 
+use super::MinecraftProfile;
+
 pub async fn migrate_legacy_data<'a, E>(exec: E) -> crate::Result<()>
 where
     E: sqlx::Executor<'a, Database = sqlx::Sqlite> + Copy,
@@ -117,13 +119,16 @@ where
         .await
         {
             let minecraft_users_len = minecraft_auth.users.len();
-            for (uuid, credential) in minecraft_auth.users {
+            for (uuid, legacy_credentials) in minecraft_auth.users {
                 Credentials {
-                    id: credential.id,
-                    username: credential.username,
-                    access_token: credential.access_token,
-                    refresh_token: credential.refresh_token,
-                    expires: credential.expires,
+                    offline_profile: MinecraftProfile {
+                        id: legacy_credentials.id,
+                        name: legacy_credentials.username,
+                        ..MinecraftProfile::default()
+                    },
+                    access_token: legacy_credentials.access_token,
+                    refresh_token: legacy_credentials.refresh_token,
+                    expires: legacy_credentials.expires,
                     active: minecraft_auth.default_user == Some(uuid)
                         || minecraft_users_len == 1,
                 }

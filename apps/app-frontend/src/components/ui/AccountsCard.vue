@@ -10,12 +10,12 @@
       size="36px"
       :src="
         selectedAccount
-          ? `https://mc-heads.net/avatar/${selectedAccount.id}/128`
+          ? `https://mc-heads.net/avatar/${selectedAccount.profile.id}/128`
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
     <div class="flex flex-col w-full">
-      <span>{{ selectedAccount ? selectedAccount.username : 'Select account' }}</span>
+      <span>{{ selectedAccount ? selectedAccount.profile.name : 'Select account' }}</span>
       <span class="text-secondary text-xs">Minecraft account</span>
     </div>
     <DropdownIcon class="w-5 h-5 shrink-0" />
@@ -28,12 +28,12 @@
       :class="{ expanded: mode === 'expanded', isolated: mode === 'isolated' }"
     >
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="`https://mc-heads.net/avatar/${selectedAccount.id}/128`" />
+        <Avatar size="xs" :src="`https://mc-heads.net/avatar/${selectedAccount.profile.id}/128`" />
         <div>
-          <h4>{{ selectedAccount.username }}</h4>
+          <h4>{{ selectedAccount.profile.name }}</h4>
           <p>Selected</p>
         </div>
-        <Button v-tooltip="'Log out'" icon-only color="raised" @click="logout(selectedAccount.id)">
+        <Button v-tooltip="'Log out'" icon-only color="raised" @click="logout(selectedAccount.profile.id)">
           <TrashIcon />
         </Button>
       </div>
@@ -44,12 +44,12 @@
         </Button>
       </div>
       <div v-if="displayAccounts.length > 0" class="account-group">
-        <div v-for="account in displayAccounts" :key="account.id" class="account-row">
+        <div v-for="account in displayAccounts" :key="account.profile.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
-            <Avatar :src="`https://mc-heads.net/avatar/${account.id}/128`" class="icon" />
-            <p>{{ account.username }}</p>
+            <Avatar :src="`https://mc-heads.net/avatar/${account.profile.id}/128`" class="icon" />
+            <p>{{ account.profile.name }}</p>
           </Button>
-          <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
+          <Button v-tooltip="'Log out'" icon-only @click="logout(account.profile.id)">
             <TrashIcon />
           </Button>
         </div>
@@ -101,16 +101,16 @@ defineExpose({
 await refreshValues()
 
 const displayAccounts = computed(() =>
-  accounts.value.filter((account) => defaultUser.value !== account.id),
+  accounts.value.filter((account) => defaultUser.value !== account.profile.id),
 )
 
 const selectedAccount = computed(() =>
-  accounts.value.find((account) => account.id === defaultUser.value),
+  accounts.value.find((account) => account.profile.id === defaultUser.value),
 )
 
 async function setAccount(account) {
-  defaultUser.value = account.id
-  await set_default_user(account.id).catch(handleError)
+  defaultUser.value = account.profile.id
+  await set_default_user(account.profile.id).catch(handleError)
   emit('change')
 }
 

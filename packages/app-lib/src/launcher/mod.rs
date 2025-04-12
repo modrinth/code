@@ -645,7 +645,8 @@ pub async fn launch_minecraft(
                 *resolution,
                 &java_version.architecture,
                 quick_play_type,
-            )?
+            )
+            .await?
             .into_iter(),
         )
         .current_dir(instance_path.clone());
