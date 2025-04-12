@@ -33,7 +33,12 @@
           <h4>{{ selectedAccount.profile.name }}</h4>
           <p>Selected</p>
         </div>
-        <Button v-tooltip="'Log out'" icon-only color="raised" @click="logout(selectedAccount.profile.id)">
+        <Button
+          v-tooltip="'Log out'"
+          icon-only
+          color="raised"
+          @click="logout(selectedAccount.profile.id)"
+        >
           <TrashIcon />
         </Button>
       </div>
