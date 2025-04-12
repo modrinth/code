@@ -602,7 +602,8 @@ pub async fn launch_minecraft(
                 &version.type_,
                 *resolution,
                 &java_version.architecture,
-            )?
+            )
+            .await?
             .into_iter()
             .collect::<Vec<_>>(),
         )
