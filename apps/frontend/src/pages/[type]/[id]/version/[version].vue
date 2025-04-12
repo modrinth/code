@@ -424,10 +424,6 @@
           <h4>Modrinth Maven</h4>
           <div class="maven-section">
             <CopyCode :text="`maven.modrinth:${project.slug}:${version.id}`" />
-            <a href="https://support.modrinth.com/en/articles/8801191-modrinth-maven" target="_blank"
-              rel="noopener noreferrer" class="info-link">
-              <LinkIcon aria-hidden="true" />
-            </a>
           </div>
         </div>
       </div>
@@ -1354,21 +1350,6 @@ export default defineNuxtComponent({
     display: flex;
     align-items: center;
     gap: 0.5rem;
-
-    .info-link {
-      display: inline-flex;
-      color: var(--color-text-secondary);
-      transition: color 0.2s ease;
-
-      &:hover {
-        color: var(--color-brand);
-      }
-
-      svg {
-        width: 1rem;
-        height: 1rem;
-      }
-    }
   }
 
   .team-member {
