@@ -108,7 +108,6 @@
 </template>
 
 <script setup>
-import { formatProjectType } from "~/plugins/shorthands.js";
 import {
   ChevronRightIcon,
   CheckIcon,
@@ -117,7 +116,9 @@ import {
   LightBulbIcon,
   SendIcon,
   ScaleIcon,
+  DropdownIcon,
 } from "@modrinth/assets";
+import { formatProjectType } from "~/plugins/shorthands.js";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 
 const props = defineProps({
