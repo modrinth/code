@@ -7,11 +7,13 @@ on:
     paths:
       - .github/workflows/daedalus-docker.yml
       - 'apps/daedalus_client/**'
+      - 'packages/daedalus/**'
   pull_request:
     types: [opened, synchronize]
     paths:
       - .github/workflows/daedalus-docker.yml
       - 'apps/daedalus_client/**'
+      - 'packages/daedalus/**'
   merge_group:
     types: [checks_requested]
 

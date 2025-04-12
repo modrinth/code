@@ -19,6 +19,7 @@ const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
 
 #[derive(Clone)]
 pub struct RedisPool {
+    pub url: String,
     pub pool: deadpool_redis::Pool,
     meta_namespace: String,
 }
@@ -33,23 +34,23 @@ impl RedisPool {
     // testing pool uses a hashmap to mimic redis behaviour for very small data sizes (ie: tests)
     // PANICS: production pool will panic if redis url is not set
     pub fn new(meta_namespace: Option<String>) -> Self {
-        let redis_pool = Config::from_url(
-            dotenvy::var("REDIS_URL").expect("Redis URL not set"),
-        )
-        .builder()
-        .expect("Error building Redis pool")
-        .max_size(
-            dotenvy::var("REDIS_MAX_CONNECTIONS")
-                .ok()
-                .and_then(|x| x.parse().ok())
-                .unwrap_or(10000),
-        )
-        .runtime(Runtime::Tokio1)
-        .build()
-        .expect("Redis connection failed");
+        let url = dotenvy::var("REDIS_URL").expect("Redis URL not set");
+        let pool = Config::from_url(url.clone())
+            .builder()
+            .expect("Error building Redis pool")
+            .max_size(
+                dotenvy::var("REDIS_MAX_CONNECTIONS")
+                    .ok()
+                    .and_then(|x| x.parse().ok())
+                    .unwrap_or(10000),
+            )
+            .runtime(Runtime::Tokio1)
+            .build()
+            .expect("Redis connection failed");
 
         RedisPool {
-            pool: redis_pool,
+            url,
+            pool,
             meta_namespace: meta_namespace.unwrap_or("".to_string()),
         }
     }

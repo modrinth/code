@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="landing-hero">
-      <ModrinthIcon class="modrinth-icon" />
+      <ModrinthIcon class="modrinth-icon text-brand" />
       <h1 class="main-header">
         The place for Minecraft
         <div class="animate-strong">
@@ -24,7 +24,10 @@
       </h2>
       <div class="button-group">
         <ButtonStyled color="brand" size="large">
-          <nuxt-link to="/mods"> <CompassIcon aria-hidden="true" /> Discover mods </nuxt-link>
+          <nuxt-link to="/mods">
+            <CompassIcon aria-hidden="true" />
+            Discover mods
+          </nuxt-link>
         </ButtonStyled>
         <ButtonStyled size="large" type="outlined">
           <nuxt-link v-if="!auth.user" to="/auth/sign-up" rel="noopener nofollow">
@@ -39,7 +42,7 @@
       </div>
     </div>
     <div class="users-section-outer">
-      <div class="projects-showcase">
+      <div v-if="rows" class="projects-showcase">
         <div v-for="(row, index) in rows" :key="index" class="row">
           <div v-for="n in 2" :key="n" class="row__content" :class="{ offset: index % 2 }">
             <nuxt-link
@@ -60,6 +63,9 @@
             </nuxt-link>
           </div>
         </div>
+      </div>
+      <div v-else class="relative z-[10] w-full text-center text-xl font-bold text-contrast">
+        Failed to load random projects :(
       </div>
       <div class="projects-transition" />
       <div class="users-section">
@@ -194,8 +200,8 @@
             <p>
               Modrinth's open-source API lets launchers add deep integration with Modrinth. You can
               use Modrinth through
-              <nuxt-link class="title-link" to="/app">our own app</nuxt-link> and some of the most
-              popular launchers like ATLauncher, MultiMC, and Prism Launcher.
+              <nuxt-link class="title-link" to="/app">our own app</nuxt-link>
+              and some of the most popular launchers like ATLauncher, MultiMC, and Prism Launcher.
             </p>
           </div>
           <div class="blob-demonstration gradient-border">
@@ -222,7 +228,11 @@
                 >
                   <PrismLauncherLogo aria-hidden="true" />
                 </a>
-                <nuxt-link to="/app" class="graphic gradient-border" aria-label="Modrinth App">
+                <nuxt-link
+                  to="/app"
+                  class="graphic gradient-border text-brand"
+                  aria-label="Modrinth App"
+                >
                   <ModrinthIcon aria-hidden="true" />
                 </nuxt-link>
                 <a
@@ -518,10 +528,15 @@
 <script setup>
 import { Multiselect } from "vue-multiselect";
 import { ButtonStyled } from "@modrinth/ui";
-import { CompassIcon, LogInIcon, DashboardIcon, NewspaperIcon } from "@modrinth/assets";
-import SearchIcon from "~/assets/images/utils/search.svg?component";
-import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
-import ModrinthIcon from "~/assets/images/logo.svg?component";
+import {
+  CompassIcon,
+  LogInIcon,
+  DashboardIcon,
+  NewspaperIcon,
+  SearchIcon,
+  CalendarIcon,
+  ModrinthIcon,
+} from "@modrinth/assets";
 import PrismLauncherLogo from "~/assets/images/external/prism.svg?component";
 import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
 import Avatar from "~/components/ui/Avatar.vue";
@@ -535,23 +550,27 @@ const sortType = ref("relevance");
 const auth = await useAuth();
 const tags = useTags();
 
-const newProjects = homePageProjects.slice(0, 40);
-const val = Math.ceil(newProjects.length / 3);
-const rows = ref([
-  newProjects.slice(0, val),
-  newProjects.slice(val, val * 2),
-  newProjects.slice(val * 2, val * 3),
-]);
+const newProjects = homePageProjects?.slice(0, 40);
+const val = Math.ceil(newProjects?.length / 3);
+const rows = ref(
+  newProjects.length > 0
+    ? [
+        newProjects.slice(0, val),
+        newProjects.slice(val, val * 2),
+        newProjects.slice(val * 2, val * 3),
+      ]
+    : undefined,
+);
 
-const notifications = ref(homePageNotifs.hits ?? []);
-const searchProjects = ref(homePageSearch.hits ?? []);
+const notifications = ref(homePageNotifs?.hits ?? []);
+const searchProjects = ref(homePageSearch?.hits ?? []);
 
 async function updateSearchProjects() {
   const res = await useBaseFetch(
     `search?limit=3&query=${searchQuery.value}&index=${sortType.value}`,
   );
 
-  searchProjects.value = res.hits ?? [];
+  searchProjects.value = res?.hits ?? [];
 }
 </script>
 
@@ -1112,6 +1131,7 @@ async function updateSearchProjects() {
       background: var(--landing-green-label-bg);
       color: var(--landing-green-label);
     }
+
     &.blue {
       background: var(--landing-blue-label-bg);
       color: var(--landing-blue-label);
@@ -1228,6 +1248,7 @@ async function updateSearchProjects() {
           h3 {
             font-size: 3rem;
           }
+
           p {
             font-size: 1.5rem;
           }
@@ -1295,6 +1316,7 @@ async function updateSearchProjects() {
           h3 {
             font-size: 4rem;
           }
+
           p {
             font-size: 1.625rem;
           }

@@ -189,8 +189,8 @@ impl ChargeType {
     pub fn as_str(&self) -> &'static str {
         match self {
             ChargeType::OneTime => "one-time",
-            ChargeType::Subscription { .. } => "subscription",
-            ChargeType::Proration { .. } => "proration",
+            ChargeType::Subscription => "subscription",
+            ChargeType::Proration => "proration",
             ChargeType::Refund => "refund",
         }
     }

@@ -1823,7 +1823,7 @@ components:
           description: Number of projects on Modrinth
         versions:
           type: integer
-          description: Number of projects on Modrinth
+          description: Number of versions on Modrinth
         files:
           type: integer
           description: Number of version files on Modrinth

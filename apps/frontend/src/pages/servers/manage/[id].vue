@@ -381,8 +381,6 @@
           @reinstall="onReinstall"
         />
       </div>
-
-      <UiServersPoweredByPyro />
     </div>
   </div>
 </template>

@@ -47,11 +47,9 @@
     </template>
   </span>
 </template>
+
 <script setup>
-import InfoIcon from "~/assets/images/utils/info.svg?component";
-import ClientIcon from "~/assets/images/utils/client.svg?component";
-import GlobeIcon from "~/assets/images/utils/globe.svg?component";
-import ServerIcon from "~/assets/images/utils/server.svg?component";
+import { InfoIcon, ClientIcon, GlobeIcon, ServerIcon } from "@modrinth/assets";
 
 defineProps({
   type: {
@@ -99,6 +97,7 @@ const tags = useTags();
   display: flex;
   color: var(--color-text) !important;
   font-weight: bold;
+
   svg {
     margin-right: 0.2rem;
   }
