@@ -22,6 +22,13 @@ const assignedNodes = computed(() => assigned.value.filter((n) => n.kind === "no
 
 const inputField = ref("");
 
+async function refresh() {
+  await usePyroFetch("notices").then((res) => {
+    const notices = res as ServerNoticeType[];
+    assigned.value = notices.find((n) => n.id === notice.value?.id)?.assigned ?? [];
+  });
+}
+
 async function assign(server: boolean = true) {
   const input = inputField.value.trim();
 
@@ -44,10 +51,7 @@ async function assign(server: boolean = true) {
       type: "error",
     });
   }
-  await usePyroFetch("notices").then((res) => {
-    const notices = res as ServerNoticeType[];
-    assigned.value = notices.find((n) => n.id === notice.value?.id)?.assigned ?? [];
-  });
+  await refresh();
 }
 
 async function unassignDetect() {
@@ -82,6 +86,7 @@ async function unassign(id: string, server: boolean = true) {
       });
     });
   }
+  await refresh();
 }
 
 function show(currentNotice: ServerNoticeType) {
