@@ -659,6 +659,18 @@ impl User {
 
             sqlx::query!(
                 "
+                UPDATE charges
+                SET user_id = $1
+                WHERE user_id = $2
+                ",
+                deleted_user as UserId,
+                id as UserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
                 DELETE FROM user_backup_codes
                 WHERE user_id = $1
                 ",
