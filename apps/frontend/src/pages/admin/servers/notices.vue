@@ -47,7 +47,6 @@
           id="scheduled-date"
           v-model="newNoticeScheduledDate"
           type="datetime-local"
-          maxlength="128"
           autocomplete="off"
         />
       </div>
@@ -60,7 +59,6 @@
           id="expiration-date"
           v-model="newNoticeExpiresDate"
           type="datetime-local"
-          maxlength="128"
           autocomplete="off"
         />
       </div>
