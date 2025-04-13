@@ -959,6 +959,33 @@
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
   },
+  "servers.notice.actions": {
+    "message": "Actions"
+  },
+  "servers.notice.begins": {
+    "message": "Begins"
+  },
+  "servers.notice.dismissable": {
+    "message": "Dismissable"
+  },
+  "servers.notice.expires": {
+    "message": "Expires"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Level"
+  },
+  "servers.notice.undismissable": {
+    "message": "Undismissable"
+  },
+  "servers.notices.create-notice": {
+    "message": "Create notice"
+  },
+  "servers.notices.no-notices": {
+    "message": "No notices"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Cancel subscription"
   },

@@ -1,6 +1,20 @@
 <template>
   <div class="contents">
     <div
+      v-if="serverData?.notices && serverData.notices.length > 0"
+      class="experimental-styles-within relative mx-auto flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
+    >
+      <ServerNotice
+        v-for="notice in serverData?.notices"
+        :key="`notice-${notice.id}`"
+        :level="notice.level"
+        :message="notice.message"
+        :dismissable="notice.dismissable"
+        class="w-full"
+        @dismiss="() => dismissNotice(notice.id)"
+      />
+    </div>
+    <div
       v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
@@ -398,11 +412,14 @@ import {
   LockIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import { reloadNuxtApp, navigateTo } from "#app";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
+import { usePyroFetch } from "~/composables/pyroFetch.ts";
+
+const app = useNuxtApp() as unknown as { $notify: any };
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
@@ -926,6 +943,20 @@ const cleanup = () => {
 
   DOMPurify.removeHook("afterSanitizeAttributes");
 };
+
+async function dismissNotice(noticeId: number) {
+  await usePyroFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
+    method: "POST",
+  }).catch((err) => {
+    app.$notify({
+      group: "main",
+      title: "Error dismissing notice",
+      text: err,
+      type: "error",
+    });
+  });
+  await server.refresh(["general"]);
+}
 
 onMounted(() => {
   isMounted.value = true;
