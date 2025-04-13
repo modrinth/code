@@ -16,7 +16,7 @@ body:
     id: version
     attributes:
       label: What version of the Modrinth App are you using?
-      description: Find this in ⚙️ Settings (bottom right) -> About -> App version.
+      description: Find this in ⚙️ Settings (bottom right) -> After Modrinth App (bottom left)
     validations:
       required: true
   - type: dropdown

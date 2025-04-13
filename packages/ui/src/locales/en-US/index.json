@@ -404,6 +404,30 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Dismiss"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Dismissable"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Attention"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Critical"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Warning"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Undismissable"
+  },
   "settings.account.title": {
     "defaultMessage": "Account and security"
   },

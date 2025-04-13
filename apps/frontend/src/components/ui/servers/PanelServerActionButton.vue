@@ -89,6 +89,10 @@
               <InfoIcon class="h-5 w-5" />
               <span>Details</span>
             </template>
+            <template #copy-id>
+              <ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
+              <span>Copy ID</span>
+            </template>
           </UiServersTeleportOverflowMenu>
         </ButtonStyled>
       </template>
@@ -108,6 +112,7 @@ import {
   ServerIcon,
   InfoIcon,
   MoreVerticalIcon,
+  ClipboardCopyIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { useRouter } from "vue-router";
@@ -115,6 +120,8 @@ import { useStorage } from "@vueuse/core";
 
 type ServerAction = "start" | "stop" | "restart" | "kill";
 type ServerState = "stopped" | "starting" | "running" | "stopping" | "restarting";
+
+const flags = useFeatureFlags();
 
 interface PowerAction {
   action: ServerAction;
@@ -198,7 +205,18 @@ const menuOptions = computed(() => [
     icon: InfoIcon,
     action: () => detailsModal.value?.show(),
   },
+  {
+    id: "copy-id",
+    label: "Copy ID",
+    icon: ClipboardCopyIcon,
+    action: () => copyId(),
+    shown: flags.value.developerMode,
+  },
 ]);
+
+async function copyId() {
+  await navigator.clipboard.writeText(serverId as string);
+}
 
 function initiateAction(action: ServerAction) {
   if (!canTakeAction.value) return;
