@@ -114,6 +114,7 @@ defineExpose({ show, hide });
         :level="notice.level"
         :message="notice.message"
         :dismissable="notice.dismissable"
+        :title="notice.title"
         preview
       />
       <div class="flex flex-col gap-2">

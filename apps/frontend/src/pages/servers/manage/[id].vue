@@ -10,6 +10,7 @@
         :level="notice.level"
         :message="notice.message"
         :dismissable="notice.dismissable"
+        :title="notice.title"
         class="w-full"
         @dismiss="() => dismissNotice(notice.id)"
       />
