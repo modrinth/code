@@ -8,13 +8,13 @@ use crate::common::dummy_data::{
 use crate::common::get_json_val_str;
 use actix_http::StatusCode;
 use actix_web::test;
+use ariadne::ids::base62_impl::parse_base62;
 use common::api_v3::ApiV3;
 use common::asserts::assert_common_version_ids;
 use common::database::USER_USER_PAT;
 use common::environment::{with_test_environment, with_test_environment_all};
 use futures::StreamExt;
 use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
-use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::projects::{
     Dependency, DependencyType, VersionId, VersionStatus, VersionType,
 };

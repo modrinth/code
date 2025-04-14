@@ -13,14 +13,17 @@ import _SSOGoogleIcon from './external/sso/google.svg?component'
 import _SSOMicrosoftIcon from './external/sso/microsoft.svg?component'
 import _SSOSteamIcon from './external/sso/steam.svg?component'
 import _AppleIcon from './external/apple.svg?component'
+import _BlueskyIcon from './external/bluesky.svg?component'
 import _BuyMeACoffeeIcon from './external/bmac.svg?component'
 import _DiscordIcon from './external/discord.svg?component'
+import _GithubIcon from './external/github.svg?component'
 import _KoFiIcon from './external/kofi.svg?component'
 import _MastodonIcon from './external/mastodon.svg?component'
 import _OpenCollectiveIcon from './external/opencollective.svg?component'
 import _PatreonIcon from './external/patreon.svg?component'
 import _PayPalIcon from './external/paypal.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
+import _TumblrIcon from './external/tumblr.svg?component'
 import _TwitterIcon from './external/twitter.svg?component'
 import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
@@ -90,6 +93,7 @@ import _HeartHandshakeIcon from './icons/heart-handshake.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
 import _ImageIcon from './icons/image.svg?component'
+import _InProgressIcon from './icons/in-progress.svg?component'
 import _InfoIcon from './icons/info.svg?component'
 import _IssuesIcon from './icons/issues.svg?component'
 import _KeyIcon from './icons/key.svg?component'
@@ -127,7 +131,7 @@ import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
-import _RadioButtonChecked from './icons/radio-button-checked.svg?component'
+import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
@@ -209,7 +213,9 @@ export const SSOGoogleIcon = _SSOGoogleIcon
 export const SSOMicrosoftIcon = _SSOMicrosoftIcon
 export const SSOSteamIcon = _SSOSteamIcon
 export const AppleIcon = _AppleIcon
+export const BlueskyIcon = _BlueskyIcon
 export const BuyMeACoffeeIcon = _BuyMeACoffeeIcon
+export const GithubIcon = _GithubIcon
 export const DiscordIcon = _DiscordIcon
 export const KoFiIcon = _KoFiIcon
 export const MastodonIcon = _MastodonIcon
@@ -218,6 +224,7 @@ export const PatreonIcon = _PatreonIcon
 export const PayPalIcon = _PayPalIcon
 export const PyroIcon = _PyroIcon
 export const RedditIcon = _RedditIcon
+export const TumblrIcon = _TumblrIcon
 export const TwitterIcon = _TwitterIcon
 export const WindowsIcon = _WindowsIcon
 export const YouTubeIcon = _YouTubeIcon
@@ -284,6 +291,7 @@ export const HeartHandshakeIcon = _HeartHandshakeIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon
 export const ImageIcon = _ImageIcon
+export const InProgressIcon = _InProgressIcon
 export const InfoIcon = _InfoIcon
 export const IssuesIcon = _IssuesIcon
 export const KeyIcon = _KeyIcon
@@ -321,7 +329,7 @@ export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
 export const RadioButtonIcon = _RadioButtonIcon
-export const RadioButtonChecked = _RadioButtonChecked
+export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
 export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon

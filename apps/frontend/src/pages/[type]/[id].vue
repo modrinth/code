@@ -460,6 +460,10 @@
       class="new-page sidebar"
       :class="{
         'alt-layout': cosmetics.leftContentLayout,
+        'ultimate-sidebar':
+          showModerationChecklist &&
+          !collapsedModerationChecklist &&
+          !flags.alwaysShowChecklistAsPopup,
       }"
     >
       <div class="normal-page__header relative my-4">
@@ -674,7 +678,7 @@
           :auth="auth"
           :tags="tags"
         />
-        <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="mb-4">
+        <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
           {{ project.title }} has been archived. {{ project.title }} will not receive any further
           updates unless the author decides to unarchive the project.
         </MessageBanner>
@@ -805,13 +809,18 @@
           @delete-version="deleteVersion"
         />
       </div>
+      <div class="normal-page__ultimate-sidebar">
+        <ModerationChecklist
+          v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+          :project="project"
+          :future-projects="futureProjects"
+          :reset-project="resetProject"
+          :collapsed="collapsedModerationChecklist"
+          @exit="showModerationChecklist = false"
+          @toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
+        />
+      </div>
     </div>
-    <ModerationChecklist
-      v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-      :project="project"
-      :future-projects="futureProjects"
-      :reset-project="resetProject"
-    />
   </div>
 </template>
 <script setup>
@@ -841,6 +850,7 @@ import {
   UsersIcon,
   VersionIcon,
   WrenchIcon,
+  ModrinthIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
@@ -861,7 +871,6 @@ import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.v
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
 import { navigateTo } from "#app";
 import dayjs from "dayjs";
-import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
@@ -1096,14 +1105,19 @@ let project,
   featuredVersions,
   versions,
   organization,
-  resetOrganization;
+  resetOrganization,
+  projectError,
+  membersError,
+  dependenciesError,
+  featuredVersionsError,
+  versionsError;
 try {
   [
-    { data: project, refresh: resetProject },
-    { data: allMembers, refresh: resetMembers },
-    { data: dependencies },
-    { data: featuredVersions },
-    { data: versions },
+    { data: project, error: projectError, refresh: resetProject },
+    { data: allMembers, error: membersError, refresh: resetMembers },
+    { data: dependencies, error: dependenciesError },
+    { data: featuredVersions, error: featuredVersionsError },
+    { data: versions, error: versionsError },
     { data: organization, refresh: resetOrganization },
   ] = await Promise.all([
     useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
@@ -1150,13 +1164,29 @@ try {
 
   versions = shallowRef(toRaw(versions));
   featuredVersions = shallowRef(toRaw(featuredVersions));
-} catch {
+} catch (err) {
   throw createError({
     fatal: true,
-    statusCode: 404,
-    message: "Project not found",
+    statusCode: err.statusCode ?? 500,
+    message: "Error loading project data" + (err.message ? `: ${err.message}` : ""),
   });
 }
+
+function handleError(err, project = false) {
+  if (err.value && err.value.statusCode) {
+    throw createError({
+      fatal: true,
+      statusCode: err.value.statusCode,
+      message: err.value.statusCode === 404 && project ? "Project not found" : err.value.message,
+    });
+  }
+}
+
+handleError(projectError, true);
+handleError(membersError);
+handleError(dependenciesError);
+handleError(featuredVersionsError);
+handleError(versionsError);
 
 if (!project.value) {
   throw createError({
@@ -1431,6 +1461,7 @@ async function copyId() {
 const collapsedChecklist = ref(false);
 
 const showModerationChecklist = ref(false);
+const collapsedModerationChecklist = ref(false);
 const futureProjects = ref([]);
 if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;
@@ -1595,10 +1626,12 @@ const navLinks = computed(() => {
       width: 25rem;
       height: 25rem;
     }
+
     .animation-ring-2 {
       width: 50rem;
       height: 50rem;
     }
+
     .animation-ring-3 {
       width: 100rem;
       height: 100rem;

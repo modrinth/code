@@ -1,7 +1,7 @@
 <template>
   <div class="markdown-body">
     <h1>Rewards Program Information</h1>
-    <p><em>Last modified: Sep 12, 2024</em></p>
+    <p><em>Last modified: Feb 20, 2025</em></p>
     <p>
       This page was created for transparency for how the rewards program works on Modrinth. Feel
       free to join our Discord or email
@@ -82,43 +82,48 @@
     <p>
       Modrinth receives ad revenue from our ad providers on a NET 60 day basis. Due to this, not all
       revenue is immediately available to withdraw. We pay creators as soon as we receive the money
-      from our ad providers, which is 60 days after the last day of each month. This table outlines
-      some example dates of how NET 60 payments are made:
+      from our ad providers, which is 60 days after the last day of each month.
     </p>
+
+    <p>
+      To understand when revenue becomes available, you can use this calculator to estimate when
+      revenue earned on a specific date will be available for withdrawal. Please be advised that all
+      dates within this calculator are represented at 00:00 UTC.
+    </p>
+
     <table>
       <thead>
         <tr>
+          <th>Timeline</th>
           <th>Date</th>
-          <th>Payment available date</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>January 1st</td>
-          <td>March 31st</td>
+          <td>Revenue earned on</td>
+          <td>
+            <input id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
+            <noscript
+              >(JavaScript must be enabled for the date picker to function, example date:
+              2024-07-15)
+            </noscript>
+          </td>
         </tr>
         <tr>
-          <td>January 15th</td>
-          <td>March 31st</td>
+          <td>End of the month</td>
+          <td>{{ formatDate(endOfMonthDate) }}</td>
         </tr>
         <tr>
-          <td>March 3rd</td>
-          <td>May 30th</td>
+          <td>NET 60 policy applied</td>
+          <td>+ 60 days</td>
         </tr>
-        <tr>
-          <td>June 30th</td>
-          <td>August 29th</td>
-        </tr>
-        <tr>
-          <td>July 14th</td>
-          <td>September 29th</td>
-        </tr>
-        <tr>
-          <td>October 12th</td>
-          <td>December 30th</td>
+        <tr class="final-result">
+          <td>Available for withdrawal</td>
+          <td>{{ formatDate(withdrawalDate) }}</td>
         </tr>
       </tbody>
     </table>
+
     <h3>How do I know Modrinth is being transparent about revenue?</h3>
     <p>
       We aim to be as transparent as possible with creator revenue. All of our code is open source,
@@ -126,13 +131,41 @@
       <a href="https://github.com/modrinth/code/blob/main/apps/labrinth/src/queue/payouts.rs#L598">
         revenue distribution system</a
       >. We also have an
-      <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a> that allows users
-      to query exact daily revenue for the site.
+      <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>
+      to query the exact daily advertising revenue for the site - so far, creators on Modrinth have
+      earned a total of <strong>{{ formatMoney(platformRevenue) }}</strong> in ad revenue.
     </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Revenue</th>
+          <th>Creator Revenue (75%)</th>
+          <th>Modrinth's Cut (25%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in platformRevenueData" :key="item.time">
+          <td>{{ formatDate(dayjs.unix(item.time)) }}</td>
+          <td>{{ formatMoney(item.revenue) }}</td>
+          <td>{{ formatMoney(item.creator_revenue) }}</td>
+          <td>{{ formatMoney(item.revenue - item.creator_revenue) }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <small
+      >Modrinth's total ad revenue in the previous 5 days, for the entire dataset, use the
+      aforementioned
+      <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>.</small
+    >
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
+import dayjs from "dayjs";
+import { computed, ref } from "vue";
+import { formatDate, formatMoney } from "@modrinth/utils";
+
 const description =
   "Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.";
 
@@ -142,4 +175,18 @@ useSeoMeta({
   ogTitle: "Rewards Program Information",
   ogDescription: description,
 });
+
+const rawSelectedDate = ref(dayjs().format("YYYY-MM-DD"));
+const selectedDate = computed(() => dayjs(rawSelectedDate.value));
+const endOfMonthDate = computed(() => selectedDate.value.endOf("month"));
+const withdrawalDate = computed(() => endOfMonthDate.value.add(60, "days"));
+
+const { data: transparencyInformation } = await useAsyncData("payout/platform_revenue", () =>
+  useBaseFetch("payout/platform_revenue", {
+    apiVersion: 3,
+  }),
+);
+
+const platformRevenue = transparencyInformation.value.all_time;
+const platformRevenueData = transparencyInformation.value.data.slice(0, 5);
 </script>

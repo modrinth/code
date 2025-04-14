@@ -62,7 +62,6 @@
                 <BoxIcon aria-hidden="true" /> Manage your servers
               </nuxt-link>
             </ButtonStyled>
-            <UiServersPoweredByPyro class="mx-0 !mt-0" />
           </div>
         </div>
       </div>
@@ -209,9 +208,7 @@
               <polygon points="13 19 22 12 13 5 13 19" />
               <polygon points="2 19 11 12 2 5 2 19" />
             </svg>
-            <h2 class="m-0 text-lg font-bold">
-              Experience modern, reliable hosting powered by Pyro
-            </h2>
+            <h2 class="m-0 text-lg font-bold">Experience modern, reliable hosting</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
               Modrinth Servers are hosted on
               <span class="text-contrast">2023 Ryzen 7/9 CPUs with DDR5 RAM</span>, running on
@@ -223,15 +220,8 @@
             <ServerIcon class="size-8 text-brand" />
             <h2 class="m-0 text-lg font-bold">Consistently fast</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Under Pyro, infrastructure is never overloaded, meaning each Modrinth server always
-              runs at its full performance.
-              <a
-                class="mt-2 flex items-center gap-2 font-medium text-contrast transition-all hover:gap-3"
-                href="https://status.pyro.host/"
-                target="_blank"
-              >
-                See the infrastructure <RightArrowIcon class="flex-none" />
-              </a>
+              Our infrastructure is never overloaded, meaning each server hosted with Modrinth
+              always runs at its full performance.
             </h3>
           </div>
         </div>
@@ -443,8 +433,8 @@
               </summary>
               <p class="m-0 !leading-[190%]">
                 Yes. All Modrinth Servers come with DDoS protection. Protection is powered by a
-                combination of in-house network filtering by Pyro as well as with our data center
-                provider. Your server is safe on Modrinth.
+                combination of in-house network filtering as well as with our data center provider.
+                Your server is safe on Modrinth.
               </p>
             </details>
 
@@ -456,9 +446,10 @@
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
               <p class="m-0 !leading-[190%]">
-                Currently, Modrinth Servers are located in New York, Los Angeles, Seattle, and
-                Miami. More regions are coming soon! Your server's location is currently chosen
-                algorithmically, but you will be able to choose a region in the future.
+                Currently, Modrinth Servers are located throughout the United States in New York,
+                Los Angelas, Dallas, Miami, and Spokane. More regions are coming soon! Your server's
+                location is currently chosen algorithmically, but you will be able to choose a
+                region in the future.
               </p>
             </details>
 
@@ -539,9 +530,9 @@
                 <p
                   class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
                 >
-                  With strategically placed servers in New York, Los Angeles, Seattle, and Miami, we
-                  ensure low latency connections for players across North America. Each location is
-                  equipped with high-performance hardware and DDoS protection.
+                  With strategically placed servers in New York, California, Texas, Florida, and
+                  Washington, we ensure low latency connections for players across North America.
+                  Each location is equipped with high-performance hardware and DDoS protection.
                 </p>
               </div>
 
@@ -640,15 +631,15 @@
                 </h2>
               </div>
               <ButtonStyled color="blue" size="large">
-                <NuxtLink
+                <a
                   v-if="!loggedOut && isSmallAtCapacity"
-                  :to="outOfStockUrl"
+                  :href="outOfStockUrl"
                   target="_blank"
                   class="flex items-center gap-2 !bg-highlight-blue !font-medium !text-blue"
                 >
                   Out of Stock
                   <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </NuxtLink>
+                </a>
                 <button
                   v-else
                   class="!bg-highlight-blue !font-medium !text-blue"
@@ -703,15 +694,15 @@
                 </h2>
               </div>
               <ButtonStyled color="brand" size="large">
-                <NuxtLink
+                <a
                   v-if="!loggedOut && isMediumAtCapacity"
-                  :to="outOfStockUrl"
+                  :href="outOfStockUrl"
                   target="_blank"
                   class="flex items-center gap-2 !bg-highlight-green !font-medium !text-green"
                 >
                   Out of Stock
                   <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
-                </NuxtLink>
+                </a>
                 <button
                   v-else
                   class="!bg-highlight-green !font-medium !text-green"
@@ -757,15 +748,15 @@
                 </h2>
               </div>
               <ButtonStyled color="brand" size="large">
-                <NuxtLink
+                <a
                   v-if="!loggedOut && isLargeAtCapacity"
-                  :to="outOfStockUrl"
+                  :href="outOfStockUrl"
                   target="_blank"
                   class="flex items-center gap-2 !bg-highlight-purple !font-medium !text-purple"
                 >
                   Out of Stock
                   <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </NuxtLink>
+                </a>
                 <button
                   v-else
                   class="!bg-highlight-purple !font-medium !text-purple"
@@ -780,7 +771,7 @@
         </ul>
 
         <div
-          class="flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
+          class="mb-4 flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
         >
           <div class="flex flex-col gap-4">
             <h1 class="m-0">Build your own</h1>
@@ -871,7 +862,7 @@ const deletingSpeed = 25;
 const pauseTime = 2000;
 
 const loggedOut = computed(() => !auth.value.user);
-const outOfStockUrl = "https://support.modrinth.com";
+const outOfStockUrl = "https://discord.modrinth.com";
 
 const { data: hasServers } = await useAsyncData("ServerListCountCheck", async () => {
   try {

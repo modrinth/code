@@ -1,0 +1,43 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Test build Frontend and Backend
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install System Dependency
+      run: |
+        sudo apt update
+        sudo apt install -y git build-essential pkg-config curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libwebkit2gtk-4.1-dev
+
+    - name: Setup pnpm for Frontend
+      uses: pnpm/action-setup@v4
+
+    - name: Install Frontend Dependencies
+      working-directory: ./
+      run: pnpm install
+
+    - name: Build Frontend
+      working-directory: ./apps/app-frontend/
+      run: pnpm build
+
+    - name: Build Backend
+      working-directory: ./apps/app/
+      run: cargo +stable build
+
+    - name: Test Backend
+      working-directory: ./apps/app/
+      run: cargo +stable test

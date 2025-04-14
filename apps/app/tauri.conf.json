@@ -39,7 +39,7 @@
     "fileAssociations": [
       {
         "ext": ["mrpack"],
-        "mimeType": "application/zip+mrpack"
+        "mimeType": "application/x-modrinth-modpack+zip"
       }
     ]
   },

@@ -173,10 +173,12 @@
           <button
             :disabled="isLoading"
             @click="
-              if (isSecondPhase) {
-                isSecondPhase = false;
-              } else {
-                hide();
+              () => {
+                if (isSecondPhase) {
+                  isSecondPhase = false;
+                } else {
+                  hide();
+                }
               }
             "
           >
@@ -337,7 +339,7 @@ watch(
   selectedLoaderVersions,
   (newVersions) => {
     if (newVersions.length > 0 && !selectedLoaderVersion.value) {
-      selectedLoaderVersion.value = String(newVersions[0]); // Ensure string type
+      selectedLoaderVersion.value = String(newVersions[0]);
     }
   },
   { immediate: true },
@@ -516,8 +518,6 @@ const handleReinstall = async () => {
 
 const onShow = () => {
   selectedMCVersion.value = props.server.general?.mc_version || "";
-  selectedLoaderVersion.value = "";
-  hardReset.value = false;
 };
 
 const onHide = () => {
@@ -528,13 +528,15 @@ const onHide = () => {
   loadingServerCheck.value = false;
   isLoading.value = false;
   selectedMCVersion.value = "";
-  selectedLoaderVersion.value = "";
   serverCheckError.value = "";
   paperVersions.value = {};
   purpurVersions.value = {};
 };
 
 const show = (loader: Loaders) => {
+  if (selectedLoader.value !== loader) {
+    selectedLoaderVersion.value = "";
+  }
   selectedLoader.value = loader;
   selectedMCVersion.value = props.server.general?.mc_version || "";
   versionSelectModal.value?.show();

@@ -11,6 +11,187 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-04-12T22:10:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added ability to notify customers in the panel with notices concerning their servers.`,
+  },
+  {
+    date: `2025-04-12T22:10:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fix missing dropdown icon in publishing checklist.`,
+  },
+  {
+    date: `2025-04-01T21:15:00-07:00`,
+    product: 'web',
+    body: `### Added
+- Reverted Modrinth Pizza due to issues in pizza processing leading to users being redirected to [this page](https://modrinth.com/pizza/error).
+- Fixed bug causing theme color to turn orange and corners turn sharp.`,
+  },
+  {
+    date: `2025-04-01T12:00:00`,
+    product: 'web',
+    body: `### Added
+- Added Modrinth Pizza.`,
+  },
+  {
+    date: `2025-04-01T00:00:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed project version field accepting more than 32 characters.`,
+  },
+  {
+    date: `2025-03-25T18:25:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed random 'displayName' error on search pages on some browsers such as Firefox.
+- Fixed 'Resubmit' icon in publishing checklist showing up when it hasn't been submitted before.`,
+  },
+  {
+    date: `2025-03-25T10:40:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed error with links on error pages.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed server plugin loaders not being populated when browsing for plugins
+- Fixed modpack search being filtered by Minecraft version when browsing for modpacks.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Improved error handling, especially when the Modrinth API is down.`,
+  },
+  {
+    date: `2025-03-13T19:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Updated Modrinth Servers marketing page, removing Pyro branding.`,
+  },
+  {
+    date: `2025-03-12T10:15:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed low-res icons being pixelated.
+- Fixed mobile navbar hiding bottom of footer.
+- Updated CMP info page to correct some incorrect information.
+- Updated CCPA notice with updated information since Modrinth Servers and Modrinth+.
+- Fixed review page failing under edge case.`,
+  },
+  {
+    date: `2025-03-05T17:40:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed moderation-end pages failing under edge cases.`,
+  },
+  {
+    date: `2025-03-05T12:40:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed various errors with modals for some users.
+- Fixed hold R button not working on some systems.`,
+  },
+  {
+    date: `2025-03-03T22:30:00-08:00`,
+    product: 'web',
+    body: `### Added
+- Hold R for a random project :D
+
+### Improvements
+- Improved admin navigation and admin panels.`,
+  },
+  {
+    date: `2025-03-02T18:45:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Added option to copy version IDs from the version list for project members and developer mode.
+- Fixed the staff moderation checklist going off the screen.`,
+  },
+  {
+    date: `2025-02-25T10:20:00-08:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed server upgrades being allowed when out of stock, despite warning.`,
+  },
+  {
+    date: `2025-02-25T10:20:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Moved Minecraft brand disclaimer to bottom of footer.
+- Improved clarity of the ongoing revenue period footnote on the Revenue page.
+- Fixed collections without a summary being unable to be edited.`,
+  },
+  {
+    date: `2025-02-21T13:30:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Collections are now sorted by creation date. (Contributed by [worldwidepixel](https://github.com/modrinth/code/pull/3286))
+- Collections are no longer required to have summaries. (Contributed by [Erb3](https://github.com/modrinth/code/pull/3281))
+- Fixed padding issue on revenue page.
+- Fixed last modified date on Rewards Program Info page. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3287))`,
+  },
+  {
+    date: `2025-02-20T18:15:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Revenue page has been updated to more clearly display pending revenue and when it will be available to withdraw. (Contributed by [IMB11](https://github.com/modrinth/code/pull/3250))
+- Footer will now be forced to the bottom of the page on short pages.
+- Styling fixes to moderation checklist proof form.`,
+  },
+  {
+    date: `2025-02-19T22:20:00-08:00`,
+    product: 'web',
+    body: `### Added
+- All-new site footer with more links, better organization, and a new aesthetic.
+
+### Improvements
+- Added Dallas location to Modrinth Servers landing page.
+- Updated staff moderation checklist to be more visually consistent and more dynamic.`,
+  },
+  {
+    date: `2025-02-18T14:30:00-08:00`,
+    product: 'servers',
+    body: `### Added
+- Links will now be detected in console line viewer modal.
+
+### Improvements
+- Initial loading of pages in the server panel are now up to 400% faster.
+- Syncing and uploading new server icons no longer requires a full page refresh.
+- Fix a case where opening the platform modal, closing it, and reopening it would cause the loader version to be unselected.
+- Prevents an issue where, if crash log analysis fails, the Overview page would unrender.
+- Suspended server listings now have a copy ID button.
+- Fixed bugs from Modrinth Servers February Release.`,
+  },
+  {
+    date: `2025-02-16T19:10:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed spacing issue on confirmation modals.`,
+  },
+  {
+    date: `2025-02-16T19:10:00-08:00`,
+    product: 'servers',
+    body: `### Improvements
+- Check for availability before allowing a server upgrade.`,
+  },
+  {
+    date: `2025-02-12T19:10:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Servers out of stock link now links to Modrinth Discord instead of support page.`,
+  },
+  {
+    date: `2025-02-12T19:10:00-08:00`,
+    product: 'servers',
+    body: `### Added
+- Added server upgrades to switch to a larger plan as an option in billing settings.`,
+  },
+  {
     date: `2025-02-12T12:10:00-08:00`,
     product: 'web',
     body: `### Added
@@ -44,6 +225,7 @@ const VERSIONS: VersionEntry[] = [
   {
     date: `2025-02-10T08:00:00-08:00`,
     product: 'servers',
+    version: `February Release`,
     body: `### Added
 - You can now search and filter through your server's console in the Overview tab, jump to specific results to see the log in context, select them, and copy them.
 - You can now drag and select any number of lines in the console, copy them. and view them formatted.
@@ -94,9 +276,25 @@ Contributed by [IMB11](https://github.com/modrinth/code/pull/1301).`,
   {
     date: `2025-01-10T09:00:00-08:00`,
     product: 'servers',
-    body: `### Improvements
+    version: 'January Release',
+    body: `### Added
+- Added drag & drop upload support for mod and plugin files on the content page.
+- Added a button to upload files to the content page.
+- Added extra info (file name, author) to each mod on the content page.
+- Show number of mods in search box.
+- Adds a "No mods/plugins found for your query!" message if nothing is found, with a button to show everything again.
+
+### Improvements
 - The content page layout has been enhanced, now showing the file name and author of each installed item.
-- You can now upload directly from the content page, instead of having to go to the Files page.`,
+- You can now upload directly from the content page, instead of having to go to the Files page.
+- Auto-backup now lists options in a dropdown instead of number input.
+- Auto-backup 'Save changes' button now disables when no changes are made and backups are off.
+- Servers dropdowns now have rounded corners on the last elements for consistency.
+- Added support for more suspension reasons.
+- Will now show resubscribe button on servers when payment status is "failed" instead of just "cancelled".
+- Tweak button styles for consistency.
+- Only scroll to the top of the mod/plugin list when searching if already scrolled down.
+- Tweak content page mobile UI.`,
   },
   {
     date: `2025-01-10T09:00:00-08:00`,
@@ -104,6 +302,16 @@ Contributed by [IMB11](https://github.com/modrinth/code/pull/1301).`,
     body: `### Improvements
 - Tags on project pages are now clickable to view other projects with that tag (Contributed by [Neddo](https://github.com/modrinth/code/pull/3126))
 - You can now send someone a link to the download interface with a specific version and loader selected, like so: https://modrinth.com/mod/sodium?version=1.21.2&loader=quilt#download (Contributed by [AwakenedRedstone](https://github.com/modrinth/code/pull/3138))`,
+  },
+  {
+    date: `2024-12-26T22:05:00-08:00`,
+    product: 'servers',
+    body: `### Added
+- Added ability for users to clean install modpacks when switching versions.
+
+### Improvements
+- New status bar in ServerListing that shows suspension reasons/upgrade status.
+- Displays a new screen for servers that are being upgraded.`,
   },
   {
     date: `2024-12-25T14:00:00-08:00`,
@@ -143,6 +351,52 @@ Contributed by [IMB11](https://github.com/modrinth/code/pull/1301).`,
 - Access your most recent instances with ease with Quick Instances.
 - Fixed “Database is locked” errors on devices with slow disks.
 - Fixed a few edge cases where API downtime could lead to an invalid state.`,
+  },
+  {
+    date: `2024-12-21T16:00:00-08:00`,
+    product: 'servers',
+    body: `### Added
+- Drag and drop anything in the file manager.
+- Added file upload queue status bar.
+- Added support for parallel file uploads to upload multiple files faster.
+- Added ability to cancel in-progress file uploads.
+- Creation dates are now displayed for files.
+- Can now sort by most recently created files
+- YAML and TOML files now support syntax highlighting
+- Find and replace support in files editor
+
+### Improvements
+- Files list renders up to 200% faster.
+- Image viewer performance improvements, improved UI, and better handling of large-to-display images.
+- UI inconsistency fixes.
+- When reinstalling the loader, the current Minecraft version is automatically selected.
+- Allow user to clean install modpacks on the modpack search page.
+- Fixed 'Change platform' button leading to the wrong page on a vanilla server.`,
+  },
+  {
+    date: `2024-12-11T22:18:45-08:00`,
+    product: 'servers',
+    version: `December Release`,
+    body: `### Added
+- Expanded loader support to include **Paper** and **Purpur** servers, offering fully native plugin compatibility.
+- A live chat button has been added to the bottom right of all server pages, making it easier for customers to contact our support team.
+- Automatic backups are now *rolling*. This means older backups will be deleted to make space for new backups when a new one is being created. You can also now **lock** specific backups so that they don't get deleted by the automatic backup process.
+- Users can now easily create backups before reinstalling a server with a different loader.
+
+### Improvements
+- The Platform options page has been completely redesigned to streamline user interactions and improve overall clarity.
+- Suspended servers now display a clear "Suspended" status instead of a confusing "Connection lost" message, allowing users to easily check their billing information.
+- The console has been internally reworked to improve responsiveness and prevent freezing during high-volume spam.
+- Resolved CPU usage readings that previously exceeded 100% during high-load scenarios. CPU usage is now accurately normalized to a 0–100% range across all cores.
+- Corrected CPU limit settings for some servers, potentially improving performance by up to half a core.
+- Fixed an issue preventing server reinstallation when at the maximum backup limit.
+- Resolved installation and runtime problems with older Minecraft versions.
+- Added missing dynamic system libraries to our images, ensuring compatibility with the vast majority of mods.
+- Implemented several additional bug fixes and performance optimizations.
+- Removed Herobrine.
+
+### Known Issues
+- Backups may occasionally take longer than expected or become stuck. If a backup is unresponsive, please submit a support inquiry, and we'll investigate further.`,
   },
 ].map((x) => ({ ...x, date: dayjs(x.date) }) as VersionEntry)
 

@@ -59,7 +59,29 @@
     />
 
     <div class="relative h-full w-full overflow-y-auto">
-      <div v-if="data" class="flex h-full w-full flex-col justify-between gap-4">
+      <div
+        v-if="server.network?.error"
+        class="flex w-full flex-col items-center justify-center gap-4 p-4"
+      >
+        <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+          <div class="flex flex-col items-center text-center">
+            <div class="flex flex-col items-center gap-4">
+              <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+                <IssuesIcon class="size-12 text-orange" />
+              </div>
+              <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load network settings</h1>
+            </div>
+            <p class="text-lg text-secondary">
+              We couldn't load your server's network settings. Here's what we know:
+              <span class="break-all font-mono">{{ JSON.stringify(server.network.error) }}</span>
+            </p>
+            <ButtonStyled size="large" color="brand" @click="() => server.refresh(['network'])">
+              <button class="mt-6 !w-full">Retry</button>
+            </ButtonStyled>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="data" class="flex h-full w-full flex-col justify-between gap-4">
         <div class="flex h-full flex-col">
           <!-- Subdomain section -->
           <div class="card flex flex-col gap-4">
@@ -155,7 +177,7 @@
                 </span>
               </div>
 
-              <ButtonStyled type="standard" color="brand" @click="showNewAllocationModal">
+              <ButtonStyled type="standard" @click="showNewAllocationModal">
                 <button class="!w-full sm:!w-auto">
                   <PlusIcon />
                   <span>New allocation</span>
@@ -247,6 +269,7 @@ import {
   SaveIcon,
   InfoIcon,
   UploadIcon,
+  IssuesIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal, ConfirmModal } from "@modrinth/ui";
 import { ref, computed, nextTick } from "vue";
@@ -286,11 +309,10 @@ const addNewAllocation = async () => {
 
   try {
     await props.server.network?.reserveAllocation(newAllocationName.value);
+    await props.server.refresh(["network"]);
 
     newAllocationModal.value?.hide();
     newAllocationName.value = "";
-
-    await props.server.refresh();
 
     addNotification({
       group: "serverOptions",
@@ -332,8 +354,8 @@ const confirmDeleteAllocation = async () => {
   if (allocationToDelete.value === null) return;
 
   await props.server.network?.deleteAllocation(allocationToDelete.value);
+  await props.server.refresh(["network"]);
 
-  await props.server.refresh();
   addNotification({
     group: "serverOptions",
     type: "success",
@@ -349,11 +371,10 @@ const editAllocation = async () => {
 
   try {
     await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value);
+    await props.server.refresh(["network"]);
 
     editAllocationModal.value?.hide();
     newAllocationName.value = "";
-
-    await props.server.refresh();
 
     addNotification({
       group: "serverOptions",

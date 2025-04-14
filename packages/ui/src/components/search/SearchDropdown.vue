@@ -51,10 +51,10 @@
               <Avatar :src="option.icon" :circle="circledIcons" />
               <div class="text">
                 <div class="title">
-                  {{ displayName(option.title) }}
+                  {{ getOptionLabel(option.title) }}
                 </div>
                 <div class="author">
-                  {{ displayName(option.subtitle) }}
+                  {{ getOptionLabel(option.subtitle) }}
                 </div>
               </div>
             </div>
@@ -98,13 +98,17 @@ const props = defineProps({
   },
   displayName: {
     type: Function,
-    default: (option) => option,
+    default: undefined,
   },
   circledIcons: {
     type: Boolean,
     default: false,
   },
 })
+
+function getOptionLabel(option) {
+  return props.displayName?.(option) ?? option
+}
 
 const emit = defineEmits(['input', 'onSelected', 'update:modelValue', 'enter'])
 

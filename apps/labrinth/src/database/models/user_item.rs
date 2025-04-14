@@ -3,8 +3,8 @@ use super::{CollectionId, ReportId, ThreadId};
 use crate::database::models;
 use crate::database::models::{DatabaseError, OrganizationId};
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::users::Badges;
+use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
@@ -652,6 +652,18 @@ impl User {
                 DELETE FROM friends
                 WHERE user_id = $1 OR friend_id = $1
                 ",
+                id as UserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                UPDATE charges
+                SET user_id = $1
+                WHERE user_id = $2
+                ",
+                deleted_user as UserId,
                 id as UserId,
             )
             .execute(&mut **transaction)

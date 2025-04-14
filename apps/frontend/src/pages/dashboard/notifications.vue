@@ -12,9 +12,13 @@
           <h2 v-else class="text-2xl">Notifications</h2>
         </div>
         <template v-if="!history">
-          <Button v-if="hasRead" @click="updateRoute()"> <HistoryIcon /> View history </Button>
+          <Button v-if="hasRead" @click="updateRoute()">
+            <HistoryIcon />
+            View history
+          </Button>
           <Button v-if="notifications.length > 0" color="danger" @click="readAll()">
-            <CheckCheckIcon /> Mark all as read
+            <CheckCheckIcon />
+            Mark all as read
           </Button>
         </template>
       </div>
@@ -50,16 +54,14 @@
   </div>
 </template>
 <script setup>
-import { Button } from "@modrinth/ui";
-import { HistoryIcon } from "@modrinth/assets";
+import { Button, Chips } from "@modrinth/ui";
+import { HistoryIcon, CheckCheckIcon } from "@modrinth/assets";
 import {
   fetchExtraNotificationData,
   groupNotifications,
   markAsRead,
 } from "~/helpers/notifications.js";
 import NotificationItem from "~/components/ui/NotificationItem.vue";
-import Chips from "~/components/ui/Chips.vue";
-import CheckCheckIcon from "~/assets/images/utils/check-check.svg?component";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import Pagination from "~/components/ui/Pagination.vue";
 

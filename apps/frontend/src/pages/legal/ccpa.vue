@@ -2,7 +2,7 @@
   <div class="markdown-body">
     <h1>Privacy Notice for California Residents</h1>
     <p><strong>Effective Date: </strong><em>August 5th, 2023</em></p>
-    <p><strong>Last reviewed on: </strong><em>August 5th, 2023</em></p>
+    <p><strong>Last reviewed on: </strong><em>March 11th, 2025</em></p>
     <p>
       This Privacy Notice for California Residents supplements the information contained in the
       <nuxt-link to="/legal/privacy">Privacy Policy</nuxt-link> of Rinth, Inc. (the "Company," "we,"
@@ -49,7 +49,7 @@
             information, medical information, or health insurance information. <br /><br />
             Some personal information included in this category may overlap with other categories.
           </td>
-          <td>NO</td>
+          <td>YES</td>
         </tr>
         <tr>
           <td>C. Protected classification characteristics.</td>
@@ -68,7 +68,7 @@
             Records of personal property, products or services purchased, obtained, or considered,
             or other purchasing or consuming histories or tendencies.
           </td>
-          <td>NO</td>
+          <td>YES</td>
         </tr>
         <tr>
           <td>E. Biometric information.</td>

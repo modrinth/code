@@ -5,9 +5,14 @@ use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
-use crate::routes::internal::statuses::{close_socket, ServerToClientMessage};
+use crate::routes::internal::statuses::{
+    broadcast_friends_message, send_message_to_user,
+};
 use crate::routes::ApiError;
+use crate::sync::friends::RedisFriendsMessage;
+use crate::sync::status::get_user_status;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use ariadne::networking::message::ServerToClientMessage;
 use chrono::Utc;
 use sqlx::PgPool;
 
@@ -75,30 +80,28 @@ pub async fn add_friend(
                 user_id: UserId,
                 friend_id: UserId,
                 sockets: &ActiveSockets,
+                redis: &RedisPool,
             ) -> Result<(), ApiError> {
-                if let Some(pair) = sockets.auth_sockets.get(&user_id.into()) {
-                    let (friend_status, _) = pair.value();
-                    if let Some(socket) =
-                        sockets.auth_sockets.get(&friend_id.into())
-                    {
-                        let (_, socket) = socket.value();
-
-                        let _ = socket
-                            .clone()
-                            .text(serde_json::to_string(
-                                &ServerToClientMessage::StatusUpdate {
-                                    status: friend_status.clone(),
-                                },
-                            )?)
-                            .await;
-                    }
+                if let Some(friend_status) =
+                    get_user_status(user_id.into(), sockets, redis).await
+                {
+                    broadcast_friends_message(
+                        redis,
+                        RedisFriendsMessage::DirectStatusUpdate {
+                            to_user: friend_id.into(),
+                            status: friend_status,
+                        },
+                    )
+                    .await?;
                 }
 
                 Ok(())
             }
 
-            send_friend_status(friend.user_id, friend.friend_id, &db).await?;
-            send_friend_status(friend.friend_id, friend.user_id, &db).await?;
+            send_friend_status(friend.user_id, friend.friend_id, &db, &redis)
+                .await?;
+            send_friend_status(friend.friend_id, friend.user_id, &db, &redis)
+                .await?;
         } else {
             if friend.id == user.id.into() {
                 return Err(ApiError::InvalidInput(
@@ -121,20 +124,12 @@ pub async fn add_friend(
             .insert(&mut transaction)
             .await?;
 
-            if let Some(socket) = db.auth_sockets.get(&friend.id.into()) {
-                let (_, socket) = socket.value();
-
-                if socket
-                    .clone()
-                    .text(serde_json::to_string(
-                        &ServerToClientMessage::FriendRequest { from: user.id },
-                    )?)
-                    .await
-                    .is_err()
-                {
-                    close_socket(user.id, &pool, &db).await?;
-                }
-            }
+            send_message_to_user(
+                &db,
+                friend.id.into(),
+                &ServerToClientMessage::FriendRequest { from: user.id },
+            )
+            .await?;
         }
 
         transaction.commit().await?;
@@ -178,18 +173,12 @@ pub async fn remove_friend(
         )
         .await?;
 
-        if let Some(socket) = db.auth_sockets.get(&friend.id.into()) {
-            let (_, socket) = socket.value();
-
-            let _ = socket
-                .clone()
-                .text(serde_json::to_string(
-                    &ServerToClientMessage::FriendRequestRejected {
-                        from: user.id,
-                    },
-                )?)
-                .await;
-        }
+        send_message_to_user(
+            &db,
+            friend.id.into(),
+            &ServerToClientMessage::FriendRequestRejected { from: user.id },
+        )
+        .await?;
 
         transaction.commit().await?;
 

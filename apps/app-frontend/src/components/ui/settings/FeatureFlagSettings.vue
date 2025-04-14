@@ -37,7 +37,6 @@ watch(
     <Toggle
       id="advanced-rendering"
       :model-value="getStoreValue(option)"
-      :checked="getStoreValue(option)"
       @update:model-value="() => setStoreValue(option, !themeStore.featureFlags[option])"
     />
   </div>

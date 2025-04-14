@@ -225,11 +225,10 @@ import {
   UserPlusIcon,
   UserXIcon as UserRemoveIcon,
   DropdownIcon,
+  CrownIcon,
 } from "@modrinth/assets";
 import { Button, Badge, Avatar, Checkbox } from "@modrinth/ui";
 import { ref } from "vue";
-import CrownIcon from "~/assets/images/utils/crown.svg?component";
-
 import { removeTeamMember } from "~/helpers/teams.js";
 import { isPermission } from "~/utils/permissions.ts";
 
@@ -363,8 +362,10 @@ const onTransferOwnership = useClientTry(async (teamId, uid) => {
   .member-header {
     display: flex;
     justify-content: space-between;
+
     .info {
       display: flex;
+
       .text {
         margin: auto 0 auto 0.5rem;
         font-size: var(--font-size-sm);
@@ -386,24 +387,30 @@ const onTransferOwnership = useClientTry(async (teamId, uid) => {
         }
       }
     }
+
     .side-buttons {
       display: flex;
       align-items: center;
+
       .dropdown-icon {
         margin-left: 1rem;
+
         svg {
           transition: 150ms ease transform;
         }
       }
     }
   }
+
   .content {
     display: none;
     flex-direction: column;
     padding-top: var(--gap-md);
+
     .main-info {
       margin-bottom: var(--gap-lg);
     }
+
     .permissions {
       margin-bottom: var(--gap-md);
       max-width: 45rem;
@@ -412,17 +419,20 @@ const onTransferOwnership = useClientTry(async (teamId, uid) => {
       grid-gap: 0.5rem;
     }
   }
+
   &.open {
     .member-header {
       .dropdown-icon svg {
         transform: rotate(180deg);
       }
     }
+
     .content {
       display: flex;
     }
   }
 }
+
 :deep(.checkbox-outer) {
   button.checkbox {
     border: none;
