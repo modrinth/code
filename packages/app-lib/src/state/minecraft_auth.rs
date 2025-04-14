@@ -404,6 +404,8 @@ impl Credentials {
         )
     }
 
+    /// Like [`get_active`](Self::get_active), but enforces credentials to be
+    /// successfully refreshed unless the network is unreachable or times out.
     #[tracing::instrument]
     pub async fn get_default_credential(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
@@ -436,6 +438,8 @@ impl Credentials {
         }
     }
 
+    /// Fetches the currently selected credentials from the database, attempting
+    /// to refresh them if they are expired.
     pub async fn get_active(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<Option<Self>> {
