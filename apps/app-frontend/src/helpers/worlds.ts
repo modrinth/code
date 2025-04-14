@@ -25,6 +25,10 @@ export type ServerWorld = BaseWorld & {
 
 export type World = SingleplayerWorld | ServerWorld
 
+export type WorldWithProfile = {
+  profile: string
+} & World
+
 export type SingleplayerGameMode = 'survival' | 'creative' | 'adventure' | 'spectator'
 export type ServerPackStatus = 'enabled' | 'disabled' | 'prompt'
 
@@ -54,6 +58,10 @@ export interface Chat {
   obfuscated: boolean
   color?: string
   extra: Chat[]
+}
+
+export async function get_recent_worlds(limit: number): Promise<WorldWithProfile[]> {
+  return await invoke('plugin:worlds|get_recent_worlds', { limit })
 }
 
 export async function get_profile_worlds(path: string): Promise<World[]> {

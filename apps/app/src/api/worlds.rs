@@ -3,12 +3,15 @@ use either::Either;
 use tauri::{AppHandle, Manager, Runtime};
 use theseus::prelude::ProcessMetadata;
 use theseus::profile::{get_full_path, QuickPlayType};
-use theseus::worlds::{ServerPackStatus, ServerStatus, World};
+use theseus::worlds::{
+    ServerPackStatus, ServerStatus, World, WorldWithProfile,
+};
 use theseus::{profile, worlds};
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("worlds")
         .invoke_handler(tauri::generate_handler![
+            get_recent_worlds,
             get_profile_worlds,
             get_singleplayer_world,
             rename_world,
@@ -24,6 +27,18 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             start_join_server,
         ])
         .build()
+}
+
+#[tauri::command]
+pub async fn get_recent_worlds<R: Runtime>(
+    app_handle: AppHandle<R>,
+    limit: usize,
+) -> Result<Vec<WorldWithProfile>> {
+    let mut result = worlds::get_recent_worlds(limit).await?;
+    for world in result.iter_mut() {
+        adapt_world_icon(&app_handle, &mut world.world);
+    }
+    Ok(result)
 }
 
 #[tauri::command]

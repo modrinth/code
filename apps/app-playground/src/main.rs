@@ -4,8 +4,7 @@
 )]
 
 use theseus::prelude::*;
-use theseus::profile::get_full_path;
-use theseus::worlds::delete_world;
+use theseus::worlds::get_recent_worlds;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -41,8 +40,16 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
-    let path = get_full_path("Logging Test").await?;
-    delete_world(&path, "World 2").await?;
+    let worlds = get_recent_worlds(4).await?;
+    for world in worlds {
+        println!(
+            "World: {:?}/{:?} played at {:?}: {:#?}",
+            world.profile,
+            world.world.name,
+            world.world.last_played,
+            world.world.details
+        );
+    }
 
     Ok(())
 }

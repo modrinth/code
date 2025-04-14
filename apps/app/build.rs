@@ -245,6 +245,7 @@ fn main() {
                 "worlds",
                 InlinedPlugin::new()
                     .commands(&[
+                        "get_recent_worlds",
                         "get_profile_worlds",
                         "get_singleplayer_world",
                         "rename_world",

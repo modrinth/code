@@ -1,7 +1,7 @@
 use crate::data::ModLoader;
 use crate::launcher::get_loader_version_from_profile;
 use crate::profile::get_full_path;
-use crate::state::{server_join_log, ProfileInstallStage};
+use crate::state::{server_join_log, Profile, ProfileInstallStage};
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
@@ -18,12 +18,20 @@ use lazy_static::lazy_static;
 use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
+use std::cmp::Reverse;
 use std::io::Cursor;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncWriteExt;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 use url::Url;
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct WorldWithProfile {
+    pub profile: String,
+    #[serde(flatten)]
+    pub world: World,
+}
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct World {
@@ -94,15 +102,75 @@ impl From<ServerPackStatus> for Option<bool> {
     }
 }
 
-pub async fn get_profile_worlds(profile_path: &str) -> Result<Vec<World>> {
-    let profile_dir = get_full_path(profile_path).await?;
-    let mut result = vec![];
-    get_singleplayer_worlds(&profile_dir, &mut result).await?;
-    get_server_worlds(profile_path, &profile_dir, &mut result).await?;
+pub async fn get_recent_worlds(limit: usize) -> Result<Vec<WorldWithProfile>> {
+    let state = State::get().await?;
+    let profiles_dir = state.directories.profiles_dir();
+
+    let mut profiles = Profile::get_all(&state.pool).await?;
+    profiles.sort_by_key(|x| Reverse(x.last_played));
+
+    let mut result = Vec::with_capacity(limit);
+
+    let mut least_recent_time = None;
+    for profile in profiles {
+        if result.len() >= limit && profile.last_played < least_recent_time {
+            break;
+        }
+        let profile_path = &profile.path;
+        let profile_dir = profiles_dir.join(profile_path);
+        let profile_worlds =
+            get_all_worlds_in_profile(profile_path, &profile_dir).await;
+        if let Err(e) = profile_worlds {
+            tracing::error!(
+                "Failed to get worlds for profile {}: {}",
+                profile_path,
+                e
+            );
+            continue;
+        }
+        for world in profile_worlds? {
+            let is_older = least_recent_time.is_none()
+                || world.last_played < least_recent_time;
+            if result.len() >= limit && is_older {
+                continue;
+            }
+            if is_older {
+                least_recent_time = world.last_played;
+            }
+            result.push(WorldWithProfile {
+                profile: profile_path.clone(),
+                world,
+            });
+        }
+        if result.len() > limit {
+            result.sort_by_key(|x| Reverse(x.world.last_played));
+            result.truncate(limit);
+        }
+    }
+
+    if result.len() <= limit {
+        result.sort_by_key(|x| Reverse(x.world.last_played));
+    }
     Ok(result)
 }
 
-async fn get_singleplayer_worlds(
+pub async fn get_profile_worlds(profile_path: &str) -> Result<Vec<World>> {
+    get_all_worlds_in_profile(profile_path, &get_full_path(profile_path).await?)
+        .await
+}
+
+async fn get_all_worlds_in_profile(
+    profile_path: &str,
+    profile_dir: &Path,
+) -> Result<Vec<World>> {
+    let mut worlds = vec![];
+    get_singleplayer_worlds_in_profile(&profile_dir, &mut worlds).await?;
+    get_server_worlds_in_profile(profile_path, &profile_dir, &mut worlds)
+        .await?;
+    Ok(worlds)
+}
+
+async fn get_singleplayer_worlds_in_profile(
     instance_dir: &Path,
     worlds: &mut Vec<World>,
 ) -> Result<()> {
@@ -198,7 +266,7 @@ async fn read_singleplayer_world_maybe_locked(
     })
 }
 
-async fn get_server_worlds(
+async fn get_server_worlds_in_profile(
     profile_path: &str,
     instance_dir: &Path,
     worlds: &mut Vec<World>,
