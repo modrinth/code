@@ -1,7 +1,15 @@
 <template>
   <Admonition :type="NOTICE_TYPE[props.level]">
     <template #header>
-      {{ formatMessage(heading) }}
+      <template v-if="!hideDefaultTitle">
+        {{ formatMessage(heading) }}
+      </template>
+      <template v-if="title">
+        <template v-if="hideDefaultTitle">
+          {{ title.substring(1) }}
+        </template>
+        <template v-else> - {{ title }}</template>
+      </template>
     </template>
     <template #actions>
       <ButtonStyled v-if="dismissable" circular>
@@ -36,10 +44,16 @@ const props = withDefaults(
     message: string
     dismissable: boolean
     preview?: boolean
+    title?: string
   }>(),
   {
     preview: false,
+    title: undefined,
   },
+)
+
+const hideDefaultTitle = computed(
+  () => props.title && props.title.length > 1 && props.title.startsWith('\\'),
 )
 
 const messages = defineMessages({
@@ -71,3 +85,8 @@ const NOTICE_TYPE: Record<string, 'info' | 'warning' | 'critical'> = {
 
 const heading = computed(() => NOTICE_HEADINGS[props.level] ?? messages.info)
 </script>
+<style scoped lang="scss">
+.markdown-body > *:first-child {
+  margin-top: 0;
+}
+</style>
