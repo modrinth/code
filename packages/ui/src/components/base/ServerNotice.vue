@@ -6,7 +6,7 @@
       </template>
       <template v-if="title">
         <template v-if="hideDefaultTitle">
-          {{ title.substring(1)}}
+          {{ title.substring(1) }}
         </template>
         <template v-else> - {{ title }}</template>
       </template>
@@ -43,7 +43,7 @@ const props = withDefaults(
     level: string
     message: string
     dismissable: boolean
-    preview?: boolean,
+    preview?: boolean
     title?: string
   }>(),
   {
@@ -52,7 +52,9 @@ const props = withDefaults(
   },
 )
 
-const hideDefaultTitle = computed(() => props.title && props.title.length > 1 && props.title.startsWith('\\'))
+const hideDefaultTitle = computed(
+  () => props.title && props.title.length > 1 && props.title.startsWith('\\'),
+)
 
 const messages = defineMessages({
   info: {
