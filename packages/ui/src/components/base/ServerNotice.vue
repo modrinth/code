@@ -1,5 +1,11 @@
 <template>
-  <Admonition :type="NOTICE_TYPE[props.level]">
+  <div
+    v-if="level === 'survey'"
+    class="flex items-center gap-2 border-2 border-solid border-brand-purple bg-bg-purple p-4 rounded-2xl"
+  >
+    <span class="text-contrast font-bold">Survey ID:</span> <CopyCode :text="message" />
+  </div>
+  <Admonition v-else :type="NOTICE_TYPE[level]">
     <template #header>
       <template v-if="!hideDefaultTitle">
         {{ formatMessage(heading) }}
@@ -32,6 +38,7 @@ import { XIcon } from '@modrinth/assets'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 import ButtonStyled from './ButtonStyled.vue'
+import CopyCode from './CopyCode.vue'
 
 const { formatMessage } = useVIntl()
 const emit = defineEmits<{

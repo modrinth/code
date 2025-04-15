@@ -257,7 +257,7 @@ export type ServerNotice = {
   id: number
   message: string
   title?: string
-  level: string
+  level: 'info' | 'warn' | 'critical' | 'survey'
   dismissable: boolean
   announce_at: string
   expires: string
