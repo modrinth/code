@@ -1,5 +1,8 @@
 <template>
-  <div v-if="level === 'survey'" class="flex items-center gap-2 border-2 border-solid border-brand-purple bg-bg-purple p-4 rounded-2xl">
+  <div
+    v-if="level === 'survey'"
+    class="flex items-center gap-2 border-2 border-solid border-brand-purple bg-bg-purple p-4 rounded-2xl"
+  >
     <span class="text-contrast font-bold">Survey ID:</span> <CopyCode :text="message" />
   </div>
   <Admonition v-else :type="NOTICE_TYPE[level]">
