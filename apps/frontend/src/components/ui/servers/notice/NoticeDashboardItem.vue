@@ -85,6 +85,7 @@ const props = defineProps<{
         :level="notice.level"
         :message="notice.message"
         :dismissable="notice.dismissable"
+        :title="notice.title"
         preview
       />
       <div class="mt-4 flex items-center gap-2">

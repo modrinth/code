@@ -256,6 +256,7 @@ export type Report = {
 export type ServerNotice = {
   id: number
   message: string
+  title?: string
   level: string
   dismissable: boolean
   announce_at: string
