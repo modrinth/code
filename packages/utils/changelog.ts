@@ -14,7 +14,10 @@ const VERSIONS: VersionEntry[] = [
     date: `2025-04-15T16:35:00-07:00`,
     product: 'servers',
     body: `### Added
-- Added ability to send surveys to customers in the panel via notices.`,
+- Added ability to send surveys to customers in the panel via notices.
+
+### Improvements
+- Added titles to notices.`,
   },
   {
     date: `2025-04-12T22:10:00-07:00`,
