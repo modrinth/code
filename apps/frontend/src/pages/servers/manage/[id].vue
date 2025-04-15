@@ -596,6 +596,7 @@ const popupOptions = computed(
       layout: "default",
       width: 400,
       autoClose: 2000,
+      hideTitle: true,
       hiddenFields: {
         username: auth.value?.user?.username,
         user_id: auth.value?.user?.id,
@@ -605,10 +606,6 @@ const popupOptions = computed(
         game_version: serverData.value?.mc_version,
         modpack_id: serverData.value?.project?.id,
         modpack_name: serverData.value?.project?.title,
-      },
-      emoji: {
-        text: "🐸",
-        animation: "rubber-band",
       },
       onOpen: () => console.log(`Opened survey notice: ${surveyNotice.value?.id}`),
       onClose: async () => await dismissSurvey(),
