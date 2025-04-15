@@ -6,29 +6,6 @@
       }}</span>
     </template>
     <div class="flex w-[700px] flex-col gap-3">
-      <div class="flex flex-col gap-2">
-        <label for="notice-title" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast"> Title </span>
-        </label>
-        <input
-          id="notice-title"
-          v-model="newNoticeTitle"
-          placeholder="E.g. Maintenance"
-          type="text"
-          autocomplete="off"
-        />
-      </div>
-      <div class="flex flex-col gap-2">
-        <label for="notice-message" class="flex flex-col gap-1">
-          <span class="text-lg font-semibold text-contrast">
-            Message
-            <span class="text-brand-red">*</span>
-          </span>
-        </label>
-        <div class="textarea-wrapper h-32">
-          <textarea id="notice-message" v-model="newNoticeMessage" />
-        </div>
-      </div>
       <div class="flex items-center justify-between gap-2">
         <label for="level-selector" class="flex flex-col gap-1">
           <span class="text-lg font-semibold text-contrast"> Level </span>
@@ -43,7 +20,38 @@
           name="Level"
         />
       </div>
-      <div class="flex items-center justify-between gap-2">
+      <div v-if="!newNoticeSurvey" class="flex flex-col gap-2">
+        <label for="notice-title" class="flex flex-col gap-1">
+          <span class="text-lg font-semibold text-contrast"> Title </span>
+        </label>
+        <input
+          id="notice-title"
+          v-model="newNoticeTitle"
+          placeholder="E.g. Maintenance"
+          type="text"
+          autocomplete="off"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="notice-message" class="flex flex-col gap-1">
+          <span class="text-lg font-semibold text-contrast">
+            {{ newNoticeSurvey ? "Survey ID" : "Message" }}
+            <span class="text-brand-red">*</span>
+          </span>
+        </label>
+        <input
+          v-if="newNoticeSurvey"
+          id="notice-message"
+          v-model="newNoticeMessage"
+          placeholder="E.g. rXGtq2"
+          type="text"
+          autocomplete="off"
+        />
+        <div v-else class="textarea-wrapper h-32">
+          <textarea id="notice-message" v-model="newNoticeMessage" />
+        </div>
+      </div>
+      <div v-if="!newNoticeSurvey" class="flex items-center justify-between gap-2">
         <label for="dismissable-toggle" class="flex flex-col gap-1">
           <span class="text-lg font-semibold text-contrast"> Dismissable </span>
           <span>Allow users to dismiss the notice from their panel.</span>
@@ -75,7 +83,7 @@
         />
       </div>
 
-      <div class="flex flex-col gap-2">
+      <div v-if="!newNoticeSurvey" class="flex flex-col gap-2">
         <span class="text-lg font-semibold text-contrast"> Preview </span>
         <ServerNotice
           :level="newNoticeLevel.id"
@@ -355,6 +363,7 @@ async function deleteNotice(notice: ServerNoticeType) {
 
 const trimmedMessage = computed(() => newNoticeMessage.value?.trim());
 const trimmedTitle = computed(() => newNoticeTitle.value?.trim());
+const newNoticeSurvey = computed(() => newNoticeLevel.value.id === "survey");
 
 const noticeSubmitError = computed(() => {
   let error: undefined | string;
@@ -389,9 +398,9 @@ async function saveChanges() {
     method: "PATCH",
     body: {
       message: newNoticeMessage.value,
-      title: trimmedTitle.value,
+      title: newNoticeSurvey.value ? undefined : trimmedTitle.value,
       level: newNoticeLevel.value.id,
-      dismissable: newNoticeDismissable.value,
+      dismissable: newNoticeSurvey.value ? true : newNoticeDismissable.value,
       announce_at: newNoticeScheduledDate.value
         ? dayjs(newNoticeScheduledDate.value).toISOString()
         : dayjs().toISOString(),
@@ -420,9 +429,9 @@ async function createNotice() {
     method: "POST",
     body: {
       message: newNoticeMessage.value,
-      title: trimmedTitle.value,
+      title: newNoticeSurvey.value ? undefined : trimmedTitle.value,
       level: newNoticeLevel.value.id,
-      dismissable: newNoticeDismissable.value,
+      dismissable: newNoticeSurvey.value ? true : newNoticeDismissable.value,
       announce_at: newNoticeScheduledDate.value
         ? dayjs(newNoticeScheduledDate.value).toISOString()
         : dayjs().toISOString(),

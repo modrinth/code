@@ -1,11 +1,11 @@
 <template>
   <div class="contents">
     <div
-      v-if="serverData?.notices && serverData.notices.length > 0"
+      v-if="filteredNotices.length > 0"
       class="experimental-styles-within relative mx-auto flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
     >
       <ServerNotice
-        v-for="notice in serverData?.notices"
+        v-for="notice in filteredNotices"
         :key="`notice-${notice.id}`"
         :level="notice.level"
         :message="notice.message"
@@ -430,15 +430,13 @@ const isFirstMount = ref(true);
 const isMounted = ref(true);
 
 const INTERCOM_APP_ID = ref("ykeritl9");
-const auth = await useAuth();
-// @ts-expect-error - Auth is untyped
+const auth = (await useAuth()) as unknown as {
+  value: { user: { id: string; username: string; email: string; created: string } };
+};
 const userId = ref(auth.value?.user?.id ?? null);
-// @ts-expect-error - Auth is untyped
 const username = ref(auth.value?.user?.username ?? null);
-// @ts-expect-error - Auth is untyped
 const email = ref(auth.value?.user?.email ?? null);
 const createdAt = ref(
-  // @ts-expect-error - Auth is untyped
   auth.value?.user?.created ? Math.floor(new Date(auth.value.user.created).getTime() / 1000) : null,
 );
 
@@ -543,6 +541,102 @@ const navLinks = [
     subpages: ["startup", "network", "properties", "info"],
   },
 ];
+
+const filteredNotices = computed(
+  () => serverData.value?.notices?.filter((n) => n.level !== "survey") ?? [],
+);
+const surveyNotice = computed(() => serverData.value?.notices?.find((n) => n.level === "survey"));
+
+async function dismissSurvey() {
+  const noticeId = surveyNotice.value?.id;
+  if (noticeId === undefined) {
+    console.warn("No survey notice to dismiss");
+    return;
+  }
+  await dismissNotice(noticeId);
+  console.log(`Dismissed survey notice ${noticeId}`);
+}
+
+type TallyPopupOptions = {
+  key?: string;
+  layout?: "default" | "modal";
+  width?: number;
+  alignLeft?: boolean;
+  hideTitle?: boolean;
+  overlay?: boolean;
+  emoji?: {
+    text: string;
+    animation:
+      | "none"
+      | "wave"
+      | "tada"
+      | "heart-beat"
+      | "spin"
+      | "flash"
+      | "bounce"
+      | "rubber-band"
+      | "head-shake";
+  };
+  autoClose?: number;
+  showOnce?: boolean;
+  doNotShowAfterSubmit?: boolean;
+  customFormUrl?: string;
+  hiddenFields?: {
+    [key: string]: unknown;
+  };
+  onOpen?: () => void;
+  onClose?: () => void;
+  onPageView?: (page: number) => void;
+  onSubmit?: (payload: unknown) => void;
+};
+
+const popupOptions = computed(
+  () =>
+    ({
+      layout: "default",
+      width: 400,
+      autoClose: 2000,
+      hiddenFields: {
+        username: auth.value?.user?.username,
+        user_id: auth.value?.user?.id,
+        user_email: auth.value?.user?.email,
+        server_id: serverData.value?.server_id,
+        loader: serverData.value?.loader,
+        game_version: serverData.value?.mc_version,
+        modpack_id: serverData.value?.project?.id,
+        modpack_name: serverData.value?.project?.title,
+      },
+      emoji: {
+        text: "🐸",
+        animation: "rubber-band",
+      },
+      onOpen: () => console.log(`Opened survey notice: ${surveyNotice.value?.id}`),
+      onClose: async () => await dismissSurvey(),
+      onSubmit: (payload: any) => {
+        console.log("Form submitted:", payload);
+      },
+    }) satisfies TallyPopupOptions,
+);
+
+function showSurvey() {
+  if (!surveyNotice.value) {
+    console.warn("No survey notice to open");
+    return;
+  }
+
+  try {
+    if ((window as any).Tally?.openPopup) {
+      console.log(
+        `Opening Tally popup for survey notice ${surveyNotice.value?.id} (form ID: ${surveyNotice.value?.message})`,
+      );
+      (window as any).Tally.openPopup(surveyNotice.value?.message, popupOptions.value);
+    } else {
+      console.warn("Tally script not yet loaded");
+    }
+  } catch (e) {
+    console.error("Error opening Tally popup:", e);
+  }
+}
 
 const connectWebSocket = () => {
   if (!isMounted.value) return;
@@ -1006,6 +1100,10 @@ onMounted(() => {
       }
     },
   );
+
+  if (surveyNotice.value) {
+    showSurvey();
+  }
 });
 
 onUnmounted(() => {
@@ -1029,6 +1127,15 @@ watch(
 
 definePageMeta({
   middleware: "auth",
+});
+
+useHead({
+  script: [
+    {
+      src: "https://tally.so/widgets/embed.js",
+      defer: true,
+    },
+  ],
 });
 </script>
 
