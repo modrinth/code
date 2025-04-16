@@ -246,6 +246,10 @@
                 <SettingsIcon />
                 Edit assignments
               </button>
+              <template v-if="notice.dismissed_by.length > 0">
+                •
+                <span> Dismissed by {{ notice.dismissed_by.length }} servers </span>
+              </template>
             </div>
           </div>
         </div>
