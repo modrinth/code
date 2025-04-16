@@ -19,18 +19,15 @@ actix-ws = "0.3.0"
 actix-files = "0.6.5"
 prometheus = "0.13.4"
 actix-web-prom = { version = "0.9.0", features = ["process"] }
-governor = "0.6.3"
 
 tracing = "0.1.41"
-tracing-subscriber = "0.3.19"
 tracing-actix-web = "0.7.16"
 console-subscriber = "0.4.1"
 
-tokio = { version = "1.35.1", features = ["sync"] }
+tokio = { version = "1.35.1", features = ["sync", "rt-multi-thread"] }
 tokio-stream = "0.1.14"
 
 futures = "0.3.30"
-futures-timer = "3.0.2"
 futures-util = "0.3.30"
 async-trait = "0.1.70"
 dashmap = "5.4.0"
@@ -43,14 +40,11 @@ hyper = { version = "0.14", features = ["full"] }
 hyper-tls = "0.5.0"
 
 serde = { version = "1.0", features = ["derive"] }
-serde_bytes = "0.11"
 serde_json = "1.0"
-serde_cbor = "0.11"
 serde_with = "3.0.0"
 chrono = { version = "0.4.26", features = ["serde"] }
 yaserde = "0.12.0"
 yaserde_derive = "0.12.0"
-xml-rs = "0.8.15"
 
 rand = "0.8.5"
 rand_chacha = "0.3.1"
@@ -132,6 +126,7 @@ json-patch = "*"
 ariadne = { path = "../../packages/ariadne" }
 
 clap = { version = "4.5", features = ["derive"] }
+iana-time-zone = "0.1.61"
 
 [target.'cfg(not(target_env = "msvc"))'.dependencies]
 tikv-jemallocator = { version = "0.6.0", features = ["profiling", "unprefixed_malloc_on_supported_platforms"] }
@@ -140,3 +135,8 @@ jemalloc_pprof = { version = "0.7.0", features = ["flamegraph"] }
 
 [dev-dependencies]
 actix-http = "3.4.0"
+
+[build-dependencies]
+dotenv-build = "0.1.1"
+chrono = "0.4.38"
+iana-time-zone = "0.1.60"

@@ -298,6 +298,12 @@
                 link: '/admin/user_email',
                 shown: isAdmin(auth.user),
               },
+              {
+                id: 'servers-notices',
+                color: 'primary',
+                link: '/admin/servers/notices',
+                shown: isAdmin(auth.user),
+              },
             ]"
           >
             <ModrinthIcon aria-hidden="true" />
@@ -305,6 +311,9 @@
             <template #review-projects> <ScaleIcon aria-hidden="true" /> Review projects </template>
             <template #review-reports> <ReportIcon aria-hidden="true" /> Reports </template>
             <template #user-lookup> <UserIcon aria-hidden="true" /> Lookup by email </template>
+            <template #servers-notices>
+              <IssuesIcon aria-hidden="true" /> Manage server notices
+            </template>
           </OverflowMenu>
         </ButtonStyled>
         <ButtonStyled type="transparent">

@@ -139,9 +139,7 @@ pub async fn write(
         })
     })
     .await
-    .map_err(|_| {
-        std::io::Error::new(std::io::ErrorKind::Other, "background task failed")
-    })??;
+    .map_err(|_| std::io::Error::other("background task failed"))??;
 
     Ok(())
 }
@@ -152,8 +150,7 @@ fn sync_write(
 ) -> Result<(), std::io::Error> {
     let mut tempfile =
         NamedTempFile::new_in(path.as_ref().parent().ok_or_else(|| {
-            std::io::Error::new(
-                std::io::ErrorKind::Other,
+            std::io::Error::other(
                 "could not get parent directory for temporary file",
             )
         })?)?;

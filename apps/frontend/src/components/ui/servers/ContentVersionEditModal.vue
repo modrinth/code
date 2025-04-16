@@ -155,9 +155,11 @@
             class="w-full"
             :disabled="gameVersions.length < 2 && platforms.length < 2"
             @click="
-              versionFilter = !versionFilter;
-              setInitialFilters();
-              updateFiltersToUi();
+              () => {
+                versionFilter = !versionFilter;
+                setInitialFilters();
+                updateFiltersToUi();
+              }
             "
           >
             <LockOpenIcon />

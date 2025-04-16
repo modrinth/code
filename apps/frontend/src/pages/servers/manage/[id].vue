@@ -1,6 +1,21 @@
 <template>
   <div class="contents">
     <div
+      v-if="filteredNotices.length > 0"
+      class="experimental-styles-within relative mx-auto flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
+    >
+      <ServerNotice
+        v-for="notice in filteredNotices"
+        :key="`notice-${notice.id}`"
+        :level="notice.level"
+        :message="notice.message"
+        :dismissable="notice.dismissable"
+        :title="notice.title"
+        class="w-full"
+        @dismiss="() => dismissNotice(notice.id)"
+      />
+    </div>
+    <div
       v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
       class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
     >
@@ -398,11 +413,14 @@ import {
   LockIcon,
 } from "@modrinth/assets";
 import DOMPurify from "dompurify";
-import { ButtonStyled } from "@modrinth/ui";
+import { ButtonStyled, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import { reloadNuxtApp, navigateTo } from "#app";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
+import { usePyroFetch } from "~/composables/pyroFetch.ts";
+
+const app = useNuxtApp() as unknown as { $notify: any };
 
 const socket = ref<WebSocket | null>(null);
 const isReconnecting = ref(false);
@@ -412,15 +430,13 @@ const isFirstMount = ref(true);
 const isMounted = ref(true);
 
 const INTERCOM_APP_ID = ref("ykeritl9");
-const auth = await useAuth();
-// @ts-expect-error - Auth is untyped
+const auth = (await useAuth()) as unknown as {
+  value: { user: { id: string; username: string; email: string; created: string } };
+};
 const userId = ref(auth.value?.user?.id ?? null);
-// @ts-expect-error - Auth is untyped
 const username = ref(auth.value?.user?.username ?? null);
-// @ts-expect-error - Auth is untyped
 const email = ref(auth.value?.user?.email ?? null);
 const createdAt = ref(
-  // @ts-expect-error - Auth is untyped
   auth.value?.user?.created ? Math.floor(new Date(auth.value.user.created).getTime() / 1000) : null,
 );
 
@@ -525,6 +541,99 @@ const navLinks = [
     subpages: ["startup", "network", "properties", "info"],
   },
 ];
+
+const filteredNotices = computed(
+  () => serverData.value?.notices?.filter((n) => n.level !== "survey") ?? [],
+);
+const surveyNotice = computed(() => serverData.value?.notices?.find((n) => n.level === "survey"));
+
+async function dismissSurvey() {
+  const noticeId = surveyNotice.value?.id;
+  if (noticeId === undefined) {
+    console.warn("No survey notice to dismiss");
+    return;
+  }
+  await dismissNotice(noticeId);
+  console.log(`Dismissed survey notice ${noticeId}`);
+}
+
+type TallyPopupOptions = {
+  key?: string;
+  layout?: "default" | "modal";
+  width?: number;
+  alignLeft?: boolean;
+  hideTitle?: boolean;
+  overlay?: boolean;
+  emoji?: {
+    text: string;
+    animation:
+      | "none"
+      | "wave"
+      | "tada"
+      | "heart-beat"
+      | "spin"
+      | "flash"
+      | "bounce"
+      | "rubber-band"
+      | "head-shake";
+  };
+  autoClose?: number;
+  showOnce?: boolean;
+  doNotShowAfterSubmit?: boolean;
+  customFormUrl?: string;
+  hiddenFields?: {
+    [key: string]: unknown;
+  };
+  onOpen?: () => void;
+  onClose?: () => void;
+  onPageView?: (page: number) => void;
+  onSubmit?: (payload: unknown) => void;
+};
+
+const popupOptions = computed(
+  () =>
+    ({
+      layout: "default",
+      width: 400,
+      autoClose: 2000,
+      hideTitle: true,
+      hiddenFields: {
+        username: auth.value?.user?.username,
+        user_id: auth.value?.user?.id,
+        user_email: auth.value?.user?.email,
+        server_id: serverData.value?.server_id,
+        loader: serverData.value?.loader,
+        game_version: serverData.value?.mc_version,
+        modpack_id: serverData.value?.project?.id,
+        modpack_name: serverData.value?.project?.title,
+      },
+      onOpen: () => console.log(`Opened survey notice: ${surveyNotice.value?.id}`),
+      onClose: async () => await dismissSurvey(),
+      onSubmit: (payload: any) => {
+        console.log("Form submitted:", payload);
+      },
+    }) satisfies TallyPopupOptions,
+);
+
+function showSurvey() {
+  if (!surveyNotice.value) {
+    console.warn("No survey notice to open");
+    return;
+  }
+
+  try {
+    if ((window as any).Tally?.openPopup) {
+      console.log(
+        `Opening Tally popup for survey notice ${surveyNotice.value?.id} (form ID: ${surveyNotice.value?.message})`,
+      );
+      (window as any).Tally.openPopup(surveyNotice.value?.message, popupOptions.value);
+    } else {
+      console.warn("Tally script not yet loaded");
+    }
+  } catch (e) {
+    console.error("Error opening Tally popup:", e);
+  }
+}
 
 const connectWebSocket = () => {
   if (!isMounted.value) return;
@@ -927,6 +1036,20 @@ const cleanup = () => {
   DOMPurify.removeHook("afterSanitizeAttributes");
 };
 
+async function dismissNotice(noticeId: number) {
+  await usePyroFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
+    method: "POST",
+  }).catch((err) => {
+    app.$notify({
+      group: "main",
+      title: "Error dismissing notice",
+      text: err,
+      type: "error",
+    });
+  });
+  await server.refresh(["general"]);
+}
+
 onMounted(() => {
   isMounted.value = true;
   if (server.general?.status === "suspended") {
@@ -974,6 +1097,10 @@ onMounted(() => {
       }
     },
   );
+
+  if (surveyNotice.value) {
+    showSurvey();
+  }
 });
 
 onUnmounted(() => {
@@ -997,6 +1124,15 @@ watch(
 
 definePageMeta({
   middleware: "auth",
+});
+
+useHead({
+  script: [
+    {
+      src: "https://tally.so/widgets/embed.js",
+      defer: true,
+    },
+  ],
 });
 </script>
 

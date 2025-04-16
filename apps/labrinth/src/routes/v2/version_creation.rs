@@ -188,7 +188,7 @@ pub async fn version_create(
                 // Handle project type via file extension prediction
                 let mut project_type = None;
                 for file_part in &legacy_create.file_parts {
-                    if let Some(ext) = file_part.split('.').last() {
+                    if let Some(ext) = file_part.split('.').next_back() {
                         match ext {
                             "mrpack" | "mrpack-primary" => {
                                 project_type = Some("modpack");
