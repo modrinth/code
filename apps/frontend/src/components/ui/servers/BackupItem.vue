@@ -47,9 +47,12 @@ const backupQueued = computed(
 const automated = computed(() => props.backup.automated);
 const failedToCreate = computed(() => props.backup.interrupted);
 
-const hasPreparedDownload = computed(() => props.backup.task?.file?.state === "done");
-
+const preparedDownloadStates = ["ready", "done"];
 const inactiveStates = ["failed", "cancelled"];
+
+const hasPreparedDownload = computed(() =>
+  preparedDownloadStates.includes(props.backup.task?.file?.state ?? ""),
+);
 
 const creating = computed(() => {
   const task = props.backup.task?.create;
