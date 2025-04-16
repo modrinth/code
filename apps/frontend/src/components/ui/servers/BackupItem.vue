@@ -22,7 +22,8 @@ const flags = useFeatureFlags();
 const { formatMessage } = useVIntl();
 
 const emit = defineEmits<{
-  (e: "download" | "rename" | "restore" | "lock"): void;
+  (e: "prepare" | "rename" | "restore" | "lock"): void;
+  (e: "download", callback: () => void): void;
   (e: "delete", skipConfirmation?: boolean): void;
 }>();
 
@@ -36,6 +37,8 @@ const props = withDefaults(
   },
 );
 
+const downloading = ref(false);
+
 const backupQueued = computed(
   () =>
     props.backup.task?.create?.progress === 0 ||
@@ -43,6 +46,8 @@ const backupQueued = computed(
 );
 const automated = computed(() => props.backup.automated);
 const failedToCreate = computed(() => props.backup.interrupted);
+
+const hasPreparedDownload = computed(() => props.backup.task?.file?.state === "done");
 
 const inactiveStates = ["failed", "cancelled"];
 
@@ -62,6 +67,14 @@ const creating = computed(() => {
 
 const restoring = computed(() => {
   const task = props.backup.task?.restore;
+  if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
+    return task;
+  }
+  return undefined;
+});
+
+const preparingFile = computed(() => {
+  const task = props.backup.task?.file;
   if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
     return task;
   }
@@ -94,6 +107,18 @@ const messages = defineMessages({
   queuedForBackup: {
     id: "servers.backups.item.queued-for-backup",
     defaultMessage: "Queued for backup",
+  },
+  preparingDownload: {
+    id: "servers.backups.item.preparing-download",
+    defaultMessage: "Preparing download...",
+  },
+  prepareDownload: {
+    id: "servers.backups.item.prepare-download",
+    defaultMessage: "Prepare download",
+  },
+  alreadyPreparing: {
+    id: "servers.backups.item.already-preparing",
+    defaultMessage: "Already preparing backup for download",
   },
   creatingBackup: {
     id: "servers.backups.item.creating-backup",
@@ -188,10 +213,10 @@ const messages = defineMessages({
       />
     </div>
     <template v-else>
-      <div class="col-span-2 sm:col-span-1">
+      <div class="col-span-2">
         {{ dayjs(backup.created_at).format("MMMM D, YYYY [at] h:mm A") }}
       </div>
-      <div>{{ 245 }} MiB</div>
+      <div v-if="false">{{ 245 }} MiB</div>
     </template>
     <div
       v-if="!preview"
@@ -212,26 +237,56 @@ const messages = defineMessages({
         </ButtonStyled>
       </template>
       <ButtonStyled v-else-if="creating">
-        <button>
+        <button @click="() => emit('delete')">
           <XIcon />
           {{ formatMessage(commonMessages.cancelButton) }}
         </button>
       </ButtonStyled>
       <template v-else>
         <ButtonStyled>
-          <button @click="() => emit('download')">
-            <DownloadIcon />
-            {{ formatMessage(commonMessages.downloadButton) }}
+          <button
+            v-if="hasPreparedDownload"
+            :disabled="downloading"
+            @click="
+              () => {
+                downloading = true;
+                emit('download', () => (downloading = false));
+              }
+            "
+          >
+            <SpinnerIcon v-if="downloading" class="animate-spin" />
+            <DownloadIcon v-else />
+            {{
+              formatMessage(
+                downloading ? commonMessages.downloadingButton : commonMessages.downloadButton,
+              )
+            }}
+          </button>
+          <button v-else :disabled="!!preparingFile" @click="() => emit('prepare')">
+            <SpinnerIcon v-if="preparingFile" class="animate-spin" />
+            <DownloadIcon v-else />
+            {{
+              formatMessage(preparingFile ? messages.preparingDownload : messages.prepareDownload)
+            }}
           </button>
         </ButtonStyled>
         <ButtonStyled circular type="transparent">
           <OverflowMenu
             :options="[
               { id: 'rename', action: () => emit('rename') },
-              { id: 'restore', action: () => emit('restore'), disabled: !!restoring },
+              {
+                id: 'restore',
+                action: () => emit('restore'),
+                disabled: !!restoring || !!preparingFile,
+              },
               { id: 'lock', action: () => emit('lock') },
               { divider: true },
-              { id: 'delete', color: 'red', action: () => emit('delete'), disabled: !!restoring },
+              {
+                id: 'delete',
+                color: 'red',
+                action: () => emit('delete'),
+                disabled: !!restoring || !!preparingFile,
+              },
             ]"
           >
             <MoreVerticalIcon />

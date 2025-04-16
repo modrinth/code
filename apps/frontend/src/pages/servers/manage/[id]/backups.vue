@@ -87,11 +87,22 @@
     </div>
 
     <div class="flex w-full flex-col gap-2">
+      <div
+        v-if="backups.length === 0"
+        class="mt-6 flex items-center justify-center gap-2 text-center text-secondary"
+      >
+        <template v-if="data.used_backup_quota">
+          <SpinnerIcon class="animate-spin" />
+          Loading backups...
+        </template>
+        <template v-else> You don't have any backups yet. </template>
+      </div>
       <BackupItem
         v-for="backup in backups"
         :key="`backup-${backup.id}`"
         :backup="backup"
-        @download="() => initiateDownload(backup.id)"
+        @prepare="() => prepareDownload(backup.id)"
+        @download="(callback) => downloadBackup(backup.id, callback)"
         @rename="() => renameBackupModal?.show(backup)"
         @restore="() => restoreBackupModal?.show(backup)"
         @lock="
@@ -134,7 +145,7 @@
 <script setup lang="ts">
 import { ButtonStyled, TagItem } from "@modrinth/ui";
 import { useStorage } from "@vueuse/core";
-import { PlusIcon, DownloadIcon, SettingsIcon, IssuesIcon } from "@modrinth/assets";
+import { SpinnerIcon, PlusIcon, DownloadIcon, SettingsIcon, IssuesIcon } from "@modrinth/assets";
 import { ref, computed } from "vue";
 import type { Server } from "~/composables/pyroServers";
 import BackupItem from "~/components/ui/servers/BackupItem.vue";
@@ -212,40 +223,32 @@ function triggerDownloadAnimation() {
   setTimeout(() => (overTheTopDownloadAnimation.value = false), 500);
 }
 
-const initiateDownload = async (backupId: string) => {
-  addNotification({
-    type: "success",
-    title: "Preparing download",
-    text: "We are preparing your download. Your download will start automatically once ready.",
-  });
-
+const prepareDownload = async (backupId: string) => {
   try {
     await props.server.backups?.prepare(backupId);
   } catch (error) {
     console.error("Failed to prepare download:", error);
-    addNotification({ type: "error", text: "Failed to prepare download." });
+    addNotification({ type: "error", title: "Failed to prepare backup for download", text: error });
   }
+};
 
-  // try {
-  //   const downloadurl: any = await props.server.backups?.download(backupId);
-  //   if (!downloadurl || !downloadurl.download_url) {
-  //     throw new Error("Invalid download URL.");
-  //   }
-  //
-  //   let finalDownloadUrl: string = downloadurl.download_url;
-  //
-  //   if (!/^https?:\/\//i.test(finalDownloadUrl)) {
-  //     finalDownloadUrl = `https://${finalDownloadUrl.startsWith("/") ? finalDownloadUrl.substring(1) : finalDownloadUrl}`;
-  //   }
-  //
-  //   const a = document.createElement("a");
-  //   a.href = finalDownloadUrl;
-  //   a.setAttribute("download", "");
-  //   a.click();
-  //   a.remove();
-  // } catch (error) {
-  //   console.error("Download failed:", error);
-  // }
+const downloadBackup = async (backupId: string, callback: () => void) => {
+  try {
+    const fileData = await props.server.backups?.download(backupId);
+
+    if (fileData) {
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(fileData);
+      link.download = backupId;
+      link.click();
+      window.URL.revokeObjectURL(link.href);
+      triggerDownloadAnimation();
+    }
+  } catch (error) {
+    console.error("Failed to download:", error);
+    addNotification({ type: "error", title: "Failed to download backup", text: error });
+  }
+  callback();
 };
 
 const lockBackup = async (backupId: string) => {
