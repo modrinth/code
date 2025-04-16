@@ -41,6 +41,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  markdown: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['proceed'])
@@ -80,6 +84,7 @@ function proceed() {
     :on-hide="onModalHide"
     :noblur="!themeStore.advancedRendering"
     :danger="danger"
+    :markdown="markdown"
     @proceed="proceed"
   />
 </template>

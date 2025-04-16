@@ -19,6 +19,7 @@
           path: breadcrumb.link.replace('{id}', encodeURIComponent($route.params.id)),
           query: breadcrumb.query,
         }"
+        class="text-primary"
         >{{
           breadcrumb.name.charAt(0) === '?'
             ? breadcrumbData.getName(breadcrumb.name.slice(1))

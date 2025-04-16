@@ -4,9 +4,11 @@ use theseus::{
     prelude::{CommandPayload, DirectoryInfo},
 };
 
-use crate::api::Result;
+use crate::api::{Result, TheseusSerializableError};
 use dashmap::DashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use theseus::prelude::canonicalize;
+use url::Url;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
@@ -139,4 +141,29 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 pub async fn handle_command(command: String) -> Result<()> {
     tracing::info!("handle command: {command}");
     Ok(theseus::handler::parse_and_emit_command(&command).await?)
+}
+
+// Remove when (and if) https://github.com/tauri-apps/tauri/issues/12022 is implemented
+pub(crate) fn tauri_convert_file_src(path: &Path) -> Result<Url> {
+    #[cfg(any(windows, target_os = "android"))]
+    const BASE: &str = "http://asset.localhost/";
+    #[cfg(not(any(windows, target_os = "android")))]
+    const BASE: &str = "asset://localhost/";
+
+    macro_rules! theseus_try {
+        ($test:expr) => {
+            match $test {
+                Ok(val) => val,
+                Err(e) => {
+                    return Err(TheseusSerializableError::Theseus(e.into()))
+                }
+            }
+        };
+    }
+
+    let path = theseus_try!(canonicalize(path));
+    let path = path.to_string_lossy();
+    let encoded = urlencoding::encode(&path);
+
+    Ok(theseus_try!(Url::parse(&format!("{BASE}{encoded}"))))
 }

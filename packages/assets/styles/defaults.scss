@@ -59,7 +59,7 @@ textarea,
   padding: 0.5rem 1rem;
   font-weight: var(--font-weight-medium);
   transition: box-shadow 0.1s ease-in-out;
-  min-height: 40px;
+  min-height: 36px;
   box-shadow:
     var(--shadow-inset-sm),
     0 0 0 0 transparent;
@@ -159,7 +159,7 @@ input[type='number'] {
     @extend .transparent, .icon-only;
 
     position: absolute;
-    right: 0.25rem;
+    right: 0.125rem;
     z-index: 1;
 
     svg {

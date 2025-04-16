@@ -77,6 +77,7 @@ pub async fn profile_create(
         name,
         icon_path: None,
         game_version,
+        protocol_version: None,
         loader: modloader,
         loader_version: loader.map(|x| x.id),
         groups: Vec::new(),

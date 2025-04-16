@@ -14,7 +14,7 @@
     <div v-if="selectedProcess" class="status">
       <span class="circle running" />
       <div ref="profileButton" class="running-text">
-        <router-link :to="`/instance/${encodeURIComponent(selectedProcess.profile.path)}`">
+        <router-link class="text-primary" :to="`/instance/${encodeURIComponent(selectedProcess.profile.path)}`">
           {{ selectedProcess.profile.name }}
         </router-link>
         <div

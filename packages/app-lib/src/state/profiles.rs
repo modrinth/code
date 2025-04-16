@@ -23,6 +23,7 @@ pub struct Profile {
     pub icon_path: Option<String>,
 
     pub game_version: String,
+    pub protocol_version: Option<i32>,
     pub loader: ModLoader,
     pub loader_version: Option<String>,
 
@@ -261,6 +262,7 @@ struct ProfileQueryResult {
     override_hook_pre_launch: Option<String>,
     override_hook_wrapper: Option<String>,
     override_hook_post_exit: Option<String>,
+    protocol_version: Option<i64>,
 }
 
 impl TryFrom<ProfileQueryResult> for Profile {
@@ -273,6 +275,7 @@ impl TryFrom<ProfileQueryResult> for Profile {
             name: x.name,
             icon_path: x.icon_path,
             game_version: x.game_version,
+            protocol_version: x.protocol_version.map(|x| x as i32),
             loader: ModLoader::from_string(&x.mod_loader),
             loader_version: x.mod_loader_version,
             groups: serde_json::from_value(x.groups).unwrap_or_default(),
@@ -337,7 +340,7 @@ macro_rules! select_profiles_with_predicate {
             r#"
             SELECT
                 path, install_stage, name, icon_path,
-                game_version, mod_loader, mod_loader_version,
+                game_version, protocol_version, mod_loader, mod_loader_version,
                 json(groups) as "groups!: serde_json::Value",
                 linked_project_id, linked_version_id, locked,
                 created, modified, last_played,
@@ -435,7 +438,8 @@ impl Profile {
                 submitted_time_played, recent_time_played,
                 override_java_path, override_extra_launch_args, override_custom_env_vars,
                 override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
-                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit
+                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,
+                protocol_version
             )
             VALUES (
                 $1, $2, $3, $4,
@@ -446,7 +450,8 @@ impl Profile {
                 $15, $16,
                 $17, jsonb($18), jsonb($19),
                 $20, $21, $22, $23,
-                $24, $25, $26
+                $24, $25, $26,
+                $27
             )
             ON CONFLICT (path) DO UPDATE SET
                 install_stage = $2,
@@ -480,7 +485,9 @@ impl Profile {
 
                 override_hook_pre_launch = $24,
                 override_hook_wrapper = $25,
-                override_hook_post_exit = $26
+                override_hook_post_exit = $26,
+
+                protocol_version = $27
             ",
             self.path,
             install_stage,
@@ -508,6 +515,7 @@ impl Profile {
             self.hooks.pre_launch,
             self.hooks.wrapper,
             self.hooks.post_exit,
+            self.protocol_version,
         )
             .execute(exec)
             .await?;

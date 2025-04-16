@@ -118,6 +118,8 @@
             :playing="playing"
             :versions="modrinthVersions"
             :installed="instance.install_stage !== 'installed'"
+            @play="updatePlayState"
+            @stop="() => stopInstance('InstanceSubpage')"
           ></component>
           <template #fallback>
             <LoadingIndicator />
@@ -238,6 +240,10 @@ async function fetchInstance() {
       })
   }
 
+  await updatePlayState()
+}
+
+async function updatePlayState() {
   const runningProcesses = await get_by_profile_path(route.params.id).catch(handleError)
 
   playing.value = runningProcesses.length > 0
@@ -253,14 +259,20 @@ watch(
   },
 )
 
+const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id)}`)
+
 const tabs = computed(() => [
   {
     label: 'Content',
-    href: `/instance/${encodeURIComponent(route.params.id)}`,
+    href: `${basePath.value}`,
+  },
+  {
+    label: 'Worlds',
+    href: `${basePath.value}/worlds`,
   },
   {
     label: 'Logs',
-    href: `/instance/${encodeURIComponent(route.params.id)}/logs`,
+    href: `${basePath.value}/logs`,
   },
 ])
 

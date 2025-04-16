@@ -91,8 +91,7 @@ pub async fn ws_init(
     let friend_statuses = if !friends.is_empty() {
         let db = db.clone();
         let redis = redis.clone();
-
-        let statuses = tokio_stream::iter(friends.iter())
+        tokio_stream::iter(friends.iter())
             .map(|x| {
                 let db = db.clone();
                 let redis = redis.clone();
@@ -112,9 +111,10 @@ pub async fn ws_init(
             })
             .buffer_unordered(16)
             .collect::<Vec<_>>()
-            .await;
-
-        statuses.into_iter().flatten().collect()
+            .await
+            .into_iter()
+            .flatten()
+            .collect()
     } else {
         Vec::new()
     };

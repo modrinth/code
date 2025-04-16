@@ -30,8 +30,10 @@ tokio = { version = "1", features = ["full"] }
 thiserror = "1.0"
 daedalus = { path = "../../packages/daedalus" }
 chrono = "0.4.26"
+either = "1.15"
 
 url = "2.2"
+urlencoding = "2.1"
 uuid = { version = "1.1", features = ["serde", "v4"] }
 os_info = "3.7.0"
 

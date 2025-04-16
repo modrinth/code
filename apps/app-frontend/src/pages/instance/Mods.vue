@@ -219,17 +219,16 @@
       />
     </div>
   </template>
-  <div v-else class="w-full flex flex-col items-center justify-center mt-6 max-w-[48rem] mx-auto">
-    <div class="top-box w-full">
+  <div v-else class="w-full max-w-[48rem] mx-auto flex flex-col mt-6">
+    <RadialHeader class="">
       <div class="flex items-center gap-6 w-[32rem] mx-auto">
         <img src="@/assets/sad-modrinth-bot.webp" class="h-24" />
         <span class="text-contrast font-bold text-xl"
-          >You haven't added any content to this instance yet.</span
+        >You haven't added any content to this instance yet.</span
         >
       </div>
-    </div>
-    <div class="top-box-divider"></div>
-    <div class="flex items-center gap-6 py-4">
+    </RadialHeader>
+    <div class="flex mt-4 mx-auto">
       <AddContentButton :instance="instance" />
     </div>
   </div>
@@ -271,8 +270,8 @@ import {
   ButtonStyled,
   ContentListPanel,
   OverflowMenu,
-  Pagination,
-  Toggle,
+  Pagination, RadialHeader,
+  Toggle
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import type { ComputedRef } from 'vue'

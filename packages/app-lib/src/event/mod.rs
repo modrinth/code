@@ -1,5 +1,6 @@
 //! Theseus state management system
 use ariadne::users::{UserId, UserStatus};
+use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
@@ -234,13 +235,23 @@ pub enum ProcessPayloadType {
 #[derive(Serialize, Clone)]
 pub struct ProfilePayload {
     pub profile_path_id: String,
+    #[serde(flatten)]
     pub event: ProfilePayloadType,
 }
 #[derive(Serialize, Clone)]
-#[serde(rename_all = "snake_case")]
+#[serde(tag = "event", rename_all = "snake_case")]
 pub enum ProfilePayloadType {
     Created,
     Synced,
+    ServersUpdated,
+    WorldUpdated {
+        world: String,
+    },
+    ServerJoined {
+        host: String,
+        port: u16,
+        timestamp: DateTime<Utc>,
+    },
     Edited,
     Removed,
 }

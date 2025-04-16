@@ -35,6 +35,7 @@
     "tags:default",
     "utils:default",
     "ads:default",
-    "friends:default"
+    "friends:default",
+    "worlds:default"
   ]
 }
