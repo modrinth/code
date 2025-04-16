@@ -18,7 +18,7 @@ async_zip = { version = "0.0.17", features = ["chrono", "tokio-fs", "deflate", "
 flate2 = "1.0.28"
 tempfile = "3.5.0"
 dashmap = { version = "6.0.1", features = ["serde"] }
-quick-xml = { version = "0.37.3", features = ["async-tokio"] }
+quick-xml = { version = "0.37", features = ["async-tokio"] }
 
 chrono = { version = "0.4.19", features = ["serde"] }
 daedalus = { path = "../../packages/daedalus" }
@@ -66,7 +66,7 @@ base64 = "0.22.0"
 sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
 
 quartz_nbt = { version = "0.2", features = ["serde"] }
-hickory-resolver = "0.24"
+hickory-resolver = "0.25"
 
 ariadne = { path = "../ariadne" }
 

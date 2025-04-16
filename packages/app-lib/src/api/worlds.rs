@@ -13,7 +13,6 @@ use chrono::{DateTime, Local, TimeZone, Utc};
 use either::Either;
 use fs4::tokio::AsyncFileExt;
 use futures::StreamExt;
-use hickory_resolver::error::ResolveErrorKind;
 use lazy_static::lazy_static;
 use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
@@ -164,8 +163,8 @@ async fn get_all_worlds_in_profile(
     profile_dir: &Path,
 ) -> Result<Vec<World>> {
     let mut worlds = vec![];
-    get_singleplayer_worlds_in_profile(&profile_dir, &mut worlds).await?;
-    get_server_worlds_in_profile(profile_path, &profile_dir, &mut worlds)
+    get_singleplayer_worlds_in_profile(profile_dir, &mut worlds).await?;
+    get_server_worlds_in_profile(profile_path, profile_dir, &mut worlds)
         .await?;
     Ok(worlds)
 }
@@ -809,14 +808,15 @@ async fn resolve_server_address(
     if host.parse::<Ipv4Addr>().is_ok() || host.parse::<Ipv6Addr>().is_ok() {
         return Ok((host.to_owned(), port));
     }
-    let resolver =
-        hickory_resolver::TokioAsyncResolver::tokio_from_system_conf()?;
+    let resolver = hickory_resolver::TokioResolver::builder_tokio()?.build();
     Ok(match resolver
         .srv_lookup(format!("_minecraft._tcp.{}", host))
         .await
     {
         Err(e)
-            if matches!(e.kind(), ResolveErrorKind::NoRecordsFound { .. }) =>
+            if e.proto()
+                .filter(|x| x.kind().is_no_records_found())
+                .is_some() =>
         {
             None
         }

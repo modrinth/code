@@ -124,7 +124,7 @@ pub enum ErrorKind {
     DirectoryMoveError(String),
 
     #[error("Error resolving DNS: {0}")]
-    DNSError(#[from] hickory_resolver::error::ResolveError),
+    DNSError(#[from] hickory_resolver::ResolveError),
 }
 
 #[derive(Debug)]
