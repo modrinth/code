@@ -65,7 +65,10 @@
       >
         <ButtonStyled type="standard">
           <button
-            :disabled="server.general?.status === 'installing'"
+            v-tooltip="
+              'Auto backups are currently unavailable; we apologize for the inconvenience.'
+            "
+            :disabled="true || server.general?.status === 'installing'"
             @click="showbackupSettingsModal"
           >
             <SettingsIcon class="h-5 w-5" />
