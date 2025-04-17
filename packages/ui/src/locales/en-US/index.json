@@ -428,6 +428,9 @@
   "servers.notice.level.info.name": {
     "defaultMessage": "Info"
   },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Survey"
+  },
   "servers.notice.level.warn.name": {
     "defaultMessage": "Warning"
   },

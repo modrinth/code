@@ -131,8 +131,6 @@ interface PowerAction {
   nextState: ServerState;
 }
 
-const flags = useFeatureFlags();
-
 const props = defineProps<{
   isOnline: boolean;
   isActioning: boolean;

@@ -1,9 +1,7 @@
 // usePyroServer is a composable that interfaces with the REDACTED API to get data and control the users server
 import { $fetch, FetchError } from "ofetch";
-import type { MessageDescriptor } from "@vintl/vintl";
-import type { ComputedRef } from "vue";
-import type { WSBackupState, WSBackupTask } from "~/types/servers.ts";
 import type { ServerNotice } from "@modrinth/utils";
+import type { WSBackupState, WSBackupTask } from "~/types/servers.ts";
 
 interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";

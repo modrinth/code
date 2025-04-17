@@ -409,7 +409,8 @@ import { reloadNuxtApp, navigateTo } from "#app";
 import type { MessageDescriptor } from "@vintl/vintl";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
-import { type Backup, usePyroFetch } from "~/composables/pyroServers.ts";
+import { type Backup } from "~/composables/pyroServers.ts";
+import { usePyroFetch } from "~/composables/pyroFetch.ts";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 
