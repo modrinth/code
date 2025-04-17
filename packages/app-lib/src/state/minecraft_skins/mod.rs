@@ -150,12 +150,12 @@ impl CustomMinecraftSkin {
     pub async fn texture_blob(
         &self,
         db: impl sqlx::Acquire<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<Option<Vec<u8>>> {
+    ) -> crate::Result<Vec<u8>> {
         Ok(sqlx::query_scalar!(
             "SELECT texture FROM custom_minecraft_skin_textures WHERE texture_key = ?",
             self.texture_key
         )
-        .fetch_optional(&mut *db.acquire().await?)
+        .fetch_one(&mut *db.acquire().await?)
         .await?)
     }
 
