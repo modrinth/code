@@ -137,6 +137,14 @@ pub enum ErrorKind {
 
     #[error("Invalid data URL: {0}")]
     InvalidDataUrlBase64(#[from] data_url::forgiving_base64::InvalidBase64),
+
+    #[error("Invalid PNG")]
+    InvalidPng,
+
+    #[error(
+        "A skin texture must have a dimension of either 64x64 or 64x32 pixels"
+    )]
+    InvalidSkinTexture,
 }
 
 #[derive(Debug)]

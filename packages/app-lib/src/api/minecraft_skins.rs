@@ -262,6 +262,11 @@ pub async fn add_and_equip_custom_skin(
     variant: MinecraftSkinVariant,
     cape_override: Option<Cape>,
 ) -> crate::Result<()> {
+    let (skin_width, skin_height) = png_dimensions(&texture_blob)?;
+    if skin_width != 64 || ![32, 64].contains(&skin_height) {
+        return Err(ErrorKind::InvalidSkinTexture)?;
+    }
+
     let cape_override = cape_override.map(|cape| cape.id);
     let state = State::get().await?;
 
@@ -271,7 +276,7 @@ pub async fn add_and_equip_custom_skin(
 
     // We have to equip the skin first, as it's the Mojang API backend who knows
     // how to compute the texture key we require, which we can then read from the
-    // updated player profile. This also ensures the skin data is indeed valid
+    // updated player profile
     mojang_api::MinecraftSkinOperation::equip(
         &selected_credentials,
         stream::iter([Ok::<_, String>(Bytes::clone(&texture_blob))]),
@@ -479,13 +484,15 @@ async fn sync_cape(
     Ok(())
 }
 
-fn texture_blob_to_data_url(texture_blob: Option<Vec<u8>>) -> Arc<Url> {
-    let data = texture_blob.map_or(
+fn texture_blob_to_data_url(texture_blob: Vec<u8>) -> Arc<Url> {
+    let data = if is_png(&texture_blob) {
+        Cow::Owned(texture_blob)
+    } else {
+        // Fall back to a placeholder texture if the DB somehow contains corrupt data
         Cow::Borrowed(
             &include_bytes!("minecraft_skins/assets/default/MissingNo.png")[..],
-        ),
-        Cow::Owned,
-    );
+        )
+    };
 
     Url::parse(&format!(
         "data:image/png;base64,{}",
@@ -493,4 +500,40 @@ fn texture_blob_to_data_url(texture_blob: Option<Vec<u8>>) -> Arc<Url> {
     ))
     .unwrap()
     .into()
+}
+
+fn is_png(data: &[u8]) -> bool {
+    /// The initial 8 bytes of a PNG file, used to identify it as such.
+    ///
+    /// Reference: <https://www.w3.org/TR/png-3/#3PNGsignature>
+    const PNG_SIGNATURE: &[u8] =
+        &[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+
+    data.starts_with(PNG_SIGNATURE)
+}
+
+fn png_dimensions(data: &[u8]) -> crate::Result<(u32, u32)> {
+    if !is_png(data) {
+        Err(ErrorKind::InvalidPng)?;
+    }
+
+    // Read the width and height fields from the IHDR chunk, which the
+    // PNG specification mandates to be the first in the file, just after
+    // the 8 signature bytes. See:
+    // https://www.w3.org/TR/png-3/#5DataRep
+    // https://www.w3.org/TR/png-3/#11IHDR
+    let width = u32::from_be_bytes(
+        data.get(16..20)
+            .ok_or(ErrorKind::InvalidPng)?
+            .try_into()
+            .unwrap(),
+    );
+    let height = u32::from_be_bytes(
+        data.get(20..24)
+            .ok_or(ErrorKind::InvalidPng)?
+            .try_into()
+            .unwrap(),
+    );
+
+    Ok((width, height))
 }
