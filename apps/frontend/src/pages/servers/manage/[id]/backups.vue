@@ -104,8 +104,10 @@
         v-for="backup in backups"
         :key="`backup-${backup.id}`"
         :backup="backup"
+        :kyros-url="props.server.general?.node.instance"
+        :jwt="props.server.general?.node.token"
         @prepare="() => prepareDownload(backup.id)"
-        @download="(callback) => downloadBackup(backup.id, callback)"
+        @download="() => triggerDownloadAnimation()"
         @rename="() => renameBackupModal?.show(backup)"
         @restore="() => restoreBackupModal?.show(backup)"
         @lock="
@@ -233,25 +235,6 @@ const prepareDownload = async (backupId: string) => {
     console.error("Failed to prepare download:", error);
     addNotification({ type: "error", title: "Failed to prepare backup for download", text: error });
   }
-};
-
-const downloadBackup = async (backupId: string, callback: () => void) => {
-  try {
-    const fileData = await props.server.backups?.download(backupId);
-
-    if (fileData) {
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(fileData);
-      link.download = backupId;
-      link.click();
-      window.URL.revokeObjectURL(link.href);
-      triggerDownloadAnimation();
-    }
-  } catch (error) {
-    console.error("Failed to download:", error);
-    addNotification({ type: "error", title: "Failed to download backup", text: error });
-  }
-  callback();
 };
 
 const lockBackup = async (backupId: string) => {

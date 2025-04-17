@@ -22,8 +22,7 @@ const flags = useFeatureFlags();
 const { formatMessage } = useVIntl();
 
 const emit = defineEmits<{
-  (e: "prepare" | "rename" | "restore" | "lock"): void;
-  (e: "download", callback: () => void): void;
+  (e: "prepare" | "download" | "rename" | "restore" | "lock"): void;
   (e: "delete", skipConfirmation?: boolean): void;
 }>();
 
@@ -31,13 +30,15 @@ const props = withDefaults(
   defineProps<{
     backup: Backup;
     preview?: boolean;
+    kyrosUrl?: string;
+    jwt?: string;
   }>(),
   {
     preview: false,
+    kyrosUrl: undefined,
+    jwt: undefined,
   },
 );
-
-const downloading = ref(false);
 
 const backupQueued = computed(
   () =>
@@ -247,24 +248,17 @@ const messages = defineMessages({
       </ButtonStyled>
       <template v-else>
         <ButtonStyled>
-          <button
+          <a
             v-if="hasPreparedDownload"
-            :disabled="downloading"
-            @click="
-              () => {
-                downloading = true;
-                emit('download', () => (downloading = false));
-              }
-            "
+            :class="{
+              disabled: !kyrosUrl || !jwt,
+            }"
+            :href="`https://${kyrosUrl}/modrinth/v0/backups/${backup.id}/download?auth=${jwt}`"
+            @click="() => emit('download')"
           >
-            <SpinnerIcon v-if="downloading" class="animate-spin" />
-            <DownloadIcon v-else />
-            {{
-              formatMessage(
-                downloading ? commonMessages.downloadingButton : commonMessages.downloadButton,
-              )
-            }}
-          </button>
+            <DownloadIcon />
+            {{ formatMessage(commonMessages.downloadButton) }}
+          </a>
           <button v-else :disabled="!!preparingFile" @click="() => emit('prepare')">
             <SpinnerIcon v-if="preparingFile" class="animate-spin" />
             <DownloadIcon v-else />

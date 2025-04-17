@@ -726,20 +726,6 @@ const restoreBackup = async (backupId: string) => {
   }
 };
 
-const downloadBackup = async (backupId: string) => {
-  try {
-    return await PyroFetch(`backups/${backupId}/download`, {
-      override: {
-        url: `${internalServerRefrence.value?.general?.node.instance}/modrinth/v0`,
-        token: internalServerRefrence.value.general?.node.token,
-      },
-    });
-  } catch (error) {
-    console.error("Error downloading backup:", error);
-    throw error;
-  }
-};
-
 const prepareBackup = async (backupId: string) => {
   try {
     await PyroFetch(
