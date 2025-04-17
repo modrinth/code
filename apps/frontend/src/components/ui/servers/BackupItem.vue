@@ -16,6 +16,7 @@ import {
 } from "@modrinth/assets";
 import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from "@modrinth/ui";
 import { defineMessages, useVIntl } from "@vintl/vintl";
+import { ref } from "vue";
 import type { Backup } from "~/composables/pyroServers.ts";
 
 const flags = useFeatureFlags();
@@ -77,12 +78,13 @@ const restoring = computed(() => {
   return undefined;
 });
 
+const initiatedPrepare = ref(false);
+
 const preparingFile = computed(() => {
   const task = props.backup.task?.file;
-  if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
-    return task;
-  }
-  return undefined;
+  return (
+    initiatedPrepare.value || (task && task.progress < 1 && !inactiveStates.includes(task.state))
+  );
 });
 
 const failedToRestore = computed(() => props.backup.task?.restore?.state === "failed");
@@ -259,7 +261,16 @@ const messages = defineMessages({
             <DownloadIcon />
             {{ formatMessage(commonMessages.downloadButton) }}
           </a>
-          <button v-else :disabled="!!preparingFile" @click="() => emit('prepare')">
+          <button
+            v-else
+            :disabled="!!preparingFile"
+            @click="
+              () => {
+                initiatedPrepare = true;
+                emit('prepare');
+              }
+            "
+          >
             <SpinnerIcon v-if="preparingFile" class="animate-spin" />
             <DownloadIcon v-else />
             {{

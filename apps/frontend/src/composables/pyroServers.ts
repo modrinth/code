@@ -739,7 +739,6 @@ const prepareBackup = async (backupId: string) => {
         method: "POST",
       },
     );
-    await internalServerReference.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error preparing backup:", error);
     throw error;
@@ -799,7 +798,6 @@ const retryBackup = async (backupId: string) => {
     await PyroFetch(`servers/${internalServerReference.value.serverId}/backups/${backupId}/retry`, {
       method: "POST",
     });
-    await internalServerReference.value.refresh(["backups"]);
   } catch (error) {
     console.error("Error retrying backup:", error);
     throw error;
