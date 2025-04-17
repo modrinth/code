@@ -762,7 +762,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
       uptimeSeconds.value = data.uptime;
       startUptimeUpdates();
       break;
-    case "backup-progress":
+    case "backup-progress": {
       // Update a backup's state
       const curBackup = server.backups?.data.find((backup) => backup.id === data.id);
 
@@ -786,6 +786,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
       }
 
       break;
+    }
     default:
       console.warn("Unhandled WebSocket event:", data);
   }

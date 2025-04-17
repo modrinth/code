@@ -11,6 +11,18 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-04-17T01:30:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Completely overhauled the Backups interface and fixed them being non-functional.
+  - Backups will now show progress when creating and restoring.
+  - Backups now have a "Prepare download" phase, which will prepare a backup file for downloading.
+  - You can now cancel a backup in progress and retry a failed backup.
+- When a backup is in progress, you will no longer be allowed to modify the modpack or loader.
+- Removed the ability to create backups on install automatically, and replaced with a notice that you may want to create a backup before installing a new modpack or loader. This is because the previous implementation of backup on install was unreliable and buggy. We are working on a better implementation for this feature and plan for it to return in the future.
+- Temporarily disabled auto backups button, since they are currently not working.`,
+  },
+  {
     date: `2025-04-15T16:35:00-07:00`,
     product: 'servers',
     body: `### Added
