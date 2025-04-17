@@ -195,7 +195,7 @@ const colorVariables = computed(() => {
   > *:first-child
   > *:first-child
   > :is(button, a, .button-like):first-child {
-  @apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight];
+  @apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
   transition:
     scale 0.125s ease-in-out,
     background-color 0.25s ease-in-out,
@@ -204,6 +204,7 @@ const colorVariables = computed(() => {
   svg:first-child {
     color: var(--_icon, var(--_text));
     transition: color 0.25s ease-in-out;
+    flex-shrink: 0;
   }
 
   &[disabled],

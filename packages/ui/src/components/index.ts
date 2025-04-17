@@ -26,6 +26,7 @@ export { default as Page } from './base/Page.vue'
 export { default as Pagination } from './base/Pagination.vue'
 export { default as PopoutMenu } from './base/PopoutMenu.vue'
 export { default as PreviewSelectButton } from './base/PreviewSelectButton.vue'
+export { default as ProgressBar } from './base/ProgressBar.vue'
 export { default as ProjectCard } from './base/ProjectCard.vue'
 export { default as RadialHeader } from './base/RadialHeader.vue'
 export { default as RadioButtons } from './base/RadioButtons.vue'
@@ -98,3 +99,6 @@ export { default as VersionSummary } from './version/VersionSummary.vue'
 
 // Settings
 export { default as ThemeSelector } from './settings/ThemeSelector.vue'
+
+// Servers
+export { default as BackupWarning } from './servers/backups/BackupWarning.vue'
