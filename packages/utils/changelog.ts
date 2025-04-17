@@ -11,7 +11,7 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
-    date: `2025-04-17T01:30:00-07:00`,
+    date: `2025-04-17T02:25:00-07:00`,
     product: 'servers',
     body: `### Improvements
 - Completely overhauled the Backups interface and fixed them being non-functional.
