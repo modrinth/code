@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT texture FROM custom_minecraft_skin_textures WHERE texture_key = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "texture",
+        "ordinal": 0,
+        "type_info": "Blob"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "3f3d3c2d77c1bcaf4044b612c3822546583aa19ea7088682d718c64ed5d5f1c5"
+}

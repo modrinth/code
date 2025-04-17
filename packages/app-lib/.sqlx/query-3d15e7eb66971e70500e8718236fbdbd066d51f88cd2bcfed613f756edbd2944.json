@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT OR REPLACE INTO default_minecraft_capes (minecraft_user_uuid, id) VALUES (?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "3d15e7eb66971e70500e8718236fbdbd066d51f88cd2bcfed613f756edbd2944"
+}
