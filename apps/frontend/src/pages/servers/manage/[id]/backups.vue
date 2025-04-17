@@ -123,6 +123,7 @@
           (skipConfirmation?: boolean) =>
             !skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
         "
+        @retry="() => retryBackup(backup.id)"
       />
     </div>
 
@@ -252,6 +253,15 @@ const unlockBackup = async (backupId: string) => {
     await props.server.refresh(["backups"]);
   } catch (error) {
     console.error("Failed to toggle lock:", error);
+  }
+};
+
+const retryBackup = async (backupId: string) => {
+  try {
+    await props.server.backups?.retry(backupId);
+    await props.server.refresh(["backups"]);
+  } catch (error) {
+    console.error("Failed to retry backup:", error);
   }
 };
 

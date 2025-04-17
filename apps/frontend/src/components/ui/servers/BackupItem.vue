@@ -22,7 +22,7 @@ const flags = useFeatureFlags();
 const { formatMessage } = useVIntl();
 
 const emit = defineEmits<{
-  (e: "prepare" | "download" | "rename" | "restore" | "lock"): void;
+  (e: "prepare" | "download" | "rename" | "restore" | "lock" | "retry"): void;
   (e: "delete", skipConfirmation?: boolean): void;
 }>();
 
@@ -228,7 +228,7 @@ const messages = defineMessages({
     >
       <template v-if="failedToCreate">
         <ButtonStyled>
-          <button>
+          <button @click="() => emit('retry')">
             <RotateCounterClockwiseIcon />
             {{ formatMessage(messages.retry) }}
           </button>

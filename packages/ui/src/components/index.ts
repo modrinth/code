@@ -99,3 +99,6 @@ export { default as VersionSummary } from './version/VersionSummary.vue'
 
 // Settings
 export { default as ThemeSelector } from './settings/ThemeSelector.vue'
+
+// Servers
+export { default as BackupWarning } from './servers/backups/BackupWarning.vue'

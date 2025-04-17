@@ -383,6 +383,7 @@
         :power-state-details="powerStateDetails"
         :socket="socket"
         :server="server"
+        :backup-in-progress="backupInProgress"
         @reinstall="onReinstall"
       />
     </div>
@@ -405,9 +406,10 @@ import DOMPurify from "dompurify";
 import { ButtonStyled, ServerNotice } from "@modrinth/ui";
 import { Intercom, shutdown } from "@intercom/messenger-js-sdk";
 import { reloadNuxtApp, navigateTo } from "#app";
+import type { MessageDescriptor } from "@vintl/vintl";
 import type { ServerState, Stats, WSEvent, WSInstallationResultEvent } from "~/types/servers";
 import { usePyroConsole } from "~/store/console.ts";
-import { usePyroFetch } from "~/composables/pyroFetch.ts";
+import { type Backup, usePyroFetch } from "~/composables/pyroServers.ts";
 
 const app = useNuxtApp() as unknown as { $notify: any };
 
@@ -948,19 +950,6 @@ const toAdverb = (word: string) => {
   return word + "ing";
 };
 
-const taskToFriendlyName = (task: string) => {
-  switch (task) {
-    case "create":
-      return "Creating";
-    case "restore":
-      return "Restoring";
-    case "file":
-      return "Downloading";
-    default:
-      return task.charAt(0).toUpperCase() + task.slice(1);
-  }
-};
-
 const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   try {
@@ -992,6 +981,41 @@ const countdown = ref(15);
 const formattedTime = computed(() => {
   const seconds = countdown.value % 60;
   return `${seconds.toString().padStart(2, "0")}`;
+});
+
+export type BackupInProgressReason = {
+  type: string;
+  tooltip: MessageDescriptor;
+};
+
+const RestoreInProgressReason = {
+  type: "restore",
+  tooltip: defineMessage({
+    id: "servers.backup.restore.in-progress.tooltip",
+    defaultMessage: "Backup restore in progress",
+  }),
+} satisfies BackupInProgressReason;
+
+const CreateInProgressReason = {
+  type: "create",
+  tooltip: defineMessage({
+    id: "servers.backup.create.in-progress.tooltip",
+    defaultMessage: "Backup creation in progress",
+  }),
+} satisfies BackupInProgressReason;
+
+const backupInProgress = computed(() => {
+  const backups = server.backups?.data;
+  if (!backups) {
+    return undefined;
+  }
+  if (backups.find((backup: Backup) => backup?.task?.create?.state === "ongoing")) {
+    return CreateInProgressReason;
+  }
+  if (backups.find((backup: Backup) => backup?.task?.restore?.state === "ongoing")) {
+    return RestoreInProgressReason;
+  }
+  return undefined;
 });
 
 const stopPolling = () => {
