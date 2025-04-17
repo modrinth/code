@@ -977,6 +977,9 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Failed to create backup"
   },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "Failed to prepare download"
+  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Failed to restore from backup"
   },
@@ -988,6 +991,9 @@
   },
   "servers.backups.item.prepare-download": {
     "message": "Prepare download"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "Try preparing again"
   },
   "servers.backups.item.preparing-download": {
     "message": "Preparing download..."

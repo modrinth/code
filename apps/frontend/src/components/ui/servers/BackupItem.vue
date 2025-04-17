@@ -83,11 +83,13 @@ const initiatedPrepare = ref(false);
 const preparingFile = computed(() => {
   const task = props.backup.task?.file;
   return (
-    initiatedPrepare.value || (task && task.progress < 1 && !inactiveStates.includes(task.state))
+    (!task && initiatedPrepare.value) ||
+    (task && task.progress < 1 && !inactiveStates.includes(task.state))
   );
 });
 
 const failedToRestore = computed(() => props.backup.task?.restore?.state === "failed");
+const failedToPrepareFile = computed(() => props.backup.task?.file?.state === "failed");
 
 const messages = defineMessages({
   locked: {
@@ -122,6 +124,10 @@ const messages = defineMessages({
     id: "servers.backups.item.prepare-download",
     defaultMessage: "Prepare download",
   },
+  prepareDownloadAgain: {
+    id: "servers.backups.item.prepare-download-again",
+    defaultMessage: "Try preparing again",
+  },
   alreadyPreparing: {
     id: "servers.backups.item.already-preparing",
     defaultMessage: "Already preparing backup for download",
@@ -141,6 +147,10 @@ const messages = defineMessages({
   failedToRestoreBackup: {
     id: "servers.backups.item.failed-to-restore-backup",
     defaultMessage: "Failed to restore from backup",
+  },
+  failedToPrepareFile: {
+    id: "servers.backups.item.failed-to-prepare-backup",
+    defaultMessage: "Failed to prepare download",
   },
   automated: {
     id: "servers.backups.item.automated",
@@ -175,7 +185,7 @@ const messages = defineMessages({
       <span class="font-bold text-contrast">
         {{ backup.name }}
       </span>
-      <div class="flex items-center gap-2 text-sm">
+      <div class="flex flex-wrap items-center gap-2 text-sm">
         <span v-if="backup.locked" class="flex items-center gap-1 text-sm text-secondary">
           <LockIcon /> {{ formatMessage(messages.locked) }}
         </span>
@@ -185,13 +195,17 @@ const messages = defineMessages({
         </span>
         <span v-if="(failedToCreate || failedToRestore) && (automated || backup.locked)">•</span>
         <span
-          v-if="failedToCreate || failedToRestore"
+          v-if="failedToCreate || failedToRestore || failedToPrepareFile"
           class="flex items-center gap-1 text-sm text-red"
         >
           <XIcon />
           {{
             formatMessage(
-              failedToCreate ? messages.failedToCreateBackup : messages.failedToRestoreBackup,
+              failedToCreate
+                ? messages.failedToCreateBackup
+                : failedToRestore
+                  ? messages.failedToRestoreBackup
+                  : messages.failedToPrepareFile,
             )
           }}
         </span>
@@ -274,7 +288,13 @@ const messages = defineMessages({
             <SpinnerIcon v-if="preparingFile" class="animate-spin" />
             <DownloadIcon v-else />
             {{
-              formatMessage(preparingFile ? messages.preparingDownload : messages.prepareDownload)
+              formatMessage(
+                preparingFile
+                  ? messages.preparingDownload
+                  : failedToPrepareFile
+                    ? messages.prepareDownloadAgain
+                    : messages.prepareDownload,
+              )
             }}
           </button>
         </ButtonStyled>
