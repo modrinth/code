@@ -228,6 +228,30 @@ pub struct Credentials {
     pub active: bool,
 }
 
+/// An entry in the player profile cache, keyed by player UUID.
+pub(super) enum ProfileCacheEntry {
+    /// A cached profile that is valid, even though it may be stale.
+    Hit(Arc<MinecraftProfile>),
+    /// A negative profile fetch result due to an authentication error,
+    /// from which we're recovering by holding off from repeatedly
+    /// attempting to fetch the profile until the token is refreshed
+    /// or some time has passed.
+    AuthErrorBackoff {
+        likely_expired_token: String,
+        last_attempt: Instant,
+    },
+}
+
+/// A thread-safe cache of online profiles, used to avoid fetching the
+/// same profile multiple times as long as they don't get too stale.
+///
+/// The cache has to be static because credential objects are short lived
+/// and disposable, and in the future several threads may be interested in
+/// profile data.
+pub(super) static PROFILE_CACHE: Mutex<
+    HashMap<Uuid, ProfileCacheEntry, BuildHasherDefault<DefaultHasher>>,
+> = Mutex::const_new(HashMap::with_hasher(BuildHasherDefault::new()));
+
 impl Credentials {
     /// Refreshes the authentication tokens for this user if they are expired.
     async fn refresh(
@@ -276,31 +300,8 @@ impl Credentials {
         Ok(())
     }
 
-    /// Fetches the online profile for this user if possible.
-    ///
-    /// Even if assuming a flawless network connection and Mojang backend, this may fail
-    /// if the current access token has expired. To ensure that does not happen, log in or
-    /// call [`refresh`](Self::refresh) before this method.
     #[tracing::instrument(skip(self))]
     pub async fn online_profile(&self) -> Option<Arc<MinecraftProfile>> {
-        enum ProfileCacheEntry {
-            Hit(Arc<MinecraftProfile>),
-            AuthErrorBackoff {
-                likely_expired_token: String,
-                last_attempt: Instant,
-            },
-        }
-
-        /// A thread-safe cache of online profiles, used to avoid fetching the
-        /// same profile multiple times as long as they don't get too stale.
-        ///
-        /// The cache has to be static because credential objects are short lived
-        /// and disposable, and in the future several threads may be interested in
-        /// profile data.
-        static PROFILE_CACHE: Mutex<
-            HashMap<Uuid, ProfileCacheEntry, BuildHasherDefault<DefaultHasher>>,
-        > = Mutex::const_new(HashMap::with_hasher(BuildHasherDefault::new()));
-
         let mut profile_cache = PROFILE_CACHE.lock().await;
 
         loop {
@@ -1119,9 +1120,12 @@ async fn minecraft_token(
     })
 }
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+#[derive(
+    sqlx::Type, Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq,
+)]
 #[serde(rename_all(deserialize = "UPPERCASE"))]
-pub enum MinecraftSkinModelVariant {
+#[sqlx(rename_all = "UPPERCASE")]
+pub enum MinecraftSkinVariant {
     /// The classic player model, with arms that are 4 pixels wide.
     Classic,
     /// The slim player model, with arms that are 3 pixels wide.
@@ -1132,7 +1136,7 @@ pub enum MinecraftSkinModelVariant {
              // prevent breaking the entire profile parsing
 }
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq)]
 #[serde(rename_all(deserialize = "UPPERCASE"))]
 pub enum MinecraftCharacterExpressionState {
     /// This expression is selected for being displayed ingame.
@@ -1166,7 +1170,7 @@ pub struct MinecraftSkin {
     /// As of 2025-04-08, in the production Mojang profile endpoint the file
     /// name for this URL is a hash of the skin texture, so that different
     /// players using the same skin texture will share a texture URL.
-    pub url: Url,
+    pub url: Arc<Url>,
     /// A hash of the skin texture.
     ///
     /// As of 2025-04-08, in the production Mojang profile endpoint this
@@ -1176,9 +1180,9 @@ pub struct MinecraftSkin {
                  // prevent breaking the entire profile parsing
         rename = "textureKey"
     )]
-    pub texture_key: Option<String>,
+    pub texture_key: Option<Arc<str>>,
     /// The player model variant this skin is for.
-    pub variant: MinecraftSkinModelVariant,
+    pub variant: MinecraftSkinVariant,
     /// User-friendly name for the skin.
     ///
     /// As of 2025-04-08, in the production Mojang profile endpoint this is
@@ -1190,6 +1194,22 @@ pub struct MinecraftSkin {
         deserialize_with = "normalize_skin_alias_case"
     )]
     pub name: Option<String>,
+}
+
+impl MinecraftSkin {
+    /// Robustly computes the texture key for this skin, falling back to its
+    /// URL file name and finally to the skin UUID when necessary.
+    pub fn texture_key(&self) -> Arc<str> {
+        self.texture_key.as_ref().cloned().unwrap_or_else(|| {
+            self.url
+                .path_segments()
+                .and_then(|mut path_segments| {
+                    path_segments.next_back().map(String::from)
+                })
+                .unwrap_or_else(|| self.id.as_simple().to_string())
+                .into()
+        })
+    }
 }
 
 fn normalize_skin_alias_case<'de, D: Deserializer<'de>>(
@@ -1208,10 +1228,10 @@ pub struct MinecraftCape {
     /// The selection state of the cape.
     pub state: MinecraftCharacterExpressionState,
     /// The URL to the cape texture.
-    pub url: Url,
+    pub url: Arc<Url>,
     /// The user-friendly name for the cape.
     #[serde(rename = "alias")]
-    pub name: String,
+    pub name: Arc<str>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
@@ -1247,6 +1267,27 @@ impl MinecraftProfile {
         self.fetch_time.is_some_and(|last_profile_fetch_time| {
             Instant::now().saturating_duration_since(last_profile_fetch_time)
                 < std::time::Duration::from_secs(60)
+        })
+    }
+
+    /// Returns the currently selected skin for this profile.
+    pub fn current_skin(&self) -> crate::Result<&MinecraftSkin> {
+        Ok(self
+            .skins
+            .iter()
+            .find(|skin| {
+                skin.state == MinecraftCharacterExpressionState::Active
+            })
+            // There should always be one active skin, even when the player uses their default skin
+            .ok_or_else(|| {
+                ErrorKind::OtherError("No active skin found".into())
+            })?)
+    }
+
+    /// Returns the currently selected cape for this profile.
+    pub fn current_cape(&self) -> Option<&MinecraftCape> {
+        self.capes.iter().find(|cape| {
+            cape.state == MinecraftCharacterExpressionState::Active
         })
     }
 }

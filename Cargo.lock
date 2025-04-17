@@ -1975,6 +1975,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a2330da5de22e8a3cb63252ce2abb30116bf5265e89c0e01bc17015ce30a476"
 
 [[package]]
+name = "data-url"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c297a1c74b71ae29df00c3e22dd9534821d60eb9af5a0192823fa2acea70c2a"
+
+[[package]]
 name = "deadpool"
 version = "0.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7989,6 +7995,7 @@ dependencies = [
  "tokio-stream",
  "tracing",
  "url",
+ "uuid 1.16.0",
  "webpki-roots 0.26.11",
 ]
 
@@ -8071,6 +8078,7 @@ dependencies = [
  "stringprep",
  "thiserror 2.0.12",
  "tracing",
+ "uuid 1.16.0",
  "whoami",
 ]
 
@@ -8110,6 +8118,7 @@ dependencies = [
  "stringprep",
  "thiserror 2.0.12",
  "tracing",
+ "uuid 1.16.0",
  "whoami",
 ]
 
@@ -8136,6 +8145,7 @@ dependencies = [
  "thiserror 2.0.12",
  "tracing",
  "url",
+ "uuid 1.16.0",
 ]
 
 [[package]]
@@ -8880,6 +8890,7 @@ dependencies = [
  "chrono",
  "daedalus",
  "dashmap",
+ "data-url",
  "dirs",
  "discord-rich-presence",
  "dunce",
