@@ -561,6 +561,7 @@
       <ModalCreation v-if="auth.user" ref="modal_creation" />
       <CollectionCreateModal ref="modal_collection_creation" />
       <OrganizationCreateModal ref="modal_organization_creation" />
+      <CommandMenu ref="commandMenu" />
       <slot id="main" />
     </main>
     <footer
@@ -701,6 +702,7 @@ import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import OrganizationCreateModal from "~/components/ui/OrganizationCreateModal.vue";
 import TeleportOverflowMenu from "~/components/ui/servers/TeleportOverflowMenu.vue";
+import CommandMenu from "~/components/ui/CommandMenu.vue";
 
 const { formatMessage } = useVIntl();
 
@@ -998,6 +1000,8 @@ const disableRandomProjectsForRoute = computed(
     route.name.includes("settings") ||
     route.name.includes("admin"),
 );
+
+const commandMenu = ref(null);
 
 async function onKeyDown(event) {
   if (disableRandomProjects.value || disableRandomProjectsForRoute.value) {
