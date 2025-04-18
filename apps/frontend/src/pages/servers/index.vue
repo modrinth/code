@@ -401,6 +401,21 @@
                 Modrinth Servers are powered by AMD 7950X3D CPUs with DDR5 memory.
               </p>
             </details>
+            <details pyro-hash="cpu-burst" class="group" :open="$route.hash === '#cpu-burst'">
+              <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
+                <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
+                  <RightArrowIcon />
+                </span>
+                How do CPU burst threads work?
+              </summary>
+              <p class="m-0 ml-6 leading-[160%]">
+                When your server is under heavy load, we temporarily give it access to additional
+                CPU threads to help mitigate lag spikes and instability. This helps prevent the TPS
+                from going below 20, ensuring the smoothest experience possible. Since those extra
+                CPU threads are only shortly available during high load periods, they might not show
+                up in Spark reports or other profiling tools.
+              </p>
+            </details>
 
             <details pyro-hash="ddos" class="group" :open="$route.hash === '#ddos'">
               <summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
