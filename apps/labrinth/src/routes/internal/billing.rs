@@ -206,8 +206,10 @@ pub async fn refund_charge(
             ));
         }
 
-        if refund_amount != 0 {
-            let (id, net) = match charge.payment_platform {
+        let (id, net) = if refund_amount != 0 {
+            (None, None)
+        } else {
+            match charge.payment_platform {
                 PaymentPlatform::Stripe => {
                     if let Some(payment_platform_id) =
                         charge.payment_platform_id.and_then(|x| {
@@ -240,7 +242,7 @@ pub async fn refund_charge(
                         .await?;
 
                         (
-                            refund.id.to_string(),
+                            Some(refund.id.to_string()),
                             refund
                                 .balance_transaction
                                 .and_then(|x| x.into_object())
@@ -253,8 +255,8 @@ pub async fn refund_charge(
                         ));
                     }
                 }
-            };
-        }
+            }
+        };
 
         let mut transaction = pool.begin().await?;
 
@@ -272,7 +274,7 @@ pub async fn refund_charge(
             subscription_id: charge.subscription_id,
             subscription_interval: charge.subscription_interval,
             payment_platform: charge.payment_platform,
-            payment_platform_id: Some(id),
+            payment_platform_id: id,
             parent_charge_id: Some(charge.id),
             net,
         }
