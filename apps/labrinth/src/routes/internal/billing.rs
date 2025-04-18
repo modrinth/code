@@ -206,8 +206,6 @@ pub async fn refund_charge(
             ));
         }
 
-        let mut transaction = pool.begin().await?;
-
         if refund_amount != 0 {
             let (id, net) = match charge.payment_platform {
                 PaymentPlatform::Stripe => {
@@ -256,28 +254,30 @@ pub async fn refund_charge(
                     }
                 }
             };
-
-            let charge_id = generate_charge_id(&mut transaction).await?;
-            ChargeItem {
-                id: charge_id,
-                user_id: charge.user_id,
-                price_id: charge.price_id,
-                amount: -refund_amount,
-                currency_code: charge.currency_code,
-                status: ChargeStatus::Succeeded,
-                due: Utc::now(),
-                last_attempt: None,
-                type_: ChargeType::Refund,
-                subscription_id: charge.subscription_id,
-                subscription_interval: charge.subscription_interval,
-                payment_platform: charge.payment_platform,
-                payment_platform_id: Some(id),
-                parent_charge_id: Some(charge.id),
-                net,
-            }
-            .upsert(&mut transaction)
-            .await?;
         }
+
+        let mut transaction = pool.begin().await?;
+
+        let charge_id = generate_charge_id(&mut transaction).await?;
+        ChargeItem {
+            id: charge_id,
+            user_id: charge.user_id,
+            price_id: charge.price_id,
+            amount: -refund_amount,
+            currency_code: charge.currency_code,
+            status: ChargeStatus::Succeeded,
+            due: Utc::now(),
+            last_attempt: None,
+            type_: ChargeType::Refund,
+            subscription_id: charge.subscription_id,
+            subscription_interval: charge.subscription_interval,
+            payment_platform: charge.payment_platform,
+            payment_platform_id: Some(id),
+            parent_charge_id: Some(charge.id),
+            net,
+        }
+        .upsert(&mut transaction)
+        .await?;
 
         if body.0.unprovision.unwrap_or(false) {
             if let Some(subscription_id) = charge.subscription_id {
