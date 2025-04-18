@@ -210,9 +210,9 @@
             </svg>
             <h2 class="m-0 text-lg font-bold">Experience modern, reliable hosting</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Modrinth Servers are hosted on
-              <span class="text-contrast">2023 Ryzen 7/9 CPUs with DDR5 RAM</span>, running on
-              custom-built software to ensure your server performs smoothly.
+              Modrinth Servers are hosted on high-performance
+              <span class="text-contrast">7950X3D CPUs with DDR5 RAM</span>, running on custom-built
+              software to ensure your server performs smoothly.
             </h3>
           </div>
 
@@ -329,27 +329,6 @@
               alt=""
               class="absolute -bottom-12 -right-[15%] hidden max-w-2xl rounded-2xl bg-brand p-4 lg:block"
             />
-            <div class="flex flex-row items-center gap-3">
-              <div
-                aria-hidden="true"
-                class="max-w-fit rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)] lg:absolute lg:bottom-8 lg:right-8 lg:block"
-              >
-                8.49 GB used
-              </div>
-              <div
-                aria-hidden="true"
-                class="flex w-fit items-center gap-2 rounded-full bg-button-bg p-3 lg:hidden"
-              >
-                <SortAscendingIcon class="h-6 w-6" />
-                Sort
-              </div>
-              <div
-                aria-hidden="true"
-                class="flex w-fit items-center rounded-full bg-button-bg p-3 lg:hidden"
-              >
-                <SearchIcon class="h-6 w-6" />
-              </div>
-            </div>
           </div>
         </div>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
@@ -418,9 +397,8 @@
                 </span>
                 What kind of CPUs do Modrinth Servers run on?
               </summary>
-              <p class="m-0 !leading-[190%]">
-                Modrinth Servers use 2023 Ryzen 7 and Ryzen 9 CPUs at 4+ GHz, paired with DDR5
-                memory.
+              <p class="m-0 ml-6 leading-[160%]">
+                Modrinth Servers are powered by AMD 7950X3D CPUs with DDR5 memory.
               </p>
             </details>
 
@@ -431,10 +409,12 @@
                 </span>
                 Do Modrinth Servers have DDoS protection?
               </summary>
-              <p class="m-0 !leading-[190%]">
-                Yes. All Modrinth Servers come with DDoS protection. Protection is powered by a
-                combination of in-house network filtering as well as with our data center provider.
-                Your server is safe on Modrinth.
+              <p class="m-0 ml-6 leading-[160%]">
+                Yes. All Modrinth Servers come with DDoS protection powered by
+                <a href="https://us.ovhcloud.com/security/anti-ddos/" target="_blank"
+                  >OVHcloud® Anti-DDoS infrastructure</a
+                >
+                which has over 17Tbps capacity. Your server is safe on Modrinth.
               </p>
             </details>
 
@@ -445,11 +425,9 @@
                 </span>
                 Where are Modrinth Servers located? Can I choose a region?
               </summary>
-              <p class="m-0 !leading-[190%]">
-                Currently, Modrinth Servers are located throughout the United States in New York,
-                Los Angelas, Dallas, Miami, and Spokane. More regions are coming soon! Your server's
-                location is currently chosen algorithmically, but you will be able to choose a
-                region in the future.
+              <p class="m-0 ml-6 leading-[160%]">
+                Currently, Modrinth Servers are located on the east coast of the United States in
+                Vint Hill, Virginia. More regions to come in the future!
               </p>
             </details>
 
@@ -460,7 +438,7 @@
                 </span>
                 Can I increase the storage on my server?
               </summary>
-              <p class="m-0 !leading-[190%]">
+              <p class="m-0 ml-6 leading-[160%]">
                 Yes, storage can be increased on your server at no additional cost. If you need more
                 storage, reach out to Modrinth Support.
               </p>
@@ -471,13 +449,19 @@
                 <span class="mr-2 transition-transform duration-200 group-open:rotate-90">
                   <RightArrowIcon />
                 </span>
-                How fast are Modrinth Servers? How many players can they handle?
+                How fast are Modrinth Servers?
               </summary>
-              <p class="m-0 !leading-[190%]">
-                During the Modrinth "Emergency SMP" test, we had over 80 players on a server running
-                on the Large plan. The server ran smoothly and was only limited by RAM. We're
-                confident that Modrinth Servers can handle a large number of players, with any kind
-                of modpack.
+              <p class="m-0 ml-6 leading-[160%]">
+                Modrinth Servers are hosted on very modern high-performance hardware, but it's tough
+                to say how exactly that will translate into how fast your server will run because
+                there are so many factors that affect it, such as the mods, data packs, or plugins
+                you're running on your server, and even user behavior.
+              </p>
+              <p class="mb-0 ml-6 mt-3 leading-[160%]">
+                Most performance issues that arise tend to be the fault of an unoptimized modpack,
+                mod, data pack, or plugin that causes the server to lag. Since our servers are very
+                high-end, you shouldn't run into much trouble as long as you pick an appropriate
+                plan for the content you're running on the server.
               </p>
             </details>
           </div>
@@ -486,6 +470,7 @@
     </section>
 
     <section
+      v-if="false"
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
       <div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
@@ -596,182 +581,49 @@
         </h2>
 
         <ul class="m-0 mt-8 flex w-full flex-col gap-8 p-0 lg:flex-row">
-          <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
-            <div
-              v-if="isSmallLowStock"
-              class="absolute left-0 right-0 top-[-2px] rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
-            >
-              Only {{ capacityStatuses?.small?.available }} left in stock!
-            </div>
-            <div
-              class="flex w-full flex-col justify-between gap-4 rounded-2xl bg-bg p-8 text-left"
-              :class="{ '!rounded-t-none': isSmallLowStock }"
-            >
-              <div class="flex flex-col gap-4">
-                <div class="flex flex-row items-center justify-between">
-                  <h1 class="m-0">Small</h1>
-                  <div
-                    class="grid size-8 place-content-center rounded-full bg-highlight-blue text-xs font-bold text-blue"
-                  >
-                    S
-                  </div>
-                </div>
-                <p class="m-0">
-                  Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding.
-                </p>
-                <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
-                  <p class="m-0">4 GB RAM</p>
-                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-                  <p class="m-0">4 vCPUs</p>
-                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-                  <p class="m-0">32 GB Storage</p>
-                </div>
-                <h2 class="m-0 text-3xl text-contrast">
-                  $12<span class="text-sm font-normal text-secondary">/month</span>
-                </h2>
-              </div>
-              <ButtonStyled color="blue" size="large">
-                <a
-                  v-if="!loggedOut && isSmallAtCapacity"
-                  :href="outOfStockUrl"
-                  target="_blank"
-                  class="flex items-center gap-2 !bg-highlight-blue !font-medium !text-blue"
-                >
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </a>
-                <button
-                  v-else
-                  class="!bg-highlight-blue !font-medium !text-blue"
-                  @click="selectProduct('small')"
-                >
-                  Get Started
-                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-blue" />
-                </button>
-              </ButtonStyled>
-            </div>
-          </li>
-
-          <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
-            <div
-              v-if="isMediumLowStock"
-              class="absolute left-0 right-0 top-[-2px] rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
-            >
-              Only {{ capacityStatuses?.medium?.available }} left in stock!
-            </div>
-            <div
-              style="
-                background: radial-gradient(
-                  86.12% 101.64% at 95.97% 94.07%,
-                  rgba(27, 217, 106, 0.23) 0%,
-                  rgba(14, 115, 56, 0.2) 100%
-                );
-                border: 1px solid rgba(12, 107, 52, 0.55);
-                box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
-              "
-              class="flex w-full flex-col justify-between gap-4 rounded-2xl p-8 text-left"
-              :class="{ '!rounded-t-none': isMediumLowStock }"
-            >
-              <div class="flex flex-col gap-4">
-                <div class="flex flex-row items-center justify-between">
-                  <h1 class="m-0">Medium</h1>
-                  <div
-                    class="grid size-8 place-content-center rounded-full bg-highlight-green text-xs font-bold text-brand"
-                  >
-                    M
-                  </div>
-                </div>
-                <p class="m-0">Great for modded multiplayer and small communities.</p>
-                <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
-                  <p class="m-0">6 GB RAM</p>
-                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-                  <p class="m-0">6 vCPUs</p>
-                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-                  <p class="m-0">48 GB Storage</p>
-                </div>
-                <h2 class="m-0 text-3xl text-contrast">
-                  $18<span class="text-sm font-normal text-secondary">/month</span>
-                </h2>
-              </div>
-              <ButtonStyled color="brand" size="large">
-                <a
-                  v-if="!loggedOut && isMediumAtCapacity"
-                  :href="outOfStockUrl"
-                  target="_blank"
-                  class="flex items-center gap-2 !bg-highlight-green !font-medium !text-green"
-                >
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-green" />
-                </a>
-                <button
-                  v-else
-                  class="!bg-highlight-green !font-medium !text-green"
-                  @click="selectProduct('medium')"
-                >
-                  Get Started
-                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-green" />
-                </button>
-              </ButtonStyled>
-            </div>
-          </li>
-
-          <li class="relative flex w-full flex-col justify-between pt-12 lg:w-1/3">
-            <div
-              v-if="isLargeLowStock"
-              class="absolute left-0 right-0 top-[-2px] rounded-t-2xl bg-yellow-500/20 p-4 text-center font-bold"
-            >
-              Only {{ capacityStatuses?.large?.available }} left in stock!
-            </div>
-            <div
-              class="flex w-full flex-col justify-between gap-4 rounded-2xl bg-bg p-8 text-left"
-              :class="{ '!rounded-t-none': isLargeLowStock }"
-            >
-              <div class="flex flex-col gap-4">
-                <div class="flex flex-row items-center justify-between">
-                  <h1 class="m-0">Large</h1>
-                  <div
-                    class="grid size-8 place-content-center rounded-full bg-highlight-purple text-xs font-bold text-purple"
-                  >
-                    L
-                  </div>
-                </div>
-                <p class="m-0">Ideal for larger communities, modpacks, and heavy modding.</p>
-                <div class="flex flex-row flex-wrap items-center gap-3 text-nowrap">
-                  <p class="m-0">8 GB RAM</p>
-                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-                  <p class="m-0">8 vCPUs</p>
-                  <div class="size-1.5 rounded-full bg-secondary opacity-25"></div>
-                  <p class="m-0">64 GB Storage</p>
-                </div>
-                <h2 class="m-0 text-3xl text-contrast">
-                  $24<span class="text-sm font-normal text-secondary">/month</span>
-                </h2>
-              </div>
-              <ButtonStyled color="brand" size="large">
-                <a
-                  v-if="!loggedOut && isLargeAtCapacity"
-                  :href="outOfStockUrl"
-                  target="_blank"
-                  class="flex items-center gap-2 !bg-highlight-purple !font-medium !text-purple"
-                >
-                  Out of Stock
-                  <ExternalIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </a>
-                <button
-                  v-else
-                  class="!bg-highlight-purple !font-medium !text-purple"
-                  @click="selectProduct('large')"
-                >
-                  Get Started
-                  <RightArrowIcon class="!min-h-4 !min-w-4 !text-purple" />
-                </button>
-              </ButtonStyled>
-            </div>
-          </li>
+          <ServerPlanSelector
+            :capacity="capacityStatuses?.small?.available"
+            plan="small"
+            :ram="plans.small.metadata.ram"
+            :storage="plans.small.metadata.storage"
+            :cpus="plans.small.metadata.cpu"
+            :price="
+              plans.small?.prices?.find((x) => x.currency_code === 'USD')?.prices?.intervals
+                ?.monthly
+            "
+            @select="selectProduct('small')"
+            @scroll-to-faq="scrollToFaq()"
+          />
+          <ServerPlanSelector
+            :capacity="capacityStatuses?.medium?.available"
+            plan="medium"
+            :ram="plans.medium.metadata.ram"
+            :storage="plans.medium.metadata.storage"
+            :cpus="plans.medium.metadata.cpu"
+            :price="
+              plans.medium?.prices?.find((x) => x.currency_code === 'USD')?.prices?.intervals
+                ?.monthly
+            "
+            @select="selectProduct('medium')"
+            @scroll-to-faq="scrollToFaq()"
+          />
+          <ServerPlanSelector
+            :capacity="capacityStatuses?.large?.available"
+            :ram="plans.large.metadata.ram"
+            :storage="plans.large.metadata.storage"
+            :cpus="plans.large.metadata.cpu"
+            :price="
+              plans.large?.prices?.find((x) => x.currency_code === 'USD')?.prices?.intervals
+                ?.monthly
+            "
+            plan="large"
+            @select="selectProduct('large')"
+            @scroll-to-faq="scrollToFaq()"
+          />
         </ul>
 
         <div
-          class="mb-4 flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
+          class="mb-24 flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
         >
           <div class="flex flex-col gap-4">
             <h1 class="m-0">Build your own</h1>
@@ -781,11 +633,13 @@
             </h2>
           </div>
 
-          <div class="flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center">
+          <div
+            class="experimental-styles-within flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center"
+          >
             <ButtonStyled color="standard" size="large">
               <button class="w-full md:w-fit" @click="selectProduct('custom')">
                 Build your own
-                <RightArrowIcon class="!min-h-4 !min-w-4" />
+                <RightArrowIcon class="shrink-0" />
               </button>
             </ButtonStyled>
             <p class="m-0 text-sm">Starting at $3/GB RAM</p>
@@ -802,9 +656,6 @@ import {
   BoxIcon,
   GameIcon,
   RightArrowIcon,
-  SearchIcon,
-  SortAscendingIcon,
-  ExternalIcon,
   TerminalSquareIcon,
   TransferIcon,
   VersionIcon,
@@ -813,6 +664,7 @@ import {
 import { products } from "~/generated/state.json";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 import Globe from "~/components/ui/servers/Globe.vue";
+import ServerPlanSelector from "~/components/ui/servers/marketing/ServerPlanSelector.vue";
 
 const pyroProducts = products.filter((p) => p.metadata.type === "pyro");
 const pyroPlanProducts = pyroProducts.filter(
@@ -930,21 +782,6 @@ const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.availabl
 const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0);
 const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0);
 const isCustomAtCapacity = computed(() => capacityStatuses.value?.custom?.available === 0);
-
-const isSmallLowStock = computed(() => {
-  const available = capacityStatuses.value?.small?.available;
-  return available !== undefined && available > 0 && available < 8;
-});
-
-const isMediumLowStock = computed(() => {
-  const available = capacityStatuses.value?.medium?.available;
-  return available !== undefined && available > 0 && available < 8;
-});
-
-const isLargeLowStock = computed(() => {
-  const available = capacityStatuses.value?.large?.available;
-  return available !== undefined && available > 0 && available < 8;
-});
 
 const startTyping = () => {
   const currentWord = words[currentWordIndex.value];
