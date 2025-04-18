@@ -210,9 +210,9 @@
             </svg>
             <h2 class="m-0 text-lg font-bold">Experience modern, reliable hosting</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Modrinth Servers are hosted on high-performance
-              <span class="text-contrast">7950X3D CPUs with DDR5 RAM</span>, running on custom-built
-              software to ensure your server performs smoothly.
+              Modrinth Servers are hosted on
+              <span class="text-contrast">high-performance AMD CPUs with DDR5 RAM</span>, running on
+              custom-built software to ensure your server performs smoothly.
             </h3>
           </div>
 
@@ -398,7 +398,8 @@
                 What kind of CPUs do Modrinth Servers run on?
               </summary>
               <p class="m-0 ml-6 leading-[160%]">
-                Modrinth Servers are powered by AMD 7950X3D CPUs with DDR5 memory.
+                Modrinth Servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+
+                GHz, paired with with DDR5 memory.
               </p>
             </details>
             <details pyro-hash="cpu-burst" class="group" :open="$route.hash === '#cpu-burst'">
