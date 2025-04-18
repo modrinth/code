@@ -11,6 +11,39 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-04-17T02:25:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Completely overhauled the Backups interface and fixed them being non-functional.
+  - Backups will now show progress when creating and restoring.
+  - Backups now have a "Prepare download" phase, which will prepare a backup file for downloading.
+  - You can now cancel a backup in progress and retry a failed backup.
+- When a backup is in progress, you will no longer be allowed to modify the modpack or loader.
+- Removed the ability to create backups on install automatically, and replaced with a notice that you may want to create a backup before installing a new modpack or loader. This is because the previous implementation of backup on install was unreliable and buggy. We are working on a better implementation for this feature and plan for it to return in the future.
+- Temporarily disabled auto backups button, since they are currently not working.`,
+  },
+  {
+    date: `2025-04-15T16:35:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added ability to send surveys to customers in the panel via notices.
+
+### Improvements
+- Added titles to notices.`,
+  },
+  {
+    date: `2025-04-12T22:10:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added ability to notify customers in the panel with notices concerning their servers.`,
+  },
+  {
+    date: `2025-04-12T22:10:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fix missing dropdown icon in publishing checklist.`,
+  },
+  {
     date: `2025-04-01T21:15:00-07:00`,
     product: 'web',
     body: `### Added

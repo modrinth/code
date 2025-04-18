@@ -5,26 +5,28 @@
         <span class="font-extrabold text-contrast text-lg">{{ title }}</span>
       </slot>
     </template>
-    <div>
-      <div class="markdown-body max-w-[35rem]" v-html="renderString(description)" />
-      <label v-if="hasToType" for="confirmation" class="confirmation-label">
+    <div class="flex flex-col gap-4">
+      <div
+        v-if="description"
+        class="markdown-body max-w-[35rem]"
+        v-html="renderString(description)"
+      />
+      <slot />
+      <label v-if="hasToType" for="confirmation">
         <span>
-          <strong>To verify, type</strong>
-          <em class="confirmation-text"> {{ confirmationText }} </em>
-          <strong>below:</strong>
+          To confirm you want to proceed, type
+          <span class="italic font-bold">{{ confirmationText }}</span> below:
         </span>
       </label>
-      <div class="confirmation-input">
-        <input
-          v-if="hasToType"
-          id="confirmation"
-          v-model="confirmation_typed"
-          type="text"
-          placeholder="Type here..."
-          @input="type"
-        />
-      </div>
-      <div class="flex gap-2 mt-6">
+      <input
+        v-if="hasToType"
+        id="confirmation"
+        v-model="confirmation_typed"
+        type="text"
+        placeholder="Type here..."
+        class="max-w-[20rem]"
+      />
+      <div class="flex gap-2">
         <ButtonStyled :color="danger ? 'red' : 'brand'">
           <button :disabled="action_disabled" @click="proceed">
             <component :is="proceedIcon" />
@@ -65,8 +67,8 @@ const props = defineProps({
   },
   description: {
     type: String,
-    default: 'No description defined',
-    required: true,
+    default: undefined,
+    required: false,
   },
   proceedIcon: {
     type: Object,
@@ -95,19 +97,18 @@ const props = defineProps({
 const emit = defineEmits(['proceed'])
 const modal = ref(null)
 
-const action_disabled = ref(props.hasToType)
 const confirmation_typed = ref('')
+
+const action_disabled = computed(
+  () =>
+    props.hasToType &&
+    confirmation_typed.value.toLowerCase() !== props.confirmationText.toLowerCase(),
+)
 
 function proceed() {
   modal.value.hide()
+  confirmation_typed.value = ''
   emit('proceed')
-}
-
-function type() {
-  if (props.hasToType) {
-    action_disabled.value =
-      confirmation_typed.value.toLowerCase() !== props.confirmationText.toLowerCase()
-  }
 }
 
 function show() {

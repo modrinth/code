@@ -40,6 +40,7 @@ import _BellRingIcon from './icons/bell-ring.svg?component'
 import _BookIcon from './icons/book.svg?component'
 import _BookTextIcon from './icons/book-text.svg?component'
 import _BookmarkIcon from './icons/bookmark.svg?component'
+import _BotIcon from './icons/bot.svg?component'
 import _BoxIcon from './icons/box.svg?component'
 import _BoxImportIcon from './icons/box-import.svg?component'
 import _BracesIcon from './icons/braces.svg?component'
@@ -76,6 +77,7 @@ import _FileIcon from './icons/file.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
 import _FilterXIcon from './icons/filter-x.svg?component'
+import _FolderArchiveIcon from './icons/folder-archive.svg?component'
 import _FolderOpenIcon from './icons/folder-open.svg?component'
 import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _GapIcon from './icons/gap.svg?component'
@@ -137,6 +139,8 @@ import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
 import _RestoreIcon from './icons/restore.svg?component'
 import _RightArrowIcon from './icons/right-arrow.svg?component'
+import _RotateCounterClockwiseIcon from './icons/rotate-ccw.svg?component'
+import _RotateClockwiseIcon from './icons/rotate-cw.svg?component'
 import _SaveIcon from './icons/save.svg?component'
 import _ScaleIcon from './icons/scale.svg?component'
 import _ScanEyeIcon from './icons/scan-eye.svg?component'
@@ -238,6 +242,7 @@ export const BellRingIcon = _BellRingIcon
 export const BookIcon = _BookIcon
 export const BookTextIcon = _BookTextIcon
 export const BookmarkIcon = _BookmarkIcon
+export const BotIcon = _BotIcon
 export const BoxIcon = _BoxIcon
 export const BoxImportIcon = _BoxImportIcon
 export const BracesIcon = _BracesIcon
@@ -274,6 +279,7 @@ export const FileIcon = _FileIcon
 export const FileTextIcon = _FileTextIcon
 export const FilterIcon = _FilterIcon
 export const FilterXIcon = _FilterXIcon
+export const FolderArchiveIcon = _FolderArchiveIcon
 export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
 export const GapIcon = _GapIcon
@@ -335,6 +341,8 @@ export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon
 export const RestoreIcon = _RestoreIcon
 export const RightArrowIcon = _RightArrowIcon
+export const RotateCounterClockwiseIcon = _RotateCounterClockwiseIcon
+export const RotateClockwiseIcon = _RotateClockwiseIcon
 export const SaveIcon = _SaveIcon
 export const ScaleIcon = _ScaleIcon
 export const ScanEyeIcon = _ScanEyeIcon

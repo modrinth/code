@@ -3,6 +3,7 @@
     ref="versionSelectModal"
     :server="props.server"
     :current-loader="data?.loader as Loaders"
+    :backup-in-progress="backupInProgress"
     @reinstall="emit('reinstall', $event)"
   />
 
@@ -93,13 +94,23 @@
         </div>
         <div v-else class="flex w-full flex-col items-center gap-2 sm:w-fit sm:flex-row">
           <ButtonStyled>
-            <nuxt-link class="!w-full sm:!w-auto" :to="`/modpacks?sid=${props.server.serverId}`">
+            <nuxt-link
+              v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
+              :class="{ disabled: backupInProgress }"
+              class="!w-full sm:!w-auto"
+              :to="`/modpacks?sid=${props.server.serverId}`"
+            >
               <CompassIcon class="size-4" /> Find a modpack
             </nuxt-link>
           </ButtonStyled>
           <span class="hidden sm:block">or</span>
           <ButtonStyled>
-            <button class="!w-full sm:!w-auto" @click="mrpackModal.show()">
+            <button
+              v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
+              :disabled="!!backupInProgress"
+              class="!w-full sm:!w-auto"
+              @click="mrpackModal.show()"
+            >
               <UploadIcon class="size-4" /> Upload .mrpack file
             </button>
           </ButtonStyled>
@@ -143,9 +154,13 @@ import { ButtonStyled, NewProjectCard } from "@modrinth/ui";
 import { TransferIcon, UploadIcon, InfoIcon, CompassIcon, SettingsIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 import type { Loaders } from "~/types/servers";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+
+const { formatMessage } = useVIntl();
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  backupInProgress?: BackupInProgressReason;
 }>();
 
 const emit = defineEmits<{
