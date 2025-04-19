@@ -761,6 +761,7 @@ async function fetchCapacityStatuses(customProduct = null) {
           swap_mb: product.metadata.swap,
           storage_mb: product.metadata.storage,
         },
+        bypassAuth: true,
       }),
     );
 
