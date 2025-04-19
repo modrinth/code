@@ -14,7 +14,6 @@ use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::LoaderVersion;
 use st::Profile;
-use std::collections::HashMap;
 use tokio::process::Command;
 
 mod args;
@@ -603,7 +602,8 @@ pub async fn launch_minecraft(
                 &version.type_,
                 *resolution,
                 &java_version.architecture,
-            )?
+            )
+            .await?
             .into_iter()
             .collect::<Vec<_>>(),
         )
@@ -614,7 +614,7 @@ pub async fn launch_minecraft(
     if std::env::var("CARGO").is_ok() {
         command.env_remove("DYLD_FALLBACK_LIBRARY_PATH");
     }
-    // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwites them)
+    // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwrites them)
     command.env_remove("_JAVA_OPTIONS");
 
     command.envs(env_args);
@@ -652,33 +652,6 @@ pub async fn launch_minecraft(
         async { Ok(()) }
     })
     .await?;
-
-    let mut censor_strings = HashMap::new();
-    let username = whoami::username();
-    censor_strings.insert(
-        format!("/{}/", username),
-        "/{COMPUTER_USERNAME}/".to_string(),
-    );
-    censor_strings.insert(
-        format!("\\{}\\", username),
-        "\\{COMPUTER_USERNAME}\\".to_string(),
-    );
-    censor_strings.insert(
-        credentials.access_token.clone(),
-        "{MINECRAFT_ACCESS_TOKEN}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.username.clone(),
-        "{MINECRAFT_USERNAME}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_simple().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_hyphenated().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
 
     // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
     #[cfg(feature = "tauri")]

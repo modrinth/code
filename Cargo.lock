@@ -9000,6 +9000,7 @@ dependencies = [
  "either",
  "flate2",
  "futures",
+ "heck 0.5.0",
  "indicatif",
  "lazy_static",
  "notify",
