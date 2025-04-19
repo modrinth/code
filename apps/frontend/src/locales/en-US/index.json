@@ -1043,6 +1043,33 @@
   "servers.notices.no-notices": {
     "message": "No notices"
   },
+  "servers.plan.large.description": {
+    "message": "Ideal for larger communities, modpacks, and heavy modding."
+  },
+  "servers.plan.large.name": {
+    "message": "Large"
+  },
+  "servers.plan.large.symbol": {
+    "message": "L"
+  },
+  "servers.plan.medium.description": {
+    "message": "Great for modded multiplayer and small communities."
+  },
+  "servers.plan.medium.name": {
+    "message": "Medium"
+  },
+  "servers.plan.medium.symbol": {
+    "message": "M"
+  },
+  "servers.plan.small.description": {
+    "message": "Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding."
+  },
+  "servers.plan.small.name": {
+    "message": "Small"
+  },
+  "servers.plan.small.symbol": {
+    "message": "S"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Cancel subscription"
   },
