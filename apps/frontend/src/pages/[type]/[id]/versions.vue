@@ -106,6 +106,13 @@
                 },
                 shown: currentMember || flags.developerMode,
               },
+              {
+                id: 'copy-maven',
+                action: () => {
+                  copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`);
+                },
+                shown: flags.developerMode,
+              },
               { divider: true, shown: currentMember },
               {
                 id: 'edit',
@@ -159,6 +166,10 @@
             <template #copy-id>
               <ClipboardCopyIcon aria-hidden="true" />
               Copy ID
+            </template>
+            <template #copy-maven>
+              <ClipboardCopyIcon aria-hidden="true" />
+              Copy Modrinth Maven
             </template>
           </OverflowMenu>
         </ButtonStyled>
