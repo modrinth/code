@@ -473,7 +473,7 @@ function handleAuxClick(e) {
             <RunningAppBar />
           </Suspense>
         </div>
-        <section v-if="!nativeDecorations" class="window-controls">
+        <section v-if="!nativeDecorations" class="window-controls" data-tauri-drag-region-exclude>
           <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
             <MinimizeIcon />
           </Button>
@@ -702,6 +702,14 @@ function handleAuxClick(e) {
 
 .app-grid-statusbar {
   grid-area: status;
+}
+
+[data-tauri-drag-region] {
+  -webkit-app-region: drag;
+}
+
+[data-tauri-drag-region-exclude] {
+  -webkit-app-region: no-drag;
 }
 
 .app-contents {
