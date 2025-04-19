@@ -6,10 +6,12 @@
     </p>
     <div class="input-group">
       <button class="iconified-button brand-button" @click="acceptInvite()">
-        <CheckIcon />Accept
+        <CheckIcon />
+        Accept
       </button>
       <button class="iconified-button danger-button" @click="declineInvite()">
-        <CrossIcon />Decline
+        <XIcon />
+        Decline
       </button>
     </div>
   </div>
@@ -32,21 +34,21 @@
               :key="`checklist-${nag.id}`"
               v-tooltip="nag.title"
               :aria-label="nag.title"
-              class="circle"
               :class="'circle ' + (!nag.condition ? 'done' : '') + nag.status"
+              class="circle"
             >
               <CheckIcon v-if="!nag.condition" />
-              <RequiredIcon v-else-if="nag.status === 'required'" />
-              <SuggestionIcon v-else-if="nag.status === 'suggestion'" />
-              <ModerationIcon v-else-if="nag.status === 'review'" />
+              <AsteriskIcon v-else-if="nag.status === 'required'" />
+              <LightBulbIcon v-else-if="nag.status === 'suggestion'" />
+              <ScaleIcon v-else-if="nag.status === 'review'" />
             </div>
           </div>
         </div>
       </div>
       <div class="input-group">
         <button
-          class="square-button"
           :class="{ 'not-collapsed': !collapsed }"
+          class="square-button"
           @click="toggleCollapsed()"
         >
           <DropdownIcon />
@@ -60,41 +62,41 @@
         class="grid-display__item"
       >
         <span class="label">
-          <RequiredIcon
+          <AsteriskIcon
             v-if="nag.status === 'required'"
             v-tooltip="'Required'"
-            aria-label="Required"
             :class="nag.status"
+            aria-label="Required"
           />
-          <SuggestionIcon
+          <LightBulbIcon
             v-else-if="nag.status === 'suggestion'"
             v-tooltip="'Suggestion'"
-            aria-label="Suggestion"
             :class="nag.status"
+            aria-label="Suggestion"
           />
-          <ModerationIcon
+          <ScaleIcon
             v-else-if="nag.status === 'review'"
             v-tooltip="'Review'"
-            aria-label="Review"
             :class="nag.status"
+            aria-label="Review"
           />{{ nag.title }}</span
         >
         {{ nag.description }}
         <NuxtLink
           v-if="nag.link"
           :class="{ invisible: nag.link.hide }"
-          class="goto-link"
           :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
             nag.link.path
           }`"
+          class="goto-link"
         >
           {{ nag.link.title }}
-          <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
+          <ChevronRightIcon aria-hidden="true" class="featured-header-chevron" />
         </NuxtLink>
         <button
           v-else-if="nag.action"
-          class="btn btn-orange"
           :disabled="nag.action.disabled()"
+          class="btn btn-orange"
           @click="nag.action.onClick"
         >
           <SendIcon />
@@ -106,16 +108,17 @@
 </template>
 
 <script setup>
+import {
+  ChevronRightIcon,
+  CheckIcon,
+  XIcon,
+  AsteriskIcon,
+  LightBulbIcon,
+  SendIcon,
+  ScaleIcon,
+  DropdownIcon,
+} from "@modrinth/assets";
 import { formatProjectType } from "~/plugins/shorthands.js";
-
-import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
-import DropdownIcon from "~/assets/images/utils/dropdown.svg?component";
-import CheckIcon from "~/assets/images/utils/check.svg?component";
-import CrossIcon from "~/assets/images/utils/x.svg?component";
-import RequiredIcon from "~/assets/images/utils/asterisk.svg?component";
-import SuggestionIcon from "~/assets/images/utils/lightbulb.svg?component";
-import ModerationIcon from "~/assets/images/sidebar/admin.svg?component";
-import SendIcon from "~/assets/images/utils/send.svg?component";
 import { acceptTeamInvite, removeTeamMember } from "~/helpers/teams.js";
 
 const props = defineProps({
@@ -336,6 +339,7 @@ const nags = computed(() => [
     },
   },
   {
+    hide: props.project.stats === "draft",
     condition: props.tags.rejectedStatuses.includes(props.project.status),
     title: "Resubmit for review",
     id: "resubmit-for-review",

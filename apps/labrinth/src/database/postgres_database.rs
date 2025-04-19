@@ -1,8 +1,9 @@
-use log::info;
+use prometheus::{IntGauge, Registry};
 use sqlx::migrate::MigrateDatabase;
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use sqlx::{Connection, PgConnection, Postgres};
 use std::time::Duration;
+use tracing::info;
 
 pub async fn connect() -> Result<PgPool, sqlx::Error> {
     info!("Initializing database connection");
@@ -42,6 +43,33 @@ pub async fn check_for_migrations() -> Result<(), sqlx::Error> {
         .run(&mut conn)
         .await
         .expect("Error while running database migrations!");
+
+    Ok(())
+}
+
+pub async fn register_and_set_metrics(
+    pool: &PgPool,
+    registry: &Registry,
+) -> Result<(), prometheus::Error> {
+    let pg_pool_size =
+        IntGauge::new("labrinth_pg_pool_size", "Size of Postgres pool")?;
+    let pg_pool_idle = IntGauge::new(
+        "labrinth_pg_pool_idle",
+        "Number of idle Postgres connections",
+    )?;
+
+    registry.register(Box::new(pg_pool_size.clone()))?;
+    registry.register(Box::new(pg_pool_idle.clone()))?;
+
+    let pool_ref = pool.clone();
+    tokio::spawn(async move {
+        loop {
+            pg_pool_size.set(pool_ref.size() as i64);
+            pg_pool_idle.set(pool_ref.num_idle() as i64);
+
+            tokio::time::sleep(Duration::from_secs(5)).await;
+        }
+    });
 
     Ok(())
 }

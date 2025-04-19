@@ -2,8 +2,8 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
-use log::info;
 use std::collections::HashMap;
+use tracing::info;
 
 use super::IndexingError;
 use crate::database::models::loader_fields::{

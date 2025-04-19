@@ -22,7 +22,6 @@ reqwest = { version = "0.12.5", default-features = false, features = [
     "rustls-tls-native-roots",
 ] }
 async_zip = { version = "0.0.17", features = ["full"] }
-semver = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 bytes = "1.6.0"
 rust-s3 = { version = "0.33.0", default-features = false, features = [
@@ -39,4 +38,3 @@ tracing-error = "0.2.0"
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-tracing-futures = { version = "0.2.5", features = ["futures", "tokio"] }

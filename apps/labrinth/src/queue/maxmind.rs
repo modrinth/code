@@ -1,10 +1,10 @@
 use flate2::read::GzDecoder;
-use log::warn;
 use maxminddb::geoip2::Country;
 use std::io::{Cursor, Read};
 use std::net::Ipv6Addr;
 use tar::Archive;
 use tokio::sync::RwLock;
+use tracing::warn;
 
 pub struct MaxMindIndexer {
     pub reader: RwLock<Option<maxminddb::Reader<Vec<u8>>>>,
