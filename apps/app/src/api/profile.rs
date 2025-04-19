@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
+use ts_rs::TS;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile")
@@ -276,7 +277,8 @@ pub async fn profile_kill(path: &str) -> Result<()> {
     Ok(())
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "../../app-frontend/src/helpers/api-types.d.ts")]
 pub struct EditProfile {
     pub name: Option<String>,
 
