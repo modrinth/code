@@ -312,15 +312,58 @@
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileBadges) }}</h2>
           <div class="flex flex-wrap gap-2">
             <div v-for="badge in badges" :key="badge">
-              <StaffBadge v-if="badge === 'staff'" class="h-14 w-14" />
-              <ModBadge v-else-if="badge === 'mod'" class="h-14 w-14" />
-              <nuxt-link v-else-if="badge === 'plus'" to="/plus">
+              <StaffBadge
+                v-if="badge === 'staff'"
+                v-tooltip="formatMessage(messages.badgeStaffTooltip)"
+                class="h-14 w-14"
+              />
+              <ModBadge
+                v-else-if="badge === 'mod'"
+                v-tooltip="formatMessage(messages.badgeModTooltip)"
+                class="h-14 w-14"
+              />
+              <nuxt-link
+                v-else-if="badge === 'plus'"
+                v-tooltip="formatMessage(messages.badgePlusTooltip)"
+                to="/plus"
+              >
                 <PlusBadge class="h-14 w-14" />
               </nuxt-link>
-              <TenMClubBadge v-else-if="badge === '10m-club'" class="h-14 w-14" />
-              <EarlyAdopterBadge v-else-if="badge === 'early-adopter'" class="h-14 w-14" />
-              <AlphaTesterBadge v-else-if="badge === 'alpha-tester'" class="h-14 w-14" />
-              <BetaTesterBadge v-else-if="badge === 'beta-tester'" class="h-14 w-14" />
+              <OneMClubBadge
+                v-else-if="badge === '1m-club'"
+                v-tooltip="formatMessage(messages.badge1MClubTooltip)"
+                class="h-14 w-14"
+              />
+              <TenMClubBadge
+                v-else-if="badge === '10m-club'"
+                v-tooltip="formatMessage(messages.badge10MClubTooltip)"
+                class="h-14 w-14"
+              />
+              <FiftyMClubBadge
+                v-else-if="badge === '50m-club'"
+                v-tooltip="formatMessage(messages.badge50MClubTooltip)"
+                class="h-14 w-14"
+              />
+              <HundredMClubBadge
+                v-else-if="badge === '100m-club'"
+                v-tooltip="formatMessage(messages.badge100MClubTooltip)"
+                class="h-14 w-14"
+              />
+              <EarlyAdopterBadge
+                v-else-if="badge === 'early-adopter'"
+                v-tooltip="formatMessage(messages.badgeEarlyAdopterTooltip)"
+                class="h-14 w-14"
+              />
+              <AlphaTesterBadge
+                v-else-if="badge === 'alpha-tester'"
+                v-tooltip="formatMessage(messages.badgeAlphaTesterTooltip)"
+                class="h-14 w-14"
+              />
+              <BetaTesterBadge
+                v-else-if="badge === 'beta-tester'"
+                v-tooltip="formatMessage(messages.badgeBetaTesterTooltip)"
+                class="h-14 w-14"
+              />
             </div>
           </div>
         </div>
@@ -364,7 +407,10 @@ import { reportUser } from "~/utils/report-helpers.ts";
 import StaffBadge from "~/assets/images/badges/staff.svg?component";
 import ModBadge from "~/assets/images/badges/mod.svg?component";
 import PlusBadge from "~/assets/images/badges/plus.svg?component";
+import OneMClubBadge from "~/assets/images/badges/1m-club.svg?component";
 import TenMClubBadge from "~/assets/images/badges/10m-club.svg?component";
+import FiftyMClubBadge from "~/assets/images/badges/50m-club.svg?component";
+import HundredMClubBadge from "~/assets/images/badges/100m-club.svg?component";
 import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?component";
 import AlphaTesterBadge from "~/assets/images/badges/alpha-tester.svg?component";
 import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
@@ -466,6 +512,46 @@ const messages = defineMessages({
   userNotFoundError: {
     id: "profile.error.not-found",
     defaultMessage: "User not found",
+  },
+  badgeStaffTooltip: {
+    id: "profile.badge.staff",
+    defaultMessage: "Official Modrinth Staff",
+  },
+  badgeModTooltip: {
+    id: "profile.badge.mod",
+    defaultMessage: "Official Modrinth Moderator",
+  },
+  badgePlusTooltip: {
+    id: "profile.badge.plus",
+    defaultMessage: "Modrinth Plus Member",
+  },
+  badge1MClubTooltip: {
+    id: "profile.badge.1m-club",
+    defaultMessage: "1 Million Downloads Club",
+  },
+  badge10MClubTooltip: {
+    id: "profile.badge.10m-club",
+    defaultMessage: "10 Million Downloads Club",
+  },
+  badge50MClubTooltip: {
+    id: "profile.badge.50m-club",
+    defaultMessage: "50 Million Downloads Club",
+  },
+  badge100MClubTooltip: {
+    id: "profile.badge.100m-club",
+    defaultMessage: "100 Million Downloads Club",
+  },
+  badgeEarlyAdopterTooltip: {
+    id: "profile.badge.early-adopter",
+    defaultMessage: "Early Adopter",
+  },
+  badgeAlphaTesterTooltip: {
+    id: "profile.badge.alpha-tester",
+    defaultMessage: "Modrinth Alpha Tester",
+  },
+  badgeBetaTesterTooltip: {
+    id: "profile.badge.beta-tester",
+    defaultMessage: "Modrinth Beta Tester",
   },
 });
 
@@ -571,6 +657,22 @@ const MODRINTH_ALPHA_END_DATE = new Date("2020-11-30T08:00:00.000Z");
 const badges = computed(() => {
   const badges = [];
 
+  if (sumDownloads.value > 1000000) {
+    badges.push("1m-club");
+  }
+
+  if (sumDownloads.value > 10000000) {
+    badges.push("10m-club");
+  }
+
+  if (sumDownloads.value > 50000000) {
+    badges.push("50m-club");
+  }
+
+  if (sumDownloads.value > 100000000) {
+    badges.push("100m-club");
+  }
+
   if (user.value.role === "admin") {
     badges.push("staff");
   }
@@ -581,10 +683,6 @@ const badges = computed(() => {
 
   if (isPermission(user.value.badges, 1 << 0)) {
     badges.push("plus");
-  }
-
-  if (sumDownloads.value > 10000000) {
-    badges.push("10m-club");
   }
 
   if (
