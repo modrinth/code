@@ -27,6 +27,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(user_delete)
             .service(user_edit)
             .service(user_icon_edit)
+            .service(user_icon_delete)
             .service(user_notifications)
             .service(user_follows),
     );
@@ -217,6 +218,28 @@ pub async fn user_icon_edit(
         redis,
         file_host,
         payload,
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)
+}
+
+#[delete("{id}/icon")]
+pub async fn user_icon_delete(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so we don't need to convert to V2
+    v3::users::user_icon_delete(
+        req,
+        info,
+        pool,
+        redis,
+        file_host,
         session_queue,
     )
     .await

@@ -25,7 +25,7 @@ pub fn get_color_from_img(data: &[u8]) -> Result<Option<u32>, ImageError> {
     )
     .ok()
     .and_then(|x| x.first().copied())
-    .map(|x| (x.r as u32) << 16 | (x.g as u32) << 8 | (x.b as u32));
+    .map(|x| ((x.r as u32) << 16) | ((x.g as u32) << 8) | (x.b as u32));
 
     Ok(color)
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <ModalConfirm
-      v-if="auth.user && auth.user.id === creator.id"
+    <ConfirmModal
+      v-if="canEdit"
       ref="deleteModal"
       :title="formatMessage(messages.deleteModalTitle)"
       :description="formatMessage(messages.deleteModalDescription)"
@@ -25,7 +25,8 @@
             </template>
             <template v-else-if="canEdit && isEditing === true">
               <PopoutMenu class="btn">
-                <EditIcon aria-hidden="true" /> {{ formatMessage(messages.editIconButton) }}
+                <EditIcon aria-hidden="true" />
+                {{ formatMessage(messages.editIconButton) }}
                 <template #menu>
                   <span class="icon-edit-menu">
                     <FileInput
@@ -135,7 +136,7 @@
 
                 <div v-if="canEdit" class="primary-stat">
                   <template v-if="collection.status === 'listed'">
-                    <WorldIcon class="primary-stat__icon" aria-hidden="true" />
+                    <GlobeIcon class="primary-stat__icon" aria-hidden="true" />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.publicLabel) }} </strong>
                     </div>
@@ -346,7 +347,8 @@
           </ProjectCard>
         </div>
         <div v-else class="error">
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === creator.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.noProjectsAuthLabel">
               <template #create-link="{ children }">
@@ -365,34 +367,35 @@
 
 <script setup>
 import {
+  BoxIcon,
   CalendarIcon,
   EditIcon,
-  XIcon,
-  SaveIcon,
-  UploadIcon,
-  TrashIcon,
-  LinkIcon,
-  LockIcon,
   GridIcon,
   ImageIcon,
-  ListIcon,
-  UpdatedIcon,
   LibraryIcon,
-  BoxIcon,
+  LinkIcon,
+  ListIcon,
+  LockIcon,
+  SaveIcon,
+  TrashIcon,
+  UpdatedIcon,
+  UploadIcon,
+  XIcon,
+  GlobeIcon,
 } from "@modrinth/assets";
 import {
-  PopoutMenu,
-  FileInput,
-  DropdownSelect,
   Avatar,
   Button,
   commonMessages,
+  ConfirmModal,
+  DropdownSelect,
+  FileInput,
+  PopoutMenu,
 } from "@modrinth/ui";
 
-import WorldIcon from "assets/images/utils/world.svg";
+import { isAdmin } from "@modrinth/utils";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
 import { addNotification } from "~/composables/notifs.js";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
@@ -596,7 +599,7 @@ useSeoMeta({
 const canEdit = computed(
   () =>
     auth.value.user &&
-    auth.value.user.id === collection.value.user &&
+    (auth.value.user.id === collection.value.user || isAdmin(auth.value.user)) &&
     collection.value.id !== "following",
 );
 
@@ -650,7 +653,7 @@ async function saveChanges() {
       method: "PATCH",
       body: {
         name: name.value,
-        description: summary.value,
+        description: summary.value || null,
         status: visibility.value,
         new_projects: newProjectIds,
       },
@@ -685,12 +688,16 @@ async function deleteCollection() {
       method: "DELETE",
       apiVersion: 3,
     });
-    await navigateTo("/dashboard/collections");
+    if (auth.value.user.id === collection.value.user) {
+      await navigateTo("/dashboard/collections");
+    } else {
+      await navigateTo(`/user/${collection.value.user}/collections`);
+    }
   } catch (err) {
     addNotification({
       group: "main",
       title: formatMessage(commonMessages.errorNotificationTitle),
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

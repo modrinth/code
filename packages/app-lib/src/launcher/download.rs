@@ -9,6 +9,7 @@ use crate::{
     state::State,
     util::{fetch::*, io, platform::OsExt},
 };
+use daedalus::minecraft::{LoggingConfiguration, LoggingSide};
 use daedalus::{
     self as d,
     minecraft::{
@@ -48,7 +49,8 @@ pub async fn download_minecraft(
 
     tokio::try_join! {
         // Total loading sums to 90/60
-        download_client(st, version, Some(loading_bar), force), // 10
+        download_client(st, version, Some(loading_bar), force), // 9
+        download_log_config(st, version, Some(loading_bar), force),
         download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar), amount, force), // 40
         download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount, java_arch, force, minecraft_updated) // 40
     }?;
@@ -80,7 +82,11 @@ pub async fn download_version_info(
             .await
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
-        tracing::info!("Downloading version info for version {}", &version.id);
+        tracing::info!(
+            "Downloading version info for version {} from {}",
+            &version.id,
+            version.url
+        );
         let mut info = fetch_json(
             Method::GET,
             &version.url,
@@ -374,5 +380,47 @@ pub async fn download_libraries(
         ).await?;
 
     tracing::debug!("Done loading libraries!");
+    Ok(())
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn download_log_config(
+    st: &State,
+    version_info: &GameVersionInfo,
+    loading_bar: Option<&LoadingBarId>,
+    force: bool,
+) -> crate::Result<()> {
+    let log_download = version_info
+        .logging
+        .as_ref()
+        .and_then(|x| x.get(&LoggingSide::Client));
+    let Some(LoggingConfiguration::Log4j2Xml {
+        file: log_download, ..
+    }) = log_download
+    else {
+        if let Some(loading_bar) = loading_bar {
+            emit_loading(loading_bar, 1.0, None)?;
+        }
+        return Ok(());
+    };
+
+    let path = st.directories.log_configs_dir().join(&log_download.id);
+
+    if !path.exists() || force {
+        let bytes = fetch(
+            &log_download.url,
+            Some(&log_download.sha1),
+            &st.fetch_semaphore,
+            &st.pool,
+        )
+        .await?;
+        write(&path, &bytes, &st.io_semaphore).await?;
+        tracing::trace!("Fetched log config {}", log_download.id);
+    }
+    if let Some(loading_bar) = loading_bar {
+        emit_loading(loading_bar, 1.0, None)?;
+    }
+
+    tracing::debug!("Log config {} loaded", log_download.id);
     Ok(())
 }

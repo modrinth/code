@@ -40,12 +40,7 @@
           </span>
           <span> Whether or not the subscription should be unprovisioned on refund. </span>
         </label>
-        <Toggle
-          id="unprovision"
-          :model-value="unprovision"
-          :checked="unprovision"
-          @update:model-value="() => (unprovision = !unprovision)"
-        />
+        <Toggle id="unprovision" v-model="unprovision" />
       </div>
       <div class="flex gap-2">
         <ButtonStyled color="brand">
@@ -63,50 +58,137 @@
       </div>
     </div>
   </NewModal>
-  <div class="normal-page no-sidebar">
-    <h1>{{ user.username }}'s subscriptions</h1>
-    <div class="normal-page__content">
+  <div class="page experimental-styles-within">
+    <div
+      class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
+    >
+      <div class="flex items-center gap-2">
+        <Avatar :src="user.avatar_url" :alt="user.username" size="32px" circle />
+        <h1 class="m-0 text-2xl font-extrabold">{{ user.username }}'s subscriptions</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <ButtonStyled>
+          <nuxt-link :to="`/user/${user.id}`">
+            <UserIcon aria-hidden="true" />
+            User profile
+            <ExternalIcon class="h-4 w-4" />
+          </nuxt-link>
+        </ButtonStyled>
+      </div>
+    </div>
+    <div>
       <div v-for="subscription in subscriptionCharges" :key="subscription.id" class="card">
-        <span class="font-extrabold text-contrast">
-          <template v-if="subscription.product.metadata.type === 'midas'"> Modrinth Plus </template>
-          <template v-else-if="subscription.product.metadata.type === 'pyro'">
-            Modrinth Servers
-          </template>
-          <template v-else> Unknown product </template>
-          <template v-if="subscription.interval">
-            {{ subscription.interval }}
-          </template>
-        </span>
-        <div class="mb-4 mt-2 flex items-center gap-1">
-          {{ subscription.status }} ⋅ {{ $dayjs(subscription.created).format("YYYY-MM-DD") }}
-          <template v-if="subscription.metadata?.id"> ⋅ {{ subscription.metadata.id }}</template>
-        </div>
-        <div
-          v-for="charge in subscription.charges"
-          :key="charge.id"
-          class="universal-card recessed flex items-center justify-between gap-4"
-        >
-          <div class="flex w-full items-center justify-between gap-4">
-            <div class="flex items-center gap-1">
-              <Badge
-                :color="charge.status === 'succeeded' ? 'green' : 'red'"
-                :type="charge.status"
-              />
-              ⋅
-              {{ charge.type }}
-              ⋅
-              {{ $dayjs(charge.due).format("YYYY-MM-DD") }}
-              ⋅
-              <span>{{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}</span>
-              <template v-if="subscription.interval"> ⋅ {{ subscription.interval }} </template>
+        <div class="mb-4 grid grid-cols-[1fr_auto]">
+          <div>
+            <span class="flex items-center gap-2 font-semibold text-contrast">
+              <template v-if="subscription.product.metadata.type === 'midas'">
+                <ModrinthPlusIcon class="h-7 w-min" />
+              </template>
+              <template v-else-if="subscription.product.metadata.type === 'pyro'">
+                <ModrinthServersIcon class="h-7 w-min" />
+              </template>
+              <template v-else> Unknown product </template>
+            </span>
+            <div class="mb-4 mt-2 flex w-full items-center gap-1 text-sm text-secondary">
+              {{ formatCategory(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
+              {{ dayjs(subscription.created).format("MMMM D, YYYY [at] h:mma") }} ({{
+                dayjs(subscription.created).fromNow()
+              }})
             </div>
-            <button
-              v-if="charge.status === 'succeeded' && charge.type !== 'refund'"
-              class="btn"
-              @click="showRefundModal(charge)"
-            >
-              Refund charge
-            </button>
+          </div>
+          <div v-if="subscription.metadata?.id" class="flex flex-col items-end gap-2">
+            <ButtonStyled v-if="subscription.product.metadata.type === 'pyro'">
+              <nuxt-link
+                :to="`/servers/manage/${subscription.metadata.id}`"
+                target="_blank"
+                class="w-fit"
+              >
+                <ServerIcon /> Server panel <ExternalIcon class="h-4 w-4" />
+              </nuxt-link>
+            </ButtonStyled>
+            <CopyCode :text="subscription.metadata.id" />
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <div
+            v-for="(charge, index) in subscription.charges"
+            :key="charge.id"
+            class="relative overflow-clip rounded-xl bg-bg px-4 py-3"
+          >
+            <div
+              class="absolute bottom-0 left-0 top-0 w-1"
+              :class="charge.type === 'refund' ? 'bg-purple' : chargeStatuses[charge.status].color"
+            />
+            <div class="grid w-full grid-cols-[1fr_auto] items-center gap-4">
+              <div class="flex flex-col gap-2">
+                <span>
+                  <span class="font-bold text-contrast">
+                    <template v-if="charge.status === 'succeeded'"> Succeeded </template>
+                    <template v-else-if="charge.status === 'failed'"> Failed </template>
+                    <template v-else-if="charge.status === 'cancelled'"> Cancelled </template>
+                    <template v-else-if="charge.status === 'processing'"> Processing </template>
+                    <template v-else-if="charge.status === 'open'"> Upcoming </template>
+                    <template v-else> {{ charge.status }} </template>
+                  </span>
+                  ⋅
+                  <span>
+                    <template v-if="charge.type === 'refund'"> Refund </template>
+                    <template v-else-if="charge.type === 'subscription'">
+                      <template v-if="charge.status === 'cancelled'"> Subscription </template>
+                      <template v-else-if="index === subscription.charges.length - 1">
+                        Started subscription
+                      </template>
+                      <template v-else> Subscription renewal </template>
+                    </template>
+                    <template v-else-if="charge.type === 'one-time'"> One-time charge </template>
+                    <template v-else-if="charge.type === 'proration'"> Proration charge </template>
+                    <template v-else> {{ charge.status }} </template>
+                  </span>
+                  <template v-if="charge.status !== 'cancelled'">
+                    ⋅
+                    {{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}
+                  </template>
+                </span>
+                <span class="text-sm text-secondary">
+                  {{ dayjs(charge.due).format("MMMM D, YYYY [at] h:mma") }}
+                  <span class="text-secondary">({{ dayjs(charge.due).fromNow() }}) </span>
+                </span>
+                <div
+                  v-if="flags.developerMode"
+                  class="flex w-full items-center gap-1 text-xs text-secondary"
+                >
+                  {{ charge.status }}
+                  ⋅
+                  {{ charge.type }}
+                  ⋅
+                  {{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}
+                  ⋅
+                  {{ dayjs(charge.due).format("YYYY-MM-DD h:mma") }}
+                  <template v-if="charge.subscription_interval">
+                    ⋅ {{ charge.subscription_interval }}
+                  </template>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <ButtonStyled
+                  v-if="
+                    charges.some((x) => x.type === 'refund' && x.parent_charge_id === charge.id)
+                  "
+                >
+                  <div class="button-like disabled"><CheckIcon /> Charge refunded</div>
+                </ButtonStyled>
+                <ButtonStyled
+                  v-else-if="charge.status === 'succeeded' && charge.type !== 'refund'"
+                  color="red"
+                  color-fill="text"
+                >
+                  <button @click="showRefundModal(charge)">
+                    <CurrencyIcon />
+                    Refund options
+                  </button>
+                </ButtonStyled>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -114,11 +196,22 @@
   </div>
 </template>
 <script setup>
-import { Badge, NewModal, ButtonStyled, DropdownSelect, Toggle } from "@modrinth/ui";
-import { formatPrice } from "@modrinth/utils";
-import { CheckIcon, XIcon } from "@modrinth/assets";
+import { Avatar, ButtonStyled, CopyCode, DropdownSelect, NewModal, Toggle } from "@modrinth/ui";
+import { formatCategory, formatPrice } from "@modrinth/utils";
+import {
+  CheckIcon,
+  XIcon,
+  UserIcon,
+  ModrinthPlusIcon,
+  ServerIcon,
+  ExternalIcon,
+  CurrencyIcon,
+} from "@modrinth/assets";
+import dayjs from "dayjs";
 import { products } from "~/generated/state.json";
+import ModrinthServersIcon from "~/components/ui/servers/ModrinthServersIcon.vue";
 
+const flags = useFeatureFlags();
 const route = useRoute();
 const data = useNuxtApp();
 const vintl = useVIntl();
@@ -169,7 +262,10 @@ const subscriptionCharges = computed(() => {
   return subscriptions.value.map((subscription) => {
     return {
       ...subscription,
-      charges: charges.value.filter((charge) => charge.subscription_id === subscription.id),
+      charges: charges.value
+        .filter((charge) => charge.subscription_id === subscription.id)
+        .slice()
+        .sort((a, b) => dayjs(b.due).diff(dayjs(a.due))),
       product: products.find((product) =>
         product.prices.some((price) => price.id === subscription.price_id),
       ),
@@ -181,7 +277,7 @@ const refunding = ref(false);
 const refundModal = ref();
 const selectedCharge = ref(null);
 const refundType = ref("full");
-const refundTypes = ref(["full", "partial"]);
+const refundTypes = ref(["full", "partial", "none"]);
 const refundAmount = ref(0);
 const unprovision = ref(false);
 
@@ -217,4 +313,30 @@ async function refundCharge() {
   }
   refunding.value = false;
 }
+
+const chargeStatuses = {
+  open: {
+    color: "bg-blue",
+  },
+  processing: {
+    color: "bg-orange",
+  },
+  succeeded: {
+    color: "bg-green",
+  },
+  failed: {
+    color: "bg-red",
+  },
+  cancelled: {
+    color: "bg-red",
+  },
+};
 </script>
+<style scoped>
+.page {
+  padding: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 56rem;
+}
+</style>

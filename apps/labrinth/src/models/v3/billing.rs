@@ -176,7 +176,7 @@ pub struct Charge {
     pub net: Option<i64>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ChargeType {
     OneTime,
@@ -189,8 +189,8 @@ impl ChargeType {
     pub fn as_str(&self) -> &'static str {
         match self {
             ChargeType::OneTime => "one-time",
-            ChargeType::Subscription { .. } => "subscription",
-            ChargeType::Proration { .. } => "proration",
+            ChargeType::Subscription => "subscription",
+            ChargeType::Proration => "proration",
             ChargeType::Refund => "refund",
         }
     }

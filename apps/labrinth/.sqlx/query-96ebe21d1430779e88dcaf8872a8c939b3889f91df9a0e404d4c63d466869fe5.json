@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT u.id\n            FROM team_members\n            INNER JOIN users u ON u.id = team_members.user_id\n            WHERE team_id = $1 AND is_owner = TRUE\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "96ebe21d1430779e88dcaf8872a8c939b3889f91df9a0e404d4c63d466869fe5"
+}

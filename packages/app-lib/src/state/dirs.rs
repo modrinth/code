@@ -106,6 +106,12 @@ impl DirectoryInfo {
         self.objects_dir().join(&hash[..2]).join(hash)
     }
 
+    /// Get the Minecraft log config's directory
+    #[inline]
+    pub fn log_configs_dir(&self) -> PathBuf {
+        self.metadata_dir().join("log_configs")
+    }
+
     /// Get the Minecraft legacy assets metadata directory
     #[inline]
     pub fn legacy_assets_dir(&self) -> PathBuf {
@@ -209,34 +215,6 @@ impl DirectoryInfo {
                 }
             }
 
-            fn is_same_disk(
-                old_dir: &Path,
-                new_dir: &Path,
-            ) -> crate::Result<bool> {
-                #[cfg(unix)]
-                {
-                    use std::os::unix::fs::MetadataExt;
-                    Ok(old_dir.metadata()?.dev() == new_dir.metadata()?.dev())
-                }
-
-                #[cfg(windows)]
-                {
-                    let old_dir = crate::util::io::canonicalize(old_dir)?;
-                    let new_dir = crate::util::io::canonicalize(new_dir)?;
-
-                    let old_component = old_dir.components().next();
-                    let new_component = new_dir.components().next();
-
-                    match (old_component, new_component) {
-                        (
-                            Some(std::path::Component::Prefix(old)),
-                            Some(std::path::Component::Prefix(new)),
-                        ) => Ok(old.as_os_str() == new.as_os_str()),
-                        _ => Ok(false),
-                    }
-                }
-            }
-
             fn get_disk_usage(path: &Path) -> crate::Result<Option<u64>> {
                 let path = crate::util::io::canonicalize(path)?;
 
@@ -335,7 +313,9 @@ impl DirectoryInfo {
 
                 let paths_len = paths.len();
 
-                if is_same_disk(&prev_dir, &move_dir).unwrap_or(false) {
+                if crate::util::io::is_same_disk(&prev_dir, &move_dir)
+                    .unwrap_or(false)
+                {
                     let success_idxs = Arc::new(DashSet::new());
 
                     let loader_bar_id = Arc::new(&loader_bar_id);
@@ -359,7 +339,7 @@ impl DirectoryInfo {
                                     })?;
                                 }
 
-                                crate::util::io::rename(
+                                crate::util::io::rename_or_move(
                                     &x.old,
                                     &x.new,
                                 )

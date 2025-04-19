@@ -13,7 +13,7 @@
       class="notification__icon backed-svg"
       :class="{ raised: raised }"
     >
-      <NotificationIcon />
+      <BellIcon />
     </nuxt-link>
     <DoubleIcon v-else class="notification__icon">
       <template #primary>
@@ -33,24 +33,24 @@
         <Avatar v-else size="xs" :raised="raised" no-shadow />
       </template>
       <template #secondary>
-        <ModerationIcon
+        <ScaleIcon
           v-if="type === 'moderator_message' || type === 'status_change'"
           class="moderation-color"
         />
-        <InvitationIcon v-else-if="type === 'team_invite' && project" class="creator-color" />
-        <InvitationIcon
+        <UserPlusIcon v-else-if="type === 'team_invite' && project" class="creator-color" />
+        <UserPlusIcon
           v-else-if="type === 'organization_invite' && organization"
           class="creator-color"
         />
         <VersionIcon v-else-if="type === 'project_update' && project && version" />
-        <NotificationIcon v-else />
+        <BellIcon v-else />
       </template>
     </DoubleIcon>
     <div class="notification__title">
       <template v-if="type === 'project_update' && project && version">
         A project you follow,
-        <nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link
-        >, has been updated:
+        <nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link>
+        , has been updated:
       </template>
       <template v-else-if="type === 'team_invite' && project">
         <nuxt-link
@@ -103,7 +103,8 @@
           {{ project.title }}
         </nuxt-link>
         <template v-if="tags.rejectedStatuses.includes(notification.body.new_status)">
-          has been <Badge :type="notification.body.new_status" />
+          has been
+          <Badge :type="notification.body.new_status" />
         </template>
         <template v-else>
           updated from
@@ -115,9 +116,9 @@
       </template>
       <template v-else-if="type === 'moderator_message' && thread && project && !report">
         Your project,
-        <nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link
-        >, has received
-        <template v-if="notification.grouped_notifs"> messages </template>
+        <nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link>
+        , has received
+        <template v-if="notification.grouped_notifs"> messages</template>
         <template v-else>a message</template>
         from the moderators.
       </template>
@@ -134,8 +135,9 @@
           {{ project.title }}
         </nuxt-link>
         <nuxt-link v-else-if="user" :to="getUserLink(user)" class="title-link">
-          {{ user.username }} </nuxt-link
-        >.
+          {{ user.username }}
+        </nuxt-link>
+        .
       </template>
       <nuxt-link v-else :to="notification.link" class="title-link">
         <span v-html="renderString(notification.title)" />
@@ -192,7 +194,9 @@
       </template>
     </div>
     <span class="notification__date">
-      <span v-if="notification.read" class="read-badge inline-flex"> <ReadIcon /> Read </span>
+      <span v-if="notification.read" class="read-badge inline-flex">
+        <CheckCircleIcon /> Read
+      </span>
       <span
         v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm A')"
         class="inline-flex"
@@ -224,7 +228,7 @@
             }
           "
         >
-          <CrossIcon />
+          <XIcon />
         </button>
       </template>
       <button
@@ -233,7 +237,7 @@
         class="iconified-button square-button button-transparent"
         @click="read()"
       >
-        <CrossIcon />
+        <XIcon />
       </button>
     </div>
     <div v-else class="notification__actions">
@@ -250,7 +254,8 @@
               }
             "
           >
-            <CheckIcon /> Accept
+            <CheckIcon />
+            Accept
           </button>
           <button
             class="iconified-button danger-button"
@@ -261,7 +266,8 @@
               }
             "
           >
-            <CrossIcon /> Decline
+            <XIcon />
+            Decline
           </button>
         </template>
         <button
@@ -270,7 +276,8 @@
           :class="{ 'raised-button': raised }"
           @click="read()"
         >
-          <CheckIcon /> Mark as read
+          <CheckIcon />
+          Mark as read
         </button>
         <CopyCode v-if="flags.developerMode" :text="notification.id" />
       </div>
@@ -293,7 +300,7 @@
           @click="performAction(notification, actionIndex)"
         >
           <CheckIcon v-if="action.title === 'Accept'" />
-          <CrossIcon v-else-if="action.title === 'Deny'" />
+          <XIcon v-else-if="action.title === 'Deny'" />
           {{ action.title }}
         </button>
         <button
@@ -302,7 +309,8 @@
           :class="{ 'raised-button': raised }"
           @click="performAction(notification, null)"
         >
-          <CheckIcon /> Mark as read
+          <CheckIcon />
+          Mark as read
         </button>
         <CopyCode v-if="flags.developerMode" :text="notification.id" />
       </div>
@@ -312,15 +320,17 @@
 
 <script setup>
 import { renderString } from "@modrinth/utils";
-import InvitationIcon from "~/assets/images/utils/user-plus.svg?component";
-import ModerationIcon from "~/assets/images/sidebar/admin.svg?component";
-import NotificationIcon from "~/assets/images/sidebar/notifications.svg?component";
-import ReadIcon from "~/assets/images/utils/check-circle.svg?component";
-import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
-import VersionIcon from "~/assets/images/utils/version.svg?component";
-import CheckIcon from "~/assets/images/utils/check.svg?component";
-import CrossIcon from "~/assets/images/utils/x.svg?component";
-import ExternalIcon from "~/assets/images/utils/external.svg?component";
+import {
+  UserPlusIcon,
+  ScaleIcon,
+  BellIcon,
+  CheckCircleIcon,
+  CalendarIcon,
+  VersionIcon,
+  CheckIcon,
+  XIcon,
+  ExternalIcon,
+} from "@modrinth/assets";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
 import { getProjectLink, getVersionLink } from "~/helpers/projects.js";
 import { getUserLink } from "~/helpers/users.js";
@@ -420,7 +430,7 @@ async function performAction(notification, actionIndex) {
     app.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -513,6 +523,7 @@ function getMessages() {
       }
     }
   }
+
   .notification__body {
     grid-area: body;
 
@@ -583,6 +594,7 @@ function getMessages() {
     &:not(:hover) {
       text-decoration: none;
     }
+
     font-weight: bold;
   }
 

@@ -209,7 +209,8 @@
           </div>
         </div>
         <div v-else-if="route.params.projectType !== 'collections'" class="error">
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.profileNoProjectsAuthLabel">
               <template #create-link="{ children }">
@@ -223,7 +224,9 @@
         </div>
         <div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
           <nuxt-link
-            v-for="collection in collections"
+            v-for="collection in collections.sort(
+              (a, b) => new Date(b.created) - new Date(a.created),
+            )"
             :key="collection.id"
             :to="`/collection/${collection.id}`"
             class="card collection-item"
@@ -242,10 +245,15 @@
               {{ collection.description }}
             </div>
             <div class="stat-bar">
-              <div class="stats"><BoxIcon /> {{ collection.projects?.length || 0 }} projects</div>
+              <div class="stats">
+                <BoxIcon />
+                {{
+                  `${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? "s" : ""}`
+                }}
+              </div>
               <div class="stats">
                 <template v-if="collection.status === 'listed'">
-                  <WorldIcon />
+                  <GlobeIcon />
                   <span> Public </span>
                 </template>
                 <template v-else-if="collection.status === 'unlisted'">
@@ -268,7 +276,8 @@
           v-if="route.params.projectType === 'collections' && collections.length === 0"
           class="error"
         >
-          <UpToDate class="icon" /><br />
+          <UpToDate class="icon" />
+          <br />
           <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
               <template #create-link="{ children }">
@@ -336,6 +345,9 @@ import {
   CurrencyIcon,
   InfoIcon,
   CheckIcon,
+  ReportIcon,
+  EditIcon,
+  GlobeIcon,
 } from "@modrinth/assets";
 import {
   OverflowMenu,
@@ -357,10 +369,7 @@ import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?componen
 import AlphaTesterBadge from "~/assets/images/badges/alpha-tester.svg?component";
 import BetaTesterBadge from "~/assets/images/badges/beta-tester.svg?component";
 
-import ReportIcon from "~/assets/images/utils/report.svg?component";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
-import EditIcon from "~/assets/images/utils/edit.svg?component";
-import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
@@ -638,12 +647,13 @@ export default defineNuxtComponent({
     grid-template-columns: repeat(1, 1fr);
   }
 
-  gap: var(--gap-lg);
+  gap: var(--gap-md);
 
   .collection-item {
     display: flex;
     flex-direction: column;
     gap: var(--gap-md);
+    margin-bottom: 0px;
   }
 
   .description {
@@ -692,7 +702,7 @@ export default defineNuxtComponent({
 
       .title {
         color: var(--color-contrast);
-        font-weight: 600;
+        font-weight: 700;
         font-size: var(--font-size-lg);
         margin: 0;
       }

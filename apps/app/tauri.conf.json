@@ -39,12 +39,12 @@
     "fileAssociations": [
       {
         "ext": ["mrpack"],
-        "mimeType": "application/zip+mrpack"
+        "mimeType": "application/x-modrinth-modpack+zip"
       }
     ]
   },
   "productName": "Modrinth App",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "mainBinaryName": "Modrinth App",
   "identifier": "ModrinthApp",
   "plugins": {

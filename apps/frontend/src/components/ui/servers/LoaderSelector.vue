@@ -10,6 +10,7 @@
         :is-current="isCurrentLoader(loader.name)"
         :loader-version="data.loader_version"
         :current-loader="data.loader"
+        :is-installing="isInstalling"
         @select="selectLoader"
       />
     </div>
@@ -28,6 +29,7 @@
           :is-current="isCurrentLoader(loader.name)"
           :loader-version="data.loader_version"
           :current-loader="data.loader"
+          :is-installing="isInstalling"
           @select="selectLoader"
         />
       </div>
@@ -47,6 +49,7 @@
           :is-current="isCurrentLoader(loader.name)"
           :loader-version="data.loader_version"
           :current-loader="data.loader"
+          :is-installing="isInstalling"
           @select="selectLoader"
         />
       </div>
@@ -60,6 +63,7 @@ const props = defineProps<{
     loader: string | null;
     loader_version: string | null;
   };
+  isInstalling?: boolean;
 }>();
 
 const emit = defineEmits<{

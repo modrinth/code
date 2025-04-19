@@ -5,6 +5,27 @@
   <div class="pointer-events-none absolute inset-0 z-[-1]">
     <div id="absolute-background-teleport" class="relative"></div>
   </div>
+  <div class="pointer-events-none absolute inset-0 z-50">
+    <div
+      class="over-the-top-random-animation"
+      :style="{ '--_r-count': rCount }"
+      :class="{ threshold: rCount > 20, 'rings-expand': rCount >= 40 }"
+    >
+      <div>
+        <div
+          class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+        ></div>
+        <div
+          class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+        ></div>
+        <div
+          class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast"
+        >
+          ?
+        </div>
+      </div>
+    </div>
+  </div>
   <div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
     <div
       v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
@@ -57,6 +78,23 @@
         <Button transparent icon-only :action="hideStagingBanner" aria-label="Close banner"
           ><XIcon aria-hidden="true"
         /></Button>
+      </div>
+    </div>
+    <div
+      v-if="generatedStateErrors && generatedStateErrors.length > 0"
+      class="site-banner site-banner--warning [&>*]:z-[6]"
+    >
+      <div class="site-banner__title">
+        <IssuesIcon aria-hidden="true" />
+        <span>{{ formatMessage(failedToBuildBannerMessages.title) }}</span>
+      </div>
+      <div class="site-banner__description">
+        {{
+          formatMessage(failedToBuildBannerMessages.description, {
+            errors: generatedStateErrors,
+            url: config.public.apiBaseUrl,
+          })
+        }}
       </div>
     </div>
     <header
@@ -206,7 +244,6 @@
               <template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
             </TeleportOverflowMenu>
           </ButtonStyled>
-
           <ButtonStyled
             type="transparent"
             :highlighted="
@@ -231,14 +268,61 @@
           </ButtonStyled>
         </template>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1">
+        <ButtonStyled type="transparent">
+          <OverflowMenu
+            v-if="auth.user && isStaff(auth.user)"
+            class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+            position="bottom"
+            direction="left"
+            :dropdown-id="`${basePopoutId}-staff`"
+            aria-label="Create new..."
+            :options="[
+              {
+                id: 'review-projects',
+                color: 'orange',
+                link: '/moderation/review',
+              },
+              {
+                id: 'review-reports',
+                color: 'orange',
+                link: '/moderation/reports',
+              },
+              {
+                divider: true,
+                shown: isAdmin(auth.user),
+              },
+              {
+                id: 'user-lookup',
+                color: 'primary',
+                link: '/admin/user_email',
+                shown: isAdmin(auth.user),
+              },
+              {
+                id: 'servers-notices',
+                color: 'primary',
+                link: '/admin/servers/notices',
+                shown: isAdmin(auth.user),
+              },
+            ]"
+          >
+            <ModrinthIcon aria-hidden="true" />
+            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+            <template #review-projects> <ScaleIcon aria-hidden="true" /> Review projects </template>
+            <template #review-reports> <ReportIcon aria-hidden="true" /> Reports </template>
+            <template #user-lookup> <UserIcon aria-hidden="true" /> Lookup by email </template>
+            <template #servers-notices>
+              <IssuesIcon aria-hidden="true" /> Manage server notices
+            </template>
+          </OverflowMenu>
+        </ButtonStyled>
         <ButtonStyled type="transparent">
           <OverflowMenu
             v-if="auth.user"
             class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
             position="bottom"
             direction="left"
-            :dropdown-id="createPopoutId"
+            :dropdown-id="`${basePopoutId}-create`"
             aria-label="Create new..."
             :options="[
               {
@@ -270,7 +354,7 @@
         </ButtonStyled>
         <OverflowMenu
           v-if="auth.user"
-          :dropdown-id="userPopoutId"
+          :dropdown-id="`${basePopoutId}-user`"
           class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
           :options="userMenuOptions"
         >
@@ -291,15 +375,22 @@
           </template>
           <template #revenue> <CurrencyIcon aria-hidden="true" /> Revenue </template>
           <template #analytics> <ChartIcon aria-hidden="true" /> Analytics </template>
-          <template #moderation> <ModerationIcon aria-hidden="true" /> Moderation </template>
+          <template #moderation> <ScaleIcon aria-hidden="true" /> Moderation </template>
           <template #sign-out> <LogOutIcon aria-hidden="true" /> Sign out </template>
         </OverflowMenu>
-        <ButtonStyled v-else color="brand">
-          <nuxt-link to="/auth/sign-in">
-            <LogInIcon aria-hidden="true" />
-            Sign in
-          </nuxt-link>
-        </ButtonStyled>
+        <template v-else>
+          <ButtonStyled color="brand">
+            <nuxt-link to="/auth/sign-in">
+              <LogInIcon aria-hidden="true" />
+              Sign in
+            </nuxt-link>
+          </ButtonStyled>
+          <ButtonStyled circular>
+            <nuxt-link v-tooltip="'Settings'" to="/settings">
+              <SettingsIcon aria-label="Settings" />
+            </nuxt-link>
+          </ButtonStyled>
+        </template>
       </div>
     </header>
     <header class="mobile-navigation mobile-only">
@@ -371,7 +462,7 @@
               class="iconified-button"
               to="/moderation"
             >
-              <ModerationIcon aria-hidden="true" />
+              <ScaleIcon aria-hidden="true" />
               {{ formatMessage(commonMessages.moderationLabel) }}
             </NuxtLink>
             <NuxtLink v-if="flags.developerMode" class="iconified-button" to="/flags">
@@ -432,7 +523,7 @@
               }
             "
           >
-            <NotificationIcon aria-hidden="true" />
+            <BellIcon aria-hidden="true" />
           </NuxtLink>
           <NuxtLink
             to="/dashboard"
@@ -451,7 +542,7 @@
         >
           <template v-if="!auth.user">
             <HamburgerIcon v-if="!isMobileMenuOpen" aria-hidden="true" />
-            <CrossIcon v-else aria-hidden="true" />
+            <XIcon v-else aria-hidden="true" />
           </template>
           <template v-else>
             <Avatar
@@ -466,108 +557,102 @@
         </button>
       </div>
     </header>
-    <main>
+    <main class="min-h-[calc(100vh-4.5rem-310.59px)]">
       <ModalCreation v-if="auth.user" ref="modal_creation" />
       <CollectionCreateModal ref="modal_collection_creation" />
       <OrganizationCreateModal ref="modal_organization_creation" />
       <slot id="main" />
     </main>
-    <footer>
-      <div class="logo-info" role="region" aria-label="Modrinth information">
-        <BrandTextLogo
-          aria-hidden="true"
-          class="text-logo button-base mx-auto mb-4 lg:mx-0"
-          @click="developerModeIncrement()"
-        />
-        <p class="mb-4">
-          <IntlFormatted :message-id="footerMessages.openSource">
-            <template #github-link="{ children }">
-              <a
-                :target="$external()"
-                href="https://github.com/modrinth"
-                class="text-link"
-                rel="noopener"
-              >
-                <component :is="() => children" />
-              </a>
-            </template>
-          </IntlFormatted>
-        </p>
-        <p class="mb-4">
-          {{ config.public.branch }}@<a
-            :target="$external()"
-            :href="
-              'https://github.com/' +
-              config.public.owner +
-              '/' +
-              config.public.slug +
-              '/tree/' +
-              config.public.hash
-            "
-            class="text-link"
-            rel="noopener"
-            >{{ config.public.hash.substring(0, 7) }}</a
+    <footer
+      class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid"
+    >
+      <div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
+        <div
+          class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
+        >
+          <div
+            class="flex flex-col items-center gap-3 md:items-start"
+            role="region"
+            aria-label="Modrinth information"
           >
-        </p>
-        <p>© Rinth, Inc.</p>
-      </div>
-      <div class="links links-1" role="region" aria-label="Legal">
-        <h4 aria-hidden="true">{{ formatMessage(footerMessages.companyTitle) }}</h4>
-        <nuxt-link to="/legal/terms"> {{ formatMessage(footerMessages.terms) }}</nuxt-link>
-        <nuxt-link to="/legal/privacy"> {{ formatMessage(footerMessages.privacy) }}</nuxt-link>
-        <nuxt-link to="/legal/rules"> {{ formatMessage(footerMessages.rules) }}</nuxt-link>
-        <a :target="$external()" href="https://careers.modrinth.com">
-          {{ formatMessage(footerMessages.careers) }}
-          <span v-if="false" class="count-bubble">0</span>
-        </a>
-      </div>
-      <div class="links links-2" role="region" aria-label="Resources">
-        <h4 aria-hidden="true">{{ formatMessage(footerMessages.resourcesTitle) }}</h4>
-        <a :target="$external()" href="https://support.modrinth.com">
-          {{ formatMessage(footerMessages.support) }}
-        </a>
-        <a :target="$external()" href="https://blog.modrinth.com">
-          {{ formatMessage(footerMessages.blog) }}
-        </a>
-        <a :target="$external()" href="https://docs.modrinth.com">
-          {{ formatMessage(footerMessages.docs) }}
-        </a>
-        <a :target="$external()" href="https://status.modrinth.com">
-          {{ formatMessage(footerMessages.status) }}
-        </a>
-      </div>
-      <div class="links links-3" role="region" aria-label="Interact">
-        <h4 aria-hidden="true">{{ formatMessage(footerMessages.interactTitle) }}</h4>
-        <a rel="noopener" :target="$external()" href="https://discord.modrinth.com"> Discord </a>
-        <a rel="noopener" :target="$external()" href="https://x.com/modrinth"> X (Twitter) </a>
-        <a rel="noopener" :target="$external()" href="https://floss.social/@modrinth"> Mastodon </a>
-        <a rel="noopener" :target="$external()" href="https://crowdin.com/project/modrinth">
-          Crowdin
-        </a>
-      </div>
-      <div class="buttons">
-        <nuxt-link class="btn btn-outline btn-primary" to="/app">
-          <DownloadIcon aria-hidden="true" />
-          {{ formatMessage(messages.getModrinthApp) }}
-        </nuxt-link>
-        <button class="iconified-button raised-button" @click="changeTheme">
-          <MoonIcon v-if="$theme.active === 'light'" aria-hidden="true" />
-          <SunIcon v-else aria-hidden="true" />
-          {{ formatMessage(messages.changeTheme) }}
-        </button>
-        <nuxt-link class="iconified-button raised-button" to="/settings">
-          <SettingsIcon aria-hidden="true" />
-          {{ formatMessage(commonMessages.settingsLabel) }}
-        </nuxt-link>
-      </div>
-      <div class="not-affiliated-notice">
-        {{ formatMessage(footerMessages.legalDisclaimer) }}
+            <BrandTextLogo
+              aria-hidden="true"
+              class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+              @click="developerModeIncrement()"
+            />
+            <div class="flex flex-wrap justify-center gap-px sm:-mx-2">
+              <ButtonStyled
+                v-for="(social, index) in socialLinks"
+                :key="`footer-social-${index}`"
+                circular
+                type="transparent"
+              >
+                <a
+                  v-tooltip="social.label"
+                  :href="social.href"
+                  target="_blank"
+                  :rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
+                >
+                  <component :is="social.icon" class="h-5 w-5" />
+                </a>
+              </ButtonStyled>
+            </div>
+            <div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
+              <p class="m-0">
+                <IntlFormatted :message-id="footerMessages.openSource">
+                  <template #github-link="{ children }">
+                    <a
+                      href="https://github.com/modrinth/code"
+                      class="text-brand hover:underline"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      <component :is="() => children" />
+                    </a>
+                  </template>
+                </IntlFormatted>
+              </p>
+              <p class="m-0">© 2025 Rinth, Inc.</p>
+            </div>
+          </div>
+          <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
+            <div
+              v-for="group in footerLinks"
+              :key="group.label"
+              class="flex flex-col items-center gap-3 sm:items-start"
+            >
+              <h3 class="m-0 text-base text-contrast">{{ group.label }}</h3>
+              <template v-for="item in group.links" :key="item.label">
+                <nuxt-link
+                  v-if="item.href.startsWith('/')"
+                  :to="item.href"
+                  class="w-fit hover:underline"
+                >
+                  {{ item.label }}
+                </nuxt-link>
+                <a
+                  v-else
+                  :href="item.href"
+                  class="w-fit hover:underline"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {{ item.label }}
+                </a>
+              </template>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-center text-center text-xs font-medium text-secondary opacity-50">
+          {{ formatMessage(footerMessages.legalDisclaimer) }}
+        </div>
       </div>
     </footer>
   </div>
 </template>
 <script setup>
 import {
+  ModrinthIcon,
   ArrowBigUpDashIcon,
   BookmarkIcon,
   ServerIcon,
@@ -599,11 +684,17 @@ import {
   GlassesIcon,
   PaintBrushIcon,
   PackageOpenIcon,
-  XIcon as CrossIcon,
-  ScaleIcon as ModerationIcon,
-  BellIcon as NotificationIcon,
+  DiscordIcon,
+  BlueskyIcon,
+  TumblrIcon,
+  TwitterIcon,
+  MastodonIcon,
+  GitHubIcon,
+  ScaleIcon,
 } from "@modrinth/assets";
 import { Button, ButtonStyled, OverflowMenu, Avatar, commonMessages } from "@modrinth/ui";
+import { isAdmin, isStaff } from "@modrinth/utils";
+import { errors as generatedStateErrors } from "~/generated/state.json";
 
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
@@ -622,10 +713,10 @@ const flags = useFeatureFlags();
 
 const config = useRuntimeConfig();
 const route = useNativeRoute();
+const router = useNativeRouter();
 const link = config.public.siteUrl + route.path.replace(/\/+$/, "");
 
-const createPopoutId = useId();
-const userPopoutId = useId();
+const basePopoutId = useId();
 
 const verifyEmailBannerMessages = defineMessages({
   title: {
@@ -673,6 +764,18 @@ const stagingBannerMessages = defineMessages({
   },
 });
 
+const failedToBuildBannerMessages = defineMessages({
+  title: {
+    id: "layout.banner.build-fail.title",
+    defaultMessage: "Error generating state from API when building.",
+  },
+  description: {
+    id: "layout.banner.build-fail.description",
+    defaultMessage:
+      "This deploy of Modrinth's frontend failed to generate state from the API. This may be due to an outage or an error in configuration. Rebuild when the API is available. Error codes: {errors}; Current API URL is: {url}",
+  },
+});
+
 const navMenuMessages = defineMessages({
   home: {
     id: "layout.nav.home",
@@ -707,50 +810,6 @@ const footerMessages = defineMessages({
   openSource: {
     id: "layout.footer.open-source",
     defaultMessage: "Modrinth is <github-link>open source</github-link>.",
-  },
-  companyTitle: {
-    id: "layout.footer.company.title",
-    defaultMessage: "Company",
-  },
-  terms: {
-    id: "layout.footer.company.terms",
-    defaultMessage: "Terms",
-  },
-  privacy: {
-    id: "layout.footer.company.privacy",
-    defaultMessage: "Privacy",
-  },
-  rules: {
-    id: "layout.footer.company.rules",
-    defaultMessage: "Rules",
-  },
-  careers: {
-    id: "layout.footer.company.careers",
-    defaultMessage: "Careers",
-  },
-  resourcesTitle: {
-    id: "layout.footer.resources.title",
-    defaultMessage: "Resources",
-  },
-  support: {
-    id: "layout.footer.resources.support",
-    defaultMessage: "Support",
-  },
-  blog: {
-    id: "layout.footer.resources.blog",
-    defaultMessage: "Blog",
-  },
-  docs: {
-    id: "layout.footer.resources.docs",
-    defaultMessage: "Docs",
-  },
-  status: {
-    id: "layout.footer.resources.status",
-    defaultMessage: "Status",
-  },
-  interactTitle: {
-    id: "layout.footer.interact.title",
-    defaultMessage: "Interact",
   },
   legalDisclaimer: {
     id: "layout.footer.legal-disclaimer",
@@ -928,12 +987,57 @@ const isDiscoveringSubpage = computed(
   () => route.name && route.name.startsWith("type-id") && !route.query.sid,
 );
 
+const rCount = ref(0);
+
+const randomProjects = ref([]);
+const disableRandomProjects = ref(false);
+
+const disableRandomProjectsForRoute = computed(
+  () =>
+    route.name.startsWith("servers") ||
+    route.name.includes("settings") ||
+    route.name.includes("admin"),
+);
+
+async function onKeyDown(event) {
+  if (disableRandomProjects.value || disableRandomProjectsForRoute.value) {
+    return;
+  }
+
+  if (event.key === "r") {
+    rCount.value++;
+
+    if (randomProjects.value.length < 3) {
+      randomProjects.value = await useBaseFetch("projects_random?count=50").catch((err) => {
+        console.error(err);
+        return [];
+      });
+    }
+  }
+
+  if (rCount.value >= 40) {
+    rCount.value = 0;
+    const randomProject = randomProjects.value[0];
+    await router.push(`/project/${randomProject.slug}`);
+    randomProjects.value.splice(0, 1);
+  }
+}
+
+function onKeyUp(event) {
+  if (event.key === "r") {
+    rCount.value = 0;
+  }
+}
+
 onMounted(() => {
   if (window && import.meta.client) {
     window.history.scrollRestoration = "auto";
   }
 
   runAnalytics();
+
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
 });
 
 watch(
@@ -1023,6 +1127,194 @@ const { cycle: changeTheme } = useTheme();
 function hideStagingBanner() {
   cosmetics.value.hideStagingBanner = true;
 }
+
+const socialLinks = [
+  {
+    label: formatMessage(
+      defineMessage({ id: "layout.footer.social.discord", defaultMessage: "Discord" }),
+    ),
+    href: "https://discord.modrinth.com",
+    icon: DiscordIcon,
+  },
+  {
+    label: formatMessage(
+      defineMessage({ id: "layout.footer.social.bluesky", defaultMessage: "Bluesky" }),
+    ),
+    href: "https://bsky.app/profile/modrinth.com",
+    icon: BlueskyIcon,
+  },
+  {
+    label: formatMessage(
+      defineMessage({ id: "layout.footer.social.mastodon", defaultMessage: "Mastodon" }),
+    ),
+    href: "https://floss.social/@modrinth",
+    icon: MastodonIcon,
+    rel: "me",
+  },
+  {
+    label: formatMessage(
+      defineMessage({ id: "layout.footer.social.tumblr", defaultMessage: "Tumblr" }),
+    ),
+    href: "https://tumblr.com/modrinth",
+    icon: TumblrIcon,
+  },
+  {
+    label: formatMessage(defineMessage({ id: "layout.footer.social.x", defaultMessage: "X" })),
+    href: "https://x.com/modrinth",
+    icon: TwitterIcon,
+  },
+  {
+    label: formatMessage(
+      defineMessage({ id: "layout.footer.social.github", defaultMessage: "GitHub" }),
+    ),
+    href: "https://github.com/modrinth",
+    icon: GitHubIcon,
+  },
+];
+
+const footerLinks = [
+  {
+    label: formatMessage(defineMessage({ id: "layout.footer.about", defaultMessage: "About" })),
+    links: [
+      {
+        href: "https://blog.modrinth.com",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.about.blog", defaultMessage: "Blog" }),
+        ),
+      },
+      {
+        href: "/news/changelog",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.about.changelog", defaultMessage: "Changelog" }),
+        ),
+      },
+      {
+        href: "https://status.modrinth.com",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.about.status", defaultMessage: "Status" }),
+        ),
+      },
+      {
+        href: "https://careers.modrinth.com",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.about.careers", defaultMessage: "Careers" }),
+        ),
+      },
+      {
+        href: "/legal/cmp-info",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.about.rewards-program",
+            defaultMessage: "Rewards Program",
+          }),
+        ),
+      },
+    ],
+  },
+  {
+    label: formatMessage(
+      defineMessage({ id: "layout.footer.products", defaultMessage: "Products" }),
+    ),
+    links: [
+      {
+        href: "/plus",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.products.plus", defaultMessage: "Modrinth+" }),
+        ),
+      },
+      {
+        href: "/app",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.products.app", defaultMessage: "Modrinth App" }),
+        ),
+      },
+      {
+        href: "/servers",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.products.servers",
+            defaultMessage: "Modrinth Servers",
+          }),
+        ),
+      },
+    ],
+  },
+  {
+    label: formatMessage(
+      defineMessage({ id: "layout.footer.resources", defaultMessage: "Resources" }),
+    ),
+    links: [
+      {
+        href: "https://support.modrinth.com",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.resources.help-center",
+            defaultMessage: "Help Center",
+          }),
+        ),
+      },
+      {
+        href: "https://crowdin.com/project/modrinth",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.resources.translate", defaultMessage: "Translate" }),
+        ),
+      },
+      {
+        href: "https://github.com/modrinth/code/issues",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.resources.report-issues",
+            defaultMessage: "Report issues",
+          }),
+        ),
+      },
+      {
+        href: "https://docs.modrinth.com/api/",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.resources.api-docs",
+            defaultMessage: "API documentation",
+          }),
+        ),
+      },
+    ],
+  },
+  {
+    label: formatMessage(defineMessage({ id: "layout.footer.legal", defaultMessage: "Legal" })),
+    links: [
+      {
+        href: "/legal/rules",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.legal.rules", defaultMessage: "Content Rules" }),
+        ),
+      },
+      {
+        href: "/legal/terms",
+        label: formatMessage(
+          defineMessage({ id: "layout.footer.legal.terms-of-use", defaultMessage: "Terms of Use" }),
+        ),
+      },
+      {
+        href: "/legal/privacy",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.legal.privacy-policy",
+            defaultMessage: "Privacy Policy",
+          }),
+        ),
+      },
+      {
+        href: "/legal/security",
+        label: formatMessage(
+          defineMessage({
+            id: "layout.footer.legal.security-notice",
+            defaultMessage: "Security Notice",
+          }),
+        ),
+      },
+    ],
+  },
+];
 </script>
 
 <style lang="scss">
@@ -1037,126 +1329,8 @@ function hideStagingBanner() {
     min-height: calc(100vh - var(--spacing-card-bg));
   }
 
-  @media screen and (max-width: 750px) {
-    margin-bottom: calc(var(--size-mobile-navbar-height) + 2rem);
-  }
-
   main {
     grid-area: main;
-  }
-
-  footer {
-    margin: 6rem 0 2rem 0;
-    text-align: center;
-    display: grid;
-    grid-template:
-      "logo-info  logo-info  logo-info" auto
-      "links-1    links-2    links-3" auto
-      "buttons    buttons    buttons" auto
-      "notice     notice     notice" auto
-      / 1fr 1fr 1fr;
-    max-width: 1280px;
-
-    .logo-info {
-      margin-left: auto;
-      margin-right: auto;
-      max-width: 15rem;
-      margin-bottom: 1rem;
-      grid-area: logo-info;
-
-      .text-logo {
-        width: 10rem;
-        height: auto;
-      }
-    }
-
-    .links {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 1rem;
-
-      h4 {
-        color: var(--color-text-dark);
-        margin: 0 0 1rem 0;
-      }
-
-      a {
-        margin: 0 0 1rem 0;
-      }
-
-      &.links-1 {
-        grid-area: links-1;
-      }
-
-      &.links-2 {
-        grid-area: links-2;
-      }
-
-      &.links-3 {
-        grid-area: links-3;
-      }
-
-      .count-bubble {
-        font-size: 1rem;
-        border-radius: 5rem;
-        background: var(--color-brand);
-        color: var(--color-text-inverted);
-        padding: 0 0.35rem;
-        margin-left: 0.25rem;
-      }
-    }
-
-    .buttons {
-      margin-left: auto;
-      margin-right: auto;
-      grid-area: buttons;
-
-      button,
-      a {
-        margin-bottom: 0.5rem;
-        margin-left: auto;
-        margin-right: auto;
-      }
-    }
-
-    .not-affiliated-notice {
-      grid-area: notice;
-      font-size: var(--font-size-xs);
-      text-align: center;
-      font-weight: 500;
-      margin-top: var(--spacing-card-md);
-    }
-
-    @media screen and (min-width: 1024px) {
-      display: grid;
-      margin-inline: auto;
-      grid-template:
-        "logo-info  links-1 links-2 links-3 buttons" auto
-        "notice     notice  notice  notice  notice" auto;
-      text-align: unset;
-
-      .logo-info {
-        margin-right: 4rem;
-      }
-
-      .links {
-        margin-right: 4rem;
-      }
-
-      .buttons {
-        width: unset;
-        margin-left: 0;
-
-        button,
-        a {
-          margin-right: unset;
-        }
-      }
-
-      .not-affiliated-notice {
-        margin-top: 0;
-      }
-    }
   }
 }
 
@@ -1444,9 +1618,120 @@ function hideStagingBanner() {
   .mobile-navigation {
     display: flex;
   }
+}
 
-  main {
-    padding-top: 1.5rem;
+.footer-brand-background {
+  background: var(--brand-gradient-strong-bg);
+  border-color: var(--brand-gradient-border);
+}
+
+.over-the-top-random-animation {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  scale: 0.5;
+  transition: all 0.5s ease-out;
+  opacity: 0;
+  animation:
+    tilt-shaking calc(0.2s / (max((var(--_r-count) - 20), 1) / 20)) linear infinite,
+    translate-x-shaking calc(0.3s / (max((var(--_r-count) - 20), 1) / 20)) linear infinite,
+    translate-y-shaking calc(0.25s / (max((var(--_r-count) - 20), 1) / 20)) linear infinite;
+
+  &.threshold {
+    opacity: 1;
+  }
+
+  &.rings-expand {
+    scale: 0.8;
+    opacity: 0;
+
+    .animation-ring-1 {
+      width: 25rem;
+      height: 25rem;
+    }
+    .animation-ring-2 {
+      width: 50rem;
+      height: 50rem;
+    }
+    .animation-ring-3 {
+      width: 100rem;
+      height: 100rem;
+    }
+  }
+
+  > div {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    height: fit-content;
+
+    > * {
+      position: absolute;
+      scale: calc(1 + max((var(--_r-count) - 20), 0) * 0.1);
+      transition: all 0.2s ease-out;
+      width: 20rem;
+      height: 20rem;
+    }
+  }
+}
+
+@keyframes tilt-shaking {
+  0% {
+    rotate: 0deg;
+  }
+  25% {
+    rotate: calc(1deg * (var(--_r-count) - 20));
+  }
+  50% {
+    rotate: 0deg;
+  }
+  75% {
+    rotate: calc(-1deg * (var(--_r-count) - 20));
+  }
+  100% {
+    rotate: 0deg;
+  }
+}
+
+@keyframes translate-x-shaking {
+  0% {
+    translate: 0;
+  }
+  25% {
+    translate: calc(2px * (var(--_r-count) - 20));
+  }
+  50% {
+    translate: 0;
+  }
+  75% {
+    translate: calc(-2px * (var(--_r-count) - 20));
+  }
+  100% {
+    translate: 0;
+  }
+}
+
+@keyframes translate-y-shaking {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(calc(2px * (var(--_r-count) - 20)));
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(calc(-2px * (var(--_r-count) - 20)));
+  }
+  100% {
+    transform: translateY(0);
   }
 }
 </style>

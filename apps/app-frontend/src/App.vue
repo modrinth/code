@@ -521,6 +521,16 @@ function handleAuxClick(e) {
           width: 'calc(100% - var(--right-bar-width))',
         }"
       ></div>
+      <div
+        v-if="criticalErrorMessage"
+        class="m-6 mb-0 flex flex-col border-red bg-bg-red rounded-2xl border-2 border-solid p-4 gap-1 font-semibold text-contrast"
+      >
+        <h1 class="m-0 text-lg font-extrabold">{{ criticalErrorMessage.header }}</h1>
+        <div
+          class="markdown-body text-primary"
+          v-html="renderString(criticalErrorMessage.body ?? '')"
+        ></div>
+      </div>
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
@@ -591,12 +601,6 @@ function handleAuxClick(e) {
         </a>
         <PromotionWrapper />
       </template>
-    </div>
-    <div class="view">
-      <div v-if="criticalErrorMessage" class="critical-error-banner" data-tauri-drag-region>
-        <h1>{{ criticalErrorMessage.header }}</h1>
-        <div class="markdown-body" v-html="renderString(criticalErrorMessage.body ?? '')"></div>
-      </div>
     </div>
   </div>
   <URLConfirmModal ref="urlModal" />
