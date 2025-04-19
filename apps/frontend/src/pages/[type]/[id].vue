@@ -869,8 +869,8 @@ import {
 } from "@modrinth/ui";
 import VersionSummary from "@modrinth/ui/src/components/version/VersionSummary.vue";
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
-import { navigateTo } from "#app";
 import dayjs from "dayjs";
+import { navigateTo } from "#app";
 import Accordion from "~/components/ui/Accordion.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
@@ -1524,6 +1524,11 @@ const navLinks = computed(() => {
       href: `${projectUrl}/versions`,
       shown: versions.value.length > 0 || !!currentMember.value,
       subpages: [`${projectUrl}/version/`],
+    },
+    {
+      label: "Dependencies",
+      href: `${projectUrl}/dependencies`,
+      shown: project.value.project_type === "modpack" && dependencies.value?.projects?.length > 0,
     },
     {
       label: formatMessage(messages.moderationTab),
