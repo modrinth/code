@@ -598,7 +598,7 @@ async fn fetch(
                             ))
                                 })?;
 
-                        let file_name = value.split('/').last()
+                        let file_name = value.split('/').next_back()
                             .ok_or_else(|| {
                                 crate::ErrorKind::InvalidInput(format!(
                                     "Unable reading filename for data key {key} at path {value}",

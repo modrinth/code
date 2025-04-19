@@ -1346,7 +1346,7 @@ async function setProcessing() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -1389,7 +1389,7 @@ async function patchProject(resData, quiet = false) {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1426,7 +1426,7 @@ async function patchIcon(icon) {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
 

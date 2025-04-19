@@ -106,13 +106,16 @@
           </p>
           <IssuesIcon
             v-if="customServerConfig.ramInGb < 4"
-            v-tooltip="'This might not be enough resources for your Minecraft server.'"
+            v-tooltip="'This might not be powerful enough for your Minecraft server.'"
             class="h-6 w-6 text-orange"
           />
         </div>
         <p v-if="existingPlan" class="mt-1 mb-2 text-secondary">
           Your current plan has <strong>{{ existingPlan.metadata.ram / 1024 }} GB RAM</strong> and
-          <strong>{{ existingPlan.metadata.cpu }} vCPUs</strong>.
+          <strong
+            >{{ existingPlan.metadata.cpu / 2 }} shared CPUs (bursts up to
+            {{ existingPlan.metadata.cpu }} CPUs)</strong
+          >.
         </p>
         <div class="flex flex-col gap-4">
           <div class="flex w-full gap-2 items-center">
@@ -131,12 +134,28 @@
             class="flex sm:flex-row flex-col gap-4 w-full"
           >
             <div class="flex flex-col w-full gap-2">
-              <div class="font-semibold">vCPUs</div>
-              <input v-model="mutatedProduct.metadata.cpu" disabled class="input" />
+              <div class="font-semibold">Shared CPUs</div>
+              <input :value="sharedCpus" disabled class="input w-full" />
+            </div>
+            <div class="flex flex-col w-full gap-2">
+              <div class="font-semibold flex items-center gap-1">
+                Max Burst CPUs
+                <UnknownIcon
+                  v-tooltip="
+                    'CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. See Modrinth Servers FAQ for more info.'
+                  "
+                  class="h-4 w-4text-secondary opacity-60"
+                />
+              </div>
+              <input :value="mutatedProduct.metadata.cpu" disabled class="input w-full" />
             </div>
             <div class="flex flex-col w-full gap-2">
               <div class="font-semibold">Storage</div>
-              <input v-model="customServerConfig.storageGbFormatted" disabled class="input" />
+              <input
+                v-model="customServerConfig.storageGbFormatted"
+                disabled
+                class="input w-full"
+              />
             </div>
           </div>
           <Admonition
@@ -153,10 +172,11 @@
             later, or try a different amount.
           </Admonition>
 
-          <div class="flex items-center gap-2">
-            <InfoIcon class="hidden sm:block" />
+          <div class="flex gap-2">
+            <InfoIcon class="hidden sm:block shrink-0 mt-1" />
             <span class="text-sm text-secondary">
-              Storage and vCPUs are currently not configurable.
+              Storage and shared CPU count are currently not configurable independently, and are
+              based on the amount of RAM you select.
             </span>
           </div>
         </div>
@@ -500,6 +520,7 @@
 import { ref, computed, nextTick, reactive, watch } from 'vue'
 import NewModal from '../modal/NewModal.vue'
 import {
+  UnknownIcon,
   SpinnerIcon,
   CardIcon,
   CheckCircleIcon,
@@ -765,7 +786,11 @@ function updateRamValues() {
   customMinRam.value = Math.min(...ramValues)
   customMaxRam.value = Math.max(...ramValues)
 
-  customServerConfig.ramInGb = customMinRam.value
+  if (props.product.some((product) => product.metadata.ram / 1024 === 4)) {
+    customServerConfig.ramInGb = 4
+  } else {
+    customServerConfig.ramInGb = customMinRam.value
+  }
 }
 
 if (props.customServer) {
@@ -830,6 +855,10 @@ const metadata = computed(() => {
     }
   }
   return null
+})
+
+const sharedCpus = computed(() => {
+  return (mutatedProduct.value?.metadata?.cpu ?? 0) / 2
 })
 
 function nextStep() {

@@ -135,6 +135,7 @@ pub async fn subscriptions(
 pub enum ChargeRefundAmount {
     Full,
     Partial { amount: u64 },
+    None,
 }
 
 #[derive(Deserialize)]
@@ -189,6 +190,7 @@ pub async fn refund_charge(
         let refund_amount = match body.0.amount {
             ChargeRefundAmount::Full => refundable,
             ChargeRefundAmount::Partial { amount } => amount as i64,
+            ChargeRefundAmount::None => 0,
         };
 
         if charge.status != ChargeStatus::Succeeded {
@@ -197,55 +199,61 @@ pub async fn refund_charge(
             ));
         }
 
-        if (refundable - refund_amount) < 0 || refund_amount == 0 {
+        if (refundable - refund_amount) < 0 {
             return Err(ApiError::InvalidInput(
                 "You cannot refund more than the amount of the charge!"
                     .to_string(),
             ));
         }
 
-        let (id, net) = match charge.payment_platform {
-            PaymentPlatform::Stripe => {
-                if let Some(payment_platform_id) = charge
-                    .payment_platform_id
-                    .and_then(|x| stripe::PaymentIntentId::from_str(&x).ok())
-                {
-                    let mut metadata = HashMap::new();
+        let (id, net) = if refund_amount == 0 {
+            (None, None)
+        } else {
+            match charge.payment_platform {
+                PaymentPlatform::Stripe => {
+                    if let Some(payment_platform_id) =
+                        charge.payment_platform_id.and_then(|x| {
+                            stripe::PaymentIntentId::from_str(&x).ok()
+                        })
+                    {
+                        let mut metadata = HashMap::new();
 
-                    metadata.insert(
-                        "modrinth_user_id".to_string(),
-                        to_base62(user.id.0),
-                    );
-                    metadata.insert(
-                        "modrinth_charge_id".to_string(),
-                        to_base62(charge.id.0 as u64),
-                    );
+                        metadata.insert(
+                            "modrinth_user_id".to_string(),
+                            to_base62(user.id.0),
+                        );
+                        metadata.insert(
+                            "modrinth_charge_id".to_string(),
+                            to_base62(charge.id.0 as u64),
+                        );
 
-                    let refund = stripe::Refund::create(
-                        &stripe_client,
-                        CreateRefund {
-                            amount: Some(refund_amount),
-                            metadata: Some(metadata),
-                            payment_intent: Some(payment_platform_id),
+                        let refund = stripe::Refund::create(
+                            &stripe_client,
+                            CreateRefund {
+                                amount: Some(refund_amount),
+                                metadata: Some(metadata),
+                                payment_intent: Some(payment_platform_id),
 
-                            expand: &["balance_transaction"],
+                                expand: &["balance_transaction"],
 
-                            ..Default::default()
-                        },
-                    )
-                    .await?;
+                                ..Default::default()
+                            },
+                        )
+                        .await?;
 
-                    (
-                        refund.id.to_string(),
-                        refund
-                            .balance_transaction
-                            .and_then(|x| x.into_object())
-                            .map(|x| x.net),
-                    )
-                } else {
-                    return Err(ApiError::InvalidInput(
-                        "Charge does not have attached payment id!".to_string(),
-                    ));
+                        (
+                            Some(refund.id.to_string()),
+                            refund
+                                .balance_transaction
+                                .and_then(|x| x.into_object())
+                                .map(|x| x.net),
+                        )
+                    } else {
+                        return Err(ApiError::InvalidInput(
+                            "Charge does not have attached payment id!"
+                                .to_string(),
+                        ));
+                    }
                 }
             }
         };
@@ -266,7 +274,7 @@ pub async fn refund_charge(
             subscription_id: charge.subscription_id,
             subscription_interval: charge.subscription_interval,
             payment_platform: charge.payment_platform,
-            payment_platform_id: Some(id),
+            payment_platform_id: id,
             parent_charge_id: Some(charge.id),
             net,
         }
@@ -2300,8 +2308,6 @@ pub async fn index_billing(
         )
         .await?;
 
-        let mut transaction = pool.begin().await?;
-
         for mut charge in charges_to_do {
             let product_price = if let Some(price) =
                 prices.iter().find(|x| x.id == charge.price_id)
@@ -2396,18 +2402,27 @@ pub async fn index_billing(
 
                     charge.status = ChargeStatus::Processing;
 
-                    stripe::PaymentIntent::create(&stripe_client, intent)
-                        .await?;
+                    if let Err(e) =
+                        stripe::PaymentIntent::create(&stripe_client, intent)
+                            .await
+                    {
+                        tracing::error!(
+                            "Failed to create payment intent: {:?}",
+                            e
+                        );
+                        charge.status = ChargeStatus::Failed;
+                        charge.last_attempt = Some(Utc::now());
+                    }
                 } else {
                     charge.status = ChargeStatus::Failed;
                     charge.last_attempt = Some(Utc::now());
                 }
 
+                let mut transaction = pool.begin().await?;
                 charge.upsert(&mut transaction).await?;
+                transaction.commit().await?;
             }
         }
-
-        transaction.commit().await?;
 
         Ok::<(), ApiError>(())
     }

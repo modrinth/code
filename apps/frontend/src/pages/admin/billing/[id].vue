@@ -277,7 +277,7 @@ const refunding = ref(false);
 const refundModal = ref();
 const selectedCharge = ref(null);
 const refundType = ref("full");
-const refundTypes = ref(["full", "partial"]);
+const refundTypes = ref(["full", "partial", "none"]);
 const refundAmount = ref(0);
 const unprovision = ref(false);
 
