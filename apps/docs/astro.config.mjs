@@ -43,11 +43,16 @@ export default defineConfig({
       sidebar: [
         { slug: 'overview' },
         // Add the generated sidebar group to the sidebar.
-        ...openAPISidebarGroups,
         {
           label: 'Contributing to Modrinth',
           autogenerate: { directory: 'contributing' },
         },
+        {
+          label: 'Guides',
+          autogenerate: { directory: 'guide' },
+        },
+        // Add the generated sidebar group to the sidebar.
+        ...openAPISidebarGroups,
       ],
     }),
   ],

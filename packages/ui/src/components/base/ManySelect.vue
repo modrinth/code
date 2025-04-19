@@ -43,7 +43,7 @@
             class="!w-full"
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
-            <slot name="option" :option="option">{{ displayName?.(option) }}</slot>
+            <slot name="option" :option="option">{{ getOptionLabel(option) }}</slot>
             <CheckIcon
               class="h-5 w-5 text-contrast ml-auto transition-opacity"
               :class="{ 'opacity-0': !manyValues.includes(option) }"
@@ -59,7 +59,7 @@
             class="!w-full"
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
-            <slot name="option" :option="option">{{ displayName?.(option) }}</slot>
+            <slot name="option" :option="option">{{ getOptionLabel(option) }}</slot>
             <CheckIcon
               class="h-5 w-5 text-contrast ml-auto transition-opacity"
               :class="{ 'opacity-0': !manyValues.includes(option) }"
@@ -97,7 +97,7 @@ const props = withDefaults(
     disabled: false,
     position: 'auto',
     direction: 'auto',
-    displayName: (option: Option) => option as string,
+    displayName: undefined,
     search: false,
     dropdownId: '',
     dropdownClass: '',
@@ -105,6 +105,10 @@ const props = withDefaults(
     tooltip: '',
   },
 )
+
+function getOptionLabel(option: Option): string {
+  return props.displayName?.(option) ?? (option as string)
+}
 
 const emit = defineEmits(['update:modelValue', 'change'])
 const selectedValues = ref(props.modelValue || [])
@@ -127,7 +131,7 @@ const filteredOptions = computed(() => {
   return props.options.filter(
     (x) =>
       !searchQuery.value ||
-      props.displayName(x).toLowerCase().includes(searchQuery.value.toLowerCase()),
+      getOptionLabel(x).toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 

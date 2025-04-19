@@ -25,8 +25,7 @@
 </template>
 
 <script>
-import CheckIcon from "~/assets/images/utils/check.svg?component";
-import DropdownIcon from "~/assets/images/utils/dropdown.svg?component";
+import { CheckIcon, DropdownIcon } from "@modrinth/assets";
 
 export default {
   components: {

@@ -109,8 +109,6 @@
         <p class="text-contrast">No servers found.</p>
       </div>
     </template>
-
-    <UiServersPoweredByPyro />
   </div>
 </template>
 

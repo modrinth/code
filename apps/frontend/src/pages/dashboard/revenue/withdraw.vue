@@ -80,7 +80,7 @@
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked v-if="selectedMethodId === method.id" class="radio" />
+            <RadioButtonCheckedIcon v-if="selectedMethodId === method.id" class="radio" />
             <RadioButtonIcon v-else class="radio" />
             <span>{{ method.name }}</span>
           </div>
@@ -192,7 +192,7 @@ import {
   PayPalIcon,
   SearchIcon,
   RadioButtonIcon,
-  RadioButtonChecked,
+  RadioButtonCheckedIcon,
   XIcon,
   TransferIcon,
 } from "@modrinth/assets";
@@ -369,7 +369,7 @@ async function withdraw() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

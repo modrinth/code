@@ -10,6 +10,7 @@ interface PyroFetchOptions {
     token?: string;
   };
   retry?: boolean;
+  bypassAuth?: boolean;
 }
 
 export class PyroFetchError extends Error {
@@ -28,7 +29,7 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
   const auth = await useAuth();
   const authToken = auth.value?.token;
 
-  if (!authToken) {
+  if (!authToken && !options.bypassAuth) {
     throw new PyroFetchError("Cannot pyrofetch without auth", 10000);
   }
 
@@ -52,9 +53,15 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
 
   type HeadersRecord = Record<string, string>;
 
+  const authHeader: HeadersRecord = options.bypassAuth
+    ? {}
+    : {
+        Authorization: `Bearer ${override?.token ?? authToken}`,
+        "Access-Control-Allow-Headers": "Authorization",
+      };
+
   const headers: HeadersRecord = {
-    Authorization: `Bearer ${override?.token ?? authToken}`,
-    "Access-Control-Allow-Headers": "Authorization",
+    ...authHeader,
     "User-Agent": "Pyro/1.0 (https://pyro.host)",
     Vary: "Accept, Origin",
     "Content-Type": contentType,

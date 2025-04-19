@@ -1,82 +1,58 @@
 <template>
-  <NewModal ref="modal" header="Restoring backup">
-    <div class="flex flex-col gap-4">
-      <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
-        <div class="text-2xl font-extrabold text-contrast">
-          {{ backupName }}
-        </div>
-        <div class="flex gap-2 font-semibold text-contrast">
-          <CalendarIcon />
-          {{ formattedDate }}
-        </div>
-      </div>
-    </div>
-    <div class="mb-1 mt-4 flex justify-end gap-4">
-      <ButtonStyled color="brand">
-        <button :disabled="isRestoring" @click="restoreBackup">Restore backup</button>
-      </ButtonStyled>
-      <ButtonStyled type="transparent">
-        <button @click="hideModal">Cancel</button>
-      </ButtonStyled>
-    </div>
-  </NewModal>
+  <ConfirmModal
+    ref="modal"
+    danger
+    title="Are you sure you want to restore from this backup?"
+    proceed-label="Restore from backup"
+    description="This will **overwrite all files on your server** and replace them with the files from the backup."
+    @proceed="restoreBackup"
+  >
+    <BackupItem
+      v-if="currentBackup"
+      :backup="currentBackup"
+      preview
+      class="border-px border-solid border-button-border"
+    />
+  </ConfirmModal>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
-import { CalendarIcon } from "@modrinth/assets";
+import { ConfirmModal, NewModal } from "@modrinth/ui";
 import type { Server } from "~/composables/pyroServers";
+import BackupItem from "~/components/ui/servers/BackupItem.vue";
 
 const props = defineProps<{
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
-  backupId: string;
-  backupName: string;
-  backupCreatedAt: string;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
-const emit = defineEmits(["backupRestored"]);
-
 const modal = ref<InstanceType<typeof NewModal>>();
-const isRestoring = ref(false);
-const backupError = ref<string | null>(null);
+const currentBackup = ref<Backup | null>(null);
 
-const formattedDate = computed(() => {
-  return new Date(props.backupCreatedAt).toLocaleString("en-US", {
-    month: "numeric",
-    day: "numeric",
-    year: "2-digit",
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  });
-});
-
-const hideModal = () => {
-  modal.value?.hide();
-};
+function show(backup: Backup) {
+  currentBackup.value = backup;
+  modal.value?.show();
+}
 
 const restoreBackup = async () => {
-  if (!props.backupId) {
-    emit("backupRestored", { success: false, message: "No backup selected" });
+  if (!currentBackup.value) {
+    addNotification({
+      type: "error",
+      title: "Failed to restore backup",
+      text: "Current backup is null",
+    });
     return;
   }
 
-  isRestoring.value = true;
   try {
-    await props.server.backups?.restore(props.backupId);
-    hideModal();
-    emit("backupRestored", { success: true, message: "Backup restored successfully" });
+    await props.server.backups?.restore(currentBackup.value.id);
   } catch (error) {
-    backupError.value = error instanceof Error ? error.message : String(error);
-    emit("backupRestored", { success: false, message: backupError.value });
-  } finally {
-    isRestoring.value = false;
+    const message = error instanceof Error ? error.message : String(error);
+    addNotification({ type: "error", title: "Failed to restore backup", text: message });
   }
 };
 
 defineExpose({
-  show: () => modal.value?.show(),
-  hide: hideModal,
+  show,
 });
 </script>

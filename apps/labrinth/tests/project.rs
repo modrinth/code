@@ -18,10 +18,10 @@ use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 
-use ariadne::api_common::models::CommonProject;
-use ariadne::api_common::request_data::ProjectCreationRequestData;
-use ariadne::api_common::{ApiProject, ApiTeams, ApiVersion};
-use ariadne::dummy_data::{
+use crate::common::api_common::models::CommonProject;
+use crate::common::api_common::request_data::ProjectCreationRequestData;
+use crate::common::api_common::{ApiProject, ApiTeams, ApiVersion};
+use crate::common::dummy_data::{
     DummyImage, DummyOrganizationZeta, DummyProjectAlpha, DummyProjectBeta,
     TestFile,
 };

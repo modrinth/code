@@ -31,11 +31,11 @@ use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::stream::StreamExt;
 use itertools::Itertools;
-use log::error;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use tracing::error;
 use validator::Validate;
 
 fn default_requested_status() -> VersionStatus {
