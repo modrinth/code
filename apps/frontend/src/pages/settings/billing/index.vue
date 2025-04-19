@@ -196,7 +196,10 @@
                 <div class="mt-2 flex flex-col gap-2">
                   <div class="flex items-center gap-2">
                     <CheckCircleIcon class="h-5 w-5 text-brand" />
-                    <span> {{ getPyroProduct(subscription)?.metadata?.cpu }} vCores (CPU) </span>
+                    <span>
+                      {{ getPyroProduct(subscription)?.metadata?.cpu / 2 }} Shared CPUs (Bursts up
+                      to {{ getPyroProduct(subscription)?.metadata?.cpu }} CPUs)
+                    </span>
                   </div>
                   <div class="flex items-center gap-2">
                     <CheckCircleIcon class="h-5 w-5 text-brand" />

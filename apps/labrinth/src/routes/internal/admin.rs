@@ -15,12 +15,12 @@ use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::guards::admin_key_guard;
 use actix_web::{get, patch, post, web, HttpRequest, HttpResponse};
-use log::info;
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
+use tracing::info;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -74,11 +74,10 @@ pub async fn count_download(
     let project_id: crate::database::models::ids::ProjectId =
         download_body.project_id.into();
 
-    let id_option = crate::models::ids::base62_impl::parse_base62(
-        &download_body.version_name,
-    )
-    .ok()
-    .map(|x| x as i64);
+    let id_option =
+        ariadne::ids::base62_impl::parse_base62(&download_body.version_name)
+            .ok()
+            .map(|x| x as i64);
 
     let (version_id, project_id) = if let Some(version) = sqlx::query!(
         "
@@ -247,6 +246,10 @@ pub async fn delphi_result_ingest(
                 "\n\n- issue {issue} found at file {}",
                 path
             ));
+        }
+
+        if trace.is_empty() {
+            thread_header.push_str(&format!("\n\n- issue {issue} found",));
         }
     }
 

@@ -212,6 +212,18 @@ export interface WSNewModEvent {
   event: "new-mod";
 }
 
+export type WSBackupTask = "file" | "create" | "restore";
+export type WSBackupState = "ongoing" | "done" | "failed" | "cancelled" | "unchanged";
+
+export interface WSBackupProgressEvent {
+  event: "backup-progress";
+  task: WSBackupTask;
+  id: string;
+  progress: number; // percentage
+  state: WSBackupState;
+  ready: boolean;
+}
+
 export type WSEvent =
   | WSLogEvent
   | WSStatsEvent
@@ -221,7 +233,8 @@ export type WSEvent =
   | WSInstallationResultEvent
   | WSAuthOkEvent
   | WSUptimeEvent
-  | WSNewModEvent;
+  | WSNewModEvent
+  | WSBackupProgressEvent;
 
 export interface Servers {
   servers: Server[];

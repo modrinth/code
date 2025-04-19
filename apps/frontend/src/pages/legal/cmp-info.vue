@@ -92,32 +92,38 @@
     </p>
 
     <table>
-      <tr>
-        <th>Timeline</th>
-        <th>Date</th>
-      </tr>
-      <tr>
-        <td>Revenue earned on</td>
-        <td>
-          <input id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
-          <noscript
-            >(JavaScript must be enabled for the date picker to function, example date: 2024-07-15)
-          </noscript>
-        </td>
-      </tr>
-      <tr>
-        <td>End of the month</td>
-        <td>{{ formatDate(endOfMonthDate) }}</td>
-      </tr>
-      <tr>
-        <td>NET 60 policy applied</td>
-        <td>+ 60 days</td>
-      </tr>
-      <tr class="final-result">
-        <td>Available for withdrawal</td>
-        <td>{{ formatDate(withdrawalDate) }}</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Timeline</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Revenue earned on</td>
+          <td>
+            <input id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
+            <noscript
+              >(JavaScript must be enabled for the date picker to function, example date:
+              2024-07-15)
+            </noscript>
+          </td>
+        </tr>
+        <tr>
+          <td>End of the month</td>
+          <td>{{ formatDate(endOfMonthDate) }}</td>
+        </tr>
+        <tr>
+          <td>NET 60 policy applied</td>
+          <td>+ 60 days</td>
+        </tr>
+        <tr class="final-result">
+          <td>Available for withdrawal</td>
+          <td>{{ formatDate(withdrawalDate) }}</td>
+        </tr>
+      </tbody>
     </table>
+
     <h3>How do I know Modrinth is being transparent about revenue?</h3>
     <p>
       We aim to be as transparent as possible with creator revenue. All of our code is open source,
@@ -125,9 +131,9 @@
       <a href="https://github.com/modrinth/code/blob/main/apps/labrinth/src/queue/payouts.rs#L598">
         revenue distribution system</a
       >. We also have an
-      <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a> that allows users
-      to query exact daily revenue for the site - so far, Modrinth has generated
-      <strong>{{ formatMoney(platformRevenue) }}</strong> in revenue.
+      <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>
+      to query the exact daily advertising revenue for the site - so far, creators on Modrinth have
+      earned a total of <strong>{{ formatMoney(platformRevenue) }}</strong> in ad revenue.
     </p>
     <table>
       <thead>
@@ -148,7 +154,7 @@
       </tbody>
     </table>
     <small
-      >Modrinth's total revenue in the previous 5 days, for the entire dataset, use the
+      >Modrinth's total ad revenue in the previous 5 days, for the entire dataset, use the
       aforementioned
       <a href="https://api.modrinth.com/v3/payout/platform_revenue">API route</a>.</small
     >

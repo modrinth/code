@@ -6,7 +6,7 @@ use crate::common::dummy_data::TestFile;
 use crate::common::environment::with_test_environment;
 use crate::common::environment::TestEnvironment;
 use crate::common::scopes::ScopeTest;
-use labrinth::models::ids::base62_impl::parse_base62;
+use ariadne::ids::base62_impl::parse_base62;
 use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectId;
 

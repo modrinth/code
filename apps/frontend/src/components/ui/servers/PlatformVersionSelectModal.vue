@@ -20,9 +20,7 @@
         }"
       >
         {{
-          backupServer
-            ? "A backup will be created before proceeding with the reinstallation, then all data will be erased from your server. Are you sure you want to continue?"
-            : "This will reinstall your server and erase all data. Are you sure you want to continue?"
+          "This will reinstall your server and erase all data. Are you sure you want to continue?"
         }}
       </p>
       <div v-if="!isSecondPhase" class="flex flex-col gap-4">
@@ -131,41 +129,28 @@
             Removes all data on your server, including your worlds, mods, and configuration files,
             then reinstalls it with the selected version.
           </div>
+          <div class="font-bold">This does not affect your backups, which are stored off-site.</div>
         </div>
 
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
-          <div class="flex w-full flex-row items-center justify-between">
-            <label class="w-full text-lg font-bold text-contrast" for="backup-server">
-              Backup server
-            </label>
-            <input
-              id="backup-server"
-              v-model="backupServer"
-              class="switch stylized-toggle shrink-0"
-              type="checkbox"
-            />
-          </div>
-          <div>
-            Creates a backup of your server before proceeding with the installation or
-            reinstallation.
-          </div>
-        </div>
+        <BackupWarning :backup-link="`/servers/manage/${props.server?.serverId}/backups`" />
       </div>
 
       <div class="mt-4 flex justify-start gap-4">
         <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="canInstall" @click="handleReinstall">
+          <button
+            v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
+            :disabled="canInstall || !!backupInProgress"
+            @click="handleReinstall"
+          >
             <RightArrowIcon />
             {{
-              isBackingUp
-                ? "Backing up..."
-                : isLoading
-                  ? "Installing..."
-                  : isSecondPhase
-                    ? "Erase and install"
-                    : hardReset
-                      ? "Continue"
-                      : "Install"
+              isLoading
+                ? "Installing..."
+                : isSecondPhase
+                  ? "Erase and install"
+                  : hardReset
+                    ? "Continue"
+                    : "Install"
             }}
           </button>
         </ButtonStyled>
@@ -173,10 +158,12 @@
           <button
             :disabled="isLoading"
             @click="
-              if (isSecondPhase) {
-                isSecondPhase = false;
-              } else {
-                hide();
+              () => {
+                if (isSecondPhase) {
+                  isSecondPhase = false;
+                } else {
+                  hide();
+                }
               }
             "
           >
@@ -190,10 +177,13 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { RightArrowIcon, XIcon, ServerIcon, DropdownIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
 import type { Loaders } from "~/types/servers";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
+
+const { formatMessage } = useVIntl();
 
 interface LoaderVersion {
   id: string;
@@ -211,6 +201,7 @@ type VersionCache = Record<string, any>;
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
   currentLoader: Loaders | undefined;
+  backupInProgress?: BackupInProgressReason;
 }>();
 
 const emit = defineEmits<{
@@ -220,9 +211,7 @@ const emit = defineEmits<{
 const versionSelectModal = ref();
 const isSecondPhase = ref(false);
 const hardReset = ref(false);
-const backupServer = ref(false);
 const isLoading = ref(false);
-const isBackingUp = ref(false);
 const loadingServerCheck = ref(false);
 const serverCheckError = ref("");
 
@@ -411,67 +400,10 @@ const canInstall = computed(() => {
   return conds || !selectedLoaderVersion.value;
 });
 
-const performBackup = async (): Promise<boolean> => {
-  try {
-    const date = new Date();
-    const format = date.toLocaleString(navigator.language || "en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      timeZoneName: "short",
-    });
-    const backupName = `Reinstallation - ${format}`;
-    isLoading.value = true;
-    const backupId = await props.server.backups?.create(backupName);
-    isBackingUp.value = true;
-    let attempts = 0;
-    while (true) {
-      attempts++;
-      if (attempts > 100) {
-        addNotification({
-          group: "server",
-          title: "Backup Failed",
-          text: "An unexpected error occurred while backing up. Please try again later.",
-        });
-        return false;
-      }
-      await props.server.refresh(["backups"]);
-      const backups = await props.server.backups?.data;
-      const backup = backupId ? backups?.find((x) => x.id === backupId) : undefined;
-      if (backup && !backup.ongoing) {
-        isBackingUp.value = false;
-        break;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-    }
-    return true;
-  } catch {
-    addNotification({
-      group: "server",
-      title: "Backup Failed",
-      text: "An unexpected error occurred while backing up. Please try again later.",
-    });
-    return false;
-  }
-};
-
 const handleReinstall = async () => {
   if (hardReset.value && !isSecondPhase.value) {
     isSecondPhase.value = true;
     return;
-  }
-
-  if (backupServer.value) {
-    isBackingUp.value = true;
-    if (!(await performBackup())) {
-      isBackingUp.value = false;
-      isLoading.value = false;
-      return;
-    }
-    isBackingUp.value = false;
   }
 
   isLoading.value = true;
@@ -520,7 +452,6 @@ const onShow = () => {
 
 const onHide = () => {
   hardReset.value = false;
-  backupServer.value = false;
   isSecondPhase.value = false;
   serverCheckError.value = "";
   loadingServerCheck.value = false;

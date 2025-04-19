@@ -6,7 +6,6 @@ use crate::database::models::{
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::collections::{Collection, CollectionStatus};
-use crate::models::ids::base62_impl::parse_base62;
 use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
@@ -18,6 +17,7 @@ use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::web::Data;
 use actix_web::{web, HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -50,7 +50,7 @@ pub struct CollectionCreateData {
     #[validate(length(min = 3, max = 255))]
     /// A short description of the collection.
     pub description: Option<String>,
-    #[validate(length(max = 32))]
+    #[validate(length(max = 1024))]
     #[serde(default = "Vec::new")]
     /// A list of initial projects to use with the created collection
     pub projects: Vec<String>,

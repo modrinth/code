@@ -37,7 +37,7 @@ async function copyText() {
   margin: 0;
   padding: 0.25rem 0.5rem;
   background-color: var(--color-button-bg);
-  width: min-content;
+  width: fit-content;
   border-radius: 10px;
   user-select: text;
   transition:
@@ -48,12 +48,6 @@ async function copyText() {
 
   @media (prefers-reduced-motion) {
     transition: none !important;
-  }
-
-  span {
-    max-width: 10rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   svg {

@@ -12,6 +12,9 @@ pub mod internal;
 pub mod v2;
 pub mod v3;
 
+#[cfg(not(target_env = "msvc"))]
+pub mod debug;
+
 pub mod v2_reroute;
 
 mod analytics;
@@ -92,6 +95,8 @@ pub enum ApiError {
     Database(#[from] crate::database::models::DatabaseError),
     #[error("Database Error: {0}")]
     SqlxDatabase(#[from] sqlx::Error),
+    #[error("Database Error: {0}")]
+    RedisDatabase(#[from] redis::RedisError),
     #[error("Clickhouse Error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
     #[error("Internal server error: {0}")]
@@ -117,7 +122,7 @@ pub enum ApiError {
     #[error("Captcha Error. Try resubmitting the form.")]
     Turnstile,
     #[error("Error while decoding Base62: {0}")]
-    Decoding(#[from] crate::models::ids::DecodingError),
+    Decoding(#[from] ariadne::ids::DecodingError),
     #[error("Image Parsing Error: {0}")]
     ImageParse(#[from] image::ImageError),
     #[error("Password Hashing Error: {0}")]
@@ -145,8 +150,9 @@ impl ApiError {
         crate::models::error::ApiError {
             error: match self {
                 ApiError::Env(..) => "environment_error",
-                ApiError::SqlxDatabase(..) => "database_error",
                 ApiError::Database(..) => "database_error",
+                ApiError::SqlxDatabase(..) => "database_error",
+                ApiError::RedisDatabase(..) => "database_error",
                 ApiError::Authentication(..) => "unauthorized",
                 ApiError::CustomAuthentication(..) => "unauthorized",
                 ApiError::Xml(..) => "xml_error",
@@ -183,6 +189,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SqlxDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::RedisDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Clickhouse(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Authentication(..) => StatusCode::UNAUTHORIZED,
             ApiError::CustomAuthentication(..) => StatusCode::UNAUTHORIZED,

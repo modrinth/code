@@ -13,7 +13,7 @@
         <div v-if="header" class="header">
           <strong>{{ header }}</strong>
           <button class="iconified-button icon-only transparent" @click="hide">
-            <CrossIcon />
+            <XIcon />
           </button>
         </div>
         <div class="content">
@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import CrossIcon from "~/assets/images/utils/x.svg?component";
+import { XIcon } from "@modrinth/assets";
 
 export default {
   components: {
-    CrossIcon,
+    XIcon,
   },
   props: {
     header: {
@@ -104,6 +104,7 @@ export default {
 
   &.shown {
     visibility: visible;
+
     .modal-body {
       opacity: 1;
       visibility: visible;
