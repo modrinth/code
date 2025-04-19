@@ -151,7 +151,7 @@ const exportPack = async () => {
           </div>
         </div>
         <div v-if="showingFiles" class="table-content">
-          <div v-for="[path, children] of folders" :key="path.name" class="table-row">
+          <div v-for="[path, children] in folders" :key="path.name" class="table-row">
             <div class="table-cell file-entry">
               <div class="file-primary">
                 <Checkbox

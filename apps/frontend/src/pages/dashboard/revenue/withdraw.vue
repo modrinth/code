@@ -80,7 +80,7 @@
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked v-if="selectedMethodId === method.id" class="radio" />
+            <RadioButtonCheckedIcon v-if="selectedMethodId === method.id" class="radio" />
             <RadioButtonIcon v-else class="radio" />
             <span>{{ method.name }}</span>
           </div>
@@ -192,7 +192,7 @@ import {
   PayPalIcon,
   SearchIcon,
   RadioButtonIcon,
-  RadioButtonChecked,
+  RadioButtonCheckedIcon,
   XIcon,
   TransferIcon,
 } from "@modrinth/assets";

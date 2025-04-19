@@ -30,6 +30,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
   newProjectCards: false,
   projectBackground: false,
   searchBackground: false,
+  advancedDebugInfo: false,
   // advancedRendering: true,
   // externalLinksNewTab: true,
   // notUsingBlockers: false,

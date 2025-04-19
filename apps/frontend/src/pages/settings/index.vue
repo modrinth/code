@@ -52,7 +52,7 @@
                 </div>
               </div>
               <div class="label">
-                <RadioButtonChecked
+                <RadioButtonCheckedIcon
                   v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
                   class="radio"
                 />
@@ -76,7 +76,7 @@
                 </div>
               </div>
               <div class="label">
-                <RadioButtonChecked
+                <RadioButtonCheckedIcon
                   v-if="cosmetics.searchDisplayMode[projectType.id] === 'grid'"
                   class="radio"
                 />
@@ -98,7 +98,7 @@
                 </div>
               </div>
               <div class="label">
-                <RadioButtonChecked
+                <RadioButtonCheckedIcon
                   v-if="cosmetics.searchDisplayMode[projectType.id] === 'gallery'"
                   class="radio"
                 />
@@ -198,7 +198,7 @@
 </template>
 
 <script setup lang="ts">
-import { CodeIcon, RadioButtonChecked, RadioButtonIcon } from "@modrinth/assets";
+import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from "@modrinth/assets";
 import { Button, ThemeSelector } from "@modrinth/ui";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
 import type { DisplayLocation } from "~/plugins/cosmetics";

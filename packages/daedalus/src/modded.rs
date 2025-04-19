@@ -164,6 +164,7 @@ pub fn merge_partial_version(
                 x
             })
             .collect::<Vec<_>>(),
+        logging: merge.logging,
         main_class: if let Some(main_class) = partial.main_class {
             main_class
         } else {

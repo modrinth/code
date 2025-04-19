@@ -5,7 +5,7 @@ use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::time::Duration;
 use url::Url;
 
-use ariadne::{dummy_data, environment::TestEnvironment};
+use crate::common::{dummy_data, environment::TestEnvironment};
 
 use super::{api_v3::ApiV3, dummy_data::DUMMY_DATA_UPDATE};
 
