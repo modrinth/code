@@ -74,7 +74,7 @@ If the request succeeds, you should receive a JSON payload with these fields:
 
 To use this access token, you attach it to API requests in the `Authorization` header. To get basic information about the authorizer, you can use the [`/user` endpoint], which automatically gets the user from the header.
 
-If you have any questions, you're welcome to ask in #api-development in the [Discord guild], or create an issue on [GitHub].
+If you have any questions, you're welcome to ask in #api-development in the [Discord guild], or create a ticket on the [support portal].
 
 [RFC 6749]: https://datatracker.ietf.org/doc/html/rfc6749
 
@@ -92,4 +92,4 @@ If you have any questions, you're welcome to ask in #api-development in the [Dis
 
 [Discord guild]: https://discord.modrinth.com
 
-[GitHub]: https://github.com/modrinth/code
+[support portal]: https://support.modrinth.com/en/
