@@ -657,19 +657,19 @@ const MODRINTH_ALPHA_END_DATE = new Date("2020-11-30T08:00:00.000Z");
 const badges = computed(() => {
   const badges = [];
 
-  if (sumDownloads.value > 1000000) {
+  if (sumDownloads.value >= 1000000) {
     badges.push("1m-club");
   }
 
-  if (sumDownloads.value > 10000000) {
+  if (sumDownloads.value >= 10000000) {
     badges.push("10m-club");
   }
 
-  if (sumDownloads.value > 50000000) {
+  if (sumDownloads.value >= 50000000) {
     badges.push("50m-club");
   }
 
-  if (sumDownloads.value > 100000000) {
+  if (sumDownloads.value >= 100000000) {
     badges.push("100m-club");
   }
 
