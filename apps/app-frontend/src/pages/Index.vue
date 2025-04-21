@@ -10,11 +10,11 @@ import dayjs from 'dayjs'
 import { get_search_results } from '@/helpers/cache.js'
 import { useTheming } from '@/store/state.js'
 import { HeadingLink } from '@modrinth/ui'
-import { GAME_MODES, useWorlds } from '@/composables/worlds.ts'
+import { GAME_MODES } from '@/composables/worlds.ts'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
-import { getWorldIdentifier } from '@/helpers/worlds.ts'
-import { get_all, get_by_profile_path } from '@/helpers/process.js'
+import { get_recent_worlds, getWorldIdentifier } from '@/helpers/worlds.ts'
+import { get_all } from '@/helpers/process.js'
 import { trackEvent } from '@/helpers/analytics.js'
 
 const featuredModpacks = ref({})
@@ -105,13 +105,6 @@ const total = computed(() => {
   )
 })
 
-const worldInstances = computed(() => {
-  return instances.value
-    .filter((instance) => instance.last_played)
-    .slice()
-    .sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
-})
-
 const jumpBackInItems = ref([])
 const serverMetadata = ref({})
 
@@ -119,87 +112,41 @@ const MIN_JUMP_BACK_IN = 3
 const MAX_JUMP_BACK_IN = 6
 const TWO_WEEKS_AGO = dayjs().subtract(14, 'day')
 
-const unlisteners = []
-
 populateJumpBackIn()
 
 function populateJumpBackIn() {
   nextTick().then(async () => {
-    for (const instance of worldInstances.value.map(ref)) {
-      const playing = ref(false)
+    const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN);
 
-      if (jumpBackInItems.value.length >= MAX_JUMP_BACK_IN) {
-        break
-      }
+    const worldItems = worlds.map((world) => ({
+      type: 'world',
+      last_played: world.last_played ? dayjs(world.last_played) : undefined,
+      world: world,
+      instance: recentInstances.value.find((instance) => instance.path === world.profile),
+    }));
 
-      await useWorlds(instance, playing, () => {}).then((instanceWorldsData) => {
-        unlisteners.push(instanceWorldsData.unlistenWorldsListener)
-        if (
-          instanceWorldsData.worlds.value.length === 0 &&
-          jumpBackInItems.value.length < MAX_JUMP_BACK_IN
-        ) {
-          jumpBackInItems.value.push({
-            type: 'instance',
-            instance: instance.value,
-            last_played: instance.value.last_played,
-          })
-        } else {
-          instanceWorldsData.worlds.value
-            .filter((world) => world.last_played)
-            .forEach((world) => {
-              if (jumpBackInItems.value.length < MAX_JUMP_BACK_IN) {
-                if (instanceWorldsData.supportsQuickPlay.value) {
-                  jumpBackInItems.value.push({
-                    type: 'world',
-                    instance: instance.value,
-                    last_played: world.last_played,
-                    world: world,
-                    protocolVersion: instanceWorldsData.protocolVersion.value || undefined,
-                    play: instanceWorldsData.joinWorld,
-                    refresh: instanceWorldsData.refreshServer,
-                  })
-                } else if (
-                  !jumpBackInItems.value.some(
-                    (item) =>
-                      item.type === 'instance' && item.instance.path === instance.value.path,
-                  )
-                ) {
-                  jumpBackInItems.value.push({
-                    type: 'instance',
-                    last_played: instance.value.last_played,
-                    instance: instance.value,
-                  })
-                }
-              }
-            })
-          serverMetadata.value[instance.value.path] = {
-            status: instanceWorldsData.serverStatus,
-            motd: instanceWorldsData.renderedMotds,
-            refreshing: instanceWorldsData.refreshingServers,
-          }
-        }
-      })
-    }
+    const instanceItems = recentInstances.value.map((instance) => ({
+      type: 'instance',
+      last_played: instance.last_played ? dayjs(instance.last_played) : undefined,
+      instance: instance,
+    }));
 
-    // Always show the first 3, but only show additional if they're less than two weeks old
-    const firstThree = jumpBackInItems.value.slice(0, MIN_JUMP_BACK_IN)
-    const rest = jumpBackInItems.value
-      .slice(MIN_JUMP_BACK_IN)
-      .filter((item) => dayjs(item.last_played).isAfter(TWO_WEEKS_AGO))
-    jumpBackInItems.value = [...firstThree, ...rest]
+    const items = [...worldItems, ...instanceItems];
+    items.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)));
+    jumpBackInItems.value = items.filter((item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO));
   })
 }
-
-onUnmounted(() => {
-  unlisteners.forEach((unlisten) => unlisten())
-})
-
-const currentProfile = ref()
-const currentWorld = ref()
 
 const unlistenProcesses = await process_listener(async (e) => {
   await checkProcesses()
 })
+
+onUnmounted(() => {
+  unlistenProcesses()
+})
+
+const currentProfile = ref()
+const currentWorld = ref()
 
 const runningInstances = ref([])
 
@@ -283,7 +230,7 @@ onUnmounted(() => {
             "
             :instance-path="item.instance.path"
             :instance-name="item.instance.name"
-            :instance-icon="item.instance.icon_path"
+            :instance-icon="item.instance.icon_path ?? undefined"
             @refresh="() => (item.world.type === 'server' ? item.refresh(item.world.address) : {})"
             @play="
               () => {
