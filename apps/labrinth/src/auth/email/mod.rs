@@ -35,7 +35,7 @@ pub fn send_email_raw(
     let username = dotenvy::var("SMTP_USERNAME")?;
     let password = dotenvy::var("SMTP_PASSWORD")?;
     let host = dotenvy::var("SMTP_HOST")?;
-    let port = dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(25);
+    let port = dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(465);
     let creds = Credentials::new(username, password);
     let tls_settings =
         if dotenvy::var("SMTP_TLS")?.parse::<bool>().unwrap_or(true) {
