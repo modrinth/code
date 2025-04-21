@@ -936,19 +936,26 @@ pub async fn transfer_ownership(
     let mut transaction = pool.begin().await?;
 
     // The following are the only places new_is_owner is modified.
-    TeamMember::edit_team_member(
-        id.into(),
-        current_user.id.into(),
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        Some(false),
-        &mut transaction,
-    )
-    .await?;
+    if let Some(former_owner) =
+        TeamMember::get_from_team_full(id.into(), &**pool, &redis)
+            .await?
+            .into_iter()
+            .find(|x| x.is_owner)
+    {
+        TeamMember::edit_team_member(
+            id.into(),
+            former_owner.user_id,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            Some(false),
+            &mut transaction,
+        )
+        .await?;
+    }
 
     TeamMember::edit_team_member(
         id.into(),

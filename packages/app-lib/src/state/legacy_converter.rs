@@ -308,7 +308,7 @@ where
                             ProfileInstallStage::Installed
                         }
                         LegacyProfileInstallStage::Installing => {
-                            ProfileInstallStage::Installing
+                            ProfileInstallStage::MinecraftInstalling
                         }
                         LegacyProfileInstallStage::PackInstalling => {
                             ProfileInstallStage::PackInstalling

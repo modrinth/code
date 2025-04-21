@@ -1,22 +1,22 @@
 <script setup>
-import { computed, ref, onMounted, watch, onUnmounted } from 'vue'
-import { RouterView, useRouter, useRoute } from 'vue-router'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
-  LogInIcon,
+  CompassIcon,
+  DownloadIcon,
   HomeIcon,
+  LeftArrowIcon,
   LibraryIcon,
+  LogInIcon,
+  LogOutIcon,
+  MaximizeIcon,
+  MinimizeIcon,
   PlusIcon,
+  RestoreIcon,
+  RightArrowIcon,
   SettingsIcon,
   XIcon,
-  DownloadIcon,
-  CompassIcon,
-  MinimizeIcon,
-  MaximizeIcon,
-  RestoreIcon,
-  LogOutIcon,
-  RightArrowIcon,
-  LeftArrowIcon,
 } from '@modrinth/assets'
 import { Avatar, Button, ButtonStyled, Notifications, OverflowMenu } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
@@ -32,12 +32,12 @@ import ModrinthLoadingIndicator from '@/components/LoadingIndicatorBar.vue'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { type } from '@tauri-apps/plugin-os'
-import { isDev, getOS, restartApp } from '@/helpers/utils.js'
-import { initAnalytics, debugAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import { install_from_file } from './helpers/pack'
+import { create_profile_and_install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
@@ -51,7 +51,7 @@ import { renderString } from '@modrinth/utils'
 import { useFetch } from '@/helpers/fetch.js'
 import { check } from '@tauri-apps/plugin-updater'
 import NavButton from '@/components/ui/NavButton.vue'
-import { get as getCreds, logout, login } from '@/helpers/mr_auth.js'
+import { get as getCreds, login, logout } from '@/helpers/mr_auth.js'
 import { get_user } from '@/helpers/cache.js'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import dayjs from 'dayjs'
@@ -296,7 +296,7 @@ async function handleCommand(e) {
   if (e.event === 'RunMRPack') {
     // RunMRPack should directly install a local mrpack given a path
     if (e.path.endsWith('.mrpack')) {
-      await install_from_file(e.path).catch(handleError)
+      await create_profile_and_install_from_file(e.path).catch(handleError)
       trackEvent('InstanceCreate', {
         source: 'CreationModalFileDrop',
       })
@@ -473,7 +473,7 @@ function handleAuxClick(e) {
             <RunningAppBar />
           </Suspense>
         </div>
-        <section v-if="!nativeDecorations" class="window-controls">
+        <section v-if="!nativeDecorations" class="window-controls" data-tauri-drag-region-exclude>
           <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
             <MinimizeIcon />
           </Button>
@@ -521,6 +521,16 @@ function handleAuxClick(e) {
           width: 'calc(100% - var(--right-bar-width))',
         }"
       ></div>
+      <div
+        v-if="criticalErrorMessage"
+        class="m-6 mb-0 flex flex-col border-red bg-bg-red rounded-2xl border-2 border-solid p-4 gap-1 font-semibold text-contrast"
+      >
+        <h1 class="m-0 text-lg font-extrabold">{{ criticalErrorMessage.header }}</h1>
+        <div
+          class="markdown-body text-primary"
+          v-html="renderString(criticalErrorMessage.body ?? '')"
+        ></div>
+      </div>
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
@@ -591,12 +601,6 @@ function handleAuxClick(e) {
         </a>
         <PromotionWrapper />
       </template>
-    </div>
-    <div class="view">
-      <div v-if="criticalErrorMessage" class="critical-error-banner" data-tauri-drag-region>
-        <h1>{{ criticalErrorMessage.header }}</h1>
-        <div class="markdown-body" v-html="renderString(criticalErrorMessage.body ?? '')"></div>
-      </div>
     </div>
   </div>
   <URLConfirmModal ref="urlModal" />
@@ -698,6 +702,14 @@ function handleAuxClick(e) {
 
 .app-grid-statusbar {
   grid-area: status;
+}
+
+[data-tauri-drag-region] {
+  -webkit-app-region: drag;
+}
+
+[data-tauri-drag-region-exclude] {
+  -webkit-app-region: no-drag;
 }
 
 .app-contents {

@@ -35,6 +35,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use tracing::error;
 use validator::Validate;
 
 fn default_requested_status() -> VersionStatus {
@@ -977,6 +978,30 @@ pub async fn upload_file(
     if let ValidationResult::Warning(msg) = validation_result {
         if primary {
             return Err(CreateError::InvalidInput(msg.to_string()));
+        }
+    }
+
+    let url = format!("{cdn_url}/{file_path_encode}");
+
+    let client = reqwest::Client::new();
+    let delphi_url = dotenvy::var("DELPHI_URL")?;
+    match client
+        .post(delphi_url)
+        .json(&serde_json::json!({
+            "url": url,
+            "project_id": project_id,
+            "version_id": version_id,
+        }))
+        .send()
+        .await
+    {
+        Ok(res) => {
+            if !res.status().is_success() {
+                error!("Failed to upload file to Delphi: {url}");
+            }
+        }
+        Err(e) => {
+            error!("Failed to upload file to Delphi: {url}: {e}");
         }
     }
 

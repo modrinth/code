@@ -1,23 +1,25 @@
 <template>
   <div class="contents">
-    <NewModal ref="confirmActionModal" header="Confirming power action" @close="closePowerModal">
+    <NewModal ref="confirmActionModal" header="Confirming power action" @close="resetPowerAction">
       <div class="flex flex-col gap-4 md:w-[400px]">
-        <p class="m-0">Are you sure you want to {{ currentPendingAction }} the server?</p>
-
+        <p class="m-0">
+          Are you sure you want to <span class="lowercase">{{ confirmActionText }}</span> the
+          server?
+        </p>
         <UiCheckbox
-          v-model="powerDontAskAgainCheckbox"
+          v-model="dontAskAgain"
           label="Don't ask me again"
           class="text-sm"
-          :disabled="!currentPendingAction"
+          :disabled="!powerAction"
         />
         <div class="flex flex-row gap-4">
-          <ButtonStyled type="standard" color="brand" @click="confirmAction">
+          <ButtonStyled type="standard" color="brand" @click="executePowerAction">
             <button>
               <CheckIcon class="h-5 w-5" />
-              {{ currentPendingActionFriendly }} server
+              {{ confirmActionText }} server
             </button>
           </ButtonStyled>
-          <ButtonStyled @click="closePowerModal">
+          <ButtonStyled @click="resetPowerAction">
             <button>
               <XIcon class="h-5 w-5" />
               Cancel
@@ -29,7 +31,7 @@
 
     <NewModal
       ref="detailsModal"
-      :header="`All of ${props.serverName ? props.serverName : 'Server'} info`"
+      :header="`All of ${serverName || 'Server'} info`"
       @close="closeDetailsModal"
     >
       <UiServersServerInfoLabels
@@ -40,6 +42,9 @@
         :column="true"
         class="mb-6 flex flex-col gap-2"
       />
+      <div v-if="flags.advancedDebugInfo" class="markdown-body">
+        <pre>{{ serverData }}</pre>
+      </div>
       <ButtonStyled type="standard" color="brand" @click="closeDetailsModal">
         <button class="w-full">Close</button>
       </ButtonStyled>
@@ -51,74 +56,80 @@
           <UiServersPanelSpinner class="size-5" /> Installing...
         </button>
       </ButtonStyled>
-      <div v-else class="contents">
+
+      <template v-else>
         <ButtonStyled v-if="showStopButton" type="transparent">
-          <button :disabled="!canTakeAction || disabled || isStopping" @click="stopServer">
+          <button :disabled="!canTakeAction" @click="initiateAction('stop')">
             <div class="flex gap-1">
               <StopCircleIcon class="h-5 w-5" />
-              <span>{{ stopButtonText }}</span>
+              <span>{{ isStoppingState ? "Stopping..." : "Stop" }}</span>
             </div>
           </button>
         </ButtonStyled>
+
         <ButtonStyled type="standard" color="brand">
-          <button :disabled="!canTakeAction || disabled || isStopping" @click="handleAction">
-            <div v-if="isStartingOrRestarting" class="grid place-content-center">
+          <button :disabled="!canTakeAction" @click="handlePrimaryAction">
+            <div v-if="isTransitionState" class="grid place-content-center">
               <UiServersIconsLoadingIcon />
             </div>
-            <div v-else class="contents">
-              <component :is="showRestartIcon ? UpdatedIcon : PlayIcon" />
-            </div>
-            <span>
-              {{ actionButtonText }}
-            </span>
+            <component :is="isRunning ? UpdatedIcon : PlayIcon" v-else />
+            <span>{{ primaryActionText }}</span>
           </button>
         </ButtonStyled>
-      </div>
 
-      <!-- Dropdown options -->
-      <ButtonStyled circular type="transparent">
-        <UiServersTeleportOverflowMenu
-          :options="[
-            ...(props.isInstalling ? [] : [{ id: 'kill', action: () => killServer() }]),
-            { id: 'allServers', action: () => router.push('/servers/manage') },
-            { id: 'details', action: () => showDetailsModal() },
-          ]"
-        >
-          <MoreVerticalIcon aria-hidden="true" />
-          <template #kill>
-            <SlashIcon class="h-5 w-5" />
-            <span>Kill server</span>
-          </template>
-          <template #allServers>
-            <ServerIcon class="h-5 w-5" />
-            <span>All servers</span>
-          </template>
-          <template #details>
-            <InfoIcon class="h-5 w-5" />
-            <span>Details</span>
-          </template>
-        </UiServersTeleportOverflowMenu>
-      </ButtonStyled>
+        <ButtonStyled circular type="transparent">
+          <UiServersTeleportOverflowMenu :options="[...menuOptions]">
+            <MoreVerticalIcon aria-hidden="true" />
+            <template #kill>
+              <SlashIcon class="h-5 w-5" />
+              <span>Kill server</span>
+            </template>
+            <template #allServers>
+              <ServerIcon class="h-5 w-5" />
+              <span>All servers</span>
+            </template>
+            <template #details>
+              <InfoIcon class="h-5 w-5" />
+              <span>Details</span>
+            </template>
+            <template #copy-id>
+              <ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
+              <span>Copy ID</span>
+            </template>
+          </UiServersTeleportOverflowMenu>
+        </ButtonStyled>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 import {
   PlayIcon,
   UpdatedIcon,
   StopCircleIcon,
   SlashIcon,
-  MoreVerticalIcon,
   XIcon,
   CheckIcon,
   ServerIcon,
   InfoIcon,
+  MoreVerticalIcon,
+  ClipboardCopyIcon,
 } from "@modrinth/assets";
 import { ButtonStyled, NewModal } from "@modrinth/ui";
 import { useRouter } from "vue-router";
 import { useStorage } from "@vueuse/core";
+
+type ServerAction = "start" | "stop" | "restart" | "kill";
+type ServerState = "stopped" | "starting" | "running" | "stopping" | "restarting";
+
+const flags = useFeatureFlags();
+
+interface PowerAction {
+  action: ServerAction;
+  nextState: ServerState;
+}
 
 const props = defineProps<{
   isOnline: boolean;
@@ -130,183 +141,153 @@ const props = defineProps<{
   uptimeSeconds: number;
 }>();
 
+const emit = defineEmits<{
+  (e: "action", action: ServerAction): void;
+}>();
+
 const router = useRouter();
 const serverId = router.currentRoute.value.params.id;
+const confirmActionModal = ref<InstanceType<typeof NewModal> | null>(null);
+const detailsModal = ref<InstanceType<typeof NewModal> | null>(null);
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
   powerDontAskAgain: false,
 });
 
-const emit = defineEmits<{
-  (e: "action", action: "start" | "restart" | "stop" | "kill"): void;
-}>();
+const serverState = ref<ServerState>(props.isOnline ? "running" : "stopped");
+const powerAction = ref<PowerAction | null>(null);
+const dontAskAgain = ref(false);
+const startingDelay = ref(false);
 
-const confirmActionModal = ref<InstanceType<typeof NewModal> | null>(null);
-const detailsModal = ref<InstanceType<typeof NewModal> | null>(null);
-
-const ServerState = {
-  Stopped: "Stopped",
-  Starting: "Starting",
-  Running: "Running",
-  Stopping: "Stopping",
-  Restarting: "Restarting",
-} as const;
-
-type ServerStateType = (typeof ServerState)[keyof typeof ServerState];
-
-const currentPendingAction = ref<string | null>(null);
-const currentPendingState = ref<ServerStateType | null>(null);
-const powerDontAskAgainCheckbox = ref(false);
-
-const currentState = ref<ServerStateType>(
-  props.isOnline ? ServerState.Running : ServerState.Stopped,
-);
-
-const isStartingDelay = ref(false);
-const showStopButton = computed(
-  () => currentState.value === ServerState.Running || currentState.value === ServerState.Stopping,
-);
-const showRestartIcon = computed(() => currentState.value === ServerState.Running);
 const canTakeAction = computed(
-  () =>
-    !props.isActioning &&
-    !isStartingDelay.value &&
-    currentState.value !== ServerState.Starting &&
-    currentState.value !== ServerState.Stopping,
+  () => !props.isActioning && !startingDelay.value && !isTransitionState.value,
 );
-
-const isStartingOrRestarting = computed(
-  () =>
-    currentState.value === ServerState.Starting || currentState.value === ServerState.Restarting,
+const isRunning = computed(() => serverState.value === "running");
+const isTransitionState = computed(() =>
+  ["starting", "stopping", "restarting"].includes(serverState.value),
 );
+const isStoppingState = computed(() => serverState.value === "stopping");
+const showStopButton = computed(() => isRunning.value || isStoppingState.value);
 
-const isStopping = computed(() => currentState.value === ServerState.Stopping);
-
-const actionButtonText = computed(() => {
-  switch (currentState.value) {
-    case ServerState.Starting:
-      return "Starting...";
-    case ServerState.Restarting:
-      return "Restarting...";
-    case ServerState.Running:
-      return "Restart";
-    case ServerState.Stopping:
-      return "Stopping...";
-    default:
-      return "Start";
-  }
+const primaryActionText = computed(() => {
+  const states: Record<ServerState, string> = {
+    starting: "Starting...",
+    restarting: "Restarting...",
+    running: "Restart",
+    stopping: "Stopping...",
+    stopped: "Start",
+  };
+  return states[serverState.value];
 });
 
-const currentPendingActionFriendly = computed(() => {
-  switch (currentPendingAction.value) {
-    case "start":
-      return "Start";
-    case "restart":
-      return "Restart";
-    case "stop":
-      return "Stop";
-    case "kill":
-      return "Kill";
-    default:
-      return null;
-  }
+const confirmActionText = computed(() => {
+  if (!powerAction.value) return "";
+  return powerAction.value.action.charAt(0).toUpperCase() + powerAction.value.action.slice(1);
 });
 
-const stopButtonText = computed(() =>
-  currentState.value === ServerState.Stopping ? "Stopping..." : "Stop",
-);
+const menuOptions = computed(() => [
+  ...(props.isInstalling
+    ? []
+    : [
+        {
+          id: "kill",
+          label: "Kill server",
+          icon: SlashIcon,
+          action: () => initiateAction("kill"),
+        },
+      ]),
+  {
+    id: "allServers",
+    label: "All servers",
+    icon: ServerIcon,
+    action: () => router.push("/servers/manage"),
+  },
+  {
+    id: "details",
+    label: "Details",
+    icon: InfoIcon,
+    action: () => detailsModal.value?.show(),
+  },
+  {
+    id: "copy-id",
+    label: "Copy ID",
+    icon: ClipboardCopyIcon,
+    action: () => copyId(),
+    shown: flags.value.developerMode,
+  },
+]);
 
-const createPendingAction = () => {
+async function copyId() {
+  await navigator.clipboard.writeText(serverId as string);
+}
+
+function initiateAction(action: ServerAction) {
   if (!canTakeAction.value) return;
-  if (currentState.value === ServerState.Running) {
-    currentPendingAction.value = "restart";
-    currentPendingState.value = ServerState.Restarting;
-    showPowerModal();
-  } else {
-    runAction("start", ServerState.Starting);
+
+  const stateMap: Record<ServerAction, ServerState> = {
+    start: "starting",
+    stop: "stopping",
+    restart: "restarting",
+    kill: "stopping",
+  };
+
+  if (action === "start") {
+    emit("action", action);
+    serverState.value = stateMap[action];
+    startingDelay.value = true;
+    setTimeout(() => (startingDelay.value = false), 5000);
+    return;
   }
-};
 
-const handleAction = () => {
-  createPendingAction();
-};
+  powerAction.value = { action, nextState: stateMap[action] };
 
-const showPowerModal = () => {
   if (userPreferences.value.powerDontAskAgain) {
-    runAction(
-      currentPendingAction.value as "start" | "restart" | "stop" | "kill",
-      currentPendingState.value!,
-    );
+    executePowerAction();
   } else {
     confirmActionModal.value?.show();
   }
-};
+}
 
-const confirmAction = () => {
-  if (powerDontAskAgainCheckbox.value) {
+function handlePrimaryAction() {
+  initiateAction(isRunning.value ? "restart" : "start");
+}
+
+function executePowerAction() {
+  if (!powerAction.value) return;
+
+  const { action, nextState } = powerAction.value;
+  emit("action", action);
+  serverState.value = nextState;
+
+  if (dontAskAgain.value) {
     userPreferences.value.powerDontAskAgain = true;
   }
-  runAction(
-    currentPendingAction.value as "start" | "restart" | "stop" | "kill",
-    currentPendingState.value!,
-  );
-  closePowerModal();
-};
-
-const runAction = (action: "start" | "restart" | "stop" | "kill", serverState: ServerStateType) => {
-  emit("action", action);
-  currentState.value = serverState;
 
   if (action === "start") {
-    isStartingDelay.value = true;
-    setTimeout(() => {
-      isStartingDelay.value = false;
-    }, 5000);
+    startingDelay.value = true;
+    setTimeout(() => (startingDelay.value = false), 5000);
   }
-};
 
-const stopServer = () => {
-  if (!canTakeAction.value) return;
-  currentPendingAction.value = "stop";
-  currentPendingState.value = ServerState.Stopping;
-  showPowerModal();
-};
+  resetPowerAction();
+}
 
-const killServer = () => {
-  currentPendingAction.value = "kill";
-  currentPendingState.value = ServerState.Stopping;
-  showPowerModal();
-};
-
-const closePowerModal = () => {
+function resetPowerAction() {
   confirmActionModal.value?.hide();
-  currentPendingAction.value = null;
-  powerDontAskAgainCheckbox.value = false;
-};
+  powerAction.value = null;
+  dontAskAgain.value = false;
+}
 
-const closeDetailsModal = () => {
+function closeDetailsModal() {
   detailsModal.value?.hide();
-};
-
-const showDetailsModal = () => {
-  detailsModal.value?.show();
-};
+}
 
 watch(
   () => props.isOnline,
-  (newValue) => {
-    if (newValue) {
-      currentState.value = ServerState.Running;
-    } else {
-      currentState.value = ServerState.Stopped;
-    }
-  },
+  (online) => (serverState.value = online ? "running" : "stopped"),
 );
 
 watch(
   () => router.currentRoute.value.fullPath,
-  () => {
-    closeDetailsModal();
-  },
+  () => closeDetailsModal(),
 );
 </script>

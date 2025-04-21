@@ -115,7 +115,11 @@ impl ChargeItem {
                     payment_platform = EXCLUDED.payment_platform,
                     payment_platform_id = EXCLUDED.payment_platform_id,
                     parent_charge_id = EXCLUDED.parent_charge_id,
-                    net = EXCLUDED.net
+                    net = EXCLUDED.net,
+                    price_id = EXCLUDED.price_id,
+                    amount = EXCLUDED.amount,
+                    currency_code = EXCLUDED.currency_code,
+                    charge_type = EXCLUDED.charge_type
             "#,
             self.id.0,
             self.user_id.0,

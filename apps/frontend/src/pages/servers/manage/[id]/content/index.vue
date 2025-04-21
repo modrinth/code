@@ -1,59 +1,39 @@
 <template>
-  <NewModal ref="modModal" header="Editing mod version">
-    <div>
-      <div class="mb-4 flex flex-col gap-4">
-        <div class="inline-flex flex-wrap items-center">
-          You're changing the version of
-          <div class="inline-flex flex-wrap items-center gap-1 text-nowrap pl-2">
-            <UiAvatar
-              :src="currentMod?.icon_url"
-              size="24px"
-              class="inline-block"
-              alt="Server Icon"
-            />
-            <strong>{{ currentMod?.name + "." }}</strong>
+  <UiServersContentVersionEditModal
+    v-if="!invalidModal"
+    ref="versionEditModal"
+    :type="type"
+    :mod-pack="Boolean(props.server.general?.upstream)"
+    :game-version="props.server.general?.mc_version ?? ''"
+    :loader="props.server.general?.loader?.toLowerCase() ?? ''"
+    :server-id="props.server.serverId"
+    @change-version="changeModVersion($event)"
+  />
+
+  <div
+    v-if="server.content?.error"
+    class="flex w-full flex-col items-center justify-center gap-4 p-4"
+  >
+    <div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="flex flex-col items-center gap-4">
+          <div class="grid place-content-center rounded-full bg-bg-orange p-4">
+            <IssuesIcon class="size-12 text-orange" />
           </div>
+          <h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load content</h1>
         </div>
-        <div>
-          <div v-if="props.server.general?.upstream" class="flex gap-2">
-            <InfoIcon class="hidden sm:block" />
-            <span class="text-sm text-secondary">
-              Changing the mod version may cause unexpected issues. Because your server was created
-              from a modpack, it is recommended to use the modpack's version of the mod.
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="flex items-center gap-4">
-        <UiServersTeleportDropdownMenu
-          v-model="currentVersion"
-          name="Project"
-          :options="currentVersions"
-          placeholder="Select project..."
-          class="!w-full"
-          :display-name="
-            (version) => (typeof version === 'object' ? version?.version_number : version)
-          "
-        />
-      </div>
-      <div class="mt-4 flex flex-row items-center gap-4">
-        <ButtonStyled color="brand">
-          <button :disabled="currentMod.changing" @click="changeModVersion">
-            <PlusIcon />
-            Install
-          </button>
-        </ButtonStyled>
-        <ButtonStyled>
-          <button @click="modModal.value.hide()">
-            <XIcon />
-            Cancel
-          </button>
+        <p class="text-lg text-secondary">
+          We couldn't load your server's {{ type.toLowerCase() }}s. Here's what we know:
+          <span class="break-all font-mono">{{ JSON.stringify(server.content.error) }}</span>
+        </p>
+        <ButtonStyled size="large" color="brand" @click="() => server.refresh(['content'])">
+          <button class="mt-6 !w-full">Retry</button>
         </ButtonStyled>
       </div>
     </div>
-  </NewModal>
+  </div>
 
-  <div v-if="server.general && localMods" class="relative isolate flex h-full w-full flex-col">
+  <div v-else-if="server.general && localMods" class="relative isolate flex h-full w-full flex-col">
     <div ref="pyroContentSentinel" class="sentinel" data-pyro-content-sentinel />
     <div class="relative flex h-full w-full flex-col">
       <div class="sticky top-0 z-20 -mt-3 flex items-center justify-between bg-bg py-3">
@@ -123,7 +103,7 @@
         class="rounded-xl bg-bg-raised"
         :margin-bottom="16"
         :file-type="type"
-        :current-path="'/mods'"
+        :current-path="`/${type.toLocaleLowerCase()}s`"
         :fs="props.server.fs"
         :accepted-types="acceptFileFromProjectType(type.toLocaleLowerCase()).split(',')"
         @upload-complete="() => props.server.refresh(['content'])"
@@ -149,7 +129,7 @@
                       :to="
                         mod.project_id
                           ? `/project/${mod.project_id}/version/${mod.version_id}`
-                          : `files?path=mods`
+                          : `files?path=${type.toLocaleLowerCase()}s`
                       "
                       class="flex min-w-0 flex-1 items-center gap-2 rounded-xl p-2"
                       draggable="false"
@@ -162,9 +142,7 @@
                       />
                       <div class="flex min-w-0 flex-col gap-1">
                         <span class="text-md flex min-w-0 items-center gap-2 font-bold">
-                          <span class="truncate text-contrast">{{
-                            mod.name || mod.filename.replace(".disabled", "")
-                          }}</span>
+                          <span class="truncate text-contrast">{{ friendlyModName(mod) }}</span>
                           <span
                             v-if="mod.disabled"
                             class="hidden rounded-full bg-button-bg p-1 px-2 text-xs text-contrast sm:block"
@@ -174,19 +152,21 @@
                         <div class="min-w-0 text-xs text-secondary">
                           <span v-if="mod.owner" class="hidden sm:block"> by {{ mod.owner }} </span>
                           <span class="block font-semibold sm:hidden">
-                            {{ mod.version_number || "External mod" }}
+                            {{ mod.version_number || `External ${type.toLocaleLowerCase()}` }}
                           </span>
                         </div>
                       </div>
                     </NuxtLink>
                     <div class="ml-2 hidden min-w-0 flex-1 flex-col text-sm sm:flex">
                       <div class="truncate font-semibold text-contrast">
-                        <span v-tooltip="'Mod version'">{{
-                          mod.version_number || "External mod"
+                        <span v-tooltip="`${type} version`">{{
+                          mod.version_number || `External ${type.toLocaleLowerCase()}`
                         }}</span>
                       </div>
                       <div class="truncate">
-                        <span v-tooltip="'Mod file name'">{{ mod.filename }}</span>
+                        <span v-tooltip="`${type} file name`">
+                          {{ mod.filename }}
+                        </span>
                       </div>
                     </div>
                     <div
@@ -194,7 +174,7 @@
                     >
                       <ButtonStyled color="red" type="transparent">
                         <button
-                          v-tooltip="'Delete mod'"
+                          v-tooltip="`Delete ${type.toLocaleLowerCase()}`"
                           :disabled="mod.changing"
                           class="!hidden sm:!block"
                           @click="removeMod(mod)"
@@ -205,14 +185,16 @@
                       <ButtonStyled type="transparent">
                         <button
                           v-tooltip="
-                            mod.project_id ? 'Edit mod version' : 'External mods cannot be edited'
+                            mod.project_id
+                              ? `Edit ${type.toLocaleLowerCase()} version`
+                              : `External ${type.toLocaleLowerCase()}s cannot be edited`
                           "
                           :disabled="mod.changing || !mod.project_id"
                           class="!hidden sm:!block"
-                          @click="beginChangeModVersion(mod)"
+                          @click="showVersionModal(mod)"
                         >
                           <template v-if="mod.changing">
-                            <UiServersIconsLoadingIcon />
+                            <UiServersIconsLoadingIcon class="animate-spin" />
                           </template>
                           <template v-else>
                             <EditIcon />
@@ -232,7 +214,7 @@
                             :options="[
                               {
                                 id: 'edit',
-                                action: () => beginChangeModVersion(mod),
+                                action: () => showVersionModal(mod),
                                 shown: !!(mod.project_id && !mod.changing),
                               },
                               {
@@ -357,16 +339,15 @@ import {
   PackageClosedIcon,
   FilterIcon,
   DropdownIcon,
-  InfoIcon,
-  XIcon,
   PlusIcon,
   MoreVerticalIcon,
   CompassIcon,
   WrenchIcon,
   ListIcon,
   FileIcon,
+  IssuesIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
 import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
@@ -400,6 +381,64 @@ const modSearchInput = ref("");
 const filterMethod = ref("all");
 
 const uploadDropdownRef = ref();
+
+const versionEditModal = ref();
+const currentEditMod = ref<ContentItem | null>(null);
+const invalidModal = computed(
+  () => !props.server.general?.mc_version || !props.server.general?.loader,
+);
+async function changeModVersion(event: string) {
+  const mod = currentEditMod.value;
+
+  if (mod) mod.changing = true;
+
+  try {
+    versionEditModal.value.hide();
+
+    // This will be used instead once backend implementation is done
+    // await props.server.content?.reinstall(
+    //   `/${type.value.toLowerCase()}s/${event.fileName}`,
+    //   currentMod.value.project_id,
+    //   currentVersion.value.id,
+    // );
+
+    await props.server.content?.install(
+      type.value.toLowerCase() as "mod" | "plugin",
+      mod?.project_id || "",
+      event,
+    );
+
+    await props.server.content?.remove(`/${type.value.toLowerCase()}s/${mod?.filename}`);
+
+    await props.server.refresh(["general", "content"]);
+  } catch (error) {
+    const errmsg = `Error changing mod version: ${error}`;
+    console.error(errmsg);
+    addNotification({
+      text: errmsg,
+      type: "error",
+    });
+    return;
+  }
+  if (mod) mod.changing = false;
+}
+
+function showVersionModal(mod: ContentItem) {
+  if (invalidModal.value || !mod?.project_id || !mod?.filename) {
+    const errmsg = invalidModal.value
+      ? "Data required for changing mod version was not found."
+      : `${!mod?.project_id ? "No mod project ID found" : "No mod filename found"} for ${friendlyModName(mod!)}`;
+    console.error(errmsg);
+    addNotification({
+      text: errmsg,
+      type: "error",
+    });
+    return;
+  }
+
+  currentEditMod.value = mod;
+  versionEditModal.value.show(mod);
+}
 
 const handleDroppedFiles = (files: File[]) => {
   files.forEach((file) => {
@@ -529,17 +568,30 @@ const debouncedSearch = debounce(() => {
   }
 }, 300);
 
+function friendlyModName(mod: ContentItem) {
+  if (mod.name) return mod.name;
+
+  // remove .disabled if at the end of the filename
+  let cleanName = mod.filename.endsWith(".disabled") ? mod.filename.slice(0, -9) : mod.filename;
+
+  // remove everything after the last dot
+  const lastDotIndex = cleanName.lastIndexOf(".");
+  if (lastDotIndex !== -1) cleanName = cleanName.substring(0, lastDotIndex);
+  return cleanName;
+}
+
 async function toggleMod(mod: ContentItem) {
   mod.changing = true;
 
   const originalFilename = mod.filename;
   try {
     const newFilename = mod.filename.endsWith(".disabled")
-      ? mod.filename.replace(".disabled", "")
+      ? mod.filename.slice(0, -9)
       : `${mod.filename}.disabled`;
 
-    const sourcePath = `/mods/${mod.filename}`;
-    const destinationPath = `/mods/${newFilename}`;
+    const folder = `${type.value.toLocaleLowerCase()}s`;
+    const sourcePath = `/${folder}/${mod.filename}`;
+    const destinationPath = `/${folder}/${newFilename}`;
 
     mod.disabled = newFilename.endsWith(".disabled");
     mod.filename = newFilename;
@@ -553,7 +605,7 @@ async function toggleMod(mod: ContentItem) {
 
     console.error("Error toggling mod:", error);
     addNotification({
-      text: `Something went wrong toggling ${mod.name || mod.filename.replace(".disabled", "")}`,
+      text: `Something went wrong toggling ${friendlyModName(mod)}`,
       type: "error",
     });
   }
@@ -565,10 +617,7 @@ async function removeMod(mod: ContentItem) {
   mod.changing = true;
 
   try {
-    await props.server.content?.remove(
-      type.value as "Mod" | "Plugin",
-      `/${type.value.toLowerCase()}s/${mod.filename}`,
-    );
+    await props.server.content?.remove(`/${type.value.toLowerCase()}s/${mod.filename}`);
     await props.server.refresh(["general", "content"]);
   } catch (error) {
     console.error("Error removing mod:", error);
@@ -580,41 +629,6 @@ async function removeMod(mod: ContentItem) {
   }
 
   mod.changing = false;
-}
-
-const modModal = ref();
-const currentMod = ref();
-const currentVersions = ref();
-const currentVersion = ref();
-
-async function beginChangeModVersion(mod: Mod) {
-  currentMod.value = mod;
-  currentVersions.value = await useBaseFetch(`project/${mod.project_id}/version`, {}, false);
-
-  currentVersions.value = currentVersions.value.filter((version: any) =>
-    version.loaders.includes(props.server.general?.loader?.toLowerCase()),
-  );
-
-  currentVersion.value = currentVersions.value.find(
-    (version: any) => version.id === mod.version_id,
-  );
-  modModal.value.show();
-}
-
-async function changeModVersion() {
-  currentMod.value.changing = true;
-  try {
-    modModal.value.hide();
-    await props.server.content?.reinstall(
-      type.value,
-      currentMod.value.version_id,
-      currentVersion.value.id,
-    );
-    await props.server.refresh(["general", "content"]);
-  } catch (error) {
-    console.error("Error changing mod version:", error);
-  }
-  currentMod.value.changing = false;
 }
 
 const hasMods = computed(() => {
@@ -646,9 +660,7 @@ const filteredMods = computed(() => {
   })();
 
   return statusFilteredMods.sort((a, b) => {
-    const aName = a.name || a.filename.replace(".disabled", "");
-    const bName = b.name || b.filename.replace(".disabled", "");
-    return aName.localeCompare(bName);
+    return friendlyModName(a).localeCompare(friendlyModName(b));
   });
 });
 </script>

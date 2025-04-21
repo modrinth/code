@@ -35,6 +35,9 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     let maxmind_reader =
         Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
 
+    let stripe_client =
+        stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
+
     labrinth::app_setup(
         pool.clone(),
         redis_pool.clone(),
@@ -42,6 +45,8 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         &mut clickhouse,
         file_host.clone(),
         maxmind_reader,
+        stripe_client,
+        false,
     )
 }
 

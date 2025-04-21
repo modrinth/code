@@ -1,18 +1,5 @@
 use std::{collections::HashSet, fmt::Display, sync::Arc};
 
-use actix_web::{
-    delete, get, patch, post,
-    web::{self, scope},
-    HttpRequest, HttpResponse,
-};
-use chrono::Utc;
-use itertools::Itertools;
-use rand::{distributions::Alphanumeric, Rng, SeedableRng};
-use rand_chacha::ChaCha20Rng;
-use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
-use validator::Validate;
-
 use super::ApiError;
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
@@ -35,13 +22,22 @@ use crate::{
     util::validate::validation_errors_to_string,
 };
 use crate::{
-    file_hosting::FileHost,
-    models::{
-        ids::base62_impl::parse_base62,
-        oauth_clients::DeleteOAuthClientQueryParam,
-    },
+    file_hosting::FileHost, models::oauth_clients::DeleteOAuthClientQueryParam,
     util::routes::read_from_payload,
 };
+use actix_web::{
+    delete, get, patch, post,
+    web::{self, scope},
+    HttpRequest, HttpResponse,
+};
+use ariadne::ids::base62_impl::parse_base62;
+use chrono::Utc;
+use itertools::Itertools;
+use rand::{distributions::Alphanumeric, Rng, SeedableRng};
+use rand_chacha::ChaCha20Rng;
+use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+use validator::Validate;
 
 use crate::database::models::oauth_client_item::OAuthClient as DBOAuthClient;
 use crate::models::ids::OAuthClientId as ApiOAuthClientId;
@@ -160,7 +156,7 @@ pub struct NewOAuthApp {
 }
 
 #[post("app")]
-pub async fn oauth_client_create<'a>(
+pub async fn oauth_client_create(
     req: HttpRequest,
     new_oauth_app: web::Json<NewOAuthApp>,
     pool: web::Data<PgPool>,
@@ -221,7 +217,7 @@ pub async fn oauth_client_create<'a>(
 }
 
 #[delete("app/{id}")]
-pub async fn oauth_client_delete<'a>(
+pub async fn oauth_client_delete(
     req: HttpRequest,
     client_id: web::Path<ApiOAuthClientId>,
     pool: web::Data<PgPool>,

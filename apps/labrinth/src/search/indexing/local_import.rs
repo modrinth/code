@@ -2,8 +2,8 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
-use log::info;
 use std::collections::HashMap;
+use tracing::info;
 
 use super::IndexingError;
 use crate::database::models::loader_fields::{
@@ -505,7 +505,11 @@ async fn index_versions(
                     version_id: VersionId(m.version_id),
                     field_id: LoaderFieldId(m.field_id),
                     int_value: m.int_value,
-                    enum_value: m.enum_value.map(LoaderFieldEnumValueId),
+                    enum_value: if m.enum_value == -1 {
+                        None
+                    } else {
+                        Some(LoaderFieldEnumValueId(m.enum_value))
+                    },
                     string_value: m.string_value,
                 };
 

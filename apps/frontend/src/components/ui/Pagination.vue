@@ -51,9 +51,7 @@
 </template>
 
 <script>
-import GapIcon from "~/assets/images/utils/gap.svg?component";
-import LeftArrowIcon from "~/assets/images/utils/left-arrow.svg?component";
-import RightArrowIcon from "~/assets/images/utils/right-arrow.svg?component";
+import { GapIcon, LeftArrowIcon, RightArrowIcon } from "@modrinth/assets";
 
 export default {
   components: {
@@ -151,6 +149,7 @@ a {
 .has-icon {
   display: flex;
   align-items: center;
+
   svg {
     width: 1em;
   }
@@ -167,6 +166,7 @@ a,
 .paginates {
   height: 2em;
   margin: 0.5rem 0;
+
   > div,
   .has-icon {
     margin: 0 0.3em;

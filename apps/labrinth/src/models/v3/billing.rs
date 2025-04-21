@@ -161,7 +161,7 @@ pub struct Charge {
     pub id: ChargeId,
     pub user_id: UserId,
     pub price_id: ProductPriceId,
-    pub amount: u64,
+    pub amount: i64,
     pub currency_code: String,
     pub status: ChargeStatus,
     pub due: DateTime<Utc>,
@@ -171,9 +171,12 @@ pub struct Charge {
     pub subscription_id: Option<UserSubscriptionId>,
     pub subscription_interval: Option<PriceDuration>,
     pub platform: PaymentPlatform,
+
+    pub parent_charge_id: Option<ChargeId>,
+    pub net: Option<i64>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ChargeType {
     OneTime,
@@ -186,8 +189,8 @@ impl ChargeType {
     pub fn as_str(&self) -> &'static str {
         match self {
             ChargeType::OneTime => "one-time",
-            ChargeType::Subscription { .. } => "subscription",
-            ChargeType::Proration { .. } => "proration",
+            ChargeType::Subscription => "subscription",
+            ChargeType::Proration => "proration",
             ChargeType::Refund => "refund",
         }
     }

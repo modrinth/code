@@ -21,7 +21,12 @@
     </div>
 
     <div class="h-full w-full">
-      <NuxtPage :route="props.route" :server="props.server" @reinstall="onReinstall" />
+      <NuxtPage
+        :route="route"
+        :server="server"
+        :backup-in-progress="backupInProgress"
+        @reinstall="onReinstall"
+      />
     </div>
   </div>
 </template>
@@ -30,13 +35,15 @@
 import { RightArrowIcon } from "@modrinth/assets";
 import type { RouteLocationNormalized } from "vue-router";
 import type { Server } from "~/composables/pyroServers";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
 const emit = defineEmits(["reinstall"]);
 
-const props = defineProps<{
+defineProps<{
   navLinks: { label: string; href: string; icon: Component; external?: boolean }[];
   route: RouteLocationNormalized;
-  server: Server<["general", "mods", "backups", "network", "startup", "ws", "fs"]>;
+  server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  backupInProgress?: BackupInProgressReason;
 }>();
 
 const onReinstall = (...args: any[]) => {

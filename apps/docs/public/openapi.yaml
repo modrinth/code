@@ -1,7 +1,7 @@
 openapi: '3.0.0'
 
 info:
-  version: v2.7.0/15cf3fc
+  version: v2.7.0/366f528
   title: Labrinth
   termsOfService: https://modrinth.com/legal/terms
   contact:
@@ -51,35 +51,7 @@ info:
     Please note that certain scopes and requests cannot be completed with a personal access token or using OAuth.
     For example, deleting a user account can only be done through Modrinth's frontend.
 
-    ### OAuth2
-    Applications interacting with an authenticated API should create an OAuth2 application.
-    You can do this in [the developer settings](https://modrinth.com/settings/applications).
-
-    Make sure to save your application secret, as you will not be able to access it after you leave the page.
-
-    Once you have created a client, use the following URL to have a user authorize your client:
-    ```
-    https://modrinth.com/auth/authorize?client_id=<CLIENT_ID>&redirect_uri=<CALLBACK_URL>&scope=<SCOPE_ONE>+<SCOPE_TWO>+<SCOPE_THREE>
-    ```
-    > You can get a list of all scope names [here](https://github.com/modrinth/code/tree/main/apps/labrinth/src/models/v3/pats.rs).
-
-    Then, send a `POST` request to the following URL to get the token:
-
-    ```
-    https://api.modrinth.com/_internal/oauth/token
-    ```
-
-    > Note that you will need to provide your application's secret under the Authorization header.
-
-    In the body of your request, make sure to include the following:
-    - `code`: The code generated when authorizing your client
-    - `client_id`: Your client ID (found in developer settings)
-    - `redirect_uri`: A valid redirect URI provided in your application's settings
-    - `grant_type`: This will need to be `authorization_code`.
-
-    If your token request fails for any reason, you will need to get another code from the authorization process.
-
-    This route will be changed in the future to move the `_internal` part to `v3`.
+    A detailed guide on OAuth has been published in [Modrinth's technical documentation](https://docs.modrinth.com/guide/oauth).
 
     ### Personal access tokens
     Personal access tokens (PATs) can be generated in from [the user settings](https://modrinth.com/settings/account).
@@ -1823,7 +1795,7 @@ components:
           description: Number of projects on Modrinth
         versions:
           type: integer
-          description: Number of projects on Modrinth
+          description: Number of versions on Modrinth
         files:
           type: integer
           description: Number of version files on Modrinth
@@ -3005,6 +2977,24 @@ paths:
         - users
       requestBody:
         $ref: '#/components/requestBodies/Image'
+      security:
+        - TokenAuth: ['USER_WRITE']
+      responses:
+        '204':
+          description: Expected response to a valid request
+        '400':
+          description: Request was invalid, see given error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidInputError'
+        '404':
+          description: The requested item(s) were not found or no authorization to access the requested item(s)
+    delete:
+      summary: Remove user's avatar
+      operationId: deleteUserIcon
+      tags:
+        - users
       security:
         - TokenAuth: ['USER_WRITE']
       responses:

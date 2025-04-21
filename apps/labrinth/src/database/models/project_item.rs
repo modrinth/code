@@ -6,8 +6,8 @@ use super::{ids::*, User};
 use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::parse_base62;
 use crate::models::projects::{MonetizationStatus, ProjectStatus};
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
@@ -300,7 +300,7 @@ impl Project {
                 slug, color, monetization_status, organization_id
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, 
+                $1, $2, $3, $4, $5, $6,
                 $7, $8, $9, $10, $11,
                 $12, $13,
                 LOWER($14), $15, $16, $17
@@ -595,12 +595,12 @@ impl Project {
                                 version_id: VersionId(m.version_id),
                                 field_id: LoaderFieldId(m.field_id),
                                 int_value: m.int_value,
-                                enum_value: m.enum_value.map(LoaderFieldEnumValueId),
+                                enum_value: if m.enum_value == -1  { None } else { Some(LoaderFieldEnumValueId(m.enum_value)) },
                                 string_value: m.string_value,
                             };
 
-                            if let Some(enum_value) = m.enum_value {
-                                loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(enum_value));
+                            if m.enum_value != -1 {
+                                loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(m.enum_value));
                             }
 
                             acc.entry(ProjectId(m.mod_id)).or_default().push(qvf);

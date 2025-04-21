@@ -58,7 +58,7 @@
               :value="option"
               :name="name"
             />
-            <label :for="`${name}-${index}`">{{ displayName(option) }}</label>
+            <label :for="`${name}-${index}`">{{ getOptionLabel(option) }}</label>
           </div>
         </div>
       </transition>
@@ -101,9 +101,13 @@ const props = defineProps({
   },
   displayName: {
     type: Function,
-    default: (option) => option,
+    default: undefined,
   },
 })
+
+function getOptionLabel(option) {
+  return props.displayName?.(option) ?? option
+}
 
 const emit = defineEmits(['input', 'change', 'update:modelValue'])
 
@@ -114,7 +118,7 @@ const dropdown = ref(null)
 const optionElements = ref(null)
 
 const selectedOption = computed(() => {
-  return props.displayName(selectedValue.value) || props.placeholder || 'Select an option'
+  return getOptionLabel(selectedValue.value) ?? props.placeholder ?? 'Select an option'
 })
 
 const radioValue = computed({

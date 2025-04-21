@@ -70,7 +70,7 @@ const props = withDefaults(
     closeOnClickOutside: true,
     closeOnEsc: true,
     warnOnClose: false,
-    header: null,
+    header: undefined,
     onHide: () => {},
     onShow: () => {},
   },
@@ -90,7 +90,7 @@ function addBodyPadding() {
 }
 
 function show(event?: MouseEvent) {
-  props.onShow()
+  props.onShow?.()
   open.value = true
 
   addBodyPadding()
@@ -109,7 +109,7 @@ function show(event?: MouseEvent) {
 }
 
 function hide() {
-  props.onHide()
+  props.onHide?.()
   visible.value = false
   document.body.style.overflow = ''
   document.body.style.paddingRight = ''

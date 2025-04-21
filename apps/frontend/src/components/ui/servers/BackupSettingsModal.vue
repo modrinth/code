@@ -106,6 +106,7 @@ const fetchSettings = async () => {
     initialSettings.value = settings as { interval: number; enabled: boolean };
     autoBackupEnabled.value = settings?.enabled ?? false;
     autoBackupInterval.value = settings?.interval || 6;
+    return true;
   } catch (error) {
     console.error("Error fetching backup settings:", error);
     addNotification({
@@ -114,6 +115,7 @@ const fetchSettings = async () => {
       text: "Failed to load backup settings",
       type: "error",
     });
+    return false;
   } finally {
     isLoadingSettings.value = false;
   }
@@ -155,8 +157,10 @@ const saveSettings = async () => {
 
 defineExpose({
   show: async () => {
-    await fetchSettings();
-    modal.value?.show();
+    const success = await fetchSettings();
+    if (success) {
+      modal.value?.show();
+    }
   },
 });
 </script>

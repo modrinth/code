@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Toggle, ThemeSelector, TeleportDropdownMenu } from '@modrinth/ui'
+import { TeleportDropdownMenu, ThemeSelector, Toggle } from '@modrinth/ui'
 import { useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
-import { watch, ref } from 'vue'
+import { ref, watch } from 'vue'
 import { getOS } from '@/helpers/utils'
 
 const themeStore = useTheming()
@@ -46,7 +46,6 @@ watch(
     <Toggle
       id="advanced-rendering"
       :model-value="themeStore.advancedRendering"
-      :checked="themeStore.advancedRendering"
       @update:model-value="
         (e) => {
           themeStore.advancedRendering = e
@@ -61,16 +60,7 @@ watch(
       <h2 class="m-0 text-lg font-extrabold text-contrast">Native Decorations</h2>
       <p class="m-0 mt-1">Use system window frame (app restart required).</p>
     </div>
-    <Toggle
-      id="native-decorations"
-      :model-value="settings.native_decorations"
-      :checked="settings.native_decorations"
-      @update:model-value="
-        (e) => {
-          settings.native_decorations = e
-        }
-      "
-    />
+    <Toggle id="native-decorations" v-model="settings.native_decorations" />
   </div>
 
   <div class="mt-4 flex items-center justify-between">
@@ -78,16 +68,7 @@ watch(
       <h2 class="m-0 text-lg font-extrabold text-contrast">Minimize launcher</h2>
       <p class="m-0 mt-1">Minimize the launcher when a Minecraft process starts.</p>
     </div>
-    <Toggle
-      id="minimize-launcher"
-      :model-value="settings.hide_on_process_start"
-      :checked="settings.hide_on_process_start"
-      @update:model-value="
-        (e) => {
-          settings.hide_on_process_start = e
-        }
-      "
-    />
+    <Toggle id="minimize-launcher" v-model="settings.hide_on_process_start" />
   </div>
 
   <div class="mt-4 flex items-center justify-between">
@@ -111,7 +92,6 @@ watch(
     <Toggle
       id="toggle-sidebar"
       :model-value="settings.toggle_sidebar"
-      :checked="settings.toggle_sidebar"
       @update:model-value="
         (e) => {
           settings.toggle_sidebar = e

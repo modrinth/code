@@ -38,9 +38,13 @@
     <div class="withdraw-options-scroll">
       <div class="withdraw-options">
         <button
-          v-for="method in payoutMethods.filter((x) =>
-            x.name.toLowerCase().includes(search.toLowerCase()),
-          )"
+          v-for="method in payoutMethods
+            .filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+            .sort((a, b) =>
+              a.type !== 'tremendous'
+                ? -1
+                : a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+            )"
           :key="method.id"
           class="withdraw-option button-base"
           :class="{ selected: selectedMethodId === method.id }"
@@ -76,7 +80,7 @@
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked v-if="selectedMethodId === method.id" class="radio" />
+            <RadioButtonCheckedIcon v-if="selectedMethodId === method.id" class="radio" />
             <RadioButtonIcon v-else class="radio" />
             <span>{{ method.name }}</span>
           </div>
@@ -188,7 +192,7 @@ import {
   PayPalIcon,
   SearchIcon,
   RadioButtonIcon,
-  RadioButtonChecked,
+  RadioButtonCheckedIcon,
   XIcon,
   TransferIcon,
 } from "@modrinth/assets";
@@ -365,7 +369,7 @@ async function withdraw() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

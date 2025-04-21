@@ -34,12 +34,17 @@
           <UiServersFilesBrowseNavbar
             :breadcrumb-segments="breadcrumbSegments"
             :search-query="searchQuery"
-            :sort-method="sortMethod"
+            :current-filter="viewFilter"
             @navigate="navigateToSegment"
-            @sort="sortFiles"
             @create="showCreateModal"
             @upload="initiateFileUpload"
+            @filter="handleFilter"
             @update:search-query="searchQuery = $event"
+          />
+          <UiServersFilesLabelBar
+            :sort-field="sortMethod"
+            :sort-desc="sortDesc"
+            @sort="handleSort"
           />
           <FilesUploadDropdown
             v-if="props.server.fs"
@@ -94,7 +99,6 @@
         </div>
 
         <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
-          <UiServersFilesLabelBar />
           <UiServersFileVirtualList
             :items="filteredItems"
             @delete="showDeleteModal"
@@ -185,6 +189,8 @@ const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
 }>();
 
+const modulesLoaded = inject<Promise<void>>("modulesLoaded");
+
 const route = useRoute();
 const router = useRouter();
 
@@ -196,7 +202,8 @@ const operationHistory = ref<Operation[]>([]);
 const redoStack = ref<Operation[]>([]);
 
 const searchQuery = ref("");
-const sortMethod = ref("default");
+const sortMethod = ref("name");
+const sortDesc = ref(false);
 
 const maxResults = 100;
 const currentPage = ref(1);
@@ -227,11 +234,21 @@ const uploadDropdownRef = ref();
 
 const data = computed(() => props.server.general);
 
+const viewFilter = ref("all");
+
+const handleFilter = (type: string) => {
+  viewFilter.value = type;
+  sortMethod.value = "name";
+  sortDesc.value = false;
+};
+
 useHead({
   title: computed(() => `Files - ${data.value?.name ?? "Server"} - Modrinth`),
 });
 
 const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
+  await modulesLoaded;
+
   const path = Array.isArray(currentPath.value) ? currentPath.value.join("") : currentPath.value;
   try {
     const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults);
@@ -567,6 +584,51 @@ const applyDefaultSort = (items: DirectoryItem[]) => {
   });
 };
 
+const handleSort = (field: string) => {
+  if (sortMethod.value === field) {
+    sortDesc.value = !sortDesc.value;
+  } else {
+    sortMethod.value = field;
+    sortDesc.value = false;
+  }
+};
+
+const applySort = (items: DirectoryItem[]) => {
+  let result = [...items];
+
+  switch (viewFilter.value) {
+    case "filesOnly":
+      result = result.filter((item) => item.type !== "directory");
+      break;
+    case "foldersOnly":
+      result = result.filter((item) => item.type === "directory");
+      break;
+  }
+
+  const compareItems = (a: DirectoryItem, b: DirectoryItem) => {
+    if (viewFilter.value === "all") {
+      if (a.type === "directory" && b.type !== "directory") return -1;
+      if (a.type !== "directory" && b.type === "directory") return 1;
+    }
+
+    switch (sortMethod.value) {
+      case "modified":
+        return sortDesc.value
+          ? new Date(a.modified).getTime() - new Date(b.modified).getTime()
+          : new Date(b.modified).getTime() - new Date(a.modified).getTime();
+      case "created":
+        return sortDesc.value
+          ? new Date(a.created).getTime() - new Date(b.created).getTime()
+          : new Date(b.created).getTime() - new Date(a.created).getTime();
+      default:
+        return sortDesc.value ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name);
+    }
+  };
+
+  result.sort(compareItems);
+  return result;
+};
+
 const filteredItems = computed(() => {
   let result = [...items.value];
 
@@ -575,24 +637,7 @@ const filteredItems = computed(() => {
     result = result.filter((item) => item.name.toLowerCase().includes(query));
   }
 
-  switch (sortMethod.value) {
-    case "modified":
-      result.sort((a, b) => new Date(b.modified).getTime() - new Date(a.modified).getTime());
-      break;
-    case "created":
-      result.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
-      break;
-    case "filesOnly":
-      result = result.filter((item) => item.type !== "directory");
-      break;
-    case "foldersOnly":
-      result = result.filter((item) => item.type === "directory");
-      break;
-    default:
-      result = applyDefaultSort(result);
-  }
-
-  return result;
+  return applySort(result);
 });
 
 const { reset } = useInfiniteScroll(
@@ -656,10 +701,6 @@ const onAnywhereClicked = (e: MouseEvent) => {
   }
 };
 
-const sortFiles = (method: string) => {
-  sortMethod.value = method;
-};
-
 const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
 
 const editFile = async (item: { name: string; type: string; path: string }) => {
@@ -682,7 +723,22 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
   }
 };
 
+const initializeFileEdit = async () => {
+  if (!route.query.editing || !props.server.fs) return;
+
+  const filePath = route.query.editing as string;
+  await editFile({
+    name: filePath.split("/").pop() || "",
+    type: "file",
+    path: filePath,
+  });
+};
+
 onMounted(async () => {
+  await modulesLoaded;
+
+  await initializeFileEdit();
+
   await import("ace-builds");
   await import("ace-builds/src-noconflict/mode-json");
   await import("ace-builds/src-noconflict/mode-yaml");
@@ -717,7 +773,9 @@ watch(
   async (newQuery) => {
     currentPage.value = 1;
     searchQuery.value = "";
-    sortMethod.value = "default";
+    viewFilter.value = "all";
+    sortMethod.value = "name";
+    sortDesc.value = false;
 
     currentPath.value = Array.isArray(newQuery.path)
       ? newQuery.path.join("")
