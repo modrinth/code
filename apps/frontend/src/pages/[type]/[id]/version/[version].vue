@@ -621,6 +621,12 @@
           <h4>Version ID</h4>
           <CopyCode :text="version.id" />
         </div>
+        <div v-if="!isEditing && flags.developerMode">
+          <h4>Modrinth Maven</h4>
+          <div class="maven-section">
+            <CopyCode :text="`maven.modrinth:${project.id}:${version.id}`" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1136,7 +1142,7 @@ export default defineNuxtComponent({
         this.$notify({
           group: "main",
           title: "An error occurred",
-          text: err.data.description,
+          text: err.data ? err.data.description : err,
           type: "error",
         });
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1543,6 +1549,12 @@ export default defineNuxtComponent({
 
   h4 {
     margin: 1rem 0 0.25rem 0;
+  }
+
+  .maven-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .team-member {

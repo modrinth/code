@@ -44,6 +44,10 @@ export default defineConfig({
           label: 'Contributing to Modrinth',
           autogenerate: { directory: 'contributing' },
         },
+        {
+          label: 'Guides',
+          autogenerate: { directory: 'guide' },
+        },
         // Add the generated sidebar group to the sidebar.
         ...openAPISidebarGroups,
       ],
