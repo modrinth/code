@@ -27,7 +27,7 @@ const VIntlPlugin = createPlugin({
 })
 
 const vueScan = new VueScanPlugin({
-  enabled: true, // Enable or disable the tracker
+  enabled: false, // Enable or disable the tracker
   showOverlay: true, // Show overlay to visualize renders
   log: false, // Log render events to the console
   playSound: false, // Play sound on each render
