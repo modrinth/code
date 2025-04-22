@@ -219,7 +219,7 @@ const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
     await refreshAllWorlds()
   }
 
-  await handleDefaultProfileUpdateEvent()
+  await handleDefaultProfileUpdateEvent(worlds.value, instance.value.path, e)
 })
 
 await refreshAllWorlds()
@@ -324,7 +324,7 @@ watch(
       setTimeout(async () => {
         for (const world of worlds.value) {
           if (world.type === 'singleplayer' && world.locked) {
-            await refreshWorld(world.path)
+            await refreshWorld(worlds.value, instance.value.path, world.path)
           }
         }
       }, 1000)

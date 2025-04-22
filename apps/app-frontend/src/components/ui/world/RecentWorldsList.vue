@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import {
+  type ServerWorld,
+  type ServerData,
   type WorldWithProfile,
   get_recent_worlds,
   getWorldIdentifier,
@@ -12,6 +14,7 @@ import { HeadingLink, GAME_MODES } from '@modrinth/ui'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
 import { watch, onMounted, onUnmounted, ref } from 'vue'
+import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { useTheming } from '@/store/theme'
 import { kill } from '@/helpers/profile'
@@ -19,6 +22,7 @@ import { handleError } from '@/store/notifications'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_all } from '@/helpers/process'
+import type { GameInstance } from '@/helpers/types'
 
 const props = defineProps<{
   recentInstances: GameInstance[]
@@ -26,13 +30,29 @@ const props = defineProps<{
 
 const theme = useTheming()
 
-const jumpBackInItems = ref([])
-const serverData = ref({})
+const jumpBackInItems = ref<JumpBackInItem[]>([])
+const serverData = ref<Record<string, ServerData>>({})
 const protocolVersions = ref<Record<string, number | null>>({})
 
 const MIN_JUMP_BACK_IN = 3
 const MAX_JUMP_BACK_IN = 6
 const TWO_WEEKS_AGO = dayjs().subtract(14, 'day')
+
+type BaseJumpBackInItem = {
+  last_played: Dayjs
+  instance: GameInstance
+}
+
+type InstanceJumpBackInItem = BaseJumpBackInItem & {
+  type: 'instance'
+}
+
+type WorldJumpBackInItem = BaseJumpBackInItem & {
+  type: 'world'
+  world: WorldWithProfile
+}
+
+type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
 watch(props.recentInstances, async () => {
   await populateJumpBackIn().catch(() => {
@@ -48,12 +68,21 @@ async function populateJumpBackIn() {
   console.info('Repopulating jump back in...')
   const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN)
 
-  const worldItems = worlds.map((world) => ({
-    type: 'world',
-    last_played: world.last_played ? dayjs(world.last_played) : undefined,
-    world: world,
-    instance: props.recentInstances.find((instance) => instance.path === world.profile),
-  }))
+  const worldItems: WorldJumpBackInItem[] = []
+  worlds.forEach((world) => {
+    const instance = props.recentInstances.find((instance) => instance.path === world.profile)
+
+    if (!instance || !world.last_played) {
+      return
+    }
+
+    worldItems.push({
+      type: 'world',
+      last_played: dayjs(world.last_played),
+      world: world,
+      instance: instance,
+    })
+  })
 
   const servers: {
     instancePath: string
@@ -62,7 +91,7 @@ async function populateJumpBackIn() {
     .filter((item) => item.world.type === 'server' && item.instance)
     .map((item) => ({
       instancePath: item.instance.path,
-      address: item.world.address,
+      address: (item.world as ServerWorld).address,
     }))
 
   // fetch protocol versions for all unique MC versions with server worlds
@@ -88,24 +117,33 @@ async function populateJumpBackIn() {
 
   // fetch each server's data
   await Promise.all(
-    servers.map(({ game_version, address }) =>
-      refreshServerData(serverData.value[address], protocolVersions.value[game_version], address),
+    servers.map(({ instancePath, address }) =>
+      refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
     ),
   )
 
-  const instanceItems = props.recentInstances
-    .filter((instance) => !worldItems.some((item) => item.instance.path === instance.path))
-    .map((instance) => ({
-      type: 'instance',
-      last_played: instance.last_played ? dayjs(instance.last_played) : undefined,
-      instance: instance,
-    }))
+  const instanceItems: InstanceJumpBackInItem[] = []
+  props.recentInstances.forEach((instance) => {
+    if(worldItems.some((item) => item.instance.path === instance.path) || !instance.last_played) {
+      return
+    }
 
-  const items = [...worldItems, ...instanceItems]
+    instanceItems.push({
+      type: 'instance',
+      last_played: dayjs(instance.last_played),
+      instance: instance,
+    })
+  })
+
+  const items: JumpBackInItem[] = [...worldItems, ...instanceItems]
   items.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
   jumpBackInItems.value = items.filter(
     (item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO),
   )
+}
+
+async function refreshServer(address: string, instancePath: string) {
+  await refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address);
 }
 
 async function joinWorld(world: WorldWithProfile) {
@@ -117,15 +155,15 @@ async function joinWorld(world: WorldWithProfile) {
   }
 }
 
-const stopInstance = async (path) => {
+async function stopInstance(path: string) {
   await kill(path).catch(handleError)
   trackEvent('InstanceStop', {
     source: 'RecentWorldsList',
   })
 }
 
-const currentProfile = ref()
-const currentWorld = ref()
+const currentProfile = ref<string>()
+const currentWorld = ref<string>()
 
 const unlistenProcesses = await process_listener(async () => {
   await checkProcesses()
@@ -137,17 +175,23 @@ const unlistenProfiles = await profile_listener(async () => {
   })
 })
 
-const runningInstances = ref([])
+const runningInstances = ref<string[]>([])
+
+type ProcessMetadata = {
+  uuid: string;
+  profile_path: string;
+  start_time: string;
+};
 
 const checkProcesses = async () => {
-  const runningProcesses = await get_all().catch(handleError)
+  const runningProcesses: ProcessMetadata[] = await get_all().catch(handleError)
 
   const runningPaths = runningProcesses.map((x) => x.profile_path)
 
   const stoppedInstances = runningInstances.value.filter((x) => !runningPaths.includes(x))
-  if (stoppedInstances.includes(currentProfile.value)) {
-    currentProfile.value = null
-    currentWorld.value = null
+  if (currentProfile.value && stoppedInstances.includes(currentProfile.value)) {
+    currentProfile.value = undefined
+    currentWorld.value = undefined
   }
 
   runningInstances.value = runningPaths
@@ -165,7 +209,7 @@ onUnmounted(() => {
 
 <template>
   <div v-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
-    <HeadingLink v-if="theme.featureFlags['worlds_tab']" to="/worlds" class="mt-1">
+    <HeadingLink v-if="(theme.featureFlags as Record<string, boolean>)['worlds_tab']" to="/worlds" class="mt-1">
       Jump back in
     </HeadingLink>
     <span
@@ -205,7 +249,7 @@ onUnmounted(() => {
           :instance-path="item.instance.path"
           :instance-name="item.instance.name"
           :instance-icon="item.instance.icon_path"
-          @refresh="() => (item.world.type === 'server' ? item.refresh(item.world.address) : {})"
+          @refresh="() => (item.world.type === 'server' ? refreshServer(item.world.address, item.instance.path) : {})"
           @play="
             () => {
               currentProfile = item.instance.path

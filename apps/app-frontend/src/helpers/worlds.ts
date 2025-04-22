@@ -3,7 +3,7 @@ import { get_full_path } from '@/helpers/profile'
 import { openPath } from '@/helpers/utils'
 import { autoToHTML } from '@geometrically/minecraft-motd-parser'
 import dayjs from 'dayjs'
-import { refreshWorlds } from '@/composables/worlds.ts'
+import type { GameVersion } from '@modrinth/ui'
 
 type BaseWorld = {
   name: string
@@ -184,7 +184,7 @@ export function isServerWorld(world: World): world is ServerWorld {
 
 export async function refreshServerData(
   serverData: ServerData,
-  protocolVersion: number,
+  protocolVersion: number | null,
   address: string,
 ): Promise<void> {
   serverData.refreshing = true
@@ -232,7 +232,7 @@ export async function refreshWorld(worlds: World[], instancePath: string, worldP
   const index = worlds.findIndex((w) => w.type === 'singleplayer' && w.path === worldPath)
   if (index !== -1) {
     worlds[index] = await get_singleplayer_world(instancePath, worldPath)
-    sortWorlds(worlds.value)
+    sortWorlds(worlds)
   } else {
     console.error(`Error refreshing world, could not find world at path ${worldPath}.`)
   }
@@ -266,21 +266,11 @@ export async function refreshWorlds(instancePath: string): Promise<World[]> {
   const worlds = await get_profile_worlds(instancePath).catch((err) => {
     console.error(`Error refreshing worlds for instance: ${instancePath}`, err)
   })
-  sortWorlds(worlds)
+  if (worlds) {
+    sortWorlds(worlds)
+  }
 
   return worlds ?? []
-}
-
-export function updateServerTimestamp() {
-  const world = worlds.value.find(
-    (w) =>
-      w.type === 'server' &&
-      (w.address === `${e.host}:${e.port}` || (e.port == 25565 && w.address == e.host)),
-  )
-  if (world) {
-    world.last_played = e.timestamp
-    sortWorlds(worlds.value)
-  }
 }
 
 const FIRST_QUICK_PLAY_VERSION = '23w14a'
