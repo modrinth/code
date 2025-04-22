@@ -1,8 +1,10 @@
 use lettre::message::header::ContentType;
 use lettre::message::Mailbox;
 use lettre::transport::smtp::authentication::Credentials;
+use lettre::transport::smtp::client::{Tls, TlsParameters};
 use lettre::{Address, Message, SmtpTransport, Transport};
 use thiserror::Error;
+use tracing::warn;
 
 #[derive(Error, Debug)]
 pub enum MailError {
@@ -34,9 +36,28 @@ pub fn send_email_raw(
     let username = dotenvy::var("SMTP_USERNAME")?;
     let password = dotenvy::var("SMTP_PASSWORD")?;
     let host = dotenvy::var("SMTP_HOST")?;
+    let port = dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(465);
     let creds = Credentials::new(username, password);
+    let tls_setting = match dotenvy::var("SMTP_TLS")?.as_str() {
+        "none" => Tls::None,
+        "opportunistic_start_tls" => {
+            Tls::Opportunistic(TlsParameters::new(host.to_string())?)
+        }
+        "requires_start_tls" => {
+            Tls::Required(TlsParameters::new(host.to_string())?)
+        }
+        "tls" => Tls::Wrapper(TlsParameters::new(host.to_string())?),
+        _ => {
+            warn!("Unrecognized SMTP TLS setting. Defaulting to TLS.");
+            Tls::Wrapper(TlsParameters::new(host.to_string())?)
+        }
+    };
 
-    let mailer = SmtpTransport::relay(&host)?.credentials(creds).build();
+    let mailer = SmtpTransport::relay(&host)?
+        .port(port)
+        .tls(tls_setting)
+        .credentials(creds)
+        .build();
 
     mailer.send(&email)?;
 
