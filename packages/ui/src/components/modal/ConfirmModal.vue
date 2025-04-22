@@ -51,7 +51,7 @@
 
 <script setup>
 import { renderString } from '@modrinth/utils'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import NewModal from './NewModal.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
