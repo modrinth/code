@@ -49,6 +49,14 @@ export const commonMessages = defineMessages({
     id: 'label.description',
     defaultMessage: 'Description',
   },
+  downloadButton: {
+    id: 'button.download',
+    defaultMessage: 'Download',
+  },
+  downloadingButton: {
+    id: 'button.downloading',
+    defaultMessage: 'Downloading',
+  },
   editButton: {
     id: 'button.edit',
     defaultMessage: 'Edit',

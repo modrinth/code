@@ -42,6 +42,9 @@
         :column="true"
         class="mb-6 flex flex-col gap-2"
       />
+      <div v-if="flags.advancedDebugInfo" class="markdown-body">
+        <pre>{{ serverData }}</pre>
+      </div>
       <ButtonStyled type="standard" color="brand" @click="closeDetailsModal">
         <button class="w-full">Close</button>
       </ButtonStyled>

@@ -959,6 +959,63 @@
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
   },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Backup creation in progress"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "Backup restore in progress"
+  },
+  "servers.backups.item.already-preparing": {
+    "message": "Already preparing backup for download"
+  },
+  "servers.backups.item.automated": {
+    "message": "Automated"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Creating backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Failed to create backup"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "Failed to prepare download"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Failed to restore from backup"
+  },
+  "servers.backups.item.lock": {
+    "message": "Lock"
+  },
+  "servers.backups.item.locked": {
+    "message": "Locked"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "Prepare download"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "Try preparing again"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "Preparing download..."
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "Queued for backup"
+  },
+  "servers.backups.item.rename": {
+    "message": "Rename"
+  },
+  "servers.backups.item.restore": {
+    "message": "Restore"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Restoring from backup..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Retry"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Unlock"
+  },
   "servers.notice.actions": {
     "message": "Actions"
   },
@@ -985,6 +1042,33 @@
   },
   "servers.notices.no-notices": {
     "message": "No notices"
+  },
+  "servers.plan.large.description": {
+    "message": "Ideal for larger communities, modpacks, and heavy modding."
+  },
+  "servers.plan.large.name": {
+    "message": "Large"
+  },
+  "servers.plan.large.symbol": {
+    "message": "L"
+  },
+  "servers.plan.medium.description": {
+    "message": "Great for modded multiplayer and small communities."
+  },
+  "servers.plan.medium.name": {
+    "message": "Medium"
+  },
+  "servers.plan.medium.symbol": {
+    "message": "M"
+  },
+  "servers.plan.small.description": {
+    "message": "Perfect for vanilla multiplayer, small friend groups, SMPs, and light modding."
+  },
+  "servers.plan.small.name": {
+    "message": "Small"
+  },
+  "servers.plan.small.symbol": {
+    "message": "S"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Cancel subscription"

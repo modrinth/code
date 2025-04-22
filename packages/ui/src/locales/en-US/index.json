@@ -11,6 +11,12 @@
   "button.create-a-project": {
     "defaultMessage": "Create a project"
   },
+  "button.download": {
+    "defaultMessage": "Download"
+  },
+  "button.downloading": {
+    "defaultMessage": "Downloading"
+  },
   "button.edit": {
     "defaultMessage": "Edit"
   },
