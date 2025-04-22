@@ -49,7 +49,7 @@ defineOptions({
 
     // Utility classes for contents
     :deep(.smart-clickable\:highlight-on-hover) {
-      filter: brightness(1.25);
+      filter: brightness(var(--hover-brightness, 1.25));
     }
   }
 

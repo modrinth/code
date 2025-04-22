@@ -275,7 +275,7 @@ const messages = defineMessages({
           </template>
           <div
             v-else-if="renderedMotd"
-            class="font-normal font-minecraft line-clamp-2 text-secondary leading-5"
+            class="motd-renderer font-normal font-minecraft line-clamp-2 text-secondary leading-5"
             v-html="renderedMotd"
           />
           <div v-else-if="!serverStatus" class="font-normal font-minecraft text-red leading-5">
@@ -462,5 +462,9 @@ const messages = defineMessages({
   100% {
     opacity: 0;
   }
+}
+
+.light-mode .motd-renderer {
+  filter: brightness(0.75);
 }
 </style>
