@@ -30,7 +30,7 @@ const props = defineProps<{
   options: FilterBarOption[]
 }>()
 
-watch(props.options, () => {
+watch(() => props.options, () => {
   for (let i = 0; i < selectedFilters.value.length; i++) {
     const option = selectedFilters.value[i]
     if (!props.options.some((x) => x.id === option)) {

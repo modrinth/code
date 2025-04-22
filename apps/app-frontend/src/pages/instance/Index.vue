@@ -1,83 +1,84 @@
 <template>
-  <div
-    class="p-6 pr-2 pb-4"
-    @contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
-  >
-    <ExportModal ref="exportModal" :instance="instance" />
-    <InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
-    <ContentPageHeader>
-      <template #icon>
-        <Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />
-      </template>
-      <template #title>
-        {{ instance.name }}
-      </template>
-      <template #summary> </template>
-      <template #stats>
-        <div
-          class="flex items-center gap-2 font-semibold transform capitalize border-0 border-solid border-divider pr-4 md:border-r"
-        >
-          <GameIcon class="h-6 w-6 text-secondary" />
-          {{ instance.loader }} {{ instance.game_version }}
-        </div>
-        <div class="flex items-center gap-2 font-semibold">
-          <TimerIcon class="h-6 w-6 text-secondary" />
-          <template v-if="timePlayed > 0">
-            {{ timePlayedHumanized }}
-          </template>
-          <template v-else> Never played </template>
-        </div>
-      </template>
-      <template #actions>
-        <div class="flex gap-2">
-          <ButtonStyled
-            v-if="instance.install_stage.includes('installing')"
-            color="brand"
-            size="large"
+  <div>
+    <div
+      class="p-6 pr-2 pb-4"
+      @contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
+    >
+      <ExportModal ref="exportModal" :instance="instance" />
+      <InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
+      <ContentPageHeader>
+        <template #icon>
+          <Avatar :src="icon" :alt="instance.name" size="96px" :tint-by="instance.path" />
+        </template>
+        <template #title>
+          {{ instance.name }}
+        </template>
+        <template #summary> </template>
+        <template #stats>
+          <div
+            class="flex items-center gap-2 font-semibold transform capitalize border-0 border-solid border-divider pr-4 md:border-r"
           >
-            <button disabled>Installing...</button>
-          </ButtonStyled>
-          <ButtonStyled
-            v-else-if="instance.install_stage !== 'installed'"
-            color="brand"
-            size="large"
-          >
-            <button @click="repairInstance()">
-              <DownloadIcon />
-              Repair
-            </button>
-          </ButtonStyled>
-          <ButtonStyled v-else-if="playing === true" color="red" size="large">
-            <button @click="stopInstance('InstancePage')">
-              <StopCircleIcon />
-              Stop
-            </button>
-          </ButtonStyled>
-          <ButtonStyled
-            v-else-if="playing === false && loading === false"
-            color="brand"
-            size="large"
-          >
-            <button @click="startInstance('InstancePage')">
-              <PlayIcon />
-              Play
-            </button>
-          </ButtonStyled>
-          <ButtonStyled
-            v-else-if="loading === true && playing === false"
-            color="brand"
-            size="large"
-          >
-            <button disabled>Loading...</button>
-          </ButtonStyled>
-          <ButtonStyled size="large" circular>
-            <button v-tooltip="'Instance settings'" @click="settingsModal.show()">
-              <SettingsIcon />
-            </button>
-          </ButtonStyled>
-          <ButtonStyled size="large" type="transparent" circular>
-            <OverflowMenu
-              :options="[
+            <GameIcon class="h-6 w-6 text-secondary" />
+            {{ instance.loader }} {{ instance.game_version }}
+          </div>
+          <div class="flex items-center gap-2 font-semibold">
+            <TimerIcon class="h-6 w-6 text-secondary" />
+            <template v-if="timePlayed > 0">
+              {{ timePlayedHumanized }}
+            </template>
+            <template v-else> Never played </template>
+          </div>
+        </template>
+        <template #actions>
+          <div class="flex gap-2">
+            <ButtonStyled
+              v-if="instance.install_stage.includes('installing')"
+              color="brand"
+              size="large"
+            >
+              <button disabled>Installing...</button>
+            </ButtonStyled>
+            <ButtonStyled
+              v-else-if="instance.install_stage !== 'installed'"
+              color="brand"
+              size="large"
+            >
+              <button @click="repairInstance()">
+                <DownloadIcon />
+                Repair
+              </button>
+            </ButtonStyled>
+            <ButtonStyled v-else-if="playing === true" color="red" size="large">
+              <button @click="stopInstance('InstancePage')">
+                <StopCircleIcon />
+                Stop
+              </button>
+            </ButtonStyled>
+            <ButtonStyled
+              v-else-if="playing === false && loading === false"
+              color="brand"
+              size="large"
+            >
+              <button @click="startInstance('InstancePage')">
+                <PlayIcon />
+                Play
+              </button>
+            </ButtonStyled>
+            <ButtonStyled
+              v-else-if="loading === true && playing === false"
+              color="brand"
+              size="large"
+            >
+              <button disabled>Loading...</button>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular>
+              <button v-tooltip="'Instance settings'" @click="settingsModal.show()">
+                <SettingsIcon />
+              </button>
+            </ButtonStyled>
+            <ButtonStyled size="large" type="transparent" circular>
+              <OverflowMenu
+                :options="[
                 {
                   id: 'open-folder',
                   action: () => showProfileInFolder(instance.path),
@@ -87,68 +88,69 @@
                   action: () => $refs.exportModal.show(),
                 },
               ]"
-            >
-              <MoreVerticalIcon />
-              <template #share-instance> <UserPlusIcon /> Share instance </template>
-              <template #host-a-server> <ServerIcon /> Create a server </template>
-              <template #open-folder> <FolderOpenIcon /> Open folder </template>
-              <template #export-mrpack> <PackageIcon /> Export modpack </template>
-            </OverflowMenu>
-          </ButtonStyled>
-        </div>
-      </template>
-    </ContentPageHeader>
-  </div>
-  <div class="px-6">
-    <NavTabs :links="tabs" />
-  </div>
-  <div class="p-6 pt-4">
-    <RouterView v-slot="{ Component }" :key="instance.path">
-      <template v-if="Component">
-        <Suspense
-          :key="instance.path"
-          @pending="loadingBar.startLoading()"
-          @resolve="loadingBar.stopLoading()"
-        >
-          <component
-            :is="Component"
-            :instance="instance"
-            :options="options"
-            :offline="offline"
-            :playing="playing"
-            :versions="modrinthVersions"
-            :installed="instance.install_stage !== 'installed'"
-            @play="updatePlayState"
-            @stop="() => stopInstance('InstanceSubpage')"
-          ></component>
-          <template #fallback>
-            <LoadingIndicator />
-          </template>
-        </Suspense>
-      </template>
-    </RouterView>
-  </div>
-  <ContextMenu ref="options" @option-clicked="handleOptionsClick">
-    <template #play> <PlayIcon /> Play </template>
-    <template #stop> <StopCircleIcon /> Stop </template>
-    <template #add_content> <PlusIcon /> Add content </template>
-    <template #edit> <EditIcon /> Edit </template>
-    <template #copy_path> <ClipboardCopyIcon /> Copy path </template>
-    <template #open_folder> <ClipboardCopyIcon /> Open folder </template>
-    <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
-    <template #open_link> <ClipboardCopyIcon /> Open in Modrinth <ExternalIcon /> </template>
-    <template #copy_names><EditIcon />Copy names</template>
-    <template #copy_slugs><HashIcon />Copy slugs</template>
-    <template #copy_links><GlobeIcon />Copy links</template>
-    <template #toggle><EditIcon />Toggle selected</template>
-    <template #disable><XIcon />Disable selected</template>
-    <template #enable><CheckCircleIcon />Enable selected</template>
-    <template #hide_show><EyeIcon />Show/Hide unselected</template>
-    <template #update_all
+              >
+                <MoreVerticalIcon />
+                <template #share-instance> <UserPlusIcon /> Share instance </template>
+                <template #host-a-server> <ServerIcon /> Create a server </template>
+                <template #open-folder> <FolderOpenIcon /> Open folder </template>
+                <template #export-mrpack> <PackageIcon /> Export modpack </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </div>
+        </template>
+      </ContentPageHeader>
+    </div>
+    <div class="px-6">
+      <NavTabs :links="tabs" />
+    </div>
+    <div v-if="!!instance" class="p-6 pt-4">
+      <RouterView v-slot="{ Component }" :key="instance.path">
+        <template v-if="Component">
+          <Suspense
+            :key="instance.path"
+            @pending="loadingBar.startLoading()"
+            @resolve="loadingBar.stopLoading()"
+          >
+            <component
+              :is="Component"
+              :instance="instance"
+              :options="options"
+              :offline="offline"
+              :playing="playing"
+              :versions="modrinthVersions"
+              :installed="instance.install_stage !== 'installed'"
+              @play="updatePlayState"
+              @stop="() => stopInstance('InstanceSubpage')"
+            ></component>
+            <template #fallback>
+              <LoadingIndicator />
+            </template>
+          </Suspense>
+        </template>
+      </RouterView>
+    </div>
+    <ContextMenu ref="options" @option-clicked="handleOptionsClick">
+      <template #play> <PlayIcon /> Play </template>
+      <template #stop> <StopCircleIcon /> Stop </template>
+      <template #add_content> <PlusIcon /> Add content </template>
+      <template #edit> <EditIcon /> Edit </template>
+      <template #copy_path> <ClipboardCopyIcon /> Copy path </template>
+      <template #open_folder> <ClipboardCopyIcon /> Open folder </template>
+      <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+      <template #open_link> <ClipboardCopyIcon /> Open in Modrinth <ExternalIcon /> </template>
+      <template #copy_names><EditIcon />Copy names</template>
+      <template #copy_slugs><HashIcon />Copy slugs</template>
+      <template #copy_links><GlobeIcon />Copy links</template>
+      <template #toggle><EditIcon />Toggle selected</template>
+      <template #disable><XIcon />Disable selected</template>
+      <template #enable><CheckCircleIcon />Enable selected</template>
+      <template #hide_show><EyeIcon />Show/Hide unselected</template>
+      <template #update_all
       ><UpdatedIcon />Update {{ selected.length > 0 ? 'selected' : 'all' }}</template
-    >
-    <template #filter_update><UpdatedIcon />Select Updatable</template>
-  </ContextMenu>
+      >
+      <template #filter_update><UpdatedIcon />Select Updatable</template>
+    </ContextMenu>
+  </div>
 </template>
 <script setup>
 import {

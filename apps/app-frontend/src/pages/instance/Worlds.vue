@@ -134,6 +134,8 @@ import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { GAME_MODES, useWorlds } from '@/composables/worlds.ts'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { handleError } from '@/store/notifications'
+import type ContextMenu from '@/components/ui/ContextMenu.vue'
+import type { Version } from '@modrinth/utils'
 
 const route = useRoute()
 
@@ -153,8 +155,11 @@ const emit = defineEmits<{
 
 const props = defineProps<{
   instance: GameInstance
+  options: InstanceType<typeof ContextMenu> | null
   offline: boolean
   playing: boolean
+  versions: Version[]
+  installed: boolean
 }>()
 
 const instance = computed(() => props.instance)
