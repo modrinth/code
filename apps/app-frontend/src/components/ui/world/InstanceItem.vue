@@ -186,7 +186,6 @@ onUnmounted(() => {
         </ButtonStyled>
         <ButtonStyled circular type="transparent">
           <OverflowMenu
-            v-if="false"
             :options="[
             {
               id: 'open-instance',
