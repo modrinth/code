@@ -42,8 +42,8 @@
         </Button>
       </div>
       <ButtonStyled>
-        <button :disabled="refreshing" @click="refreshWorlds">
-          <template v-if="refreshing">
+        <button :disabled="refreshingAll" @click="refreshAllWorlds">
+          <template v-if="refreshingAll">
             <SpinnerIcon class="animate-spin" />
             Refreshing...
           </template>
@@ -64,7 +64,7 @@
     <div class="flex flex-col w-full gap-2">
       <WorldItem
         v-for="world in filteredWorlds"
-        :key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : world.address}`"
+        :key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
         :world="world"
         :highlighted="highlightedWorld === getWorldIdentifier(world)"
         :supports-quick-play="supportsQuickPlay"
@@ -72,11 +72,11 @@
         :playing-instance="playing"
         :playing-world="worldsMatch(world, worldPlaying)"
         :starting-instance="startingInstance"
-        :refreshing="
-          world.type === 'server' ? refreshingServers.includes(world.address) : undefined
+        :refreshing="world.type === 'server' ? serverData[world.address]?.refreshing : undefined"
+        :server-status="world.type === 'server' ? serverData[world.address]?.status : undefined"
+        :rendered-motd="
+          world.type === 'server' ? serverData[world.address]?.renderedMotd : undefined
         "
-        :server-status="world.type === 'server' ? serverStatus[world.address] : undefined"
-        :rendered-motd="world.type === 'server' ? renderedMotds[world.address] : undefined"
         :game-mode="world.type === 'singleplayer' ? GAME_MODES[world.game_mode] : undefined"
         @play="() => joinWorld(world)"
         @stop="() => emit('stop')"
@@ -104,8 +104,8 @@
         </button>
       </ButtonStyled>
       <ButtonStyled>
-        <button :disabled="refreshing" @click="refreshWorlds">
-          <template v-if="refreshing">
+        <button :disabled="refreshingAll" @click="refreshAllWorlds">
+          <template v-if="refreshingAll">
             <SpinnerIcon aria-hidden="true" class="animate-spin" />
             Refreshing...
           </template>
@@ -119,23 +119,51 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { GameInstance } from '@/helpers/types'
-import { Button, ButtonStyled, RadialHeader, FilterBar } from '@modrinth/ui'
+import {
+  Button,
+  ButtonStyled,
+  RadialHeader,
+  FilterBar,
+  type FilterBarOption,
+  type GameVersion,
+  GAME_MODES,
+} from '@modrinth/ui'
 import { PlusIcon, SpinnerIcon, UpdatedIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import type { World, ServerWorld, SingleplayerWorld } from '@/helpers/worlds.ts'
-import { getWorldIdentifier } from '@/helpers/worlds.ts'
+import {
+  type SingleplayerWorld,
+  type World,
+  type ServerWorld,
+  type ServerData,
+  type ProfileEvent,
+  get_profile_protocol_version,
+  remove_server_from_profile,
+  delete_world,
+  start_join_server,
+  start_join_singleplayer_world,
+  getWorldIdentifier,
+  refreshServerData,
+  refreshWorld,
+  sortWorlds,
+  refreshServers,
+  hasQuickPlaySupport,
+  refreshWorlds,
+  handleDefaultProfileUpdateEvent,
+} from '@/helpers/worlds.ts'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 
-import { GAME_MODES, useWorlds } from '@/composables/worlds.ts'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { handleError } from '@/store/notifications'
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
 import type { Version } from '@modrinth/utils'
+import { profile_listener } from '@/helpers/events'
+import { get_game_versions } from '@/helpers/tags'
+import { defineMessages } from '@vintl/vintl'
 
 const route = useRoute()
 
@@ -169,30 +197,189 @@ function play(world: World) {
   emit('play', world)
 }
 
-const {
-  refreshing,
-  startingInstance,
-  filters,
-  searchFilter,
-  worlds,
-  serverStatus,
-  renderedMotds,
-  refreshingServers,
-  filterOptions,
-  supportsQuickPlay,
-  worldPlaying,
-  protocolVersion,
-  worldsMatch,
-  addServer,
-  editServer,
-  removeServer,
-  editWorld,
-  deleteWorld,
-  joinWorld,
-  refreshWorlds,
-  refreshServer,
-  unlistenWorldsListener,
-} = await useWorlds(instance, playing, play)
+const filters = ref<string[]>([])
+const searchFilter = ref('')
+
+const refreshingAll = ref(false)
+const hadNoWorlds = ref(true)
+const startingInstance = ref(false)
+const worldPlaying = ref<World>()
+
+const worlds = ref<World[]>([])
+const serverData = ref<Record<string, ServerData>>({})
+
+const protocolVersion = ref<number | null>(await get_profile_protocol_version(instance.value.path))
+
+const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
+  if (e.profile_path_id !== instance.value.path) return
+
+  console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
+
+  if (e.event === 'servers_updated') {
+    await refreshAllWorlds()
+  }
+
+  await handleDefaultProfileUpdateEvent()
+})
+
+await refreshAllWorlds()
+
+async function refreshServer(address: string) {
+  await refreshServerData(serverData.value[address], protocolVersion.value, address)
+}
+
+async function refreshAllWorlds() {
+  if (refreshingAll.value) {
+    console.log(`Already refreshing, cancelling refresh.`)
+    return
+  }
+
+  refreshingAll.value = true
+
+  worlds.value = await refreshWorlds(instance.value.path).finally(
+    () => (refreshingAll.value = false),
+  )
+  await refreshServers(worlds.value, serverData.value, protocolVersion.value)
+
+  const hasNoWorlds = worlds.value.length === 0
+
+  if (hadNoWorlds.value && hasNoWorlds) {
+    setTimeout(() => {
+      refreshingAll.value = false
+    }, 1000)
+  } else {
+    refreshingAll.value = false
+  }
+
+  hadNoWorlds.value = hasNoWorlds
+}
+
+async function addServer(server: ServerWorld) {
+  worlds.value.push(server)
+  sortWorlds(worlds.value)
+  await refreshServer(server.address)
+}
+
+async function editServer(server: ServerWorld) {
+  const index = worlds.value.findIndex((w) => w.type === 'server' && w.index === server.index)
+  if (index !== -1) {
+    worlds.value[index] = server
+    sortWorlds(worlds.value)
+    await refreshServer(server.address)
+  } else {
+    handleError(`Error refreshing server, refreshing all worlds`)
+    await refreshAllWorlds()
+  }
+}
+
+async function removeServer(server: ServerWorld) {
+  await remove_server_from_profile(instance.value.path, server.index).catch(handleError)
+  worlds.value = worlds.value.filter((w) => w.type !== 'server' || w.index !== server.index)
+}
+
+async function editWorld(path: string, name: string, removeIcon: boolean) {
+  const world = worlds.value.find((world) => world.type === 'singleplayer' && world.path === path)
+  if (world) {
+    world.name = name
+    if (removeIcon) {
+      world.icon = undefined
+    }
+    sortWorlds(worlds.value)
+  } else {
+    handleError(`Error finding world in list, refreshing all worlds`)
+    await refreshAllWorlds()
+  }
+}
+
+async function deleteWorld(world: SingleplayerWorld) {
+  await delete_world(instance.value.path, world.path).catch(handleError)
+  worlds.value = worlds.value.filter((w) => w.type !== 'singleplayer' || w.path !== world.path)
+}
+
+function handleJoinError(err: unknown) {
+  handleError(err)
+  startingInstance.value = false
+  worldPlaying.value = undefined
+}
+
+async function joinWorld(world: World) {
+  console.log(`Joining world ${getWorldIdentifier(world)}`)
+  startingInstance.value = true
+  worldPlaying.value = world
+  if (world.type === 'server') {
+    await start_join_server(instance.value.path, world.address).catch(handleJoinError)
+  } else if (world.type === 'singleplayer') {
+    await start_join_singleplayer_world(instance.value.path, world.path).catch(handleJoinError)
+  }
+  play(world)
+  startingInstance.value = false
+}
+
+watch(
+  () => playing.value,
+  (playing) => {
+    if (!playing) {
+      worldPlaying.value = undefined
+
+      setTimeout(async () => {
+        for (const world of worlds.value) {
+          if (world.type === 'singleplayer' && world.locked) {
+            await refreshWorld(world.path)
+          }
+        }
+      }, 1000)
+    }
+  },
+)
+
+function worldsMatch(world: World, other: World | undefined) {
+  if (world.type === 'server' && other?.type === 'server') {
+    return world.address === other.address
+  } else if (world.type === 'singleplayer' && other?.type === 'singleplayer') {
+    return world.path === other.path
+  }
+  return false
+}
+
+const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
+const supportsQuickPlay = computed(() =>
+  hasQuickPlaySupport(gameVersions.value, instance.value.game_version),
+)
+
+const filterOptions = computed(() => {
+  const options: FilterBarOption[] = []
+
+  if (worlds.value.some((x) => x.type === 'singleplayer')) {
+    options.push({
+      id: 'singleplayer',
+      message: messages.singleplayer,
+    })
+  }
+
+  if (worlds.value.some((x) => x.type === 'server')) {
+    options.push({
+      id: 'server',
+      message: messages.server,
+    })
+
+    // add available filter if there's any offline ("unavailable") servers
+    if (
+      worlds.value.some(
+        (x) =>
+          x.type === 'server' &&
+          !serverData.value[x.address]?.status &&
+          !serverData.value[x.address]?.refreshing,
+      )
+    ) {
+      options.push({
+        id: 'available',
+        message: messages.available,
+      })
+    }
+  }
+
+  return options
+})
 
 const filteredWorlds = computed(() =>
   worlds.value.filter((x) => {
@@ -201,7 +388,7 @@ const filteredWorlds = computed(() =>
 
     return (
       (!typeFilter || filters.value.includes(x.type)) &&
-      (!availableFilter || x.type !== 'server' || serverStatus.value[x.address]) &&
+      (!availableFilter || x.type !== 'server' || serverData.value[x.address]?.status) &&
       (!searchFilter.value || x.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
     )
   }),
@@ -240,6 +427,21 @@ async function proceedDeleteWorld() {
 }
 
 onUnmounted(() => {
-  unlistenWorldsListener()
+  unlistenProfile()
+})
+
+const messages = defineMessages({
+  singleplayer: {
+    id: 'instance.worlds.type.singleplayer',
+    defaultMessage: 'Singleplayer',
+  },
+  server: {
+    id: 'instance.worlds.type.server',
+    defaultMessage: 'Server',
+  },
+  available: {
+    id: 'instance.worlds.filter.available',
+    defaultMessage: 'Available',
+  },
 })
 </script>

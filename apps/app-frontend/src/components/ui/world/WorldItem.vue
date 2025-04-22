@@ -45,7 +45,7 @@ const props = withDefaults(
     playingWorld?: boolean
     startingInstance?: boolean
     supportsQuickPlay?: boolean
-    currentProtocol: number | null
+    currentProtocol?: number | null
     highlighted?: boolean
 
     // Server only
@@ -298,7 +298,10 @@ const messages = defineMessages({
       </div>
       <div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
         <template v-if="world.type === 'singleplayer' || serverStatus">
-          <ButtonStyled v-if="(playingWorld || locked && playingInstance) && !startingInstance" color="red">
+          <ButtonStyled
+            v-if="(playingWorld || (locked && playingInstance)) && !startingInstance"
+            color="red"
+          >
             <button @click="emit('stop')">
               <StopCircleIcon aria-hidden="true" />
               {{ formatMessage(commonMessages.stopButton) }}

@@ -92,7 +92,7 @@ const stop = async (event: MouseEvent) => {
 }
 
 const unlistenProcesses = await process_listener(async () => {
-  await checkProcess();
+  await checkProcess()
 })
 
 const checkProcess = async () => {
@@ -112,7 +112,10 @@ onUnmounted(() => {
 <template>
   <SmartClickable>
     <template #clickable>
-      <router-link class="no-click-animation" :to="`/instance/${encodeURIComponent(instance.path)}`" />
+      <router-link
+        class="no-click-animation"
+        :to="`/instance/${encodeURIComponent(instance.path)}`"
+      />
     </template>
     <div
       class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised rounded-xl smart-clickable:highlight-on-hover"
@@ -124,15 +127,17 @@ onUnmounted(() => {
       />
       <div class="flex flex-col col-span-2 justify-between h-full">
         <div class="flex items-center gap-2">
-          <div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">{{ instance.name }}</div>
+          <div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">
+            {{ instance.name }}
+          </div>
         </div>
         <div class="flex items-center gap-2 text-sm text-secondary">
           <div
             v-tooltip="
-            instance.last_played
-              ? dayjs(instance.last_played).format('MMMM D, YYYY [at] h:mm A')
-              : null
-          "
+              instance.last_played
+                ? dayjs(instance.last_played).format('MMMM D, YYYY [at] h:mm A')
+                : null
+            "
             class="w-fit shrink-0"
             :class="{ 'cursor-help smart-clickable:allow-pointer-events': instance.last_played }"
           >
@@ -147,23 +152,23 @@ onUnmounted(() => {
           </div>
           •
           <span v-if="modpack" class="flex items-center gap-1 truncate text-secondary">
-          <router-link
-            class="inline-flex items-center gap-1 truncate hover:underline text-secondary"
-            :to="`/project/${modpack.id}`"
-          >
-            <Avatar :src="modpack.icon_url" size="16px" class="shrink-0" />
-            <span class="truncate">{{ modpack.title }}</span>
-          </router-link>
-          ({{ loader }} {{ instance.game_version }})
-        </span>
+            <router-link
+              class="inline-flex items-center gap-1 truncate hover:underline text-secondary"
+              :to="`/project/${modpack.id}`"
+            >
+              <Avatar :src="modpack.icon_url" size="16px" class="shrink-0" />
+              <span class="truncate">{{ modpack.title }}</span>
+            </router-link>
+            ({{ loader }} {{ instance.game_version }})
+          </span>
           <span v-else-if="loadingModpack" class="flex items-center gap-1 truncate text-secondary">
-          <SpinnerIcon class="animate-spin shrink-0" />
-          <span class="truncate">Loading modpack...</span>
-        </span>
+            <SpinnerIcon class="animate-spin shrink-0" />
+            <span class="truncate">Loading modpack...</span>
+          </span>
           <span v-else class="flex items-center gap-1 truncate text-secondary">
-          {{ loader }}
-          {{ instance.game_version }}
-        </span>
+            {{ loader }}
+            {{ instance.game_version }}
+          </span>
         </div>
       </div>
       <div class="flex gap-1 justify-end smart-clickable:allow-pointer-events">
@@ -187,16 +192,16 @@ onUnmounted(() => {
         <ButtonStyled circular type="transparent">
           <OverflowMenu
             :options="[
-            {
-              id: 'open-instance',
-              shown: !!instance.path,
-              action: () => router.push(encodeURI(`/instance/${instance.path}`)),
-            },
-            {
-              id: 'open-folder',
-              action: () => showProfileInFolder(instance.path),
-            },
-          ]"
+              {
+                id: 'open-instance',
+                shown: !!instance.path,
+                action: () => router.push(encodeURI(`/instance/${instance.path}`)),
+              },
+              {
+                id: 'open-folder',
+                action: () => showProfileInFolder(instance.path),
+              },
+            ]"
           >
             <MoreVerticalIcon aria-hidden="true" />
             <template #open-instance>

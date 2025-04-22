@@ -79,15 +79,15 @@
             <ButtonStyled size="large" type="transparent" circular>
               <OverflowMenu
                 :options="[
-                {
-                  id: 'open-folder',
-                  action: () => showProfileInFolder(instance.path),
-                },
-                {
-                  id: 'export-mrpack',
-                  action: () => $refs.exportModal.show(),
-                },
-              ]"
+                  {
+                    id: 'open-folder',
+                    action: () => showProfileInFolder(instance.path),
+                  },
+                  {
+                    id: 'export-mrpack',
+                    action: () => $refs.exportModal.show(),
+                  },
+                ]"
               >
                 <MoreVerticalIcon />
                 <template #share-instance> <UserPlusIcon /> Share instance </template>
@@ -146,7 +146,7 @@
       <template #enable><CheckCircleIcon />Enable selected</template>
       <template #hide_show><EyeIcon />Show/Hide unselected</template>
       <template #update_all
-      ><UpdatedIcon />Update {{ selected.length > 0 ? 'selected' : 'all' }}</template
+        ><UpdatedIcon />Update {{ selected.length > 0 ? 'selected' : 'all' }}</template
       >
       <template #filter_update><UpdatedIcon />Select Updatable</template>
     </ContextMenu>

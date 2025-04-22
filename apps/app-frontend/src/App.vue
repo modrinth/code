@@ -167,13 +167,17 @@ async function setupApp() {
     `https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
     'criticalAnnouncements',
     true,
-  ).then((res) => {
-    if (res && res.header && res.body) {
-      criticalErrorMessage.value = res
-    }
-  }).catch(() => {
-    console.log(`No critical announcement found at https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`);
-  })
+  )
+    .then((res) => {
+      if (res && res.header && res.body) {
+        criticalErrorMessage.value = res
+      }
+    })
+    .catch(() => {
+      console.log(
+        `No critical announcement found at https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
+      )
+    })
 
   useFetch(`https://modrinth.com/blog/news.json`, 'news', true).then((res) => {
     if (res && res.articles) {

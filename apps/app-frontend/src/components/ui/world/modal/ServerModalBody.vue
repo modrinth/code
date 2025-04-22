@@ -9,7 +9,7 @@ const name = defineModel<string>('name')
 const address = defineModel<string>('address')
 const resourcePack = defineModel<ServerPackStatus>('resourcePack')
 
-const resourcePackOptions: ServerPackStatus[] = [ 'enabled', 'prompt', 'disabled' ]
+const resourcePackOptions: ServerPackStatus[] = ['enabled', 'prompt', 'disabled']
 
 const resourcePackOptionMessages: Record<ServerPackStatus, MessageDescriptor> = defineMessages({
   enabled: {
@@ -49,8 +49,16 @@ defineExpose({ resourcePackOptions })
 </script>
 <template>
   <div class="w-[450px]">
-    <h2 class="text-lg font-extrabold text-contrast mt-0 mb-1">{{ formatMessage(messages.name) }}</h2>
-    <input v-model="name" type="text" :placeholder="formatMessage(messages.placeholderName)" class="w-full" autocomplete="off" />
+    <h2 class="text-lg font-extrabold text-contrast mt-0 mb-1">
+      {{ formatMessage(messages.name) }}
+    </h2>
+    <input
+      v-model="name"
+      type="text"
+      :placeholder="formatMessage(messages.placeholderName)"
+      class="w-full"
+      autocomplete="off"
+    />
     <h2 class="text-lg font-extrabold text-contrast mt-3 mb-1">
       {{ formatMessage(messages.address) }}
     </h2>
@@ -69,7 +77,9 @@ defineExpose({ resourcePackOptions })
         v-model="resourcePack"
         :options="resourcePackOptions"
         name="Server resource pack"
-        :display-name="(option: ServerPackStatus) => formatMessage(resourcePackOptionMessages[option])"
+        :display-name="
+          (option: ServerPackStatus) => formatMessage(resourcePackOptionMessages[option])
+        "
       />
     </div>
   </div>

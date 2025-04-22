@@ -41,7 +41,7 @@ export async function restartApp() {
  * @deprecated This method is no longer needed, and just returns its parameter
  */
 export function sanitizePotentialFileUrl(url) {
-  return url;
+  return url
 }
 
 export const releaseColor = (releaseType) => {

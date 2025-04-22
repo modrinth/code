@@ -30,14 +30,17 @@ const props = defineProps<{
   options: FilterBarOption[]
 }>()
 
-watch(() => props.options, () => {
-  for (let i = 0; i < selectedFilters.value.length; i++) {
-    const option = selectedFilters.value[i]
-    if (!props.options.some((x) => x.id === option)) {
-      selectedFilters.value.splice(i, 1)
+watch(
+  () => props.options,
+  () => {
+    for (let i = 0; i < selectedFilters.value.length; i++) {
+      const option = selectedFilters.value[i]
+      if (!props.options.some((x) => x.id === option)) {
+        selectedFilters.value.splice(i, 1)
+      }
     }
-  }
-})
+  },
+)
 
 function toggleFilter(option: string) {
   if (selectedFilters.value.includes(option)) {

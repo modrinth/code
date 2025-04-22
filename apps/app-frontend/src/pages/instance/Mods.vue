@@ -305,8 +305,6 @@ import { profile_listener } from '@/helpers/events.js'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import dayjs from 'dayjs'
-import type { GameInstance } from '@/helpers/types'
-import ContextMenu from '@/components/ui/ContextMenu.vue'
 
 const props = defineProps({
   instance: {

@@ -10,7 +10,6 @@ import {
   StopCircleIcon,
   ExternalIcon,
   EyeIcon,
-  ChevronRightIcon,
 } from '@modrinth/assets'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import Instance from '@/components/ui/Instance.vue'
@@ -45,7 +44,9 @@ const props = defineProps({
 })
 
 const actualInstances = computed(() =>
-  props.instances.filter((x) => x && x.instances && x.instances[0] && x.show === undefined || x.show),
+  props.instances.filter(
+    (x) => (x && x.instances && x.instances[0] && x.show === undefined) || x.show,
+  ),
 )
 
 const modsRow = ref(null)
@@ -237,11 +238,8 @@ onUnmounted(() => {
     @proceed="deleteProfile"
   />
   <div ref="rowContainer" class="flex flex-col gap-4">
-    <div v-for="(row) in actualInstances" ref="rows" :key="row.label" class="row">
-      <HeadingLink
-        class="mt-1"
-        :to="row.route"
-      >
+    <div v-for="row in actualInstances" ref="rows" :key="row.label" class="row">
+      <HeadingLink class="mt-1" :to="row.route">
         {{ row.label }}
       </HeadingLink>
       <section

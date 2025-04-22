@@ -21,7 +21,6 @@ defineOptions({
   }
 
   .smart-clickable__contents {
-
     // Utility classes for contents
     :deep(.smart-clickable\:allow-pointer-events) {
       pointer-events: all;
@@ -31,7 +30,6 @@ defineOptions({
 
 // Only apply effects when a clickable is present
 .smart-clickable.smart-clickable--has-clickable {
-
   // Setup base styles for contents
   .smart-clickable__contents {
     transition: scale 0.125s ease-out;

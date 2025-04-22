@@ -6,8 +6,7 @@ import FloatingVue from 'floating-vue'
 import 'floating-vue/dist/style.css'
 import { createPlugin } from '@vintl/vintl/plugin'
 import * as Sentry from '@sentry/vue'
-import { VueScanPlugin } from "@taijased/vue-render-tracker";
-
+import { VueScanPlugin } from '@taijased/vue-render-tracker'
 
 const VIntlPlugin = createPlugin({
   controllerOpts: {
@@ -31,7 +30,7 @@ const vueScan = new VueScanPlugin({
   showOverlay: true, // Show overlay to visualize renders
   log: false, // Log render events to the console
   playSound: false, // Play sound on each render
-});
+})
 
 const pinia = createPinia()
 
