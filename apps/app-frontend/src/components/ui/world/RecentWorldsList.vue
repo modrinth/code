@@ -124,7 +124,7 @@ async function populateJumpBackIn() {
 
   const instanceItems: InstanceJumpBackInItem[] = []
   props.recentInstances.forEach((instance) => {
-    if(worldItems.some((item) => item.instance.path === instance.path) || !instance.last_played) {
+    if (worldItems.some((item) => item.instance.path === instance.path) || !instance.last_played) {
       return
     }
 
@@ -143,7 +143,7 @@ async function populateJumpBackIn() {
 }
 
 async function refreshServer(address: string, instancePath: string) {
-  await refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address);
+  await refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
 }
 
 async function joinWorld(world: WorldWithProfile) {
@@ -178,10 +178,10 @@ const unlistenProfiles = await profile_listener(async () => {
 const runningInstances = ref<string[]>([])
 
 type ProcessMetadata = {
-  uuid: string;
-  profile_path: string;
-  start_time: string;
-};
+  uuid: string
+  profile_path: string
+  start_time: string
+}
 
 const checkProcesses = async () => {
   const runningProcesses: ProcessMetadata[] = await get_all().catch(handleError)
@@ -209,7 +209,11 @@ onUnmounted(() => {
 
 <template>
   <div v-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
-    <HeadingLink v-if="(theme.featureFlags as Record<string, boolean>)['worlds_tab']" to="/worlds" class="mt-1">
+    <HeadingLink
+      v-if="(theme.featureFlags as Record<string, boolean>)['worlds_tab']"
+      to="/worlds"
+      class="mt-1"
+    >
       Jump back in
     </HeadingLink>
     <span
@@ -249,7 +253,12 @@ onUnmounted(() => {
           :instance-path="item.instance.path"
           :instance-name="item.instance.name"
           :instance-icon="item.instance.icon_path"
-          @refresh="() => (item.world.type === 'server' ? refreshServer(item.world.address, item.instance.path) : {})"
+          @refresh="
+            () =>
+              item.world.type === 'server'
+                ? refreshServer(item.world.address, item.instance.path)
+                : {}
+          "
           @play="
             () => {
               currentProfile = item.instance.path
