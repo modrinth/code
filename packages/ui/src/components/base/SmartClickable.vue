@@ -37,7 +37,7 @@ defineOptions({
     transition: scale 0.125s ease-out;
 
     // Why? I don't know. It forces the SVGs to render differently, which fixes some shift on hover otherwise.
-    filter: brightness(1.00001);
+    //filter: brightness(1.00001);
   }
 
   // When clickable is being hovered or focus-visible, give contents an effect
