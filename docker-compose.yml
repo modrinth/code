@@ -32,6 +32,9 @@ services:
     image: clickhouse/clickhouse-server
     ports:
       - '8123:8123'
+    environment:
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: default
 volumes:
   meilisearch-data:
   db-data:

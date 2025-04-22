@@ -189,6 +189,10 @@ export const commonMessages = defineMessages({
     id: 'button.upload-image',
     defaultMessage: 'Upload image',
   },
+  removeImageButton: {
+    id: 'button.remove-image',
+    defaultMessage: 'Remove image',
+  },
   visibilityLabel: {
     id: 'label.visibility',
     defaultMessage: 'Visibility',

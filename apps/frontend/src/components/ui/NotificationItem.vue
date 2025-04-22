@@ -430,7 +430,7 @@ async function performAction(notification, actionIndex) {
     app.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

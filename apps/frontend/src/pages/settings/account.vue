@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ModalConfirm
+    <ConfirmModal
       ref="modal_confirm"
       title="Are you sure you want to delete your account?"
       description="This will **immediately delete all of your user data and follows**. This will not delete your projects. Deleting your account cannot be reversed.<br><br>If you need help with your account, get support on the [Modrinth Discord](https://discord.modrinth.com)."
@@ -421,6 +421,7 @@ import {
   DownloadIcon,
 } from "@modrinth/assets";
 import QrcodeVue from "qrcode.vue";
+import { ConfirmModal } from "@modrinth/ui";
 import GitHubIcon from "assets/icons/auth/sso-github.svg";
 import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
 import GoogleIcon from "assets/icons/auth/sso-google.svg";
@@ -428,7 +429,6 @@ import SteamIcon from "assets/icons/auth/sso-steam.svg";
 import DiscordIcon from "assets/icons/auth/sso-discord.svg";
 import KeyIcon from "assets/icons/auth/key.svg";
 import GitLabIcon from "assets/icons/auth/sso-gitlab.svg";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import Modal from "~/components/ui/Modal.vue";
 
 useHead({
@@ -463,7 +463,7 @@ async function saveEmail() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -495,7 +495,7 @@ async function savePassword() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -532,7 +532,7 @@ async function showTwoFactorModal() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -622,7 +622,7 @@ async function deleteAccount() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }
@@ -652,7 +652,7 @@ async function exportData() {
     data.$notify({
       group: "main",
       title: "An error occurred",
-      text: err.data.description,
+      text: err.data ? err.data.description : err,
       type: "error",
     });
   }

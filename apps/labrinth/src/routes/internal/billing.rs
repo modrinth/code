@@ -206,7 +206,7 @@ pub async fn refund_charge(
             ));
         }
 
-        let (id, net) = if refund_amount != 0 {
+        let (id, net) = if refund_amount == 0 {
             (None, None)
         } else {
             match charge.payment_platform {

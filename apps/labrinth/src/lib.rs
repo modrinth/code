@@ -425,6 +425,8 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("SMTP_USERNAME");
     failed |= check_var::<String>("SMTP_PASSWORD");
     failed |= check_var::<String>("SMTP_HOST");
+    failed |= check_var::<u16>("SMTP_PORT");
+    failed |= check_var::<String>("SMTP_TLS");
 
     failed |= check_var::<String>("SITE_VERIFY_EMAIL_PATH");
     failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");
