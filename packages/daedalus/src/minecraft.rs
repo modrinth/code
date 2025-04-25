@@ -402,6 +402,44 @@ pub enum ArgumentType {
     Jvm,
 }
 
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash)]
+#[serde(rename_all = "snake_case")]
+/// The physical side of the logging configuration
+pub enum LoggingSide {
+    /// Client logging configuration
+    Client,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+/// File download information for a logging configuration
+pub struct LogConfigDownload {
+    /// The path that the logging configuration should be saved to
+    pub id: String,
+    /// The SHA1 hash of the logging configuration
+    pub sha1: String,
+    /// The size of the logging configuration
+    pub size: u32,
+    /// The URL where the logging configuration can be downloaded
+    pub url: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(
+    tag = "type",
+    rename_all = "kebab-case",
+    rename_all_fields = "camelCase"
+)]
+/// Information about a version's logging configuration
+pub enum LoggingConfiguration {
+    /// Use a log4j2 XML log config file
+    Log4j2Xml {
+        /// The JVM argument for passing the file to the Java process
+        argument: String,
+        /// The config file to download
+        file: LogConfigDownload,
+    },
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 /// Information about a version
@@ -422,6 +460,9 @@ pub struct VersionInfo {
     pub java_version: Option<JavaVersion>,
     /// Libraries that the version depends on
     pub libraries: Vec<Library>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// The logging configuration data for the game
+    pub logging: Option<HashMap<LoggingSide, LoggingConfiguration>>,
     /// The classpath to the main class to launch the game
     pub main_class: String,
     #[serde(skip_serializing_if = "Option::is_none")]

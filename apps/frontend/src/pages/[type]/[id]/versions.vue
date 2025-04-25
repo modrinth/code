@@ -98,6 +98,21 @@
                 action: () => (auth.user ? reportVersion(version.id) : navigateTo('/auth/sign-in')),
                 shown: !currentMember,
               },
+              { divider: true, shown: currentMember || flags.developerMode },
+              {
+                id: 'copy-id',
+                action: () => {
+                  copyToClipboard(version.id);
+                },
+                shown: currentMember || flags.developerMode,
+              },
+              {
+                id: 'copy-maven',
+                action: () => {
+                  copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`);
+                },
+                shown: flags.developerMode,
+              },
               { divider: true, shown: currentMember },
               {
                 id: 'edit',
@@ -148,6 +163,14 @@
               <TrashIcon aria-hidden="true" />
               Delete
             </template>
+            <template #copy-id>
+              <ClipboardCopyIcon aria-hidden="true" />
+              Copy ID
+            </template>
+            <template #copy-maven>
+              <ClipboardCopyIcon aria-hidden="true" />
+              Copy Modrinth Maven
+            </template>
           </OverflowMenu>
         </ButtonStyled>
       </template>
@@ -174,6 +197,7 @@ import {
   ReportIcon,
   UploadIcon,
   InfoIcon,
+  ClipboardCopyIcon,
 } from "@modrinth/assets";
 import DropArea from "~/components/ui/DropArea.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";

@@ -17,14 +17,17 @@ actix-multipart = "0.6.1"
 actix-cors = "0.7.0"
 actix-ws = "0.3.0"
 actix-files = "0.6.5"
-actix-web-prom = { version = "0.8.0", features = ["process"] }
-governor = "0.6.3"
+prometheus = "0.13.4"
+actix-web-prom = { version = "0.9.0", features = ["process"] }
 
-tokio = { version = "1.35.1", features = ["sync"] }
+tracing = "0.1.41"
+tracing-actix-web = "0.7.16"
+console-subscriber = "0.4.1"
+
+tokio = { version = "1.35.1", features = ["sync", "rt-multi-thread"] }
 tokio-stream = "0.1.14"
 
 futures = "0.3.30"
-futures-timer = "3.0.2"
 futures-util = "0.3.30"
 async-trait = "0.1.70"
 dashmap = "5.4.0"
@@ -36,13 +39,12 @@ reqwest = { version = "0.11.18", features = ["json", "multipart"] }
 hyper = { version = "0.14", features = ["full"] }
 hyper-tls = "0.5.0"
 
-serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 serde_with = "3.0.0"
 chrono = { version = "0.4.26", features = ["serde"] }
 yaserde = "0.12.0"
 yaserde_derive = "0.12.0"
-xml-rs = "0.8.15"
 
 rand = "0.8.5"
 rand_chacha = "0.3.1"
@@ -71,9 +73,8 @@ censor = "0.3.0"
 spdx = { version = "0.10.3", features = ["text"] }
 
 dotenvy = "0.15.7"
-log = "0.4.20"
-env_logger = "0.10.1"
 thiserror = "1.0.56"
+either = "1.13"
 
 sqlx = { version = "0.8.2", features = [
     "runtime-tokio-rustls",
@@ -118,14 +119,24 @@ lettre = "0.11.3"
 derive-new = "0.6.0"
 rust_iso3166 = "0.1.11"
 
-jemallocator = { version = "0.5.4", optional = true }
-
 async-stripe = { version = "0.39.1", features = ["runtime-tokio-hyper-rustls"] }
 rusty-money = "0.4.1"
 json-patch = "*"
 
+ariadne = { path = "../../packages/ariadne" }
+
+clap = { version = "4.5", features = ["derive"] }
+iana-time-zone = "0.1.61"
+
+[target.'cfg(not(target_env = "msvc"))'.dependencies]
+tikv-jemallocator = { version = "0.6.0", features = ["profiling", "unprefixed_malloc_on_supported_platforms"] }
+tikv-jemalloc-ctl = { version = "0.6.0", features = ["stats"] }
+jemalloc_pprof = { version = "0.7.0", features = ["flamegraph"] }
+
 [dev-dependencies]
 actix-http = "3.4.0"
 
-[features]
-jemalloc = ["jemallocator"]
+[build-dependencies]
+dotenv-build = "0.1.1"
+chrono = "0.4.38"
+iana-time-zone = "0.1.60"

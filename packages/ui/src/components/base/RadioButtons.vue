@@ -10,14 +10,14 @@
       }"
       @click="selected = item"
     >
-      <RadioButtonChecked v-if="selected === item" class="text-brand h-5 w-5" />
+      <RadioButtonCheckedIcon v-if="selected === item" class="text-brand h-5 w-5" />
       <RadioButtonIcon v-else class="h-5 w-5" />
       <slot :item="item" />
     </button>
   </div>
 </template>
 <script setup lang="ts" generic="T">
-import { RadioButtonIcon, RadioButtonChecked } from '@modrinth/assets'
+import { RadioButtonIcon, RadioButtonCheckedIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 const props = withDefaults(

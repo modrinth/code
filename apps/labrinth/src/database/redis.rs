@@ -1,8 +1,9 @@
 use super::models::DatabaseError;
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
+use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
+use prometheus::{IntGauge, Registry};
 use redis::{cmd, Cmd, ExistenceCheck, SetExpiry, SetOptions};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -18,6 +19,7 @@ const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
 
 #[derive(Clone)]
 pub struct RedisPool {
+    pub url: String,
     pub pool: deadpool_redis::Pool,
     meta_namespace: String,
 }
@@ -32,25 +34,67 @@ impl RedisPool {
     // testing pool uses a hashmap to mimic redis behaviour for very small data sizes (ie: tests)
     // PANICS: production pool will panic if redis url is not set
     pub fn new(meta_namespace: Option<String>) -> Self {
-        let redis_pool = Config::from_url(
-            dotenvy::var("REDIS_URL").expect("Redis URL not set"),
-        )
-        .builder()
-        .expect("Error building Redis pool")
-        .max_size(
-            dotenvy::var("DATABASE_MAX_CONNECTIONS")
-                .ok()
-                .and_then(|x| x.parse().ok())
-                .unwrap_or(10000),
-        )
-        .runtime(Runtime::Tokio1)
-        .build()
-        .expect("Redis connection failed");
+        let url = dotenvy::var("REDIS_URL").expect("Redis URL not set");
+        let pool = Config::from_url(url.clone())
+            .builder()
+            .expect("Error building Redis pool")
+            .max_size(
+                dotenvy::var("REDIS_MAX_CONNECTIONS")
+                    .ok()
+                    .and_then(|x| x.parse().ok())
+                    .unwrap_or(10000),
+            )
+            .runtime(Runtime::Tokio1)
+            .build()
+            .expect("Redis connection failed");
 
         RedisPool {
-            pool: redis_pool,
+            url,
+            pool,
             meta_namespace: meta_namespace.unwrap_or("".to_string()),
         }
+    }
+
+    pub async fn register_and_set_metrics(
+        &self,
+        registry: &Registry,
+    ) -> Result<(), prometheus::Error> {
+        let redis_max_size = IntGauge::new(
+            "labrinth_redis_pool_max_size",
+            "Maximum size of Redis pool",
+        )?;
+        let redis_size = IntGauge::new(
+            "labrinth_redis_pool_size",
+            "Current size of Redis pool",
+        )?;
+        let redis_available = IntGauge::new(
+            "labrinth_redis_pool_available",
+            "Available connections in Redis pool",
+        )?;
+        let redis_waiting = IntGauge::new(
+            "labrinth_redis_pool_waiting",
+            "Number of futures waiting for a Redis connection",
+        )?;
+
+        registry.register(Box::new(redis_max_size.clone()))?;
+        registry.register(Box::new(redis_size.clone()))?;
+        registry.register(Box::new(redis_available.clone()))?;
+        registry.register(Box::new(redis_waiting.clone()))?;
+
+        let redis_pool_ref = self.pool.clone();
+        tokio::spawn(async move {
+            loop {
+                let status = redis_pool_ref.status();
+                redis_max_size.set(status.max_size as i64);
+                redis_size.set(status.size as i64);
+                redis_available.set(status.available as i64);
+                redis_waiting.set(status.waiting as i64);
+
+                tokio::time::sleep(Duration::from_secs(5)).await;
+            }
+        });
+
+        Ok(())
     }
 
     pub async fn connect(&self) -> Result<RedisConnection, DatabaseError> {
@@ -180,8 +224,6 @@ impl RedisPool {
             + Serialize,
         S: Display + Clone + DeserializeOwned + Serialize + Debug,
     {
-        let connection = self.connect().await?.connection;
-
         let ids = keys
             .iter()
             .map(|x| (x.to_string(), x.clone()))
@@ -191,49 +233,21 @@ impl RedisPool {
             return Ok(HashMap::new());
         }
 
-        let get_cached_values =
-            |ids: DashMap<String, I>,
-             mut connection: deadpool_redis::Connection| async move {
-                let slug_ids = if let Some(slug_namespace) = slug_namespace {
-                    cmd("MGET")
-                        .arg(
-                            ids.iter()
-                                .map(|x| {
-                                    format!(
-                                        "{}_{slug_namespace}:{}",
-                                        self.meta_namespace,
-                                        if case_sensitive {
-                                            x.value().to_string()
-                                        } else {
-                                            x.value().to_string().to_lowercase()
-                                        }
-                                    )
-                                })
-                                .collect::<Vec<_>>(),
-                        )
-                        .query_async::<Vec<Option<String>>>(&mut connection)
-                        .await?
-                        .into_iter()
-                        .flatten()
-                        .collect::<Vec<_>>()
-                } else {
-                    Vec::new()
-                };
-
-                let cached_values = cmd("MGET")
+        let get_cached_values = |ids: DashMap<String, I>| async move {
+            let slug_ids = if let Some(slug_namespace) = slug_namespace {
+                let mut connection = self.pool.get().await?;
+                cmd("MGET")
                     .arg(
                         ids.iter()
-                            .map(|x| x.value().to_string())
-                            .chain(ids.iter().filter_map(|x| {
-                                parse_base62(&x.value().to_string())
-                                    .ok()
-                                    .map(|x| x.to_string())
-                            }))
-                            .chain(slug_ids)
                             .map(|x| {
                                 format!(
-                                    "{}_{namespace}:{x}",
-                                    self.meta_namespace
+                                    "{}_{slug_namespace}:{}",
+                                    self.meta_namespace,
+                                    if case_sensitive {
+                                        x.value().to_string()
+                                    } else {
+                                        x.value().to_string().to_lowercase()
+                                    }
                                 )
                             })
                             .collect::<Vec<_>>(),
@@ -241,23 +255,46 @@ impl RedisPool {
                     .query_async::<Vec<Option<String>>>(&mut connection)
                     .await?
                     .into_iter()
-                    .filter_map(|x| {
-                        x.and_then(|val| {
-                            serde_json::from_str::<RedisValue<T, K, S>>(&val)
-                                .ok()
-                        })
-                        .map(|val| (val.key.clone(), val))
-                    })
-                    .collect::<HashMap<_, _>>();
-
-                Ok::<_, DatabaseError>((cached_values, connection, ids))
+                    .flatten()
+                    .collect::<Vec<_>>()
+            } else {
+                Vec::new()
             };
+
+            let mut connection = self.pool.get().await?;
+            let cached_values = cmd("MGET")
+                .arg(
+                    ids.iter()
+                        .map(|x| x.value().to_string())
+                        .chain(ids.iter().filter_map(|x| {
+                            parse_base62(&x.value().to_string())
+                                .ok()
+                                .map(|x| x.to_string())
+                        }))
+                        .chain(slug_ids)
+                        .map(|x| {
+                            format!("{}_{namespace}:{x}", self.meta_namespace)
+                        })
+                        .collect::<Vec<_>>(),
+                )
+                .query_async::<Vec<Option<String>>>(&mut connection)
+                .await?
+                .into_iter()
+                .filter_map(|x| {
+                    x.and_then(|val| {
+                        serde_json::from_str::<RedisValue<T, K, S>>(&val).ok()
+                    })
+                    .map(|val| (val.key.clone(), val))
+                })
+                .collect::<HashMap<_, _>>();
+
+            Ok::<_, DatabaseError>((cached_values, ids))
+        };
 
         let current_time = Utc::now();
         let mut expired_values = HashMap::new();
 
-        let (cached_values_raw, mut connection, ids) =
-            get_cached_values(ids, connection).await?;
+        let (cached_values_raw, ids) = get_cached_values(ids).await?;
         let mut cached_values = cached_values_raw
             .into_iter()
             .filter_map(|(key, val)| {
@@ -308,9 +345,12 @@ impl RedisPool {
                         .with_expiration(SetExpiry::EX(60)),
                 );
             });
-            let results = pipe
-                .query_async::<Vec<Option<i32>>>(&mut connection)
-                .await?;
+            let results = {
+                let mut connection = self.pool.get().await?;
+
+                pipe.query_async::<Vec<Option<i32>>>(&mut connection)
+                    .await?
+            };
 
             for (idx, key) in fetch_ids.into_iter().enumerate() {
                 if let Some(locked) = results.get(idx) {
@@ -443,6 +483,7 @@ impl RedisPool {
                     ));
                 }
 
+                let mut connection = self.pool.get().await?;
                 pipe.query_async::<()>(&mut connection).await?;
 
                 Ok(return_values)
@@ -451,28 +492,29 @@ impl RedisPool {
 
         if !subscribe_ids.is_empty() {
             fetch_tasks.push(Box::pin(async {
-                let mut connection = self.pool.get().await?;
-
                 let mut interval =
                     tokio::time::interval(Duration::from_millis(100));
                 let start = Utc::now();
                 loop {
-                    let results = cmd("MGET")
-                        .arg(
-                            subscribe_ids
-                                .iter()
-                                .map(|x| {
-                                    format!(
-                                        "{}_{namespace}:{}/lock",
-                                        self.meta_namespace,
-                                        // We lowercase key because locks are stored in lowercase
-                                        x.key().to_lowercase()
-                                    )
-                                })
-                                .collect::<Vec<_>>(),
-                        )
-                        .query_async::<Vec<Option<String>>>(&mut connection)
-                        .await?;
+                    let results = {
+                        let mut connection = self.pool.get().await?;
+                        cmd("MGET")
+                            .arg(
+                                subscribe_ids
+                                    .iter()
+                                    .map(|x| {
+                                        format!(
+                                            "{}_{namespace}:{}/lock",
+                                            self.meta_namespace,
+                                            // We lowercase key because locks are stored in lowercase
+                                            x.key().to_lowercase()
+                                        )
+                                    })
+                                    .collect::<Vec<_>>(),
+                            )
+                            .query_async::<Vec<Option<String>>>(&mut connection)
+                            .await?
+                    };
 
                     if results.into_iter().all(|x| x.is_none()) {
                         break;
@@ -485,8 +527,8 @@ impl RedisPool {
                     interval.tick().await;
                 }
 
-                let (return_values, _, _) =
-                    get_cached_values(subscribe_ids, connection).await?;
+                let (return_values, _) =
+                    get_cached_values(subscribe_ids).await?;
 
                 Ok(return_values)
             }));

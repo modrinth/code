@@ -126,6 +126,7 @@
   max-width: 80rem;
   column-gap: 0.75rem;
   padding: 0 1.5rem;
+  padding-bottom: 1.5rem;
 
   grid-template:
     "header"
@@ -140,6 +141,8 @@
     right: 1rem;
     z-index: 100;
     max-width: calc(100% - 2rem);
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
 
     > div {
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);

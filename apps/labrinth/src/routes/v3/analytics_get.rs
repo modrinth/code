@@ -6,12 +6,13 @@ use crate::{
     auth::get_user_from_headers,
     database::models::user_item,
     models::{
-        ids::{base62_impl::to_base62, ProjectId, VersionId},
+        ids::{ProjectId, VersionId},
         pats::Scopes,
     },
     queue::session::AuthQueue,
 };
 use actix_web::{web, HttpRequest, HttpResponse};
+use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::types::PgInterval;

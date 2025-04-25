@@ -1,10 +1,13 @@
 use super::ids::{ProjectId, UserId};
 use super::{CollectionId, ReportId, ThreadId};
 use crate::database::models;
+use crate::database::models::charge_item::ChargeItem;
+use crate::database::models::user_subscription_item::UserSubscriptionItem;
 use crate::database::models::{DatabaseError, OrganizationId};
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
+use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
+use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
@@ -652,6 +655,35 @@ impl User {
                 DELETE FROM friends
                 WHERE user_id = $1 OR friend_id = $1
                 ",
+                id as UserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            let open_subscriptions =
+                UserSubscriptionItem::get_all_user(id, &mut **transaction)
+                    .await?;
+
+            for x in open_subscriptions {
+                let charge =
+                    ChargeItem::get_open_subscription(x.id, &mut **transaction)
+                        .await?;
+                if let Some(mut charge) = charge {
+                    charge.status = ChargeStatus::Cancelled;
+                    charge.due = Utc::now();
+                    charge.user_id = deleted_user;
+
+                    charge.upsert(transaction).await?;
+                }
+            }
+
+            sqlx::query!(
+                "
+                UPDATE users_subscriptions
+                SET user_id = $1
+                WHERE user_id = $2
+                ",
+                deleted_user as UserId,
                 id as UserId,
             )
             .execute(&mut **transaction)

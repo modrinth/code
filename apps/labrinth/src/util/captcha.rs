@@ -8,6 +8,13 @@ pub async fn check_hcaptcha(
     req: &HttpRequest,
     challenge: &str,
 ) -> Result<bool, ApiError> {
+    let secret = dotenvy::var("HCAPTCHA_SECRET")?;
+
+    if secret.is_empty() || secret == "none" {
+        tracing::info!("hCaptcha secret not set, skipping check");
+        return Ok(true);
+    }
+
     let conn_info = req.connection_info().clone();
     let ip_addr = if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
         if let Some(header) = req.headers().get("CF-Connecting-IP") {
@@ -30,7 +37,6 @@ pub async fn check_hcaptcha(
 
     let mut form = HashMap::new();
 
-    let secret = dotenvy::var("HCAPTCHA_SECRET")?;
     form.insert("response", challenge);
     form.insert("secret", &*secret);
     form.insert("remoteip", ip_addr);
