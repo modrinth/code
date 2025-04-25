@@ -67,10 +67,10 @@
 
             if (x.author) {
               item.creator = {
-              name: x.author.name,
-              type: x.author.type,
-              id: x.author.slug,
-              link: `https://modrinth.com/${x.author.type}/${x.author.slug}`,
+                name: x.author.name,
+                type: x.author.type,
+                id: x.author.slug,
+                link: `https://modrinth.com/${x.author.type}/${x.author.slug}`,
                 linkProps: { target: '_blank' },
               }
             }

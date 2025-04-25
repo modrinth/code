@@ -193,7 +193,7 @@ async function fetchProjectData() {
   const project = await get_project(route.params.id, 'must_revalidate').catch(handleError)
 
   if (!project) {
-    handleError("Error loading project")
+    handleError('Error loading project')
     return
   }
 
