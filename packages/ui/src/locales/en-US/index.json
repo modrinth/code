@@ -32,6 +32,9 @@
   "button.remove": {
     "defaultMessage": "Remove"
   },
+  "button.remove-image": {
+    "defaultMessage": "Remove image"
+  },
   "button.report": {
     "defaultMessage": "Report"
   },
