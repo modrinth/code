@@ -253,12 +253,16 @@ pub(super) static PROFILE_CACHE: Mutex<
 > = Mutex::const_new(HashMap::with_hasher(BuildHasherDefault::new()));
 
 impl Credentials {
-    /// Refreshes the authentication tokens for this user if they are expired.
+    /// Refreshes the authentication tokens for this user if they are expired, or
+    /// very close to expiration.
     async fn refresh(
         &mut self,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<()> {
-        if self.expires > Utc::now() {
+        // Use a margin of 5 minutes to give e.g. Minecraft and potentially
+        // other operations that depend on a fresh token 5 minutes to complete
+        // from now, and deal with some classes of clock skew
+        if self.expires > Utc::now() + Duration::minutes(5) {
             return Ok(());
         }
 
