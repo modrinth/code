@@ -1,8 +1,13 @@
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone, TS)]
+#[ts(
+    export,
+    export_to = "../../../apps/app-frontend/src/helpers/lib-types.d.ts"
+)]
 pub struct JavaVersion {
     pub major_version: u32,
     pub version: String,

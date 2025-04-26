@@ -35,6 +35,13 @@
     "test": {
       "env": ["SQLX_OFFLINE", "DATABASE_URL"]
     },
+    "@modrinth/app-lib#test": {
+      "env": [
+        "SQLX_OFFLINE",
+        "DATABASE_URL"
+      ],
+      "dependsOn": ["@modrinth/app#test"]
+    },
     "fix": {
       "cache": false
     }
