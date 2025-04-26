@@ -151,7 +151,6 @@ fn main() {
                         "profile_update_managed_modrinth_version",
                         "profile_repair_managed_modrinth",
                         "profile_run",
-                        "profile_run_credentials",
                         "profile_kill",
                         "profile_edit",
                         "profile_edit_icon",
