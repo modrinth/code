@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import {
   ArrowBigUpDashIcon,
+  ChangeSkinIcon,
   CompassIcon,
   DownloadIcon,
   HomeIcon,
@@ -398,6 +399,9 @@ function handleAuxClick(e) {
         :is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
       >
         <CompassIcon />
+      </NavButton>
+      <NavButton v-tooltip.right="'Skins'" to="/skins">
+        <ChangeSkinIcon />
       </NavButton>
       <NavButton
         v-tooltip.right="'Library'"
