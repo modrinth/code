@@ -289,8 +289,14 @@
                 v-if="flags.newProjectCards"
                 :to="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`"
               >
-                <NewProjectCard :project="result" :categories="result.display_categories">
-                  <template v-if="false" #actions></template>
+                <NewProjectCard
+                  v-if="flags.newProjectCards"
+                  :project="result"
+                  :categories="result.display_categories"
+                  :link="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`"
+                  :creator-link="`/user/${result.author}`"
+                >
+                  <template v-if="false" #actions> </template>
                 </NewProjectCard>
               </NuxtLink>
             </template>

@@ -44,6 +44,7 @@ pub struct Settings {
 pub enum FeatureFlag {
     PagePath,
     ProjectBackground,
+    ProjectCardBackground,
 }
 
 impl Settings {

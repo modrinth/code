@@ -69,7 +69,10 @@
               name: x.author.name,
               type: x.author.type,
               id: x.author.slug,
-              link: `https://modrinth.com/${x.author.type}/${x.author.slug}`,
+              link: {
+                path: `/${x.author.type}/${x.author.slug}`,
+                query: { i: props.instance.path },
+              },
               linkProps: { target: '_blank' },
             }
           }
