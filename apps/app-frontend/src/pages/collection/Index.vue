@@ -1,8 +1,21 @@
 <template>
   <Teleport to="#sidebar-teleport-target">
-    <CollectionSidebarDescription v-if="collection" :collection="collection" class="project-sidebar-section" />
-    <CollectionSidebarCurator v-if="curator" :user="curator" :link="`/user/${curator.id}`" class="project-sidebar-section" />
-    <CollectionSidebarDetails v-if="collection" :collection="collection" class="project-sidebar-section" />
+    <CollectionSidebarDescription
+      v-if="collection"
+      :collection="collection"
+      class="project-sidebar-section"
+    />
+    <CollectionSidebarCurator
+      v-if="curator"
+      :user="curator"
+      :link="`/user/${curator.id}`"
+      class="project-sidebar-section"
+    />
+    <CollectionSidebarDetails
+      v-if="collection"
+      :collection="collection"
+      class="project-sidebar-section"
+    />
   </Teleport>
   <div v-if="collection" class="p-6 flex flex-col gap-4">
     <InstanceIndicator :instance="instance" />
@@ -10,9 +23,7 @@
       <template #actions>
         <ButtonStyled v-if="themeStore.devMode" circular type="transparent" size="large">
           <OverflowMenu
-            :options="[
-                  { id: 'copy-id', action: () => copyId(), shown: themeStore.devMode },
-                ]"
+            :options="[{ id: 'copy-id', action: () => copyId(), shown: themeStore.devMode }]"
             aria-label="More options"
           >
             <MoreVerticalIcon aria-hidden="true" />
@@ -25,9 +36,17 @@
       </template>
     </CollectionHeader>
     <div v-if="projects">
-      <ProjectsList :projects="projects" :project-link="(project) => `/project/${project.id}${instanceQueryAppendage}`" :experimental-colors="themeStore.featureFlags.project_card_background">
+      <ProjectsList
+        :projects="projects"
+        :project-link="(project) => `/project/${project.id}${instanceQueryAppendage}`"
+        :experimental-colors="themeStore.featureFlags.project_card_background"
+      >
         <template #project-actions="{ project }">
-          <ProjectCardActions :instance="instance" :instance-content="instanceContent" :project="project" />
+          <ProjectCardActions
+            :instance="instance"
+            :instance-content="instanceContent"
+            :project="project"
+          />
         </template>
       </ProjectsList>
     </div>
@@ -43,7 +62,10 @@ import {
   ButtonStyled,
   commonMessages,
   OverflowMenu,
-  CollectionHeader, CollectionSidebarCurator, CollectionSidebarDescription, CollectionSidebarDetails
+  CollectionHeader,
+  CollectionSidebarCurator,
+  CollectionSidebarDescription,
+  CollectionSidebarDetails,
 } from '@modrinth/ui'
 import { ClipboardCopyIcon, MoreVerticalIcon } from '@modrinth/assets'
 import { useVIntl } from '@vintl/vintl'
@@ -64,14 +86,18 @@ const curator: Ref<User | null> = ref(null)
 const projects: Ref<Project[]> = ref([])
 
 async function fetchCollection() {
-  collection.value = await useFetch(`https://api.modrinth.com/v3/collection/${route.params.id}`).catch(handleError)
+  collection.value = await useFetch(
+    `https://api.modrinth.com/v3/collection/${route.params.id}`,
+  ).catch(handleError)
 
   if (!collection.value) {
-    return;
+    return
   }
 
-  [ projects.value, curator.value ] = await Promise.all([
-    useFetch(`https://api.modrinth.com/v2/projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}`),
+  ;[projects.value, curator.value] = await Promise.all([
+    useFetch(
+      `https://api.modrinth.com/v2/projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}`,
+    ),
     useFetch(`https://api.modrinth.com/v2/user/${collection.value.user}`).catch(handleError),
   ])
 
@@ -94,10 +120,9 @@ watch(
 
 const themeStore = useTheming()
 
-
 async function copyId() {
   if (collection.value) {
-    await navigator.clipboard.writeText(String(collection.value.id));
+    await navigator.clipboard.writeText(String(collection.value.id))
   }
 }
 </script>

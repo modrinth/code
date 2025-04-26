@@ -1,16 +1,23 @@
 <template>
   <Teleport to="#sidebar-teleport-target">
-    <OrganizationSidebarMembers v-if="organization" :members="organization.members" :user-link="(user) => `/user/${user.id}`" class="project-sidebar-section" />
+    <OrganizationSidebarMembers
+      v-if="organization"
+      :members="organization.members"
+      :user-link="(user) => `/user/${user.id}`"
+      class="project-sidebar-section"
+    />
   </Teleport>
   <div v-if="organization" class="flex flex-col gap-4 p-6">
     <InstanceIndicator :instance="instance" />
-    <OrganizationHeader :organization="organization" :download-count="sumDownloads" :project-count="projects.length">
+    <OrganizationHeader
+      :organization="organization"
+      :download-count="sumDownloads"
+      :project-count="projects.length"
+    >
       <template #actions>
         <ButtonStyled v-if="themeStore.devMode" circular type="transparent" size="large">
           <OverflowMenu
-            :options="[
-                  { id: 'copy-id', action: () => copyId(), shown: themeStore.devMode },
-                ]"
+            :options="[{ id: 'copy-id', action: () => copyId(), shown: themeStore.devMode }]"
             aria-label="More options"
           >
             <MoreVerticalIcon aria-hidden="true" />
@@ -23,9 +30,17 @@
       </template>
     </OrganizationHeader>
     <div v-if="projects">
-      <ProjectsList :projects="projects" :project-link="(project) => `/project/${project.id}${instanceQueryAppendage}`" :experimental-colors="themeStore.featureFlags.project_card_background">
+      <ProjectsList
+        :projects="projects"
+        :project-link="(project) => `/project/${project.id}${instanceQueryAppendage}`"
+        :experimental-colors="themeStore.featureFlags.project_card_background"
+      >
         <template #project-actions="{ project }">
-          <ProjectCardActions :project="project" :instance="instance" :instance-content="instanceContent" />
+          <ProjectCardActions
+            :project="project"
+            :instance="instance"
+            :instance-content="instanceContent"
+          />
         </template>
       </ProjectsList>
     </div>
@@ -41,9 +56,10 @@ import {
   ButtonStyled,
   commonMessages,
   OverflowMenu,
-  OrganizationHeader, OrganizationSidebarMembers
+  OrganizationHeader,
+  OrganizationSidebarMembers,
 } from '@modrinth/ui'
-import { ClipboardCopyIcon, MoreVerticalIcon, DownloadIcon, HeartIcon, BookmarkIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, MoreVerticalIcon } from '@modrinth/assets'
 import { useVIntl } from '@vintl/vintl'
 import { useFetch } from '@/helpers/fetch'
 import type { Project, Organization, ProjectV3, Environment } from '@modrinth/utils'
@@ -63,35 +79,41 @@ const projects: Ref<Project[]> = ref([])
 const { instance, instanceContent, instanceQueryAppendage } = await useInstanceContext()
 
 async function fetchOrganization() {
-  organization.value = await useFetch(`https://api.modrinth.com/v3/organization/${route.params.id}`).catch(handleError)
-  projects.value = (await useFetch(`https://api.modrinth.com/v3/organization/${route.params.id}/projects`).catch(handleError)).map((projectV3: ProjectV3) => {
+  organization.value = await useFetch(
+    `https://api.modrinth.com/v3/organization/${route.params.id}`,
+  ).catch(handleError)
+  projects.value = (
+    await useFetch(`https://api.modrinth.com/v3/organization/${route.params.id}/projects`).catch(
+      handleError,
+    )
+  ).map((projectV3: ProjectV3) => {
     let type = projectV3.project_types[0]
 
     if (type === 'plugin' || type === 'datapack') {
       type = 'mod'
     }
 
-    let clientSide: Environment = 'unknown';
-    let serverSide: Environment = 'unknown';
+    let clientSide: Environment = 'unknown'
+    let serverSide: Environment = 'unknown'
 
-    const singleplayer = projectV3.singleplayer && projectV3.singleplayer[0];
-    const clientAndServer = projectV3.client_and_server && projectV3.client_and_server[0];
-    const clientOnly = projectV3.client_only && projectV3.client_only[0];
-    const serverOnly = projectV3.server_only && projectV3.server_only[0];
+    const singleplayer = projectV3.singleplayer && projectV3.singleplayer[0]
+    const clientAndServer = projectV3.client_and_server && projectV3.client_and_server[0]
+    const clientOnly = projectV3.client_only && projectV3.client_only[0]
+    const serverOnly = projectV3.server_only && projectV3.server_only[0]
 
     // quick and dirty hack to show envs as legacy
     if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
-      clientSide = "required";
-      serverSide = "required";
+      clientSide = 'required'
+      serverSide = 'required'
     } else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
-      clientSide = "required";
-      serverSide = "unsupported";
+      clientSide = 'required'
+      serverSide = 'unsupported'
     } else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
-      clientSide = "unsupported";
-      serverSide = "required";
+      clientSide = 'unsupported'
+      serverSide = 'required'
     } else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
-      clientSide = "optional";
-      serverSide = "optional";
+      clientSide = 'optional'
+      serverSide = 'optional'
     }
 
     const projectV2: Project = {
@@ -109,7 +131,7 @@ async function fetchOrganization() {
   })
 
   if (!organization.value) {
-    return;
+    return
   }
 
   breadcrumbs.setName('Organization', organization.value.name)
@@ -130,20 +152,19 @@ const themeStore = useTheming()
 
 async function copyId() {
   if (organization.value) {
-    await navigator.clipboard.writeText(String(organization.value.id));
+    await navigator.clipboard.writeText(String(organization.value.id))
   }
 }
 
 const sumDownloads = computed(() => {
-  let sum = 0;
+  let sum = 0
 
   for (const project of projects.value) {
-    sum += project.downloads;
+    sum += project.downloads
   }
 
-  return sum;
-});
-
+  return sum
+})
 </script>
 <style scoped lang="scss">
 .project-sidebar-section {

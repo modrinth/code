@@ -37,7 +37,7 @@ type InstanceContent = {
   file_name: string
   size: number
   metadata?: {
-    project_id: ModrinthId,
+    project_id: ModrinthId
     version_id: ModrinthId
   }
   update_version_id: string

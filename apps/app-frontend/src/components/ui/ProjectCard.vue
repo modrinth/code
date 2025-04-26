@@ -5,7 +5,6 @@ import { formatNumber, formatCategory } from '@modrinth/utils'
 import { computed } from 'vue'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRouter } from 'vue-router'
 
 dayjs.extend(relativeTime)
 
@@ -45,10 +44,7 @@ const toColor = computed(() => {
     class="card-shadow bg-bg-raised rounded-xl overflow-clip cursor-pointer hover:brightness-90 transition-all"
   >
     <template #clickable>
-      <router-link
-        class="no-click-animation"
-        :to="`/project/${project.slug}`"
-      />
+      <router-link class="no-click-animation" :to="`/project/${project.slug}`" />
     </template>
     <div
       class="w-full aspect-[2/1] bg-cover bg-center bg-no-repeat"
@@ -60,12 +56,13 @@ const toColor = computed(() => {
           'https://launcher-files.modrinth.com/assets/maze-bg.png'
         })`,
       }"
-    >
-    </div>
+    ></div>
     <div class="flex flex-col justify-center gap-2 px-4 py-3">
       <div class="flex gap-2 items-center">
         <Avatar size="48px" :src="project.icon_url" />
-        <div class="h-full flex items-center font-bold text-contrast leading-normal smart-clickable:underline-on-hover">
+        <div
+          class="h-full flex items-center font-bold text-contrast leading-normal smart-clickable:underline-on-hover"
+        >
           <span class="line-clamp-2">{{ project.title }}</span>
         </div>
       </div>

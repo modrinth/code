@@ -11,14 +11,16 @@
       )
     "
     :experimental-colors="themeStore.featureFlags.project_card_background"
-    :creator-link=" creator ?
-      asLink(
-        {
-          path: `/user/${creator}`,
-          query: { i: props.instance ? props.instance.path : undefined },
-        },
-        () => emit('open'),
-      ) : undefined
+    :creator-link="
+      creator
+        ? asLink(
+            {
+              path: `/user/${creator}`,
+              query: { i: props.instance ? props.instance.path : undefined },
+            },
+            () => emit('open'),
+          )
+        : undefined
     "
   >
     <template #actions>
@@ -42,12 +44,8 @@
 <script setup lang="ts">
 import { DownloadIcon, CheckIcon } from '@modrinth/assets'
 import { ButtonStyled, NewProjectCard, asLink } from '@modrinth/ui'
-import type {
-  Project,
-  SearchResult} from '@modrinth/utils';
-import {
-  isSearchResult
-} from '@modrinth/utils'
+import type { Project, SearchResult } from '@modrinth/utils'
+import { isSearchResult } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ref, computed } from 'vue'
@@ -58,14 +56,17 @@ dayjs.extend(relativeTime)
 
 const themeStore = useTheming()
 
-const props = withDefaults(defineProps<{
-  project: Project | SearchResult
-  instance?: GameInstance
-  installed?: boolean
-}>(), {
-  instance: undefined,
-  installed: false,
-})
+const props = withDefaults(
+  defineProps<{
+    project: Project | SearchResult
+    instance?: GameInstance
+    installed?: boolean
+  }>(),
+  {
+    instance: undefined,
+    installed: false,
+  },
+)
 
 const emit = defineEmits(['open', 'install'])
 
@@ -85,6 +86,8 @@ async function install() {
   )
 }
 
-const projectId = computed(() => isSearchResult(props.project) ? props.project.project_id : props.project.id)
-const creator = computed(() => isSearchResult(props.project) ? props.project.author : undefined)
+const projectId = computed(() =>
+  isSearchResult(props.project) ? props.project.project_id : props.project.id,
+)
+const creator = computed(() => (isSearchResult(props.project) ? props.project.author : undefined))
 </script>

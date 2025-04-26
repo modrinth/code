@@ -30,31 +30,37 @@ watch(
 )
 </script>
 <template>
-  <h2 class="m-0 text-lg font-extrabold text-contrast">
-    Feature flags
-  </h2>
+  <h2 class="m-0 text-lg font-extrabold text-contrast">Feature flags</h2>
   <p class="mt-1 mb-0 leading-tight text-secondary">
-    These are developer tools that are not intended to be used by end users except for debugging purposes.
+    These are developer tools that are not intended to be used by end users except for debugging
+    purposes.
   </p>
   <p class="my-3 font-bold">Do not report bugs or issues if you have any feature flags enabled.</p>
-  <div v-for="option in options" :key="option" class="mt-2 px-4 py-3 flex items-center justify-between bg-bg rounded-2xl">
+  <div
+    v-for="option in options"
+    :key="option"
+    class="mt-2 px-4 py-3 flex items-center justify-between bg-bg rounded-2xl"
+  >
     <div>
       <h2 class="m-0 text-base font-bold text-primary capitalize">
-        {{ option.replace(new RegExp('_', "g"), ' ') }}
+        {{ option.replace(new RegExp('_', 'g'), ' ') }}
       </h2>
       <p class="m-0 text-sm text-secondary">Default: {{ DEFAULT_FEATURE_FLAGS[option] }}</p>
     </div>
 
     <div class="flex items-center gap-1">
       <ButtonStyled type="transparent">
-        <button class="text-sm" :disabled="getStoreValue(option) === DEFAULT_FEATURE_FLAGS[option]" @click="() => setStoreValue(option, !themeStore.featureFlags[option])">
+        <button
+          class="text-sm"
+          :disabled="getStoreValue(option) === DEFAULT_FEATURE_FLAGS[option]"
+          @click="() => setStoreValue(option, !themeStore.featureFlags[option])"
+        >
           Reset to default
         </button>
       </ButtonStyled>
       <Toggle
         id="advanced-rendering"
         :model-value="getStoreValue(option)"
-
         @update:model-value="() => setStoreValue(option, !themeStore.featureFlags[option])"
       />
     </div>

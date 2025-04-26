@@ -1,7 +1,14 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { SpinnerIcon, GameIcon, TimerIcon, StopCircleIcon, PlayIcon, DownloadIcon } from '@modrinth/assets'
+import {
+  SpinnerIcon,
+  GameIcon,
+  TimerIcon,
+  StopCircleIcon,
+  PlayIcon,
+  DownloadIcon,
+} from '@modrinth/assets'
 import { ButtonStyled, Avatar, SmartClickable } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { finish_install, kill, run } from '@/helpers/profile'
@@ -129,19 +136,21 @@ onUnmounted(() => unlisten())
 <template>
   <SmartClickable class="card-shadow bg-bg-raised rounded-xl" @mouseenter="checkProcess">
     <template #clickable>
-      <router-link class="no-click-animation" :to="`/instance/${encodeURIComponent(instance.path)}/`" />
+      <router-link
+        class="no-click-animation"
+        :to="`/instance/${encodeURIComponent(instance.path)}/`"
+      />
     </template>
-    <div
-      v-if="compact"
-      class="grid grid-cols-[auto_1fr_auto] p-3 pl-4 gap-2"
-    >
+    <div v-if="compact" class="grid grid-cols-[auto_1fr_auto] p-3 pl-4 gap-2">
       <Avatar
         size="48px"
         :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
         :tint-by="instance.path"
         alt="Mod card"
       />
-      <div class="h-full flex items-center font-bold text-contrast leading-normal smart-clickable:underline-on-hover">
+      <div
+        class="h-full flex items-center font-bold text-contrast leading-normal smart-clickable:underline-on-hover"
+      >
         <span class="line-clamp-2">{{ instance.name }}</span>
       </div>
       <div class="flex items-center smart-clickable:allow-pointer-events">
@@ -171,11 +180,7 @@ onUnmounted(() => unlisten())
         <span class="text-sm"> Played {{ dayjs(instance.last_played).fromNow() }} </span>
       </div>
     </div>
-    <div
-      v-else
-      class="p-4 rounded-xl flex gap-3 group"
-      @mouseenter="checkProcess"
-    >
+    <div v-else class="p-4 rounded-xl flex gap-3 group" @mouseenter="checkProcess">
       <div class="relative flex items-center justify-center">
         <Avatar
           size="48px"
@@ -224,7 +229,9 @@ onUnmounted(() => unlisten())
         </div>
       </div>
       <div class="flex flex-col gap-1">
-        <p class="m-0 text-md font-bold text-contrast leading-tight line-clamp-1 smart-clickable:underline-on-hover">
+        <p
+          class="m-0 text-md font-bold text-contrast leading-tight line-clamp-1 smart-clickable:underline-on-hover"
+        >
           {{ instance.name }}
         </p>
         <div class="flex items-center col-span-3 gap-1 text-secondary font-semibold mt-auto">

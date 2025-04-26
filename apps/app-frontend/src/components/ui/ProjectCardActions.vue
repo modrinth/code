@@ -34,8 +34,9 @@ const installed: Ref<boolean> = ref(false)
 
 function checkInstallStatus() {
   if (props.instanceContent) {
-    installed.value = Object.values(props.instanceContent)
-      .some((content) => content.metadata?.project_id === projectId.value)
+    installed.value = Object.values(props.instanceContent).some(
+      (content) => content.metadata?.project_id === projectId.value,
+    )
   }
 }
 

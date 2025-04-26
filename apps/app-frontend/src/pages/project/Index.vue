@@ -204,7 +204,9 @@ async function fetchProjectData() {
     ])
 
   if (project.organization) {
-    organization.value = await useFetch(`https://api.modrinth.com/v3/organization/${project.organization}`).catch(handleError)
+    organization.value = await useFetch(
+      `https://api.modrinth.com/v3/organization/${project.organization}`,
+    ).catch(handleError)
   }
 
   versions.value = versions.value.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))

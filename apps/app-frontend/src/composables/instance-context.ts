@@ -12,18 +12,17 @@ export async function useInstanceContext() {
   const instance: Ref<GameInstance | undefined> = ref()
   const instanceContent: Ref<InstanceContentMap | undefined> = ref()
 
-  await loadInstance();
+  await loadInstance()
 
   watch(route, () => {
     loadInstance()
   })
 
   async function loadInstance() {
-    [instance.value, instanceContent.value] =
-      await Promise.all([
-        route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),
-        route.query.i ? getInstanceProjects(route.query.i).catch(handleError) : Promise.resolve(),
-      ])
+    ;[instance.value, instanceContent.value] = await Promise.all([
+      route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),
+      route.query.i ? getInstanceProjects(route.query.i).catch(handleError) : Promise.resolve(),
+    ])
   }
 
   const instanceQueryAppendage = computed(() => {

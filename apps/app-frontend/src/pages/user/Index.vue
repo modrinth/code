@@ -1,13 +1,21 @@
 <template>
   <Teleport to="#sidebar-teleport-target">
-    <UserSidebarOrganizations :organizations="organizations" :link="(org: Organization) => `/organization/${org.id}${instanceQueryAppendage}`" class="project-sidebar-section" />
+    <UserSidebarOrganizations
+      :organizations="organizations"
+      :link="(org: Organization) => `/organization/${org.id}${instanceQueryAppendage}`"
+      class="project-sidebar-section"
+    />
     <UserSidebarBadges
       v-if="user"
       :user="user"
       :download-count="sumDownloads"
       class="project-sidebar-section"
     />
-    <UserSidebarCollections :collections="collections" :link="(collection: Collection) => `/collection/${collection.id}${instanceQueryAppendage}`" class="project-sidebar-section" />
+    <UserSidebarCollections
+      :collections="collections"
+      :link="(collection: Collection) => `/collection/${collection.id}${instanceQueryAppendage}`"
+      class="project-sidebar-section"
+    />
   </Teleport>
   <div v-if="user" class="p-6 flex flex-col gap-4">
     <InstanceIndicator :instance="instance" />
@@ -16,9 +24,13 @@
         <ButtonStyled circular type="transparent" size="large">
           <OverflowMenu
             :options="[
-                  { id: 'report', link: `https://modrinth.com/report?item=user&itemID=${user.id}`, color: 'red' },
-                  { id: 'copy-id', action: () => copyId(), shown: themeStore.devMode },
-                ]"
+              {
+                id: 'report',
+                link: `https://modrinth.com/report?item=user&itemID=${user.id}`,
+                color: 'red',
+              },
+              { id: 'copy-id', action: () => copyId(), shown: themeStore.devMode },
+            ]"
             aria-label="More options"
           >
             <MoreVerticalIcon aria-hidden="true" />
@@ -35,9 +47,17 @@
       </template>
     </UserHeader>
     <div v-if="projects">
-      <ProjectsList :projects="projects" :project-link="(project) => `/project/${project.id}${instanceQueryAppendage}`" :experimental-colors="themeStore.featureFlags.project_card_background">
+      <ProjectsList
+        :projects="projects"
+        :project-link="(project) => `/project/${project.id}${instanceQueryAppendage}`"
+        :experimental-colors="themeStore.featureFlags.project_card_background"
+      >
         <template #project-actions="{ project }">
-          <ProjectCardActions :instance="instance" :instance-content="instanceContent" :project="project" />
+          <ProjectCardActions
+            :instance="instance"
+            :instance-content="instanceContent"
+            :project="project"
+          />
         </template>
       </ProjectsList>
     </div>
@@ -55,7 +75,8 @@ import {
   commonMessages,
   OverflowMenu,
   UserHeader,
-  UserSidebarBadges, UserSidebarCollections
+  UserSidebarBadges,
+  UserSidebarCollections,
 } from '@modrinth/ui'
 import { ReportIcon, ClipboardCopyIcon, MoreVerticalIcon } from '@modrinth/assets'
 import { useVIntl } from '@vintl/vintl'
@@ -77,15 +98,17 @@ const organizations: Ref<Organization[]> = ref([])
 const collections: Ref<Collection[]> = ref([])
 
 async function fetchUser() {
-  [ user.value, projects.value, organizations.value, collections.value ] = await Promise.all([
+  ;[user.value, projects.value, organizations.value, collections.value] = await Promise.all([
     useFetch(`https://api.modrinth.com/v2/user/${route.params.id}`).catch(handleError),
     useFetch(`https://api.modrinth.com/v2/user/${route.params.id}/projects`).catch(handleError),
-    useFetch(`https://api.modrinth.com/v3/user/${route.params.id}/organizations`).catch(handleError),
-    useFetch(`https://api.modrinth.com/v3/user/${route.params.id}/collections`).catch(handleError)
+    useFetch(`https://api.modrinth.com/v3/user/${route.params.id}/organizations`).catch(
+      handleError,
+    ),
+    useFetch(`https://api.modrinth.com/v3/user/${route.params.id}/collections`).catch(handleError),
   ])
 
   if (!user.value) {
-    return;
+    return
   }
 
   breadcrumbs.setContext({ name: 'User', link: `/user/${user.value.username}` })
@@ -107,22 +130,21 @@ watch(
 
 const themeStore = useTheming()
 
-
 async function copyId() {
   if (user.value) {
-    await navigator.clipboard.writeText(String(user.value.id));
+    await navigator.clipboard.writeText(String(user.value.id))
   }
 }
 
 const sumDownloads = computed(() => {
-  let sum = 0;
+  let sum = 0
 
   for (const project of projects.value) {
-    sum += project.downloads;
+    sum += project.downloads
   }
 
-  return sum;
-});
+  return sum
+})
 </script>
 <style scoped lang="scss">
 .project-sidebar-section {
