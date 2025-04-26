@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import CheckIcon from "~/assets/images/utils/check.svg?component";
+import { CheckIcon } from "@modrinth/assets";
 
 export default {
   components: {

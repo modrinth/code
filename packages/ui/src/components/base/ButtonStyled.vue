@@ -6,7 +6,7 @@ const props = withDefaults(
     color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
     size?: 'standard' | 'large'
     circular?: boolean
-    type?: 'standard' | 'outlined' | 'transparent' | 'highlight'
+    type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text'
     colorFill?: 'auto' | 'background' | 'text' | 'none'
     hoverColorFill?: 'auto' | 'background' | 'text' | 'none'
     highlightedStyle?: 'main-nav-primary' | 'main-nav-secondary'
@@ -24,20 +24,40 @@ const props = withDefaults(
   },
 )
 
+const highlightedColorVar = computed(() => {
+  switch (props.color) {
+    case 'brand':
+      return 'var(--color-brand-highlight)'
+    case 'red':
+      return 'var(--color-red-highlight)'
+    case 'orange':
+      return 'var(--color-orange-highlight)'
+    case 'green':
+      return 'var(--color-green-highlight)'
+    case 'blue':
+      return 'var(--color-blue-highlight)'
+    case 'purple':
+      return 'var(--color-purple-highlight)'
+    case 'standard':
+    default:
+      return null
+  }
+})
+
 const colorVar = computed(() => {
   switch (props.color) {
     case 'brand':
-      return props.type === 'highlight' ? 'var(--color-brand-highlight)' : 'var(--color-brand)'
+      return 'var(--color-brand)'
     case 'red':
-      return props.type === 'highlight' ? 'var(--color-red-highlight)' : 'var(--color-red)'
+      return 'var(--color-red)'
     case 'orange':
-      return props.type === 'highlight' ? 'var(--color-orange-highlight)' : 'var(--color-orange)'
+      return 'var(--color-orange)'
     case 'green':
-      return props.type === 'highlight' ? 'var(--color-green-highlight)' : 'var(--color-green)'
+      return 'var(--color-green)'
     case 'blue':
-      return props.type === 'highlight' ? 'var(--color-blue-highlight)' : 'var(--color-blue)'
+      return 'var(--color-blue)'
     case 'purple':
-      return props.type === 'highlight' ? 'var(--color-purple-highlight)' : 'var(--color-purple)'
+      return 'var(--color-purple)'
     case 'standard':
     default:
       return null
@@ -111,10 +131,14 @@ function setColorFill(
 ): { bg: string; text: string } {
   if (colorVar.value) {
     if (fill === 'background') {
-      colors.bg = colorVar.value
-      if (props.type === 'highlight') {
+      if (props.type === 'highlight' && highlightedColorVar.value) {
+        colors.bg = highlightedColorVar.value
         colors.text = 'var(--color-contrast)'
+      } else if (props.type === 'highlight-colored-text' && highlightedColorVar.value) {
+        colors.bg = highlightedColorVar.value
+        colors.text = colorVar.value
       } else {
+        colors.bg = colorVar.value
         colors.text = 'var(--color-accent-contrast)'
       }
     } else if (fill === 'text') {
@@ -195,7 +219,7 @@ const colorVariables = computed(() => {
   > *:first-child
   > *:first-child
   > :is(button, a, .button-like):first-child {
-  @apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight];
+  @apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
   transition:
     scale 0.125s ease-in-out,
     background-color 0.25s ease-in-out,
@@ -204,6 +228,7 @@ const colorVariables = computed(() => {
   svg:first-child {
     color: var(--_icon, var(--_text));
     transition: color 0.25s ease-in-out;
+    flex-shrink: 0;
   }
 
   &[disabled],

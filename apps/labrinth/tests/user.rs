@@ -1,4 +1,4 @@
-use ariadne::api_common::{ApiProject, ApiTeams};
+use crate::common::api_common::{ApiProject, ApiTeams};
 use common::dummy_data::TestFile;
 use common::{
     database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_ID, USER_USER_PAT},

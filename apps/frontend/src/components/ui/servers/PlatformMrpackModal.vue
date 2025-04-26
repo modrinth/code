@@ -67,37 +67,27 @@
             Removes all data on your server, including your worlds, mods, and configuration files,
             then reinstalls it with the selected version.
           </div>
+          <div class="font-bold">This does not affect your backups, which are stored off-site.</div>
         </div>
 
-        <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
-          <div class="flex w-full flex-row items-center justify-between">
-            <label class="w-full text-lg font-bold text-contrast" for="backup-server-mrpack">
-              Backup server
-            </label>
-            <input
-              id="backup-server-mrpack"
-              v-model="backupServer"
-              class="switch stylized-toggle shrink-0"
-              type="checkbox"
-            />
-          </div>
-          <div>Creates a backup of your server before proceeding.</div>
-        </div>
+        <BackupWarning :backup-link="`/servers/manage/${props.server?.serverId}/backups`" />
       </div>
       <div class="mt-4 flex justify-start gap-4">
         <ButtonStyled :color="isDangerous ? 'red' : 'brand'">
-          <button :disabled="canInstall" @click="handleReinstall">
+          <button
+            v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
+            :disabled="canInstall || backupInProgress"
+            @click="handleReinstall"
+          >
             <RightArrowIcon />
             {{
-              isBackingUp
-                ? "Backing up..."
-                : isMrpackModalSecondPhase
-                  ? "Erase and install"
-                  : loadingServerCheck
-                    ? "Loading..."
-                    : isDangerous
-                      ? "Erase and install"
-                      : "Install"
+              isMrpackModalSecondPhase
+                ? "Erase and install"
+                : loadingServerCheck
+                  ? "Loading..."
+                  : isDangerous
+                    ? "Erase and install"
+                    : "Install"
             }}
           </button>
         </ButtonStyled>
@@ -105,10 +95,12 @@
           <button
             :disabled="isLoading"
             @click="
-              if (isMrpackModalSecondPhase) {
-                isMrpackModalSecondPhase = false;
-              } else {
-                hide();
+              () => {
+                if (isMrpackModalSecondPhase) {
+                  isMrpackModalSecondPhase = false;
+                } else {
+                  hide();
+                }
               }
             "
           >
@@ -122,12 +114,14 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from "@modrinth/ui";
+import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
 import { UploadIcon, RightArrowIcon, XIcon, ServerIcon } from "@modrinth/assets";
 import type { Server } from "~/composables/pyroServers";
+import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
 
 const props = defineProps<{
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  backupInProgress?: BackupInProgressReason;
 }>();
 
 const emit = defineEmits<{
@@ -137,9 +131,7 @@ const emit = defineEmits<{
 const mrpackModal = ref();
 const isMrpackModalSecondPhase = ref(false);
 const hardReset = ref(false);
-const backupServer = ref(false);
 const isLoading = ref(false);
-const isBackingUp = ref(false);
 const loadingServerCheck = ref(false);
 const mrpackFile = ref<File | null>(null);
 
@@ -154,61 +146,9 @@ const uploadMrpack = (event: Event) => {
   mrpackFile.value = target.files[0];
 };
 
-const performBackup = async (): Promise<boolean> => {
-  try {
-    const date = new Date();
-    const format = date.toLocaleString(navigator.language || "en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      timeZoneName: "short",
-    });
-    const backupName = `Reinstallation - ${format}`;
-    isLoading.value = true;
-    const backupId = await props.server.backups?.create(backupName);
-    isBackingUp.value = true;
-    let attempts = 0;
-    while (true) {
-      attempts++;
-      if (attempts > 100) {
-        addNotification({
-          group: "server",
-          title: "Backup Failed",
-          text: "An unexpected error occurred while backing up. Please try again later.",
-        });
-        return false;
-      }
-      await props.server.refresh(["backups"]);
-      const backups = await props.server.backups?.data;
-      const backup = backupId ? backups?.find((x) => x.id === backupId) : undefined;
-      if (backup && !backup.ongoing) {
-        isBackingUp.value = false;
-        break;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-    }
-    return true;
-  } catch {
-    addNotification({
-      group: "server",
-      title: "Backup Failed",
-      text: "An unexpected error occurred while backing up. Please try again later.",
-    });
-    return false;
-  }
-};
-
 const handleReinstall = async () => {
-  if (hardReset.value && !backupServer.value && !isMrpackModalSecondPhase.value) {
+  if (hardReset.value && !isMrpackModalSecondPhase.value) {
     isMrpackModalSecondPhase.value = true;
-    return;
-  }
-
-  if (backupServer.value && !(await performBackup())) {
-    isLoading.value = false;
     return;
   }
 
@@ -257,7 +197,6 @@ const handleReinstall = async () => {
 
 const onShow = () => {
   hardReset.value = false;
-  backupServer.value = false;
   isMrpackModalSecondPhase.value = false;
   loadingServerCheck.value = false;
   isLoading.value = false;

@@ -196,7 +196,10 @@
                 <div class="mt-2 flex flex-col gap-2">
                   <div class="flex items-center gap-2">
                     <CheckCircleIcon class="h-5 w-5 text-brand" />
-                    <span> {{ getPyroProduct(subscription)?.metadata?.cpu }} vCores (CPU) </span>
+                    <span>
+                      {{ getPyroProduct(subscription)?.metadata?.cpu / 2 }} Shared CPUs (Bursts up
+                      to {{ getPyroProduct(subscription)?.metadata?.cpu }} CPUs)
+                    </span>
                   </div>
                   <div class="flex items-center gap-2">
                     <CheckCircleIcon class="h-5 w-5 text-brand" />
@@ -285,7 +288,7 @@
                         getPyroCharge(subscription).status !== 'failed'
                       "
                     >
-                      <button @click="showPyroCancelModal(subscription.id)">
+                      <button @click="showCancellationSurvey(subscription)">
                         <XIcon />
                         Cancel
                       </button>
@@ -943,15 +946,6 @@ const getProductPrice = (product, interval) => {
 
 const modalCancel = ref(null);
 
-const showPyroCancelModal = (subscriptionId) => {
-  cancelSubscriptionId.value = subscriptionId;
-  if (modalCancel.value) {
-    modalCancel.value.show();
-  } else {
-    console.error("modalCancel ref is undefined");
-  }
-};
-
 const pyroPurchaseModal = ref();
 const currentSubscription = ref(null);
 const currentProduct = ref(null);
@@ -1054,4 +1048,66 @@ const refresh = async () => {
     refreshServers(),
   ]);
 };
+
+function showCancellationSurvey(subscription) {
+  if (!subscription) {
+    console.warn("No survey notice to open");
+    return;
+  }
+
+  const product = getPyroProduct(subscription);
+  const priceObj = product?.prices?.find((x) => x.id === subscription.price_id);
+  const price = priceObj?.prices?.intervals?.[subscription.interval];
+  const currency = priceObj?.currency_code;
+
+  const popupOptions = {
+    layout: "modal",
+    width: 700,
+    autoClose: 2000,
+    hideTitle: true,
+    hiddenFields: {
+      username: auth.value?.user?.username,
+      user_id: auth.value?.user?.id,
+      user_email: auth.value?.user?.email,
+      subscription_id: subscription.id,
+      price_id: subscription.price_id,
+      interval: subscription.interval,
+      started: subscription.created,
+      plan_ram: product?.metadata.ram / 1024,
+      plan_cpu: product?.metadata.cpu,
+      price: price ? `${price / 100}` : "unknown",
+      currency: currency ?? "unknown",
+    },
+    onOpen: () => console.log(`Opened cancellation survey for: ${subscription.id}`),
+    onClose: () => console.log(`Closed cancellation survey for: ${subscription.id}`),
+    onSubmit: (payload) => {
+      console.log("Form submitted, cancelling server.", payload);
+      cancelSubscription(subscription.id, true);
+    },
+  };
+
+  const formId = "mOr7lM";
+
+  try {
+    if (window.Tally?.openPopup) {
+      console.log(
+        `Opening Tally popup for servers subscription ${subscription.id} (form ID: ${formId})`,
+      );
+      window.Tally.openPopup(formId, popupOptions);
+    } else {
+      console.warn("Tally script not yet loaded");
+    }
+  } catch (e) {
+    console.error("Error opening Tally popup:", e);
+  }
+}
+
+useHead({
+  script: [
+    {
+      src: "https://tally.so/widgets/embed.js",
+      defer: true,
+    },
+  ],
+});
 </script>

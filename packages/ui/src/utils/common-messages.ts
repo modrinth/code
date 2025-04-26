@@ -49,6 +49,14 @@ export const commonMessages = defineMessages({
     id: 'label.description',
     defaultMessage: 'Description',
   },
+  downloadButton: {
+    id: 'button.download',
+    defaultMessage: 'Download',
+  },
+  downloadingButton: {
+    id: 'button.downloading',
+    defaultMessage: 'Downloading',
+  },
   editButton: {
     id: 'button.edit',
     defaultMessage: 'Edit',
@@ -196,6 +204,10 @@ export const commonMessages = defineMessages({
   uploadImageButton: {
     id: 'button.upload-image',
     defaultMessage: 'Upload image',
+  },
+  removeImageButton: {
+    id: 'button.remove-image',
+    defaultMessage: 'Remove image',
   },
   visibilityLabel: {
     id: 'label.visibility',

@@ -315,6 +315,9 @@ import {
   CurrencyIcon,
   InfoIcon,
   CheckIcon,
+  ReportIcon,
+  EditIcon,
+  GlobeIcon,
 } from "@modrinth/assets";
 import {
   OverflowMenu,
@@ -332,10 +335,7 @@ import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import { reportUser } from "~/utils/report-helpers.ts";
 
-import ReportIcon from "~/assets/images/utils/report.svg?component";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
-import EditIcon from "~/assets/images/utils/edit.svg?component";
-import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";

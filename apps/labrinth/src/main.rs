@@ -1,28 +1,54 @@
+use actix_web::middleware::from_fn;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
-use env_logger::Env;
+use clap::Parser;
+use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;
 use labrinth::search;
-use labrinth::util::ratelimit::RateLimit;
+use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
-use log::{error, info};
 use std::sync::Arc;
+use tracing::{error, info};
+use tracing_actix_web::TracingLogger;
 
-#[cfg(feature = "jemalloc")]
+#[cfg(not(target_env = "msvc"))]
 #[global_allocator]
-static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
+#[allow(non_upper_case_globals)]
+#[export_name = "malloc_conf"]
+pub static malloc_conf: &[u8] =
+    b"prof:true,prof_active:true,lg_prof_sample:19\0";
 
 #[derive(Clone)]
 pub struct Pepper {
     pub pepper: String,
 }
 
+#[derive(Parser)]
+#[command(version)]
+struct Args {
+    /// Don't run regularly scheduled background tasks. This means the tasks should be run
+    /// manually with --run-background-task.
+    #[arg(long)]
+    no_background_tasks: bool,
+
+    /// Don't automatically run migrations. This means the migrations should be run via --run-background-task.
+    #[arg(long)]
+    no_migrations: bool,
+
+    /// Run a single background task and then exit. Perfect for cron jobs.
+    #[arg(long, value_enum, id = "task")]
+    run_background_task: Option<BackgroundTask>,
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+    let args = Args::parse();
+
     dotenvy::dotenv().ok();
-    env_logger::Builder::from_env(Env::default().default_filter_or("info"))
-        .init();
+    console_subscriber::init();
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
@@ -40,14 +66,18 @@ async fn main() -> std::io::Result<()> {
         std::env::set_var("RUST_BACKTRACE", "1");
     }
 
-    info!(
-        "Starting Labrinth on {}",
-        dotenvy::var("BIND_ADDR").unwrap()
-    );
+    if args.run_background_task.is_none() {
+        info!(
+            "Starting Labrinth on {}",
+            dotenvy::var("BIND_ADDR").unwrap()
+        );
 
-    database::check_for_migrations()
-        .await
-        .expect("An error occurred while running migrations.");
+        if !args.no_migrations {
+            database::check_for_migrations()
+                .await
+                .expect("An error occurred while running migrations.");
+        }
+    }
 
     // Database Connector
     let pool = database::connect()
@@ -87,16 +117,41 @@ async fn main() -> std::io::Result<()> {
     info!("Initializing clickhouse connection");
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
+    let search_config = search::SearchConfig::new(None);
+
+    let stripe_client =
+        stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
+
+    if let Some(task) = args.run_background_task {
+        info!("Running task {task:?} and exiting");
+        task.run(pool, redis_pool, search_config, clickhouse, stripe_client)
+            .await;
+        return Ok(());
+    }
+
     let maxmind_reader =
         Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")
+        .exclude_regex(r"^/api/v1/.*$")
+        .exclude_regex(r"^/maven/.*$")
         .exclude("/_internal/launcher_socket")
+        .mask_unmatched_patterns("UNKNOWN")
         .build()
         .expect("Failed to create prometheus metrics middleware");
 
-    let search_config = search::SearchConfig::new(None);
+    database::register_and_set_metrics(&pool, &prometheus.registry)
+        .await
+        .expect("Failed to register database metrics");
+    redis_pool
+        .register_and_set_metrics(&prometheus.registry)
+        .await
+        .expect("Failed to register redis metrics");
+
+    #[cfg(not(target_env = "msvc"))]
+    labrinth::routes::debug::jemalloc_mmeory_stats(&prometheus.registry)
+        .expect("Failed to register jemalloc metrics");
 
     let labrinth_config = labrinth::app_setup(
         pool.clone(),
@@ -105,6 +160,8 @@ async fn main() -> std::io::Result<()> {
         &mut clickhouse,
         file_host.clone(),
         maxmind_reader.clone(),
+        stripe_client,
+        !args.no_background_tasks,
     );
 
     info!("Starting Actix HTTP server!");
@@ -112,8 +169,9 @@ async fn main() -> std::io::Result<()> {
     // Init App
     HttpServer::new(move || {
         App::new()
+            .wrap(TracingLogger::default())
             .wrap(prometheus.clone())
-            .wrap(RateLimit(Arc::clone(&labrinth_config.rate_limiter)))
+            .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
             .wrap(sentry_actix::Sentry::new())
             .configure(|cfg| labrinth::app_config(cfg, labrinth_config.clone()))

@@ -11,6 +11,135 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-04-25T19:45:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Added feedback survey upon Modrinth Servers cancellation.
+- Added FAQ question about the currency for Modrinth Servers subscription payments.`,
+  },
+  {
+    date: `2025-04-18T22:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Updated Modrinth Servers marketing page to be accurate to post-Pyro infrastructure.`,
+  },
+  {
+    date: `2025-04-17T02:25:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Completely overhauled the Backups interface and fixed them being non-functional.
+  - Backups will now show progress when creating and restoring.
+  - Backups now have a "Prepare download" phase, which will prepare a backup file for downloading.
+  - You can now cancel a backup in progress and retry a failed backup.
+- When a backup is in progress, you will no longer be allowed to modify the modpack or loader.
+- Removed the ability to create backups on install automatically, and replaced with a notice that you may want to create a backup before installing a new modpack or loader. This is because the previous implementation of backup on install was unreliable and buggy. We are working on a better implementation for this feature and plan for it to return in the future.
+- Temporarily disabled auto backups button, since they are currently not working.`,
+  },
+  {
+    date: `2025-04-15T16:35:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added ability to send surveys to customers in the panel via notices.
+
+### Improvements
+- Added titles to notices.`,
+  },
+  {
+    date: `2025-04-12T22:10:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added ability to notify customers in the panel with notices concerning their servers.`,
+  },
+  {
+    date: `2025-04-12T22:10:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fix missing dropdown icon in publishing checklist.`,
+  },
+  {
+    date: `2025-04-01T21:15:00-07:00`,
+    product: 'web',
+    body: `### Added
+- Reverted Modrinth Pizza due to issues in pizza processing leading to users being redirected to [this page](https://modrinth.com/pizza/error).
+- Fixed bug causing theme color to turn orange and corners turn sharp.`,
+  },
+  {
+    date: `2025-04-01T12:00:00`,
+    product: 'web',
+    body: `### Added
+- Added Modrinth Pizza.`,
+  },
+  {
+    date: `2025-04-01T00:00:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed project version field accepting more than 32 characters.`,
+  },
+  {
+    date: `2025-03-25T18:25:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed random 'displayName' error on search pages on some browsers such as Firefox.
+- Fixed 'Resubmit' icon in publishing checklist showing up when it hasn't been submitted before.`,
+  },
+  {
+    date: `2025-03-25T10:40:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed error with links on error pages.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-07:00`,
+    product: 'servers',
+    body: `### Improvements
+- Fixed server plugin loaders not being populated when browsing for plugins
+- Fixed modpack search being filtered by Minecraft version when browsing for modpacks.`,
+  },
+  {
+    date: `2025-03-24T22:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Improved error handling, especially when the Modrinth API is down.`,
+  },
+  {
+    date: `2025-03-13T19:30:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Updated Modrinth Servers marketing page, removing Pyro branding.`,
+  },
+  {
+    date: `2025-03-12T10:15:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed low-res icons being pixelated.
+- Fixed mobile navbar hiding bottom of footer.
+- Updated CMP info page to correct some incorrect information.
+- Updated CCPA notice with updated information since Modrinth Servers and Modrinth+.
+- Fixed review page failing under edge case.`,
+  },
+  {
+    date: `2025-03-05T17:40:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed moderation-end pages failing under edge cases.`,
+  },
+  {
+    date: `2025-03-05T12:40:00-08:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed various errors with modals for some users.
+- Fixed hold R button not working on some systems.`,
+  },
+  {
+    date: `2025-03-03T22:30:00-08:00`,
+    product: 'web',
+    body: `### Added
+- Hold R for a random project :D
+
+### Improvements
+- Improved admin navigation and admin panels.`,
+  },
+  {
     date: `2025-03-02T18:45:00-08:00`,
     product: 'web',
     body: `### Improvements
