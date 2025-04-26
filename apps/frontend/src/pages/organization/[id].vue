@@ -510,7 +510,7 @@ async function copyId() {
 }
 
 async function copyPermalink() {
-  await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${organization.value.id}`);
+  await navigator.clipboard.writeText(`${config.public.siteUrl}/organization/${organization.value.id}`);
 }
 </script>
 
