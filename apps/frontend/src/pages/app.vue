@@ -19,7 +19,6 @@ import Checkbox from "~/components/ui/Checkbox.vue";
 import { homePageProjects } from "~/generated/state.json";
 
 const os = ref(null);
-const macValue = ref(null);
 const downloadWindows = ref(null);
 const downloadLinux = ref(null);
 const downloadSection = ref(null);
@@ -31,8 +30,7 @@ const linuxLinks = {
   thirdParty: "https://support.modrinth.com/en/articles/9298760",
 };
 const macLinks = {
-  appleSilicon: null,
-  intel: null,
+  universal: null,
 };
 
 let downloadLauncher;
@@ -53,8 +51,7 @@ const [{ data: launcherUpdates }] = await Promise.all([
   ),
 ]);
 
-macLinks.appleSilicon = launcherUpdates.value.platforms["darwin-aarch64"].install_urls[0];
-macLinks.intel = launcherUpdates.value.platforms["darwin-x86_64"].install_urls[0];
+macLinks.universal = launcherUpdates.value.platforms["darwin-aarch64"].install_urls[0];
 windowsLink.value = launcherUpdates.value.platforms["windows-x86_64"].install_urls[0];
 linuxLinks.appImage = launcherUpdates.value.platforms["linux-x86_64"].install_urls[1];
 linuxLinks.deb = launcherUpdates.value.platforms["linux-x86_64"].install_urls[0];
@@ -82,24 +79,6 @@ onMounted(() => {
     downloadLauncher = () => {
       scrollToSection();
     };
-  }
-});
-
-watch(macValue, () => {
-  if (macValue.value === "Download for Apple Silicon") {
-    const link = document.createElement("a");
-    link.href = macLinks.appleSilicon;
-    link.download = "";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } else if (macValue.value === "Download for Intel") {
-    const link = document.createElement("a");
-    link.href = macLinks.intel;
-    link.download = "";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   }
 });
 
@@ -834,13 +813,9 @@ useSeoMeta({
             Mac
           </div>
           <div class="description apple">
-            <a :href="macLinks.appleSilicon" download="">
+            <a :href="macLinks.universal" download="">
               <DownloadIcon />
-              <span> Download for Apple Silicon </span>
-            </a>
-            <a :href="macLinks.intel" download="">
-              <DownloadIcon />
-              <span> Download for Intel </span>
+              <span> Download the beta </span>
             </a>
           </div>
         </div>
