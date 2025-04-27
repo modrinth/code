@@ -9236,7 +9236,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.9.3"
+version = "0.9.4"
 dependencies = [
  "ariadne",
  "async-recursion",
@@ -9293,7 +9293,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_gui"
-version = "0.9.3"
+version = "0.9.4"
 dependencies = [
  "chrono",
  "cocoa 0.25.0",

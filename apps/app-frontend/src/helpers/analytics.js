@@ -1,8 +1,9 @@
 import { posthog } from 'posthog-js'
 
 export const initAnalytics = () => {
-  posthog.init('phc_hm2ihMpTAoE86xIm7XzsCB8RPiTRKivViK5biiHedm', {
+  posthog.init('phc_9Iqi6lFs9sr5BSqh9RRNRSJ0mATS9PSgirDiX3iOYJ', {
     persistence: 'localStorage',
+    api_host: 'https://posthog.modrinth.com',
   })
 }
 
