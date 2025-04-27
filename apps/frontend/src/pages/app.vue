@@ -815,7 +815,7 @@ useSeoMeta({
           <div class="description apple">
             <a :href="macLinks.universal" download="">
               <DownloadIcon />
-              <span> Download (Intel & Apple) </span>
+              <span> Download the beta </span>
             </a>
           </div>
         </div>
