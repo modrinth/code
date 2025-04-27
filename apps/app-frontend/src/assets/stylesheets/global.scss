@@ -2,8 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'bundled-minecraft-font-mrapp';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('https://cdn.modrinth.com/fonts/minecraft/regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'bundled-minecraft-font-mrapp';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url('https://cdn.modrinth.com/fonts/minecraft/italic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'bundled-minecraft-font-mrapp';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('https://cdn.modrinth.com/fonts/minecraft/bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'bundled-minecraft-font-mrapp';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 600;
+  src: url('https://cdn.modrinth.com/fonts/minecraft/bold-italic.otf') format('opentype');
+}
+
+.font-minecraft {
+  font-family: 'bundled-minecraft-font-mrapp', monospace;
+}
+
 :root {
-  font-family: var(--font-standard);
+  font-family: var(--font-standard, sans-serif), sans-serif;
   color-scheme: dark;
   --view-width: calc(100% - 5rem);
   --expanded-view-width: calc(100% - 13rem);

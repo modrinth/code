@@ -451,7 +451,7 @@ textarea {
     var(--shadow-inset-sm),
     0 0 0 0 transparent;
   transition: box-shadow 0.1s ease-in-out;
-  min-height: 40px;
+  min-height: 36px;
 
   &:focus,
   &:focus-visible {

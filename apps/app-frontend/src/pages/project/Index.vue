@@ -192,6 +192,11 @@ const [allLoaders, allGameVersions] = await Promise.all([
 async function fetchProjectData() {
   const project = await get_project(route.params.id, 'must_revalidate').catch(handleError)
 
+  if (!project) {
+    handleError('Error loading project')
+    return
+  }
+
   data.value = project
   ;[versions.value, members.value, categories.value, instance.value, instanceProjects.value] =
     await Promise.all([

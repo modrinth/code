@@ -36,6 +36,13 @@ use tokio::{fs::File, process::Command, sync::RwLock};
 pub mod create;
 pub mod update;
 
+#[derive(Debug, Clone)]
+pub enum QuickPlayType {
+    None,
+    Singleplayer(String),
+    Server(String),
+}
+
 /// Remove a profile
 #[tracing::instrument]
 pub async fn remove(path: &str) -> crate::Result<()> {
@@ -623,14 +630,17 @@ fn pack_get_relative_path(
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument]
-pub async fn run(path: &str) -> crate::Result<ProcessMetadata> {
+pub async fn run(
+    path: &str,
+    quick_play_type: &QuickPlayType,
+) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
 
     let default_account = Credentials::get_default_credential(&state.pool)
         .await?
         .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?;
 
-    run_credentials(path, &default_account).await
+    run_credentials(path, &default_account, quick_play_type).await
 }
 
 /// Run Minecraft using a profile, and credentials for authentication
@@ -640,6 +650,7 @@ pub async fn run(path: &str) -> crate::Result<ProcessMetadata> {
 pub async fn run_credentials(
     path: &str,
     credentials: &Credentials,
+    quick_play_type: &QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
     let settings = Settings::get(&state.pool).await?;
@@ -719,6 +730,7 @@ pub async fn run_credentials(
         credentials,
         post_exit_hook,
         &profile,
+        quick_play_type,
     )
     .await
 }
