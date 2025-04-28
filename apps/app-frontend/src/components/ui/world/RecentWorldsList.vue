@@ -13,10 +13,10 @@ import {
 import { HeadingLink, GAME_MODES } from '@modrinth/ui'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
-import { watch, onMounted, onUnmounted, ref } from 'vue'
+import { watch, onMounted, onUnmounted, ref, computed } from 'vue'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
-import { useTheming } from '@/store/theme'
+import { useTheming } from '@/store/theme.ts'
 import { kill } from '@/helpers/profile'
 import { handleError } from '@/store/notifications'
 import { trackEvent } from '@/helpers/analytics'
@@ -54,6 +54,8 @@ type WorldJumpBackInItem = BaseJumpBackInItem & {
 
 type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
+const showWorlds = computed(() => theme.getFeatureFlag('worlds_in_home'))
+
 watch(props.recentInstances, async () => {
   await populateJumpBackIn().catch(() => {
     console.error('Failed to populate jump back in')
@@ -66,61 +68,65 @@ await populateJumpBackIn().catch(() => {
 
 async function populateJumpBackIn() {
   console.info('Repopulating jump back in...')
-  const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN)
 
   const worldItems: WorldJumpBackInItem[] = []
-  worlds.forEach((world) => {
-    const instance = props.recentInstances.find((instance) => instance.path === world.profile)
 
-    if (!instance || !world.last_played) {
-      return
-    }
+  if (showWorlds.value) {
+    const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN)
 
-    worldItems.push({
-      type: 'world',
-      last_played: dayjs(world.last_played),
-      world: world,
-      instance: instance,
-    })
-  })
+    worlds.forEach((world) => {
+      const instance = props.recentInstances.find((instance) => instance.path === world.profile)
 
-  const servers: {
-    instancePath: string
-    address: string
-  }[] = worldItems
-    .filter((item) => item.world.type === 'server' && item.instance)
-    .map((item) => ({
-      instancePath: item.instance.path,
-      address: (item.world as ServerWorld).address,
-    }))
-
-  // fetch protocol versions for all unique MC versions with server worlds
-  const uniqueServerInstances = new Set<string>(servers.map((x) => x.instancePath))
-  await Promise.all(
-    [...uniqueServerInstances].map((path) => {
-      get_profile_protocol_version(path)
-        .then((protoVer) => (protocolVersions.value[path] = protoVer))
-        .catch(() => {
-          console.error(`Failed to get profile protocol for: ${path} `)
-        })
-    }),
-  )
-
-  // initialize server data
-  servers.forEach(({ address }) => {
-    if (!serverData.value[address]) {
-      serverData.value[address] = {
-        refreshing: true,
+      if (!instance || !world.last_played) {
+        return
       }
-    }
-  })
 
-  // fetch each server's data
-  await Promise.all(
-    servers.map(({ instancePath, address }) =>
-      refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
-    ),
-  )
+      worldItems.push({
+        type: 'world',
+        last_played: dayjs(world.last_played),
+        world: world,
+        instance: instance,
+      })
+    })
+
+    const servers: {
+      instancePath: string
+      address: string
+    }[] = worldItems
+      .filter((item) => item.world.type === 'server' && item.instance)
+      .map((item) => ({
+        instancePath: item.instance.path,
+        address: (item.world as ServerWorld).address,
+      }))
+
+    // fetch protocol versions for all unique MC versions with server worlds
+    const uniqueServerInstances = new Set<string>(servers.map((x) => x.instancePath))
+    await Promise.all(
+      [...uniqueServerInstances].map((path) => {
+        get_profile_protocol_version(path)
+          .then((protoVer) => (protocolVersions.value[path] = protoVer))
+          .catch(() => {
+            console.error(`Failed to get profile protocol for: ${path} `)
+          })
+      }),
+    )
+
+    // initialize server data
+    servers.forEach(({ address }) => {
+      if (!serverData.value[address]) {
+        serverData.value[address] = {
+          refreshing: true,
+        }
+      }
+    })
+
+    // fetch each server's data
+    await Promise.all(
+      servers.map(({ instancePath, address }) =>
+        refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
+      ),
+    )
+  }
 
   const instanceItems: InstanceJumpBackInItem[] = []
   props.recentInstances.forEach((instance) => {
@@ -209,11 +215,7 @@ onUnmounted(() => {
 
 <template>
   <div v-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
-    <HeadingLink
-      v-if="(theme.featureFlags as Record<string, boolean>)['worlds_tab']"
-      to="/worlds"
-      class="mt-1"
-    >
+    <HeadingLink v-if="theme.getFeatureFlag('worlds_tab')" to="/worlds" class="mt-1">
       Jump back in
     </HeadingLink>
     <span

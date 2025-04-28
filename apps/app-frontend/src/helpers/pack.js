@@ -7,7 +7,13 @@ import { invoke } from '@tauri-apps/api/core'
 import { create } from './profile'
 
 // Installs pack from a version ID
-export async function create_profile_and_install(projectId, versionId, packTitle, iconUrl) {
+export async function create_profile_and_install(
+  projectId,
+  versionId,
+  packTitle,
+  iconUrl,
+  createInstanceCallback = () => {},
+) {
   const location = {
     type: 'fromVersionId',
     project_id: projectId,
@@ -24,6 +30,7 @@ export async function create_profile_and_install(projectId, versionId, packTitle
     null,
     true,
   )
+  createInstanceCallback(profile)
 
   return await invoke('plugin:pack|pack_install', { location, profile })
 }

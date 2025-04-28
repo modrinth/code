@@ -88,6 +88,7 @@ type AppSettings = {
   collapsed_navigation: boolean
   advanced_rendering: boolean
   native_decorations: boolean
+  worlds_in_home: boolean
 
   telemetry: boolean
   discord_rpc: boolean
