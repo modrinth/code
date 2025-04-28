@@ -18,6 +18,7 @@ use std::path::Path;
 pub struct Profile {
     pub path: String,
     pub install_stage: ProfileInstallStage,
+    pub launcher_feature_version: LauncherFeatureVersion,
 
     pub name: String,
     pub icon_path: Option<String>,
@@ -83,6 +84,38 @@ impl ProfileInstallStage {
             "pack_installing" => Self::PackInstalling,
             "not_installed" => Self::NotInstalled,
             _ => Self::NotInstalled,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum LauncherFeatureVersion {
+    None,
+    MigratedServerLastPlayTime,
+}
+
+impl LauncherFeatureVersion {
+    pub fn most_recent() -> Self {
+        Self::MigratedServerLastPlayTime
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match *self {
+            Self::None => "none",
+            Self::MigratedServerLastPlayTime => {
+                "migrated_server_last_play_time"
+            }
+        }
+    }
+
+    pub fn from_str(val: &str) -> Self {
+        match val {
+            "none" => Self::None,
+            "migrated_server_last_play_time" => {
+                Self::MigratedServerLastPlayTime
+            }
+            _ => Self::None,
         }
     }
 }
@@ -263,6 +296,7 @@ struct ProfileQueryResult {
     override_hook_wrapper: Option<String>,
     override_hook_post_exit: Option<String>,
     protocol_version: Option<i64>,
+    launcher_feature_version: String,
 }
 
 impl TryFrom<ProfileQueryResult> for Profile {
@@ -272,6 +306,9 @@ impl TryFrom<ProfileQueryResult> for Profile {
         Ok(Profile {
             path: x.path,
             install_stage: ProfileInstallStage::from_str(&x.install_stage),
+            launcher_feature_version: LauncherFeatureVersion::from_str(
+                &x.launcher_feature_version,
+            ),
             name: x.name,
             icon_path: x.icon_path,
             game_version: x.game_version,
@@ -339,7 +376,7 @@ macro_rules! select_profiles_with_predicate {
             ProfileQueryResult,
             r#"
             SELECT
-                path, install_stage, name, icon_path,
+                path, install_stage, launcher_feature_version, name, icon_path,
                 game_version, protocol_version, mod_loader, mod_loader_version,
                 json(groups) as "groups!: serde_json::Value",
                 linked_project_id, linked_version_id, locked,
@@ -402,6 +439,8 @@ impl Profile {
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let install_stage = self.install_stage.as_str();
+        let launcher_feature_version = self.launcher_feature_version.as_str();
+
         let mod_loader = self.loader.as_str();
 
         let groups = serde_json::to_string(&self.groups)?;
@@ -439,7 +478,7 @@ impl Profile {
                 override_java_path, override_extra_launch_args, override_custom_env_vars,
                 override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
                 override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit,
-                protocol_version
+                protocol_version, launcher_feature_version
             )
             VALUES (
                 $1, $2, $3, $4,
@@ -451,7 +490,7 @@ impl Profile {
                 $17, jsonb($18), jsonb($19),
                 $20, $21, $22, $23,
                 $24, $25, $26,
-                $27
+                $27, $28
             )
             ON CONFLICT (path) DO UPDATE SET
                 install_stage = $2,
@@ -487,7 +526,8 @@ impl Profile {
                 override_hook_wrapper = $25,
                 override_hook_post_exit = $26,
 
-                protocol_version = $27
+                protocol_version = $27,
+                launcher_feature_version = $28
             ",
             self.path,
             install_stage,
@@ -516,6 +556,7 @@ impl Profile {
             self.hooks.wrapper,
             self.hooks.post_exit,
             self.protocol_version,
+            launcher_feature_version
         )
             .execute(exec)
             .await?;
