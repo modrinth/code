@@ -1,6 +1,6 @@
 [package]
 name = "theseus"
-version = "0.9.3"
+version = "0.9.4"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition = "2021"
 
@@ -11,13 +11,14 @@ serde_json = "1.0"
 serde_ini = "0.2.0"
 sha1_smol = { version = "1.0.0", features = ["std"] }
 sha2 = "0.10.8"
-url = "2.2"
+url = { version = "2.2", features = ["serde"] }
 uuid = { version = "1.1", features = ["serde", "v4"] }
 zip = "0.6.5"
 async_zip = { version = "0.0.17", features = ["chrono", "tokio-fs", "deflate", "bzip2", "zstd", "deflate64"] }
 flate2 = "1.0.28"
 tempfile = "3.5.0"
 dashmap = { version = "6.0.1", features = ["serde"] }
+quick-xml = { version = "0.37", features = ["async-tokio"] }
 
 chrono = { version = "0.4.19", features = ["serde"] }
 daedalus = { path = "../../packages/daedalus" }
@@ -42,7 +43,10 @@ async-tungstenite = { version = "0.27.0", features = ["tokio-runtime", "tokio-ru
 futures = "0.3"
 reqwest = { version = "0.12.3", features = ["json", "stream", "deflate", "gzip", "brotli", "rustls-tls", "charset", "http2", "macos-system-configuration"], default-features = false }
 tokio = { version = "1", features = ["full"] }
+tokio-util = "0.7"
 async-recursion = "1.0.4"
+fs4 = { version = "0.13", features = ["tokio"] }
+async-walkdir = "2.1"
 
 notify = { version = "6.1.1", default-features = false }
 notify-debouncer-mini = { version = "0.4.1", default-features = false }
@@ -60,6 +64,9 @@ byteorder = "1.5.0"
 base64 = "0.22.0"
 
 sqlx = { version = "0.8.2", features = [ "runtime-tokio", "sqlite", "macros" ] }
+
+quartz_nbt = { version = "0.2", features = ["serde"] }
+hickory-resolver = "0.25"
 
 ariadne = { path = "../ariadne" }
 

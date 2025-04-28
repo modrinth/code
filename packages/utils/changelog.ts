@@ -11,6 +11,35 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-04-26T19:15:00-07:00`,
+    product: 'app',
+    version: `0.9.4`,
+    body: `### Added
+- Added a Worlds tab to instances that allow you to manage your worlds and servers directly from the app
+  - Server ping, play count, and descriptions will all show before having to open the game.
+  - Add, edit, and remove servers
+  - Edit and delete singleplayer worlds
+- Added 'Quick Play' functionality, allowing you to jump straight into worlds and servers from the app
+- Added new launcher-log.txt file to log stdout to a file, similar to the Minecraft Launcher which can be helpful for debugging.
+
+### Improvements
+- Overhauled the 'Jump back in' section of the Home page, showing recently played worlds instead of just instances.
+  - This supports the new 'Quick Play' functionality, allowing you to jump back into your recent worlds (on supported Minecraft versions 1.20+)
+- Improved the fatal error dialog to show debug information more prominently, and allow you to copy it to share with support.
+- Fixed the display of critical announcements that has been broken since 0.9.0.
+- Fixed content authors not displaying properly on Content page if the content was owned by an organization.
+- Fixed random errors on the Library page, causing no instances to load.
+- Fixed .mrpack file association on Linux.
+- Fixed occasional failures when moving app directory between disks.`,
+  },
+  {
+    date: `2025-04-25T19:45:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Added feedback survey upon Modrinth Servers cancellation.
+- Added FAQ question about the currency for Modrinth Servers subscription payments.`,
+  },
+  {
     date: `2025-04-18T22:30:00-07:00`,
     product: 'web',
     body: `### Improvements

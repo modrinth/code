@@ -117,15 +117,37 @@ const route = useRoute()
 const props = defineProps({
   instance: {
     type: Object,
-    required: true,
+    default() {
+      return {}
+    },
+  },
+  options: {
+    type: Object,
+    default() {
+      return {}
+    },
   },
   offline: {
     type: Boolean,
-    default: false,
+    default() {
+      return false
+    },
   },
   playing: {
     type: Boolean,
-    default: false,
+    default() {
+      return false
+    },
+  },
+  versions: {
+    type: Array,
+    required: true,
+  },
+  installed: {
+    type: Boolean,
+    default() {
+      return false
+    },
   },
 })
 

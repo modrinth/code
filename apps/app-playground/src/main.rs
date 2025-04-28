@@ -3,9 +3,8 @@
     windows_subsystem = "windows"
 )]
 
-use std::time::Duration;
 use theseus::prelude::*;
-use tokio::signal::ctrl_c;
+use theseus::worlds::get_recent_worlds;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -41,21 +40,16 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
-    loop {
-        if State::get().await?.friends_socket.is_connected().await {
-            break;
-        }
-        tokio::time::sleep(Duration::from_millis(500)).await;
+    let worlds = get_recent_worlds(4).await?;
+    for world in worlds {
+        println!(
+            "World: {:?}/{:?} played at {:?}: {:#?}",
+            world.profile,
+            world.world.name,
+            world.world.last_played,
+            world.world.details
+        );
     }
-
-    tracing::info!("Starting host");
-
-    let socket = State::get().await?.friends_socket.open_port(25565).await?;
-    tracing::info!("Running host on socket {}", socket.socket_id());
-
-    ctrl_c().await?;
-    tracing::info!("Stopping host");
-    socket.shutdown().await?;
 
     Ok(())
 }

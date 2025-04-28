@@ -6,11 +6,16 @@
       </slot>
     </template>
     <div class="flex flex-col gap-4">
-      <div
-        v-if="description"
-        class="markdown-body max-w-[35rem]"
-        v-html="renderString(description)"
-      />
+      <template v-if="description">
+        <div
+          v-if="markdown"
+          class="markdown-body max-w-[35rem]"
+          v-html="renderString(description)"
+        />
+        <p v-else class="max-w-[35rem] m-0">
+          {{ description }}
+        </p>
+      </template>
       <slot />
       <label v-if="hasToType" for="confirmation">
         <span>
@@ -46,7 +51,7 @@
 
 <script setup>
 import { renderString } from '@modrinth/utils'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { TrashIcon, XIcon } from '@modrinth/assets'
 import NewModal from './NewModal.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
@@ -91,6 +96,10 @@ const props = defineProps({
     default() {
       return () => {}
     },
+  },
+  markdown: {
+    type: Boolean,
+    default: true,
   },
 })
 
