@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="experimental-styles-within flex flex-col gap-2">
-      <RadialHeader class="top-box mb-2 text-center" color="orange">
+      <RadialHeader class="top-box mb-2 flex flex-col items-center justify-center" color="orange">
         <ScaleIcon class="h-12 w-12 text-brand-orange" />
         <h1 class="m-3 gap-2 text-3xl font-extrabold">
           {{
