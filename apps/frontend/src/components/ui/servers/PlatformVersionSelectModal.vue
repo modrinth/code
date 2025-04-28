@@ -420,11 +420,7 @@ const mcVersions = computed(() =>
         ? x.version_type === "snapshot" || x.version_type === "release"
         : x.version_type === "release",
     )
-    .map((x) => x.version)
-    .filter((x) => {
-      const segment = parseInt(x.split(".")[1], 10);
-      return !isNaN(segment) && segment > 2;
-    }),
+    .map((x) => x.version),
 );
 
 const isDangerous = computed(() => hardReset.value);
