@@ -309,11 +309,11 @@ const fetchPurpurVersions = async (mcVersion: string) => {
   }
 };
 
-const selectedLoaderVersions = computed(() => {
+const selectedLoaderVersions = computed<string[]>(() => {
   const loader = selectedLoader.value.toLowerCase();
 
   if (loader === "paper") {
-    return paperVersions.value[selectedMCVersion.value] || [];
+    return paperVersions.value[selectedMCVersion.value].map((x) => `${x}`) || [];
   }
 
   if (loader === "purpur") {
@@ -357,7 +357,10 @@ watch(selectedLoader, async () => {
 watch(
   selectedLoaderVersions,
   (newVersions) => {
-    if (newVersions.length > 0 && !selectedLoaderVersion.value) {
+    if (
+      newVersions.length > 0 &&
+      (!selectedLoaderVersion.value || !newVersions.includes(selectedLoaderVersion.value))
+    ) {
       selectedLoaderVersion.value = String(newVersions[0]);
     }
   },
