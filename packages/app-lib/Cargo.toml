@@ -47,6 +47,7 @@ tokio-util = "0.7"
 async-recursion = "1.0.4"
 fs4 = { version = "0.13", features = ["tokio"] }
 async-walkdir = "2.1"
+async-compression = { version = "0.4", default-features = false, features = ["tokio", "gzip"] }
 
 notify = { version = "6.1.1", default-features = false }
 notify-debouncer-mini = { version = "0.4.1", default-features = false }

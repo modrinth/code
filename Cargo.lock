@@ -9239,6 +9239,7 @@ name = "theseus"
 version = "0.9.4"
 dependencies = [
  "ariadne",
+ "async-compression",
  "async-recursion",
  "async-tungstenite",
  "async-walkdir",

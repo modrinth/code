@@ -74,7 +74,7 @@ pub async fn profile_create(
     let mut profile = Profile {
         path: path.clone(),
         install_stage: ProfileInstallStage::NotInstalled,
-        launcher_feature_version: LauncherFeatureVersion::most_recent(),
+        launcher_feature_version: LauncherFeatureVersion::MOST_RECENT,
         name,
         icon_path: None,
         game_version,
