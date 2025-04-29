@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO attached_world_data (profile_path, world_type, world_id, display_status)\n            VALUES ($1, $2, $3, $4)\n            ON CONFLICT (profile_path, world_type, world_id) DO UPDATE SET\n                display_status = $4\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "679fa80cf9ba3209ae289497945281b9ff4f9dae3d2ba0c2b6708e4650dbbcaf"
+}

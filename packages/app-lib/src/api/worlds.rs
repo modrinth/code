@@ -46,6 +46,34 @@ pub struct World {
     pub details: WorldDetails,
 }
 
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum DisplayStatus {
+    #[default]
+    Normal,
+    Hidden,
+    Favorite,
+}
+
+impl DisplayStatus {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Normal => "normal",
+            Self::Hidden => "hidden",
+            Self::Favorite => "favorite",
+        }
+    }
+
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "normal" => Self::Normal,
+            "hidden" => Self::Hidden,
+            "favorite" => Self::Favorite,
+            _ => Self::Normal,
+        }
+    }
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WorldDetails {
