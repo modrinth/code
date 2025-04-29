@@ -1,10 +1,12 @@
 use crate::api::Result;
 use either::Either;
+use enumset::EnumSet;
 use tauri::{AppHandle, Manager, Runtime};
 use theseus::prelude::ProcessMetadata;
 use theseus::profile::{get_full_path, QuickPlayType};
 use theseus::worlds::{
-    ServerPackStatus, ServerStatus, World, WorldWithProfile,
+    DisplayStatus, ServerPackStatus, ServerStatus, World, WorldType,
+    WorldWithProfile,
 };
 use theseus::{profile, worlds};
 
@@ -14,6 +16,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_recent_worlds,
             get_profile_worlds,
             get_singleplayer_world,
+            set_world_display_status,
             rename_world,
             reset_world_icon,
             backup_world,
@@ -33,8 +36,13 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
 pub async fn get_recent_worlds<R: Runtime>(
     app_handle: AppHandle<R>,
     limit: usize,
+    display_statuses: Option<EnumSet<DisplayStatus>>,
 ) -> Result<Vec<WorldWithProfile>> {
-    let mut result = worlds::get_recent_worlds(limit).await?;
+    let mut result = worlds::get_recent_worlds(
+        limit,
+        display_statuses.unwrap_or(EnumSet::all()),
+    )
+    .await?;
     for world in result.iter_mut() {
         adapt_world_icon(&app_handle, &mut world.world);
     }
@@ -59,8 +67,7 @@ pub async fn get_singleplayer_world<R: Runtime>(
     instance: &str,
     world: &str,
 ) -> Result<World> {
-    let instance = get_full_path(instance).await?;
-    let mut world = worlds::get_singleplayer_world(&instance, world).await?;
+    let mut world = worlds::get_singleplayer_world(instance, world).await?;
     adapt_world_icon(&app_handle, &mut world);
     Ok(world)
 }
@@ -88,6 +95,22 @@ fn adapt_world_icon<R: Runtime>(app_handle: &AppHandle<R>, world: &mut World) {
             world.icon = None;
         }
     }
+}
+
+#[tauri::command]
+pub async fn set_world_display_status(
+    instance: &str,
+    world_type: WorldType,
+    world_id: &str,
+    display_status: DisplayStatus,
+) -> theseus::Result<()> {
+    worlds::set_world_display_status(
+        instance,
+        world_type,
+        world_id,
+        display_status,
+    )
+    .await
 }
 
 #[tauri::command]

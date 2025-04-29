@@ -9,7 +9,12 @@ type BaseWorld = {
   name: string
   last_played?: string
   icon?: string
+  display_status: DisplayStatus
+  type: WorldType
 }
+
+export type WorldType = 'singleplayer' | 'server'
+export type DisplayStatus = 'normal' | 'hidden' | 'favorite'
 
 export type SingleplayerWorld = BaseWorld & {
   type: 'singleplayer'
@@ -70,8 +75,8 @@ export type ServerData = {
   renderedMotd?: string
 }
 
-export async function get_recent_worlds(limit: number): Promise<WorldWithProfile[]> {
-  return await invoke('plugin:worlds|get_recent_worlds', { limit })
+export async function get_recent_worlds(limit: number, displayStatuses?: DisplayStatus[]): Promise<WorldWithProfile[]> {
+  return await invoke('plugin:worlds|get_recent_worlds', { limit, displayStatuses })
 }
 
 export async function get_profile_worlds(path: string): Promise<World[]> {
@@ -83,6 +88,15 @@ export async function get_singleplayer_world(
   world: string,
 ): Promise<SingleplayerWorld> {
   return await invoke('plugin:worlds|get_singleplayer_world', { instance, world })
+}
+
+export async function set_world_display_status(
+  instance: string,
+  worldType: WorldType,
+  worldId: string,
+  displayStatus: DisplayStatus,
+): Promise<void> {
+  return await invoke('plugin:worlds|set_world_display_status', { instance, worldType, worldId, displayStatus })
 }
 
 export async function rename_world(

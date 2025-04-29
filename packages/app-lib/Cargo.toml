@@ -19,6 +19,7 @@ flate2 = "1.0.28"
 tempfile = "3.5.0"
 dashmap = { version = "6.0.1", features = ["serde"] }
 quick-xml = { version = "0.37", features = ["async-tokio"] }
+enumset = "1.1"
 
 chrono = { version = "0.4.19", features = ["serde"] }
 daedalus = { path = "../../packages/daedalus" }

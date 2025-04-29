@@ -1,7 +1,10 @@
 use crate::data::ModLoader;
 use crate::launcher::get_loader_version_from_profile;
 use crate::profile::get_full_path;
-use crate::state::{server_join_log, Profile, ProfileInstallStage};
+use crate::state::attached_world_data::AttachedWorldData;
+use crate::state::{
+    attached_world_data, server_join_log, Profile, ProfileInstallStage,
+};
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
@@ -11,6 +14,7 @@ use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
 use either::Either;
+use enumset::{EnumSet, EnumSetType};
 use fs4::tokio::AsyncFileExt;
 use futures::StreamExt;
 use lazy_static::lazy_static;
@@ -42,12 +46,54 @@ pub struct World {
         with = "either::serde_untagged_optional"
     )]
     pub icon: Option<Either<PathBuf, Url>>,
+    pub display_status: DisplayStatus,
     #[serde(flatten)]
     pub details: WorldDetails,
 }
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone, Default)]
+impl World {
+    pub fn world_type(&self) -> WorldType {
+        match self.details {
+            WorldDetails::Singleplayer { .. } => WorldType::Singleplayer,
+            WorldDetails::Server { .. } => WorldType::Server,
+        }
+    }
+
+    pub fn world_id(&self) -> &str {
+        match &self.details {
+            WorldDetails::Singleplayer { path, .. } => path,
+            WorldDetails::Server { address, .. } => address,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(rename_all = "snake_case")]
+pub enum WorldType {
+    Singleplayer,
+    Server,
+}
+
+impl WorldType {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Singleplayer => "singleplayer",
+            Self::Server => "server",
+        }
+    }
+
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "singleplayer" => Self::Singleplayer,
+            "server" => Self::Server,
+            _ => Self::Singleplayer,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, EnumSetType, Debug, Default)]
+#[serde(rename_all = "snake_case")]
+#[enumset(serialize_repr = "list")]
 pub enum DisplayStatus {
     #[default]
     Normal,
@@ -56,7 +102,7 @@ pub enum DisplayStatus {
 }
 
 impl DisplayStatus {
-    pub fn as_str(self) -> &'static str {
+    pub fn as_str(&self) -> &'static str {
         match self {
             Self::Normal => "normal",
             Self::Hidden => "hidden",
@@ -129,7 +175,10 @@ impl From<ServerPackStatus> for Option<bool> {
     }
 }
 
-pub async fn get_recent_worlds(limit: usize) -> Result<Vec<WorldWithProfile>> {
+pub async fn get_recent_worlds(
+    limit: usize,
+    display_statuses: EnumSet<DisplayStatus>,
+) -> Result<Vec<WorldWithProfile>> {
     let state = State::get().await?;
     let profiles_dir = state.directories.profiles_dir();
 
@@ -159,6 +208,9 @@ pub async fn get_recent_worlds(limit: usize) -> Result<Vec<WorldWithProfile>> {
             let is_older = least_recent_time.is_none()
                 || world.last_played < least_recent_time;
             if result.len() >= limit && is_older {
+                continue;
+            }
+            if !display_statuses.contains(world.display_status) {
                 continue;
             }
             if is_older {
@@ -194,6 +246,21 @@ async fn get_all_worlds_in_profile(
     get_singleplayer_worlds_in_profile(profile_dir, &mut worlds).await?;
     get_server_worlds_in_profile(profile_path, profile_dir, &mut worlds)
         .await?;
+
+    let state = State::get().await?;
+    let attached_data =
+        AttachedWorldData::get_all_for_instance(profile_path, &state.pool)
+            .await?;
+    if !attached_data.is_empty() {
+        for world in worlds.iter_mut() {
+            if let Some(data) = attached_data
+                .get(&(world.world_type(), world.world_id().to_owned()))
+            {
+                attach_world_data_to_world(world, data);
+            }
+        }
+    }
+
     Ok(worlds)
 }
 
@@ -221,10 +288,25 @@ async fn get_singleplayer_worlds_in_profile(
 }
 
 pub async fn get_singleplayer_world(
-    profile_path: &Path,
+    instance: &str,
     world: &str,
 ) -> Result<World> {
-    read_singleplayer_world(get_world_dir(profile_path, world)).await
+    let state = State::get().await?;
+    let profile_path = state.directories.profiles_dir().join(instance);
+    let mut world =
+        read_singleplayer_world(get_world_dir(&profile_path, world)).await?;
+
+    if let Some(data) = AttachedWorldData::get_for_world(
+        instance,
+        world.world_type(),
+        world.world_id(),
+        &state.pool,
+    )
+    .await?
+    {
+        attach_world_data_to_world(&mut world, &data);
+    }
+    Ok(world)
 }
 
 async fn read_singleplayer_world(world_path: PathBuf) -> Result<World> {
@@ -280,6 +362,7 @@ async fn read_singleplayer_world_maybe_locked(
         name: level_data.level_name,
         last_played: Utc.timestamp_millis_opt(level_data.last_played).single(),
         icon: icon.map(Either::Left),
+        display_status: DisplayStatus::Normal,
         details: WorldDetails::Singleplayer {
             path: world_path
                 .file_name()
@@ -327,6 +410,7 @@ async fn get_server_worlds_in_profile(
             name: server.name,
             last_played,
             icon: icon.map(Either::Right),
+            display_status: DisplayStatus::Normal,
             details: WorldDetails::Server {
                 index,
                 address: server.ip,
@@ -336,6 +420,28 @@ async fn get_server_worlds_in_profile(
         worlds.push(world);
     }
 
+    Ok(())
+}
+
+fn attach_world_data_to_world(world: &mut World, data: &AttachedWorldData) {
+    world.display_status = data.display_status;
+}
+
+pub async fn set_world_display_status(
+    instance: &str,
+    world_type: WorldType,
+    world_id: &str,
+    display_status: DisplayStatus,
+) -> Result<()> {
+    let state = State::get().await?;
+    attached_world_data::set_display_status(
+        instance,
+        world_type,
+        world_id,
+        display_status,
+        &state.pool,
+    )
+    .await?;
     Ok(())
 }
 
