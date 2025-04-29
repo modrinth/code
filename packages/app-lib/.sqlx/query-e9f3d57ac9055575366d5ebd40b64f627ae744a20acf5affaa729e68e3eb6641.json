@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO join_log (profile_path, host, port, join_time)\n            VALUES ($1, $2, $3, $4)\n            ON CONFLICT (profile_path, host, port) DO UPDATE SET\n                join_time = $4\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "e9f3d57ac9055575366d5ebd40b64f627ae744a20acf5affaa729e68e3eb6641"
+}

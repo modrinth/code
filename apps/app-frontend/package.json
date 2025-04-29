@@ -1,7 +1,7 @@
 {
   "name": "@modrinth/app-frontend",
   "private": true,
-  "version": "0.9.3",
+  "version": "0.9.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,6 +16,7 @@
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
     "@sentry/vue": "^8.27.0",
+    "@geometrically/minecraft-motd-parser": "^1.1.4",
     "@tauri-apps/api": "^2.1.1",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-os": "^2.2.0",
@@ -50,7 +51,8 @@
     "tsconfig": "workspace:*",
     "typescript": "^5.5.4",
     "vite": "^5.4.6",
-    "vue-tsc": "^2.1.6"
+    "vue-tsc": "^2.1.6",
+    "@taijased/vue-render-tracker": "^1.0.7"
   },
   "packageManager": "pnpm@9.4.0",
   "web-types": "../../web-types.json"

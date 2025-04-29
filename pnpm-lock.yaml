@@ -41,6 +41,9 @@ importers:
 
   apps/app-frontend:
     dependencies:
+      '@geometrically/minecraft-motd-parser':
+        specifier: ^1.1.4
+        version: 1.1.4
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets
@@ -114,6 +117,9 @@ importers:
       '@nuxt/eslint-config':
         specifier: ^0.5.6
         version: 0.5.7(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4)
+      '@taijased/vue-render-tracker':
+        specifier: ^1.0.7
+        version: 1.0.7(vue@3.5.13(typescript@5.5.4))
       '@vitejs/plugin-vue':
         specifier: ^5.0.4
         version: 5.2.1(vite@5.4.11(@types/node@22.4.1)(sass@1.77.6)(terser@5.31.6))(vue@3.5.13(typescript@5.5.4))
@@ -1554,6 +1560,9 @@ packages:
       ts-jest:
         optional: true
 
+  '@geometrically/minecraft-motd-parser@1.1.4':
+    resolution: {integrity: sha512-iW4mddbyLu2j2CUB8ODAuAEVpyf0ryzkDNmHQl3YbUL9s6jzKCBYWkfTqr61Yhse+nfA98JARc2Cw2R/rZebog==}
+
   '@humanfs/core@0.19.0':
     resolution: {integrity: sha512-2cbWIHbZVEweE853g8jymffCA+NCMiuqeECeBBLm8dg2oFdjuGJhgN4UAbI+6v0CKbbhvtXA4qV8YR5Ji86nmw==}
     engines: {node: '>=18.18.0'}
@@ -2331,6 +2340,11 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: '>=8.40.0'
+
+  '@taijased/vue-render-tracker@1.0.7':
+    resolution: {integrity: sha512-nW3eYHdqRiA1AhhOm2rHxHAQCTww9W3CDHd4DYFniqwy29X1W5HXeNjr/yt+8kysTqJsb5PUv0tN6nghKmPq5w==}
+    peerDependencies:
+      vue: ^3.0.0
 
   '@tauri-apps/api@2.1.1':
     resolution: {integrity: sha512-fzUfFFKo4lknXGJq8qrCidkUcKcH2UHhfaaCNt4GzgzGaW2iS26uFOg4tS3H4P8D6ZEeUxtiD5z0nwFF0UN30A==}
@@ -8766,6 +8780,8 @@ snapshots:
       tslib: 2.6.3
       typescript: 5.8.2
 
+  '@geometrically/minecraft-motd-parser@1.1.4': {}
+
   '@humanfs/core@0.19.0': {}
 
   '@humanfs/node@0.16.5':
@@ -9348,7 +9364,7 @@ snapshots:
 
   '@nuxtjs/eslint-config-typescript@12.1.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4)':
     dependencies:
-      '@nuxtjs/eslint-config': 12.0.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))
+      '@nuxtjs/eslint-config': 12.0.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))
       '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4)
       '@typescript-eslint/parser': 6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4)
       eslint: 9.13.0(jiti@2.4.1)
@@ -9361,10 +9377,10 @@ snapshots:
       - supports-color
       - typescript
 
-  '@nuxtjs/eslint-config@12.0.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))':
+  '@nuxtjs/eslint-config@12.0.0(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))':
     dependencies:
       eslint: 9.13.0(jiti@2.4.1)
-      eslint-config-standard: 17.1.0(eslint-plugin-import@2.29.1)(eslint-plugin-n@15.7.0(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-promise@6.4.0(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))
+      eslint-config-standard: 17.1.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-n@15.7.0(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-promise@6.4.0(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-n: 15.7.0(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-node: 11.1.0(eslint@9.13.0(jiti@2.4.1))
@@ -9829,6 +9845,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - typescript
+
+  '@taijased/vue-render-tracker@1.0.7(vue@3.5.13(typescript@5.5.4))':
+    dependencies:
+      vue: 3.5.13(typescript@5.5.4)
 
   '@tauri-apps/api@2.1.1': {}
 
@@ -11926,10 +11946,10 @@ snapshots:
     dependencies:
       eslint: 9.13.0(jiti@2.4.1)
 
-  eslint-config-standard@17.1.0(eslint-plugin-import@2.29.1)(eslint-plugin-n@15.7.0(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-promise@6.4.0(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1)):
+  eslint-config-standard@17.1.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-n@15.7.0(eslint@9.13.0(jiti@2.4.1)))(eslint-plugin-promise@6.4.0(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1)):
     dependencies:
       eslint: 9.13.0(jiti@2.4.1)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.16.1(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint@9.13.0(jiti@2.4.1))
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-n: 15.7.0(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-promise: 6.4.0(eslint@9.13.0(jiti@2.4.1))
 
@@ -11955,7 +11975,7 @@ snapshots:
       debug: 4.4.0(supports-color@9.4.0)
       enhanced-resolve: 5.17.1
       eslint: 9.13.0(jiti@2.4.1)
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1))
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1))
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.16.1(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint@9.13.0(jiti@2.4.1))
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
@@ -11967,7 +11987,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@9.13.0(jiti@2.4.1)):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.21.0(eslint@9.13.0(jiti@2.4.1))(typescript@5.5.4))(eslint-plugin-import@2.29.1)(eslint@9.13.0(jiti@2.4.1)))(eslint@9.13.0(jiti@2.4.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:

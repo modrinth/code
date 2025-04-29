@@ -45,6 +45,8 @@ pub use self::mr_auth::*;
 
 mod legacy_converter;
 
+pub mod server_join_log;
+
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();

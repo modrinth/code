@@ -53,7 +53,7 @@
         </div>
 
         <div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
-          <div class="text-sm font-bold text-contrast">Minecraft version</div>
+          <div class="text-lg font-bold text-contrast">Minecraft version</div>
           <UiServersTeleportDropdownMenu
             v-model="selectedMCVersion"
             name="mcVersion"
@@ -61,6 +61,20 @@
             class="w-full max-w-[100%]"
             placeholder="Select Minecraft version..."
           />
+          <div class="mt-2 flex items-center justify-between gap-2">
+            <label for="toggle-snapshots" class="font-semibold"> Show snapshot versions </label>
+            <div
+              v-tooltip="
+                isSnapshotSelected ? 'A snapshot version is currently selected.' : undefined
+              "
+            >
+              <Toggle
+                id="toggle-snapshots"
+                v-model="showSnapshots"
+                :disabled="isSnapshotSelected"
+              />
+            </div>
+          </div>
         </div>
 
         <div
@@ -74,7 +88,7 @@
           }"
         >
           <div class="flex flex-col gap-2">
-            <div class="text-sm font-bold text-contrast">{{ selectedLoader }} version</div>
+            <div class="text-lg font-bold text-contrast">{{ selectedLoader }} version</div>
 
             <template v-if="!selectedMCVersion">
               <div
@@ -177,8 +191,9 @@
 </template>
 
 <script setup lang="ts">
-import { BackupWarning, ButtonStyled, NewModal } from "@modrinth/ui";
-import { RightArrowIcon, XIcon, ServerIcon, DropdownIcon } from "@modrinth/assets";
+import { BackupWarning, ButtonStyled, NewModal, Toggle } from "@modrinth/ui";
+import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from "@modrinth/assets";
+import { $fetch } from "ofetch";
 import type { Server } from "~/composables/pyroServers";
 import type { Loaders } from "~/types/servers";
 import type { BackupInProgressReason } from "~/pages/servers/manage/[id].vue";
@@ -214,6 +229,7 @@ const hardReset = ref(false);
 const isLoading = ref(false);
 const loadingServerCheck = ref(false);
 const serverCheckError = ref("");
+const showSnapshots = ref(false);
 
 const selectedLoader = ref<Loaders>("Vanilla");
 const selectedMCVersion = ref("");
@@ -226,6 +242,22 @@ const cachedVersions = ref<VersionCache>({});
 
 const versionStrings = ["forge", "fabric", "quilt", "neo"] as const;
 
+const isSnapshotSelected = computed(() => {
+  if (selectedMCVersion.value) {
+    const selected = tags.value.gameVersions.find((x) => x.version === selectedMCVersion.value);
+    if (selected?.version_type !== "release") {
+      return true;
+    }
+  }
+  return false;
+});
+
+const getLoaderVersions = async (loader: string) => {
+  return await $fetch(
+    `https://launcher-meta.modrinth.com/${loader?.toLowerCase()}/v0/manifest.json`,
+  );
+};
+
 const fetchLoaderVersions = async () => {
   const versions = await Promise.all(
     versionStrings.map(async (loader) => {
@@ -234,7 +266,7 @@ const fetchLoaderVersions = async () => {
           throw new Error("Failed to fetch loader versions");
         }
         try {
-          const res = await $fetch(`/loader-versions?loader=${loader}`);
+          const res = await getLoaderVersions(loader);
           return { [loader]: (res as any).gameVersions };
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (_) {
@@ -277,11 +309,11 @@ const fetchPurpurVersions = async (mcVersion: string) => {
   }
 };
 
-const selectedLoaderVersions = computed(() => {
+const selectedLoaderVersions = computed<string[]>(() => {
   const loader = selectedLoader.value.toLowerCase();
 
   if (loader === "paper") {
-    return paperVersions.value[selectedMCVersion.value] || [];
+    return paperVersions.value[selectedMCVersion.value].map((x) => `${x}`) || [];
   }
 
   if (loader === "purpur") {
@@ -325,12 +357,21 @@ watch(selectedLoader, async () => {
 watch(
   selectedLoaderVersions,
   (newVersions) => {
-    if (newVersions.length > 0 && !selectedLoaderVersion.value) {
+    if (
+      newVersions.length > 0 &&
+      (!selectedLoaderVersion.value || !newVersions.includes(selectedLoaderVersion.value))
+    ) {
       selectedLoaderVersion.value = String(newVersions[0]);
     }
   },
   { immediate: true },
 );
+
+const getLoaderVersion = async (loader: string, version: string) => {
+  return await $fetch(
+    `https://launcher-meta.modrinth.com/${loader?.toLowerCase()}/v0/versions/${version}.json`,
+  );
+};
 
 const checkVersionAvailability = async (version: string) => {
   if (!version || version.trim().length < 3) return;
@@ -339,9 +380,7 @@ const checkVersionAvailability = async (version: string) => {
   loadingServerCheck.value = true;
 
   try {
-    const mcRes =
-      cachedVersions.value[version] ||
-      (await $fetch(`/loader-versions?loader=minecraft&version=${version}`));
+    const mcRes = cachedVersions.value[version] || (await getLoaderVersion("minecraft", version));
 
     cachedVersions.value[version] = mcRes;
 
@@ -377,13 +416,15 @@ onMounted(() => {
 });
 
 const tags = useTags();
-const mcVersions = tags.value.gameVersions
-  .filter((x) => x.version_type === "release")
-  .map((x) => x.version)
-  .filter((x) => {
-    const segment = parseInt(x.split(".")[1], 10);
-    return !isNaN(segment) && segment > 2;
-  });
+const mcVersions = computed(() =>
+  tags.value.gameVersions
+    .filter((x) =>
+      showSnapshots.value
+        ? x.version_type === "snapshot" || x.version_type === "release"
+        : x.version_type === "release",
+    )
+    .map((x) => x.version),
+);
 
 const isDangerous = computed(() => hardReset.value);
 const canInstall = computed(() => {
@@ -448,6 +489,9 @@ const handleReinstall = async () => {
 
 const onShow = () => {
   selectedMCVersion.value = props.server.general?.mc_version || "";
+  if (isSnapshotSelected.value) {
+    showSnapshots.value = true;
+  }
 };
 
 const onHide = () => {

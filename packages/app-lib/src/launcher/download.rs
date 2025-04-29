@@ -1,6 +1,7 @@
 //! Downloader for Minecraft data
 
 use crate::launcher::parse_rules;
+use crate::profile::QuickPlayType;
 use crate::{
     event::{
         emit::{emit_loading, loading_try_for_each_concurrent},
@@ -295,7 +296,7 @@ pub async fn download_libraries(
         stream::iter(libraries.iter())
             .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
                 if let Some(rules) = &library.rules {
-                    if !parse_rules(rules, java_arch, minecraft_updated) {
+                    if !parse_rules(rules, java_arch, &QuickPlayType::None, minecraft_updated) {
                         tracing::trace!("Skipped library {}", &library.name);
                         return Ok(());
                     }
