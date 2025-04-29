@@ -21,6 +21,10 @@ export const commonMessages = defineMessages({
     id: 'button.copy-id',
     defaultMessage: 'Copy ID',
   },
+  copyPermalinkButton: {
+    id: 'button.copy-permalink',
+    defaultMessage: 'Copy permanent link',
+  },
   changesSavedLabel: {
     id: 'label.changes-saved',
     defaultMessage: 'Changes saved',

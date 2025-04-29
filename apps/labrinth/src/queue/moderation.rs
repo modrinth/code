@@ -168,19 +168,19 @@ impl ModerationMessage {
 
                     for project in &projects {
                         let additional_text = if project.contains("ftb-quests") {
-                            Some("Heracles")
+                            Some(("Odyssey Quests", "lo90fZoB"))
                         } else if project.contains("ftb-ranks") || project.contains("ftb-essentials") {
-                            Some("Prometheus")
+                            Some(("Odyssey Roles", "iYcNKH7W"))
                         } else if project.contains("ftb-teams") {
-                            Some("Argonauts")
+                            Some(("Odyssey Guilds", "bb2EpKpx"))
                         } else if project.contains("ftb-chunks") {
-                            Some("Cadmus")
+                            Some(("Odyssey Claims", "fEWKxVzh"))
                         } else {
                             None
                         };
 
                         val.push_str(&if let Some(additional_text) = additional_text {
-                            format!("- {project}(consider using [{additional_text}](https://modrinth.com/mod/{}) instead)\n", additional_text.to_lowercase())
+                            format!("- {project} (consider using [{}](https://modrinth.com/project/{}) instead)\n", additional_text.0, additional_text.1)
                         } else {
                             format!("- {project}\n")
                         })
