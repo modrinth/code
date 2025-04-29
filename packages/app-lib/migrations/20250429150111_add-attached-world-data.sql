@@ -1,6 +1,6 @@
 CREATE TABLE attached_world_data (
     profile_path TEXT NOT NULL,
-    world_type TEXT CHECK ( world_type in ('world', 'server') ) NOT NULL,
+    world_type TEXT CHECK ( world_type in ('singleplayer', 'server') ) NOT NULL,
     world_id TEXT NOT NULL,
     display_status TEXT NOT NULL DEFAULT 'normal',
 

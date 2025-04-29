@@ -1,5 +1,6 @@
 use crate::worlds::DisplayStatus;
 use paste::paste;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default)]
@@ -7,25 +8,26 @@ pub struct AttachedWorldData {
     pub display_status: DisplayStatus,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[serde(rename_all = "snake_case")]
 pub enum WorldType {
-    World,
+    Singleplayer,
     Server,
 }
 
 impl WorldType {
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::World => "normal",
-            Self::Server => "hidden",
+            Self::Singleplayer => "singleplayer",
+            Self::Server => "server",
         }
     }
 
     pub fn from_str(s: &str) -> Self {
         match s {
-            "world" => Self::World,
+            "singleplayer" => Self::Singleplayer,
             "server" => Self::Server,
-            _ => Self::World,
+            _ => Self::Singleplayer,
         }
     }
 }
