@@ -178,8 +178,12 @@
               />
               <div v-else class="w-fit">
                 <p>
-                  A linked server couldn't be found with this subscription. It may have been deleted
-                  or suspended. Please contact Modrinth support with the following information:
+                  A linked server couldn't be found for this subscription. There are a few possible
+                  explanations for this. If you just purchased your server, this is normal. It could
+                  take up to an hour for your server to be provisioned. Otherwise, if you purchased
+                  this server a while ago, it has likely since been suspended. If this is not what
+                  you were expecting, please contact Modrinth support with the following
+                  information:
                 </p>
                 <div class="flex w-full flex-col gap-2">
                   <CopyCode
