@@ -262,8 +262,9 @@ export const processAnalyticsByCountry = (category, projects, sortFn) => {
 
   loadedProjectData.forEach((data) => {
     Object.entries(data).forEach(([country, value]) => {
-      const current = countrySums.get(country) || 0;
-      countrySums.set(country, current + value);
+      const countryCode = country || "XX";
+      const current = countrySums.get(countryCode) || 0;
+      countrySums.set(countryCode, current + value);
     });
   });
 
