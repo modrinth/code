@@ -11,6 +11,30 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
   {
+    date: `2025-04-29T08:20:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Fixed multiple 'Hidden' countries showing up in analytics, updated flag and changed to 'Other'.`,
+  },
+  {
+    date: `2025-04-28T19:45:00-07:00`,
+    product: 'servers',
+    body: `### Added
+- Added support for installing snapshot versions of Minecraft.
+
+### Improvements
+- Fixed a bug where the loader version wouldn't update after changing Minecraft version if the old loader version did not support the newly selected Minecraft version.
+- Improved wording of unprovisioned servers, to inform people that newly purchased servers may be unprovisioned for a small amount of time.`,
+  },
+  {
+    date: `2025-04-28T19:45:00-07:00`,
+    product: 'web',
+    body: `### Improvements
+- Combined Apple Silicon and Intel download links for Modrinth App into one link.
+- Added an option to copy a permanent link (using IDs instead of changeable slugs) to projects, users, and organizations.
+- Fixed overflow issue with dev-mode Maven coordinates widget, and changed wording.`,
+  },
+  {
     date: `2025-04-26T19:15:00-07:00`,
     product: 'app',
     version: `0.9.4`,
