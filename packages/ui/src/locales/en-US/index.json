@@ -8,6 +8,9 @@
   "button.copy-id": {
     "defaultMessage": "Copy ID"
   },
+  "button.copy-permalink": {
+    "defaultMessage": "Copy permanent link"
+  },
   "button.create-a-project": {
     "defaultMessage": "Create a project"
   },
