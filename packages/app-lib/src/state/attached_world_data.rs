@@ -1,14 +1,6 @@
-use std::collections::HashMap;
-
 use crate::worlds::DisplayStatus;
-
-#[derive(Debug, Clone)]
-pub struct AttachedWorldDataReference {
-    pub profile_path: String,
-    pub world_type: WorldType,
-    pub world_id: String,
-    pub data: AttachedWorldData,
-}
+use paste::paste;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default)]
 pub struct AttachedWorldData {
@@ -38,40 +30,13 @@ impl WorldType {
     }
 }
 
-impl AttachedWorldDataReference {
-    pub async fn upsert(
-        &self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<()> {
-        let world_type = self.world_type.as_str();
-        let display_status = self.data.display_status.as_str();
-
-        sqlx::query!(
-            "
-            INSERT INTO attached_world_data (profile_path, world_type, world_id, display_status)
-            VALUES ($1, $2, $3, $4)
-            ON CONFLICT (profile_path, world_type, world_id) DO UPDATE SET
-                display_status = $4
-            ",
-            self.profile_path,
-            world_type,
-            self.world_id,
-            display_status
-        )
-        .execute(exec)
-        .await?;
-
-        Ok(())
-    }
-}
-
 impl AttachedWorldData {
     pub async fn get_for_world(
         instance: &str,
         world_type: WorldType,
         world_id: &str,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<Self> {
+    ) -> crate::Result<Option<Self>> {
         let world_type = world_type.as_str();
 
         let attached_data = sqlx::query!(
@@ -87,11 +52,9 @@ impl AttachedWorldData {
         .fetch_optional(exec)
         .await?;
 
-        Ok(attached_data
-            .map(|x| AttachedWorldData {
-                display_status: DisplayStatus::from_str(&x.display_status),
-            })
-            .unwrap_or_else(Default::default))
+        Ok(attached_data.map(|x| AttachedWorldData {
+            display_status: DisplayStatus::from_str(&x.display_status),
+        }))
     }
 
     pub async fn get_all_for_instance(
@@ -122,3 +85,37 @@ impl AttachedWorldData {
             .collect())
     }
 }
+
+macro_rules! attached_data_setter {
+    ($parameter:ident: $parameter_type:ty, $column:expr $(=> $adapter:expr)?) => {
+        paste! {
+            pub async fn [<set_ $parameter>](
+                instance: &str,
+                world_type: WorldType,
+                world_id: &str,
+                $parameter: $parameter_type,
+                exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+            ) -> crate::Result<()> {
+                let world_type = world_type.as_str();
+                $(let $parameter = $adapter;)?
+
+                sqlx::query!(
+                    "INSERT INTO attached_world_data (profile_path, world_type, world_id, " + $column + ")\n" +
+                    "VALUES ($1, $2, $3, $4)\n" +
+                    "ON CONFLICT (profile_path, world_type, world_id) DO UPDATE\n" +
+                    "    SET " + $column + " = $4",
+                    instance,
+                    world_type,
+                    world_id,
+                    $parameter
+                )
+                .execute(exec)
+                .await?;
+
+                Ok(())
+            }
+        }
+    }
+}
+
+attached_data_setter!(display_status: DisplayStatus, "display_status" => display_status.as_str());
