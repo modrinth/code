@@ -225,6 +225,11 @@ const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
 await refreshAllWorlds()
 
 async function refreshServer(address: string) {
+  if (!serverData.value[address]) {
+    serverData.value[address] = {
+      refreshing: true,
+    }
+  }
   await refreshServerData(serverData.value[address], protocolVersion.value, address)
 }
 

@@ -10,6 +10,7 @@ import dayjs from 'dayjs'
 import { get_search_results } from '@/helpers/cache.js'
 import type { SearchResult } from '@modrinth/utils'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
+import { useTheming } from '@/store/theme.ts'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()

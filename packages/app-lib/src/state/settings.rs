@@ -44,6 +44,8 @@ pub struct Settings {
 pub enum FeatureFlag {
     PagePath,
     ProjectBackground,
+    WorldsTab,
+    WorldsInHome,
 }
 
 impl Settings {
