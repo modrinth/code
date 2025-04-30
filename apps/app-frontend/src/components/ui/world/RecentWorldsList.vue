@@ -146,7 +146,7 @@ async function populateJumpBackIn() {
   items.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
   jumpBackInItems.value = items.filter(
     (item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO),
-  )
+  ).slice(0, MAX_JUMP_BACK_IN);
 }
 
 async function refreshServer(address: string, instancePath: string) {
