@@ -17,12 +17,13 @@ import { watch, onMounted, onUnmounted, ref, computed } from 'vue'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { useTheming } from '@/store/theme.ts'
-import { kill } from '@/helpers/profile'
+import { kill, run } from '@/helpers/profile'
 import { handleError } from '@/store/notifications'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_all } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
+import { handleSevereError } from '@/store/error'
 
 const props = defineProps<{
   recentInstances: GameInstance[]
@@ -161,6 +162,18 @@ async function joinWorld(world: WorldWithProfile) {
   }
 }
 
+async function playInstance(instance: GameInstance) {
+  await run(instance.path)
+    .catch((err) => handleSevereError(err, { profilePath: instance.path }))
+    .finally(() => {
+      trackEvent('InstancePlay', {
+        loader: instance.loader,
+        game_version: instance.game_version,
+        source: 'WorldItem',
+      })
+    })
+}
+
 async function stopInstance(path: string) {
   await kill(path).catch(handleError)
   trackEvent('InstanceStop', {
@@ -268,6 +281,10 @@ onUnmounted(() => {
               joinWorld(item.world)
             }
           "
+          @play-instance="() => {
+            currentProfile = item.instance.path
+            playInstance(item.instance)
+          }"
           @stop="() => stopInstance(item.instance.path)"
         />
         <InstanceItem v-else :instance="item.instance" />

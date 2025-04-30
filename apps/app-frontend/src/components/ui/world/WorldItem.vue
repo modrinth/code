@@ -35,7 +35,7 @@ const { formatMessage } = useVIntl()
 const router = useRouter()
 
 const emit = defineEmits<{
-  (e: 'play' | 'stop' | 'refresh' | 'edit' | 'delete'): void
+  (e: 'play' | 'play-instance' | 'stop' | 'refresh' | 'edit' | 'delete'): void
 }>()
 
 const props = withDefaults(
@@ -142,6 +142,10 @@ const messages = defineMessages({
   playAnyway: {
     id: 'instance.worlds.play_anyway',
     defaultMessage: 'Play anyway',
+  },
+  playInstance: {
+    id: 'instance.worlds.play_instance',
+    defaultMessage: 'Play instance',
   },
   worldInUse: {
     id: 'instance.worlds.world_in_use',
@@ -337,6 +341,12 @@ const messages = defineMessages({
           <OverflowMenu
             :options="[
               {
+                id: 'play-instance',
+                shown: !!instancePath,
+                disabled: playingInstance,
+                action: () => emit('play-instance'),
+              },
+              {
                 id: 'play-anyway',
                 shown: serverIncompatible && !playingInstance && supportsQuickPlay,
                 action: () => emit('play'),
@@ -344,7 +354,7 @@ const messages = defineMessages({
               {
                 id: 'open-instance',
                 shown: !!instancePath,
-                action: () => router.push(encodeURI(`/instance/${instancePath}/worlds`)),
+                action: () => router.push(encodeURI(`/instance/${instancePath}`)),
               },
               {
                 id: 'refresh',
@@ -385,6 +395,10 @@ const messages = defineMessages({
             ]"
           >
             <MoreVerticalIcon aria-hidden="true" />
+            <template #play-instance>
+              <PlayIcon aria-hidden="true" />
+              {{ formatMessage(messages.playInstance) }}
+            </template>
             <template #play-anyway>
               <PlayIcon aria-hidden="true" />
               {{ formatMessage(messages.playAnyway) }}
