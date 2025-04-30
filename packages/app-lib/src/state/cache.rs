@@ -843,7 +843,7 @@ impl CachedEntry {
             fetch_semaphore: &FetchSemaphore,
             pool: &SqlitePool,
         ) -> crate::Result<Vec<T>> {
-            const MAX_REQUEST_SIZE: usize = 1000;
+            const MAX_REQUEST_SIZE: usize = 800;
 
             let urls = keys
                 .iter()
