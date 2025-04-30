@@ -482,12 +482,12 @@ dependencies = [
  "chrono",
  "either",
  "lazy_static",
- "rand 0.8.5",
+ "rand 0.9.1",
  "serde",
  "serde_bytes",
  "serde_cbor",
  "serde_json",
- "thiserror 1.0.69",
+ "thiserror 2.0.12",
  "uuid 1.16.0",
 ]
 
