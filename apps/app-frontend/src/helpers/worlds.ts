@@ -244,12 +244,14 @@ export async function refreshServers(
 
 export async function refreshWorld(worlds: World[], instancePath: string, worldPath: string) {
   const index = worlds.findIndex((w) => w.type === 'singleplayer' && w.path === worldPath)
+  const newWorld = await get_singleplayer_world(instancePath, worldPath)
   if (index !== -1) {
-    worlds[index] = await get_singleplayer_world(instancePath, worldPath)
-    sortWorlds(worlds)
+    worlds[index] = newWorld
   } else {
-    console.error(`Error refreshing world, could not find world at path ${worldPath}.`)
+    console.info(`Adding new world at path: ${worldPath}.`)
+    worlds.push(newWorld)
   }
+  sortWorlds(worlds)
 }
 
 export async function handleDefaultProfileUpdateEvent(

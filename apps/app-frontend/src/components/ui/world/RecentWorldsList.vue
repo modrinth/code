@@ -73,7 +73,7 @@ async function populateJumpBackIn() {
   const worldItems: WorldJumpBackInItem[] = []
 
   if (showWorlds.value) {
-    const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN)
+    const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN, ['normal', 'favorite'])
 
     worlds.forEach((world) => {
       const instance = props.recentInstances.find((instance) => instance.path === world.profile)

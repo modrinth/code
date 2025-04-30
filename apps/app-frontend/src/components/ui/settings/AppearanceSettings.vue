@@ -89,7 +89,7 @@ watch(
   <div class="mt-4 flex items-center justify-between">
     <div>
       <h2 class="m-0 text-lg font-extrabold text-contrast">Jump back into worlds</h2>
-      <p class="m-0 mt-1">Includes recent worlds on the Home page's 'Jump back in' section.</p>
+      <p class="m-0 mt-1">Includes recent worlds in the "Jump back in" section on the Home page.</p>
     </div>
     <Toggle
       :model-value="themeStore.getFeatureFlag('worlds_in_home')"
