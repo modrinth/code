@@ -103,14 +103,14 @@ pub async fn set_world_display_status(
     world_type: WorldType,
     world_id: &str,
     display_status: DisplayStatus,
-) -> theseus::Result<()> {
-    worlds::set_world_display_status(
+) -> Result<()> {
+    Ok(worlds::set_world_display_status(
         instance,
         world_type,
         world_id,
         display_status,
     )
-    .await
+    .await?)
 }
 
 #[tauri::command]
