@@ -13,6 +13,7 @@ use async_tungstenite::tokio::{connect_async, ConnectStream};
 use async_tungstenite::tungstenite::client::IntoClientRequest;
 use async_tungstenite::tungstenite::Message;
 use async_tungstenite::WebSocketStream;
+use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use either::Either;
@@ -258,7 +259,7 @@ impl FriendsSocket {
                     last_ping = Utc::now();
                     let mut write = state.friends_socket.write.write().await;
                     if let Some(write) = write.as_mut() {
-                        let _ = write.send(Message::Ping(Vec::new())).await;
+                        let _ = write.send(Message::Ping(Bytes::new())).await;
                     }
                 }
 
