@@ -9,7 +9,7 @@ use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
 };
 use crate::util::io;
-use crate::{process, state as st, State};
+use crate::{State, process, state as st};
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
@@ -65,13 +65,11 @@ pub fn parse_rule(
     use d::minecraft::{Rule, RuleAction};
 
     let res = match rule {
-        Rule {
-            os: Some(ref os), ..
-        } => {
+        Rule { os: Some(os), .. } => {
             crate::util::platform::os_rule(os, java_version, minecraft_updated)
         }
         Rule {
-            features: Some(ref features),
+            features: Some(features),
             ..
         } => {
             !features.is_demo_user.unwrap_or(true)

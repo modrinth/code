@@ -1,7 +1,7 @@
-use crate::util::fetch::REQWEST_CLIENT;
 use crate::ErrorKind;
-use base64::prelude::{BASE64_STANDARD, BASE64_URL_SAFE_NO_PAD};
+use crate::util::fetch::REQWEST_CLIENT;
 use base64::Engine;
+use base64::prelude::{BASE64_STANDARD, BASE64_URL_SAFE_NO_PAD};
 use byteorder::BigEndian;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use dashmap::DashMap;
@@ -9,10 +9,10 @@ use futures::TryStreamExt;
 use p256::ecdsa::signature::Signer;
 use p256::ecdsa::{Signature, SigningKey, VerifyingKey};
 use p256::pkcs8::{DecodePrivateKey, EncodePrivateKey, LineEnding};
-use rand::rngs::OsRng;
 use rand::Rng;
-use reqwest::header::HeaderMap;
+use rand::rngs::OsRng;
 use reqwest::Response;
+use reqwest::header::HeaderMap;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -1201,6 +1201,6 @@ fn get_date_header(headers: &HeaderMap) -> DateTime<Utc> {
 fn generate_oauth_challenge() -> String {
     let mut rng = rand::thread_rng();
 
-    let bytes: Vec<u8> = (0..64).map(|_| rng.gen::<u8>()).collect();
+    let bytes: Vec<u8> = (0..64).map(|_| rng.r#gen::<u8>()).collect();
     bytes.iter().map(|byte| format!("{:02x}", byte)).collect()
 }

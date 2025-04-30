@@ -2,7 +2,7 @@
 name = "theseus"
 version = "0.9.4"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 bytes = "1"
