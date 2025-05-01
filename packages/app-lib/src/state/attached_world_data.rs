@@ -1,6 +1,6 @@
 use crate::worlds::{DisplayStatus, WorldType};
 use paste::paste;
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default)]
 pub struct AttachedWorldData {
@@ -30,8 +30,7 @@ impl AttachedWorldData {
         .await?;
 
         Ok(attached_data.map(|x| AttachedWorldData {
-            display_status: DisplayStatus::from_str(&x.display_status)
-                .unwrap_or_default(),
+            display_status: DisplayStatus::from_string(&x.display_status),
         }))
     }
 
@@ -53,10 +52,9 @@ impl AttachedWorldData {
         Ok(attached_data
             .into_iter()
             .map(|x| {
-                let world_type =
-                    WorldType::from_str(&x.world_type).unwrap_or_default();
-                let display_status = DisplayStatus::from_str(&x.display_status)
-                    .unwrap_or_default();
+                let world_type = WorldType::from_string(&x.world_type);
+                let display_status =
+                    DisplayStatus::from_string(&x.display_status);
                 (
                     (world_type, x.world_id),
                     AttachedWorldData { display_status },

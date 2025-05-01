@@ -29,20 +29,6 @@ use tokio::io::AsyncWriteExt;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 use url::Url;
 
-macro_rules! impl_from_str_from_deserialize {
-    ($( $t:ty ),+) => {
-        $(
-            impl ::std::str::FromStr for $t {
-                type Err = ::serde::de::value::Error;
-
-                fn from_str(s: &str) -> ::std::result::Result<Self, Self::Err> {
-                    Self::deserialize(::serde::de::IntoDeserializer::into_deserializer(s))
-                }
-            }
-        )+
-    };
-}
-
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct WorldWithProfile {
     pub profile: String,
@@ -98,9 +84,15 @@ impl WorldType {
             Self::Server => "server",
         }
     }
-}
 
-impl_from_str_from_deserialize!(WorldType);
+    pub fn from_string(string: &str) -> Self {
+        match string {
+            "singleplayer" => Self::Singleplayer,
+            "server" => Self::Server,
+            _ => Self::Singleplayer,
+        }
+    }
+}
 
 #[derive(Deserialize, Serialize, EnumSetType, Debug, Default)]
 #[serde(rename_all = "snake_case")]
@@ -120,9 +112,16 @@ impl DisplayStatus {
             Self::Favorite => "favorite",
         }
     }
-}
 
-impl_from_str_from_deserialize!(DisplayStatus);
+    pub fn from_string(string: &str) -> Self {
+        match string {
+            "normal" => Self::Normal,
+            "hidden" => Self::Hidden,
+            "favorite" => Self::Favorite,
+            _ => Self::Normal,
+        }
+    }
+}
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
