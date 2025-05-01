@@ -144,7 +144,7 @@ where
 
     match (
         "Content-Type",
-        format!("multipart/form-data; boundary={}", boundary).as_str(),
+        format!("multipart/form-data; boundary={boundary}").as_str(),
     )
         .try_into_pair()
     {
@@ -153,8 +153,7 @@ where
         }
         Err(err) => {
             CreateError::InvalidInput(format!(
-                "Error inserting test header: {:?}.",
-                err
+                "Error inserting test header: {err:?}."
             ));
         }
     };

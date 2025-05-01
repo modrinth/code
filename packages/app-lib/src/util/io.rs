@@ -256,6 +256,19 @@ pub async fn remove_file(
         })
 }
 
+// open file
+pub async fn open_file(
+    path: impl AsRef<std::path::Path>,
+) -> Result<tokio::fs::File, IOError> {
+    let path = path.as_ref();
+    tokio::fs::File::open(path)
+        .await
+        .map_err(|e| IOError::IOPathError {
+            source: e,
+            path: path.to_string_lossy().to_string(),
+        })
+}
+
 // remove dir
 pub async fn remove_dir(
     path: impl AsRef<std::path::Path>,

@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import type { ServerStatus, ServerWorld, World } from '@/helpers/worlds.ts'
-import { getWorldIdentifier, showWorldInFolder } from '@/helpers/worlds.ts'
+import {
+  set_world_display_status,
+  getWorldIdentifier,
+  showWorldInFolder,
+} from '@/helpers/worlds.ts'
 import { formatNumber } from '@modrinth/utils'
 import {
   IssuesIcon,
@@ -19,6 +23,7 @@ import {
   TrashIcon,
   UpdatedIcon,
   UserIcon,
+  XIcon,
 } from '@modrinth/assets'
 import { Avatar, ButtonStyled, commonMessages, OverflowMenu, SmartClickable } from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
@@ -35,7 +40,7 @@ const { formatMessage } = useVIntl()
 const router = useRouter()
 
 const emit = defineEmits<{
-  (e: 'play' | 'stop' | 'refresh' | 'edit' | 'delete'): void
+  (e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete'): void
 }>()
 
 const props = withDefaults(
@@ -69,6 +74,7 @@ const props = withDefaults(
     playingWorld: false,
     startingInstance: false,
     supportsQuickPlay: false,
+    currentProtocol: null,
 
     refreshing: false,
     serverStatus: undefined,
@@ -143,9 +149,17 @@ const messages = defineMessages({
     id: 'instance.worlds.play_anyway',
     defaultMessage: 'Play anyway',
   },
+  playInstance: {
+    id: 'instance.worlds.play_instance',
+    defaultMessage: 'Play instance',
+  },
   worldInUse: {
     id: 'instance.worlds.world_in_use',
     defaultMessage: 'World is in use',
+  },
+  dontShowOnHome: {
+    id: 'instance.worlds.dont_show_on_home',
+    defaultMessage: `Don't show on Home`,
   },
 })
 </script>
@@ -337,6 +351,12 @@ const messages = defineMessages({
           <OverflowMenu
             :options="[
               {
+                id: 'play-instance',
+                shown: !!instancePath,
+                disabled: playingInstance,
+                action: () => emit('play-instance'),
+              },
+              {
                 id: 'play-anyway',
                 shown: serverIncompatible && !playingInstance && supportsQuickPlay,
                 action: () => emit('play'),
@@ -344,7 +364,7 @@ const messages = defineMessages({
               {
                 id: 'open-instance',
                 shown: !!instancePath,
-                action: () => router.push(encodeURI(`/instance/${instancePath}/worlds`)),
+                action: () => router.push(encodeURI(`/instance/${instancePath}`)),
               },
               {
                 id: 'refresh',
@@ -371,6 +391,24 @@ const messages = defineMessages({
               },
               {
                 divider: true,
+                shown: !!instancePath,
+              },
+              {
+                id: 'dont-show-on-home',
+                shown: !!instancePath,
+                action: () => {
+                  set_world_display_status(
+                    instancePath,
+                    world.type,
+                    getWorldIdentifier(world),
+                    'hidden',
+                  ).then(() => {
+                    emit('update')
+                  })
+                },
+              },
+              {
+                divider: true,
                 shown: !instancePath,
               },
               {
@@ -385,6 +423,10 @@ const messages = defineMessages({
             ]"
           >
             <MoreVerticalIcon aria-hidden="true" />
+            <template #play-instance>
+              <PlayIcon aria-hidden="true" />
+              {{ formatMessage(messages.playInstance) }}
+            </template>
             <template #play-anyway>
               <PlayIcon aria-hidden="true" />
               {{ formatMessage(messages.playAnyway) }}
@@ -405,6 +447,10 @@ const messages = defineMessages({
             </template>
             <template #refresh>
               <UpdatedIcon aria-hidden="true" /> {{ formatMessage(commonMessages.refreshButton) }}
+            </template>
+            <template #dont-show-on-home>
+              <XIcon aria-hidden="true" />
+              {{ formatMessage(messages.dontShowOnHome) }}
             </template>
             <template #delete>
               <TrashIcon aria-hidden="true" />

@@ -137,7 +137,7 @@ impl TemporaryDatabase {
                     dotenvy::var("DATABASE_URL").expect("No database URL");
                 let mut template_url =
                     Url::parse(&url).expect("Invalid database URL");
-                template_url.set_path(&format!("/{}", TEMPLATE_DATABASE_NAME));
+                template_url.set_path(&format!("/{TEMPLATE_DATABASE_NAME}"));
 
                 let pool = PgPool::connect(template_url.as_str())
                     .await

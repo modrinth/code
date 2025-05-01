@@ -414,7 +414,7 @@ fn generate_access_token() -> String {
         .take(60)
         .map(char::from)
         .collect::<String>();
-    format!("mro_{}", random)
+    format!("mro_{random}")
 }
 
 async fn init_oauth_code_flow(

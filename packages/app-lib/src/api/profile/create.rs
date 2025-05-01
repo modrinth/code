@@ -1,7 +1,7 @@
 //! Theseus profile management interface
 use crate::launcher::get_loader_version_from_profile;
 use crate::settings::Hooks;
-use crate::state::{LinkedData, ProfileInstallStage};
+use crate::state::{LauncherFeatureVersion, LinkedData, ProfileInstallStage};
 use crate::util::io::{self, canonicalize};
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
@@ -74,6 +74,7 @@ pub async fn profile_create(
     let mut profile = Profile {
         path: path.clone(),
         install_stage: ProfileInstallStage::NotInstalled,
+        launcher_feature_version: LauncherFeatureVersion::MOST_RECENT,
         name,
         icon_path: None,
         game_version,

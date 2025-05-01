@@ -95,7 +95,7 @@ impl actix_web::ResponseError for OAuthError {
             );
 
             if let Some(state) = self.state.as_ref() {
-                redirect_uri = format!("{}&state={}", redirect_uri, state);
+                redirect_uri = format!("{redirect_uri}&state={state}");
             }
 
             HttpResponse::Ok()

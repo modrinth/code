@@ -3,6 +3,7 @@
     windows_subsystem = "windows"
 )]
 
+use enumset::EnumSet;
 use theseus::prelude::*;
 use theseus::worlds::get_recent_worlds;
 
@@ -40,7 +41,7 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
-    let worlds = get_recent_worlds(4).await?;
+    let worlds = get_recent_worlds(4, EnumSet::all()).await?;
     for world in worlds {
         println!(
             "World: {:?}/{:?} played at {:?}: {:#?}",

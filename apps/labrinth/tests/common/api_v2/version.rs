@@ -399,18 +399,18 @@ impl ApiVersion for ApiV2 {
             ));
         }
         if let Some(featured) = featured {
-            query_string.push_str(&format!("&featured={}", featured));
+            query_string.push_str(&format!("&featured={featured}"));
         }
         if let Some(version_type) = version_type {
-            query_string.push_str(&format!("&version_type={}", version_type));
+            query_string.push_str(&format!("&version_type={version_type}"));
         }
         if let Some(limit) = limit {
             let limit = limit.to_string();
-            query_string.push_str(&format!("&limit={}", limit));
+            query_string.push_str(&format!("&limit={limit}"));
         }
         if let Some(offset) = offset {
             let offset = offset.to_string();
-            query_string.push_str(&format!("&offset={}", offset));
+            query_string.push_str(&format!("&offset={offset}"));
         }
 
         let req = test::TestRequest::get()
@@ -480,7 +480,7 @@ impl ApiVersion for ApiV2 {
     ) -> ServiceResponse {
         let ids = url_encode_json_serialized_vec(&version_ids);
         let request = test::TestRequest::get()
-            .uri(&format!("/v2/versions?ids={}", ids))
+            .uri(&format!("/v2/versions?ids={ids}"))
             .append_pat(pat)
             .to_request();
         self.call(request).await

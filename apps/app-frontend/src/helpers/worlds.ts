@@ -9,7 +9,12 @@ type BaseWorld = {
   name: string
   last_played?: string
   icon?: string
+  display_status: DisplayStatus
+  type: WorldType
 }
+
+export type WorldType = 'singleplayer' | 'server'
+export type DisplayStatus = 'normal' | 'hidden' | 'favorite'
 
 export type SingleplayerWorld = BaseWorld & {
   type: 'singleplayer'
@@ -70,8 +75,11 @@ export type ServerData = {
   renderedMotd?: string
 }
 
-export async function get_recent_worlds(limit: number): Promise<WorldWithProfile[]> {
-  return await invoke('plugin:worlds|get_recent_worlds', { limit })
+export async function get_recent_worlds(
+  limit: number,
+  displayStatuses?: DisplayStatus[],
+): Promise<WorldWithProfile[]> {
+  return await invoke('plugin:worlds|get_recent_worlds', { limit, displayStatuses })
 }
 
 export async function get_profile_worlds(path: string): Promise<World[]> {
@@ -83,6 +91,20 @@ export async function get_singleplayer_world(
   world: string,
 ): Promise<SingleplayerWorld> {
   return await invoke('plugin:worlds|get_singleplayer_world', { instance, world })
+}
+
+export async function set_world_display_status(
+  instance: string,
+  worldType: WorldType,
+  worldId: string,
+  displayStatus: DisplayStatus,
+): Promise<void> {
+  return await invoke('plugin:worlds|set_world_display_status', {
+    instance,
+    worldType,
+    worldId,
+    displayStatus,
+  })
 }
 
 export async function rename_world(
@@ -230,12 +252,14 @@ export async function refreshServers(
 
 export async function refreshWorld(worlds: World[], instancePath: string, worldPath: string) {
   const index = worlds.findIndex((w) => w.type === 'singleplayer' && w.path === worldPath)
+  const newWorld = await get_singleplayer_world(instancePath, worldPath)
   if (index !== -1) {
-    worlds[index] = await get_singleplayer_world(instancePath, worldPath)
-    sortWorlds(worlds)
+    worlds[index] = newWorld
   } else {
-    console.error(`Error refreshing world, could not find world at path ${worldPath}.`)
+    console.info(`Adding new world at path: ${worldPath}.`)
+    worlds.push(newWorld)
   }
+  sortWorlds(worlds)
 }
 
 export async function handleDefaultProfileUpdateEvent(

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT display_status\n            FROM attached_world_data\n            WHERE profile_path = $1 and world_type = $2 and world_id = $3\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "display_status",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "a2184fc5d62570aec0a15c0a8d628a597e90c2bf7ce5dc1b39edb6977e2f6da6"
+}

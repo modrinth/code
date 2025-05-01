@@ -60,7 +60,7 @@
         </button>
       </ButtonStyled>
     </div>
-    <FilterBar v-model="filters" :options="filterOptions" />
+    <FilterBar v-model="filters" :options="filterOptions" show-all-options />
     <div class="flex flex-col w-full gap-2">
       <WorldItem
         v-for="world in filteredWorlds"
@@ -225,6 +225,11 @@ const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
 await refreshAllWorlds()
 
 async function refreshServer(address: string) {
+  if (!serverData.value[address]) {
+    serverData.value[address] = {
+      refreshing: true,
+    }
+  }
   await refreshServerData(serverData.value[address], protocolVersion.value, address)
 }
 
@@ -263,9 +268,12 @@ async function addServer(server: ServerWorld) {
 async function editServer(server: ServerWorld) {
   const index = worlds.value.findIndex((w) => w.type === 'server' && w.index === server.index)
   if (index !== -1) {
+    const oldServer = worlds.value[index] as ServerWorld
     worlds.value[index] = server
     sortWorlds(worlds.value)
-    await refreshServer(server.address)
+    if (oldServer.address !== server.address) {
+      await refreshServer(server.address)
+    }
   } else {
     handleError(`Error refreshing server, refreshing all worlds`)
     await refreshAllWorlds()
@@ -349,26 +357,34 @@ const supportsQuickPlay = computed(() =>
 const filterOptions = computed(() => {
   const options: FilterBarOption[] = []
 
-  if (worlds.value.some((x) => x.type === 'singleplayer')) {
+  const hasServer = worlds.value.some((x) => x.type === 'server')
+
+  if (worlds.value.some((x) => x.type === 'singleplayer') && hasServer) {
     options.push({
       id: 'singleplayer',
       message: messages.singleplayer,
     })
-  }
-
-  if (worlds.value.some((x) => x.type === 'server')) {
     options.push({
       id: 'server',
       message: messages.server,
     })
+  }
 
-    // add available filter if there's any offline ("unavailable") servers
+  if (hasServer) {
+    // add available filter if there's any offline ("unavailable") servers AND there's any singleplayer worlds or available servers
     if (
       worlds.value.some(
         (x) =>
           x.type === 'server' &&
           !serverData.value[x.address]?.status &&
           !serverData.value[x.address]?.refreshing,
+      ) &&
+      worlds.value.some(
+        (x) =>
+          x.type === 'singleplayer' ||
+          (x.type === 'server' &&
+            serverData.value[x.address]?.status &&
+            !serverData.value[x.address]?.refreshing),
       )
     ) {
       options.push({

@@ -13,16 +13,17 @@ import {
 import { HeadingLink, GAME_MODES } from '@modrinth/ui'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import InstanceItem from '@/components/ui/world/InstanceItem.vue'
-import { watch, onMounted, onUnmounted, ref } from 'vue'
+import { watch, onMounted, onUnmounted, ref, computed } from 'vue'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
-import { useTheming } from '@/store/theme'
-import { kill } from '@/helpers/profile'
+import { useTheming } from '@/store/theme.ts'
+import { kill, run } from '@/helpers/profile'
 import { handleError } from '@/store/notifications'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_all } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
+import { handleSevereError } from '@/store/error'
 
 const props = defineProps<{
   recentInstances: GameInstance[]
@@ -54,7 +55,9 @@ type WorldJumpBackInItem = BaseJumpBackInItem & {
 
 type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
-watch(props.recentInstances, async () => {
+const showWorlds = computed(() => theme.getFeatureFlag('worlds_in_home'))
+
+watch([() => props.recentInstances, () => showWorlds.value], async () => {
   await populateJumpBackIn().catch(() => {
     console.error('Failed to populate jump back in')
   })
@@ -66,66 +69,71 @@ await populateJumpBackIn().catch(() => {
 
 async function populateJumpBackIn() {
   console.info('Repopulating jump back in...')
-  const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN)
 
   const worldItems: WorldJumpBackInItem[] = []
-  worlds.forEach((world) => {
-    const instance = props.recentInstances.find((instance) => instance.path === world.profile)
 
-    if (!instance || !world.last_played) {
-      return
-    }
+  if (showWorlds.value) {
+    const worlds = await get_recent_worlds(MAX_JUMP_BACK_IN, ['normal', 'favorite'])
 
-    worldItems.push({
-      type: 'world',
-      last_played: dayjs(world.last_played),
-      world: world,
-      instance: instance,
-    })
-  })
+    worlds.forEach((world) => {
+      const instance = props.recentInstances.find((instance) => instance.path === world.profile)
 
-  const servers: {
-    instancePath: string
-    address: string
-  }[] = worldItems
-    .filter((item) => item.world.type === 'server' && item.instance)
-    .map((item) => ({
-      instancePath: item.instance.path,
-      address: (item.world as ServerWorld).address,
-    }))
-
-  // fetch protocol versions for all unique MC versions with server worlds
-  const uniqueServerInstances = new Set<string>(servers.map((x) => x.instancePath))
-  await Promise.all(
-    [...uniqueServerInstances].map((path) => {
-      get_profile_protocol_version(path)
-        .then((protoVer) => (protocolVersions.value[path] = protoVer))
-        .catch(() => {
-          console.error(`Failed to get profile protocol for: ${path} `)
-        })
-    }),
-  )
-
-  // initialize server data
-  servers.forEach(({ address }) => {
-    if (!serverData.value[address]) {
-      serverData.value[address] = {
-        refreshing: true,
+      if (!instance || !world.last_played) {
+        return
       }
-    }
-  })
 
-  // fetch each server's data
-  await Promise.all(
-    servers.map(({ instancePath, address }) =>
-      refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
-    ),
-  )
+      worldItems.push({
+        type: 'world',
+        last_played: dayjs(world.last_played),
+        world: world,
+        instance: instance,
+      })
+    })
+
+    const servers: {
+      instancePath: string
+      address: string
+    }[] = worldItems
+      .filter((item) => item.world.type === 'server' && item.instance)
+      .map((item) => ({
+        instancePath: item.instance.path,
+        address: (item.world as ServerWorld).address,
+      }))
+
+    // fetch protocol versions for all unique MC versions with server worlds
+    const uniqueServerInstances = new Set<string>(servers.map((x) => x.instancePath))
+    await Promise.all(
+      [...uniqueServerInstances].map((path) =>
+        get_profile_protocol_version(path)
+          .then((protoVer) => (protocolVersions.value[path] = protoVer))
+          .catch(() => {
+            console.error(`Failed to get profile protocol for: ${path} `)
+          }),
+      ),
+    )
+
+    // initialize server data
+    servers.forEach(({ address }) => {
+      if (!serverData.value[address]) {
+        serverData.value[address] = {
+          refreshing: true,
+        }
+      }
+    })
+
+    // fetch each server's data
+    Promise.all(
+      servers.map(({ instancePath, address }) =>
+        refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address),
+      ),
+    )
+  }
 
   const instanceItems: InstanceJumpBackInItem[] = []
-  props.recentInstances.forEach((instance) => {
-    if (worldItems.some((item) => item.instance.path === instance.path) || !instance.last_played) {
-      return
+  for (const instance of props.recentInstances) {
+    const worldItem = worldItems.find((item) => item.instance.path === instance.path)
+    if ((worldItem && worldItem.last_played.isAfter(TWO_WEEKS_AGO)) || !instance.last_played) {
+      continue
     }
 
     instanceItems.push({
@@ -133,13 +141,13 @@ async function populateJumpBackIn() {
       last_played: dayjs(instance.last_played),
       instance: instance,
     })
-  })
+  }
 
   const items: JumpBackInItem[] = [...worldItems, ...instanceItems]
   items.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
-  jumpBackInItems.value = items.filter(
-    (item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO),
-  )
+  jumpBackInItems.value = items
+    .filter((item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO))
+    .slice(0, MAX_JUMP_BACK_IN)
 }
 
 async function refreshServer(address: string, instancePath: string) {
@@ -153,6 +161,18 @@ async function joinWorld(world: WorldWithProfile) {
   } else if (world.type === 'singleplayer') {
     await start_join_singleplayer_world(world.profile, world.path).catch(handleError)
   }
+}
+
+async function playInstance(instance: GameInstance) {
+  await run(instance.path)
+    .catch((err) => handleSevereError(err, { profilePath: instance.path }))
+    .finally(() => {
+      trackEvent('InstancePlay', {
+        loader: instance.loader,
+        game_version: instance.game_version,
+        source: 'WorldItem',
+      })
+    })
 }
 
 async function stopInstance(path: string) {
@@ -209,11 +229,7 @@ onUnmounted(() => {
 
 <template>
   <div v-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
-    <HeadingLink
-      v-if="(theme.featureFlags as Record<string, boolean>)['worlds_tab']"
-      to="/worlds"
-      class="mt-1"
-    >
+    <HeadingLink v-if="theme.getFeatureFlag('worlds_tab')" to="/worlds" class="mt-1">
       Jump back in
     </HeadingLink>
     <span
@@ -222,7 +238,7 @@ onUnmounted(() => {
     >
       Jump back in
     </span>
-    <div class="flex flex-col w-full gap-2">
+    <div class="grid-when-huge flex flex-col w-full gap-2">
       <template
         v-for="item in jumpBackInItems"
         :key="`${item.instance.path}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
@@ -246,7 +262,7 @@ onUnmounted(() => {
           :rendered-motd="
             item.world.type === 'server' ? serverData[item.world.address].renderedMotd : undefined
           "
-          :current-protocol="protocolVersions[item.instance.game_version]"
+          :current-protocol="protocolVersions[item.instance.path]"
           :game-mode="
             item.world.type === 'singleplayer' ? GAME_MODES[item.world.game_mode] : undefined
           "
@@ -259,11 +275,18 @@ onUnmounted(() => {
                 ? refreshServer(item.world.address, item.instance.path)
                 : {}
           "
+          @update="() => populateJumpBackIn()"
           @play="
             () => {
               currentProfile = item.instance.path
               currentWorld = getWorldIdentifier(item.world)
               joinWorld(item.world)
+            }
+          "
+          @play-instance="
+            () => {
+              currentProfile = item.instance.path
+              playInstance(item.instance)
             }
           "
           @stop="() => stopInstance(item.instance.path)"
@@ -273,3 +296,9 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
+<style scoped lang="scss">
+.grid-when-huge {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(670px, 1fr));
+}
+</style>

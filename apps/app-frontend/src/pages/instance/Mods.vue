@@ -22,7 +22,7 @@
           <FilterIcon class="text-secondary h-5 w-5 mr-1" />
           <button
             v-for="filter in filterOptions"
-            :key="filter"
+            :key="`content-filter-${filter.id}`"
             :class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
             @click="toggleArray(selectedFilters, filter.id)"
           >
@@ -47,7 +47,7 @@
               path: x.path,
               disabled: x.disabled,
               filename: x.file_name,
-              icon: x.icon,
+              icon: x.icon ?? undefined,
               title: x.name,
               data: x,
             }
@@ -156,7 +156,7 @@
             color-fill="text"
             hover-color-fill="text"
           >
-            <button class="w-max" :disabled="installing" @click="modpackVersionModal.show()">
+            <button class="w-max" :disabled="installing" @click="modpackVersionModal?.show()">
               <DownloadIcon /> Update pack
             </button>
           </ButtonStyled>
@@ -170,7 +170,7 @@
           >
             <button
               v-tooltip="`Update`"
-              :disabled="(item.data as any).updating"
+              :disabled="(item.data as ProjectListEntry).updating"
               @click="updateProject(item.data)"
             >
               <DownloadIcon />
@@ -276,6 +276,7 @@ import {
   RadialHeader,
   Toggle,
 } from '@modrinth/ui'
+import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -305,43 +306,18 @@ import { profile_listener } from '@/helpers/events.js'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import dayjs from 'dayjs'
+import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
+import type ContextMenu from '@/components/ui/ContextMenu.vue'
+import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 
-const props = defineProps({
-  instance: {
-    type: Object,
-    default() {
-      return {}
-    },
-  },
-  options: {
-    type: Object,
-    default() {
-      return {}
-    },
-  },
-  offline: {
-    type: Boolean,
-    default() {
-      return false
-    },
-  },
-  playing: {
-    type: Boolean,
-    default() {
-      return false
-    },
-  },
-  versions: {
-    type: Array,
-    required: true,
-  },
-  installed: {
-    type: Boolean,
-    default() {
-      return false
-    },
-  },
-})
+const props = defineProps<{
+  instance: GameInstance
+  options: InstanceType<typeof ContextMenu>
+  offline: boolean
+  playing: boolean
+  versions: Version[]
+  installed: boolean
+}>()
 
 type ProjectListEntryAuthor = {
   name: string
@@ -356,13 +332,15 @@ type ProjectListEntry = {
   author: ProjectListEntryAuthor | null
   version: string | null
   file_name: string
-  icon: string | null
+  icon: string | undefined
   disabled: boolean
   updateVersion?: string
   outdated: boolean
   updated: dayjs.Dayjs
   project_type: string
   id?: string
+  updating?: boolean
+  selected?: boolean
 }
 
 const isPackLocked = computed(() => {
@@ -375,17 +353,20 @@ const canUpdatePack = computed(() => {
 const exportModal = ref(null)
 
 const projects = ref<ProjectListEntry[]>([])
-const selectedFiles = ref([])
+const selectedFiles = ref<string[]>([])
 const selectedProjects = computed(() =>
   projects.value.filter((x) => selectedFiles.value.includes(x.file_name)),
 )
 
 const selectionMap = ref(new Map())
 
-const initProjects = async (cacheBehaviour?) => {
+const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
   const newProjects: ProjectListEntry[] = []
 
-  const profileProjects = await get_projects(props.instance.path, cacheBehaviour)
+  const profileProjects = (await get_projects(props.instance.path, cacheBehaviour)) as Record<
+    string,
+    ContentFile
+  >
   const fetchProjects = []
   const fetchVersions = []
 
@@ -397,21 +378,21 @@ const initProjects = async (cacheBehaviour?) => {
   }
 
   const [modrinthProjects, modrinthVersions] = await Promise.all([
-    await get_project_many(fetchProjects).catch(handleError),
-    await get_version_many(fetchVersions).catch(handleError),
+    (await get_project_many(fetchProjects).catch(handleError)) as Project[],
+    (await get_version_many(fetchVersions).catch(handleError)) as Version[],
   ])
 
   const [modrinthTeams, modrinthOrganizations] = await Promise.all([
-    await get_team_many(modrinthProjects.map((x) => x.team)).catch(handleError),
-    await get_organization_many(
+    (await get_team_many(modrinthProjects.map((x) => x.team)).catch(handleError)) as TeamMember[][],
+    (await get_organization_many(
       modrinthProjects.map((x) => x.organization).filter((x) => !!x),
-    ).catch(handleError),
+    ).catch(handleError)) as Organization[],
   ])
 
   for (const [path, file] of Object.entries(profileProjects)) {
     if (file.metadata) {
-      const project = modrinthProjects.find((x) => file.metadata.project_id === x.id)
-      const version = modrinthVersions.find((x) => file.metadata.version_id === x.id)
+      const project = modrinthProjects.find((x) => file.metadata?.project_id === x.id)
+      const version = modrinthVersions.find((x) => file.metadata?.version_id === x.id)
 
       if (project && version) {
         const org = project.organization
@@ -420,7 +401,7 @@ const initProjects = async (cacheBehaviour?) => {
 
         const team = modrinthTeams.find((x) => x[0].team_id === project.team)
 
-        let author: ProjectListEntryAuthor | null
+        let author: ProjectListEntryAuthor | null = null
         if (org) {
           author = {
             name: org.name,
@@ -429,13 +410,13 @@ const initProjects = async (cacheBehaviour?) => {
           }
         } else if (team) {
           const teamMember = team.find((x) => x.is_owner)
-          author = {
-            name: teamMember.user.username,
-            slug: teamMember.user.username,
-            type: 'user',
+          if (teamMember) {
+            author = {
+              name: teamMember.user.username,
+              slug: teamMember.user.username,
+              type: 'user',
+            }
           }
-        } else {
-          author = null
         }
 
         newProjects.push({
@@ -464,7 +445,7 @@ const initProjects = async (cacheBehaviour?) => {
       author: null,
       version: null,
       file_name: file.file_name,
-      icon: null,
+      icon: undefined,
       disabled: file.file_name.endsWith('.disabled'),
       outdated: false,
       updated: dayjs(0),
@@ -488,7 +469,7 @@ const initProjects = async (cacheBehaviour?) => {
 }
 await initProjects()
 
-const modpackVersionModal = ref(null)
+const modpackVersionModal = ref<InstanceType<typeof ModpackVersionModal> | null>()
 const installing = computed(() => props.instance.install_stage !== 'installed')
 
 const vintl = useVIntl()
@@ -513,7 +494,7 @@ const messages = defineMessages({
 const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
   const options: FilterOption[] = []
 
-  const frequency = projects.value.reduce((map, item) => {
+  const frequency = projects.value.reduce((map: Record<string, number>, item) => {
     map[item.project_type] = (map[item.project_type] || 0) + 1
     return map
   }, {})
@@ -544,7 +525,7 @@ const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
   return options
 })
 
-const selectedFilters = ref([])
+const selectedFilters = ref<string[]>([])
 const filteredProjects = computed(() => {
   const updatesFilter = selectedFilters.value.includes('updates')
   const disabledFilter = selectedFilters.value.includes('disabled')
@@ -571,7 +552,7 @@ watch(filterOptions, () => {
   }
 })
 
-function toggleArray(array, value) {
+function toggleArray<T>(array: T[], value: T) {
   if (array.includes(value)) {
     array.splice(array.indexOf(value), 1)
   } else {
@@ -581,7 +562,7 @@ function toggleArray(array, value) {
 
 const searchFilter = ref('')
 const selectAll = ref(false)
-const shareModal = ref(null)
+const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const ascending = ref(true)
 const sortColumn = ref('Name')
 const currentPage = ref(1)
@@ -622,7 +603,7 @@ const search = computed(() => {
 
 watch([sortColumn, ascending, selectedFilters.value, searchFilter], () => (currentPage.value = 1))
 
-const sortProjects = (filter) => {
+const sortProjects = (filter: string) => {
   if (sortColumn.value === filter) {
     ascending.value = !ascending.value
   } else {
@@ -640,7 +621,7 @@ const updateAll = async () => {
     }
   }
 
-  const paths = await update_all(props.instance.path).catch(handleError)
+  const paths = (await update_all(props.instance.path).catch(handleError)) as Record<string, string>
 
   for (const [oldVal, newVal] of Object.entries(paths)) {
     const index = projects.value.findIndex((x) => x.path === oldVal)
@@ -649,7 +630,7 @@ const updateAll = async () => {
 
     if (projects.value[index].updateVersion) {
       projects.value[index].version = projects.value[index].updateVersion.version_number
-      projects.value[index].updateVersion = null
+      projects.value[index].updateVersion = undefined
     }
   }
   for (const project of setProjects) {
@@ -664,15 +645,15 @@ const updateAll = async () => {
   })
 }
 
-const updateProject = async (mod) => {
+const updateProject = async (mod: ProjectListEntry) => {
   mod.updating = true
   await new Promise((resolve) => setTimeout(resolve, 0))
   mod.path = await update_project(props.instance.path, mod.path).catch(handleError)
   mod.updating = false
 
   mod.outdated = false
-  mod.version = mod.updateVersion.version_number
-  mod.updateVersion = null
+  mod.version = mod.updateVersion?.version_number
+  mod.updateVersion = undefined
 
   trackEvent('InstanceProjectUpdate', {
     loader: props.instance.loader,
@@ -683,15 +664,15 @@ const updateProject = async (mod) => {
   })
 }
 
-const locks = {}
+const locks: Record<string, string | null> = {}
 
-const toggleDisableMod = async (mod) => {
+const toggleDisableMod = async (mod: ProjectListEntry) => {
   // Use mod's id as the key for the lock. If mod doesn't have a unique id, replace `mod.id` with some unique property.
   const lock = locks[mod.file_name]
 
   while (lock) {
     await new Promise((resolve) => {
-      setTimeout((_) => resolve(), 100)
+      setTimeout((value: unknown) => resolve(value), 100)
     })
   }
 
@@ -716,20 +697,20 @@ const toggleDisableMod = async (mod) => {
   locks[mod.file_name] = null
 }
 
-const removeMod = async (mod) => {
+const removeMod = async (mod: ContentItem<ProjectListEntry>) => {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
   trackEvent('InstanceProjectRemove', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
-    id: mod.id,
-    name: mod.name,
-    project_type: mod.project_type,
+    id: mod.data.id,
+    name: mod.data.name,
+    project_type: mod.data.project_type,
   })
 }
 
-const copyModLink = async (mod) => {
+const copyModLink = async (mod: ContentItem<ProjectListEntry>) => {
   await navigator.clipboard.writeText(
     `https://modrinth.com/${mod.data.project_type}/${mod.data.slug}`,
   )
@@ -744,15 +725,15 @@ const deleteSelected = async () => {
 }
 
 const shareNames = async () => {
-  await shareModal.value.show(functionValues.value.map((x) => x.name).join('\n'))
+  await shareModal.value?.show(functionValues.value.map((x) => x.name).join('\n'))
 }
 
 const shareFileNames = async () => {
-  await shareModal.value.show(functionValues.value.map((x) => x.file_name).join('\n'))
+  await shareModal.value?.show(functionValues.value.map((x) => x.file_name).join('\n'))
 }
 
 const shareUrls = async () => {
-  await shareModal.value.show(
+  await shareModal.value?.show(
     functionValues.value
       .filter((x) => x.slug)
       .map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
@@ -761,7 +742,7 @@ const shareUrls = async () => {
 }
 
 const shareMarkdown = async () => {
-  await shareModal.value.show(
+  await shareModal.value?.show(
     functionValues.value
       .map((x) => {
         if (x.slug) {
@@ -826,15 +807,17 @@ const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
   await initProjects()
 })
 
-const unlistenProfiles = await profile_listener(async (event) => {
-  if (
-    event.profile_path_id === props.instance.path &&
-    event.event === 'synced' &&
-    props.instance.install_stage !== 'pack_installing'
-  ) {
-    await initProjects()
-  }
-})
+const unlistenProfiles = await profile_listener(
+  async (event: { event: string; profile_path_id: string }) => {
+    if (
+      event.profile_path_id === props.instance.path &&
+      event.event === 'synced' &&
+      props.instance.install_stage !== 'pack_installing'
+    ) {
+      await initProjects()
+    }
+  },
+)
 
 onUnmounted(() => {
   unlisten()

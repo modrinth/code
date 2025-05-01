@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, TimeZone, Utc};
 
+#[derive(Default)]
 pub struct JoinLogEntry {
     pub profile_path: String,
     pub host: String,

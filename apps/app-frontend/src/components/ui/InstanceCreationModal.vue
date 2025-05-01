@@ -1,5 +1,5 @@
 <template>
-  <ModalWrapper ref="modal" header="Create instance">
+  <ModalWrapper ref="modal" header="Creating an instance">
     <div class="modal-header">
       <Chips v-model="creationType" :items="['custom', 'from file', 'import from launcher']" />
     </div>

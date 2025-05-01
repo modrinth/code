@@ -155,7 +155,7 @@ import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
@@ -170,6 +170,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 dayjs.extend(relativeTime)
 
 const route = useRoute()
+const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 
@@ -246,6 +247,9 @@ async function install(version) {
         installed.value = true
         installedVersion.value = version
       }
+    },
+    (profile) => {
+      router.push(`/instance/${profile}`)
     },
   )
 }
