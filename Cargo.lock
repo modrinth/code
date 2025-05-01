@@ -9609,7 +9609,7 @@ name = "theseus_gui"
 version = "0.9.4"
 dependencies = [
  "chrono",
- "cocoa 0.25.0",
+ "cocoa 0.26.0",
  "daedalus",
  "dashmap 6.1.0",
  "either",
@@ -9619,7 +9619,7 @@ dependencies = [
  "opener",
  "os_info",
  "paste",
- "rand 0.8.5",
+ "rand 0.9.1",
  "serde",
  "serde_json",
  "serde_with",

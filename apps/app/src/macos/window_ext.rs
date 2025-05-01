@@ -371,7 +371,7 @@ pub fn setup_traffic_light_positioner<R: Runtime>(window: Window<R>) {
 
         let app_state = WindowState { window };
         let app_box = Box::into_raw(Box::new(app_state)) as *mut c_void;
-        let random_str: String = rand::thread_rng()
+        let random_str: String = rand::rng()
             .sample_iter(&Alphanumeric)
             .take(20)
             .map(char::from)
