@@ -1,5 +1,8 @@
 <template>
-  <div v-if="showAllOptions || options.length > 1" class="flex flex-wrap gap-1 items-center">
+  <div
+    v-if="(showAllOptions && options.length > 0) || options.length > 1"
+    class="flex flex-wrap gap-1 items-center"
+  >
     <FilterIcon class="text-secondary h-5 w-5 mr-1" />
     <button
       v-for="filter in options"
