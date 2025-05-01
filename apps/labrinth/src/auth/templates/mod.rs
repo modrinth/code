@@ -32,7 +32,7 @@ impl Display for ErrorPage {
         let html = include_str!("error.html")
             .replace("{{ code }}", &self.code.to_string())
             .replace("{{ message }}", &self.message);
-        write!(f, "{}", html)?;
+        write!(f, "{html}")?;
 
         Ok(())
     }

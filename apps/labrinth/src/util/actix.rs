@@ -34,7 +34,7 @@ impl AppendsMultipart for TestRequest {
         let (boundary, payload) = generate_multipart(data);
         self.append_header((
             "Content-Type",
-            format!("multipart/form-data; boundary={}", boundary),
+            format!("multipart/form-data; boundary={boundary}"),
         ))
         .set_payload(payload)
     }
@@ -62,17 +62,12 @@ pub fn generate_multipart(
 
         if let Some(filename) = &segment.filename {
             payload.extend_from_slice(
-                format!("; filename=\"{filename}\"", filename = filename)
-                    .as_bytes(),
+                format!("; filename=\"{filename}\"").as_bytes(),
             );
         }
         if let Some(content_type) = &segment.content_type {
             payload.extend_from_slice(
-                format!(
-                    "\r\nContent-Type: {content_type}",
-                    content_type = content_type
-                )
-                .as_bytes(),
+                format!("\r\nContent-Type: {content_type}").as_bytes(),
             );
         }
         payload.extend_from_slice(b"\r\n\r\n");
@@ -87,9 +82,7 @@ pub fn generate_multipart(
         }
         payload.extend_from_slice(b"\r\n");
     }
-    payload.extend_from_slice(
-        format!("--{boundary}--\r\n", boundary = boundary).as_bytes(),
-    );
+    payload.extend_from_slice(format!("--{boundary}--\r\n").as_bytes());
 
     (boundary, Bytes::from(payload))
 }

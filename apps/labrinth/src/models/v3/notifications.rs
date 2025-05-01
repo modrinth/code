@@ -80,10 +80,9 @@ impl From<DBNotification> for Notification {
                 } => (
                     "A project you follow has been updated!".to_string(),
                     format!(
-                        "The project {} has released a new version: {}",
-                        project_id, version_id
+                        "The project {project_id} has released a new version: {version_id}"
                     ),
-                    format!("/project/{}/version/{}", project_id, version_id),
+                    format!("/project/{project_id}/version/{version_id}"),
                     vec![],
                 ),
                 NotificationBody::TeamInvite {
@@ -93,8 +92,8 @@ impl From<DBNotification> for Notification {
                     ..
                 } => (
                     "You have been invited to join a team!".to_string(),
-                    format!("An invite has been sent for you to be {} of a team", role),
-                    format!("/project/{}", project_id),
+                    format!("An invite has been sent for you to be {role} of a team"),
+                    format!("/project/{project_id}"),
                     vec![
                         NotificationAction {
                             name: "Accept".to_string(),
@@ -117,10 +116,9 @@ impl From<DBNotification> for Notification {
                 } => (
                     "You have been invited to join an organization!".to_string(),
                     format!(
-                        "An invite has been sent for you to be {} of an organization",
-                        role
+                        "An invite has been sent for you to be {role} of an organization"
                     ),
-                    format!("/organization/{}", organization_id),
+                    format!("/organization/{organization_id}"),
                     vec![
                         NotificationAction {
                             name: "Accept".to_string(),
@@ -149,7 +147,7 @@ impl From<DBNotification> for Notification {
                         old_status.as_friendly_str(),
                         new_status.as_friendly_str()
                     ),
-                    format!("/project/{}", project_id),
+                    format!("/project/{project_id}"),
                     vec![],
                 ),
                 NotificationBody::ModeratorMessage {
@@ -160,9 +158,9 @@ impl From<DBNotification> for Notification {
                     "A moderator has sent you a message!".to_string(),
                     "Click on the link to read more.".to_string(),
                     if let Some(project_id) = project_id {
-                        format!("/project/{}", project_id)
+                        format!("/project/{project_id}")
                     } else if let Some(report_id) = report_id {
-                        format!("/project/{}", report_id)
+                        format!("/project/{report_id}")
                     } else {
                         "#".to_string()
                     },

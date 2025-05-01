@@ -9358,6 +9358,7 @@ dependencies = [
 name = "theseus_playground"
 version = "0.0.0"
 dependencies = [
+ "enumset",
  "theseus",
  "tokio",
  "tracing",

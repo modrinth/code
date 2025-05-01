@@ -178,8 +178,7 @@ pub async fn report_create(
                 || image.context.inner_id().is_some()
             {
                 return Err(ApiError::InvalidInput(format!(
-                    "Image {} is not unused and in the 'report' context",
-                    image_id
+                    "Image {image_id} is not unused and in the 'report' context"
                 )));
             }
 
@@ -198,8 +197,7 @@ pub async fn report_create(
             image_item::Image::clear_cache(image.id.into(), &redis).await?;
         } else {
             return Err(ApiError::InvalidInput(format!(
-                "Image {} could not be found",
-                image_id
+                "Image {image_id} could not be found"
             )));
         }
     }

@@ -28,7 +28,7 @@ async fn oauth_flow_happy_path() {
         } = &env.dummy.oauth_client_alpha;
 
         // Initiate authorization
-        let redirect_uri = format!("{}?foo=bar", base_redirect_uri);
+        let redirect_uri = format!("{base_redirect_uri}?foo=bar");
         let original_state = "1234";
         let resp = env
             .api
