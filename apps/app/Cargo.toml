@@ -8,7 +8,7 @@ edition = "2021"
 build = "build.rs"
 
 [build-dependencies]
-tauri-build = { version = "2.0.3", features = ["codegen"] }
+tauri-build = { version = "2.2.0", features = ["codegen"] }
 
 [dependencies]
 theseus = { path = "../../packages/app-lib", features = ["tauri"] }
@@ -17,7 +17,7 @@ serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_with = "3.0.0"
 
-tauri = { version = "2.1.1",  features = ["devtools", "macos-private-api", "protocol-asset", "unstable"] }
+tauri = { version = "2.5.1",  features = ["devtools", "macos-private-api", "protocol-asset", "unstable"] }
 tauri-plugin-window-state = "2.2.0"
 tauri-plugin-deep-link = "2.2.0"
 tauri-plugin-os = "2.2.0"
