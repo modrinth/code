@@ -1,13 +1,13 @@
 use crate::state::CacheBehaviour;
 use crate::{
+    LoadingBarType,
     event::{
-        emit::{emit_profile, init_loading},
         ProfilePayloadType,
+        emit::{emit_profile, init_loading},
     },
     pack::{self, install_from::generate_pack_from_version_id},
     profile::get,
     state::ProfileInstallStage,
-    LoadingBarType,
 };
 use futures::try_join;
 
@@ -24,9 +24,9 @@ pub async fn update_managed_modrinth_version(
     })?;
 
     let unmanaged_err = || {
-        crate::ErrorKind::InputError(
-            format!("Profile at {} is not a managed modrinth pack, or has been disconnected.", profile_path),
-        )
+        crate::ErrorKind::InputError(format!(
+            "Profile at {profile_path} is not a managed modrinth pack, or has been disconnected."
+        ))
     };
 
     // Extract modrinth pack information, if appropriate
@@ -58,9 +58,9 @@ pub async fn repair_managed_modrinth(profile_path: &str) -> crate::Result<()> {
     })?;
 
     let unmanaged_err = || {
-        crate::ErrorKind::InputError(
-            format!("Profile at {} is not a managed modrinth pack, or has been disconnected.", profile_path),
-        )
+        crate::ErrorKind::InputError(format!(
+            "Profile at {profile_path} is not a managed modrinth pack, or has been disconnected."
+        ))
     };
 
     // For repairing specifically, first we remove all installed projects (to ensure we do remove ones that aren't in the pack)

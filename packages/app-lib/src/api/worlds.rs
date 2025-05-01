@@ -1,12 +1,12 @@
 use crate::data::ModLoader;
 use crate::launcher::get_loader_version_from_profile;
 use crate::profile::get_full_path;
-use crate::state::{server_join_log, Profile, ProfileInstallStage};
+use crate::state::{Profile, ProfileInstallStage, server_join_log};
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::util::{io, server_ping};
-use crate::{launcher, Error, ErrorKind, Result, State};
+use crate::{Error, ErrorKind, Result, State, launcher};
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
@@ -286,7 +286,7 @@ async fn get_server_worlds_in_profile(
             continue;
         }
         let icon = server.icon.and_then(|icon| {
-            Url::parse(&format!("data:image/png;base64,{}", icon)).ok()
+            Url::parse(&format!("data:image/png;base64,{icon}")).ok()
         });
         let last_played = join_log
             .as_ref()
@@ -365,7 +365,7 @@ pub async fn backup_world(instance: &Path, world: &str) -> Result<u64> {
     let name_base = {
         let now = Local::now();
         let formatted_time = now.format("%Y-%m-%d_%H-%M-%S");
-        format!("{}_{}", formatted_time, world)
+        format!("{formatted_time}_{world}")
     };
     let output_path =
         backups_dir.join(find_available_name(&backups_dir, &name_base, ".zip"));
@@ -606,8 +606,8 @@ pub async fn remove_server_from_profile(
 }
 
 mod servers_data {
-    use crate::util::io;
     use crate::Result;
+    use crate::util::io;
     use serde::{Deserialize, Serialize};
     use std::path::Path;
 
@@ -671,8 +671,7 @@ pub async fn get_profile_protocol_version(
 ) -> Result<Option<i32>> {
     let mut profile = super::profile::get(profile).await?.ok_or_else(|| {
         ErrorKind::UnmanagedProfileError(format!(
-            "Could not find profile {}",
-            profile
+            "Could not find profile {profile}"
         ))
     })?;
     if profile.install_stage != ProfileInstallStage::Installed {
@@ -809,22 +808,21 @@ async fn resolve_server_address(
         return Ok((host.to_owned(), port));
     }
     let resolver = hickory_resolver::TokioResolver::builder_tokio()?.build();
-    Ok(match resolver
-        .srv_lookup(format!("_minecraft._tcp.{}", host))
-        .await
-    {
-        Err(e)
-            if e.proto()
-                .filter(|x| x.kind().is_no_records_found())
-                .is_some() =>
-        {
-            None
+    Ok(
+        match resolver.srv_lookup(format!("_minecraft._tcp.{host}")).await {
+            Err(e)
+                if e.proto()
+                    .filter(|x| x.kind().is_no_records_found())
+                    .is_some() =>
+            {
+                None
+            }
+            Err(e) => return Err(e.into()),
+            Ok(lookup) => lookup
+                .into_iter()
+                .next()
+                .map(|r| (r.target().to_string(), r.port())),
         }
-        Err(e) => return Err(e.into()),
-        Ok(lookup) => lookup
-            .into_iter()
-            .next()
-            .map(|r| (r.target().to_string(), r.port())),
-    }
-    .unwrap_or_else(|| (host.to_owned(), port)))
+        .unwrap_or_else(|| (host.to_owned(), port)),
+    )
 }

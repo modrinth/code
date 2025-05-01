@@ -9,9 +9,9 @@ use tokio::{
 };
 
 use crate::{
+    State,
     prelude::Credentials,
     util::io::{self, IOError},
-    State,
 };
 
 #[derive(Serialize, Debug)]
@@ -42,8 +42,8 @@ impl CensoredString {
     pub fn censor(mut s: String, credentials_set: &Vec<Credentials>) -> Self {
         let username = whoami::username();
         s = s
-            .replace(&format!("/{}/", username), "/{COMPUTER_USERNAME}/")
-            .replace(&format!("\\{}\\", username), "\\{COMPUTER_USERNAME}\\");
+            .replace(&format!("/{username}/"), "/{COMPUTER_USERNAME}/")
+            .replace(&format!("\\{username}\\"), "\\{COMPUTER_USERNAME}\\");
         for credentials in credentials_set {
             s = s
                 .replace(&credentials.access_token, "{MINECRAFT_ACCESS_TOKEN}")

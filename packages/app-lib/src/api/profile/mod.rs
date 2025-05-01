@@ -1,9 +1,9 @@
 //! Theseus profile management interface
 
+use crate::event::LoadingBarType;
 use crate::event::emit::{
     emit_loading, init_loading, loading_try_for_each_concurrent,
 };
-use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
@@ -12,10 +12,10 @@ use crate::state::{
     ProfileFile, ProfileInstallStage, ProjectType, SideType,
 };
 
-use crate::event::{emit::emit_profile, ProfilePayloadType};
+use crate::event::{ProfilePayloadType, emit::emit_profile};
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
-pub use crate::{state::Profile, State};
+pub use crate::{State, state::Profile};
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
 use serde_json::json;
@@ -470,8 +470,7 @@ pub async fn export_mrpack(
         state.io_semaphore.0.acquire().await?;
     let profile = get(profile_path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to export a nonexistent or unloaded profile at path {}!",
-            profile_path
+            "Tried to export a nonexistent or unloaded profile at path {profile_path}!"
         ))
     })?;
 
@@ -617,8 +616,7 @@ fn pack_get_relative_path(
         .strip_prefix(profile_path)
         .map_err(|_| {
             crate::ErrorKind::FSError(format!(
-                "Path {path:?} does not correspond to a profile",
-                path = path
+                "Path {path:?} does not correspond to a profile"
             ))
         })?
         .components()
@@ -656,8 +654,7 @@ pub async fn run_credentials(
     let settings = Settings::get(&state.pool).await?;
     let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to run a nonexistent or unloaded profile at path {}!",
-            path
+            "Tried to run a nonexistent or unloaded profile at path {path}!"
         ))
     })?;
 
@@ -753,8 +750,7 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
 
     let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to update playtime for a nonexistent or unloaded profile at path {}!",
-            path
+            "Tried to update playtime for a nonexistent or unloaded profile at path {path}!"
         ))
     })?;
     let updated_recent_playtime = profile.recent_time_played;
@@ -835,7 +831,7 @@ pub async fn create_mrpack_json(
             return Err(crate::ErrorKind::OtherError(
                 "Loader version mismatch".to_string(),
             )
-            .into())
+            .into());
         }
     };
     dependencies

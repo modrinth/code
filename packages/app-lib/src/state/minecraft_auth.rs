@@ -1202,5 +1202,5 @@ fn generate_oauth_challenge() -> String {
     let mut rng = rand::thread_rng();
 
     let bytes: Vec<u8> = (0..64).map(|_| rng.r#gen::<u8>()).collect();
-    bytes.iter().map(|byte| format!("{:02x}", byte)).collect()
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
