@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import type { ServerStatus, ServerWorld, World } from '@/helpers/worlds.ts'
-import { getWorldIdentifier, showWorldInFolder } from '@/helpers/worlds.ts'
+import {
+  set_world_display_status,
+  getWorldIdentifier,
+  showWorldInFolder,
+} from '@/helpers/worlds.ts'
 import { formatNumber } from '@modrinth/utils'
 import {
   IssuesIcon,
@@ -19,6 +23,7 @@ import {
   TrashIcon,
   UpdatedIcon,
   UserIcon,
+  XIcon,
 } from '@modrinth/assets'
 import { Avatar, ButtonStyled, commonMessages, OverflowMenu, SmartClickable } from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
@@ -35,7 +40,7 @@ const { formatMessage } = useVIntl()
 const router = useRouter()
 
 const emit = defineEmits<{
-  (e: 'play' | 'play-instance' | 'stop' | 'refresh' | 'edit' | 'delete'): void
+  (e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete'): void
 }>()
 
 const props = withDefaults(
@@ -150,6 +155,10 @@ const messages = defineMessages({
   worldInUse: {
     id: 'instance.worlds.world_in_use',
     defaultMessage: 'World is in use',
+  },
+  dontShowOnHome: {
+    id: 'instance.worlds.dont_show_on_home',
+    defaultMessage: `Don't show on Home`,
   },
 })
 </script>
@@ -381,6 +390,24 @@ const messages = defineMessages({
               },
               {
                 divider: true,
+                shown: !!instancePath,
+              },
+              {
+                id: 'dont-show-on-home',
+                shown: !!instancePath,
+                action: () => {
+                  set_world_display_status(
+                    instancePath,
+                    world.type,
+                    getWorldIdentifier(world),
+                    'hidden',
+                  ).then(() => {
+                    emit('update')
+                  })
+                },
+              },
+              {
+                divider: true,
                 shown: !instancePath,
               },
               {
@@ -419,6 +446,10 @@ const messages = defineMessages({
             </template>
             <template #refresh>
               <UpdatedIcon aria-hidden="true" /> {{ formatMessage(commonMessages.refreshButton) }}
+            </template>
+            <template #dont-show-on-home>
+              <XIcon aria-hidden="true" />
+              {{ formatMessage(messages.dontShowOnHome) }}
             </template>
             <template #delete>
               <TrashIcon aria-hidden="true" />

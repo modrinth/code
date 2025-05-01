@@ -57,7 +57,7 @@ type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
 const showWorlds = computed(() => theme.getFeatureFlag('worlds_in_home'))
 
-watch([props.recentInstances, showWorlds], async () => {
+watch([() => props.recentInstances, () => showWorlds.value], async () => {
   await populateJumpBackIn().catch(() => {
     console.error('Failed to populate jump back in')
   })
@@ -274,6 +274,7 @@ onUnmounted(() => {
                 ? refreshServer(item.world.address, item.instance.path)
                 : {}
           "
+          @update="() => populateJumpBackIn()"
           @play="
             () => {
               currentProfile = item.instance.path

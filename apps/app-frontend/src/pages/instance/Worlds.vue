@@ -268,9 +268,12 @@ async function addServer(server: ServerWorld) {
 async function editServer(server: ServerWorld) {
   const index = worlds.value.findIndex((w) => w.type === 'server' && w.index === server.index)
   if (index !== -1) {
+    const oldServer = worlds.value[index] as ServerWorld
     worlds.value[index] = server
     sortWorlds(worlds.value)
-    await refreshServer(server.address)
+    if (oldServer.address !== server.address) {
+      await refreshServer(server.address)
+    }
   } else {
     handleError(`Error refreshing server, refreshing all worlds`)
     await refreshAllWorlds()

@@ -153,7 +153,7 @@ onUnmounted(() => {
           •
           <span v-if="modpack" class="flex items-center gap-1 truncate text-secondary">
             <router-link
-              class="inline-flex items-center gap-1 truncate hover:underline text-secondary"
+              class="inline-flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
               :to="`/project/${modpack.id}`"
             >
               <Avatar :src="modpack.icon_url" size="16px" class="shrink-0" />
