@@ -25,7 +25,7 @@ pub async fn update_managed_modrinth_version(
 
     let unmanaged_err = || {
         crate::ErrorKind::InputError(
-            format!("Profile at {} is not a managed modrinth pack, or has been disconnected.", profile_path),
+            format!("Profile at {profile_path} is not a managed modrinth pack, or has been disconnected."),
         )
     };
 
@@ -59,7 +59,7 @@ pub async fn repair_managed_modrinth(profile_path: &str) -> crate::Result<()> {
 
     let unmanaged_err = || {
         crate::ErrorKind::InputError(
-            format!("Profile at {} is not a managed modrinth pack, or has been disconnected.", profile_path),
+            format!("Profile at {profile_path} is not a managed modrinth pack, or has been disconnected."),
         )
     };
 

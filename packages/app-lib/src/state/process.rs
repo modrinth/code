@@ -86,7 +86,7 @@ impl ProcessManager {
                 now.format("%Y-%m-%d %H:%M:%S")
             )
             .map_err(|e| IOError::with_path(e, &log_path))?;
-            writeln!(log_file, "# Profile: {} \n", profile_path)
+            writeln!(log_file, "# Profile: {profile_path} \n")
                 .map_err(|e| IOError::with_path(e, &log_path))?;
             writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
         }
@@ -318,7 +318,7 @@ impl Process {
                                         formatted_time,
                                         thread,
                                         if !logger.is_empty() {
-                                            format!("{}/", logger)
+                                            format!("{logger}/")
                                         } else {
                                             String::new()
                                         },
@@ -383,7 +383,7 @@ impl Process {
                                         formatted_time,
                                         thread,
                                         if !logger.is_empty() {
-                                            format!("{}/", logger)
+                                            format!("{logger}/")
                                         } else {
                                             String::new()
                                         },
@@ -659,10 +659,7 @@ impl Process {
         if log_path.exists() {
             if let Err(e) = Process::append_to_log_file(
                 &log_path,
-                &format!(
-                    "\n# Process exited with status: {}\n",
-                    mc_exit_status
-                ),
+                &format!("\n# Process exited with status: {mc_exit_status}\n"),
             ) {
                 tracing::warn!(
                     "Failed to write exit status to log file: {}",

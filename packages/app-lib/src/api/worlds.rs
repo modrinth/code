@@ -82,8 +82,8 @@ impl WorldType {
         }
     }
 
-    pub fn from_str(s: &str) -> Self {
-        match s {
+    pub fn from_string(string: &str) -> Self {
+        match string {
             "singleplayer" => Self::Singleplayer,
             "server" => Self::Server,
             _ => Self::Singleplayer,
@@ -110,8 +110,8 @@ impl DisplayStatus {
         }
     }
 
-    pub fn from_str(s: &str) -> Self {
-        match s {
+    pub fn from_string(string: &str) -> Self {
+        match string {
             "normal" => Self::Normal,
             "hidden" => Self::Hidden,
             "favorite" => Self::Favorite,
@@ -397,7 +397,7 @@ async fn get_server_worlds_in_profile(
             continue;
         }
         let icon = server.icon.and_then(|icon| {
-            Url::parse(&format!("data:image/png;base64,{}", icon)).ok()
+            Url::parse(&format!("data:image/png;base64,{icon}")).ok()
         });
         let last_played = join_log
             .as_ref()
@@ -499,7 +499,7 @@ pub async fn backup_world(instance: &Path, world: &str) -> Result<u64> {
     let name_base = {
         let now = Local::now();
         let formatted_time = now.format("%Y-%m-%d_%H-%M-%S");
-        format!("{}_{}", formatted_time, world)
+        format!("{formatted_time}_{world}")
     };
     let output_path =
         backups_dir.join(find_available_name(&backups_dir, &name_base, ".zip"));
@@ -805,8 +805,7 @@ pub async fn get_profile_protocol_version(
 ) -> Result<Option<i32>> {
     let mut profile = super::profile::get(profile).await?.ok_or_else(|| {
         ErrorKind::UnmanagedProfileError(format!(
-            "Could not find profile {}",
-            profile
+            "Could not find profile {profile}"
         ))
     })?;
     if profile.install_stage != ProfileInstallStage::Installed {
@@ -943,22 +942,21 @@ async fn resolve_server_address(
         return Ok((host.to_owned(), port));
     }
     let resolver = hickory_resolver::TokioResolver::builder_tokio()?.build();
-    Ok(match resolver
-        .srv_lookup(format!("_minecraft._tcp.{}", host))
-        .await
-    {
-        Err(e)
-            if e.proto()
-                .filter(|x| x.kind().is_no_records_found())
-                .is_some() =>
-        {
-            None
+    Ok(
+        match resolver.srv_lookup(format!("_minecraft._tcp.{host}")).await {
+            Err(e)
+                if e.proto()
+                    .filter(|x| x.kind().is_no_records_found())
+                    .is_some() =>
+            {
+                None
+            }
+            Err(e) => return Err(e.into()),
+            Ok(lookup) => lookup
+                .into_iter()
+                .next()
+                .map(|r| (r.target().to_string(), r.port())),
         }
-        Err(e) => return Err(e.into()),
-        Ok(lookup) => lookup
-            .into_iter()
-            .next()
-            .map(|r| (r.target().to_string(), r.port())),
-    }
-    .unwrap_or_else(|| (host.to_owned(), port)))
+        .unwrap_or_else(|| (host.to_owned(), port)),
+    )
 }
