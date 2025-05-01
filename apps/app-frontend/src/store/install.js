@@ -56,7 +56,13 @@ export const install = async (
     const packs = await list().catch(handleError)
 
     if (packs.length === 0 || !packs.find((pack) => pack.linked_data?.project_id === project.id)) {
-      await packInstall(project.id, version, project.title, project.icon_url, createInstanceCallback).catch(handleError)
+      await packInstall(
+        project.id,
+        version,
+        project.title,
+        project.icon_url,
+        createInstanceCallback,
+      ).catch(handleError)
 
       trackEvent('PackInstall', {
         id: project.id,

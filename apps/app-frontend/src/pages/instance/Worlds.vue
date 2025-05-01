@@ -357,7 +357,7 @@ const supportsQuickPlay = computed(() =>
 const filterOptions = computed(() => {
   const options: FilterBarOption[] = []
 
-  const hasServer = worlds.value.some((x) => x.type === 'server');
+  const hasServer = worlds.value.some((x) => x.type === 'server')
 
   if (worlds.value.some((x) => x.type === 'singleplayer') && hasServer) {
     options.push({

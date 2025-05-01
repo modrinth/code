@@ -75,7 +75,10 @@ export type ServerData = {
   renderedMotd?: string
 }
 
-export async function get_recent_worlds(limit: number, displayStatuses?: DisplayStatus[]): Promise<WorldWithProfile[]> {
+export async function get_recent_worlds(
+  limit: number,
+  displayStatuses?: DisplayStatus[],
+): Promise<WorldWithProfile[]> {
   return await invoke('plugin:worlds|get_recent_worlds', { limit, displayStatuses })
 }
 
@@ -96,7 +99,12 @@ export async function set_world_display_status(
   worldId: string,
   displayStatus: DisplayStatus,
 ): Promise<void> {
-  return await invoke('plugin:worlds|set_world_display_status', { instance, worldType, worldId, displayStatus })
+  return await invoke('plugin:worlds|set_world_display_status', {
+    instance,
+    worldType,
+    worldId,
+    displayStatus,
+  })
 }
 
 export async function rename_world(

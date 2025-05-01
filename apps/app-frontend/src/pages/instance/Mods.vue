@@ -363,7 +363,10 @@ const selectionMap = ref(new Map())
 const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
   const newProjects: ProjectListEntry[] = []
 
-  const profileProjects = await get_projects(props.instance.path, cacheBehaviour) as Record<string, ContentFile>
+  const profileProjects = (await get_projects(props.instance.path, cacheBehaviour)) as Record<
+    string,
+    ContentFile
+  >
   const fetchProjects = []
   const fetchVersions = []
 
@@ -375,15 +378,15 @@ const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
   }
 
   const [modrinthProjects, modrinthVersions] = await Promise.all([
-    await get_project_many(fetchProjects).catch(handleError) as Project[],
-    await get_version_many(fetchVersions).catch(handleError) as Version[],
+    (await get_project_many(fetchProjects).catch(handleError)) as Project[],
+    (await get_version_many(fetchVersions).catch(handleError)) as Version[],
   ])
 
   const [modrinthTeams, modrinthOrganizations] = await Promise.all([
-    await get_team_many(modrinthProjects.map((x) => x.team)).catch(handleError) as TeamMember[][],
-    await get_organization_many(
+    (await get_team_many(modrinthProjects.map((x) => x.team)).catch(handleError)) as TeamMember[][],
+    (await get_organization_many(
       modrinthProjects.map((x) => x.organization).filter((x) => !!x),
-    ).catch(handleError) as Organization[],
+    ).catch(handleError)) as Organization[],
   ])
 
   for (const [path, file] of Object.entries(profileProjects)) {
@@ -618,7 +621,7 @@ const updateAll = async () => {
     }
   }
 
-  const paths = await update_all(props.instance.path).catch(handleError) as Record<string, string>
+  const paths = (await update_all(props.instance.path).catch(handleError)) as Record<string, string>
 
   for (const [oldVal, newVal] of Object.entries(paths)) {
     const index = projects.value.findIndex((x) => x.path === oldVal)
@@ -804,18 +807,17 @@ const unlisten = await getCurrentWebview().onDragDropEvent(async (event) => {
   await initProjects()
 })
 
-const unlistenProfiles = await profile_listener(async (event: {
-  event: string
-  profile_path_id: string
-}) => {
-  if (
-    event.profile_path_id === props.instance.path &&
-    event.event === 'synced' &&
-    props.instance.install_stage !== 'pack_installing'
-  ) {
-    await initProjects()
-  }
-})
+const unlistenProfiles = await profile_listener(
+  async (event: { event: string; profile_path_id: string }) => {
+    if (
+      event.profile_path_id === props.instance.path &&
+      event.event === 'synced' &&
+      props.instance.install_stage !== 'pack_installing'
+    ) {
+      await initProjects()
+    }
+  },
+)
 
 onUnmounted(() => {
   unlisten()

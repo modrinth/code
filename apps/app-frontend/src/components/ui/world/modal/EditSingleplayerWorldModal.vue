@@ -4,8 +4,8 @@ import { Avatar, ButtonStyled, commonMessages } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import type { GameInstance } from '@/helpers/types'
-import type { DisplayStatus, SingleplayerWorld } from '@/helpers/worlds.ts';
-import { set_world_display_status , rename_world, reset_world_icon } from '@/helpers/worlds.ts'
+import type { DisplayStatus, SingleplayerWorld } from '@/helpers/worlds.ts'
+import { set_world_display_status, rename_world, reset_world_icon } from '@/helpers/worlds.ts'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { handleError } from '@/store/notifications'
 import HideFromHomeOption from '@/components/ui/world/modal/HideFromHomeOption.vue'
@@ -29,7 +29,7 @@ const removeIcon = ref(false)
 const displayStatus = ref<DisplayStatus>('normal')
 const hideFromHome = ref(false)
 
-const newDisplayStatus = computed(() => hideFromHome.value ? 'hidden' : 'normal')
+const newDisplayStatus = computed(() => (hideFromHome.value ? 'hidden' : 'normal'))
 
 async function saveWorld() {
   await rename_world(props.instance.path, path.value, name.value).catch(handleError)
@@ -102,7 +102,7 @@ const messages = defineMessages({
         class="w-full"
         autocomplete="off"
       />
-      <HideFromHomeOption v-model="hideFromHome" class="mt-3"/>
+      <HideFromHomeOption v-model="hideFromHome" class="mt-3" />
     </div>
     <div class="flex gap-2 mt-4">
       <ButtonStyled color="brand">

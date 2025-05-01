@@ -173,7 +173,7 @@ async function install() {
     },
     (profile) => {
       router.push(`/instance/${profile}`)
-    }
+    },
   )
 }
 

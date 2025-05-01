@@ -4,12 +4,11 @@ import { computed } from 'vue'
 import { Checkbox } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
-const value = defineModel<boolean>({ required: true });
+const value = defineModel<boolean>({ required: true })
 
-const labelMessage = defineMessage(
-  {
+const labelMessage = defineMessage({
   id: 'instance.edit-world.hide-from-home',
-    defaultMessage: `Hide from the Home page`,
+  defaultMessage: `Hide from the Home page`,
 })
 
 const label = computed(() => formatMessage(labelMessage))

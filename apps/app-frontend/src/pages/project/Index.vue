@@ -250,7 +250,7 @@ async function install(version) {
     },
     (profile) => {
       router.push(`/instance/${profile}`)
-    }
+    },
   )
 }
 

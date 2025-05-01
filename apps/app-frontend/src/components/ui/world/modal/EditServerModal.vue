@@ -8,7 +8,8 @@ import {
   type ServerPackStatus,
   edit_server_in_profile,
   type ServerWorld,
-  set_world_display_status, type DisplayStatus
+  set_world_display_status,
+  type DisplayStatus,
 } from '@/helpers/worlds.ts'
 import { defineMessage, useVIntl } from '@vintl/vintl'
 import { handleError } from '@/store/notifications'
@@ -34,7 +35,7 @@ const index = ref<number>(0)
 const displayStatus = ref<DisplayStatus>('normal')
 const hideFromHome = ref(false)
 
-const newDisplayStatus = computed(() => hideFromHome.value ? 'hidden' : 'normal')
+const newDisplayStatus = computed(() => (hideFromHome.value ? 'hidden' : 'normal'))
 
 async function saveServer() {
   const serverName = name.value ? name.value : address.value

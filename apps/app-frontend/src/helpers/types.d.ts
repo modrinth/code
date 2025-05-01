@@ -49,34 +49,30 @@ type LinkedData = {
 type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
 
 type ContentFile = {
-  hash: string;
-  file_name: string;
-  size: number;
-  metadata?: FileMetadata;
-  update_version_id?: string;
-  project_type: ContentFileProjectType;
+  hash: string
+  file_name: string
+  size: number
+  metadata?: FileMetadata
+  update_version_id?: string
+  project_type: ContentFileProjectType
 }
 
 type FileMetadata = {
-  project_id: string;
-  version_id: string;
+  project_id: string
+  version_id: string
 }
 
-type ContentFileProjectType =
-  | "mod"
-  | "datapack"
-  | "resourcepack"
-  | "shaderpack";
+type ContentFileProjectType = 'mod' | 'datapack' | 'resourcepack' | 'shaderpack'
 
 type CacheBehaviour =
   // Serve expired data. If fetch fails / launcher is offline, errors are ignored
-  | "stale_while_revalidate_skip_offline"
+  | 'stale_while_revalidate_skip_offline'
   // Serve expired data, revalidate in background
-  | "stale_while_revalidate"
+  | 'stale_while_revalidate'
   // Must revalidate if data is expired
-  | "must_revalidate"
+  | 'must_revalidate'
   // Ignore cache- always fetch updated data from origin
-  | "bypass";
+  | 'bypass'
 
 type MemorySettings = {
   maximum: number
