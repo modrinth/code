@@ -12,7 +12,7 @@ use thiserror::Error;
 /// can only represent up to 11 character base62 strings
 #[inline]
 pub fn random_base62(n: usize) -> u64 {
-    random_base62_rng(&mut rand::rng(), n)
+    random_base62_rng(&mut rand::thread_rng(), n)
 }
 
 /// Generates a random 64 bit integer that is exactly `n` characters
@@ -35,7 +35,7 @@ pub fn random_base62_rng_range<R: rand::RngCore>(
     assert!(n_min > 0 && n_max <= 11 && n_min <= n_max);
     // random_range is [low, high): max value is `MULTIPLES[n] - 1`,
     // which is n characters long when encoded
-    rng.random_range(MULTIPLES[n_min - 1]..MULTIPLES[n_max])
+    rng.gen_range(MULTIPLES[n_min - 1]..MULTIPLES[n_max])
 }
 
 const MULTIPLES: [u64; 12] = [

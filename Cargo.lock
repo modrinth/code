@@ -482,7 +482,7 @@ dependencies = [
  "chrono",
  "either",
  "lazy_static",
- "rand 0.9.1",
+ "rand 0.8.5",
  "serde",
  "serde_bytes",
  "serde_cbor",
