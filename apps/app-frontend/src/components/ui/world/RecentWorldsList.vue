@@ -130,9 +130,10 @@ async function populateJumpBackIn() {
   }
 
   const instanceItems: InstanceJumpBackInItem[] = []
-  props.recentInstances.forEach((instance) => {
-    if (worldItems.some((item) => item.instance.path === instance.path) || !instance.last_played) {
-      return
+  for (const instance of props.recentInstances) {
+    const worldItem = worldItems.find((item) => item.instance.path === instance.path)
+    if ((worldItem && worldItem.last_played.isAfter(TWO_WEEKS_AGO)) || !instance.last_played) {
+      continue
     }
 
     instanceItems.push({
@@ -140,13 +141,13 @@ async function populateJumpBackIn() {
       last_played: dayjs(instance.last_played),
       instance: instance,
     })
-  })
+  }
 
   const items: JumpBackInItem[] = [...worldItems, ...instanceItems]
   items.sort((a, b) => dayjs(b.last_played).diff(dayjs(a.last_played)))
-  jumpBackInItems.value = items.filter(
-    (item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO),
-  ).slice(0, MAX_JUMP_BACK_IN);
+  jumpBackInItems.value = items
+    .filter((item, index) => index < MIN_JUMP_BACK_IN || item.last_played.isAfter(TWO_WEEKS_AGO))
+    .slice(0, MAX_JUMP_BACK_IN)
 }
 
 async function refreshServer(address: string, instancePath: string) {
@@ -237,7 +238,7 @@ onUnmounted(() => {
     >
       Jump back in
     </span>
-    <div class="flex flex-col w-full gap-2">
+    <div class="grid-when-huge flex flex-col w-full gap-2">
       <template
         v-for="item in jumpBackInItems"
         :key="`${item.instance.path}-${item.type === 'world' ? getWorldIdentifier(item.world) : 'instance'}`"
@@ -282,10 +283,12 @@ onUnmounted(() => {
               joinWorld(item.world)
             }
           "
-          @play-instance="() => {
-            currentProfile = item.instance.path
-            playInstance(item.instance)
-          }"
+          @play-instance="
+            () => {
+              currentProfile = item.instance.path
+              playInstance(item.instance)
+            }
+          "
           @stop="() => stopInstance(item.instance.path)"
         />
         <InstanceItem v-else :instance="item.instance" />
@@ -293,3 +296,11 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
+<style scoped lang="scss">
+@media (min-width: 1900px) {
+  .grid-when-huge {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(670px, 1fr));
+  }
+}
+</style>
